@@ -9,6 +9,11 @@ public class CityEditor : EditorWindow
     // The tag of all houses as defined in the house preftab.
     public string houseTag = "House";
 
+    // The tag of all edges as defined in the edge preftab.
+    public string edgeTag = "Edge";
+
+    // The relative path to the line preftab.
+    public string linePreftabPath = "Assets/Prefabs/Line.prefab";
     // The relative path to the house preftab.
     const string housePrefabPath = "Assets/Prefabs/House.prefab";
 
@@ -38,43 +43,109 @@ public class CityEditor : EditorWindow
                 Delete();
                 break;
             default:
-                // Debug.LogError("Unexpected action selection");
+                // Debug.LogError("Unexpected action selection.\n");
                 break;
         }
     }
 
     private void Delete()
     {
-        GameObject[] houses = GameObject.FindGameObjectsWithTag(houseTag);
-        Debug.Log("Found houses: " + houses.Length);
-        foreach (GameObject house in houses)
+        DeleteByTag(houseTag);
+        DeleteByTag(edgeTag);
+    }
+
+    private void DeleteByTag(string tag)
+    {
+        GameObject[] objects = GameObject.FindGameObjectsWithTag(tag);
+        Debug.Log("Deleting objects: " + objects.Length + "\n");
+        foreach (GameObject o in objects)
         {
-            DestroyImmediate(house);
+            DestroyImmediate(o);
         }
     }
 
     private void Create()
     {
         GameObject housePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(housePrefabPath);
+        GameObject linePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(linePreftabPath);
         if (housePrefab == null)
         {
-            Debug.LogError(housePrefabPath + " does not exist.");
+            Debug.LogError(housePrefabPath + " does not exist.\n");
+        }
+        else if (linePrefab == null)
+        {
+            Debug.LogError(linePreftabPath + " does not exist.\n");
         }
         else
         {
-            const int rows = 100;
+            const int rows = 4;
             const int columns = rows;
+            const float epsilon = 0.01f;
 
+            int count = 0;
             for (int r = 1; r <= rows; r++)
             {
+                GameObject previousHouse = null;
                 for (int c = 1; c <= columns; c++)
                 {
+                    count++;
                     GameObject house = (GameObject)PrefabUtility.InstantiatePrefab(housePrefab);
+                    house.name = house.name + " " + count;
+
+                    float width   = UnityEngine.Random.Range(0.0F + epsilon, 1.0F);
+                    float breadth = UnityEngine.Random.Range(0.0F + epsilon, 1.0F);
+                    float height  = UnityEngine.Random.Range(0.0F + epsilon, 1.0F);
+                    house.transform.localScale = new Vector3(width, height, breadth);
+
                     house.transform.position = new Vector3(r + r*0.3f, 0f, c + c*0.3f);
+                    Debug.Log("house name: " + house.name + "\n");
+                    Debug.Log("house position: " + house.transform.position + "\n");
+                    {
+                        Renderer m_ObjectRenderer;
+                        //Fetch the GameObject's Renderer component
+                        m_ObjectRenderer = house.GetComponent<Renderer>();
+                        //Change the GameObject's Material Color to red
+                        //m_ObjectRenderer.material.color = Color.red;
+                        Debug.Log("house size: " + m_ObjectRenderer.bounds.size + "\n");
+                    }
+
+                    if (previousHouse != null)
+                    {
+                        drawLine(previousHouse, house, linePrefab);
+                    }
+                    previousHouse = house;
                 }
             }
             // Undo.RegisterCreatedObjectUndo(house, "Create city");
         }
+    }
+
+    private void drawLine(GameObject from, GameObject to, GameObject linePrefab)
+    {
+        const float above = 4f;
+        
+        GameObject line = (GameObject)PrefabUtility.InstantiatePrefab(linePrefab);
+        LineRenderer renderer = line.GetComponent<LineRenderer>();
+
+        renderer.sortingLayerName = "OnTop";
+        renderer.sortingOrder = 5;
+        renderer.positionCount = 4; // number of vertices
+
+        var points = new Vector3[renderer.positionCount];
+        // starting position
+        points[0] = from.transform.position;
+        // position above starting position
+        points[1] = from.transform.position;
+        points[1].y += above;
+        // position above ending position
+        points[2] = to.transform.position;
+        points[2].y += above;
+        // ending position
+        points[3] = to.transform.position;
+        renderer.SetPositions(points);
+
+        //renderer.SetWidth(0.5f, 0.5f);
+        renderer.useWorldSpace = true;
     }
 
     /*
