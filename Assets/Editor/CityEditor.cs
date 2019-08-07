@@ -87,6 +87,9 @@ public class CityEditor : EditorWindow
             const int rows = 4;
             const int columns = rows;
             const float epsilon = 0.01f;
+            // the distance of the edges relative to the houses; the maximal height of
+            // a house is 1.0
+            const float above = orientation * (1f / 2.0f);
 
             int count = 0;
             for (int r = 1; r <= rows; r++)
@@ -117,7 +120,7 @@ public class CityEditor : EditorWindow
 
                     if (previousHouse != null)
                     {
-                        drawLine(previousHouse, house, linePrefab);
+                        drawLine(previousHouse, house, linePrefab, above);
                     }
                     previousHouse = house;
                 }
@@ -126,9 +129,8 @@ public class CityEditor : EditorWindow
         }
     }
 
-    private void drawLine(GameObject from, GameObject to, GameObject linePrefab)
+    private void drawLine(GameObject from, GameObject to, GameObject linePrefab, float above)
     {
-        const float above = orientation * 4f;
         
         GameObject line = (GameObject)PrefabUtility.InstantiatePrefab(linePrefab);
         LineRenderer renderer = line.GetComponent<LineRenderer>();
