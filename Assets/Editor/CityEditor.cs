@@ -17,6 +17,12 @@ public class CityEditor : EditorWindow
     // The relative path to the house preftab.
     const string housePrefabPath = "Assets/Prefabs/House.prefab";
 
+    // orientation of the edges; 
+    // if -1, the edges are drawn below the houses;
+    // if 1, the edges are drawn above the houses;
+    // use either -1 or 1
+    const float orientation = -1f;
+
     [MenuItem("Window/City Editor")]
     // This method will be called when the user selects the menu item.
     // Such methods must be static and void. They can have any name.
@@ -122,7 +128,7 @@ public class CityEditor : EditorWindow
 
     private void drawLine(GameObject from, GameObject to, GameObject linePrefab)
     {
-        const float above = 4f;
+        const float above = orientation * 4f;
         
         GameObject line = (GameObject)PrefabUtility.InstantiatePrefab(linePrefab);
         LineRenderer renderer = line.GetComponent<LineRenderer>();
