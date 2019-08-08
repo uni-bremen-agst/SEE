@@ -121,8 +121,9 @@ public class CityEditor : EditorWindow
         }
         else
         {
-            const int rows = 4;
-            const int columns = rows;
+            const int numberOfNodes = 1000;
+            int rows = (int)Mathf.Sqrt(numberOfNodes);
+            int columns = rows;
             const float epsilon = 0.01f;
 
             int count = 0;
@@ -152,8 +153,10 @@ public class CityEditor : EditorWindow
                     }
                     nodes.Add(house);
                 }
+                Debug.Log("Created " + r + "/" + rows + " rows of buildings.\n");
             }
-        }
+            Debug.Log("Created city with " + numberOfNodes + " buildings.\n");
+        } 
     }
 
     private void LoadEdges()
@@ -169,16 +172,22 @@ public class CityEditor : EditorWindow
             // the distance of the edges relative to the houses; the maximal height of
             // a house is 1.0
             const float above = orientation * (1f / 2.0f);
-            const int numberOfEdgePerNode = 10;
+            const int numberOfEdgePerNode = 2;
+            int totalEdges = nodes.Count * numberOfEdgePerNode;
 
-            for (int i = 1; i <= nodes.Count * numberOfEdgePerNode; i++)
+            for (int i = 1; i <= totalEdges; i++)
             {
                 // pick two nodes randomly
                 int start = UnityEngine.Random.Range(0, nodes.Count);
                 int end = UnityEngine.Random.Range(0, nodes.Count);
                 GameObject edge = drawLine(nodes[start], nodes[end], linePrefab, above);
                 edges.Add(edge);
+                if (totalEdges % 100 == 0)
+                {
+                    Debug.Log("Created " + i + "/" + totalEdges + " rows of buildings.\n");
+                }
             }
+            Debug.Log("Created city with " + totalEdges + " connections.\n");
         }
     }
 
