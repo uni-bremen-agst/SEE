@@ -50,36 +50,30 @@ public class CityEditor : EditorWindow
                 break;
             case 1:
                 Debug.Log(actionLabels[1]);
-                DeleteCity();
+                graph.Delete();
                 break;
             case 2:
                 Debug.Log(actionLabels[2]);
-                DeleteCity();
+                graph.Delete();
                 LoadNodes();
                 break;
             case 3:
                 Debug.Log(actionLabels[3]);
-                DeleteCity();
+                graph.Delete();
                 break;
             case 4:
                 Debug.Log(actionLabels[4]);
-                DeleteEdges();
+                graph.DeleteEdges();
                 LoadEdges();
                 break;
             case 5:
                 Debug.Log(actionLabels[5]);
-                DeleteEdges();
+                graph.DeleteEdges();
                 break;
             default:
                 // Debug.LogError("Unexpected action selection.\n");
                 break;
         }
-    }
-
-    private void DeleteCity()
-    {
-        DeleteNodes();
-        DeleteEdges();
     }
 
     private void LoadCity()
@@ -88,31 +82,7 @@ public class CityEditor : EditorWindow
         LoadEdges();
     }
 
-    // The list of graph nodes loaded.
-    private List<GameObject> nodes = new List<GameObject>();
-
-    // The list of graph edges loaded.
-    private List<GameObject> edges = new List<GameObject>();
-
-    private void DeleteNodes()
-    {
-        DeleteGameObjects(nodes);
-        nodes = new List<GameObject>();
-    }
-
-    private void DeleteEdges()
-    {
-        DeleteGameObjects(edges);
-        edges = new List<GameObject>();
-    }
-
-    private void DeleteGameObjects(List<GameObject> objects)
-    {
-        foreach (GameObject o in objects)
-        {
-            DestroyImmediate(o);
-        }
-    }
+    private Graph graph = new Graph();
 
     private void DeleteByTag(string tag)
     {
@@ -166,7 +136,7 @@ public class CityEditor : EditorWindow
                         //m_ObjectRenderer.material.color = Color.red;
                         Debug.Log("house size: " + renderer.bounds.size + "\n");
                     }
-                    nodes.Add(house);
+                    graph.AddNode(count.ToString(), house);
                 }
                 Debug.Log("Created " + r + "/" + rows + " rows of buildings.\n");
             }
@@ -178,7 +148,7 @@ public class CityEditor : EditorWindow
     {
         const int numberOfEdgePerNode = 2;
 
-        int totalEdges = Mathf.Clamp(0, 1000, nodes.Count * numberOfEdgePerNode);
+        int totalEdges = Mathf.Clamp(0, 1000, graph.NodeCount() * numberOfEdgePerNode);
 
         GameObject linePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(linePreftabPath);
 
@@ -194,11 +164,11 @@ public class CityEditor : EditorWindow
 
             for (int i = 1; i <= totalEdges; i++)
             {
-                // pick two nodes randomly
-                int start = UnityEngine.Random.Range(0, nodes.Count);
-                int end = UnityEngine.Random.Range(0, nodes.Count);
-                GameObject edge = drawLine(nodes[start], nodes[end], linePrefab, above);
-                edges.Add(edge);
+                // pick two nodes randomly (node ids are in the range 1..graph.NodeCount()
+                int start = UnityEngine.Random.Range(1, graph.NodeCount()+1);
+                int end = UnityEngine.Random.Range(1, graph.NodeCount()+1);
+                GameObject edge = drawLine(graph.GetNode(start.ToString()), graph.GetNode(end.ToString()), linePrefab, above);
+                graph.AddEdge(edge);
                 if (totalEdges % 100 == 0)
                 {
                     Debug.Log("Created " + i + "/" + totalEdges + " rows of buildings.\n");
@@ -209,8 +179,7 @@ public class CityEditor : EditorWindow
     }
 
     private GameObject drawLine(GameObject from, GameObject to, GameObject linePrefab, float above)
-    {
-        
+    {   
         GameObject edge = (GameObject)PrefabUtility.InstantiatePrefab(linePrefab);
         LineRenderer renderer = edge.GetComponent<LineRenderer>();
 
