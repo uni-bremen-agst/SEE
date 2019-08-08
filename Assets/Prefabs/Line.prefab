@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1202919737447516710}
   - component: {fileID: 1202919737447516711}
+  - component: {fileID: 9173356851296738539}
   m_Layer: 0
   m_Name: Line
   m_TagString: Edge
@@ -125,3 +126,15 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 0
   m_Loop: 0
+--- !u!114 &9173356851296738539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1202919737447516704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c488be0311bcdc40947c0e62c02a8e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
