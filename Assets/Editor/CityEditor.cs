@@ -37,8 +37,11 @@ public class CityEditor : EditorWindow
     {
         float width = position.width - 5;
         const float height = 30;
-        string[] actionLabels = new string[] { "Load City", "Delete City", "Delete Connections", "Create Connections" };
-        int selectedAction = GUILayout.SelectionGrid(-1, actionLabels, actionLabels.Length / 2, GUILayout.Width(width), GUILayout.Height(height));
+        string[] actionLabels = new string[] { "Load City", "Delete City",
+                                               "Create Buildings", "Delete Buildings",
+                                               "Create Connections", "Delete Connections"
+                                             };
+        int selectedAction = GUILayout.SelectionGrid(-1, actionLabels, actionLabels.Length, GUILayout.Width(width), GUILayout.Height(height));
         switch (selectedAction)
         {
             case 0:
@@ -51,12 +54,21 @@ public class CityEditor : EditorWindow
                 break;
             case 2:
                 Debug.Log(actionLabels[2]);
-                DeleteEdges();
+                DeleteCity();
+                LoadNodes();
                 break;
             case 3:
                 Debug.Log(actionLabels[3]);
+                DeleteCity();
+                break;
+            case 4:
+                Debug.Log(actionLabels[4]);
                 DeleteEdges();
                 LoadEdges();
+                break;
+            case 5:
+                Debug.Log(actionLabels[5]);
+                DeleteEdges();
                 break;
             default:
                 // Debug.LogError("Unexpected action selection.\n");
@@ -121,7 +133,7 @@ public class CityEditor : EditorWindow
         }
         else
         {
-            const int numberOfNodes = 1000;
+            const int numberOfNodes = 100;
             int rows = (int)Mathf.Sqrt(numberOfNodes);
             int columns = rows;
             const float epsilon = 0.01f;
@@ -140,7 +152,10 @@ public class CityEditor : EditorWindow
                     float height = UnityEngine.Random.Range(0.0F + epsilon, 1.0F);
                     house.transform.localScale = new Vector3(width, height, breadth);
 
-                    house.transform.position = new Vector3(r + r * 0.3f, 0f, c + c * 0.3f);
+                    // The position is the center of a GameObject. We want all GameObjects
+                    // be placed at the same ground level 0. That is why we need to "lift"
+                    // every building by half of its height.
+                    house.transform.position = new Vector3(r + r * 0.3f, height/2.0f, c + c * 0.3f);
                     Debug.Log("house name: " + house.name + "\n");
                     Debug.Log("house position: " + house.transform.position + "\n");
                     {
@@ -155,12 +170,16 @@ public class CityEditor : EditorWindow
                 }
                 Debug.Log("Created " + r + "/" + rows + " rows of buildings.\n");
             }
-            Debug.Log("Created city with " + numberOfNodes + " buildings.\n");
+            Debug.Log("Created city with " + count + " buildings.\n");
         } 
     }
 
     private void LoadEdges()
     {
+        const int numberOfEdgePerNode = 2;
+
+        int totalEdges = Mathf.Clamp(0, 1000, nodes.Count * numberOfEdgePerNode);
+
         GameObject linePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(linePreftabPath);
 
         if (linePrefab == null)
@@ -172,8 +191,6 @@ public class CityEditor : EditorWindow
             // the distance of the edges relative to the houses; the maximal height of
             // a house is 1.0
             const float above = orientation * (1f / 2.0f);
-            const int numberOfEdgePerNode = 2;
-            int totalEdges = nodes.Count * numberOfEdgePerNode;
 
             for (int i = 1; i <= totalEdges; i++)
             {
