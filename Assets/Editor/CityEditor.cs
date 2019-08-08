@@ -1,20 +1,21 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System;
+using System.Collections.Generic;
 
 // An editor that allows an Unreal editor user to create a city.
 // Note: An alternative to an EditorWindow extension could have been a ScriptableWizard.
 public class CityEditor : EditorWindow
 {
-    // The tag of all houses as defined in the house preftab.
+    [Tooltip("The tag of all buildings")]
     public string houseTag = "House";
 
-    // The tag of all edges as defined in the edge preftab.
+    [Tooltip("The tag of all connections")]
     public string edgeTag = "Edge";
 
-    // The relative path to the line preftab.
+    [Tooltip("The relative path to the connection preftab")]
     public string linePreftabPath = "Assets/Prefabs/Line.prefab";
-    // The relative path to the house preftab.
+    [Tooltip("The relative path to the building preftab")]
     const string housePrefabPath = "Assets/Prefabs/House.prefab";
 
     // orientation of the edges; 
@@ -36,17 +37,26 @@ public class CityEditor : EditorWindow
     {
         float width = position.width - 5;
         const float height = 30;
-        string[] actionLabels = new string[] { "Create City", "Delete City" };
-        int selectedAction = GUILayout.SelectionGrid(-1, actionLabels, actionLabels.Length, GUILayout.Width(width), GUILayout.Height(height));
+        string[] actionLabels = new string[] { "Load City", "Delete City", "Delete Connections", "Create Connections" };
+        int selectedAction = GUILayout.SelectionGrid(-1, actionLabels, actionLabels.Length / 2, GUILayout.Width(width), GUILayout.Height(height));
         switch (selectedAction)
         {
             case 0:
-                Debug.Log("Create");
-                Create();
+                Debug.Log(actionLabels[0]);
+                LoadCity();
                 break;
             case 1:
-                Debug.Log("Delete");
-                Delete();
+                Debug.Log(actionLabels[1]);
+                DeleteCity();
+                break;
+            case 2:
+                Debug.Log(actionLabels[2]);
+                DeleteEdges();
+                break;
+            case 3:
+                Debug.Log(actionLabels[3]);
+                DeleteEdges();
+                LoadEdges();
                 break;
             default:
                 // Debug.LogError("Unexpected action selection.\n");
@@ -54,10 +64,42 @@ public class CityEditor : EditorWindow
         }
     }
 
-    private void Delete()
+    private void DeleteCity()
     {
-        DeleteByTag(houseTag);
-        DeleteByTag(edgeTag);
+        DeleteNodes();
+        DeleteEdges();
+    }
+
+    private void LoadCity()
+    {
+        LoadNodes();
+        LoadEdges();
+    }
+
+    // The list of graph nodes loaded.
+    private List<GameObject> nodes = new List<GameObject>();
+
+    // The list of graph edges loaded.
+    private List<GameObject> edges = new List<GameObject>();
+
+    private void DeleteNodes()
+    {
+        DeleteGameObjects(nodes);
+        nodes = new List<GameObject>();
+    }
+
+    private void DeleteEdges()
+    {
+        DeleteGameObjects(edges);
+        edges = new List<GameObject>();
+    }
+
+    private void DeleteGameObjects(List<GameObject> objects)
+    {
+        foreach (GameObject o in objects)
+        {
+            DestroyImmediate(o);
+        }
     }
 
     private void DeleteByTag(string tag)
@@ -70,70 +112,81 @@ public class CityEditor : EditorWindow
         }
     }
 
-    private void Create()
+    private void LoadNodes()
     {
         GameObject housePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(housePrefabPath);
-        GameObject linePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(linePreftabPath);
         if (housePrefab == null)
         {
             Debug.LogError(housePrefabPath + " does not exist.\n");
-        }
-        else if (linePrefab == null)
-        {
-            Debug.LogError(linePreftabPath + " does not exist.\n");
         }
         else
         {
             const int rows = 4;
             const int columns = rows;
             const float epsilon = 0.01f;
-            // the distance of the edges relative to the houses; the maximal height of
-            // a house is 1.0
-            const float above = orientation * (1f / 2.0f);
 
             int count = 0;
             for (int r = 1; r <= rows; r++)
             {
-                GameObject previousHouse = null;
                 for (int c = 1; c <= columns; c++)
                 {
                     count++;
                     GameObject house = (GameObject)PrefabUtility.InstantiatePrefab(housePrefab);
                     house.name = house.name + " " + count;
 
-                    float width   = UnityEngine.Random.Range(0.0F + epsilon, 1.0F);
+                    float width = UnityEngine.Random.Range(0.0F + epsilon, 1.0F);
                     float breadth = UnityEngine.Random.Range(0.0F + epsilon, 1.0F);
-                    float height  = UnityEngine.Random.Range(0.0F + epsilon, 1.0F);
+                    float height = UnityEngine.Random.Range(0.0F + epsilon, 1.0F);
                     house.transform.localScale = new Vector3(width, height, breadth);
 
-                    house.transform.position = new Vector3(r + r*0.3f, 0f, c + c*0.3f);
+                    house.transform.position = new Vector3(r + r * 0.3f, 0f, c + c * 0.3f);
                     Debug.Log("house name: " + house.name + "\n");
                     Debug.Log("house position: " + house.transform.position + "\n");
                     {
-                        Renderer m_ObjectRenderer;
+                        Renderer renderer;
                         //Fetch the GameObject's Renderer component
-                        m_ObjectRenderer = house.GetComponent<Renderer>();
+                        renderer = house.GetComponent<Renderer>();
                         //Change the GameObject's Material Color to red
                         //m_ObjectRenderer.material.color = Color.red;
-                        Debug.Log("house size: " + m_ObjectRenderer.bounds.size + "\n");
+                        Debug.Log("house size: " + renderer.bounds.size + "\n");
                     }
-
-                    if (previousHouse != null)
-                    {
-                        drawLine(previousHouse, house, linePrefab, above);
-                    }
-                    previousHouse = house;
+                    nodes.Add(house);
                 }
             }
-            // Undo.RegisterCreatedObjectUndo(house, "Create city");
         }
     }
 
-    private void drawLine(GameObject from, GameObject to, GameObject linePrefab, float above)
+    private void LoadEdges()
+    {
+        GameObject linePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(linePreftabPath);
+
+        if (linePrefab == null)
+        {
+            Debug.LogError(linePreftabPath + " does not exist.\n");
+        }
+        else
+        {
+            // the distance of the edges relative to the houses; the maximal height of
+            // a house is 1.0
+            const float above = orientation * (1f / 2.0f);
+            const int numberOfEdgePerNode = 10;
+
+            for (int i = 1; i <= nodes.Count * numberOfEdgePerNode; i++)
+            {
+                // pick two nodes randomly
+                int start = UnityEngine.Random.Range(0, nodes.Count);
+                int end = UnityEngine.Random.Range(0, nodes.Count);
+                GameObject edge = drawLine(nodes[start], nodes[end], linePrefab, above);
+                edges.Add(edge);
+            }
+        }
+    }
+
+    private GameObject drawLine(GameObject from, GameObject to, GameObject linePrefab, float above)
     {
         
-        GameObject line = (GameObject)PrefabUtility.InstantiatePrefab(linePrefab);
-        LineRenderer renderer = line.GetComponent<LineRenderer>();
+        GameObject edge = (GameObject)PrefabUtility.InstantiatePrefab(linePrefab);
+        LineRenderer renderer = edge.GetComponent<LineRenderer>();
 
         renderer.sortingLayerName = "OnTop";
         renderer.sortingOrder = 5;
@@ -154,6 +207,7 @@ public class CityEditor : EditorWindow
 
         //renderer.SetWidth(0.5f, 0.5f);
         renderer.useWorldSpace = true;
+        return edge;
     }
 
     /*
