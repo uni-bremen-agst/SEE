@@ -51,6 +51,8 @@ public class CityEditor : EditorWindow
             case 1:
                 Debug.Log(actionLabels[1]);
                 graph.Delete();
+                // delete any left-over if there is any
+                DeleteAll();
                 break;
             case 2:
                 Debug.Log(actionLabels[2]);
@@ -73,6 +75,26 @@ public class CityEditor : EditorWindow
             default:
                 // Debug.LogError("Unexpected action selection.\n");
                 break;
+        }
+    }
+
+    private void DeleteAll()
+    {
+        try
+        {
+            DeleteByTag("House");
+        }
+        catch (UnityException e)
+        {
+            Debug.LogError(e.ToString());
+        }
+        try
+        {
+            DeleteByTag("Line");
+        }
+        catch (UnityException e)
+        {
+            Debug.LogError(e.ToString());
         }
     }
 
@@ -204,25 +226,4 @@ public class CityEditor : EditorWindow
         renderer.useWorldSpace = true;
         return edge;
     }
-
-    /*
-    void OnScene(SceneView sceneview)
-    {
-        Event e = Event.current;
-        if (e.type == EventType.MouseUp)
-        {
-            Ray r = Camera.current.ScreenPointToRay(new Vector3(e.mousePosition.x, Camera.current.pixelHeight - e.mousePosition.y));
-            if (selectedAction == 1)
-            {
-                // TODO: Create OpenSpot
-                Debug.Log("Create OpenSpot");
-            }
-            else if (selectedAction == 2)
-            {
-                // TODO: Delete OpenSpot
-                Debug.Log("Delete OpenSpot");
-            }
-        }
-    }
-    */
 }
