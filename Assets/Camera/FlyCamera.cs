@@ -15,6 +15,10 @@ Controls:
 WASD  : Directional movement
 Shift : Increase speed
 Space : Moves camera directly up per its local Y-axis
+
+See also: 
+ https://answers.unity.com/questions/666905/in-game-camera-movement-like-editor.html
+ https://gist.github.com/Mahelita/f82d5b574ab6333f0c834178582280c3
 */
 
 public class FlyCamera : MonoBehaviour
@@ -46,6 +50,44 @@ public class FlyCamera : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Debug.Log("Left mouse button pressed down.\n");
+            Camera camera = gameObject.GetComponentInParent<Camera>();
+
+            if (camera == null)
+            {
+                Debug.Log("Parent has no camera.\n");
+                camera = Camera.current;
+            }
+            if (camera != null)
+            {
+                Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+
+                    //new Vector3(Input.mousePosition.x, camera.pixelHeight - Input.mousePosition.y));
+                Debug.Log("Drew a ray " + ray.ToString() + "\n");
+                Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
+
+                RaycastHit hit;
+                // Note: The object to be hidden needs a collider.
+                if (Physics.Raycast(ray, out hit))
+                {
+                    Transform objectHit = hit.transform;
+                    // Do something with the object that was hit by the raycast.
+                    Debug.Log("Hit object at " + transform.position + "\n");
+                    objectHit.gameObject.SetActive(false); // hide the hidden object
+                }
+                else
+                {
+                    Debug.Log("No oject hidden.\n");
+                }
+            }
+            else
+            {
+                Debug.LogError("No current camera found.\n");
+            }
+        }
+  
         // if the user wants us to accelerate by holding the shift key
         bool accelerationMode = Input.GetKey(KeyCode.LeftShift);
 
@@ -151,4 +193,15 @@ public class FlyCamera : MonoBehaviour
 
         return p_Velocity;
     }
+
+    /*
+    void OnScene(SceneView sceneview)
+    {
+        Event e = Event.current;
+        if (e.type == EventType.MouseDown)
+        {
+            Ray ray = Camera.current.ScreenPointToRay(new Vector3(e.mousePosition.x, Camera.current.pixelHeight - e.mousePosition.y));
+            Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
+        }
+    } */
 }
