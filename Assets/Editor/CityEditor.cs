@@ -90,7 +90,7 @@ public class CityEditor : EditorWindow
         }
         try
         {
-            DeleteByTag("Line");
+            DeleteByTag("Edge");
         }
         catch (UnityException e)
         {
@@ -100,6 +100,8 @@ public class CityEditor : EditorWindow
 
     private void LoadCity()
     {
+        // GraphLoader.Load("C:\\Users\\raine\\develop\\see\\data\\gxl\\minimal_test\\minimal_clones.gxl");
+        GraphLoader.Load("C:\\Users\\raine\\Downloads\\codefacts.gxl");
         LoadNodes();
         LoadEdges();
     }
@@ -125,7 +127,7 @@ public class CityEditor : EditorWindow
         }
         else
         {
-            const int numberOfNodes = 100;
+            const int numberOfNodes = 10;
             int rows = (int)Mathf.Sqrt(numberOfNodes);
             int columns = rows;
             const float epsilon = 0.01f;
