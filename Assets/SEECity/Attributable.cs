@@ -90,6 +90,20 @@ public abstract class Attributable : IAttributable
         return intAttributes.TryGetValue(attributeName, out value);
     }
 
+    bool IAttributable.TryGetNumeric(string attributeName, out float value)
+    {
+
+        if (intAttributes.TryGetValue(attributeName, out int intValue))
+        {
+            value = intValue;
+            return true;
+        }
+        else
+        {
+            return floatAttributes.TryGetValue(attributeName, out value);
+        }
+    }
+
     public override string ToString()
     {
         string result = "";

@@ -11,12 +11,15 @@ public interface IAttributable
     void SetInt(string attributeName, int value);
     bool TryGetInt(string attributeName, out int value);
 
+    bool TryGetNumeric(string attributeName, out float value);
+
     string GetString(string attributeName);
     void SetString(string attributeName, string value);
     bool TryGetString(string attributeName, out string value);
 
     bool HasToggle(string attributeName);  
     void SetToggle(string attributeName);
+
 
     string ToString();
 }

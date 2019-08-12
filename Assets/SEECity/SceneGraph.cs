@@ -121,9 +121,9 @@ public class SceneGraph
         }
     }
 
-    const string widthMetric = "Metric.Lines.LOC";
-    const string heightMetric = "Metric.Halstead.Length";
-    const string breadthMetric = "Metric.McCabe_Complexity";
+    const string widthMetric = "Metric.Number_of_Tokens";
+    const string heightMetric = "Metric.Clone_Rate";
+    const string breadthMetric = "Metric.LOC";
 
     private Dictionary<string, float> metricMaxima;
 
@@ -139,16 +139,12 @@ public class SceneGraph
         {
             foreach (string metric in metrics)
             {
-                if (node.TryGetInt(metric, out int value))
+                if (node.TryGetNumeric(metric, out float value))
                 {
                     if (value > result[metric])
                     {
                         result[metric] = value;
                     }
-                }
-                else
-                {
-                    Debug.Log(node.LinkName + " has no " + metric + "\n");
                 }
             }
         }
@@ -184,9 +180,9 @@ public class SceneGraph
                 GameObject house = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(housePrefab);
                 house.name = node.GetString("Source.Name");
 
-                float width = NormalizedIntMetric(node, widthMetric);
-                float breadth = NormalizedIntMetric(node, breadthMetric);
-                float height = NormalizedIntMetric(node, heightMetric);
+                float width = NormalizedMetric(node, widthMetric);
+                float breadth = NormalizedMetric(node, breadthMetric);
+                float height = NormalizedMetric(node, heightMetric);
                 house.transform.localScale = new Vector3(width, height, breadth);
 
                 // The position is the center of a GameObject. We want all GameObjects
@@ -212,7 +208,7 @@ public class SceneGraph
     // Must not exceed 1.0f.
     const float minimalLength = 0.1f;
 
-    private float NormalizedIntMetric(INode node, string metric)
+    private float NormalizedMetric(INode node, string metric)
     {
         float max = metricMaxima[metric];
 
@@ -220,7 +216,7 @@ public class SceneGraph
         {
             return minimalLength;
         }
-        if (node.TryGetInt(metric, out int width))
+        if (node.TryGetNumeric(metric, out float width))
         {
             if (width <= minimalLength)
             {
@@ -228,13 +224,7 @@ public class SceneGraph
             }
             else
             {
-                float result = (float)width / max;
-                if (result > 1.0f)
-                {
-                    Debug.LogError("unexpected metric value for " + metric + ": " + result);
-                    throw new Exception("unexpected metric value for " + metric + ": " + result);
-                }
-                return result;
+                return (float)width / max;
             }
         }
         else
