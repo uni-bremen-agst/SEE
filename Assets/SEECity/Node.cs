@@ -1,23 +1,35 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class Node : MonoBehaviour
+﻿
+public class Node : GraphElement, INode
 {
-    [Tooltip("Node type")]
-    public string type;
+    // Important note: Nodes should be created only by calling IGraph.newNode().
+    // Do not use 'new Node()'.
 
-    // Start is called before the first frame update
-    void Start()
+    private const string linknameAttribute = "Linkage.Name";
+
+    string INode.LinkName
     {
-        //Debug.Log("House is spawned");
+        get => GetString(linknameAttribute);
+        // This will only set the linkname attribute, but does not alter the
+        // hashed linknames of the underlying graph. You will likely want to
+        // use Graph.SetLinkname instead. Otherwise expect inconsistencies.
+        // This setter should only be called by Graph.SetLinkname.
+        set => SetString(linknameAttribute, value);
     }
 
-    // Update is called once per frame
-    /*
-    void Update()
+    private const string sourcenameAttribute = "Source.Name";
+    
+    string INode.SourceName
     {
-
+        get => GetString(sourcenameAttribute);
+        set => SetString(sourcenameAttribute, value);
     }
-    */
+
+    public override string ToString()
+    {
+        string result = "{\n";
+        result += " \"kind\": node,\n";
+        result += base.ToString();
+        result += "}";
+        return result;
+    }
 }
