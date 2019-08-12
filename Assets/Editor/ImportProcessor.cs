@@ -10,6 +10,6 @@ public class ImportProcessor : AssetPostprocessor
     void OnPreprocessAsset()
     {
         // assetPath is the relative path of the imported asset
-        Debug.Log(assetPath);
+        Debug.Log(assetPath + "\n");
     } 
 }
