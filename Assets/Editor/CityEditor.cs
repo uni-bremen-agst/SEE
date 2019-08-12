@@ -64,8 +64,8 @@ public class CityEditor : EditorWindow
 
     private void LoadCity()
     {
-        // graph.Load("C:\\Users\\raine\\develop\\see\\data\\gxl\\minimal_test\\minimal_clones.gxl");
-        graph.Load("C:\\Users\\raine\\Downloads\\codefacts.gxl");
+        graph.Load("C:\\Users\\raine\\develop\\see\\data\\gxl\\minimal_test\\minimal_clones.gxl");
+        //graph.Load("C:\\Users\\raine\\Downloads\\codefacts.gxl");
     }
 
     private void DeleteAll()
