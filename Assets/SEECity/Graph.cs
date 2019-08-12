@@ -1,75 +1,107 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Linq;
 
-// A graph with nodes and edges (both derived from GameObject).
-public class Graph
+/// <summary>
+/// Implements IGraph.
+/// </summary>
+public class Graph : Attributable, IGraph
 {
     // The list of graph nodes indexed by their unique linkname
-    private Dictionary<string, GameObject> nodes = new Dictionary<string, GameObject>();
-    //private List<GameObject> nodes = new List<GameObject>();
+    private Dictionary<string, INode> nodes = new Dictionary<string, INode>();
 
     // The list of graph edges.
-    private List<GameObject> edges = new List<GameObject>();
+    private List<IEdge> edges = new List<IEdge>();
 
-    // Deletes the edges of the graph.
-    public void DeleteEdges()
+    /// <summary>
+    /// Adds the given node to the internal node mapping using linkname as 
+    /// unique key. Only then, the node can be derived from this graph.
+    /// If the node was added previously with a linkname, it will be 
+    /// remapped with the new linkname.
+    /// </summary>
+    /// <param name="node">the node to be added (must not be null)</param>
+    /// <param name="linkName">the unique linkname for this node; must neither be null nor empty </param>
+    void IGraph.SetLinkname(INode node, string linkName)
     {
-        DeleteGameObjects(edges);
-        edges.Clear();
-    }
-
-    // Deletes the nodes of the graph.
-    public void DeleteNodes()
-    {
-        foreach (KeyValuePair<string, GameObject> entry in nodes)
+        if (node == null)
         {
-            UnityEngine.Object.DestroyImmediate(entry.Value);
+            throw new System.Exception("node must not be null");
         }
-        nodes.Clear();
-    }
-
-    // Deletes all nodes and edges of the graph.
-    public void Delete()
-    {
-        DeleteNodes();
-        DeleteEdges();
-    }
-
-    // Deletes all given objects immediately.
-    private void DeleteGameObjects(List<GameObject> objects)
-    {
-        foreach (GameObject o in objects)
+        if (String.IsNullOrEmpty(linkName))
         {
-            UnityEngine.Object.DestroyImmediate(o);
+            throw new System.Exception("linkname of a node must neither be null nor empty");
         }
-    }
 
-    // Adds an edge to the graph.
-    public void AddEdge(GameObject edge)
-    {
-        edges.Add(edge);
-    }
+        string oldLinkName = node.LinkName;
 
-    // Adds a node to the graph.
-    public void AddNode(string nodeID, GameObject node)
-    {
-        nodes.Add(nodeID, node);
-    }
-
-    // The number of nodes.
-    public int NodeCount()
-    {
-        return nodes.Count;
-    }
-
-    public GameObject GetNode(string nodeID)
-    {
-        GameObject result;
-        if (!nodes.TryGetValue(nodeID, out result))
+        if (!String.IsNullOrEmpty(oldLinkName))
         {
-            throw new Exception("Unknown node id " + nodeID);
+            // the node has had a linkname before; we may need to remove the old key;
+            // Remove will do nothing if the key is not contained
+            nodes.Remove(oldLinkName);
         }
+        // this will also work if oldLinkName == linkName
+        nodes[linkName] = node;
+        node.LinkName = linkName;
+    }
+
+    IEdge IGraph.NewEdge()
+    {
+        IEdge result = new Edge();
+        edges.Add(result);
         return result;
     }
+
+    /// <summary>
+    /// Creates and returns a new plain node. 
+    /// Note: This method only creates a new node but does not actually add it to
+    /// the graph. In order to add it, you need to call SetLinkname later when the
+    /// node has a linkname.
+    /// </summary>
+    /// <returns>a new node (not yet part of the graph)</returns>
+    INode IGraph.NewNode()
+    {
+        return new Node();
+    }
+
+    int IGraph.NodeCount => nodes.Count;
+
+    int IGraph.EdgeCount => edges.Count;
+
+    private string viewName = "";
+
+    /// <summary>
+    /// Name of the graph (the view name of the underlying RFG).
+    /// </summary>
+    public string Name
+    {
+        get => viewName;
+        set => viewName = value;
+    }
+
+    public override string ToString()
+    {
+        string result = "{\n";
+        result += " \"kind\": graph,\n";
+        result += " \"name\": \"" + viewName + "\",\n";
+        // its own attributes
+        result += base.ToString();
+        // its nodes
+        foreach(INode node in nodes.Values)
+        {
+            result += node.ToString() + ",\n";
+        }
+        foreach (IEdge edge in edges)
+        {
+            result += edge.ToString() + ",\n";
+        }
+        result += "}\n";
+        return result;
+    }
+
+    INode[] IGraph.Nodes()
+    {
+        return nodes.Values.ToArray();
+    }
 }
+
