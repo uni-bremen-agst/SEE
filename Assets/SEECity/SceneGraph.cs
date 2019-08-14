@@ -6,7 +6,7 @@ using UnityEngine;
 /// A container for nodes and edges of the graph represented in a scene where the 
 /// nodes and edges are GameObjects.
 /// </summary>
-public class SceneGraph
+public class SceneGraph : MonoBehaviour
 {
     [Tooltip("The tag of all buildings")]
     public string houseTag = "House";
@@ -16,8 +16,12 @@ public class SceneGraph
 
     [Tooltip("The relative path to the connection preftab")]
     public string linePreftabPath = "Assets/Prefabs/Line.prefab";
+
     [Tooltip("The relative path to the building preftab")]
-    const string housePrefabPath = "Assets/Prefabs/House.prefab";
+    public string housePrefabPath = "Assets/Prefabs/House.prefab";
+
+    [Tooltip("The path to the graph data")]
+    public string graphPath = "";
 
     // orientation of the edges; 
     // if -1, the edges are drawn below the houses;
@@ -41,6 +45,58 @@ public class SceneGraph
     }
 
     /// <summary>
+    /// Called by Unity once before any Update messages is sent.
+    /// Loads the graph data.
+    /// 
+    /// Note: This mechanism works for classes derived from MonoBehaviour.
+    /// For other runtime classes, we could use the attribute 
+    /// RuntimeInitializeOnLoadMethod; see
+    /// https://docs.unity3d.com/ScriptReference/RuntimeInitializeOnLoadMethodAttribute-ctor.html
+    /// 
+    /// Example: 
+    /// [RuntimeInitializeOnLoadMethod]
+    /// static void OnRuntimeMethodLoad()
+    /// {
+    /// Debug.Log("After Scene is loaded and game is running.\n");
+    /// }
+    /// </summary>
+    private void Start()
+    {
+        Debug.Log("Loading graph data.\n");
+        Load();
+    }
+
+    // the unique SceneGraph instance
+    private static SceneGraph instance;
+
+    /// <summary>
+    /// Returns the unique SceneGraph instance. If a GameObject with name
+    /// SceneGraph exists already, that will be the instance. If no such
+    /// GameObject exists yet, a new one will be created with a new 
+    /// SceenGraph instance attached to it. The latter is returned then.
+    /// </summary>
+    /// <returns>unique SceneGraph instance</returns>
+    public static SceneGraph GetInstance()
+    {
+        if (instance == null)
+        {
+            const string sceneGraphTag = "SceneGraph";
+            GameObject gameObjectForSceneGraph = GameObject.Find(sceneGraphTag);
+            if (gameObjectForSceneGraph != null)
+            {
+                instance = gameObjectForSceneGraph.GetComponent<SceneGraph>();
+            }
+            else
+            {
+                Instantiate(gameObjectForSceneGraph);
+                gameObjectForSceneGraph.name = sceneGraphTag;
+                instance = gameObjectForSceneGraph.AddComponent<SceneGraph>();
+            }
+        }
+        return instance;
+    }
+
+    /// <summary>
     /// Deletes the nodes of the graph.
     /// </summary>
     public void DeleteNodes()
@@ -53,12 +109,14 @@ public class SceneGraph
     }
 
     /// <summary>
-    /// Deletes all nodes and edges of the graph.
+    /// Deletes all scene nodes and edges of the graph as well 
+    /// as the graph data themselves.
     /// </summary>
     public void Delete()
     {
         DeleteNodes();
         DeleteEdges();
+        graph = null;
     }
 
     /// <summary>
@@ -73,46 +131,108 @@ public class SceneGraph
         }
     }
 
-    // The number of nodes.
+    /// <summary>
+    /// The number of nodes in the scene.
+    /// </summary>
+    /// <returns></returns>
     public int NodeCount()
     {
         return nodes.Count;
     }
 
     /// <summary>
-    /// Returns the node having the given nodeID. Throws an Exception
+    /// Returns the scene node having the given linkname. Throws an Exception
     /// if no such node exists.
     /// </summary>
-    /// <param name="nodeID">unique ID of the node to be retrieved</param>
+    /// <param name="linkname">unique ID of the node to be retrieved</param>
     /// <returns></returns>
-    public GameObject GetNode(string nodeID)
+    public GameObject GetGameNode(string linkname)
     {
-        if (!nodes.TryGetValue(nodeID, out GameObject result))
+        if (!nodes.TryGetValue(linkname, out GameObject result))
         {
-            throw new Exception("Unknown node id " + nodeID);
+            throw new Exception("Unknown node id " + linkname);
         }
         return result;
     }
 
+    /// <summary>
+    /// Returns the graph node having the given linkname. Throws an Exception
+    /// if no such node exists.
+    /// </summary>
+    /// <param name="linkname">unique ID of the node to be retrieved</param>
+    /// <returns></returns>
+    public INode GetNode(string linkname)
+    {
+        if (graph.TryGetNode(linkname, out INode node))
+        {
+            return node;
+        }
+        else
+        {
+            Debug.Log("graph node number: " + graph.NodeCount + "\n");
+            throw new Exception("Unknown node id " + linkname);
+        }
+    }
+
     // The underlying graph whose nodes and edges are to be visualized.
-    private IGraph graph = new Graph();
+    // Note: When the game is started, this attribute initialization will be executed
+    // even though the GameObject this SceneGraph is contained in continues to exist.
+    // TODO: WE NEED TO PRESERVE THE GRAPH DATA.
+    private IGraph graph;
 
     /// <summary>
     /// Loads the graph from the given file and creates the GameObjects representing
-    /// its nodes and edges.
+    /// its nodes and edges. Sets the graphPath attribute.
     /// </summary>
     /// <param name="filename"></param>
-    public void Load(string filename)
+    public void LoadAndDraw(string filename)
     {
-        GraphCreator graphCreator = new GraphCreator(filename, graph, new Logger());
-        graphCreator.Load();
-        Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
-        Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
-        metricMaxima = DetermineMetricMaxima(widthMetric, heightMetric, breadthMetric);
-        CreateNodes();
-        CreateEdges();
+        graphPath = filename;
+        Load();
+        Draw();
     }
 
+    /// <summary>
+    /// Loads the graph from graphPath (if set), but does not actually create the GameObjects 
+    /// representing its nodes and edges.
+    /// </summary>
+    public void Load()
+    {
+        if (!string.IsNullOrEmpty(graphPath))
+        {
+            graph = new Graph();
+            GraphCreator graphCreator = new GraphCreator(graphPath, graph, new Logger());
+            graphCreator.Load();
+            Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
+            Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
+        }
+        else
+        {
+            Debug.LogError("No graph path given.\n");
+        }
+    }
+
+    /// <summary>
+    /// Draws the scene graph. 
+    /// Precondition: graph data must have been loaded.
+    /// </summary>
+    public void Draw()
+    {
+        if (graph != null)
+        {
+            metricMaxima = DetermineMetricMaxima(widthMetric, heightMetric, breadthMetric);
+            CreateNodes();
+            CreateEdges();
+        }
+        else
+        {
+            Debug.LogError("No graph loaded.\n");
+        }
+    }
+
+    /// <summary>
+    /// Dumps metricMaxima for debugging.
+    /// </summary>
     private void DumpMetricMaxima()
     {
         foreach (var item in metricMaxima)
@@ -125,9 +245,15 @@ public class SceneGraph
     const string heightMetric = "Metric.Clone_Rate";
     const string breadthMetric = "Metric.LOC";
 
+    // The maximal values of the relevant metrics.
     private Dictionary<string, float> metricMaxima;
 
-    Dictionary<string, float> DetermineMetricMaxima(params string[] metrics)
+    /// <summary>
+    /// Returns the maximal values of the given node metrics.
+    /// </summary>
+    /// <param name="metrics">the metrics for which the maxima are to be gathered</param>
+    /// <returns>metric maxima</returns>
+    private Dictionary<string, float> DetermineMetricMaxima(params string[] metrics)
     {
         Dictionary<string, float> result = new Dictionary<string, float>();
         foreach (string metric in metrics)
@@ -178,7 +304,8 @@ public class SceneGraph
                     row++;
                 }
                 GameObject house = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(housePrefab);
-                house.name = node.GetString("Source.Name");
+                // name of a building should be unique
+                house.name = node.LinkName; //GetString("Source.Name");
 
                 float width = NormalizedMetric(node, widthMetric);
                 float breadth = NormalizedMetric(node, breadthMetric);
@@ -199,7 +326,7 @@ public class SceneGraph
                     Debug.Log("house size: " + renderer.bounds.size + "\n");
                 }
                 */
-                nodes.Add(node.LinkName, house);
+    nodes.Add(node.LinkName, house);
             }
         }
     }
@@ -208,6 +335,13 @@ public class SceneGraph
     // Must not exceed 1.0f.
     const float minimalLength = 0.1f;
 
+    /// <summary>
+    /// Returns a value in the range [0.0, 1.0] representing the relative value of the given
+    /// metric in the metrics value range for the given node.
+    /// </summary>
+    /// <param name="node"></param>
+    /// <param name="metric"></param>
+    /// <returns></returns>
     private float NormalizedMetric(INode node, string metric)
     {
         float max = metricMaxima[metric];

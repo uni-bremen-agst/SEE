@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /*
  * Allows to move the camera with WASD, Shift and Space.
@@ -21,6 +22,9 @@ See also:
  https://gist.github.com/Mahelita/f82d5b574ab6333f0c834178582280c3
 */
 
+/// <summary>
+/// Moves the main camera based on keyboard input.
+/// </summary>
 public class FlyCamera : MonoBehaviour
 {
     // These variables are exposed to the editor and can be changed by the user.
@@ -40,6 +44,12 @@ public class FlyCamera : MonoBehaviour
     private Vector3 previousPosition = new Vector3(0f, 0f, 0f);
     private Quaternion previousRotation = new Quaternion(0f, 0f, 0f, 0f);
 
+    // The scene graph this camera observes.
+    private SceneGraph sceneGraph = null;
+
+    // The GUI text field showing the object name of a the currently selected node.
+    private GameObject guiObjectNameTextField = null;
+
     // Spin the object in given direction around the origin of the object at rotationFactor per tick.
     private void Rotate(Vector3 direction, bool accelerationMode)
     {
@@ -47,12 +57,46 @@ public class FlyCamera : MonoBehaviour
         transform.RotateAround(transform.position, direction, degree * Time.deltaTime);
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// Intializes sceneGraph and guiObjectNameTextField.
+    /// 
+    /// Called by unity on the frame when a script is enabled just before any of the Update 
+    /// methods are called the first time. It is called only once.
+    /// 
+    /// This is a Unity message.  It is not defined in the base MonoBehaviour class, 
+    /// so you we don't have to specify override in your derived class. Instead Unity 
+    /// uses reflection to see if we've put a method named "Start" in our class and 
+    /// if we have then it will call that method as needed.
+    /// 
+    /// See also https://docs.unity3d.com/Manual/ExecutionOrder.html on the execution order
+    /// of messages.
+    /// </summary>
+    void Start()
+    {
+        if (sceneGraph == null)
+        {
+            sceneGraph = SceneGraph.GetInstance();
+        }
+        if (guiObjectNameTextField == null)
+        {
+            guiObjectNameTextField = GameObject.Find("Objectname");
+        }
+    }
+
+    /// <summary>
+    /// Unity message called for every frame.
+    /// 
+    /// Reacts to user interactions by moving the camera or showing information
+    /// on selected entities.
+    /// Note: Update is called once per frame by Unity.
+    /// </summary>
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("Left mouse button pressed down.\n");
+            // If a node is hit by a left mouse click, the name of the selected
+            // node is shown in the guiObjectNameTextField.
+
             Camera camera = gameObject.GetComponentInParent<Camera>();
 
             if (camera == null)
@@ -63,23 +107,51 @@ public class FlyCamera : MonoBehaviour
             if (camera != null)
             {
                 Ray ray = camera.ScreenPointToRay(Input.mousePosition);
-
-                    //new Vector3(Input.mousePosition.x, camera.pixelHeight - Input.mousePosition.y));
-                Debug.Log("Drew a ray " + ray.ToString() + "\n");
-                Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
-
-                RaycastHit hit;
-                // Note: The object to be hidden needs a collider.
-                if (Physics.Raycast(ray, out hit))
+                // Note: The object to be hit needs a collider.
+                if (Physics.Raycast(ray, out RaycastHit hit))
                 {
-                    Transform objectHit = hit.transform;
-                    // Do something with the object that was hit by the raycast.
-                    Debug.Log("Hit object at " + transform.position + "\n");
-                    objectHit.gameObject.SetActive(false); // hide the hidden object
+                    // if the hit object is a node, we show the Source.Name
+                    // of the graph node the object represents if it has a
+                    // name; in all other cases, the name attribute of object
+                    // is used instead.
+
+                    GameObject objectHit = hit.transform.gameObject;                    
+                    if (objectHit.tag == sceneGraph.houseTag)
+                    {
+                        // objectHit.SetActive(false); // hide the hidden object
+                        if (guiObjectNameTextField != null)
+                        {
+                            Text text = guiObjectNameTextField.GetComponent<Text>();
+                            INode node = sceneGraph.GetNode(objectHit.name);
+                            if (node == null)
+                            {
+                                text.text = objectHit.name;
+                            }
+                            else
+                            {
+                                if (node.TryGetString("Source.Name", out string nodeName))
+                                {
+                                    text.text = nodeName;
+                                }
+                                else
+                                {
+                                    text.text = objectHit.name;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogError("No text field named Objectname");
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("Hidden object is no building.\n");
+                    }
                 }
                 else
                 {
-                    Debug.Log("No oject hidden.\n");
+                    Debug.Log("No oject hit.\n");
                 }
             }
             else
@@ -131,7 +203,7 @@ public class FlyCamera : MonoBehaviour
         // Rotation of the object is done.
 
         // Moving the object.
-        // Keyboard commands give the basic direction
+        // Keyboard commands give the basic direction.
         Vector3 newPosition = GetBaseInput();
 
         if (accelerationMode)
@@ -152,12 +224,12 @@ public class FlyCamera : MonoBehaviour
 
         if (previousPosition != transform.position)
         {
-            Debug.Log("position: " + transform.position + "\n");
+            // Debug.Log("position: " + transform.position + "\n");
             previousPosition = transform.position;
         }
         if (previousRotation != transform.rotation)
         {
-            Debug.Log("rotation: " + transform.rotation + "\n");
+            // Debug.Log("rotation: " + transform.rotation + "\n");
             previousRotation = transform.rotation;
         }
     }
