@@ -373,7 +373,6 @@ public class SceneGraph : MonoBehaviour
     /// </summary>
     public void CreateEdges()
     {
-        /*
         GameObject linePrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(linePreftabPath);
 
         if (linePrefab == null)
@@ -386,25 +385,23 @@ public class SceneGraph : MonoBehaviour
             // a house is 1.0
             const float above = orientation * (1f / 2.0f);
 
-
-            for (int i = 1; i <= totalEdges; i++)
+            foreach (IEdge edge in graph.Edges())
             {
-                // pick two nodes randomly (node ids are in the range 1..graph.NodeCount()
-                int start = UnityEngine.Random.Range(1, graph.NodeCount() + 1);
-                int end = UnityEngine.Random.Range(1, graph.NodeCount() + 1);
-                GameObject edge = drawLine(graph.GetNode(start.ToString()), graph.GetNode(end.ToString()), linePrefab, above);
-                graph.AddEdge(edge);
-                if (totalEdges % 100 == 0)
-                {
-                    Debug.Log("Created " + i + "/" + totalEdges + " rows of buildings.\n");
-                }
+                GameObject sceneEdge = DrawLine(nodes[edge.Source.LinkName], nodes[edge.Target.LinkName], linePrefab, above);
+                edges.Add(sceneEdge);
             }
-            Debug.Log("Created city with " + totalEdges + " connections.\n");
         }
-        */
     }
 
-    private GameObject drawLine(GameObject from, GameObject to, GameObject linePrefab, float above)
+    /// <summary>
+    /// Draws a straight line from the two given GameObjects. 
+    /// </summary>
+    /// <param name="from">the source object of the line</param>
+    /// <param name="to">the target object of the line</param>
+    /// <param name="linePrefab">the preftab from which to instantiate the line</param>
+    /// <param name="offset">the y offset at which to draw the begin and end of the line</param>
+    /// <returns></returns>
+    private GameObject DrawLine(GameObject from, GameObject to, GameObject linePrefab, float offset)
     {
         GameObject edge = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(linePrefab);
         LineRenderer renderer = edge.GetComponent<LineRenderer>();
@@ -418,10 +415,10 @@ public class SceneGraph : MonoBehaviour
         points[0] = from.transform.position;
         // position above starting position
         points[1] = from.transform.position;
-        points[1].y += above;
+        points[1].y += offset;
         // position above ending position
         points[2] = to.transform.position;
-        points[2].y += above;
+        points[2].y += offset;
         // ending position
         points[3] = to.transform.position;
         renderer.SetPositions(points);

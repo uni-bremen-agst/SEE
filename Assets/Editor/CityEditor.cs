@@ -16,7 +16,10 @@ public class CityEditor : EditorWindow
     }
 
     // The name of the file containing the graph data.
-    public string graphFilename = "C:\\Users\\raine\\develop\\see\\data\\gxl\\minimal_test\\minimal_clones.gxl";
+    //public string graphFilename = "C:\\Users\\raine\\develop\\see\\data\\gxl\\minimal_test\\minimal_clones.gxl";
+    public string graphFilename = "C:\\Users\\raine\\develop\\see\\data\\gxl\\linux-clones\\clones.gxl";
+    // The following graph will not work because it does not have the necessary metrics.
+    // public string graphFilename = "C:\\Users\\raine\\Downloads\\codefacts.gxl";
 
     /// <summary>
     /// Creates a new window offering the city editor commands.
@@ -92,10 +95,8 @@ public class CityEditor : EditorWindow
         SceneGraph sgraph = GetSceneGraph();
         if (sgraph != null)
         {
-            sgraph.LoadAndDraw("C:\\Users\\raine\\develop\\see\\data\\gxl\\linux-clones\\clones.gxl");
-            //sgraph.LoadAndDraw(graphFilename);
-            // The following graph will not work because it does not have the necessary metrics.
-            //sgraph.LoadAndDraw("C:\\Users\\raine\\Downloads\\codefacts.gxl");
+            Debug.Log("Loading graph from " + graphFilename + "\n");
+            sgraph.LoadAndDraw(graphFilename);
         }
         else
         {

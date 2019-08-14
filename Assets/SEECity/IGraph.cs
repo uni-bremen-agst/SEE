@@ -1,4 +1,6 @@
-﻿public interface IGraph : IAttributable
+﻿using System.Collections.Generic;
+
+public interface IGraph : IAttributable
 {
     /// <summary>
     /// The number of edges of the graph.
@@ -41,6 +43,12 @@
     /// </summary>
     /// <returns>all nodes</returns>
     INode[] Nodes();
+
+    /// <summary>
+    /// Returns all edges of the graph.
+    /// </summary>
+    /// <returns>all edges</returns>
+    IEdge[] Edges();
 
     /// <summary>
     /// Returns the node with the given unique linkname. If there is no
