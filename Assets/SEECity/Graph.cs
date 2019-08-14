@@ -103,5 +103,10 @@ public class Graph : Attributable, IGraph
     {
         return nodes.Values.ToArray();
     }
+
+    bool IGraph.TryGetNode(string linkname, out INode node)
+    {
+        return nodes.TryGetValue(linkname, out node);
+    }
 }
 
