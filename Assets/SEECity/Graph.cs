@@ -104,6 +104,11 @@ public class Graph : Attributable, IGraph
         return nodes.Values.ToArray();
     }
 
+    IEdge[] IGraph.Edges()
+    {
+        return edges.ToArray();
+    }
+
     bool IGraph.TryGetNode(string linkname, out INode node)
     {
         return nodes.TryGetValue(linkname, out node);
