@@ -5,7 +5,6 @@ using UnityEditor;
 // Note: An alternative to an EditorWindow extension could have been a ScriptableWizard.
 public class CityEditor : EditorWindow
 {
-
     [MenuItem("Window/City Editor")]
     // This method will be called when the user selects the menu item.
     // Such methods must be static and void. They can have any name.
@@ -16,8 +15,8 @@ public class CityEditor : EditorWindow
     }
 
     // The name of the file containing the graph data.
-    //public string graphFilename = "C:\\Users\\raine\\develop\\see\\data\\gxl\\minimal_test\\minimal_clones.gxl";
-    public string graphFilename = "C:\\Users\\raine\\develop\\see\\data\\gxl\\linux-clones\\clones.gxl";
+    public string graphFilename = "C:\\Users\\raine\\develop\\see\\data\\gxl\\minimal_test\\minimal_clones.gxl";
+    //public string graphFilename = "C:\\Users\\raine\\develop\\see\\data\\gxl\\linux-clones\\clones.gxl";
     // The following graph will not work because it does not have the necessary metrics.
     // public string graphFilename = "C:\\Users\\raine\\Downloads\\codefacts.gxl";
 
