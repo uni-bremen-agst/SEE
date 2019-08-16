@@ -88,8 +88,13 @@ public class SceneGraph : MonoBehaviour
             }
             else
             {
-                Instantiate(gameObjectForSceneGraph);
-                gameObjectForSceneGraph.name = sceneGraphTag;
+                // Note: Instantiate(gameObjectForSceneGraph) will not work here, because
+                // it attempts to create a copy of the given game object passed as parameter,
+                // which in our case is null.
+                gameObjectForSceneGraph = new GameObject
+                {
+                    name = sceneGraphTag
+                };
                 instance = gameObjectForSceneGraph.AddComponent<SceneGraph>();
             }
         }
