@@ -18,37 +18,33 @@ public interface IGraph : IAttributable
     string Name { get; set; }
 
     /// <summary>
-    /// Returns a new node. The node may or may not be part of the node.
-    /// This can be decided by the implementation.
+    /// Adds a non-hierarchical edge to the graph.
+    /// Precondition: edge must not be null.
     /// </summary>
-    /// <returns></returns>
-    INode NewNode();
+    /// <param name="edge"></param>
+    void AddEdge(IEdge edge);
 
     /// <summary>
-    /// Returns a new edge. The edge may or may not be part of the node.
-    /// This can be decided by the implementation.
-    /// </summary>
-    /// <returns></returns>
-    IEdge NewEdge();
-
-    /// <summary>
-    /// 
+    /// Adds a node to the graph. 
+    /// Preconditions:
+    ///   (1) node must not be null
+    ///   (2) node.Linkname must be defined.
+    ///   (3) a node with node.Linkname must not have been added before
     /// </summary>
     /// <param name="node"></param>
-    /// <param name="linkName"></param>
-    void SetLinkname(INode node, string linkName);
+    void AddNode(INode node);
 
     /// <summary>
     /// Returns all nodes of the graph.
     /// </summary>
     /// <returns>all nodes</returns>
-    INode[] Nodes();
+    List<INode> Nodes();
 
     /// <summary>
-    /// Returns all edges of the graph.
+    /// Returns all non-hierarchical edges of the graph.
     /// </summary>
-    /// <returns>all edges</returns>
-    IEdge[] Edges();
+    /// <returns>all non-hierarchical edges</returns>
+    List<IEdge> Edges();
 
     /// <summary>
     /// Returns the node with the given unique linkname. If there is no

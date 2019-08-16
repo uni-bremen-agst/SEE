@@ -11,10 +11,12 @@ class GraphCreator : GXLParser
     /// </summary>
     /// <param name="filename">the name of the GXL file</param>
     /// <param name="graph">the graph to which the entities found in the GXL are to be added</param>
+    /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
     /// <param name="logger">the logger used for messages; if null, no messages are emitted</param>
-    public GraphCreator(string filename, IGraph graph, ILogger logger = null) : base(filename, logger)
+    public GraphCreator(string filename, IGraph graph, HashSet<string> hierarchicalEdgeTypes, ILogger logger = null) : base(filename, logger)
     {
         this.graph = graph;
+        this.hierarchicalEdgeTypes = hierarchicalEdgeTypes;
     }
 
     // Number of errors detected.
@@ -51,6 +53,9 @@ class GraphCreator : GXLParser
     // A mapping of the GXL node ids onto the graph nodes.
     private Dictionary<String, INode> nodes = new Dictionary<string, INode>();
 
+    // The set of edge-type names for edges considered to represent nesting.
+    private readonly HashSet<string> hierarchicalEdgeTypes = null;
+
     /// <summary>
     /// Sets the graph name using the attribute 'id'.
     /// </summary>
@@ -65,7 +70,7 @@ class GraphCreator : GXLParser
                     graph.Name = reader.Value;
                 }
             }
-            // You can bove the reader back to the element node as follows:
+            // You can move the reader back to the element node as follows:
             // reader.MoveToElement();
         }
     }
@@ -79,7 +84,7 @@ class GraphCreator : GXLParser
         {
             LogError("There is still a pending graph element when new node declaration has begun.");
         }
-        current = graph.NewNode();
+        current = new Node();
         if (reader.HasAttributes)
         {
             while (reader.MoveToNextAttribute())
@@ -119,7 +124,7 @@ class GraphCreator : GXLParser
                 } 
                 else
                 {
-                    graph.SetLinkname(node, node.LinkName);
+                    graph.AddNode(node);
                 }
             }
             current = null;
@@ -141,7 +146,7 @@ class GraphCreator : GXLParser
         {
             LogError("There is still a pending graph element when new edge declaration has begun.");
         }
-        current = graph.NewEdge();
+        current = new Edge();
         if (reader.HasAttributes)
         {
             IEdge thisEdge = (IEdge)current;
@@ -162,8 +167,7 @@ class GraphCreator : GXLParser
                     {
                         fromNode = reader.Value;
                         // set source of the edge
-                        INode node;
-                        if (nodes.TryGetValue(fromNode, out node))
+                        if (nodes.TryGetValue(fromNode, out INode node))
                         {
                             thisEdge.Source = node;
                         }
@@ -183,8 +187,7 @@ class GraphCreator : GXLParser
                     {
                         toNode = reader.Value;
                         // set target of the edge
-                        INode node;
-                        if (nodes.TryGetValue(toNode, out node))
+                        if (nodes.TryGetValue(toNode, out INode node))
                         {
                             thisEdge.Target = node;
                         }
@@ -222,6 +225,19 @@ class GraphCreator : GXLParser
             if (!(current is Edge))
             {
                 LogError("The declaration to be ended is no edge.");
+            }
+            else
+            {
+                IEdge edge = current as Edge;
+                if (hierarchicalEdgeTypes.Contains(edge.Type))
+                {
+                    // hierarchial edges are turned into children
+                    edge.Source.AddChild(edge.Target);
+                }
+                else
+                {  // non-hierarchical edges are added to the graph
+                    graph.AddEdge(edge);
+                }
             }
             current = null;
         }
