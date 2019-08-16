@@ -15,7 +15,7 @@ public class CityEditor : EditorWindow
     }
 
     // The name of the file containing the graph data.
-    public string graphFilename = "C:\\Users\\raine\\develop\\see\\data\\gxl\\minimal_test\\minimal_clones.gxl";
+    public string graphFilename = "C:\\Users\\raine\\develop\\seecity\\data\\gxl\\minimal_clones.gxl";
     //public string graphFilename = "C:\\Users\\raine\\develop\\see\\data\\gxl\\linux-clones\\clones.gxl";
     // The following graph will not work because it does not have the necessary metrics.
     // public string graphFilename = "C:\\Users\\raine\\Downloads\\codefacts.gxl";
@@ -29,10 +29,7 @@ public class CityEditor : EditorWindow
 
         float width = position.width - 5;
         const float height = 30;
-        string[] actionLabels = new string[] { "Load City", "Delete City",
-                                               "Create Buildings", "Delete Buildings",
-                                               "Create Connections", "Delete Connections"
-                                             };
+        string[] actionLabels = new string[] { "Load City", "Delete City" };
         int selectedAction = GUILayout.SelectionGrid(-1, actionLabels, actionLabels.Length, GUILayout.Width(width), GUILayout.Height(height));
         switch (selectedAction)
         {
@@ -45,24 +42,6 @@ public class CityEditor : EditorWindow
                 sceneGraph.Delete();
                 // delete any left-over if there is any
                 DeleteAll();
-                break;
-            case 2:
-                Debug.Log(actionLabels[2] + "\n");
-                sceneGraph.Delete();
-                sceneGraph.CreateNodes();
-                break;
-            case 3:
-                Debug.Log(actionLabels[3] + "\n");
-                sceneGraph.Delete();
-                break;
-            case 4:
-                Debug.Log(actionLabels[4] + "\n");
-                sceneGraph.DeleteEdges();
-                sceneGraph.CreateEdges();
-                break;
-            case 5:
-                Debug.Log(actionLabels[5] + "\n");
-                sceneGraph.DeleteEdges();
                 break;
             default:
                 // Debug.LogError("Unexpected action selection.\n");
