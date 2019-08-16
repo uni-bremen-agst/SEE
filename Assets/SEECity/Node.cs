@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 public class Node : GraphElement, INode
 {
     // Important note: Nodes should be created only by calling IGraph.newNode().
@@ -24,6 +26,14 @@ public class Node : GraphElement, INode
         set => SetString(sourcenameAttribute, value);
     }
 
+    private INode parent;
+
+    INode INode.Parent
+    {
+        get => parent;
+        set => parent = value;
+    }
+
     public override string ToString()
     {
         string result = "{\n";
@@ -31,5 +41,22 @@ public class Node : GraphElement, INode
         result += base.ToString();
         result += "}";
         return result;
+    }
+
+    private List<INode> children = new List<INode>();
+
+    int INode.NumberOfChildren()
+    {
+        return children.Count;
+    }
+
+    List<INode> INode.Children()
+    {
+        return children;
+    }
+
+    void INode.AddChild(INode child)
+    {
+        children.Add(child);
     }
 }
