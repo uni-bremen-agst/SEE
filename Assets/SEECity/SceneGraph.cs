@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// A container for nodes and edges of the graph represented in a scene where the 
@@ -22,6 +24,9 @@ public class SceneGraph : MonoBehaviour
 
     [Tooltip("The path to the graph data")]
     public string graphPath = "";
+
+    [Tooltip("The name of the edge type of hierarchical edges")]
+    public string hierarchicalEdgeType = "Enclosing";
 
     // orientation of the edges; 
     // if -1, the edges are drawn below the houses;
@@ -62,7 +67,6 @@ public class SceneGraph : MonoBehaviour
     /// </summary>
     private void Start()
     {
-        Debug.Log("Loading graph data.\n");
         Load();
     }
 
@@ -194,7 +198,11 @@ public class SceneGraph : MonoBehaviour
     {
         graphPath = filename;
         Load();
-        Draw();
+        {
+            Performance p = Performance.Begin("drawing graph");
+            Draw();
+            p.End();
+        }
     }
 
     /// <summary>
@@ -206,8 +214,15 @@ public class SceneGraph : MonoBehaviour
         if (!string.IsNullOrEmpty(graphPath))
         {
             graph = new Graph();
-            GraphCreator graphCreator = new GraphCreator(graphPath, graph, new Logger());
-            graphCreator.Load();
+            HashSet<string> hierarchicalEdges = new HashSet<string>();
+            hierarchicalEdges.Add(hierarchicalEdgeType);
+            GraphCreator graphCreator = new GraphCreator(graphPath, graph, hierarchicalEdges, new Logger());
+            {
+                Performance p = Performance.Begin("loading graph data");
+                graphCreator.Load();
+                p.End();
+            }
+            
             Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
             Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
         }
@@ -331,7 +346,7 @@ public class SceneGraph : MonoBehaviour
                     Debug.Log("house size: " + renderer.bounds.size + "\n");
                 }
                 */
-    nodes.Add(node.LinkName, house);
+                nodes.Add(node.LinkName, house);
             }
         }
     }
