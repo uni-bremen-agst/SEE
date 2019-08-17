@@ -2,7 +2,7 @@
 
 namespace SEE
 {
-    class Logger : ILogger
+    public class SEELogger : ILogger
     {
         public void LogInfo(string message)
         {
