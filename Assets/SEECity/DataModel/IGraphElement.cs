@@ -1,4 +1,7 @@
-﻿public interface IGraphElement : IAttributable
+﻿namespace SEE
 {
-    string Type { get; set; }    
+    public interface IGraphElement : IAttributable
+    {
+        string Type { get; set; }
+    }
 }

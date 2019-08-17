@@ -1,395 +1,398 @@
 ﻿using System;
 using System.Collections.Generic;
 
-/// <summary>
-/// Reads a graph from a GXL file and returns it.
-/// </summary>
-class GraphCreator : GXLParser
+namespace SEE
 {
     /// <summary>
-    /// Constructor.
+    /// Reads a graph from a GXL file and returns it.
     /// </summary>
-    /// <param name="filename">the name of the GXL file</param>
-    /// <param name="graph">the graph to which the entities found in the GXL are to be added</param>
-    /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
-    /// <param name="logger">the logger used for messages; if null, no messages are emitted</param>
-    public GraphCreator(string filename, IGraph graph, HashSet<string> hierarchicalEdgeTypes, ILogger logger = null) : base(filename, logger)
+    class GraphCreator : GXLParser
     {
-        this.graph = graph;
-        this.hierarchicalEdgeTypes = hierarchicalEdgeTypes;
-    }
-
-    // Number of errors detected.
-    private int errors = 0;
-
-    /// <summary>
-    /// Returns the number of errors found during loading the GXL.
-    /// </summary>
-    public int Errors
-    {
-        get
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="filename">the name of the GXL file</param>
+        /// <param name="graph">the graph to which the entities found in the GXL are to be added</param>
+        /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
+        /// <param name="logger">the logger used for messages; if null, no messages are emitted</param>
+        public GraphCreator(string filename, IGraph graph, HashSet<string> hierarchicalEdgeTypes, ILogger logger = null) : base(filename, logger)
         {
-            return errors;
+            this.graph = graph;
+            this.hierarchicalEdgeTypes = hierarchicalEdgeTypes;
         }
-    }
 
-    /// <summary>
-    /// Logs the given error message using the logger and increments the
-    /// error count.
-    /// </summary>
-    /// <param name="message">message to be logged</param>
-    protected override void LogError(string message)
-    {
-        base.LogError(message);
-        errors++;
-    }
+        // Number of errors detected.
+        private int errors = 0;
 
-    // graph where to add the GXL information
-    private IGraph graph;
-
-    // the previously added graph element (node or edge)
-    private IGraphElement current = null;
-
-    // A mapping of the GXL node ids onto the graph nodes.
-    private Dictionary<String, INode> nodes = new Dictionary<string, INode>();
-
-    // The set of edge-type names for edges considered to represent nesting.
-    private readonly HashSet<string> hierarchicalEdgeTypes = null;
-
-    /// <summary>
-    /// Sets the graph name using the attribute 'id'.
-    /// </summary>
-    protected override void StartGraph()
-    {
-        if (reader.HasAttributes)
+        /// <summary>
+        /// Returns the number of errors found during loading the GXL.
+        /// </summary>
+        public int Errors
         {
-            while (reader.MoveToNextAttribute())
+            get
             {
-                if (reader.Name == "id")
-                {
-                    graph.Name = reader.Value;
-                }
-            }
-            // You can move the reader back to the element node as follows:
-            // reader.MoveToElement();
-        }
-    }
-
-    /// <summary>
-    /// Sets current to a new graph node and adds it to the nodes mapping.
-    /// </summary>
-    protected override void StartNode()
-    {
-        if (current != null)
-        {
-            LogError("There is still a pending graph element when new node declaration has begun.");
-        }
-        current = new Node();
-        if (reader.HasAttributes)
-        {
-            while (reader.MoveToNextAttribute())
-            {
-                if (reader.Name == "id")
-                {
-                    nodes.Add(reader.Value, (Node)current);
-                    break;
-                }
+                return errors;
             }
         }
-        else
-        {
-            LogError("Node without ID");
-        }
-    }
 
-    /// <summary>
-    /// Sets the linkname of the current graph element (a node) and resets it to null.
-    /// </summary>
-    protected override void EndNode()
-    {
-        if (current != null)
+        /// <summary>
+        /// Logs the given error message using the logger and increments the
+        /// error count.
+        /// </summary>
+        /// <param name="message">message to be logged</param>
+        protected override void LogError(string message)
         {
-            if (!(current is INode))
-            {
-                LogError("The declaration to be ended is no node.");
-            }
-            else
-            {
-                // Now the current node should have a linkname and we can
-                // actually add it to the graph.
-                INode node = (INode)current;
-                if (String.IsNullOrEmpty(node.LinkName))
-                {
-                    LogError("Node has no attribute Source.Linkname.");
-                } 
-                else
-                {
-                    graph.AddNode(node);
-                }
-            }
-            current = null;
+            base.LogError(message);
+            errors++;
         }
-        else
-        {
-            LogError("There is no node to be ended here.");
-        }
-    }
 
-    /// <summary>
-    /// Sets current to a new edge. Adds this edge to the graph deriving the
-    /// source and target node of this edge from the nodes mapping using the
-    /// GXL node IDs in the GXL file.
-    /// </summary>
-    protected override void StartEdge()
-    {
-        if (current != null)
-        {
-            LogError("There is still a pending graph element when new edge declaration has begun.");
-        }
-        current = new Edge();
-        if (reader.HasAttributes)
-        {
-            IEdge thisEdge = (IEdge)current;
+        // graph where to add the GXL information
+        private IGraph graph;
 
-            string fromNode = "";
-            string toNode = "";
+        // the previously added graph element (node or edge)
+        private IGraphElement current = null;
 
-            // determine fromNode and toNode
-            while (reader.MoveToNextAttribute())
-            {
-                if (reader.Name == "from")
-                {
-                    if (fromNode != "")
-                    {
-                        LogError("Edge has multiple source nodes.");
-                    }
-                    else
-                    {
-                        fromNode = reader.Value;
-                        // set source of the edge
-                        if (nodes.TryGetValue(fromNode, out INode node))
-                        {
-                            thisEdge.Source = node;
-                        }
-                        else
-                        {
-                            LogError("Unkown source node ID " + fromNode + ".");
-                        }
-                    }
-                }
-                else if (reader.Name == "to")
-                {
-                    if (toNode != "")
-                    {
-                        LogError("Edge has multiple target nodes.");
-                    }
-                    else
-                    {
-                        toNode = reader.Value;
-                        // set target of the edge
-                        if (nodes.TryGetValue(toNode, out INode node))
-                        {
-                            thisEdge.Target = node;
-                        }
-                        else
-                        {
-                            LogError("Unkown target node ID " + toNode + ".");
-                        }
-                    }
-                }
-            } // while
-            if (fromNode == "")
-            {
-                LogError("Edge has no source node.");
-                throw new SyntaxError("Edge has no source node.");
-            }
-            else if (toNode == "")
-            {
-                LogError("Edge has no target node.");
-                throw new SyntaxError("Edge has no target node.");
-            }
-        }
-        else
-        {
-            LogError("Edge without source and target node.");
-        }
-    }
+        // A mapping of the GXL node ids onto the graph nodes.
+        private Dictionary<String, INode> nodes = new Dictionary<string, INode>();
 
-    /// <summary>
-    /// Resets current graph element (an edge) to null.
-    /// </summary>
-    protected override void EndEdge()
-    {
-        if (current != null)
-        {
-            if (!(current is Edge))
-            {
-                LogError("The declaration to be ended is no edge.");
-            }
-            else
-            {
-                IEdge edge = current as Edge;
-                if (hierarchicalEdgeTypes.Contains(edge.Type))
-                {
-                    // hierarchial edges are turned into children
-                    // Note: a hierarchical edge starts at the child and ends at the parent
-                    edge.Target.AddChild(edge.Source);
-                }
-                else
-                {  // non-hierarchical edges are added to the graph
-                    graph.AddEdge(edge);
-                }
-            }
-            current = null;
-        }
-        else
-        {
-            LogError("There is no edge to be ended here.");
-        }
-    }
+        // The set of edge-type names for edges considered to represent nesting.
+        private readonly HashSet<string> hierarchicalEdgeTypes = null;
 
-    /// <summary>
-    /// Sets the type of the current graph element.
-    /// </summary>
-    protected override void StartType()
-    {
-        if (current == null)
-        {
-            LogError("Found type declaration outside of a node/edge declaration.");
-        }
-        else
+        /// <summary>
+        /// Sets the graph name using the attribute 'id'.
+        /// </summary>
+        protected override void StartGraph()
         {
             if (reader.HasAttributes)
             {
                 while (reader.MoveToNextAttribute())
                 {
-                    if (reader.Name == "xlink:href")
+                    if (reader.Name == "id")
                     {
-                        current.Type = reader.Value;
+                        graph.Name = reader.Value;
+                    }
+                }
+                // You can move the reader back to the element node as follows:
+                // reader.MoveToElement();
+            }
+        }
+
+        /// <summary>
+        /// Sets current to a new graph node and adds it to the nodes mapping.
+        /// </summary>
+        protected override void StartNode()
+        {
+            if (current != null)
+            {
+                LogError("There is still a pending graph element when new node declaration has begun.");
+            }
+            current = new Node();
+            if (reader.HasAttributes)
+            {
+                while (reader.MoveToNextAttribute())
+                {
+                    if (reader.Name == "id")
+                    {
+                        nodes.Add(reader.Value, (Node)current);
                         break;
                     }
                 }
             }
             else
             {
-                LogError("Type declaration without name.");
+                LogError("Node without ID");
             }
         }
-    }
 
-    // The name of the currently processed attribute. For instance, when
-    // parsing:
-    //   <attr name="Source.Name">
-    //     <string>.entry</string>
-    //   </attr>
-    // the attribute name will be Source.Name.
-    // Is the empty string outside of an attribute declaration.
-    private string currentAttributeName = "";
-
-    /// <summary>
-    /// Defines currentAttributeName.
-    /// </summary>
-    protected override void StartAttr()
-    {
-        if (current == null)
+        /// <summary>
+        /// Sets the linkname of the current graph element (a node) and resets it to null.
+        /// </summary>
+        protected override void EndNode()
         {
-            LogError("Found attribute declaration outside of a node/edge declaration");
+            if (current != null)
+            {
+                if (!(current is INode))
+                {
+                    LogError("The declaration to be ended is no node.");
+                }
+                else
+                {
+                    // Now the current node should have a linkname and we can
+                    // actually add it to the graph.
+                    INode node = (INode)current;
+                    if (String.IsNullOrEmpty(node.LinkName))
+                    {
+                        LogError("Node has no attribute Source.Linkname.");
+                    }
+                    else
+                    {
+                        graph.AddNode(node);
+                    }
+                }
+                current = null;
+            }
+            else
+            {
+                LogError("There is no node to be ended here.");
+            }
         }
-        else
+
+        /// <summary>
+        /// Sets current to a new edge. Adds this edge to the graph deriving the
+        /// source and target node of this edge from the nodes mapping using the
+        /// GXL node IDs in the GXL file.
+        /// </summary>
+        protected override void StartEdge()
         {
+            if (current != null)
+            {
+                LogError("There is still a pending graph element when new edge declaration has begun.");
+            }
+            current = new Edge();
             if (reader.HasAttributes)
             {
+                IEdge thisEdge = (IEdge)current;
+
+                string fromNode = "";
+                string toNode = "";
+
+                // determine fromNode and toNode
                 while (reader.MoveToNextAttribute())
                 {
-                    if (reader.Name == "name")
+                    if (reader.Name == "from")
                     {
-                        // save for later when we know the attribute type
-                        currentAttributeName = reader.Value;
-                        break;
+                        if (fromNode != "")
+                        {
+                            LogError("Edge has multiple source nodes.");
+                        }
+                        else
+                        {
+                            fromNode = reader.Value;
+                            // set source of the edge
+                            if (nodes.TryGetValue(fromNode, out INode node))
+                            {
+                                thisEdge.Source = node;
+                            }
+                            else
+                            {
+                                LogError("Unkown source node ID " + fromNode + ".");
+                            }
+                        }
                     }
+                    else if (reader.Name == "to")
+                    {
+                        if (toNode != "")
+                        {
+                            LogError("Edge has multiple target nodes.");
+                        }
+                        else
+                        {
+                            toNode = reader.Value;
+                            // set target of the edge
+                            if (nodes.TryGetValue(toNode, out INode node))
+                            {
+                                thisEdge.Target = node;
+                            }
+                            else
+                            {
+                                LogError("Unkown target node ID " + toNode + ".");
+                            }
+                        }
+                    }
+                } // while
+                if (fromNode == "")
+                {
+                    LogError("Edge has no source node.");
+                    throw new SyntaxError("Edge has no source node.");
+                }
+                else if (toNode == "")
+                {
+                    LogError("Edge has no target node.");
+                    throw new SyntaxError("Edge has no target node.");
                 }
             }
             else
             {
-                LogError("Attribute declaration without name.");
+                LogError("Edge without source and target node.");
             }
         }
-    }
 
-    /// <summary>
-    /// Sets toggle attribute value of attribute currentAttributeName of current graph element.
-    /// </summary>
-    protected override void StartEnum()
-    {
-        if (current == null)
+        /// <summary>
+        /// Resets current graph element (an edge) to null.
+        /// </summary>
+        protected override void EndEdge()
         {
-            LogError("Found toggle attribute (enum) outside of a node/edge declaration.");
+            if (current != null)
+            {
+                if (!(current is Edge))
+                {
+                    LogError("The declaration to be ended is no edge.");
+                }
+                else
+                {
+                    IEdge edge = current as Edge;
+                    if (hierarchicalEdgeTypes.Contains(edge.Type))
+                    {
+                        // hierarchial edges are turned into children
+                        // Note: a hierarchical edge starts at the child and ends at the parent
+                        edge.Target.AddChild(edge.Source);
+                    }
+                    else
+                    {  // non-hierarchical edges are added to the graph
+                        graph.AddEdge(edge);
+                    }
+                }
+                current = null;
+            }
+            else
+            {
+                LogError("There is no edge to be ended here.");
+            }
         }
-        else if (currentAttributeName == "")
-        {
-            LogError("There is not attribute name for this enum.");
-        }
-        else
-        {
-            // enums (toggles) have no further attributes
-            current.SetToggle(currentAttributeName);
-        }
-    }
 
-    /// <summary>
-    /// Sets string attribute value of attribute currentAttributeName of current graph element.
-    /// </summary>
-    protected override void EndString(string value)
-    {
-        if (current == null)
+        /// <summary>
+        /// Sets the type of the current graph element.
+        /// </summary>
+        protected override void StartType()
         {
-            LogError("Found string attribute outside of a node/edge declaration.");
+            if (current == null)
+            {
+                LogError("Found type declaration outside of a node/edge declaration.");
+            }
+            else
+            {
+                if (reader.HasAttributes)
+                {
+                    while (reader.MoveToNextAttribute())
+                    {
+                        if (reader.Name == "xlink:href")
+                        {
+                            current.Type = reader.Value;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    LogError("Type declaration without name.");
+                }
+            }
         }
-        else if (currentAttributeName == "")
-        {
-            LogError("There is not attribute name for this string.");
-        }
-        else
-        {
-            current.SetString(currentAttributeName, value);
-        }
-    }
 
-    /// <summary>
-    /// Sets float attribute value of attribute currentAttributeName of current graph element.
-    /// </summary>
-    protected override void EndFloat(float value)
-    {
-        if (current == null)
-        {
-            LogError("Found float attribute outside of a node/edge declaration.");
-        }
-        else if (currentAttributeName == "")
-        {
-            LogError("There is not attribute name for this float.");
-        }
-        else
-        {
-            current.SetFloat(currentAttributeName, value);
-        }
-    }
+        // The name of the currently processed attribute. For instance, when
+        // parsing:
+        //   <attr name="Source.Name">
+        //     <string>.entry</string>
+        //   </attr>
+        // the attribute name will be Source.Name.
+        // Is the empty string outside of an attribute declaration.
+        private string currentAttributeName = "";
 
-    /// <summary>
-    /// Sets int attribute value of attribute currentAttributeName of current graph element.
-    /// </summary>
-    protected override void EndInt(int value)
-    {
-        if (current == null)
+        /// <summary>
+        /// Defines currentAttributeName.
+        /// </summary>
+        protected override void StartAttr()
         {
-            LogError("Found int attribute outside of a node/edge declaration.");
+            if (current == null)
+            {
+                LogError("Found attribute declaration outside of a node/edge declaration");
+            }
+            else
+            {
+                if (reader.HasAttributes)
+                {
+                    while (reader.MoveToNextAttribute())
+                    {
+                        if (reader.Name == "name")
+                        {
+                            // save for later when we know the attribute type
+                            currentAttributeName = reader.Value;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    LogError("Attribute declaration without name.");
+                }
+            }
         }
-        else if (currentAttributeName == "")
+
+        /// <summary>
+        /// Sets toggle attribute value of attribute currentAttributeName of current graph element.
+        /// </summary>
+        protected override void StartEnum()
         {
-            LogError("There is not attribute name for this int.");
+            if (current == null)
+            {
+                LogError("Found toggle attribute (enum) outside of a node/edge declaration.");
+            }
+            else if (currentAttributeName == "")
+            {
+                LogError("There is not attribute name for this enum.");
+            }
+            else
+            {
+                // enums (toggles) have no further attributes
+                current.SetToggle(currentAttributeName);
+            }
         }
-        else
+
+        /// <summary>
+        /// Sets string attribute value of attribute currentAttributeName of current graph element.
+        /// </summary>
+        protected override void EndString(string value)
         {
-            current.SetInt(currentAttributeName, value);
+            if (current == null)
+            {
+                LogError("Found string attribute outside of a node/edge declaration.");
+            }
+            else if (currentAttributeName == "")
+            {
+                LogError("There is not attribute name for this string.");
+            }
+            else
+            {
+                current.SetString(currentAttributeName, value);
+            }
+        }
+
+        /// <summary>
+        /// Sets float attribute value of attribute currentAttributeName of current graph element.
+        /// </summary>
+        protected override void EndFloat(float value)
+        {
+            if (current == null)
+            {
+                LogError("Found float attribute outside of a node/edge declaration.");
+            }
+            else if (currentAttributeName == "")
+            {
+                LogError("There is not attribute name for this float.");
+            }
+            else
+            {
+                current.SetFloat(currentAttributeName, value);
+            }
+        }
+
+        /// <summary>
+        /// Sets int attribute value of attribute currentAttributeName of current graph element.
+        /// </summary>
+        protected override void EndInt(int value)
+        {
+            if (current == null)
+            {
+                LogError("Found int attribute outside of a node/edge declaration.");
+            }
+            else if (currentAttributeName == "")
+            {
+                LogError("There is not attribute name for this int.");
+            }
+            else
+            {
+                current.SetInt(currentAttributeName, value);
+            }
         }
     }
 }

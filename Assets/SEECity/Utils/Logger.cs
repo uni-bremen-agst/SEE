@@ -1,20 +1,22 @@
 ﻿using UnityEngine;
 
-class Logger : ILogger
+namespace SEE
 {
-    public void LogInfo(string message)
+    class Logger : ILogger
     {
-        Debug.Log(message);
-    }
+        public void LogInfo(string message)
+        {
+            Debug.Log(message);
+        }
 
-    public void LogError(string message)
-    {
-        Debug.LogError(message);
-    }
+        public void LogError(string message)
+        {
+            Debug.LogError(message);
+        }
 
-    public void LogDebug(string message)
-    {
-        Debug.Log(message);
+        public void LogDebug(string message)
+        {
+            Debug.Log(message);
+        }
     }
 }
-
