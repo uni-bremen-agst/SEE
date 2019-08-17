@@ -3,8 +3,9 @@ using UnityEditor;
 
 namespace SEEEditor
 {
-    // An editor that allows an Unreal editor user to create a city.
-    // Note: An alternative to an EditorWindow extension could have been a ScriptableWizard.
+    /// <summary>
+    /// An editor that allows an Unreal editor user to create a city.
+    /// </summary>
     public class CityEditor : EditorWindow
     {
         [MenuItem("Window/City Editor")]
@@ -27,42 +28,20 @@ namespace SEEEditor
         }
 
         // As to whether the optional settings for node and edge tags are to be enabled.
-        bool tagGroupEnabled = false;
-        [Tooltip("The tag of all nodes")]
-        public string nodeTag = "House";
-
-        [Tooltip("The tag of all edges")]
-        public string edgeTag = "Edge";
-
-        [Tooltip("The relative path to the building preftab")]
-        public string nodePrefabPath = "Assets/Prefabs/House.prefab";
-
-        [Tooltip("The relative path to the connection preftab")]
-        public string edgePreftabPath = "Assets/Prefabs/Line.prefab";
-
-        [Tooltip("The path to the graph data")]
-        public string graphPath = "C:\\Users\\raine\\develop\\seecity\\data\\gxl\\minimal_clones.gxl";
-        //public string graphPath = "C:\\Users\\raine\\develop\\see\\data\\gxl\\linux-clones\\clones.gxl";
-        // The following graph will not work because it does not have the necessary metrics.
-        // public string graphPath = "C:\\Users\\raine\\Downloads\\codefacts.gxl";
-
-        [Tooltip("The name of the edge type of hierarchical edges")]
-        public string hierarchicalEdgeType = "Enclosing";
+        private bool tagGroupEnabled = false;
 
         /// <summary>
         /// Creates a new window offering the city editor commands.
         /// </summary>
         void OnGUI()
         {
-            sceneGraph = GetSceneGraph();
-
             GUILayout.Label("Graph", EditorStyles.boldLabel);
-            graphPath = EditorGUILayout.TextField("Graph", graphPath);
-            hierarchicalEdgeType = EditorGUILayout.TextField("Hierarchical Edge", hierarchicalEdgeType);
+            SceneGraphCreator.settings.graphPath = EditorGUILayout.TextField("Graph", SceneGraphCreator.settings.graphPath);
+            SceneGraphCreator.settings.hierarchicalEdgeType = EditorGUILayout.TextField("Hierarchical Edge", SceneGraphCreator.settings.hierarchicalEdgeType);
 
             GUILayout.Label("Preftabs", EditorStyles.boldLabel);
-            nodePrefabPath = EditorGUILayout.TextField("Node", nodePrefabPath);
-            edgePreftabPath = EditorGUILayout.TextField("Edge", edgePreftabPath);
+            SceneGraphCreator.settings.nodePrefabPath = EditorGUILayout.TextField("Node", SceneGraphCreator.settings.nodePrefabPath);
+            SceneGraphCreator.settings.edgePreftabPath = EditorGUILayout.TextField("Edge", SceneGraphCreator.settings.edgePreftabPath);
 
             //groupEnabled = EditorGUILayout.BeginToggleGroup("Optional Settings", groupEnabled);
             //myBool = EditorGUILayout.Toggle("Toggle", myBool);
@@ -70,8 +49,8 @@ namespace SEEEditor
             //EditorGUILayout.EndToggleGroup();
 
             tagGroupEnabled = EditorGUILayout.BeginToggleGroup("GameObject Tags", tagGroupEnabled);
-            nodeTag = EditorGUILayout.TextField("Node Tag", nodeTag);
-            edgeTag = EditorGUILayout.TextField("Edge Tag", edgeTag);
+            SceneGraphCreator.settings.nodeTag = EditorGUILayout.TextField("Node Tag", SceneGraphCreator.settings.nodeTag);
+            SceneGraphCreator.settings.edgeTag = EditorGUILayout.TextField("Edge Tag", SceneGraphCreator.settings.edgeTag);
             EditorGUILayout.EndToggleGroup();
 
             float width = position.width - 5;
@@ -81,52 +60,17 @@ namespace SEEEditor
             switch (selectedAction)
             {
                 case 0:
-                    Debug.Log(actionLabels[0] + "\n");
-                    LoadCity();
+                    SceneGraphCreator.Load();
                     break;
                 case 1:
-                    Debug.Log(actionLabels[1] + "\n");
-                    sceneGraph.Delete();
-                    // delete any left-over if there is any
+                    SceneGraphCreator.Delete();
+                    // delete all left-overs if there are any
                     DeleteAll();
                     break;
                 default:
                     break;
             }
             this.Repaint();
-        }
-
-        // The scene graph created by this CityEditor.
-        private SEE.SceneGraph sceneGraph = null;
-
-        /// <summary>
-        /// Returns the scene graph if it exists. Will return null if it does not exist.
-        /// </summary>
-        /// <returns>the scene graph or null</returns>
-        private SEE.SceneGraph GetSceneGraph()
-        {
-            if (sceneGraph == null)
-            {
-                sceneGraph = SEE.SceneGraph.GetInstance();
-            }
-            return sceneGraph;
-        }
-
-        /// <summary>
-        /// Loads a graph from disk and creates the scene objects representing it.
-        /// </summary>
-        private void LoadCity()
-        {
-            SEE.SceneGraph sgraph = GetSceneGraph();
-            if (sgraph != null)
-            {
-                Debug.Log("Loading graph from " + graphPath + "\n");
-                sgraph.LoadAndDraw(graphPath);
-            }
-            else
-            {
-                Debug.LogError("There is no scene graph.\n");
-            }
         }
 
         /// <summary>
@@ -136,7 +80,7 @@ namespace SEEEditor
         {
             try
             {
-                DeleteByTag(sceneGraph.houseTag);
+                DeleteByTag(SceneGraphCreator.settings.nodeTag);
             }
             catch (UnityException e)
             {
@@ -144,7 +88,7 @@ namespace SEEEditor
             }
             try
             {
-                DeleteByTag(sceneGraph.edgeTag);
+                DeleteByTag(SceneGraphCreator.settings.edgeTag);
             }
             catch (UnityException e)
             {
