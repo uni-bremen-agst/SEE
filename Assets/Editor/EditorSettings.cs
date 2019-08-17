@@ -4,7 +4,7 @@ namespace SEEEditor
     /// <summary>
     /// Represents the parameters needed to create the visualization at design time.
     /// </summary>
-    class EditorSettings : SEE.IGraphSettings
+    public class EditorSettings : SEE.IGraphSettings
     {
         /// <summary>
         /// The tag of all nodes.
