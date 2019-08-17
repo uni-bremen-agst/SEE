@@ -47,7 +47,7 @@ namespace SEE
         private Quaternion previousRotation = new Quaternion(0f, 0f, 0f, 0f);
 
         // The scene graph this camera observes.
-        private SceneGraph sceneGraph = null;
+        // private SceneGraph sceneGraph = null; // TODO: Re-enable
 
         // The GUI text field showing the object name of a the currently selected node.
         private GameObject guiObjectNameTextField = null;
@@ -75,10 +75,11 @@ namespace SEE
         /// </summary>
         void Start()
         {
-            if (sceneGraph == null)
-            {
-                sceneGraph = SceneGraph.GetInstance();
-            }
+            // TODO: Re-enable
+            //if (sceneGraph == null)
+            //{
+            //    sceneGraph = SceneGraph.GetInstance();
+            //}
             if (guiObjectNameTextField == null)
             {
                 guiObjectNameTextField = GameObject.Find("Objectname");
@@ -112,53 +113,7 @@ namespace SEE
                 }
                 if (camera != null)
                 {
-                    Ray ray = camera.ScreenPointToRay(Input.mousePosition);
-                    // Note: The object to be hit needs a collider.
-                    if (Physics.Raycast(ray, out RaycastHit hit))
-                    {
-                        // if the hit object is a node, we show the Source.Name
-                        // of the graph node the object represents if it has a
-                        // name; in all other cases, the name attribute of object
-                        // is used instead.
-
-                        GameObject objectHit = hit.transform.gameObject;
-                        if (objectHit.tag == sceneGraph.houseTag)
-                        {
-                            // objectHit.SetActive(false); // hide the hidden object
-                            if (guiObjectNameTextField != null)
-                            {
-                                Text text = guiObjectNameTextField.GetComponent<Text>();
-                                INode node = sceneGraph.GetNode(objectHit.name);
-                                if (node == null)
-                                {
-                                    text.text = objectHit.name;
-                                }
-                                else
-                                {
-                                    if (node.TryGetString("Source.Name", out string nodeName))
-                                    {
-                                        text.text = nodeName;
-                                    }
-                                    else
-                                    {
-                                        text.text = objectHit.name;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                Debug.LogError("No text field named Objectname");
-                            }
-                        }
-                        else
-                        {
-                            Debug.Log("Hidden object is no building.\n");
-                        }
-                    }
-                    else
-                    {
-                        Debug.Log("No oject hit.\n");
-                    }
+                    ShowSelectObject(camera);
                 }
                 else
                 {
@@ -238,6 +193,60 @@ namespace SEE
                 // Debug.Log("rotation: " + transform.rotation + "\n");
                 previousRotation = transform.rotation;
             }
+        }
+
+        private void ShowSelectObject(Camera camera)
+        {
+            // TODO: Re-enable
+            /*
+            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+            // Note: The object to be hit needs a collider.
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                // if the hit object is a node, we show the Source.Name
+                // of the graph node the object represents if it has a
+                // name; in all other cases, the name attribute of object
+                // is used instead.
+
+                GameObject objectHit = hit.transform.gameObject;
+                if (objectHit.tag == sceneGraph.houseTag)
+                {
+                    // objectHit.SetActive(false); // hide the hidden object
+                    if (guiObjectNameTextField != null)
+                    {
+                        Text text = guiObjectNameTextField.GetComponent<Text>();
+                        INode node = sceneGraph.GetNode(objectHit.name);
+                        if (node == null)
+                        {
+                            text.text = objectHit.name;
+                        }
+                        else
+                        {
+                            if (node.TryGetString("Source.Name", out string nodeName))
+                            {
+                                text.text = nodeName;
+                            }
+                            else
+                            {
+                                text.text = objectHit.name;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("No text field named Objectname");
+                    }
+                }
+                else
+                {
+                    Debug.Log("Hidden object is no building.\n");
+                }
+            }
+            else
+            {
+                Debug.Log("No oject hit.\n");
+            }
+            */
         }
 
         // Returns the basic values, if it's 0 than it's not active.
