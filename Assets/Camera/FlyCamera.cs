@@ -113,7 +113,7 @@ namespace SEE
                 }
                 if (camera != null)
                 {
-                    ShowSelectObject(camera);
+                    ShowSelectedObject(camera);
                 }
                 else
                 {
@@ -195,7 +195,7 @@ namespace SEE
             }
         }
 
-        private void ShowSelectObject(Camera camera)
+        private void ShowSelectedObject(Camera camera)
         {
             // TODO: Re-enable
             /*
