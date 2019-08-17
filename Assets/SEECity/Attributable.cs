@@ -8,12 +8,12 @@ public abstract class Attributable : IAttributable
 {
     private HashSet<string> toggleAttributes = new HashSet<string>();
 
-    void IAttributable.SetToggle(string attributeName)
+    public void SetToggle(string attributeName)
     {
         toggleAttributes.Add(attributeName);
     }
 
-    bool IAttributable.HasToggle(string attributeName)
+    public bool HasToggle(string attributeName)
     {
         return toggleAttributes.Contains(attributeName);
     }
@@ -25,7 +25,7 @@ public abstract class Attributable : IAttributable
         stringAttributes[attributeName] = value;
     }
 
-    bool IAttributable.TryGetString(string attributeName, out string value)
+    public bool TryGetString(string attributeName, out string value)
     {
         return stringAttributes.TryGetValue(attributeName, out value);
     }
@@ -44,12 +44,12 @@ public abstract class Attributable : IAttributable
 
     private Dictionary<string, float> floatAttributes = new Dictionary<string, float>();
 
-    void IAttributable.SetFloat(string attributeName, float value)
+    public void SetFloat(string attributeName, float value)
     {
         floatAttributes[attributeName] = value;
     }
 
-    float IAttributable.GetFloat(string attributeName)
+    public float GetFloat(string attributeName)
     {
         if (floatAttributes.TryGetValue(attributeName, out float value))
         {
@@ -61,19 +61,19 @@ public abstract class Attributable : IAttributable
         }
     }
 
-    bool IAttributable.TryGetFloat(string attributeName, out float value)
+    public bool TryGetFloat(string attributeName, out float value)
     {
         return floatAttributes.TryGetValue(attributeName, out value);
     }
 
     private Dictionary<string, int> intAttributes = new Dictionary<string, int>();
 
-    void IAttributable.SetInt(string attributeName, int value)
+    public void SetInt(string attributeName, int value)
     {
         intAttributes[attributeName] = value;
     }
 
-    int IAttributable.GetInt(string attributeName)
+    public int GetInt(string attributeName)
     {
         if (intAttributes.TryGetValue(attributeName, out int value))
         {
@@ -85,12 +85,12 @@ public abstract class Attributable : IAttributable
         }
     }
 
-    bool IAttributable.TryGetInt(string attributeName, out int value)
+    public bool TryGetInt(string attributeName, out int value)
     {
         return intAttributes.TryGetValue(attributeName, out value);
     }
 
-    bool IAttributable.TryGetNumeric(string attributeName, out float value)
+    public bool TryGetNumeric(string attributeName, out float value)
     {
 
         if (intAttributes.TryGetValue(attributeName, out int intValue))

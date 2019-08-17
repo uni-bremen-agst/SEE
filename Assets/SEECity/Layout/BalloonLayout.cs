@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE
@@ -12,7 +11,7 @@ namespace SEE
     /// </summary>
     class BalloonLayout : ILayout
     {
-        void ILayout.Draw(IGraph graph, Dictionary<string, GameObject> nodes, List<GameObject> edges)
+        public void Draw(IGraph graph, Dictionary<string, GameObject> nodes, List<GameObject> edges)
         {
             CreateNodes(graph, nodes);
         }

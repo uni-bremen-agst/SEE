@@ -13,7 +13,7 @@ public class Graph : Attributable, IGraph
     // The list of graph edges.
     private List<IEdge> edges = new List<IEdge>();
 
-    void IGraph.AddNode(INode node)
+    public void AddNode(INode node)
     {
         if (node == null)
         {
@@ -30,14 +30,14 @@ public class Graph : Attributable, IGraph
         nodes[node.LinkName] = node;
     }
 
-    void IGraph.AddEdge(IEdge edge)
+    public void AddEdge(IEdge edge)
     {
         edges.Add(edge);
     }
 
-    int IGraph.NodeCount => nodes.Count;
+    public int NodeCount => nodes.Count;
 
-    int IGraph.EdgeCount => edges.Count;
+    public int EdgeCount => edges.Count;
 
     private string viewName = "";
 
@@ -70,22 +70,22 @@ public class Graph : Attributable, IGraph
         return result;
     }
 
-    List<INode> IGraph.Nodes()
+    public List<INode> Nodes()
     {
         return nodes.Values.ToList();
     }
 
-    List<IEdge> IGraph.Edges()
+    public List<IEdge> Edges()
     {
         return edges;
     }
 
-    bool IGraph.TryGetNode(string linkname, out INode node)
+    public bool TryGetNode(string linkname, out INode node)
     {
         return nodes.TryGetValue(linkname, out node);
     }
 
-    List<INode> IGraph.GetRoots()
+    public List<INode> GetRoots()
     {
         List<INode> result = new List<INode>();
         foreach (INode node in nodes.Values)

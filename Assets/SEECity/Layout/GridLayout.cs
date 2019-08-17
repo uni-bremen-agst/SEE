@@ -21,7 +21,7 @@ namespace SEE
             this.breadthMetric = breadthMetric;
         }
 
-        void ILayout.Draw(IGraph graph, Dictionary<string, GameObject> nodes, List<GameObject> edges)
+        public void Draw(IGraph graph, Dictionary<string, GameObject> nodes, List<GameObject> edges)
         {
             // The maximal values of the relevant metrics.
             Dictionary<string, float> metricMaxima = DetermineMetricMaxima(graph, widthMetric, heightMetric, breadthMetric);
@@ -62,7 +62,7 @@ namespace SEE
         /// Creates the GameObjects representing the nodes of the graph.
         /// The graph must have been loaded before via Load().
         /// </summary>
-        public void CreateNodes(IGraph graph, Dictionary<string, float> metricMaxima, Dictionary<string, GameObject> nodes)
+        private void CreateNodes(IGraph graph, Dictionary<string, float> metricMaxima, Dictionary<string, GameObject> nodes)
         {
             GameObject housePrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(housePrefabPath);
             if (housePrefab == null)
@@ -117,7 +117,7 @@ namespace SEE
         // if -1, the edges are drawn below the houses;
         // if 1, the edges are drawn above the houses;
         // use either -1 or 1
-        const float orientation = -1f;
+        private const float orientation = -1f;
 
         /// <summary>
         /// Dumps metricMaxima for debugging.
@@ -132,7 +132,7 @@ namespace SEE
 
         // The minimal length of any axis (width, breadth, height) of a block.
         // Must not exceed 1.0f.
-        const float minimalLength = 0.1f;
+        private const float minimalLength = 0.1f;
 
         /// <summary>
         /// Returns a value in the range [0.0, 1.0] representing the relative value of the given
@@ -170,7 +170,7 @@ namespace SEE
         /// Creates the GameObjects representing the edges of the graph.
         /// The graph must have been loaded before via Load().
         /// </summary>
-        public void CreateEdges(IGraph graph, Dictionary<string, GameObject> nodes, List<GameObject> edges)
+        private void CreateEdges(IGraph graph, Dictionary<string, GameObject> nodes, List<GameObject> edges)
         {
             GameObject linePrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(linePreftabPath);
 

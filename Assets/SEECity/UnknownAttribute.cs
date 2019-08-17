@@ -1,5 +1,9 @@
 ﻿using System;
 
+/// <summary>
+/// An exception thrown in case a graph, node, or edge attribute is unknown.
+/// </summary>
+[Serializable]
 public class UnknownAttribute : Exception
 {
     public UnknownAttribute()
