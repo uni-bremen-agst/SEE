@@ -232,7 +232,8 @@ class GraphCreator : GXLParser
                 if (hierarchicalEdgeTypes.Contains(edge.Type))
                 {
                     // hierarchial edges are turned into children
-                    edge.Source.AddChild(edge.Target);
+                    // Note: a hierarchical edge starts at the child and ends at the parent
+                    edge.Target.AddChild(edge.Source);
                 }
                 else
                 {  // non-hierarchical edges are added to the graph
