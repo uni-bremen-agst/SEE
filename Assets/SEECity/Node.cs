@@ -57,6 +57,15 @@ public class Node : GraphElement, INode
 
     void INode.AddChild(INode child)
     {
-        children.Add(child);
+        if (child.Parent == null)
+        {
+            children.Add(child);
+            child.Parent = this;
+        }
+        else
+        {
+            throw new System.Exception("Hierarchical edges do not form a tree. Node with multiple parents: "
+                + child.LinkName);
+        }
     }
 }
