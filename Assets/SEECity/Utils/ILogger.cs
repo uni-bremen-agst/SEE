@@ -4,14 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
-public interface ILogger
+namespace SEE
 {
-    void LogDebug(string message);
+    public interface ILogger
+    {
+        void LogDebug(string message);
 
-    void LogInfo(string message);
+        void LogInfo(string message);
 
-    void LogError(string message);
+        void LogError(string message);
 
+    }
 }
 

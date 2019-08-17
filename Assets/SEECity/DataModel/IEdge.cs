@@ -1,5 +1,8 @@
-﻿public interface IEdge : IGraphElement
+﻿namespace SEE
 {
-    INode Source { get; set; }
-    INode Target { get; set; }
+    public interface IEdge : IGraphElement
+    {
+        INode Source { get; set; }
+        INode Target { get; set; }
+    }
 }

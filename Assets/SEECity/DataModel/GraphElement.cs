@@ -1,31 +1,33 @@
 ﻿using System.Collections.Generic;
 
-public abstract class GraphElement : Attributable, IGraphElement
+namespace SEE
 {
-    private string type;
-
-    public string Type
+    public abstract class GraphElement : Attributable, IGraphElement
     {
-        get
-        {
-            return type;
-        }
-        set
-        {
-            if (!string.IsNullOrEmpty(value))
-            {
-                type = value;
-            }
-            else
-            {
-                type = "Unknown";
-            }
-        }
-    }
+        private string type;
 
-    public override string ToString()
-    {
-        return " \"type\": " + type + "\",\n" + base.ToString();
+        public string Type
+        {
+            get
+            {
+                return type;
+            }
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    type = value;
+                }
+                else
+                {
+                    type = "Unknown";
+                }
+            }
+        }
+
+        public override string ToString()
+        {
+            return " \"type\": " + type + "\",\n" + base.ToString();
+        }
     }
 }
-
