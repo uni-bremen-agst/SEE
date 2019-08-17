@@ -238,7 +238,7 @@ public class SceneGraph : MonoBehaviour
     {
         if (graph != null)
         {
-            ILayout layout = new GridLayout(housePrefabPath, linePreftabPath, widthMetric, heightMetric, breadthMetric);
+            SEE.ILayout layout = new SEE.GridLayout(housePrefabPath, linePreftabPath, widthMetric, heightMetric, breadthMetric);
             layout.Draw(graph, nodes, edges);
         }
         else
