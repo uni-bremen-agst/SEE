@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class ImportProcessor : AssetPostprocessor
+namespace SEEEditor
 {
-    // This function is called just before any Asset is imported.
-    // This lets us control the import settings through code.
-    void OnPreprocessAsset()
+    public class ImportProcessor : AssetPostprocessor
     {
-        // assetPath is the relative path of the imported asset
-        Debug.Log(assetPath + "\n");
-    } 
+        // This function is called just before any Asset is imported.
+        // This lets us control the import settings through code.
+        void OnPreprocessAsset()
+        {
+            // assetPath is the relative path of the imported asset
+            Debug.Log(assetPath + "\n");
+        }
+    }
 }
