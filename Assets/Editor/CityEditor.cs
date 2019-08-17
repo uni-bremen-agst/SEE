@@ -24,16 +24,28 @@ public class CityEditor : EditorWindow
         window.Show();
     }
 
-    // The name of the file containing the graph data.
-    public string graphFilename = "C:\\Users\\raine\\develop\\seecity\\data\\gxl\\minimal_clones.gxl";
-    //public string graphFilename = "C:\\Users\\raine\\develop\\see\\data\\gxl\\linux-clones\\clones.gxl";
-    // The following graph will not work because it does not have the necessary metrics.
-    // public string graphFilename = "C:\\Users\\raine\\Downloads\\codefacts.gxl";
+    // As to whether the optional settings for node and edge tags are to be enabled.
+    bool tagGroupEnabled = false;
+    [Tooltip("The tag of all nodes")]
+    public string nodeTag = "House";
 
-    string myString = "Hello World";
-    bool groupEnabled;
-    bool myBool = true;
-    float myFloat = 1.23f;
+    [Tooltip("The tag of all edges")]
+    public string edgeTag = "Edge";
+
+    [Tooltip("The relative path to the building preftab")]
+    public string nodePrefabPath = "Assets/Prefabs/House.prefab";
+
+    [Tooltip("The relative path to the connection preftab")]
+    public string edgePreftabPath = "Assets/Prefabs/Line.prefab";
+
+    [Tooltip("The path to the graph data")]
+    public string graphPath = "C:\\Users\\raine\\develop\\seecity\\data\\gxl\\minimal_clones.gxl";
+    //public string graphPath = "C:\\Users\\raine\\develop\\see\\data\\gxl\\linux-clones\\clones.gxl";
+    // The following graph will not work because it does not have the necessary metrics.
+    // public string graphPath = "C:\\Users\\raine\\Downloads\\codefacts.gxl";
+
+    [Tooltip("The name of the edge type of hierarchical edges")]
+    public string hierarchicalEdgeType = "Enclosing";
 
     /// <summary>
     /// Creates a new window offering the city editor commands.
@@ -42,14 +54,24 @@ public class CityEditor : EditorWindow
     {
         sceneGraph = GetSceneGraph();
 
-        GUILayout.Label("Base Settings", EditorStyles.boldLabel);
-        myString = EditorGUILayout.TextField("Text Field", myString);
+        GUILayout.Label("Graph", EditorStyles.boldLabel);
+        graphPath = EditorGUILayout.TextField("Graph", graphPath);
+        hierarchicalEdgeType = EditorGUILayout.TextField("Hierarchical Edge", hierarchicalEdgeType);
 
-        groupEnabled = EditorGUILayout.BeginToggleGroup("Optional Settings", groupEnabled);
-        myBool = EditorGUILayout.Toggle("Toggle", myBool);
-        myFloat = EditorGUILayout.Slider("Slider", myFloat, -3, 3);
+        GUILayout.Label("Preftabs", EditorStyles.boldLabel);
+        nodePrefabPath = EditorGUILayout.TextField("Node", nodePrefabPath);
+        edgePreftabPath = EditorGUILayout.TextField("Edge", edgePreftabPath);
+
+        //groupEnabled = EditorGUILayout.BeginToggleGroup("Optional Settings", groupEnabled);
+        //myBool = EditorGUILayout.Toggle("Toggle", myBool);
+        //myFloat = EditorGUILayout.Slider("Slider", myFloat, -3, 3);
+        //EditorGUILayout.EndToggleGroup();
+
+        tagGroupEnabled = EditorGUILayout.BeginToggleGroup("GameObject Tags", tagGroupEnabled);
+        nodeTag = EditorGUILayout.TextField("Node Tag", nodeTag);
+        edgeTag = EditorGUILayout.TextField("Edge Tag", edgeTag);
         EditorGUILayout.EndToggleGroup();
-        
+
         float width = position.width - 5;
         const float height = 30;
         string[] actionLabels = new string[] { "Load City", "Delete City" };
@@ -67,10 +89,8 @@ public class CityEditor : EditorWindow
                 DeleteAll();
                 break;
             default:
-                // Debug.LogError("Unexpected action selection.\n");
                 break;
         }
-
         this.Repaint();
     }
 
@@ -98,8 +118,8 @@ public class CityEditor : EditorWindow
         SEE.SceneGraph sgraph = GetSceneGraph();
         if (sgraph != null)
         {
-            Debug.Log("Loading graph from " + graphFilename + "\n");
-            sgraph.LoadAndDraw(graphFilename);
+            Debug.Log("Loading graph from " + graphPath + "\n");
+            sgraph.LoadAndDraw(graphPath);
         }
         else
         {
