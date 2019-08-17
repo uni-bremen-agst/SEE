@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
 
-public class GXLParser
+public class GXLParser : IDisposable
 {
     public GXLParser(string filename, ILogger logger = null)
     {
         this.filename = filename;
         this.logger = logger;
-        reader = new XmlTextReader(filename);
-        reader.WhitespaceHandling = WhitespaceHandling.None;
+        this.reader = new XmlTextReader(filename)
+        {
+            WhitespaceHandling = WhitespaceHandling.None
+        };
     }
 
     protected enum State
@@ -100,6 +102,7 @@ public class GXLParser
     protected XmlTextReader reader;
     protected ILogger logger = null;
 
+    [Serializable]
     public class SyntaxError : Exception
     {
         public SyntaxError()
@@ -402,4 +405,52 @@ public class GXLParser
     protected virtual void EndGXL()
     {
     }
+
+    #region IDisposable Support
+    private bool disposedValue = false; // To detect redundant calls of Dispose(bool).
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                // dispose managed resources
+                if (reader != null)
+                {
+                    reader.Dispose();
+                    reader = null;
+                }
+            }
+
+            // release unmanaged ressources (requires to override the Finalizer below)
+            // there are none here
+
+            // set larger attributes to null
+            context = null;
+            logger = null;
+            filename = null;
+
+            // this object is now considerd disposed
+            disposedValue = true;
+        }
+    }
+
+    // Override the Finalizer only if Dispose(bool) contains code for releasing
+    // unmanaged resources
+    //~GXLParser()
+    //{
+    //    // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
+    //    Dispose(false);
+    //}
+
+    // Required to implement the Dispose pattern correctly.
+    public void Dispose()
+    {
+        // All code for releasing ressources should be added to Dispose(bool).
+        Dispose(true);
+        // Comment out this code when the Finalizer ~GXLParser() is overridden.
+        //GC.SuppressFinalize(this);
+    }
+    #endregion
 }
