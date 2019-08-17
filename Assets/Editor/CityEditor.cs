@@ -10,7 +10,17 @@ public class CityEditor : EditorWindow
     // Such methods must be static and void. They can have any name.
     static void Init()
     {
-        CityEditor window = (CityEditor)EditorWindow.GetWindow(typeof(CityEditor));
+        // We try to open the window by docking it next to the Inspector if possible.
+        System.Type desiredDockNextTo = System.Type.GetType("UnityEditor.InspectorWindow,UnityEditor.dll");
+        CityEditor window;
+        if (desiredDockNextTo == null)
+        {
+            window = (CityEditor)EditorWindow.GetWindow(typeof(CityEditor), false, "City", true);
+        }
+        else
+        {
+            window = EditorWindow.GetWindow<CityEditor>("City", false, new System.Type[] { desiredDockNextTo });
+        }
         window.Show();
     }
 
@@ -20,6 +30,11 @@ public class CityEditor : EditorWindow
     // The following graph will not work because it does not have the necessary metrics.
     // public string graphFilename = "C:\\Users\\raine\\Downloads\\codefacts.gxl";
 
+    string myString = "Hello World";
+    bool groupEnabled;
+    bool myBool = true;
+    float myFloat = 1.23f;
+
     /// <summary>
     /// Creates a new window offering the city editor commands.
     /// </summary>
@@ -27,6 +42,14 @@ public class CityEditor : EditorWindow
     {
         sceneGraph = GetSceneGraph();
 
+        GUILayout.Label("Base Settings", EditorStyles.boldLabel);
+        myString = EditorGUILayout.TextField("Text Field", myString);
+
+        groupEnabled = EditorGUILayout.BeginToggleGroup("Optional Settings", groupEnabled);
+        myBool = EditorGUILayout.Toggle("Toggle", myBool);
+        myFloat = EditorGUILayout.Slider("Slider", myFloat, -3, 3);
+        EditorGUILayout.EndToggleGroup();
+        
         float width = position.width - 5;
         const float height = 30;
         string[] actionLabels = new string[] { "Load City", "Delete City" };
@@ -47,20 +70,22 @@ public class CityEditor : EditorWindow
                 // Debug.LogError("Unexpected action selection.\n");
                 break;
         }
+
+        this.Repaint();
     }
 
     // The scene graph created by this CityEditor.
-    private SceneGraph sceneGraph = null;
+    private SEE.SceneGraph sceneGraph = null;
 
     /// <summary>
     /// Returns the scene graph if it exists. Will return null if it does not exist.
     /// </summary>
     /// <returns>the scene graph or null</returns>
-    private SceneGraph GetSceneGraph()
+    private SEE.SceneGraph GetSceneGraph()
     {
         if (sceneGraph == null)
         {
-            sceneGraph = SceneGraph.GetInstance();
+            sceneGraph = SEE.SceneGraph.GetInstance();
         }
         return sceneGraph;
     }
@@ -70,7 +95,7 @@ public class CityEditor : EditorWindow
     /// </summary>
     private void LoadCity()
     {
-        SceneGraph sgraph = GetSceneGraph();
+        SEE.SceneGraph sgraph = GetSceneGraph();
         if (sgraph != null)
         {
             Debug.Log("Loading graph from " + graphFilename + "\n");
