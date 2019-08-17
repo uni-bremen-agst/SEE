@@ -25,6 +25,12 @@ public interface IGraph : IAttributable
     void AddEdge(IEdge edge);
 
     /// <summary>
+    /// Returns the list of nodes without parent.
+    /// </summary>
+    /// <returns>root nodes of the hierarchy</returns>
+    List<INode> GetRoots();
+
+    /// <summary>
     /// Adds a node to the graph. 
     /// Preconditions:
     ///   (1) node must not be null

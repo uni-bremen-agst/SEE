@@ -84,5 +84,18 @@ public class Graph : Attributable, IGraph
     {
         return nodes.TryGetValue(linkname, out node);
     }
+
+    List<INode> IGraph.GetRoots()
+    {
+        List<INode> result = new List<INode>();
+        foreach (INode node in nodes.Values)
+        {
+            if (node.Parent == null)
+            {
+                result.Add(node);
+            }
+        }
+        return result;
+    }
 }
 
