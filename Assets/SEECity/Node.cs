@@ -8,7 +8,7 @@ public class Node : GraphElement, INode
 
     private const string linknameAttribute = "Linkage.Name";
 
-    string INode.LinkName
+    public string LinkName
     {
         get => GetString(linknameAttribute);
         // This will only set the linkname attribute, but does not alter the
@@ -20,7 +20,7 @@ public class Node : GraphElement, INode
 
     private const string sourcenameAttribute = "Source.Name";
     
-    string INode.SourceName
+    public string SourceName
     {
         get => GetString(sourcenameAttribute);
         set => SetString(sourcenameAttribute, value);
@@ -28,7 +28,7 @@ public class Node : GraphElement, INode
 
     private INode parent;
 
-    INode INode.Parent
+    public INode Parent
     {
         get => parent;
         set => parent = value;
@@ -45,17 +45,17 @@ public class Node : GraphElement, INode
 
     private List<INode> children = new List<INode>();
 
-    int INode.NumberOfChildren()
+    public int NumberOfChildren()
     {
         return children.Count;
     }
 
-    List<INode> INode.Children()
+    public List<INode> Children()
     {
         return children;
     }
 
-    void INode.AddChild(INode child)
+    public void AddChild(INode child)
     {
         if (child.Parent == null)
         {

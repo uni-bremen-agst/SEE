@@ -4,7 +4,7 @@ public abstract class GraphElement : Attributable, IGraphElement
 {
     private string type;
 
-    string IGraphElement.Type
+    public string Type
     {
         get
         {
