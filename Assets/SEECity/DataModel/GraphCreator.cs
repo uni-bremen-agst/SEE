@@ -6,7 +6,7 @@ namespace SEE
     /// <summary>
     /// Reads a graph from a GXL file and returns it.
     /// </summary>
-    class GraphCreator : GXLParser
+    public class GraphCreator : GXLParser
     {
         /// <summary>
         /// Constructor.
