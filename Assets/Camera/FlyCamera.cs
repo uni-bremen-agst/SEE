@@ -86,8 +86,6 @@ namespace SEE
             }
         }
 
-        private int updateCounts = 0;
-
         /// <summary>
         /// Unity message called for every frame.
         /// 
@@ -97,8 +95,6 @@ namespace SEE
         /// </summary>
         void Update()
         {
-            //updateCounts++;
-            //if (updateCounts > )
             if (Input.GetMouseButtonDown(0))
             {
                 // If a node is hit by a left mouse click, the name of the selected
