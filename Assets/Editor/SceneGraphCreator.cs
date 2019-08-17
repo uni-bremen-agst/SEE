@@ -36,7 +36,10 @@ namespace SEEEditor
         internal static void Delete()
         {
             sceneGraph = GetSceneGraph();
-            sceneGraph.Delete();
+            if (sceneGraph != null)
+            {
+                sceneGraph.Delete();
+            }
         }
 
         /// <summary>
