@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SEE
 {
-    class GridLayout : ILayout
+    public class GridLayout : ILayout
     {
         private readonly string housePrefabPath;
         private readonly string linePreftabPath;

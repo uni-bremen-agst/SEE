@@ -14,7 +14,7 @@ namespace SEE
     ///   ... do something
     ///   p.End();
     /// </summary>
-    class Performance
+    public class Performance
     {
         private Performance() { }
 
