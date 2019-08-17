@@ -1,35 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using SEE;
 
-namespace SEE
+namespace SEEEditor
 {
     /// <summary>
     /// A container for nodes and edges of the graph represented in a scene where the 
-    /// nodes and edges are GameObjects.
+    /// nodes and edges are GameObjects. It will be created at design time and used at
+    /// runtime to relate graph objects of the underlying data model to the GameObjects
+    /// in the scene.
     /// </summary>
     public class SceneGraph : MonoBehaviour
     {
-        [Tooltip("The tag of all buildings")]
-        public string houseTag = "House";
-
-        [Tooltip("The tag of all connections")]
-        public string edgeTag = "Edge";
-
-        [Tooltip("The relative path to the connection preftab")]
-        public string linePreftabPath = "Assets/Prefabs/Line.prefab";
-
-        [Tooltip("The relative path to the building preftab")]
-        public string housePrefabPath = "Assets/Prefabs/House.prefab";
-
-        [Tooltip("The path to the graph data")]
-        public string graphPath = "";
-
-        [Tooltip("The name of the edge type of hierarchical edges")]
-        public string hierarchicalEdgeType = "Enclosing";
-
         // The list of graph nodes indexed by their unique linkname
         private Dictionary<string, GameObject> nodes = new Dictionary<string, GameObject>();
 
@@ -55,7 +39,7 @@ namespace SEE
         private void Start()
         {
             Debug.Log("SceneGraph.Start started\n");
-            Load();
+            Load(settings);
             Debug.Log("SceneGraph.Start ended\n");
         }
 
@@ -184,39 +168,32 @@ namespace SEE
         // The underlying graph whose nodes and edges are to be visualized.
         // Note: When the game is started, this attribute initialization will be executed
         // even though the GameObject this SceneGraph is contained in continues to exist.
-        // TODO: WE NEED TO PRESERVE THE GRAPH DATA.
-        private IGraph graph;
+        private SEE.IGraph graph;
 
-        /// <summary>
-        /// Loads the graph from the given file and creates the GameObjects representing
-        /// its nodes and edges. Sets the graphPath attribute.
-        /// </summary>
-        /// <param name="filename"></param>
-        public void LoadAndDraw(string filename)
-        {
-            graphPath = filename;
-            Load();
-            {
-                Performance p = Performance.Begin("drawing graph from file");
-                Draw();
-                p.End();
-            }
-        }
+        // Path to the graph containing the graph data. It must be loaded at runtime
+        // so that GameObjects (which are generated at design time) and graph data
+        // can be connected. Only the GameObjects are created and preserved when the
+        // system is built, but not the data of the underlying graph.
+
+        private SEEEditor.EditorSettings settings;
 
         /// <summary>
         /// Loads the graph from graphPath (if set), but does not actually create the GameObjects 
         /// representing its nodes and edges.
         /// </summary>
-        public void Load()
+        public void Load(SEEEditor.EditorSettings settings)
         {
-            if (!string.IsNullOrEmpty(graphPath))
+            if (!string.IsNullOrEmpty(settings.graphPath))
             {
+                this.settings = settings;
                 graph = new Graph();
-                HashSet<string> hierarchicalEdges = new HashSet<string>();
-                hierarchicalEdges.Add(hierarchicalEdgeType);
-                GraphCreator graphCreator = new GraphCreator(graphPath, graph, hierarchicalEdges, new Logger());
+                HashSet<string> hierarchicalEdges = new HashSet<string>
                 {
-                    Performance p = Performance.Begin("loading graph data");
+                    settings.hierarchicalEdgeType
+                };
+                SEE.GraphCreator graphCreator = new SEE.GraphCreator(settings.graphPath, graph, hierarchicalEdges, new SEELogger());
+                {
+                    SEE.Performance p = SEE.Performance.Begin("loading graph data");
                     graphCreator.Load();
                     p.End();
                 }
@@ -242,7 +219,7 @@ namespace SEE
         {
             if (graph != null)
             {
-                SEE.ILayout layout = new SEE.GridLayout(housePrefabPath, linePreftabPath, widthMetric, heightMetric, breadthMetric);
+                SEE.ILayout layout = new SEE.GridLayout(settings.nodePrefabPath, settings.edgePreftabPath, widthMetric, heightMetric, breadthMetric);
                 layout.Draw(graph, nodes, edges);
             }
             else
@@ -250,5 +227,6 @@ namespace SEE
                 Debug.LogError("No graph loaded.\n");
             }
         }
+
     }
 }
