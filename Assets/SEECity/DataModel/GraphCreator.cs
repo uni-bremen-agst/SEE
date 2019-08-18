@@ -159,6 +159,16 @@ namespace SEE.DataModel
             {
                 LogError("There is no node to be ended here.");
             }
+            Dump(currentGameObject);
+        }
+
+        private static void Dump(GameObject obj)
+        {
+            Debug.Log("Loaded: " + obj.name + "\n");
+            if (obj.TryGetComponent<INode>(out INode node))
+            {
+                Debug.Log(node.ToString() + "\n");
+            }
         }
 
         /// <summary>

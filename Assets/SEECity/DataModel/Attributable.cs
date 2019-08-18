@@ -3,11 +3,29 @@ using UnityEngine;
 
 namespace SEE.DataModel
 {
+    // When you hit the play button in the editor, all the objects in the active scene are 
+    // serialized and saved, so that unity can deserialize and return them to their original 
+    // state when you stop the execution in the editor. Unity also creates copies of all 
+    // objects in the scene, so the changes you do during play mode change the copies, not 
+    // the original objects in the scene. During this copy process it deserializes the 
+    // objects with the data it saved just before copying, so no visible change is done 
+    // on the objects.
+    // 
+    // All the scripts which inherit from MonoBehaviour are serializable, but custom classes 
+    // are not.To inform unity that you want your class to be serialized you have to use 
+    // the [System.Serializable] attribute.
+    //
+    // Also, unity only serializes the public members in your class, if you want your 
+    // private members to be serialized too, you should inform unity with the [SerializeField] 
+    // attribute.
+
     /// <summary>
     /// Implements IAttributable providing named toggle, int, float, and string attributes.
     /// </summary>
+    [System.Serializable]
     public abstract class Attributable : MonoBehaviour, IAttributable
     {
+        [SerializeField]
         private HashSet<string> toggleAttributes = new HashSet<string>();
 
         public void SetToggle(string attributeName)
@@ -20,6 +38,10 @@ namespace SEE.DataModel
             return toggleAttributes.Contains(attributeName);
         }
 
+        // TODO: We must serialize Dictionary and other System.Classes.
+        // Unity serializes only primitive types.
+        // See https://forum.unity.com/threads/finally-a-serializable-dictionary-for-unity-extracted-from-system-collections-generic.335797/
+        [SerializeField]
         private Dictionary<string, string> stringAttributes = new Dictionary<string, string>();
 
         public void SetString(string attributeName, string value)
@@ -44,6 +66,7 @@ namespace SEE.DataModel
             }
         }
 
+        [SerializeField]
         private Dictionary<string, float> floatAttributes = new Dictionary<string, float>();
 
         public void SetFloat(string attributeName, float value)
@@ -68,6 +91,7 @@ namespace SEE.DataModel
             return floatAttributes.TryGetValue(attributeName, out value);
         }
 
+        [SerializeField]
         private Dictionary<string, int> intAttributes = new Dictionary<string, int>();
 
         public void SetInt(string attributeName, int value)

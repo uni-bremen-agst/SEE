@@ -1,8 +1,9 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.DataModel
 {
+    [System.Serializable]
     public class Node : GraphElement, INode
     {
         // Important note: Nodes should be created only by calling IGraph.newNode().
@@ -10,6 +11,7 @@ namespace SEE.DataModel
 
         private const string linknameAttribute = "Linkage.Name";
 
+        [SerializeField]
         public string LinkName
         {
             get => GetString(linknameAttribute);
@@ -28,8 +30,10 @@ namespace SEE.DataModel
             set => SetString(sourcenameAttribute, value);
         }
 
+        [SerializeField]
         private INode parent;
 
+        [SerializeField]
         public INode Parent
         {
             get => parent;
@@ -45,6 +49,7 @@ namespace SEE.DataModel
             return result;
         }
 
+        [SerializeField]
         private List<INode> children = new List<INode>();
 
         public int NumberOfChildren()
