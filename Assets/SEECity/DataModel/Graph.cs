@@ -8,12 +8,15 @@ namespace SEE.DataModel
     /// <summary>
     /// Implements IGraph.
     /// </summary>
+    [System.Serializable]
     public class Graph : Attributable, ISceneGraph
     {
         // The list of graph nodes indexed by their unique linkname
+        [SerializeField]
         private Dictionary<string, INode> nodes = new Dictionary<string, INode>();
 
         // The list of graph edges.
+        [SerializeField]
         private List<IEdge> edges = new List<IEdge>();
 
         public void AddNode(INode node)
@@ -38,10 +41,13 @@ namespace SEE.DataModel
             edges.Add(edge);
         }
 
+        [SerializeField]
         public int NodeCount => nodes.Count;
 
+        [SerializeField]
         public int EdgeCount => edges.Count;
 
+        [SerializeField]
         private string viewName = "";
 
         /// <summary>
@@ -53,6 +59,7 @@ namespace SEE.DataModel
             set => viewName = value;
         }
 
+        [SerializeField]
         private string path = "";
 
         public string Path

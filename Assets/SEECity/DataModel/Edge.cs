@@ -1,10 +1,14 @@
-﻿namespace SEE.DataModel
+﻿using UnityEngine;
+
+namespace SEE.DataModel
 {
     /// <summary>
     /// Implements IEdge.
     /// </summary>
+    [System.Serializable]
     class Edge : GraphElement, IEdge
     {
+        [SerializeField]
         private INode source;
 
         // Important note: Edges should be created only by calling IGraph.newEdge().
@@ -16,6 +20,7 @@
             set => source = value;
         }
 
+        [SerializeField]
         private INode target;
 
         public INode Target

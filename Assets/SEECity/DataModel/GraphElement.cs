@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using UnityEngine;
 
 namespace SEE.DataModel
 {
+    [System.Serializable]
     public abstract class GraphElement : Attributable, IGraphElement
     {
+        [SerializeField]
         private string type;
 
+        [SerializeField]
         public string Type
         {
             get
