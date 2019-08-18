@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using SEE.DataModel;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -75,11 +76,6 @@ namespace SEE
         /// </summary>
         void Start()
         {
-            // TODO: Re-enable
-            //if (sceneGraph == null)
-            //{
-            //    sceneGraph = SceneGraph.GetInstance();
-            //}
             if (guiObjectNameTextField == null)
             {
                 guiObjectNameTextField = GameObject.Find("Objectname");
@@ -99,21 +95,23 @@ namespace SEE
             {
                 // If a node is hit by a left mouse click, the name of the selected
                 // node is shown in the guiObjectNameTextField.
+                if (guiObjectNameTextField != null)
+                {
+                    Camera camera = gameObject.GetComponentInParent<Camera>();
 
-                Camera camera = gameObject.GetComponentInParent<Camera>();
-
-                if (camera == null)
-                {
-                    Debug.Log("Parent has no camera.\n");
-                    camera = Camera.current;
-                }
-                if (camera != null)
-                {
-                    ShowSelectedObject(camera);
-                }
-                else
-                {
-                    Debug.LogError("No current camera found.\n");
+                    if (camera == null)
+                    {
+                        Debug.Log("Parent has no camera.\n");
+                        camera = Camera.current;
+                    }
+                    if (camera != null)
+                    {
+                        ShowSelectedObject(camera);
+                    }
+                    else
+                    {
+                        Debug.LogError("No current camera found.\n");
+                    }
                 }
             }
 
@@ -193,8 +191,6 @@ namespace SEE
 
         private void ShowSelectedObject(Camera camera)
         {
-            // TODO: Re-enable
-            /*
             Ray ray = camera.ScreenPointToRay(Input.mousePosition);
             // Note: The object to be hit needs a collider.
             if (Physics.Raycast(ray, out RaycastHit hit))
@@ -205,44 +201,46 @@ namespace SEE
                 // is used instead.
 
                 GameObject objectHit = hit.transform.gameObject;
-                if (objectHit.tag == sceneGraph.houseTag)
+
+                Text text = guiObjectNameTextField.GetComponent<Text>();
+                if (objectHit.TryGetComponent<INode>(out INode node))
                 {
-                    // objectHit.SetActive(false); // hide the hidden object
-                    if (guiObjectNameTextField != null)
+                    if (node.TryGetString("Source.Name", out string nodeName))
                     {
-                        Text text = guiObjectNameTextField.GetComponent<Text>();
-                        INode node = sceneGraph.GetNode(objectHit.name);
-                        if (node == null)
-                        {
-                            text.text = objectHit.name;
-                        }
-                        else
-                        {
-                            if (node.TryGetString("Source.Name", out string nodeName))
-                            {
-                                text.text = nodeName;
-                            }
-                            else
-                            {
-                                text.text = objectHit.name;
-                            }
-                        }
+                        text.text = nodeName;
                     }
+                    //else if (!string.IsNullOrEmpty(node.LinkName))
+                    //{
+                    //    text.text = node.LinkName;
+                    //}
+                    
                     else
                     {
-                        Debug.LogError("No text field named Objectname");
+                        text.text = node.Type;
+                        // text.text = objectHit.name;
+                        Debug.Log("Node has neither Source.Name nor unique linkname.\n");
+                        Dump(objectHit);
                     }
                 }
                 else
                 {
-                    Debug.Log("Hidden object is no building.\n");
+                    text.text = objectHit.name;
+                    Debug.Log("No node hit.\n");
                 }
             }
             else
             {
-                Debug.Log("No oject hit.\n");
+                Debug.Log("No object hit.\n");
             }
-            */
+        }
+
+        private static void Dump(GameObject obj)
+        {
+            Debug.Log("Selected: " + obj.name + "\n");
+            if (obj.TryGetComponent<INode>(out INode node))
+            {
+                Debug.Log(node.ToString() + "\n");
+            }
         }
 
         // Returns the basic values, if it's 0 than it's not active.
