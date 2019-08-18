@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
-namespace SEE
+namespace SEE.DataModel
 {
     /// <summary>
     /// Implements IGraph.
     /// </summary>
-    public class Graph : Attributable, IGraph
+    public class Graph : Attributable, ISceneGraph
     {
         // The list of graph nodes indexed by their unique linkname
         private Dictionary<string, INode> nodes = new Dictionary<string, INode>();
@@ -50,6 +51,14 @@ namespace SEE
         {
             get => viewName;
             set => viewName = value;
+        }
+
+        private string path = "";
+
+        public string Path
+        {
+            get => path;
+            set => path = value;
         }
 
         public override string ToString()
@@ -98,6 +107,62 @@ namespace SEE
                 }
             }
             return result;
+        }
+
+        public GameObject GetGraph()
+        {
+            return this.gameObject;
+        }
+
+        public List<GameObject> GetNodes()
+        {
+            List<GameObject> result = new List<GameObject>();
+            foreach (Node node in nodes.Values)
+            {
+                result.Add(node.gameObject);
+            }
+            return result;
+        }
+
+        public List<GameObject> GetEdges()
+        {
+            List<GameObject> result = new List<GameObject>();
+            foreach (Edge edge in edges)
+            {
+                result.Add(edge.gameObject);
+            }
+            return result;
+        }
+
+        private static void DestroyGameObject(GameObject gameObject)
+        {
+            // We must use DestroyImmediate when we are in the editor mode.
+            if (Application.isPlaying)
+            {
+                // playing either in a built player or in the player of the editor
+                Destroy(gameObject);
+            }
+            else
+            {
+                // game is not played; we are in the editor mode
+                DestroyImmediate(gameObject);
+            }
+        }
+
+        public void Destroy()
+        {
+            foreach (Edge edge in edges)
+            {
+                DestroyGameObject(edge.gameObject);
+            }
+            edges.Clear();
+            foreach (Node node in nodes.Values)
+            {
+                DestroyGameObject(node.gameObject);
+            }
+            nodes.Clear();
+            // TODO: Will this actually work and not crash?
+            DestroyGameObject(this.gameObject);
         }
     }
 }

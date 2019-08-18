@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE
+namespace SEE.DataModel
 {
     /// <summary>
     /// Implements IAttributable providing named toggle, int, float, and string attributes.
     /// </summary>
-    public abstract class Attributable : IAttributable
+    public abstract class Attributable : MonoBehaviour, IAttributable
     {
         private HashSet<string> toggleAttributes = new HashSet<string>();
 

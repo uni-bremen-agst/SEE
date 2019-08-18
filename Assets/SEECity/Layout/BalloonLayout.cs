@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using SEE.DataModel;
+using System;
 
 namespace SEE
 {
@@ -9,14 +11,14 @@ namespace SEE
     /// Published in: Proceeding INFOVIS '98 Proceedings of the 1998 IEEE Symposium on 
     /// Information Visualization, Pages 19-25.
     /// </summary>
-    class BalloonLayout : ILayout
+    public class BalloonLayout : ILayout
     {
-        public void Draw(IGraph graph, Dictionary<string, GameObject> nodes, List<GameObject> edges)
+        public void Draw(ISceneGraph graph)
         {
-            CreateNodes(graph, nodes);
+            DrawNodes(graph);
         }
 
-        private void CreateNodes(IGraph graph, Dictionary<string, GameObject> nodes)
+        private void DrawNodes(ISceneGraph graph)
         {
             List<INode> roots = graph.GetRoots();
             foreach (INode node in roots)

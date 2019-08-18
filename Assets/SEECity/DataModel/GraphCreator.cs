@@ -1,10 +1,13 @@
-﻿using System;
+﻿using SEE.DataModel;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-namespace SEE
+namespace SEE.DataModel
 {
     /// <summary>
-    /// Reads a graph from a GXL file and returns it.
+    /// Reads a graph from a GXL file and returns it as IGraph. Every graph entity (IGraph, INode, IEdge)
+    /// is nested in an otherwise empty GameObject. All of those GameObjects have the same transform.
     /// </summary>
     public class GraphCreator : GXLParser
     {
@@ -15,10 +18,18 @@ namespace SEE
         /// <param name="graph">the graph to which the entities found in the GXL are to be added</param>
         /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
         /// <param name="logger">the logger used for messages; if null, no messages are emitted</param>
-        public GraphCreator(string filename, IGraph graph, HashSet<string> hierarchicalEdgeTypes, ILogger logger = null) : base(filename, logger)
+        public GraphCreator(string filename, HashSet<string> hierarchicalEdgeTypes, ILogger logger = null) : base(filename, logger)
         {
-            this.graph = graph;
             this.hierarchicalEdgeTypes = hierarchicalEdgeTypes;
+        }
+
+        /// <summary>
+        /// Returns the graph after it was loaded. Load() must have been called before.
+        /// </summary>
+        /// <returns>loaded graph</returns>
+        public ISceneGraph GetGraph()
+        {
+            return graph;
         }
 
         // Number of errors detected.
@@ -47,10 +58,15 @@ namespace SEE
         }
 
         // graph where to add the GXL information
-        private IGraph graph;
+        private ISceneGraph graph;
 
         // the previously added graph element (node or edge)
         private IGraphElement current = null;
+
+        // The current GameObject that is created for the current graph element.
+        // The current graph element will be added as a component to the current 
+        // game object.
+        GameObject currentGameObject;
 
         // A mapping of the GXL node ids onto the graph nodes.
         private Dictionary<String, INode> nodes = new Dictionary<string, INode>();
@@ -63,6 +79,9 @@ namespace SEE
         /// </summary>
         protected override void StartGraph()
         {
+            currentGameObject = new GameObject();
+            graph = currentGameObject.AddComponent<Graph>();
+            graph.Path = filename;
             if (reader.HasAttributes)
             {
                 while (reader.MoveToNextAttribute())
@@ -70,6 +89,8 @@ namespace SEE
                     if (reader.Name == "id")
                     {
                         graph.Name = reader.Value;
+                        currentGameObject.name = reader.Value;
+                        currentGameObject.tag = Tags.Graph;
                     }
                 }
                 // You can move the reader back to the element node as follows:
@@ -86,7 +107,8 @@ namespace SEE
             {
                 LogError("There is still a pending graph element when new node declaration has begun.");
             }
-            current = new Node();
+            currentGameObject = new GameObject();
+            current = currentGameObject.AddComponent<Node>();
             if (reader.HasAttributes)
             {
                 while (reader.MoveToNextAttribute())
@@ -126,6 +148,8 @@ namespace SEE
                     }
                     else
                     {
+                        currentGameObject.tag = Tags.Node;
+                        currentGameObject.name = node.LinkName;
                         graph.AddNode(node);
                     }
                 }
@@ -148,7 +172,10 @@ namespace SEE
             {
                 LogError("There is still a pending graph element when new edge declaration has begun.");
             }
-            current = new Edge();
+            currentGameObject = new GameObject();
+            current = currentGameObject.AddComponent<Edge>();
+            currentGameObject.tag = Tags.Edge;
+            
             if (reader.HasAttributes)
             {
                 IEdge thisEdge = (IEdge)current;
@@ -198,6 +225,10 @@ namespace SEE
                                 LogError("Unkown target node ID " + toNode + ".");
                             }
                         }
+                    }
+                    else if (reader.Name == "id")
+                    {
+                        currentGameObject.name = reader.Value;
                     }
                 } // while
                 if (fromNode == "")

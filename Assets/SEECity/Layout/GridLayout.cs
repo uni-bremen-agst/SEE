@@ -1,32 +1,29 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+using SEE.DataModel;
+
 namespace SEE
 {
     public class GridLayout : ILayout
     {
-        private readonly string housePrefabPath;
-        private readonly string linePreftabPath;
-
         private readonly string widthMetric;
         private readonly string heightMetric;
         private readonly string breadthMetric;
 
-        public GridLayout(string housePrefabPath, string linePreftabPath, string widthMetric, string heightMetric, string breadthMetric)
+        public GridLayout(string widthMetric, string heightMetric, string breadthMetric)
         {
-            this.housePrefabPath = housePrefabPath;
-            this.linePreftabPath = linePreftabPath;
             this.widthMetric = widthMetric;
             this.heightMetric = heightMetric;
             this.breadthMetric = breadthMetric;
         }
 
-        public void Draw(IGraph graph, Dictionary<string, GameObject> nodes, List<GameObject> edges)
+        public void Draw(ISceneGraph graph)
         {
             // The maximal values of the relevant metrics.
             Dictionary<string, float> metricMaxima = DetermineMetricMaxima(graph, widthMetric, heightMetric, breadthMetric);
-            CreateNodes(graph, metricMaxima, nodes);
-            CreateEdges(graph, nodes, edges);
+            CreateNodes(graph, metricMaxima);
+            CreateEdges(graph);
         }
 
         /// <summary>
@@ -62,56 +59,58 @@ namespace SEE
         /// Creates the GameObjects representing the nodes of the graph.
         /// The graph must have been loaded before via Load().
         /// </summary>
-        private void CreateNodes(IGraph graph, Dictionary<string, float> metricMaxima, Dictionary<string, GameObject> nodes)
+        private void CreateNodes(ISceneGraph graph, Dictionary<string, float> metricMaxima)
         {
-            GameObject housePrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(housePrefabPath);
-            if (housePrefab == null)
-            {
-                Debug.LogError(housePrefabPath + " does not exist.\n");
-            }
-            else
-            {
-                int length = (int)Mathf.Sqrt(graph.NodeCount);
-                int column = 0;
-                int row = 1;
+            int length = (int)Mathf.Sqrt(graph.NodeCount);
+            int column = 0;
+            int row = 1;
 
-                foreach (INode node in graph.Nodes())
+            foreach (GameObject sceneNode in graph.GetNodes())
+            {
+                column++;
+                if (column > length)
                 {
-                    column++;
-                    if (column > length)
-                    {
-                        // exceeded length of the square => start a new row
-                        column = 1;
-                        row++;
-                    }
-                    GameObject house = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(housePrefab);
-                    // name of a building should be unique
-                    house.name = node.LinkName;
-
-                    float width = NormalizedMetric(metricMaxima, node, widthMetric);
-                    float breadth = NormalizedMetric(metricMaxima, node, breadthMetric);
-                    float height = NormalizedMetric(metricMaxima, node, heightMetric);
-                    house.transform.localScale = new Vector3(width, height, breadth);
-
-                    // The position is the center of a GameObject. We want all GameObjects
-                    // be placed at the same ground level 0. That is why we need to "lift"
-                    // every building by half of its height.
-                    house.transform.position = new Vector3(row + row * 0.3f, height / 2.0f, column + column * 0.3f);
-                    /*
-                    {
-                        Renderer renderer;
-                        //Fetch the GameObject's Renderer component
-                        renderer = house.GetComponent<Renderer>();
-                        //Change the GameObject's Material Color to red
-                        //m_ObjectRenderer.material.color = Color.red;
-                        Debug.Log("house size: " + renderer.bounds.size + "\n");
-                    }
-                    */
-                    nodes.Add(node.LinkName, house);
+                    // exceeded length of the square => start a new row
+                    column = 1;
+                    row++;
                 }
+                INode node = sceneNode.GetComponent<INode>();
+
+                float width;
+                float breadth;
+                float height;
+
+                if (node != null)
+                {
+                    width = NormalizedMetric(metricMaxima, node, widthMetric);
+                    breadth = NormalizedMetric(metricMaxima, node, breadthMetric);
+                    height = NormalizedMetric(metricMaxima, node, heightMetric);
+                }
+                else
+                {
+                    Debug.LogError("Scene node " + sceneNode.name + " does not have a graph node component.\n");
+                    width = minimalLength;
+                    breadth = minimalLength;
+                    height = minimalLength;
+                }
+                sceneNode.transform.localScale = new Vector3(width, height, breadth);
+
+                // The position is the center of a GameObject. We want all GameObjects
+                // be placed at the same ground level 0. That is why we need to "lift"
+                // every building by half of its height.
+                sceneNode.transform.position = new Vector3(row + row * 0.3f, height / 2.0f, column + column * 0.3f);
+                /*
+                {
+                    Renderer renderer;
+                    //Fetch the GameObject's Renderer component
+                    renderer = house.GetComponent<Renderer>();
+                    //Change the GameObject's Material Color to red
+                    //m_ObjectRenderer.material.color = Color.red;
+                    Debug.Log("house size: " + renderer.bounds.size + "\n");
+                }
+                */
             }
         }
-
 
         // orientation of the edges; 
         // if -1, the edges are drawn below the houses;
@@ -170,25 +169,33 @@ namespace SEE
         /// Creates the GameObjects representing the edges of the graph.
         /// The graph must have been loaded before via Load().
         /// </summary>
-        private void CreateEdges(IGraph graph, Dictionary<string, GameObject> nodes, List<GameObject> edges)
+        private void CreateEdges(ISceneGraph graph)
         {
-            GameObject linePrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(linePreftabPath);
+            // the distance of the edges relative to the houses; the maximal height of
+            // a house is 1.0
+            const float above = orientation * (1f / 2.0f);
 
-            if (linePrefab == null)
+            foreach (GameObject gameEdge in graph.GetEdges())
             {
-                Debug.LogError(linePreftabPath + " does not exist.\n");
-            }
-            else
-            {
-                // the distance of the edges relative to the houses; the maximal height of
-                // a house is 1.0
-                const float above = orientation * (1f / 2.0f);
-
-                foreach (IEdge edge in graph.Edges())
+                IEdge edge = gameEdge.GetComponent<IEdge>();
+                if (edge != null)
                 {
-                    GameObject sceneEdge = DrawLine(nodes[edge.Source.LinkName], nodes[edge.Target.LinkName], linePrefab, above);
-                    edges.Add(sceneEdge);
+                    INode source = edge.Source;
+                    INode target = edge.Target;
+                    if (source != null && target != null)
+                    {
+                        //GameObject s = source.
+                    }
+                    else
+                    {
+                        Debug.LogError("Scene edge " + gameEdge.name + " has a missing source or target.\n");
+                    }
                 }
+                else
+                {
+                    Debug.LogError("Scene edge " + gameEdge.name + " does not have a graph edge component.\n");
+                }
+                //GameObject sceneEdge = DrawLine(nodes[gameEdge.Source.LinkName], nodes[gameEdge.Target.LinkName], linePrefab, above);
             }
         }
 

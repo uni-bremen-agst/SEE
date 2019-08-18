@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SEE
+namespace SEE.DataModel
 {
     public interface IGraph : IAttributable
     {
@@ -18,6 +18,12 @@ namespace SEE
         /// The name of the graph.
         /// </summary>
         string Name { get; set; }
+
+        /// <summary>
+        /// The path of the file from which this graph was loaded. Could be the
+        /// empty string if the graph was created by loading it from disk.
+        /// </summary>
+        string Path { get; set; }
 
         /// <summary>
         /// Adds a non-hierarchical edge to the graph.
@@ -63,5 +69,6 @@ namespace SEE
         /// <param name="node">the found node, otherwise null</param>
         /// <returns>true if a node could be found</returns>
         bool TryGetNode(string linkname, out INode node);
+
     }
 }

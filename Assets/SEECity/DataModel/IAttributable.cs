@@ -1,4 +1,4 @@
-﻿namespace SEE
+﻿namespace SEE.DataModel
 {
     /// <summary>
     /// Specifies attributable objects with named toggle, int, float, and string attributes.

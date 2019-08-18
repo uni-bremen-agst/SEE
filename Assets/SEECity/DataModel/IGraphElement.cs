@@ -1,4 +1,4 @@
-﻿namespace SEE
+﻿namespace SEE.DataModel
 {
     public interface IGraphElement : IAttributable
     {

@@ -1,4 +1,4 @@
-﻿namespace SEE
+﻿namespace SEE.DataModel
 {
     /// <summary>
     /// Implements IEdge.

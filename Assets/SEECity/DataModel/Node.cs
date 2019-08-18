@@ -1,7 +1,7 @@
 ﻿
 using System.Collections.Generic;
 
-namespace SEE
+namespace SEE.DataModel
 {
     public class Node : GraphElement, INode
     {
