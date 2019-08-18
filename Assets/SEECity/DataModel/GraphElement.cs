@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SEE
+namespace SEE.DataModel
 {
     public abstract class GraphElement : Attributable, IGraphElement
     {

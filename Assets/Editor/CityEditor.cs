@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using SEE.DataModel;
+using SEE;
+using System;
+using SEE.Layout;
 
 namespace SEEEditor
 {
@@ -30,18 +34,18 @@ namespace SEEEditor
         // As to whether the optional settings for node and edge tags are to be enabled.
         private bool tagGroupEnabled = false;
 
+        private ISceneGraph graph = null;
+
+        private SEE.IGraphSettings editorSettings = new SEE.IGraphSettings();
+
         /// <summary>
         /// Creates a new window offering the city editor commands.
         /// </summary>
         void OnGUI()
         {
             GUILayout.Label("Graph", EditorStyles.boldLabel);
-            SceneGraphCreator.settings.graphPath = EditorGUILayout.TextField("Graph", SceneGraphCreator.settings.graphPath);
-            SceneGraphCreator.settings.hierarchicalEdgeType = EditorGUILayout.TextField("Hierarchical Edge", SceneGraphCreator.settings.hierarchicalEdgeType);
-
-            GUILayout.Label("Preftabs", EditorStyles.boldLabel);
-            SceneGraphCreator.settings.nodePrefabPath = EditorGUILayout.TextField("Node", SceneGraphCreator.settings.nodePrefabPath);
-            SceneGraphCreator.settings.edgePreftabPath = EditorGUILayout.TextField("Edge", SceneGraphCreator.settings.edgePreftabPath);
+            editorSettings.graphPath = EditorGUILayout.TextField("Graph", editorSettings.graphPath);
+            editorSettings.hierarchicalEdgeType = EditorGUILayout.TextField("Hierarchical Edge", editorSettings.hierarchicalEdgeType);
 
             //groupEnabled = EditorGUILayout.BeginToggleGroup("Optional Settings", groupEnabled);
             //myBool = EditorGUILayout.Toggle("Toggle", myBool);
@@ -49,8 +53,6 @@ namespace SEEEditor
             //EditorGUILayout.EndToggleGroup();
 
             tagGroupEnabled = EditorGUILayout.BeginToggleGroup("GameObject Tags", tagGroupEnabled);
-            SceneGraphCreator.settings.nodeTag = EditorGUILayout.TextField("Node Tag", SceneGraphCreator.settings.nodeTag);
-            SceneGraphCreator.settings.edgeTag = EditorGUILayout.TextField("Edge Tag", SceneGraphCreator.settings.edgeTag);
             EditorGUILayout.EndToggleGroup();
 
             float width = position.width - 5;
@@ -60,10 +62,26 @@ namespace SEEEditor
             switch (selectedAction)
             {
                 case 0:
-                    SceneGraphCreator.Load();
+                    graph = SceneGraphs.Add(editorSettings);
+
+                    if (graph != null)
+                    {
+                        const string widthMetric = "Metric.Number_of_Tokens";
+                        const string heightMetric = "Metric.Clone_Rate";
+                        const string breadthMetric = "Metric.LOC";
+                        MeshFactory.Reset();
+                        AddMeshes(graph);
+                        SEE.ILayout layout = new SEE.GridLayout(widthMetric, heightMetric, breadthMetric);
+                        layout.Draw(graph);
+                    }
+                    else
+                    {
+                        Debug.LogError("No graph loaded.\n");
+                    }
                     break;
                 case 1:
-                    SceneGraphCreator.Delete();
+                    SceneGraphs.DeleteAll();
+                    graph = null;
                     // delete all left-overs if there are any
                     DeleteAll();
                     break;
@@ -73,26 +91,29 @@ namespace SEEEditor
             this.Repaint();
         }
 
+        private void AddMeshes(ISceneGraph graph)
+        {
+            foreach (GameObject node in graph.GetNodes())
+            {
+                MeshFactory.AddMesh(node, PrimitiveType.Cube);
+            }
+        }
+
         /// <summary>
-        /// Deletes all scene nodes and edges via the tags defined in sceneGraph.
+        /// Deletes all scene graph, nodes and edges via their tags.
         /// </summary>
         private void DeleteAll()
         {
-            try
+            foreach (string tag in SEE.DataModel.Tags.All)
             {
-                DeleteByTag(SceneGraphCreator.settings.nodeTag);
-            }
-            catch (UnityException e)
-            {
-                Debug.LogError(e.ToString());
-            }
-            try
-            {
-                DeleteByTag(SceneGraphCreator.settings.edgeTag);
-            }
-            catch (UnityException e)
-            {
-                Debug.LogError(e.ToString());
+                try
+                {
+                    DeleteByTag(tag);
+                }
+                catch (UnityException e)
+                {
+                    Debug.LogError(e.ToString());
+                }
             }
         }
 

@@ -4,8 +4,10 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - House
   - Edge
+  - Graph
+  - Node
+  - House
   layers:
   - Default
   - TransparentFX
