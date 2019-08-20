@@ -18,6 +18,9 @@ namespace SEE.DataModel
     // Also, unity only serializes the public members in your class, if you want your 
     // private members to be serialized too, you should inform unity with the [SerializeField] 
     // attribute.
+    //
+    // More on Unity's serialization can be found here: 
+    // https://docs.unity3d.com/Manual/script-Serialization.html
 
     /// <summary>
     /// Implements IAttributable providing named toggle, int, float, and string attributes.
@@ -38,11 +41,11 @@ namespace SEE.DataModel
             return toggleAttributes.Contains(attributeName);
         }
 
-        // TODO: We must serialize Dictionary and other System.Classes.
-        // Unity serializes only primitive types.
-        // See https://forum.unity.com/threads/finally-a-serializable-dictionary-for-unity-extracted-from-system-collections-generic.335797/
-        [SerializeField]
-        private Dictionary<string, string> stringAttributes = new Dictionary<string, string>();
+        // Unity does not serializes Dictionarys. That is why we need to use StringStringDictionary
+        // instead here. Note that we need to declare the attribute here as a SerializeField 
+        // nevertheless.
+        [UnityEngine.SerializeField]
+        private StringStringDictionary stringAttributes = new StringStringDictionary();
 
         public void SetString(string attributeName, string value)
         {
@@ -67,7 +70,7 @@ namespace SEE.DataModel
         }
 
         [SerializeField]
-        private Dictionary<string, float> floatAttributes = new Dictionary<string, float>();
+        private StringFloatDictionary floatAttributes = new StringFloatDictionary();
 
         public void SetFloat(string attributeName, float value)
         {
@@ -92,7 +95,7 @@ namespace SEE.DataModel
         }
 
         [SerializeField]
-        private Dictionary<string, int> intAttributes = new Dictionary<string, int>();
+        private StringIntDictionary intAttributes = new StringIntDictionary();
 
         public void SetInt(string attributeName, int value)
         {
