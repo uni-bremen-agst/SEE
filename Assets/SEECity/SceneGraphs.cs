@@ -6,7 +6,8 @@ using SEE.DataModel;
 namespace SEE
 {
     /// <summary>
-    /// A container for all graphs shown in the scene.
+    /// A container for all graphs shown in the scene. Exists only in editor mode,
+    /// not during the game.
     /// </summary>
     public class SceneGraphs
     {
