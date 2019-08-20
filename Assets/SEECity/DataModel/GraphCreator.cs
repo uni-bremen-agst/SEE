@@ -159,10 +159,10 @@ namespace SEE.DataModel
             {
                 LogError("There is no node to be ended here.");
             }
-            if (currentGameObject != null)
-            {
-                Dump(currentGameObject);
-            }
+            //if (currentGameObject != null)
+            //{
+            //    Dump(currentGameObject);
+            //}
         }
 
         private static void Dump(GameObject obj)
@@ -185,6 +185,11 @@ namespace SEE.DataModel
             {
                 LogError("There is still a pending graph element when new edge declaration has begun.");
             }
+            // the game object we create for this edge in the game; we do not
+            // know whether this edge is a hierarchical or non-hierarchical 
+            // edge until we see the edge type; hierarchical edges will not be 
+            // represented as GameObjects; if we create a game object for a 
+            // a hierarchical edge, we may need to destroy it later again
             currentGameObject = new GameObject();
             current = currentGameObject.AddComponent<Edge>();
             currentGameObject.tag = Tags.Edge;
@@ -280,6 +285,10 @@ namespace SEE.DataModel
                         // hierarchial edges are turned into children
                         // Note: a hierarchical edge starts at the child and ends at the parent
                         edge.Target.AddChild(edge.Source);
+
+                        // hierarchical edges do not have an associated GameObject; we need to
+                        // destroy currentGameObject (which we created in StartEdge above) again
+                        Destroyer.DestroyGameObject(currentGameObject);
                     }
                     else
                     {  // non-hierarchical edges are added to the graph

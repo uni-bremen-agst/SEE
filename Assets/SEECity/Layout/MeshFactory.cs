@@ -11,17 +11,7 @@ namespace SEE.Layout
         {
             foreach (GameObject gameObject in primitiveMeshes.Values)
             {
-                // We must use DestroyImmediate when we are in the editor mode.
-                if (Application.isPlaying)
-                {
-                    // playing either in a built player or in the player of the editor
-                    Object.Destroy(gameObject);
-                }
-                else
-                {
-                    // game is not played; we are in the editor mode
-                    Object.DestroyImmediate(gameObject);
-                }
+                Destroyer.DestroyGameObject(gameObject);
             }
             primitiveMeshes = new Dictionary<PrimitiveType, GameObject>();
         }
