@@ -41,10 +41,8 @@ namespace SEE.DataModel
             edges.Add(edge);
         }
 
-        [SerializeField]
         public int NodeCount => nodes.Count;
 
-        [SerializeField]
         public int EdgeCount => edges.Count;
 
         [SerializeField]
