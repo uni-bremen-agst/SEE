@@ -3,14 +3,20 @@ using UnityEngine;
 
 namespace SEE.DataModel
 {
+    /// <summary>
+    /// Node of a graph.
+    /// </summary>
     [System.Serializable]
-    public class Node : GraphElement, INode
+    public class Node : GraphElement
     {
-        // Important note: Nodes should be created only by calling IGraph.newNode().
+        // Important note: Nodes should be created only by calling Graph.newNode().
         // Do not use 'new Node()'.
 
         private const string linknameAttribute = "Linkage.Name";
 
+        /// <summary>
+        /// The unique identifier of a node.
+        /// </summary>
         [SerializeField]
         public string LinkName
         {
@@ -24,6 +30,9 @@ namespace SEE.DataModel
 
         private const string sourcenameAttribute = "Source.Name";
 
+        /// <summary>
+        /// The name of the node (which is not necessarily unique).
+        /// </summary>
         public string SourceName
         {
             get => GetString(sourcenameAttribute);
@@ -31,10 +40,14 @@ namespace SEE.DataModel
         }
 
         [SerializeField]
-        private INode parent;
+        private Node parent;
 
+        /// <summary>
+        /// The ancestor of the node in the hierarchy. May be null if the node
+        /// is a root.
+        /// </summary>
         [SerializeField]
-        public INode Parent
+        public Node Parent
         {
             get => parent;
             set => parent = value;
@@ -50,19 +63,33 @@ namespace SEE.DataModel
         }
 
         [SerializeField]
-        private List<INode> children = new List<INode>();
+        private List<Node> children = new List<Node>();
 
+        /// <summary>
+        /// The number of descendants of this node.
+        /// </summary>
+        /// <returns>number of descendants</returns>
         public int NumberOfChildren()
         {
             return children.Count;
         }
 
-        public List<INode> Children()
+        /// <summary>
+        /// The descendants of the node. 
+        /// Note: This is not a copy. Do not modify the result.
+        /// </summary>
+        /// <returns>descendants of the node</returns>
+        public List<Node> Children()
         {
             return children;
         }
 
-        public void AddChild(INode child)
+        /// <summary>
+        /// Add given node as a descendant of the node in the hierarchy.
+        /// The same node must not be added more than once.
+        /// </summary>
+        /// <param name="child">descendant to be added to node</param>
+        public void AddChild(Node child)
         {
             if (child.Parent == null)
             {

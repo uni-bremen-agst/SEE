@@ -13,15 +13,15 @@ namespace SEE
     /// </summary>
     public class BalloonLayout : ILayout
     {
-        public void Draw(ISceneGraph graph)
+        public void Draw(Graph graph)
         {
             DrawNodes(graph);
         }
 
-        private void DrawNodes(ISceneGraph graph)
+        private void DrawNodes(Graph graph)
         {
-            List<INode> roots = graph.GetRoots();
-            foreach (INode node in roots)
+            List<Node> roots = graph.GetRoots();
+            foreach (Node node in roots)
             {
 
             }

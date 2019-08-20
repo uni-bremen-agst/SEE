@@ -33,9 +33,9 @@ namespace SEEEditor
         // As to whether the optional settings for node and edge tags are to be enabled.
         private bool tagGroupEnabled = false;
 
-        private ISceneGraph graph = null;
+        private Graph graph = null;
 
-        private SEE.IGraphSettings editorSettings = new SEE.IGraphSettings();
+        private SEE.GraphSettings editorSettings = new SEE.GraphSettings();
 
         /// <summary>
         /// Creates a new window offering the city editor commands.
@@ -90,7 +90,7 @@ namespace SEEEditor
             this.Repaint();
         }
 
-        private void AddMeshes(ISceneGraph graph)
+        private void AddMeshes(Graph graph)
         {
             foreach (GameObject node in graph.GetNodes())
             {

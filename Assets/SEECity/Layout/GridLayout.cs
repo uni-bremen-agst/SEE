@@ -18,7 +18,7 @@ namespace SEE
             this.breadthMetric = breadthMetric;
         }
 
-        public void Draw(ISceneGraph graph)
+        public void Draw(Graph graph)
         {
             // The maximal values of the relevant metrics.
             Dictionary<string, float> metricMaxima = DetermineMetricMaxima(graph, widthMetric, heightMetric, breadthMetric);
@@ -31,7 +31,7 @@ namespace SEE
         /// </summary>
         /// <param name="metrics">the metrics for which the maxima are to be gathered</param>
         /// <returns>metric maxima</returns>
-        private Dictionary<string, float> DetermineMetricMaxima(IGraph graph, params string[] metrics)
+        private Dictionary<string, float> DetermineMetricMaxima(Graph graph, params string[] metrics)
         {
             Dictionary<string, float> result = new Dictionary<string, float>();
             foreach (string metric in metrics)
@@ -39,7 +39,7 @@ namespace SEE
                 result.Add(metric, 0.0f);
             }
 
-            foreach (INode node in graph.Nodes())
+            foreach (Node node in graph.Nodes())
             {
                 foreach (string metric in metrics)
                 {
@@ -59,7 +59,7 @@ namespace SEE
         /// Creates the GameObjects representing the nodes of the graph.
         /// The graph must have been loaded before via Load().
         /// </summary>
-        private void CreateNodes(ISceneGraph graph, Dictionary<string, float> metricMaxima)
+        private void CreateNodes(Graph graph, Dictionary<string, float> metricMaxima)
         {
             int length = (int)Mathf.Sqrt(graph.NodeCount);
             int column = 0;
@@ -74,7 +74,7 @@ namespace SEE
                     column = 1;
                     row++;
                 }
-                INode node = sceneNode.GetComponent<INode>();
+                Node node = sceneNode.GetComponent<Node>();
 
                 float width;
                 float breadth;
@@ -140,7 +140,7 @@ namespace SEE
         /// <param name="node"></param>
         /// <param name="metric"></param>
         /// <returns></returns>
-        private float NormalizedMetric(Dictionary<string, float> metricMaxima, INode node, string metric)
+        private float NormalizedMetric(Dictionary<string, float> metricMaxima, Node node, string metric)
         {
             float max = metricMaxima[metric];
 
@@ -169,7 +169,7 @@ namespace SEE
         /// Creates the GameObjects representing the edges of the graph.
         /// The graph must have been loaded before via Load().
         /// </summary>
-        private void CreateEdges(ISceneGraph graph)
+        private void CreateEdges(Graph graph)
         {
             // the distance of the edges relative to the houses; the maximal height of
             // a house is 1.0
@@ -177,11 +177,11 @@ namespace SEE
 
             foreach (GameObject gameEdge in graph.GetEdges())
             {
-                IEdge edge = gameEdge.GetComponent<IEdge>();
+                Edge edge = gameEdge.GetComponent<Edge>();
                 if (edge != null)
                 {
-                    INode source = edge.Source;
-                    INode target = edge.Target;
+                    Node source = edge.Source;
+                    Node target = edge.Target;
                     if (source != null && target != null)
                     {
                         //GameObject s = source.

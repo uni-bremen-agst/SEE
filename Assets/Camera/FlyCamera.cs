@@ -203,7 +203,7 @@ namespace SEE
                 GameObject objectHit = hit.transform.gameObject;
 
                 Text text = guiObjectNameTextField.GetComponent<Text>();
-                if (objectHit.TryGetComponent<INode>(out INode node))
+                if (objectHit.TryGetComponent<Node>(out Node node))
                 {
                     if (node.TryGetString("Source.Name", out string nodeName))
                     {
@@ -237,7 +237,7 @@ namespace SEE
         private static void Dump(GameObject obj)
         {
             Debug.Log("Selected: " + obj.name + "\n");
-            if (obj.TryGetComponent<INode>(out INode node))
+            if (obj.TryGetComponent<Node>(out Node node))
             {
                 Debug.Log(node.ToString() + "\n");
             }

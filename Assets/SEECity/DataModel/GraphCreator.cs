@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SEE.DataModel
 {
     /// <summary>
-    /// Reads a graph from a GXL file and returns it as IGraph. Every graph entity (IGraph, INode, IEdge)
+    /// Reads a graph from a GXL file and returns it as Graph. Every graph entity (Graph, Node, Edge)
     /// is nested in an otherwise empty GameObject. All of those GameObjects have the same transform.
     /// </summary>
     public class GraphCreator : GXLParser
@@ -27,7 +27,7 @@ namespace SEE.DataModel
         /// Returns the graph after it was loaded. Load() must have been called before.
         /// </summary>
         /// <returns>loaded graph</returns>
-        public ISceneGraph GetGraph()
+        public Graph GetGraph()
         {
             return graph;
         }
@@ -58,10 +58,10 @@ namespace SEE.DataModel
         }
 
         // graph where to add the GXL information
-        private ISceneGraph graph;
+        private Graph graph;
 
         // the previously added graph element (node or edge)
-        private IGraphElement current = null;
+        private GraphElement current = null;
 
         // The current GameObject that is created for the current graph element.
         // The current graph element will be added as a component to the current 
@@ -69,7 +69,7 @@ namespace SEE.DataModel
         GameObject currentGameObject;
 
         // A mapping of the GXL node ids onto the graph nodes.
-        private Dictionary<String, INode> nodes = new Dictionary<string, INode>();
+        private Dictionary<String, Node> nodes = new Dictionary<string, Node>();
 
         // The set of edge-type names for edges considered to represent nesting.
         private readonly HashSet<string> hierarchicalEdgeTypes = null;
@@ -133,7 +133,7 @@ namespace SEE.DataModel
         {
             if (current != null)
             {
-                if (!(current is INode))
+                if (!(current is Node))
                 {
                     LogError("The declaration to be ended is no node.");
                 }
@@ -141,7 +141,7 @@ namespace SEE.DataModel
                 {
                     // Now the current node should have a linkname and we can
                     // actually add it to the graph.
-                    INode node = (INode)current;
+                    Node node = (Node)current;
                     if (String.IsNullOrEmpty(node.LinkName))
                     {
                         LogError("Node has no attribute Source.Linkname.");
@@ -168,7 +168,7 @@ namespace SEE.DataModel
         private static void Dump(GameObject obj)
         {
             Debug.Log("Loaded: " + obj.name + "\n");
-            if (obj.TryGetComponent<INode>(out INode node))
+            if (obj.TryGetComponent<Node>(out Node node))
             {
                 Debug.Log(node.ToString() + "\n");
             }
@@ -191,7 +191,7 @@ namespace SEE.DataModel
             
             if (reader.HasAttributes)
             {
-                IEdge thisEdge = (IEdge)current;
+                Edge thisEdge = (Edge)current;
 
                 string fromNode = "";
                 string toNode = "";
@@ -209,7 +209,7 @@ namespace SEE.DataModel
                         {
                             fromNode = reader.Value;
                             // set source of the edge
-                            if (nodes.TryGetValue(fromNode, out INode node))
+                            if (nodes.TryGetValue(fromNode, out Node node))
                             {
                                 thisEdge.Source = node;
                             }
@@ -229,7 +229,7 @@ namespace SEE.DataModel
                         {
                             toNode = reader.Value;
                             // set target of the edge
-                            if (nodes.TryGetValue(toNode, out INode node))
+                            if (nodes.TryGetValue(toNode, out Node node))
                             {
                                 thisEdge.Target = node;
                             }
@@ -274,7 +274,7 @@ namespace SEE.DataModel
                 }
                 else
                 {
-                    IEdge edge = current as Edge;
+                    Edge edge = current as Edge;
                     if (hierarchicalEdgeTypes.Contains(edge.Type))
                     {
                         // hierarchial edges are turned into children
