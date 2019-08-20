@@ -2,6 +2,9 @@
 
 namespace SEE.DataModel
 {
+    /// <summary>
+    /// Nodes of a graph.
+    /// </summary>
     public interface INode : IGraphElement
     {
         /// <summary>
