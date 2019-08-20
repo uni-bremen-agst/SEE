@@ -178,21 +178,6 @@ namespace SEE.DataModel
             return result;
         }
 
-        private static void DestroyGameObject(GameObject gameObject)
-        {
-            // We must use DestroyImmediate when we are in the editor mode.
-            if (Application.isPlaying)
-            {
-                // playing either in a built player or in the player of the editor
-                Destroy(gameObject);
-            }
-            else
-            {
-                // game is not played; we are in the editor mode
-                DestroyImmediate(gameObject);
-            }
-        }
-
         /// <summary>
         /// Destroys the GameObjects of the graph's nodes and edges including the
         /// associated Node and Edge components as well as the GameObject of the graph 
@@ -202,16 +187,16 @@ namespace SEE.DataModel
         {
             foreach (Edge edge in edges)
             {
-                DestroyGameObject(edge.gameObject);
+                Destroyer.DestroyGameObject(edge.gameObject);
             }
             edges.Clear();
             foreach (Node node in nodes.Values)
             {
-                DestroyGameObject(node.gameObject);
+                Destroyer.DestroyGameObject(node.gameObject);
             }
             nodes.Clear();
             // TODO: Will this actually work and not crash?
-            DestroyGameObject(this.gameObject);
+            Destroyer.DestroyGameObject(this.gameObject);
         }
 
         public override string ToString()
