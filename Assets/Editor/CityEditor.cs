@@ -2,7 +2,6 @@
 using UnityEditor;
 using SEE.DataModel;
 using SEE;
-using System;
 using SEE.Layout;
 
 namespace SEEEditor
