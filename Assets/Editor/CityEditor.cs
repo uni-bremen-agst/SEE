@@ -70,7 +70,7 @@ namespace SEEEditor
                         const string breadthMetric = "Metric.LOC";
                         MeshFactory.Reset();
                         AddMeshes(graph);
-                        SEE.ILayout layout = new SEE.GridLayout(widthMetric, heightMetric, breadthMetric);
+                        SEE.ILayout layout = new SEE.ManhattenLayout(widthMetric, heightMetric, breadthMetric);
                         layout.Draw(graph);
                     }
                     else
