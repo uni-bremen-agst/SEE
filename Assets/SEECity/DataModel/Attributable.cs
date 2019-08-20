@@ -28,12 +28,20 @@ namespace SEE.DataModel
     [System.Serializable]
     public abstract class Attributable : MonoBehaviour, IAttributable
     {
+        /// <summary>
+        /// The set of toggle attributes. A toggle is set if it is contained in this
+        /// list, otherwise it is unset. Conceptionally, toggleAttributes is a HashSet,
+        /// but HashSets are not serialized by Unity. That is why we use List instead.
+        /// </summary>
         [SerializeField]
-        private HashSet<string> toggleAttributes = new HashSet<string>();
+        private List<string> toggleAttributes = new List<string>();
 
         public void SetToggle(string attributeName)
         {
-            toggleAttributes.Add(attributeName);
+            if (!toggleAttributes.Contains(attributeName))
+            {
+                toggleAttributes.Add(attributeName);
+            }
         }
 
         public bool HasToggle(string attributeName)
