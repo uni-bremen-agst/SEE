@@ -222,6 +222,11 @@ namespace SEE
                         Dump(objectHit);
                     }
                 }
+                else if (objectHit.TryGetComponent<Edge>(out Edge edge))
+                {
+                    text.text = "Edge " + objectHit.name;
+                    Debug.Log("Edge hit.\n");
+                }
                 else
                 {
                     text.text = objectHit.name;

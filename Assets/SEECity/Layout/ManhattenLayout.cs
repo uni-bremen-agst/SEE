@@ -178,6 +178,8 @@ namespace SEE
             const float maxHeight = 1f;
             const float offset = maxHeight * 0.1f; // must be positive
 
+            const float lineWidth = 0.01f;
+
             string materialPath = "BrickTextures/BricksTexture13/BricksTexture13";
             //Material newMat = Resources.Load<Material>(materialPath);
             Material newMat = new Material(Shader.Find("Legacy Shaders/Particles/Additive"));
@@ -217,8 +219,15 @@ namespace SEE
                             renderer.sortingOrder = 5;
                             renderer.positionCount = 4; // number of vertices
 
+                            // simplify rendering
+                            renderer.receiveShadows = false;
+                            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+
                             Vector3 sourceCenterToBorder = GetCenterToBorder(sourceObject);
                             Vector3 targetCenterToBorder = GetCenterToBorder(targetObject);
+
+                            renderer.startWidth = lineWidth;
+                            renderer.endWidth = lineWidth;
 
                             var points = new Vector3[renderer.positionCount];
                             // starting position
@@ -239,8 +248,16 @@ namespace SEE
 
                             renderer.SetPositions(points);
 
-                            renderer.startWidth = 0.01f;
-                            renderer.endWidth = renderer.startWidth;
+                            // put a capsule collider around the straight main line
+                            // (the one from points[1] to points[2]
+
+                            CapsuleCollider capsule = gameEdge.AddComponent<CapsuleCollider>();
+                            capsule.radius = lineWidth / 2.0f;
+                            capsule.center = Vector3.zero;
+                            capsule.direction = 2; // Z-axis for easier "LookAt" orientation
+                            capsule.transform.position = points[1] + (points[2] - points[1]) / 2;
+                            capsule.transform.LookAt(points[1]);
+                            capsule.height = (points[2] - points[1]).magnitude;
 
                             renderer.startColor = Color.green;
                             renderer.endColor = Color.red;
