@@ -2,16 +2,17 @@
 using UnityEngine;
 
 using SEE.DataModel;
+using System;
 
 namespace SEE
 {
-    public class GridLayout : ILayout
+    public class ManhattenLayout : ILayout
     {
         private readonly string widthMetric;
         private readonly string heightMetric;
         private readonly string breadthMetric;
 
-        public GridLayout(string widthMetric, string heightMetric, string breadthMetric)
+        public ManhattenLayout(string widthMetric, string heightMetric, string breadthMetric)
         {
             this.widthMetric = widthMetric;
             this.heightMetric = heightMetric;
@@ -171,20 +172,85 @@ namespace SEE
         /// </summary>
         private void CreateEdges(Graph graph)
         {
-            // the distance of the edges relative to the houses; the maximal height of
-            // a house is 1.0
-            const float above = orientation * (1f / 2.0f);
+            // The distance of the edges relative to the houses; the maximal height of
+            // a house is 1.0. This offset is used to draw the line somewhat below
+            // or above the house (depending on the orientation).
+            const float maxHeight = 1f;
+            const float offset = maxHeight * 0.1f; // must be positive
+
+            string materialPath = "BrickTextures/BricksTexture13/BricksTexture13";
+            //Material newMat = Resources.Load<Material>(materialPath);
+            Material newMat = new Material(Shader.Find("Legacy Shaders/Particles/Additive"));
+            //Material newMat = new Material(Shader.Find("Particles/Standard Surface"));
+            if (newMat == null)
+            {
+                Debug.LogError("Could not find material " + materialPath + "\n");
+                return;
+            }
 
             foreach (GameObject gameEdge in graph.GetEdges())
             {
                 Edge edge = gameEdge.GetComponent<Edge>();
+
                 if (edge != null)
                 {
                     Node source = edge.Source;
                     Node target = edge.Target;
                     if (source != null && target != null)
                     {
-                        //GameObject s = source.
+                        GameObject sourceObject = source.gameObject;
+                        GameObject targetObject = target.gameObject;
+
+                        LineRenderer renderer = gameEdge.GetComponent<LineRenderer>();
+                        if (renderer == null)
+                        {
+                            // gameEdge does not yet have a renderer; we add a new one
+                            renderer = gameEdge.AddComponent<LineRenderer>();
+                        }
+                        if (renderer != null)
+                        {
+                            //renderer.sharedMaterial = newMat;
+                            renderer.material = newMat;
+
+                            //renderer.widthCurve = 0.1f;
+                            renderer.sortingLayerName = "OnTop";
+                            renderer.sortingOrder = 5;
+                            renderer.positionCount = 4; // number of vertices
+
+                            Vector3 sourceCenterToBorder = GetCenterToBorder(sourceObject);
+                            Vector3 targetCenterToBorder = GetCenterToBorder(targetObject);
+
+                            var points = new Vector3[renderer.positionCount];
+                            // starting position
+                            points[0] = sourceObject.transform.position; // center of source node
+                            points[0].y += orientation * sourceCenterToBorder.y; // floor/ceiling
+
+                            // position below/above starting position
+                            points[1] = points[0];
+                            points[1].y += orientation * offset;
+
+                            // ending position
+                            points[3] = targetObject.transform.position; // center of target node
+                            points[3].y += orientation * targetCenterToBorder.y; // floor/ceiling
+
+                            // position below/above ending position
+                            points[2] = points[3];
+                            points[2].y += orientation * offset;
+
+                            renderer.SetPositions(points);
+
+                            renderer.startWidth = 0.01f;
+                            renderer.endWidth = renderer.startWidth;
+
+                            renderer.startColor = Color.green;
+                            renderer.endColor = Color.red;
+
+                            renderer.useWorldSpace = true;
+                        }
+                        else
+                        {
+                            Debug.LogError("Cannot attach renderer on scene edge " + gameEdge.name + ".\n");
+                        }
                     }
                     else
                     {
@@ -195,8 +261,13 @@ namespace SEE
                 {
                     Debug.LogError("Scene edge " + gameEdge.name + " does not have a graph edge component.\n");
                 }
-                //GameObject sceneEdge = DrawLine(nodes[gameEdge.Source.LinkName], nodes[gameEdge.Target.LinkName], linePrefab, above);
             }
+        }
+
+        private Vector3 GetCenterToBorder(GameObject o)
+        {
+            Renderer renderer = o.GetComponent<Renderer>();
+            return renderer.bounds.extents;
         }
 
         /// <summary>
@@ -204,33 +275,17 @@ namespace SEE
         /// </summary>
         /// <param name="from">the source object of the line</param>
         /// <param name="to">the target object of the line</param>
-        /// <param name="linePrefab">the preftab from which to instantiate the line</param>
         /// <param name="offset">the y offset at which to draw the begin and end of the line</param>
         /// <returns></returns>
-        private GameObject DrawLine(GameObject from, GameObject to, GameObject linePrefab, float offset)
+        private GameObject DrawLine(GameObject from, GameObject to, float offset)
         {
-            GameObject edge = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(linePrefab);
+            GameObject edge = new GameObject();
+            
             LineRenderer renderer = edge.GetComponent<LineRenderer>();
 
-            renderer.sortingLayerName = "OnTop";
-            renderer.sortingOrder = 5;
-            renderer.positionCount = 4; // number of vertices
+            
 
-            var points = new Vector3[renderer.positionCount];
-            // starting position
-            points[0] = from.transform.position;
-            // position above starting position
-            points[1] = from.transform.position;
-            points[1].y += offset;
-            // position above ending position
-            points[2] = to.transform.position;
-            points[2].y += offset;
-            // ending position
-            points[3] = to.transform.position;
-            renderer.SetPositions(points);
 
-            //renderer.SetWidth(0.5f, 0.5f);
-            renderer.useWorldSpace = true;
             return edge;
         }
 
