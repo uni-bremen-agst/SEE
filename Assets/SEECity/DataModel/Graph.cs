@@ -45,6 +45,11 @@ namespace SEE.DataModel
 
         public int EdgeCount => edges.Count;
 
+        private void Awake()
+        {
+            Debug.Log("Graph " + name + " with " + NodeCount + " nodes and " + EdgeCount + " edges.\n");
+        }
+
         [SerializeField]
         private string viewName = "";
 
