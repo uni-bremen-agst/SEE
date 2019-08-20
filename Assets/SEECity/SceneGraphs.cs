@@ -11,11 +11,11 @@ namespace SEE
     /// </summary>
     public class SceneGraphs
     {
-        private static Dictionary<string, ISceneGraph> graphs = new Dictionary<string, ISceneGraph>();
+        private static Dictionary<string, Graph> graphs = new Dictionary<string, Graph>();
 
-        public static ISceneGraph Add(IGraphSettings settings)
+        public static Graph Add(GraphSettings settings)
         {
-            ISceneGraph graph = null;
+            Graph graph = null;
             if (string.IsNullOrEmpty(settings.graphPath))
             {
                 Debug.LogError("No graph path given.\n");
@@ -39,7 +39,7 @@ namespace SEE
             return graph;
         }
 
-        private static ISceneGraph Load(IGraphSettings settings)
+        private static Graph Load(GraphSettings settings)
         {
             HashSet<string> hierarchicalEdges = new HashSet<string>
                 {
@@ -48,21 +48,21 @@ namespace SEE
             GraphCreator graphCreator = new GraphCreator(settings.graphPath, hierarchicalEdges, new SEELogger());
             SEE.Performance p = SEE.Performance.Begin("loading graph data");
             graphCreator.Load();
-            ISceneGraph graph = graphCreator.GetGraph();
+            Graph graph = graphCreator.GetGraph();
             p.End();
             Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
             Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
             return graph;
         }
 
-        private static void Delete(ISceneGraph graph)
+        private static void Delete(Graph graph)
         {
             graph.Destroy();
         }
 
         public static void Delete(string path)
         {
-            if (graphs.TryGetValue(path, out ISceneGraph graph))
+            if (graphs.TryGetValue(path, out Graph graph))
             {
                 // first remove graph from the dictionary
                 graphs.Remove(path);
@@ -73,7 +73,7 @@ namespace SEE
 
         public static void DeleteAll()
         {
-            foreach (ISceneGraph graph in graphs.Values)
+            foreach (Graph graph in graphs.Values)
             {
                 Delete(graph);
             }

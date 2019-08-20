@@ -4,7 +4,7 @@ namespace SEE
     /// <summary>
     /// Settings of the graph data needed at runtime.
     /// </summary>
-    public class IGraphSettings
+    public class GraphSettings
     {
         /// <summary>
         /// The path to the graph data.

@@ -3,27 +3,27 @@
 namespace SEE.DataModel
 {
     /// <summary>
-    /// Implements IEdge.
+    /// Directed and typed edges of the graph with source and target node.
     /// </summary>
     [System.Serializable]
-    class Edge : GraphElement, IEdge
+    public class Edge : GraphElement
     {
         [SerializeField]
-        private INode source;
+        private Node source;
 
-        // Important note: Edges should be created only by calling IGraph.newEdge().
+        // Important note: Edges should be created only by calling Graph.newEdge().
         // Do not use 'new Edge()'.
 
-        public INode Source
+        public Node Source
         {
             get => source;
             set => source = value;
         }
 
         [SerializeField]
-        private INode target;
+        private Node target;
 
-        public INode Target
+        public Node Target
         {
             get => target;
             set => target = value;

@@ -6,20 +6,28 @@ using UnityEngine;
 namespace SEE.DataModel
 {
     /// <summary>
-    /// Implements IGraph.
+    /// A graph with nodes and edges representing the data to be visualized 
+    /// by way of blocks and connections.
     /// </summary>
     [System.Serializable]
-    public class Graph : Attributable, ISceneGraph
+    public class Graph : Attributable
     {
         // The list of graph nodes indexed by their unique linkname
         [SerializeField]
-        private Dictionary<string, INode> nodes = new Dictionary<string, INode>();
+        private StringNodeDictionary nodes = new StringNodeDictionary();
 
         // The list of graph edges.
         [SerializeField]
-        private List<IEdge> edges = new List<IEdge>();
+        private List<Edge> edges = new List<Edge>();
 
-        public void AddNode(INode node)
+        /// Adds a node to the graph. 
+        /// Preconditions:
+        ///   (1) node must not be null
+        ///   (2) node.Linkname must be defined.
+        ///   (3) a node with node.Linkname must not have been added before
+        /// </summary>
+        /// <param name="node"></param>
+        public void AddNode(Node node)
         {
             if (node == null)
             {
@@ -36,13 +44,23 @@ namespace SEE.DataModel
             nodes[node.LinkName] = node;
         }
 
-        public void AddEdge(IEdge edge)
+        /// <summary>
+        /// Adds a non-hierarchical edge to the graph.
+        /// Precondition: edge must not be null.
+        /// </summary>
+        public void AddEdge(Edge edge)
         {
             edges.Add(edge);
         }
 
+        /// <summary>
+        /// The number of nodes of the graph.
+        /// </summary>
         public int NodeCount => nodes.Count;
 
+        /// <summary>
+        /// The number of edges of the graph.
+        /// </summary>
         public int EdgeCount => edges.Count;
 
         private void Awake()
@@ -65,51 +83,55 @@ namespace SEE.DataModel
         [SerializeField]
         private string path = "";
 
+        /// <summary>
+        /// The path of the file from which this graph was loaded. Could be the
+        /// empty string if the graph was created by loading it from disk.
+        /// </summary>
         public string Path
         {
             get => path;
             set => path = value;
         }
 
-        public override string ToString()
-        {
-            string result = "{\n";
-            result += " \"kind\": graph,\n";
-            result += " \"name\": \"" + viewName + "\",\n";
-            // its own attributes
-            result += base.ToString();
-            // its nodes
-            foreach (INode node in nodes.Values)
-            {
-                result += node.ToString() + ",\n";
-            }
-            foreach (IEdge edge in edges)
-            {
-                result += edge.ToString() + ",\n";
-            }
-            result += "}\n";
-            return result;
-        }
-
-        public List<INode> Nodes()
+        /// <summary>
+        /// Returns all nodes of the graph.
+        /// </summary>
+        /// <returns>all nodes</returns>
+        public List<Node> Nodes()
         {
             return nodes.Values.ToList();
         }
 
-        public List<IEdge> Edges()
+        /// <summary>
+        /// Returns all non-hierarchical edges of the graph.
+        /// </summary>
+        /// <returns>all non-hierarchical edges</returns>
+        public List<Edge> Edges()
         {
             return edges;
         }
 
-        public bool TryGetNode(string linkname, out INode node)
+        /// <summary>
+        /// Returns the node with the given unique linkname. If there is no
+        /// such node, node will be null and false will be returned; otherwise
+        /// true will be returned.
+        /// </summary>
+        /// <param name="linkname">unique linkname of the searched node</param>
+        /// <param name="node">the found node, otherwise null</param>
+        /// <returns>true if a node could be found</returns>
+        public bool TryGetNode(string linkname, out Node node)
         {
             return nodes.TryGetValue(linkname, out node);
         }
 
-        public List<INode> GetRoots()
+        /// <summary>
+        /// Returns the list of nodes without parent.
+        /// </summary>
+        /// <returns>root nodes of the hierarchy</returns>
+        public List<Node> GetRoots()
         {
-            List<INode> result = new List<INode>();
-            foreach (INode node in nodes.Values)
+            List<Node> result = new List<Node>();
+            foreach (Node node in nodes.Values)
             {
                 if (node.Parent == null)
                 {
@@ -119,11 +141,19 @@ namespace SEE.DataModel
             return result;
         }
 
+        /// <summary>
+        /// Returns the game object representing the graph in the scene.
+        /// </summary>
+        /// <returns>game object representing the graph in the scene</returns>
         public GameObject GetGraph()
         {
             return this.gameObject;
         }
 
+        /// <summary>
+        /// Returns all game objects representing the nodes of the graph in the scene.
+        /// </summary>
+        /// <returns>all node game objects</returns>
         public List<GameObject> GetNodes()
         {
             List<GameObject> result = new List<GameObject>();
@@ -134,6 +164,10 @@ namespace SEE.DataModel
             return result;
         }
 
+        /// <summary>
+        /// Returns all game objects representing the edges of the graph in the scene.
+        /// </summary>
+        /// <returns>all edge game objects</returns>
         public List<GameObject> GetEdges()
         {
             List<GameObject> result = new List<GameObject>();
@@ -159,6 +193,11 @@ namespace SEE.DataModel
             }
         }
 
+        /// <summary>
+        /// Destroys the GameObjects of the graph's nodes and edges including the
+        /// associated Node and Edge components as well as the GameObject of the graph 
+        /// itself (and its Graph component). The graph is unusable afterward.
+        /// </summary>
         public void Destroy()
         {
             foreach (Edge edge in edges)
@@ -173,6 +212,26 @@ namespace SEE.DataModel
             nodes.Clear();
             // TODO: Will this actually work and not crash?
             DestroyGameObject(this.gameObject);
+        }
+
+        public override string ToString()
+        {
+            string result = "{\n";
+            result += " \"kind\": graph,\n";
+            result += " \"name\": \"" + viewName + "\",\n";
+            // its own attributes
+            result += base.ToString();
+            // its nodes
+            foreach (Node node in nodes.Values)
+            {
+                result += node.ToString() + ",\n";
+            }
+            foreach (Edge edge in edges)
+            {
+                result += edge.ToString() + ",\n";
+            }
+            result += "}\n";
+            return result;
         }
     }
 }

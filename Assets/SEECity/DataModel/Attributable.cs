@@ -23,10 +23,10 @@ namespace SEE.DataModel
     // https://docs.unity3d.com/Manual/script-Serialization.html
 
     /// <summary>
-    /// Implements IAttributable providing named toggle, int, float, and string attributes.
+    /// Specifies and implements attributable objects with named toggle, int, float, and string attributes.
     /// </summary>
     [System.Serializable]
-    public abstract class Attributable : MonoBehaviour, IAttributable
+    public abstract class Attributable : MonoBehaviour
     {
         /// <summary>
         /// The set of toggle attributes. A toggle is set if it is contained in this

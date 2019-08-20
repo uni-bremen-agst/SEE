@@ -2,12 +2,18 @@
 
 namespace SEE.DataModel
 {
+    /// <summary>
+    /// A type graph element. Either a node or an edge.
+    /// </summary>
     [System.Serializable]
-    public abstract class GraphElement : Attributable, IGraphElement
+    public abstract class GraphElement : Attributable
     {
         [SerializeField]
         private string type;
 
+        /// <summary>
+        /// The type of this graph element.
+        /// </summary>
         [SerializeField]
         public string Type
         {
