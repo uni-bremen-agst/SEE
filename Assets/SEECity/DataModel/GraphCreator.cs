@@ -159,7 +159,10 @@ namespace SEE.DataModel
             {
                 LogError("There is no node to be ended here.");
             }
-            Dump(currentGameObject);
+            if (currentGameObject != null)
+            {
+                Dump(currentGameObject);
+            }
         }
 
         private static void Dump(GameObject obj)
