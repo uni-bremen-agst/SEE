@@ -22,9 +22,17 @@ namespace SEE
         public void Draw(Graph graph)
         {
             // The maximal values of the relevant metrics.
+            Performance p;
+
+            p = Performance.Begin("Determine metric maxima");
             Dictionary<string, float> metricMaxima = DetermineMetricMaxima(graph, widthMetric, heightMetric, breadthMetric);
+            p.End();
+            p = Performance.Begin("Layout nodes");
             CreateNodes(graph, metricMaxima);
-            CreateEdges(graph);
+            p.End();
+            p = Performance.Begin("Layout edges");
+            //CreateEdges(graph);
+            p.End();
         }
 
         /// <summary>
@@ -62,17 +70,21 @@ namespace SEE
         /// </summary>
         private void CreateNodes(Graph graph, Dictionary<string, float> metricMaxima)
         {
-            int length = (int)Mathf.Sqrt(graph.NodeCount);
-            int column = 0;
-            int row = 1;
+            DumpMetricMaxima(metricMaxima);
 
+            int length = (int)Mathf.Sqrt(graph.NodeCount);
+            float column = 0f;
+            float row = 1f;
+            const float relativeOffset = 0.1f;
+
+            Vector3 maxSize = Vector3.zero;
             foreach (GameObject sceneNode in graph.GetNodes())
             {
                 column++;
                 if (column > length)
                 {
                     // exceeded length of the square => start a new row
-                    column = 1;
+                    column = 1f;
                     row++;
                 }
                 Node node = sceneNode.GetComponent<Node>();
@@ -99,7 +111,7 @@ namespace SEE
                 // The position is the center of a GameObject. We want all GameObjects
                 // be placed at the same ground level 0. That is why we need to "lift"
                 // every building by half of its height.
-                sceneNode.transform.position = new Vector3(row + row * 0.3f, height / 2.0f, column + column * 0.3f);
+                sceneNode.transform.position = new Vector3(row + row * relativeOffset, height / 2.0f, column + column * relativeOffset);
                 /*
                 {
                     Renderer renderer;
@@ -110,7 +122,12 @@ namespace SEE
                     Debug.Log("house size: " + renderer.bounds.size + "\n");
                 }
                 */
+                Vector3 size = GetSize(sceneNode);
+                if (size.x > maxSize.x) maxSize.x = size.x;
+                if (size.y > maxSize.y) maxSize.y = size.y;
+                if (size.z > maxSize.z) maxSize.z = size.z;
             }
+            Debug.Log("Maxima: " + maxSize + "\n");
         }
 
         // orientation of the edges; 
@@ -281,30 +298,16 @@ namespace SEE
             }
         }
 
+        private Vector3 GetSize(GameObject o)
+        {
+            Renderer renderer = o.GetComponent<Renderer>();
+            return renderer.bounds.size;
+        }
+
         private Vector3 GetCenterToBorder(GameObject o)
         {
             Renderer renderer = o.GetComponent<Renderer>();
             return renderer.bounds.extents;
         }
-
-        /// <summary>
-        /// Draws a straight line from the two given GameObjects. 
-        /// </summary>
-        /// <param name="from">the source object of the line</param>
-        /// <param name="to">the target object of the line</param>
-        /// <param name="offset">the y offset at which to draw the begin and end of the line</param>
-        /// <returns></returns>
-        private GameObject DrawLine(GameObject from, GameObject to, float offset)
-        {
-            GameObject edge = new GameObject();
-            
-            LineRenderer renderer = edge.GetComponent<LineRenderer>();
-
-            
-
-
-            return edge;
-        }
-
     }
 }
