@@ -11,7 +11,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>4357f535-cf4d-4615-a162-5b0f4e223c1b</string>
+        <string>dir_A</string>
       </attr>
     </node>
     <node id="N2">
@@ -23,7 +23,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>5a41bb53-fe87-4c41-8b6e-59e16e0efefd</string>
+        <string>dir_B</string>
       </attr>
     </node>
     <node id="N3">
@@ -35,7 +35,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>b9992918-c74a-488b-87f4-d2ee40744082</string>
+        <string>dir_C</string>
       </attr>
     </node>
     <node id="N4">
@@ -47,7 +47,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>c55024ba-39f8-4a56-99a5-1b2f6290e1c2</string>
+        <string>dir_A_1</string>
       </attr>
     </node>
     <node id="N5">
@@ -59,7 +59,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>735f83e8-f8c8-420a-8928-40004375db57</string>
+        <string>dir_A_2</string>
       </attr>
     </node>
     <node id="N6">
@@ -71,7 +71,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>a3d4977a-be55-420f-9941-962a858f0061</string>
+        <string>dir_B_1</string>
       </attr>
     </node>
     <node id="N7">
@@ -83,7 +83,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>7ce3afb1-a512-4989-962c-7a66f3de0c9e</string>
+        <string>dir_B_2</string>
       </attr>
     </node>
     <node id="N8">
@@ -95,7 +95,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>b604e239-bb13-4d18-894a-4c6b859d48bf</string>
+        <string>dir_C_1</string>
       </attr>
     </node>
     <node id="N9">
@@ -107,7 +107,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>0ea2a52a-2eb3-4181-bd15-586699582c5e</string>
+        <string>dir_C_2</string>
       </attr>
     </node>
     <node id="N10">
@@ -119,7 +119,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>76586469-76dd-4111-abd1-0b02b91caa1f</string>
+        <string>a1_a.cpp</string>
       </attr>
 	  <attr name="Metric.Number_of_Tokens">
         <int>1496</int>
@@ -149,7 +149,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>d1ba65c3-187d-4021-9321-664a88ba37ca</string>
+        <string>a1_b.cpp</string>
       </attr>
 	  <attr name="Metric.Number_of_Tokens">
         <int>800</int>
@@ -179,7 +179,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>ed3603bd-d6f5-45e1-9273-ef759a9a06fb</string>
+        <string>a2_a.cpp</string>
       </attr>
 	  <attr name="Metric.Number_of_Tokens">
         <int>1200</int>
@@ -209,7 +209,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>5ccadd68-46f9-45cb-83c4-f250467e75c0</string>
+        <string>a2_b.cpp</string>
       </attr>
 	  <attr name="Metric.Number_of_Tokens">
         <int>3000</int>
@@ -239,7 +239,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>ea75a26a-d0c0-41c6-abca-c3ee24f793a4</string>
+        <string>b1_a.cpp</string>
       </attr>
     </node>
     <node id="N15">
@@ -251,7 +251,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>16308988-9918-470b-b9d1-eaf5654063a6</string>
+        <string>b1_b.cpp</string>
       </attr>
 	  <attr name="Metric.Number_of_Tokens">
         <int>16</int>
@@ -281,7 +281,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>54d11b34-f80d-4670-9ac1-7537b6aec6de</string>
+        <string>b2_a.cpp</string>
       </attr>
 	  <attr name="Metric.Number_of_Tokens">
         <int>1110</int>
@@ -311,7 +311,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>b156537a-4937-41cb-a30a-562d5a853e6d</string>
+        <string>b2_b.cpp</string>
       </attr>
 	  <attr name="Metric.Number_of_Tokens">
         <int>500</int>
@@ -335,22 +335,22 @@
     <node id="N18">
       <type xlink:href="File"/>
       <attr name="Source.Name">
-        <string>c1_a.cpp</string>
+        <string>MAX.cpp</string>
       </attr>
       <attr name="Linkage.Is_Definition">
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>fd78c6f0-a0a9-4d00-b6ae-0400f0e7f713</string>
+        <string>MAX.cpp</string>
       </attr>
 	  <attr name="Metric.Number_of_Tokens">
-        <int>2000</int>
+        <int>3000</int>
       </attr>
       <attr name="Metric.LOC">
-        <int>300</int>
+        <int>400</int>
       </attr>
       <attr name="Metric.Clone_Rate">
-        <float>4</float>
+        <float>1.0</float>
       </attr>
 	  <attr name="Metric.Authors">
         <int>4</int>
@@ -371,7 +371,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>4a390c60-d91a-4600-aa6a-344e0fa15f19</string>
+        <string>c1_b.cpp</string>
       </attr>
 	  <attr name="Metric.Number_of_Tokens">
         <int>1492</int>
@@ -401,7 +401,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>69da67be-6cd6-489c-b8cb-ef120dca104c</string>
+        <string>c2_a.cpp</string>
       </attr>
 	  <attr name="Metric.Number_of_Tokens">
         <int>257</int>
@@ -431,7 +431,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>6c4acd06-922d-4826-a7b0-2b8f8848d604</string>
+        <string>c2_b.cpp</string>
       </attr>
 	  <attr name="Metric.Number_of_Tokens">
         <int>780</int>
@@ -461,7 +461,7 @@
         <enum/>
       </attr>	  
       <attr name="Linkage.Name">
-        <string>4e702510-6d39-4e98-94db-89f523aede5d</string>
+        <string>c_a.cpp</string>
       </attr>
 	  <attr name="Metric.Number_of_Tokens">
         <int>490</int>
