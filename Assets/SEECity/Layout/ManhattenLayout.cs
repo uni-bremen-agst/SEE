@@ -70,14 +70,14 @@ namespace SEE
         /// </summary>
         private void CreateNodes(Graph graph, Dictionary<string, float> metricMaxima)
         {
-            DumpMetricMaxima(metricMaxima);
+            //DumpMetricMaxima(metricMaxima);
 
             int length = (int)Mathf.Sqrt(graph.NodeCount);
             float column = 0f;
             float row = 1f;
             const float relativeOffset = 0.1f;
 
-            Vector3 maxSize = Vector3.zero;
+            //Vector3 maxSize = Vector3.zero;
             foreach (GameObject sceneNode in graph.GetNodes())
             {
                 column++;
@@ -122,12 +122,12 @@ namespace SEE
                     Debug.Log("house size: " + renderer.bounds.size + "\n");
                 }
                 */
-                Vector3 size = GetSize(sceneNode);
-                if (size.x > maxSize.x) maxSize.x = size.x;
-                if (size.y > maxSize.y) maxSize.y = size.y;
-                if (size.z > maxSize.z) maxSize.z = size.z;
+                //Vector3 size = GetSize(sceneNode);
+                //if (size.x > maxSize.x) maxSize.x = size.x;
+                //if (size.y > maxSize.y) maxSize.y = size.y;
+                //if (size.z > maxSize.z) maxSize.z = size.z;
             }
-            Debug.Log("Maxima: " + maxSize + "\n");
+            //Debug.Log("Maxima: " + maxSize + "\n");
         }
 
         // orientation of the edges; 
