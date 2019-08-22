@@ -1,6 +1,6 @@
 ﻿using SEE.DataModel;
 
-namespace SEE
+namespace SEE.Layout
 {
     public interface ILayout
     {
