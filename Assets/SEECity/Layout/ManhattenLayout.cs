@@ -4,7 +4,7 @@ using UnityEngine;
 using SEE.DataModel;
 using System;
 
-namespace SEE
+namespace SEE.Layout
 {
     public class ManhattenLayout : ILayout
     {
@@ -31,7 +31,7 @@ namespace SEE
             CreateNodes(graph, metricMaxima);
             p.End();
             p = Performance.Begin("Layout edges");
-            //CreateEdges(graph);
+            CreateEdges(graph);
             p.End();
         }
 
@@ -195,12 +195,12 @@ namespace SEE
             const float maxHeight = 1f;
             const float offset = maxHeight * 0.1f; // must be positive
 
-            const float lineWidth = 0.01f;
+            string materialPath = "Legacy Shaders/Particles/Additive";
+            // string materialPath = "BrickTextures/BricksTexture13/BricksTexture13";
+            // string materialPath = "Particles/Standard Surface";
 
-            string materialPath = "BrickTextures/BricksTexture13/BricksTexture13";
             //Material newMat = Resources.Load<Material>(materialPath);
-            Material newMat = new Material(Shader.Find("Legacy Shaders/Particles/Additive"));
-            //Material newMat = new Material(Shader.Find("Particles/Standard Surface"));
+            Material newMat = new Material(Shader.Find(materialPath));
             if (newMat == null)
             {
                 Debug.LogError("Could not find material " + materialPath + "\n");
@@ -220,33 +220,32 @@ namespace SEE
                         GameObject sourceObject = source.gameObject;
                         GameObject targetObject = target.gameObject;
 
-                        LineRenderer renderer = gameEdge.GetComponent<LineRenderer>();
-                        if (renderer == null)
+                        LineRenderer line = gameEdge.GetComponent<LineRenderer>();
+                        if (line == null)
                         {
                             // gameEdge does not yet have a renderer; we add a new one
-                            renderer = gameEdge.AddComponent<LineRenderer>();
+                            line = gameEdge.AddComponent<LineRenderer>();
                         }
-                        if (renderer != null)
+                        if (line != null)
                         {
-                            //renderer.sharedMaterial = newMat;
-                            renderer.material = newMat;
+                            // use sharedMaterial if changes to the original material should affect all
+                            // objects using this material; renderer.material instead will create a copy
+                            // of the material and will not be affected by changes of the original material
+                            line.sharedMaterial = newMat;
 
-                            //renderer.widthCurve = 0.1f;
-                            renderer.sortingLayerName = "OnTop";
-                            renderer.sortingOrder = 5;
-                            renderer.positionCount = 4; // number of vertices
+                            LineFactory.SetDefaults(line);
+                            
+                            // If enabled, the lines are defined in world space.
+                            // This means the object's position is ignored, and the lines are rendered around 
+                            // world origin.
+                            line.useWorldSpace = true;
 
-                            // simplify rendering
-                            renderer.receiveShadows = false;
-                            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-
+                            // define the points along the line
                             Vector3 sourceCenterToBorder = GetCenterToBorder(sourceObject);
                             Vector3 targetCenterToBorder = GetCenterToBorder(targetObject);
+                            line.positionCount = 4; // number of vertices
+                            Vector3[] points = new Vector3[line.positionCount];
 
-                            renderer.startWidth = lineWidth;
-                            renderer.endWidth = lineWidth;
-
-                            var points = new Vector3[renderer.positionCount];
                             // starting position
                             points[0] = sourceObject.transform.position; // center of source node
                             points[0].y += orientation * sourceCenterToBorder.y; // floor/ceiling
@@ -263,23 +262,17 @@ namespace SEE
                             points[2] = points[3];
                             points[2].y += orientation * offset;
 
-                            renderer.SetPositions(points);
+                            line.SetPositions(points);
 
                             // put a capsule collider around the straight main line
                             // (the one from points[1] to points[2]
-
                             CapsuleCollider capsule = gameEdge.AddComponent<CapsuleCollider>();
-                            capsule.radius = lineWidth / 2.0f;
+                            capsule.radius = Math.Max(line.startWidth, line.endWidth) / 2.0f;
                             capsule.center = Vector3.zero;
                             capsule.direction = 2; // Z-axis for easier "LookAt" orientation
                             capsule.transform.position = points[1] + (points[2] - points[1]) / 2;
                             capsule.transform.LookAt(points[1]);
                             capsule.height = (points[2] - points[1]).magnitude;
-
-                            renderer.startColor = Color.green;
-                            renderer.endColor = Color.red;
-
-                            renderer.useWorldSpace = true;
                         }
                         else
                         {
