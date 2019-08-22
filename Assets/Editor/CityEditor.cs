@@ -69,8 +69,17 @@ namespace SEEEditor
                         const string heightMetric = "Metric.Clone_Rate";
                         const string breadthMetric = "Metric.LOC";
                         MeshFactory.Reset();
-                        AddMeshes(graph);
-                        SEE.ILayout layout = new SEE.ManhattenLayout(widthMetric, heightMetric, breadthMetric);
+                        
+                        SEE.Layout.ILayout layout;
+                        if (true)
+                        {
+                            layout = new SEE.Layout.BalloonLayout();
+                        }
+                        else
+                        {
+                            AddMeshes(graph);
+                            layout = new SEE.Layout.ManhattenLayout(widthMetric, heightMetric, breadthMetric);
+                        }
                         layout.Draw(graph);
                     }
                     else
