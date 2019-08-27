@@ -35,7 +35,8 @@ namespace SEE.Layout
             {
                 CalculateRadius2D(root, out float out_rad);
                 DrawCircles(root, position, material);
-                position.x += out_rad;
+                position.x += 2.2f * out_rad;
+                //break; // FIXME
             }
 
 
@@ -59,46 +60,84 @@ namespace SEE.Layout
             {
                 // TODO: We will create a block for children.
                 DrawCircle(node, position, radii[node].outer_radius, material);
+                //Debug.Log("leaf " + node.name + " @ " + position + " radius " + radii[node].outer_radius + "\n");
             }
             else
             {
                 DrawCircle(node, position, radii[node].outer_radius, material);
+                // The center points of the children circles are located on the circle
+                // with center point 'position' and radius of the inner circle of the
+                // current node plus the reference length of the children. See the paper
+                // for details.
+                float parent_inner_radius = radii[node].radius + radii[node].reference_length_children;
+
+                //Debug.Log("inner " + node.name + " @ " + position + " outer-radius " + radii[node].outer_radius + " inner-radius " + parent_inner_radius + "\n");
 
                 // Placing all children of the inner circle defined by the 
                 // center point (the given position) and the radius 
 
-                // FIXME: This will not work for more than four children.
-                int i = 0;
+                Vector3 child_center = new Vector3(position.x, position.y, position.z);
+
+                double accummulated_alpha = 0.0;
+
                 foreach (Node child in children)
                 {
-                    Vector3 child_position = position;
-                    float offset = radii[node].radius;
-                    switch (i)
-                    {
-                        case 0: child_position.z += offset; break;
-                        case 1: child_position.z -= offset; break;
-                        case 2: child_position.x += offset; break;
-                        case 3: child_position.x -= offset; break;
-                    }
-                    DrawCircles(child, child_position, material);
-                    i++;
-                    if (i > 3)
-                    {
-                        i = 0;
-                    }
+                    double child_outer_radius = radii[child].outer_radius;
+                    // As in polar coordinates, the angle of the child circle w.r.t. to the 
+                    // circle point of the node's circle. The distance from the node's center point
+                    // to the child node's center point together with this angle defines the polar
+                    // coordinates of the child relative to the node.
+                    double alpha = 2* System.Math.Asin(child_outer_radius / (2 * parent_inner_radius));
+
+                    accummulated_alpha += alpha;
+                    // Convert polar coordinate back to cartesian coordinate.
+                    child_center.x = position.x + (float)(parent_inner_radius * System.Math.Cos(accummulated_alpha));
+                    child_center.z = position.z + (float)(parent_inner_radius * System.Math.Sin(accummulated_alpha));
+
+                    DrawCircles(child, child_center, material);
+
+                    // The next available circle must be located outside of the child circle
+                    accummulated_alpha += alpha;
                 }
-            }
+
+                //Debug.Log("Remaining angle: " + (360.0f - accummulated_alpha) + "\n");
+
+                    // FIXME: This will not work for more than four children.
+                    /*
+                    int i = 0;
+                    foreach (Node child in children)
+                    {
+                        Vector3 child_position = position;
+                        float offset = radii[node].radius;
+                        switch (i)
+                        {
+                            case 0: child_position.z += offset; break;
+                            case 1: child_position.z -= offset; break;
+                            case 2: child_position.x += offset; break;
+                            case 3: child_position.x -= offset; break;
+                        }
+                        DrawCircles(child, child_position, material);
+                        i++;
+                        if (i > 3)
+                        {
+                            i = 0;
+                        }
+                    }
+                    */
+                }
         }
 
         private struct RadiusInfo
         {
             public readonly float radius;
             public readonly float outer_radius;
+            public readonly float reference_length_children;
 
-            public RadiusInfo(float radius, float outer_radius)
+            public RadiusInfo(float radius, float outer_radius, float reference_length_children)
             {
                 this.radius = radius;
                 this.outer_radius = outer_radius;
+                this.reference_length_children = reference_length_children;
             }
         }
 
@@ -224,11 +263,11 @@ namespace SEE.Layout
 
                 rl_child = max_children_rad;
             }
-            radii.Add(node, new RadiusInfo(rad, out_rad));
+            radii.Add(node, new RadiusInfo(rad, out_rad, rl_child));
 
             // We could not draw a circle with center point cp_i and radius out_rad.
             
-            Debug.Log(node.name + " rad: " + rad + " outer-rad: " + out_rad + " reference-length of children: " + rl_child + "\n");
+            //Debug.Log(node.name + " rad: " + rad + " outer-rad: " + out_rad + " reference-length of children: " + rl_child + "\n");
         }
 
         private void DrawCircle(Node node, Vector3 position, float radius, Material newMat)
