@@ -35,13 +35,13 @@ namespace SEE.Layout
 
             foreach (Node root in graph.GetRoots())
             {
-                CalculateRadius2D(root, out float out_rad);
-                DrawCircles(root, position, material, metricMaxima);
+                CalculateRadius2D(root, out float out_rad, out int max_depth);
+                DrawCircles(root, position, material, metricMaxima, 0, max_depth);
                 position.x += 2.2f * out_rad;
             }
         }
 
-        private void DrawCircles(Node node, Vector3 position, Material material, Dictionary<string, float> metricMaxima)
+        private void DrawCircles(Node node, Vector3 position, Material material, Dictionary<string, float> metricMaxima, int depth, int max_depth)
         {
             List<Node> children = node.Children();
 
@@ -52,7 +52,9 @@ namespace SEE.Layout
             }
             else
             {
+                DrawInnerNode(node, position, radii[node].outer_radius, depth, max_depth);
                 DrawCircle(node, position, radii[node].outer_radius, material);
+
                 // The center points of the children circles are located on the circle
                 // with center point 'position' and radius of the inner circle of the
                 // current node plus the reference length of the children. See the paper
@@ -152,7 +154,7 @@ namespace SEE.Layout
                         child_center.x = position.x + (float)(parent_inner_radius * System.Math.Cos(accummulated_alpha));
                         child_center.z = position.z + (float)(parent_inner_radius * System.Math.Sin(accummulated_alpha));
 
-                        DrawCircles(child, child_center, material, metricMaxima);
+                        DrawCircles(child, child_center, material, metricMaxima, depth + 1, max_depth);
 
                         // The next available circle must be located outside of the child circle
                         accummulated_alpha += alpha + space_between_child_circles;
@@ -210,8 +212,6 @@ namespace SEE.Layout
             float factor = maximal_length / (2.0f * radius);
             cube.transform.localScale = new Vector3(factor * scale.x, 1.0f, factor * scale.z);
 
-            //go.transform.localScale = new Vector3(radius, 0.01f, radius);
-
             // the cylinder will be placed just below the center of the cube;
             // it will fill the complete plane of the parent
             GameObject cylinder = new GameObject
@@ -225,7 +225,7 @@ namespace SEE.Layout
             cylinder.transform.localPosition = Vector3.zero;
             // Scale to full extent of the parent's width and breadth (chosen to
             // be twice the radius above). The cylinder's height should be minimal.
-            cylinder.transform.localScale = new Vector3(1.0f, 0.01f, 1.0f);  
+            cylinder.transform.localScale = new Vector3(1.0f, cylinder_height, 1.0f);  
         }
 
         private struct RadiusInfo
@@ -314,10 +314,12 @@ namespace SEE.Layout
         /// <param name="node">the node for which the ballon layout is to be computed</param>
         /// <param name="rad">radius of the circle around node at which the center of every circly of its direct children is located</param>
         /// <param name="out_rad">radius of the minimal circle around node that includes every circle of its descendants</param>
-        private void CalculateRadius2D(Node node, out float out_rad)
+        private void CalculateRadius2D(Node node, out float out_rad, out int max_depth)
         {
             float rad = 0.0f;
             float rl_child = 0.0f;
+
+            max_depth = 0;
 
             if (node.NumberOfChildren() == 0)
             {
@@ -326,6 +328,7 @@ namespace SEE.Layout
                 // TODO: Here we need to consider the metric
                 out_rad = minimal_radius;
                 rad = 0.0f;
+                max_depth = 0;
             }
             else
             {
@@ -335,19 +338,25 @@ namespace SEE.Layout
                 // maximal out_rad_k over all children k of i
                 float max_children_rad = 0.0f;
 
+                int max_child_depth = 0;
                 foreach (Node child in node.Children())
                 {
+                   
                     // Find the radius rad_k and outer-radius out_rad_k for each child k of node i.
-                    CalculateRadius2D(child, out float child_out_rad);
+                    CalculateRadius2D(child, out float child_out_rad, out int child_depth);
+                    if (child_depth > max_child_depth)
+                    {
+                        max_child_depth = child_depth;
+                    }
                     inner_sum += child_out_rad;
                     if (max_children_rad < child_out_rad)
                     {
                         max_children_rad = child_out_rad;
                     }
                 }
+                max_depth = max_child_depth + 1;
                 inner_sum *= 2;
 
-                const float factor = 1.01f;
                 // min_rad is the minimal circumference to accommodate all the children
                 // TODO: If a metric determines the radius of leaves, they may have
                 // different radii and we cannot just multiply the number of children
@@ -382,8 +391,21 @@ namespace SEE.Layout
             //Debug.Log(node.name + " rad: " + rad + " outer-rad: " + out_rad + " reference-length of children: " + rl_child + "\n");
         }
 
+        const float cylinder_height = 0.01f;
+
+        private void DrawInnerNode(Node node, Vector3 position, float radius, int depth, int max_depth)
+        {
+            GameObject go = node.gameObject;
+            go.transform.position = new Vector3(position.x, position.y - (max_depth - depth + 1) * cylinder_height, position.z);
+            MeshFactory.AddMesh(go, PrimitiveType.Cylinder);
+
+            go.transform.localScale = new Vector3(2.0f * radius, cylinder_height, 2.0f * radius);
+            // TODO: use depth for gray color gradient
+        }
+
         private void DrawCircle(Node node, Vector3 position, float radius, Material newMat)
         {
+            /*
             const int segments = 360;
             GameObject go = node.gameObject;
             go.transform.position = position;
@@ -411,6 +433,7 @@ namespace SEE.Layout
             }
 
             line.SetPositions(points);
+            */
         }
     }
 }
