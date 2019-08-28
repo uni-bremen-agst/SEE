@@ -8,10 +8,11 @@
         public const string Graph = "Graph";
         public const string Node = "Node";
         public const string Edge = "Edge";
+        public const string NodePrefab = "Node Prefab";
 
         /// <summary>
         /// All existing tags in one.
         /// </summary>
-        public static readonly string[] All = new string[] { Graph, Node, Edge };
+        public static readonly string[] All = new string[] { Graph, Node, Edge, NodePrefab};
     }
 }
