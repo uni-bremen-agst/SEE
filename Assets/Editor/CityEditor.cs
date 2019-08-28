@@ -73,11 +73,10 @@ namespace SEEEditor
                         SEE.Layout.ILayout layout;
                         if (true)
                         {
-                            layout = new SEE.Layout.BalloonLayout();
+                            layout = new SEE.Layout.BalloonLayout(widthMetric, heightMetric, breadthMetric);
                         }
                         else
                         {
-                            AddMeshes(graph);
                             layout = new SEE.Layout.ManhattenLayout(widthMetric, heightMetric, breadthMetric);
                         }
                         layout.Draw(graph);
@@ -97,14 +96,6 @@ namespace SEEEditor
                     break;
             }
             this.Repaint();
-        }
-
-        private void AddMeshes(Graph graph)
-        {
-            foreach (GameObject node in graph.GetNodes())
-            {
-                MeshFactory.AddMesh(node, PrimitiveType.Cube);
-            }
         }
 
         /// <summary>
