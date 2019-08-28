@@ -30,7 +30,26 @@ namespace SEE.Layout
         }
         */
 
-        public static void AddMesh(GameObject gameObject, PrimitiveType type)
+        public static void AddCube(GameObject gameObject)
+        {
+            AddMesh(gameObject, PrimitiveType.Cube, "BrickTextures/BricksTexture13/BricksTexture13");
+        }
+
+        public static void AddCylinder(GameObject gameObject)
+        {
+            AddMesh(gameObject, PrimitiveType.Cylinder, "Grass/Grass FD 1 diffuse");
+        }
+
+        /// <summary>
+        /// Creates a mesh for given object and assigning the material loaded from materialPath 
+        /// to it.
+        /// </summary>
+        /// <param name="gameObject">The game object for which to create the mesh</param>
+        /// <param name="type">The kind of mesh to be created</param>
+        /// <param name="materialPath">Path to the material file. The material file must be located 
+        /// in a folder Resources. There must not be any file extension in the path name passed here. 
+        /// However, the actual file on the disk must have the file extension .mat.</param>
+        public static void AddMesh(GameObject gameObject, PrimitiveType type, string materialPath)
         {
             // So to create a cube (or sphere, or any object really) you need three things:
             // 1) A MeshFilter (The Mesh Filter takes a mesh from your assets and passes it 
@@ -55,10 +74,6 @@ namespace SEE.Layout
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
             // 3) Assigns a material to the object.
-            // The material file must be located in a folder Resources. There must not
-            // be any file extension in the path name passed to Load(). However, the actual 
-            // file on the disk must have the file extension .mat.
-            string materialPath = "BrickTextures/BricksTexture13/BricksTexture13";
             Material newMat = Resources.Load<Material>(materialPath);
             if (newMat != null)
             {
