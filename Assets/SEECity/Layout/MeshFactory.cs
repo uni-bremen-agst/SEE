@@ -35,9 +35,19 @@ namespace SEE.Layout
             AddMesh(gameObject, PrimitiveType.Cube, "BrickTextures/BricksTexture13/BricksTexture13");
         }
 
-        public static void AddCylinder(GameObject gameObject)
+        public static void AddCylinder(GameObject gameObject, string materialPath)
         {
-            AddMesh(gameObject, PrimitiveType.Cylinder, "Grass/Grass FD 1 diffuse");
+            AddMesh(gameObject, PrimitiveType.Cylinder, materialPath);
+        }
+
+        public static void AddTerrain(GameObject gameObject)
+        {
+            AddCylinder(gameObject, "Grass/Grass FD 1 diffuse");
+        }
+
+        public static void AddFrontYard(GameObject gameObject)
+        {
+            AddCylinder(gameObject, "Grass/Sand FD 1 diffuse");
         }
 
         /// <summary>

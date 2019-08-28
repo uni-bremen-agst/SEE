@@ -218,7 +218,7 @@ namespace SEE.Layout
             {
                 name = "garden " + parent.name
             };
-            MeshFactory.AddCylinder(cylinder.gameObject);
+            MeshFactory.AddFrontYard(cylinder.gameObject);
             // game object of node becomes the parent of cube
             cylinder.transform.parent = parent.transform;
             // relative position within parent
@@ -226,8 +226,9 @@ namespace SEE.Layout
             // Scale to full extent of the parent's width and breadth (chosen to
             // be twice the radius above). The cylinder's height should be minimal.
             cylinder.transform.localScale = new Vector3(1.0f, cylinder_height, 1.0f);
-            Renderer renderer = cylinder.GetComponent<Renderer>();
-            renderer.material.color = Color.white;
+
+            //Renderer renderer = cylinder.GetComponent<Renderer>();
+            //renderer.material.color = Color.white;
         }
 
         private struct RadiusInfo
@@ -395,15 +396,25 @@ namespace SEE.Layout
 
         const float cylinder_height = 0.01f;
 
+        private Color lawngreen = new Color((float)200 / 255, (float)247 / 255, (float)197 / 255, 1.0f);
+        private Color salem = new Color((float)30 / 255, (float)130 / 255, (float)76 / 255, 1.0f);
+
         private void DrawInnerNode(Node node, Vector3 position, float radius, int depth, int max_depth)
         {
             GameObject go = node.gameObject;
             go.transform.position = new Vector3(position.x, position.y - (max_depth - depth + 1) * cylinder_height, position.z);
-            MeshFactory.AddCylinder(go);
+            MeshFactory.AddTerrain(go);
 
             go.transform.localScale = new Vector3(2.0f * radius, cylinder_height, 2.0f * radius);
-            Renderer renderer = go.GetComponent<Renderer>();
-            renderer.material.color = Color.Lerp(Color.white, Color.green, (float)depth / (float)max_depth);
+            SetColor(go, Color.Lerp(lawngreen, salem, (float)depth / (float)max_depth));
+        }
+
+        private void SetColor(GameObject gameObject, Color color)
+        {
+            Renderer renderer = gameObject.GetComponent<Renderer>();
+            var tempMaterial = new Material(renderer.sharedMaterial);
+            tempMaterial.color = color;
+            renderer.sharedMaterial = tempMaterial;
         }
 
         private void DrawCircle(Node node, Vector3 position, float radius, Material newMat)
