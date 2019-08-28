@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SEE.DataModel;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -31,8 +32,9 @@ namespace SEE.Layout
 
         public static void AddMesh(GameObject gameObject, PrimitiveType type)
         {
-            // So to create a cube (or sphere, or any object really) you 3 things
-            // 1) A MeshFilter
+            // So to create a cube (or sphere, or any object really) you need three things:
+            // 1) A MeshFilter (The Mesh Filter takes a mesh from your assets and passes it 
+            //    to the Mesh Renderer)
             // 2) A MeshRenderer
             // 3) A Material to go on the Renderer
             // The MeshRenderer and the Material are just built-in Unity classes you 
@@ -41,9 +43,11 @@ namespace SEE.Layout
             // which will return a game object, not just a mesh.
 
             // 1) Add mesh
-            MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
-            GameObject protoType = GetPrimitiveMesh(type);
-            meshFilter.sharedMesh = protoType.GetComponent<MeshFilter>().sharedMesh;
+            {
+                MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
+                GameObject protoType = GetPrimitiveMesh(type);
+                meshFilter.sharedMesh = protoType.GetComponent<MeshFilter>().sharedMesh;
+            }
 
             // 2) Add mesh renderer
             MeshRenderer renderer = gameObject.AddComponent<MeshRenderer>();
@@ -93,9 +97,9 @@ namespace SEE.Layout
         private static GameObject CreatePrimitiveMesh(PrimitiveType type)
         {
             GameObject gameObject = GameObject.CreatePrimitive(type);
-            gameObject.name = "Node Preftab";
+            gameObject.name = Tags.NodePrefab;
+            gameObject.tag = gameObject.name;
             gameObject.isStatic = true;
-            //gameObject.tag = Tags.Node;
             gameObject.SetActive(false); // this object should not be visible
             primitiveMeshes[type] = gameObject;
             return gameObject;
