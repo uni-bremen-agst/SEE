@@ -15,7 +15,11 @@ namespace SEE.Layout
     {
         public void Draw(Graph graph)
         {
+            Performance p;
+
+            p = Performance.Begin("Ballon Layout nodes");
             DrawNodes(graph);
+            p.End();
         }
 
         private const string materialPath = "Legacy Shaders/Particles/Additive";
@@ -36,20 +40,7 @@ namespace SEE.Layout
                 CalculateRadius2D(root, out float out_rad);
                 DrawCircles(root, position, material);
                 position.x += 2.2f * out_rad;
-                break; // FIXME
             }
-
-
-            /*
-            foreach (Node root in graph.GetRoots())
-            {
-                const float radius = 0.4f;
-                const float lineWidth = 0.1f;
-
-                DrawCircle(root, position, lineWidth, radius, newMat);
-                position.x += 2 * (radius + lineWidth);
-            }
-            */
         }
 
         private void DrawCircles(Node node, Vector3 position, Material material)
@@ -81,10 +72,13 @@ namespace SEE.Layout
                 double space_between_child_circles = 0.0;
 
                 {
-                    // Calculate the sum over all angles necessary to position the child
+                    // Here, we calculate the sum over all angles necessary to position the child
                     // circles onto the circle with radius parent_inner_radius and center
                     // point 'position'.
+
+                    // The accumulated angles in radians.
                     double accummulated_alpha = 0.0;
+
                     foreach (Node child in children)
                     {
                         double child_outer_radius = radii[child].outer_radius;
@@ -104,7 +98,7 @@ namespace SEE.Layout
                         // and |cp_c - P| = r_c. The angle alpha of this isosceles triangle is
                         // 2 * arcsin(r_c / (2*r_p)).
                         double alpha = 2 * System.Math.Asin(child_outer_radius / (2 * parent_inner_radius));
-                        Debug.Log(node.name + " 1) Alpha:         " + alpha + "\n");
+                        //Debug.Log(node.name + " 1) Alpha:         " + alpha + "\n");
 
                         // There are two identical isosceles triangles, one for each of the two
                         // intersection points of the parent circle and child circle. When we
@@ -113,32 +107,42 @@ namespace SEE.Layout
                         // of the child circle with radius r_c. That is why, we need to double
                         // the angle alpha to position the next circle.
                         accummulated_alpha += 2 * alpha;
-                        Debug.Log(node.name + " 1) Accumulated angle: " + accummulated_alpha + "\n");
+                        //Debug.Log(node.name + " 1) Accumulated angle: " + accummulated_alpha + "\n");
                     }
-                    Debug.Log(node.name + " 1) Remaining angle:   " + (360.0f - accummulated_alpha) + "\n");
-                    if (accummulated_alpha > 360.0)
+                    //Debug.Log(node.name + " 1) Remaining angle:   " + (2 * Math.PI - accummulated_alpha) + "\n");
+                    if (accummulated_alpha > 2 * Math.PI)
                     {
-                        Debug.LogError("BallonLayout.DrawCircles: Accumulated angle is greater than 360 degrees.\n");
+                        Debug.LogError("BallonLayout.DrawCircles: Accumulated angle is greater than 360 degrees: "
+                            + ((accummulated_alpha * 180) / Math.PI) + ".\n");
                     }
                     else
                     {
-                        space_between_child_circles = (360.0 - accummulated_alpha) / (double)children.Count;
+                        space_between_child_circles = (2 * Math.PI - accummulated_alpha) / (double)children.Count;
                     }
                 }
                 {
+                    // The accumulated angles in radians.
                     double accummulated_alpha = 0.0;
 
                     foreach (Node child in children)
                     {
-                        double child_outer_radius = radii[child].outer_radius;
                         // As in polar coordinates, the angle of the child circle w.r.t. to the 
                         // circle point of the node's circle. The distance from the node's center point
                         // to the child node's center point together with this angle defines the polar
                         // coordinates of the child relative to the node.
+                        double child_outer_radius = radii[child].outer_radius;
+
+                        // Asin (arcsin) returns an angle, θ, measured in radians, such that 
+                        // -π/2 ≤ θ ≤ π/2 -or- NaN if d < -1 or d > 1 or d equals NaN.
                         double alpha = 2 * System.Math.Asin(child_outer_radius / (2 * parent_inner_radius));
 
-                        accummulated_alpha += alpha;// + space_between_child_circles;
+                        if (accummulated_alpha > 0.0)
+                        {
+                            // We are not drawing the very first child circle. We need to add 
+                            // the alpha angle of the current child circle to the accumulated alpha.
+                            accummulated_alpha += alpha;
 
+                        }
                         // Convert polar coordinate back to cartesian coordinate.
                         child_center.x = position.x + (float)(parent_inner_radius * System.Math.Cos(accummulated_alpha));
                         child_center.z = position.z + (float)(parent_inner_radius * System.Math.Sin(accummulated_alpha));
@@ -146,37 +150,12 @@ namespace SEE.Layout
                         DrawCircles(child, child_center, material);
 
                         // The next available circle must be located outside of the child circle
-                        accummulated_alpha += alpha;
-                        Debug.Log(node.name + " 2) Accumulated angle: " + accummulated_alpha + "\n");
+                        accummulated_alpha += alpha + space_between_child_circles;
+                        //Debug.Log(node.name + " 2) Accumulated angle: " + accummulated_alpha + "\n");
                     }
 
-                    Debug.Log(node.name + " 2) Remaining angle:   " + (360.0f - accummulated_alpha) + "\n");
+                    //Debug.Log(node.name + " 2) Remaining angle:   " + (360.0f - accummulated_alpha) + "\n");
                 }
-
-
-
-                // FIXME: This will not work for more than four children.
-                /*
-                int i = 0;
-                foreach (Node child in children)
-                {
-                    Vector3 child_position = position;
-                    float offset = radii[node].radius;
-                    switch (i)
-                    {
-                        case 0: child_position.z += offset; break;
-                        case 1: child_position.z -= offset; break;
-                        case 2: child_position.x += offset; break;
-                        case 3: child_position.x -= offset; break;
-                    }
-                    DrawCircles(child, child_position, material);
-                    i++;
-                    if (i > 3)
-                    {
-                        i = 0;
-                    }
-                }
-                */
             }
         }
 
@@ -353,88 +332,5 @@ namespace SEE.Layout
 
             line.SetPositions(points);
         }
-
-        /* 
-        private void DrawNodes(Graph graph)
-        {
-            SerializeTree(graph, out Node[] nodes);
-            if (nodes == null)
-            {
-                // no nodes
-                return;
-            }
-
-            //CalculateRadius2D(node, out float rad, out float out_rad);
-        }
-
-        /// <summary>
-        /// Enumerates all nodes of the graph in nodes. The nodes are added in
-        /// pre-order of the depth-first traversal. 
-        /// </summary>
-        /// <param name="graph"></param>
-        /// <param name="nodes"></param>
-        private void SerializeTree(Graph graph, out Node[] nodes)
-        {
-            List<Node> roots = graph.GetRoots();
-            if (roots.Count == 0)
-            {
-                // no nodes
-                nodes = null;
-            }
-            else if (roots.Count == 1)
-            {
-                nodes = new Node[graph.NodeCount];
-                int dfsn = 0;
-                DFS(nodes[0], nodes, ref dfsn);
-            }
-            else
-            {
-                // More than one root: We will introduce an artifical root whose
-                // children are the actual roots
-                nodes = new Node[graph.NodeCount + 1];
-                // we cannot really create a node here, because Node derives from MonoBehaviour;
-                // that is why we represent the artifical root by null; we need to make sure
-                // that we handle this case properly later
-                nodes[0] = null;
-                // all other nodes will be placed after our artifical root
-                int dfsn = 1;
-                foreach (Node node in roots)
-                {
-                    DFS(nodes[0], nodes, ref dfsn);
-                }
-            }
-            Dump(0, roots, nodes);
-        }
-
-        private void Dump(int node, List<Node> roots, Node[] nodes)
-        {
-            if (roots.Count > 1)
-            {
-                foreach (Node root in roots)
-                {
-                    Dump(node, nodes, 0);
-                }
-            }
-            else
-            {
-                Dump(nodes[0], nodes, 0);
-            }
-        }
-
-        private void Dump(Node node, Node[] nodes, int level)
-        {
-
-        }
-
-        private void DFS(Node node, Node[] nodes, ref int dfsn)
-        {
-            nodes[dfsn] = node;
-            dfsn++;
-            foreach (Node child in node.Children())
-            {
-                DFS(child, nodes, ref dfsn);
-            }
-        }
-        */
     }
 }
