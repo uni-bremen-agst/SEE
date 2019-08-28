@@ -77,8 +77,8 @@ namespace SEE.Layout
             Material newMat = Resources.Load<Material>(materialPath);
             if (newMat != null)
             {
-                //renderer.material = newMat;
-                renderer.sharedMaterial = newMat;
+                renderer.material = newMat;
+                //renderer.sharedMaterial = newMat;
             }
             else
             {
