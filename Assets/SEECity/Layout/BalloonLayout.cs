@@ -36,7 +36,7 @@ namespace SEE.Layout
                 CalculateRadius2D(root, out float out_rad);
                 DrawCircles(root, position, material);
                 position.x += 2.2f * out_rad;
-                //break; // FIXME
+                break; // FIXME
             }
 
 
@@ -78,53 +78,106 @@ namespace SEE.Layout
 
                 Vector3 child_center = new Vector3(position.x, position.y, position.z);
 
-                double accummulated_alpha = 0.0;
+                double space_between_child_circles = 0.0;
 
-                foreach (Node child in children)
                 {
-                    double child_outer_radius = radii[child].outer_radius;
-                    // As in polar coordinates, the angle of the child circle w.r.t. to the 
-                    // circle point of the node's circle. The distance from the node's center point
-                    // to the child node's center point together with this angle defines the polar
-                    // coordinates of the child relative to the node.
-                    double alpha = 2* System.Math.Asin(child_outer_radius / (2 * parent_inner_radius));
-
-                    accummulated_alpha += alpha;
-                    // Convert polar coordinate back to cartesian coordinate.
-                    child_center.x = position.x + (float)(parent_inner_radius * System.Math.Cos(accummulated_alpha));
-                    child_center.z = position.z + (float)(parent_inner_radius * System.Math.Sin(accummulated_alpha));
-
-                    DrawCircles(child, child_center, material);
-
-                    // The next available circle must be located outside of the child circle
-                    accummulated_alpha += alpha;
-                }
-
-                //Debug.Log("Remaining angle: " + (360.0f - accummulated_alpha) + "\n");
-
-                    // FIXME: This will not work for more than four children.
-                    /*
-                    int i = 0;
+                    // Calculate the sum over all angles necessary to position the child
+                    // circles onto the circle with radius parent_inner_radius and center
+                    // point 'position'.
+                    double accummulated_alpha = 0.0;
                     foreach (Node child in children)
                     {
-                        Vector3 child_position = position;
-                        float offset = radii[node].radius;
-                        switch (i)
-                        {
-                            case 0: child_position.z += offset; break;
-                            case 1: child_position.z -= offset; break;
-                            case 2: child_position.x += offset; break;
-                            case 3: child_position.x -= offset; break;
-                        }
-                        DrawCircles(child, child_position, material);
-                        i++;
-                        if (i > 3)
-                        {
-                            i = 0;
-                        }
+                        double child_outer_radius = radii[child].outer_radius;
+                        // As in polar coordinates, the angle of the child circle w.r.t. to the 
+                        // circle point of the node's circle. The distance from the node's center point
+                        // to the child node's center point together with this angle defines the polar
+                        // coordinates of the child relative to the node.
+
+                        // Let cp_p be the center point of the parent circle and cp_c be
+                        // the center point of the child circle. cp_c is placed on the circle
+                        // around cp_p with radius r_p. Thus, the distance between cp_p
+                        // and cp_c is r_p. The child circle has radius r_c. The child circle
+                        // around cp_ with radius r_c intersects twice with the parent circle.
+                        // The distance between cp_c and those intersection points is r_c.
+                        // The two triangles formed by the cp_p, cp_c, and each intersection
+                        // point, P, are isosceles triangles, with |cp_p - P| = |cp_p - cp_c| = r_p
+                        // and |cp_c - P| = r_c. The angle alpha of this isosceles triangle is
+                        // 2 * arcsin(r_c / (2*r_p)).
+                        double alpha = 2 * System.Math.Asin(child_outer_radius / (2 * parent_inner_radius));
+                        Debug.Log(node.name + " 1) Alpha:         " + alpha + "\n");
+
+                        // There are two identical isosceles triangles, one for each of the two
+                        // intersection points of the parent circle and child circle. When we
+                        // place the child circle on the parent circle, the other child circles
+                        // must be placed on the next free points on the parent circles outside
+                        // of the child circle with radius r_c. That is why, we need to double
+                        // the angle alpha to position the next circle.
+                        accummulated_alpha += 2 * alpha;
+                        Debug.Log(node.name + " 1) Accumulated angle: " + accummulated_alpha + "\n");
                     }
-                    */
+                    Debug.Log(node.name + " 1) Remaining angle:   " + (360.0f - accummulated_alpha) + "\n");
+                    if (accummulated_alpha > 360.0)
+                    {
+                        Debug.LogError("BallonLayout.DrawCircles: Accumulated angle is greater than 360 degrees.\n");
+                    }
+                    else
+                    {
+                        space_between_child_circles = (360.0 - accummulated_alpha) / (double)children.Count;
+                    }
                 }
+                {
+                    double accummulated_alpha = 0.0;
+
+                    foreach (Node child in children)
+                    {
+                        double child_outer_radius = radii[child].outer_radius;
+                        // As in polar coordinates, the angle of the child circle w.r.t. to the 
+                        // circle point of the node's circle. The distance from the node's center point
+                        // to the child node's center point together with this angle defines the polar
+                        // coordinates of the child relative to the node.
+                        double alpha = 2 * System.Math.Asin(child_outer_radius / (2 * parent_inner_radius));
+
+                        accummulated_alpha += alpha;// + space_between_child_circles;
+
+                        // Convert polar coordinate back to cartesian coordinate.
+                        child_center.x = position.x + (float)(parent_inner_radius * System.Math.Cos(accummulated_alpha));
+                        child_center.z = position.z + (float)(parent_inner_radius * System.Math.Sin(accummulated_alpha));
+
+                        DrawCircles(child, child_center, material);
+
+                        // The next available circle must be located outside of the child circle
+                        accummulated_alpha += alpha;
+                        Debug.Log(node.name + " 2) Accumulated angle: " + accummulated_alpha + "\n");
+                    }
+
+                    Debug.Log(node.name + " 2) Remaining angle:   " + (360.0f - accummulated_alpha) + "\n");
+                }
+
+
+
+                // FIXME: This will not work for more than four children.
+                /*
+                int i = 0;
+                foreach (Node child in children)
+                {
+                    Vector3 child_position = position;
+                    float offset = radii[node].radius;
+                    switch (i)
+                    {
+                        case 0: child_position.z += offset; break;
+                        case 1: child_position.z -= offset; break;
+                        case 2: child_position.x += offset; break;
+                        case 3: child_position.x -= offset; break;
+                    }
+                    DrawCircles(child, child_position, material);
+                    i++;
+                    if (i > 3)
+                    {
+                        i = 0;
+                    }
+                }
+                */
+            }
         }
 
         private struct RadiusInfo
