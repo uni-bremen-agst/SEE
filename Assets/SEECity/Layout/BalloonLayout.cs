@@ -194,7 +194,7 @@ namespace SEE.Layout
             {
                 name = "house " + parent.name
             };
-            MeshFactory.AddMesh(cube, PrimitiveType.Cube);         
+            MeshFactory.AddCube(cube);         
             // cube is nested in parent
             cube.transform.parent = parent.transform;
             // relative position within parent
@@ -218,7 +218,7 @@ namespace SEE.Layout
             {
                 name = "garden " + parent.name
             };
-            MeshFactory.AddMesh(cylinder.gameObject, PrimitiveType.Cylinder);
+            MeshFactory.AddCylinder(cylinder.gameObject);
             // game object of node becomes the parent of cube
             cylinder.transform.parent = parent.transform;
             // relative position within parent
@@ -227,7 +227,7 @@ namespace SEE.Layout
             // be twice the radius above). The cylinder's height should be minimal.
             cylinder.transform.localScale = new Vector3(1.0f, cylinder_height, 1.0f);
             Renderer renderer = cylinder.GetComponent<Renderer>();
-            renderer.material.color = Color.black;
+            renderer.material.color = Color.white;
         }
 
         private struct RadiusInfo
@@ -399,12 +399,11 @@ namespace SEE.Layout
         {
             GameObject go = node.gameObject;
             go.transform.position = new Vector3(position.x, position.y - (max_depth - depth + 1) * cylinder_height, position.z);
-            MeshFactory.AddMesh(go, PrimitiveType.Cylinder);
+            MeshFactory.AddCylinder(go);
 
             go.transform.localScale = new Vector3(2.0f * radius, cylinder_height, 2.0f * radius);
             Renderer renderer = go.GetComponent<Renderer>();
-            renderer.material.color = Color.Lerp(Color.white, Color.black, (float)depth / (float)max_depth);
-            // TODO: use depth for gray color gradient
+            renderer.material.color = Color.Lerp(Color.white, Color.green, (float)depth / (float)max_depth);
         }
 
         private void DrawCircle(Node node, Vector3 position, float radius, Material newMat)
