@@ -24,7 +24,7 @@ namespace SEE.Layout
         {
             foreach (GameObject node in graph.GetNodes())
             {
-                MeshFactory.AddMesh(node, PrimitiveType.Cube);
+                MeshFactory.AddCube(node);
             }
         }
 
