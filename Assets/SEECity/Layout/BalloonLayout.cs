@@ -225,7 +225,9 @@ namespace SEE.Layout
             cylinder.transform.localPosition = Vector3.zero;
             // Scale to full extent of the parent's width and breadth (chosen to
             // be twice the radius above). The cylinder's height should be minimal.
-            cylinder.transform.localScale = new Vector3(1.0f, cylinder_height, 1.0f);  
+            cylinder.transform.localScale = new Vector3(1.0f, cylinder_height, 1.0f);
+            Renderer renderer = cylinder.GetComponent<Renderer>();
+            renderer.material.color = Color.black;
         }
 
         private struct RadiusInfo
@@ -400,6 +402,8 @@ namespace SEE.Layout
             MeshFactory.AddMesh(go, PrimitiveType.Cylinder);
 
             go.transform.localScale = new Vector3(2.0f * radius, cylinder_height, 2.0f * radius);
+            Renderer renderer = go.GetComponent<Renderer>();
+            renderer.material.color = Color.Lerp(Color.white, Color.black, (float)depth / (float)max_depth);
             // TODO: use depth for gray color gradient
         }
 
