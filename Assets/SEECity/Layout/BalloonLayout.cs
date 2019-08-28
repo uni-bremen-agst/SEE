@@ -13,18 +13,16 @@ namespace SEE.Layout
     /// </summary>
     public class BalloonLayout : ILayout
     {
-        public void Draw(Graph graph)
+   
+        public BalloonLayout(string widthMetric, string heightMetric, string breadthMetric)
+        : base(widthMetric, heightMetric, breadthMetric)
         {
-            Performance p;
-
-            p = Performance.Begin("Ballon Layout nodes");
-            DrawNodes(graph);
-            p.End();
+            name = "Ballon";
         }
 
         private const string materialPath = "Legacy Shaders/Particles/Additive";
 
-        private void DrawNodes(Graph graph)
+        protected override void DrawNodes(Graph graph, Dictionary<string, float> metricMaxima)
         {
             Material material = new Material(Shader.Find(materialPath));
             if (material == null)
@@ -38,19 +36,18 @@ namespace SEE.Layout
             foreach (Node root in graph.GetRoots())
             {
                 CalculateRadius2D(root, out float out_rad);
-                DrawCircles(root, position, material);
+                DrawCircles(root, position, material, metricMaxima);
                 position.x += 2.2f * out_rad;
             }
         }
 
-        private void DrawCircles(Node node, Vector3 position, Material material)
+        private void DrawCircles(Node node, Vector3 position, Material material, Dictionary<string, float> metricMaxima)
         {
             List<Node> children = node.Children();
 
             if (children.Count == 0)
             {
-                // TODO: We will create a block for children.
-                DrawCircle(node, position, radii[node].outer_radius, material);
+                DrawLeaf(node, position, radii[node].outer_radius, metricMaxima);
                 //Debug.Log("leaf " + node.name + " @ " + position + " radius " + radii[node].outer_radius + "\n");
             }
             else
@@ -65,14 +62,17 @@ namespace SEE.Layout
                 //Debug.Log("inner " + node.name + " @ " + position + " outer-radius " + radii[node].outer_radius + " inner-radius " + parent_inner_radius + "\n");
 
                 // Placing all children of the inner circle defined by the 
-                // center point (the given position) and the radius 
+                // center point (the given position) and the radius with some
+                // space in between if that is possible.
 
                 Vector3 child_center = new Vector3(position.x, position.y, position.z);
 
+                // The space in between neighboring child circles if there is any left.
                 double space_between_child_circles = 0.0;
 
                 {
-                    // Here, we calculate the sum over all angles necessary to position the child
+                    // Calculate space_between_child_circles.
+                    // Here, we first calculate the sum over all angles necessary to position the child
                     // circles onto the circle with radius parent_inner_radius and center
                     // point 'position'.
 
@@ -112,14 +112,19 @@ namespace SEE.Layout
                     //Debug.Log(node.name + " 1) Remaining angle:   " + (2 * Math.PI - accummulated_alpha) + "\n");
                     if (accummulated_alpha > 2 * Math.PI)
                     {
-                        Debug.LogError("BallonLayout.DrawCircles: Accumulated angle is greater than 360 degrees: "
-                            + ((accummulated_alpha * 180) / Math.PI) + ".\n");
+                        // No space left.
+
+                        // The following error may occur maybe because of rounding errors?
+                        //Debug.LogError("BallonLayout.DrawCircles: Accumulated angle is greater than 360 degrees: "
+                        //    + ((accummulated_alpha * 180) / Math.PI) + ".\n");
                     }
                     else
                     {
                         space_between_child_circles = (2 * Math.PI - accummulated_alpha) / (double)children.Count;
                     }
                 }
+                // Now that we know the space we can put in between neighboring circles, we can
+                // draw the child circles.
                 {
                     // The accumulated angles in radians.
                     double accummulated_alpha = 0.0;
@@ -147,7 +152,7 @@ namespace SEE.Layout
                         child_center.x = position.x + (float)(parent_inner_radius * System.Math.Cos(accummulated_alpha));
                         child_center.z = position.z + (float)(parent_inner_radius * System.Math.Sin(accummulated_alpha));
 
-                        DrawCircles(child, child_center, material);
+                        DrawCircles(child, child_center, material, metricMaxima);
 
                         // The next available circle must be located outside of the child circle
                         accummulated_alpha += alpha + space_between_child_circles;
@@ -157,6 +162,70 @@ namespace SEE.Layout
                     //Debug.Log(node.name + " 2) Remaining angle:   " + (360.0f - accummulated_alpha) + "\n");
                 }
             }
+        }
+
+        /// <summary>
+        /// We will draw a leaf nodes as two objects: cube and cylinder. Both become children
+        /// of the node's game object. The cube represents the metrics and is put onto the
+        /// cylinder. The cylinder is the Ballon circle.
+        /// </summary>
+        /// <param name="node">leaf node to be drawn</param>
+        /// <param name="position">center point of the node where it is to be positioned</param>
+        /// <param name="radius">the radius for the cylinder</param>
+        /// <param name="metricMaxima">the maxima of the metrics needed for normalization</param>
+        private void DrawLeaf(Node node, Vector3 position, float radius, Dictionary<string, float> metricMaxima)
+        {
+            // node will have two children: a cube placed on top of a cylinder; the cylinder is the 
+            // circle; the cube represents the node's metrics
+
+            Vector3 scale = ScaleNode(node, metricMaxima, minimal_length, 1.0f);
+
+            // set position of parent
+            GameObject parent = node.gameObject;
+            // A Vector3 is a struct, not a true object, and is passed by value. 
+            parent.transform.position = position;
+            // width and breadth are determined by the cylinder, height by the cube's height
+            parent.transform.localScale = new Vector3(2.0f * radius, scale.y, 2.0f * radius);
+
+            // add cube to parent
+            GameObject cube = new GameObject
+            {
+                name = "house " + parent.name
+            };
+            MeshFactory.AddMesh(cube, PrimitiveType.Cube);         
+            // cube is nested in parent
+            cube.transform.parent = parent.transform;
+            // relative position within parent
+            cube.transform.position = new Vector3(position.x, scale.y / 2.0f, position.z);
+
+            //localPosition = new Vector3(position.x, 2.0f * scale.y, position.z);
+
+            // Note that the values are interpreted relative to the parent here.
+            // The parent's height was chosen as scale.y above. Hence, we need to
+            // to scale by 1.0 for the y coordinate. The width and height of the
+            // parent were chosen to be twice the radius. We cannot scale to the
+            // radius, however, because otherwise the corners of the cube might
+            // range out of the circle. We need to scale by the following factor
+            // (the quotient of the cube length and the the circle diameter):
+            float factor = maximal_length / (2.0f * radius);
+            cube.transform.localScale = new Vector3(factor * scale.x, 1.0f, factor * scale.z);
+
+            //go.transform.localScale = new Vector3(radius, 0.01f, radius);
+
+            // the cylinder will be placed just below the center of the cube;
+            // it will fill the complete plane of the parent
+            GameObject cylinder = new GameObject
+            {
+                name = "garden " + parent.name
+            };
+            MeshFactory.AddMesh(cylinder.gameObject, PrimitiveType.Cylinder);
+            // game object of node becomes the parent of cube
+            cylinder.transform.parent = parent.transform;
+            // relative position within parent
+            cylinder.transform.localPosition = Vector3.zero;
+            // Scale to full extent of the parent's width and breadth (chosen to
+            // be twice the radius above). The cylinder's height should be minimal.
+            cylinder.transform.localScale = new Vector3(1.0f, 0.01f, 1.0f);  
         }
 
         private struct RadiusInfo
@@ -173,9 +242,20 @@ namespace SEE.Layout
             }
         }
 
-        Dictionary<Node, RadiusInfo> radii = new Dictionary<Node, RadiusInfo>();
+        private Dictionary<Node, RadiusInfo> radii = new Dictionary<Node, RadiusInfo>();
 
-        const float minimal_radius = 0.1f;
+        // This parameter determines the radius of circles for leaves.
+        private const float minimal_radius = 0.5f;
+
+        // This parameter determines the maximal width, breadth, and height of each cube. 
+        // The cubes for the nodes representing leaves are put into the innermost leaf circles.
+        // The maximal length l (width or breadth) of the square within the circle with given 
+        // radius r is l = sqrt(2) * r.
+        private static readonly float maximal_length = (float)Math.Sqrt(2.0) * minimal_radius;
+
+        // This parameter determines the minimal width, breadth, and height of each cube. It
+        // must be smaller than maximal_length.
+        private static readonly float minimal_length = maximal_length / 10.0f;
 
         // Concepts
         //

@@ -8,67 +8,32 @@ namespace SEE.Layout
 {
     public class ManhattenLayout : ILayout
     {
-        private readonly string widthMetric;
-        private readonly string heightMetric;
-        private readonly string breadthMetric;
-
         public ManhattenLayout(string widthMetric, string heightMetric, string breadthMetric)
+            : base(widthMetric, heightMetric, breadthMetric)
         {
-            this.widthMetric = widthMetric;
-            this.heightMetric = heightMetric;
-            this.breadthMetric = breadthMetric;
+            name = "Manhattan";
         }
 
-        public void Draw(Graph graph)
+        public override void Draw(Graph graph)
         {
-            // The maximal values of the relevant metrics.
-            Performance p;
-
-            p = Performance.Begin("Determine metric maxima");
-            Dictionary<string, float> metricMaxima = DetermineMetricMaxima(graph, widthMetric, heightMetric, breadthMetric);
-            p.End();
-            p = Performance.Begin("Layout nodes");
-            CreateNodes(graph, metricMaxima);
-            p.End();
-            p = Performance.Begin("Layout edges");
-            CreateEdges(graph);
-            p.End();
+            AddMeshes(graph);
+            base.Draw(graph);
         }
 
-        /// <summary>
-        /// Returns the maximal values of the given node metrics.
-        /// </summary>
-        /// <param name="metrics">the metrics for which the maxima are to be gathered</param>
-        /// <returns>metric maxima</returns>
-        private Dictionary<string, float> DetermineMetricMaxima(Graph graph, params string[] metrics)
+        private void AddMeshes(Graph graph)
         {
-            Dictionary<string, float> result = new Dictionary<string, float>();
-            foreach (string metric in metrics)
+            foreach (GameObject node in graph.GetNodes())
             {
-                result.Add(metric, 0.0f);
+                MeshFactory.AddMesh(node, PrimitiveType.Cube);
             }
-
-            foreach (Node node in graph.Nodes())
-            {
-                foreach (string metric in metrics)
-                {
-                    if (node.TryGetNumeric(metric, out float value))
-                    {
-                        if (value > result[metric])
-                        {
-                            result[metric] = value;
-                        }
-                    }
-                }
-            }
-            return result;
         }
 
-        /// <summary>
-        /// Creates the GameObjects representing the nodes of the graph.
-        /// The graph must have been loaded before via Load().
-        /// </summary>
-        private void CreateNodes(Graph graph, Dictionary<string, float> metricMaxima)
+        // The minimal length of any axis (width, breadth, height) of a block.
+        // Must not exceed 1.0f.
+        protected const float minimalLength = 0.1f;
+
+        // precondition: the GameObjects and their meshes have already been created for all nodes
+        protected override void DrawNodes(Graph graph, Dictionary<string, float> metricMaxima)
         {
             //DumpMetricMaxima(metricMaxima);
 
@@ -88,30 +53,17 @@ namespace SEE.Layout
                     row++;
                 }
                 Node node = sceneNode.GetComponent<Node>();
-
-                float width;
-                float breadth;
-                float height;
-
-                if (node != null)
-                {
-                    width = NormalizedMetric(metricMaxima, node, widthMetric);
-                    breadth = NormalizedMetric(metricMaxima, node, breadthMetric);
-                    height = NormalizedMetric(metricMaxima, node, heightMetric);
-                }
-                else
+                if (node == null)
                 {
                     Debug.LogError("Scene node " + sceneNode.name + " does not have a graph node component.\n");
-                    width = minimalLength;
-                    breadth = minimalLength;
-                    height = minimalLength;
                 }
-                sceneNode.transform.localScale = new Vector3(width, height, breadth);
+                Vector3 scale = ScaleNode(node, metricMaxima, minimalLength, 1.0f);
+                node.gameObject.transform.localScale = scale;
 
                 // The position is the center of a GameObject. We want all GameObjects
                 // be placed at the same ground level 0. That is why we need to "lift"
                 // every building by half of its height.
-                sceneNode.transform.position = new Vector3(row + row * relativeOffset, height / 2.0f, column + column * relativeOffset);
+                sceneNode.transform.position = new Vector3(row + row * relativeOffset, scale.y / 2.0f, column + column * relativeOffset);
                 /*
                 {
                     Renderer renderer;
@@ -147,47 +99,11 @@ namespace SEE.Layout
             }
         }
 
-        // The minimal length of any axis (width, breadth, height) of a block.
-        // Must not exceed 1.0f.
-        private const float minimalLength = 0.1f;
-
-        /// <summary>
-        /// Returns a value in the range [0.0, 1.0] representing the relative value of the given
-        /// metric in the metrics value range for the given node.
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="metric"></param>
-        /// <returns></returns>
-        private float NormalizedMetric(Dictionary<string, float> metricMaxima, Node node, string metric)
-        {
-            float max = metricMaxima[metric];
-
-            if (max <= 0.0f)
-            {
-                return minimalLength;
-            }
-            if (node.TryGetNumeric(metric, out float width))
-            {
-                if (width <= minimalLength)
-                {
-                    return minimalLength;
-                }
-                else
-                {
-                    return (float)width / max;
-                }
-            }
-            else
-            {
-                return minimalLength;
-            }
-        }
-
         /// <summary>
         /// Creates the GameObjects representing the edges of the graph.
         /// The graph must have been loaded before via Load().
         /// </summary>
-        private void CreateEdges(Graph graph)
+        protected override void DrawEdges(Graph graph)
         {
             // The distance of the edges relative to the houses; the maximal height of
             // a house is 1.0. This offset is used to draw the line somewhat below
