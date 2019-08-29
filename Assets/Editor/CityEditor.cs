@@ -103,6 +103,7 @@ namespace SEEEditor
         /// </summary>
         private void DeleteAll()
         {
+            MeshFactory.Reset();
             foreach (string tag in SEE.DataModel.Tags.All)
             {
                 try
