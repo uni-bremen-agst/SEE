@@ -43,7 +43,15 @@ namespace SEE.Layout
 
             const float offset = 1.0f;
             Node[] roots = graph.GetRoots().ToArray();
+            if (roots.Length == 0)
+            {
+                Debug.LogError("Graph has no nodes.\n");
+                return;
+            }
             int[] max_depths = new int[roots.Length];
+
+            // the maximal radius over all root circles; required to create the plane underneath
+            float max_radius = 0.0f;
 
             // first calculate all radii including those for the roots
             {
@@ -53,6 +61,10 @@ namespace SEE.Layout
                     CalculateRadius2D(root, out float out_rad, out int max_depth);
                     max_depths[i] = max_depth;
                     i++;
+                    if (out_rad > max_radius)
+                    {
+                        max_radius = out_rad;
+                    }
                 }
             }
             // now we know the minimal distance between two subsequent roots so that
@@ -69,6 +81,42 @@ namespace SEE.Layout
                     DrawCircles(root, position, metricMaxima, 0, max_depths[i]);
                     i++;
                 }
+            }
+
+            {
+                // The factor by which we enlarge the plane somewhat. The plane may be a bit
+                // larger than the maximal extents of the circles. That solves may also solve the issue
+                // of the line width of the circle drawn (which depends upon its tree depth) that is not 
+                // capture by the radius.
+                const float enlargementFactor = 1.12f; // should not be smaller than 1.0
+
+                // Width of the plane underneath the root circles determined by the left-most and right-most circle.
+                float xLength = (roots[roots.Length - 1].transform.position.x - roots[0].transform.position.x
+                    + radii[roots[0]].outer_radius + radii[roots[roots.Length - 1]].outer_radius)
+                    * enlargementFactor;
+
+                // Breadth of the plane: double the radius. 
+                float zLength = (2.0f * max_radius) * enlargementFactor;
+
+                GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+
+                Vector3 leftRootCenter = roots[0].transform.position;
+                float planePositionX = (leftRootCenter.x - radii[roots[0]].outer_radius) + (xLength / enlargementFactor / 2.0f);
+                float planePositionY = leftRootCenter.y - 1.0f; // somewhat underneath roots
+                float planePositionZ = leftRootCenter.z;
+                plane.transform.position = new Vector3(planePositionX, planePositionY, planePositionZ);
+
+                // TODO: Turn off reflection of plane.
+                // TODO: Circle ines way below the nodes.
+                // TODO: Plane below everything else.
+
+                // A plane is a flat square with edges ten units long oriented in the XZ plane of the local 
+                // coordinate space. Thus, the mesh of a plane is 10 times larger than its scale factors. 
+                // When we want a plane to have width 12 units, we need to devide the scale for the width 
+                // by 1.2.
+                const float planeMeshFactor = 10.0f;
+                Vector3 planeScale = new Vector3(xLength, 10.0f, zLength) / planeMeshFactor;
+                plane.transform.localScale = planeScale;
             }
         }
 
@@ -359,7 +407,9 @@ namespace SEE.Layout
             {
                 // If node i is a leaf, we can return an outer-radius of small value
                 // minimal_radius so that it can be properly placed in the next lower level.
-                // TODO: Here we need to consider the metric
+                // Leaf nodes have currently a fixed size. If we ever considered the
+                // radius of a leaf proportional to a metric, we would need to adjust
+                // the assignment to out_rad here.
                 out_rad = minimal_radius;
                 rad = 0.0f;
                 max_depth = 0;
@@ -437,7 +487,10 @@ namespace SEE.Layout
         {
 
             GameObject go = node.gameObject;
-            go.transform.position = new Vector3(position.x, position.y - (max_depth - depth + 1) * cylinder_height, position.z);
+            // If wanted to have the nesting of circles on different ground levels depending
+            // on the depth of the node, we would use position.y - (max_depth - depth + 1) * cylinder_height
+            // for the y coordinate.
+            go.transform.position = position;
            //go.transform.localScale = new Vector3(2.0f * radius, cylinder_height, 2.0f * radius);
             /*
               MeshFactory.AddTerrain(go);
@@ -445,7 +498,9 @@ namespace SEE.Layout
             */
 
             // DrawCircle(node, position, radius);
-            AttachCircleLine(go, radius);
+            // Roots have depth 0. We want the line to be thicker for nodes higher in the hierarchy.
+            float lineWidth = Mathf.Lerp(0.1f, 1.0f, (float)(max_depth - depth) / max_depth);
+            AttachCircleLine(go, radius, lineWidth);
         }
 
         private void SetColor(GameObject gameObject, Color color)
@@ -472,10 +527,10 @@ namespace SEE.Layout
             // be twice the radius above). The cylinder's height should be minimal.
             // circle.transform.localScale = new Vector3(1.0f, cylinder_height, 1.0f);
 
-            AttachCircleLine(circle, radius);
+            AttachCircleLine(circle, radius, 0.1f);
         }
 
-        private static void AttachCircleLine(GameObject circle, float radius)
+        private static void AttachCircleLine(GameObject circle, float radius, float lineWidth)
         {
             // Number of line segments constituting the circle
             const int segments = 360;
@@ -484,6 +539,7 @@ namespace SEE.Layout
 
             LineFactory.SetDefaults(line);
             LineFactory.SetColor(line, Color.red);
+            LineFactory.SetWidth(line, lineWidth);
 
             // We want to set the points of the circle lines relative to the game object.
             line.useWorldSpace = false;
