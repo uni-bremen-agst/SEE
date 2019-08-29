@@ -35,20 +35,40 @@ namespace SEE.Layout
         }
         protected override void DrawNodes(Graph graph, Dictionary<string, float> metricMaxima)
         {
-            Vector3 position = Vector3.zero;
+            
 
             // puts the outermost circles of the roots next to each other;
             // later we might use a circle-packing algorithm instead,
             // e.g., https://www.codeproject.com/Articles/42067/D-Circle-Packing-Algorithm-Ported-to-Csharp
-            float previous_out_rad = 0.0f;
+
             const float offset = 1.0f;
-            foreach (Node root in graph.GetRoots())
+            Node[] roots = graph.GetRoots().ToArray();
+            int[] max_depths = new int[roots.Length];
+
+            // first calculate all radii including those for the roots
             {
-                Debug.Log("Drawing balloon for root " + root.name);
-                position.x += 2.0f * previous_out_rad + offset;
-                CalculateRadius2D(root, out float out_rad, out int max_depth);
-                DrawCircles(root, position, metricMaxima, 0, max_depth);
-                previous_out_rad = out_rad;
+                int i = 0;
+                foreach (Node root in roots)
+                {
+                    CalculateRadius2D(root, out float out_rad, out int max_depth);
+                    max_depths[i] = max_depth;
+                    i++;
+                }
+            }
+            // now we know the minimal distance between two subsequent roots so that
+            // their outer circles do not overlap
+            {
+                Vector3 position = Vector3.zero;
+                int i = 0;
+                foreach (Node root in graph.GetRoots())
+                { 
+                    // for two neighboring circles the distance must be the sum of the their two radii;
+                    // in case we draw the very first circle, no distance must be kept
+                    position.x += i == 0 ? 0.0f : radii[roots[i - 1]].outer_radius + radii[roots[i]].outer_radius + offset;
+                    Debug.Log("Drawing balloon for root " + root.name + "@" + position + "\n");
+                    DrawCircles(root, position, metricMaxima, 0, max_depths[i]);
+                    i++;
+                }
             }
         }
 
@@ -418,13 +438,14 @@ namespace SEE.Layout
 
             GameObject go = node.gameObject;
             go.transform.position = new Vector3(position.x, position.y - (max_depth - depth + 1) * cylinder_height, position.z);
-            go.transform.localScale = new Vector3(2.0f * radius, cylinder_height, 2.0f * radius);
+           //go.transform.localScale = new Vector3(2.0f * radius, cylinder_height, 2.0f * radius);
             /*
               MeshFactory.AddTerrain(go);
               SetColor(go, Color.Lerp(lightCylinderColor, rightCylinderColor, (float)depth / (float)max_depth));
             */
 
-            DrawCircle(node, position, radius);
+            // DrawCircle(node, position, radius);
+            AttachCircleLine(go, radius);
         }
 
         private void SetColor(GameObject gameObject, Color color)
@@ -441,7 +462,7 @@ namespace SEE.Layout
 
             GameObject circle = new GameObject();
             circle.name = node.name + " border";
-                 
+
             // Create new circle line that becomes the child game object of node's game object.
             circle.transform.parent = parent.transform;
             // relative position within parent
@@ -451,6 +472,11 @@ namespace SEE.Layout
             // be twice the radius above). The cylinder's height should be minimal.
             // circle.transform.localScale = new Vector3(1.0f, cylinder_height, 1.0f);
 
+            AttachCircleLine(circle, radius);
+        }
+
+        private static void AttachCircleLine(GameObject circle, float radius)
+        {
             // Number of line segments constituting the circle
             const int segments = 360;
 
@@ -459,6 +485,7 @@ namespace SEE.Layout
             LineFactory.SetDefaults(line);
             LineFactory.SetColor(line, Color.red);
 
+            // We want to set the points of the circle lines relative to the game object.
             line.useWorldSpace = false;
 
             // use sharedMaterial if changes to the original material should affect all
@@ -475,7 +502,6 @@ namespace SEE.Layout
                 float rad = Mathf.Deg2Rad * (i * 360f / segments);
                 points[i] = new Vector3(Mathf.Sin(rad) * radius, 0, Mathf.Cos(rad) * radius);
             }
-
             line.SetPositions(points);
         }
     }
