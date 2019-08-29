@@ -46,13 +46,21 @@ namespace SEE
                     settings.hierarchicalEdgeType
                 };
             GraphCreator graphCreator = new GraphCreator(settings.graphPath, hierarchicalEdges, new SEELogger());
-            SEE.Performance p = SEE.Performance.Begin("loading graph data");
-            graphCreator.Load();
-            Graph graph = graphCreator.GetGraph();
-            p.End();
-            Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
-            Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
-            return graph;
+            if (string.IsNullOrEmpty(settings.graphPath))
+            {
+                Debug.LogError("Empty graph path.\n");
+                return null;
+            }
+            else
+            {
+                SEE.Performance p = SEE.Performance.Begin("loading graph data from " + settings.graphPath);
+                graphCreator.Load();
+                Graph graph = graphCreator.GetGraph();
+                p.End();
+                Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
+                Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
+                return graph;
+            }
         }
 
         private static void Delete(Graph graph)
