@@ -8,7 +8,7 @@ namespace SEE.Layout
     /// </summary>
     class LineFactory
     {
-        const float defaultWidth = 0.01f;
+        const float defaultWidth = 0.1f;
 
         internal static void SetDefaults(LineRenderer line)
         {
