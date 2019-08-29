@@ -20,28 +20,39 @@ namespace SEE.Layout
             name = "Ballon";
         }
 
-        private const string materialPath = "Legacy Shaders/Particles/Additive";
+        private static Material circleLineMaterial = CircleLineMaterial();
 
-        protected override void DrawNodes(Graph graph, Dictionary<string, float> metricMaxima)
+        private static Material CircleLineMaterial()
         {
+            const string materialPath = "Legacy Shaders/Particles/Additive";
+
             Material material = new Material(Shader.Find(materialPath));
             if (material == null)
             {
                 Debug.LogError("Could not find material " + materialPath + "\n");
-                return;
             }
-
+            return material;
+        }
+        protected override void DrawNodes(Graph graph, Dictionary<string, float> metricMaxima)
+        {
             Vector3 position = Vector3.zero;
 
+            // puts the outermost circles of the roots next to each other;
+            // later we might use a circle-packing algorithm instead,
+            // e.g., https://www.codeproject.com/Articles/42067/D-Circle-Packing-Algorithm-Ported-to-Csharp
+            float previous_out_rad = 0.0f;
+            const float offset = 1.0f;
             foreach (Node root in graph.GetRoots())
             {
+                Debug.Log("Drawing balloon for root " + root.name);
+                position.x += 2.0f * previous_out_rad + offset;
                 CalculateRadius2D(root, out float out_rad, out int max_depth);
-                DrawCircles(root, position, material, metricMaxima, 0, max_depth);
-                position.x += 2.2f * out_rad;
+                DrawCircles(root, position, metricMaxima, 0, max_depth);
+                previous_out_rad = out_rad;
             }
         }
 
-        private void DrawCircles(Node node, Vector3 position, Material material, Dictionary<string, float> metricMaxima, int depth, int max_depth)
+        private void DrawCircles(Node node, Vector3 position, Dictionary<string, float> metricMaxima, int depth, int max_depth)
         {
             List<Node> children = node.Children();
 
@@ -53,7 +64,6 @@ namespace SEE.Layout
             else
             {
                 DrawInnerNode(node, position, radii[node].outer_radius, depth, max_depth);
-                DrawCircle(node, position, radii[node].outer_radius, material);
 
                 // The center points of the children circles are located on the circle
                 // with center point 'position' and radius of the inner circle of the
@@ -154,7 +164,7 @@ namespace SEE.Layout
                         child_center.x = position.x + (float)(parent_inner_radius * System.Math.Cos(accummulated_alpha));
                         child_center.z = position.z + (float)(parent_inner_radius * System.Math.Sin(accummulated_alpha));
 
-                        DrawCircles(child, child_center, material, metricMaxima, depth + 1, max_depth);
+                        DrawCircles(child, child_center, metricMaxima, depth + 1, max_depth);
 
                         // The next available circle must be located outside of the child circle
                         accummulated_alpha += alpha + space_between_child_circles;
@@ -312,7 +322,8 @@ namespace SEE.Layout
         // length rl_k.
 
         /// <summary>
-        /// 
+        /// Calculates the inner and outer radius and the reference length of each node.
+        /// This algorithm is described in the paper.
         /// </summary>
         /// <param name="node">the node for which the ballon layout is to be computed</param>
         /// <param name="rad">radius of the circle around node at which the center of every circly of its direct children is located</param>
@@ -396,17 +407,24 @@ namespace SEE.Layout
 
         const float cylinder_height = 0.01f;
 
-        private Color lawngreen = new Color((float)200 / 255, (float)247 / 255, (float)197 / 255, 1.0f);
-        private Color salem = new Color((float)30 / 255, (float)130 / 255, (float)76 / 255, 1.0f);
+        private Color lightCylinderColor = new Color((float)236 / 255, (float)236 / 255, (float)236 / 255, 1.0f); // White smoke
+        private Color rightCylinderColor = new Color((float)46 / 255, (float)46 / 255, (float)46 / 255, 1.0f); // Outer space
+
+        //private Color lightCylinderColor = new Color((float)200 / 255, (float)247 / 255, (float)197 / 255, 1.0f); // Lawn green
+        // private Color rightCylinderColor = new Color((float)30 / 255, (float)130 / 255, (float)76 / 255, 1.0f); // Salem green
 
         private void DrawInnerNode(Node node, Vector3 position, float radius, int depth, int max_depth)
         {
+
             GameObject go = node.gameObject;
             go.transform.position = new Vector3(position.x, position.y - (max_depth - depth + 1) * cylinder_height, position.z);
-            MeshFactory.AddTerrain(go);
-
             go.transform.localScale = new Vector3(2.0f * radius, cylinder_height, 2.0f * radius);
-            SetColor(go, Color.Lerp(lawngreen, salem, (float)depth / (float)max_depth));
+            /*
+              MeshFactory.AddTerrain(go);
+              SetColor(go, Color.Lerp(lightCylinderColor, rightCylinderColor, (float)depth / (float)max_depth));
+            */
+
+            DrawCircle(node, position, radius);
         }
 
         private void SetColor(GameObject gameObject, Color color)
@@ -417,14 +435,26 @@ namespace SEE.Layout
             renderer.sharedMaterial = tempMaterial;
         }
 
-        private void DrawCircle(Node node, Vector3 position, float radius, Material newMat)
+        private void DrawCircle(Node node, Vector3 position, float radius)
         {
-            /*
-            const int segments = 360;
-            GameObject go = node.gameObject;
-            go.transform.position = position;
+            GameObject parent = node.gameObject;
 
-            LineRenderer line = go.AddComponent<LineRenderer>();
+            GameObject circle = new GameObject();
+            circle.name = node.name + " border";
+                 
+            // Create new circle line that becomes the child game object of node's game object.
+            circle.transform.parent = parent.transform;
+            // relative position within parent
+            circle.transform.localPosition = Vector3.zero;
+
+            // Scale to full extent of the parent's width and breadth (chosen to
+            // be twice the radius above). The cylinder's height should be minimal.
+            // circle.transform.localScale = new Vector3(1.0f, cylinder_height, 1.0f);
+
+            // Number of line segments constituting the circle
+            const int segments = 360;
+
+            LineRenderer line = circle.AddComponent<LineRenderer>();
 
             LineFactory.SetDefaults(line);
             LineFactory.SetColor(line, Color.red);
@@ -434,7 +464,7 @@ namespace SEE.Layout
             // use sharedMaterial if changes to the original material should affect all
             // objects using this material; renderer.material instead will create a copy
             // of the material and will not be affected by changes of the original material
-            line.sharedMaterial = newMat;
+            line.sharedMaterial = circleLineMaterial;
 
             line.positionCount = segments + 1;
             const int pointCount = segments + 1; // add extra point to make startpoint and endpoint the same to close the circle
@@ -447,7 +477,6 @@ namespace SEE.Layout
             }
 
             line.SetPositions(points);
-            */
         }
     }
 }

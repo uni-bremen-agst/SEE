@@ -37,7 +37,7 @@ namespace SEE.Layout
 
         public static void AddCylinder(GameObject gameObject, string materialPath)
         {
-            AddMesh(gameObject, PrimitiveType.Cylinder, materialPath);
+            AddMesh(gameObject, PrimitiveType.Cylinder, "");
         }
 
         public static void AddTerrain(GameObject gameObject)
@@ -84,7 +84,27 @@ namespace SEE.Layout
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
             // 3) Assigns a material to the object.
-            Material newMat = Resources.Load<Material>(materialPath);
+            Material newMat;
+            if (string.IsNullOrEmpty(materialPath))
+            {
+                // FIXME: Store the shader for later use
+                const string shaderName = "Diffuse";
+                Shader shader = Shader.Find(shaderName);
+                if (shader != null)
+                {
+                    newMat = new Material(shader);
+                }
+                else
+                {
+                    newMat = null;
+                    Debug.LogError("Could not find shader " + shaderName + "\n");
+                }
+            } 
+            else
+            {
+                newMat = Resources.Load<Material>(materialPath);
+            }
+            
             if (newMat != null)
             {
                 renderer.material = newMat;
