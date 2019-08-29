@@ -10,7 +10,7 @@ namespace SEE
         /// The path to the graph data.
         /// </summary>
         public string graphPath = "C:\\Users\\raine\\develop\\seecity\\data\\gxl\\minimal_clones.gxl";
-        //public string graphPath = "C:\\Users\\raine\\develop\\evostreets\\data\\gxl\\linux-clones\\clones.gxl";
+        //public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\linux-clones.gxl";
         // The following graph will not work because it does not have the necessary metrics.
         // public string graphPath = "C:\\Users\\raine\\Downloads\\codefacts.gxl";
 
