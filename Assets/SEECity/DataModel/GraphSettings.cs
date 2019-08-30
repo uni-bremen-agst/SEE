@@ -9,12 +9,19 @@ namespace SEE
         /// <summary>
         /// The path to the graph data.
         /// </summary>
+        
         /// Small clone graph with multiple roots to experiment with.
         //public string graphPath = "C:\\Users\\raine\\develop\\seecity\\data\\gxl\\minimal_clones.gxl";
+
+        // Large clone graph with multiple roots.
+        //public string graphPath = "C:\\Users\\raine\\develop\\evostreets\\data\\gxl\\linux-clones\\clones.gxl";
+
+        // Medium-size clone graph with multiple root (Linux directories whose path include "arch").
+        public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\arch.gxl";
+
         // Large clone graph with single root.
         //public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\linux-clones.gxl";
-        // Large clone graph with multiple roots.
-        public string graphPath = "C:\\Users\\raine\\develop\\evostreets\\data\\gxl\\linux-clones\\clones.gxl";
+
         // The following graph will not work because it does not have the necessary metrics.
         // public string graphPath = "C:\\Users\\raine\\Downloads\\codefacts.gxl";
 
