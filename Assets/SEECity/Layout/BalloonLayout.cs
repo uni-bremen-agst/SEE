@@ -106,9 +106,23 @@ namespace SEE.Layout
                 float planePositionZ = leftRootCenter.z;
                 plane.transform.position = new Vector3(planePositionX, planePositionY, planePositionZ);
 
-                // TODO: Turn off reflection of plane.
-                // TODO: Circle ines way below the nodes.
+                // TODO: Circle lines way below the nodes.
                 // TODO: Plane below everything else.
+
+                Renderer planeRenderer = plane.GetComponent<Renderer>();
+                planeRenderer.sharedMaterial = new Material(planeRenderer.sharedMaterial);
+
+                //planeRenderer.sharedMaterial.color = Color.black;
+
+                // Turn off reflection of plane
+                planeRenderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
+                planeRenderer.sharedMaterial.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
+                planeRenderer.sharedMaterial.SetFloat("_SpecularHighlights", 0.0f);
+                // To turn reflection on again, use (_SPECULARHIGHLIGHTS_OFF and _GLOSSYREFLECTIONS_OFF
+                // work as toggle, there is no _SPECULARHIGHLIGHTS_ON and _GLOSSYREFLECTIONS_ON):
+                //planeRenderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
+                //planeRenderer.sharedMaterial.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
+                //planeRenderer.sharedMaterial.SetFloat("_SpecularHighlights", 1.0f);
 
                 // A plane is a flat square with edges ten units long oriented in the XZ plane of the local 
                 // coordinate space. Thus, the mesh of a plane is 10 times larger than its scale factors. 
