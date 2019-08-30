@@ -1,8 +1,5 @@
 ﻿using SEE.DataModel;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace SEE
 {
@@ -201,8 +198,7 @@ namespace SEE
                 // is used instead.
 
                 GameObject objectHit = hit.transform.gameObject;
-
-                Text text = guiObjectNameTextField.GetComponent<Text>();
+                UnityEngine.UI.Text text = guiObjectNameTextField.GetComponent<UnityEngine.UI.Text>();
                 if (objectHit.TryGetComponent<Node>(out Node node))
                 {
                     if (node.TryGetString("Source.Name", out string nodeName))
