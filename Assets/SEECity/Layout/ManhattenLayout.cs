@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-
-using SEE.DataModel;
+﻿using SEE.DataModel;
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Layout
 {
@@ -111,12 +110,8 @@ namespace SEE.Layout
             const float maxHeight = 1f;
             const float offset = maxHeight * 0.1f; // must be positive
 
-            string materialPath = "Legacy Shaders/Particles/Additive";
-            // string materialPath = "BrickTextures/BricksTexture13/BricksTexture13";
-            // string materialPath = "Particles/Standard Surface";
-
             //Material newMat = Resources.Load<Material>(materialPath);
-            Material newMat = new Material(Shader.Find(materialPath));
+            Material newMat = new Material(defaultLineMaterial);
             if (newMat == null)
             {
                 Debug.LogError("Could not find material " + materialPath + "\n");
@@ -157,8 +152,8 @@ namespace SEE.Layout
                             line.useWorldSpace = true;
 
                             // define the points along the line
-                            Vector3 sourceCenterToBorder = GetCenterToBorder(sourceObject);
-                            Vector3 targetCenterToBorder = GetCenterToBorder(targetObject);
+                            Vector3 sourceCenterToBorder = GetExtent(sourceObject);
+                            Vector3 targetCenterToBorder = GetExtent(targetObject);
                             line.positionCount = 4; // number of vertices
                             Vector3[] points = new Vector3[line.positionCount];
 
@@ -207,15 +202,27 @@ namespace SEE.Layout
             }
         }
 
-        private Vector3 GetSize(GameObject o)
+        /// <summary>
+        /// Total size of the bounding box of given game object.
+        /// This is always twice as large as the extent (see GetExtent()).
+        /// </summary>
+        /// <param name="gameObject">game object whose size is to be determined</param>
+        /// <returns>size of the game object</returns>
+        private Vector3 GetSize(GameObject gameObject)
         {
-            Renderer renderer = o.GetComponent<Renderer>();
+            Renderer renderer = gameObject.GetComponent<Renderer>();
             return renderer.bounds.size;
         }
 
-        private Vector3 GetCenterToBorder(GameObject o)
+        /// <summary>
+        /// The extents of the bounding box of given game object.
+        /// This is always half of the size of the bounds (see GetSize()).
+        /// </summary>
+        /// <param name="gameObject">game object whose extent is to be determined</param>
+        /// <returns>extent of the game object</returns>
+        private Vector3 GetExtent(GameObject gameObject)
         {
-            Renderer renderer = o.GetComponent<Renderer>();
+            Renderer renderer = gameObject.GetComponent<Renderer>();
             return renderer.bounds.extents;
         }
     }
