@@ -2,6 +2,7 @@
 using UnityEngine;
 using SEE.DataModel;
 using System;
+using TinySpline;
 
 namespace SEE.Layout
 {
@@ -18,25 +19,11 @@ namespace SEE.Layout
         : base(widthMetric, heightMetric, breadthMetric)
         {
             name = "Ballon";
+            BSplineFactory.Foo();
         }
 
-        private static Material circleLineMaterial = CircleLineMaterial();
-
-        private static Material CircleLineMaterial()
-        {
-            const string materialPath = "Legacy Shaders/Particles/Additive";
-
-            Material material = new Material(Shader.Find(materialPath));
-            if (material == null)
-            {
-                Debug.LogError("Could not find material " + materialPath + "\n");
-            }
-            return material;
-        }
         protected override void DrawNodes(Graph graph, Dictionary<string, float> metricMaxima)
         {
-            
-
             // puts the outermost circles of the roots next to each other;
             // later we might use a circle-packing algorithm instead,
             // e.g., https://www.codeproject.com/Articles/42067/D-Circle-Packing-Algorithm-Ported-to-Csharp
@@ -558,10 +545,7 @@ namespace SEE.Layout
             // We want to set the points of the circle lines relative to the game object.
             line.useWorldSpace = false;
 
-            // use sharedMaterial if changes to the original material should affect all
-            // objects using this material; renderer.material instead will create a copy
-            // of the material and will not be affected by changes of the original material
-            line.sharedMaterial = circleLineMaterial;
+            line.sharedMaterial = new Material(defaultLineMaterial);
 
             line.positionCount = segments + 1;
             const int pointCount = segments + 1; // add extra point to make startpoint and endpoint the same to close the circle
