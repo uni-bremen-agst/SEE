@@ -151,6 +151,43 @@ namespace SEE.DataModel
         }
 
         /// <summary>
+        /// Dumps the hierarchy for each root. Used for debugging.
+        /// </summary>
+        internal void DumpTree()
+        {
+            foreach (Node root in GetRoots())
+            {
+                DumpTree(root);
+            }
+        }
+
+        /// <summary>
+        /// Dumps the hierarchy for given root. Used for debugging.
+        /// </summary>
+        internal void DumpTree(Node root)
+        {
+            DumpTree(root, 0);
+        }
+
+        /// <summary>
+        /// Dumps the hierarchy for given root by adding level many blanks 
+        /// as indentation. Used for debugging.
+        /// </summary>
+        private void DumpTree(Node root, int level)
+        {
+            string indentation = "";
+            for (int i = 0; i < level; i++)
+            {
+                indentation += "-";
+            }            
+            Debug.Log(indentation + root.LinkName + "\n");
+            foreach (Node child in root.Children())
+            {
+                DumpTree(child, level + 1);
+            }
+        }
+
+        /// <summary>
         /// Returns all game objects representing the nodes of the graph in the scene.
         /// </summary>
         /// <returns>all node game objects</returns>
