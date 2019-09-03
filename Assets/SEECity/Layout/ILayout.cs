@@ -157,6 +157,17 @@ namespace SEE.Layout
         }
 
         /// <summary>
+        /// Dumps metricMaxima for debugging.
+        /// </summary>
+        protected void DumpMetricMaxima(Dictionary<string, float> metricMaxima)
+        {
+            foreach (var item in metricMaxima)
+            {
+                Debug.Log("maximum of " + item.Key + ": " + item.Value + "\n");
+            }
+        }
+
+        /// <summary>
         /// Yields a vector where each element (x, y, z) is a linear interpolation of the normalized
         /// value of the metrics that determine the width, height, and breadth of the given node.
         /// The range of the linear interpolation is set by [minimalLength, maximalLength].
@@ -186,6 +197,35 @@ namespace SEE.Layout
             }
             return new Vector3(x, z, y);
         }
+
+        /// <summary>
+        /// Total size of the bounding box of given game object.
+        /// This is always twice as large as the extent (see GetExtent()).
+        /// </summary>
+        /// <param name="gameObject">game object whose size is to be determined</param>
+        /// <returns>size of the game object</returns>
+        protected static Vector3 GetSize(GameObject gameObject)
+        {
+            Renderer renderer = gameObject.GetComponent<Renderer>();
+            return renderer.bounds.size;
+        }
+
+        /// <summary>
+        /// The extents of the bounding box of given game object.
+        /// This is always half of the size of the bounds (see GetSize()).
+        /// </summary>
+        /// <param name="gameObject">game object whose extent is to be determined</param>
+        /// <returns>extent of the game object</returns>
+        protected static Vector3 GetExtent(GameObject gameObject)
+        {
+            Renderer renderer = gameObject.GetComponent<Renderer>();
+            return renderer.bounds.extents;
+        }
+
+        /// <summary>
+        /// Removes everything the layout has added to the scence, such as planes etc.
+        /// </summary>
+        public abstract void Reset();
     }
 }
 
