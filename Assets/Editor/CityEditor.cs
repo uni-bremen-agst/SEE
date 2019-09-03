@@ -37,6 +37,8 @@ namespace SEEEditor
 
         private SEE.GraphSettings editorSettings = new SEE.GraphSettings();
 
+        private SEE.Layout.ILayout layout;
+
         /// <summary>
         /// Creates a new window offering the city editor commands.
         /// </summary>
@@ -69,8 +71,6 @@ namespace SEEEditor
                         const string heightMetric = "Metric.Clone_Rate";
                         const string breadthMetric = "Metric.LOC";
                         MeshFactory.Reset();
-                        
-                        SEE.Layout.ILayout layout;
                         if (true)
                         {
                             layout = new SEE.Layout.BalloonLayout(widthMetric, heightMetric, breadthMetric);
@@ -87,10 +87,8 @@ namespace SEEEditor
                     }
                     break;
                 case 1:
-                    SceneGraphs.DeleteAll();
-                    graph = null;
-                    // delete all left-overs if there are any
-                    DeleteAll();
+                    Reset();
+
                     break;
                 default:
                     break;
@@ -101,9 +99,17 @@ namespace SEEEditor
         /// <summary>
         /// Deletes all scene graph, nodes and edges via their tags.
         /// </summary>
-        private void DeleteAll()
+        private void Reset()
         {
+            SceneGraphs.DeleteAll();
+            graph = null;
             MeshFactory.Reset();
+            if (layout != null)
+            {
+                layout.Reset();
+                layout = null;
+            }
+            // delete all left-overs if there are any
             foreach (string tag in SEE.DataModel.Tags.All)
             {
                 try
