@@ -122,10 +122,11 @@ namespace SEE.Layout
         public static void Draw(GameObject edge, Vector3[] controlPoints, Material material = null)
         {
             // Create a cubic spline with control points in 3D using a clamped knot vector.
-            TinySpline.BSpline spline = new TinySpline.BSpline((uint)controlPoints.Length, dimensions);
-
-            // Setup control points.
-            spline.controlPoints = VectorsToList(controlPoints);
+            TinySpline.BSpline spline = new TinySpline.BSpline((uint)controlPoints.Length, dimensions)
+            {
+                // Setup control points.
+                controlPoints = VectorsToList(controlPoints)
+            };
 
             IList<double> list = spline.buckle(0.5f).sample();
 
