@@ -96,7 +96,7 @@ namespace SEE.Layout
             }
             finally
             {
-                UnityEngine.Object.DestroyImmediate(gameObject);
+                Destroyer.DestroyGameObject(gameObject);
             }
         }
 
@@ -126,7 +126,7 @@ namespace SEE.Layout
             }
             finally
             {
-                UnityEngine.Object.DestroyImmediate(gameObject);
+                Destroyer.DestroyGameObject(gameObject);
             }
         }
 
@@ -186,7 +186,7 @@ namespace SEE.Layout
             }
             finally
             {
-                UnityEngine.Object.DestroyImmediate(gameObject);
+                Destroyer.DestroyGameObject(gameObject);
             }
         }
     }
