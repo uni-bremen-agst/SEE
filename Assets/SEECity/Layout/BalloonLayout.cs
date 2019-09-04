@@ -526,6 +526,9 @@ namespace SEE.Layout
             // Roots have depth 0. We want the line to be thicker for nodes higher in the hierarchy.
             float lineWidth = Mathf.Lerp(0.1f, 1.0f, (float)(max_depth - depth) / max_depth);
             AttachCircleLine(go, radius, lineWidth);
+
+            GameObject text = TextFactory.GetText(node.name, position, 12);
+            //text.transform.parent = go.transform; // make the text a child of circle
         }
 
         private void SetColor(GameObject gameObject, Color color)
