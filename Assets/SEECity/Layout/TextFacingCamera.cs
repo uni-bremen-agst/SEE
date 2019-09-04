@@ -27,10 +27,10 @@ public class TextFacingCamera : MonoBehaviour
     private float timer = updatePeriod;
 
     // The last known position of the main camera.
-    private static Vector3 lastCameraPosition;
+    private Vector3 lastCameraPosition = Vector3.zero;
 
     // Vector to describe the rotation of the text. Needed to show the text correctly.
-    private Vector3 rotation = Vector3.up - new Vector3(0, 180, 0);
+    private static Vector3 rotation = Vector3.up - new Vector3(0, 180, 0);
 
     // The renderer of the gameObject.
     private Renderer gameObjectRenderer;
@@ -57,8 +57,10 @@ public class TextFacingCamera : MonoBehaviour
             if (mainCamera.transform.position != lastCameraPosition)
             {
                 Vector3 heading = transform.position - mainCamera.transform.position;
-                float distance = Vector3.Dot(heading, mainCamera.transform.forward);
+                float distance = Mathf.Abs(Vector3.Dot(heading, mainCamera.transform.forward));
                 gameObjectRenderer.enabled = (minimalDistance <= distance && distance <= maximalDistance);
+
+                Debug.LogFormat("{0} is within range: {1}  {2}\n", gameObject.name, (gameObjectRenderer.enabled ? "yes" : "no"), distance);
 
                 if (gameObjectRenderer.enabled)
                 {
