@@ -9,8 +9,19 @@ public class TextFacingCamera : MonoBehaviour
     // The time in seconds until the text is updated again.
     private const float updatePeriod = 1.0f;
 
-    // The minimal distance between the text and the main camera to become visible.
-    public float minimalDistance = 20.0f;
+    /// <summary>
+    /// The minimal distance between the text and the main camera to become visible.
+    /// If the actual distance is below this value, the object will not be visible.
+    /// If minimalDistance > maximalDistance, the object will not be visible.
+    /// </summary>
+    public float minimalDistance = 5.0f;
+
+    /// <summary>
+    /// The maximal distance between the text and the main camera to become visible.
+    /// If the actual distance is above this value, the object will not be visible.
+    /// If minimalDistance > maximalDistance, the object will not be visible.
+    /// </summary>
+    public float maximalDistance = 20.0f;
 
     // Time since the start of the last update period.
     private float timer = updatePeriod;
@@ -47,11 +58,12 @@ public class TextFacingCamera : MonoBehaviour
             {
                 Vector3 heading = transform.position - mainCamera.transform.position;
                 float distance = Vector3.Dot(heading, mainCamera.transform.forward);
-
-                gameObjectRenderer.enabled = distance <= minimalDistance;
+                Debug.LogFormat("Distance:{0} <= {1} <= {2}?\n", minimalDistance, distance, maximalDistance);
+                gameObjectRenderer.enabled = (minimalDistance <= distance && distance <= maximalDistance);
 
                 if (gameObjectRenderer.enabled)
                 {
+                    Debug.Log("Showing the object\n");
                     lastCameraPosition = mainCamera.transform.position;
                     gameObject.transform.LookAt(mainCamera.transform);
                     gameObject.transform.Rotate(rotation);
