@@ -58,12 +58,10 @@ public class TextFacingCamera : MonoBehaviour
             {
                 Vector3 heading = transform.position - mainCamera.transform.position;
                 float distance = Vector3.Dot(heading, mainCamera.transform.forward);
-                Debug.LogFormat("Distance:{0} <= {1} <= {2}?\n", minimalDistance, distance, maximalDistance);
                 gameObjectRenderer.enabled = (minimalDistance <= distance && distance <= maximalDistance);
 
                 if (gameObjectRenderer.enabled)
                 {
-                    Debug.Log("Showing the object\n");
                     lastCameraPosition = mainCamera.transform.position;
                     gameObject.transform.LookAt(mainCamera.transform);
                     gameObject.transform.Rotate(rotation);
