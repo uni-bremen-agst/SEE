@@ -2,6 +2,8 @@ Linux-Subsystem driver als weiteren größeren Graphen.
 
 Normalisierung relativ zu statistischem Kennwert, z.B. Median o.Ä.
 
+Kamera-Geschwindigkeit relativ zum Abstand zur Ebene.
+
 Kinder alphabetisch sortieren.
 
 Normale Cubes verwenden und dekorieren.
