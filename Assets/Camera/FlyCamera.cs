@@ -27,6 +27,8 @@ namespace SEE
     /// </summary>
     public class FlyCamera : MonoBehaviour
     {
+        // TODO: Speed should be relative to the distance to the plane.
+
         // These variables are exposed to the editor and can be changed by the user.
         public float normalSpeed = 10.0f;   // Normal speed without acceleration
         public float acceleration = 25.0f;  // Amount to accelerate when shift is pressed
