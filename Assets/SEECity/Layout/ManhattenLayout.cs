@@ -13,8 +13,14 @@ namespace SEE.Layout
             name = "Manhattan";
         }
 
+        /// <summary>
+        /// Used to determine the lengths of the node blocks.
+        /// </summary>
+        private IScale scaler;
+
         public override void Draw(Graph graph)
         {
+            scaler = new LinearScale(graph, minimal_length, 1.0f, widthMetric, heightMetric, breadthMetric);
             AddMeshes(graph);
             base.Draw(graph);
         }
@@ -32,7 +38,7 @@ namespace SEE.Layout
         protected const float minimalLength = 0.1f;
 
         // precondition: the GameObjects and their meshes have already been created for all nodes
-        protected override void DrawNodes(Graph graph, Dictionary<string, float> metricMaxima)
+        protected override void DrawNodes(Graph graph)
         {
             //DumpMetricMaxima(metricMaxima);
 
@@ -56,7 +62,7 @@ namespace SEE.Layout
                 {
                     Debug.LogError("Scene node " + sceneNode.name + " does not have a graph node component.\n");
                 }
-                Vector3 scale = ScaleNode(node, metricMaxima, minimalLength, 1.0f);
+                Vector3 scale = scaler.Lengths(node);
                 node.gameObject.transform.localScale = scale;
 
                 // The position is the center of a GameObject. We want all GameObjects
