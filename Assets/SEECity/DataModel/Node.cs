@@ -81,6 +81,7 @@ namespace SEE.DataModel
         /// <returns>descendants of the node</returns>
         public List<Node> Children()
         {
+            // TODO: We should order the children alphabetically.
             return children;
         }
 
