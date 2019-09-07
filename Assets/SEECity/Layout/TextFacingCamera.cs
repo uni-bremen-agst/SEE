@@ -49,6 +49,9 @@ public class TextFacingCamera : MonoBehaviour
     /// </summary>
     void Update()
     {
+        // TODO: We could add a little animation enlarging the text when it
+        // comes into the visible range (and decreasing it again when the 
+        // the distance is out of range). Currently, the text is turned on and off.
         timer -= Time.deltaTime;
         if (timer < 0.0f)
         {
@@ -59,9 +62,6 @@ public class TextFacingCamera : MonoBehaviour
                 Vector3 heading = transform.position - mainCamera.transform.position;
                 float distance = Mathf.Abs(Vector3.Dot(heading, mainCamera.transform.forward));
                 gameObjectRenderer.enabled = (minimalDistance <= distance && distance <= maximalDistance);
-
-                Debug.LogFormat("{0} is within range: {1}  {2}\n", gameObject.name, (gameObjectRenderer.enabled ? "yes" : "no"), distance);
-
                 if (gameObjectRenderer.enabled)
                 {
                     lastCameraPosition = mainCamera.transform.position;
