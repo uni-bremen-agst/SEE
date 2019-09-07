@@ -527,7 +527,7 @@ namespace SEE.Layout
             float lineWidth = Mathf.Lerp(0.1f, 1.0f, (float)(max_depth - depth) / max_depth);
             AttachCircleLine(go, radius, lineWidth);
 
-            GameObject text = TextFactory.GetText(node.name, position, 12);
+            GameObject text = TextFactory.GetText(node.SourceName, position, 2.0f * radius * 0.3f);
             //text.transform.parent = go.transform; // make the text a child of circle
         }
 
