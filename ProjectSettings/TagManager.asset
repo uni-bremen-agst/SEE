@@ -9,6 +9,7 @@ TagManager:
   - Node
   - House
   - Node Prefab
+  - Text
   layers:
   - Default
   - TransparentFX
