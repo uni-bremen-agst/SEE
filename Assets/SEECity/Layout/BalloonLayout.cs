@@ -2,7 +2,6 @@
 using UnityEngine;
 using SEE.DataModel;
 using System;
-using TinySpline;
 
 namespace SEE.Layout
 {
@@ -14,14 +13,13 @@ namespace SEE.Layout
     /// </summary>
     public class BalloonLayout : ILayout
     {
-   
         public BalloonLayout(string widthMetric, string heightMetric, string breadthMetric)
         : base(widthMetric, heightMetric, breadthMetric)
         {
             name = "Ballon";
         }
 
-        protected override void DrawNodes(Graph graph, Dictionary<string, float> metricMaxima)
+        protected override void DrawNodes(Graph graph)
         {
             // puts the outermost circles of the roots next to each other;
             // later we might use a circle-packing algorithm instead,
@@ -58,13 +56,14 @@ namespace SEE.Layout
             {
                 Vector3 position = Vector3.zero;
                 int i = 0;
+                IScale scaler = new LinearScale(graph, minimal_length, 1.0f, widthMetric, heightMetric, breadthMetric);
                 foreach (Node root in graph.GetRoots())
                 {
                     // for two neighboring circles the distance must be the sum of the their two radii;
                     // in case we draw the very first circle, no distance must be kept
                     position.x += i == 0 ? 0.0f : nodeInfos[roots[i - 1]].outer_radius + nodeInfos[roots[i]].outer_radius + offset;
                     Debug.Log("Drawing balloon for root " + root.name + "@" + position + "\n");
-                    DrawCircles(root, position, metricMaxima, 0, max_depths[i]);
+                    DrawCircles(root, position, 0, max_depths[i], scaler);
                     i++;
                 }
             }
@@ -140,13 +139,13 @@ namespace SEE.Layout
             }
         }
 
-        private void DrawCircles(Node node, Vector3 position, Dictionary<string, float> metricMaxima, int depth, int max_depth)
+        private void DrawCircles(Node node, Vector3 position, int depth, int max_depth, IScale scaler)
         {
             List<Node> children = node.Children();
 
             if (children.Count == 0)
             {
-                DrawLeaf(node, position, nodeInfos[node].outer_radius, metricMaxima);
+                DrawLeaf(node, position, nodeInfos[node].outer_radius, scaler);
                 //Debug.Log("leaf " + node.name + " @ " + position + " radius " + radii[node].outer_radius + "\n");
             }
             else
@@ -252,7 +251,7 @@ namespace SEE.Layout
                         child_center.x = position.x + (float)(parent_inner_radius * System.Math.Cos(accummulated_alpha));
                         child_center.z = position.z + (float)(parent_inner_radius * System.Math.Sin(accummulated_alpha));
 
-                        DrawCircles(child, child_center, metricMaxima, depth + 1, max_depth);
+                        DrawCircles(child, child_center, depth + 1, max_depth, scaler);
 
                         // The next available circle must be located outside of the child circle
                         accummulated_alpha += alpha + space_between_child_circles;
@@ -273,21 +272,20 @@ namespace SEE.Layout
         /// <param name="position">center point of the node where it is to be positioned</param>
         /// <param name="radius">the radius for the cylinder</param>
         /// <param name="metricMaxima">the maxima of the metrics needed for normalization</param>
-        private void DrawLeaf(Node node, Vector3 position, float radius, Dictionary<string, float> metricMaxima)
+        private void DrawLeaf(Node node, Vector3 position, float radius, IScale scaler)
         {
             // node will have two children: a cube placed on top of a cylinder; the cylinder is the 
             // circle; the cube represents the node's metrics
+            Vector3 scale = scaler.Lengths(node);
 
-            Vector3 scale = ScaleNode(node, metricMaxima, minimal_length, 1.0f);
-
-            // set position of parent
+            // set position and size of parent
             GameObject parent = node.gameObject;
             // A Vector3 is a struct, not a true object, and is passed by value. 
             parent.transform.position = position;
-            // width and breadth are determined by the cylinder, height by the cube's height
+            // width and breadth are determined by the circle, height by the cube's height
             parent.transform.localScale = new Vector3(2.0f * radius, scale.y, 2.0f * radius);
 
-            // add cube to parent; cube is the first child
+            // First child: add cube to parent; cube is the first child
             GameObject cube = new GameObject
             {
                 name = "house " + parent.name
@@ -297,8 +295,6 @@ namespace SEE.Layout
             cube.transform.parent = parent.transform;
             // relative position within parent
             cube.transform.position = new Vector3(position.x, scale.y / 2.0f, position.z);
-
-            //localPosition = new Vector3(position.x, 2.0f * scale.y, position.z);
 
             // Note that the values are interpreted relative to the parent here.
             // The parent's height was chosen as scale.y above. Hence, we need to
@@ -310,7 +306,8 @@ namespace SEE.Layout
             float factor = maximal_length / (2.0f * radius);
             cube.transform.localScale = new Vector3(factor * scale.x, 1.0f, factor * scale.z);
 
-            // the cylinder will be placed just below the center of the cube;
+            // Second child: the cylinder.
+            // The cylinder will be placed just below the center of the cube;
             // it will fill the complete plane of the parent;
             // the "garden" will be the second child; IMPORTANT NOTE: If we
             // ever change the order of the children, we need to adjust Roof().
@@ -357,10 +354,6 @@ namespace SEE.Layout
         // The maximal length l (width or breadth) of the square within the circle with given 
         // radius r is l = sqrt(2) * r.
         private static readonly float maximal_length = (float)Math.Sqrt(2.0) * minimal_radius;
-
-        // This parameter determines the minimal width, breadth, and height of each cube. It
-        // must be smaller than maximal_length.
-        private static readonly float minimal_length = maximal_length / 10.0f;
 
         // Concepts
         //
