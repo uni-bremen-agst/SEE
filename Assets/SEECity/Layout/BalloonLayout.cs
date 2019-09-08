@@ -37,12 +37,21 @@ namespace SEE.Layout
             // the maximal radius over all root circles; required to create the plane underneath
             float max_radius = 0.0f;
 
+            IScale scaler;
+            if (false)
+            {
+                scaler = new LinearScale(graph, minimal_length, 1.0f, widthMetric, heightMetric, breadthMetric);
+            }
+            else
+            {
+                scaler = new ZScoreScale(graph, minimal_length, widthMetric, heightMetric, breadthMetric);
+            }
             // first calculate all radii including those for the roots
             {
                 int i = 0;
                 foreach (Node root in roots)
                 {
-                    CalculateRadius2D(root, 0, out float out_rad, out int max_depth);
+                    CalculateRadius2D(root, 0, out float out_rad, out int max_depth, scaler);
                     max_depths[i] = max_depth;
                     i++;
                     if (out_rad > max_radius)
@@ -56,16 +65,6 @@ namespace SEE.Layout
             {
                 Vector3 position = Vector3.zero;
                 int i = 0;
-                IScale scaler;
-                if (false)
-                {
-                    scaler = new LinearScale(graph, minimal_length, 1.0f, widthMetric, heightMetric, breadthMetric);
-                }
-                else
-                {
-                    scaler = new ZScoreScale(graph, minimal_length, widthMetric, heightMetric, breadthMetric);
-                }
-
                 foreach (Node root in graph.GetRoots())
                 {
                     // for two neighboring circles the distance must be the sum of the their two radii;
@@ -76,7 +75,6 @@ namespace SEE.Layout
                     i++;
                 }
             }
-
             DrawPlane(roots, max_radius);
         }
 
@@ -424,7 +422,7 @@ namespace SEE.Layout
         /// <param name="level">the level of the currently visited node; a root has level 0</param>
         /// <param name="rad">radius of the circle around node at which the center of every circly of its direct children is located</param>
         /// <param name="out_rad">radius of the minimal circle around node that includes every circle of its descendants</param>
-        private void CalculateRadius2D(Node node, int level, out float out_rad, out int max_depth)
+        private void CalculateRadius2D(Node node, int level, out float out_rad, out int max_depth, IScale scaler)
         {
             float rad = 0.0f;
             float rl_child = 0.0f;
@@ -433,12 +431,15 @@ namespace SEE.Layout
 
             if (node.NumberOfChildren() == 0)
             {
-                // If node i is a leaf, we can return an outer-radius of small value
-                // minimal_radius so that it can be properly placed in the next lower level.
-                // Leaf nodes have currently a fixed size. If we ever considered the
-                // radius of a leaf proportional to a metric, we would need to adjust
-                // the assignment to out_rad here.
-                out_rad = minimal_radius;
+                // If node i is a leaf, we return an outer-radius large enough to
+                // put in the building that will later be placed into the circle.
+                // The block's width and breadth are proportional to the two metrics.
+                Vector3 scale = scaler.Lengths(node);
+                // The outer radius of an inner-most node is determined by the ground
+                // rectangle of the block to be drawn for the node.
+                // Pythagoras: diagonal of the ground rectangle.
+                float diagonal = Mathf.Sqrt(scale.x * scale.x + scale.z * scale.z);
+                out_rad = diagonal / 2.0f;
                 rad = 0.0f;
                 max_depth = 0;
             }
@@ -455,7 +456,7 @@ namespace SEE.Layout
                 {
                    
                     // Find the radius rad_k and outer-radius out_rad_k for each child k of node i.
-                    CalculateRadius2D(child, level + 1, out float child_out_rad, out int child_depth);
+                    CalculateRadius2D(child, level + 1, out float child_out_rad, out int child_depth, scaler);
                     if (child_depth > max_child_depth)
                     {
                         max_child_depth = child_depth;
