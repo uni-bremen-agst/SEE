@@ -27,16 +27,108 @@ namespace SEE
     /// </summary>
     public class FlyCamera : MonoBehaviour
     {
-        // TODO: Speed should be relative to the distance to the plane.
-
         // These variables are exposed to the editor and can be changed by the user.
-        public float normalSpeed = 10.0f;   // Normal speed without acceleration
-        public float acceleration = 25.0f;  // Amount to accelerate when shift is pressed
-        public float maximalSpeed = 100.0f; // Maximum speed when holding shift
+        // These parameters determine the principal speed of movement but their
+        // actual value is also function of the distance to the ground. The lower we 
+        // are to the ground, the slower we move, and vice versa.
 
+        [Tooltip("Relative base speed without acceleration and independent of the distance to the ground."
+                 + " The actual speed is a function of this parameter and the distance to the ground."
+                 + " The farther the ground, the higher the speed. This parameter must"
+                 + " be greater than 0.")]
+        /// <summary>
+        /// Normal speed without acceleration. This defines the amount of distance to be covered
+        /// per tick.
+        /// </summary>
+        public float relativeBaseSpeed = 10.0f; 
+
+        [Tooltip("Maximal speed in the presence of acceleration, but independent of the distance to the ground."
+         + " The actual maximal speed is a function of this parameter and the distance to the ground,"
+         + " but it cannot go beyond the absolute maximum speed."
+         + " This parameter must be greater than 0.")]
+        public float relativeMaximalSpeed = 100.0f; // Maximum speed when holding shift
+
+        [Tooltip("The absolute minimum speed that can be reached, no matter how"
+         + " close we are to the ground. Must not be larger than the absolute maximum speed."
+         + " This parameter must be greater than 0.")]
+        public float absoluteMinimumSpeed = 0.1f;
+
+        [Tooltip("The absolute maximum speed that can be reached, no matter how much we accelerate and how"
+            + " far we are off the ground. Must not be lower than the absolute minimum speed."
+            + " This parameter must be greater than 0.")]
+        public float absoluteMaximumSpeed = 300.0f;
+
+        // Amount to accelerate when shift is pressed. The actual acceleration is
+        // a function of this parameter and the accummulated time since the user
+        // started to hold the shift key. That is, we are getting faster, the longer
+        // the shift key has been pressed up to the maximal speed. The duration of
+        // the acceleration period is captured in variable accelerationPeriod.
+        [Tooltip("The amount of acceleration while holding the shift key. The actual acceleration is" +
+             " a function of this parameter and the accummulated time since you" +
+            " started to hold the shift key. That is, you are getting faster, the longer" +
+            " the shift key has been pressed up to the maximal speed."
+            + " This parameter must be greater than 0.")]
+        public float acceleration = 25.0f;
+
+        // Degree of spinning for each tick without acceleration. This value is
+        // independent of the distance to the ground because it is used to turn
+        // around at the same location. The actual rotation, however, may depend 
+        // on the acceleration.
+        [Tooltip("Degree of spinning for each tick. This value is" +
+            " independent of the distance to the ground because it is used to turn" +
+            " around at the same location. The actual rotation, however, may depend" +
+            " on the acceleration."
+            + " This parameter must be greater than 0.")]
+        public float rotationFactor = 50f;
+
+        // Factor for speed based on the distance to the ground. The y co-ordinate 
+        // determines the distance to the ground.
+        [Tooltip("Factor for speed based on the distance to the ground." +
+            " The actual speed is a function of the relative base speed and the distance to the" +
+            " ground multiplied by this parameters."
+            + " This parameter must be greater than 0.")]
+        public float groundDistanceFactor = 0.1f;
+
+        // The main camera that is controlled by this controller.
+        private Camera mainCamera;
+
+        /// <summary>
+        /// Yields the amount of movement as a product of movementDelta, the distance
+        /// to the ground, and groundDistanceFactor. This value is always positive.
+        /// </summary>
+        /// <param name="movementDelta">the speed; must be greater than 0</param>
+        /// <returns>amount of movement (always greater than 0)</returns>
+        private float SpeedFunction(float movementDelta)
+        {
+            // Abs because we might be flying below the ground level.
+            return movementDelta * Mathf.Abs(mainCamera.transform.position.y) * groundDistanceFactor;
+        }
+
+        /// <summary>
+        /// Yields the amount of movement as a product of relativeBaseSpeed, the distance
+        /// to the ground, and groundDistanceFactor. This value is always in the range
+        /// of [absoluteMinimumSpeed, absoluteMaximumSpeed].
+        /// </summary>
+        /// <returns>amount of movement</returns>
+        private float GetNormalSpeed()
+        {
+            return Mathf.Clamp(SpeedFunction(relativeBaseSpeed), absoluteMinimumSpeed, absoluteMaximumSpeed);
+        }
+
+        /// <summary>
+        /// Yields the amount of maximal movement as a product of relativeMaximalSpeed, the distance
+        /// to the ground, and groundDistanceFactor. This value is always in the range
+        /// of [absoluteMinimumSpeed, absoluteMaximumSpeed].
+        /// </summary>
+        /// <returns>amount of movement</returns>
+        private float GetMaximalSpeed()
+        {
+            return Mathf.Clamp(SpeedFunction(relativeMaximalSpeed), absoluteMinimumSpeed, absoluteMaximumSpeed);
+        }
+        
+        [Tooltip("The sensitivity to the mouse movement.")]
         public float camSens = 0.15f;   // Mouse sensitivity
-        public float rotationFactor = 100f; // degree of spinning for each tick without acceleration
-
+        
         // the position of the mouse cursor of the last tick
         private Vector3 lastMouse = new Vector3(255, 255, 255);  // kind of in the middle of the screen, rather than at the top (play)
 
@@ -79,6 +171,14 @@ namespace SEE
             {
                 guiObjectNameTextField = GameObject.Find("Objectname");
             }
+
+            mainCamera = gameObject.GetComponentInParent<Camera>();
+
+            if (mainCamera == null)
+            {
+                Debug.LogError("Parent has no camera.\n");
+                mainCamera = Camera.current;
+            }
         }
 
         /// <summary>
@@ -96,16 +196,9 @@ namespace SEE
                 // node is shown in the guiObjectNameTextField.
                 if (guiObjectNameTextField != null)
                 {
-                    Camera camera = gameObject.GetComponentInParent<Camera>();
-
-                    if (camera == null)
+                    if (mainCamera != null)
                     {
-                        Debug.Log("Parent has no camera.\n");
-                        camera = Camera.current;
-                    }
-                    if (camera != null)
-                    {
-                        ShowSelectedObject(camera);
+                        ShowSelectedObject(mainCamera);
                     }
                     else
                     {
@@ -114,7 +207,7 @@ namespace SEE
                 }
             }
 
-            // if the user wants us to accelerate by holding the shift key
+            // whether the user wants us to accelerate by holding the shift key
             bool accelerationMode = Input.GetKey(KeyCode.LeftShift);
 
             // Handle acceleration
@@ -164,13 +257,16 @@ namespace SEE
             {
                 // handle acceleration
                 newPosition *= accelerationPeriod * acceleration;
-                newPosition.x = Mathf.Clamp(newPosition.x, -maximalSpeed, maximalSpeed);
-                newPosition.y = Mathf.Clamp(newPosition.y, -maximalSpeed, maximalSpeed);
-                newPosition.z = Mathf.Clamp(newPosition.z, -maximalSpeed, maximalSpeed);
+                float maxSpeed = GetMaximalSpeed();
+                // Note: we need to clamp by -maxSpeed and not 0 because we
+                // might be moving backward in the respective dimension.
+                newPosition.x = Mathf.Clamp(newPosition.x, -maxSpeed, maxSpeed);
+                newPosition.y = Mathf.Clamp(newPosition.y, -maxSpeed, maxSpeed);
+                newPosition.z = Mathf.Clamp(newPosition.z, -maxSpeed, maxSpeed);
             }
             else
             {
-                newPosition *= normalSpeed;
+                newPosition *= GetNormalSpeed();
             }
 
             // Make the move to the new position
@@ -246,25 +342,32 @@ namespace SEE
             }
         }
 
-        // Returns the basic values, if it's 0 than it's not active.
+        /// <summary>
+        /// Returns a vector indicating the direction of the movement.
+        /// An element in this vector can have one of the following
+        /// values: -1, 0, or 1. A value of 0 means no move in this
+        /// dimension; 1 to move forward in this dimension, and -1
+        /// to move backward in this dimension.
+        /// </summary>
+        /// <returns>vector indicating the direction</returns>
         private Vector3 GetBaseInput()
         {
             Vector3 p_Velocity = new Vector3();
 
             // Forwards
-            if (Input.GetKey(KeyCode.W))
+            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
                 p_Velocity += Vector3.forward;
 
             // Backwards
-            if (Input.GetKey(KeyCode.S))
+            if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
                 p_Velocity += Vector3.back;
 
             // Left
-            if (Input.GetKey(KeyCode.A))
+            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
                 p_Velocity += Vector3.left;
 
             // Right
-            if (Input.GetKey(KeyCode.D))
+            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
                 p_Velocity += Vector3.right;
 
             // Up
