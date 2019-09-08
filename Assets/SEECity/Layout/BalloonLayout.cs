@@ -56,7 +56,16 @@ namespace SEE.Layout
             {
                 Vector3 position = Vector3.zero;
                 int i = 0;
-                IScale scaler = new LinearScale(graph, minimal_length, 1.0f, widthMetric, heightMetric, breadthMetric);
+                IScale scaler;
+                if (false)
+                {
+                    scaler = new LinearScale(graph, minimal_length, 1.0f, widthMetric, heightMetric, breadthMetric);
+                }
+                else
+                {
+                    scaler = new ZScoreScale(graph, minimal_length, widthMetric, heightMetric, breadthMetric);
+                }
+
                 foreach (Node root in graph.GetRoots())
                 {
                     // for two neighboring circles the distance must be the sum of the their two radii;
@@ -277,6 +286,7 @@ namespace SEE.Layout
             // node will have two children: a cube placed on top of a cylinder; the cylinder is the 
             // circle; the cube represents the node's metrics
             Vector3 scale = scaler.Lengths(node);
+            // Debug.LogFormat("scale of {0} = {1}\n", node.name, scale);
 
             // set position and size of parent
             GameObject parent = node.gameObject;
