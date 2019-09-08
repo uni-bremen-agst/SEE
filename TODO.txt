@@ -1,9 +1,5 @@
 Linux-Subsystem driver als weiteren größeren Graphen.
 
-Normalisierung relativ zu statistischem Kennwert, z.B. Median o.Ä.
-
-Kamera-Geschwindigkeit relativ zum Abstand zur Ebene.
-
 Kinder alphabetisch sortieren.
 
 Normale Cubes verwenden und dekorieren.
@@ -12,4 +8,6 @@ Donut-Chart für Garten.
 
 Heat-Map für Innenkreis.
 
+Minimap
+                   
 Animation für Circle-Text, damit er nicht einfach so aufpoppt.
