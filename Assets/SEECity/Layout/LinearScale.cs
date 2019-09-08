@@ -9,7 +9,18 @@ namespace SEE.Layout
     /// of the node's metrics.
     /// </summary>
     internal class LinearScale : IScale
-    {      
+    {
+        /// <summary>
+        /// Constructor for linear-interpolation based scaling of node metrics.
+        /// The values are guaranteed to be in the range of [minimalLength,
+        /// maximalLength].
+        /// </summary>
+        /// <param name="graph">the graph whose node metrics are to be scaled</param>
+        /// <param name="minimalLength">the mininmal value a node length should have</param>
+        /// <param name="maximalLength">the maximal value a node length should have</param>
+        /// <param name="widthMetric">metric for node width</param>
+        /// <param name="heightMetric">metric for node height</param>
+        /// <param name="breadthMetric">metric for node breadth</param>
         public LinearScale(Graph graph, float minimalLength, float maximalLength,
                            string widthMetric, string heightMetric, string breadthMetric)
             : base(widthMetric, heightMetric, breadthMetric)
