@@ -495,11 +495,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 777166b103fd6964f95e4c82cbdd85f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  normalSpeed: 10
+  relativeBaseSpeed: 10
+  relativeMaximalSpeed: 100
+  absoluteMinimumSpeed: 0.1
+  absoluteMaximumSpeed: 300
   acceleration: 25
-  maximalSpeed: 100
-  camSens: 0.15
   rotationFactor: 100
+  groundDistanceFactor: 0.1
+  camSens: 0.15
 --- !u!1 &1639590096
 GameObject:
   m_ObjectHideFlags: 0

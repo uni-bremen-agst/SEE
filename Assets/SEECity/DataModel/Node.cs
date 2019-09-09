@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.DataModel
@@ -81,7 +82,6 @@ namespace SEE.DataModel
         /// <returns>descendants of the node</returns>
         public List<Node> Children()
         {
-            // TODO: We should order the children alphabetically.
             return children;
         }
 
@@ -101,6 +101,72 @@ namespace SEE.DataModel
             {
                 throw new System.Exception("Hierarchical edges do not form a tree. Node with multiple parents: "
                     + child.LinkName);
+            }
+        }
+
+        /// <summary>
+        /// Sorts the list of children using the given comparison.
+        /// </summary>
+        /// <param name="comparison"></param>
+        public void SortChildren(Comparison<Node> comparison)
+        {
+            children.Sort(comparison);
+        }
+
+        /// <summary>
+        /// Compares the two given nodes by name. 
+        /// 
+        /// Returns 0 if:
+        ///    both are null
+        ///    or name(first) = name(second)
+        /// Returns -1 if:
+        ///    first is null and second is not null
+        ///    or name(first) < name(second)
+        /// Returns 1 if:
+        ///    second is null and first is not null
+        ///    or name(first) > name(second)
+        /// Where name(n) denotes the Source.Name of n if it has one or otherwise its Linkage.Name.
+        /// </summary>
+        /// <param name="first">first node to be compared</param>
+        /// <param name="second">second node to be compared</param>
+        /// <returns></returns>
+        public static int CompareTo(Node first, Node second)
+        {
+            if (first == null)
+            {
+                if (second == null)
+                {
+                    // If first is null and second is null, they're equal. 
+                    return 0;
+                }
+                else
+                {
+                    // If first is null and second is not null, second is greater. 
+                    return -1;
+                }
+            }
+            else
+            {
+                // If first is not null...
+                if (second == null)
+                // ...and second is null, first is greater.
+                {
+                    return 1;
+                }
+                else
+                {
+                    string firstName = first.SourceName;
+                    if (string.IsNullOrEmpty(firstName))
+                    {
+                        firstName = first.LinkName;
+                    }
+                    string secondName = second.SourceName;
+                    if (string.IsNullOrEmpty(secondName))
+                    {
+                        secondName = second.LinkName;
+                    }
+                    return firstName.CompareTo(secondName);
+                }
             }
         }
     }

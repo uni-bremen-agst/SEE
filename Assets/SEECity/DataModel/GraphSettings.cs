@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace SEE
 {
@@ -11,12 +10,18 @@ namespace SEE
         /// <summary>
         /// The path to the graph data.
         /// </summary>
-        
-        /// Small clone graph with multiple roots to experiment with.
-        //public string graphPath = "C:\\Users\\raine\\develop\\seecity\\data\\gxl\\minimal_clones.gxl";
+
+        /// Small clone graph with multiple roots to experiment with (we cannot use Application.dataPath
+        /// unfortunately, that is why this path is currently hard coded).
+        public string graphPath = "C:\\Users\\raine\\develop\\seecity\\data\\gxl\\minimal_clones.gxl";
 
         // Medium-size clone graph with single root (Linux directories whose path include "arch").
-        public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\arch-single-root.gxl";
+        // public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\arch-single-root.gxl";
+
+        // Larger clone graph with single root (Linux subsystem 'drivers'), but with only those subsystems containing clones.
+        // 14.500 nodes, 10.300 edges.
+        // This graph is currently too large to play. The frame rate drops to 3 frames per second.
+        //public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\drivers-clones-only-single-root.gxl";
 
         // Larger clone graph with single root (Linux subsystem 'drivers').
         // This graph is currently too large to play. The frame rate drops to 3 frames per second.
