@@ -232,10 +232,35 @@ namespace SEE.DataModel
                 Destroyer.DestroyGameObject(node.gameObject);
             }
             nodes.Clear();
-            // TODO: Will this actually work and not crash?
             Destroyer.DestroyGameObject(this.gameObject);
         }
 
+        /// <summary>
+        /// Sorts the list of children of all nodes using the given comparison.
+        /// </summary>
+        /// <param name="comparison">the comparison used to sort the nodes in the hierarchy</param>
+        public void SortHierarchy(Comparison<Node> comparison)
+        {
+            foreach (Node node in nodes.Values)
+            {
+                node.SortChildren(comparison);
+            }
+        }
+
+        /// <summary>
+        /// Sorts the list of children of all nodes using Node.CompareTo(), which compares the
+        /// nodes by their names (either Source.Name or Linkname).
+        /// </summary>
+        public void SortHierarchyByName()
+        {
+            SortHierarchy(Node.CompareTo);
+        }
+
+        /// <summary>
+        /// Returns the graph in a JSON-like format including its attributes and all its nodes 
+        /// and edges including their attributes.
+        /// </summary>
+        /// <returns>graph in textual form</returns>
         public override string ToString()
         {
             string result = "{\n";
