@@ -25,6 +25,8 @@ namespace SEE.Layout
             // later we might use a circle-packing algorithm instead,
             // e.g., https://www.codeproject.com/Articles/42067/D-Circle-Packing-Algorithm-Ported-to-Csharp
 
+            graph.SortHierarchyByName();
+
             const float offset = 1.0f;
             Node[] roots = graph.GetRoots().ToArray();
             if (roots.Length == 0)
