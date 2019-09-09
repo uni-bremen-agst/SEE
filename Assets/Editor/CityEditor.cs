@@ -46,7 +46,8 @@ namespace SEEEditor
         {
             GUILayout.Label("Graph", EditorStyles.boldLabel);
             editorSettings.graphPath = EditorGUILayout.TextField("Graph", editorSettings.graphPath);
-            editorSettings.hierarchicalEdgeType = EditorGUILayout.TextField("Hierarchical Edge", editorSettings.hierarchicalEdgeType);
+
+            // TODO: We may want to allow a user to define the edge types to be considered hierarchical.
 
             //groupEnabled = EditorGUILayout.BeginToggleGroup("Optional Settings", groupEnabled);
             //myBool = EditorGUILayout.Toggle("Toggle", myBool);
