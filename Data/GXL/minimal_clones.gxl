@@ -133,6 +133,9 @@
       <attr name="Metric.Complexity">
         <float>80</float>
       </attr>
+	  <attr name="Metric.Dead_Code">
+        <float>80</float>
+      </attr>
       <attr name="Source.Name">
         <string>a1_a.cpp</string>
       </attr>
