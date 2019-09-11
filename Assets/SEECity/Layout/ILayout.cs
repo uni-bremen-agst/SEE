@@ -36,6 +36,11 @@ namespace SEE.Layout
         protected readonly static Material defaultLineMaterial = LineMaterial();
 
         /// <summary>
+        /// Mapping of node attributes onto erosion issue icons.
+        /// </summary>
+        protected readonly SerializableDictionary<string, IconFactory.Erosion> issueMap;
+
+        /// <summary>
         /// Returns the default material for edges using the materialPath.
         /// </summary>
         /// <returns>default material for edges</returns>
@@ -76,11 +81,12 @@ namespace SEE.Layout
             get => name;
         }
 
-        public ILayout(string widthMetric, string heightMetric, string breadthMetric)
+        public ILayout(string widthMetric, string heightMetric, string breadthMetric, SerializableDictionary<string, IconFactory.Erosion> issueMap)
         {
             this.widthMetric = widthMetric;
             this.heightMetric = heightMetric;
             this.breadthMetric = breadthMetric;
+            this.issueMap = issueMap;
         }
 
         /// <summary>
@@ -121,9 +127,22 @@ namespace SEE.Layout
         }
 
         /// <summary>
+        /// Returns the roof position of a node.
+        /// </summary>
+        /// <param name="node">node for which to determine the roof position</param>
+        /// <returns>roof position</returns>
+        protected static Vector3 Roof(GameObject node)
+        {
+            Vector3 result = node.transform.position;
+            result.y += GetExtent(node).y;
+            return result;
+        }
+
+        /// <summary>
         /// Removes everything the layout has added to the scence, such as planes etc.
         /// </summary>
         public abstract void Reset();
+
     }
 }
 
