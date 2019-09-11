@@ -12,10 +12,11 @@ namespace SEEEditor
     public class CityEditor : EditorWindow
     {
         [MenuItem("Window/City Editor")]
-        // This method will be called when the user selects the menu item.
+        // This method will be called when the user selects the menu item to create the window.
         // Such methods must be static and void. They can have any name.
         static void Init()
         {
+            IconFactory.Initialize();
             // We try to open the window by docking it next to the Inspector if possible.
             System.Type desiredDockNextTo = System.Type.GetType("UnityEditor.InspectorWindow,UnityEditor.dll");
             CityEditor window;
@@ -47,7 +48,17 @@ namespace SEEEditor
             GUILayout.Label("Graph", EditorStyles.boldLabel);
             editorSettings.graphPath = EditorGUILayout.TextField("Graph", editorSettings.graphPath);
 
-            // TODO: We may want to allow a user to define the edge types to be considered hierarchical.
+            GUILayout.Label("Width of buildings", EditorStyles.boldLabel);
+            editorSettings.WidthMetric = EditorGUILayout.TextField("Width", editorSettings.WidthMetric);
+
+            GUILayout.Label("Height of buildings", EditorStyles.boldLabel);
+            editorSettings.HeightMetric = EditorGUILayout.TextField("Width", editorSettings.HeightMetric);
+
+            GUILayout.Label("Breadth of buildings", EditorStyles.boldLabel);
+            editorSettings.BreadthMetric = EditorGUILayout.TextField("Breadth", editorSettings.BreadthMetric);
+
+            // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
+            // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
 
             //groupEnabled = EditorGUILayout.BeginToggleGroup("Optional Settings", groupEnabled);
             //myBool = EditorGUILayout.Toggle("Toggle", myBool);
@@ -68,17 +79,14 @@ namespace SEEEditor
 
                     if (graph != null)
                     {
-                        const string widthMetric = "Metric.Number_of_Tokens";
-                        const string heightMetric = "Metric.Clone_Rate";
-                        const string breadthMetric = "Metric.LOC";
                         MeshFactory.Reset();
                         if (true)
                         {
-                            layout = new SEE.Layout.BalloonLayout(widthMetric, heightMetric, breadthMetric);
+                            layout = new SEE.Layout.BalloonLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, editorSettings.IssueMap());
                         }
                         else
                         {
-                            layout = new SEE.Layout.ManhattenLayout(widthMetric, heightMetric, breadthMetric);
+                            layout = new SEE.Layout.ManhattenLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, editorSettings.IssueMap());
                         }
                         layout.Draw(graph);
                     }
@@ -122,6 +130,8 @@ namespace SEEEditor
                     Debug.LogError(e.ToString());
                 }
             }
+            IconFactory.Reset();
+            IconFactory.Initialize();
         }
 
         /// <summary>

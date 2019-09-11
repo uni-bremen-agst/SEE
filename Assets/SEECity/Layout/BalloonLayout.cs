@@ -13,8 +13,8 @@ namespace SEE.Layout
     /// </summary>
     public class BalloonLayout : ILayout
     {
-        public BalloonLayout(string widthMetric, string heightMetric, string breadthMetric)
-        : base(widthMetric, heightMetric, breadthMetric)
+        public BalloonLayout(string widthMetric, string heightMetric, string breadthMetric, SerializableDictionary<string, IconFactory.Erosion> issueMap)
+        : base(widthMetric, heightMetric, breadthMetric, issueMap)
         {
             name = "Ballon";
         }
@@ -334,8 +334,18 @@ namespace SEE.Layout
             // be twice the radius above). The cylinder's height should be minimal.
             cylinder.transform.localScale = new Vector3(1.0f, cylinder_height, 1.0f);
 
+            AddErosionIssues(node);
             //Renderer renderer = cylinder.GetComponent<Renderer>();
             //renderer.material.color = Color.white;
+        }
+
+        protected void AddErosionIssues(Node node)
+        {
+            Vector3 roof = RoofOfHouse(node.gameObject);
+            GameObject issue = IconFactory.GetArchitectureViolationIcon(node.transform.position + Vector3.up);
+            issue.name = issue.name + " " + node.SourceName;
+            issue.transform.parent = node.transform;
+            issue.transform.localScale = Vector3.one / 50.0f;
         }
 
         private struct NodeInfo
@@ -668,13 +678,13 @@ namespace SEE.Layout
                                 fullPath[sourceToLCA.Length + i - 1] = targetToLCA[i];
                             }
                             controlPoints = new Vector3[fullPath.Length];
-                            controlPoints[0] = Roof(sourceObject);
+                            controlPoints[0] = RoofOfHouse(sourceObject);
                             for (int i = 1; i < fullPath.Length - 1; i++)
                             {
                                 // We consider the height of intermediate nodes.
                                 controlPoints[i] = fullPath[i].gameObject.transform.position + nodeInfos[fullPath[i]].level * levelFactor * Vector3.up;
                             }
-                            controlPoints[controlPoints.Length - 1] = Roof(targetObject);
+                            controlPoints[controlPoints.Length - 1] = RoofOfHouse(targetObject);
                         }
                     }
                 }
@@ -716,19 +726,17 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Returns the roof position of a node.
+        /// Returns the roof position of the first child (the house).
         /// </summary>
         /// <param name="node">node for which to determine the roof position</param>
         /// <returns>roof position</returns>
-        private static Vector3 Roof(GameObject node)
+        private static Vector3 RoofOfHouse(GameObject node)
         {
             // Note: The leaf nodes are represented by a composite game object,
             // one for the building, one for the circle on its ground;
             // the building is the first child
             GameObject child = node.transform.GetChild(0).gameObject;
-            Vector3 result = child.transform.position;
-            result.y += GetExtent(child).y;
-            return result;
+            return Roof(child);
         }
 
         /// <summary>
@@ -752,20 +760,20 @@ namespace SEE.Layout
             // we need at least four control points; tinySplines wants that
             Vector3[] controlPoints = new Vector3[4];
             // self-loop
-            controlPoints[0] = Roof(sourceObject); 
+            controlPoints[0] = RoofOfHouse(sourceObject); 
             controlPoints[1] = controlPoints[0] + levelFactor * Vector3.up + Vector3.right;
             controlPoints[2] = controlPoints[1] + 2 * Vector3.left;
-            controlPoints[3] = Roof(targetObject);
+            controlPoints[3] = RoofOfHouse(targetObject);
             return controlPoints;
         }
 
         private static Vector3[] ThroughCenter(GameObject sourceObject, GameObject targetObject)
         {
             Vector3[] controlPoints = new Vector3[4];
-            controlPoints[0] = Roof(sourceObject);
+            controlPoints[0] = RoofOfHouse(sourceObject);
             controlPoints[1] = levelFactor * Vector3.up;
             controlPoints[2] = levelFactor * Vector3.up;
-            controlPoints[3] = Roof(targetObject);
+            controlPoints[3] = RoofOfHouse(targetObject);
             return controlPoints;
         }
 

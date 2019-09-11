@@ -7,8 +7,8 @@ namespace SEE.Layout
 {
     public class ManhattenLayout : ILayout
     {
-        public ManhattenLayout(string widthMetric, string heightMetric, string breadthMetric)
-            : base(widthMetric, heightMetric, breadthMetric)
+        public ManhattenLayout(string widthMetric, string heightMetric, string breadthMetric, SerializableDictionary<string, IconFactory.Erosion> issueMap)
+            : base(widthMetric, heightMetric, breadthMetric, issueMap)
         {
             name = "Manhattan";
         }
