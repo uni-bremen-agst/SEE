@@ -43,7 +43,7 @@ namespace SEE
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
-        public static HashSet<string> HierarchicalEdges = Hierarchical_Edge_Types();
+        public HashSet<string> HierarchicalEdges = Hierarchical_Edge_Types();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
