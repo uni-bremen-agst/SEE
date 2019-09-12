@@ -16,7 +16,6 @@ namespace SEEEditor
         // Such methods must be static and void. They can have any name.
         static void Init()
         {
-            IconFactory.Initialize();
             // We try to open the window by docking it next to the Inspector if possible.
             System.Type desiredDockNextTo = System.Type.GetType("UnityEditor.InspectorWindow,UnityEditor.dll");
             CityEditor window;
@@ -130,8 +129,6 @@ namespace SEEEditor
                     Debug.LogError(e.ToString());
                 }
             }
-            IconFactory.Reset();
-            IconFactory.Initialize();
         }
 
         /// <summary>
