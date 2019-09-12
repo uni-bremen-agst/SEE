@@ -37,17 +37,17 @@ ScriptedImporter:
   spriteData:
     TessellationDetail: 0
     SpriteRect:
-      name: 
+      name: architectureSprite
       originalName: 
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.49974573, y: 0.5001147}
       alignment: 0
       border: {x: 0, y: 0, z: 0, w: 0}
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 0
-        height: 0
+        width: 747
+        height: 741
       spriteID: 52a84562d8309eb449e8cbc1cd460bfe
       internalID: 0
     PhysicsOutlines: []
