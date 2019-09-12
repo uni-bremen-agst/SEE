@@ -67,6 +67,18 @@ namespace SEE.Layout
             "Assets/Resources/Icons/universal.svg"
             };
 
+        private IconFactory()
+        {
+            erosionToSpriteGeometries = LoadAllSVGs();
+        }
+
+        private static readonly IconFactory instance = new IconFactory();
+
+        public static IconFactory Instance
+        {
+            get => instance;
+        }
+
         /// <summary>
         /// Returns a game object as place holder for sprite visualizing an
         /// architecture violation. This method can be called in both play
@@ -75,54 +87,43 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="position">the position of the newly generated object</param>
         /// <returns></returns>
-        public static GameObject GetArchitectureViolationIcon(Vector3 position)
+        public GameObject GetArchitectureViolationIcon(Vector3 position)
         {
             return GetIcon(position, Erosion.Architecture_Violation);
         }
 
-        public static GameObject GetCloneIcon(Vector3 position)
+        public GameObject GetCloneIcon(Vector3 position)
         {
             return GetIcon(position, Erosion.Clone);
         }
 
-        public static GameObject GetDeadCodeIcon(Vector3 position)
+        public GameObject GetDeadCodeIcon(Vector3 position)
         {
             return GetIcon(position, Erosion.Cycle);
         }
 
-        public static GameObject GetMetricIcon(Vector3 position)
+        public GameObject GetMetricIcon(Vector3 position)
         {
             return GetIcon(position, Erosion.Metric);
         }
 
-        public static GameObject GetCycleIcon(Vector3 position)
+        public GameObject GetCycleIcon(Vector3 position)
         {
             return GetIcon(position, Erosion.Cycle);
         }
 
-        public static GameObject GetStyleIcon(Vector3 position)
+        public GameObject GetStyleIcon(Vector3 position)
         {
             return GetIcon(position, Erosion.Style);
         }
 
-        public static GameObject GetUniversalIcon(Vector3 position)
+        public GameObject GetUniversalIcon(Vector3 position)
         {
             return GetIcon(position, Erosion.Universal);
         }
 
         [SerializeField]
-        // FIXME: Note: Unity does not serialize static fields.
-        private static List<VectorUtils.Geometry>[] erosionToSpriteGeometries;
-
-        public static void Initialize()
-        {
-            erosionToSpriteGeometries = LoadAllSVGs();
-        }
-
-        public static void Reset()
-        {
-            erosionToSpriteGeometries = null;
-        }
+        private List<VectorUtils.Geometry>[] erosionToSpriteGeometries;
 
         private static List<VectorUtils.Geometry>[] LoadAllSVGs()
         {
@@ -137,18 +138,26 @@ namespace SEE.Layout
             return result;
         }
 
+        /*
+        private static GameObject GetIcon(Vector3 position, IconFactory.Erosion value)
+        {
+            UnityEngine.Object prefab = UnityEditor.AssetDatabase.LoadAssetAtPath("Assets/Resources//Icons/architectureSprite.prefab", typeof(GameObject));
+            GameObject clone = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
+            // Modify the clone to your heart's content
+            clone.transform.position = position;
+            clone.name = "SPRITE";
+            return clone;
+        }
+        */
+
         /// <summary>
         /// Returns a sprite for this erosion issue kind. This function can only
         /// be called in game mode, not in the editor mode.
         /// </summary>
         /// <param name="erosion"></param>
         /// <returns>sprite for give erosion kind</returns>
-        public static Sprite GetSprite(Erosion erosion)
+        public Sprite GetSprite(Erosion erosion)
         {
-            if (erosionToSpriteGeometries == null)
-            {
-                Initialize();
-            }
             List<VectorUtils.Geometry> geoms = erosionToSpriteGeometries[(int)erosion];
             // Build a sprite with the tessellated geometry.
             return VectorUtils.BuildSprite(geoms, 10.0f, VectorUtils.Alignment.Center, Vector2.zero, 128, true);
@@ -181,12 +190,8 @@ namespace SEE.Layout
             return new List<VectorUtils.Geometry>();
         }
 
-        public static GameObject GetIcon(Vector3 position, Erosion erosion)
+        public GameObject GetIcon(Vector3 position, Erosion erosion)
         {
-            if(erosionToSpriteGeometries == null)
-            {
-                Initialize();
-            }
             GameObject result = new GameObject();
             result.name = ToString(erosion);
             result.transform.position = position;

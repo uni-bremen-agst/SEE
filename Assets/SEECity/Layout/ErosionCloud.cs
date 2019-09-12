@@ -10,7 +10,7 @@ namespace SEE.Layout
 
         private void Start()
         {
-            sprite = IconFactory.GetSprite(erosion);
+            sprite = IconFactory.Instance.GetSprite(erosion);
             SpriteRenderer renderer = gameObject.GetComponent<SpriteRenderer>();
             renderer.sprite = sprite;
         }
