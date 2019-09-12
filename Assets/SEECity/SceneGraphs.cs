@@ -41,7 +41,7 @@ namespace SEE
 
         private static Graph Load(GraphSettings settings)
         {
-            GraphCreator graphCreator = new GraphCreator(settings.graphPath, GraphSettings.HierarchicalEdges, new SEELogger());
+            GraphCreator graphCreator = new GraphCreator(settings.graphPath, settings.HierarchicalEdges, new SEELogger());
             if (string.IsNullOrEmpty(settings.graphPath))
             {
                 Debug.LogError("Empty graph path.\n");
