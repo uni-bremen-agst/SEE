@@ -341,11 +341,29 @@ namespace SEE.Layout
 
         protected void AddErosionIssues(Node node)
         {
-            Vector3 roof = RoofOfHouse(node.gameObject);
-            GameObject issue = IconFactory.GetArchitectureViolationIcon(node.transform.position + Vector3.up);
-            issue.name = issue.name + " " + node.SourceName;
-            issue.transform.parent = node.transform;
-            issue.transform.localScale = Vector3.one / 50.0f;
+            Vector3 delta = Vector3.up / 10.0f;
+            Vector3 roof = RoofOfHouse(node.gameObject) + delta;
+            SerializableDictionary<string, IconFactory.Erosion> map = issueMap;
+
+            foreach (KeyValuePair<string, IconFactory.Erosion> issue in issueMap)
+            {
+                if (node.TryGetNumeric(issue.Key, out float value))
+                {
+                    if (value > 0.0f)
+                    {
+                        GameObject icon = IconFactory.Instance.GetIcon(roof, issue.Value);
+                        icon.transform.parent = node.transform;
+                        // TODO: scale relative to 'value'
+                        icon.transform.localScale = Vector3.one / 200.0f;
+                        // float height = GetSize(icon).y;
+                        SpriteRenderer renderer = icon.GetComponent<SpriteRenderer>();
+                        float height = renderer != null && renderer.sprite != null ? renderer.sprite.bounds.size.x : 0.0f;
+                        Debug.LogFormat("Icon {0} height: {1}\n", icon.name, height);
+                        roof += delta + height * Vector3.up;
+                        icon.name = icon.name + " " + node.SourceName;
+                    }
+                }
+            }
         }
 
         private struct NodeInfo
