@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using UnityEngine;
 using System;
+using SEE.DataModel;
 
 namespace SEE.Layout
 {
@@ -55,7 +56,10 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// The paths to the sprite prefab files.
+        /// The paths to the sprite prefab files. 
+        /// The viewBox of the original SVG files from which those prefabs were
+        /// create is 0 0 1194.11 1161.28. Thus, the aspect ratio is roughly 1194:1161,
+        /// or even more roughly 1:1.
         /// </summary>
         private static readonly string[] paths = new string[]
             {
@@ -164,6 +168,7 @@ namespace SEE.Layout
             {
                 result = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
             }
+            result.tag = Tags.Erosion;
             result.name = ToString(erosion);
             result.transform.position = position;
             return result;

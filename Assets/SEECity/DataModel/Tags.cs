@@ -10,10 +10,11 @@
         public const string Edge = "Edge";
         public const string NodePrefab = "Node Prefab";
         public const string Text = "Text";
+        public const string Erosion = "Erosion";
 
         /// <summary>
         /// All existing tags in one.
         /// </summary>
-        public static readonly string[] All = new string[] { Graph, Node, Edge, NodePrefab, Text};
+        public static readonly string[] All = new string[] { Graph, Node, Edge, NodePrefab, Text, Erosion};
     }
 }
