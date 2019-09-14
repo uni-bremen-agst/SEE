@@ -123,7 +123,6 @@ namespace SEE.Layout
         /// <returns></returns>
         private static UnityEngine.Object LoadSprite(string filename)
         {
-            Debug.LogFormat("Load sprite prefab from file {0}\n", filename);
             try
             {
                 if (File.Exists(filename))
