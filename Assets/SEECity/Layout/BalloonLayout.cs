@@ -40,14 +40,17 @@ namespace SEE.Layout
             float max_radius = 0.0f;
 
             IScale scaler;
-            IList<string> cubeMetrics = new List<string>() {widthMetric, heightMetric, breadthMetric};
-            if (false)
             {
-                scaler = new LinearScale(graph, minimal_length, 1.0f, cubeMetrics);
-            }
-            else
-            {
-                scaler = new ZScoreScale(graph, minimal_length, cubeMetrics);
+                List<string> nodeMetrics = new List<string>() { widthMetric, heightMetric, breadthMetric };
+                nodeMetrics.AddRange(issueMap.Keys);
+                if (false)
+                {
+                    scaler = new LinearScale(graph, minimal_length, 1.0f, nodeMetrics);
+                }
+                else
+                {
+                    scaler = new ZScoreScale(graph, minimal_length, nodeMetrics);
+                }
             }
             // first calculate all radii including those for the roots
             {
@@ -337,44 +340,101 @@ namespace SEE.Layout
             // be twice the radius above). The cylinder's height should be minimal.
             cylinder.transform.localScale = new Vector3(1.0f, cylinder_height, 1.0f);
 
-            AddErosionIssues(node);
+            AddErosionIssues(node, scaler);
             //Renderer renderer = cylinder.GetComponent<Renderer>();
             //renderer.material.color = Color.white;
         }
 
-        protected Vector3 GetSizeOfSprite(GameObject go)
+        protected static Vector3 GetSizeOfSprite(GameObject go)
         {
             SpriteRenderer renderer = go.GetComponent<SpriteRenderer>();
-            return renderer.sprite.bounds.size;
+            // Note: renderer.sprite.bounds.size yields the original size
+            // of the sprite of the prefab. It does not consider the scaling.
+            // It depends only upon the imported graphic. That is why we
+            // need to use renderer.bounds.size.
+            return renderer.bounds.size;
         }
 
-        protected void AddErosionIssues(Node node)
-        {
-            Vector3 delta = Vector3.up / 10.0f;
-            Vector3 roof = RoofOfHouse(node.gameObject) + delta;
-            SerializableDictionary<string, IconFactory.Erosion> map = issueMap;
+        // Comparer for the widths of sprites.
+        private readonly IComparer<GameObject> comparer = new WidthComparer();
 
+        /// <summary>
+        /// Comparer for the widths of sprites. Let width(x) be the width
+        /// of a sprite. Yields:
+        /// -1 if width(left) > width(right) 
+        /// 0 if width(left) = width(right)
+        /// 1 if width(left) < width(right)
+        /// Note that the scale of the returned values is inverted. That is,
+        /// if the width of left is shorter than the width of right, left actually
+        /// precedes right in this order. We want to sort our sprites in descending
+        /// order of their widths.
+        /// </summary>
+        private class WidthComparer : IComparer<GameObject>
+        {
+            public int Compare(GameObject left, GameObject right)
+            {
+                float widthLeft = GetSizeOfSprite(left).x;
+                float widthRight = GetSizeOfSprite(right).x;
+                // invert comparison
+                return widthRight.CompareTo(widthLeft);
+            }
+        }
+
+        private void AddErosionIssues(Node node, IScale scaler)
+        {
+            // The list of sprites for the erosion issues.
+            List<GameObject> sprites = new List<GameObject>();
+
+            // Create and scale the sprites and add them to the list of sprites.
             foreach (KeyValuePair<string, IconFactory.Erosion> issue in issueMap)
             {
                 if (node.TryGetNumeric(issue.Key, out float value))
                 {
                     if (value > 0.0f)
                     {
-                        GameObject icon = IconFactory.Instance.GetIcon(roof, issue.Value);
-                        // The icon will not become a child of node so that we can more easily
-                        // scale it. If the icon had a parent, localScale would be relative to
+                        GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
+                        // The sprite will not become a child of node so that we can more easily
+                        // scale it. If the sprite had a parent, localScale would be relative to
                         // the parent's size. That just complicates things.
-                        Vector3 spriteSize = GetSizeOfSprite(icon);
-                        float scaleFactor = SizeOfHouse(node.gameObject).x / spriteSize.x;
-
-                        // TODO: scale relative to 'value'
-                        icon.transform.localScale *= scaleFactor;
-                        float height = icon.transform.localScale.y;
-                        //float height = spriteSize.y / scaleFactor; // adjusted height after scaling
-                        Debug.LogFormat("Icon {0} height: {1}\n", icon.name, height);
-                        roof += delta + height * Vector3.up;
-                        icon.name = icon.name + " " + node.SourceName;
+                        Vector3 spriteSize = GetSizeOfSprite(sprite);
+                        // Scale the sprite to one Unity unit.
+                        float spriteScale = 1.0f / spriteSize.x;
+                        // Scale the erosion issue by normalization.
+                        float metricScale = scaler.GetNormalizedValue(node, issue.Key);
+                        //Debug.LogFormat("sprite {0} before scaling: size={1}.\n",
+                        //                sprite.name, GetSizeOfSprite(sprite));
+                        // First: scale its width to unit size 1.0 maintaining the aspect ratio
+                        sprite.transform.localScale *= spriteScale;
+                        //Debug.LogFormat("sprite {0} scaled to unit size: size={1}.\n",
+                        //                sprite.name, GetSizeOfSprite(sprite));
+                        // Now scale it by the normalized metric.
+                        sprite.transform.localScale *= metricScale;
+                        //Debug.LogFormat("sprite {0} after scaling: size={1}.\n",
+                        //                sprite.name, GetSizeOfSprite(sprite));
+                        sprite.name = sprite.name + " " + node.SourceName;
+                        sprites.Add(sprite);
                     }
+                }
+            }
+
+            // Now we stack the sprites on top of the roof of the building in
+            // descending order of their widths.
+            {
+                // The space that we put in between two subsequent erosion issue sprites.
+                Vector3 delta = Vector3.zero; // FIXME: Use Vector3.up / 100.0f;
+                Vector3 currentRoof = RoofOfHouse(node.gameObject);
+                sprites.Sort(comparer);
+                //Debug.Log("---------------------------------\n");
+                foreach (GameObject sprite in sprites)
+                {
+                    Vector3 size = GetSizeOfSprite(sprite);
+                    // Note: Consider that the position of the sprite is its center.
+                    Vector3 halfHeight = (size.y / 2.0f) * Vector3.up;
+                    sprite.transform.position = currentRoof + delta + halfHeight;
+                    currentRoof = sprite.transform.position + halfHeight;
+
+                    //Debug.LogFormat("sprite {0}: size={1} position={2} halfHeight={3}.\n",
+                    //                sprite.name, size, sprite.transform.position, halfHeight);
                 }
             }
         }
@@ -583,8 +643,10 @@ namespace SEE.Layout
         private void SetColor(GameObject gameObject, Color color)
         {
             Renderer renderer = gameObject.GetComponent<Renderer>();
-            var tempMaterial = new Material(renderer.sharedMaterial);
-            tempMaterial.color = color;
+            var tempMaterial = new Material(renderer.sharedMaterial)
+            {
+                color = color
+            };
             renderer.sharedMaterial = tempMaterial;
         }
 
