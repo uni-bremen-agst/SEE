@@ -134,25 +134,25 @@
         <float>80</float>
       </attr>
 	  <attr name="Metric.Architecture_Violations">
-        <int>1</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Clone">
-        <int>2</int>
+        <int>0</int>
       </attr>
 	  	<attr name="Metric.Dead_Code">
-        <int>3</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Cycle">
-        <int>4</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Metric">
-        <int>5</int>
+        <int>2</int>
       </attr>
 	  	  <attr name="Metric.Style">
-        <int>6</int>
+        <int>600</int>
       </attr>
 	  <attr name="Metric.Universal">
-        <int>7</int>
+        <int>0</int>
       </attr>		
       <attr name="Source.Name">
         <string>a1_a.cpp</string>
@@ -185,25 +185,25 @@
         <float>23</float>
       </attr>
 	  <attr name="Metric.Architecture_Violations">
-        <int>1</int>
+        <int>10</int>
       </attr>
 	  <attr name="Metric.Clone">
-        <int>2</int>
+        <int>20</int>
       </attr>
 	  	<attr name="Metric.Dead_Code">
-        <int>3</int>
+        <int>1</int>
       </attr>
 	  <attr name="Metric.Cycle">
-        <int>4</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Metric">
-        <int>5</int>
+        <int>8</int>
       </attr>
 	  	  <attr name="Metric.Style">
-        <int>6</int>
+        <int>123</int>
       </attr>
 	  <attr name="Metric.Universal">
-        <int>7</int>
+        <int>0</int>
       </attr>	  
       <attr name="Source.Name">
         <string>a1_b.cpp</string>
@@ -239,22 +239,22 @@
         <int>1</int>
       </attr>
 	  <attr name="Metric.Clone">
-        <int>2</int>
+        <int>11</int>
       </attr>
 	  	<attr name="Metric.Dead_Code">
-        <int>3</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Cycle">
-        <int>4</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Metric">
-        <int>5</int>
+        <int>1</int>
       </attr>
 	  	  <attr name="Metric.Style">
-        <int>6</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Universal">
-        <int>7</int>
+        <int>0</int>
       </attr>	  
       <attr name="Source.Name">
         <string>a2_a.cpp</string>
@@ -287,25 +287,25 @@
         <float>180</float>
       </attr>
 	  <attr name="Metric.Architecture_Violations">
-        <int>1</int>
+        <int>15</int>
       </attr>
 	  <attr name="Metric.Clone">
-        <int>2</int>
+        <int>48</int>
       </attr>
 	  	<attr name="Metric.Dead_Code">
-        <int>3</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Cycle">
-        <int>4</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Metric">
-        <int>5</int>
+        <int>9</int>
       </attr>
 	  	  <attr name="Metric.Style">
-        <int>6</int>
+        <int>698</int>
       </attr>
 	  <attr name="Metric.Universal">
-        <int>7</int>
+        <int>0</int>
       </attr>	  
       <attr name="Source.Name">
         <string>a2_b.cpp</string>
@@ -349,26 +349,23 @@
       <attr name="Metric.Complexity">
         <float>1</float>
       </attr>
-	  <attr name="Metric.Architecture_Violations">
-        <int>1</int>
-      </attr>
 	  <attr name="Metric.Clone">
-        <int>2</int>
+        <int>50</int>
       </attr>
 	  	<attr name="Metric.Dead_Code">
-        <int>3</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Cycle">
-        <int>4</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Metric">
-        <int>5</int>
+        <int>1000</int>
       </attr>
 	  	  <attr name="Metric.Style">
-        <int>6</int>
+        <int>8989</int>
       </attr>
 	  <attr name="Metric.Universal">
-        <int>7</int>
+        <int>0</int>
       </attr>	  
       <attr name="Source.Name">
         <string>b1_b.cpp</string>
@@ -401,25 +398,25 @@
         <float>8</float>
       </attr>
 	  <attr name="Metric.Architecture_Violations">
-        <int>1</int>
-      </attr>
-	  <attr name="Metric.Clone">
-        <int>2</int>
-      </attr>
-	  	<attr name="Metric.Dead_Code">
-        <int>3</int>
-      </attr>
-	  <attr name="Metric.Cycle">
-        <int>4</int>
-      </attr>
-	  <attr name="Metric.Metric">
         <int>5</int>
       </attr>
+	  <attr name="Metric.Clone">
+        <int>12</int>
+      </attr>
+	  	<attr name="Metric.Dead_Code">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Cycle">
+        <int>1</int>
+      </attr>
+	  <attr name="Metric.Metric">
+        <int>3</int>
+      </attr>
 	  	  <attr name="Metric.Style">
-        <int>6</int>
+        <int>234</int>
       </attr>
 	  <attr name="Metric.Universal">
-        <int>7</int>
+        <int>0</int>
       </attr>	  
       <attr name="Source.Name">
         <string>b2_a.cpp</string>
@@ -452,25 +449,25 @@
         <float>45</float>
       </attr>
 	  <attr name="Metric.Architecture_Violations">
-        <int>1</int>
+        <int>18</int>
       </attr>
 	  <attr name="Metric.Clone">
-        <int>2</int>
+        <int>0</int>
       </attr>
 	  	<attr name="Metric.Dead_Code">
-        <int>3</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Cycle">
         <int>4</int>
       </attr>
 	  <attr name="Metric.Metric">
-        <int>5</int>
+        <int>19</int>
       </attr>
 	  	  <attr name="Metric.Style">
-        <int>6</int>
+        <int>134</int>
       </attr>
 	  <attr name="Metric.Universal">
-        <int>7</int>
+        <int>0</int>
       </attr>	  
       <attr name="Source.Name">
         <string>b2_b.cpp</string>
@@ -503,25 +500,25 @@
         <float>150</float>
       </attr>
 	  <attr name="Metric.Architecture_Violations">
-        <int>1</int>
+        <int>50</int>
       </attr>
 	  <attr name="Metric.Clone">
-        <int>2</int>
+        <int>17</int>
       </attr>
 	  	<attr name="Metric.Dead_Code">
-        <int>3</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Cycle">
-        <int>4</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Metric">
-        <int>5</int>
+        <int>0</int>
       </attr>
 	  	  <attr name="Metric.Style">
-        <int>6</int>
+        <int>3432</int>
       </attr>
 	  <attr name="Metric.Universal">
-        <int>7</int>
+        <int>0</int>
       </attr>	  
       <attr name="Source.Name">
         <string>MAX.cpp</string>
@@ -554,25 +551,25 @@
         <float>85</float>
       </attr>
 	  <attr name="Metric.Architecture_Violations">
-        <int>1</int>
+        <int>11</int>
       </attr>
 	  <attr name="Metric.Clone">
-        <int>2</int>
+        <int>100</int>
       </attr>
 	  	<attr name="Metric.Dead_Code">
-        <int>3</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Cycle">
-        <int>4</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Metric">
-        <int>5</int>
+        <int>0</int>
       </attr>
 	  	  <attr name="Metric.Style">
-        <int>6</int>
+        <int>156</int>
       </attr>
 	  <attr name="Metric.Universal">
-        <int>7</int>
+        <int>0</int>
       </attr>	  
       <attr name="Source.Name">
         <string>c1_b.cpp</string>
@@ -605,25 +602,25 @@
         <float>25</float>
       </attr>
 	  <attr name="Metric.Architecture_Violations">
-        <int>1</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Clone">
-        <int>2</int>
+        <int>24</int>
       </attr>
 	  	<attr name="Metric.Dead_Code">
-        <int>3</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Cycle">
-        <int>4</int>
+        <int>2</int>
       </attr>
 	  <attr name="Metric.Metric">
-        <int>5</int>
+        <int>9</int>
       </attr>
 	  	  <attr name="Metric.Style">
-        <int>6</int>
+        <int>125</int>
       </attr>
 	  <attr name="Metric.Universal">
-        <int>7</int>
+        <int>0</int>
       </attr>	  
       <attr name="Source.Name">
         <string>c2_a.cpp</string>
@@ -656,25 +653,25 @@
         <float>25</float>
       </attr>
 	  <attr name="Metric.Architecture_Violations">
-        <int>1</int>
-      </attr>
-	  <attr name="Metric.Clone">
-        <int>2</int>
-      </attr>
-	  	<attr name="Metric.Dead_Code">
-        <int>3</int>
-      </attr>
-	  <attr name="Metric.Cycle">
         <int>4</int>
       </attr>
+	  <attr name="Metric.Clone">
+        <int>29</int>
+      </attr>
+	  	<attr name="Metric.Dead_Code">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Cycle">
+        <int>0</int>
+      </attr>
 	  <attr name="Metric.Metric">
-        <int>5</int>
+        <int>12</int>
       </attr>
 	  	  <attr name="Metric.Style">
-        <int>6</int>
+        <int>261</int>
       </attr>
 	  <attr name="Metric.Universal">
-        <int>7</int>
+        <int>0</int>
       </attr>	  
       <attr name="Source.Name">
         <string>c2_b.cpp</string>
@@ -707,25 +704,25 @@
         <float>25</float>
       </attr>
 	  <attr name="Metric.Architecture_Violations">
-        <int>1</int>
+        <int>11</int>
       </attr>
 	  <attr name="Metric.Clone">
-        <int>2</int>
+        <int>43</int>
       </attr>
 	  	<attr name="Metric.Dead_Code">
-        <int>3</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Cycle">
-        <int>4</int>
+        <int>0</int>
       </attr>
 	  <attr name="Metric.Metric">
-        <int>5</int>
+        <int>14</int>
       </attr>
 	  <attr name="Metric.Style">
-        <int>6</int>
+        <int>231</int>
       </attr>
 	  <attr name="Metric.Universal">
-        <int>7</int>
+        <int>0</int>
       </attr>	  
       <attr name="Source.Name">
         <string>c_a.cpp</string>
