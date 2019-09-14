@@ -20,7 +20,8 @@ namespace SEE.Layout
 
         public override void Draw(Graph graph)
         {
-            scaler = new LinearScale(graph, minimal_length, 1.0f, widthMetric, heightMetric, breadthMetric);
+            IList<string> metrics = new List<string>() {widthMetric, heightMetric, breadthMetric};
+            scaler = new LinearScale(graph, minimal_length, 1.0f, metrics);
             AddMeshes(graph);
             base.Draw(graph);
         }
@@ -62,7 +63,9 @@ namespace SEE.Layout
                 {
                     Debug.LogError("Scene node " + sceneNode.name + " does not have a graph node component.\n");
                 }
-                Vector3 scale = scaler.Lengths(node);
+                Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, widthMetric),
+                                            scaler.GetNormalizedValue(node, heightMetric),
+                                            scaler.GetNormalizedValue(node, breadthMetric));
                 node.gameObject.transform.localScale = scale;
 
                 // The position is the center of a GameObject. We want all GameObjects

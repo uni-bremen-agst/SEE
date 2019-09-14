@@ -18,14 +18,11 @@ namespace SEE.Layout
         /// <param name="graph">the graph whose node metrics are to be scaled</param>
         /// <param name="minimalLength">the mininmal value a node length should have</param>
         /// <param name="maximalLength">the maximal value a node length should have</param>
-        /// <param name="widthMetric">metric for node width</param>
-        /// <param name="heightMetric">metric for node height</param>
-        /// <param name="breadthMetric">metric for node breadth</param>
-        public LinearScale(Graph graph, float minimalLength, float maximalLength,
-                           string widthMetric, string heightMetric, string breadthMetric)
-            : base(widthMetric, heightMetric, breadthMetric)
+        /// <param name="metrics">node metrics for scaling</param>
+        public LinearScale(Graph graph, float minimalLength, float maximalLength, IList<string> metrics)
+            : base(metrics)
         {
-            this.metricMaxima = DetermineMetricMaxima(graph, widthMetric, heightMetric, breadthMetric);
+            this.metricMaxima = DetermineMetricMaxima(graph, metrics);
             this.minimalLength = minimalLength;
             this.maximalLength = maximalLength;
         }
@@ -35,31 +32,18 @@ namespace SEE.Layout
         private readonly float maximalLength;
 
         /// <summary>
-        /// Yields a vector where each element (x, y, z) is a linear interpolation of the normalized
-        /// value of the metrics that determine the width, height, and breadth of the given node.
+        /// Yields a linear interpolation of the normalized value of the given node metric.
         /// The range of the linear interpolation is set by [minimalLength, maximalLength].
+        /// The normalization is done by dividing the value by the maximal value of
+        /// the metric. The assumption is that metric values are non-negative. If a node
+        /// does not have metric attribute, minimalLength will be returned.
         /// </summary>
-        /// <param name="node">node for which to determine the x, y, z lengths</param>
-        /// <returns>x, y, z lengths of node</returns>
-        public override Vector3 Lengths(Node node)
+        /// <param name="node">node for which to determine the normalized value</param>
+        /// <param name="metric">name of the node metric</param>
+        /// <returns>normalized value of node metric</returns>
+        public override float GetNormalizedValue(Node node, string metric)
         {
-            float x;
-            float y;
-            float z;
-
-            if (node != null)
-            {
-                x = Mathf.Lerp(minimalLength, maximalLength, NormalizedMetric(metricMaxima, node, widthMetric));
-                y = Mathf.Lerp(minimalLength, maximalLength, NormalizedMetric(metricMaxima, node, heightMetric));
-                z = Mathf.Lerp(minimalLength, maximalLength, NormalizedMetric(metricMaxima, node, breadthMetric));
-            }
-            else
-            {
-                x = minimalLength;
-                y = minimalLength;
-                z = minimalLength;
-            }
-            return new Vector3(x, z, y);
+            return Mathf.Lerp(minimalLength, maximalLength, NormalizedMetric(metricMaxima, node, metric));
         }
 
         /// <summary>
@@ -99,7 +83,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="metrics">the metrics for which the maxima are to be gathered</param>
         /// <returns>metric maxima</returns>
-        protected Dictionary<string, float> DetermineMetricMaxima(Graph graph, params string[] metrics)
+        protected Dictionary<string, float> DetermineMetricMaxima(Graph graph, IList<string> metrics)
         {
             Dictionary<string, float> result = new Dictionary<string, float>();
             foreach (string metric in metrics)
