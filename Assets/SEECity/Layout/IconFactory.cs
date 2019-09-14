@@ -11,14 +11,6 @@ namespace SEE.Layout
     /// </summary>
     public class IconFactory
     {
-        private static VectorUtils.TessellationOptions tessOptions = new VectorUtils.TessellationOptions()
-        {
-            StepDistance = 100.0f,
-            MaxCordDeviation = 0.5f,
-            MaxTanAngleDeviation = 0.1f,
-            SamplingStepSize = 0.01f
-        };
-
         /// <summary>
         /// The different types of software erosions.
         /// </summary>
@@ -54,22 +46,22 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// The paths to the SVG files.
+        /// The paths to the icon prefab files.
         /// </summary>
         private static readonly string[] paths = new string[]
             {
-            "Assets/Resources/Icons/architecture.svg",
-            "Assets/Resources/Icons/clone.svg",
-            "Assets/Resources/Icons/cycle.svg",
-            "Assets/Resources/Icons/deadcode.svg",
-            "Assets/Resources/Icons/metric.svg",
-            "Assets/Resources/Icons/stil.svg",
-            "Assets/Resources/Icons/universal.svg"
+            "Assets/Resources/Icons/architectureSprite.prefab",
+            "Assets/Resources/Icons/cloneSprite.prefab",
+            "Assets/Resources/Icons/cycleSprite.prefab",
+            "Assets/Resources/Icons/deadcodeSprite.prefab",
+            "Assets/Resources/Icons/metricSprite.prefab",
+            "Assets/Resources/Icons/stilSprite.prefab",
+            "Assets/Resources/Icons/universalSprite.prefab"
             };
 
         private IconFactory()
         {
-            erosionToSpriteGeometries = LoadAllSVGs();
+            erosionToSprite = LoadAllSprites();
         }
 
         private static readonly IconFactory instance = new IconFactory();
@@ -79,168 +71,61 @@ namespace SEE.Layout
             get => instance;
         }
 
-        /// <summary>
-        /// Returns a game object as place holder for sprite visualizing an
-        /// architecture violation. This method can be called in both play
-        /// and editor mode. The sprite, however, must be added later using
-        /// GetSprite().
-        /// </summary>
-        /// <param name="position">the position of the newly generated object</param>
-        /// <returns></returns>
-        public GameObject GetArchitectureViolationIcon(Vector3 position)
-        {
-            return GetIcon(position, Erosion.Architecture_Violation);
-        }
-
-        public GameObject GetCloneIcon(Vector3 position)
-        {
-            return GetIcon(position, Erosion.Clone);
-        }
-
-        public GameObject GetDeadCodeIcon(Vector3 position)
-        {
-            return GetIcon(position, Erosion.Cycle);
-        }
-
-        public GameObject GetMetricIcon(Vector3 position)
-        {
-            return GetIcon(position, Erosion.Metric);
-        }
-
-        public GameObject GetCycleIcon(Vector3 position)
-        {
-            return GetIcon(position, Erosion.Cycle);
-        }
-
-        public GameObject GetStyleIcon(Vector3 position)
-        {
-            return GetIcon(position, Erosion.Style);
-        }
-
-        public GameObject GetUniversalIcon(Vector3 position)
-        {
-            return GetIcon(position, Erosion.Universal);
-        }
-
         [SerializeField]
-        private List<VectorUtils.Geometry>[] erosionToSpriteGeometries;
+        private readonly UnityEngine.Object[] erosionToSprite;
 
-        private static List<VectorUtils.Geometry>[] LoadAllSVGs()
+        private static UnityEngine.Object[] LoadAllSprites()
         {
             Erosion[] erosionIssues = (Erosion[])Enum.GetValues(typeof(Erosion));
-            List<VectorUtils.Geometry>[] result = new List<VectorUtils.Geometry>[erosionIssues.Length];
+            UnityEngine.Object[] result = new UnityEngine.Object[erosionIssues.Length];
 
             foreach (Erosion erosion in erosionIssues)
             {
-                List<VectorUtils.Geometry> geoms = LoadSVG(paths[(int)erosion]);
-                result[(int)erosion] = geoms;
+                result[(int)erosion] = LoadSprite(paths[(int)erosion]);
             }
             return result;
         }
 
-        /*
-        private static GameObject GetIcon(Vector3 position, IconFactory.Erosion value)
+        private static UnityEngine.Object LoadSprite(string filename)
         {
-            UnityEngine.Object prefab = UnityEditor.AssetDatabase.LoadAssetAtPath("Assets/Resources//Icons/architectureSprite.prefab", typeof(GameObject));
-            GameObject clone = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
-            // Modify the clone to your heart's content
-            clone.transform.position = position;
-            clone.name = "SPRITE";
-            return clone;
-        }
-        */
-
-        /// <summary>
-        /// Returns a sprite for this erosion issue kind. This function can only
-        /// be called in game mode, not in the editor mode.
-        /// </summary>
-        /// <param name="erosion"></param>
-        /// <returns>sprite for give erosion kind</returns>
-        public Sprite GetSprite(Erosion erosion)
-        {
-            List<VectorUtils.Geometry> geoms = erosionToSpriteGeometries[(int)erosion];
-            // Build a sprite with the tessellated geometry.
-            return VectorUtils.BuildSprite(geoms, 10.0f, VectorUtils.Alignment.Center, Vector2.zero, 128, true);
-        }
-
-        private static List<VectorUtils.Geometry> LoadSVG(string filename)
-        {
-            Debug.LogFormat("LoadSVG from file {0}\n", filename);
+            Debug.LogFormat("Load sprite prefab from file {0}\n", filename);
             try
             {
                 if (File.Exists(filename))
                 {
-                    using (StreamReader sr = new StreamReader(filename))
+                    UnityEngine.Object prefab = UnityEditor.AssetDatabase.LoadAssetAtPath(filename, typeof(GameObject));
+                    if (prefab == null)
                     {
-                        // Dynamically import the SVG data, and tessellate the resulting vector scene.
-                        SVGParser.SceneInfo sceneInfo = SVGParser.ImportSVG(sr);
-                        List<VectorUtils.Geometry> geoms = VectorUtils.TessellateScene(sceneInfo.Scene, tessOptions);
-                        return geoms;
+                        Debug.LogErrorFormat("Loading sprite prefab from file {0} failed.\n", filename);
                     }
+                    return prefab;
                 }
                 else
                 {
-                    Debug.LogErrorFormat("SVG file does not exist: {0}.\n", filename);
+                    Debug.LogErrorFormat("Sprite prefab file does not exist: {0}.\n", filename);
                 }
             }
             catch (System.Exception e)
             {
-                Debug.LogErrorFormat("Loading SVG {0} failed: {1}", filename, e.ToString());
+                Debug.LogErrorFormat("Loading Sprite prefab from file {0} failed: {1}", filename, e.ToString());
             }
-            return new List<VectorUtils.Geometry>();
+            return null;
         }
 
         public GameObject GetIcon(Vector3 position, Erosion erosion)
         {
-            GameObject result = new GameObject();
+            GameObject result;
+            UnityEngine.Object prefab = erosionToSprite[(int)erosion];
+            if (prefab == null)
+            {
+                result = new GameObject();
+            }
+            else
+            {
+                result = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
+            }
             result.name = ToString(erosion);
             result.transform.position = position;
-            ErosionCloud cloud = result.AddComponent<ErosionCloud>();
-            SpriteRenderer renderer = result.AddComponent<SpriteRenderer>();
-            cloud.erosion = erosion;
-            return result;
-        }
-
-        private static GameObject LoadIcon(string filename)
-        {
-            Debug.LogFormat("LoadIcon from file {0}\n", filename);
-
-            GameObject result = new GameObject
-            {
-                name = "prototype " + filename
-            };
-            try
-            {
-                if (File.Exists(filename))
-                {
-                    using (StreamReader sr = new StreamReader(filename))
-                    {
-                        // Dynamically import the SVG data, and tessellate the resulting vector scene.
-                        var sceneInfo = SVGParser.ImportSVG(sr);
-                        var geoms = VectorUtils.TessellateScene(sceneInfo.Scene, tessOptions);
-
-                        // Build a sprite with the tessellated geometry.
-                        // Important note: VectorUtils.BuildSprite calls OverrideGeometry and
-                        // OverrideGeometry is not allowed to be called outside of the player loop, and 
-                        // the sprites won't allow to override their geometries in this situation. 
-                        UnityEngine.Sprite sprite = VectorUtils.BuildSprite(geoms, 10.0f, VectorUtils.Alignment.Center, Vector2.zero, 128, true);
-                        if (sprite == null)
-                        {
-                            Debug.LogErrorFormat("LoadIcon: cannot create sprite from file {0}\n", filename);
-                        }
-                        SpriteRenderer renderer = result.AddComponent<SpriteRenderer>();
-                        renderer.sprite = sprite;
-                    }
-                }
-                else
-                {
-                    Debug.LogErrorFormat("SVG file does not exist: {0}.\n", filename);
-                }
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogErrorFormat("Loading SVG {0} failed: {1}", filename, e.ToString());
-            }
             return result;
         }
     }
