@@ -339,6 +339,12 @@ namespace SEE.Layout
             //renderer.material.color = Color.white;
         }
 
+        protected Vector3 GetSizeOfSprite(GameObject go)
+        {
+            SpriteRenderer renderer = go.GetComponent<SpriteRenderer>();
+            return renderer.sprite.bounds.size;
+        }
+
         protected void AddErosionIssues(Node node)
         {
             Vector3 delta = Vector3.up / 10.0f;
@@ -352,12 +358,16 @@ namespace SEE.Layout
                     if (value > 0.0f)
                     {
                         GameObject icon = IconFactory.Instance.GetIcon(roof, issue.Value);
-                        icon.transform.parent = node.transform;
+                        // The icon will not become a child of node so that we can more easily
+                        // scale it. If the icon had a parent, localScale would be relative to
+                        // the parent's size. That just complicates things.
+                        Vector3 spriteSize = GetSizeOfSprite(icon);
+                        float scaleFactor = SizeOfHouse(node.gameObject).x / spriteSize.x;
+
                         // TODO: scale relative to 'value'
-                        icon.transform.localScale = Vector3.one / 200.0f;
-                        // float height = GetSize(icon).y;
-                        SpriteRenderer renderer = icon.GetComponent<SpriteRenderer>();
-                        float height = renderer != null && renderer.sprite != null ? renderer.sprite.bounds.size.x : 0.0f;
+                        icon.transform.localScale *= scaleFactor;
+                        float height = icon.transform.localScale.y;
+                        //float height = spriteSize.y / scaleFactor; // adjusted height after scaling
                         Debug.LogFormat("Icon {0} height: {1}\n", icon.name, height);
                         roof += delta + height * Vector3.up;
                         icon.name = icon.name + " " + node.SourceName;
@@ -755,6 +765,20 @@ namespace SEE.Layout
             // the building is the first child
             GameObject child = node.transform.GetChild(0).gameObject;
             return Roof(child);
+        }
+
+        /// <summary>
+        /// Returns the size of the first child (the house).
+        /// </summary>
+        /// <param name="node">node for whose first child we are to determine the size</param>
+        /// <returns>roof position</returns>
+        private static Vector3 SizeOfHouse(GameObject node)
+        {
+            // Note: The leaf nodes are represented by a composite game object,
+            // one for the building, one for the circle on its ground;
+            // the building is the first child
+            GameObject child = node.transform.GetChild(0).gameObject;
+            return GetSize(child);
         }
 
         /// <summary>
