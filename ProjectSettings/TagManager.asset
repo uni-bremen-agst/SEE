@@ -10,6 +10,7 @@ TagManager:
   - House
   - Node Prefab
   - Text
+  - Erosion
   layers:
   - Default
   - TransparentFX
