@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using SEE.DataModel;
 using System;
+using System.Collections.Generic;
 
 namespace SEE.Layout
 {
@@ -21,12 +22,9 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="graph">the graph whose node metrics are to be scaled</param>
         /// <param name="minimalLength">the mininmal value a node length should have</param>
-        /// <param name="widthMetric">metric for node width</param>
-        /// <param name="heightMetric">metric for node height</param>
-        /// <param name="breadthMetric">metric for node breadth</param>
-        public ZScoreScale(Graph graph, float minimalLength,
-                           string widthMetric, string heightMetric, string breadthMetric)
-        : base(widthMetric, heightMetric, breadthMetric)
+        /// <param name="metrics">node metrics for scaling</param>
+        public ZScoreScale(Graph graph, float minimalLength, IList<string> metrics)
+        : base(metrics)
         {
             this.minimalLength = minimalLength;
             Determine_Statistics(graph);
@@ -37,10 +35,22 @@ namespace SEE.Layout
         /// </summary>
         public float standard_length = 1.0f; // FIXME: Re-set to 0.5f;
 
+        private Dictionary<string, Statistics> statistics;
+
         /// <summary>
         /// The minimal length of a building.
         /// </summary>
         private readonly float minimalLength;
+
+        protected Dictionary<string, float> Initial(IList<string> metrics)
+        {
+            Dictionary<string, float> result = new Dictionary<string, float>();
+            foreach(string metric in metrics)
+            {
+                result.Add(metric, 0.0f);
+            }
+            return result;
+        }
 
         /// <summary>
         /// Determines mean and standard deviation for each metric.
@@ -48,79 +58,60 @@ namespace SEE.Layout
         /// <param name="graph">graph whose nodes are to be considered</param>
         private void Determine_Statistics(Graph graph)
         {
-            float width_sum = 0.0f;
-            float height_sum = 0.0f;
-            float breadth_sum = 0.0f;
+            Dictionary<string, float> sum = Initial(metrics);
+            Dictionary<string, float> count = Initial(metrics);
 
-            int width_count = 0;
-            int height_count = 0;
-            int breadth_count = 0;
-
+            // Count the number of metric values and sum them up for each metric.
             foreach (Node node in graph.Nodes())
             {
-                { 
-                    if (node.TryGetNumeric(widthMetric, out float value))
-                    {
-                        width_count++;
-                        width_sum += value;
-                    }
-                }
+                foreach (string metric in metrics)
                 {
-                    if (node.TryGetNumeric(heightMetric, out float value))
+                    if (node.TryGetNumeric(metric, out float value))
                     {
-                        height_count++;
-                        height_sum += value;
-                    }
-                }
-                {
-                    if (node.TryGetNumeric(breadthMetric, out float value))
-                    {
-                        breadth_count++;
-                        breadth_sum += value;
+                        count[metric]++;
+                        sum[metric] += value;
                     }
                 }
             }
-           
-            width_statistics.mean = (width_count > 0) ? width_sum / width_count : 0.0f;
-            height_statistics.mean = (height_count > 0) ? height_sum / height_count : 0.0f;
-            breadth_statistics.mean = (breadth_count > 0) ? breadth_sum / breadth_count : 0.0f;
+            // Initialize statistics
+            statistics = new Dictionary<string, Statistics>();
+            foreach (string metric in metrics)
+            {
+                statistics.Add(metric, new Statistics(0.0f, 0.0f));
+            }
 
+            // Calculate the mean value of each metric
+            foreach (string metric in metrics)
+            {
+                float c = count[metric];
+                statistics[metric].mean = c > 0 ? sum[metric] / c : 0.0f;
+            }
+
+            // Calculate sum((x_i - mean)^2) over all i in [1..n]
             foreach (Node node in graph.Nodes())
             {
+                foreach (string metric in metrics)
                 {
-                    if (node.TryGetNumeric(widthMetric, out float value))
+                    if (node.TryGetNumeric(metric, out float value))
                     {
-                        float diff = value - width_statistics.mean;
-                        width_statistics.standard_deviation += diff * diff;
-                    }
-                }
-                {
-                    if (node.TryGetNumeric(heightMetric, out float value))
-                    {
-                        float diff = value - height_statistics.mean;
-                        height_statistics.standard_deviation += diff * diff;
-                    }
-                }
-                {
-                    if (node.TryGetNumeric(breadthMetric, out float value))
-                    {
-                        float diff = value - breadth_statistics.mean;
-                        breadth_statistics.standard_deviation += diff * diff;
+                        float diff = value - statistics[metric].mean;
+                        statistics[metric].standard_deviation += diff * diff;
                     }
                 }
             }
 
-            width_statistics.standard_deviation
-                = (width_count > 0) ? Mathf.Sqrt(width_statistics.standard_deviation / width_count) : 0.0f;
-            height_statistics.standard_deviation
-                = (height_count > 0) ? Mathf.Sqrt(height_statistics.standard_deviation / height_count) : 0.0f;
-            breadth_statistics.standard_deviation
-                = (breadth_count > 0) ? Mathf.Sqrt(breadth_statistics.standard_deviation / breadth_count) : 0.0f;
-
+            // Calculate standard deviation sd = sqrt(var(X)) where var(X) = S/n 
+            // is the variance of X = {x_1, ..., x_n} and S = sum((x_i - mean)^2) over all i in [1..n]
+            foreach (string metric in metrics)
+            {
+                float c = count[metric];
+                statistics[metric].standard_deviation
+                     = c > 0 ? Mathf.Sqrt(statistics[metric].standard_deviation / c) : 0.0f;
+            }
             // DumpStatistics();
         }
 
-        private struct Statistics
+        private class Statistics
         {
             public float mean;
             public float standard_deviation;
@@ -136,33 +127,26 @@ namespace SEE.Layout
             }
         }
 
-        private Statistics width_statistics = new Statistics(0.0f, 0.0f);
-        private Statistics height_statistics = new Statistics(0.0f, 0.0f);
-        private Statistics breadth_statistics = new Statistics(0.0f, 0.0f);
-
+        /// <summary>
+        /// Dumps the statistics for debugging.
+        /// </summary>
         private void DumpStatistics()
         {
-            Debug.LogFormat("width statistics {0}\n", width_statistics.ToString());
-            Debug.LogFormat("height statistics {0}\n", height_statistics.ToString());
-            Debug.LogFormat("breadth statistics {0}\n", breadth_statistics.ToString());
+            foreach (string metric in metrics)
+            {
+                Debug.LogFormat("statistics of metric {0}: {1}\n", metric, statistics[metric].ToString());
+            }      
         }
 
         /// <summary>
-        /// Yields a vector where each element (x, y, z) is a z-score normalized
-        /// value of the metrics that determine the width, height, and breadth of the given node.
+        /// Yields a z-score normalized value of the given node metric.
         /// The minimal value is specified by minimalLength. There is no maximal value,
         /// but generally values greater than 30 are unlikely.
         /// </summary>
-        /// <param name="node">node for which to determine the x, y, z lengths</param>
-        /// <returns>x, y, z lengths of node</returns>
-        public override Vector3 Lengths(Node node)
-        {
-            return new Vector3(GetLength(node, width_statistics, widthMetric),
-                               GetLength(node, height_statistics, heightMetric),
-                               GetLength(node, breadth_statistics, breadthMetric));
-        }
-
-        private float GetLength(Node node, Statistics statistics, string metric)
+        /// <param name="node">node for which to determine the normalized value</param>
+        /// <param name="metric">name of the node metric</param>
+        /// <returns>normalized value of node metric</returns>
+        public override float GetNormalizedValue(Node node, string metric)
         {
             // We normalize x by z-score(x), which is defined as (x - mean)/sd where sd is
             // the standard deviation. The z-score be viewed as a linear function
@@ -175,7 +159,7 @@ namespace SEE.Layout
 
                 if (node.TryGetNumeric(metric, out float value))
                 {
-                    result = ((value - statistics.mean) / statistics.standard_deviation + 1.0f) * standard_length;
+                    result = ((value - statistics[metric].mean) / statistics[metric].standard_deviation + 1.0f) * standard_length;
                     if (result < minimalLength)
                     {
                         result = minimalLength;

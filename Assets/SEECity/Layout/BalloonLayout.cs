@@ -40,13 +40,14 @@ namespace SEE.Layout
             float max_radius = 0.0f;
 
             IScale scaler;
+            IList<string> cubeMetrics = new List<string>() {widthMetric, heightMetric, breadthMetric};
             if (false)
             {
-                scaler = new LinearScale(graph, minimal_length, 1.0f, widthMetric, heightMetric, breadthMetric);
+                scaler = new LinearScale(graph, minimal_length, 1.0f, cubeMetrics);
             }
             else
             {
-                scaler = new ZScoreScale(graph, minimal_length, widthMetric, heightMetric, breadthMetric);
+                scaler = new ZScoreScale(graph, minimal_length, cubeMetrics);
             }
             // first calculate all radii including those for the roots
             {
@@ -285,7 +286,9 @@ namespace SEE.Layout
         {
             // node will have two children: a cube placed on top of a cylinder; the cylinder is the 
             // circle; the cube represents the node's metrics
-            Vector3 scale = scaler.Lengths(node);
+            Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, widthMetric),
+                                        scaler.GetNormalizedValue(node, heightMetric),
+                                        scaler.GetNormalizedValue(node, breadthMetric));
             // Debug.LogFormat("scale of {0} = {1}\n", node.name, scale);
 
             // set position and size of parent
@@ -474,7 +477,9 @@ namespace SEE.Layout
                 // If node i is a leaf, we return an outer-radius large enough to
                 // put in the building that will later be placed into the circle.
                 // The block's width and breadth are proportional to the two metrics.
-                Vector3 scale = scaler.Lengths(node);
+                Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, widthMetric),
+                                            scaler.GetNormalizedValue(node, heightMetric),
+                                            scaler.GetNormalizedValue(node, breadthMetric));
                 // The outer radius of an inner-most node is determined by the ground
                 // rectangle of the block to be drawn for the node.
                 // Pythagoras: diagonal of the ground rectangle.
