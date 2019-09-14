@@ -1,18 +1,15 @@
-﻿using UnityEngine;
-using SEE.DataModel;
+﻿using SEE.DataModel;
 using System.Collections.Generic;
 
 namespace SEE.Layout
 {
     /// <summary>
-    /// Abstract super class of all classes providing x, y, z lengths 
-    /// of nodes based on their metrics.
+    /// Abstract super class of all classes providing normalized node metrics.
     /// </summary>
     internal abstract class IScale
     {
         /// <summary>
-        /// Constructor defining the node metrics to be used for determining
-        /// the lengths of the nodes.
+        /// Constructor defining the node metrics to be normalized.
         /// </summary>
         /// <param name="metrics">node metrics for scaling</param>
         public IScale(IList<string> metrics)

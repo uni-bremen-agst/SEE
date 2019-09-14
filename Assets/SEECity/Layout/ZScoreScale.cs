@@ -35,6 +35,7 @@ namespace SEE.Layout
         /// </summary>
         public float standard_length = 1.0f; // FIXME: Re-set to 0.5f;
 
+        // The statistics gathered for the node metrics.
         private Dictionary<string, Statistics> statistics;
 
         /// <summary>
@@ -42,6 +43,11 @@ namespace SEE.Layout
         /// </summary>
         private readonly float minimalLength;
 
+        /// <summary>
+        /// Initial values 0.0 for all metrics.
+        /// </summary>
+        /// <param name="metrics"></param>
+        /// <returns>map with value 0.0 for each metric (key)</returns>
         protected Dictionary<string, float> Initial(IList<string> metrics)
         {
             Dictionary<string, float> result = new Dictionary<string, float>();
@@ -149,7 +155,7 @@ namespace SEE.Layout
         public override float GetNormalizedValue(Node node, string metric)
         {
             // We normalize x by z-score(x), which is defined as (x - mean)/sd where sd is
-            // the standard deviation. The z-score be viewed as a linear function
+            // the standard deviation. The z-score can be viewed as a linear function
             // 1/sd * x - mean/sd where z-score(mean) = 0. We want to map the average
             // value onto the standard size of a building. That is why we add 1 to the
             // factor by which we multiply the standard length. Thus, if the metric value
@@ -159,10 +165,18 @@ namespace SEE.Layout
 
                 if (node.TryGetNumeric(metric, out float value))
                 {
-                    result = ((value - statistics[metric].mean) / statistics[metric].standard_deviation + 1.0f) * standard_length;
-                    if (result < minimalLength)
+                    float sd = statistics[metric].standard_deviation;
+                    if (sd == 0.0f)
                     {
                         result = minimalLength;
+                    }
+                    else
+                    {
+                        result = ((value - statistics[metric].mean) / sd + 1.0f) * standard_length;
+                        if (result < minimalLength)
+                        {
+                            result = minimalLength;
+                        }
                     }
                 }
                 return result;
