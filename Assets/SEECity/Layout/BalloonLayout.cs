@@ -361,13 +361,9 @@ namespace SEE.Layout
         /// <summary>
         /// Comparer for the widths of sprites. Let width(x) be the width
         /// of a sprite. Yields:
-        /// -1 if width(left) > width(right) 
+        /// -1 if width(left) < width(right) 
         /// 0 if width(left) = width(right)
-        /// 1 if width(left) < width(right)
-        /// Note that the scale of the returned values is inverted. That is,
-        /// if the width of left is shorter than the width of right, left actually
-        /// precedes right in this order. We want to sort our sprites in descending
-        /// order of their widths.
+        /// 1 if width(left) ></width> width(right)
         /// </summary>
         private class WidthComparer : IComparer<GameObject>
         {
@@ -375,11 +371,17 @@ namespace SEE.Layout
             {
                 float widthLeft = GetSizeOfSprite(left).x;
                 float widthRight = GetSizeOfSprite(right).x;
-                // invert comparison
-                return widthRight.CompareTo(widthLeft);
+                return widthLeft.CompareTo(widthRight);
             }
         }
 
+        /// <summary>
+        /// Stacks sprites for software-erosion issues atop of the roof of the given node
+        /// in ascending order in terms of the sprite width. The sprite width is proportional
+        /// to the normalized metric value for the erosion issue.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="scaler"></param>
         private void AddErosionIssues(Node node, IScale scaler)
         {
             // The list of sprites for the erosion issues.
@@ -418,10 +420,10 @@ namespace SEE.Layout
             }
 
             // Now we stack the sprites on top of the roof of the building in
-            // descending order of their widths.
+            // ascending order of their widths.
             {
                 // The space that we put in between two subsequent erosion issue sprites.
-                Vector3 delta = Vector3.zero; // FIXME: Use Vector3.up / 100.0f;
+                Vector3 delta = Vector3.up / 100.0f;
                 Vector3 currentRoof = RoofOfHouse(node.gameObject);
                 sprites.Sort(comparer);
                 //Debug.Log("---------------------------------\n");
