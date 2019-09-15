@@ -144,7 +144,7 @@ namespace SEE.DataModel
                     Node node = (Node)current;
                     if (String.IsNullOrEmpty(node.LinkName))
                     {
-                        LogError("Node has no attribute Source.Linkname.");
+                        LogError("Node has no attribute " + Node.LinknameAttribute);
                     }
                     else
                     {
