@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SEE.Layout;
+using System.Collections.Generic;
 
 namespace SEE
 {
@@ -16,7 +17,7 @@ namespace SEE
         public string graphPath = "C:\\Users\\raine\\develop\\seecity\\data\\gxl\\minimal_clones.gxl";
 
         // Medium-size clone graph with single root (Linux directories whose path include "arch").
-        // public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\arch-single-root.gxl";
+        //public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\arch-single-root.gxl";
 
         // Larger clone graph with single root (Linux subsystem 'drivers'), but with only those subsystems containing clones.
         // 14.500 nodes, 10.300 edges.
@@ -42,7 +43,7 @@ namespace SEE
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
-        public static HashSet<string> HierarchicalEdges = Hierarchical_Edge_Types();
+        public HashSet<string> HierarchicalEdges = Hierarchical_Edge_Types();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
@@ -59,5 +60,47 @@ namespace SEE
             return result;
         }
 
+        //-------------------------------
+        // Size attributes of a building
+        //-------------------------------
+        //
+        // Width of a building (x co-ordinate)
+        public string WidthMetric = "Metric.Number_of_Tokens";
+        // Height of a building (y co-ordinate)
+        public string HeightMetric = "Metric.Clone_Rate";
+        // Breadth of a building (y co-ordinate)
+        public string BreadthMetric = "Metric.LOC";
+
+        //------------------------------------------------------
+        // Software erosion issues shown as icons above building
+        //------------------------------------------------------
+        //
+        public string ArchitectureIssue = "Metric.Architecture_Violations";
+        public string CloneIssue = "Metric.Clone";
+        public string CycleIssue = "Metric.Cycle";
+        public string Dead_CodeIssue = "Metric.Dead_Code";
+        public string MetricIssue = "Metric.Metric";
+        public string StyleIssue = "Metric.Style";
+        public string UniversalIssue = "Metric.Universal";
+
+        /// <summary>
+        /// Yields a mapping of all node attribute names that define erosion issues in the GXL file
+        /// onto the icons to be used for visualizing them.
+        /// </summary>
+        /// <returns>mapping of all node attribute names onto icon ids</returns>
+        public SerializableDictionary<string, IconFactory.Erosion> IssueMap()
+        {
+            SerializableDictionary<string, IconFactory.Erosion> result = new SerializableDictionary<string, IconFactory.Erosion>
+            {
+                { ArchitectureIssue, IconFactory.Erosion.Architecture_Violation },
+                { CloneIssue, IconFactory.Erosion.Clone },
+                { CycleIssue, IconFactory.Erosion.Cycle },
+                { Dead_CodeIssue, IconFactory.Erosion.Dead_Code },
+                { MetricIssue, IconFactory.Erosion.Metric },
+                { StyleIssue, IconFactory.Erosion.Style },
+                { UniversalIssue, IconFactory.Erosion.Universal }
+            };
+            return result;
+        }
     }
 }

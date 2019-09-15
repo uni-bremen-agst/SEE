@@ -133,6 +133,27 @@
       <attr name="Metric.Complexity">
         <float>80</float>
       </attr>
+	  <attr name="Metric.Architecture_Violations">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Clone">
+        <int>0</int>
+      </attr>
+	  	<attr name="Metric.Dead_Code">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Cycle">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Metric">
+        <int>2</int>
+      </attr>
+	  	  <attr name="Metric.Style">
+        <int>600</int>
+      </attr>
+	  <attr name="Metric.Universal">
+        <int>0</int>
+      </attr>		
       <attr name="Source.Name">
         <string>a1_a.cpp</string>
       </attr>
@@ -163,6 +184,27 @@
       <attr name="Metric.Complexity">
         <float>23</float>
       </attr>
+	  <attr name="Metric.Architecture_Violations">
+        <int>10</int>
+      </attr>
+	  <attr name="Metric.Clone">
+        <int>20</int>
+      </attr>
+	  	<attr name="Metric.Dead_Code">
+        <int>1</int>
+      </attr>
+	  <attr name="Metric.Cycle">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Metric">
+        <int>8</int>
+      </attr>
+	  	  <attr name="Metric.Style">
+        <int>123</int>
+      </attr>
+	  <attr name="Metric.Universal">
+        <int>0</int>
+      </attr>	  
       <attr name="Source.Name">
         <string>a1_b.cpp</string>
       </attr>
@@ -193,6 +235,27 @@
       <attr name="Metric.Complexity">
         <float>90</float>
       </attr>
+	  <attr name="Metric.Architecture_Violations">
+        <int>1</int>
+      </attr>
+	  <attr name="Metric.Clone">
+        <int>11</int>
+      </attr>
+	  	<attr name="Metric.Dead_Code">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Cycle">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Metric">
+        <int>1</int>
+      </attr>
+	  	  <attr name="Metric.Style">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Universal">
+        <int>0</int>
+      </attr>	  
       <attr name="Source.Name">
         <string>a2_a.cpp</string>
       </attr>
@@ -223,6 +286,27 @@
       <attr name="Metric.Complexity">
         <float>180</float>
       </attr>
+	  <attr name="Metric.Architecture_Violations">
+        <int>15</int>
+      </attr>
+	  <attr name="Metric.Clone">
+        <int>48</int>
+      </attr>
+	  	<attr name="Metric.Dead_Code">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Cycle">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Metric">
+        <int>9</int>
+      </attr>
+	  	  <attr name="Metric.Style">
+        <int>698</int>
+      </attr>
+	  <attr name="Metric.Universal">
+        <int>0</int>
+      </attr>	  
       <attr name="Source.Name">
         <string>a2_b.cpp</string>
       </attr>
@@ -265,6 +349,24 @@
       <attr name="Metric.Complexity">
         <float>1</float>
       </attr>
+	  <attr name="Metric.Clone">
+        <int>50</int>
+      </attr>
+	  	<attr name="Metric.Dead_Code">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Cycle">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Metric">
+        <int>1000</int>
+      </attr>
+	  	  <attr name="Metric.Style">
+        <int>8989</int>
+      </attr>
+	  <attr name="Metric.Universal">
+        <int>0</int>
+      </attr>	  
       <attr name="Source.Name">
         <string>b1_b.cpp</string>
       </attr>
@@ -295,6 +397,27 @@
       <attr name="Metric.Complexity">
         <float>8</float>
       </attr>
+	  <attr name="Metric.Architecture_Violations">
+        <int>5</int>
+      </attr>
+	  <attr name="Metric.Clone">
+        <int>12</int>
+      </attr>
+	  	<attr name="Metric.Dead_Code">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Cycle">
+        <int>1</int>
+      </attr>
+	  <attr name="Metric.Metric">
+        <int>3</int>
+      </attr>
+	  	  <attr name="Metric.Style">
+        <int>234</int>
+      </attr>
+	  <attr name="Metric.Universal">
+        <int>0</int>
+      </attr>	  
       <attr name="Source.Name">
         <string>b2_a.cpp</string>
       </attr>
@@ -325,6 +448,27 @@
       <attr name="Metric.Complexity">
         <float>45</float>
       </attr>
+	  <attr name="Metric.Architecture_Violations">
+        <int>18</int>
+      </attr>
+	  <attr name="Metric.Clone">
+        <int>0</int>
+      </attr>
+	  	<attr name="Metric.Dead_Code">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Cycle">
+        <int>4</int>
+      </attr>
+	  <attr name="Metric.Metric">
+        <int>19</int>
+      </attr>
+	  	  <attr name="Metric.Style">
+        <int>134</int>
+      </attr>
+	  <attr name="Metric.Universal">
+        <int>0</int>
+      </attr>	  
       <attr name="Source.Name">
         <string>b2_b.cpp</string>
       </attr>
@@ -355,6 +499,27 @@
       <attr name="Metric.Complexity">
         <float>150</float>
       </attr>
+	  <attr name="Metric.Architecture_Violations">
+        <int>50</int>
+      </attr>
+	  <attr name="Metric.Clone">
+        <int>17</int>
+      </attr>
+	  	<attr name="Metric.Dead_Code">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Cycle">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Metric">
+        <int>0</int>
+      </attr>
+	  	  <attr name="Metric.Style">
+        <int>3432</int>
+      </attr>
+	  <attr name="Metric.Universal">
+        <int>0</int>
+      </attr>	  
       <attr name="Source.Name">
         <string>MAX.cpp</string>
       </attr>
@@ -385,6 +550,27 @@
       <attr name="Metric.Complexity">
         <float>85</float>
       </attr>
+	  <attr name="Metric.Architecture_Violations">
+        <int>11</int>
+      </attr>
+	  <attr name="Metric.Clone">
+        <int>100</int>
+      </attr>
+	  	<attr name="Metric.Dead_Code">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Cycle">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Metric">
+        <int>0</int>
+      </attr>
+	  	  <attr name="Metric.Style">
+        <int>156</int>
+      </attr>
+	  <attr name="Metric.Universal">
+        <int>0</int>
+      </attr>	  
       <attr name="Source.Name">
         <string>c1_b.cpp</string>
       </attr>
@@ -415,6 +601,27 @@
       <attr name="Metric.Complexity">
         <float>25</float>
       </attr>
+	  <attr name="Metric.Architecture_Violations">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Clone">
+        <int>24</int>
+      </attr>
+	  	<attr name="Metric.Dead_Code">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Cycle">
+        <int>2</int>
+      </attr>
+	  <attr name="Metric.Metric">
+        <int>9</int>
+      </attr>
+	  	  <attr name="Metric.Style">
+        <int>125</int>
+      </attr>
+	  <attr name="Metric.Universal">
+        <int>0</int>
+      </attr>	  
       <attr name="Source.Name">
         <string>c2_a.cpp</string>
       </attr>
@@ -445,6 +652,27 @@
       <attr name="Metric.Complexity">
         <float>25</float>
       </attr>
+	  <attr name="Metric.Architecture_Violations">
+        <int>4</int>
+      </attr>
+	  <attr name="Metric.Clone">
+        <int>29</int>
+      </attr>
+	  	<attr name="Metric.Dead_Code">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Cycle">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Metric">
+        <int>12</int>
+      </attr>
+	  	  <attr name="Metric.Style">
+        <int>261</int>
+      </attr>
+	  <attr name="Metric.Universal">
+        <int>0</int>
+      </attr>	  
       <attr name="Source.Name">
         <string>c2_b.cpp</string>
       </attr>
@@ -475,6 +703,27 @@
       <attr name="Metric.Complexity">
         <float>25</float>
       </attr>
+	  <attr name="Metric.Architecture_Violations">
+        <int>11</int>
+      </attr>
+	  <attr name="Metric.Clone">
+        <int>43</int>
+      </attr>
+	  	<attr name="Metric.Dead_Code">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Cycle">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Metric">
+        <int>14</int>
+      </attr>
+	  <attr name="Metric.Style">
+        <int>231</int>
+      </attr>
+	  <attr name="Metric.Universal">
+        <int>0</int>
+      </attr>	  
       <attr name="Source.Name">
         <string>c_a.cpp</string>
       </attr>

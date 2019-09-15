@@ -13,8 +13,8 @@ namespace SEE.Layout
     /// </summary>
     public class BalloonLayout : ILayout
     {
-        public BalloonLayout(string widthMetric, string heightMetric, string breadthMetric)
-        : base(widthMetric, heightMetric, breadthMetric)
+        public BalloonLayout(string widthMetric, string heightMetric, string breadthMetric, SerializableDictionary<string, IconFactory.Erosion> issueMap)
+        : base(widthMetric, heightMetric, breadthMetric, issueMap)
         {
             name = "Ballon";
         }
@@ -40,13 +40,17 @@ namespace SEE.Layout
             float max_radius = 0.0f;
 
             IScale scaler;
-            if (false)
             {
-                scaler = new LinearScale(graph, minimal_length, 1.0f, widthMetric, heightMetric, breadthMetric);
-            }
-            else
-            {
-                scaler = new ZScoreScale(graph, minimal_length, widthMetric, heightMetric, breadthMetric);
+                List<string> nodeMetrics = new List<string>() { widthMetric, heightMetric, breadthMetric };
+                nodeMetrics.AddRange(issueMap.Keys);
+                if (false)
+                {
+                    scaler = new LinearScale(graph, minimal_length, 1.0f, nodeMetrics);
+                }
+                else
+                {
+                    scaler = new ZScoreScale(graph, minimal_length, nodeMetrics);
+                }
             }
             // first calculate all radii including those for the roots
             {
@@ -285,7 +289,9 @@ namespace SEE.Layout
         {
             // node will have two children: a cube placed on top of a cylinder; the cylinder is the 
             // circle; the cube represents the node's metrics
-            Vector3 scale = scaler.Lengths(node);
+            Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, widthMetric),
+                                        scaler.GetNormalizedValue(node, heightMetric),
+                                        scaler.GetNormalizedValue(node, breadthMetric));
             // Debug.LogFormat("scale of {0} = {1}\n", node.name, scale);
 
             // set position and size of parent
@@ -334,8 +340,105 @@ namespace SEE.Layout
             // be twice the radius above). The cylinder's height should be minimal.
             cylinder.transform.localScale = new Vector3(1.0f, cylinder_height, 1.0f);
 
+            AddErosionIssues(node, scaler);
             //Renderer renderer = cylinder.GetComponent<Renderer>();
             //renderer.material.color = Color.white;
+        }
+
+        protected static Vector3 GetSizeOfSprite(GameObject go)
+        {
+            SpriteRenderer renderer = go.GetComponent<SpriteRenderer>();
+            // Note: renderer.sprite.bounds.size yields the original size
+            // of the sprite of the prefab. It does not consider the scaling.
+            // It depends only upon the imported graphic. That is why we
+            // need to use renderer.bounds.size.
+            return renderer.bounds.size;
+        }
+
+        // Comparer for the widths of sprites.
+        private readonly IComparer<GameObject> comparer = new WidthComparer();
+
+        /// <summary>
+        /// Comparer for the widths of sprites. Let width(x) be the width
+        /// of a sprite. Yields:
+        /// -1 if width(left) < width(right) 
+        /// 0 if width(left) = width(right)
+        /// 1 if width(left) ></width> width(right)
+        /// </summary>
+        private class WidthComparer : IComparer<GameObject>
+        {
+            public int Compare(GameObject left, GameObject right)
+            {
+                float widthLeft = GetSizeOfSprite(left).x;
+                float widthRight = GetSizeOfSprite(right).x;
+                return widthLeft.CompareTo(widthRight);
+            }
+        }
+
+        /// <summary>
+        /// Stacks sprites for software-erosion issues atop of the roof of the given node
+        /// in ascending order in terms of the sprite width. The sprite width is proportional
+        /// to the normalized metric value for the erosion issue.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="scaler"></param>
+        private void AddErosionIssues(Node node, IScale scaler)
+        {
+            // The list of sprites for the erosion issues.
+            List<GameObject> sprites = new List<GameObject>();
+
+            // Create and scale the sprites and add them to the list of sprites.
+            foreach (KeyValuePair<string, IconFactory.Erosion> issue in issueMap)
+            {
+                if (node.TryGetNumeric(issue.Key, out float value))
+                {
+                    if (value > 0.0f)
+                    {
+                        GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
+                        // The sprite will not become a child of node so that we can more easily
+                        // scale it. If the sprite had a parent, localScale would be relative to
+                        // the parent's size. That just complicates things.
+                        Vector3 spriteSize = GetSizeOfSprite(sprite);
+                        // Scale the sprite to one Unity unit.
+                        float spriteScale = 1.0f / spriteSize.x;
+                        // Scale the erosion issue by normalization.
+                        float metricScale = scaler.GetNormalizedValue(node, issue.Key);
+                        //Debug.LogFormat("sprite {0} before scaling: size={1}.\n",
+                        //                sprite.name, GetSizeOfSprite(sprite));
+                        // First: scale its width to unit size 1.0 maintaining the aspect ratio
+                        sprite.transform.localScale *= spriteScale;
+                        //Debug.LogFormat("sprite {0} scaled to unit size: size={1}.\n",
+                        //                sprite.name, GetSizeOfSprite(sprite));
+                        // Now scale it by the normalized metric.
+                        sprite.transform.localScale *= metricScale;
+                        //Debug.LogFormat("sprite {0} after scaling: size={1}.\n",
+                        //                sprite.name, GetSizeOfSprite(sprite));
+                        sprite.name = sprite.name + " " + node.SourceName;
+                        sprites.Add(sprite);
+                    }
+                }
+            }
+
+            // Now we stack the sprites on top of the roof of the building in
+            // ascending order of their widths.
+            {
+                // The space that we put in between two subsequent erosion issue sprites.
+                Vector3 delta = Vector3.up / 100.0f;
+                Vector3 currentRoof = RoofOfHouse(node.gameObject);
+                sprites.Sort(comparer);
+                //Debug.Log("---------------------------------\n");
+                foreach (GameObject sprite in sprites)
+                {
+                    Vector3 size = GetSizeOfSprite(sprite);
+                    // Note: Consider that the position of the sprite is its center.
+                    Vector3 halfHeight = (size.y / 2.0f) * Vector3.up;
+                    sprite.transform.position = currentRoof + delta + halfHeight;
+                    currentRoof = sprite.transform.position + halfHeight;
+
+                    //Debug.LogFormat("sprite {0}: size={1} position={2} halfHeight={3}.\n",
+                    //                sprite.name, size, sprite.transform.position, halfHeight);
+                }
+            }
         }
 
         private struct NodeInfo
@@ -436,7 +539,9 @@ namespace SEE.Layout
                 // If node i is a leaf, we return an outer-radius large enough to
                 // put in the building that will later be placed into the circle.
                 // The block's width and breadth are proportional to the two metrics.
-                Vector3 scale = scaler.Lengths(node);
+                Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, widthMetric),
+                                            scaler.GetNormalizedValue(node, heightMetric),
+                                            scaler.GetNormalizedValue(node, breadthMetric));
                 // The outer radius of an inner-most node is determined by the ground
                 // rectangle of the block to be drawn for the node.
                 // Pythagoras: diagonal of the ground rectangle.
@@ -540,8 +645,10 @@ namespace SEE.Layout
         private void SetColor(GameObject gameObject, Color color)
         {
             Renderer renderer = gameObject.GetComponent<Renderer>();
-            var tempMaterial = new Material(renderer.sharedMaterial);
-            tempMaterial.color = color;
+            var tempMaterial = new Material(renderer.sharedMaterial)
+            {
+                color = color
+            };
             renderer.sharedMaterial = tempMaterial;
         }
 
@@ -668,13 +775,13 @@ namespace SEE.Layout
                                 fullPath[sourceToLCA.Length + i - 1] = targetToLCA[i];
                             }
                             controlPoints = new Vector3[fullPath.Length];
-                            controlPoints[0] = Roof(sourceObject);
+                            controlPoints[0] = RoofOfHouse(sourceObject);
                             for (int i = 1; i < fullPath.Length - 1; i++)
                             {
                                 // We consider the height of intermediate nodes.
                                 controlPoints[i] = fullPath[i].gameObject.transform.position + nodeInfos[fullPath[i]].level * levelFactor * Vector3.up;
                             }
-                            controlPoints[controlPoints.Length - 1] = Roof(targetObject);
+                            controlPoints[controlPoints.Length - 1] = RoofOfHouse(targetObject);
                         }
                     }
                 }
@@ -716,19 +823,31 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Returns the roof position of a node.
+        /// Returns the roof position of the first child (the house).
         /// </summary>
         /// <param name="node">node for which to determine the roof position</param>
         /// <returns>roof position</returns>
-        private static Vector3 Roof(GameObject node)
+        private static Vector3 RoofOfHouse(GameObject node)
         {
             // Note: The leaf nodes are represented by a composite game object,
             // one for the building, one for the circle on its ground;
             // the building is the first child
             GameObject child = node.transform.GetChild(0).gameObject;
-            Vector3 result = child.transform.position;
-            result.y += GetExtent(child).y;
-            return result;
+            return Roof(child);
+        }
+
+        /// <summary>
+        /// Returns the size of the first child (the house).
+        /// </summary>
+        /// <param name="node">node for whose first child we are to determine the size</param>
+        /// <returns>roof position</returns>
+        private static Vector3 SizeOfHouse(GameObject node)
+        {
+            // Note: The leaf nodes are represented by a composite game object,
+            // one for the building, one for the circle on its ground;
+            // the building is the first child
+            GameObject child = node.transform.GetChild(0).gameObject;
+            return GetSize(child);
         }
 
         /// <summary>
@@ -752,20 +871,20 @@ namespace SEE.Layout
             // we need at least four control points; tinySplines wants that
             Vector3[] controlPoints = new Vector3[4];
             // self-loop
-            controlPoints[0] = Roof(sourceObject); 
+            controlPoints[0] = RoofOfHouse(sourceObject); 
             controlPoints[1] = controlPoints[0] + levelFactor * Vector3.up + Vector3.right;
             controlPoints[2] = controlPoints[1] + 2 * Vector3.left;
-            controlPoints[3] = Roof(targetObject);
+            controlPoints[3] = RoofOfHouse(targetObject);
             return controlPoints;
         }
 
         private static Vector3[] ThroughCenter(GameObject sourceObject, GameObject targetObject)
         {
             Vector3[] controlPoints = new Vector3[4];
-            controlPoints[0] = Roof(sourceObject);
+            controlPoints[0] = RoofOfHouse(sourceObject);
             controlPoints[1] = levelFactor * Vector3.up;
             controlPoints[2] = levelFactor * Vector3.up;
-            controlPoints[3] = Roof(targetObject);
+            controlPoints[3] = RoofOfHouse(targetObject);
             return controlPoints;
         }
 

@@ -12,12 +12,12 @@ namespace SEE.DataModel
     // on the objects.
     // 
     // All the scripts which inherit from MonoBehaviour are serializable, but custom classes 
-    // are not.To inform unity that you want your class to be serialized you have to use 
-    // the [System.Serializable] attribute.
+    // are not. To inform unity that you want your class to be serialized you have to use 
+    // the [System.Serializable] attribute. 
     //
     // Also, unity only serializes the public members in your class, if you want your 
     // private members to be serialized too, you should inform unity with the [SerializeField] 
-    // attribute.
+    // attribute. Note: Unity does not serialize static fields.
     //
     // More on Unity's serialization can be found here: 
     // https://docs.unity3d.com/Manual/script-Serialization.html
@@ -49,7 +49,7 @@ namespace SEE.DataModel
             return toggleAttributes.Contains(attributeName);
         }
 
-        // Unity does not serializes Dictionarys. That is why we need to use StringStringDictionary
+        // Unity does not serializes Dictionaries. That is why we need to use StringStringDictionary
         // instead here. Note that we need to declare the attribute here as a SerializeField 
         // nevertheless.
         [UnityEngine.SerializeField]

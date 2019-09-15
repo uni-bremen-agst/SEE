@@ -1,37 +1,31 @@
-﻿using UnityEngine;
-using SEE.DataModel;
+﻿using SEE.DataModel;
+using System.Collections.Generic;
 
 namespace SEE.Layout
 {
     /// <summary>
-    /// Abstract super class of all classes providing x, y, z lengths 
-    /// of nodes based on their metrics.
+    /// Abstract super class of all classes providing normalized node metrics.
     /// </summary>
     internal abstract class IScale
     {
         /// <summary>
-        /// Constructor defining the node metrics to be used for determining
-        /// the lengths of the nodes.
+        /// Constructor defining the node metrics to be normalized.
         /// </summary>
-        /// <param name="widthMetric">metric for node width</param>
-        /// <param name="heightMetric">metric for node height</param>
-        /// <param name="breadthMetric">metric for node breadth</param>
-        public IScale(string widthMetric, string heightMetric, string breadthMetric)
+        /// <param name="metrics">node metrics for scaling</param>
+        public IScale(IList<string> metrics)
         {
-            this.widthMetric = widthMetric;
-            this.heightMetric = heightMetric;
-            this.breadthMetric = breadthMetric;
+            this.metrics = metrics;
         }
 
-        protected readonly string widthMetric;
-        protected readonly string heightMetric;
-        protected readonly string breadthMetric;
+        protected readonly IList<string> metrics;
 
         /// <summary>
-        /// Returns the x, y, z lengths of the given node.
+        /// Yields a normalized value of the given node metric. The type of normalization
+        /// is determined by concrete subclasses.
         /// </summary>
-        /// <param name="node">node for which to determine the x, y, z lengths</param>
-        /// <returns>x, y, z lengths of node</returns>
-        public abstract Vector3 Lengths(Node node);
+        /// <param name="node">node for which to determine the normalized value</param>
+        /// <param name="metric">name of the node metric</param>
+        /// <returns>normalized value of node metric</returns>
+        public abstract float GetNormalizedValue(Node node, string metric);
     }
 }
