@@ -14,11 +14,20 @@ namespace SEE
 
         /// Small clone graph with multiple roots to experiment with (we cannot use Application.dataPath
         /// unfortunately, that is why this path is currently hard coded).
-        public string graphPath = "C:\\Users\\raine\\develop\\seecity\\data\\gxl\\minimal_clones.gxl";
-        public string CSVPath = "C:\\Users\\raine\\develop\\seecity\\data\\gxl\\minimal_erosions.csv";
+        //public string graphPath = "C:\\Users\\raine\\develop\\seecity\\data\\gxl\\minimal_clones.gxl";
+        //public string CSVPath = "C:\\Users\\raine\\develop\\seecity\\data\\gxl\\minimal_erosions.csv";
+
+        // Smaller Linux subsystem net with 1375 files
+        //public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\net.gxl";
+        //public string CSVPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\net.csv";
+
+        // Smaller Linux subsystem fs with 1288 nodes
+        public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\fs.gxl";
+        public string CSVPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\fs.csv";
 
         // Medium-size clone graph with single root (Linux directories whose path include "arch").
         //public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\arch-single-root.gxl";
+        //public string CSVPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\arch-single-root.csv";
 
         // Larger clone graph with single root (Linux subsystem 'drivers'), but with only those subsystems containing clones.
         // 14.500 nodes, 10.300 edges.
