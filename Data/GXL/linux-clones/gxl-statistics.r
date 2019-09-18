@@ -95,7 +95,41 @@ clone.statistics = function(gxl)
 
 clone.statistics(gxl)
 
-add.metrics = function(gxl)
+# Yields a vector of randomized values having any desired correlation rho with Y.
+# The optional X represents the regression function of the correlation. If X is 
+# 1:length(y), a linear correlation is to be used. If X is omitted, the normal
+# distribution is used.
+# X any Y must have the same length.
+#
+# Taken from:
+# https://stats.stackexchange.com/questions/15011/generate-a-random-variable-with-a-defined-correlation-to-an-existing-variables/313138#313138
+complement <- function(y, rho, x) {
+  stopifnot(length(x) == length(y))
+  if (missing(x)) x <- rnorm(length(y)) # Optional: supply a default if `x` is not given
+  y.perp <- residuals(lm(x ~ y))
+  rho * sd(y.perp) * y + y.perp * sd(y) * sqrt(1 - rho^2)
+}
+
+# An example use of complement to experiment with.
+try.complement = function() {
+  y <- rnorm(50, sd=10)
+  x <- 1:50 # Optional
+  # draws six plots with six different values for rho ranging from -0.8 to 1.0
+  rho <- seq(0, 1, length.out=6) * rep(c(-1,1), 3)
+  X <- data.frame(z=as.vector(sapply(rho, function(rho) complement(y, rho, x))),
+                  rho=ordered(rep(signif(rho, 2), each=length(y))),
+                  y=rep(y, length(rho)))
+  
+  library(ggplot2)
+  ggplot(X, aes(y,z, group=rho)) + 
+    geom_smooth(method="lm", color="Black") + 
+    geom_rug(sides="b") + 
+    geom_point(aes(fill=rho), alpha=1/2, shape=21) +
+    facet_wrap(~ rho, scales="free")
+}
+
+# metrics are randomly chosen from normal distribution using different scales
+add.random.metrics = function(gxl)
 {
   # all linkage names for the rows in gxl where all columns have values different from na
   Linkage.Name = gxl[complete.cases(gxl), ]$Linkname
@@ -110,6 +144,42 @@ add.metrics = function(gxl)
   df
 }
 
-metrics = add.metrics(gxl)
+# normalized randomized values of y correlated by function x with
+# correlation factor rho. The normalized values are limited to the 
+# range [0, 1.0].
+random.correlated = function(y, rho, x) {
+  result = complement(y, rho, x)
+  minimum = min(result)
+  if (minimum < 0) {
+    result = result + abs(minimum)
+  }
+  result / max(result)
+}
+
+# metrics are randomly chosen but linearly correlated to number of tokens
+add.random.correlated.metrics = function(gxl)
+{
+  gxl.without.na = gxl[complete.cases(gxl), ]
+  # all linkage names for the rows in gxl where all columns have values different from na
+  Linkage.Name = gxl.without.na$Linkname
+  df = data.frame(Linkage.Name)
+  df$Number_Of_Tokens = gxl.without.na$Number_Of_Tokens
+  
+  x = 1:nrow(df) # we want a linear correlation
+  df$Metric.Architecture_Violations = random.correlated(df$Number_Of_Tokens, 0.8, x)
+  df$Metric.Clone                   = random.correlated(df$Number_Of_Tokens, 0.7, x)
+  df$Metric.Dead_Code               = random.correlated(df$Number_Of_Tokens, 0.5, x)
+  df$Metric.Cycle                   = random.correlated(df$Number_Of_Tokens, 0.9, x)
+  df$Metric.Metric                  = random.correlated(df$Number_Of_Tokens, 0.6, x)
+  df$Metric.Style                   = random.correlated(df$Number_Of_Tokens, 0.4, x)
+  df$Metric.Universal               = random.correlated(df$Number_Of_Tokens, 0.85, x)
+  df
+}
+
+#metrics = add.random.metrics(gxl)
+metrics = add.random.correlated.metrics(gxl)
+
+#plot(metrics$Number_Of_Tokens, metrics$Metric.Architecture_Violations)
 
 write.table(metrics, csvfile, quote=FALSE, sep=";", row.names=FALSE, col.names=TRUE, dec=".", fileEncoding = "UTF-8")
+
