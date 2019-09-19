@@ -170,6 +170,8 @@ namespace SEE.Layout
             result.tag = Tags.Erosion;
             result.name = ToString(erosion);
             result.transform.position = position;
+            SpriteRenderer renderer = result.GetComponent<SpriteRenderer>();
+            renderer.color = Color.white;
             return result;
         }
     }
