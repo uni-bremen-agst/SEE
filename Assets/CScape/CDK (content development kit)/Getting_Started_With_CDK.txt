@@ -1,0 +1,16 @@
+To get startedd with Contend Developement Kit, you have to download Texture Sources from this link:
+https://www.dropbox.com/s/8desklhixvtvr6g/CScapeToolsetSources.unitypackage?dl=0
+After downloading, import this package into your Unity Project. 
+
+Open the scene: "CScapeToolset", it is in the root of the CScape folder.
+Select the "CscapeBaker" in the Hierarchy.
+Set the lock icon (upper right) in the inspector so that the Baker does not move away as you adjust windows, etc.
+Split your windows so you can see the Game and Scene side-by-side. The Game window will show you a 3D representation of what it will look like. The Scene view is 2D.
+Set any of the 40 tiles as desired. (ie: add, remove, move windows and other objects within the Tile. Press the Previous/Next Tile buttons to navigate.
+Press the "Bake Textures" button on the SCcape Toolset "CScape Toolset Manager" script
+Switch back to game scene (in MY case the included CScapeDemo scene. I wanted to have a clean testbed, you do whatever you want.)
+Select the "CScape City" in the Hierarchy
+Find the "CS Materials Tools" script attached to the CScape City
+Press the "Compile all textures" button.
+
+(big thanks to JamesWjRose - betatester, for writing this description)

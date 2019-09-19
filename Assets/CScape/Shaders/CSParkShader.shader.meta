@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 18dc71d99485efb4bb2e07b30c89e5ae
+timeCreated: 1525739845
+licenseType: Store
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _Grass_Normal: {fileID: 2800000, guid: 407964dbb4552fa41bd5edd8d919d1ff, type: 3}
+  - _Grass_Albedo: {fileID: 2800000, guid: 1d38b4c7072fa1b4e91e3ba755d32b7e, type: 3}
+  - _Texture0: {fileID: 2800000, guid: 85c7302b886d61d46a3dd335a3a5ed94, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

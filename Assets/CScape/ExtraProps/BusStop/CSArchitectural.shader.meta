@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: ad03dd283a77d024faf7e6c66a547323
+timeCreated: 1510797158
+licenseType: Store
+ShaderImporter:
+  defaultTextures:
+  - _BusStation_normal: {fileID: 2800000, guid: cbaef188381fd86408af3e7f1398d545,
+      type: 3}
+  - _BusStation_albedo: {fileID: 2800000, guid: 9002e6fbb380906418eef987ff5e41ea,
+      type: 3}
+  - _BusStation_specular: {fileID: 2800000, guid: b88a1b46b6c742f4a8e2969eb40248ac,
+      type: 3}
+  - _BusStation_gloss: {fileID: 2800000, guid: 4bbe14e71ed226d42b05880d63088437, type: 3}
+  - _BusStation_ao: {fileID: 2800000, guid: d43adb02e49d04c42894ecc521d1c400, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

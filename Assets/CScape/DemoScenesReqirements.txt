@@ -1,0 +1,9 @@
+For getting a best visual effect from demo scene:
+-Set your project to "Linear color space" (EDIT/PROJECT SETTINGS/PLAYER)
+-Import Standard Unity Character Asset Pack (Assets/Import Package/Characters)
+-Import Unity Post Processing Stack from here:
+https://www.assetstore.unity3d.com/en/#!/content/83912
+I am reccomending to use in this moment a Post Pocessing Stack V.1, due to it's better Screen space reflections than one found in V2. As a city needs good reflections to simulate glasses, it can give you a better SSR quuality. 
+Demo scenes doesn't contain any buildings, and they have to be built (this makes whole package lighter for download). 
+This is done by selecting CScape City, and clicking on a Generate Streets Layout. Then Generate Buildings.. and so on. going into detailing your city. 
+

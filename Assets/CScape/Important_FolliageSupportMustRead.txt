@@ -1,0 +1,10 @@
+For a folliage support please import Environment Package from Standard Unity assets (it has all models neccessary for folliage generation).
+if you are using many trees, we suggest to edit LOD's of original tree file that can be found in folder "Assets\Standard Assets\Environment\SpeedTree\Broadleaf"
+File name to edit is Broadleaf Mobile. I suggest You to set LOD factors to (in order off LOD's ):
+100% LOD0
+90% LOD1
+70% LOD2
+60% Billboard
+40% Culled
+if you are running your game on mobile device, trees might be too complex for rendering. 
+

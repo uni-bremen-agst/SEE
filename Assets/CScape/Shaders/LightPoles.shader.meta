@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 99d07eb864f87454c9d10b6cd6c1b345
+timeCreated: 1525737914
+licenseType: Store
+ShaderImporter:
+  defaultTextures:
+  - _Lamp_normal: {fileID: 2800000, guid: 0a44b5e47ce0aa243a11f79f31744971, type: 3}
+  - _Lamp_albedo: {fileID: 2800000, guid: 48036792b6c216449a96b55b89bd9286, type: 3}
+  - _LampIllumination: {fileID: 2800000, guid: d036c8d72ba3c24448637745ab558fb9, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
