@@ -94,7 +94,7 @@ namespace SEEEditor
                     if (graph != null)
                     {
                         MeshFactory.Reset();
-                        if (true)
+                        if (false)
                         {
                             layout = new SEE.Layout.BalloonLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, editorSettings.IssueMap());
                         }
