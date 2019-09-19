@@ -16,40 +16,40 @@ namespace SEE
         public static Graph Add(GraphSettings settings)
         {
             Graph graph = null;
-            if (string.IsNullOrEmpty(settings.graphPath))
+            if (string.IsNullOrEmpty(settings.GXLPath()))
             {
                 Debug.LogError("No graph path given.\n");
             }
-            else if (!graphs.ContainsKey(settings.graphPath))
+            else if (!graphs.ContainsKey(settings.GXLPath()))
             {
                 graph = Load(settings);
                 if (graph == null)
                 {
-                    Debug.LogError("graph " + settings.graphPath + " could not be loaded.");
+                    Debug.LogError("graph " + settings.GXLPath() + " could not be loaded.");
                 }
                 else
                 {
-                    graphs.Add(settings.graphPath, graph);
+                    graphs.Add(settings.GXLPath(), graph);
                 }
             }
             else
             {
-                Debug.LogError("graph " + settings.graphPath + " is already loaded.");
+                Debug.LogError("graph " + settings.GXLPath() + " is already loaded.");
             }
             return graph;
         }
 
         private static Graph Load(GraphSettings settings)
         {
-            GraphCreator graphCreator = new GraphCreator(settings.graphPath, settings.HierarchicalEdges, new SEELogger());
-            if (string.IsNullOrEmpty(settings.graphPath))
+            GraphCreator graphCreator = new GraphCreator(settings.GXLPath(), settings.HierarchicalEdges, new SEELogger());
+            if (string.IsNullOrEmpty(settings.GXLPath()))
             {
                 Debug.LogError("Empty graph path.\n");
                 return null;
             }
             else
             {
-                SEE.Performance p = SEE.Performance.Begin("loading graph data from " + settings.graphPath);
+                SEE.Performance p = SEE.Performance.Begin("loading graph data from " + settings.GXLPath());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
                 p.End();

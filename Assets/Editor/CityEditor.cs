@@ -39,13 +39,23 @@ namespace SEEEditor
 
         private SEE.Layout.ILayout layout;
 
+        private string ProjectPath()
+        {
+            string result = Application.dataPath;
+            // Unity uses Unix directory separator; we need Windows here
+            
+            return result.Replace('/', '\\') + '\\';
+        }
+
         /// <summary>
         /// Creates a new window offering the city editor commands.
         /// </summary>
         void OnGUI()
         {
             GUILayout.Label("Graph", EditorStyles.boldLabel);
-            editorSettings.graphPath = EditorGUILayout.TextField("Graph", editorSettings.graphPath);
+            editorSettings.pathPrefix = EditorGUILayout.TextField("Project path prefix", ProjectPath());
+            editorSettings.gxlPath = EditorGUILayout.TextField("GXL file", editorSettings.gxlPath);
+            editorSettings.csvPath = EditorGUILayout.TextField("CSV file", editorSettings.csvPath);
 
             GUILayout.Label("Width of buildings", EditorStyles.boldLabel);
             editorSettings.WidthMetric = EditorGUILayout.TextField("Width", editorSettings.WidthMetric);
@@ -75,10 +85,10 @@ namespace SEEEditor
             {
                 case 0:
                     graph = SceneGraphs.Add(editorSettings);
-                    int numberOfErrors = MetricImporter.Load(graph, editorSettings.CSVPath);
+                    int numberOfErrors = MetricImporter.Load(graph, editorSettings.CSVPath());
                     if (numberOfErrors > 0)
                     {
-                        Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", editorSettings.CSVPath, numberOfErrors);
+                        Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", editorSettings.CSVPath(), numberOfErrors);
                     }
 
                     if (graph != null)
