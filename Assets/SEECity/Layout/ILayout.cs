@@ -2,6 +2,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using CScape;
 
 namespace SEE.Layout
 {
@@ -110,8 +111,27 @@ namespace SEE.Layout
         /// <returns>size of the game object</returns>
         protected static Vector3 GetSize(GameObject gameObject)
         {
-            Renderer renderer = gameObject.GetComponent<Renderer>();
-            return renderer.bounds.size;
+            return GetExtent(gameObject) * 2.0f;
+        }
+
+        /// <summary>
+        /// Returns the first immediate child of parent with given tag or null
+        /// if none exists.
+        /// </summary>
+        /// <param name="parent">parent whose children are to be searched</param>
+        /// <param name="tag">search tag</param>
+        /// <returns>first immediate child of parent with given tag or null</returns>
+        protected static GameObject GetChild(GameObject parent, string tag)
+        {
+            for (int i = 0; i < parent.transform.childCount; i++)
+            {
+                Transform child = parent.transform.GetChild(i);
+                if (child.tag == tag)
+                {
+                    return child.gameObject;
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -122,8 +142,42 @@ namespace SEE.Layout
         /// <returns>extent of the game object</returns>
         protected static Vector3 GetExtent(GameObject gameObject)
         {
-            Renderer renderer = gameObject.GetComponent<Renderer>();
-            return renderer.bounds.extents;
+            // gameObject is the logical node with tag Tags.Node; it may have different
+            // visual representations. Currently, we have cubes, which are tagged by 
+            // Tags.Block, and CScape buildings, which are tagged by Tags.Building.
+            // Both of them are immediate children of gameObject.
+            GameObject child = GetChild(gameObject, Tags.Building); 
+            if (child != null)
+            {
+                // It is a CScape building which has no renderer. We use its collider instead.
+                Collider collider = child.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    //Vector3 extents = collider.bounds.extents;
+                    //Debug.LogFormat("CScape building {0} has extent ({1}, {2}, {3}).\n", gameObject.name, extents.x, extents.y, extents.z);
+                    return collider.bounds.extents;
+                }
+                else
+                {
+                    Debug.LogErrorFormat("CScape building {0] without collider.\n", gameObject.name);
+                    return Vector3.one;
+                }
+            }
+            else
+            {
+                // Nodes represented by cubes have a renderer from which we can derive the
+                // extent.
+                Renderer renderer = gameObject.GetComponent<Renderer>();
+                if (renderer != null)
+                {
+                    return renderer.bounds.extents;
+                }
+                else
+                {
+                    Debug.LogErrorFormat("Node {0} (tag: {1}) without collider.\n", gameObject.name, gameObject.tag);
+                    return Vector3.one;
+                }
+            }
         }
 
         /// <summary>
