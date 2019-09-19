@@ -119,7 +119,7 @@ namespace SEE.Layout
             Renderer planeRenderer = plane.GetComponent<Renderer>();
             planeRenderer.sharedMaterial = new Material(planeRenderer.sharedMaterial);
 
-            //planeRenderer.sharedMaterial.color = Color.black;
+            planeRenderer.sharedMaterial.color = Color.gray;
 
             // Turn off reflection of plane
             planeRenderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
@@ -679,7 +679,7 @@ namespace SEE.Layout
             LineRenderer line = circle.AddComponent<LineRenderer>();
 
             LineFactory.SetDefaults(line);
-            LineFactory.SetColor(line, Color.red);
+            LineFactory.SetColor(line, Color.white);
             LineFactory.SetWidth(line, lineWidth);
 
             // We want to set the points of the circle lines relative to the game object.
