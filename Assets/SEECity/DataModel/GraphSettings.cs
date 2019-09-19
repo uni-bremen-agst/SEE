@@ -9,38 +9,43 @@ namespace SEE
     public class GraphSettings
     {
         /// <summary>
-        /// The path to the graph data.
-        /// </summary>
+        /// The prefix of the absolute paths for the GXL and CSV data.
+        /// </summary>        
+        public string pathPrefix;
 
-        /// Small clone graph with multiple roots to experiment with (we cannot use Application.dataPath
+        /// Tiny clone graph with multiple roots to experiment with (we cannot use Application.dataPath
         /// unfortunately, that is why this path is currently hard coded).
-        public string graphPath = "C:\\Users\\raine\\develop\\seecity\\data\\gxl\\minimal_clones.gxl";
-        public string CSVPath = "C:\\Users\\raine\\develop\\seecity\\data\\gxl\\minimal_erosions.csv";
+        public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
+        public string csvPath = "..\\Data\\GXL\\minimal_erosions.csv";
 
-        // Medium-size clone graph with single root (Linux directories whose path include "arch").
-        //public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\arch-single-root.gxl";
+        // Smaller clone graph with single root (Linux directory "fs").
+        //public string gxlPath = "..\\Data\\GXL\\linux-clones\\fs.gxl";
+        //public string csvPath = "..\\Data\\GXL\\linux-clones\\fs.csv";
 
-        // Larger clone graph with single root (Linux subsystem 'drivers'), but with only those subsystems containing clones.
-        // 14.500 nodes, 10.300 edges.
-        // This graph is currently too large to play. The frame rate drops to 3 frames per second.
-        //public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\drivers-clones-only-single-root.gxl";
+        // Smaller clone graph with single root (Linux directory "net").
+        //public string gxlPath = "..\\Data\\GXL\\linux-clones\\net.gxl";
+        //public string csvPath = "..\\Data\\GXL\\linux-clones\\net.csv";
 
-        // Larger clone graph with single root (Linux subsystem 'drivers').
-        // This graph is currently too large to play. The frame rate drops to 3 frames per second.
-        // public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\drivers-single-root.gxl";
+        /// <summary>
+        /// Returns the concatenation of pathPrefix and gxlPath. That is the complete
+        /// absolute path to the GXL file containing the graph data.
+        /// </summary>
+        /// <returns>concatenation of pathPrefix and gxlPath</returns>
+        public string GXLPath()
+        {
+            return pathPrefix + gxlPath;
+        }
 
-        // Large clone graph with multiple roots.
-        //public string graphPath = "C:\\Users\\raine\\develop\\evostreets\\data\\gxl\\linux-clones\\clones.gxl";
-
-        // Medium-size clone graph with multiple root (Linux directories whose path include "arch").
-        //public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\arch.gxl";
-
-        // Large clone graph with single root.
-        //public string graphPath = "C:\\Users\\raine\\develop\\SEECity\\Data\\GXL\\linux-clones\\linux-clones.gxl";
-
-        // The following graph will not work because it does not have the necessary metrics.
-        // public string graphPath = "C:\\Users\\raine\\Downloads\\codefacts.gxl";
-
+        /// <summary>
+        /// Returns the concatenation of pathPrefix and csvPath. That is the complete
+        /// absolute path to the CSV file containing the additional metric values.
+        /// </summary>
+        /// <returns>concatenation of pathPrefix and csvPath</returns>
+        public string CSVPath()
+        {
+            return pathPrefix + csvPath;
+        }
+        
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
