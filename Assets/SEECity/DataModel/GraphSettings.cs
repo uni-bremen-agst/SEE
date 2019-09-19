@@ -13,8 +13,7 @@ namespace SEE
         /// </summary>        
         public string pathPrefix;
 
-        /// Tiny clone graph with multiple roots to experiment with (we cannot use Application.dataPath
-        /// unfortunately, that is why this path is currently hard coded).
+        /// Tiny clone graph with multiple roots to experiment with.
         public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
         public string csvPath = "..\\Data\\GXL\\minimal_erosions.csv";
 
@@ -25,6 +24,10 @@ namespace SEE
         // Smaller clone graph with single root (Linux directory "net").
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\net.gxl";
         //public string csvPath = "..\\Data\\GXL\\linux-clones\\net.csv";
+
+        // Larger clone graph with single root (Linux directory "drivers").
+        //public string gxlPath = "..\\Data\\GXL\\linux-clones\\drivers.gxl";
+        //public string csvPath = "..\\Data\\GXL\\linux-clones\\drivers.csv";
 
         /// <summary>
         /// Returns the concatenation of pathPrefix and gxlPath. That is the complete
