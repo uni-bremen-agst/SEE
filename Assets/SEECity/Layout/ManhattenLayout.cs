@@ -30,7 +30,8 @@ namespace SEE.Layout
         {
             foreach (GameObject node in graph.GetNodes())
             {
-                MeshFactory.AddCube(node);
+                //MeshFactory.AddCube(node);
+                BuildingFactory.AddBuilding(node);
             }
         }
 
@@ -41,22 +42,23 @@ namespace SEE.Layout
         // precondition: the GameObjects and their meshes have already been created for all nodes
         protected override void DrawNodes(Graph graph)
         {
-            //DumpMetricMaxima(metricMaxima);
+            int numberOfBuildingsPerRow = (int)Mathf.Sqrt(graph.NodeCount);
+            int column = 0;
+            const float distanceBetweenBuildings = 1.0f;
+            float maxZ = 0.0f;  // maximal depth of a building in a row
+            float positionX = 0.0f;
+            float positionZ = 0.0f;
 
-            int length = (int)Mathf.Sqrt(graph.NodeCount);
-            float column = 0f;
-            float row = 1f;
-            const float relativeOffset = 0.1f;
-
-            //Vector3 maxSize = Vector3.zero;
             foreach (GameObject sceneNode in graph.GetNodes())
             {
                 column++;
-                if (column > length)
+                if (column > numberOfBuildingsPerRow)
                 {
                     // exceeded length of the square => start a new row
-                    column = 1f;
-                    row++;
+                    column = 1;
+                    positionZ += maxZ + distanceBetweenBuildings;
+                    maxZ = 0.0f;
+                    positionX = 0.0f;
                 }
                 Node node = sceneNode.GetComponent<Node>();
                 if (node == null)
@@ -66,28 +68,20 @@ namespace SEE.Layout
                 Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, widthMetric),
                                             scaler.GetNormalizedValue(node, heightMetric),
                                             scaler.GetNormalizedValue(node, breadthMetric));
-                node.gameObject.transform.localScale = scale;
+                sceneNode.transform.localScale = scale;
 
+                Vector3 size = GetSize(sceneNode);
+                if (size.z > maxZ)
+                {
+                    maxZ = size.z;
+                }
+                positionX += size.x / 2.0f;
                 // The position is the center of a GameObject. We want all GameObjects
                 // be placed at the same ground level 0. That is why we need to "lift"
                 // every building by half of its height.
-                sceneNode.transform.position = new Vector3(row + row * relativeOffset, scale.y / 2.0f, column + column * relativeOffset);
-                /*
-                {
-                    Renderer renderer;
-                    //Fetch the GameObject's Renderer component
-                    renderer = house.GetComponent<Renderer>();
-                    //Change the GameObject's Material Color to red
-                    //m_ObjectRenderer.material.color = Color.red;
-                    Debug.Log("house size: " + renderer.bounds.size + "\n");
-                }
-                */
-                //Vector3 size = GetSize(sceneNode);
-                //if (size.x > maxSize.x) maxSize.x = size.x;
-                //if (size.y > maxSize.y) maxSize.y = size.y;
-                //if (size.z > maxSize.z) maxSize.z = size.z;
+                sceneNode.transform.position = new Vector3(positionX, scale.y / 2.0f, positionZ);
+                positionX += size.x / 2.0f + distanceBetweenBuildings;
             }
-            //Debug.Log("Maxima: " + maxSize + "\n");
         }
 
         // orientation of the edges; 
@@ -102,6 +96,8 @@ namespace SEE.Layout
         /// </summary>
         protected override void DrawEdges(Graph graph)
         {
+            return; // FIXME turned off for now
+
             // The distance of the edges relative to the houses; the maximal height of
             // a house is 1.0. This offset is used to draw the line somewhat below
             // or above the house (depending on the orientation).
