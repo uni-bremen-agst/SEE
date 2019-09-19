@@ -1,15 +1,10 @@
 library(xml2)
 library(purrr)
 
-#filename = "arch-single-root"
-#gxlfile = paste(filename, ".gxl", sep="")
-#csvfile = paste(filename, ".csv", sep="")
-
+#filename = "arch"
 #filename = "net"
-#gxlfile = paste(filename, ".gxl", sep="")
-#csvfile = paste(filename, ".csv", sep="")
-
 filename = "fs"
+#filename = "drivers"
 gxlfile = paste(filename, ".gxl", sep="")
 csvfile = paste(filename, ".csv", sep="")
 

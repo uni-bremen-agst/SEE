@@ -143,7 +143,7 @@ namespace SEE.Layout
         {
             GameObject gameObject = GameObject.CreatePrimitive(type);
             gameObject.name = Tags.NodePrefab;
-            gameObject.tag = gameObject.name;
+            gameObject.tag = Tags.Block;
             gameObject.isStatic = true;
             gameObject.SetActive(false); // this object should not be visible
             primitiveMeshes[type] = gameObject;
