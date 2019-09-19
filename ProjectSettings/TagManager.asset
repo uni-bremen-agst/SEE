@@ -7,10 +7,12 @@ TagManager:
   - Edge
   - Graph
   - Node
-  - House
   - Node Prefab
   - Text
   - Erosion
+  - Fire
+  - Building
+  - Block
   layers:
   - Default
   - TransparentFX
