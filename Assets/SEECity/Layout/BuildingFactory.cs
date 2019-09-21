@@ -76,6 +76,7 @@ namespace SEE.Layout
             foreach (UnityEngine.Object prefab in prefabs)
             {
                 GameObject o = NewBuilding(prefab);
+                o.AddComponent<CScapeBlockModifier>();
                 o.name = prefabFiles[i];
 
                 float width;
@@ -96,6 +97,7 @@ namespace SEE.Layout
         {
             GameObject building = NewBuilding();
             building.transform.parent = parent.transform;
+            parent.AddComponent<CScapeBlockModifier>();
         }
 
         public static GameObject NewBuilding()
