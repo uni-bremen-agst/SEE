@@ -6,7 +6,8 @@ namespace SEE.Layout
 {
     /// <summary>
     /// A block modifier for CScape buildings. It is intended to be attached
-    /// to the container game object containing a CScape building.
+    /// to the container game object containing a CScape building. It encapsulates
+    /// the specifics of CScape buildings with respect to size and scaling.
     /// </summary>
     public class CScapeBlockModifier : BlockModifier
     {
