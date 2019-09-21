@@ -57,12 +57,16 @@ namespace SEE.Layout
                 int i = 0;
                 foreach (Node root in roots)
                 {
-                    CalculateRadius2D(root, 0, out float out_rad, out int max_depth, scaler);
-                    max_depths[i] = max_depth;
+                    CalculateRadius2D(root, 0, out float out_rad, out int max_depth_of_this_tree, scaler);
+                    max_depths[i] = max_depth_of_this_tree;
                     i++;
                     if (out_rad > max_radius)
                     {
                         max_radius = out_rad;
+                    }
+                    if (max_depth_of_this_tree > maxDepth)
+                    {
+                        maxDepth = max_depth_of_this_tree;
                     }
                 }
             }
@@ -83,6 +87,11 @@ namespace SEE.Layout
             }
             DrawPlane(roots, max_radius);
         }
+
+        /// <summary>
+        /// The maximal depth of the node hierarchy.
+        /// </summary>
+        private int maxDepth = 0;
 
         /// <summary>
         /// Draws the plane underneath the nodes. Defines attribute 'plane'.
@@ -441,11 +450,16 @@ namespace SEE.Layout
             }
         }
 
+        /// <summary>
+        /// Information about a node necessary to draw it.
+        /// </summary>
         private struct NodeInfo
         {
             public readonly float radius;
             public readonly float outer_radius;
             public readonly float reference_length_children;
+            // The level of node, that is, the distance from the root node to this node.
+            // The root node has always level 0. 
             public readonly int level;
 
             public NodeInfo(float radius, int level, float outer_radius, float reference_length_children)
@@ -699,7 +713,27 @@ namespace SEE.Layout
             line.SetPositions(points);
         }
 
-        private Vector3[] GetControlPoints(Node source, Node target, LCAFinder lcaFinder)
+        /// <summary>
+        /// Yields the list of control points for the bspline along the node hierarchy.
+        /// If source equals target, a self loop is generated atop of the node.
+        /// If source and target have no common ancestor, the path starts at source
+        /// and ends at target and reaches through the point on half distance between 
+        /// these two nodes, but at the top-most edge height (given by maxDepth).
+        /// If source and target are siblings (immediate ancestors of the same parent
+        /// node), the control points are all on ground level froum source to target
+        /// via their parent.
+        /// Otherwise, the control points are chosen along the path from the source
+        /// node to their lowest common ancestor and then down again to the target 
+        /// node. The height of each such control point is proportional to the level 
+        /// of the node hierarchy. The higher the node in the hierarchy on this path,
+        /// the higher the control point.
+        /// </summary>
+        /// <param name="source">starting node</param>
+        /// <param name="target">ending node</param>
+        /// <param name="lcaFinder">to retrieve the lowest common ancestor of source and target</param>
+        /// <param name="maxDepth">the maximal depth of the node hierarchy</param>
+        /// <returns>control points to draw a bspline between source and target</returns>
+        private Vector3[] GetControlPoints(Node source, Node target, LCAFinder lcaFinder, int maxDepth)
         {
             Vector3[] controlPoints;
 
@@ -708,16 +742,20 @@ namespace SEE.Layout
 
             if (source == target)
             {
-                controlPoints = SelfLoop(sourceObject, targetObject);
+                controlPoints = SelfLoop(sourceObject);
             }
             else
             {
+                // Lowest common ancestor
                 Node lca = lcaFinder.LCA(source, target);
                 if (lca == null)
                 {
+                    // This should never occur if we have a single root node, but may happen if
+                    // there are multiple roots, in which case nodes in different trees of this
+                    // forrest do not have a common ancestor.
                     Debug.LogError("Undefined lowest common ancestor for "
                         + source.LinkName + " and " + target.LinkName + "\n");
-                    controlPoints = ThroughCenter(sourceObject, targetObject);
+                    controlPoints = ThroughCenter(sourceObject, targetObject, maxDepth);
                 }
                 else
                 {
@@ -726,7 +764,7 @@ namespace SEE.Layout
                     {
                         Debug.LogError("Undefined game object for lowest common ancestor of "
                                        + source.LinkName + " and " + target.LinkName + "\n");
-                        controlPoints = ThroughCenter(sourceObject, targetObject);
+                        controlPoints = ThroughCenter(sourceObject, targetObject, maxDepth);
                     }
                     else
                     {
@@ -752,9 +790,9 @@ namespace SEE.Layout
 
                         if (sourceToLCA.Length == 2 && targetToLCA.Length == 2)
                         {
-                            // source and target are in the same subtree at the same level
-                            // the total path has length 4 and and we do need at least four control points for Bsplines
-                            // (it is fine to include LCA twice)
+                            // source and target are siblings in the same subtree at the same level
+                            // the total path has length 4 and and we do need at least four control points 
+                            // for Bsplines (it is fine to include LCA twice).
                             // Edges between leaves will be on the ground.
                             controlPoints = new Vector3[4];
                             controlPoints[0] = Garden(sourceObject);
@@ -764,8 +802,8 @@ namespace SEE.Layout
                         }
                         else
                         {
-                            // concatenate both paths
-                            // we have sufficient many control points without the duplicated LCA,
+                            // Concatenate both paths.
+                            // We have sufficient many control points without the duplicated LCA,
                             // hence, we can remove the duplicate
                             Node[] fullPath = new Node[sourceToLCA.Length + targetToLCA.Length - 1];
                             sourceToLCA.CopyTo(fullPath, 0);
@@ -774,19 +812,38 @@ namespace SEE.Layout
                             {
                                 fullPath[sourceToLCA.Length + i - 1] = targetToLCA[i];
                             }
+                            // Calculate control points along the node hierarchy 
                             controlPoints = new Vector3[fullPath.Length];
                             controlPoints[0] = RoofOfHouse(sourceObject);
                             for (int i = 1; i < fullPath.Length - 1; i++)
                             {
                                 // We consider the height of intermediate nodes.
-                                controlPoints[i] = fullPath[i].gameObject.transform.position + nodeInfos[fullPath[i]].level * levelFactor * Vector3.up;
+                                // Note that a root has level 0 and the level is increases along 
+                                // the childrens' depth. That is why we need to choose the height
+                                // as a measure relative to maxDepth.
+                                controlPoints[i] = fullPath[i].gameObject.transform.position + (maxDepth - nodeInfos[fullPath[i]].level) * levelUnit;
                             }
                             controlPoints[controlPoints.Length - 1] = RoofOfHouse(targetObject);
+                            //Dump(controlPoints);
                         }
                     }
                 }
             }
             return controlPoints;
+        }
+
+        /// <summary>
+        /// Dumps given control points for debugging.
+        /// </summary>
+        /// <param name="controlPoints">control points to be emitted</param>
+        private void Dump(Vector3[] controlPoints)
+        {
+            int i = 0;
+            foreach (Vector3 cp in controlPoints)
+            {
+                Debug.LogFormat("controlpoint[{0}] = {1}\n", i, cp);
+                i++;
+            }
         }
 
         /// <summary>
@@ -854,7 +911,7 @@ namespace SEE.Layout
         /// Returns the position of the garden of a node.
         /// </summary>
         /// <param name="node">node for which to determine the garden position</param>
-        /// <returns>roof position</returns>
+        /// <returns>position the node's garden</returns>
         private static Vector3 Garden(GameObject node)
         {
             // Note: The leaf nodes are represented by a composite game object,
@@ -864,32 +921,76 @@ namespace SEE.Layout
             return child.transform.position;
         }
 
-        private const float levelFactor = 2.0f;
+        /// <summary>
+        /// The number of Unity units per level of the hierarchy for the height of control points.
+        /// This factor must be relative to the height of the buildings. The initial value is
+        /// just a default.
+        /// </summary>
+        public static Vector3 levelUnit = 2.0f * Vector3.up;
 
-        private static Vector3[] SelfLoop(GameObject sourceObject, GameObject targetObject)
+        /// <summary>
+        /// The number of Unity units by which the second and third control point of 
+        /// a self loop is located towards left and right (x axis).
+        /// </summary>
+        private static readonly float selfLoopExtent = 3.0f;
+
+        /// <summary>
+        /// Yields control points for a self loop at a node. The control points
+        /// start and end at the center of roof of the node (first and last
+        /// control points). The second control point is selfLoopExtent units
+        /// to the left and levelUnit units above of the roof center. The 
+        /// third control point is opposite of the second control point, that
+        /// is, selfLoopExtent units to the right and levelUnit units above of 
+        /// the roof center.
+        /// </summary>
+        /// <param name="node">node whose self loop control points are required</param>
+        /// <returns>control points forming a self loop above the node</returns>
+        private static Vector3[] SelfLoop(GameObject node)
         {
             // we need at least four control points; tinySplines wants that
             Vector3[] controlPoints = new Vector3[4];
             // self-loop
-            controlPoints[0] = RoofOfHouse(sourceObject); 
-            controlPoints[1] = controlPoints[0] + levelFactor * Vector3.up + Vector3.right;
-            controlPoints[2] = controlPoints[1] + 2 * Vector3.left;
-            controlPoints[3] = RoofOfHouse(targetObject);
+            controlPoints[0] = RoofOfHouse(node); 
+            controlPoints[1] = controlPoints[0] + levelUnit + selfLoopExtent * Vector3.left;
+            controlPoints[2] = controlPoints[1] + 2.0f * selfLoopExtent * Vector3.right;
+            controlPoints[3] = RoofOfHouse(node);
             return controlPoints;
         }
 
-        private static Vector3[] ThroughCenter(GameObject sourceObject, GameObject targetObject)
+        /// <summary>
+        /// Yields control points for two nodes that do not have a common ancestor in the
+        /// node hierarchy. This may occur when we have multiple roots in the graph, that
+        /// is, the node hierarchy is a forrest and not just a single tree. In this case,
+        /// we want the spline to reach above all other splines of nodes having a common
+        /// ancestor. 
+        /// The first and last control points are the respective roots of source and target
+        /// node. The second and third control points are the same: it lies in between 
+        /// the two nodes with respect to the x and z axis; its height (y axis) is the
+        /// highest hierarchical level, that is, one levelUnit above the level at maxDepth.
+        /// </summary>
+        /// <param name="sourceObject"></param>
+        /// <param name="targetObject"></param>
+        /// <param name="maxDepth">maximal depth of the node hierarchy</param>
+        /// <returns>control points for two nodes without common ancestor</returns>
+        private static Vector3[] ThroughCenter(GameObject sourceObject, GameObject targetObject, int maxDepth)
         {
             Vector3[] controlPoints = new Vector3[4];
             controlPoints[0] = RoofOfHouse(sourceObject);
-            controlPoints[1] = levelFactor * Vector3.up;
-            controlPoints[2] = levelFactor * Vector3.up;
             controlPoints[3] = RoofOfHouse(targetObject);
+            // the point in between the two roofs
+            Vector3 center = controlPoints[0] + 0.5f * (controlPoints[3] - controlPoints[0]);
+            // note: height is independent of the roofs; it is the distance to the ground
+            center.y = levelUnit.y * (maxDepth + 1); 
+            controlPoints[1] = center;
+            controlPoints[2] = center;    
             return controlPoints;
         }
 
         protected override void DrawEdges(Graph graph)
         {
+            levelUnit = MaximalNodeHeight(graph);
+            Debug.LogFormat("levelUnit={0}\n", levelUnit);
+
             Material newMat = new Material(defaultLineMaterial);
             if (newMat == null)
             {
@@ -914,7 +1015,7 @@ namespace SEE.Layout
                     Node target = edge.Target;
                     if (source != null && target != null)
                     {
-                        BSplineFactory.Draw(edge.gameObject, GetControlPoints(source, target, lca), newMat);
+                        BSplineFactory.Draw(edge.gameObject, GetControlPoints(source, target, lca, maxDepth), newMat);
                     }
                     else
                     {
@@ -926,6 +1027,29 @@ namespace SEE.Layout
                     Debug.LogError("Scene edge " + gameEdge.name + " does not have a graph edge component.\n");
                 }
             }
+        }
+
+        /// <summary>
+        /// Yields the maximal height over all nodes.
+        /// </summary>
+        /// <param name="graph">graph whose nodes are to be considered</param>
+        /// <returns>maximal height of nodes in y coordinate (x and z are zero)</returns>
+        private Vector3 MaximalNodeHeight(Graph graph)
+        {
+            Vector3 result = Vector3.zero;
+            foreach (GameObject node in graph.GetNodes())
+            {
+                Node n = node.GetComponent<Node>();
+                if (n != null && n.IsLeaf())
+                {
+                    Vector3 size = SizeOfHouse(node);
+                    if (size.y > result.y)
+                    {
+                        result.y = size.y;
+                    }
+                }
+            }
+            return result;
         }
     }
 }
