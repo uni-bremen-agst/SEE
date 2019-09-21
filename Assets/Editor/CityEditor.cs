@@ -93,7 +93,7 @@ namespace SEEEditor
 
                     if (graph != null)
                     {
-                        MeshFactory.Reset();
+                        CubeFactory.Reset();
                         if (false)
                         {
                             layout = new SEE.Layout.BalloonLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, editorSettings.IssueMap());
@@ -126,7 +126,7 @@ namespace SEEEditor
         {
             SceneGraphs.DeleteAll();
             graph = null;
-            MeshFactory.Reset();
+            CubeFactory.Reset();
             if (layout != null)
             {
                 layout.Reset();
