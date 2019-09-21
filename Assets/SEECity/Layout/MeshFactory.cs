@@ -120,6 +120,8 @@ namespace SEE.Layout
 
             // Object should be static so that we save rendering time at run-time.
             gameObject.isStatic = true;
+
+            gameObject.AddComponent<CubeModifier>();
         }
 
         /// <summary>
