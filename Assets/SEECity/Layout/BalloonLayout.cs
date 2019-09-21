@@ -315,7 +315,7 @@ namespace SEE.Layout
             {
                 name = "house " + parent.name
             };
-            MeshFactory.AddCube(cube);         
+            CubeFactory.AddCube(cube);         
             // cube is nested in parent
             cube.transform.parent = parent.transform;
             // relative position within parent
@@ -340,7 +340,7 @@ namespace SEE.Layout
             {
                 name = "garden " + parent.name
             };
-            MeshFactory.AddFrontYard(cylinder.gameObject);
+            CubeFactory.AddFrontYard(cylinder.gameObject);
             // game object of node becomes the parent of cube
             cylinder.transform.parent = parent.transform;
             // relative position within parent

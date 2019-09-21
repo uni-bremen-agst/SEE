@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
-    public static class MeshFactory
+    public static class CubeFactory
     {
         private static Dictionary<PrimitiveType, GameObject> primitiveMeshes = new Dictionary<PrimitiveType, GameObject>();
 
