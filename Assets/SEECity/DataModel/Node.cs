@@ -169,5 +169,14 @@ namespace SEE.DataModel
                 }
             }
         }
+
+        /// <summary>
+        /// True if node is a leaf, i.e., has no children.
+        /// </summary>
+        /// <returns>true iff leaf node</returns>
+        public bool IsLeaf()
+        {
+            return children.Count == 0;
+        }
     }
 }
