@@ -22,16 +22,20 @@ namespace SEE.Layout
         {
             IList<string> metrics = new List<string>() {widthMetric, heightMetric, breadthMetric};
             scaler = new LinearScale(graph, minimal_length, 1.0f, metrics);
-            AddMeshes(graph);
+            AddNodes(graph);
             base.Draw(graph);
         }
 
-        private void AddMeshes(Graph graph)
+        private void AddNodes(Graph graph)
         {
-            foreach (GameObject node in graph.GetNodes())
+            foreach (GameObject sceneNode in graph.GetNodes())
             {
-                //MeshFactory.AddCube(node);
-                BuildingFactory.AddBuilding(node);
+                Node node = sceneNode.GetComponent<Node>();
+                if (node != null && node.IsLeaf())
+                {
+                    //MeshFactory.AddCube(sceneNode); // TODO: Parameterize by node factory
+                    BuildingFactory.AddBuilding(sceneNode);
+                }
             }
         }
 
@@ -51,36 +55,46 @@ namespace SEE.Layout
 
             foreach (GameObject sceneNode in graph.GetNodes())
             {
-                column++;
-                if (column > numberOfBuildingsPerRow)
-                {
-                    // exceeded length of the square => start a new row
-                    column = 1;
-                    positionZ += maxZ + distanceBetweenBuildings;
-                    maxZ = 0.0f;
-                    positionX = 0.0f;
-                }
+                // Note: sceneNode may only be a container for the actual building.
+
+                // The logical node represented by this game object.
                 Node node = sceneNode.GetComponent<Node>();
                 if (node == null)
                 {
                     Debug.LogError("Scene node " + sceneNode.name + " does not have a graph node component.\n");
                 }
-                Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, widthMetric),
-                                            scaler.GetNormalizedValue(node, heightMetric),
-                                            scaler.GetNormalizedValue(node, breadthMetric));
-                sceneNode.transform.localScale = scale;
-
-                Vector3 size = GetSize(sceneNode);
-                if (size.z > maxZ)
+                else if (node.IsLeaf())
                 {
-                    maxZ = size.z;
+                    // We only draw leaves.
+                    column++;
+                    if (column > numberOfBuildingsPerRow)
+                    {
+                        // exceeded length of the square => start a new row
+                        column = 1;
+                        positionZ += maxZ + distanceBetweenBuildings;
+                        maxZ = 0.0f;
+                        positionX = 0.0f;
+                    }
+                    // Scaled metric values for the dimensions.
+                    Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, widthMetric),
+                                                scaler.GetNormalizedValue(node, heightMetric),
+                                                scaler.GetNormalizedValue(node, breadthMetric));
+
+                    // Scale according to the metrics.
+                    ScaleBlock(sceneNode, scale);
+
+                    Vector3 size = GetSize(sceneNode);
+                    if (size.z > maxZ)
+                    {
+                        maxZ = size.z;
+                    }
+                    positionX += size.x / 2.0f;
+                    // The position is the center of a GameObject. We want all GameObjects
+                    // be placed at the same ground level 0. That is why we need to "lift"
+                    // every building by half of its height.
+                    sceneNode.transform.position = new Vector3(positionX, scale.y / 2.0f, positionZ);
+                    positionX += size.x / 2.0f + distanceBetweenBuildings;
                 }
-                positionX += size.x / 2.0f;
-                // The position is the center of a GameObject. We want all GameObjects
-                // be placed at the same ground level 0. That is why we need to "lift"
-                // every building by half of its height.
-                sceneNode.transform.position = new Vector3(positionX, scale.y / 2.0f, positionZ);
-                positionX += size.x / 2.0f + distanceBetweenBuildings;
             }
         }
 

@@ -115,6 +115,24 @@ namespace SEE.Layout
         }
 
         /// <summary>
+        /// Scales the given game object by given scale.
+        /// </summary>
+        /// <param name="gameObject">object to be scaled</param>
+        /// <param name="scale">scale to be used for that</param>
+        protected static void ScaleBlock(GameObject gameObject, Vector3 scale)
+        {
+            BlockModifier bm = gameObject.GetComponent<BlockModifier>();
+            if (bm == null)
+            {
+                Debug.LogErrorFormat("Game object {0} without block modifier.\n", gameObject.name);
+            }
+            else
+            {
+                bm.Scale(scale);
+            }
+        }
+
+        /// <summary>
         /// Returns the first immediate child of parent with given tag or null
         /// if none exists.
         /// </summary>
@@ -142,41 +160,15 @@ namespace SEE.Layout
         /// <returns>extent of the game object</returns>
         protected static Vector3 GetExtent(GameObject gameObject)
         {
-            // gameObject is the logical node with tag Tags.Node; it may have different
-            // visual representations. Currently, we have cubes, which are tagged by 
-            // Tags.Block, and CScape buildings, which are tagged by Tags.Building.
-            // Both of them are immediate children of gameObject.
-            GameObject child = GetChild(gameObject, Tags.Building); 
-            if (child != null)
+            BlockModifier bm = gameObject.GetComponent<BlockModifier>();
+            if (bm == null)
             {
-                // It is a CScape building which has no renderer. We use its collider instead.
-                Collider collider = child.GetComponent<Collider>();
-                if (collider != null)
-                {
-                    //Vector3 extents = collider.bounds.extents;
-                    //Debug.LogFormat("CScape building {0} has extent ({1}, {2}, {3}).\n", gameObject.name, extents.x, extents.y, extents.z);
-                    return collider.bounds.extents;
-                }
-                else
-                {
-                    Debug.LogErrorFormat("CScape building {0] without collider.\n", gameObject.name);
-                    return Vector3.one;
-                }
+                Debug.LogErrorFormat("Game object {0} without block modifier.\n", gameObject.name);
+                return Vector3.one;
             }
             else
             {
-                // Nodes represented by cubes have a renderer from which we can derive the
-                // extent.
-                Renderer renderer = gameObject.GetComponent<Renderer>();
-                if (renderer != null)
-                {
-                    return renderer.bounds.extents;
-                }
-                else
-                {
-                    Debug.LogErrorFormat("Node {0} (tag: {1}) without collider.\n", gameObject.name, gameObject.tag);
-                    return Vector3.one;
-                }
+                return bm.GetExtent();
             }
         }
 
