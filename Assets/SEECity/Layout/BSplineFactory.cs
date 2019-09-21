@@ -119,6 +119,12 @@ namespace SEE.Layout
             return spline;
         }
 
+        /// <summary>
+        /// Determines the strength of the tension for bundling edges. This value may
+        /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
+        /// </summary>
+        public static float tension = 0.85f; // 0.85 is the value recommended by Holten
+
         public static void Draw(GameObject edge, Vector3[] controlPoints, Material material = null)
         {
             // Create a cubic spline with control points in 3D using a clamped knot vector.
@@ -128,7 +134,7 @@ namespace SEE.Layout
                 controlPoints = VectorsToList(controlPoints)
             };
 
-            IList<double> list = spline.buckle(0.5f).sample();
+            IList<double> list = spline.buckle(tension).sample();
 
             Vector3[] splinePoints = ListToVectors(list);
 
@@ -151,31 +157,6 @@ namespace SEE.Layout
             LineFactory.SetDefaults(line);
             LineFactory.SetWidth(line, 0.1f);
             LineFactory.SetColors(line);
-        }
-
-        public static void Foo()
-        {
-            Vector3[] controlPoints = new Vector3[] { new Vector3(2.0f, 5.0f, 2.0f),
-                                               new Vector3(5.0f, 5.0f, 3.0f),
-                                               new Vector3(8.0f, 5.0f, 10.0f),
-                                               new Vector3(2.0f, 5.0f, 19.0f),
-                                               new Vector3(-10.0f, 5.0f, 23.0f),
-                                               new Vector3(-22.0f, 5.0f, 5.0f)};
-
-            GameObject edge = new GameObject();
-            edge.name = "BSpline";
-            string materialPath = "Legacy Shaders/Particles/Additive";
-            // string materialPath = "BrickTextures/BricksTexture13/BricksTexture13";
-            // string materialPath = "Particles/Standard Surface";
-
-            //Material newMat = Resources.Load<Material>(materialPath);
-            Material newMat = new Material(Shader.Find(materialPath));
-            if (newMat == null)
-            {
-                Debug.LogError("Could not find material " + materialPath + "\n");
-                return;
-            }
-            Draw(edge, controlPoints, newMat);
         }
     }
 }
