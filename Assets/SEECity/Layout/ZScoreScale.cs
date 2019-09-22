@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using SEE.DataModel;
-using System;
 using System.Collections.Generic;
 
 namespace SEE.Layout
@@ -15,18 +14,18 @@ namespace SEE.Layout
     /// of standard deviation units. It allows one to compare different metrics that
     /// may have very different ranges of values.
     /// </summary>
-    internal class ZScoreScale : IScale
+    public class ZScoreScale : IScale
     {
         /// <summary>
         /// Constructor for z-score based scaling of node metrics. 
         /// </summary>
         /// <param name="graph">the graph whose node metrics are to be scaled</param>
-        /// <param name="minimalLength">the mininmal value a node length should have</param>
+        /// <param name="minimalLength">the mininmal value a node length can have</param>
+        /// <param name="maximalLength">the maximal value a node length can have</param>
         /// <param name="metrics">node metrics for scaling</param>
-        public ZScoreScale(Graph graph, float minimalLength, IList<string> metrics)
-        : base(metrics)
+        public ZScoreScale(Graph graph, float minimalLength, float maximalLength, IList<string> metrics)
+        : base(metrics, minimalLength, maximalLength)
         {
-            this.minimalLength = minimalLength;
             Determine_Statistics(graph);
         }
 
@@ -37,11 +36,6 @@ namespace SEE.Layout
 
         // The statistics gathered for the node metrics.
         private Dictionary<string, Statistics> statistics;
-
-        /// <summary>
-        /// The minimal length of a building.
-        /// </summary>
-        private readonly float minimalLength;
 
         /// <summary>
         /// Initial values 0.0 for all metrics.
@@ -179,7 +173,7 @@ namespace SEE.Layout
                         }
                     }
                 }
-                return result;
+                return WithinLimits(result);
             }
         }
     }
