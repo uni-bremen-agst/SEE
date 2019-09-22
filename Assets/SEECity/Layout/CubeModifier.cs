@@ -21,7 +21,7 @@ namespace SEE.Layout
             }
             else
             {
-                Debug.LogErrorFormat("Node {0} (tag: {1}) without collider.\n", gameObject.name, gameObject.tag);
+                Debug.LogErrorFormat("Node {0} (tag: {1}) without renderer.\n", gameObject.name, gameObject.tag);
                 return Vector3.one;
             }
         }
