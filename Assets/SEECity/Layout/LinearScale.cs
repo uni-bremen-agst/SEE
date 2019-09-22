@@ -8,7 +8,7 @@ namespace SEE.Layout
     /// Provides x, y, z lengths of a node based on a linear interpolation
     /// of the node's metrics.
     /// </summary>
-    internal class LinearScale : IScale
+    public class LinearScale : IScale
     {
         /// <summary>
         /// Constructor for linear-interpolation based scaling of node metrics.
@@ -16,20 +16,19 @@ namespace SEE.Layout
         /// maximalLength].
         /// </summary>
         /// <param name="graph">the graph whose node metrics are to be scaled</param>
-        /// <param name="minimalLength">the mininmal value a node length should have</param>
-        /// <param name="maximalLength">the maximal value a node length should have</param>
+        /// <param name="minimalLength">the mininmal value a node length can have</param>
+        /// <param name="maximalLength">the maximal value a node length can have</param>
         /// <param name="metrics">node metrics for scaling</param>
         public LinearScale(Graph graph, float minimalLength, float maximalLength, IList<string> metrics)
-            : base(metrics)
+            : base(metrics, minimalLength, maximalLength)
         {
-            this.metricMaxima = DetermineMetricMaxima(graph, metrics);
-            this.minimalLength = minimalLength;
-            this.maximalLength = maximalLength;
+            metricMaxima = DetermineMetricMaxima(graph, metrics);
         }
 
+        /// <summary>
+        /// The maximal values of all metrics as a map metric-name -> maximal value.
+        /// </summary>
         private readonly Dictionary<string, float> metricMaxima;
-        private readonly float minimalLength;
-        private readonly float maximalLength;
 
         /// <summary>
         /// Yields a linear interpolation of the normalized value of the given node metric.
