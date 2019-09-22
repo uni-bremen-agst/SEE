@@ -1,51 +1,52 @@
 ﻿using SEE.DataModel;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
 {
-    public static class CubeFactory
+    /// <summary>
+    /// A factory for cubes as visual representations of graph nodes in the scene.
+    /// </summary>
+    public class CubeFactory : BlockFactory
     {
-        private static Dictionary<PrimitiveType, GameObject> primitiveMeshes = new Dictionary<PrimitiveType, GameObject>();
+        private SerializableDictionary<PrimitiveType, GameObject> primitiveMeshes = new SerializableDictionary<PrimitiveType, GameObject>();
 
-        public static void Reset()
+        ~CubeFactory()
         {
             foreach (GameObject gameObject in primitiveMeshes.Values)
             {
                 Destroyer.DestroyGameObject(gameObject);
             }
-            primitiveMeshes = new Dictionary<PrimitiveType, GameObject>();
         }
-        /*
-        public static GameObject CreatePrimitive(PrimitiveType type, bool withCollider)
+
+        public override void AttachBlock(GameObject parent, GameObject block)
         {
-            if (withCollider) { return GameObject.CreatePrimitive(type); }
-
-            GameObject gameObject = new GameObject(type.ToString());
-            MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
-            meshFilter.sharedMesh = MeshFactory.GetPrimitiveMesh(type);
-            gameObject.AddComponent<MeshRenderer>();
-
-            return gameObject;
+            base.AttachBlock(parent, block);
+            parent.AddComponent<CubeModifier>();
         }
-        */
 
-        public static void AddCube(GameObject gameObject)
+        public override GameObject NewBlock()
+        {
+            GameObject result = new GameObject();
+            AddCube(result);
+            return result;
+        }
+
+        private void AddCube(GameObject gameObject)
         {
             AddMesh(gameObject, PrimitiveType.Cube, "BrickTextures/BricksTexture13/BricksTexture13");
         }
 
-        public static void AddCylinder(GameObject gameObject, string materialPath)
+        private void AddCylinder(GameObject gameObject, string materialPath)
         {
-            AddMesh(gameObject, PrimitiveType.Cylinder, "");
+            AddMesh(gameObject, PrimitiveType.Cylinder, materialPath);
         }
 
-        public static void AddTerrain(GameObject gameObject)
+        public void AddTerrain(GameObject gameObject)
         {
             AddCylinder(gameObject, "Grass/Grass FD 1 diffuse");
         }
 
-        public static void AddFrontYard(GameObject gameObject)
+        public void AddFrontYard(GameObject gameObject)
         {
             AddCylinder(gameObject, "Grass/Sand FD 1 diffuse");
         }
@@ -59,7 +60,7 @@ namespace SEE.Layout
         /// <param name="materialPath">Path to the material file. The material file must be located 
         /// in a folder Resources. There must not be any file extension in the path name passed here. 
         /// However, the actual file on the disk must have the file extension .mat.</param>
-        public static void AddMesh(GameObject gameObject, PrimitiveType type, string materialPath)
+        private void AddMesh(GameObject gameObject, PrimitiveType type, string materialPath)
         {
             // So to create a cube (or sphere, or any object really) you need three things:
             // 1) A MeshFilter (The Mesh Filter takes a mesh from your assets and passes it 
@@ -121,7 +122,7 @@ namespace SEE.Layout
             // Object should be static so that we save rendering time at run-time.
             gameObject.isStatic = true;
 
-            gameObject.AddComponent<CubeModifier>();
+            
         }
 
         /// <summary>
@@ -131,7 +132,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="type">the type of mesh to be created</param>
         /// <returns>mesh of given type</returns>
-        private static GameObject GetPrimitiveMesh(PrimitiveType type)
+        private GameObject GetPrimitiveMesh(PrimitiveType type)
         {
             if (!primitiveMeshes.ContainsKey(type))
             {
@@ -141,7 +142,7 @@ namespace SEE.Layout
         }
 
         // "Steals" the necessary components from a temporarily created game object.
-        private static GameObject CreatePrimitiveMesh(PrimitiveType type)
+        private GameObject CreatePrimitiveMesh(PrimitiveType type)
         {
             GameObject gameObject = GameObject.CreatePrimitive(type);
             gameObject.name = Tags.NodePrefab;
@@ -150,6 +151,35 @@ namespace SEE.Layout
             gameObject.SetActive(false); // this object should not be visible
             primitiveMeshes[type] = gameObject;
             return gameObject;
+        }
+
+        public override Vector3 GetSize(GameObject block)
+        {
+            // Nodes represented by cubes have a renderer from which we can derive the
+            // extent.
+            Renderer renderer = block.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                return renderer.bounds.extents;
+            }
+            else
+            {
+                Debug.LogErrorFormat("Node {0} (tag: {1}) without renderer.\n", block.name, block.tag);
+                return Vector3.one;
+            }
+        }
+
+        /// <summary>
+        /// Scales the given block by the given scale. Note: The unit of scaling 
+        /// are normal Unity units.
+        /// 
+        /// Precondition: The given block must have been generated by this factory.
+        /// </summary>
+        /// <param name="block">block to be scaled</param>
+        /// <param name="scale">scaling factor</param>
+        public override void ScaleBlock(GameObject block, Vector3 scale)
+        {
+            block.transform.localScale = scale;
         }
     }
 }
