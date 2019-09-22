@@ -3,6 +3,7 @@ using UnityEditor;
 using SEE.DataModel;
 using SEE;
 using SEE.Layout;
+using System.Collections.Generic;
 
 namespace SEEEditor
 {
@@ -66,6 +67,11 @@ namespace SEEEditor
             GUILayout.Label("Breadth of buildings", EditorStyles.boldLabel);
             editorSettings.BreadthMetric = EditorGUILayout.TextField("Breadth", editorSettings.BreadthMetric);
 
+            GUILayout.Label("Visual attributes", EditorStyles.boldLabel);
+            editorSettings.BallonLayout = EditorGUILayout.Toggle("Balloon Layout", editorSettings.BallonLayout);
+            editorSettings.CScapeBuildings = EditorGUILayout.Toggle("CScape buildings", editorSettings.CScapeBuildings);
+            editorSettings.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", editorSettings.ZScoreScale);
+
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
             // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
 
@@ -74,13 +80,21 @@ namespace SEEEditor
             //myFloat = EditorGUILayout.Slider("Slider", myFloat, -3, 3);
             //EditorGUILayout.EndToggleGroup();
 
-            tagGroupEnabled = EditorGUILayout.BeginToggleGroup("GameObject Tags", tagGroupEnabled);
-            EditorGUILayout.EndToggleGroup();
-
             float width = position.width - 5;
             const float height = 30;
             string[] actionLabels = new string[] { "Load City", "Delete City" };
             int selectedAction = GUILayout.SelectionGrid(-1, actionLabels, actionLabels.Length, GUILayout.Width(width), GUILayout.Height(height));
+
+            BlockFactory blockFactory;
+            if (editorSettings.CScapeBuildings)
+            {
+                blockFactory = new BuildingFactory();
+            }
+            else
+            {
+                blockFactory = new CubeFactory();
+            }
+
             switch (selectedAction)
             {
                 case 0:
@@ -93,14 +107,34 @@ namespace SEEEditor
 
                     if (graph != null)
                     {
-                        CubeFactory.Reset();
-                        if (false)
+                        //CubeFactory.Reset();            
+                        IScale scaler;
                         {
-                            layout = new SEE.Layout.BalloonLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, editorSettings.IssueMap());
+                            List<string> nodeMetrics = new List<string>() { editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric };
+                            nodeMetrics.AddRange(editorSettings.IssueMap().Keys);
+                            if (editorSettings.ZScoreScale)
+                            {
+                                scaler = new ZScoreScale(graph, editorSettings.MinimalBlockLength, editorSettings.MaximalBlockLength, nodeMetrics);
+                            }
+                            else
+                            {
+                                scaler = new LinearScale(graph, editorSettings.MinimalBlockLength, editorSettings.MaximalBlockLength, nodeMetrics);
+                            }
+                        }
+
+                        if (editorSettings.BallonLayout)
+                        {
+                            layout = new SEE.Layout.BalloonLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, 
+                                                                  editorSettings.IssueMap(),
+                                                                  blockFactory,
+                                                                  scaler);
                         }
                         else
                         {
-                            layout = new SEE.Layout.ManhattenLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, editorSettings.IssueMap());
+                            layout = new SEE.Layout.ManhattenLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, 
+                                                                    editorSettings.IssueMap(),
+                                                                    blockFactory,
+                                                                    scaler);
                         }
                         layout.Draw(graph);
                     }
@@ -126,10 +160,9 @@ namespace SEEEditor
         {
             SceneGraphs.DeleteAll();
             graph = null;
-            CubeFactory.Reset();
+            //CubeFactory.Reset();
             if (layout != null)
             {
-                layout.Reset();
                 layout = null;
             }
             // delete all left-overs if there are any

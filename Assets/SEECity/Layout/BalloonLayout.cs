@@ -13,8 +13,11 @@ namespace SEE.Layout
     /// </summary>
     public class BalloonLayout : ILayout
     {
-        public BalloonLayout(string widthMetric, string heightMetric, string breadthMetric, SerializableDictionary<string, IconFactory.Erosion> issueMap)
-        : base(widthMetric, heightMetric, breadthMetric, issueMap)
+        public BalloonLayout(string widthMetric, string heightMetric, string breadthMetric, 
+                             SerializableDictionary<string, IconFactory.Erosion> issueMap,
+                             BlockFactory blockFactory,
+                             IScale scaler)
+        : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler)
         {
             name = "Ballon";
         }
@@ -39,19 +42,6 @@ namespace SEE.Layout
             // the maximal radius over all root circles; required to create the plane underneath
             float max_radius = 0.0f;
 
-            IScale scaler;
-            {
-                List<string> nodeMetrics = new List<string>() { widthMetric, heightMetric, breadthMetric };
-                nodeMetrics.AddRange(issueMap.Keys);
-                if (false)
-                {
-                    scaler = new LinearScale(graph, minimal_length, 1.0f, nodeMetrics);
-                }
-                else
-                {
-                    scaler = new ZScoreScale(graph, minimal_length, nodeMetrics);
-                }
-            }
             // first calculate all radii including those for the roots
             {
                 int i = 0;
@@ -93,6 +83,17 @@ namespace SEE.Layout
         /// </summary>
         private int maxDepth = 0;
 
+        // The plane underneath the nodes.
+        private GameObject plane;
+
+        ~BalloonLayout()
+        {
+            if (plane != null)
+            {
+                Destroyer.DestroyGameObject(plane);
+            }
+        }
+
         /// <summary>
         /// Draws the plane underneath the nodes. Defines attribute 'plane'.
         /// </summary>
@@ -114,7 +115,7 @@ namespace SEE.Layout
             // Breadth of the plane: double the radius. 
             float zLength = (2.0f * max_radius) * enlargementFactor;
 
-            this.plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
             Vector3 leftRootCenter = roots[0].transform.position;
             float planePositionX = (leftRootCenter.x - nodeInfos[roots[0]].outer_radius) + (xLength / enlargementFactor / 2.0f);
@@ -149,17 +150,7 @@ namespace SEE.Layout
             plane.transform.localScale = planeScale;
         }
 
-        // The plane underneath the nodes.
-        private GameObject plane;
 
-        public override void Reset()
-        {
-            if (plane != null)
-            {
-                Destroyer.DestroyGameObject(this.plane);
-                plane = null;
-            }
-        }
 
         private void DrawCircles(Node node, Vector3 position, int depth, int max_depth, IScale scaler)
         {
@@ -296,41 +287,23 @@ namespace SEE.Layout
         /// <param name="metricMaxima">the maxima of the metrics needed for normalization</param>
         private void DrawLeaf(Node node, Vector3 position, float radius, IScale scaler)
         {
-            // node will have two children: a cube placed on top of a cylinder; the cylinder is the 
-            // circle; the cube represents the node's metrics
-            Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, widthMetric),
-                                        scaler.GetNormalizedValue(node, heightMetric),
-                                        scaler.GetNormalizedValue(node, breadthMetric));
-            // Debug.LogFormat("scale of {0} = {1}\n", node.name, scale);
-
-            // set position and size of parent
+            // Set position of parent. The block was already created within the parent
+            // and will be moved along with it.
             GameObject parent = node.gameObject;
+
             // A Vector3 is a struct, not a true object, and is passed by value. 
             parent.transform.position = position;
-            // width and breadth are determined by the circle, height by the cube's height
-            parent.transform.localScale = new Vector3(2.0f * radius, scale.y, 2.0f * radius);
 
-            // First child: add cube to parent; cube is the first child
-            GameObject cube = new GameObject
-            {
-                name = "house " + parent.name
-            };
-            CubeFactory.AddCube(cube);         
-            // cube is nested in parent
-            cube.transform.parent = parent.transform;
-            // relative position within parent
-            cube.transform.position = new Vector3(position.x, scale.y / 2.0f, position.z);
+            // FIXME: We do without garden for the time being
+            //AddGarden(parent);
 
-            // Note that the values are interpreted relative to the parent here.
-            // The parent's height was chosen as scale.y above. Hence, we need to
-            // to scale by 1.0 for the y coordinate. The width and height of the
-            // parent were chosen to be twice the radius. We cannot scale to the
-            // radius, however, because otherwise the corners of the cube might
-            // range out of the circle. We need to scale by the following factor
-            // (the quotient of the cube length and the the circle diameter):
-            float factor = maximal_length / (2.0f * radius);
-            cube.transform.localScale = new Vector3(factor * scale.x, 1.0f, factor * scale.z);
+            AddErosionIssues(node, scaler);
+            //Renderer renderer = cylinder.GetComponent<Renderer>();
+            //renderer.material.color = Color.white;
+        }
 
+        private void AddGarden(GameObject parent)
+        {
             // Second child: the cylinder.
             // The cylinder will be placed just below the center of the cube;
             // it will fill the complete plane of the parent;
@@ -340,7 +313,8 @@ namespace SEE.Layout
             {
                 name = "garden " + parent.name
             };
-            CubeFactory.AddFrontYard(cylinder.gameObject);
+            // FIXME: Re-enable this:
+            //blockFactory.AddFrontYard(cylinder.gameObject);
             // game object of node becomes the parent of cube
             cylinder.transform.parent = parent.transform;
             // relative position within parent
@@ -348,10 +322,6 @@ namespace SEE.Layout
             // Scale to full extent of the parent's width and breadth (chosen to
             // be twice the radius above). The cylinder's height should be minimal.
             cylinder.transform.localScale = new Vector3(1.0f, cylinder_height, 1.0f);
-
-            AddErosionIssues(node, scaler);
-            //Renderer renderer = cylinder.GetComponent<Renderer>();
-            //renderer.material.color = Color.white;
         }
 
         protected static Vector3 GetSizeOfSprite(GameObject go)
@@ -548,21 +518,64 @@ namespace SEE.Layout
 
             max_depth = 0;
 
-            if (node.NumberOfChildren() == 0)
+            if (node.IsLeaf())
             {
-                // If node i is a leaf, we return an outer-radius large enough to
-                // put in the building that will later be placed into the circle.
-                // The block's width and breadth are proportional to the two metrics.
-                Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, widthMetric),
-                                            scaler.GetNormalizedValue(node, heightMetric),
-                                            scaler.GetNormalizedValue(node, breadthMetric));
+                // parent will have two children: a block placed on top of a cylinder; the cylinder is the 
+                // circle; the block represents the node's metrics
+                GameObject parent = node.gameObject;
+
+                // First child: add block to parent; block will become the first child.
+                // The block is create here so that we know its size. It will be positioned later.
+                GameObject block = blockFactory.NewBlock();
+                block.name = "house " + parent.name;
+
+                {
+                    // The block's width and breadth are proportional to the two metrics.
+                    Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, widthMetric),
+                                                scaler.GetNormalizedValue(node, heightMetric),
+                                                scaler.GetNormalizedValue(node, breadthMetric));
+
+                    // We scale the block before it becomes a child of parent so that its scale
+                    // is not relative to its parent.
+                    blockFactory.ScaleBlock(block, scale);
+                }
+
+                // block is nested in parent
+                blockFactory.AttachBlock(parent, block);
+
+                // Necessary size of the block independent of the parent
+                Vector3 size = blockFactory.GetSize(block);
+
                 // The outer radius of an inner-most node is determined by the ground
                 // rectangle of the block to be drawn for the node.
                 // Pythagoras: diagonal of the ground rectangle.
-                float diagonal = Mathf.Sqrt(scale.x * scale.x + scale.z * scale.z);
+                float diagonal = Mathf.Sqrt(size.x * size.x + size.z * size.z);
+
+                // The outer-radius must be large enough to put in the block.
                 out_rad = diagonal / 2.0f;
                 rad = 0.0f;
                 max_depth = 0;
+
+                Debug.LogFormat("size of block = {0}, radius = {1}\n", size, out_rad);
+
+                // size of parent are determined by the circle, height by the blocks's height
+                //parent.transform.localScale = new Vector3(2.0f * out_rad, size.y, 2.0f * out_rad);
+
+                // relative position within parent
+                // block.transform.position = new Vector3(position.x, scale.y / 2.0f, position.z);
+
+                // Note that the values are interpreted relative to the parent here.
+                // The parent's height was chosen as scale.y above. Hence, we need to
+                // to scale by 1.0 for the y coordinate. The width and height of the
+                // parent were chosen to be twice the radius. We cannot scale to the
+                // radius, however, because otherwise the corners of the cube might
+                // range out of the circle. We need to scale by the following factor
+                // (the quotient of the cube length and the the circle diameter):
+                //float factor = maximal_length / (2.0f * radius);
+
+                // FIXME: Must be adjusted to scaling of CScape buildings
+                //ScaleBlock(block, new Vector3(factor * scale.x, 1.0f, factor * scale.z));
+
             }
             else
             {
@@ -884,7 +897,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">node for which to determine the roof position</param>
         /// <returns>roof position</returns>
-        private static Vector3 RoofOfHouse(GameObject node)
+        private Vector3 RoofOfHouse(GameObject node)
         {
             // Note: The leaf nodes are represented by a composite game object,
             // one for the building, one for the circle on its ground;
@@ -898,7 +911,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">node for whose first child we are to determine the size</param>
         /// <returns>roof position</returns>
-        private static Vector3 SizeOfHouse(GameObject node)
+        private Vector3 SizeOfHouse(GameObject node)
         {
             // Note: The leaf nodes are represented by a composite game object,
             // one for the building, one for the circle on its ground;
@@ -945,7 +958,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">node whose self loop control points are required</param>
         /// <returns>control points forming a self loop above the node</returns>
-        private static Vector3[] SelfLoop(GameObject node)
+        private Vector3[] SelfLoop(GameObject node)
         {
             // we need at least four control points; tinySplines wants that
             Vector3[] controlPoints = new Vector3[4];
@@ -972,7 +985,7 @@ namespace SEE.Layout
         /// <param name="targetObject"></param>
         /// <param name="maxDepth">maximal depth of the node hierarchy</param>
         /// <returns>control points for two nodes without common ancestor</returns>
-        private static Vector3[] ThroughCenter(GameObject sourceObject, GameObject targetObject, int maxDepth)
+        private Vector3[] ThroughCenter(GameObject sourceObject, GameObject targetObject, int maxDepth)
         {
             Vector3[] controlPoints = new Vector3[4];
             controlPoints[0] = RoofOfHouse(sourceObject);

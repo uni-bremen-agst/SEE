@@ -1,8 +1,6 @@
 ﻿using SEE.DataModel;
 
 using UnityEngine;
-using System.Collections.Generic;
-using CScape;
 
 namespace SEE.Layout
 {
@@ -18,11 +16,6 @@ namespace SEE.Layout
             DrawEdges(graph);
             p.End();
         }
-
-        // This parameter determines the minimal width, breadth, and height of each cube. 
-        // Subclasses may define a maximal length, too, in which case minimal_length
-        // must be smaller than that maximal length.
-        public static readonly float minimal_length = 0.1f;
 
         /// <summary>
         /// Path to the material used for edges.
@@ -40,6 +33,11 @@ namespace SEE.Layout
         /// Mapping of node attributes onto erosion issue icons.
         /// </summary>
         protected readonly SerializableDictionary<string, IconFactory.Erosion> issueMap;
+
+        /// <summary>
+        /// A factory to create visual representations of graph nodes (e.g., cubes or CScape buildings).
+        /// </summary>
+        protected readonly BlockFactory blockFactory;
 
         /// <summary>
         /// Returns the default material for edges using the materialPath.
@@ -75,6 +73,11 @@ namespace SEE.Layout
         protected string name = "";
 
         /// <summary>
+        /// Used to determine the lengths of the node blocks.
+        /// </summary>
+        protected readonly IScale scaler;
+
+        /// <summary>
         /// The unique name of a layout.
         /// </summary>
         public string Name
@@ -82,12 +85,17 @@ namespace SEE.Layout
             get => name;
         }
 
-        public ILayout(string widthMetric, string heightMetric, string breadthMetric, SerializableDictionary<string, IconFactory.Erosion> issueMap)
+        public ILayout(string widthMetric, string heightMetric, string breadthMetric, 
+                       SerializableDictionary<string, IconFactory.Erosion> issueMap, 
+                       BlockFactory blockFactory,
+                       IScale scaler)
         {
             this.widthMetric = widthMetric;
             this.heightMetric = heightMetric;
             this.breadthMetric = breadthMetric;
             this.issueMap = issueMap;
+            this.blockFactory = blockFactory;
+            this.scaler = scaler;
         }
 
         /// <summary>
@@ -109,7 +117,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="gameObject">game object whose size is to be determined</param>
         /// <returns>size of the game object</returns>
-        protected static Vector3 GetSize(GameObject gameObject)
+        protected Vector3 GetSize(GameObject gameObject)
         {
             return GetExtent(gameObject) * 2.0f;
         }
@@ -158,18 +166,9 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="gameObject">game object whose extent is to be determined</param>
         /// <returns>extent of the game object</returns>
-        protected static Vector3 GetExtent(GameObject gameObject)
+        protected Vector3 GetExtent(GameObject gameObject)
         {
-            BlockModifier bm = gameObject.GetComponent<BlockModifier>();
-            if (bm == null)
-            {
-                Debug.LogErrorFormat("Game object {0} without block modifier.\n", gameObject.name);
-                return Vector3.one;
-            }
-            else
-            {
-                return bm.GetExtent();
-            }
+            return blockFactory.GetSize(gameObject) / 2.0f;
         }
 
         /// <summary>
@@ -177,18 +176,12 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">node for which to determine the roof position</param>
         /// <returns>roof position</returns>
-        protected static Vector3 Roof(GameObject node)
+        protected Vector3 Roof(GameObject node)
         {
             Vector3 result = node.transform.position;
             result.y += GetExtent(node).y;
             return result;
         }
-
-        /// <summary>
-        /// Removes everything the layout has added to the scence, such as planes etc.
-        /// </summary>
-        public abstract void Reset();
-
     }
 }
 
