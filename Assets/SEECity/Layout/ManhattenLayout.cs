@@ -7,36 +7,13 @@ namespace SEE.Layout
 {
     public class ManhattenLayout : ILayout
     {
-        public ManhattenLayout(string widthMetric, string heightMetric, string breadthMetric, SerializableDictionary<string, IconFactory.Erosion> issueMap)
-            : base(widthMetric, heightMetric, breadthMetric, issueMap)
+        public ManhattenLayout(string widthMetric, string heightMetric, string breadthMetric, 
+                               SerializableDictionary<string, IconFactory.Erosion> issueMap,
+                               BlockFactory blockFactory,
+                               IScale scaler)
+            : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler)
         {
             name = "Manhattan";
-        }
-
-        /// <summary>
-        /// Used to determine the lengths of the node blocks.
-        /// </summary>
-        private IScale scaler;
-
-        public override void Draw(Graph graph)
-        {
-            IList<string> metrics = new List<string>() {widthMetric, heightMetric, breadthMetric};
-            scaler = new LinearScale(graph, minimal_length, 1.0f, metrics);
-            AddNodes(graph);
-            base.Draw(graph);
-        }
-
-        private void AddNodes(Graph graph)
-        {
-            foreach (GameObject sceneNode in graph.GetNodes())
-            {
-                Node node = sceneNode.GetComponent<Node>();
-                if (node != null && node.IsLeaf())
-                {
-                    //MeshFactory.AddCube(sceneNode); // TODO: Parameterize by node factory
-                    BuildingFactory.AddBuilding(sceneNode);
-                }
-            }
         }
 
         // The minimal length of any axis (width, breadth, height) of a block.
@@ -55,7 +32,7 @@ namespace SEE.Layout
 
             foreach (GameObject sceneNode in graph.GetNodes())
             {
-                // Note: sceneNode may only be a container for the actual building.
+                // Note: sceneNode is only be a container for the actual building.
 
                 // The logical node represented by this game object.
                 Node node = sceneNode.GetComponent<Node>();
@@ -66,6 +43,9 @@ namespace SEE.Layout
                 else if (node.IsLeaf())
                 {
                     // We only draw leaves.
+
+                    GameObject block = blockFactory.NewBlock();
+
                     column++;
                     if (column > numberOfBuildingsPerRow)
                     {
@@ -81,9 +61,11 @@ namespace SEE.Layout
                                                 scaler.GetNormalizedValue(node, breadthMetric));
 
                     // Scale according to the metrics.
-                    ScaleBlock(sceneNode, scale);
+                    blockFactory.ScaleBlock(block, scale);
 
-                    Vector3 size = GetSize(sceneNode);
+                    // size is independent of the sceneNode
+                    Vector3 size = blockFactory.GetSize(block);
+                    blockFactory.AttachBlock(sceneNode, block);
                     if (size.z > maxZ)
                     {
                         maxZ = size.z;
@@ -110,8 +92,6 @@ namespace SEE.Layout
         /// </summary>
         protected override void DrawEdges(Graph graph)
         {
-            return; // FIXME turned off for now
-
             // The distance of the edges relative to the houses; the maximal height of
             // a house is 1.0. This offset is used to draw the line somewhat below
             // or above the house (depending on the orientation).
@@ -209,7 +189,5 @@ namespace SEE.Layout
                 }
             }
         }
-
-        public override void Reset() { /* Does not need to do anything. */}
     }
 }
