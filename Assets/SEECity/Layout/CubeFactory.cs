@@ -18,12 +18,6 @@ namespace SEE.Layout
             }
         }
 
-        public override void AttachBlock(GameObject parent, GameObject block)
-        {
-            base.AttachBlock(parent, block);
-            parent.AddComponent<CubeModifier>();
-        }
-
         public override GameObject NewBlock()
         {
             GameObject result = new GameObject();

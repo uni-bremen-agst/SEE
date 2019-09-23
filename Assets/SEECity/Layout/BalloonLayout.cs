@@ -16,11 +16,15 @@ namespace SEE.Layout
         public BalloonLayout(string widthMetric, string heightMetric, string breadthMetric, 
                              SerializableDictionary<string, IconFactory.Erosion> issueMap,
                              BlockFactory blockFactory,
-                             IScale scaler)
-        : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler)
+                             IScale scaler,
+                             float edgeWidth)
+        : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
         {
             name = "Ballon";
         }
+
+        // A mapping of graph nodes onto the game objects representing them visually in the scene
+        private Dictionary<Node, GameObject> gameObjects = new Dictionary<Node, GameObject>();
 
         protected override void DrawNodes(Graph graph)
         {
@@ -70,7 +74,7 @@ namespace SEE.Layout
                     // for two neighboring circles the distance must be the sum of the their two radii;
                     // in case we draw the very first circle, no distance must be kept
                     position.x += i == 0 ? 0.0f : nodeInfos[roots[i - 1]].outer_radius + nodeInfos[roots[i]].outer_radius + offset;
-                    Debug.Log("Drawing balloon for root " + root.name + "@" + position + "\n");
+                    Debug.Log("Drawing balloon for root " + root.LinkName + "@" + position + "\n");
                     DrawCircles(root, position, 0, max_depths[i], scaler);
                     i++;
                 }
@@ -108,7 +112,7 @@ namespace SEE.Layout
             const float enlargementFactor = 1.12f; // should not be smaller than 1.0
 
             // Width of the plane underneath the root circles determined by the left-most and right-most circle.
-            float xLength = (roots[roots.Length - 1].transform.position.x - roots[0].transform.position.x
+            float xLength = (gameObjects[roots[roots.Length - 1]].transform.position.x - gameObjects[roots[0]].transform.position.x
                 + nodeInfos[roots[0]].outer_radius + nodeInfos[roots[roots.Length - 1]].outer_radius)
                 * enlargementFactor;
 
@@ -116,8 +120,9 @@ namespace SEE.Layout
             float zLength = (2.0f * max_radius) * enlargementFactor;
 
             plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            plane.tag = Tags.Decoration;
 
-            Vector3 leftRootCenter = roots[0].transform.position;
+            Vector3 leftRootCenter = gameObjects[roots[0]].transform.position;
             float planePositionX = (leftRootCenter.x - nodeInfos[roots[0]].outer_radius) + (xLength / enlargementFactor / 2.0f);
             float planePositionY = leftRootCenter.y - 1.0f; // somewhat underneath roots
             float planePositionZ = leftRootCenter.z;
@@ -149,8 +154,6 @@ namespace SEE.Layout
             Vector3 planeScale = new Vector3(xLength, 10.0f, zLength) / planeMeshFactor;
             plane.transform.localScale = planeScale;
         }
-
-
 
         private void DrawCircles(Node node, Vector3 position, int depth, int max_depth, IScale scaler)
         {
@@ -287,12 +290,8 @@ namespace SEE.Layout
         /// <param name="metricMaxima">the maxima of the metrics needed for normalization</param>
         private void DrawLeaf(Node node, Vector3 position, float radius, IScale scaler)
         {
-            // Set position of parent. The block was already created within the parent
-            // and will be moved along with it.
-            GameObject parent = node.gameObject;
-
-            // A Vector3 is a struct, not a true object, and is passed by value. 
-            parent.transform.position = position;
+            GameObject gameObject = gameObjects[node];
+            blockFactory.SetPosition(gameObject, position);
 
             // FIXME: We do without garden for the time being
             //AddGarden(parent);
@@ -403,7 +402,7 @@ namespace SEE.Layout
             {
                 // The space that we put in between two subsequent erosion issue sprites.
                 Vector3 delta = Vector3.up / 100.0f;
-                Vector3 currentRoof = RoofOfHouse(node.gameObject);
+                Vector3 currentRoof = blockFactory.Roof(gameObjects[node]);
                 sprites.Sort(comparer);
                 //Debug.Log("---------------------------------\n");
                 foreach (GameObject sprite in sprites)
@@ -520,14 +519,13 @@ namespace SEE.Layout
 
             if (node.IsLeaf())
             {
-                // parent will have two children: a block placed on top of a cylinder; the cylinder is the 
-                // circle; the block represents the node's metrics
-                GameObject parent = node.gameObject;
-
                 // First child: add block to parent; block will become the first child.
                 // The block is create here so that we know its size. It will be positioned later.
                 GameObject block = blockFactory.NewBlock();
-                block.name = "house " + parent.name;
+                NodeRef noderef = block.AddComponent<NodeRef>();
+                noderef.node = node;
+                block.name = node.LinkName;
+                gameObjects[node] = block;
 
                 {
                     // The block's width and breadth are proportional to the two metrics.
@@ -541,7 +539,7 @@ namespace SEE.Layout
                 }
 
                 // block is nested in parent
-                blockFactory.AttachBlock(parent, block);
+                //blockFactory.AttachBlock(parent, block);
 
                 // Necessary size of the block independent of the parent
                 Vector3 size = blockFactory.GetSize(block);
@@ -649,11 +647,17 @@ namespace SEE.Layout
         private void DrawInnerNode(Node node, Vector3 position, float radius, int depth, int max_depth)
         {
 
-            GameObject go = node.gameObject;
+            GameObject circle = new GameObject();
+            gameObjects[node] = circle;
+            NodeRef nodeRef = circle.AddComponent<NodeRef>();
+            nodeRef.node = node;
+            circle.name = node.LinkName;
+            circle.tag = Tags.Node;
+
             // If wanted to have the nesting of circles on different ground levels depending
             // on the depth of the node, we would use position.y - (max_depth - depth + 1) * cylinder_height
             // for the y coordinate.
-            go.transform.position = position;
+            circle.transform.position = position;
            //go.transform.localScale = new Vector3(2.0f * radius, cylinder_height, 2.0f * radius);
             /*
               MeshFactory.AddTerrain(go);
@@ -663,7 +667,7 @@ namespace SEE.Layout
             // DrawCircle(node, position, radius);
             // Roots have depth 0. We want the line to be thicker for nodes higher in the hierarchy.
             float lineWidth = Mathf.Lerp(0.1f, 1.0f, (float)(max_depth - depth) / max_depth);
-            AttachCircleLine(go, radius, lineWidth);
+            AttachCircleLine(circle, radius, lineWidth);
 
             GameObject text = TextFactory.GetText(node.SourceName, position, 2.0f * radius * 0.3f);
             //text.transform.parent = go.transform; // make the text a child of circle
@@ -677,25 +681,6 @@ namespace SEE.Layout
                 color = color
             };
             renderer.sharedMaterial = tempMaterial;
-        }
-
-        private void DrawCircle(Node node, Vector3 position, float radius)
-        {
-            GameObject parent = node.gameObject;
-
-            GameObject circle = new GameObject();
-            circle.name = node.name + " border";
-
-            // Create new circle line that becomes the child game object of node's game object.
-            circle.transform.parent = parent.transform;
-            // relative position within parent
-            circle.transform.localPosition = Vector3.zero;
-
-            // Scale to full extent of the parent's width and breadth (chosen to
-            // be twice the radius above). The cylinder's height should be minimal.
-            // circle.transform.localScale = new Vector3(1.0f, cylinder_height, 1.0f);
-
-            AttachCircleLine(circle, radius, 0.1f);
         }
 
         private static void AttachCircleLine(GameObject circle, float radius, float lineWidth)
@@ -750,8 +735,8 @@ namespace SEE.Layout
         {
             Vector3[] controlPoints;
 
-            GameObject sourceObject = source.gameObject;
-            GameObject targetObject = target.gameObject;
+            GameObject sourceObject = gameObjects[source];
+            GameObject targetObject = gameObjects[target];
 
             if (source == target)
             {
@@ -772,7 +757,7 @@ namespace SEE.Layout
                 }
                 else
                 {
-                    GameObject lcaObject = lca.gameObject;
+                    GameObject lcaObject = gameObjects[lca];
                     if (lcaObject == null)
                     {
                         Debug.LogError("Undefined game object for lowest common ancestor of "
@@ -786,7 +771,8 @@ namespace SEE.Layout
                         // because the edges are only between leaves:
                         // assert: sourceObject != lcaObject
                         // assert: targetObject != lcaObject
-                        Node lcaNode = lcaObject.GetComponent<Node>();
+                        NodeRef nodeRef = lcaObject.GetComponent<NodeRef>();
+                        Node lcaNode = nodeRef.node;
 
                         Node[] sourceToLCA = Ancestors(source, lcaNode);
                         Debug.Assert(sourceToLCA.Length > 1);
@@ -808,10 +794,10 @@ namespace SEE.Layout
                             // for Bsplines (it is fine to include LCA twice).
                             // Edges between leaves will be on the ground.
                             controlPoints = new Vector3[4];
-                            controlPoints[0] = Garden(sourceObject);
-                            controlPoints[1] = lcaNode.gameObject.transform.position;
+                            controlPoints[0] = blockFactory.Ground(sourceObject);
+                            controlPoints[1] = gameObjects[lcaNode].transform.position;
                             controlPoints[2] = controlPoints[1];
-                            controlPoints[3] = Garden(targetObject);
+                            controlPoints[3] = blockFactory.Ground(targetObject);
                         }
                         else
                         {
@@ -827,16 +813,16 @@ namespace SEE.Layout
                             }
                             // Calculate control points along the node hierarchy 
                             controlPoints = new Vector3[fullPath.Length];
-                            controlPoints[0] = RoofOfHouse(sourceObject);
+                            controlPoints[0] = blockFactory.Roof(sourceObject);
                             for (int i = 1; i < fullPath.Length - 1; i++)
                             {
                                 // We consider the height of intermediate nodes.
                                 // Note that a root has level 0 and the level is increases along 
                                 // the childrens' depth. That is why we need to choose the height
                                 // as a measure relative to maxDepth.
-                                controlPoints[i] = fullPath[i].gameObject.transform.position + (maxDepth - nodeInfos[fullPath[i]].level) * levelUnit;
+                                controlPoints[i] = gameObjects[fullPath[i]].transform.position + (maxDepth - nodeInfos[fullPath[i]].level) * levelUnit;
                             }
-                            controlPoints[controlPoints.Length - 1] = RoofOfHouse(targetObject);
+                            controlPoints[controlPoints.Length - 1] = blockFactory.Roof(targetObject);
                             //Dump(controlPoints);
                         }
                     }
@@ -893,48 +879,6 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Returns the roof position of the first child (the house).
-        /// </summary>
-        /// <param name="node">node for which to determine the roof position</param>
-        /// <returns>roof position</returns>
-        private Vector3 RoofOfHouse(GameObject node)
-        {
-            // Note: The leaf nodes are represented by a composite game object,
-            // one for the building, one for the circle on its ground;
-            // the building is the first child
-            GameObject child = node.transform.GetChild(0).gameObject;
-            return Roof(child);
-        }
-
-        /// <summary>
-        /// Returns the size of the first child (the house).
-        /// </summary>
-        /// <param name="node">node for whose first child we are to determine the size</param>
-        /// <returns>roof position</returns>
-        private Vector3 SizeOfHouse(GameObject node)
-        {
-            // Note: The leaf nodes are represented by a composite game object,
-            // one for the building, one for the circle on its ground;
-            // the building is the first child
-            GameObject child = node.transform.GetChild(0).gameObject;
-            return GetSize(child);
-        }
-
-        /// <summary>
-        /// Returns the position of the garden of a node.
-        /// </summary>
-        /// <param name="node">node for which to determine the garden position</param>
-        /// <returns>position the node's garden</returns>
-        private static Vector3 Garden(GameObject node)
-        {
-            // Note: The leaf nodes are represented by a composite game object,
-            // one for the building, one for the circle on its ground;
-            // the garden is the second child
-            GameObject child = node.transform.GetChild(1).gameObject;
-            return child.transform.position;
-        }
-
-        /// <summary>
         /// The number of Unity units per level of the hierarchy for the height of control points.
         /// This factor must be relative to the height of the buildings. The initial value is
         /// just a default.
@@ -963,10 +907,10 @@ namespace SEE.Layout
             // we need at least four control points; tinySplines wants that
             Vector3[] controlPoints = new Vector3[4];
             // self-loop
-            controlPoints[0] = RoofOfHouse(node); 
+            controlPoints[0] = blockFactory.Roof(node); 
             controlPoints[1] = controlPoints[0] + levelUnit + selfLoopExtent * Vector3.left;
             controlPoints[2] = controlPoints[1] + 2.0f * selfLoopExtent * Vector3.right;
-            controlPoints[3] = RoofOfHouse(node);
+            controlPoints[3] = blockFactory.Roof(node);
             return controlPoints;
         }
 
@@ -988,8 +932,8 @@ namespace SEE.Layout
         private Vector3[] ThroughCenter(GameObject sourceObject, GameObject targetObject, int maxDepth)
         {
             Vector3[] controlPoints = new Vector3[4];
-            controlPoints[0] = RoofOfHouse(sourceObject);
-            controlPoints[3] = RoofOfHouse(targetObject);
+            controlPoints[0] = blockFactory.Roof(sourceObject);
+            controlPoints[3] = blockFactory.Roof(targetObject);
             // the point in between the two roofs
             Vector3 center = controlPoints[0] + 0.5f * (controlPoints[3] - controlPoints[0]);
             // note: height is independent of the roofs; it is the distance to the ground
@@ -1001,7 +945,7 @@ namespace SEE.Layout
 
         protected override void DrawEdges(Graph graph)
         {
-            levelUnit = MaximalNodeHeight(graph);
+            levelUnit = MaximalNodeHeight();
             Debug.LogFormat("levelUnit={0}\n", levelUnit);
 
             Material newMat = new Material(defaultLineMaterial);
@@ -1018,44 +962,41 @@ namespace SEE.Layout
                 return;
             }
             LCAFinder lca = new LCAFinder(graph, roots);
-            foreach (GameObject gameEdge in graph.GetEdges())
+            foreach (Edge edge in graph.Edges())
             {
-                Edge edge = gameEdge.GetComponent<Edge>();
+                GameObject go = new GameObject();
+                go.tag = Tags.Edge;
 
-                if (edge != null)
+                Node source = edge.Source;
+                Node target = edge.Target;
+                if (source != null && target != null)
                 {
-                    Node source = edge.Source;
-                    Node target = edge.Target;
-                    if (source != null && target != null)
-                    {
-                        BSplineFactory.Draw(edge.gameObject, GetControlPoints(source, target, lca, maxDepth), newMat);
-                    }
-                    else
-                    {
-                        Debug.LogError("Scene edge " + gameEdge.name + " has a missing source or target.\n");
-                    }
+                    go.name = edge.Type + "(" + source.LinkName + ", " + target.LinkName + ")";
+                    BSplineFactory.Draw(go, GetControlPoints(source, target, lca, maxDepth), edgeWidth, newMat);
                 }
                 else
                 {
-                    Debug.LogError("Scene edge " + gameEdge.name + " does not have a graph edge component.\n");
+                    Debug.LogErrorFormat("Scene edge from {0} to {1} of type {2} has a missing source or target.\n",
+                                         source != null ? source.LinkName : "null", 
+                                         target != null ? target.LinkName : "null", 
+                                         edge.Type);
                 }
             }
         }
 
         /// <summary>
-        /// Yields the maximal height over all nodes.
+        /// Yields the maximal height over all nodes (stored in gameObjects).
         /// </summary>
-        /// <param name="graph">graph whose nodes are to be considered</param>
         /// <returns>maximal height of nodes in y coordinate (x and z are zero)</returns>
-        private Vector3 MaximalNodeHeight(Graph graph)
+        private Vector3 MaximalNodeHeight()
         {
             Vector3 result = Vector3.zero;
-            foreach (GameObject node in graph.GetNodes())
+            foreach (KeyValuePair<Node, GameObject> node in gameObjects)
             {
-                Node n = node.GetComponent<Node>();
+                Node n = node.Key;
                 if (n != null && n.IsLeaf())
                 {
-                    Vector3 size = SizeOfHouse(node);
+                    Vector3 size = blockFactory.GetSize(node.Value);
                     if (size.y > result.y)
                     {
                         result.y = size.y;

@@ -66,5 +66,41 @@ namespace SEE.Layout
         /// <param name="block">block to be scaled</param>
         /// <param name="scale">scaling factor</param>
         public abstract void ScaleBlock(GameObject block, Vector3 scale);
+
+        /// <summary>
+        /// Sets the position of the current block. The given position is interpreted
+        /// as the center of the block.
+        /// </summary>
+        /// <param name="block">block to be positioned</param>
+        /// <param name="position">where to position the block</param>
+        public virtual void SetPosition(GameObject block, Vector3 position)
+        {
+            // the default position of a game object in Unity is its center
+            block.transform.position = position;
+        }
+
+        /// <summary>
+        /// Returns the center of the roof of the given block.
+        /// </summary>
+        /// <param name="block">block for which to determine the roof position</param>
+        /// <returns>roof position</returns>
+        public virtual Vector3 Roof(GameObject block)
+        {
+            Vector3 result = block.transform.position;
+            result.y += GetSize(block).y / 2.0f;
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the center of the ground of a block.
+        /// </summary>
+        /// <param name="block">block for which to determine the ground position</param>
+        /// <returns>ground position</returns>
+        public virtual Vector3 Ground(GameObject block)
+        {
+            Vector3 result = block.transform.position;
+            result.y -= GetSize(block).y / 2.0f;
+            return result;
+        }
     }
 }

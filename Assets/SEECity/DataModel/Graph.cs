@@ -63,10 +63,10 @@ namespace SEE.DataModel
         /// </summary>
         public int EdgeCount => edges.Count;
 
-        private void Awake()
-        {
-            Debug.Log("Graph " + name + " with " + NodeCount + " nodes and " + EdgeCount + " edges.\n");
-        }
+        //private void Awake()
+        //{
+        //    Debug.Log("Graph " + name + " with " + NodeCount + " nodes and " + EdgeCount + " edges.\n");
+        //}
 
         [SerializeField]
         private string viewName = "";
@@ -145,10 +145,10 @@ namespace SEE.DataModel
         /// Returns the game object representing the graph in the scene.
         /// </summary>
         /// <returns>game object representing the graph in the scene</returns>
-        public GameObject GetGraph()
-        {
-            return this.gameObject;
-        }
+        //public GameObject GetGraph()
+        //{
+        //    return this.gameObject;
+        //}
 
         /// <summary>
         /// Dumps the hierarchy for each root. Used for debugging.
@@ -191,13 +191,15 @@ namespace SEE.DataModel
         /// Returns all game objects representing the nodes of the graph in the scene.
         /// </summary>
         /// <returns>all node game objects</returns>
+        [ObsoleteAttribute("GetNodes(). Use Nodes() instead.", false)]
         public List<GameObject> GetNodes()
         {
             List<GameObject> result = new List<GameObject>();
-            foreach (Node node in nodes.Values)
-            {
-                result.Add(node.gameObject);
-            }
+            // FIXME
+            //foreach (Node node in nodes.Values)
+            //{
+            //    result.Add(node.gameObject);
+            //}
             return result;
         }
 
@@ -205,13 +207,15 @@ namespace SEE.DataModel
         /// Returns all game objects representing the edges of the graph in the scene.
         /// </summary>
         /// <returns>all edge game objects</returns>
+        [ObsoleteAttribute("GetEdges(). Use Edges() instead.", false)]
         public List<GameObject> GetEdges()
         {
             List<GameObject> result = new List<GameObject>();
-            foreach (Edge edge in edges)
-            {
-                result.Add(edge.gameObject);
-            }
+            // FIXME:
+            //foreach (Edge edge in edges)
+            //{
+            //    result.Add(edge.gameObject);
+            //}
             return result;
         }
 
@@ -222,17 +226,20 @@ namespace SEE.DataModel
         /// </summary>
         public void Destroy()
         {
-            foreach (Edge edge in edges)
-            {
-                Destroyer.DestroyGameObject(edge.gameObject);
-            }
+            // FIXME
+            //foreach (Edge edge in edges)
+            //{
+            //    Destroyer.DestroyGameObject(edge.gameObject);
+            //}
             edges.Clear();
-            foreach (Node node in nodes.Values)
-            {
-                Destroyer.DestroyGameObject(node.gameObject);
-            }
+            // FIXME
+            //foreach (Node node in nodes.Values)
+            //{
+            //    Destroyer.DestroyGameObject(node.gameObject);
+            //}
             nodes.Clear();
-            Destroyer.DestroyGameObject(this.gameObject);
+            // FIXME
+            //Destroyer.DestroyGameObject(this.gameObject);
         }
 
         /// <summary>
