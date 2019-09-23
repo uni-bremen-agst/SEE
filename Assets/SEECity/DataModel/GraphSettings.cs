@@ -110,6 +110,9 @@ namespace SEE
         // Whether CScape building should be used to visualize graph nodes. If false, cubes are used.
         public bool CScapeBuildings = true;
 
+        // The width of edges.
+        public float EdgeWidth = 1.0f;
+
         /// <summary>
         /// Yields a mapping of all node attribute names that define erosion issues in the GXL file
         /// onto the icons to be used for visualizing them.
