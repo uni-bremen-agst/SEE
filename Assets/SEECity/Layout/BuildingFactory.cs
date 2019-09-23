@@ -76,7 +76,6 @@ namespace SEE.Layout
             foreach (UnityEngine.Object prefab in prefabs)
             {
                 GameObject o = NewBuilding(prefab);
-                o.AddComponent<CScapeBlockModifier>();
                 o.name = prefabFiles[i];
 
                 float width;
@@ -91,12 +90,6 @@ namespace SEE.Layout
                     position += (width / 2.0f) * Vector3.right + 5 * Vector3.right;
                 }
             }
-        }
-
-        public override void AttachBlock(GameObject parent, GameObject block)
-        {
-            base.AttachBlock(parent, block);
-            parent.AddComponent<CScapeBlockModifier>();
         }
 
         public override GameObject NewBlock()
@@ -205,7 +198,47 @@ namespace SEE.Layout
                 bm.buildingWidth = (int)scale.x;
                 bm.floorNumber = (int)scale.y;
                 bm.buildingDepth = (int)scale.z;
+                bm.UpdateCity();
+                bm.AwakeCity();
             }
+        }
+
+        public override void SetPosition(GameObject block, Vector3 position)
+        {
+            // the default position of a game object in Unity is its center, but the
+            // position of a CScape building is its left corner
+            Vector3 extent = GetSize(block) / 2.0f;
+            Vector3 newPosition = position - extent;
+            newPosition.y = position.y;
+            block.transform.position = newPosition;
+        }
+
+        /// <summary>
+        /// Returns the center of the roof of the given block.
+        /// </summary>
+        /// <param name="block">block for which to determine the roof position</param>
+        /// <returns>roof position</returns>
+        public override Vector3 Roof(GameObject block)
+        {
+            Vector3 result = block.transform.position;
+            Vector3 extent = GetSize(block) / 2.0f;
+            // transform to center
+            result += extent;
+            // top above the center
+            result.y += extent.y;
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the center of the ground of a block.
+        /// </summary>
+        /// <param name="block">block for which to determine the ground position</param>
+        /// <returns>ground position</returns>
+        public override Vector3 Ground(GameObject block)
+        {
+            Vector3 result = block.transform.position;
+            result.y -= GetSize(block).y / 2.0f;
+            return result;
         }
     }
 }

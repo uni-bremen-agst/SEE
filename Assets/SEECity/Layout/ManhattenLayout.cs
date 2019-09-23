@@ -10,8 +10,9 @@ namespace SEE.Layout
         public ManhattenLayout(string widthMetric, string heightMetric, string breadthMetric, 
                                SerializableDictionary<string, IconFactory.Erosion> issueMap,
                                BlockFactory blockFactory,
-                               IScale scaler)
-            : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler)
+                               IScale scaler,
+                               float edgeWidth)
+            : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
         {
             name = "Manhattan";
         }
@@ -92,6 +93,8 @@ namespace SEE.Layout
         /// </summary>
         protected override void DrawEdges(Graph graph)
         {
+            // FIXME
+            /*
             // The distance of the edges relative to the houses; the maximal height of
             // a house is 1.0. This offset is used to draw the line somewhat below
             // or above the house (depending on the orientation).
@@ -188,6 +191,7 @@ namespace SEE.Layout
                     Debug.LogError("Scene edge " + gameEdge.name + " does not have a graph edge component.\n");
                 }
             }
+            */
         }
     }
 }

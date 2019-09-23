@@ -6,6 +6,21 @@ namespace SEE.Layout
 {
     public abstract class ILayout
     {
+        public ILayout(string widthMetric, string heightMetric, string breadthMetric,
+               SerializableDictionary<string, IconFactory.Erosion> issueMap,
+               BlockFactory blockFactory,
+               IScale scaler,
+               float edgeWidth)
+        {
+            this.widthMetric = widthMetric;
+            this.heightMetric = heightMetric;
+            this.breadthMetric = breadthMetric;
+            this.issueMap = issueMap;
+            this.blockFactory = blockFactory;
+            this.scaler = scaler;
+            this.edgeWidth = edgeWidth;
+        }
+
         public virtual void Draw(Graph graph)
         {
             Performance p;
@@ -78,24 +93,16 @@ namespace SEE.Layout
         protected readonly IScale scaler;
 
         /// <summary>
+        /// The width of every edge.
+        /// </summary>
+        protected readonly float edgeWidth;
+
+        /// <summary>
         /// The unique name of a layout.
         /// </summary>
         public string Name
         {
             get => name;
-        }
-
-        public ILayout(string widthMetric, string heightMetric, string breadthMetric, 
-                       SerializableDictionary<string, IconFactory.Erosion> issueMap, 
-                       BlockFactory blockFactory,
-                       IScale scaler)
-        {
-            this.widthMetric = widthMetric;
-            this.heightMetric = heightMetric;
-            this.breadthMetric = breadthMetric;
-            this.issueMap = issueMap;
-            this.blockFactory = blockFactory;
-            this.scaler = scaler;
         }
 
         /// <summary>
@@ -110,35 +117,6 @@ namespace SEE.Layout
         /// The metric used to determine the breadth of a node.
         /// </summary>
         protected readonly string breadthMetric;
-
-        /// <summary>
-        /// Total size of the bounding box of given game object.
-        /// This is always twice as large as the extent (see GetExtent()).
-        /// </summary>
-        /// <param name="gameObject">game object whose size is to be determined</param>
-        /// <returns>size of the game object</returns>
-        protected Vector3 GetSize(GameObject gameObject)
-        {
-            return GetExtent(gameObject) * 2.0f;
-        }
-
-        /// <summary>
-        /// Scales the given game object by given scale.
-        /// </summary>
-        /// <param name="gameObject">object to be scaled</param>
-        /// <param name="scale">scale to be used for that</param>
-        protected static void ScaleBlock(GameObject gameObject, Vector3 scale)
-        {
-            BlockModifier bm = gameObject.GetComponent<BlockModifier>();
-            if (bm == null)
-            {
-                Debug.LogErrorFormat("Game object {0} without block modifier.\n", gameObject.name);
-            }
-            else
-            {
-                bm.Scale(scale);
-            }
-        }
 
         /// <summary>
         /// Returns the first immediate child of parent with given tag or null
@@ -158,29 +136,6 @@ namespace SEE.Layout
                 }
             }
             return null;
-        }
-
-        /// <summary>
-        /// The extents of the bounding box of given game object.
-        /// This is always half of the size of the bounds (see GetSize()).
-        /// </summary>
-        /// <param name="gameObject">game object whose extent is to be determined</param>
-        /// <returns>extent of the game object</returns>
-        protected Vector3 GetExtent(GameObject gameObject)
-        {
-            return blockFactory.GetSize(gameObject) / 2.0f;
-        }
-
-        /// <summary>
-        /// Returns the roof position of a node.
-        /// </summary>
-        /// <param name="node">node for which to determine the roof position</param>
-        /// <returns>roof position</returns>
-        protected Vector3 Roof(GameObject node)
-        {
-            Vector3 result = node.transform.position;
-            result.y += GetExtent(node).y;
-            return result;
         }
     }
 }
