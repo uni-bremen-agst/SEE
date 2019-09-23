@@ -71,6 +71,7 @@ namespace SEEEditor
             editorSettings.BallonLayout = EditorGUILayout.Toggle("Balloon Layout", editorSettings.BallonLayout);
             editorSettings.CScapeBuildings = EditorGUILayout.Toggle("CScape buildings", editorSettings.CScapeBuildings);
             editorSettings.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", editorSettings.ZScoreScale);
+            editorSettings.EdgeWidth = EditorGUILayout.FloatField("Edge width", editorSettings.EdgeWidth);
 
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
             // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
@@ -127,14 +128,16 @@ namespace SEEEditor
                             layout = new SEE.Layout.BalloonLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, 
                                                                   editorSettings.IssueMap(),
                                                                   blockFactory,
-                                                                  scaler);
+                                                                  scaler,
+                                                                  editorSettings.EdgeWidth);
                         }
                         else
                         {
                             layout = new SEE.Layout.ManhattenLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, 
                                                                     editorSettings.IssueMap(),
                                                                     blockFactory,
-                                                                    scaler);
+                                                                    scaler,
+                                                                    editorSettings.EdgeWidth);
                         }
                         layout.Draw(graph);
                     }
