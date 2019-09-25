@@ -1,12 +1,26 @@
 ﻿using SEE.DataModel;
 
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace SEE.Layout
 {
     public abstract class ILayout
     {
+        public ILayout(string widthMetric, string heightMetric, string breadthMetric,
+               SerializableDictionary<string, IconFactory.Erosion> issueMap,
+               BlockFactory blockFactory,
+               IScale scaler,
+               float edgeWidth)
+        {
+            this.widthMetric = widthMetric;
+            this.heightMetric = heightMetric;
+            this.breadthMetric = breadthMetric;
+            this.issueMap = issueMap;
+            this.blockFactory = blockFactory;
+            this.scaler = scaler;
+            this.edgeWidth = edgeWidth;
+        }
+
         public virtual void Draw(Graph graph)
         {
             Performance p;
@@ -17,11 +31,6 @@ namespace SEE.Layout
             DrawEdges(graph);
             p.End();
         }
-
-        // This parameter determines the minimal width, breadth, and height of each cube. 
-        // Subclasses may define a maximal length, too, in which case minimal_length
-        // must be smaller than that maximal length.
-        public static readonly float minimal_length = 0.1f;
 
         /// <summary>
         /// Path to the material used for edges.
@@ -39,6 +48,11 @@ namespace SEE.Layout
         /// Mapping of node attributes onto erosion issue icons.
         /// </summary>
         protected readonly SerializableDictionary<string, IconFactory.Erosion> issueMap;
+
+        /// <summary>
+        /// A factory to create visual representations of graph nodes (e.g., cubes or CScape buildings).
+        /// </summary>
+        protected readonly BlockFactory blockFactory;
 
         /// <summary>
         /// Returns the default material for edges using the materialPath.
@@ -74,19 +88,21 @@ namespace SEE.Layout
         protected string name = "";
 
         /// <summary>
+        /// Used to determine the lengths of the node blocks.
+        /// </summary>
+        protected readonly IScale scaler;
+
+        /// <summary>
+        /// The width of every edge.
+        /// </summary>
+        protected readonly float edgeWidth;
+
+        /// <summary>
         /// The unique name of a layout.
         /// </summary>
         public string Name
         {
             get => name;
-        }
-
-        public ILayout(string widthMetric, string heightMetric, string breadthMetric, SerializableDictionary<string, IconFactory.Erosion> issueMap)
-        {
-            this.widthMetric = widthMetric;
-            this.heightMetric = heightMetric;
-            this.breadthMetric = breadthMetric;
-            this.issueMap = issueMap;
         }
 
         /// <summary>
@@ -103,46 +119,24 @@ namespace SEE.Layout
         protected readonly string breadthMetric;
 
         /// <summary>
-        /// Total size of the bounding box of given game object.
-        /// This is always twice as large as the extent (see GetExtent()).
+        /// Returns the first immediate child of parent with given tag or null
+        /// if none exists.
         /// </summary>
-        /// <param name="gameObject">game object whose size is to be determined</param>
-        /// <returns>size of the game object</returns>
-        protected static Vector3 GetSize(GameObject gameObject)
+        /// <param name="parent">parent whose children are to be searched</param>
+        /// <param name="tag">search tag</param>
+        /// <returns>first immediate child of parent with given tag or null</returns>
+        protected static GameObject GetChild(GameObject parent, string tag)
         {
-            Renderer renderer = gameObject.GetComponent<Renderer>();
-            return renderer.bounds.size;
+            for (int i = 0; i < parent.transform.childCount; i++)
+            {
+                Transform child = parent.transform.GetChild(i);
+                if (child.tag == tag)
+                {
+                    return child.gameObject;
+                }
+            }
+            return null;
         }
-
-        /// <summary>
-        /// The extents of the bounding box of given game object.
-        /// This is always half of the size of the bounds (see GetSize()).
-        /// </summary>
-        /// <param name="gameObject">game object whose extent is to be determined</param>
-        /// <returns>extent of the game object</returns>
-        protected static Vector3 GetExtent(GameObject gameObject)
-        {
-            Renderer renderer = gameObject.GetComponent<Renderer>();
-            return renderer.bounds.extents;
-        }
-
-        /// <summary>
-        /// Returns the roof position of a node.
-        /// </summary>
-        /// <param name="node">node for which to determine the roof position</param>
-        /// <returns>roof position</returns>
-        protected static Vector3 Roof(GameObject node)
-        {
-            Vector3 result = node.transform.position;
-            result.y += GetExtent(node).y;
-            return result;
-        }
-
-        /// <summary>
-        /// Removes everything the layout has added to the scence, such as planes etc.
-        /// </summary>
-        public abstract void Reset();
-
     }
 }
 

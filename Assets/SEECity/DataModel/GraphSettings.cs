@@ -13,8 +13,7 @@ namespace SEE
         /// </summary>        
         public string pathPrefix;
 
-        /// Tiny clone graph with multiple roots to experiment with (we cannot use Application.dataPath
-        /// unfortunately, that is why this path is currently hard coded).
+        /// Tiny clone graph with multiple roots to experiment with.
         public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
         public string csvPath = "..\\Data\\GXL\\minimal_erosions.csv";
 
@@ -25,6 +24,10 @@ namespace SEE
         // Smaller clone graph with single root (Linux directory "net").
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\net.gxl";
         //public string csvPath = "..\\Data\\GXL\\linux-clones\\net.csv";
+
+        // Larger clone graph with single root (Linux directory "drivers"): 16.920 nodes, 10583 edges.
+        //public string gxlPath = "..\\Data\\GXL\\linux-clones\\drivers.gxl";
+        //public string csvPath = "..\\Data\\GXL\\linux-clones\\drivers.csv";
 
         /// <summary>
         /// Returns the concatenation of pathPrefix and gxlPath. That is the complete
@@ -75,7 +78,15 @@ namespace SEE
         // Height of a building (y co-ordinate)
         public string HeightMetric = "Metric.Clone_Rate";
         // Breadth of a building (y co-ordinate)
-        public string BreadthMetric = "Metric.LOC";
+        public string DepthMetric = "Metric.LOC";
+
+        // This parameter determines the minimal width, breadth, and height of each block
+        // representing a graph node visually. Must not be greater than MaximalBlockLength.
+        public float MinimalBlockLength = 0.1f;
+
+        // This parameter determines the maximal width, breadth, and height of each block
+        // representing a graph node visually. Must not be smaller than MinimalBlockLength.
+        public float MaximalBlockLength = 100.0f;
 
         //------------------------------------------------------
         // Software erosion issues shown as icons above building
@@ -88,6 +99,19 @@ namespace SEE
         public string MetricIssue = "Metric.Metric";
         public string StyleIssue = "Metric.Style";
         public string UniversalIssue = "Metric.Universal";
+
+        // Whether a BallonLayout should be used. If false, ManhattanLayout is used.
+        public bool BallonLayout = true;
+
+        // Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
+        // for range [0, max-value] is used, where max-value is the maximum value of a metric.
+        public bool ZScoreScale = true;
+
+        // Whether CScape building should be used to visualize graph nodes. If false, cubes are used.
+        public bool CScapeBuildings = true;
+
+        // The width of edges.
+        public float EdgeWidth = 1.0f;
 
         /// <summary>
         /// Yields a mapping of all node attribute names that define erosion issues in the GXL file
