@@ -17,8 +17,9 @@ namespace SEE.Layout
         /// <param name="position">the center position at which to draw the text</param>
         /// <param name="width">the width of the rectangle enclosing the text (essentially, 
         /// the text width); the font size will be chose appropriately</param>
+        /// <param name="lift">if true, the text will be lifted up by its extent; that is, is y position is actually the bottom line (position.y + extents.y)</param>
         /// <returns>the game object representing the text</returns>
-        public static GameObject GetText(string text, Vector3 position, float width)
+        public static GameObject GetText(string text, Vector3 position, float width, bool lift = true)
         {
             GameObject result = new GameObject("Text " + text)
             {
@@ -49,6 +50,16 @@ namespace SEE.Layout
             Renderer renderer = result.GetComponent<Renderer>();
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
+            if (lift)
+            {
+                // may need to be called before retrieving the bounds to make sure they are up to date
+                tm.ForceMeshUpdate();
+                // unlike other types of game objects, the renderer does not allow us to retrieve the
+                // extents of the text; we need to use tm.textBounds instead
+                Bounds bounds = tm.textBounds;
+                float yPosition = bounds.extents.y;
+                result.transform.position += yPosition * Vector3.up;
+            }
             return result;
         }
     }
