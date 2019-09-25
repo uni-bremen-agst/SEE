@@ -4,6 +4,7 @@ using SEE.DataModel;
 using SEE;
 using SEE.Layout;
 using System.Collections.Generic;
+using System;
 
 namespace SEEEditor
 {
@@ -58,14 +59,10 @@ namespace SEEEditor
             editorSettings.gxlPath = EditorGUILayout.TextField("GXL file", editorSettings.gxlPath);
             editorSettings.csvPath = EditorGUILayout.TextField("CSV file", editorSettings.csvPath);
 
-            GUILayout.Label("Width of buildings", EditorStyles.boldLabel);
+            GUILayout.Label("Lengths of buildings", EditorStyles.boldLabel);
             editorSettings.WidthMetric = EditorGUILayout.TextField("Width", editorSettings.WidthMetric);
-
-            GUILayout.Label("Height of buildings", EditorStyles.boldLabel);
-            editorSettings.HeightMetric = EditorGUILayout.TextField("Width", editorSettings.HeightMetric);
-
-            GUILayout.Label("Breadth of buildings", EditorStyles.boldLabel);
-            editorSettings.BreadthMetric = EditorGUILayout.TextField("Breadth", editorSettings.BreadthMetric);
+            editorSettings.HeightMetric = EditorGUILayout.TextField("Height", editorSettings.HeightMetric);
+            editorSettings.DepthMetric = EditorGUILayout.TextField("Depth", editorSettings.DepthMetric);
 
             GUILayout.Label("Visual attributes", EditorStyles.boldLabel);
             editorSettings.BallonLayout = EditorGUILayout.Toggle("Balloon Layout", editorSettings.BallonLayout);
@@ -95,6 +92,8 @@ namespace SEEEditor
             {
                 blockFactory = new CubeFactory();
             }
+            // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
+            AdjustCameraSpeed(blockFactory.Unit());
 
             switch (selectedAction)
             {
@@ -111,7 +110,7 @@ namespace SEEEditor
                         //CubeFactory.Reset();            
                         IScale scaler;
                         {
-                            List<string> nodeMetrics = new List<string>() { editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric };
+                            List<string> nodeMetrics = new List<string>() { editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric };
                             nodeMetrics.AddRange(editorSettings.IssueMap().Keys);
                             if (editorSettings.ZScoreScale)
                             {
@@ -125,7 +124,7 @@ namespace SEEEditor
 
                         if (editorSettings.BallonLayout)
                         {
-                            layout = new SEE.Layout.BalloonLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, 
+                            layout = new SEE.Layout.BalloonLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric, 
                                                                   editorSettings.IssueMap(),
                                                                   blockFactory,
                                                                   scaler,
@@ -133,7 +132,7 @@ namespace SEEEditor
                         }
                         else
                         {
-                            layout = new SEE.Layout.ManhattenLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, 
+                            layout = new SEE.Layout.ManhattenLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric, 
                                                                     editorSettings.IssueMap(),
                                                                     blockFactory,
                                                                     scaler,
@@ -154,6 +153,20 @@ namespace SEEEditor
                     break;
             }
             this.Repaint();
+        }
+
+        private void AdjustCameraSpeed(float unit)
+        {
+            foreach (GameObject camera in GameObject.FindGameObjectsWithTag("MainCamera"))
+            {
+                FlyCamera flightControl = camera.GetComponent<FlyCamera>();
+                if (flightControl != null)
+                {
+                    flightControl.SetDefaults();
+                    flightControl.AdjustSettings(unit);
+                }
+
+            }
         }
 
         /// <summary>
