@@ -78,7 +78,7 @@ namespace SEE
         // Height of a building (y co-ordinate)
         public string HeightMetric = "Metric.Clone_Rate";
         // Breadth of a building (y co-ordinate)
-        public string BreadthMetric = "Metric.LOC";
+        public string DepthMetric = "Metric.LOC";
 
         // This parameter determines the minimal width, breadth, and height of each block
         // representing a graph node visually. Must not be greater than MaximalBlockLength.
