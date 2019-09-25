@@ -339,12 +339,15 @@ namespace CScape
 
         void OnDestroy()
         {
-            foreach (Transform go in rooftopHolder.transform.Cast<Transform>().Reverse())
+            if (rooftopHolder != null)
             {
-                DestroyImmediate(go.gameObject);
+                foreach (Transform go in rooftopHolder.transform.Cast<Transform>().Reverse())
+                {
+                    DestroyImmediate(go.gameObject);
+                }
+                DestroyImmediate(rooftopHolder.GetComponent<MeshFilter>().sharedMesh);
+                DestroyImmediate(rooftopHolder);
             }
-            DestroyImmediate(rooftopHolder.GetComponent<MeshFilter>().sharedMesh);
-            DestroyImmediate(rooftopHolder);
         }
 
         //void OnDrawGizmosSelected()
