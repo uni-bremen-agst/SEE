@@ -1,0 +1,326 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: MegaCityStreet
+  m_Shader: {fileID: 4800000, guid: 80a545cd14f9a5f49b42ccd7a68057ed, type: 3}
+  m_ShaderKeywords: _DETAIL_MULX2 _EMISSION _METALLICGLOSSMAP _NORMALMAP _SPECGLOSSMAP
+  m_LightmapFlags: 1
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BumpMap:
+        m_Texture: {fileID: 1504313670, guid: 01fe60dfd19cf45499d4426ff95fafeb, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ColorVariationLookup:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _CurtainsMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DepthArray:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 0.1, y: 0.1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 2800000, guid: 3f1c78d9af9562445b6fc8bd8983adec, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DiffuseTex:
+        m_Texture: {fileID: 2800000, guid: 6f2663be96abdbf40bd995f7b189a8f6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DirtTexture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 3, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FloorPattern:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _InteriourMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 1215447233, guid: 01fe60dfd19cf45499d4426ff95fafeb, type: 3}
+        m_Scale: {x: 3, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MaskTexArray:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: -11540079, guid: 01fe60dfd19cf45499d4426ff95fafeb, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Noise:
+        m_Texture: {fileID: 2800000, guid: ba5087a48b3d70c4098ef50deb41a792, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NoiseTexture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal1:
+        m_Texture: {fileID: 2800000, guid: 8ec80db84d0480045abd3ef9031d4939, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal2:
+        m_Texture: {fileID: 2800000, guid: 8ec80db84d0480045abd3ef9031d4939, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalTextureArray:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalWindows:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Rooftoptex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Smoothness:
+        m_Texture: {fileID: 2800000, guid: 3ce46f687cf9deb40aa0d90c50165748, type: 3}
+        m_Scale: {x: 0.06, y: 0.17}
+        m_Offset: {x: 0, y: 0.5}
+    - _SpecGlossMap:
+        m_Texture: {fileID: -11540079, guid: 01fe60dfd19cf45499d4426ff95fafeb, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Specular:
+        m_Texture: {fileID: 2800000, guid: 6f2663be96abdbf40bd995f7b189a8f6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _StreetDecalls:
+        m_Texture: {fileID: 18700000, guid: c55fd95dd46c1b04ca31de43aa9871d2, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _StreetsArray:
+        m_Texture: {fileID: 18700000, guid: fff978441526f4b46ae9df5f25404ece, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Tex1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Tex2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Tex3:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture0:
+        m_Texture: {fileID: 8400000, guid: 92dbb2a403ac83f45a6f7973909742fa, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureArray0:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample0:
+        m_Texture: {fileID: 2800000, guid: 84508b93f15f2b64386ec07486afc7a3, type: 3}
+        m_Scale: {x: 100, y: 100}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 300, y: 300}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 300, y: 300}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample3:
+        m_Texture: {fileID: 2800000, guid: cce2628fa953ca64888db63d6330103c, type: 3}
+        m_Scale: {x: 300, y: 300}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample4:
+        m_Texture: {fileID: 2800000, guid: 3f1c78d9af9562445b6fc8bd8983adec, type: 3}
+        m_Scale: {x: 300, y: 300}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample5:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1.9, y: -1.1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample6:
+        m_Texture: {fileID: 2800000, guid: 3ce46f687cf9deb40aa0d90c50165748, type: 3}
+        m_Scale: {x: 0.35, y: 0.24}
+        m_Offset: {x: 0, y: 0}
+    - _WallsArray:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _grate:
+        m_Texture: {fileID: 2800000, guid: 230db1c933d400a45ae6f454858ef2b9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _grate1:
+        m_Texture: {fileID: 2800000, guid: ff6cb15a58c04d443ab54b3e1fae6cfc, type: 3}
+        m_Scale: {x: 3, y: 3}
+        m_Offset: {x: 0, y: 0}
+    - _rainDrops:
+        m_Texture: {fileID: 2800000, guid: 30af032d986c62c459ee11fda0d603b4, type: 3}
+        m_Scale: {x: 2.54, y: 2.52}
+        m_Offset: {x: 0, y: 0}
+    - _streetsArray:
+        m_Texture: {fileID: 18700000, guid: a8ee4c7432d5f2746b929e6d65b0bea9, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord3:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord4:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _AOPower: 0
+    - _BlindsOpen: 0
+    - _BuildingLightness: 5
+    - _BumpScale: 1.02
+    - _ColorVariationfactor1: 0.85
+    - _Cutoff: 0.5
+    - _DepthScale: 0.12
+    - _DetailNormalMapScale: 0.24
+    - _DirtAmount: 1
+    - _DstBlend: 0
+    - _EdgeLength: 8
+    - _ErodeSigns: 0.177
+    - _Float0: 0.453
+    - _Float1: 0.9
+    - _Float10: 0.66
+    - _Float12: 0
+    - _Float14: 0.75
+    - _Float2: 0.89
+    - _Float3: 1.3
+    - _Float4: 0.64
+    - _Float6: 0.33
+    - _Float7: -0.46
+    - _Float8: 1.06
+    - _Float9: 2.94
+    - _GlassNormal: 0
+    - _GlossMapScale: 1
+    - _Glossiness: 0.484
+    - _GlossyReflections: 1
+    - _GrateFrequency: 9
+    - _GrateSpecular: 0.53
+    - _HiglightsInteriour: 0
+    - _HorizontSpacing: 0
+    - _InteriourBlur: 0
+    - _Interiourparallax: 0
+    - _LightStrenght: 0
+    - _LightVariation: 0
+    - _LightsDistance: 0.02
+    - _Lightsheight: 0.05
+    - _Metallic: 0
+    - _Mettalic: 0.25
+    - _MinInteriourSmoothnes: 0
+    - _MinSmoothness: 0
+    - _MinSpecular: 0
+    - _Mode: 0
+    - _NormalStrenght: 1
+    - _Occlusion: 0
+    - _OcclusionStrength: 1
+    - _Parallax: 0.02
+    - _Patches: 0.6
+    - _Pu: 0.18
+    - _Puddles: 0.1
+    - _Raindrops: 0.308
+    - _ReLightTreshold: 0.131
+    - _Saturate: 1.81
+    - _ScaleNoise1: 0.01
+    - _ScaleNoise2: 0.02
+    - _ScaleTex1: 0
+    - _SmoothCurtains: 0
+    - _Smoothness: 0
+    - _SmoothnessTextureChannel: 0
+    - _SpecularHighlights: 1
+    - _SrcBlend: 1
+    - _StreetIlluminationShape: 0.04
+    - _StreetLightDistances: -0.06
+    - _TVAO_High_Value: 12.94
+    - _TVAO_LowValue: 0
+    - _TessMax: 25
+    - _TessMin: 10
+    - _TessPhongStrength: 0.764
+    - _TessValue: 9.3
+    - _Thershold: 0
+    - _TilinLines: 0.5
+    - _TilingLines: 1
+    - _TireShineless: 37.07
+    - _UVSec: 0
+    - _UseLights: 2.2
+    - _Use_Snow_Moss_Dirt: 0
+    - _WindowDirt: 0
+    - _ZWrite: 1
+    - __dirty: 0
+    - _faloff: 1.54
+    - _flooroffset: 0
+    - _lightsContour: 1.3
+    - _lightsdistance: -1.01
+    - _patchesLightness: 0.84
+    - _patchesPower: 0.67
+    - _tesselation: 115.7
+    - _tiling: 0.5
+    m_Colors:
+    - _AlbedoCol: {r: 0.41911763, g: 0.41911763, b: 0.41911763, a: 0}
+    - _Ambientocclusion: {r: 1, g: 1, b: 1, a: 0}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color0: {r: 0, g: 0, b: 0, a: 0}
+    - _Color1: {r: 1, g: 0.6697769, b: 0.45588237, a: 0}
+    - _Color3: {r: 1, g: 0.98701817, b: 0.88235295, a: 0.134}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _GlassColor: {r: 0, g: 0, b: 0, a: 0}
+    - _SidewalkAlbedoCol: {r: 0.50735295, g: 0.50735295, b: 0.50735295, a: 0}
+    - _Sidewalk_Albedo: {r: 0.5147059, g: 0.5147059, b: 0.5147059, a: 0}
+    - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _Street_Albedo: {r: 0.5514706, g: 0.5352507, b: 0.5352507, a: 0}
+    - _Vector0: {r: 0, g: 0, b: 0, a: 0}
+    - _Vector1: {r: 1728.6, g: 1728.6, b: 0, a: 0}
+    - _Vector3: {r: 0, g: 0.05, b: 0, a: 0}
+    - _WindowBorderCol: {r: 0.44852924, g: 0.44852924, b: 0.44852924, a: 0}

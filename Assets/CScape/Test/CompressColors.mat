@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: CompressColors
+  m_Shader: {fileID: 4800000, guid: ea1dd3ca123271f4eba121d467bba16a, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 0
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _TextureSample0:
+        m_Texture: {fileID: 2800000, guid: a7123216441ce0b4b99a13c3d6e1a4ac, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - __dirty: 0
+    m_Colors:
+    - _Vector0: {r: 0.56, g: 0.36, b: 0.3, a: 0}
+    - _Vector1: {r: -0.05, g: 0.44, b: 0.66, a: 0}
+    - _Vector2: {r: 1.67, g: -0.79, b: 0, a: 0}
+    - _Vector3: {r: 0.6, g: 0.54, b: 0, a: 0}
+    - _Vector4: {r: 0.89, g: 1.13, b: 0, a: 0}

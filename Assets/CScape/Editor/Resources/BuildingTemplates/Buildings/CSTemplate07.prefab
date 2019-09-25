@@ -1,0 +1,360 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1917086935648858}
+  m_IsPrefabParent: 1
+--- !u!1 &1917086935648858
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4007234341945138}
+  - component: {fileID: 33816626155992658}
+  - component: {fileID: 23243519260231736}
+  - component: {fileID: 114544608642019820}
+  - component: {fileID: 64587928259271152}
+  - component: {fileID: 114906808457704760}
+  - component: {fileID: 114791713820415274}
+  m_Layer: 0
+  m_Name: CSTemplate07
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 4294967295
+  m_IsActive: 1
+--- !u!4 &4007234341945138
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1917086935648858}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 144.1, y: 0, z: -109.6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &23243519260231736
+MeshRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1917086935648858}
+  m_Enabled: 1
+  m_CastShadows: 2
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 1
+  m_Materials:
+  - {fileID: 2100000, guid: 3da26787e2ddb6345887cb30075db27c, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &33816626155992658
+MeshFilter:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1917086935648858}
+  m_Mesh: {fileID: 0}
+--- !u!64 &64587928259271152
+MeshCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1917086935648858}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Convex: 0
+  m_InflateMesh: 0
+  m_SkinWidth: 0.01
+  m_Mesh: {fileID: 0}
+--- !u!114 &114544608642019820
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1917086935648858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1190d94edcaef6447ad307f350e985ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lowFloorBound: {x: 10.668001, y: 3.68, z: 10.41}
+  prefabFloors: 5
+  prefabDepth: 7
+  prefabWidth: 7
+  size: {x: 0, y: 1.59, z: 0}
+  scale: 1
+  meshOriginal: {fileID: 4300000, guid: 4cee7f4d4ef4c934a937b6ffcdb79974, type: 3}
+  mesh: {fileID: 0}
+  floorNumber: 19
+  floorHeight: 3
+  uniqueMapping: 4
+  buildingWidth: 23
+  buildingDepth: 20
+  normalThreshold: 0.261
+  id1: {x: 2.5, y: 1.5}
+  id2: {x: 1.7, y: 0.65}
+  id3: {x: 0.4, y: 0}
+  id4: {x: 3.9, y: 0}
+  materialId1: 25
+  materialId2: 17
+  materialId3: 4
+  materialId4: 39
+  materialId5: 21
+  divisionId4: 0
+  lightnessFront: 1
+  lightnessSide: 3
+  windowOpen: 8.727012
+  rooftopObject: {fileID: 0}
+  generateLightmappingUV: 0
+  pattern: 0.6448281
+  colorVariation: {x: 2, y: 9, z: 9, w: 9}
+  colorVariation2: {x: 5, y: 4, z: 6, w: 8}
+  colorVariation3: {x: 7, y: 0, z: 3, w: 6}
+  colorVariation4: {x: 3, y: 5, z: 6, w: 6}
+  colorVariation5: {x: 7, y: 7, z: 0, w: 0}
+  lightsOnOff: 0
+  lightsOnOff2: 1.1
+  prefabHasVertexInfo: 1
+  advertisingPanelCoord: {x: 0, y: 0, z: 0, w: 0}
+  lightVec: 2.99902
+  lightVec2: 5.46812
+  lightVec3: 0.07012
+  lightVec4: 8.32102
+  lightVec5: 8.30002
+  lightVec6: 0.07012
+  lightVec7: 0.07732
+  lightVec8: 0.07732
+  cityRandomizerParent: {fileID: 0}
+  parentStreets:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  connectedSections:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  roofOffsetX:
+  - {x: -10.56, y: -10.42}
+  roofOffsetZ:
+  - {x: 9.78, y: 10.1}
+  advertOffsetX:
+  - {x: 0, y: 3.15}
+  advertOffsetZ:
+  - {x: 0, y: 0}
+  advertSide: {x: 0, y: 0, z: 0}
+  roofOffsetY:
+  - 0.16
+  advertOffsetY:
+  - 0
+  hasRooftops: 1
+  hasAdvertising: 0
+  hasBalcony: 1
+  rooftops: {fileID: 114906808457704760}
+  advertising: {fileID: 0}
+  balcony: {fileID: 114791713820415274}
+  floorDetails: {fileID: 0}
+  distort: 1
+  distortXZ: 1
+  useAdvertising: 1
+  borderCol: 0
+  thresholdResizeX: 0
+  thresholdResizeZ: 0
+  thresholdResizeY: 0
+  supportSkewing: 0
+  skew: 0
+  useGraffiti: 0
+  autoMap: 1
+  scaleFrom1to3: 0
+  extendFoundations: 1
+  extFoundationsTreshhold: 0
+  isInRoot: 0
+  hasFloorDetails: 0
+  rooftopID: 0
+  customData1: 0
+  customBool2: 0
+  buildingPositionOnStreet: 0
+  useFloorLimiting: 0
+  minFloorNumber: 0
+  maxFloorNumber: 0
+  dontDestroyChildren: 0
+  hasNoFloorLevel: 0
+--- !u!114 &114791713820415274
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1917086935648858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f44c154f2150b5944972a781c08b5712, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  instancesX: 36
+  instancesZ: 0
+  mat: {fileID: 0}
+  mesh: {fileID: 0}
+  meshOriginal: {fileID: 0}
+  offsetX: 0
+  offsetZ: 0
+  update: 0
+  width: 0
+  depth: 0
+  maxMeshSize: 0
+  parentSection: {fileID: 0}
+  parentBuilding: {fileID: 0}
+  rooftopHolder:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  rooftopElements:
+  - {fileID: 1749121841956678, guid: ef72cb460b8fcbc4685e363779e2cba5, type: 2}
+  - {fileID: 1749121841956678, guid: ef72cb460b8fcbc4685e363779e2cba5, type: 2}
+  - {fileID: 1749121841956678, guid: ef72cb460b8fcbc4685e363779e2cba5, type: 2}
+  - {fileID: 1749121841956678, guid: ef72cb460b8fcbc4685e363779e2cba5, type: 2}
+  - {fileID: 1749121841956678, guid: ef72cb460b8fcbc4685e363779e2cba5, type: 2}
+  - {fileID: 1749121841956678, guid: ef72cb460b8fcbc4685e363779e2cba5, type: 2}
+  - {fileID: 1749121841956678, guid: ef72cb460b8fcbc4685e363779e2cba5, type: 2}
+  - {fileID: 1749121841956678, guid: ef72cb460b8fcbc4685e363779e2cba5, type: 2}
+  - {fileID: 1749121841956678, guid: ef72cb460b8fcbc4685e363779e2cba5, type: 2}
+  - {fileID: 1749121841956678, guid: ef72cb460b8fcbc4685e363779e2cba5, type: 2}
+  bmComponent: {fileID: 114544608642019820}
+  randomSeed: 17
+  rh: {fileID: 0}
+  greebleMat:
+  - {fileID: 2100000, guid: afc2d859820c58c4fba292cabcd7a9fb, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  lodComponent: {fileID: 0}
+  roofTopsObject: {fileID: 0}
+  lodDistance: 0.7
+  useAdvertising: 1
+  animateLodFade: 1
+  maxFloors: 00000000000000000000000000000000000000000000000000000000000000000000000000000000
+  leftSideStart: 03000000000000000000000000000000000000000000000000000000000000000000000000000000
+  rightSideStart: 03000000000000000000000000000000000000000000000000000000000000000000000000000000
+  downStart: 02000000000000000000000000000000000000000000000000000000000000000000000000000000
+  upStart: 05000000000000000000000000000000000000000000000000000000000000000000000000000000
+  skipX: 02000000000000000000000000000000000000000000000000000000000000000000000000000000
+  skipY: 01000000000000000000000000000000000000000000000000000000000000000000000000000000
+  placingDepth:
+  - 3.15
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  projectDepth: 
+  numberOfModifiers: 1
+  modifierType: 00000000000000000000000000000000000000000000000000000000000000000000000000000000
+  alignTo: 00000000000000000000000000000000000000000000000000000000000000000000000000000000
+  useProjection: 0
+  sparseRemove: 00000000000000000000
+  sparseRandom: 00000000000000000000000000000000000000000000000000000000000000000000000000000000
+  strechable: 0
+--- !u!114 &114906808457704760
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1917086935648858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39a91388d79359247b2aa5de0de6f6dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  instancesX: 139
+  instancesZ: 23
+  mat: {fileID: 2100000, guid: 71a819dfc509b50428b3c319688e5166, type: 2}
+  mesh: {fileID: 0}
+  meshOriginal: {fileID: 0}
+  greebleElements: []
+  offsetX: 26
+  offsetZ: 29
+  update: 0
+  width: 24
+  depth: 32
+  maxMeshSize: 0
+  parentSection: {fileID: 0}
+  parentBuilding: {fileID: 0}
+  rooftopHolder: {fileID: 0}
+  rooftopHolderPrefab: {fileID: 0}
+  rooftopElements:
+  - {fileID: 1770266728114726, guid: 8ccc03760c0aee04faf1edfae7eb6e65, type: 2}
+  - {fileID: 1906058441182334, guid: f8c7537aeff857a41b70dec7a0c6d9b0, type: 2}
+  - {fileID: 1292552957532222, guid: 20465f87e92879147a40366a73839ca8, type: 2}
+  - {fileID: 1068474993234608, guid: 6fcba06b63b0364439ea46d542b5ddf5, type: 2}
+  - {fileID: 1167711001054286, guid: 5367bcdd71af96a4da9c3517de569f3a, type: 2}
+  - {fileID: 1142679560735720, guid: acc2ae7b67eab4544b86c5fd5c37524c, type: 2}
+  - {fileID: 1147687880919820, guid: 3f0a93e0911c0a94990c1faa109cd46d, type: 2}
+  - {fileID: 1334531627779978, guid: 964b62505c55e1746a3263043a545b5b, type: 2}
+  - {fileID: 1225639919668734, guid: 174a832485730d740b55981677cb72c8, type: 2}
+  - {fileID: 1285039299547322, guid: 926a4c12fe90baa4c860b33ca6911de9, type: 2}
+  - {fileID: 1194140255307604, guid: cd360065356e28d43825bce68dc596b8, type: 2}
+  - {fileID: 1752540576187076, guid: ee5d91961ea1bd74f9254a9072df6a8d, type: 2}
+  bmComponent: {fileID: 114544608642019820}
+  parentCity: {fileID: 0}
+  randomSeed: 170429
+  rh: {fileID: 0}
+  greebleMat: {fileID: 2100000, guid: a79ff04ad5ab47a44aa8f300d54d70d4, type: 2}
+  lodComponent: {fileID: 0}
+  roofTopsObject: {fileID: 0}
+  lodDistance: 0.18
+  animateLodFade: 1
+  useRooftops: 1
+  noMesh: 0

@@ -7,31 +7,14 @@ namespace SEE.Layout
 {
     public class ManhattenLayout : ILayout
     {
-        public ManhattenLayout(string widthMetric, string heightMetric, string breadthMetric, SerializableDictionary<string, IconFactory.Erosion> issueMap)
-            : base(widthMetric, heightMetric, breadthMetric, issueMap)
+        public ManhattenLayout(string widthMetric, string heightMetric, string breadthMetric, 
+                               SerializableDictionary<string, IconFactory.Erosion> issueMap,
+                               BlockFactory blockFactory,
+                               IScale scaler,
+                               float edgeWidth)
+            : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
         {
             name = "Manhattan";
-        }
-
-        /// <summary>
-        /// Used to determine the lengths of the node blocks.
-        /// </summary>
-        private IScale scaler;
-
-        public override void Draw(Graph graph)
-        {
-            IList<string> metrics = new List<string>() {widthMetric, heightMetric, breadthMetric};
-            scaler = new LinearScale(graph, minimal_length, 1.0f, metrics);
-            AddMeshes(graph);
-            base.Draw(graph);
-        }
-
-        private void AddMeshes(Graph graph)
-        {
-            foreach (GameObject node in graph.GetNodes())
-            {
-                MeshFactory.AddCube(node);
-            }
         }
 
         // The minimal length of any axis (width, breadth, height) of a block.
@@ -41,53 +24,61 @@ namespace SEE.Layout
         // precondition: the GameObjects and their meshes have already been created for all nodes
         protected override void DrawNodes(Graph graph)
         {
-            //DumpMetricMaxima(metricMaxima);
+            int numberOfBuildingsPerRow = (int)Mathf.Sqrt(graph.NodeCount);
+            int column = 0;
+            const float distanceBetweenBuildings = 1.0f;
+            float maxZ = 0.0f;  // maximal depth of a building in a row
+            float positionX = 0.0f;
+            float positionZ = 0.0f;
 
-            int length = (int)Mathf.Sqrt(graph.NodeCount);
-            float column = 0f;
-            float row = 1f;
-            const float relativeOffset = 0.1f;
-
-            //Vector3 maxSize = Vector3.zero;
             foreach (GameObject sceneNode in graph.GetNodes())
             {
-                column++;
-                if (column > length)
-                {
-                    // exceeded length of the square => start a new row
-                    column = 1f;
-                    row++;
-                }
+                // Note: sceneNode is only be a container for the actual building.
+
+                // The logical node represented by this game object.
                 Node node = sceneNode.GetComponent<Node>();
                 if (node == null)
                 {
                     Debug.LogError("Scene node " + sceneNode.name + " does not have a graph node component.\n");
                 }
-                Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, widthMetric),
-                                            scaler.GetNormalizedValue(node, heightMetric),
-                                            scaler.GetNormalizedValue(node, breadthMetric));
-                node.gameObject.transform.localScale = scale;
-
-                // The position is the center of a GameObject. We want all GameObjects
-                // be placed at the same ground level 0. That is why we need to "lift"
-                // every building by half of its height.
-                sceneNode.transform.position = new Vector3(row + row * relativeOffset, scale.y / 2.0f, column + column * relativeOffset);
-                /*
+                else if (node.IsLeaf())
                 {
-                    Renderer renderer;
-                    //Fetch the GameObject's Renderer component
-                    renderer = house.GetComponent<Renderer>();
-                    //Change the GameObject's Material Color to red
-                    //m_ObjectRenderer.material.color = Color.red;
-                    Debug.Log("house size: " + renderer.bounds.size + "\n");
+                    // We only draw leaves.
+
+                    GameObject block = blockFactory.NewBlock();
+
+                    column++;
+                    if (column > numberOfBuildingsPerRow)
+                    {
+                        // exceeded length of the square => start a new row
+                        column = 1;
+                        positionZ += maxZ + distanceBetweenBuildings;
+                        maxZ = 0.0f;
+                        positionX = 0.0f;
+                    }
+                    // Scaled metric values for the dimensions.
+                    Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, widthMetric),
+                                                scaler.GetNormalizedValue(node, heightMetric),
+                                                scaler.GetNormalizedValue(node, breadthMetric));
+
+                    // Scale according to the metrics.
+                    blockFactory.ScaleBlock(block, scale);
+
+                    // size is independent of the sceneNode
+                    Vector3 size = blockFactory.GetSize(block);
+                    blockFactory.AttachBlock(sceneNode, block);
+                    if (size.z > maxZ)
+                    {
+                        maxZ = size.z;
+                    }
+                    positionX += size.x / 2.0f;
+                    // The position is the center of a GameObject. We want all GameObjects
+                    // be placed at the same ground level 0. That is why we need to "lift"
+                    // every building by half of its height.
+                    sceneNode.transform.position = new Vector3(positionX, scale.y / 2.0f, positionZ);
+                    positionX += size.x / 2.0f + distanceBetweenBuildings;
                 }
-                */
-                //Vector3 size = GetSize(sceneNode);
-                //if (size.x > maxSize.x) maxSize.x = size.x;
-                //if (size.y > maxSize.y) maxSize.y = size.y;
-                //if (size.z > maxSize.z) maxSize.z = size.z;
             }
-            //Debug.Log("Maxima: " + maxSize + "\n");
         }
 
         // orientation of the edges; 
@@ -102,6 +93,8 @@ namespace SEE.Layout
         /// </summary>
         protected override void DrawEdges(Graph graph)
         {
+            // FIXME
+            /*
             // The distance of the edges relative to the houses; the maximal height of
             // a house is 1.0. This offset is used to draw the line somewhat below
             // or above the house (depending on the orientation).
@@ -198,8 +191,7 @@ namespace SEE.Layout
                     Debug.LogError("Scene edge " + gameEdge.name + " does not have a graph edge component.\n");
                 }
             }
+            */
         }
-
-        public override void Reset() { /* Does not need to do anything. */}
     }
 }

@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 3ebfd66c1a6ad4247b5fd7864348361f
+timeCreated: 1541340549
+licenseType: Store
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _tentMaskSubSurface: {fileID: 2800000, guid: 308d81826dbd02e4baec08c4a4b2f44a,
+      type: 3}
+  - _tentMask: {fileID: 2800000, guid: 21acf63903b71d6469380c5cda92b8c3, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

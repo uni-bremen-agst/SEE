@@ -1,0 +1,2 @@
+SRP support for Unity 2018 is in experimental phase. You can download updated HD SRP from this page:
+https://olivr.info/srp-support-downloads/

@@ -1,0 +1,126 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: ScapeSky
+  m_Shader: {fileID: 4800000, guid: 92b32295724eb014ebf62e056c8f7f40, type: 3}
+  m_ShaderKeywords: _EMISSION
+  m_LightmapFlags: 1
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DummyTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _PortalNormal:
+        m_Texture: {fileID: 2800000, guid: 94f0e096fe4d8e14eaf231eb69202d44, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SimpleFoam:
+        m_Texture: {fileID: 2800000, guid: 28c7aad1372ff114b90d330f8a2dd938, type: 3}
+        m_Scale: {x: 23.1, y: 57.3}
+        m_Offset: {x: 0.8, y: 0.41}
+    - _Texture0:
+        m_Texture: {fileID: 2800000, guid: 9733f0d7aec8848f08cae3c95b44d3ae, type: 3}
+        m_Scale: {x: 1, y: 1.85}
+        m_Offset: {x: 0, y: 0.11}
+    - _TextureSample2:
+        m_Texture: {fileID: 2800000, guid: e958c6041cfe445e987c73751e8d4082, type: 3}
+        m_Scale: {x: 39.17, y: 49.08}
+        m_Offset: {x: -23.9, y: 0}
+    - _TextureSample3:
+        m_Texture: {fileID: 2800000, guid: 4e4a0e2a9212f4a1b8ce9108443f3b03, type: 3}
+        m_Scale: {x: 19.76, y: 18.57}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _BumpScale: 1
+    - _CurvFix: 0
+    - _Cutoff: 0.5
+    - _DepthFade: -740
+    - _DetailNormalMapScale: 1
+    - _DstBlend: 0
+    - _Fadedistance: 0.0008
+    - _Float0: 0.03
+    - _Float1: 0.04
+    - _Float2: 0.35
+    - _Float3: 0.13
+    - _Float4: 7.6
+    - _Float5: -0.21
+    - _GlossMapScale: 1
+    - _Glossiness: 0.5
+    - _GlossyReflections: 1
+    - _Metallic: 0
+    - _Mode: 0
+    - _OcclusionStrength: 1
+    - _Parallax: 0.02
+    - _SmoothnessTextureChannel: 0
+    - _SpecularHighlights: 1
+    - _Speed: 0
+    - _SrcBlend: 1
+    - _TessMax: 24.86
+    - _TessMin: 9.5
+    - _TessPhongStrength: 0.34
+    - _TessValue: 4
+    - _TransAmbient: 0.883
+    - _TransDirect: 0.709
+    - _TransNormalDistortion: 0.33
+    - _TransScattering: 1
+    - _TransShadow: 1
+    - _Translucency: 50
+    - _UVSec: 0
+    - _ZWrite: 1
+    - __dirty: 0
+    - _cloudsSpeed: 0.22
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 80a545cd14f9a5f49b42ccd7a68057ed
+timeCreated: 1542545006
+licenseType: Store
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _grate1: {fileID: 2800000, guid: ff6cb15a58c04d443ab54b3e1fae6cfc, type: 3}
+  - _Noise: {fileID: 2800000, guid: 6f9a0e55e3ffc6044944be5e3035e195, type: 3}
+  - _grate: {fileID: 2800000, guid: 230db1c933d400a45ae6f454858ef2b9, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

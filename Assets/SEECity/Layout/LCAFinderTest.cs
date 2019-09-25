@@ -57,7 +57,9 @@ namespace SEE.Layout
         private static Node NewVertex(Graph graph, string name = "")
         {
             GameObject gameObject = new GameObject();
-            Node node = gameObject.AddComponent<Node>();
+            // FIXME
+
+            Node node = new Node(); //  gameObject.AddComponent<Node>();
             if (string.IsNullOrEmpty(name))
             {
                 node.LinkName = nodeID.ToString();
@@ -75,8 +77,10 @@ namespace SEE.Layout
         {
             nodeID = 0;
             GameObject gameObject = new GameObject();
-            graph = gameObject.AddComponent<Graph>();
-            graph.name = "LCA Graph";
+            // FIXME
+            graph = new Graph();
+            //graph = gameObject.AddComponent<Graph>();
+            //graph.name = "LCA Graph";
             return gameObject;
         }
 
