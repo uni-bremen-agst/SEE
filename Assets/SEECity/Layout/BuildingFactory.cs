@@ -162,21 +162,6 @@ namespace SEE.Layout
             return building;
         }
 
-        public override Vector3 GetSize(GameObject block)
-        {
-            // It is a CScape building which has no renderer. We use its collider instead.
-            Collider collider = block.GetComponent<Collider>();
-            if (collider != null)
-            {
-                return collider.bounds.extents;
-            }
-            else
-            {
-                Debug.LogErrorFormat("CScape building {0} without collider.\n", block.name);
-                return Vector3.one;
-            }
-        }
-
         /// <summary>
         /// Scales the given block by the given scale. Note: The unit of scaling 
         /// is as follows: x -> building width, y -> number of floors, z -> building depth
@@ -237,7 +222,11 @@ namespace SEE.Layout
         public override Vector3 Ground(GameObject block)
         {
             Vector3 result = block.transform.position;
-            result.y -= GetSize(block).y / 2.0f;
+            Vector3 extent = GetSize(block) / 2.0f;
+            // transform to center
+            result -= extent;
+            // bottom below the center
+            result.y -= extent.y;
             return result;
         }
     }

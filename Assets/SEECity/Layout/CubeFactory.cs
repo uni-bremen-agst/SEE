@@ -147,22 +147,6 @@ namespace SEE.Layout
             return gameObject;
         }
 
-        public override Vector3 GetSize(GameObject block)
-        {
-            // Nodes represented by cubes have a renderer from which we can derive the
-            // extent.
-            Renderer renderer = block.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                return renderer.bounds.extents;
-            }
-            else
-            {
-                Debug.LogErrorFormat("Node {0} (tag: {1}) without renderer.\n", block.name, block.tag);
-                return Vector3.one;
-            }
-        }
-
         /// <summary>
         /// Scales the given block by the given scale. Note: The unit of scaling 
         /// are normal Unity units.

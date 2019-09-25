@@ -54,7 +54,21 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="block">block whose size is to be returned</param>
         /// <returns>size of the block</returns>
-        public abstract Vector3 GetSize(GameObject block);
+        public virtual Vector3 GetSize(GameObject block)
+        {
+            // Nodes represented by cubes have a renderer from which we can derive the
+            // extent.
+            Renderer renderer = block.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                return renderer.bounds.size;
+            }
+            else
+            {
+                Debug.LogErrorFormat("Node {0} (tag: {1}) without renderer.\n", block.name, block.tag);
+                return Vector3.one;
+            }
+        }
 
         /// <summary>
         /// Scales the given block by the given scale. Note: The unit of scaling depends
