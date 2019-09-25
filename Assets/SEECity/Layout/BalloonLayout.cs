@@ -384,7 +384,7 @@ namespace SEE.Layout
                         //Debug.LogFormat("sprite {0} before scaling: size={1}.\n",
                         //                sprite.name, GetSizeOfSprite(sprite));
                         // First: scale its width to unit size 1.0 maintaining the aspect ratio
-                        sprite.transform.localScale *= spriteScale;
+                        sprite.transform.localScale *= spriteScale * blockFactory.Unit();
                         //Debug.LogFormat("sprite {0} scaled to unit size: size={1}.\n",
                         //                sprite.name, GetSizeOfSprite(sprite));
                         // Now scale it by the normalized metric.
@@ -554,7 +554,7 @@ namespace SEE.Layout
                 rad = 0.0f;
                 max_depth = 0;
 
-                Debug.LogFormat("size of block = {0}, radius = {1}\n", size, out_rad);
+                //Debug.LogFormat("size of block = {0}, radius = {1}\n", size, out_rad);
 
                 // size of parent are determined by the circle, height by the blocks's height
                 //parent.transform.localScale = new Vector3(2.0f * out_rad, size.y, 2.0f * out_rad);
