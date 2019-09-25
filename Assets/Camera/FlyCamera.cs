@@ -1,4 +1,5 @@
-﻿using SEE.DataModel;
+﻿using System;
+using SEE.DataModel;
 using UnityEngine;
 
 namespace SEE
@@ -32,6 +33,8 @@ namespace SEE
         // actual value is also function of the distance to the ground. The lower we 
         // are to the ground, the slower we move, and vice versa.
 
+        public const float relativeBaseSpeedDefault = 10.0f;
+
         [Tooltip("Relative base speed without acceleration and independent of the distance to the ground."
                  + " The actual speed is a function of this parameter and the distance to the ground."
                  + " The farther the ground, the higher the speed. This parameter must"
@@ -40,23 +43,49 @@ namespace SEE
         /// Normal speed without acceleration. This defines the amount of distance to be covered
         /// per tick.
         /// </summary>
-        public float relativeBaseSpeed = 10.0f; 
+        public float relativeBaseSpeed = relativeBaseSpeedDefault;
+
+        public const float relativeMaximalSpeedDefault = 100.0f;
 
         [Tooltip("Maximal speed in the presence of acceleration, but independent of the distance to the ground."
          + " The actual maximal speed is a function of this parameter and the distance to the ground,"
          + " but it cannot go beyond the absolute maximum speed."
          + " This parameter must be greater than 0.")]
-        public float relativeMaximalSpeed = 100.0f; // Maximum speed when holding shift
+        public float relativeMaximalSpeed = relativeMaximalSpeedDefault; // Maximum speed when holding shift
 
         [Tooltip("The absolute minimum speed that can be reached, no matter how"
          + " close we are to the ground. Must not be larger than the absolute maximum speed."
          + " This parameter must be greater than 0.")]
         public float absoluteMinimumSpeed = 0.1f;
 
+        public const float absoluteMaximumSpeedDefault = 300.0f;
+
         [Tooltip("The absolute maximum speed that can be reached, no matter how much we accelerate and how"
             + " far we are off the ground. Must not be lower than the absolute minimum speed."
             + " This parameter must be greater than 0.")]
-        public float absoluteMaximumSpeed = 300.0f;
+        public float absoluteMaximumSpeed = absoluteMaximumSpeedDefault;
+
+        /// <summary>
+        /// Sets relativeBaseSpeed, relativeMaximalSpeed, and absoluteMaximumSpeed to their default
+        /// multiplied by the given unit factor, unless their value is already greater than that.
+        /// </summary>
+        /// <param name="unit"></param>
+        public void AdjustSettings(float unit)
+        {
+            relativeBaseSpeed     = Mathf.Max(relativeBaseSpeedDefault * unit,   relativeBaseSpeed);
+            relativeMaximalSpeed = Mathf.Max(relativeMaximalSpeedDefault * unit, relativeMaximalSpeed);
+            absoluteMaximumSpeed = Mathf.Max(absoluteMaximumSpeedDefault * unit, absoluteMaximumSpeed);
+        }
+
+        /// <summary>
+        /// Resets relativeBaseSpeed, relativeMaximalSpeed, and absoluteMaximumSpeed to their defaults.
+        /// </summary>
+        public void SetDefaults()
+        {
+            relativeBaseSpeed = relativeBaseSpeedDefault;
+            relativeMaximalSpeed = relativeMaximalSpeedDefault;
+            absoluteMaximumSpeed = absoluteMaximumSpeedDefault;
+        }
 
         // Amount to accelerate when shift is pressed. The actual acceleration is
         // a function of this parameter and the accummulated time since the user
@@ -68,7 +97,7 @@ namespace SEE
             " started to hold the shift key. That is, you are getting faster, the longer" +
             " the shift key has been pressed up to the maximal speed."
             + " This parameter must be greater than 0.")]
-        public float acceleration = 25.0f;
+        public float acceleration = 10.0f;
 
         // Degree of spinning for each tick without acceleration. This value is
         // independent of the distance to the ground because it is used to turn
@@ -256,7 +285,7 @@ namespace SEE
             if (accelerationMode)
             {
                 // handle acceleration
-                newPosition *= accelerationPeriod * acceleration;
+                newPosition *= accelerationPeriod * acceleration * GetNormalSpeed();
                 float maxSpeed = GetMaximalSpeed();
                 // Note: we need to clamp by -maxSpeed and not 0 because we
                 // might be moving backward in the respective dimension.
