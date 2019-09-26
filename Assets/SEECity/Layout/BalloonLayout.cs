@@ -23,6 +23,16 @@ namespace SEE.Layout
             name = "Ballon";
         }
 
+        /// <summary>
+        /// The minimal line width of a circle drawn for an inner node.
+        /// </summary>
+        public float minmalCircleLineWidth = 0.1f;
+
+        /// <summary>
+        /// The maximal line width of a circle drawn for an inner node.
+        /// </summary>
+        public float maximalCircleLineWidth = 10.0f;
+
         // A mapping of graph nodes onto the game objects representing them visually in the scene
         private Dictionary<Node, GameObject> gameObjects = new Dictionary<Node, GameObject>();
 
@@ -515,10 +525,10 @@ namespace SEE.Layout
             float rad = 0.0f;
             float rl_child = 0.0f;
 
-            max_depth = 0;
-
             if (node.IsLeaf())
             {
+                max_depth = 1;
+
                 // First child: add block to parent; block will become the first child.
                 // The block is create here so that we know its size. It will be positioned later.
                 GameObject block = blockFactory.NewBlock();
@@ -552,7 +562,6 @@ namespace SEE.Layout
                 // The outer-radius must be large enough to put in the block.
                 out_rad = diagonal / 2.0f;
                 rad = 0.0f;
-                max_depth = 0;
 
                 //Debug.LogFormat("size of block = {0}, radius = {1}\n", size, out_rad);
 
@@ -666,7 +675,7 @@ namespace SEE.Layout
 
             // DrawCircle(node, position, radius);
             // Roots have depth 0. We want the line to be thicker for nodes higher in the hierarchy.
-            float lineWidth = Mathf.Lerp(0.1f, 1.0f, (float)(max_depth - depth) / max_depth);
+            float lineWidth = Mathf.Lerp(minmalCircleLineWidth, maximalCircleLineWidth, (float)(max_depth - depth) / max_depth);
             AttachCircleLine(circle, radius, lineWidth);
 
             GameObject text = TextFactory.GetText(node.SourceName, position, 2.0f * radius * 0.3f);
@@ -771,8 +780,8 @@ namespace SEE.Layout
                         // because the edges are only between leaves:
                         // assert: sourceObject != lcaObject
                         // assert: targetObject != lcaObject
-                        NodeRef nodeRef = lcaObject.GetComponent<NodeRef>();
-                        Node lcaNode = nodeRef.node;
+                        NodeRef lcaNodeRef = lcaObject.GetComponent<NodeRef>();
+                        Node lcaNode = lcaNodeRef.node;
 
                         Node[] sourceToLCA = Ancestors(source, lcaNode);
                         Debug.Assert(sourceToLCA.Length > 1);
@@ -801,6 +810,7 @@ namespace SEE.Layout
                         }
                         else
                         {
+                            Debug.LogFormat("maxDepth = {0}\n", maxDepth);
                             // Concatenate both paths.
                             // We have sufficient many control points without the duplicated LCA,
                             // hence, we can remove the duplicate
@@ -823,6 +833,7 @@ namespace SEE.Layout
                                 controlPoints[i] = gameObjects[fullPath[i]].transform.position + (maxDepth - nodeInfos[fullPath[i]].level) * levelUnit;
                             }
                             controlPoints[controlPoints.Length - 1] = blockFactory.Roof(targetObject);
+                            //Debug.LogFormat("control points from {0} to {1}\n", source.SourceName, target.SourceName);
                             //Dump(controlPoints);
                         }
                     }
@@ -945,8 +956,8 @@ namespace SEE.Layout
 
         protected override void DrawEdges(Graph graph)
         {
+            // The distance between of the control points at the subsequent levels of the hierarchy.
             levelUnit = MaximalNodeHeight();
-            Debug.LogFormat("levelUnit={0}\n", levelUnit);
 
             Material newMat = new Material(defaultLineMaterial);
             if (newMat == null)
