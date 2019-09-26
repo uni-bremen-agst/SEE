@@ -13,9 +13,13 @@ namespace SEE
         /// </summary>        
         public string pathPrefix;
 
-        /// Tiny clone graph with multiple roots to experiment with.
+        /// Tiny clone graph with single root to experiment with.
         public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
         public string csvPath = "..\\Data\\GXL\\minimal_erosions.csv";
+
+        /// Tiny clone graph with single roots to check edge bundling.
+        //public string gxlPath = "..\\Data\\GXL\\controlPoints.gxl";
+        //public string csvPath = "..\\Data\\GXL\\controlPoints.csv";
 
         // Smaller clone graph with single root (Linux directory "fs").
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\fs.gxl";
@@ -28,6 +32,10 @@ namespace SEE
         // Larger clone graph with single root (Linux directory "drivers"): 16.920 nodes, 10583 edges.
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\drivers.gxl";
         //public string csvPath = "..\\Data\\GXL\\linux-clones\\drivers.csv";
+
+        // Medium size include graph with single root (OpenSSL).
+        //public string gxlPath = "..\\Data\\GXL\\OpenSSL\\openssl-include.gxl";
+        //public string csvPath = "..\\Data\\GXL\\OpenSSL\\openssl-include.csv";
 
         /// <summary>
         /// Returns the concatenation of pathPrefix and gxlPath. That is the complete
