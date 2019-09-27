@@ -306,6 +306,8 @@ namespace SEE.Layout
             {
                 name = "house " + parent.name
             };
+            // tag for later detection
+            cube.tag = "House";
             MeshFactory.AddCube(cube);         
             // cube is nested in parent
             cube.transform.parent = parent.transform;
