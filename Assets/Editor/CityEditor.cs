@@ -94,14 +94,9 @@ namespace SEEEditor
                     if (graph != null)
                     {
                         MeshFactory.Reset();
-                        if (true)
-                        {
-                            layout = new SEE.Layout.BalloonLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, editorSettings.IssueMap());
-                        }
-                        else
-                        {
-                            layout = new SEE.Layout.ManhattenLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, editorSettings.IssueMap());
-                        }
+                        //layout = new SEE.Layout.BalloonLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, editorSettings.IssueMap());
+                        //layout = new SEE.Layout.ManhattenLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, editorSettings.IssueMap());
+                        layout = new SEE.Layout.CirclePackingLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, editorSettings.IssueMap());
                         layout.Draw(graph);
                     }
                     else

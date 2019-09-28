@@ -229,6 +229,10 @@ namespace SEE.DataModel
             edges.Clear();
             foreach (Node node in nodes.Values)
             {
+                node.transform.parent = null;
+            }
+            foreach (Node node in nodes.Values)
+            {
                 Destroyer.DestroyGameObject(node.gameObject);
             }
             nodes.Clear();
