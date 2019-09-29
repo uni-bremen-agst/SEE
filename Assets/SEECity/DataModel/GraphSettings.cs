@@ -15,12 +15,12 @@ namespace SEE
 
         /// Tiny clone graph with multiple roots to experiment with (we cannot use Application.dataPath
         /// unfortunately, that is why this path is currently hard coded).
-        public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
-        public string csvPath = "..\\Data\\GXL\\minimal_erosions.csv";
+        //public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
+        //public string csvPath = "..\\Data\\GXL\\minimal_erosions.csv";
 
         // Smaller clone graph with single root (Linux directory "fs").
-        //public string gxlPath = "..\\Data\\GXL\\linux-clones\\fs.gxl";
-        //public string csvPath = "..\\Data\\GXL\\linux-clones\\fs.csv";
+        public string gxlPath = "..\\Data\\GXL\\linux-clones\\fs.gxl";
+        public string csvPath = "..\\Data\\GXL\\linux-clones\\fs.csv";
 
         // Smaller clone graph with single root (Linux directory "net").
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\net.gxl";
