@@ -810,7 +810,7 @@ namespace SEE.Layout
                         }
                         else
                         {
-                            Debug.LogFormat("maxDepth = {0}\n", maxDepth);
+                            //Debug.LogFormat("maxDepth = {0}\n", maxDepth);
                             // Concatenate both paths.
                             // We have sufficient many control points without the duplicated LCA,
                             // hence, we can remove the duplicate
