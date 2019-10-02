@@ -205,6 +205,7 @@ namespace SEE.Layout
         /// <returns>roof position</returns>
         public override Vector3 Roof(GameObject block)
         {
+            // block.transform.position of a building is the left front lower corner of the building
             Vector3 result = block.transform.position;
             Vector3 extent = GetSize(block) / 2.0f;
             // transform to center
@@ -221,12 +222,13 @@ namespace SEE.Layout
         /// <returns>ground position</returns>
         public override Vector3 Ground(GameObject block)
         {
+            // block.transform.position of a building is the left front lower corner of the building 
             Vector3 result = block.transform.position;
             Vector3 extent = GetSize(block) / 2.0f;
             // transform to center
-            result -= extent;
+            result += extent;
             // bottom below the center
-            result.y -= extent.y;
+            result.y = block.transform.position.y;
             return result;
         }
     }
