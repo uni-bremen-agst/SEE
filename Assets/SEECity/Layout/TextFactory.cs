@@ -33,13 +33,14 @@ namespace SEE.Layout
             tm.alignment = TextAlignmentOptions.Center;
             
             RectTransform rect = tm.GetComponent<RectTransform>();
-            // We set only the width of the rectangle and leave the z axis to Unity
+            // We set width and height of the rectangle and leave the actual size to Unity,
+            // which will select a font that matches our size constraints.
             rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
-            //rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, width);
+            rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, width);
 
             tm.enableAutoSizing = true;
             tm.fontSizeMin = 3;
-            tm.fontSizeMax = 72;
+            tm.fontSizeMax = 400;
           
             TextFacingCamera textFacing = result.AddComponent<TextFacingCamera>();
             // Rendering distance is set relative to the text's width
