@@ -17,11 +17,18 @@ namespace SEE.Layout
                              SerializableDictionary<string, IconFactory.Erosion> issueMap,
                              BlockFactory blockFactory,
                              IScale scaler,
-                             float edgeWidth)
+                             float edgeWidth,
+                             bool showErosions)
         : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
         {
             name = "Ballon";
+            this.showErosions = showErosions;
         }
+
+        /// <summary>
+        /// Whether erosions should be visible above the nodes.
+        /// </summary>
+        public bool showErosions = true;
 
         /// <summary>
         /// The minimal line width of a circle drawn for an inner node.
@@ -306,7 +313,10 @@ namespace SEE.Layout
             // FIXME: We do without garden for the time being
             //AddGarden(parent);
 
-            AddErosionIssues(node, scaler);
+            if (showErosions)
+            {
+                AddErosionIssues(node, scaler);
+            }
             //Renderer renderer = cylinder.GetComponent<Renderer>();
             //renderer.material.color = Color.white;
         }
@@ -335,7 +345,12 @@ namespace SEE.Layout
 
         protected static Vector3 GetSizeOfSprite(GameObject go)
         {
-            SpriteRenderer renderer = go.GetComponent<SpriteRenderer>();
+            // The game object representing an erosion is a composite of 
+            // multiple LOD child objects to be drawn depending how close
+            // the camera is. The container object 'go' itself does not
+            // have a renderer. We need to obtain the renderer of the
+            // first child hat represents the object at LOD 0 instead.
+            Renderer renderer = go.GetComponentInChildren<Renderer>();
             // Note: renderer.sprite.bounds.size yields the original size
             // of the sprite of the prefab. It does not consider the scaling.
             // It depends only upon the imported graphic. That is why we

@@ -69,6 +69,7 @@ namespace SEEEditor
             editorSettings.CScapeBuildings = EditorGUILayout.Toggle("CScape buildings", editorSettings.CScapeBuildings);
             editorSettings.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", editorSettings.ZScoreScale);
             editorSettings.EdgeWidth = EditorGUILayout.FloatField("Edge width", editorSettings.EdgeWidth);
+            editorSettings.ShowErosions = EditorGUILayout.Toggle("Show erosions", editorSettings.ShowErosions);
 
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
             // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
@@ -128,7 +129,8 @@ namespace SEEEditor
                                                                   editorSettings.IssueMap(),
                                                                   blockFactory,
                                                                   scaler,
-                                                                  editorSettings.EdgeWidth);
+                                                                  editorSettings.EdgeWidth,
+                                                                  editorSettings.ShowErosions);
                         }
                         else
                         {

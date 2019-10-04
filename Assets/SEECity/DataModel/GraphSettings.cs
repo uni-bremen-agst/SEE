@@ -122,6 +122,11 @@ namespace SEE
         public float EdgeWidth = 1.0f;
 
         /// <summary>
+        /// Whether erosions should be visible.
+        /// </summary>
+        public bool ShowErosions = true;
+
+        /// <summary>
         /// Yields a mapping of all node attribute names that define erosion issues in the GXL file
         /// onto the icons to be used for visualizing them.
         /// </summary>
