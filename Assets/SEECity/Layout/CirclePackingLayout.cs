@@ -36,6 +36,7 @@ namespace SEE.Layout
             Nodes.name = "Nodes";
             InitializeNodes(graph.GetRoots(), scaler, Nodes);
             DrawNodes(graph.GetRoots(), scaler, out float out_radius);
+
         }
 
         private void DrawNodes(List<Node> nodes, IScale scaler, out float out_radius)
@@ -111,6 +112,7 @@ namespace SEE.Layout
                 if (node.IsLeaf())
                 {
                     GameObject cube = new GameObject();
+                    cube.transform.position = new Vector3(0.0f, scaler.GetNormalizedValue(node, heightMetric) / 2.0f, 0.0f);
                     cube.name = node.gameObject.name + " house";
                     MeshFactory.AddCube(cube);
                     cube.transform.parent = node.gameObject.transform;
