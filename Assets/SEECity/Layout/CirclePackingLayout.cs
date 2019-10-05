@@ -17,9 +17,9 @@ namespace SEE.Layout
         private struct Circle
         {
             // The position of the transform will be changed by the circle packer.
-            public Transform Transform { get; set; }
+            public Transform Transform;
 
-            public float Radius { get; }
+            public float Radius;
 
             /// <summary>
             /// Creates a new circle at position within given transform and with given radius.
@@ -72,31 +72,58 @@ namespace SEE.Layout
                 EnclosingCircleIntersectingCircles(circles, out Vector3 out_center, out float out_radius);
                 out_outer_radius = out_radius;
                 
-                foreach (Circle c in circles)
+                for (int i = 0; i < circles.Count; i++)
                 {
-                    c.Transform.localPosition -= out_center;
+                    circles[i].Transform.localPosition -= out_center;
                 }
             }
 
             /// <summary>
-            /// The original source can be found <see href="https://gist.github.com/mbostock/29c534ff0b270054a01c">HERE</see>/>.
+            /// Finds smallest circle that encloses <paramref name="circles"/>. To improve
+            /// performance, <paramref name="circles"/> should be already sorted by radius in
+            /// descending order.
+            /// 
+            /// The original sources can be found
+            /// <see href="https://gist.github.com/mbostock/29c534ff0b270054a01c">HERE</see>/> and
+            /// <see href="http://www.sunshine2k.de/coding/java/Welzl/Welzl.html">HERE</see>/>.
             /// </summary>
-            /// <param name="circles"></param>
-            /// <param name="out_center"></param>
-            /// <param name="out_radius"></param>
+            /// 
+            /// <param name="circles">The circles to be enclosed.</param>
+            /// 
+            /// <param name="out_center">The center of <paramref name="circles"/> enclosing
+            /// circle.</param>
+            /// 
+            /// <param name="out_radius">The radius of <paramref name="circles"/> enclosing
+            /// circle.</param>
             private static void EnclosingCircleIntersectingCircles(List<Circle> circles, out Vector3 out_center, out float out_radius)
             {
-                EnclosingCircleIntersectingCircles(new List<Circle>(circles), new List<Circle>(), out Vector3 center, out float radius);
+                EnclosingCircleIntersectingCirclesImpl(new List<Circle>(circles), new List<Circle>(), out Vector3 center, out float radius);
                 out_center = center;
                 out_radius = radius;
             }
 
-            private static void EnclosingCircleIntersectingCircles(List<Circle> circles, List<Circle> borderCircles, out Vector3 out_center, out float out_radius)
+            /// <summary>
+            /// Implementation of
+            /// <see cref="EnclosingCircleIntersectingCircles(List{Circle}, out Vector3, out float)"/>
+            /// .
+            /// </summary>
+            /// 
+            /// <param name="circles">The circles to be enclosed.</param>
+            /// 
+            /// <param name="borderCircles">The circles that currently represent the border.
+            /// <code>borderCircles.Count</code> is always less than or equal to 3.</param>
+            /// 
+            /// <param name="out_center">The center of <paramref name="borderCircles"/> enclosing
+            /// circle.</param>
+            /// 
+            /// <param name="out_radius">The radius of <paramref name="borderCircles"/> enclosing
+            /// circle.</param>
+            private static void EnclosingCircleIntersectingCirclesImpl(List<Circle> circles, List<Circle> borderCircles, out Vector3 out_center, out float out_radius)
             {
                 out_center = Vector3.zero;
                 out_radius = 0.0f;
 
-                if (circles.Count == 0 || borderCircles.Count == 3)
+                if (circles.Count == 0 || borderCircles.Count > 0 && borderCircles.Count > 3)
                 {
                     switch (borderCircles.Count)
                     {
@@ -128,16 +155,22 @@ namespace SEE.Layout
                     }
                 }
 
+                // This is the smallest circle, if circles are sorted by descending radius
+                int smallestCircleIndex = circles.Count - 1;
+                Circle smallestCircle = circles[smallestCircleIndex];
 
-                Circle c = circles[0];
                 List<Circle> cmc = new List<Circle>(circles);
-                cmc.RemoveAt(0);
-                EnclosingCircleIntersectingCircles(cmc, borderCircles, out Vector3 out_center_cmc, out float out_radius_cmc);
-                if (!CircleContainsCircle(out_center_cmc, out_radius_cmc, c))
+                cmc.RemoveAt(smallestCircleIndex);
+
+                EnclosingCircleIntersectingCirclesImpl(cmc, borderCircles, out Vector3 out_center_cmc, out float out_radius_cmc);
+
+                if (!CircleContainsCircle(out_center_cmc, out_radius_cmc, smallestCircle))
                 {
                     List<Circle> bcpc = new List<Circle>(borderCircles);
-                    bcpc.Add(c);
-                    EnclosingCircleIntersectingCircles(cmc, bcpc, out Vector3 out_center_cmc_bcpc, out float out_radius_cmc_bcpc);
+                    bcpc.Add(smallestCircle);
+
+                    EnclosingCircleIntersectingCirclesImpl(cmc, bcpc, out Vector3 out_center_cmc_bcpc, out float out_radius_cmc_bcpc);
+
                     out_center = out_center_cmc_bcpc;
                     out_radius = out_radius_cmc_bcpc;
                 }
@@ -149,8 +182,10 @@ namespace SEE.Layout
             }
 
             /// <summary>
-            /// Returns <see langword="true"/> if circle with <paramref name="position1"/> and <paramref name="radius1"/> contains <paramref name="c1"/>.
+            /// Returns <see langword="true"/> if circle with <paramref name="position1"/> and
+            /// <paramref name="radius1"/> contains <paramref name="c1"/>.
             /// </summary>
+            /// 
             /// <param name="position1">Position of containing circle.</param>
             /// <param name="radius1">Radius of containing circle.</param>
             /// <param name="c1">Contained circle.</param>
@@ -162,6 +197,15 @@ namespace SEE.Layout
                 return Mathf.Sqrt(xc0 * xc0 + yc0 * yc0) < radius1 - c1.Radius + float.Epsilon;
             }
 
+            /// <summary>
+            /// Calculates smallest enclosing circle of <paramref name="c1"/> and
+            /// <paramref name="c2"/>.
+            /// </summary>
+            /// 
+            /// <param name="c1">First circle.</param>
+            /// <param name="c2">Second circle.</param>
+            /// <param name="out_center">Center of smallest enclosing circle.</param>
+            /// <param name="out_radius">Radius of smallest enclosing circle.</param>
             private static void CircleIntersectingTwoCircles(Circle c1, Circle c2, out Vector3 out_center, out float out_radius)
             {
                 Vector3 c12 = c2.Transform.position - c1.Transform.position;
@@ -171,45 +215,55 @@ namespace SEE.Layout
                 out_radius = (l + c1.Radius + c2.Radius) / 2.0f;
             }
 
-            private static void CircleIntersectingThreeCircles(Circle circle1, Circle circle2, Circle circle3, out Vector3 out_center, out float out_radius)
+            /// <summary>
+            /// Calculates smallest enclosing circle of <paramref name="c1"/>,
+            /// <paramref name="c2"/> and <paramref name="c3"/>.
+            /// </summary>
+            /// 
+            /// <param name="c1">First circle.</param>
+            /// <param name="c2">Second circle.</param>
+            /// <param name="c3">Third circle.</param>
+            /// <param name="out_center">Center of smallest enclosing circle.</param>
+            /// <param name="out_radius">Radius of smallest enclosing circle.</param>
+            private static void CircleIntersectingThreeCircles(Circle c1, Circle c2, Circle c3, out Vector3 out_center, out float out_radius)
             {
-                var x1 = circle1.Transform.position.x;
-                var y1 = circle1.Transform.position.z;
-                var r1 = circle1.Radius;
+                Vector2 p0 = new Vector2(c1.Transform.position.x, c1.Transform.position.z);
+                Vector2 p1 = new Vector2(c2.Transform.position.x, c2.Transform.position.z);
+                Vector2 p2 = new Vector2(c3.Transform.position.x, c3.Transform.position.z);
+                
+                float r0 = c1.Radius;
+                float r1 = c2.Radius;
+                float r2 = c3.Radius;
 
-                var x2 = circle2.Transform.position.x;
-                var y2 = circle2.Transform.position.z;
-                var r2 = circle2.Radius;
+                Vector2 a0 = 2.0f * (p0 - p1);
+                float a1 = 2.0f * (r1 - r0);
+                float a2 = p0.SqrMagnitude() - r0 * r0 - p1.SqrMagnitude() + r1 * r1;
 
-                var x3 = circle3.Transform.position.x;
-                var y3 = circle3.Transform.position.z;
-                var r3 = circle3.Radius;
+                Vector2 b0 = 2.0f * (p0 - p2);
+                float b1 = 2.0f * (r2 - r0);
+                float b2 = p0.SqrMagnitude() - r0 * r0 - p2.SqrMagnitude() + r2 * r2;
 
-                var a2 = 2.0f * (x1 - x2);
-                var b2 = 2.0f * (y1 - y2);
-                var c2 = 2.0f * (r2 - r1);
-                var d2 = x1 * x1 + y1 * y1 - r1 * r1 - x2 * x2 - y2 * y2 + r2 * r2;
+                float det = b0.x * a0.y - a0.x * b0.y;
 
-                var a3 = 2.0f * (x1 - x3);
-                var b3 = 2.0f * (y1 - y3);
-                var c3 = 2.0f * (r3 - r1);
-                var d3 = x1 * x1 + y1 * y1 - r1 * r1 - x3 * x3 - y3 * y3 + r3 * r3;
+                float cx =  (a0.y * b2 - b0.y * a2) / det - p1.x;
+                float cy = -(a0.x * b2 - b0.x * a2) / det - p1.y;
+                float dx =  (b0.y * a1 - a0.y * b1) / det;
+                float dy = -(b0.x * a1 - a0.x * b1) / det;
 
-                var ab = a3 * b2 - a2 * b3;
+                float e1 = dx * dx + dy * dy - 1.0f;
+                float e2 = 2.0f * (cx * dx + cy * dy + r1);
+                float e3 = cx * cx + cy * cy - r1 * r1;
 
-                var xa = (b2 * d3 - b3 * d2) / ab - x1;
-                var xb = (b3 * c2 - b2 * c3) / ab;
-                var ya = (a3 * d2 - a2 * d3) / ab - y1;
-                var yb = (a2 * c3 - a3 * c2) / ab;
-
-                var A = xb * xb + yb * yb - 1;
-                var B = 2 * (xa * xb + ya * yb + r1);
-                var C = xa * xa + ya * ya - r1 * r1;
-
-                out_radius = (-B - Mathf.Sqrt(B * B - 4.0f * A * C)) / (2.0f * A);
-                out_center = new Vector3(xa + xb * out_radius + x1, 0.0f, ya + yb * out_radius + y1);
+                out_radius = (-e2 - Mathf.Sqrt(e2 * e2 - 4.0f * e1 * e3)) / (2.0f * e1);
+                out_center = new Vector3(cx + dx * out_radius + p1.x, 0.0f, cy + dy * out_radius + p1.y);
             }
 
+            /// <summary>
+            /// Compares <paramref name="p1"/> and <paramref name="p2"/> by radius (descending).
+            /// </summary>
+            /// <param name="p1">First circle.</param>
+            /// <param name="p2">Second circle.</param>
+            /// <returns></returns>
             private static int Comparator(Circle p1, Circle p2)
             {
                 float d1 = p1.Radius;
@@ -316,8 +370,9 @@ namespace SEE.Layout
 
         private void InitializeNodes(List<Node> nodes, IScale scaler, GameObject parent)
         {
-            foreach (Node node in nodes)
+            for (int i = 0; i < nodes.Count; i++)
             {
+                Node node = nodes[i];
                 node.transform.parent = parent.transform;
                 if (node.IsLeaf())
                 {
@@ -347,9 +402,10 @@ namespace SEE.Layout
         {
             Edges = new GameObject();
             Edges.name = "Edges";
-            foreach (Edge edge in graph.Edges())
+            List<Edge> edges = graph.Edges();
+            for (int i = 0; i < edges.Count; i++)
             {
-                edge.transform.parent = Edges.transform;
+                edges[i].transform.parent = Edges.transform;
             }
         }
 
