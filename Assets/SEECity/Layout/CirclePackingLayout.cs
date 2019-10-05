@@ -69,14 +69,12 @@ namespace SEE.Layout
                     }
                 }
 
-                //EnclosingCircleIntersectingCircles(circles, out Vector3 center, out float radius);
-                Vector3 center = CenterOfMass(circles);
+                EnclosingCircleIntersectingCircles(circles, out Vector3 out_center, out float out_radius);
+                out_outer_radius = out_radius;
                 
-                out_outer_radius = 0.0f;
                 foreach (Circle c in circles)
                 {
-                    c.Transform.localPosition -= center;
-                    out_outer_radius = Mathf.Max(out_outer_radius, c.Transform.localPosition.magnitude + c.Radius);
+                    c.Transform.localPosition -= out_center;
                 }
             }
 
@@ -88,7 +86,7 @@ namespace SEE.Layout
             /// <param name="out_radius"></param>
             private static void EnclosingCircleIntersectingCircles(List<Circle> circles, out Vector3 out_center, out float out_radius)
             {
-                EnclosingCircleIntersectingCircles(circles, new List<Circle>(), out Vector3 center, out float radius);
+                EnclosingCircleIntersectingCircles(new List<Circle>(circles), new List<Circle>(), out Vector3 center, out float radius);
                 out_center = center;
                 out_radius = radius;
             }
@@ -96,46 +94,72 @@ namespace SEE.Layout
             private static void EnclosingCircleIntersectingCircles(List<Circle> circles, List<Circle> borderCircles, out Vector3 out_center, out float out_radius)
             {
                 out_center = Vector3.zero;
-                out_radius = -1.0f;
+                out_radius = 0.0f;
 
-                switch (borderCircles.Count)
+                if (circles.Count == 0 || borderCircles.Count == 3)
                 {
-                    case 1:
-                        {
-                            out_center = borderCircles[0].Transform.position;
-                            out_radius = borderCircles[0].Radius;
-                            break;
-                        }
-                    case 2:
-                        {
-                            CircleIntersectingTwoCircles(borderCircles[0], borderCircles[1], out Vector3 center, out float radius);
-                            out_center = center;
-                            out_radius = radius;
-                            break;
-                        }
-                    case 3:
-                        {
-                            CircleIntersectingThreeCircles(borderCircles[0], borderCircles[1], borderCircles[2], out Vector3 center, out float radius);
-                            out_center = center;
-                            out_radius = radius;
-                            break;
-                        }
+                    switch (borderCircles.Count)
+                    {
+                        case 1:
+                            {
+                                out_center = borderCircles[0].Transform.position;
+                                out_radius = borderCircles[0].Radius;
+                                break;
+                            }
+                        case 2:
+                            {
+                                CircleIntersectingTwoCircles(borderCircles[0], borderCircles[1], out Vector3 out_center_trivial, out float out_radius_trivial);
+                                out_center = out_center_trivial;
+                                out_radius = out_radius_trivial;
+                                break;
+                            }
+                        case 3:
+                            {
+                                CircleIntersectingThreeCircles(borderCircles[0], borderCircles[1], borderCircles[2], out Vector3 out_center_trivial, out float out_radius_trivial);
+                                out_center = out_center_trivial;
+                                out_radius = out_radius_trivial;
+                                break;
+                            }
+                    }
+
+                    if (circles.Count == 0)
+                    {
+                        return;
+                    }
                 }
 
-                for (int i = 0; i < circles.Count; i++)
+
+                Circle c = circles[0];
+                List<Circle> cmc = new List<Circle>(circles);
+                cmc.RemoveAt(0);
+                EnclosingCircleIntersectingCircles(cmc, borderCircles, out Vector3 out_center_cmc, out float out_radius_cmc);
+                if (!CircleContainsCircle(out_center_cmc, out_radius_cmc, c))
                 {
-                    if (out_radius == -1.0f || !CircleContainsCircle(circles[i], out_center, out_radius))
-                    {
-                        borderCircles.Add(circles[i]);
-                        EnclosingCircleIntersectingCircles(circles, borderCircles, out Vector3 center, out float radius);
-                        //borderCircles.Remove(circles[i]);
-                    }
+                    List<Circle> bcpc = new List<Circle>(borderCircles);
+                    bcpc.Add(c);
+                    EnclosingCircleIntersectingCircles(cmc, bcpc, out Vector3 out_center_cmc_bcpc, out float out_radius_cmc_bcpc);
+                    out_center = out_center_cmc_bcpc;
+                    out_radius = out_radius_cmc_bcpc;
+                }
+                else
+                {
+                    out_center = out_center_cmc;
+                    out_radius = out_radius_cmc;
                 }
             }
 
-            private static bool CircleContainsCircle(Circle c1, Vector3 position, float radius)
+            /// <summary>
+            /// Returns <see langword="true"/> if circle with <paramref name="position1"/> and <paramref name="radius1"/> contains <paramref name="c1"/>.
+            /// </summary>
+            /// <param name="position1">Position of containing circle.</param>
+            /// <param name="radius1">Radius of containing circle.</param>
+            /// <param name="c1">Contained circle.</param>
+            /// <returns></returns>
+            private static bool CircleContainsCircle(Vector3 position1, float radius1, Circle c1)
             {
-                return (c1.Transform.position - position).magnitude < c1.Radius - radius;
+                var xc0 = position1.x - c1.Transform.position.x;
+                var yc0 = position1.z - c1.Transform.position.z;
+                return Mathf.Sqrt(xc0 * xc0 + yc0 * yc0) < radius1 - c1.Radius + float.Epsilon;
             }
 
             private static void CircleIntersectingTwoCircles(Circle c1, Circle c2, out Vector3 out_center, out float out_radius)
@@ -147,43 +171,43 @@ namespace SEE.Layout
                 out_radius = (l + c1.Radius + c2.Radius) / 2.0f;
             }
 
-            private static void CircleIntersectingThreeCircles(Circle c1, Circle c2, Circle c3, out Vector3 out_center, out float out_radius)
+            private static void CircleIntersectingThreeCircles(Circle circle1, Circle circle2, Circle circle3, out Vector3 out_center, out float out_radius)
             {
-                Vector3 a12 = 2.0f * (c1.Transform.position - c2.Transform.position);
-                float b12 = 2.0f * (c2.Radius - c1.Radius);
-                float c12 = c1.Transform.position.sqrMagnitude - c1.Radius * c1.Radius - c2.Transform.position.sqrMagnitude - c2.Radius * c2.Radius;
+                var x1 = circle1.Transform.position.x;
+                var y1 = circle1.Transform.position.z;
+                var r1 = circle1.Radius;
 
-                Vector3 a13 = 2.0f * (c1.Transform.position - c3.Transform.position);
-                float b13 = 2.0f * (c3.Radius - c1.Radius);
-                float c13 = c1.Transform.position.sqrMagnitude - c1.Radius * c1.Radius - c3.Transform.position.sqrMagnitude - c3.Radius * c3.Radius;
+                var x2 = circle2.Transform.position.x;
+                var y2 = circle2.Transform.position.z;
+                var r2 = circle2.Radius;
 
-                float ab = a13.x * a12.y - a12.x * a13.y;
+                var x3 = circle3.Transform.position.x;
+                var y3 = circle3.Transform.position.z;
+                var r3 = circle3.Radius;
 
-                float xa = (a12.y * c13 - a13.y * c12) / ab - c1.Transform.position.x;
-                float xb = (a13.y * b12 - a12.y * b13) / ab;
-                float ya = (a13.x * c12 - a12.x * c13) / ab - c1.Transform.position.y;
-                float yb = (a12.x * b13 - a13.x * b12) / ab;
+                var a2 = 2.0f * (x1 - x2);
+                var b2 = 2.0f * (y1 - y2);
+                var c2 = 2.0f * (r2 - r1);
+                var d2 = x1 * x1 + y1 * y1 - r1 * r1 - x2 * x2 - y2 * y2 + r2 * r2;
 
-                float A = xb * xb + yb * yb - 1.0f;
-                float B = 2.0f * (xa * xb + ya * yb + c1.Radius);
-                float C = xa * xa + ya * ya - c1.Radius * c1.Radius;
+                var a3 = 2.0f * (x1 - x3);
+                var b3 = 2.0f * (y1 - y3);
+                var c3 = 2.0f * (r3 - r1);
+                var d3 = x1 * x1 + y1 * y1 - r1 * r1 - x3 * x3 - y3 * y3 + r3 * r3;
 
-                float r = (-B - (float)Math.Sqrt(B * B - 4.0f * A * C)) / (2.0f * A);
+                var ab = a3 * b2 - a2 * b3;
 
-                out_center = new Vector3(
-                    xa + xb * r + c1.Transform.position.x,
-                    0.0f,
-                    ya + yb * r + c1.Transform.position.y
-                );
-                out_radius = r;
-            }
+                var xa = (b2 * d3 - b3 * d2) / ab - x1;
+                var xb = (b3 * c2 - b2 * c3) / ab;
+                var ya = (a3 * d2 - a2 * d3) / ab - y1;
+                var yb = (a2 * c3 - a3 * c2) / ab;
 
-            private static Vector3 CenterOfMass(List<Circle> circles)
-            {
-                Vector3 center = Vector3.zero;
-                float totalMass = 0.0f;
-                circles.ForEach(delegate (Circle c) { float mass = Mathf.PI * c.Radius * c.Radius; center += c.Transform.position * mass; totalMass += mass; });
-                return center / (circles.Count * totalMass);
+                var A = xb * xb + yb * yb - 1;
+                var B = 2 * (xa * xb + ya * yb + r1);
+                var C = xa * xa + ya * ya - r1 * r1;
+
+                out_radius = (-B - Mathf.Sqrt(B * B - 4.0f * A * C)) / (2.0f * A);
+                out_center = new Vector3(xa + xb * out_radius + x1, 0.0f, ya + yb * out_radius + y1);
             }
 
             private static int Comparator(Circle p1, Circle p2)
