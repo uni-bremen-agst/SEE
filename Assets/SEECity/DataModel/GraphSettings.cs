@@ -122,9 +122,20 @@ namespace SEE
         public float EdgeWidth = 1.0f;
 
         /// <summary>
-        /// Whether erosions should be visible.
+        /// Whether erosions should be visible above blocks.
         /// </summary>
         public bool ShowErosions = true;
+
+        /// <summary>
+        /// Whether Donut charts should be visible for circles in the Ballon layout.
+        /// </summary>
+        public bool ShowDonuts = true;
+
+        public string[] InnerNodeMetrics = new string[] { "Metric.Quality",
+                                                          "Metric.McCabe_Complexity.sum",
+                                                          "Metric.Number_Of_Statements.sum",
+                                                          "Metric.Lines.Comment.sum",
+                                                          "Metric.Lines.LOC.sum" };
 
         /// <summary>
         /// Yields a mapping of all node attribute names that define erosion issues in the GXL file
