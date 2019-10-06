@@ -2,14 +2,14 @@ library(xml2)
 library(purrr)
 
 #filename = "arch"
-#filename = "net"
+filename = "net"
 #filename = "fs"
 #filename = "drivers"
 has.clone.data = TRUE
 
 # the following files have no clone data
-has.clone.data = FALSE
-filename = "../OpenSSL/openssl-include"
+# has.clone.data = FALSE
+# filename = "../OpenSSL/openssl-include"
 
 
 gxlfile = paste(filename, ".gxl", sep="")
@@ -162,3 +162,8 @@ if (! has.clone.data)
 
 write.table(metrics, csvfile, quote=FALSE, sep=";", row.names=FALSE, col.names=TRUE, dec=".", fileEncoding = "UTF-8")
 
+# Metric.Quality in range [0,1]
+# Metric.McCabe_Complexity.sum
+# Metric.Number_Of_Statements.sum
+# Metric.Lines.Comment.sum
+# Metric.Lines.LOC.sum
