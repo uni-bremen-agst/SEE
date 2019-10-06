@@ -15,6 +15,11 @@ public class ListItem : MonoBehaviour
         LinkageName = GetComponentInChildren<Text>();
     }
 
+    public Node GetNode()
+    {
+        return Node;
+    }
+
     public void SetNode(Node node)
     {
         Node = node;
