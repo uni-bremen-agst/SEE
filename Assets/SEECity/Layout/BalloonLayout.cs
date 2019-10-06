@@ -15,20 +15,34 @@ namespace SEE.Layout
     {
         public BalloonLayout(string widthMetric, string heightMetric, string breadthMetric, 
                              SerializableDictionary<string, IconFactory.Erosion> issueMap,
+                             string[] innerNodeMetrics,
                              BlockFactory blockFactory,
                              IScale scaler,
                              float edgeWidth,
-                             bool showErosions)
+                             bool showErosions,
+                             bool showDonuts)
         : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
         {
             name = "Ballon";
             this.showErosions = showErosions;
+            this.showDonuts = showDonuts;
+            this.innerNodeMetrics = innerNodeMetrics;
         }
+
+        /// <summary>
+        /// The names of the metrics for inner nodes to be put onto the 
+        /// </summary>
+        private readonly string[] innerNodeMetrics;
 
         /// <summary>
         /// Whether erosions should be visible above the nodes.
         /// </summary>
         public bool showErosions = true;
+
+        /// <summary>
+        /// Whether donut charts should be visible in the inner circle of the nodes.
+        /// </summary>
+        public bool showDonuts = true;
 
         /// <summary>
         /// The minimal line width of a circle drawn for an inner node.
@@ -84,6 +98,7 @@ namespace SEE.Layout
             // now we know the minimal distance between two subsequent roots so that
             // their outer circles do not overlap
             {
+                DonutFactory factory = new DonutFactory(innerNodeMetrics);
                 Vector3 position = Vector3.zero;
                 int i = 0;
                 foreach (Node root in graph.GetRoots())
@@ -92,7 +107,7 @@ namespace SEE.Layout
                     // in case we draw the very first circle, no distance must be kept
                     position.x += i == 0 ? 0.0f : nodeInfos[roots[i - 1]].outer_radius + nodeInfos[roots[i]].outer_radius + offset;
                     Debug.Log("Drawing balloon for root " + root.LinkName + "@" + position + "\n");
-                    DrawCircles(root, position, 0, max_depths[i], scaler);
+                    DrawCircles(root, position, 0, max_depths[i], scaler, factory);
                     i++;
                 }
             }
@@ -172,7 +187,7 @@ namespace SEE.Layout
             plane.transform.localScale = planeScale;
         }
 
-        private void DrawCircles(Node node, Vector3 position, int depth, int max_depth, IScale scaler)
+        private void DrawCircles(Node node, Vector3 position, int depth, int max_depth, IScale scaler, DonutFactory factory)
         {
             List<Node> children = node.Children();
 
@@ -183,7 +198,7 @@ namespace SEE.Layout
             }
             else
             {
-                DrawInnerNode(node, position, nodeInfos[node].outer_radius, depth, max_depth);
+                DrawInnerNode(node, position, nodeInfos[node].outer_radius, depth, max_depth, factory);
 
                 // The center points of the children circles are located on the circle
                 // with center point 'position' and radius of the inner circle of the
@@ -284,7 +299,7 @@ namespace SEE.Layout
                         child_center.x = position.x + (float)(parent_inner_radius * System.Math.Cos(accummulated_alpha));
                         child_center.z = position.z + (float)(parent_inner_radius * System.Math.Sin(accummulated_alpha));
 
-                        DrawCircles(child, child_center, depth + 1, max_depth, scaler);
+                        DrawCircles(child, child_center, depth + 1, max_depth, scaler, factory);
 
                         // The next available circle must be located outside of the child circle
                         accummulated_alpha += alpha + space_between_child_circles;
@@ -668,9 +683,8 @@ namespace SEE.Layout
         //private Color lightCylinderColor = new Color((float)200 / 255, (float)247 / 255, (float)197 / 255, 1.0f); // Lawn green
         // private Color rightCylinderColor = new Color((float)30 / 255, (float)130 / 255, (float)76 / 255, 1.0f); // Salem green
 
-        private void DrawInnerNode(Node node, Vector3 position, float radius, int depth, int max_depth)
+        private void DrawInnerNode(Node node, Vector3 position, float radius, int depth, int max_depth, DonutFactory factory)
         {
-
             GameObject circle = new GameObject();
             gameObjects[node] = circle;
             NodeRef nodeRef = circle.AddComponent<NodeRef>();
@@ -681,21 +695,48 @@ namespace SEE.Layout
             // If wanted to have the nesting of circles on different ground levels depending
             // on the depth of the node, we would use position.y - (max_depth - depth + 1) * cylinder_height
             // for the y coordinate.
-            circle.transform.position = position;
-           //go.transform.localScale = new Vector3(2.0f * radius, cylinder_height, 2.0f * radius);
+            circle.transform.position = position; // new Vector3 (position.x, position.y - depth * 0.01f, position.z);
+            //go.transform.localScale = new Vector3(2.0f * radius, cylinder_height, 2.0f * radius);
             /*
               MeshFactory.AddTerrain(go);
               SetColor(go, Color.Lerp(lightCylinderColor, rightCylinderColor, (float)depth / (float)max_depth));
             */
 
             // DrawCircle(node, position, radius);
+
             // Roots have depth 0. We want the line to be thicker for nodes higher in the hierarchy.
             float lineWidth = Mathf.Lerp(minmalCircleLineWidth, maximalCircleLineWidth, (float)(max_depth - depth) / max_depth);
-            AttachCircleLine(circle, radius, lineWidth);
+
+            if (showDonuts)
+            {
+                AddDonut(node, circle, radius, factory);
+                GameObject circleLine = new GameObject("circle line of " + circle.name)
+                {
+                    tag = Tags.Decoration
+                };
+                AttachCircleLine(circleLine, radius, lineWidth);
+                circleLine.transform.position = circle.transform.position;
+                circleLine.transform.parent = circle.transform;
+            }
+            else
+            {
+                AttachCircleLine(circle, radius, lineWidth);
+            }
 
             // The text may occupy up to 30% of the diameter in width.
             GameObject text = TextFactory.GetText(node.SourceName, position, 2.0f * radius * 0.3f);
             //text.transform.parent = go.transform; // make the text a child of circle
+        }
+
+        private void AddDonut(Node node, GameObject circle, float radius, DonutFactory factory)
+        {
+            // FIXME: Derive real metrics from nodes.
+            float innerValue = UnityEngine.Random.Range(0.0f, 1.0f);
+            float m1 = UnityEngine.Random.Range(0.0f, 50.0f);
+            float m2 = UnityEngine.Random.Range(0.0f, 90.0f);
+            float m3 = UnityEngine.Random.Range(0.0f, 150.0f);
+            float m4 = UnityEngine.Random.Range(0.0f, 200.0f);
+            factory.DonutChart(circle, 0.3f * radius, innerValue, new float[] {m1, m2, m2, m3 });
         }
 
         private void SetColor(GameObject gameObject, Color color)
