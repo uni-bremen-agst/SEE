@@ -4,7 +4,6 @@ using SEE.DataModel;
 using SEE;
 using SEE.Layout;
 using System.Collections.Generic;
-using System;
 
 namespace SEEEditor
 {
@@ -69,6 +68,8 @@ namespace SEEEditor
             editorSettings.CScapeBuildings = EditorGUILayout.Toggle("CScape buildings", editorSettings.CScapeBuildings);
             editorSettings.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", editorSettings.ZScoreScale);
             editorSettings.EdgeWidth = EditorGUILayout.FloatField("Edge width", editorSettings.EdgeWidth);
+            editorSettings.ShowErosions = EditorGUILayout.Toggle("Show erosions", editorSettings.ShowErosions);
+            editorSettings.ShowDonuts = EditorGUILayout.Toggle("Show Donut charts", editorSettings.ShowDonuts);
 
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
             // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
@@ -126,9 +127,12 @@ namespace SEEEditor
                         {
                             layout = new SEE.Layout.BalloonLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric, 
                                                                   editorSettings.IssueMap(),
+                                                                  editorSettings.InnerNodeMetrics,
                                                                   blockFactory,
                                                                   scaler,
-                                                                  editorSettings.EdgeWidth);
+                                                                  editorSettings.EdgeWidth,
+                                                                  editorSettings.ShowErosions,
+                                                                  editorSettings.ShowDonuts);
                         }
                         else
                         {
