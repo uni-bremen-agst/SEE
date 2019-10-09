@@ -159,6 +159,16 @@ namespace SEE.Layout
             {
                 Debug.LogWarningFormat("[BuildingFactory] {0} has no building modifier.\n", building.name);
             }
+            Renderer renderer = building.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+            }
+            else
+            {
+                Debug.LogWarningFormat("[BuildingFactory] {0} has no renderer.\n", building.name);
+            }
             return building;
         }
 

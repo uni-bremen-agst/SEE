@@ -7,12 +7,13 @@ namespace SEE.Layout
 {
     public class ManhattenLayout : ILayout
     {
-        public ManhattenLayout(string widthMetric, string heightMetric, string breadthMetric, 
+        public ManhattenLayout(bool showEdges,
+                               string widthMetric, string heightMetric, string breadthMetric, 
                                SerializableDictionary<string, IconFactory.Erosion> issueMap,
                                BlockFactory blockFactory,
                                IScale scaler,
                                float edgeWidth)
-            : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
+            : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
         {
             name = "Manhattan";
         }
