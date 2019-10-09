@@ -4,6 +4,8 @@ using SEE.DataModel;
 using SEE;
 using SEE.Layout;
 using System.Collections.Generic;
+using UnityEngine.XR;
+using System.Collections;
 using System;
 
 namespace SEEEditor
@@ -50,6 +52,76 @@ namespace SEEEditor
         }
 
         /// <summary>
+        /// Whether VR mode is to be activated for the game.
+        /// </summary>
+        private bool VRenabled = false;
+
+        /// <summary>
+        /// Returns all main cameras (name equals "Main Camera" and tag equals "MainCamera"
+        /// no matter whether they are activated or not.
+        /// </summary>
+        /// <returns></returns>
+        private static IList<GameObject> AllMainCameras()
+        {
+            IList<GameObject> result = new List<GameObject>();
+            // FindObjectsOfTypeAll returns also inactive game objects
+            foreach (GameObject o in Resources.FindObjectsOfTypeAll(typeof(UnityEngine.GameObject)))
+            {
+                if (o.name == "Main Camera" && o.tag == "MainCamera")
+                {
+                    result.Add(o);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Activates the leap rig for VR and deactivates the main camera for the monitor mode,
+        /// if enableVR is true. If enableVR is false, the leap rig for VR is deactivated and 
+        /// the main camera for the monitor mode is deactivated.
+        /// </summary>
+        /// <param name="enableVR">whether the leap rig for the VR mode should be activated</param>
+        private static void EnableVR(bool enableVR)
+        {
+            XRSettings.enabled = enableVR;
+            // If VR is to be enabled, we need to disable the main camera for monitor games
+            // and active the Leap Rig. If instead VR is to be disabled, we need to disable 
+            // the Leap Rig and activate the main camera.
+            foreach (GameObject camera in AllMainCameras())
+            {
+                if (camera.transform.parent == null)
+                {
+                    // The camera for the monitor game is at top-level.
+                    camera.SetActive(!enableVR);
+                }
+                else if (camera.transform.parent.name == "Leap Rig")
+                {
+                    // The camera of the Leap Rig is nested in a game object named accordingly.
+                    camera.SetActive(enableVR);
+                }
+            }
+            EnableCanvas(enableVR);
+        }
+
+        /// <summary>
+        /// In VR mode, the UI canvas must be disabled because of performance reasons and
+        /// it is not used anyhow. The canvas is recognized by its name "Canvas" and the
+        /// fact that it is expected to be at top level of the game object hierarchy.
+        /// </summary>
+        /// <param name="enableVR">whether to disable the canvas</param>
+        private static void EnableCanvas(bool enableVR)
+        {
+            // FindObjectsOfTypeAll returns also inactive game objects
+            foreach (GameObject o in Resources.FindObjectsOfTypeAll(typeof(UnityEngine.GameObject)))
+            {
+                if (o.name == "Canvas" && o.transform.parent == null)
+                {
+                    o.SetActive(! enableVR);
+                }
+            }
+        }
+
+        /// <summary>
         /// Creates a new window offering the city editor commands.
         /// </summary>
         void OnGUI()
@@ -64,11 +136,18 @@ namespace SEEEditor
             editorSettings.HeightMetric = EditorGUILayout.TextField("Height", editorSettings.HeightMetric);
             editorSettings.DepthMetric = EditorGUILayout.TextField("Depth", editorSettings.DepthMetric);
 
+            GUILayout.Label("VR settings", EditorStyles.boldLabel);
+            VRenabled = EditorGUILayout.Toggle("Enable VR", VRenabled);
+            EnableVR(VRenabled);
+
             GUILayout.Label("Visual attributes", EditorStyles.boldLabel);
             editorSettings.BallonLayout = EditorGUILayout.Toggle("Balloon Layout", editorSettings.BallonLayout);
             editorSettings.CScapeBuildings = EditorGUILayout.Toggle("CScape buildings", editorSettings.CScapeBuildings);
             editorSettings.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", editorSettings.ZScoreScale);
             editorSettings.EdgeWidth = EditorGUILayout.FloatField("Edge width", editorSettings.EdgeWidth);
+            editorSettings.ShowEdges = EditorGUILayout.Toggle("Show edges", editorSettings.ShowEdges);
+            editorSettings.ShowErosions = EditorGUILayout.Toggle("Show erosions", editorSettings.ShowErosions);
+            editorSettings.ShowDonuts = EditorGUILayout.Toggle("Show Donut charts", editorSettings.ShowDonuts);
 
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
             // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
@@ -124,15 +203,20 @@ namespace SEEEditor
 
                         if (editorSettings.BallonLayout)
                         {
-                            layout = new SEE.Layout.BalloonLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric, 
+                            layout = new SEE.Layout.BalloonLayout(editorSettings.ShowEdges,
+                                                                  editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric, 
                                                                   editorSettings.IssueMap(),
+                                                                  editorSettings.InnerNodeMetrics,
                                                                   blockFactory,
                                                                   scaler,
-                                                                  editorSettings.EdgeWidth);
+                                                                  editorSettings.EdgeWidth,
+                                                                  editorSettings.ShowErosions,
+                                                                  editorSettings.ShowDonuts);
                         }
                         else
                         {
-                            layout = new SEE.Layout.ManhattenLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric, 
+                            layout = new SEE.Layout.ManhattenLayout(editorSettings.ShowEdges,
+                                                                    editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric, 
                                                                     editorSettings.IssueMap(),
                                                                     blockFactory,
                                                                     scaler,
@@ -155,9 +239,16 @@ namespace SEEEditor
             this.Repaint();
         }
 
+        /// <summary>
+        /// Adjusts the spead of the camera according to the space unit. If we use simple
+        /// cubes for the buildings, the unit is the normal Unity unit. If we use CScape
+        /// buildings, the unit is larger than the normal Unity unit and, hence, camera
+        /// speed must be adjusted accordingly.
+        /// </summary>
+        /// <param name="unit">the factor by which to multiply the camera speed</param>
         private void AdjustCameraSpeed(float unit)
         {
-            foreach (GameObject camera in GameObject.FindGameObjectsWithTag("MainCamera"))
+            foreach (GameObject camera in AllMainCameras())
             {
                 FlyCamera flightControl = camera.GetComponent<FlyCamera>();
                 if (flightControl != null)
@@ -165,7 +256,7 @@ namespace SEEEditor
                     flightControl.SetDefaults();
                     flightControl.AdjustSettings(unit);
                 }
-
+                // TODO: Adjust speed setting for Leap Rig camera
             }
         }
 

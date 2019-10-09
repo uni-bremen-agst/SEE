@@ -77,6 +77,7 @@ namespace SEE.Layout
             MeshRenderer renderer = gameObject.AddComponent<MeshRenderer>();
             // object should not cast shadows: too expensive and may hide information
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
 
             // 3) Assigns a material to the object.
             Material newMat;

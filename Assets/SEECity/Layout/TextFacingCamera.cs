@@ -7,21 +7,21 @@
 public class TextFacingCamera : MonoBehaviour
 {
     // The time in seconds until the text is updated again.
-    private const float updatePeriod = 1.0f;
+    private const float updatePeriod = 0.5f;
 
     /// <summary>
     /// The minimal distance between the text and the main camera to become visible.
     /// If the actual distance is below this value, the object will not be visible.
     /// If minimalDistance > maximalDistance, the object will not be visible.
     /// </summary>
-    public float minimalDistance = 5.0f;
+    public float minimalDistance = 2.0f;
 
     /// <summary>
     /// The maximal distance between the text and the main camera to become visible.
     /// If the actual distance is above this value, the object will not be visible.
     /// If minimalDistance > maximalDistance, the object will not be visible.
     /// </summary>
-    public float maximalDistance = 20.0f;
+    public float maximalDistance = 30.0f;
 
     // Time since the start of the last update period.
     private float timer = updatePeriod;
@@ -59,8 +59,13 @@ public class TextFacingCamera : MonoBehaviour
             Camera mainCamera = Camera.main;
             if (mainCamera.transform.position != lastCameraPosition)
             {
-                Vector3 heading = transform.position - mainCamera.transform.position;
-                float distance = Mathf.Abs(Vector3.Dot(heading, mainCamera.transform.forward));
+                // Alternative calculation of difference, which does not quite work on updates, however.
+                // the object's heading vector
+                // Vector3 heading = transform.position - mainCamera.transform.position;
+                // mainCamera.transform.forward is the z axis of the camera
+                // float dist = Mathf.Abs(Vector3.Dot(heading, mainCamera.transform.forward));
+
+                float distance = Mathf.Abs(Vector3.Distance(transform.position, mainCamera.transform.position));
                 gameObjectRenderer.enabled = (minimalDistance <= distance && distance <= maximalDistance);
                 if (gameObjectRenderer.enabled)
                 {

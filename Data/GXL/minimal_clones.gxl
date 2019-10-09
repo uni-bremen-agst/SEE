@@ -608,5 +608,8 @@
     <edge id="E39" from="N11" to="N11">
       <type xlink:href="Clone"/>
     </edge>	
+	<edge id="E40" from="N16" to="N17">
+      <type xlink:href="Clone"/>
+    </edge>
   </graph>
 </gxl>

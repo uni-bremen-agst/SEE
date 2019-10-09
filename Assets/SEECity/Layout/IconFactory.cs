@@ -55,6 +55,10 @@ namespace SEE.Layout
             }
         }
 
+        // Relative screen space required so that a erosion sprite becomes visible.
+        // If the size of the sprite is below this value, it will be culled.
+        private const float ScreenRelativeTransitionHeight = 0.02f;
+
         /// <summary>
         /// The paths to the sprite prefab files. 
         /// The viewBox of the original SVG files from which those prefabs were
@@ -148,31 +152,52 @@ namespace SEE.Layout
 
         /// <summary>
         /// Generates a sprite game object for the given kind of Erosion at the given
-        /// location. The name of the game object is the kind of Erosion. May return
-        /// null, if a prefab could not be loaded previously. This function may be
-        /// called in editor mode.
+        /// location. The name of the game object is the kind of Erosion. The game
+        /// object returned is a composite of different level-of-detail (LOD) objects
+        /// nested in an LOD group. Currently, there is only one such child object, 
+        /// which is the sprite for the given kind of erosion. It will be culled by
+        /// ScreenRelativeTransitionHeight.
+        /// 
+        /// This function may be called in editor mode.
         /// </summary>
         /// <param name="position">the location for positioning the new game object</param>
         /// <param name="erosion">the kind of Erosion for which to generate the game object</param>
-        /// <returns>a new game object for this type of erosion (may be null)</returns>
+        /// <returns>a new game object for this type of erosion</returns>
         public GameObject GetIcon(Vector3 position, Erosion erosion)
         {
-            GameObject result;
-            UnityEngine.Object prefab = erosionToSprite[(int)erosion];
-            if (prefab == null)
+            GameObject gameObject = new GameObject
             {
-                result = new GameObject();
-            }
-            else
+                tag = Tags.Erosion,
+                name = ToString(erosion)
+            };
+            gameObject.transform.position = position;
+
+            // Programmatically create a LOD group and add LOD levels.
+            LODGroup group = gameObject.AddComponent<LODGroup>();
+
+            // Add LOD levels (currently only one).
+            LOD[] lods = new LOD[1];
             {
-                result = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
+                // Add the erosion sprite.
+                GameObject erosionSprite;
+                UnityEngine.Object prefab = erosionToSprite[(int)erosion];
+                if (prefab == null)
+                {
+                    // Let sphere be the fallback icon if we do not have a prefab for this erosion kind
+                    erosionSprite = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                }
+                else
+                {
+                    erosionSprite = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
+                }
+                erosionSprite.transform.parent = gameObject.transform;
+                Renderer[] renderers = new Renderer[1];
+                renderers[0] = erosionSprite.GetComponent<Renderer>();
+                lods[0] = new LOD(ScreenRelativeTransitionHeight, renderers);
             }
-            result.tag = Tags.Erosion;
-            result.name = ToString(erosion);
-            result.transform.position = position;
-            SpriteRenderer renderer = result.GetComponent<SpriteRenderer>();
-            renderer.color = Color.white;
-            return result;
+            group.SetLODs(lods);
+            group.RecalculateBounds();
+            return gameObject;
         }
     }
 }
