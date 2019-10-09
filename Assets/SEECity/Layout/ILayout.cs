@@ -6,12 +6,14 @@ namespace SEE.Layout
 {
     public abstract class ILayout
     {
-        public ILayout(string widthMetric, string heightMetric, string breadthMetric,
+        public ILayout(bool showEdges,
+               string widthMetric, string heightMetric, string breadthMetric,
                SerializableDictionary<string, IconFactory.Erosion> issueMap,
                BlockFactory blockFactory,
                IScale scaler,
                float edgeWidth)
         {
+            this.showEdges = showEdges;
             this.widthMetric = widthMetric;
             this.heightMetric = heightMetric;
             this.breadthMetric = breadthMetric;
@@ -27,9 +29,12 @@ namespace SEE.Layout
             p = Performance.Begin(name + " layout of nodes");
             DrawNodes(graph);
             p.End();
-            p = Performance.Begin(name + " layout of edges");
-            DrawEdges(graph);
-            p.End();
+            if (showEdges)
+            {
+                p = Performance.Begin(name + " layout of edges");
+                DrawEdges(graph);
+                p.End();
+            }
         }
 
         /// <summary>
@@ -48,6 +53,11 @@ namespace SEE.Layout
         /// Mapping of node attributes onto erosion issue icons.
         /// </summary>
         protected readonly SerializableDictionary<string, IconFactory.Erosion> issueMap;
+
+        /// <summary>
+        /// Whether edges should be shown.
+        /// </summary>
+        protected readonly bool showEdges;
 
         /// <summary>
         /// A factory to create visual representations of graph nodes (e.g., cubes or CScape buildings).
