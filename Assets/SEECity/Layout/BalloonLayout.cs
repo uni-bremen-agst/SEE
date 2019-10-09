@@ -13,7 +13,8 @@ namespace SEE.Layout
     /// </summary>
     public class BalloonLayout : ILayout
     {
-        public BalloonLayout(string widthMetric, string heightMetric, string breadthMetric, 
+        public BalloonLayout(bool showEdges,
+                             string widthMetric, string heightMetric, string breadthMetric, 
                              SerializableDictionary<string, IconFactory.Erosion> issueMap,
                              string[] innerNodeMetrics,
                              BlockFactory blockFactory,
@@ -21,7 +22,7 @@ namespace SEE.Layout
                              float edgeWidth,
                              bool showErosions,
                              bool showDonuts)
-        : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
+        : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
         {
             name = "Ballon";
             this.showErosions = showErosions;

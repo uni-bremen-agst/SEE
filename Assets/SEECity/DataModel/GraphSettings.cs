@@ -131,6 +131,11 @@ namespace SEE
         /// </summary>
         public bool ShowDonuts = true;
 
+        /// <summary>
+        /// Whether edges should be shown.
+        /// </summary>
+        public bool ShowEdges = true;
+
         public string[] InnerNodeMetrics = new string[] { "Metric.Quality",
                                                           "Metric.McCabe_Complexity.sum",
                                                           "Metric.Number_Of_Statements.sum",
