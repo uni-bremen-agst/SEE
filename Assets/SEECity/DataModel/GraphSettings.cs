@@ -40,6 +40,7 @@ namespace SEE
         // Test graph, generated directly from a git repository
         public string gxlPath = "..\\Data\\GXL\\animation-clones\\streamex-1.gxl";
         public string csvPath = "..\\Data\\GXL\\animation-clones\\streamex-1.csv";
+        public string animatedPath = "..\\Data\\GXL\\animation-clones\\";
 
         /// <summary>
         /// Returns the concatenation of pathPrefix and gxlPath. That is the complete
@@ -59,6 +60,16 @@ namespace SEE
         public string CSVPath()
         {
             return pathPrefix + csvPath;
+        }
+
+        /// <summary>
+        /// Returns the concatenation of pathPrefix and animatedPath. That is the complete
+        /// absolute path to the GXL folder containing the graph data for animation.
+        /// </summary>
+        /// <returns>concatenation of pathPrefix and animatedPath</returns>
+        public string AnimatedPath()
+        {
+            return pathPrefix + animatedPath;
         }
         
         /// <summary>
