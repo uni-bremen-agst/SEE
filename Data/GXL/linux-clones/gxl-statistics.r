@@ -2,25 +2,57 @@ library(xml2)
 library(purrr)
 
 #filename = "arch"
-#filename = "net"
-filename = "fs"
+filename = "net"
+#filename = "fs"
 #filename = "drivers"
+has.clone.data = TRUE
+
+# the following files have no clone data
+# has.clone.data = FALSE
+# filename = "../OpenSSL/openssl-include"
+
+
 gxlfile = paste(filename, ".gxl", sep="")
 csvfile = paste(filename, ".csv", sep="")
 
 read.gxl = function(gxfile)
 {
   doc <- read_xml(gxlfile)
-  gxl = xml_find_all(doc, "graph/node") %>% 
-    map_df(function(x) {
-      list(
-        Node=xml_attr(x, "id"), #,
-        Linkname=xml_find_first(x, ".//attr[@name='Linkage.Name']/string") %>%  xml_text(),
-        Number_Of_Tokens=xml_find_first(x, ".//attr[@name='Metric.Number_of_Tokens']/int") %>% xml_text() %>% strtoi(),
-        LOC=xml_find_first(x, ".//attr[@name='Metric.LOC']/int") %>% xml_text() %>% strtoi(),
-        CloneRate=xml_find_first(x, ".//attr[@name='Metric.Clone_Rate']/float") %>% xml_text() %>% as.numeric()
-      )
-    })
+  if (has.clone.data)
+  {
+    # mapping:
+    #  Linkage.Name            -> Linkname
+    #  Metric.Number_of_Tokens -> Number_Of_Tokens
+    #  Metric.LOC              -> LOC
+    # Metric.Clone_Rate        -> CloneRate
+    gxl = xml_find_all(doc, "graph/node") %>% 
+      map_df(function(x) {
+        list(
+          Node=xml_attr(x, "id"), #,
+          Linkname=xml_find_first(x, ".//attr[@name='Linkage.Name']/string") %>%  xml_text(),
+          Number_Of_Tokens=xml_find_first(x, ".//attr[@name='Metric.Number_of_Tokens']/int") %>% xml_text() %>% strtoi(),
+          LOC=xml_find_first(x, ".//attr[@name='Metric.LOC']/int") %>% xml_text() %>% strtoi(),
+          CloneRate=xml_find_first(x, ".//attr[@name='Metric.Clone_Rate']/float") %>% xml_text() %>% as.numeric()
+        )
+      })
+  }
+  else
+  {
+    #  Linkage.Name         -> Linkname
+    #  Metric.Lines.LOC     -> LOC
+    #  Metric.Lines.LOC     -> Number_Of_Tokens
+    #  Metric.Lines.Comment -> CloneRate
+    gxl = xml_find_all(doc, "graph/node") %>% 
+      map_df(function(x) {
+        list(
+          Node=xml_attr(x, "id"), #,
+          Linkname=xml_find_first(x, ".//attr[@name='Linkage.Name']/string") %>%  xml_text(),
+          Number_Of_Tokens=xml_find_first(x, ".//attr[@name='Metric.Lines.LOC']/int") %>% xml_text() %>% strtoi(),
+          LOC=xml_find_first(x, ".//attr[@name='Metric.Lines.LOC']/int") %>% xml_text() %>% strtoi(),
+          CloneRate=xml_find_first(x, ".//attr[@name='Metric.Lines.Comment']/int") %>% xml_text() %>% as.numeric()
+        )
+      })
+  }
   gxl
 }
 
@@ -119,7 +151,19 @@ add.random.correlated.metrics = function(gxl)
 #metrics = add.random.metrics(gxl)
 metrics = add.random.correlated.metrics(gxl)
 
+if (! has.clone.data)
+{
+  gxl.without.na = gxl[complete.cases(gxl), ]
+  metrics$CloneRate = gxl.without.na$CloneRate
+  metrics$LOC = gxl.without.na$LOC
+}
+
 #plot(metrics$Number_Of_Tokens, metrics$Metric.Architecture_Violations)
 
 write.table(metrics, csvfile, quote=FALSE, sep=";", row.names=FALSE, col.names=TRUE, dec=".", fileEncoding = "UTF-8")
 
+# Metric.Quality in range [0,1]
+# Metric.McCabe_Complexity.sum
+# Metric.Number_Of_Statements.sum
+# Metric.Lines.Comment.sum
+# Metric.Lines.LOC.sum
