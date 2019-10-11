@@ -26,17 +26,22 @@ public class CCALoader
         AddAllRevisions();
     }
 
+    private string GetAnimatedPath()
+    {
+        return settings.pathPrefix + "..\\Data\\GXL\\animation-clones\\";
+    }
+
     /// <summary>
     /// TODO: doc 
     /// </summary>
     private void AddAllRevisions()
     {
-        SEE.Performance p = SEE.Performance.Begin("loading animated graph data from " + settings.AnimatedPath());
+        SEE.Performance p = SEE.Performance.Begin("loading animated graph data from " + GetAnimatedPath());
         graphs.Clear();
         graphOrder.Clear();
         var settingsOldGxlPath = settings.gxlPath;
         var newGraphName = Directory
-            .GetFiles(settings.AnimatedPath(), "*.gxl", SearchOption.TopDirectoryOnly)
+            .GetFiles(GetAnimatedPath(), "*.gxl", SearchOption.TopDirectoryOnly)
             .NumericalSort();
         graphOrder.AddRange(newGraphName);
         foreach (string gxlPath in graphOrder)
