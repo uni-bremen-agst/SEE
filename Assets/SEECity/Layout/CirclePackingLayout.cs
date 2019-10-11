@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SEE.DataModel;
+using System.Collections.Generic;
 using UnityEngine;
-using SEE.DataModel;
 
 namespace SEE.Layout
 {
@@ -14,12 +14,20 @@ namespace SEE.Layout
          * CIRCLE PACKING LAYOUT
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
+        
+        private GameObject RootNodes;
+        private GameObject RootEdges;
 
-        private GameObject Nodes;
-        private GameObject Edges;
-
-        public CirclePackingLayout(string widthMetric, string heightMetric, string breadthMetric, SerializableDictionary<string, IconFactory.Erosion> issueMap)
-        : base(widthMetric, heightMetric, breadthMetric, issueMap)
+        public CirclePackingLayout(bool showEdges,
+                             string widthMetric, string heightMetric, string breadthMetric,
+                             SerializableDictionary<string, IconFactory.Erosion> issueMap,
+                             string[] innerNodeMetrics,
+                             BlockFactory blockFactory,
+                             IScale scaler,
+                             float edgeWidth,
+                             bool showErosions,
+                             bool showDonuts)
+        : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
         {
             name = "Circle Packing";
         }
@@ -31,64 +39,66 @@ namespace SEE.Layout
 
         protected override void DrawNodes(Graph graph)
         {
-            IScale scaler = new ZScoreScale(graph, minimal_length, new List<string>() { widthMetric, heightMetric, breadthMetric });
-            Nodes = new GameObject();
-            Nodes.name = "Nodes";
-            InitializeNodes(graph.GetRoots(), scaler, Nodes);
-            DrawNodes(graph.GetRoots(), scaler, out float out_radius);
-
+            graph.SortHierarchyByName();
+            RootNodes = new GameObject();
+            RootNodes.name = "Nodes";
+            DrawNodes(RootNodes, graph.GetRoots(), out float out_radius);
         }
 
-        private void DrawNodes(List<Node> nodes, IScale scaler, out float out_radius)
+        private void DrawNodes(GameObject parent, List<Node> nodes, out float out_radius)
         {
-            List<Circle> circles = new List<Circle>();
+            List<Circle> circles = new List<Circle>(nodes.Count);
+
             for (int i = 0; i < nodes.Count; i++)
             {
-                float radius = 0;
-                
-                if (nodes[i].IsLeaf())
+                Node node = nodes[i];
+
+                GameObject gameObject = new GameObject(node.LinkName);
+                gameObject.AddComponent<NodeRef>().node = node;
+                gameObject.transform.parent = parent.transform;
+
+                float radius;
+                if (node.IsLeaf())
                 {
-                    Transform cubeTransform = nodes[i].transform.GetChild(0);
-                    Vector3 cubeScale = cubeTransform.lossyScale;
-                    float cubeXZPlaneRadius = Mathf.Sqrt(cubeScale.x * cubeScale.x + cubeScale.z * cubeScale.z);
-                    radius = cubeXZPlaneRadius;
+                    Vector3 scale = GetScale(node);
+                    radius = Mathf.Sqrt(scale.x * scale.x + scale.z * scale.z);
+                    DrawLeaf(gameObject);
                 }
                 else
                 {
-                    DrawNodes(nodes[i].Children(), scaler, out float out_radius_of_child);
-                    radius = out_radius_of_child;
+                    DrawNodes(gameObject, node.Children(), out float out_child_radius);
+                    radius = out_child_radius;
                 }
 
-                nodes[i].transform.position = new Vector3(
-                    Mathf.Sin((float)i / (float)nodes.Count) * radius,
-                    0.0f,
-                    Mathf.Cos((float)i / (float)nodes.Count) * radius
-                );
-
-                DrawCircle(nodes[i], radius);
-                circles.Add(new Circle(nodes[i].gameObject.transform, radius));
+                float radians = ((float)i / (float)nodes.Count) * (2.0f * Mathf.PI);
+                gameObject.transform.position = new Vector3(Mathf.Cos(radians), 0.0f, Mathf.Sin(radians)) * radius;
+                circles.Add(new Circle(gameObject.transform, radius));
             }
 
-            out_radius = 0;
-            for (int i = 0; i < circles.Count; i++) // cp.Circles.Count as heuristic for decent result
-            {
-                CirclePacker.Pack(circles, out float out_outer_radius);
-                out_radius = out_outer_radius;
-            }
+            CirclePacker.Pack(circles, out float out_outer_radius);
+            DrawCircle(parent, out_outer_radius);
+            out_radius = out_outer_radius;
         }
 
-        private void DrawCircle(Node node, float radius)
+        private void DrawLeaf(GameObject leaf)
         {
-            GameObject parent = node.gameObject;
+            Node node = leaf.GetComponent<NodeRef>().node;
+
+            GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cube.transform.localScale = GetScale(node);
+            cube.transform.parent = leaf.transform;
+        }
+
+        private void DrawCircle(GameObject node, float radius)
+        {
             GameObject circle = new GameObject();
             circle.name = node.name + " border";
-            circle.transform.parent = parent.transform;
-            circle.transform.localPosition = Vector3.zero;
+            circle.transform.parent = node.transform;
 
             const int segments = 360;
             LineRenderer line = circle.AddComponent<LineRenderer>();
             LineFactory.SetDefaults(line);
-            LineFactory.SetColor(line, Color.red);
+            LineFactory.SetColor(line, Color.white);
             LineFactory.SetWidth(line, radius / 100.0f);
             line.useWorldSpace = false;
             line.sharedMaterial = new Material(defaultLineMaterial);
@@ -103,30 +113,9 @@ namespace SEE.Layout
             line.SetPositions(points);
         }
 
-        private void InitializeNodes(List<Node> nodes, IScale scaler, GameObject parent)
+        private Vector3 GetScale(Node node)
         {
-            for (int i = 0; i < nodes.Count; i++)
-            {
-                Node node = nodes[i];
-                node.transform.parent = parent.transform;
-                if (node.IsLeaf())
-                {
-                    GameObject cube = new GameObject();
-                    cube.transform.position = new Vector3(0.0f, scaler.GetNormalizedValue(node, heightMetric) / 2.0f, 0.0f);
-                    cube.name = node.gameObject.name + " house";
-                    MeshFactory.AddCube(cube);
-                    cube.transform.parent = node.gameObject.transform;
-                    cube.transform.localScale = new Vector3(
-                        scaler.GetNormalizedValue(node, widthMetric),
-                        scaler.GetNormalizedValue(node, heightMetric),
-                        scaler.GetNormalizedValue(node, breadthMetric)
-                    );
-                }
-                else
-                {
-                    InitializeNodes(node.Children(), scaler, node.gameObject);
-                }
-            }
+            return new Vector3(scaler.GetNormalizedValue(node, widthMetric), scaler.GetNormalizedValue(node, heightMetric), scaler.GetNormalizedValue(node, breadthMetric)); ;
         }
 
         /*
@@ -134,30 +123,8 @@ namespace SEE.Layout
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
 
-        protected override void DrawEdges(Graph graph)
-        {
-            Edges = new GameObject();
-            Edges.name = "Edges";
-            List<Edge> edges = graph.Edges();
-            for (int i = 0; i < edges.Count; i++)
-            {
-                edges[i].transform.parent = Edges.transform;
-            }
-        }
+        // TODO: it's very empty here
 
-        public override void Reset()
-        {
-            if (Nodes != null)
-            {
-                Destroyer.DestroyGameObject(this.Nodes);
-                Nodes = null;
-            }
-            if (Edges != null)
-            {
-                Destroyer.DestroyGameObject(this.Edges);
-                Edges = null;
-            }
-        }
     }
 
 }// namespace SEE.Layout

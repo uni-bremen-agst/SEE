@@ -26,7 +26,7 @@ namespace SEE.Layout
             this.Radius = radius;
         }
     }
-
+    
     /// <summary>
     /// This class holds a list of <see cref="Circle"/>-Objects and can pack them closely.
     /// The original source can be found <see href="https://www.codeproject.com/Articles/42067/D-Circle-Packing-Algorithm-Ported-to-Csharp">HERE</see>.

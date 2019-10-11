@@ -141,7 +141,7 @@ namespace SEEEditor
             EnableVR(VRenabled);
 
             GUILayout.Label("Visual attributes", EditorStyles.boldLabel);
-            editorSettings.BallonLayout = EditorGUILayout.Toggle("Balloon Layout", editorSettings.BallonLayout);
+            editorSettings.Layout = (GraphSettings.Layouts)EditorGUILayout.EnumPopup("Layout", editorSettings.Layout);
             editorSettings.CScapeBuildings = EditorGUILayout.Toggle("CScape buildings", editorSettings.CScapeBuildings);
             editorSettings.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", editorSettings.ZScoreScale);
             editorSettings.EdgeWidth = EditorGUILayout.FloatField("Edge width", editorSettings.EdgeWidth);
@@ -186,12 +186,6 @@ namespace SEEEditor
 
                     if (graph != null)
                     {
-<<<<<<< HEAD
-                        MeshFactory.Reset();
-                        //layout = new SEE.Layout.BalloonLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, editorSettings.IssueMap());
-                        //layout = new SEE.Layout.ManhattenLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, editorSettings.IssueMap());
-                        layout = new SEE.Layout.CirclePackingLayout(editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.BreadthMetric, editorSettings.IssueMap());
-=======
                         //CubeFactory.Reset();            
                         IScale scaler;
                         {
@@ -207,10 +201,12 @@ namespace SEEEditor
                             }
                         }
 
-                        if (editorSettings.BallonLayout)
+                        switch (editorSettings.Layout)
                         {
-                            layout = new SEE.Layout.BalloonLayout(editorSettings.ShowEdges,
-                                                                  editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric, 
+                            case GraphSettings.Layouts.Balloon:
+                                {
+                                    layout = new SEE.Layout.BalloonLayout(editorSettings.ShowEdges,
+                                                                  editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric,
                                                                   editorSettings.IssueMap(),
                                                                   editorSettings.InnerNodeMetrics,
                                                                   blockFactory,
@@ -218,17 +214,32 @@ namespace SEEEditor
                                                                   editorSettings.EdgeWidth,
                                                                   editorSettings.ShowErosions,
                                                                   editorSettings.ShowDonuts);
-                        }
-                        else
-                        {
-                            layout = new SEE.Layout.ManhattenLayout(editorSettings.ShowEdges,
-                                                                    editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric, 
+                                    break;
+                                }
+                            case GraphSettings.Layouts.Manhattan:
+                                {
+                                    layout = new SEE.Layout.ManhattenLayout(editorSettings.ShowEdges,
+                                                                    editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric,
                                                                     editorSettings.IssueMap(),
                                                                     blockFactory,
                                                                     scaler,
                                                                     editorSettings.EdgeWidth);
+                                    break;
+                                }
+                            case GraphSettings.Layouts.CirclePacking:
+                                {
+                                    layout = new SEE.Layout.CirclePackingLayout(editorSettings.ShowEdges,
+                                                                  editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric,
+                                                                  editorSettings.IssueMap(),
+                                                                  editorSettings.InnerNodeMetrics,
+                                                                  blockFactory,
+                                                                  scaler,
+                                                                  editorSettings.EdgeWidth,
+                                                                  editorSettings.ShowErosions,
+                                                                  editorSettings.ShowDonuts);
+                                    break;
+                                }
                         }
->>>>>>> master
                         layout.Draw(graph);
                     }
                     else
