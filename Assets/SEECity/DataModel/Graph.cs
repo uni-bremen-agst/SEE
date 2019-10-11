@@ -232,22 +232,11 @@ namespace SEE.DataModel
             //    Destroyer.DestroyGameObject(edge.gameObject);
             //}
             edges.Clear();
-<<<<<<< HEAD
-            foreach (Node node in nodes.Values)
-            {
-                node.transform.parent = null;
-            }
-            foreach (Node node in nodes.Values)
-            {
-                Destroyer.DestroyGameObject(node.gameObject);
-            }
-=======
             // FIXME
             //foreach (Node node in nodes.Values)
             //{
             //    Destroyer.DestroyGameObject(node.gameObject);
             //}
->>>>>>> master
             nodes.Clear();
             // FIXME
             //Destroyer.DestroyGameObject(this.gameObject);
