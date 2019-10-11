@@ -130,7 +130,6 @@ namespace SEEEditor
             editorSettings.pathPrefix = EditorGUILayout.TextField("Project path prefix", ProjectPath());
             editorSettings.gxlPath = EditorGUILayout.TextField("GXL file", editorSettings.gxlPath);
             editorSettings.csvPath = EditorGUILayout.TextField("CSV file", editorSettings.csvPath);
-            editorSettings.animatedPath = EditorGUILayout.TextField("Revisions folder", editorSettings.animatedPath);
 
             GUILayout.Label("Lengths of buildings", EditorStyles.boldLabel);
             editorSettings.WidthMetric = EditorGUILayout.TextField("Width", editorSettings.WidthMetric);
@@ -237,125 +236,8 @@ namespace SEEEditor
                 default:
                     break;
             }
-
-            if (GUILayout.Button("Load revisions", GUILayout.Width(position.width), GUILayout.Height(height)))
-            {
-                graph = SceneGraphs.AddAnimated(editorSettings);
-                /* TODO flo: enable loading metrics from csv
-                int numberOfErrors = MetricImporter.Load(graph, editorSettings.CSVPath());
-                if (numberOfErrors > 0)
-                {
-                    Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", editorSettings.CSVPath(), numberOfErrors);
-                }
-                */
-
-                layoutAndRenderGraph();
-            }
-            if (GUILayout.Button("Delete rev.", GUILayout.Width(position.width), GUILayout.Height(height)))
-            {
-                Reset();
-            }
-            if (GUILayout.Button("Next rev.", GUILayout.Width(position.width), GUILayout.Height(height)))
-            {
-                graph = null;
-                resetLayoutAndObjects();
-                graph = SceneGraphs.getNextAnimatedGraph();
-                layoutAndRenderGraph();
-            }
-            if (GUILayout.Button("Previous rev.", GUILayout.Width(position.width), GUILayout.Height(height)))
-            {
-                graph = null;
-                resetLayoutAndObjects();
-                graph = SceneGraphs.getPreviousAnimatedGraph();
-                layoutAndRenderGraph();
-            }
             this.Repaint();
         }
-
-        /// <summary>
-        /// Resets only the objects generated for a graph, not the graph data itself.
-        /// </summary>
-        private void resetLayoutAndObjects()
-        {
-            //CubeFactory.Reset();
-            if (layout != null)
-            {
-                layout = null;
-            }
-            // delete all left-overs if there are any
-            foreach (string tag in SEE.DataModel.Tags.All)
-            {
-                try
-                {
-                    DeleteByTag(tag);
-                }
-                catch (UnityException e)
-                {
-                    Debug.LogError(e.ToString());
-                }
-            }
-        }
-
-        /// <summary>
-        /// Layouts the Graph in graph und creates its objects in scene.
-        /// </summary>
-        private void layoutAndRenderGraph()
-        {
-            BlockFactory blockFactory;
-            if (editorSettings.CScapeBuildings)
-            {
-                blockFactory = new BuildingFactory();
-            }
-            else
-            {
-                blockFactory = new CubeFactory();
-            }
-            if (graph != null)
-            {
-                //CubeFactory.Reset();            
-                IScale scaler;
-                {
-                    List<string> nodeMetrics = new List<string>() { editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric };
-                    nodeMetrics.AddRange(editorSettings.IssueMap().Keys);
-                    if (editorSettings.ZScoreScale)
-                    {
-                        scaler = new ZScoreScale(graph, editorSettings.MinimalBlockLength, editorSettings.MaximalBlockLength, nodeMetrics);
-                    }
-                    else
-                    {
-                        scaler = new LinearScale(graph, editorSettings.MinimalBlockLength, editorSettings.MaximalBlockLength, nodeMetrics);
-                    }
-                }
-
-                if (editorSettings.BallonLayout)
-                {
-                    layout = new SEE.Layout.BalloonLayout(editorSettings.ShowEdges,
-                                                          editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric,
-                                                          editorSettings.IssueMap(),
-                                                          editorSettings.InnerNodeMetrics,
-                                                          blockFactory,
-                                                          scaler,
-                                                          editorSettings.EdgeWidth,
-                                                          editorSettings.ShowErosions,
-                                                          editorSettings.ShowDonuts);
-                }
-                else
-                {
-                    layout = new SEE.Layout.ManhattenLayout(editorSettings.ShowEdges,
-                                                            editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric,
-                                                            editorSettings.IssueMap(),
-                                                            blockFactory,
-                                                            scaler,
-                                                            editorSettings.EdgeWidth);
-                }
-                layout.Draw(graph);
-            }
-            else
-            {
-                Debug.LogError("No graph loaded.\n");
-            }
-        }
-
 
         /// <summary>
         /// Adjusts the spead of the camera according to the space unit. If we use simple
