@@ -1,0 +1,183 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1606162082404310}
+  m_IsPrefabParent: 1
+--- !u!1 &1606162082404310
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4152814625092430}
+  - component: {fileID: 33512185269037260}
+  - component: {fileID: 23548517799638384}
+  - component: {fileID: 114937214850720706}
+  - component: {fileID: 64047479680577678}
+  m_Layer: 19
+  m_Name: River
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 4294967295
+  m_IsActive: 1
+--- !u!4 &4152814625092430
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1606162082404310}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 246, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &23548517799638384
+MeshRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1606162082404310}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_Materials:
+  - {fileID: 2100000, guid: 35e03f7905f29b44492b02afd75b2e64, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &33512185269037260
+MeshFilter:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1606162082404310}
+  m_Mesh: {fileID: 0}
+--- !u!64 &64047479680577678
+MeshCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1606162082404310}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Convex: 0
+  m_InflateMesh: 0
+  m_SkinWidth: 0.01
+  m_Mesh: {fileID: 0}
+--- !u!114 &114937214850720706
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1606162082404310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4375aa9b227f3dc468cd0408d2a5faa6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lowFloorBound: {x: 6.28, y: 2.99, z: 3.45}
+  lowFloorBoundSecond: {x: 22.73, y: 2.68, z: 10.64}
+  prefabFloors: 0
+  prefabDepth: 4
+  prefabWidth: 8
+  prefabCenterSectionDepth: 20
+  prefabCenterSectionWidth: 9
+  size: {x: 0, y: 0, z: 0}
+  scale: 1
+  meshOriginal: {fileID: 4300002, guid: c787fe469c37c2948a9fa9ef94c0f3fe, type: 3}
+  mesh: {fileID: 0}
+  floorHeight: 3
+  blockWidth: 33
+  sectionWidth: 30
+  blockDepth: 38
+  sectionDepth: 34
+  normalThreshold: 0.138
+  id1: {x: 0.2, y: 0}
+  id2: {x: 0.3, y: 0}
+  id3: {x: 0.4, y: 0}
+  materialId1: 1
+  materialId2: 2
+  materialId3: 3
+  sidewalkID: 1
+  streetID: 0
+  windowOpen: 0
+  rooftopObject: {fileID: 0}
+  streetDetailObj: {fileID: 0}
+  pattern: 0
+  colorVariation: {x: 0, y: 0}
+  prefabHasVertexInfo: 1
+  parentStreets: []
+  connectedSections: []
+  streetType: 1
+  markToDelete: 0
+  useSkewLR: 0
+  useSkewFB: 0
+  slitRB: 0
+  slitLF: 0
+  skewRotationFront: 0
+  skewRotationLeft: 90
+  skewRotationBack: 180
+  skewRotationRight: -90
+  lenghtFront: 26
+  lenghtLeft: 30
+  lenghtBack: 26
+  lenghtRight: 30
+  cityRandomizerParent: {fileID: 0}
+  childrenBuildings: []
+  sidewalkSize: 2
+  averageBuildingSizeMin: 0
+  averageBuildingSizeMax: 0
+  averageBuildingDepthMax: 0
+  randomSeed: 0
+  frontBuildings: []
+  backBuildings: []
+  leftBuildings: []
+  rightBuildings: []
+  frontBuildingPositions: 
+  backBuildingPositions: 
+  leftBuildingPositions: 
+  rightBuildingPositions: 
+  protect: 0
+  protectL: 0
+  protectR: 0
+  distantiateBuildings: 0
+  useGraffiti: 0
+  frontStartPoint: {x: 0, y: 0, z: 0}
+  rightStartPoint: {x: 0, y: 0, z: 0}
+  backStartPoint: {x: 0, y: 0, z: 0}
+  leftStartPoint: {x: 0, y: 0, z: 0}
+  districtStyle: {fileID: 0}

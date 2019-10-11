@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: f500cf62071bf894192943ebf4f19c4b
+timeCreated: 1510149617
+licenseType: Store
+ShaderImporter:
+  defaultTextures:
+  - _FlowMap: {fileID: 2800000, guid: ff5f9d29db4c9eb4da2c653f576eb55b, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

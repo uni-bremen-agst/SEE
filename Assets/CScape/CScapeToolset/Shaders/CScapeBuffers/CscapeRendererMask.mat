@@ -1,0 +1,133 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: CscapeRendererMask
+  m_Shader: {fileID: 4800000, guid: 96f8780412f577743b56211f39d3671f, type: 3}
+  m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BusStation_albedo:
+        m_Texture: {fileID: 2800000, guid: 9002e6fbb380906418eef987ff5e41ea, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BusStation_ao:
+        m_Texture: {fileID: 2800000, guid: d43adb02e49d04c42894ecc521d1c400, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BusStation_gloss:
+        m_Texture: {fileID: 2800000, guid: 4bbe14e71ed226d42b05880d63088437, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BusStation_normal:
+        m_Texture: {fileID: 2800000, guid: cbaef188381fd86408af3e7f1398d545, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BusStation_specular:
+        m_Texture: {fileID: 2800000, guid: b88a1b46b6c742f4a8e2969eb40248ac, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EncodeTex:
+        m_Texture: {fileID: 8400000, guid: 47c78fe4e0481964ea3fe9715b051558, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EnterierMap:
+        m_Texture: {fileID: 18700000, guid: 39823024b8156514ca8d526952b79b2a, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ShapeTex:
+        m_Texture: {fileID: 8400000, guid: 47c78fe4e0481964ea3fe9715b051558, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Surface:
+        m_Texture: {fileID: 18700000, guid: 3b4f433e54705e944877f067a740a973, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SurfaceNormalArray:
+        m_Texture: {fileID: 18700000, guid: d7611eb1ec1b0834cbf5592a7c90ed9f, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture0:
+        m_Texture: {fileID: 8400000, guid: 47c78fe4e0481964ea3fe9715b051558, type: 2}
+        m_Scale: {x: 8, y: 8}
+        m_Offset: {x: 0, y: 0}
+    - _Texture1:
+        m_Texture: {fileID: 2800000, guid: 351a0be17d79558409a4ed61472aa426, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureArray1:
+        m_Texture: {fileID: 18700000, guid: d7611eb1ec1b0834cbf5592a7c90ed9f, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureArray2:
+        m_Texture: {fileID: 18700000, guid: 39823024b8156514ca8d526952b79b2a, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample0:
+        m_Texture: {fileID: 8400000, guid: 47c78fe4e0481964ea3fe9715b051558, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample1:
+        m_Texture: {fileID: 2800000, guid: be53a91e4e185d9448d300ead53b5f1f, type: 3}
+        m_Scale: {x: 0.125, y: 0.125}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample3:
+        m_Texture: {fileID: 8400000, guid: 47c78fe4e0481964ea3fe9715b051558, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _AOBlur: 5.25
+    - _AOBlur2: 5.13
+    - _AOBlur3: 5.13
+    - _AOBlur4: 8.21
+    - _AOOffset: 0.01
+    - _Blurring: 4.68
+    - _CurvFix: 1
+    - _Cutoff: 0.11
+    - _EdgeLength: 15
+    - _Float0: 4.61
+    - _Float11: 0.1
+    - _Float13: 0.1
+    - _Float17: 0.32
+    - _Float2: 0.954
+    - _Float3: 0.0087
+    - _Float7: 0.0027
+    - _Float8: 0.564
+    - _Lightness: 0
+    - _Mat1Index: 1.28
+    - _Mat2Index: 5.73
+    - _MaxSamplesBias: 0
+    - _MinSamplesBias: 0
+    - _MipBias: 0
+    - _Pass: 0
+    - _Pos1: 0.561
+    - _Scale: 0
+    - _ShadowOffset: 0.02
+    - _Smooth1: 0.0016
+    - _Smooth2: 0.0263
+    - _TessFactor: 69
+    - _TessMax: -2406.4
+    - _TessMin: 5107.5
+    - _TessPhongStrength: 0.5
+    - __dirty: 0
+    - _pos2: 0.437
+    m_Colors:
+    - _Color0: {r: 0, g: 1, b: 0, a: 0}
+    - _Color1: {r: 0, g: 0, b: 1, a: 0}
+    - _Color2: {r: 1, g: 0, b: 0, a: 0}
+    - _WindowBorder: {r: 1, g: 1, b: 1, a: 0.066}

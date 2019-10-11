@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: c86780a7b5469ee4686478c815b5f189
+timeCreated: 1530148460
+licenseType: Store
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 79
+  forceTextureCase: -1
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: DecoDividers
+  fontNames:
+  - DecoDividers
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

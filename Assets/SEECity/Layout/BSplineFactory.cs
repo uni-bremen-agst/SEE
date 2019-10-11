@@ -125,7 +125,7 @@ namespace SEE.Layout
         /// </summary>
         public static float tension = 0.85f; // 0.85 is the value recommended by Holten
 
-        public static void Draw(GameObject edge, Vector3[] controlPoints, Material material = null)
+        public static void Draw(GameObject edge, Vector3[] controlPoints, float width, Material material = null)
         {
             // Create a cubic spline with control points in 3D using a clamped knot vector.
             TinySpline.BSpline spline = new TinySpline.BSpline((uint)controlPoints.Length, dimensions)
@@ -155,7 +155,7 @@ namespace SEE.Layout
             line.positionCount = splinePoints.Length; // number of vertices       
             line.SetPositions(splinePoints);
             LineFactory.SetDefaults(line);
-            LineFactory.SetWidth(line, 0.1f);
+            LineFactory.SetWidth(line, width);
             LineFactory.SetColors(line);
         }
     }

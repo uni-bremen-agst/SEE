@@ -1,0 +1,215 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1487020221582396}
+  m_IsPrefabParent: 1
+--- !u!1 &1487020221582396
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4388560418756562}
+  - component: {fileID: 33373737048381628}
+  - component: {fileID: 23602475070061164}
+  - component: {fileID: 114927083773294156}
+  - component: {fileID: 64061971322489026}
+  m_Layer: 0
+  m_Name: CSTemplate28
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 4294967295
+  m_IsActive: 1
+--- !u!4 &4388560418756562
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1487020221582396}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -82.89, y: 0, z: -511.18}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &23602475070061164
+MeshRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1487020221582396}
+  m_Enabled: 1
+  m_CastShadows: 2
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 1
+  m_Materials:
+  - {fileID: 2100000, guid: 3da26787e2ddb6345887cb30075db27c, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &33373737048381628
+MeshFilter:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1487020221582396}
+  m_Mesh: {fileID: 0}
+--- !u!64 &64061971322489026
+MeshCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1487020221582396}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Convex: 0
+  m_InflateMesh: 0
+  m_SkinWidth: 0.01
+  m_Mesh: {fileID: 0}
+--- !u!114 &114927083773294156
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1487020221582396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1190d94edcaef6447ad307f350e985ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lowFloorBound: {x: 11.38, y: 6.9961123, z: 9}
+  prefabFloors: 6
+  prefabDepth: 8
+  prefabWidth: 9
+  size: {x: 0, y: 1.59, z: 0}
+  scale: 1
+  meshOriginal: {fileID: 4300000, guid: fd11054e0884ded41807709544fa96bd, type: 2}
+  mesh: {fileID: 0}
+  floorNumber: 17
+  floorHeight: 3
+  uniqueMapping: -77
+  buildingWidth: 13
+  buildingDepth: 8
+  normalThreshold: 0.285
+  id1: {x: 2.4, y: 1.5}
+  id2: {x: 1.6, y: 0.65}
+  id3: {x: 0.7, y: 0}
+  id4: {x: 3.9, y: 0}
+  materialId1: 24
+  materialId2: 16
+  materialId3: 7
+  materialId4: 39
+  materialId5: 23
+  divisionId4: 0
+  lightnessFront: 2
+  lightnessSide: 0
+  windowOpen: 3.2923465
+  rooftopObject: {fileID: 0}
+  generateLightmappingUV: 0
+  pattern: 0.9
+  colorVariation: {x: 7, y: 0, z: 0, w: 0}
+  colorVariation2: {x: 4, y: 3.79, z: 0.1, w: 8}
+  colorVariation3: {x: 4, y: 3, z: 1, w: 0}
+  colorVariation4: {x: 4, y: 4, z: 6, w: 8}
+  colorVariation5: {x: 6, y: 2, z: 0, w: 0}
+  lightsOnOff: 0
+  lightsOnOff2: 1.1
+  prefabHasVertexInfo: 1
+  advertisingPanelCoord: {x: 0, y: 0, z: 0, w: 0}
+  lightVec: 7.00002
+  lightVec2: 4.30812
+  lightVec3: 0.04322
+  lightVec4: 3.4230201
+  lightVec5: 3.4000201
+  lightVec6: 0.04322
+  lightVec7: 0.06202
+  lightVec8: 0.06202
+  cityRandomizerParent: {fileID: 0}
+  parentStreets:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  connectedSections:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  roofOffsetX:
+  - {x: -6.18, y: -6.47}
+  roofOffsetZ:
+  - {x: 7.63, y: 6.38}
+  advertOffsetX:
+  - {x: 0, y: 3.06}
+  advertOffsetZ:
+  - {x: 0, y: 0}
+  advertSide: {x: 0, y: 0, z: 0}
+  roofOffsetY:
+  - 0
+  advertOffsetY:
+  - 0
+  hasRooftops: 0
+  hasAdvertising: 0
+  hasBalcony: 0
+  rooftops: {fileID: 0}
+  advertising: {fileID: 0}
+  balcony: {fileID: 0}
+  floorDetails: {fileID: 0}
+  distort: 1
+  distortXZ: 1
+  useAdvertising: 1
+  borderCol: 0
+  thresholdResizeX: 18.04
+  thresholdResizeZ: 4.94
+  thresholdResizeY: 2.24
+  supportSkewing: 0
+  skew: 0
+  useGraffiti: 0
+  autoMap: 1
+  scaleFrom1to3: 1
+  extendFoundations: 1
+  extFoundationsTreshhold: 0
+  isInRoot: 0
+  hasFloorDetails: 0
+  rooftopID: 0
+  customData1: 0
+  customBool2: 0
+  buildingPositionOnStreet: 0
+  useFloorLimiting: 0
+  minFloorNumber: 0
+  maxFloorNumber: 0
+  dontDestroyChildren: 0
