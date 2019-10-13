@@ -40,35 +40,40 @@ namespace SEE.Layout
         /// <param name="out_outer_radius">The radius of the appoximated minimal enclosing circle.</param>
         public static void Pack(List<Circle> circles, out float out_outer_radius)
         {
+            out_outer_radius = 0.0f;
             circles.Sort(Comparator);
-            for (int i = 0; i < circles.Count - 1; i++)
+            for (int it = 0; it < circles.Count; it++)
             {
-                for (int j = i + 1; j < circles.Count; j++)
+                for (int i = 0; i < circles.Count - 1; i++)
                 {
-                    if (i == j)
-                        continue;
-
-                    Vector3 ab = circles[j].Transform.localPosition - circles[i].Transform.localPosition;
-                    float r = circles[i].Radius + circles[j].Radius;
-
-                    float d = Mathf.Max(0.0f, Vector3.SqrMagnitude(ab));
-
-                    if (d < (r * r) - 0.01)
+                    for (int j = i + 1; j < circles.Count; j++)
                     {
-                        ab.Normalize();
-                        ab *= (float)((r - Math.Sqrt(d)) * 0.5f);
-                        circles[j].Transform.localPosition += ab;
-                        circles[i].Transform.localPosition -= ab;
+                        if (i == j)
+                            continue;
+
+                        Vector3 ab = circles[j].Transform.localPosition - circles[i].Transform.localPosition;
+                        ab.y = 0.0f;
+                        float r = circles[i].Radius + circles[j].Radius;
+
+                        float d = Mathf.Max(0.0f, Vector3.SqrMagnitude(ab));
+
+                        if (d < (r * r) - 0.01)
+                        {
+                            ab.Normalize();
+                            ab *= (float)((r - Math.Sqrt(d)) * 0.5f);
+                            circles[j].Transform.localPosition += ab;
+                            circles[i].Transform.localPosition -= ab;
+                        }
                     }
                 }
-            }
 
-            EnclosingCircleIntersectingCircles(circles, out Vector3 out_center, out float out_radius);
-            out_outer_radius = out_radius;
+                EnclosingCircleIntersectingCircles(circles, out Vector3 out_center, out float out_radius);
+                out_outer_radius = out_radius;
 
-            for (int i = 0; i < circles.Count; i++)
-            {
-                circles[i].Transform.localPosition -= out_center;
+                for (int i = 0; i < circles.Count; i++)
+                {
+                    circles[i].Transform.localPosition -= out_center;
+                }
             }
         }
 
@@ -142,6 +147,7 @@ namespace SEE.Layout
                             break;
                         }
                 }
+                out_center.y = 0.0f;
 
                 if (circles.Count == 0)
                 {

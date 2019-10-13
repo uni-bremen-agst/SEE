@@ -232,7 +232,8 @@ namespace SEE.Layout
         public void DonutChart(GameObject donutChart,
                                float radius,
                                float innerValue,
-                               float[] values)
+                               float[] values,
+                               float innerScale = 0.75f)
         {
             if (values.Length != materials.Length)
             {
@@ -242,6 +243,10 @@ namespace SEE.Layout
             if (innerValue < 0.0f || innerValue > 1.0f)
             {
                 throw new System.Exception("[DonutChart] value for inner circle must be in the range [0, 1].");
+            }
+            if (innerScale < 0.0f || innerScale > 1.0f)
+            {
+                throw new System.Exception("[DonutChart] value for inner scale must be in the range [0, 1].");
             }
 
             donutChart.isStatic = true;     
@@ -284,7 +289,7 @@ namespace SEE.Layout
                 innerCircle.isStatic = true;
                 innerCircle.transform.parent = donutChart.transform;
                 innerCircle.transform.localPosition = Vector3.zero;
-                innerCircle.transform.localScale = new Vector3(0.75f, 1.0f, 0.75f);
+                innerCircle.transform.localScale = new Vector3(innerScale, 1.0f, innerScale);
                 Renderer renderer = innerCircle.GetComponent<Renderer>();
                 // We need to create a new material so that we can change its color
                 // independently from other cylinders.
@@ -355,7 +360,7 @@ namespace SEE.Layout
                 {
                     float x = radius * Mathf.Cos(radian);
                     float z = radius * Mathf.Sin(radian);
-                    vertices[i] = new Vector3(center.x + x, 0, center.z + z);
+                    vertices[i] = new Vector3(center.x + x, 0.0f, center.z + z);
                 }
             }
             // Add the very last vertex on the circle line, which is the point where the
@@ -364,7 +369,7 @@ namespace SEE.Layout
             {
                 float x = radius * Mathf.Cos(endRadian);
                 float z = radius * Mathf.Sin(endRadian);
-                vertices[vertices.Length - 1] = new Vector3(center.x + x, 0, center.z + z);
+                vertices[vertices.Length - 1] = new Vector3(center.x + x, 0.0f, center.z + z);
             }
 
             // Create the triangles for the circle sector. 
