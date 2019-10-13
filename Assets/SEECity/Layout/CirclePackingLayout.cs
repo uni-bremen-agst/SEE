@@ -61,8 +61,8 @@ namespace SEE.Layout
                 if (node.IsLeaf())
                 {
                     Vector3 scale = GetScale(node);
-                    radius = Mathf.Sqrt(scale.x * scale.x + scale.z * scale.z);
-                    DrawLeaf(gameObject);
+                    DrawLeaf(gameObject, out float out_leaf_radius);
+                    radius = out_leaf_radius;
                 }
                 else
                 {
@@ -80,13 +80,16 @@ namespace SEE.Layout
             out_radius = out_outer_radius;
         }
 
-        private void DrawLeaf(GameObject leaf)
+        private void DrawLeaf(GameObject leaf, out float out_leaf_radius)
         {
             Node node = leaf.GetComponent<NodeRef>().node;
 
-            GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            cube.transform.localScale = GetScale(node);
-            cube.transform.parent = leaf.transform;
+            GameObject block = blockFactory.NewBlock();
+            blockFactory.ScaleBlock(block, GetScale(node));
+            block.transform.parent = leaf.transform;
+
+            Vector3 size = blockFactory.GetSize(block);
+            out_leaf_radius = Mathf.Sqrt(size.x * size.x + size.z * size.z);
         }
 
         private void DrawCircle(GameObject node, float radius)
