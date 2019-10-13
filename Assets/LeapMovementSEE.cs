@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Leap;
 
@@ -15,6 +14,7 @@ public class LeapMovementSEE : MonoBehaviour
 
     void Start()
     {
+        Debug.Log("Starting LeapMovementSEE\n");
         controller = new Controller();
     }
 
@@ -91,7 +91,6 @@ public class LeapMovementSEE : MonoBehaviour
         {
             Debug.Log("Leap motion is not connected");
         }
-
     }
 
     bool TwoThumbsToIndex(Hand right, Hand left)
