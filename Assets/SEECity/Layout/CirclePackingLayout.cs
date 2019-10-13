@@ -25,7 +25,7 @@ namespace SEE.Layout
         private bool ShowDonuts;
         private readonly string[] InnerNodeMetrics;
 
-        public static Vector3 LevelUnit = 2.0f * Vector3.up;
+        public static Vector3 LevelUnit;
 
         public CirclePackingLayout(bool showEdges,
                              string widthMetric, string heightMetric, string breadthMetric,
@@ -52,6 +52,7 @@ namespace SEE.Layout
 
         protected override void DrawNodes(Graph graph)
         {
+            LevelUnit = Vector3.zero;
             graph.SortHierarchyByName();
             RootNodes = new GameObject("Nodes");
             RootNodes.tag = Tags.Node;
@@ -109,7 +110,13 @@ namespace SEE.Layout
             blockFactory.ScaleBlock(block, GetScale(node));
             Vector3 size = blockFactory.GetSize(block);
             blockFactory.SetLocalPosition(block, new Vector3(0.0f, size.y / 2.0f, 0.0f));
+            leaf.AddComponent<BlockRef>().Block = block;
             out_leaf_radius = Mathf.Sqrt(size.x * size.x + size.z * size.z);
+
+            if (ShowErosions)
+            {
+                AddErosionIssues(leaf);
+            }
 
             GameObjects[node] = leaf;
             LevelUnit.y = Mathf.Max(LevelUnit.y, size.y);
@@ -153,10 +160,6 @@ namespace SEE.Layout
 
         private void DrawDonut(GameObject parent, float radius)
         {
-            // TODO: move to ILayout (change in other layouts, too)
-
-            // FIXME: Derive real metrics from nodes.
-
             GameObject donut = new GameObject(parent.name + " Donut");
             donut.tag = Tags.Node;
             donut.transform.parent = parent.transform;
@@ -172,6 +175,48 @@ namespace SEE.Layout
         private Vector3 GetScale(Node node)
         {
             return new Vector3(scaler.GetNormalizedValue(node, widthMetric), scaler.GetNormalizedValue(node, heightMetric), scaler.GetNormalizedValue(node, breadthMetric)); ;
+        }
+
+        private void AddErosionIssues(GameObject node)
+        {
+            List<GameObject> sprites = new List<GameObject>();
+            
+            foreach (KeyValuePair<string, IconFactory.Erosion> issue in issueMap)
+            {
+                Node n = node.GetComponent<NodeRef>().node;
+                if (n.TryGetNumeric(issue.Key, out float value))
+                {
+                    if (value > 0.0f)
+                    {
+                        GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
+                        sprite.transform.parent = node.transform;
+                        Vector3 spriteSize = GetSizeOfSprite(sprite);
+                        float spriteScale = 1.0f / spriteSize.x;
+                        float metricScale = scaler.GetNormalizedValue(n, issue.Key);
+                        sprite.transform.localScale *= spriteScale * blockFactory.Unit();
+                        sprite.transform.localScale *= metricScale;
+                        sprite.name = sprite.name + " " + n.SourceName;
+                        sprites.Add(sprite);
+                    }
+                }
+            }
+            
+            Vector3 delta = Vector3.up / 100.0f;
+            Vector3 currentRoof = blockFactory.Roof(node.GetComponent<BlockRef>().Block);
+            sprites.Sort(Comparer<GameObject>.Create((left, right) => GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
+            for (int i = 0; i < sprites.Count; i++)
+            {
+                GameObject sprite = sprites[i];
+                Vector3 size = GetSizeOfSprite(sprite);
+                Vector3 halfHeight = (size.y / 2.0f) * Vector3.up;
+                sprite.transform.position = currentRoof + delta + halfHeight;
+                currentRoof = sprite.transform.position + halfHeight;
+            }
+        }
+
+        private Vector3 GetSizeOfSprite(GameObject node)
+        {
+            return node.GetComponentInChildren<Renderer>().bounds.size;
         }
 
         /*
