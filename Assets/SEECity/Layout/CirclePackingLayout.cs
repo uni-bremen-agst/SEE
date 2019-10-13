@@ -42,6 +42,7 @@ namespace SEE.Layout
             graph.SortHierarchyByName();
             RootNodes = new GameObject();
             RootNodes.name = "Nodes";
+            RootNodes.tag = Tags.Node;
             DrawNodes(RootNodes, graph.GetRoots(), out float out_radius);
         }
 
@@ -96,6 +97,7 @@ namespace SEE.Layout
         {
             GameObject circle = new GameObject();
             circle.name = node.name + " border";
+            circle.tag = Tags.Node;
             circle.transform.parent = node.transform;
 
             const int segments = 360;
