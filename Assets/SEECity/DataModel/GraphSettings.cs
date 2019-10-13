@@ -14,16 +14,16 @@ namespace SEE
         public string pathPrefix;
 
         /// Tiny clone graph with single root to experiment with.
-        public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
-        public string csvPath = "..\\Data\\GXL\\minimal_erosions.csv";
+        //public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
+        //public string csvPath = "..\\Data\\GXL\\minimal_erosions.csv";
 
         /// Tiny clone graph with single roots to check edge bundling.
         //public string gxlPath = "..\\Data\\GXL\\controlPoints.gxl";
         //public string csvPath = "..\\Data\\GXL\\controlPoints.csv";
 
         // Smaller clone graph with single root (Linux directory "fs").
-        //public string gxlPath = "..\\Data\\GXL\\linux-clones\\fs.gxl";
-        //public string csvPath = "..\\Data\\GXL\\linux-clones\\fs.csv";
+        public string gxlPath = "..\\Data\\GXL\\linux-clones\\fs.gxl";
+        public string csvPath = "..\\Data\\GXL\\linux-clones\\fs.csv";
 
         // Smaller clone graph with single root (Linux directory "net").
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\net.gxl";

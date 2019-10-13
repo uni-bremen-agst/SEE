@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,13 +15,17 @@ namespace SEE.Layout
          * CIRCLE PACKING LAYOUT
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
-        
+
+        private Dictionary<Node, GameObject> GameObjects = new Dictionary<Node, GameObject>();
+
         private GameObject RootNodes;
         private GameObject RootEdges;
 
         private bool ShowErosions;
         private bool ShowDonuts;
         private readonly string[] InnerNodeMetrics;
+
+        public static Vector3 LevelUnit = 2.0f * Vector3.up;
 
         public CirclePackingLayout(bool showEdges,
                              string widthMetric, string heightMetric, string breadthMetric,
@@ -63,6 +68,7 @@ namespace SEE.Layout
                 Node node = nodes[i];
 
                 GameObject gameObject = new GameObject(node.LinkName);
+                gameObject.tag = Tags.Node;
                 gameObject.AddComponent<NodeRef>().node = node;
                 gameObject.transform.parent = parent.transform;
 
@@ -104,6 +110,9 @@ namespace SEE.Layout
             Vector3 size = blockFactory.GetSize(block);
             blockFactory.SetLocalPosition(block, new Vector3(0.0f, size.y / 2.0f, 0.0f));
             out_leaf_radius = Mathf.Sqrt(size.x * size.x + size.z * size.z);
+
+            GameObjects[node] = leaf;
+            LevelUnit.y = Mathf.Max(LevelUnit.y, size.y);
         }
 
         private void DrawOutline(GameObject parent, float radius)
@@ -123,7 +132,6 @@ namespace SEE.Layout
             GameObject circle = new GameObject(parent.name + " Border");
             circle.tag = Tags.Node;
             circle.transform.parent = parent.transform;
-            circle.transform.localPosition = Vector3.zero;
 
             const int segments = 360;
             LineRenderer line = circle.AddComponent<LineRenderer>();
@@ -171,7 +179,42 @@ namespace SEE.Layout
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
 
-        // TODO: it's very empty here
+        protected override void DrawEdges(Graph graph)
+        {
+            RootEdges = new GameObject("Edges");
+            RootEdges.tag = Tags.Edge;
+
+            List<Edge> edges = graph.Edges();
+
+            Material edgeMaterial = new Material(defaultLineMaterial);
+            if (edgeMaterial == null)
+            {
+                Debug.LogError("Could not find material " + materialPath + "\n");
+                return;
+            }
+
+            for (int i = 0; i < edges.Count; i++)
+            {
+                Edge edge = edges[i];
+                Node source = edge.Source;
+                Node target = edge.Target;
+                Vector3 sourcePosition = GameObjects[source].transform.position;
+                Vector3 targetPosition = GameObjects[target].transform.position;
+
+                GameObject gameObject = new GameObject(edge.Type + "(" + source.LinkName + ", " + target.LinkName + ")");
+                gameObject.tag = Tags.Edge;
+                gameObject.AddComponent<EdgeRef>().edge = edge;
+                gameObject.transform.parent = RootEdges.transform;
+
+                Vector3[] controlPoints = new Vector3[] {
+                    sourcePosition,
+                    Vector3.Lerp(sourcePosition, targetPosition, 0.3f) + LevelUnit,
+                    Vector3.Lerp(sourcePosition, targetPosition, 0.7f) + LevelUnit,
+                    targetPosition
+                };
+                BSplineFactory.Draw(gameObject, controlPoints, edgeWidth, edgeMaterial);
+            }
+        }
 
     }
 
