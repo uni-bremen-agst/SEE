@@ -58,6 +58,7 @@ namespace SEE.Layout
             RootNodes.tag = Tags.Node;
             List<Node> roots = graph.GetRoots();
             DrawNodes(RootNodes, roots, out float out_radius);
+            DrawPlane(RootNodes, out_radius);
         }
 
         private void DrawNodes(GameObject parent, List<Node> nodes, out float out_radius)
@@ -217,6 +218,23 @@ namespace SEE.Layout
         private Vector3 GetSizeOfSprite(GameObject node)
         {
             return node.GetComponentInChildren<Renderer>().bounds.size;
+        }
+
+        private void DrawPlane(GameObject parent, float maxRadius)
+        {
+            const float enlargementFactor = 1.12f;
+
+            GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            plane.name = "Plane";
+            plane.tag = Tags.Decoration;
+            plane.transform.parent = parent.transform;
+            plane.transform.localScale = new Vector3(maxRadius * 0.2f, 1.0f / enlargementFactor, maxRadius * 0.2f) * enlargementFactor;
+
+            Renderer planeRenderer = plane.GetComponent<Renderer>();
+            planeRenderer.sharedMaterial.color = Color.gray;
+            planeRenderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
+            planeRenderer.sharedMaterial.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
+            planeRenderer.sharedMaterial.SetFloat("_SpecularHighlights", 1.0f);
         }
 
         /*
