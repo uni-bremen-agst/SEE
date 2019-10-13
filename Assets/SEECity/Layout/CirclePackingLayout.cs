@@ -100,10 +100,9 @@ namespace SEE.Layout
             GameObject block = blockFactory.NewBlock();
             block.name = leaf.name + " Block";
             block.transform.parent = leaf.transform;
-            block.transform.localPosition = Vector3.zero;
             blockFactory.ScaleBlock(block, GetScale(node));
-
             Vector3 size = blockFactory.GetSize(block);
+            blockFactory.SetLocalPosition(block, new Vector3(0.0f, size.y / 2.0f, 0.0f));
             out_leaf_radius = Mathf.Sqrt(size.x * size.x + size.z * size.z);
         }
 
