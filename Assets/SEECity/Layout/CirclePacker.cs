@@ -41,6 +41,7 @@ namespace SEE.Layout
         public static void Pack(List<Circle> circles, out float out_outer_radius)
         {
             out_outer_radius = 0.0f;
+            Vector3 center = Vector3.zero;
             circles.Sort(Comparator);
             for (int it = 0; it < circles.Count; it++)
             {
@@ -69,11 +70,12 @@ namespace SEE.Layout
 
                 EnclosingCircleIntersectingCircles(circles, out Vector3 out_center, out float out_radius);
                 out_outer_radius = out_radius;
+                center = out_center;
+            }
 
-                for (int i = 0; i < circles.Count; i++)
-                {
-                    circles[i].Transform.localPosition -= out_center;
-                }
+            for (int i = 0; i < circles.Count; i++)
+            {
+                circles[i].Transform.localPosition -= center;
             }
         }
 
