@@ -97,7 +97,9 @@ namespace SEE.Layout
 
             CirclePacker.Pack(circles, out float out_outer_radius);
             if (circles.Count > 1)
-                DrawOutline(parent, out_outer_radius);
+            {
+                DrawOutline(parent, ref out_outer_radius);
+            }
             out_radius = out_outer_radius;
         }
 
@@ -123,19 +125,19 @@ namespace SEE.Layout
             LevelUnit.y = Mathf.Max(LevelUnit.y, size.y);
         }
 
-        private void DrawOutline(GameObject parent, float radius)
+        private void DrawOutline(GameObject parent, ref float radius)
         {
             if (ShowDonuts)
             {
-                DrawDonut(parent, radius);
+                DrawDonut(parent, ref radius);
             }
             else
             {
-                DrawCircle(parent, radius);
+                DrawCircle(parent, ref radius);
             }
         }
 
-        private void DrawCircle(GameObject parent, float radius)
+        private void DrawCircle(GameObject parent, ref float radius)
         {
             GameObject circle = new GameObject(parent.name + " Border");
             circle.tag = Tags.Node;
@@ -145,7 +147,8 @@ namespace SEE.Layout
             LineRenderer line = circle.AddComponent<LineRenderer>();
             LineFactory.SetDefaults(line);
             LineFactory.SetColor(line, Color.white);
-            LineFactory.SetWidth(line, radius / 100.0f);
+            float lineWidth = radius / 100.0f;
+            LineFactory.SetWidth(line, lineWidth);
             line.useWorldSpace = false;
             line.sharedMaterial = new Material(defaultLineMaterial);
             line.positionCount = segments + 1;
@@ -159,7 +162,7 @@ namespace SEE.Layout
             line.SetPositions(points);
         }
 
-        private void DrawDonut(GameObject parent, float radius)
+        private void DrawDonut(GameObject parent, ref float radius)
         {
             GameObject donut = new GameObject(parent.name + " Donut");
             donut.tag = Tags.Node;
@@ -170,7 +173,10 @@ namespace SEE.Layout
             float m2 = UnityEngine.Random.Range(0.0f, 90.0f);
             float m3 = UnityEngine.Random.Range(0.0f, 150.0f);
             float m4 = UnityEngine.Random.Range(0.0f, 200.0f);
-            new DonutFactory(InnerNodeMetrics).DonutChart(donut, radius, innerValue, new float[] { m1, m2, m2, m3 }, 0.95f);
+
+            const float innerScale = 0.95f;
+            radius += (1.0f - innerScale) * radius;
+            new DonutFactory(InnerNodeMetrics).DonutChart(donut, radius, innerValue, new float[] { m1, m2, m2, m3 }, innerScale);
         }
 
         private Vector3 GetScale(Node node)
