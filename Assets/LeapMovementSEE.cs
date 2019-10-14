@@ -6,7 +6,7 @@ public class LeapMovementSEE : MonoBehaviour
 {
     private Leap.Controller controller;
     public GameObject rig;
-    public float speedFactor = 0.01f;
+    public float speedFactor = 0.5f;
     private float hightFactor = 1f;
     private float speed = 1f;
     private bool move = false;
@@ -58,26 +58,30 @@ public class LeapMovementSEE : MonoBehaviour
                     MoveUpAndDown(right, left, ref dir);
                 }
                 // checking if the left hand is pinching and the right not to moving leftwards
-                // movement speed depends on teh distance between both indexfingers
+                // movement speed depends on teh distance between both thumbs
                 else if (left.PinchDistance < 20f && right.PinchDistance > 50f)
                 {
-                    speed = left.Fingers[1].TipPosition.DistanceTo(right.Fingers[1].TipPosition) * Time.deltaTime * speedFactor;
+                    speed = left.Fingers[0].TipPosition.DistanceTo(right.Fingers[0].TipPosition) * Time.deltaTime * speedFactor;
                     dir = -Camera.main.transform.right * speed;
                     move = true;
+
+                    MoveUpAndDown(right, left, ref dir);
                 }
                 // checking if the right hand is pinching and the left not for moving rightwards
-                // movement speed depends on teh distance between both indexfingers
+                // movement speed depends on teh distance between both thumbs
                 else if(left.PinchDistance > 50f && right.PinchDistance < 20f)
                 {
-                    speed = left.Fingers[1].TipPosition.DistanceTo(right.Fingers[1].TipPosition) * Time.deltaTime * speedFactor;
+                    speed = left.Fingers[0].TipPosition.DistanceTo(right.Fingers[0].TipPosition) * Time.deltaTime * speedFactor;
                     dir = Camera.main.transform.right * speed;
                     move = true;
+
+                    MoveUpAndDown(right, left, ref dir);
                 }
                 //checking if the thumbs are together and the indexfinger not for moving bachwards
-                // movement speed depends on the distance from hands to camera
+                // movement speed depends on the distance between the indexfingers
                 else if(left.Fingers[0].TipPosition.DistanceTo(right.Fingers[0].TipPosition) < 30f && left.Fingers[1].TipPosition.DistanceTo(right.Fingers[1].TipPosition) > 120f)
                 {
-                    speed = left.Fingers[0].TipPosition.y * Time.deltaTime * speedFactor;
+                    speed = (left.Fingers[1].TipPosition.DistanceTo(right.Fingers[1].TipPosition) - 120) * Time.deltaTime * speedFactor;
                     dir = -Camera.main.transform.forward * speed;
                     move = true;
 
@@ -106,14 +110,14 @@ public class LeapMovementSEE : MonoBehaviour
         // movementspeed depends on the distance between both index fingers and the z=0 level
         if (left.Fingers[1].TipPosition.z < -50f && right.Fingers[1].TipPosition.z < -50f)
         {
-            float upSpeed = ((left.Fingers[1].TipPosition.z + right.Fingers[1].TipPosition.z) / 2 + 50f) * Time.deltaTime * speedFactor;
+            float upSpeed = ((left.Fingers[1].TipPosition.z + right.Fingers[1].TipPosition.z) / 2 + 50f) * Time.deltaTime * speedFactor * 0.5f;
             dir = dir + (Camera.main.transform.up * upSpeed);
         }
         // checking if double pinch happens in the upper half of the camera angle to move downwards
         // movementspeed depends on the distance between both index fingers and the z=0 level
         else if (left.Fingers[1].TipPosition.z > 50f && right.Fingers[1].TipPosition.z > 50f)
         {
-            float downSpeed = ((left.Fingers[1].TipPosition.z + right.Fingers[1].TipPosition.z) / 2 - 50f) * Time.deltaTime * speedFactor;
+            float downSpeed = ((left.Fingers[1].TipPosition.z + right.Fingers[1].TipPosition.z) / 2 - 50f) * Time.deltaTime * speedFactor * 0.5f;
             dir = dir + (Camera.main.transform.up * downSpeed);
         }
     }
