@@ -32,17 +32,9 @@ namespace SEE.Layout
             float positionX = 0.0f;
             float positionZ = 0.0f;
 
-            foreach (GameObject sceneNode in graph.GetNodes())
-            {
-                // Note: sceneNode is only be a container for the actual building.
-
-                // The logical node represented by this game object.
-                Node node = sceneNode.GetComponent<Node>();
-                if (node == null)
-                {
-                    Debug.LogError("Scene node " + sceneNode.name + " does not have a graph node component.\n");
-                }
-                else if (node.IsLeaf())
+            foreach (Node node in graph.Nodes())
+            { 
+                if (node.IsLeaf())
                 {
                     // We only draw leaves.
 
@@ -67,7 +59,6 @@ namespace SEE.Layout
 
                     // size is independent of the sceneNode
                     Vector3 size = blockFactory.GetSize(block);
-                    blockFactory.AttachBlock(sceneNode, block);
                     if (size.z > maxZ)
                     {
                         maxZ = size.z;
@@ -76,7 +67,7 @@ namespace SEE.Layout
                     // The position is the center of a GameObject. We want all GameObjects
                     // be placed at the same ground level 0. That is why we need to "lift"
                     // every building by half of its height.
-                    sceneNode.transform.position = new Vector3(positionX, scale.y / 2.0f, positionZ);
+                    block.transform.position = new Vector3(positionX, scale.y / 2.0f, positionZ);
                     positionX += size.x / 2.0f + distanceBetweenBuildings;
                 }
             }
