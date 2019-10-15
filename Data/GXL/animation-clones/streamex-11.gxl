@@ -2,7 +2,7 @@
 <!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
 <gxl xmlns:xlink="http://www.w3.org/1999/xlink">
     <graph id="streamex" edgeids="true">
-        <node id="N28">
+        <node id="N9">
             <type xlink:href="Directory"/>
             <attr name="Source.Name">
                 <string>test\java\javax\util\streamex</string>
@@ -11,31 +11,13 @@
                 <string>src\test\java\javax\util\streamex</string>
             </attr>
         </node>
-        <node id="N37">
-            <type xlink:href="Directory"/>
-            <attr name="Source.Name">
-                <string>src</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>src</string>
-            </attr>
-        </node>
-        <node id="N16">
+        <node id="N2">
             <type xlink:href="Directory"/>
             <attr name="Source.Name">
                 <string>main\java\javax\util\streamex</string>
             </attr>
             <attr name="Linkage.Name">
                 <string>src\main\java\javax\util\streamex</string>
-            </attr>
-        </node>
-        <node id="N5">
-            <type xlink:href="Directory"/>
-            <attr name="Source.Name">
-                <string>.settings</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>.settings</string>
             </attr>
         </node>
         <node id="N0">
@@ -50,247 +32,7 @@
         <node id="N1">
             <type xlink:href="File"/>
             <attr name="Metric.Number_of_Tokens">
-                <int>52</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>26</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>.classpath</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>.classpath</string>
-            </attr>
-            <attr name="Source.File">
-                <string>.classpath</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>.classpath</string>
-            </attr>
-        </node>
-        <node id="N2">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>1</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>1</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>.gitignore</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>.gitignore</string>
-            </attr>
-            <attr name="Source.File">
-                <string>.gitignore</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>.gitignore</string>
-            </attr>
-        </node>
-        <node id="N3">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>25</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>23</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>.project</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>.project</string>
-            </attr>
-            <attr name="Source.File">
-                <string>.project</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>.project</string>
-            </attr>
-        </node>
-        <node id="N4">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>4</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>4</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>org.eclipse.core.resources.prefs</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>.settings\org.eclipse.core.resources.prefs</string>
-            </attr>
-            <attr name="Source.File">
-                <string>org.eclipse.core.resources.prefs</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>.settings\org.eclipse.core.resources.prefs</string>
-            </attr>
-        </node>
-        <node id="N6">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>502</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>292</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>org.eclipse.jdt.core.prefs</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>.settings\org.eclipse.jdt.core.prefs</string>
-            </attr>
-            <attr name="Source.File">
-                <string>org.eclipse.jdt.core.prefs</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>.settings\org.eclipse.jdt.core.prefs</string>
-            </attr>
-        </node>
-        <node id="N8">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>62</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>62</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>org.eclipse.jdt.ui.prefs</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>.settings\org.eclipse.jdt.ui.prefs</string>
-            </attr>
-            <attr name="Source.File">
-                <string>org.eclipse.jdt.ui.prefs</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>.settings\org.eclipse.jdt.ui.prefs</string>
-            </attr>
-        </node>
-        <node id="N10">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>4</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>4</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>org.eclipse.m2e.core.prefs</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>.settings\org.eclipse.m2e.core.prefs</string>
-            </attr>
-            <attr name="Source.File">
-                <string>org.eclipse.m2e.core.prefs</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>.settings\org.eclipse.m2e.core.prefs</string>
-            </attr>
-        </node>
-        <node id="N12">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>1409</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>54</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>LICENSE</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>LICENSE</string>
-            </attr>
-            <attr name="Source.File">
-                <string>LICENSE</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>LICENSE</string>
-            </attr>
-        </node>
-        <node id="N13">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>57</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>53</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>pom.xml</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>pom.xml</string>
-            </attr>
-            <attr name="Source.File">
-                <string>pom.xml</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>pom.xml</string>
-            </attr>
-        </node>
-        <node id="N14">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>6</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>2</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>README.md</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>README.md</string>
-            </attr>
-            <attr name="Source.File">
-                <string>README.md</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>README.md</string>
-            </attr>
-        </node>
-        <node id="N15">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>705</int>
+                <int>1598</int>
             </attr>
             <attr name="Metric.LOC">
                 <int>298</int>
@@ -311,154 +53,10 @@
                 <string>src\main\java\javax\util\streamex\AbstractStreamEx.java</string>
             </attr>
         </node>
-        <node id="N17">
+        <node id="N10">
             <type xlink:href="File"/>
             <attr name="Metric.Number_of_Tokens">
-                <int>749</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>322</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>DoubleStreamEx.java</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>src\main\java\javax\util\streamex\DoubleStreamEx.java</string>
-            </attr>
-            <attr name="Source.File">
-                <string>DoubleStreamEx.java</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>src\main\java\javax\util\streamex\DoubleStreamEx.java</string>
-            </attr>
-        </node>
-        <node id="N19">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>713</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>213</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>EntryStream.java</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>src\main\java\javax\util\streamex\EntryStream.java</string>
-            </attr>
-            <attr name="Source.File">
-                <string>EntryStream.java</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>src\main\java\javax\util\streamex\EntryStream.java</string>
-            </attr>
-        </node>
-        <node id="N21">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>839</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>358</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>IntStreamEx.java</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>src\main\java\javax\util\streamex\IntStreamEx.java</string>
-            </attr>
-            <attr name="Source.File">
-                <string>IntStreamEx.java</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>src\main\java\javax\util\streamex\IntStreamEx.java</string>
-            </attr>
-        </node>
-        <node id="N23">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>798</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>340</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>LongStreamEx.java</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>src\main\java\javax\util\streamex\LongStreamEx.java</string>
-            </attr>
-            <attr name="Source.File">
-                <string>LongStreamEx.java</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>src\main\java\javax\util\streamex\LongStreamEx.java</string>
-            </attr>
-        </node>
-        <node id="N25">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>641</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>199</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>StreamEx.java</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>src\main\java\javax\util\streamex\StreamEx.java</string>
-            </attr>
-            <attr name="Source.File">
-                <string>StreamEx.java</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>src\main\java\javax\util\streamex\StreamEx.java</string>
-            </attr>
-        </node>
-        <node id="N27">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>211</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>49</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>DoubleStreamExTest.java</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>src\test\java\javax\util\streamex\DoubleStreamExTest.java</string>
-            </attr>
-            <attr name="Source.File">
-                <string>DoubleStreamExTest.java</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>src\test\java\javax\util\streamex\DoubleStreamExTest.java</string>
-            </attr>
-        </node>
-        <node id="N29">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>611</int>
+                <int>2009</int>
             </attr>
             <attr name="Metric.LOC">
                 <int>217</int>
@@ -479,58 +77,34 @@
                 <string>src\test\java\javax\util\streamex\EntryStreamTest.java</string>
             </attr>
         </node>
-        <node id="N31">
+        <node id="N6">
             <type xlink:href="File"/>
             <attr name="Metric.Number_of_Tokens">
-                <int>351</int>
+                <int>1725</int>
             </attr>
             <attr name="Metric.LOC">
-                <int>76</int>
+                <int>340</int>
             </attr>
             <attr name="Metric.Clone_Rate">
                 <float>0.0</float>
             </attr>
             <attr name="Source.Name">
-                <string>IntStreamExTest.java</string>
+                <string>LongStreamEx.java</string>
             </attr>
             <attr name="Linkage.Name">
-                <string>src\test\java\javax\util\streamex\IntStreamExTest.java</string>
+                <string>src\main\java\javax\util\streamex\LongStreamEx.java</string>
             </attr>
             <attr name="Source.File">
-                <string>IntStreamExTest.java</string>
+                <string>LongStreamEx.java</string>
             </attr>
             <attr name="Source.Path">
-                <string>src\test\java\javax\util\streamex\IntStreamExTest.java</string>
+                <string>src\main\java\javax\util\streamex\LongStreamEx.java</string>
             </attr>
         </node>
-        <node id="N33">
+        <node id="N13">
             <type xlink:href="File"/>
             <attr name="Metric.Number_of_Tokens">
-                <int>277</int>
-            </attr>
-            <attr name="Metric.LOC">
-                <int>64</int>
-            </attr>
-            <attr name="Metric.Clone_Rate">
-                <float>0.0</float>
-            </attr>
-            <attr name="Source.Name">
-                <string>LongStreamExTest.java</string>
-            </attr>
-            <attr name="Linkage.Name">
-                <string>src\test\java\javax\util\streamex\LongStreamExTest.java</string>
-            </attr>
-            <attr name="Source.File">
-                <string>LongStreamExTest.java</string>
-            </attr>
-            <attr name="Source.Path">
-                <string>src\test\java\javax\util\streamex\LongStreamExTest.java</string>
-            </attr>
-        </node>
-        <node id="N35">
-            <type xlink:href="File"/>
-            <attr name="Metric.Number_of_Tokens">
-                <int>424</int>
+                <int>1362</int>
             </attr>
             <attr name="Metric.LOC">
                 <int>129</int>
@@ -551,80 +125,293 @@
                 <string>src\test\java\javax\util\streamex\StreamExTest.java</string>
             </attr>
         </node>
-        <edge id="E0" from="N1" to="N0">
+        <node id="N5">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>1815</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>358</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>IntStreamEx.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>src\main\java\javax\util\streamex\IntStreamEx.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>IntStreamEx.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>src\main\java\javax\util\streamex\IntStreamEx.java</string>
+            </attr>
+        </node>
+        <node id="N8">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>340</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>49</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>DoubleStreamExTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>src\test\java\javax\util\streamex\DoubleStreamExTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>DoubleStreamExTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>src\test\java\javax\util\streamex\DoubleStreamExTest.java</string>
+            </attr>
+        </node>
+        <node id="N3">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>1622</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>322</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>DoubleStreamEx.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>src\main\java\javax\util\streamex\DoubleStreamEx.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>DoubleStreamEx.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>src\main\java\javax\util\streamex\DoubleStreamEx.java</string>
+            </attr>
+        </node>
+        <node id="N4">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>1886</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>213</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>EntryStream.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>src\main\java\javax\util\streamex\EntryStream.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>EntryStream.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>src\main\java\javax\util\streamex\EntryStream.java</string>
+            </attr>
+        </node>
+        <node id="N11">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>736</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>76</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>IntStreamExTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>src\test\java\javax\util\streamex\IntStreamExTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>IntStreamExTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>src\test\java\javax\util\streamex\IntStreamExTest.java</string>
+            </attr>
+        </node>
+        <node id="N12">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>526</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>64</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>LongStreamExTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>src\test\java\javax\util\streamex\LongStreamExTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>LongStreamExTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>src\test\java\javax\util\streamex\LongStreamExTest.java</string>
+            </attr>
+        </node>
+        <node id="N7">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>1595</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>199</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>StreamEx.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>src\main\java\javax\util\streamex\StreamEx.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>StreamEx.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>src\main\java\javax\util\streamex\StreamEx.java</string>
+            </attr>
+        </node>
+        <edge id="E0" from="N1" to="N2">
             <type xlink:href="Enclosing"/>
         </edge>
-        <edge id="E1" from="N2" to="N0">
+        <edge id="E1" from="N3" to="N2">
             <type xlink:href="Enclosing"/>
         </edge>
-        <edge id="E2" from="N3" to="N0">
+        <edge id="E2" from="N4" to="N2">
             <type xlink:href="Enclosing"/>
         </edge>
-        <edge id="E3" from="N4" to="N5">
+        <edge id="E3" from="N5" to="N2">
             <type xlink:href="Enclosing"/>
         </edge>
-        <edge id="E4" from="N6" to="N5">
+        <edge id="E4" from="N6" to="N2">
             <type xlink:href="Enclosing"/>
         </edge>
-        <edge id="E5" from="N8" to="N5">
+        <edge id="E5" from="N7" to="N2">
             <type xlink:href="Enclosing"/>
         </edge>
-        <edge id="E6" from="N10" to="N5">
+        <edge id="E6" from="N8" to="N9">
             <type xlink:href="Enclosing"/>
         </edge>
-        <edge id="E7" from="N12" to="N0">
+        <edge id="E7" from="N10" to="N9">
             <type xlink:href="Enclosing"/>
         </edge>
-        <edge id="E8" from="N13" to="N0">
+        <edge id="E8" from="N11" to="N9">
             <type xlink:href="Enclosing"/>
         </edge>
-        <edge id="E9" from="N14" to="N0">
+        <edge id="E9" from="N12" to="N9">
             <type xlink:href="Enclosing"/>
         </edge>
-        <edge id="E10" from="N15" to="N16">
+        <edge id="E10" from="N13" to="N9">
             <type xlink:href="Enclosing"/>
         </edge>
-        <edge id="E11" from="N17" to="N16">
+        <edge id="E11" from="N9" to="N0">
             <type xlink:href="Enclosing"/>
         </edge>
-        <edge id="E12" from="N19" to="N16">
+        <edge id="E12" from="N2" to="N0">
             <type xlink:href="Enclosing"/>
         </edge>
-        <edge id="E13" from="N21" to="N16">
-            <type xlink:href="Enclosing"/>
+        <edge id="E13" from="N1" to="N6">
+            <type xlink:href="Clone"/>
         </edge>
-        <edge id="E14" from="N23" to="N16">
-            <type xlink:href="Enclosing"/>
+        <edge id="E14" from="N1" to="N5">
+            <type xlink:href="Clone"/>
         </edge>
-        <edge id="E15" from="N25" to="N16">
-            <type xlink:href="Enclosing"/>
+        <edge id="E15" from="N1" to="N3">
+            <type xlink:href="Clone"/>
         </edge>
-        <edge id="E16" from="N27" to="N28">
-            <type xlink:href="Enclosing"/>
+        <edge id="E16" from="N3" to="N6">
+            <type xlink:href="Clone"/>
         </edge>
-        <edge id="E17" from="N29" to="N28">
-            <type xlink:href="Enclosing"/>
+        <edge id="E17" from="N3" to="N5">
+            <type xlink:href="Clone"/>
         </edge>
-        <edge id="E18" from="N31" to="N28">
-            <type xlink:href="Enclosing"/>
+        <edge id="E18" from="N3" to="N7">
+            <type xlink:href="Clone"/>
         </edge>
-        <edge id="E19" from="N33" to="N28">
-            <type xlink:href="Enclosing"/>
+        <edge id="E19" from="N4" to="N7">
+            <type xlink:href="Clone"/>
         </edge>
-        <edge id="E20" from="N35" to="N28">
-            <type xlink:href="Enclosing"/>
+        <edge id="E20" from="N4" to="N1">
+            <type xlink:href="Clone"/>
         </edge>
-        <edge id="E21" from="N37" to="N0">
-            <type xlink:href="Enclosing"/>
+        <edge id="E21" from="N5" to="N6">
+            <type xlink:href="Clone"/>
         </edge>
-        <edge id="E22" from="N28" to="N37">
-            <type xlink:href="Enclosing"/>
+        <edge id="E22" from="N5" to="N7">
+            <type xlink:href="Clone"/>
         </edge>
-        <edge id="E23" from="N16" to="N37">
-            <type xlink:href="Enclosing"/>
+        <edge id="E23" from="N5" to="N3">
+            <type xlink:href="Clone"/>
         </edge>
-        <edge id="E24" from="N5" to="N0">
-            <type xlink:href="Enclosing"/>
+        <edge id="E24" from="N6" to="N5">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E25" from="N6" to="N7">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E26" from="N6" to="N3">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E27" from="N7" to="N4">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E28" from="N7" to="N1">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E29" from="N8" to="N6">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E30" from="N8" to="N3">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E31" from="N10" to="N7">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E32" from="N10" to="N4">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E33" from="N10" to="N1">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E34" from="N11" to="N6">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E35" from="N11" to="N5">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E36" from="N11" to="N3">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E37" from="N12" to="N6">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E38" from="N13" to="N7">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E39" from="N13" to="N1">
+            <type xlink:href="Clone"/>
         </edge>
     </graph>
 </gxl>
