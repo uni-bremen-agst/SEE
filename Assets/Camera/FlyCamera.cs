@@ -1,5 +1,6 @@
 ﻿using System;
 using SEE.DataModel;
+using SEE.Layout;
 using UnityEngine;
 
 namespace SEE
@@ -59,6 +60,11 @@ namespace SEE
         public float absoluteMinimumSpeed = 0.1f;
 
         public const float absoluteMaximumSpeedDefault = 300.0f;
+
+        /// <summary>
+        /// Game object name of text field on the Canvas where a selected entity is shown.
+        /// </summary>
+        private const string TextFieldObjectName = "Objectname";
 
         [Tooltip("The absolute maximum speed that can be reached, no matter how much we accelerate and how"
             + " far we are off the ground. Must not be lower than the absolute minimum speed."
@@ -196,9 +202,15 @@ namespace SEE
         /// </summary>
         void Start()
         {
+            Debug.Log("Starting FlyCamera\n");
             if (guiObjectNameTextField == null)
             {
-                guiObjectNameTextField = GameObject.Find("Objectname");
+                guiObjectNameTextField = GameObject.Find(TextFieldObjectName);
+            }
+            else
+            {
+                Debug.LogWarningFormat("No UI textfield named {0} found. Please add one to the scene within the Unity editor.\n", 
+                                       TextFieldObjectName);
             }
 
             mainCamera = gameObject.GetComponentInParent<Camera>();
@@ -231,8 +243,13 @@ namespace SEE
                     }
                     else
                     {
-                        Debug.LogError("No current camera found.\n");
+                        Debug.LogError("No main camera found.\n");
                     }
+                }
+                else
+                {
+                    Debug.LogWarningFormat("No UI textfield named {0} found. Please add one to the scene within the Unity editor.\n",
+                                           TextFieldObjectName);
                 }
             }
 
@@ -326,9 +343,9 @@ namespace SEE
 
                 GameObject objectHit = hit.transform.gameObject;
                 UnityEngine.UI.Text text = guiObjectNameTextField.GetComponent<UnityEngine.UI.Text>();
-                if (objectHit.TryGetComponent<Node>(out Node node))
+                if (objectHit.TryGetComponent<NodeRef>(out NodeRef nodeRef))
                 {
-                    if (node.TryGetString("Source.Name", out string nodeName))
+                    if (nodeRef.node.TryGetString("Source.Name", out string nodeName))
                     {
                         text.text = nodeName;
                     }
@@ -339,7 +356,7 @@ namespace SEE
                     
                     else
                     {
-                        text.text = node.Type;
+                        text.text = nodeRef.node.Type;
                         // text.text = objectHit.name;
                         Debug.Log("Node has neither Source.Name nor unique linkname.\n");
                         Dump(objectHit);
