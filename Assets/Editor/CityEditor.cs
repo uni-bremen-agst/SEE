@@ -93,11 +93,14 @@ namespace SEEEditor
                 {
                     // The camera for the monitor game is at top-level.
                     camera.SetActive(!enableVR);
+                    Debug.LogFormat("main camera at top level: {0}\n", !enableVR);
                 }
                 else if (camera.transform.parent.name == "Leap Rig")
                 {
                     // The camera of the Leap Rig is nested in a game object named accordingly.
-                    camera.SetActive(enableVR);
+                    // We set the Leap Rig itself in which the found camera is directly nested.
+                    camera.transform.parent.gameObject.SetActive(enableVR);
+                    Debug.LogFormat("Leap rig camera: {0}\n", enableVR);
                 }
             }
             EnableCanvas(enableVR);
