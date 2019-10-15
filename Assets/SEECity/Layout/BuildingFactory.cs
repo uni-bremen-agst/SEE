@@ -59,10 +59,6 @@ namespace SEE.Layout
                 {
                     Debug.LogErrorFormat("[BuildingFactory] Could not load building prefab {0}.\n", path);
                 }
-                else
-                {
-                    Debug.LogFormat("[BuildingFactory] Loaded building prefab {0}.\n", path);
-                }
                 i++;
             }
             return result;
