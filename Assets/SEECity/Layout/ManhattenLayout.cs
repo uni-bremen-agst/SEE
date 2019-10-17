@@ -1,6 +1,5 @@
 ﻿using SEE.DataModel;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -12,8 +11,9 @@ namespace SEE.Layout
                                SerializableDictionary<string, IconFactory.Erosion> issueMap,
                                BlockFactory blockFactory,
                                IScale scaler,
-                               float edgeWidth)
-            : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
+                               float edgeWidth,
+                               bool showErosions)
+            : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions)
         {
             name = "Manhattan";
         }
@@ -71,6 +71,11 @@ namespace SEE.Layout
                     // every building by half of its height.
                     block.transform.position = new Vector3(positionX, scale.y / 2.0f, positionZ);
                     positionX += size.x / 2.0f + distanceBetweenBuildings;
+
+                    if (showErosions)
+                    {
+                        AddErosionIssues(node, scaler);
+                    }
                 }
             }
         }
