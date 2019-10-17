@@ -244,7 +244,8 @@ namespace SEEEditor
                                                                     editorSettings.IssueMap(),
                                                                     blockFactory,
                                                                     scaler,
-                                                                    editorSettings.EdgeWidth);
+                                                                    editorSettings.EdgeWidth,
+                                                                    editorSettings.ShowDonuts);
                         }
                         layout.Draw(graph);
                     }
