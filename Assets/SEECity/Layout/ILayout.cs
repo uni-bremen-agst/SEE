@@ -1,5 +1,5 @@
 ﻿using SEE.DataModel;
-
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -36,6 +36,9 @@ namespace SEE.Layout
                 p.End();
             }
         }
+
+        // A mapping of graph nodes onto the game objects representing them visually in the scene
+        protected Dictionary<Node, GameObject> gameObjects = new Dictionary<Node, GameObject>();
 
         /// <summary>
         /// Path to the material used for edges.

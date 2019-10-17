@@ -55,9 +55,6 @@ namespace SEE.Layout
         /// </summary>
         public float maximalCircleLineWidth = 10.0f;
 
-        // A mapping of graph nodes onto the game objects representing them visually in the scene
-        private Dictionary<Node, GameObject> gameObjects = new Dictionary<Node, GameObject>();
-
         protected override void DrawNodes(Graph graph)
         {
             // puts the outermost circles of the roots next to each other;
@@ -1033,8 +1030,10 @@ namespace SEE.Layout
             LCAFinder lca = new LCAFinder(graph, roots);
             foreach (Edge edge in graph.Edges())
             {
-                GameObject go = new GameObject();
-                go.tag = Tags.Edge;
+                GameObject go = new GameObject
+                {
+                    tag = Tags.Edge
+                };
 
                 Node source = edge.Source;
                 Node target = edge.Target;
