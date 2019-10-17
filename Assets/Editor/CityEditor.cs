@@ -5,8 +5,6 @@ using SEE;
 using SEE.Layout;
 using System.Collections.Generic;
 using UnityEngine.XR;
-using System.Collections;
-using System;
 
 namespace SEEEditor
 {
@@ -35,13 +33,27 @@ namespace SEEEditor
         }
 
         // As to whether the optional settings for node and edge tags are to be enabled.
-        private bool tagGroupEnabled = false;
+        //private bool tagGroupEnabled = false;
 
+        /// <summary>
+        /// The graph that is visualized in the scene.
+        /// </summary>
         private Graph graph = null;
 
+        /// <summary>
+        /// The user settings.
+        /// </summary>
         private SEE.GraphSettings editorSettings = new SEE.GraphSettings();
 
+        /// <summary>
+        /// The factory for the kinds of node visualizations to be used as requested by the user.
+        /// </summary>
         private SEE.Layout.ILayout layout;
+
+        /// <summary>
+        /// The factory for the kinds of node visualizations to be used as requested by the user.
+        /// </summary>
+        BlockFactory blockFactory;
 
         private string ProjectPath()
         {
@@ -129,6 +141,8 @@ namespace SEEEditor
         /// </summary>
         void OnGUI()
         {
+            Debug.Log("CityEditor.OnGUI()\n");
+
             GUILayout.Label("Graph", EditorStyles.boldLabel);
             editorSettings.pathPrefix = EditorGUILayout.TextField("Project path prefix", ProjectPath());
             editorSettings.gxlPath = EditorGUILayout.TextField("GXL file", editorSettings.gxlPath);
@@ -165,7 +179,6 @@ namespace SEEEditor
             string[] actionLabels = new string[] { "Load City", "Delete City" };
             int selectedAction = GUILayout.SelectionGrid(-1, actionLabels, actionLabels.Length, GUILayout.Width(width), GUILayout.Height(height));
 
-            BlockFactory blockFactory;
             if (editorSettings.CScapeBuildings)
             {
                 blockFactory = new BuildingFactory();
@@ -270,7 +283,7 @@ namespace SEEEditor
         {
             SceneGraphs.DeleteAll();
             graph = null;
-            //CubeFactory.Reset();
+            blockFactory = null;
             if (layout != null)
             {
                 layout = null;
