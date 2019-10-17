@@ -11,7 +11,7 @@ namespace SEE
         /// <summary>
         /// The prefix of the absolute paths for the GXL and CSV data.
         /// </summary>        
-        public string pathPrefix;
+        public string pathPrefix = null;
 
         /// Tiny clone graph with single root to experiment with.
         public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
