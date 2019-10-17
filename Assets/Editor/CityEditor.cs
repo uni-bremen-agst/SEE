@@ -317,12 +317,18 @@ namespace SEEEditor
         /// <param name="tag">tag of the game objects to be destroyed.</param>
         private void DeleteByTag(string tag)
         {
-            GameObject[] objects = GameObject.FindGameObjectsWithTag(tag);
-            Debug.Log("Deleting objects: " + objects.Length + "\n");
-            foreach (GameObject o in objects)
+            int count = 0;
+            // Note: FindObjectsOfTypeAll retrieves all objects including non-active ones, which is
+            // necessary for prefabs serving as prototypes for active game objects.
+            foreach (GameObject go in Resources.FindObjectsOfTypeAll(typeof(GameObject)) as GameObject[])
             {
-                DestroyImmediate(o);
+                if (go.tag == tag)
+                {
+                    Destroyer.DestroyGameObject(go);
+                    count++;
+                }
             }
+            Debug.LogFormat("Deleted {0} objects tagged {1}.\n", count, tag);
         }
     }
 }
