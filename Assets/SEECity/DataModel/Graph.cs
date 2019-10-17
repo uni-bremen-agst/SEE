@@ -188,38 +188,6 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// Returns all game objects representing the nodes of the graph in the scene.
-        /// </summary>
-        /// <returns>all node game objects</returns>
-        [ObsoleteAttribute("GetNodes(). Use Nodes() instead.", false)]
-        public List<GameObject> GetNodes()
-        {
-            List<GameObject> result = new List<GameObject>();
-            // FIXME
-            //foreach (Node node in nodes.Values)
-            //{
-            //    result.Add(node.gameObject);
-            //}
-            return result;
-        }
-
-        /// <summary>
-        /// Returns all game objects representing the edges of the graph in the scene.
-        /// </summary>
-        /// <returns>all edge game objects</returns>
-        [ObsoleteAttribute("GetEdges(). Use Edges() instead.", false)]
-        public List<GameObject> GetEdges()
-        {
-            List<GameObject> result = new List<GameObject>();
-            // FIXME:
-            //foreach (Edge edge in edges)
-            //{
-            //    result.Add(edge.gameObject);
-            //}
-            return result;
-        }
-
-        /// <summary>
         /// Destroys the GameObjects of the graph's nodes and edges including the
         /// associated Node and Edge components as well as the GameObject of the graph 
         /// itself (and its Graph component). The graph is unusable afterward.
