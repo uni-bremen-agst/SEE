@@ -39,6 +39,7 @@ namespace SEE.Layout
                     // We only draw leaves.
 
                     GameObject block = blockFactory.NewBlock();
+                    block.name = node.LinkName;
 
                     column++;
                     if (column > numberOfBuildingsPerRow)
