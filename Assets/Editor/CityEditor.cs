@@ -55,7 +55,7 @@ namespace SEEEditor
         /// </summary>
         BlockFactory blockFactory;
 
-        private string ProjectPath()
+        private static string ProjectPath()
         {
             string result = Application.dataPath;
             // Unity uses Unix directory separator; we need Windows here
@@ -141,10 +141,19 @@ namespace SEEEditor
         /// </summary>
         void OnGUI()
         {
-            Debug.Log("CityEditor.OnGUI()\n");
+            // Important note: OnGUI is called whenever the windows gets or looses the focus
+            // as well as when any of its widgets are hovered by the mouse cursor. For this
+            // reason, do not run any expensive algorithm here unless it is really needed,
+            // that is, only when any of its buttons is pressed or any of its entry are updated.
 
             GUILayout.Label("Graph", EditorStyles.boldLabel);
-            editorSettings.pathPrefix = EditorGUILayout.TextField("Project path prefix", ProjectPath());
+            if (editorSettings.pathPrefix == null)
+            {
+                // Application.dataPath (used within ProjectPath()) must not be called in a 
+                // constructor. That is why we need to set it here if it is not yet defined.
+                editorSettings.pathPrefix = ProjectPath();
+            }
+            editorSettings.pathPrefix = EditorGUILayout.TextField("Project path prefix", editorSettings.pathPrefix);
             editorSettings.gxlPath = EditorGUILayout.TextField("GXL file", editorSettings.gxlPath);
             editorSettings.csvPath = EditorGUILayout.TextField("CSV file", editorSettings.csvPath);
 
@@ -155,7 +164,6 @@ namespace SEEEditor
 
             GUILayout.Label("VR settings", EditorStyles.boldLabel);
             VRenabled = EditorGUILayout.Toggle("Enable VR", VRenabled);
-            EnableVR(VRenabled);
 
             GUILayout.Label("Visual attributes", EditorStyles.boldLabel);
             editorSettings.BallonLayout = EditorGUILayout.Toggle("Balloon Layout", editorSettings.BallonLayout);
@@ -179,20 +187,20 @@ namespace SEEEditor
             string[] actionLabels = new string[] { "Load City", "Delete City" };
             int selectedAction = GUILayout.SelectionGrid(-1, actionLabels, actionLabels.Length, GUILayout.Width(width), GUILayout.Height(height));
 
-            if (editorSettings.CScapeBuildings)
-            {
-                blockFactory = new BuildingFactory();
-            }
-            else
-            {
-                blockFactory = new CubeFactory();
-            }
-            // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
-            AdjustCameraSpeed(blockFactory.Unit());
-
             switch (selectedAction)
             {
-                case 0:
+                case 0: // Load City
+                    // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
+                    EnableVR(VRenabled);
+                    if (editorSettings.CScapeBuildings)
+                    {
+                        blockFactory = new BuildingFactory();
+                    }
+                    else
+                    {
+                        blockFactory = new CubeFactory();
+                    }
+                    AdjustCameraSpeed(blockFactory.Unit());
                     graph = SceneGraphs.Add(editorSettings);
                     int numberOfErrors = MetricImporter.Load(graph, editorSettings.CSVPath());
                     if (numberOfErrors > 0)
@@ -245,14 +253,15 @@ namespace SEEEditor
                         Debug.LogError("No graph loaded.\n");
                     }
                     break;
-                case 1:
+
+                case 1:  // Delete City
                     Reset();
 
                     break;
                 default:
                     break;
             }
-            this.Repaint();
+            //this.Repaint();
         }
 
         /// <summary>
