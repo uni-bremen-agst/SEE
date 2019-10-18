@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
 <!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
 <gxl xmlns:xlink="http://www.w3.org/1999/xlink">
     <graph id="streamex" edgeids="true">
@@ -76,6 +76,9 @@
             <attr name="Source.Path">
                 <string>src\test\java\javax\util\streamex\EntryStreamTest.java</string>
             </attr>
+            <attr name="CodeHistory.WasModified">
+                <int>1</int>
+            </attr>
         </node>
         <node id="N6">
             <type xlink:href="File"/>
@@ -123,6 +126,9 @@
             </attr>
             <attr name="Source.Path">
                 <string>src\test\java\javax\util\streamex\StreamExTest.java</string>
+            </attr>
+            <attr name="CodeHistory.WasModified">
+                <int>1</int>
             </attr>
         </node>
         <node id="N5">
@@ -172,6 +178,9 @@
             <attr name="Source.Path">
                 <string>src\test\java\javax\util\streamex\DoubleStreamExTest.java</string>
             </attr>
+            <attr name="CodeHistory.WasModified">
+                <int>1</int>
+            </attr>
         </node>
         <node id="N3">
             <type xlink:href="File"/>
@@ -220,6 +229,9 @@
             <attr name="Source.Path">
                 <string>src\main\java\javax\util\streamex\EntryStream.java</string>
             </attr>
+            <attr name="CodeHistory.WasModified">
+                <int>1</int>
+            </attr>
         </node>
         <node id="N11">
             <type xlink:href="File"/>
@@ -244,6 +256,9 @@
             <attr name="Source.Path">
                 <string>src\test\java\javax\util\streamex\IntStreamExTest.java</string>
             </attr>
+            <attr name="CodeHistory.WasModified">
+                <int>1</int>
+            </attr>
         </node>
         <node id="N12">
             <type xlink:href="File"/>
@@ -267,6 +282,9 @@
             </attr>
             <attr name="Source.Path">
                 <string>src\test\java\javax\util\streamex\LongStreamExTest.java</string>
+            </attr>
+            <attr name="CodeHistory.WasModified">
+                <int>1</int>
             </attr>
         </node>
         <node id="N7">

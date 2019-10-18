@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
 <!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
 <gxl xmlns:xlink="http://www.w3.org/1999/xlink">
     <graph id="streamex" edgeids="true">
@@ -52,6 +52,9 @@
             <attr name="Source.Path">
                 <string>src\main\java\javax\util\streamex\LongStreamEx.java</string>
             </attr>
+            <attr name="CodeHistory.WasAdded">
+                <int>1</int>
+            </attr>
         </node>
         <node id="N6">
             <type xlink:href="File"/>
@@ -75,6 +78,9 @@
             </attr>
             <attr name="Source.Path">
                 <string>src\test\java\javax\util\streamex\StreamExTest.java</string>
+            </attr>
+            <attr name="CodeHistory.WasAdded">
+                <int>1</int>
             </attr>
         </node>
         <node id="N3">
@@ -100,6 +106,9 @@
             <attr name="Source.Path">
                 <string>src\main\java\javax\util\streamex\IntStreamEx.java</string>
             </attr>
+            <attr name="CodeHistory.WasAdded">
+                <int>1</int>
+            </attr>
         </node>
         <node id="N1">
             <type xlink:href="File"/>
@@ -124,6 +133,9 @@
             <attr name="Source.Path">
                 <string>src\main\java\javax\util\streamex\DoubleStreamEx.java</string>
             </attr>
+            <attr name="CodeHistory.WasAdded">
+                <int>1</int>
+            </attr>
         </node>
         <node id="N5">
             <type xlink:href="File"/>
@@ -147,6 +159,9 @@
             </attr>
             <attr name="Source.Path">
                 <string>src\main\java\javax\util\streamex\StreamEx.java</string>
+            </attr>
+            <attr name="CodeHistory.WasAdded">
+                <int>1</int>
             </attr>
         </node>
         <edge id="E0" from="N1" to="N2">
