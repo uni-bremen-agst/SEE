@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
 <!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
 <gxl xmlns:xlink="http://www.w3.org/1999/xlink">
     <graph id="streamex" edgeids="true">
@@ -51,6 +51,9 @@
             </attr>
             <attr name="Source.Path">
                 <string>src\main\java\javax\util\streamex\AbstractStreamEx.java</string>
+            </attr>
+            <attr name="CodeHistory.WasModified">
+                <int>1</int>
             </attr>
         </node>
         <node id="N10">
@@ -123,6 +126,9 @@
             </attr>
             <attr name="Source.Path">
                 <string>src\test\java\javax\util\streamex\StreamExTest.java</string>
+            </attr>
+            <attr name="CodeHistory.WasModified">
+                <int>1</int>
             </attr>
         </node>
         <node id="N5">
