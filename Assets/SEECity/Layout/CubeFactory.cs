@@ -104,8 +104,8 @@ namespace SEE.Layout
             
             if (newMat != null)
             {
-                renderer.material = newMat;
-                //renderer.sharedMaterial = newMat;
+                //renderer.material = newMat;
+                renderer.sharedMaterial = newMat;
             }
             else
             {
@@ -117,6 +117,11 @@ namespace SEE.Layout
 
             // Object should be static so that we save rendering time at run-time.
             gameObject.isStatic = true;
+
+            // Turn off reflection
+            renderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
+            renderer.sharedMaterial.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
+            renderer.sharedMaterial.SetFloat("_SpecularHighlights", 0.0f);
         }
 
         /// <summary>

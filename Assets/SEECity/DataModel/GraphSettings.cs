@@ -119,7 +119,7 @@ namespace SEE
         public bool CScapeBuildings = true;
 
         // The width of edges.
-        public float EdgeWidth = 1.0f;
+        public float EdgeWidth = 0.3f;
 
         /// <summary>
         /// Whether erosions should be visible above blocks.

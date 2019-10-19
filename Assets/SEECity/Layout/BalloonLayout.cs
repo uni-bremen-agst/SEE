@@ -42,13 +42,15 @@ namespace SEE.Layout
 
         /// <summary>
         /// The minimal line width of a circle drawn for an inner node.
+        /// Will be adjusted by the world unit factor.
         /// </summary>
-        public float minmalCircleLineWidth = 0.1f;
+        public float minmalCircleLineWidth = 0.01f;
 
         /// <summary>
         /// The maximal line width of a circle drawn for an inner node.
+        /// Will be adjusted by the world unit factor.
         /// </summary>
-        public float maximalCircleLineWidth = 10.0f;
+        public float maximalCircleLineWidth = 1.0f;
 
         protected override void DrawNodes(Graph graph)
         {
@@ -152,9 +154,6 @@ namespace SEE.Layout
             float planePositionZ = leftRootCenter.z;
             plane.transform.position = new Vector3(planePositionX, planePositionY, planePositionZ);
 
-            // TODO: Circle lines way below the nodes.
-            // TODO: Plane below everything else.
-
             Renderer planeRenderer = plane.GetComponent<Renderer>();
             planeRenderer.sharedMaterial = new Material(planeRenderer.sharedMaterial);
 
@@ -179,6 +178,16 @@ namespace SEE.Layout
             plane.transform.localScale = planeScale;
         }
 
+        /// <summary>
+        /// If node is a leaf, a block is drawn. If node is an inner node, a circle is drawn
+        /// and its children are drawn recursively.
+        /// </summary>
+        /// <param name="node">node to be drawn</param>
+        /// <param name="position">position at which to place the node</param>
+        /// <param name="depth">depth of node in the hierarchy used to determine the width of the line</param>
+        /// <param name="max_depth">maximal depth of the hierarchy</param>
+        /// <param name="scaler">a scaler for the metrics to be drawn</param>
+        /// <param name="factory">the factory to create the Donut charts </param>
         private void DrawCircles(Node node, Vector3 position, int depth, int max_depth, IScale scaler, DonutFactory factory)
         {
             List<Node> children = node.Children();
@@ -186,7 +195,6 @@ namespace SEE.Layout
             if (children.Count == 0)
             {
                 DrawLeaf(node, position, nodeInfos[node].outer_radius, scaler);
-                //Debug.Log("leaf " + node.name + " @ " + position + " radius " + radii[node].outer_radius + "\n");
             }
             else
             {
@@ -197,8 +205,6 @@ namespace SEE.Layout
                 // current node plus the reference length of the children. See the paper
                 // for details.
                 float parent_inner_radius = nodeInfos[node].radius + nodeInfos[node].reference_length_children;
-
-                //Debug.Log("inner " + node.name + " @ " + position + " outer-radius " + radii[node].outer_radius + " inner-radius " + parent_inner_radius + "\n");
 
                 // Placing all children of the inner circle defined by the 
                 // center point (the given position) and the radius with some
@@ -246,16 +252,10 @@ namespace SEE.Layout
                         // of the child circle with radius r_c. That is why, we need to double
                         // the angle alpha to position the next circle.
                         accummulated_alpha += 2 * alpha;
-                        //Debug.Log(node.name + " 1) Accumulated angle: " + accummulated_alpha + "\n");
                     }
-                    //Debug.Log(node.name + " 1) Remaining angle:   " + (2 * Math.PI - accummulated_alpha) + "\n");
                     if (accummulated_alpha > 2 * Math.PI)
                     {
                         // No space left.
-
-                        // The following error may occur maybe because of rounding errors?
-                        //Debug.LogError("BallonLayout.DrawCircles: Accumulated angle is greater than 360 degrees: "
-                        //    + ((accummulated_alpha * 180) / Math.PI) + ".\n");
                     }
                     else
                     {
@@ -295,10 +295,7 @@ namespace SEE.Layout
 
                         // The next available circle must be located outside of the child circle
                         accummulated_alpha += alpha + space_between_child_circles;
-                        //Debug.Log(node.name + " 2) Accumulated angle: " + accummulated_alpha + "\n");
                     }
-
-                    //Debug.Log(node.name + " 2) Remaining angle:   " + (360.0f - accummulated_alpha) + "\n");
                 }
             }
         }
@@ -324,8 +321,6 @@ namespace SEE.Layout
             {
                 AddErosionIssues(node, scaler);
             }
-            //Renderer renderer = cylinder.GetComponent<Renderer>();
-            //renderer.material.color = Color.white;
         }
 
         private void AddGarden(GameObject parent)
@@ -469,9 +464,6 @@ namespace SEE.Layout
                     blockFactory.ScaleBlock(block, scale);
                 }
 
-                // block is nested in parent
-                //blockFactory.AttachBlock(parent, block);
-
                 // Necessary size of the block independent of the parent
                 Vector3 size = blockFactory.GetSize(block);
 
@@ -483,27 +475,6 @@ namespace SEE.Layout
                 // The outer-radius must be large enough to put in the block.
                 out_rad = diagonal / 2.0f;
                 rad = 0.0f;
-
-                //Debug.LogFormat("size of block = {0}, radius = {1}\n", size, out_rad);
-
-                // size of parent are determined by the circle, height by the blocks's height
-                //parent.transform.localScale = new Vector3(2.0f * out_rad, size.y, 2.0f * out_rad);
-
-                // relative position within parent
-                // block.transform.position = new Vector3(position.x, scale.y / 2.0f, position.z);
-
-                // Note that the values are interpreted relative to the parent here.
-                // The parent's height was chosen as scale.y above. Hence, we need to
-                // to scale by 1.0 for the y coordinate. The width and height of the
-                // parent were chosen to be twice the radius. We cannot scale to the
-                // radius, however, because otherwise the corners of the cube might
-                // range out of the circle. We need to scale by the following factor
-                // (the quotient of the cube length and the the circle diameter):
-                //float factor = maximal_length / (2.0f * radius);
-
-                // FIXME: Must be adjusted to scaling of CScape buildings
-                //ScaleBlock(block, new Vector3(factor * scale.x, 1.0f, factor * scale.z));
-
             }
             else
             {
@@ -533,10 +504,7 @@ namespace SEE.Layout
                 inner_sum *= 2;
 
                 // min_rad is the minimal circumference to accommodate all the children
-                // TODO: If a metric determines the radius of leaves, they may have
-                // different radii and we cannot just multiply the number of children
-                // with the minimal diameter
-                float min_rad = 0.0f; // factor * node.NumberOfChildren();
+                float min_rad = 0.0f;
 
                 // Let C be the circle with center point cp_i on which
                 // the center points of all children of i are to be placed.
@@ -574,6 +542,15 @@ namespace SEE.Layout
         //private Color lightCylinderColor = new Color((float)200 / 255, (float)247 / 255, (float)197 / 255, 1.0f); // Lawn green
         // private Color rightCylinderColor = new Color((float)30 / 255, (float)130 / 255, (float)76 / 255, 1.0f); // Salem green
 
+        /// <summary>
+        /// Draws an inner node as a circle line.
+        /// </summary>
+        /// <param name="node">node to be drawn</param>
+        /// <param name="position">center position where to place the node</param>
+        /// <param name="radius">radius of the circle line</param>
+        /// <param name="depth">depth of the node in the hierarchy used to determine the width of the line</param>
+        /// <param name="max_depth">maximal depth of the hierarchy</param>
+        /// <param name="factory">a factory to draw the Donut charts</param>
         private void DrawInnerNode(Node node, Vector3 position, float radius, int depth, int max_depth, DonutFactory factory)
         {
             GameObject circle = new GameObject();
@@ -583,20 +560,15 @@ namespace SEE.Layout
             circle.name = node.LinkName;
             circle.tag = Tags.Node;
 
-            // If wanted to have the nesting of circles on different ground levels depending
+            // If we wanted to have the nesting of circles on different ground levels depending
             // on the depth of the node, we would use position.y - (max_depth - depth + 1) * cylinder_height
-            // for the y coordinate.
-            circle.transform.position = position; // new Vector3 (position.x, position.y - depth * 0.01f, position.z);
-            //go.transform.localScale = new Vector3(2.0f * radius, cylinder_height, 2.0f * radius);
-            /*
-              MeshFactory.AddTerrain(go);
-              SetColor(go, Color.Lerp(lightCylinderColor, rightCylinderColor, (float)depth / (float)max_depth));
-            */
-
-            // DrawCircle(node, position, radius);
+            // for the y co-ordinate.
+            circle.transform.position = position; 
 
             // Roots have depth 0. We want the line to be thicker for nodes higher in the hierarchy.
-            float lineWidth = Mathf.Lerp(minmalCircleLineWidth, maximalCircleLineWidth, (float)(max_depth - depth) / max_depth);
+            float lineWidth = Mathf.Lerp(minmalCircleLineWidth,
+                                         maximalCircleLineWidth, 
+                                         (float)(max_depth - depth) / max_depth);
 
             if (showDonuts)
             {
@@ -605,18 +577,17 @@ namespace SEE.Layout
                 {
                     tag = Tags.Decoration
                 };
-                AttachCircleLine(circleLine, radius, lineWidth);
+                AttachCircleLine(circleLine, radius, lineWidth * blockFactory.Unit());
                 circleLine.transform.position = circle.transform.position;
                 circleLine.transform.parent = circle.transform;
             }
             else
             {
-                AttachCircleLine(circle, radius, lineWidth);
+                AttachCircleLine(circle, radius, lineWidth * blockFactory.Unit());
             }
 
             // The text may occupy up to 30% of the diameter in width.
             GameObject text = TextFactory.GetText(node.SourceName, position, 2.0f * radius * 0.3f);
-            //text.transform.parent = go.transform; // make the text a child of circle
         }
 
         private void AddDonut(Node node, GameObject circle, float radius, DonutFactory factory)
@@ -781,7 +752,6 @@ namespace SEE.Layout
                                 controlPoints[i] = gameObjects[fullPath[i]].transform.position + (maxDepth - nodeInfos[fullPath[i]].level) * levelUnit;
                             }
                             controlPoints[controlPoints.Length - 1] = blockFactory.Roof(targetObject);
-                            //Debug.LogFormat("control points from {0} to {1}\n", source.SourceName, target.SourceName);
                             //Dump(controlPoints);
                         }
                     }
@@ -933,7 +903,7 @@ namespace SEE.Layout
                 if (source != null && target != null)
                 {
                     go.name = edge.Type + "(" + source.LinkName + ", " + target.LinkName + ")";
-                    BSplineFactory.Draw(go, GetControlPoints(source, target, lca, maxDepth), edgeWidth, newMat);
+                    BSplineFactory.Draw(go, GetControlPoints(source, target, lca, maxDepth), edgeWidth * blockFactory.Unit(), newMat);
                 }
                 else
                 {
