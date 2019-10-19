@@ -21,8 +21,9 @@ namespace SEE.Layout
                              IScale scaler,
                              float edgeWidth,
                              bool showErosions,
-                             bool showDonuts)
-        : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions)
+                             bool showDonuts,
+                             bool edgesAboveBlocks)
+        : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions, edgesAboveBlocks)
         {
             name = "Ballon";
             this.showDonuts = showDonuts;
@@ -33,11 +34,6 @@ namespace SEE.Layout
         /// The names of the metrics for inner nodes to be put onto the 
         /// </summary>
         private readonly string[] innerNodeMetrics;
-
-        /// <summary>
-        /// Whether erosions should be visible above the nodes.
-        /// </summary>
-        public bool showErosions = true;
 
         /// <summary>
         /// Whether donut charts should be visible in the inner circle of the nodes.
@@ -56,6 +52,8 @@ namespace SEE.Layout
 
         protected override void DrawNodes(Graph graph)
         {
+            DrawBlocks();
+            return;
             // puts the outermost circles of the roots next to each other;
             // later we might use a circle-packing algorithm instead,
             // e.g., https://www.codeproject.com/Articles/42067/D-Circle-Packing-Algorithm-Ported-to-Csharp
@@ -103,12 +101,26 @@ namespace SEE.Layout
                     // for two neighboring circles the distance must be the sum of the their two radii;
                     // in case we draw the very first circle, no distance must be kept
                     position.x += i == 0 ? 0.0f : nodeInfos[roots[i - 1]].outer_radius + nodeInfos[roots[i]].outer_radius + offset;
-                    Debug.Log("Drawing balloon for root " + root.LinkName + "@" + position + "\n");
                     DrawCircles(root, position, 0, max_depths[i], scaler, factory);
                     i++;
                 }
             }
             DrawPlane(roots, max_radius);
+        }
+
+        private void DrawBlocks()
+        {
+            {
+                CubeFactory factory = new CubeFactory();
+                GameObject block = factory.NewBlock();
+                factory.SetPosition(block, Vector3.zero);
+            }
+
+            {
+                BuildingFactory factory = new BuildingFactory();
+                GameObject block = factory.NewBlock();
+                factory.SetPosition(block, Vector3.zero);
+            }
         }
 
         /// <summary>
@@ -909,6 +921,7 @@ namespace SEE.Layout
 
         protected override void DrawEdges(Graph graph)
         {
+            return; // FIXME
             // The distance between of the control points at the subsequent levels of the hierarchy.
             levelUnit = MaximalNodeHeight();
 

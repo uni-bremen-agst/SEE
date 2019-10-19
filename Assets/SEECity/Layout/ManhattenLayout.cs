@@ -12,8 +12,9 @@ namespace SEE.Layout
                                BlockFactory blockFactory,
                                IScale scaler,
                                float edgeWidth,
-                               bool showErosions)
-            : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions)
+                               bool showErosions,
+                               bool edgesAboveBlocks)
+            : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions, edgesAboveBlocks)
         {
             name = "Manhattan";
         }
@@ -21,6 +22,10 @@ namespace SEE.Layout
         // The minimal length of any axis (width, breadth, height) of a block.
         // Must not exceed 1.0f.
         protected const float minimalLength = 0.1f;
+
+        // The maximal height of all blocks. If edges are drawn above the blocks, they
+        // will be drawn somewhat above this value relative to the blocks ground.
+        private float maxBlockHeight = 0.0f;
 
         // precondition: the GameObjects and their meshes have already been created for all nodes
         protected override void DrawNodes(Graph graph)
@@ -65,11 +70,17 @@ namespace SEE.Layout
                     {
                         maxZ = size.z;
                     }
+                    if (size.y > maxBlockHeight)
+                    {
+                        maxBlockHeight = size.y;
+                    }
+                    
                     positionX += size.x / 2.0f;
                     // The position is the center of a GameObject. We want all GameObjects
                     // be placed at the same ground level 0. That is why we need to "lift"
                     // every building by half of its height.
-                    block.transform.position = new Vector3(positionX, scale.y / 2.0f, positionZ);
+                    blockFactory.SetPosition(block, new Vector3(positionX, size.y / 2.0f, positionZ));
+
                     positionX += size.x / 2.0f + distanceBetweenBuildings;
 
                     if (showErosions)
@@ -80,23 +91,20 @@ namespace SEE.Layout
             }
         }
 
-        // orientation of the edges; 
-        // if -1, the edges are drawn below the houses;
-        // if 1, the edges are drawn above the houses;
-        // use either -1 or 1
-        private const float orientation = -1f;
-
         /// <summary>
         /// Creates the GameObjects representing the edges of the graph.
         /// The graph must have been loaded before via Load().
         /// </summary>
         protected override void DrawEdges(Graph graph)
         {
-            // The distance of the edges relative to the houses; the maximal height of
-            // a house is 1.0. This offset is used to draw the line somewhat below
+            // The offset of the edges above or below the ground chosen relative 
+            // to the height of the largest block.
+            // This offset is used to draw the line somewhat below
             // or above the house (depending on the orientation).
-            const float maxHeight = 1f;
-            const float offset = maxHeight * 0.1f; // must be positive
+            float offset = maxBlockHeight * 0.1f; // must be positive
+            // The level at which edges are drawn. This value is used only if the
+            // edges are to be drawn above the blocks.
+            float edgeLevel = maxBlockHeight + offset;
 
             //Material newMat = Resources.Load<Material>(materialPath);
             Material newMat = new Material(defaultLineMaterial);
@@ -144,21 +152,29 @@ namespace SEE.Layout
                         line.positionCount = 4; // number of vertices
                         Vector3[] points = new Vector3[line.positionCount];
 
-                        // starting position
-                        points[0] = sourceObject.transform.position; // center of source node
-                        points[0].y += orientation * sourceCenterToBorder.y; // floor/ceiling
+                        if (edgesAboveBlocks)
+                        {
+                            points[0] = blockFactory.Roof(sourceObject); 
+                            points[3] = blockFactory.Roof(targetObject);
 
-                        // position below/above starting position
-                        points[1] = points[0];
-                        points[1].y += orientation * offset;
+                            points[1] = blockFactory.Ground(sourceObject);
+                            points[1].y = edgeLevel;
+                            points[2] = blockFactory.Ground(targetObject);
+                            points[2].y = edgeLevel;
+                        }
+                        else
+                        {
+                            points[0] = blockFactory.Ground(sourceObject);
+                            points[3] = blockFactory.Ground(targetObject);
 
-                        // ending position
-                        points[3] = targetObject.transform.position; // center of target node
-                        points[3].y += orientation * targetCenterToBorder.y; // floor/ceiling
+                            // position below/above starting position
+                            points[1] = points[0];
+                            points[1].y -= offset;
 
-                        // position below/above ending position
-                        points[2] = points[3];
-                        points[2].y += orientation * offset;
+                            // position below/above ending position
+                            points[2] = points[3];
+                            points[2].y -= offset;
+                        }
 
                         line.SetPositions(points);
 

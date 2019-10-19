@@ -165,15 +165,18 @@ namespace SEEEditor
             GUILayout.Label("VR settings", EditorStyles.boldLabel);
             VRenabled = EditorGUILayout.Toggle("Enable VR", VRenabled);
 
-            GUILayout.Label("Visual attributes", EditorStyles.boldLabel);
+            GUILayout.Label("Visual node attributes", EditorStyles.boldLabel);
             editorSettings.BallonLayout = EditorGUILayout.Toggle("Balloon Layout", editorSettings.BallonLayout);
             editorSettings.CScapeBuildings = EditorGUILayout.Toggle("CScape buildings", editorSettings.CScapeBuildings);
             editorSettings.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", editorSettings.ZScoreScale);
+            editorSettings.ShowDonuts = EditorGUILayout.Toggle("Show Donut charts", editorSettings.ShowDonuts);
+
+            GUILayout.Label("Visual edge attributes", EditorStyles.boldLabel);
             editorSettings.EdgeWidth = EditorGUILayout.FloatField("Edge width", editorSettings.EdgeWidth);
             editorSettings.ShowEdges = EditorGUILayout.Toggle("Show edges", editorSettings.ShowEdges);
             editorSettings.ShowErosions = EditorGUILayout.Toggle("Show erosions", editorSettings.ShowErosions);
-            editorSettings.ShowDonuts = EditorGUILayout.Toggle("Show Donut charts", editorSettings.ShowDonuts);
-
+            editorSettings.EdgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", editorSettings.EdgesAboveBlocks);
+            
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
             // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
 
@@ -235,7 +238,8 @@ namespace SEEEditor
                                                                   scaler,
                                                                   editorSettings.EdgeWidth,
                                                                   editorSettings.ShowErosions,
-                                                                  editorSettings.ShowDonuts);
+                                                                  editorSettings.ShowDonuts,
+                                                                  editorSettings.EdgesAboveBlocks);
                         }
                         else
                         {
@@ -245,7 +249,8 @@ namespace SEEEditor
                                                                     blockFactory,
                                                                     scaler,
                                                                     editorSettings.EdgeWidth,
-                                                                    editorSettings.ShowDonuts);
+                                                                    editorSettings.ShowDonuts,
+                                                                    editorSettings.EdgesAboveBlocks);
                         }
                         layout.Draw(graph);
                     }
