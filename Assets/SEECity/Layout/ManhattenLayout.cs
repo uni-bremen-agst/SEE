@@ -138,7 +138,7 @@ namespace SEE.Layout
                         line.sharedMaterial = newMat;
 
                         LineFactory.SetDefaults(line);
-                        LineFactory.SetWidth(line, edgeWidth);
+                        LineFactory.SetWidth(line, edgeWidth * blockFactory.Unit());
 
                         // If enabled, the lines are defined in world space.
                         // This means the object's position is ignored, and the lines are rendered around 
