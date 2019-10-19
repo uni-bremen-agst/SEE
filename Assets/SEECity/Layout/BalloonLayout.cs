@@ -21,8 +21,8 @@ namespace SEE.Layout
                              IScale scaler,
                              float edgeWidth,
                              bool showErosions,
-                             bool showDonuts,
-                             bool edgesAboveBlocks)
+                             bool edgesAboveBlocks,
+                             bool showDonuts)
         : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions, edgesAboveBlocks)
         {
             name = "Ballon";
