@@ -21,28 +21,29 @@ namespace SEE.Layout
         public override GameObject NewBlock()
         {
             GameObject result = new GameObject();
-            AddCube(result);
+            result.tag = Tags.Building;
+            AddCubeMesh(result);
             return result;
         }
 
-        private void AddCube(GameObject gameObject)
+        private void AddCubeMesh(GameObject gameObject)
         {
             AddMesh(gameObject, PrimitiveType.Cube, "BrickTextures/BricksTexture13/BricksTexture13");
         }
 
-        private void AddCylinder(GameObject gameObject, string materialPath)
+        private void AddCylinderMesh(GameObject gameObject, string materialPath)
         {
             AddMesh(gameObject, PrimitiveType.Cylinder, materialPath);
         }
 
         public void AddTerrain(GameObject gameObject)
         {
-            AddCylinder(gameObject, "Grass/Grass FD 1 diffuse");
+            AddCylinderMesh(gameObject, "Grass/Grass FD 1 diffuse");
         }
 
         public void AddFrontYard(GameObject gameObject)
         {
-            AddCylinder(gameObject, "Grass/Sand FD 1 diffuse");
+            AddCylinderMesh(gameObject, "Grass/Sand FD 1 diffuse");
         }
 
         /// <summary>
@@ -116,8 +117,6 @@ namespace SEE.Layout
 
             // Object should be static so that we save rendering time at run-time.
             gameObject.isStatic = true;
-
-            
         }
 
         /// <summary>

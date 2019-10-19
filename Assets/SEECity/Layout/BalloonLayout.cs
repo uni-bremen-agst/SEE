@@ -21,11 +21,11 @@ namespace SEE.Layout
                              IScale scaler,
                              float edgeWidth,
                              bool showErosions,
-                             bool showDonuts)
-        : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
+                             bool showDonuts,
+                             bool edgesAboveBlocks)
+        : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions, edgesAboveBlocks)
         {
             name = "Ballon";
-            this.showErosions = showErosions;
             this.showDonuts = showDonuts;
             this.innerNodeMetrics = innerNodeMetrics;
         }
@@ -34,11 +34,6 @@ namespace SEE.Layout
         /// The names of the metrics for inner nodes to be put onto the 
         /// </summary>
         private readonly string[] innerNodeMetrics;
-
-        /// <summary>
-        /// Whether erosions should be visible above the nodes.
-        /// </summary>
-        public bool showErosions = true;
 
         /// <summary>
         /// Whether donut charts should be visible in the inner circle of the nodes.
@@ -54,9 +49,6 @@ namespace SEE.Layout
         /// The maximal line width of a circle drawn for an inner node.
         /// </summary>
         public float maximalCircleLineWidth = 10.0f;
-
-        // A mapping of graph nodes onto the game objects representing them visually in the scene
-        private Dictionary<Node, GameObject> gameObjects = new Dictionary<Node, GameObject>();
 
         protected override void DrawNodes(Graph graph)
         {
@@ -107,12 +99,27 @@ namespace SEE.Layout
                     // for two neighboring circles the distance must be the sum of the their two radii;
                     // in case we draw the very first circle, no distance must be kept
                     position.x += i == 0 ? 0.0f : nodeInfos[roots[i - 1]].outer_radius + nodeInfos[roots[i]].outer_radius + offset;
-                    Debug.Log("Drawing balloon for root " + root.LinkName + "@" + position + "\n");
                     DrawCircles(root, position, 0, max_depths[i], scaler, factory);
                     i++;
                 }
             }
             DrawPlane(roots, max_radius);
+        }
+
+        // Just for experimentation of SetPosition.
+        private void DrawBlocks()
+        {
+            {
+                CubeFactory factory = new CubeFactory();
+                GameObject block = factory.NewBlock();
+                factory.SetPosition(block, Vector3.zero);
+            }
+
+            {
+                BuildingFactory factory = new BuildingFactory();
+                GameObject block = factory.NewBlock();
+                factory.SetPosition(block, Vector3.zero);
+            }
         }
 
         /// <summary>
@@ -357,107 +364,6 @@ namespace SEE.Layout
             // Scale to full extent of the parent's width and breadth (chosen to
             // be twice the radius above). The cylinder's height should be minimal.
             cylinder.transform.localScale = new Vector3(1.0f, cylinder_height, 1.0f);
-        }
-
-        protected static Vector3 GetSizeOfSprite(GameObject go)
-        {
-            // The game object representing an erosion is a composite of 
-            // multiple LOD child objects to be drawn depending how close
-            // the camera is. The container object 'go' itself does not
-            // have a renderer. We need to obtain the renderer of the
-            // first child hat represents the object at LOD 0 instead.
-            Renderer renderer = go.GetComponentInChildren<Renderer>();
-            // Note: renderer.sprite.bounds.size yields the original size
-            // of the sprite of the prefab. It does not consider the scaling.
-            // It depends only upon the imported graphic. That is why we
-            // need to use renderer.bounds.size.
-            return renderer.bounds.size;
-        }
-
-        // Comparer for the widths of sprites.
-        private readonly IComparer<GameObject> comparer = new WidthComparer();
-
-        /// <summary>
-        /// Comparer for the widths of sprites. Let width(x) be the width
-        /// of a sprite. Yields:
-        /// -1 if width(left) < width(right) 
-        /// 0 if width(left) = width(right)
-        /// 1 if width(left) ></width> width(right)
-        /// </summary>
-        private class WidthComparer : IComparer<GameObject>
-        {
-            public int Compare(GameObject left, GameObject right)
-            {
-                float widthLeft = GetSizeOfSprite(left).x;
-                float widthRight = GetSizeOfSprite(right).x;
-                return widthLeft.CompareTo(widthRight);
-            }
-        }
-
-        /// <summary>
-        /// Stacks sprites for software-erosion issues atop of the roof of the given node
-        /// in ascending order in terms of the sprite width. The sprite width is proportional
-        /// to the normalized metric value for the erosion issue.
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="scaler"></param>
-        private void AddErosionIssues(Node node, IScale scaler)
-        {
-            // The list of sprites for the erosion issues.
-            List<GameObject> sprites = new List<GameObject>();
-
-            // Create and scale the sprites and add them to the list of sprites.
-            foreach (KeyValuePair<string, IconFactory.Erosion> issue in issueMap)
-            {
-                if (node.TryGetNumeric(issue.Key, out float value))
-                {
-                    if (value > 0.0f)
-                    {
-                        GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
-                        // The sprite will not become a child of node so that we can more easily
-                        // scale it. If the sprite had a parent, localScale would be relative to
-                        // the parent's size. That just complicates things.
-                        Vector3 spriteSize = GetSizeOfSprite(sprite);
-                        // Scale the sprite to one Unity unit.
-                        float spriteScale = 1.0f / spriteSize.x;
-                        // Scale the erosion issue by normalization.
-                        float metricScale = scaler.GetNormalizedValue(node, issue.Key);
-                        //Debug.LogFormat("sprite {0} before scaling: size={1}.\n",
-                        //                sprite.name, GetSizeOfSprite(sprite));
-                        // First: scale its width to unit size 1.0 maintaining the aspect ratio
-                        sprite.transform.localScale *= spriteScale * blockFactory.Unit();
-                        //Debug.LogFormat("sprite {0} scaled to unit size: size={1}.\n",
-                        //                sprite.name, GetSizeOfSprite(sprite));
-                        // Now scale it by the normalized metric.
-                        sprite.transform.localScale *= metricScale;
-                        //Debug.LogFormat("sprite {0} after scaling: size={1}.\n",
-                        //                sprite.name, GetSizeOfSprite(sprite));
-                        sprite.name = sprite.name + " " + node.SourceName;
-                        sprites.Add(sprite);
-                    }
-                }
-            }
-
-            // Now we stack the sprites on top of the roof of the building in
-            // ascending order of their widths.
-            {
-                // The space that we put in between two subsequent erosion issue sprites.
-                Vector3 delta = Vector3.up / 100.0f;
-                Vector3 currentRoof = blockFactory.Roof(gameObjects[node]);
-                sprites.Sort(comparer);
-                //Debug.Log("---------------------------------\n");
-                foreach (GameObject sprite in sprites)
-                {
-                    Vector3 size = GetSizeOfSprite(sprite);
-                    // Note: Consider that the position of the sprite is its center.
-                    Vector3 halfHeight = (size.y / 2.0f) * Vector3.up;
-                    sprite.transform.position = currentRoof + delta + halfHeight;
-                    currentRoof = sprite.transform.position + halfHeight;
-
-                    //Debug.LogFormat("sprite {0}: size={1} position={2} halfHeight={3}.\n",
-                    //                sprite.name, size, sprite.transform.position, halfHeight);
-                }
-            }
         }
 
         /// <summary>
@@ -1033,8 +939,10 @@ namespace SEE.Layout
             LCAFinder lca = new LCAFinder(graph, roots);
             foreach (Edge edge in graph.Edges())
             {
-                GameObject go = new GameObject();
-                go.tag = Tags.Edge;
+                GameObject go = new GameObject
+                {
+                    tag = Tags.Edge
+                };
 
                 Node source = edge.Source;
                 Node target = edge.Target;
