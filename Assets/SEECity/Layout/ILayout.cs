@@ -12,7 +12,8 @@ namespace SEE.Layout
                BlockFactory blockFactory,
                IScale scaler,
                float edgeWidth,
-               bool showErosions)
+               bool showErosions,
+               bool edgesAboveBlocks)
         {
             this.showEdges = showEdges;
             this.widthMetric = widthMetric;
@@ -23,6 +24,7 @@ namespace SEE.Layout
             this.scaler = scaler;
             this.edgeWidth = edgeWidth;
             this.showErosions = showErosions;
+            this.edgesAboveBlocks = edgesAboveBlocks;
         }
 
         public virtual void Draw(Graph graph)
@@ -41,6 +43,13 @@ namespace SEE.Layout
 
         // A mapping of graph nodes onto the game objects representing them visually in the scene
         protected Dictionary<Node, GameObject> gameObjects = new Dictionary<Node, GameObject>();
+
+        /// <summary>
+        /// Orientation of the edges; 
+        /// if false, the edges are drawn below the houses;
+        /// if true, the edges are drawn above the houses;
+        /// </summary>
+        protected readonly bool edgesAboveBlocks;
 
         /// <summary>
         /// Path to the material used for edges.

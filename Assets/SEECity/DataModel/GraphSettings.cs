@@ -136,6 +136,13 @@ namespace SEE
         /// </summary>
         public bool ShowEdges = true;
 
+        /// <summary>
+        /// Orientation of the edges; 
+        /// if false, the edges are drawn below the houses;
+        /// if true, the edges are drawn above the houses;
+        /// </summary>
+        public bool EdgesAboveBlocks = true;
+
         public string[] InnerNodeMetrics = new string[] { "Metric.Quality",
                                                           "Metric.McCabe_Complexity.sum",
                                                           "Metric.Number_Of_Statements.sum",
