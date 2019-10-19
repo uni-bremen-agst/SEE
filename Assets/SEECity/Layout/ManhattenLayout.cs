@@ -77,9 +77,8 @@ namespace SEE.Layout
                     
                     positionX += size.x / 2.0f;
                     // The position is the center of a GameObject. We want all GameObjects
-                    // be placed at the same ground level 0. That is why we need to "lift"
-                    // every building by half of its height.
-                    blockFactory.SetPosition(block, new Vector3(positionX, size.y / 2.0f, positionZ));
+                    // be placed at the same ground level 0. 
+                    blockFactory.SetPosition(block, new Vector3(positionX, groundLevel, positionZ));
 
                     positionX += size.x / 2.0f + distanceBetweenBuildings;
 
