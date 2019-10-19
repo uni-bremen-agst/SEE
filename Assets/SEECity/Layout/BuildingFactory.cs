@@ -148,6 +148,7 @@ namespace SEE.Layout
                 buildingModifier.buildingDepth = 5;
                 buildingModifier.useAdvertising = true;
                 buildingModifier.useGraffiti = true;
+                buildingModifier.extendFoundations = 0.0f;
                 buildingModifier.AwakeCity();
                 buildingModifier.UpdateCity();
             }

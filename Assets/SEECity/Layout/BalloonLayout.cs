@@ -106,22 +106,6 @@ namespace SEE.Layout
             DrawPlane(roots, max_radius);
         }
 
-        // Just for experimentation of SetPosition.
-        private void DrawBlocks()
-        {
-            {
-                CubeFactory factory = new CubeFactory();
-                GameObject block = factory.NewBlock();
-                factory.SetPosition(block, Vector3.zero);
-            }
-
-            {
-                BuildingFactory factory = new BuildingFactory();
-                GameObject block = factory.NewBlock();
-                factory.SetPosition(block, Vector3.zero);
-            }
-        }
-
         /// <summary>
         /// The maximal depth of the node hierarchy.
         /// </summary>

@@ -159,6 +159,19 @@ namespace SEE.Layout
         {
             block.transform.localScale = scale;
         }
+
+        public override void SetPosition(GameObject block, Vector3 position)
+        {
+            // The default position of a game object in Unity is its center.
+            // Thus, the x and z co-ordinates are just fine. Yet, the y co-ordinate
+            // needs adjustment. position.y specifies the ground level of the block,
+            // whereas block.transform.position.y is assumed to be height center of a 
+            // game object by Unity. As a consequence, we need to lift position.y
+            // by half of the block's height. 
+
+            Vector3 size = GetSize(block);
+            block.transform.position = new Vector3(position.x, size.y / 2.0f, position.z);
+        }
     }
 }
 

@@ -84,6 +84,11 @@ namespace SEE.Layout
         protected bool showErosions;
 
         /// <summary>
+        /// The y co-ordinate of the ground where blocks are placed.
+        /// </summary>
+        protected const float groundLevel = 0.0f;
+
+        /// <summary>
         /// Returns the default material for edges using the materialPath.
         /// </summary>
         /// <returns>default material for edges</returns>
