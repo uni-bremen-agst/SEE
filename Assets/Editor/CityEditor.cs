@@ -238,8 +238,8 @@ namespace SEEEditor
                                                                   scaler,
                                                                   editorSettings.EdgeWidth,
                                                                   editorSettings.ShowErosions,
-                                                                  editorSettings.ShowDonuts,
-                                                                  editorSettings.EdgesAboveBlocks);
+                                                                  editorSettings.EdgesAboveBlocks,
+                                                                  editorSettings.ShowDonuts);
                         }
                         else
                         {
@@ -249,7 +249,7 @@ namespace SEEEditor
                                                                     blockFactory,
                                                                     scaler,
                                                                     editorSettings.EdgeWidth,
-                                                                    editorSettings.ShowDonuts,
+                                                                    editorSettings.ShowErosions,
                                                                     editorSettings.EdgesAboveBlocks);
                         }
                         layout.Draw(graph);
