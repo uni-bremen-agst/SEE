@@ -14,31 +14,6 @@ namespace SEE.Layout
         public abstract GameObject NewBlock();
 
         /// <summary>
-        /// Creates a new visual representation of the graph node and attaches it 
-        /// to the parent as one of its immediate children. This function is equivalent
-        /// to  AttachBlock(parent, NewBlock()).
-        /// </summary>
-        /// <param name="parent">parent of the visual representation of a graph node</param>
-        public virtual void AddBlock(GameObject parent)
-        {
-            AttachBlock(parent, NewBlock());
-        }
-
-        /// <summary>
-        /// Attaches an existing block to the parent as one of its immediate children.
-        /// Adds a BlockModifier accordingly. 
-        /// Note: This method must be extended by subclasses to attach the appropriate
-        /// BlockModifier.
-        /// </summary>
-        /// <param name="parent"></param>
-        /// <param name="block"></param>
-        public virtual void AttachBlock(GameObject parent, GameObject block)
-        {
-            block.transform.parent = parent.transform;
-            block.name = "house " + parent.name;
-        }
-
-        /// <summary>
         /// The length unit of a block representation in Unity measures.
         /// </summary>
         /// <returns>length unit of a block representation in Unity measure</returns>
