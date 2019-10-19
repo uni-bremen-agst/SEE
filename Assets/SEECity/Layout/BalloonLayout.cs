@@ -52,8 +52,6 @@ namespace SEE.Layout
 
         protected override void DrawNodes(Graph graph)
         {
-            DrawBlocks();
-            return;
             // puts the outermost circles of the roots next to each other;
             // later we might use a circle-packing algorithm instead,
             // e.g., https://www.codeproject.com/Articles/42067/D-Circle-Packing-Algorithm-Ported-to-Csharp
@@ -108,6 +106,7 @@ namespace SEE.Layout
             DrawPlane(roots, max_radius);
         }
 
+        // Just for experimentation of SetPosition.
         private void DrawBlocks()
         {
             {
@@ -921,7 +920,6 @@ namespace SEE.Layout
 
         protected override void DrawEdges(Graph graph)
         {
-            return; // FIXME
             // The distance between of the control points at the subsequent levels of the hierarchy.
             levelUnit = MaximalNodeHeight();
 
