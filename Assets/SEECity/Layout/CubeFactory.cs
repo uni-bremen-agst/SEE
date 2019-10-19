@@ -10,6 +10,9 @@ namespace SEE.Layout
     {
         private SerializableDictionary<PrimitiveType, GameObject> primitiveMeshes = new SerializableDictionary<PrimitiveType, GameObject>();
 
+        private const string shaderName = "Diffuse";
+        private readonly Shader shader = Shader.Find(shaderName);
+
         ~CubeFactory()
         {
             foreach (GameObject gameObject in primitiveMeshes.Values)
@@ -84,9 +87,6 @@ namespace SEE.Layout
             Material newMat;
             if (string.IsNullOrEmpty(materialPath))
             {
-                // FIXME: Store the shader for later use
-                const string shaderName = "Diffuse";
-                Shader shader = Shader.Find(shaderName);
                 if (shader != null)
                 {
                     newMat = new Material(shader);
