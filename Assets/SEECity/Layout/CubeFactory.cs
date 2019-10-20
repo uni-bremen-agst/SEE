@@ -12,6 +12,7 @@ namespace SEE.Layout
 
         private const string shaderName = "Diffuse";
         private readonly Shader shader = Shader.Find(shaderName);
+        private Material defaultMaterial;
 
         ~CubeFactory()
         {
@@ -23,15 +24,17 @@ namespace SEE.Layout
 
         public override GameObject NewBlock()
         {
-            GameObject result = new GameObject();
-            result.tag = Tags.Building;
+            GameObject result = new GameObject
+            {
+                tag = Tags.Building
+            };
             AddCubeMesh(result);
             return result;
         }
 
         private void AddCubeMesh(GameObject gameObject)
         {
-            AddMesh(gameObject, PrimitiveType.Cube, "BrickTextures/BricksTexture13/BricksTexture13");
+            AddMesh(gameObject, PrimitiveType.Cube, null); //, "BrickTextures/BricksTexture13/BricksTexture13");
         }
 
         private void AddCylinderMesh(GameObject gameObject, string materialPath)
@@ -87,15 +90,18 @@ namespace SEE.Layout
             Material newMat;
             if (string.IsNullOrEmpty(materialPath))
             {
-                if (shader != null)
+                if (defaultMaterial == null)
                 {
-                    newMat = new Material(shader);
+                    if (shader != null)
+                    {
+                        defaultMaterial = new Material(shader);
+                    }
+                    else
+                    {
+                        Debug.LogError("Could not find shader " + shaderName + "\n");
+                    }
                 }
-                else
-                {
-                    newMat = null;
-                    Debug.LogError("Could not find shader " + shaderName + "\n");
-                }
+                newMat = defaultMaterial;
             } 
             else
             {
