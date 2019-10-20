@@ -138,44 +138,23 @@ namespace SEE.Layout
             const float enlargementFactor = 1.12f; // should not be smaller than 1.0
 
             // Width of the plane underneath the root circles determined by the left-most and right-most circle.
-            float xLength = (gameObjects[roots[roots.Length - 1]].transform.position.x - gameObjects[roots[0]].transform.position.x
+            float width = (gameObjects[roots[roots.Length - 1]].transform.position.x - gameObjects[roots[0]].transform.position.x
                 + nodeInfos[roots[0]].outer_radius + nodeInfos[roots[roots.Length - 1]].outer_radius)
                 * enlargementFactor;
 
             // Breadth of the plane: double the radius. 
-            float zLength = (2.0f * max_radius) * enlargementFactor;
+            float depth = (2.0f * max_radius) * enlargementFactor;
 
-            plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            plane.tag = Tags.Decoration;
+            // Height of the plane.
+            float height = 1.0f;
 
             Vector3 leftRootCenter = gameObjects[roots[0]].transform.position;
-            float planePositionX = (leftRootCenter.x - nodeInfos[roots[0]].outer_radius) + (xLength / enlargementFactor / 2.0f);
+            float planePositionX = (leftRootCenter.x - nodeInfos[roots[0]].outer_radius) + (width / enlargementFactor / 2.0f);
             float planePositionY = leftRootCenter.y - 1.0f; // somewhat underneath roots
             float planePositionZ = leftRootCenter.z;
-            plane.transform.position = new Vector3(planePositionX, planePositionY, planePositionZ);
+            Vector3 centerPosition = new Vector3(planePositionX, planePositionY, planePositionZ);
 
-            Renderer planeRenderer = plane.GetComponent<Renderer>();
-            planeRenderer.sharedMaterial = new Material(planeRenderer.sharedMaterial);
-
-            planeRenderer.sharedMaterial.color = Color.gray;
-
-            // Turn off reflection of plane
-            planeRenderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
-            planeRenderer.sharedMaterial.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
-            planeRenderer.sharedMaterial.SetFloat("_SpecularHighlights", 0.0f);
-            // To turn reflection on again, use (_SPECULARHIGHLIGHTS_OFF and _GLOSSYREFLECTIONS_OFF
-            // work as toggle, there is no _SPECULARHIGHLIGHTS_ON and _GLOSSYREFLECTIONS_ON):
-            //planeRenderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
-            //planeRenderer.sharedMaterial.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
-            //planeRenderer.sharedMaterial.SetFloat("_SpecularHighlights", 1.0f);
-
-            // A plane is a flat square with edges ten units long oriented in the XZ plane of the local 
-            // coordinate space. Thus, the mesh of a plane is 10 times larger than its scale factors. 
-            // When we want a plane to have width 12 units, we need to devide the scale for the width 
-            // by 1.2.
-            const float planeMeshFactor = 10.0f;
-            Vector3 planeScale = new Vector3(xLength, 10.0f, zLength) / planeMeshFactor;
-            plane.transform.localScale = planeScale;
+            plane = PlaneFactory.NewPlane(centerPosition, Color.gray, width, depth, height);
         }
 
         /// <summary>
