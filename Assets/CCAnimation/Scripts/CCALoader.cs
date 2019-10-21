@@ -1,5 +1,6 @@
 ﻿using SEE;
 using SEE.DataModel;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -95,7 +96,10 @@ public class CCALoader
         {
             graphCreator.Load();
             Graph graph = graphCreator.GetGraph();
-            graph.Traverse(leafNode => leafNode.SetFloat("Metric.Clone_Rate", Random.value * 10));// TODO generate random test data for CloneRate
+
+            // TODO generate random test data for CloneRate
+            graph.Traverse(leafNode => leafNode.SetFloat("Metric.Clone_Rate", leafNode.GetInt("Metric.LOC")));
+
             return graph;
         }
     }

@@ -10,36 +10,36 @@ using System.Linq;
 public class CCALayout : ILayout
 {
     public CCALayout(bool showEdges,
-                         string widthMetric, string heightMetric, string breadthMetric,
-                         SerializableDictionary<string, IconFactory.Erosion> issueMap,
-                         string[] innerNodeMetrics,
-                         BlockFactory blockFactory,
-                         IScale scaler,
-                         float edgeWidth,
-                         bool showErosions,
-                         bool showDonuts)
-    : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
+                             string widthMetric, string heightMetric, string breadthMetric,
+                             SerializableDictionary<string, IconFactory.Erosion> issueMap,
+                             string[] innerNodeMetrics,
+                             BlockFactory blockFactory,
+                             IScale scaler,
+                             float edgeWidth,
+                             bool showErosions,
+                             bool edgesAboveBlocks,
+                             bool showDonuts)
+    : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions, edgesAboveBlocks)
     {
-        name = "Ballon";
-        this.showErosions = showErosions;
+        name = "CCABasic";
         this.showDonuts = showDonuts;
         this.innerNodeMetrics = innerNodeMetrics;
     }
 
     public CCALayout(bool showEdges,
-                         string widthMetric, string heightMetric, string breadthMetric,
-                         SerializableDictionary<string, IconFactory.Erosion> issueMap,
-                         string[] innerNodeMetrics,
-                         BlockFactory blockFactory,
-                         IScale scaler,
-                         float edgeWidth,
-                         bool showErosions,
-                         bool showDonuts,
-                         CCALayout oldLayout)
-    : this(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, innerNodeMetrics, blockFactory, scaler, edgeWidth, showErosions, showDonuts)
+                             string widthMetric, string heightMetric, string breadthMetric,
+                             SerializableDictionary<string, IconFactory.Erosion> issueMap,
+                             string[] innerNodeMetrics,
+                             BlockFactory blockFactory,
+                             IScale scaler,
+                             float edgeWidth,
+                             bool showErosions,
+                             bool edgesAboveBlocks,
+                             bool showDonuts,
+                             CCALayout oldLayout)
+    : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions, edgesAboveBlocks)
     {
-        name = "Ballon";
-        this.showErosions = showErosions;
+        name = "CCABasic";
         this.showDonuts = showDonuts;
         this.innerNodeMetrics = innerNodeMetrics;
         this.oldLayout = oldLayout;

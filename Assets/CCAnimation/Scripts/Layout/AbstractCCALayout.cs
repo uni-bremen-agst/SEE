@@ -49,12 +49,10 @@ public abstract class CCAAbstracLayout : ILayout
                          IScale scaler,
                          float edgeWidth,
                          bool showErosions,
-                         bool showDonuts)
-    : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
+                         bool edgesAboveBlocks)
+    : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions, edgesAboveBlocks)
     {
         name = "Ballon";
-        this.showErosions = showErosions;
-        this.showDonuts = showDonuts;
         this.innerNodeMetrics = innerNodeMetrics;
     }
 
