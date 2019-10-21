@@ -10,6 +10,10 @@ namespace SEE.Layout
     {
         private SerializableDictionary<PrimitiveType, GameObject> primitiveMeshes = new SerializableDictionary<PrimitiveType, GameObject>();
 
+        private const string shaderName = "Diffuse";
+        private readonly Shader shader = Shader.Find(shaderName);
+        private Material defaultMaterial;
+
         ~CubeFactory()
         {
             foreach (GameObject gameObject in primitiveMeshes.Values)
@@ -20,15 +24,17 @@ namespace SEE.Layout
 
         public override GameObject NewBlock()
         {
-            GameObject result = new GameObject();
-            result.tag = Tags.Building;
+            GameObject result = new GameObject
+            {
+                tag = Tags.Building
+            };
             AddCubeMesh(result);
             return result;
         }
 
         private void AddCubeMesh(GameObject gameObject)
         {
-            AddMesh(gameObject, PrimitiveType.Cube, "BrickTextures/BricksTexture13/BricksTexture13");
+            AddMesh(gameObject, PrimitiveType.Cube, null); //, "BrickTextures/BricksTexture13/BricksTexture13");
         }
 
         private void AddCylinderMesh(GameObject gameObject, string materialPath)
@@ -84,18 +90,18 @@ namespace SEE.Layout
             Material newMat;
             if (string.IsNullOrEmpty(materialPath))
             {
-                // FIXME: Store the shader for later use
-                const string shaderName = "Diffuse";
-                Shader shader = Shader.Find(shaderName);
-                if (shader != null)
+                if (defaultMaterial == null)
                 {
-                    newMat = new Material(shader);
+                    if (shader != null)
+                    {
+                        defaultMaterial = new Material(shader);
+                    }
+                    else
+                    {
+                        Debug.LogError("Could not find shader " + shaderName + "\n");
+                    }
                 }
-                else
-                {
-                    newMat = null;
-                    Debug.LogError("Could not find shader " + shaderName + "\n");
-                }
+                newMat = defaultMaterial;
             } 
             else
             {
@@ -104,8 +110,8 @@ namespace SEE.Layout
             
             if (newMat != null)
             {
-                renderer.material = newMat;
-                //renderer.sharedMaterial = newMat;
+                //renderer.material = newMat;
+                renderer.sharedMaterial = newMat;
             }
             else
             {
@@ -117,6 +123,11 @@ namespace SEE.Layout
 
             // Object should be static so that we save rendering time at run-time.
             gameObject.isStatic = true;
+
+            // Turn off reflection
+            renderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
+            renderer.sharedMaterial.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
+            renderer.sharedMaterial.SetFloat("_SpecularHighlights", 0.0f);
         }
 
         /// <summary>
