@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2637723665296559952}
   - component: {fileID: 2637723665296559955}
+  - component: {fileID: 7167062139765021778}
+  - component: {fileID: 4096480624022493778}
   m_Layer: 0
   m_Name: CCAnimationManager
   m_TagString: CCAnimation
@@ -45,6 +47,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   revisionNumberText: {fileID: 868880175780350678}
+  stateManager: {fileID: 7167062139765021778}
+--- !u!114 &7167062139765021778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2637723665296559954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ad7a99706a6bd040a79bfeeb92e73a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  graphRender: {fileID: 4096480624022493778}
+--- !u!114 &4096480624022493778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2637723665296559954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f89ea367c785c44ebd9f3c6ce2824c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2505441218421789425
 PrefabInstance:
   m_ObjectHideFlags: 0
