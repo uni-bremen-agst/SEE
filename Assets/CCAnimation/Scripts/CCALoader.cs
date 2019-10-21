@@ -16,13 +16,11 @@ public class CCALoader
     public readonly Dictionary<string, Graph> graphs = new Dictionary<string, Graph>();
     public readonly List<string> graphOrder = new List<string>();
 
-    /// <summary>
-    /// TODO: doc 
-    /// </summary>
-    public void loadGraph()
+    public void Init()
     {
         string projectPath = Application.dataPath.Replace('/', '\\') + '\\';
         settings.pathPrefix = projectPath;
+        settings.ShowDonuts = false;
         AddAllRevisions();
     }
 
@@ -97,6 +95,7 @@ public class CCALoader
         {
             graphCreator.Load();
             Graph graph = graphCreator.GetGraph();
+            graph.Traverse(leafNode => leafNode.SetFloat("Metric.Clone_Rate", Random.value * 10));// TODO generate random test data for CloneRate
             return graph;
         }
     }
