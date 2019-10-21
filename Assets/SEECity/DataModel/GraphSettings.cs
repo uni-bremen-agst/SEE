@@ -11,7 +11,7 @@ namespace SEE
         /// <summary>
         /// The prefix of the absolute paths for the GXL and CSV data.
         /// </summary>        
-        public string pathPrefix;
+        public string pathPrefix = null;
 
         /// Tiny clone graph with single root to experiment with.
         public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
@@ -119,7 +119,7 @@ namespace SEE
         public bool CScapeBuildings = true;
 
         // The width of edges.
-        public float EdgeWidth = 1.0f;
+        public float EdgeWidth = 0.3f;
 
         /// <summary>
         /// Whether erosions should be visible above blocks.
@@ -135,6 +135,13 @@ namespace SEE
         /// Whether edges should be shown.
         /// </summary>
         public bool ShowEdges = true;
+
+        /// <summary>
+        /// Orientation of the edges; 
+        /// if false, the edges are drawn below the houses;
+        /// if true, the edges are drawn above the houses;
+        /// </summary>
+        public bool EdgesAboveBlocks = true;
 
         public string[] InnerNodeMetrics = new string[] { "Metric.Quality",
                                                           "Metric.McCabe_Complexity.sum",

@@ -5,8 +5,6 @@ using SEE;
 using SEE.Layout;
 using System.Collections.Generic;
 using UnityEngine.XR;
-using System.Collections;
-using System;
 
 namespace SEEEditor
 {
@@ -35,15 +33,29 @@ namespace SEEEditor
         }
 
         // As to whether the optional settings for node and edge tags are to be enabled.
-        private bool tagGroupEnabled = false;
+        //private bool tagGroupEnabled = false;
 
+        /// <summary>
+        /// The graph that is visualized in the scene.
+        /// </summary>
         private Graph graph = null;
 
+        /// <summary>
+        /// The user settings.
+        /// </summary>
         private SEE.GraphSettings editorSettings = new SEE.GraphSettings();
 
+        /// <summary>
+        /// The factory for the kinds of node visualizations to be used as requested by the user.
+        /// </summary>
         private SEE.Layout.ILayout layout;
 
-        private string ProjectPath()
+        /// <summary>
+        /// The factory for the kinds of node visualizations to be used as requested by the user.
+        /// </summary>
+        BlockFactory blockFactory;
+
+        private static string ProjectPath()
         {
             string result = Application.dataPath;
             // Unity uses Unix directory separator; we need Windows here
@@ -129,8 +141,19 @@ namespace SEEEditor
         /// </summary>
         void OnGUI()
         {
+            // Important note: OnGUI is called whenever the windows gets or looses the focus
+            // as well as when any of its widgets are hovered by the mouse cursor. For this
+            // reason, do not run any expensive algorithm here unless it is really needed,
+            // that is, only when any of its buttons is pressed or any of its entry are updated.
+
             GUILayout.Label("Graph", EditorStyles.boldLabel);
-            editorSettings.pathPrefix = EditorGUILayout.TextField("Project path prefix", ProjectPath());
+            if (editorSettings.pathPrefix == null)
+            {
+                // Application.dataPath (used within ProjectPath()) must not be called in a 
+                // constructor. That is why we need to set it here if it is not yet defined.
+                editorSettings.pathPrefix = ProjectPath();
+            }
+            editorSettings.pathPrefix = EditorGUILayout.TextField("Project path prefix", editorSettings.pathPrefix);
             editorSettings.gxlPath = EditorGUILayout.TextField("GXL file", editorSettings.gxlPath);
             editorSettings.csvPath = EditorGUILayout.TextField("CSV file", editorSettings.csvPath);
 
@@ -141,17 +164,19 @@ namespace SEEEditor
 
             GUILayout.Label("VR settings", EditorStyles.boldLabel);
             VRenabled = EditorGUILayout.Toggle("Enable VR", VRenabled);
-            EnableVR(VRenabled);
 
-            GUILayout.Label("Visual attributes", EditorStyles.boldLabel);
+            GUILayout.Label("Visual node attributes", EditorStyles.boldLabel);
             editorSettings.BallonLayout = EditorGUILayout.Toggle("Balloon Layout", editorSettings.BallonLayout);
             editorSettings.CScapeBuildings = EditorGUILayout.Toggle("CScape buildings", editorSettings.CScapeBuildings);
             editorSettings.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", editorSettings.ZScoreScale);
+            editorSettings.ShowDonuts = EditorGUILayout.Toggle("Show Donut charts", editorSettings.ShowDonuts);
+
+            GUILayout.Label("Visual edge attributes", EditorStyles.boldLabel);
             editorSettings.EdgeWidth = EditorGUILayout.FloatField("Edge width", editorSettings.EdgeWidth);
             editorSettings.ShowEdges = EditorGUILayout.Toggle("Show edges", editorSettings.ShowEdges);
             editorSettings.ShowErosions = EditorGUILayout.Toggle("Show erosions", editorSettings.ShowErosions);
-            editorSettings.ShowDonuts = EditorGUILayout.Toggle("Show Donut charts", editorSettings.ShowDonuts);
-
+            editorSettings.EdgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", editorSettings.EdgesAboveBlocks);
+            
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
             // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
 
@@ -165,21 +190,20 @@ namespace SEEEditor
             string[] actionLabels = new string[] { "Load City", "Delete City" };
             int selectedAction = GUILayout.SelectionGrid(-1, actionLabels, actionLabels.Length, GUILayout.Width(width), GUILayout.Height(height));
 
-            BlockFactory blockFactory;
-            if (editorSettings.CScapeBuildings)
-            {
-                blockFactory = new BuildingFactory();
-            }
-            else
-            {
-                blockFactory = new CubeFactory();
-            }
-            // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
-            AdjustCameraSpeed(blockFactory.Unit());
-
             switch (selectedAction)
             {
-                case 0:
+                case 0: // Load City
+                    // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
+                    EnableVR(VRenabled);
+                    if (editorSettings.CScapeBuildings)
+                    {
+                        blockFactory = new BuildingFactory();
+                    }
+                    else
+                    {
+                        blockFactory = new CubeFactory();
+                    }
+                    AdjustCameraSpeed(blockFactory.Unit());
                     graph = SceneGraphs.Add(editorSettings);
                     int numberOfErrors = MetricImporter.Load(graph, editorSettings.CSVPath());
                     if (numberOfErrors > 0)
@@ -214,6 +238,7 @@ namespace SEEEditor
                                                                   scaler,
                                                                   editorSettings.EdgeWidth,
                                                                   editorSettings.ShowErosions,
+                                                                  editorSettings.EdgesAboveBlocks,
                                                                   editorSettings.ShowDonuts);
                         }
                         else
@@ -223,7 +248,9 @@ namespace SEEEditor
                                                                     editorSettings.IssueMap(),
                                                                     blockFactory,
                                                                     scaler,
-                                                                    editorSettings.EdgeWidth);
+                                                                    editorSettings.EdgeWidth,
+                                                                    editorSettings.ShowErosions,
+                                                                    editorSettings.EdgesAboveBlocks);
                         }
                         layout.Draw(graph);
                     }
@@ -232,14 +259,15 @@ namespace SEEEditor
                         Debug.LogError("No graph loaded.\n");
                     }
                     break;
-                case 1:
+
+                case 1:  // Delete City
                     Reset();
 
                     break;
                 default:
                     break;
             }
-            this.Repaint();
+            //this.Repaint();
         }
 
         /// <summary>
@@ -270,7 +298,7 @@ namespace SEEEditor
         {
             SceneGraphs.DeleteAll();
             graph = null;
-            //CubeFactory.Reset();
+            blockFactory = null;
             if (layout != null)
             {
                 layout = null;
@@ -295,12 +323,18 @@ namespace SEEEditor
         /// <param name="tag">tag of the game objects to be destroyed.</param>
         private void DeleteByTag(string tag)
         {
-            GameObject[] objects = GameObject.FindGameObjectsWithTag(tag);
-            Debug.Log("Deleting objects: " + objects.Length + "\n");
-            foreach (GameObject o in objects)
+            int count = 0;
+            // Note: FindObjectsOfTypeAll retrieves all objects including non-active ones, which is
+            // necessary for prefabs serving as prototypes for active game objects.
+            foreach (GameObject go in Resources.FindObjectsOfTypeAll(typeof(GameObject)) as GameObject[])
             {
-                DestroyImmediate(o);
+                if (go.tag == tag)
+                {
+                    Destroyer.DestroyGameObject(go);
+                    count++;
+                }
             }
+            Debug.LogFormat("Deleted {0} objects tagged {1}.\n", count, tag);
         }
     }
 }
