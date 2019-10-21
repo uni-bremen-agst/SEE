@@ -10,36 +10,36 @@ using System.Linq;
 public class LayoutTest : ILayout
 {
     public LayoutTest(bool showEdges,
-                         string widthMetric, string heightMetric, string breadthMetric,
-                         SerializableDictionary<string, IconFactory.Erosion> issueMap,
-                         string[] innerNodeMetrics,
-                         BlockFactory blockFactory,
-                         IScale scaler,
-                         float edgeWidth,
-                         bool showErosions,
-                         bool showDonuts)
-    : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
+                             string widthMetric, string heightMetric, string breadthMetric,
+                             SerializableDictionary<string, IconFactory.Erosion> issueMap,
+                             string[] innerNodeMetrics,
+                             BlockFactory blockFactory,
+                             IScale scaler,
+                             float edgeWidth,
+                             bool showErosions,
+                             bool edgesAboveBlocks,
+                             bool showDonuts)
+    : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions, edgesAboveBlocks)
     {
-        name = "Ballon";
-        this.showErosions = showErosions;
+        name = "CCATest";
         this.showDonuts = showDonuts;
         this.innerNodeMetrics = innerNodeMetrics;
     }
 
     public LayoutTest(bool showEdges,
-                         string widthMetric, string heightMetric, string breadthMetric,
-                         SerializableDictionary<string, IconFactory.Erosion> issueMap,
-                         string[] innerNodeMetrics,
-                         BlockFactory blockFactory,
-                         IScale scaler,
-                         float edgeWidth,
-                         bool showErosions,
-                         bool showDonuts,
-                         LayoutTest oldLayout)
-    : this(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, innerNodeMetrics, blockFactory, scaler, edgeWidth, showErosions, showDonuts)
+                             string widthMetric, string heightMetric, string breadthMetric,
+                             SerializableDictionary<string, IconFactory.Erosion> issueMap,
+                             string[] innerNodeMetrics,
+                             BlockFactory blockFactory,
+                             IScale scaler,
+                             float edgeWidth,
+                             bool showErosions,
+                             bool edgesAboveBlocks,
+                             bool showDonuts,
+                             LayoutTest oldLayout)
+    : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions, edgesAboveBlocks)
     {
-        name = "Ballon";
-        this.showErosions = showErosions;
+        name = "CCATest";
         this.showDonuts = showDonuts;
         this.innerNodeMetrics = innerNodeMetrics;
         this.oldLayout = oldLayout;

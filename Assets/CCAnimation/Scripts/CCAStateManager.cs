@@ -141,6 +141,7 @@ public class CCAStateManager : MonoBehaviour
             scaler,
             editorSettings.EdgeWidth,
             editorSettings.ShowErosions,
+            editorSettings.EdgesAboveBlocks,
             editorSettings.ShowDonuts
         );
         layout.Draw(graph);

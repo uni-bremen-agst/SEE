@@ -16,8 +16,8 @@ public class CAALayoutStateless : CCAAbstracLayout
                          IScale scaler,
                          float edgeWidth,
                          bool showErosions,
-                         bool showDonuts)
-    : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, innerNodeMetrics, null, scaler, edgeWidth, showErosions, showDonuts)
+                         bool edgesAboveBlocks)
+    : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, innerNodeMetrics, null, scaler, edgeWidth, showErosions, edgesAboveBlocks)
     {
 
     }
