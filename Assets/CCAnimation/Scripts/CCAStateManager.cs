@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections;
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class CCAStateManager : MonoBehaviour
@@ -108,8 +109,11 @@ public class CCAStateManager : MonoBehaviour
         //graphRender.TransitionToPreviousGraph(graph, editorSettings);
     }
 
+    LayoutTest layoutTest = null;
+
     void RenderLayout(Graph graph)
     {
+        /*
         foreach (string tag in SEE.DataModel.Tags.All)
         {
             foreach (GameObject o in GameObject.FindGameObjectsWithTag(tag))
@@ -117,6 +121,7 @@ public class CCAStateManager : MonoBehaviour
                 DestroyImmediate(o);
             }
         }
+        */
         BlockFactory blockFactory;
         if (editorSettings.CScapeBuildings)
         {
@@ -142,8 +147,13 @@ public class CCAStateManager : MonoBehaviour
             editorSettings.EdgeWidth,
             editorSettings.ShowErosions,
             editorSettings.EdgesAboveBlocks,
-            editorSettings.ShowDonuts
+            editorSettings.ShowDonuts,
+            layoutTest
         );
         layout.Draw(graph);
+        layoutTest?.circleTexts.Values.ToList().ForEach(Destroy);
+        layoutTest?.edges.Values.ToList().ForEach(Destroy);
+        layoutTest?.gameObjects.Values.ToList().ForEach(Destroy);
+        layoutTest = layout;
     }
 }
