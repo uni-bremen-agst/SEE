@@ -14,31 +14,6 @@ namespace SEE.Layout
         public abstract GameObject NewBlock();
 
         /// <summary>
-        /// Creates a new visual representation of the graph node and attaches it 
-        /// to the parent as one of its immediate children. This function is equivalent
-        /// to  AttachBlock(parent, NewBlock()).
-        /// </summary>
-        /// <param name="parent">parent of the visual representation of a graph node</param>
-        public virtual void AddBlock(GameObject parent)
-        {
-            AttachBlock(parent, NewBlock());
-        }
-
-        /// <summary>
-        /// Attaches an existing block to the parent as one of its immediate children.
-        /// Adds a BlockModifier accordingly. 
-        /// Note: This method must be extended by subclasses to attach the appropriate
-        /// BlockModifier.
-        /// </summary>
-        /// <param name="parent"></param>
-        /// <param name="block"></param>
-        public virtual void AttachBlock(GameObject parent, GameObject block)
-        {
-            block.transform.parent = parent.transform;
-            block.name = "house " + parent.name;
-        }
-
-        /// <summary>
         /// The length unit of a block representation in Unity measures.
         /// </summary>
         /// <returns>length unit of a block representation in Unity measure</returns>
@@ -81,16 +56,13 @@ namespace SEE.Layout
         public abstract void ScaleBlock(GameObject block, Vector3 scale);
 
         /// <summary>
-        /// Sets the position of the current block. The given position is interpreted
-        /// as the center of the block.
+        /// Sets the position of the current block. The given x and z positions are interpreted
+        /// as the center of the block and the y co-ordinate specifies the ground level of the 
+        /// block.
         /// </summary>
         /// <param name="block">block to be positioned</param>
         /// <param name="position">where to position the block</param>
-        public virtual void SetPosition(GameObject block, Vector3 position)
-        {
-            // the default position of a game object in Unity is its center
-            block.transform.position = position;
-        }
+        public abstract void SetPosition(GameObject block, Vector3 position);
 
         /// <summary>
         /// Returns the center of the roof of the given block.

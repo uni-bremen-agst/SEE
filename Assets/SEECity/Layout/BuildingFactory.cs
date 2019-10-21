@@ -59,10 +59,6 @@ namespace SEE.Layout
                 {
                     Debug.LogErrorFormat("[BuildingFactory] Could not load building prefab {0}.\n", path);
                 }
-                else
-                {
-                    Debug.LogFormat("[BuildingFactory] Loaded building prefab {0}.\n", path);
-                }
                 i++;
             }
             return result;
@@ -152,6 +148,7 @@ namespace SEE.Layout
                 buildingModifier.buildingDepth = 5;
                 buildingModifier.useAdvertising = true;
                 buildingModifier.useGraffiti = true;
+                buildingModifier.extendFoundations = 0.0f;
                 buildingModifier.AwakeCity();
                 buildingModifier.UpdateCity();
             }

@@ -10,6 +10,10 @@ namespace SEE.Layout
     {
         private SerializableDictionary<PrimitiveType, GameObject> primitiveMeshes = new SerializableDictionary<PrimitiveType, GameObject>();
 
+        private const string shaderName = "Diffuse";
+        private readonly Shader shader = Shader.Find(shaderName);
+        private Material defaultMaterial;
+
         ~CubeFactory()
         {
             foreach (GameObject gameObject in primitiveMeshes.Values)
@@ -20,29 +24,32 @@ namespace SEE.Layout
 
         public override GameObject NewBlock()
         {
-            GameObject result = new GameObject();
-            AddCube(result);
+            GameObject result = new GameObject
+            {
+                tag = Tags.Building
+            };
+            AddCubeMesh(result);
             return result;
         }
 
-        private void AddCube(GameObject gameObject)
+        private void AddCubeMesh(GameObject gameObject)
         {
-            AddMesh(gameObject, PrimitiveType.Cube, "BrickTextures/BricksTexture13/BricksTexture13");
+            AddMesh(gameObject, PrimitiveType.Cube, null); //, "BrickTextures/BricksTexture13/BricksTexture13");
         }
 
-        private void AddCylinder(GameObject gameObject, string materialPath)
+        private void AddCylinderMesh(GameObject gameObject, string materialPath)
         {
             AddMesh(gameObject, PrimitiveType.Cylinder, materialPath);
         }
 
         public void AddTerrain(GameObject gameObject)
         {
-            AddCylinder(gameObject, "Grass/Grass FD 1 diffuse");
+            AddCylinderMesh(gameObject, "Grass/Grass FD 1 diffuse");
         }
 
         public void AddFrontYard(GameObject gameObject)
         {
-            AddCylinder(gameObject, "Grass/Sand FD 1 diffuse");
+            AddCylinderMesh(gameObject, "Grass/Sand FD 1 diffuse");
         }
 
         /// <summary>
@@ -83,18 +90,18 @@ namespace SEE.Layout
             Material newMat;
             if (string.IsNullOrEmpty(materialPath))
             {
-                // FIXME: Store the shader for later use
-                const string shaderName = "Diffuse";
-                Shader shader = Shader.Find(shaderName);
-                if (shader != null)
+                if (defaultMaterial == null)
                 {
-                    newMat = new Material(shader);
+                    if (shader != null)
+                    {
+                        defaultMaterial = new Material(shader);
+                    }
+                    else
+                    {
+                        Debug.LogError("Could not find shader " + shaderName + "\n");
+                    }
                 }
-                else
-                {
-                    newMat = null;
-                    Debug.LogError("Could not find shader " + shaderName + "\n");
-                }
+                newMat = defaultMaterial;
             } 
             else
             {
@@ -103,8 +110,8 @@ namespace SEE.Layout
             
             if (newMat != null)
             {
-                renderer.material = newMat;
-                //renderer.sharedMaterial = newMat;
+                //renderer.material = newMat;
+                renderer.sharedMaterial = newMat;
             }
             else
             {
@@ -117,7 +124,10 @@ namespace SEE.Layout
             // Object should be static so that we save rendering time at run-time.
             gameObject.isStatic = true;
 
-            
+            // Turn off reflection
+            renderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
+            renderer.sharedMaterial.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
+            renderer.sharedMaterial.SetFloat("_SpecularHighlights", 0.0f);
         }
 
         /// <summary>
@@ -159,6 +169,19 @@ namespace SEE.Layout
         public override void ScaleBlock(GameObject block, Vector3 scale)
         {
             block.transform.localScale = scale;
+        }
+
+        public override void SetPosition(GameObject block, Vector3 position)
+        {
+            // The default position of a game object in Unity is its center.
+            // Thus, the x and z co-ordinates are just fine. Yet, the y co-ordinate
+            // needs adjustment. position.y specifies the ground level of the block,
+            // whereas block.transform.position.y is assumed to be height center of a 
+            // game object by Unity. As a consequence, we need to lift position.y
+            // by half of the block's height. 
+
+            Vector3 size = GetSize(block);
+            block.transform.position = new Vector3(position.x, size.y / 2.0f, position.z);
         }
     }
 }

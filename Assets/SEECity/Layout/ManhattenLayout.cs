@@ -1,6 +1,5 @@
 ﻿using SEE.DataModel;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -12,8 +11,10 @@ namespace SEE.Layout
                                SerializableDictionary<string, IconFactory.Erosion> issueMap,
                                BlockFactory blockFactory,
                                IScale scaler,
-                               float edgeWidth)
-            : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth)
+                               float edgeWidth,
+                               bool showErosions,
+                               bool edgesAboveBlocks)
+            : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions, edgesAboveBlocks)
         {
             name = "Manhattan";
         }
@@ -22,39 +23,54 @@ namespace SEE.Layout
         // Must not exceed 1.0f.
         protected const float minimalLength = 0.1f;
 
+        // The maximal height of all blocks. If edges are drawn above the blocks, they
+        // will be drawn somewhat above this value relative to the blocks ground.
+        private float maxBlockHeight = 0.0f;
+
         // precondition: the GameObjects and their meshes have already been created for all nodes
         protected override void DrawNodes(Graph graph)
         {
             int numberOfBuildingsPerRow = (int)Mathf.Sqrt(graph.NodeCount);
             int column = 0;
+            int row = 1;
             const float distanceBetweenBuildings = 1.0f;
-            float maxZ = 0.0f;  // maximal depth of a building in a row
-            float positionX = 0.0f;
-            float positionZ = 0.0f;
+            float minX = 0.0f;         // minimal x co-ordinate of a block
+            float maxZ = 0.0f;         // maximal depth of a building in a row
+            float maxZinFirstRow = 0.0f; // the value of maxZ in the first row
+            float positionX = 0.0f;    // co-ordinate in a column of the grid
+            float positionZ = 0.0f;    // co-ordinate in a row of the grid
+            float maxPositionX = 0.0f; // maximal value of any positionX
 
-            foreach (GameObject sceneNode in graph.GetNodes())
-            {
-                // Note: sceneNode is only be a container for the actual building.
-
-                // The logical node represented by this game object.
-                Node node = sceneNode.GetComponent<Node>();
-                if (node == null)
-                {
-                    Debug.LogError("Scene node " + sceneNode.name + " does not have a graph node component.\n");
-                }
-                else if (node.IsLeaf())
+            // Draw all nodes on a grid. position
+            foreach (Node node in graph.Nodes())
+            { 
+                if (node.IsLeaf())
                 {
                     // We only draw leaves.
 
                     GameObject block = blockFactory.NewBlock();
+                    block.name = node.LinkName;
+                    gameObjects[node] = block;
 
                     column++;
                     if (column > numberOfBuildingsPerRow)
                     {
                         // exceeded length of the square => start a new row
+                        if (row == 1)
+                        {
+                            // we are about to start the first column in the second row;
+                            // thus, we have seen a blocks in the first row and can set
+                            // maxZinFirstRow accordingly
+                            maxZinFirstRow = maxZ;
+                        }
+                        row++;
                         column = 1;
                         positionZ += maxZ + distanceBetweenBuildings;
                         maxZ = 0.0f;
+                        if (positionX > maxPositionX)
+                        {
+                            maxPositionX = positionX;
+                        }
                         positionX = 0.0f;
                     }
                     // Scaled metric values for the dimensions.
@@ -67,26 +83,32 @@ namespace SEE.Layout
 
                     // size is independent of the sceneNode
                     Vector3 size = blockFactory.GetSize(block);
-                    blockFactory.AttachBlock(sceneNode, block);
                     if (size.z > maxZ)
                     {
                         maxZ = size.z;
                     }
+                    if (size.y > maxBlockHeight)
+                    {
+                        maxBlockHeight = size.y;
+                    }
+                    
                     positionX += size.x / 2.0f;
                     // The position is the center of a GameObject. We want all GameObjects
-                    // be placed at the same ground level 0. That is why we need to "lift"
-                    // every building by half of its height.
-                    sceneNode.transform.position = new Vector3(positionX, scale.y / 2.0f, positionZ);
+                    // be placed at the same ground level 0. 
+                    blockFactory.SetPosition(block, new Vector3(positionX, groundLevel, positionZ));
+
                     positionX += size.x / 2.0f + distanceBetweenBuildings;
+
+                    if (showErosions)
+                    {
+                        AddErosionIssues(node, scaler);
+                    }
                 }
             }
+            // positionZ is the last row in which a block was added
+            PlaneFactory.NewPlane(0.0f, -maxZinFirstRow / 2.0f, maxPositionX - distanceBetweenBuildings, positionZ + maxZ / 2.0f,
+                                  groundLevel, Color.gray);
         }
-
-        // orientation of the edges; 
-        // if -1, the edges are drawn below the houses;
-        // if 1, the edges are drawn above the houses;
-        // use either -1 or 1
-        private const float orientation = -1f;
 
         /// <summary>
         /// Creates the GameObjects representing the edges of the graph.
@@ -94,13 +116,14 @@ namespace SEE.Layout
         /// </summary>
         protected override void DrawEdges(Graph graph)
         {
-            // FIXME
-            /*
-            // The distance of the edges relative to the houses; the maximal height of
-            // a house is 1.0. This offset is used to draw the line somewhat below
+            // The offset of the edges above or below the ground chosen relative 
+            // to the height of the largest block.
+            // This offset is used to draw the line somewhat below
             // or above the house (depending on the orientation).
-            const float maxHeight = 1f;
-            const float offset = maxHeight * 0.1f; // must be positive
+            float offset = maxBlockHeight * 0.1f; // must be positive
+            // The level at which edges are drawn. This value is used only if the
+            // edges are to be drawn above the blocks.
+            float edgeLevel = maxBlockHeight + offset;
 
             //Material newMat = Resources.Load<Material>(materialPath);
             Material newMat = new Material(defaultLineMaterial);
@@ -110,89 +133,86 @@ namespace SEE.Layout
                 return;
             }
 
-            foreach (GameObject gameEdge in graph.GetEdges())
+            foreach (Edge edge in graph.Edges())
             {
-                Edge edge = gameEdge.GetComponent<Edge>();
-
-                if (edge != null)
+                Node source = edge.Source;
+                Node target = edge.Target;
+                if (source != null && target != null)
                 {
-                    Node source = edge.Source;
-                    Node target = edge.Target;
-                    if (source != null && target != null)
+                    GameObject gameEdge = new GameObject
                     {
-                        GameObject sourceObject = source.gameObject;
-                        GameObject targetObject = target.gameObject;
+                        tag = Tags.Edge,
+                        isStatic = true,
+                        name = edge.Type + "(" + source.LinkName + ", " + target.LinkName + ")"
+                    };
+                    // gameEdge does not yet have a renderer; we add a new one
+                    LineRenderer line = gameEdge.AddComponent<LineRenderer>();
 
-                        LineRenderer line = gameEdge.GetComponent<LineRenderer>();
-                        if (line == null)
+                    GameObject sourceObject = gameObjects[source];
+                    GameObject targetObject = gameObjects[target];
+
+                    {
+                        // use sharedMaterial if changes to the original material should affect all
+                        // objects using this material; renderer.material instead will create a copy
+                        // of the material and will not be affected by changes of the original material
+                        line.sharedMaterial = newMat;
+
+                        LineFactory.SetDefaults(line);
+                        LineFactory.SetWidth(line, edgeWidth * blockFactory.Unit());
+
+                        // If enabled, the lines are defined in world space.
+                        // This means the object's position is ignored, and the lines are rendered around 
+                        // world origin.
+                        line.useWorldSpace = true;
+
+                        // define the points along the line
+                        Vector3 sourceCenterToBorder = blockFactory.GetSize(sourceObject) / 2.0f;
+                        Vector3 targetCenterToBorder = blockFactory.GetSize(targetObject) / 2.0f;
+                        line.positionCount = 4; // number of vertices
+                        Vector3[] points = new Vector3[line.positionCount];
+
+                        if (edgesAboveBlocks)
                         {
-                            // gameEdge does not yet have a renderer; we add a new one
-                            line = gameEdge.AddComponent<LineRenderer>();
-                        }
-                        if (line != null)
-                        {
-                            // use sharedMaterial if changes to the original material should affect all
-                            // objects using this material; renderer.material instead will create a copy
-                            // of the material and will not be affected by changes of the original material
-                            line.sharedMaterial = newMat;
+                            points[0] = blockFactory.Roof(sourceObject); 
+                            points[3] = blockFactory.Roof(targetObject);
 
-                            LineFactory.SetDefaults(line);
-                            
-                            // If enabled, the lines are defined in world space.
-                            // This means the object's position is ignored, and the lines are rendered around 
-                            // world origin.
-                            line.useWorldSpace = true;
-
-                            // define the points along the line
-                            Vector3 sourceCenterToBorder = GetExtent(sourceObject);
-                            Vector3 targetCenterToBorder = GetExtent(targetObject);
-                            line.positionCount = 4; // number of vertices
-                            Vector3[] points = new Vector3[line.positionCount];
-
-                            // starting position
-                            points[0] = sourceObject.transform.position; // center of source node
-                            points[0].y += orientation * sourceCenterToBorder.y; // floor/ceiling
-
-                            // position below/above starting position
-                            points[1] = points[0];
-                            points[1].y += orientation * offset;
-
-                            // ending position
-                            points[3] = targetObject.transform.position; // center of target node
-                            points[3].y += orientation * targetCenterToBorder.y; // floor/ceiling
-
-                            // position below/above ending position
-                            points[2] = points[3];
-                            points[2].y += orientation * offset;
-
-                            line.SetPositions(points);
-
-                            // put a capsule collider around the straight main line
-                            // (the one from points[1] to points[2]
-                            CapsuleCollider capsule = gameEdge.AddComponent<CapsuleCollider>();
-                            capsule.radius = Math.Max(line.startWidth, line.endWidth) / 2.0f;
-                            capsule.center = Vector3.zero;
-                            capsule.direction = 2; // Z-axis for easier "LookAt" orientation
-                            capsule.transform.position = points[1] + (points[2] - points[1]) / 2;
-                            capsule.transform.LookAt(points[1]);
-                            capsule.height = (points[2] - points[1]).magnitude;
+                            points[1] = blockFactory.Ground(sourceObject);
+                            points[1].y = edgeLevel;
+                            points[2] = blockFactory.Ground(targetObject);
+                            points[2].y = edgeLevel;
                         }
                         else
                         {
-                            Debug.LogError("Cannot attach renderer on scene edge " + gameEdge.name + ".\n");
+                            points[0] = blockFactory.Ground(sourceObject);
+                            points[3] = blockFactory.Ground(targetObject);
+
+                            // position below/above starting position
+                            points[1] = points[0];
+                            points[1].y -= offset;
+
+                            // position below/above ending position
+                            points[2] = points[3];
+                            points[2].y -= offset;
                         }
-                    }
-                    else
-                    {
-                        Debug.LogError("Scene edge " + gameEdge.name + " has a missing source or target.\n");
+
+                        line.SetPositions(points);
+
+                        // put a capsule collider around the straight main line
+                        // (the one from points[1] to points[2]
+                        CapsuleCollider capsule = gameEdge.AddComponent<CapsuleCollider>();
+                        capsule.radius = Math.Max(line.startWidth, line.endWidth) / 2.0f;
+                        capsule.center = Vector3.zero;
+                        capsule.direction = 2; // Z-axis for easier "LookAt" orientation
+                        capsule.transform.position = points[1] + (points[2] - points[1]) / 2;
+                        capsule.transform.LookAt(points[1]);
+                        capsule.height = (points[2] - points[1]).magnitude;
                     }
                 }
                 else
                 {
-                    Debug.LogError("Scene edge " + gameEdge.name + " does not have a graph edge component.\n");
+                    Debug.LogErrorFormat("Edge of type {0} has a missing source or target.\n", edge.Type);
                 }
             }
-            */
         }
     }
 }
