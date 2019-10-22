@@ -14,20 +14,21 @@ public class CCAStateManager : MonoBehaviour
     private CCALoader graphLoader = new CCALoader();
     //public CCARender graphRender;
     private LayoutTest layout;
+    private IScale scaler;
 
     private int openGraphIndex = 0;
 
-    private GraphSettings editorSettings
+    private GraphSettings EditorSettings
     {
         get { return graphLoader.settings; }
     }
 
-    private Dictionary<string, Graph> graphs
+    private Dictionary<string, Graph> Graphs
     {
         get { return graphLoader.graphs; }
     }
 
-    private List<string> graphOrder
+    private List<string> GraphOrder
     {
         get { return graphLoader.graphOrder; }
     }
@@ -39,22 +40,33 @@ public class CCAStateManager : MonoBehaviour
 
     public int GraphCount
     {
-        get { return graphOrder.Count; }
+        get { return GraphOrder.Count; }
     }
 
 
     void Start()
     {
-        editorSettings.MinimalBlockLength = 1;
-        editorSettings.MaximalBlockLength = 10;
-        editorSettings.ZScoreScale = false;
+        EditorSettings.MinimalBlockLength = 1;
+        EditorSettings.MaximalBlockLength = 10;
+        EditorSettings.ZScoreScale = false;
         graphLoader.Init();
-
-        var graph = graphs[graphOrder[openGraphIndex]];
+        var graph = Graphs[GraphOrder[openGraphIndex]];
         if (graph == null)
         {
             Debug.LogError("There ist no Graph available at index " + openGraphIndex);
             return;
+        }
+        {
+            List<string> nodeMetrics = new List<string>() { EditorSettings.WidthMetric, EditorSettings.HeightMetric, EditorSettings.DepthMetric };
+            nodeMetrics.AddRange(EditorSettings.IssueMap().Keys);
+            if (EditorSettings.ZScoreScale)
+            {
+                scaler = new ZScoreScale(graph, EditorSettings.MinimalBlockLength, EditorSettings.MaximalBlockLength, nodeMetrics);
+            }
+            else
+            {
+                scaler = new LinearMultiScale(Graphs.Values.ToList(), EditorSettings.MinimalBlockLength, EditorSettings.MaximalBlockLength, nodeMetrics);
+            }
         }
         RenderLayout(graph);
         //graphRender.DisplayStartGraph(graph, editorSettings);
@@ -70,14 +82,14 @@ public class CCAStateManager : MonoBehaviour
     /// </summary>
     public void ShowNextGraph()
     {
-        if (openGraphIndex == graphOrder.Count - 1)
+        if (openGraphIndex == GraphOrder.Count - 1)
         {
             Debug.Log("This is already the last graph revision.");
             return;
         }
         openGraphIndex++;
 
-        var graph = graphs[graphOrder[openGraphIndex]];
+        var graph = Graphs[GraphOrder[openGraphIndex]];
         if (graph == null)
         {
             Debug.LogError("There ist no Graph available at index " + openGraphIndex);
@@ -99,7 +111,7 @@ public class CCAStateManager : MonoBehaviour
         }
         openGraphIndex--;
 
-        var graph = graphs[graphOrder[openGraphIndex]];
+        var graph = Graphs[GraphOrder[openGraphIndex]];
         if (graph == null)
         {
             Debug.LogError("There ist no Graph available at index " + openGraphIndex);
@@ -123,7 +135,7 @@ public class CCAStateManager : MonoBehaviour
         }
         */
         BlockFactory blockFactory;
-        if (editorSettings.CScapeBuildings)
+        if (EditorSettings.CScapeBuildings)
         {
             blockFactory = new BuildingFactory();
         }
@@ -131,23 +143,18 @@ public class CCAStateManager : MonoBehaviour
         {
             blockFactory = new CubeFactory();
         }
-        IScale scaler;
-        {
-            List<string> nodeMetrics = new List<string>() { editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric };
-            nodeMetrics.AddRange(editorSettings.IssueMap().Keys);
-            scaler = new LinearScale(graph, editorSettings.MinimalBlockLength, editorSettings.MaximalBlockLength, nodeMetrics);
-        }
+
         layout = new LayoutTest(
-            editorSettings.ShowEdges,
-            editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric,
-            editorSettings.IssueMap(),
-            editorSettings.InnerNodeMetrics,
+            EditorSettings.ShowEdges,
+            EditorSettings.WidthMetric, EditorSettings.HeightMetric, EditorSettings.DepthMetric,
+            EditorSettings.IssueMap(),
+            EditorSettings.InnerNodeMetrics,
             blockFactory,
             scaler,
-            editorSettings.EdgeWidth,
-            editorSettings.ShowErosions,
-            editorSettings.EdgesAboveBlocks,
-            editorSettings.ShowDonuts,
+            EditorSettings.EdgeWidth,
+            EditorSettings.ShowErosions,
+            EditorSettings.EdgesAboveBlocks,
+            EditorSettings.ShowDonuts,
             layoutTest
         );
         layout.Draw(graph);
