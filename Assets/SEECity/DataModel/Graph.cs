@@ -232,6 +232,25 @@ namespace SEE.DataModel
         }
 
         /// <summary>
+        /// Returns the maximal depth of the graph. Precondition: Graph must be tree.
+        /// </summary>
+        /// <returns>The maximal depth of the graph.</returns>
+        public int GetMaxDepth()
+        {
+            return GetMaxDepth(GetRoots(), -1);
+        }
+
+        private int GetMaxDepth(List<Node> nodes, int currentDepth)
+        {
+            int max = currentDepth + 1;
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                max = Math.Max(max, GetMaxDepth(nodes[i].Children(), currentDepth + 1));
+            }
+            return max;
+        }
+
+        /// <summary>
         /// Returns the graph in a JSON-like format including its attributes and all its nodes 
         /// and edges including their attributes.
         /// </summary>
