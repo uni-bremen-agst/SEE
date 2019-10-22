@@ -6,21 +6,20 @@ using UnityEngine;
 
 public static class GraphExtension
 {
-    public static void Traverse(this Graph graph, Action<Node> rootAction, Action<Node> treeAction, Action<Node> leafAction)
+    public static void Traverse(this Graph graph, Action<Node> rootAction, Action<Node> innerNodeAction, Action<Node> leafAction)
     {
         graph.GetRoots().ForEach(
             rootNode =>
             {
                 rootAction(rootNode);
-                TraverseTree(rootNode, treeAction, leafAction);
+                TraverseTree(rootNode, innerNodeAction, leafAction);
             }
         );
     }
 
-    public static void Traverse(this Graph graph, Action<Node> treeAction, Action<Node> leafAction)
+    public static void Traverse(this Graph graph, Action<Node> innerNodeAction, Action<Node> leafAction)
     {
-        Traverse(graph, DoNothing, treeAction, leafAction);
-        graph.GetRoots().ForEach(rootNode => TraverseTree(rootNode, treeAction, leafAction));
+        Traverse(graph, DoNothing, innerNodeAction, leafAction);
     }
 
     public static void Traverse(this Graph graph, Action<Node> leafAction)

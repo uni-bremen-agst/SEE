@@ -1,16 +1,14 @@
 ﻿using SEE;
 using SEE.DataModel;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using SEE.Layout;
 
 public class LoadedGraph
 {
     private readonly Graph graph;
-    private readonly CCAAbstracLayout layout;
+    private readonly AbstractCCALayout layout;
     private readonly GraphSettings graphSettings;
 
-    public LoadedGraph(Graph graph, CCAAbstracLayout layout, GraphSettings graphSettings)
+    public LoadedGraph(Graph graph, AbstractCCALayout layout, GraphSettings graphSettings)
     {
         this.graph = graph;
         this.layout = layout;
@@ -19,7 +17,7 @@ public class LoadedGraph
 
     public Graph Graph => graph;
 
-    public CCAAbstracLayout Layout => layout;
+    public AbstractCCALayout Layout => layout;
 
     public GraphSettings Settings => graphSettings;
 }

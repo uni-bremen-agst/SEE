@@ -7,7 +7,7 @@ using SEE.Layout;
 using TMPro;
 using System.Linq;
 
-public class CAALayoutStateless : CCAAbstracLayout
+public class CAALayoutStateless : AbstractCCALayout
 {
     public CAALayoutStateless(bool showEdges,
                          string widthMetric, string heightMetric, string breadthMetric,
