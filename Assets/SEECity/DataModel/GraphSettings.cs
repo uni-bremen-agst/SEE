@@ -14,8 +14,8 @@ namespace SEE
         public string pathPrefix = null;
 
         /// Tiny clone graph with single root to experiment with.
-        public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
-        public string csvPath = "..\\Data\\GXL\\minimal_erosions.csv";
+        //public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
+        //public string csvPath = "..\\Data\\GXL\\minimal_erosions.csv";
 
         /// Tiny clone graph with single roots to check edge bundling.
         //public string gxlPath = "..\\Data\\GXL\\controlPoints.gxl";
@@ -26,8 +26,8 @@ namespace SEE
         //public string csvPath = "..\\Data\\GXL\\linux-clones\\fs.csv";
 
         // Smaller clone graph with single root (Linux directory "net").
-        //public string gxlPath = "..\\Data\\GXL\\linux-clones\\net.gxl";
-        //public string csvPath = "..\\Data\\GXL\\linux-clones\\net.csv";
+        public string gxlPath = "..\\Data\\GXL\\linux-clones\\net.gxl";
+        public string csvPath = "..\\Data\\GXL\\linux-clones\\net.csv";
 
         // Larger clone graph with single root (Linux directory "drivers"): 16.920 nodes, 10583 edges.
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\drivers.gxl";
@@ -108,8 +108,15 @@ namespace SEE
         public string StyleIssue = "Metric.Style";
         public string UniversalIssue = "Metric.Universal";
 
-        // Whether a BallonLayout should be used. If false, ManhattanLayout is used.
-        public bool BallonLayout = true;
+        public enum Layouts
+        {
+            Balloon = 0,
+            Manhattan = 1,
+            CirclePacking = 2
+        }
+
+        // The layout that should be used.
+        public Layouts Layout;
 
         // Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
         // for range [0, max-value] is used, where max-value is the maximum value of a metric.

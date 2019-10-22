@@ -65,6 +65,18 @@ namespace SEE.Layout
         public abstract void SetPosition(GameObject block, Vector3 position);
 
         /// <summary>
+        /// Sets the local position of the current block. The given position is
+        /// interpreted as the center of the block.
+        /// </summary>
+        /// <param name="block">block to be positioned</param>
+        /// <param name="position">where to position the block</param>
+        public virtual void SetLocalPosition(GameObject block, Vector3 position)
+        {
+            // the default position of a game object in Unity is its center
+            block.transform.localPosition = position;
+        }
+
+        /// <summary>
         /// Returns the center of the roof of the given block.
         /// </summary>
         /// <param name="block">block for which to determine the roof position</param>
