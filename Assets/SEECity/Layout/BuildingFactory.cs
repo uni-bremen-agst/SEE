@@ -205,6 +205,13 @@ namespace SEE.Layout
             block.transform.position = newPosition;
         }
 
+        public override void SetLocalPosition(GameObject block, Vector3 position)
+        {
+            Vector3 extent = GetSize(block) / 2.0f;
+            Vector3 newPosition = position - extent;
+            block.transform.localPosition = newPosition;
+        }
+
         /// <summary>
         /// Returns the center of the roof of the given block.
         /// </summary>

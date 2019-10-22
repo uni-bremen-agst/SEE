@@ -165,8 +165,8 @@ namespace SEEEditor
             GUILayout.Label("VR settings", EditorStyles.boldLabel);
             VRenabled = EditorGUILayout.Toggle("Enable VR", VRenabled);
 
-            GUILayout.Label("Visual node attributes", EditorStyles.boldLabel);
-            editorSettings.BallonLayout = EditorGUILayout.Toggle("Balloon Layout", editorSettings.BallonLayout);
+            GUILayout.Label("Visual attributes", EditorStyles.boldLabel);
+            editorSettings.Layout = (GraphSettings.Layouts)EditorGUILayout.EnumPopup("Layout", editorSettings.Layout);
             editorSettings.CScapeBuildings = EditorGUILayout.Toggle("CScape buildings", editorSettings.CScapeBuildings);
             editorSettings.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", editorSettings.ZScoreScale);
             editorSettings.ShowDonuts = EditorGUILayout.Toggle("Show Donut charts", editorSettings.ShowDonuts);
@@ -228,10 +228,12 @@ namespace SEEEditor
                             }
                         }
 
-                        if (editorSettings.BallonLayout)
+                        switch (editorSettings.Layout)
                         {
-                            layout = new SEE.Layout.BalloonLayout(editorSettings.ShowEdges,
-                                                                  editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric, 
+                            case GraphSettings.Layouts.Balloon:
+                                {
+                                    layout = new SEE.Layout.BalloonLayout(editorSettings.ShowEdges,
+                                                                  editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric,
                                                                   editorSettings.IssueMap(),
                                                                   editorSettings.InnerNodeMetrics,
                                                                   blockFactory,
@@ -240,17 +242,34 @@ namespace SEEEditor
                                                                   editorSettings.ShowErosions,
                                                                   editorSettings.EdgesAboveBlocks,
                                                                   editorSettings.ShowDonuts);
-                        }
-                        else
-                        {
-                            layout = new SEE.Layout.ManhattenLayout(editorSettings.ShowEdges,
-                                                                    editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric, 
+                                    break;
+                                }
+                            case GraphSettings.Layouts.Manhattan:
+                                {
+                                    layout = new SEE.Layout.ManhattenLayout(editorSettings.ShowEdges,
+                                                                    editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric,
                                                                     editorSettings.IssueMap(),
                                                                     blockFactory,
                                                                     scaler,
                                                                     editorSettings.EdgeWidth,
                                                                     editorSettings.ShowErosions,
                                                                     editorSettings.EdgesAboveBlocks);
+                                    break;
+                                }
+                            case GraphSettings.Layouts.CirclePacking:
+                                {
+                                    layout = new SEE.Layout.CirclePackingLayout(editorSettings.ShowEdges,
+                                                                  editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric,
+                                                                  editorSettings.IssueMap(),
+                                                                  editorSettings.InnerNodeMetrics,
+                                                                  blockFactory,
+                                                                  scaler,
+                                                                  editorSettings.EdgeWidth,
+                                                                  editorSettings.ShowErosions,
+                                                                  editorSettings.EdgesAboveBlocks,
+                                                                  editorSettings.ShowDonuts);
+                                    break;
+                                }
                         }
                         layout.Draw(graph);
                     }
