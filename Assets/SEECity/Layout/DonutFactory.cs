@@ -232,7 +232,8 @@ namespace SEE.Layout
         public void DonutChart(GameObject donutChart,
                                float radius,
                                float innerValue,
-                               float[] values)
+                               float[] values,
+                               float innerScale = 0.75f)
         {
             if (values.Length != materials.Length)
             {
@@ -242,6 +243,10 @@ namespace SEE.Layout
             if (innerValue < 0.0f || innerValue > 1.0f)
             {
                 throw new System.Exception("[DonutChart] value for inner circle must be in the range [0, 1].");
+            }
+            if (innerScale < 0.0f || innerScale > 1.0f)
+            {
+                throw new System.Exception("[DonutChart] value for inner scale must be in the range [0, 1].");
             }
 
             donutChart.isStatic = true;     
@@ -278,20 +283,95 @@ namespace SEE.Layout
             }
             {
                 // Add inner circle.
-                GameObject innerCircle = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                //GameObject innerCircle = GameObject.CreatePrimitive(PrimitiveType.Cylinder);//~64 segments
+                GameObject innerCircle = new GameObject("Cylinder");
+                innerCircle.AddComponent<MeshFilter>();
+                innerCircle.AddComponent<MeshRenderer>();
+
+                {
+                    // TODO create only once
+                    const int segments = 64;
+                    const int vertexCount = 2 * segments + 2;
+                    const int circleTriangleCount = segments;
+                    const int sidesTriangleCount = 2 * segments;
+                    const int triangleCount = 2 * circleTriangleCount + sidesTriangleCount;
+                    const int indicesCount = 3 * triangleCount;
+
+                    Vector3[] vertices = new Vector3[vertexCount];
+                    Vector2[] uv = new Vector2[vertexCount];
+                    int[] triangles = new int[indicesCount];
+
+                    // vertices
+                    const float y = 0.5f;
+                    vertices[0] = new Vector3(0.0f, -y, 0.0f);
+                    for (int i = 0; i < segments; i++)
+                    {
+                        float x = 0.5f * Mathf.Cos(((float)i / (float)segments) * 2.0f * Mathf.PI);
+                        float z = 0.5f * Mathf.Sin(((float)i / (float)segments) * 2.0f * Mathf.PI);
+
+                        Vector3 bottomVertex = new Vector3((float)x, -y, (float)z);
+                        Vector3 topVertex = new Vector3((float)x, y, (float)z);
+                        Vector2 textureCoordinates = new Vector2(x, z);
+
+                        vertices[1 + i] = bottomVertex;
+                        vertices[1 + i + segments] = topVertex;
+                        uv[1 + i] = textureCoordinates;
+                        uv[1 + i + segments] = textureCoordinates;
+                    }
+                    vertices[vertexCount - 1] = new Vector3(0.0f, y, 0.0f);
+
+                    // triangles
+                    for (int i = 0; i < segments - 1; i++)
+                    {
+                        triangles[3 * i + 0] = 0;
+                        triangles[3 * i + 1] = i + 1;
+                        triangles[3 * i + 2] = i + 2;
+
+                        triangles[3 * segments + 6 * i + 0] = i + 2 + segments;
+                        triangles[3 * segments + 6 * i + 1] = i + 2;
+                        triangles[3 * segments + 6 * i + 2] = i + 1;
+                        triangles[3 * segments + 6 * i + 3] = i + 1;
+                        triangles[3 * segments + 6 * i + 4] = i + 1 + segments;
+                        triangles[3 * segments + 6 * i + 5] = i + 2 + segments;
+
+                        triangles[9 * segments + 3 * i + 0] = vertexCount - 1;
+                        triangles[9 * segments + 3 * i + 1] = i + 2 + segments;
+                        triangles[9 * segments + 3 * i + 2] = i + 1 + segments;
+                    }
+                    triangles[3 * (segments - 1) + 0] = 0;
+                    triangles[3 * (segments - 1) + 1] = (segments - 1) + 1;
+                    triangles[3 * (segments - 1) + 2] = 1;
+
+                    triangles[3 * segments + 6 * (segments - 1) + 0] = 1 + segments;
+                    triangles[3 * segments + 6 * (segments - 1) + 1] = 1;
+                    triangles[3 * segments + 6 * (segments - 1) + 2] = (segments - 1) + 1;
+                    triangles[3 * segments + 6 * (segments - 1) + 3] = (segments - 1) + 1;
+                    triangles[3 * segments + 6 * (segments - 1) + 4] = (segments - 1) + 1 + segments;
+                    triangles[3 * segments + 6 * (segments - 1) + 5] = 1 + segments;
+
+                    triangles[9 * segments + 3 * (segments - 1) + 0] = vertexCount - 1;
+                    triangles[9 * segments + 3 * (segments - 1) + 1] = 1 + segments;
+                    triangles[9 * segments + 3 * (segments - 1) + 2] = (segments - 1) + 1 + segments;
+
+                    Mesh mesh = new Mesh();
+                    innerCircle.GetComponent<MeshFilter>().mesh = mesh;
+                    mesh.vertices = vertices;
+                    mesh.triangles = triangles;
+                }
+
                 innerCircle.name = innerMetric + " = " + innerValue;
                 innerCircle.tag = Tags.Decoration;
                 innerCircle.isStatic = true;
                 innerCircle.transform.parent = donutChart.transform;
                 innerCircle.transform.localPosition = Vector3.zero;
-                innerCircle.transform.localScale = new Vector3(0.75f, 1.0f, 0.75f);
+                innerCircle.transform.localScale = new Vector3(innerScale, 1.0f, innerScale);
                 Renderer renderer = innerCircle.GetComponent<Renderer>();
                 // We need to create a new material so that we can change its color
                 // independently from other cylinders.
-                renderer.sharedMaterial = new Material(renderer.sharedMaterial)
-                {
-                    color = Color.Lerp(Color.white, Color.black, innerValue)
-                };
+                // FIXME: All segments of the same color should have the very same material.
+                // The fewer materials we have, the fewer rendering calls do we have at run-time.
+                renderer.sharedMaterial = new Material(Shader.Find("Diffuse"));
+                renderer.sharedMaterial.color = Color.Lerp(Color.white, Color.black, innerValue);
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
                 renderer.receiveShadows = false;
             }
@@ -355,7 +435,7 @@ namespace SEE.Layout
                 {
                     float x = radius * Mathf.Cos(radian);
                     float z = radius * Mathf.Sin(radian);
-                    vertices[i] = new Vector3(center.x + x, 0, center.z + z);
+                    vertices[i] = new Vector3(center.x + x, 0.0f, center.z + z);
                 }
             }
             // Add the very last vertex on the circle line, which is the point where the
@@ -364,7 +444,7 @@ namespace SEE.Layout
             {
                 float x = radius * Mathf.Cos(endRadian);
                 float z = radius * Mathf.Sin(endRadian);
-                vertices[vertices.Length - 1] = new Vector3(center.x + x, 0, center.z + z);
+                vertices[vertices.Length - 1] = new Vector3(center.x + x, 0.0f, center.z + z);
             }
 
             // Create the triangles for the circle sector. 
