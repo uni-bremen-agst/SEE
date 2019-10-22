@@ -173,7 +173,7 @@ namespace SEE.Layout
 
             if (children.Count == 0)
             {
-                DrawLeaf(node, position, nodeInfos[node].outer_radius, scaler);
+                DrawLeaf(node, position, nodeInfos[node].outer_radius);
             }
             else
             {
@@ -287,8 +287,7 @@ namespace SEE.Layout
         /// <param name="node">leaf node to be drawn</param>
         /// <param name="position">center point of the node where it is to be positioned</param>
         /// <param name="radius">the radius for the cylinder</param>
-        /// <param name="metricMaxima">the maxima of the metrics needed for normalization</param>
-        private void DrawLeaf(Node node, Vector3 position, float radius, IScale scaler)
+        private void DrawLeaf(Node node, Vector3 position, float radius)
         {
             GameObject gameObject = gameObjects[node];
             blockFactory.SetPosition(gameObject, position);
@@ -298,7 +297,7 @@ namespace SEE.Layout
 
             if (showErosions)
             {
-                AddErosionIssues(node, scaler);
+                AddErosionIssues(node);
             }
         }
 
@@ -532,17 +531,17 @@ namespace SEE.Layout
         /// <param name="factory">a factory to draw the Donut charts</param>
         private void DrawInnerNode(Node node, Vector3 position, float radius, int depth, int max_depth, DonutFactory factory)
         {
-            GameObject circle = new GameObject();
-            gameObjects[node] = circle;
-            NodeRef nodeRef = circle.AddComponent<NodeRef>();
+            GameObject sceneNode = new GameObject();
+            gameObjects[node] = sceneNode;
+            NodeRef nodeRef = sceneNode.AddComponent<NodeRef>();
             nodeRef.node = node;
-            circle.name = node.LinkName;
-            circle.tag = Tags.Node;
+            sceneNode.name = node.LinkName;
+            sceneNode.tag = Tags.Node;
 
             // If we wanted to have the nesting of circles on different ground levels depending
             // on the depth of the node, we would use position.y - (max_depth - depth + 1) * cylinder_height
             // for the y co-ordinate.
-            circle.transform.position = position; 
+            sceneNode.transform.position = position; 
 
             // Roots have depth 0. We want the line to be thicker for nodes higher in the hierarchy.
             float lineWidth = Mathf.Lerp(minmalCircleLineWidth,
@@ -551,25 +550,25 @@ namespace SEE.Layout
 
             if (showDonuts)
             {
-                AddDonut(node, circle, radius, factory);
-                GameObject circleLine = new GameObject("circle line of " + circle.name)
+                AddDonut(node, sceneNode, radius, factory);
+                GameObject circleLine = new GameObject("circle line of " + sceneNode.name)
                 {
                     tag = Tags.Decoration
                 };
                 AttachCircleLine(circleLine, radius, lineWidth * blockFactory.Unit());
-                circleLine.transform.position = circle.transform.position;
-                circleLine.transform.parent = circle.transform;
+                circleLine.transform.position = sceneNode.transform.position;
+                circleLine.transform.parent = sceneNode.transform;
             }
             else
             {
-                AttachCircleLine(circle, radius, lineWidth * blockFactory.Unit());
+                AttachCircleLine(sceneNode, radius, lineWidth * blockFactory.Unit());
             }
 
             // The text may occupy up to 30% of the diameter in width.
             GameObject text = TextFactory.GetText(node.SourceName, position, 2.0f * radius * 0.3f);
         }
 
-        private void AddDonut(Node node, GameObject circle, float radius, DonutFactory factory)
+        private void AddDonut(Node node, GameObject sceneNode, float radius, DonutFactory factory)
         {
             // FIXME: Derive real metrics from nodes.
             float innerValue = UnityEngine.Random.Range(0.0f, 1.0f);
@@ -577,7 +576,7 @@ namespace SEE.Layout
             float m2 = UnityEngine.Random.Range(0.0f, 90.0f);
             float m3 = UnityEngine.Random.Range(0.0f, 150.0f);
             float m4 = UnityEngine.Random.Range(0.0f, 200.0f);
-            factory.DonutChart(circle, 0.3f * radius, innerValue, new float[] {m1, m2, m2, m3 });
+            factory.DonutChart(sceneNode, 0.3f * radius, innerValue, new float[] {m1, m2, m2, m3 });
         }
 
         private void SetColor(GameObject gameObject, Color color)

@@ -101,7 +101,7 @@ namespace SEE.Layout
 
                     if (showErosions)
                     {
-                        AddErosionIssues(node, scaler);
+                        AddErosionIssues(node);
                     }
                 }
             }

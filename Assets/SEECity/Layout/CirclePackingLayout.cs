@@ -1,5 +1,4 @@
 ﻿using SEE.DataModel;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,8 +14,6 @@ namespace SEE.Layout
          * CIRCLE PACKING LAYOUT
          * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
-
-        private Dictionary<Node, GameObject> GameObjects = new Dictionary<Node, GameObject>();
 
         private GameObject RootNodes;
         private GameObject RootEdges;
@@ -68,22 +65,23 @@ namespace SEE.Layout
             {
                 Node node = nodes[i];
 
-                GameObject gameObject = new GameObject(node.LinkName);
-                gameObject.tag = Tags.Node;
-                gameObject.AddComponent<NodeRef>().node = node;
-                gameObject.transform.parent = parent.transform;
+                GameObject gameObject;
 
                 float radius;
                 if (node.IsLeaf())
                 {
-                    DrawLeaf(gameObject, out float out_leaf_radius);
+                    gameObject = DrawLeaf(node, out float out_leaf_radius);
                     radius = out_leaf_radius;
                 }
                 else
                 {
+                    gameObject = new GameObject(node.LinkName);      
                     DrawNodes(gameObject, node.Children(), out float out_nodes_radius);
                     radius = out_nodes_radius;
                 }
+                gameObject.tag = Tags.Node;
+                gameObject.AddComponent<NodeRef>().node = node;
+                gameObject.transform.parent = parent.transform;
 
                 float radians = ((float)i / (float)nodes.Count) * (2.0f * Mathf.PI);
                 gameObject.transform.localPosition = new Vector3(Mathf.Cos(radians), 0.0f, Mathf.Sin(radians)) * radius;
@@ -102,57 +100,67 @@ namespace SEE.Layout
             out_radius = out_outer_radius;
         }
 
-        private void DrawLeaf(GameObject leaf, out float out_leaf_radius)
+        private GameObject DrawLeaf(Node node, out float out_leaf_radius)
         {
-            Node node = leaf.GetComponent<NodeRef>().node;
-
             GameObject block = blockFactory.NewBlock();
-            block.name = leaf.name + " Block";
-            block.transform.parent = leaf.transform;
+            gameObjects[node] = block;
+            
+            block.name = node.LinkName + " Block";
             blockFactory.ScaleBlock(block, GetScale(node));
             Vector3 size = blockFactory.GetSize(block);
             blockFactory.SetLocalPosition(block, new Vector3(0.0f, size.y / 2.0f, 0.0f));
-            leaf.AddComponent<BlockRef>().Block = block;
             out_leaf_radius = Mathf.Sqrt(size.x * size.x + size.z * size.z);
 
             if (showErosions)
             {
-                AddErosionIssues(leaf);
+                AddErosionIssues(node);
             }
-
-            GameObjects[node] = leaf;
+    
             LevelUnit.y = Mathf.Max(LevelUnit.y, size.y);
+
+            return block;
         }
 
         private void DrawOutline(GameObject parent, ref float radius)
         {
             if (ShowDonuts)
             {
-                DrawDonut(parent, ref radius);
+                AddDonut(parent, ref radius);
             }
             else
             {
-                DrawCircle(parent, ref radius);
+                AttachCircleLine(parent, ref radius);
             }
         }
 
-        private void DrawCircle(GameObject parent, ref float radius)
+        // FIXME: Unify with BallonLayout.AttachCircleLine
+        private void AttachCircleLine(GameObject parent, ref float radius)
         {
             GameObject circle = new GameObject(parent.name + " Border");
             circle.tag = Tags.Node;
             circle.transform.parent = parent.transform;
 
+            // Number of line segments constituting the circle
             const int segments = 360;
+
             LineRenderer line = circle.AddComponent<LineRenderer>();
+
             LineFactory.SetDefaults(line);
             LineFactory.SetColor(line, Color.white);
+
+            // line width is relative to the radius
             float lineWidth = radius / 100.0f;
             LineFactory.SetWidth(line, lineWidth);
+
+            // We want to set the points of the circle lines relative to the game object.
             line.useWorldSpace = false;
+
             line.sharedMaterial = new Material(defaultLineMaterial);
+
             line.positionCount = segments + 1;
-            const int pointCount = segments + 1;
+            const int pointCount = segments + 1; // add extra point to make startpoint and endpoint the same to close the circle
             Vector3[] points = new Vector3[pointCount];
+
             for (int i = 0; i < pointCount; i++)
             {
                 float rad = Mathf.Deg2Rad * (i * 360f / segments);
@@ -161,7 +169,8 @@ namespace SEE.Layout
             line.SetPositions(points);
         }
 
-        private void DrawDonut(GameObject parent, ref float radius)
+        // FIXME: Unify with BallonLayout.AddDonut
+        private void AddDonut(GameObject parent, ref float radius)
         {
             GameObject donut = new GameObject(parent.name + " Donut");
             donut.tag = Tags.Node;
@@ -180,66 +189,20 @@ namespace SEE.Layout
 
         private Vector3 GetScale(Node node)
         {
-            return new Vector3(scaler.GetNormalizedValue(node, widthMetric), scaler.GetNormalizedValue(node, heightMetric), scaler.GetNormalizedValue(node, breadthMetric)); ;
-        }
-
-        private void AddErosionIssues(GameObject node)
-        {
-            List<GameObject> sprites = new List<GameObject>();
-            
-            foreach (KeyValuePair<string, IconFactory.Erosion> issue in issueMap)
-            {
-                Node n = node.GetComponent<NodeRef>().node;
-                if (n.TryGetNumeric(issue.Key, out float value))
-                {
-                    if (value > 0.0f)
-                    {
-                        GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
-                        sprite.transform.parent = node.transform;
-                        Vector3 spriteSize = GetSizeOfSprite(sprite);
-                        float spriteScale = 1.0f / spriteSize.x;
-                        float metricScale = scaler.GetNormalizedValue(n, issue.Key);
-                        sprite.transform.localScale *= spriteScale * blockFactory.Unit();
-                        sprite.transform.localScale *= metricScale;
-                        sprite.name = sprite.name + " " + n.SourceName;
-                        sprites.Add(sprite);
-                    }
-                }
-            }
-            
-            Vector3 delta = Vector3.up / 100.0f;
-            Vector3 currentRoof = blockFactory.Roof(node.GetComponent<BlockRef>().Block);
-            sprites.Sort(Comparer<GameObject>.Create((left, right) => GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
-            for (int i = 0; i < sprites.Count; i++)
-            {
-                GameObject sprite = sprites[i];
-                Vector3 size = GetSizeOfSprite(sprite);
-                Vector3 halfHeight = (size.y / 2.0f) * Vector3.up;
-                sprite.transform.position = currentRoof + delta + halfHeight;
-                currentRoof = sprite.transform.position + halfHeight;
-            }
-        }
-
-        private Vector3 GetSizeOfSprite(GameObject node)
-        {
-            return node.GetComponentInChildren<Renderer>().bounds.size;
+            return new Vector3(scaler.GetNormalizedValue(node, widthMetric), 
+                               scaler.GetNormalizedValue(node, heightMetric), 
+                               scaler.GetNormalizedValue(node, breadthMetric)); ;
         }
 
         private void DrawPlane(GameObject parent, float maxRadius)
         {
             const float enlargementFactor = 1.12f;
 
-            GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            plane.name = "Plane";
-            plane.tag = Tags.Decoration;
-            plane.transform.parent = parent.transform;
-            plane.transform.localScale = new Vector3(maxRadius * 0.2f, 1.0f / enlargementFactor, maxRadius * 0.2f) * enlargementFactor;
+            // We put the circle into a square somewhat larger than what is necessary
+            float widthAndDepth = 2.0f * maxRadius * enlargementFactor;
 
-            Renderer planeRenderer = plane.GetComponent<Renderer>();
-            planeRenderer.sharedMaterial.color = Color.gray;
-            planeRenderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
-            planeRenderer.sharedMaterial.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
-            planeRenderer.sharedMaterial.SetFloat("_SpecularHighlights", 1.0f);
+            GameObject plane = PlaneFactory.NewPlane(parent.transform.position, Color.gray, widthAndDepth, widthAndDepth);
+            plane.transform.parent = parent.transform;
         }
 
         /*
@@ -266,8 +229,8 @@ namespace SEE.Layout
                 Edge edge = edges[i];
                 Node source = edge.Source;
                 Node target = edge.Target;
-                Vector3 sourcePosition = GameObjects[source].transform.position;
-                Vector3 targetPosition = GameObjects[target].transform.position;
+                Vector3 sourcePosition = blockFactory.Roof(gameObjects[source]);
+                Vector3 targetPosition = blockFactory.Roof(gameObjects[target]);
 
                 GameObject gameObject = new GameObject(edge.Type + "(" + source.LinkName + ", " + target.LinkName + ")");
                 gameObject.tag = Tags.Edge;
