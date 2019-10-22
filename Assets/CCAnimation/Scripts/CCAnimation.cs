@@ -13,30 +13,39 @@ using UnityEngine.UI;
 public class CCAnimation : MonoBehaviour
 {
     public Text revisionNumberText;
+    public Toggle endlessModeToggle;
     public CCAStateManager stateManager;
 
     void Start()
     {
-        updateText();
+        UpdateText();
+        stateManager.ViewDataChangedEvent.AddListener(OnViewDataChanged);
     }
 
     void Update()
     {
-
         if (Input.GetKeyDown("k"))
         {
             stateManager.ShowPreviousGraph();
-            updateText();
         }
         else if (Input.GetKeyDown("l"))
         {
             stateManager.ShowNextGraph();
-            updateText();
+        }
+        else if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            stateManager.ToggleEndlessMode();
         }
     }
 
-    void updateText()
+    void UpdateText()
     {
         revisionNumberText.text = (stateManager.OpenGraphIndex + 1) + " / " + stateManager.GraphCount;
+    }
+
+    void OnViewDataChanged()
+    {
+        UpdateText();
+        endlessModeToggle.isOn = stateManager.IsEndlessMode;
     }
 }
