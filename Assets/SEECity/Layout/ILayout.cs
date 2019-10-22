@@ -187,34 +187,13 @@ namespace SEE.Layout
             return renderer.bounds.size;
         }
 
-        // Comparer for the widths of sprites.
-        private readonly IComparer<GameObject> comparer = new WidthComparer();
-
-        /// <summary>
-        /// Comparer for the widths of sprites. Let width(x) be the width
-        /// of a sprite. Yields:
-        /// -1 if width(left) < width(right) 
-        /// 0 if width(left) = width(right)
-        /// 1 if width(left) ></width> width(right)
-        /// </summary>
-        private class WidthComparer : IComparer<GameObject>
-        {
-            public int Compare(GameObject left, GameObject right)
-            {
-                float widthLeft = GetSizeOfSprite(left).x;
-                float widthRight = GetSizeOfSprite(right).x;
-                return widthLeft.CompareTo(widthRight);
-            }
-        }
-
         /// <summary>
         /// Stacks sprites for software-erosion issues atop of the roof of the given node
         /// in ascending order in terms of the sprite width. The sprite width is proportional
         /// to the normalized metric value for the erosion issue.
         /// </summary>
         /// <param name="node"></param>
-        /// <param name="scaler"></param>
-        protected void AddErosionIssues(Node node, IScale scaler)
+        protected void AddErosionIssues(Node node)
         {
             // The list of sprites for the erosion issues.
             List<GameObject> sprites = new List<GameObject>();
@@ -227,25 +206,20 @@ namespace SEE.Layout
                     if (value > 0.0f)
                     {
                         GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
-                        // The sprite will not become a child of node so that we can more easily
-                        // scale it. If the sprite had a parent, localScale would be relative to
-                        // the parent's size. That just complicates things.
+                        sprite.name = sprite.name + " " + node.SourceName;
+                        // The sprite becomes a child of the node.
+                        sprite.transform.parent = gameObjects[node].transform;
+
                         Vector3 spriteSize = GetSizeOfSprite(sprite);
                         // Scale the sprite to one Unity unit.
                         float spriteScale = 1.0f / spriteSize.x;
                         // Scale the erosion issue by normalization.
                         float metricScale = scaler.GetNormalizedValue(node, issue.Key);
-                        //Debug.LogFormat("sprite {0} before scaling: size={1}.\n",
-                        //                sprite.name, GetSizeOfSprite(sprite));
                         // First: scale its width to unit size 1.0 maintaining the aspect ratio
                         sprite.transform.localScale *= spriteScale * blockFactory.Unit();
-                        //Debug.LogFormat("sprite {0} scaled to unit size: size={1}.\n",
-                        //                sprite.name, GetSizeOfSprite(sprite));
                         // Now scale it by the normalized metric.
-                        sprite.transform.localScale *= metricScale;
-                        //Debug.LogFormat("sprite {0} after scaling: size={1}.\n",
-                        //                sprite.name, GetSizeOfSprite(sprite));
-                        sprite.name = sprite.name + " " + node.SourceName;
+                        sprite.transform.localScale *= metricScale; 
+
                         sprites.Add(sprite);
                     }
                 }
@@ -257,8 +231,7 @@ namespace SEE.Layout
                 // The space that we put in between two subsequent erosion issue sprites.
                 Vector3 delta = Vector3.up / 100.0f;
                 Vector3 currentRoof = blockFactory.Roof(gameObjects[node]);
-                sprites.Sort(comparer);
-                //Debug.Log("---------------------------------\n");
+                sprites.Sort(Comparer<GameObject>.Create((left, right) => GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
                 foreach (GameObject sprite in sprites)
                 {
                     Vector3 size = GetSizeOfSprite(sprite);
@@ -266,9 +239,6 @@ namespace SEE.Layout
                     Vector3 halfHeight = (size.y / 2.0f) * Vector3.up;
                     sprite.transform.position = currentRoof + delta + halfHeight;
                     currentRoof = sprite.transform.position + halfHeight;
-
-                    //Debug.LogFormat("sprite {0}: size={1} position={2} halfHeight={3}.\n",
-                    //                sprite.name, size, sprite.transform.position, halfHeight);
                 }
             }
         }
