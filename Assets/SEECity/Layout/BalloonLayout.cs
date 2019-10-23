@@ -2,7 +2,6 @@
 using UnityEngine;
 using SEE.DataModel;
 using System;
-using System.Linq;
 
 namespace SEE.Layout
 {
@@ -14,17 +13,14 @@ namespace SEE.Layout
     /// </summary>
     public class BalloonLayout : ILayout
     {
-        public BalloonLayout(bool showEdges,
-                             string widthMetric, string heightMetric, string breadthMetric, 
+        public BalloonLayout(string widthMetric, string heightMetric, string breadthMetric, 
                              SerializableDictionary<string, IconFactory.Erosion> issueMap,
                              string[] innerNodeMetrics,
                              BlockFactory blockFactory,
                              IScale scaler,
-                             float edgeWidth,
                              bool showErosions,
-                             bool edgesAboveBlocks,
                              bool showDonuts)
-        : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions, edgesAboveBlocks)
+        : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, showErosions)
         {
             name = "Ballon";
             this.showDonuts = showDonuts;
@@ -53,7 +49,7 @@ namespace SEE.Layout
         /// </summary>
         public float maximalCircleLineWidth = 1.0f;
 
-        protected override void DrawNodes(Graph graph)
+        public override void Draw(Graph graph)
         {
             // puts the outermost circles of the roots next to each other;
             // later we might use a circle-packing algorithm instead,
@@ -616,12 +612,6 @@ namespace SEE.Layout
                 points[i] = new Vector3(Mathf.Sin(rad) * radius, 0, Mathf.Cos(rad) * radius);
             }
             line.SetPositions(points);
-        }
-
-        protected override void DrawEdges(Graph graph)
-        {
-            BundledEdgeLayout layout = new BundledEdgeLayout(blockFactory, edgeWidth, edgesAboveBlocks);
-            layout.DrawEdges(graph, gameNodes.Values.ToList());
         }
     }
 }
