@@ -166,12 +166,13 @@ namespace SEEEditor
             VRenabled = EditorGUILayout.Toggle("Enable VR", VRenabled);
 
             GUILayout.Label("Visual attributes", EditorStyles.boldLabel);
-            editorSettings.Layout = (GraphSettings.Layouts)EditorGUILayout.EnumPopup("Layout", editorSettings.Layout);
+            editorSettings.NodeLayout = (GraphSettings.NodeLayouts)EditorGUILayout.EnumPopup("Layout", editorSettings.NodeLayout);
             editorSettings.CScapeBuildings = EditorGUILayout.Toggle("CScape buildings", editorSettings.CScapeBuildings);
             editorSettings.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", editorSettings.ZScoreScale);
             editorSettings.ShowDonuts = EditorGUILayout.Toggle("Show Donut charts", editorSettings.ShowDonuts);
 
             GUILayout.Label("Visual edge attributes", EditorStyles.boldLabel);
+            editorSettings.EdgeLayout = (GraphSettings.EdgeLayouts)EditorGUILayout.EnumPopup("Layout", editorSettings.EdgeLayout);
             editorSettings.EdgeWidth = EditorGUILayout.FloatField("Edge width", editorSettings.EdgeWidth);
             editorSettings.ShowEdges = EditorGUILayout.Toggle("Show edges", editorSettings.ShowEdges);
             editorSettings.ShowErosions = EditorGUILayout.Toggle("Show erosions", editorSettings.ShowErosions);
@@ -192,18 +193,9 @@ namespace SEEEditor
 
             switch (selectedAction)
             {
-                case 0: // Load City
-                    // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
+                case 0: // Load City  
                     EnableVR(VRenabled);
-                    if (editorSettings.CScapeBuildings)
-                    {
-                        blockFactory = new BuildingFactory();
-                    }
-                    else
-                    {
-                        blockFactory = new CubeFactory();
-                    }
-                    AdjustCameraSpeed(blockFactory.Unit());
+  
                     graph = SceneGraphs.Add(editorSettings);
                     int numberOfErrors = MetricImporter.Load(graph, editorSettings.CSVPath());
                     if (numberOfErrors > 0)
@@ -213,65 +205,10 @@ namespace SEEEditor
 
                     if (graph != null)
                     {
-                        //CubeFactory.Reset();            
-                        IScale scaler;
-                        {
-                            List<string> nodeMetrics = new List<string>() { editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric };
-                            nodeMetrics.AddRange(editorSettings.IssueMap().Keys);
-                            if (editorSettings.ZScoreScale)
-                            {
-                                scaler = new ZScoreScale(graph, editorSettings.MinimalBlockLength, editorSettings.MaximalBlockLength, nodeMetrics);
-                            }
-                            else
-                            {
-                                scaler = new LinearScale(graph, editorSettings.MinimalBlockLength, editorSettings.MaximalBlockLength, nodeMetrics);
-                            }
-                        }
-
-                        switch (editorSettings.Layout)
-                        {
-                            case GraphSettings.Layouts.Balloon:
-                                {
-                                    layout = new SEE.Layout.BalloonLayout(editorSettings.ShowEdges,
-                                                                  editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric,
-                                                                  editorSettings.IssueMap(),
-                                                                  editorSettings.InnerNodeMetrics,
-                                                                  blockFactory,
-                                                                  scaler,
-                                                                  editorSettings.EdgeWidth,
-                                                                  editorSettings.ShowErosions,
-                                                                  editorSettings.EdgesAboveBlocks,
-                                                                  editorSettings.ShowDonuts);
-                                    break;
-                                }
-                            case GraphSettings.Layouts.Manhattan:
-                                {
-                                    layout = new SEE.Layout.ManhattenLayout(editorSettings.ShowEdges,
-                                                                    editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric,
-                                                                    editorSettings.IssueMap(),
-                                                                    blockFactory,
-                                                                    scaler,
-                                                                    editorSettings.EdgeWidth,
-                                                                    editorSettings.ShowErosions,
-                                                                    editorSettings.EdgesAboveBlocks);
-                                    break;
-                                }
-                            case GraphSettings.Layouts.CirclePacking:
-                                {
-                                    layout = new SEE.Layout.CirclePackingLayout(editorSettings.ShowEdges,
-                                                                  editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric,
-                                                                  editorSettings.IssueMap(),
-                                                                  editorSettings.InnerNodeMetrics,
-                                                                  blockFactory,
-                                                                  scaler,
-                                                                  editorSettings.EdgeWidth,
-                                                                  editorSettings.ShowErosions,
-                                                                  editorSettings.EdgesAboveBlocks,
-                                                                  editorSettings.ShowDonuts);
-                                    break;
-                                }
-                        }
-                        layout.Draw(graph);
+                        GraphRenderer renderer = new GraphRenderer(editorSettings);
+                        renderer.Draw(graph);
+                        // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
+                        AdjustCameraSpeed(renderer.Unit());
                     }
                     else
                     {
@@ -286,7 +223,6 @@ namespace SEEEditor
                 default:
                     break;
             }
-            //this.Repaint();
         }
 
         /// <summary>

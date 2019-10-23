@@ -108,15 +108,25 @@ namespace SEE
         public string StyleIssue = "Metric.Style";
         public string UniversalIssue = "Metric.Universal";
 
-        public enum Layouts
+        public enum NodeLayouts
         {
             Balloon = 0,
             Manhattan = 1,
             CirclePacking = 2
         }
 
-        // The layout that should be used.
-        public Layouts Layout;
+        public enum EdgeLayouts
+        {
+            Straight = 0,
+            Spline = 1,
+            Bundling = 2
+        }
+
+        // The layout that should be used for nodes.
+        public NodeLayouts NodeLayout;
+
+        // The layout that should be used for edges.
+        public EdgeLayouts EdgeLayout;
 
         // Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
         // for range [0, max-value] is used, where max-value is the maximum value of a metric.
