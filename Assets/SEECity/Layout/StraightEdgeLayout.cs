@@ -34,38 +34,33 @@ namespace SEE.Layout
                 return;
             }
 
-            foreach (Edge edge in graph.Edges())
+            foreach (Edge edge in graph.ConnectingEdges(gameNodes.Keys))
             {
                 Node source = edge.Source;
                 Node target = edge.Target;
                 if (source != null && target != null)
                 {
-                    GameObject gameEdge = new GameObject
-                    {
-                        tag = Tags.Edge,
-                        isStatic = true,
-                        name = edge.Type + "(" + source.LinkName + ", " + target.LinkName + ")"
-                    };
+                    GameObject gameEdge = NewGameEdge(edge);
+
                     // gameEdge does not yet have a renderer; we add a new one
                     LineRenderer line = gameEdge.AddComponent<LineRenderer>();
+                    // use sharedMaterial if changes to the original material should affect all
+                    // objects using this material; renderer.material instead will create a copy
+                    // of the material and will not be affected by changes of the original material
+                    line.sharedMaterial = defaultLineMaterial;
+
+                    LineFactory.SetDefaults(line);
+                    LineFactory.SetWidth(line, edgeWidth * blockFactory.Unit());
+
+                    // If enabled, the lines are defined in world space.
+                    // This means the object's position is ignored, and the lines are rendered around 
+                    // world origin.
+                    line.useWorldSpace = true;
 
                     GameObject sourceObject = gameNodes[source];
                     GameObject targetObject = gameNodes[target];
 
                     {
-                        // use sharedMaterial if changes to the original material should affect all
-                        // objects using this material; renderer.material instead will create a copy
-                        // of the material and will not be affected by changes of the original material
-                        line.sharedMaterial = newMat;
-
-                        LineFactory.SetDefaults(line);
-                        LineFactory.SetWidth(line, edgeWidth * blockFactory.Unit());
-
-                        // If enabled, the lines are defined in world space.
-                        // This means the object's position is ignored, and the lines are rendered around 
-                        // world origin.
-                        line.useWorldSpace = true;
-
                         // define the points along the line
                         Vector3 sourceCenterToBorder = blockFactory.GetSize(sourceObject) / 2.0f;
                         Vector3 targetCenterToBorder = blockFactory.GetSize(targetObject) / 2.0f;
@@ -114,25 +109,6 @@ namespace SEE.Layout
                     Debug.LogErrorFormat("Edge of type {0} has a missing source or target.\n", edge.Type);
                 }
             }
-        }
-
-        /// <summary>
-        /// Yields the greatest y co-ordinate of all nodes given.
-        /// </summary>
-        /// <param name="nodes">list of nodes whose greatest y co-ordinate is required</param>
-        /// <returns>greatest y co-ordinate of all nodes given</returns>
-        private float GetMaxBlockHeight(IList<GameObject> nodes)
-        {
-            float result = Mathf.NegativeInfinity;
-            foreach (GameObject node in nodes)
-            {
-                float y = blockFactory.Roof(node).y;
-                if (y > result)
-                {
-                    result = y;
-                }
-            }
-            return result;
         }
     }
 }

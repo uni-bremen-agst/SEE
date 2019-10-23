@@ -103,5 +103,41 @@ namespace SEE.Layout
             }
             return material;
         }
+
+        /// <summary>
+        /// Yields the greatest y co-ordinate of all nodes given.
+        /// </summary>
+        /// <param name="nodes">list of nodes whose greatest y co-ordinate is required</param>
+        /// <returns>greatest y co-ordinate of all nodes given</returns>
+        protected float GetMaxBlockHeight(IList<GameObject> nodes)
+        {
+            float result = Mathf.NegativeInfinity;
+            foreach (GameObject node in nodes)
+            {
+                float y = blockFactory.Roof(node).y;
+                if (y > result)
+                {
+                    result = y;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns a new game edge.
+        /// </summary>
+        /// <param name="edge">graph edge for which to create the game edge</param>
+        /// <returns>new game edge</returns>
+        protected GameObject NewGameEdge(Edge edge)
+        {
+            GameObject gameEdge = new GameObject
+            {
+                tag = Tags.Edge,
+                isStatic = true,
+                name = edge.Type + "(" + edge.Source.LinkName + ", " + edge.Target.LinkName + ")"
+            };
+            gameEdge.AddComponent<EdgeRef>().edge = edge;
+            return gameEdge;
+        }
     }
 }
