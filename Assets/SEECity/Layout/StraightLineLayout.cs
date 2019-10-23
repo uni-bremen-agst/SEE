@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
-    public class StraightLineLayout : IEdgeLayout
+    public class StraightEdgeLayout : IEdgeLayout
     {
-        public StraightLineLayout(BlockFactory blockFactory, float edgeWidth, bool edgesAboveBlocks) 
+        public StraightEdgeLayout(BlockFactory blockFactory, float edgeWidth, bool edgesAboveBlocks) 
             : base(blockFactory, edgeWidth, edgesAboveBlocks)
         {
         }

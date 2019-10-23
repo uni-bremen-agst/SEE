@@ -119,7 +119,7 @@ namespace SEE.Layout
         /// </summary>
         protected override void DrawEdges(Graph graph)
         {
-            StraightLineLayout layout = new StraightLineLayout(blockFactory, edgeWidth, edgesAboveBlocks);
+            StraightEdgeLayout layout = new StraightEdgeLayout(blockFactory, edgeWidth, edgesAboveBlocks);
             layout.DrawEdges(graph, gameNodes.Values.ToList());
 
             /*
