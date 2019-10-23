@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SEE.DataModel;
+using UnityEngine;
 
 namespace SEE.Layout
 {
@@ -42,7 +44,7 @@ namespace SEE.Layout
         /// Draws the graph.
         /// </summary>
         public void Draw(Graph graph)
-        {  
+        {
             IScale scaler;
             {
                 List<string> nodeMetrics = new List<string>() { settings.WidthMetric, settings.HeightMetric, settings.DepthMetric };
@@ -57,54 +59,78 @@ namespace SEE.Layout
                 }
             }
 
-            ILayout layout;
+            Dictionary<Node, GameObject> gameNodes = NodeLayout(graph, scaler);
+            if (settings.ShowEdges)
+            {
+                EdgeLayout(graph, gameNodes);
+            }
+        }
 
+        private void EdgeLayout(Graph graph, Dictionary<Node, GameObject> gameNodes)
+        {
+            IEdgeLayout layout;
+            switch (settings.EdgeLayout)
+            {
+                case GraphSettings.EdgeLayouts.Straight:
+                    layout = new StraightEdgeLayout(blockFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
+                    break;
+                case GraphSettings.EdgeLayouts.Spline:
+                    layout = new SplineEdgeLayout(blockFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
+                    break;
+                case GraphSettings.EdgeLayouts.Bundling:
+                    layout = new BundledEdgeLayout(blockFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
+                    break;
+                default:
+                    throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
+            }
+            Performance p = Performance.Begin(layout.Name + " layout of edges");
+            layout.DrawEdges(graph, gameNodes.Values.ToList());
+            p.End();
+        }
+
+        private Dictionary<Node, GameObject> NodeLayout(Graph graph, IScale scaler)
+        {
+            ILayout layout;
             switch (settings.NodeLayout)
             {
                 case GraphSettings.NodeLayouts.Balloon:
                     {
-                        layout = new SEE.Layout.BalloonLayout(settings.ShowEdges,
-                                                      settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
+                        layout = new SEE.Layout.BalloonLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
                                                       settings.IssueMap(),
                                                       settings.InnerNodeMetrics,
                                                       blockFactory,
                                                       scaler,
-                                                      settings.EdgeWidth,
                                                       settings.ShowErosions,
-                                                      settings.EdgesAboveBlocks,
                                                       settings.ShowDonuts);
                         break;
                     }
                 case GraphSettings.NodeLayouts.Manhattan:
                     {
-                        layout = new SEE.Layout.ManhattenLayout(settings.ShowEdges,
-                                                        settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
+                        layout = new SEE.Layout.ManhattenLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
                                                         settings.IssueMap(),
                                                         blockFactory,
                                                         scaler,
-                                                        settings.EdgeWidth,
-                                                        settings.ShowErosions,
-                                                        settings.EdgesAboveBlocks);
+                                                        settings.ShowErosions);
                         break;
                     }
                 case GraphSettings.NodeLayouts.CirclePacking:
                     {
-                        layout = new SEE.Layout.CirclePackingLayout(settings.ShowEdges,
-                                                      settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
+                        layout = new SEE.Layout.CirclePackingLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
                                                       settings.IssueMap(),
                                                       settings.InnerNodeMetrics,
                                                       blockFactory,
                                                       scaler,
-                                                      settings.EdgeWidth,
                                                       settings.ShowErosions,
-                                                      settings.EdgesAboveBlocks,
                                                       settings.ShowDonuts);
                         break;
                     }
                 default:
-                    throw new Exception("Unhandled layout " + settings.NodeLayout.ToString());
+                    throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }
+            Performance p = Performance.Begin(layout.Name + " layout of nodes");
             layout.Draw(graph);
+            p.End();
+            return layout.Nodes();
         }
 
         /// <summary>

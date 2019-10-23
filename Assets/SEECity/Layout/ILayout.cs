@@ -6,50 +6,28 @@ namespace SEE.Layout
 {
     public abstract class ILayout
     {
-        public ILayout(bool showEdges,
-               string widthMetric, string heightMetric, string breadthMetric,
+        public ILayout(string widthMetric, string heightMetric, string breadthMetric,
                SerializableDictionary<string, IconFactory.Erosion> issueMap,
                BlockFactory blockFactory,
                IScale scaler,
-               float edgeWidth,
-               bool showErosions,
-               bool edgesAboveBlocks)
+               bool showErosions)
         {
-            this.showEdges = showEdges;
             this.widthMetric = widthMetric;
             this.heightMetric = heightMetric;
             this.breadthMetric = breadthMetric;
             this.issueMap = issueMap;
             this.blockFactory = blockFactory;
             this.scaler = scaler;
-            this.edgeWidth = edgeWidth;
             this.showErosions = showErosions;
-            this.edgesAboveBlocks = edgesAboveBlocks;
-        }
-
-        public virtual void Draw(Graph graph)
-        {
-            Performance p;
-            p = Performance.Begin(name + " layout of nodes");
-            DrawNodes(graph);
-            p.End();
-            if (showEdges)
-            {
-                p = Performance.Begin(name + " layout of edges");
-                DrawEdges(graph);
-                p.End();
-            }
         }
 
         // A mapping of graph nodes onto the game objects representing them visually in the scene
         protected Dictionary<Node, GameObject> gameNodes = new Dictionary<Node, GameObject>();
 
-        /// <summary>
-        /// Orientation of the edges; 
-        /// if false, the edges are drawn below the houses;
-        /// if true, the edges are drawn above the houses;
-        /// </summary>
-        protected readonly bool edgesAboveBlocks;
+        public Dictionary<Node, GameObject> Nodes()
+        {
+            return gameNodes;
+        }
 
         /// <summary>
         /// Path to the material used for edges.
@@ -67,11 +45,6 @@ namespace SEE.Layout
         /// Mapping of node attributes onto erosion issue icons.
         /// </summary>
         protected readonly SerializableDictionary<string, IconFactory.Erosion> issueMap;
-
-        /// <summary>
-        /// Whether edges should be shown.
-        /// </summary>
-        protected readonly bool showEdges;
 
         /// <summary>
         /// A factory to create visual representations of graph nodes (e.g., cubes or CScape buildings).
@@ -108,15 +81,7 @@ namespace SEE.Layout
         /// Intended to be overriden by subclasses.
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
-        protected virtual void DrawNodes(Graph graph) { }
-
-        /// <summary>
-        /// Creates the GameObjects representing the edges of the graph.
-        /// The graph must have been loaded before via Load().
-        /// Intended to be overriden by subclasses.
-        /// </summary>
-        /// <param name="graph">graph whose edges are to be drawn</param>
-        protected virtual void DrawEdges(Graph graph) { }
+        public abstract void Draw(Graph graph);
 
         // name of the layout
         protected string name = "";
@@ -125,11 +90,6 @@ namespace SEE.Layout
         /// Used to determine the lengths of the node blocks.
         /// </summary>
         protected readonly IScale scaler;
-
-        /// <summary>
-        /// The width of every edge.
-        /// </summary>
-        protected readonly float edgeWidth;
 
         /// <summary>
         /// The unique name of a layout.

@@ -1,6 +1,5 @@
 ﻿using SEE.DataModel;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -11,28 +10,20 @@ namespace SEE.Layout
     /// </summary>
     public class CirclePackingLayout : ILayout
     {
-        /*
-         * CIRCLE PACKING LAYOUT
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        */
-
         private GameObject RootNodes;
         
         private readonly string[] InnerNodeMetrics;
 
         public static Vector3 LevelUnit;
 
-        public CirclePackingLayout(bool showEdges,
-                             string widthMetric, string heightMetric, string breadthMetric,
+        public CirclePackingLayout(string widthMetric, string heightMetric, string breadthMetric,
                              SerializableDictionary<string, IconFactory.Erosion> issueMap,
                              string[] innerNodeMetrics,
                              BlockFactory blockFactory,
                              IScale scaler,
-                             float edgeWidth,
                              bool showErosions,
-                             bool edgesAboveBlocks,
                              bool showDonuts)
-        : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions, edgesAboveBlocks)
+        : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, showErosions)
         {
             name = "Circle Packing";
             ShowDonuts = showDonuts;
@@ -41,12 +32,7 @@ namespace SEE.Layout
 
         private readonly bool ShowDonuts;
 
-        /*
-         * NODES
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        */
-
-        protected override void DrawNodes(Graph graph)
+        public override void Draw(Graph graph)
         {
             LevelUnit = Vector3.zero;
             graph.SortHierarchyByName();
@@ -204,18 +190,6 @@ namespace SEE.Layout
             GameObject plane = PlaneFactory.NewPlane(parent.transform.position, Color.gray, widthAndDepth, widthAndDepth);
             plane.transform.parent = parent.transform;
         }
-
-        /*
-         * EDGES
-         * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        */
-
-        protected override void DrawEdges(Graph graph)
-        {
-            SplineEdgeLayout layout = new SplineEdgeLayout(blockFactory, edgeWidth, edgesAboveBlocks);
-            layout.DrawEdges(graph, gameNodes.Values.ToList());
-        }
-
     }
 
 }// namespace SEE.Layout

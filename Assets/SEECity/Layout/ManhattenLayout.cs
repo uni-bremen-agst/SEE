@@ -1,22 +1,16 @@
 ﻿using SEE.DataModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Layout
 {
     public class ManhattenLayout : ILayout
     {
-        public ManhattenLayout(bool showEdges,
-                               string widthMetric, string heightMetric, string breadthMetric, 
+        public ManhattenLayout(string widthMetric, string heightMetric, string breadthMetric, 
                                SerializableDictionary<string, IconFactory.Erosion> issueMap,
                                BlockFactory blockFactory,
                                IScale scaler,
-                               float edgeWidth,
-                               bool showErosions,
-                               bool edgesAboveBlocks)
-            : base(showEdges, widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, edgeWidth, showErosions, edgesAboveBlocks)
+                               bool showErosions)
+            : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, showErosions)
         {
             name = "Manhattan";
         }
@@ -30,7 +24,7 @@ namespace SEE.Layout
         private float maxBlockHeight = 0.0f;
 
         // precondition: the GameObjects and their meshes have already been created for all nodes
-        protected override void DrawNodes(Graph graph)
+        public override void Draw(Graph graph)
         {
             int numberOfBuildingsPerRow = (int)Mathf.Sqrt(graph.NodeCount);
             int column = 0;
@@ -111,16 +105,6 @@ namespace SEE.Layout
             // positionZ is the last row in which a block was added
             PlaneFactory.NewPlane(0.0f, -maxZinFirstRow / 2.0f, maxPositionX - distanceBetweenBuildings, positionZ + maxZ / 2.0f,
                                   groundLevel, Color.gray);
-        }
-
-        /// <summary>
-        /// Creates the GameObjects representing the edges of the graph.
-        /// The graph must have been loaded before via Load().
-        /// </summary>
-        protected override void DrawEdges(Graph graph)
-        {
-            StraightEdgeLayout layout = new StraightEdgeLayout(blockFactory, edgeWidth, edgesAboveBlocks);
-            layout.DrawEdges(graph, gameNodes.Values.ToList());
         }
     }
 }
