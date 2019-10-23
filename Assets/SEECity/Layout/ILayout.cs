@@ -42,7 +42,7 @@ namespace SEE.Layout
         }
 
         // A mapping of graph nodes onto the game objects representing them visually in the scene
-        protected Dictionary<Node, GameObject> gameObjects = new Dictionary<Node, GameObject>();
+        protected Dictionary<Node, GameObject> gameNodes = new Dictionary<Node, GameObject>();
 
         /// <summary>
         /// Orientation of the edges; 
@@ -153,6 +153,17 @@ namespace SEE.Layout
         protected readonly string breadthMetric;
 
         /// <summary>
+        /// Adds a NodeRef component to given block referencing to given node.
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="node"></param>
+        protected void AttachNode(GameObject block, Node node)
+        {
+            NodeRef nodeRef = block.AddComponent<NodeRef>();
+            nodeRef.node = node;
+        }
+
+        /// <summary>
         /// Returns the first immediate child of parent with given tag or null
         /// if none exists.
         /// </summary>
@@ -208,7 +219,7 @@ namespace SEE.Layout
                         GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
                         sprite.name = sprite.name + " " + node.SourceName;
                         // The sprite becomes a child of the node.
-                        sprite.transform.parent = gameObjects[node].transform;
+                        sprite.transform.parent = gameNodes[node].transform;
 
                         Vector3 spriteSize = GetSizeOfSprite(sprite);
                         // Scale the sprite to one Unity unit.
@@ -230,7 +241,7 @@ namespace SEE.Layout
             {
                 // The space that we put in between two subsequent erosion issue sprites.
                 Vector3 delta = Vector3.up / 100.0f;
-                Vector3 currentRoof = blockFactory.Roof(gameObjects[node]);
+                Vector3 currentRoof = blockFactory.Roof(gameNodes[node]);
                 sprites.Sort(Comparer<GameObject>.Create((left, right) => GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
                 foreach (GameObject sprite in sprites)
                 {
