@@ -103,7 +103,7 @@ namespace SEE.Layout
         private GameObject DrawLeaf(Node node, out float out_leaf_radius)
         {
             GameObject block = blockFactory.NewBlock();
-            gameObjects[node] = block;
+            gameNodes[node] = block;
             
             block.name = node.LinkName + " Block";
             blockFactory.ScaleBlock(block, GetScale(node));
@@ -229,8 +229,8 @@ namespace SEE.Layout
                 Edge edge = edges[i];
                 Node source = edge.Source;
                 Node target = edge.Target;
-                Vector3 sourcePosition = blockFactory.Roof(gameObjects[source]);
-                Vector3 targetPosition = blockFactory.Roof(gameObjects[target]);
+                Vector3 sourcePosition = blockFactory.Roof(gameNodes[source]);
+                Vector3 targetPosition = blockFactory.Roof(gameNodes[target]);
 
                 GameObject gameObject = new GameObject(edge.Type + "(" + source.LinkName + ", " + target.LinkName + ")");
                 gameObject.tag = Tags.Edge;

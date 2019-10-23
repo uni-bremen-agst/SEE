@@ -138,7 +138,7 @@ namespace SEE.Layout
             const float enlargementFactor = 1.12f; // should not be smaller than 1.0
 
             // Width of the plane underneath the root circles determined by the left-most and right-most circle.
-            float width = (gameObjects[roots[roots.Length - 1]].transform.position.x - gameObjects[roots[0]].transform.position.x
+            float width = (gameNodes[roots[roots.Length - 1]].transform.position.x - gameNodes[roots[0]].transform.position.x
                 + nodeInfos[roots[0]].outer_radius + nodeInfos[roots[roots.Length - 1]].outer_radius)
                 * enlargementFactor;
 
@@ -148,7 +148,7 @@ namespace SEE.Layout
             // Height of the plane.
             float height = 1.0f;
 
-            Vector3 leftRootCenter = gameObjects[roots[0]].transform.position;
+            Vector3 leftRootCenter = gameNodes[roots[0]].transform.position;
             float planePositionX = (leftRootCenter.x - nodeInfos[roots[0]].outer_radius) + (width / enlargementFactor / 2.0f);
             float planePositionY = leftRootCenter.y - 1.0f; // somewhat underneath roots
             float planePositionZ = leftRootCenter.z;
@@ -289,7 +289,7 @@ namespace SEE.Layout
         /// <param name="radius">the radius for the cylinder</param>
         private void DrawLeaf(Node node, Vector3 position, float radius)
         {
-            GameObject gameObject = gameObjects[node];
+            GameObject gameObject = gameNodes[node];
             blockFactory.SetPosition(gameObject, position);
 
             // FIXME: We do without garden for the time being
@@ -429,7 +429,7 @@ namespace SEE.Layout
                 NodeRef noderef = block.AddComponent<NodeRef>();
                 noderef.node = node;
                 block.name = node.LinkName;
-                gameObjects[node] = block;
+                gameNodes[node] = block;
 
                 {
                     // The block's width and breadth are proportional to the two metrics.
@@ -532,7 +532,7 @@ namespace SEE.Layout
         private void DrawInnerNode(Node node, Vector3 position, float radius, int depth, int max_depth, DonutFactory factory)
         {
             GameObject sceneNode = new GameObject();
-            gameObjects[node] = sceneNode;
+            gameNodes[node] = sceneNode;
             NodeRef nodeRef = sceneNode.AddComponent<NodeRef>();
             nodeRef.node = node;
             sceneNode.name = node.LinkName;
@@ -641,8 +641,8 @@ namespace SEE.Layout
         {
             Vector3[] controlPoints;
 
-            GameObject sourceObject = gameObjects[source];
-            GameObject targetObject = gameObjects[target];
+            GameObject sourceObject = gameNodes[source];
+            GameObject targetObject = gameNodes[target];
 
             if (source == target)
             {
@@ -663,7 +663,7 @@ namespace SEE.Layout
                 }
                 else
                 {
-                    GameObject lcaObject = gameObjects[lca];
+                    GameObject lcaObject = gameNodes[lca];
                     if (lcaObject == null)
                     {
                         Debug.LogError("Undefined game object for lowest common ancestor of "
@@ -701,7 +701,7 @@ namespace SEE.Layout
                             // Edges between leaves will be on the ground.
                             controlPoints = new Vector3[4];
                             controlPoints[0] = blockFactory.Ground(sourceObject);
-                            controlPoints[1] = gameObjects[lcaNode].transform.position;
+                            controlPoints[1] = gameNodes[lcaNode].transform.position;
                             controlPoints[2] = controlPoints[1];
                             controlPoints[3] = blockFactory.Ground(targetObject);
                         }
@@ -727,7 +727,7 @@ namespace SEE.Layout
                                 // Note that a root has level 0 and the level is increases along 
                                 // the childrens' depth. That is why we need to choose the height
                                 // as a measure relative to maxDepth.
-                                controlPoints[i] = gameObjects[fullPath[i]].transform.position + (maxDepth - nodeInfos[fullPath[i]].level) * levelUnit;
+                                controlPoints[i] = gameNodes[fullPath[i]].transform.position + (maxDepth - nodeInfos[fullPath[i]].level) * levelUnit;
                             }
                             controlPoints[controlPoints.Length - 1] = blockFactory.Roof(targetObject);
                             //Dump(controlPoints);
@@ -900,7 +900,7 @@ namespace SEE.Layout
         private Vector3 MaximalNodeHeight()
         {
             Vector3 result = Vector3.zero;
-            foreach (KeyValuePair<Node, GameObject> node in gameObjects)
+            foreach (KeyValuePair<Node, GameObject> node in gameNodes)
             {
                 Node n = node.Key;
                 if (n != null && n.IsLeaf())

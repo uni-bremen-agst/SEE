@@ -1,5 +1,7 @@
 ﻿using SEE.DataModel;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -50,7 +52,8 @@ namespace SEE.Layout
 
                     GameObject block = blockFactory.NewBlock();
                     block.name = node.LinkName;
-                    gameObjects[node] = block;
+                    gameNodes[node] = block;
+                    AttachNode(block, node);
 
                     column++;
                     if (column > numberOfBuildingsPerRow)
@@ -116,6 +119,10 @@ namespace SEE.Layout
         /// </summary>
         protected override void DrawEdges(Graph graph)
         {
+            StraightLineLayout layout = new StraightLineLayout(blockFactory, edgeWidth, edgesAboveBlocks);
+            layout.DrawEdges(graph, gameNodes.Values.ToList());
+
+            /*
             // The offset of the edges above or below the ground chosen relative 
             // to the height of the largest block.
             // This offset is used to draw the line somewhat below
@@ -148,8 +155,8 @@ namespace SEE.Layout
                     // gameEdge does not yet have a renderer; we add a new one
                     LineRenderer line = gameEdge.AddComponent<LineRenderer>();
 
-                    GameObject sourceObject = gameObjects[source];
-                    GameObject targetObject = gameObjects[target];
+                    GameObject sourceObject = gameNodes[source];
+                    GameObject targetObject = gameNodes[target];
 
                     {
                         // use sharedMaterial if changes to the original material should affect all
@@ -213,6 +220,7 @@ namespace SEE.Layout
                     Debug.LogErrorFormat("Edge of type {0} has a missing source or target.\n", edge.Type);
                 }
             }
+            */
         }
     }
 }
