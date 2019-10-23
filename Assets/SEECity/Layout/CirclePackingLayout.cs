@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -16,8 +17,7 @@ namespace SEE.Layout
         */
 
         private GameObject RootNodes;
-        private GameObject RootEdges;
-
+        
         private readonly string[] InnerNodeMetrics;
 
         public static Vector3 LevelUnit;
@@ -212,39 +212,8 @@ namespace SEE.Layout
 
         protected override void DrawEdges(Graph graph)
         {
-            RootEdges = new GameObject("Edges");
-            RootEdges.tag = Tags.Edge;
-
-            List<Edge> edges = graph.Edges();
-
-            Material edgeMaterial = new Material(defaultLineMaterial);
-            if (edgeMaterial == null)
-            {
-                Debug.LogError("Could not find material " + materialPath + "\n");
-                return;
-            }
-
-            for (int i = 0; i < edges.Count; i++)
-            {
-                Edge edge = edges[i];
-                Node source = edge.Source;
-                Node target = edge.Target;
-                Vector3 sourcePosition = blockFactory.Roof(gameNodes[source]);
-                Vector3 targetPosition = blockFactory.Roof(gameNodes[target]);
-
-                GameObject gameObject = new GameObject(edge.Type + "(" + source.LinkName + ", " + target.LinkName + ")");
-                gameObject.tag = Tags.Edge;
-                gameObject.AddComponent<EdgeRef>().edge = edge;
-                gameObject.transform.parent = RootEdges.transform;
-
-                Vector3[] controlPoints = new Vector3[] {
-                    sourcePosition,
-                    Vector3.Lerp(sourcePosition, targetPosition, 0.3f) + LevelUnit,
-                    Vector3.Lerp(sourcePosition, targetPosition, 0.7f) + LevelUnit,
-                    targetPosition
-                };
-                BSplineFactory.Draw(gameObject, controlPoints, edgeWidth, edgeMaterial);
-            }
+            SplineEdgeLayout layout = new SplineEdgeLayout(blockFactory, edgeWidth, edgesAboveBlocks);
+            layout.DrawEdges(graph, gameNodes.Values.ToList());
         }
 
     }
