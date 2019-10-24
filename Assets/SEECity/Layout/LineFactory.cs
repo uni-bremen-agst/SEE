@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Layout
 {
@@ -9,6 +8,32 @@ namespace SEE.Layout
     class LineFactory
     {
         const float defaultWidth = 0.1f;
+
+        /// <summary>
+        /// Path to the material used for edges.
+        /// </summary>
+        protected const string materialPath = "Legacy Shaders/Particles/Additive";
+        // protected const string materialPath = "BrickTextures/BricksTexture13/BricksTexture13";
+        // protected const string materialPath = "Particles/Standard Surface";
+
+        /// <summary>
+        /// The material used for edges.
+        /// </summary>
+        public readonly static Material DefaultLineMaterial = LineMaterial();
+
+        /// <summary>
+        /// Returns the default material for edges using the materialPath.
+        /// </summary>
+        /// <returns>default material for edges</returns>
+        private static Material LineMaterial()
+        {
+            Material material = new Material(Shader.Find(materialPath));
+            if (material == null)
+            {
+                Debug.LogError("Could not find material " + materialPath + "\n");
+            }
+            return material;
+        }
 
         internal static void SetDefaults(LineRenderer line)
         {
