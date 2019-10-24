@@ -141,7 +141,9 @@ namespace SEE.Layout
             // We want to set the points of the circle lines relative to the game object.
             line.useWorldSpace = false;
 
-            line.sharedMaterial = new Material(defaultLineMaterial);
+            // FIXME: We do not want to create a new material. The fewer materials, the lesser
+            // drawing calls at run-time.
+            line.sharedMaterial = new Material(LineFactory.DefaultLineMaterial);
 
             line.positionCount = segments + 1;
             const int pointCount = segments + 1; // add extra point to make startpoint and endpoint the same to close the circle
