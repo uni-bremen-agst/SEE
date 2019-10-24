@@ -48,7 +48,7 @@ namespace SEEEditor
         /// <summary>
         /// The factory for the kinds of node visualizations to be used as requested by the user.
         /// </summary>
-        private SEE.Layout.ILayout layout;
+        private SEE.Layout.INodeLayout layout;
 
         /// <summary>
         /// The factory for the kinds of node visualizations to be used as requested by the user.

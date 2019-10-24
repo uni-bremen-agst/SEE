@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
-    public class ManhattenLayout : ILayout
+    public class ManhattenLayout : INodeLayout
     {
         public ManhattenLayout(string widthMetric, string heightMetric, string breadthMetric, 
                                SerializableDictionary<string, IconFactory.Erosion> issueMap,
