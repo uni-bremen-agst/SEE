@@ -90,7 +90,7 @@ namespace SEE.Layout
 
         private Dictionary<Node, GameObject> NodeLayout(Graph graph, IScale scaler)
         {
-            ILayout layout;
+            INodeLayout layout;
             switch (settings.NodeLayout)
             {
                 case GraphSettings.NodeLayouts.Balloon:

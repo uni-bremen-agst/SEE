@@ -11,7 +11,7 @@ namespace SEE.Layout
     /// Published in: Proceeding INFOVIS '98 Proceedings of the 1998 IEEE Symposium on 
     /// Information Visualization, Pages 19-25.
     /// </summary>
-    public class BalloonLayout : ILayout
+    public class BalloonLayout : INodeLayout
     {
         public BalloonLayout(string widthMetric, string heightMetric, string breadthMetric, 
                              SerializableDictionary<string, IconFactory.Erosion> issueMap,

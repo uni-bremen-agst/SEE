@@ -8,7 +8,7 @@ namespace SEE.Layout
     /// <summary>
     /// This layout packs circles closely together to decrease total area of city.
     /// </summary>
-    public class CirclePackingLayout : ILayout
+    public class CirclePackingLayout : INodeLayout
     {
         private GameObject RootNodes;
         

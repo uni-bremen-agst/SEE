@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
-    public abstract class ILayout
+    public abstract class INodeLayout
     {
-        public ILayout(string widthMetric, string heightMetric, string breadthMetric,
+        public INodeLayout(string widthMetric, string heightMetric, string breadthMetric,
                SerializableDictionary<string, IconFactory.Erosion> issueMap,
                BlockFactory blockFactory,
                IScale scaler,
