@@ -131,7 +131,10 @@ namespace SEE.Layout
             {
                 if (File.Exists(filename))
                 {
-                    UnityEngine.Object prefab = UnityEditor.AssetDatabase.LoadAssetAtPath(filename, typeof(GameObject));
+                    UnityEngine.Object prefab = null;
+#if UNITY_EDITOR
+                    UnityEditor.AssetDatabase.LoadAssetAtPath(filename, typeof(GameObject));
+#endif
                     if (prefab == null)
                     {
                         Debug.LogErrorFormat("Loading sprite prefab from file {0} failed.\n", filename);
