@@ -52,8 +52,10 @@ namespace SEE.Layout
             foreach (string filename in prefabFiles)
             {
                 string path = pathPrefix + filename + fileExtension;
-                result[i] = UnityEditor.AssetDatabase.LoadAssetAtPath(path, typeof(GameObject));
-
+                result[i] = null;
+#if UNITY_EDITOR
+                UnityEditor.AssetDatabase.LoadAssetAtPath(path, typeof(GameObject));
+#endif
                 //result[i] = Resources.Load<UnityEngine.Object>(filename);
                 if (result[i] == null)
                 {
