@@ -132,14 +132,21 @@ namespace SEE.Layout
             return renderer.bounds.size;
         }
 
+        protected void AddErosionIssues(Node node)
+        {
+            AddErosionIssues(gameNodes[node]);
+        }
+
         /// <summary>
         /// Stacks sprites for software-erosion issues atop of the roof of the given node
         /// in ascending order in terms of the sprite width. The sprite width is proportional
         /// to the normalized metric value for the erosion issue.
         /// </summary>
         /// <param name="node"></param>
-        protected void AddErosionIssues(Node node)
+        protected void AddErosionIssues(GameObject gameNode)
         {
+            Node node = gameNode.GetComponent<NodeRef>().node;
+
             // The list of sprites for the erosion issues.
             List<GameObject> sprites = new List<GameObject>();
 
@@ -153,7 +160,7 @@ namespace SEE.Layout
                         GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
                         sprite.name = sprite.name + " " + node.SourceName;
                         // The sprite becomes a child of the node.
-                        sprite.transform.parent = gameNodes[node].transform;
+                        sprite.transform.parent = gameNode.transform;
 
                         Vector3 spriteSize = GetSizeOfSprite(sprite);
                         // Scale the sprite to one Unity unit.
@@ -175,7 +182,7 @@ namespace SEE.Layout
             {
                 // The space that we put in between two subsequent erosion issue sprites.
                 Vector3 delta = Vector3.up / 100.0f;
-                Vector3 currentRoof = blockFactory.Roof(gameNodes[node]);
+                Vector3 currentRoof = blockFactory.Roof(gameNode);
                 sprites.Sort(Comparer<GameObject>.Create((left, right) => GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
                 foreach (GameObject sprite in sprites)
                 {
