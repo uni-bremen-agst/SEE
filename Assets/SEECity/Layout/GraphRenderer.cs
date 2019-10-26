@@ -41,28 +41,42 @@ namespace SEE.Layout
         private readonly BlockFactory blockFactory;
 
         /// <summary>
+        /// The scale used to normalize the metrics determining the lengths of the blocks.
+        /// </summary>
+        private IScale scaler;
+
+        /// <summary>
         /// Draws the graph.
         /// </summary>
         public void Draw(Graph graph)
         {
-            IScale scaler;
+            SetScaler(graph);
+
+            if (settings.NodeLayout == GraphSettings.NodeLayouts.Manhattan)
             {
-                List<string> nodeMetrics = new List<string>() { settings.WidthMetric, settings.HeightMetric, settings.DepthMetric };
-                nodeMetrics.AddRange(settings.IssueMap().Keys);
-                if (settings.ZScoreScale)
+                DrawCity(graph);
+            }
+            else
+            {
+                Dictionary<Node, GameObject> gameNodes = NodeLayout(graph, scaler);
+                if (settings.ShowEdges)
                 {
-                    scaler = new ZScoreScale(graph, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
-                }
-                else
-                {
-                    scaler = new LinearScale(graph, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
+                    EdgeLayout(graph, gameNodes);
                 }
             }
+        }
 
-            Dictionary<Node, GameObject> gameNodes = NodeLayout(graph, scaler);
-            if (settings.ShowEdges)
+        private void SetScaler(Graph graph)
+        {
+            List<string> nodeMetrics = new List<string>() { settings.WidthMetric, settings.HeightMetric, settings.DepthMetric };
+            nodeMetrics.AddRange(settings.IssueMap().Keys);
+            if (settings.ZScoreScale)
             {
-                EdgeLayout(graph, gameNodes);
+                scaler = new ZScoreScale(graph, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
+            }
+            else
+            {
+                scaler = new LinearScale(graph, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
             }
         }
 
@@ -104,15 +118,6 @@ namespace SEE.Layout
                                                       settings.ShowDonuts);
                         break;
                     }
-                case GraphSettings.NodeLayouts.Manhattan:
-                    {
-                        layout = new SEE.Layout.ManhattenLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
-                                                        settings.IssueMap(),
-                                                        blockFactory,
-                                                        scaler,
-                                                        settings.ShowErosions);
-                        break;
-                    }
                 case GraphSettings.NodeLayouts.CirclePacking:
                     {
                         layout = new SEE.Layout.CirclePackingLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
@@ -134,6 +139,101 @@ namespace SEE.Layout
         }
 
         /// <summary>
+        /// The y co-ordinate of the ground where blocks are placed.
+        /// </summary>
+        protected const float groundLevel = 0.0f;
+
+        protected void DrawCity(Graph graph)
+        {
+            Dictionary<Node, GameObject> gameNodes = CreateGameObjects(graph.Nodes());
+            Dictionary<GameObject, NodeTransform> layout = new ManhattenLayout(groundLevel, blockFactory).Layout(gameNodes);
+            Apply(layout);
+            // Decorations must be applied after the blocks have been placed, so that
+            // we also know their positions.
+            if (settings.ShowErosions)
+            {
+                AddErosionIssues(gameNodes.Values);
+            }
+            BoundingBox(gameNodes.Values, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+            PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel, Color.gray);
+        }
+
+        protected void AddErosionIssues(ICollection<GameObject> gameNodes)
+        {
+            foreach (GameObject block in gameNodes)
+            {
+                AddErosionIssues(block);
+            }
+        }
+
+        public void Apply(Dictionary<GameObject, NodeTransform> layout)
+        {
+            foreach (var entry in layout)
+            {
+                GameObject block = entry.Key;
+                NodeTransform transform = entry.Value;
+                // Note: We need to first scale a block and only then set its position
+                // because the scaling behavior differs between Cubes and CScape buildings.
+                // Cubes scale from its center up and downward, which CScape buildings
+                // scale only up.
+                blockFactory.ScaleBlock(block, transform.scale);
+                blockFactory.SetGroundPosition(block, transform.position);
+            }
+        }
+
+        private void BoundingBox(ICollection<GameObject> gameNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
+        {
+            if (gameNodes.Count == 0)
+            {
+                leftLowerCorner = Vector2.zero;
+                rightUpperCorner = Vector2.zero;
+            }
+            else
+            {
+                leftLowerCorner = new Vector2(Mathf.Infinity, Mathf.Infinity);
+                rightUpperCorner = new Vector2(Mathf.NegativeInfinity, Mathf.NegativeInfinity);
+
+                foreach (GameObject go in gameNodes)
+                {
+                    // Note: go.transform.position denotes the center of the object
+                    Vector3 extent = blockFactory.GetSize(go) / 2.0f;
+                    Vector3 position = blockFactory.GetCenterPosition(go);
+                    {
+                        // x co-ordinate of lower left corner
+                        float x = position.x - extent.x;
+                        if (x < leftLowerCorner.x)
+                        {
+                            leftLowerCorner.x = x;
+                        }
+                    }
+                    {
+                        // z co-ordinate of lower left corner
+                        float z = position.z - extent.z;
+                        if (z < leftLowerCorner.y)
+                        {
+                            leftLowerCorner.y = z;
+                        }
+                    }
+                    {   // x co-ordinate of upper right corner
+                        float x = position.x + extent.x;
+                        if (x > rightUpperCorner.x)
+                        {
+                            rightUpperCorner.x = x;
+                        }
+                    }
+                    {
+                        // z co-ordinate of upper right corner
+                        float z = position.z + extent.z;
+                        if (z > rightUpperCorner.y)
+                        {
+                            rightUpperCorner.y = z;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns the unit of the world helpful for scaling. This unit depends upon the
         /// kind of blocks we are using to represent nodes.
         /// </summary>
@@ -141,6 +241,115 @@ namespace SEE.Layout
         public float Unit()
         {
             return blockFactory.Unit();
+        }
+
+        /// <summary>
+        /// Adds a NodeRef component to given block referencing to given node.
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="node"></param>
+        protected void AttachNode(GameObject block, Node node)
+        {
+            NodeRef nodeRef = block.AddComponent<NodeRef>();
+            nodeRef.node = node;
+        }
+
+        private Dictionary<Node, GameObject> CreateGameObjects(IList<Node> nodes)
+        {
+            Dictionary<Node, GameObject> result = new Dictionary<Node, GameObject>();
+
+            foreach (Node node in nodes)
+            {
+                // We only draw leaves.
+                if (node.IsLeaf())
+                {
+                    GameObject block = blockFactory.NewBlock();
+                    block.name = node.LinkName;
+
+                    AttachNode(block, node);
+                    // Scaled metric values for the dimensions.
+                    Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, settings.WidthMetric),
+                                                scaler.GetNormalizedValue(node, settings.HeightMetric),
+                                                scaler.GetNormalizedValue(node, settings.DepthMetric));
+
+                    // Scale according to the metrics.
+                    blockFactory.ScaleBlock(block, scale);
+
+                    result[node] = block;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Stacks sprites for software-erosion issues atop of the roof of the given node
+        /// in ascending order in terms of the sprite width. The sprite width is proportional
+        /// to the normalized metric value for the erosion issue.
+        /// </summary>
+        /// <param name="node"></param>
+        protected void AddErosionIssues(GameObject gameNode)
+        {
+            Node node = gameNode.GetComponent<NodeRef>().node;
+
+            // The list of sprites for the erosion issues.
+            List<GameObject> sprites = new List<GameObject>();
+
+            // Create and scale the sprites and add them to the list of sprites.
+            foreach (KeyValuePair<string, IconFactory.Erosion> issue in settings.IssueMap())
+            {
+                if (node.TryGetNumeric(issue.Key, out float value))
+                {
+                    if (value > 0.0f)
+                    {
+                        GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
+                        sprite.name = sprite.name + " " + node.SourceName;
+
+                        Vector3 spriteSize = GetSizeOfSprite(sprite);
+                        // Scale the sprite to one Unity unit.
+                        float spriteScale = 1.0f / spriteSize.x;
+                        // Scale the erosion issue by normalization.
+                        float metricScale = scaler.GetNormalizedValue(node, issue.Key);
+                        // First: scale its width to unit size 1.0 maintaining the aspect ratio
+                        sprite.transform.localScale *= spriteScale * blockFactory.Unit();
+                        // Now scale it by the normalized metric.
+                        sprite.transform.localScale *= metricScale;
+                        sprite.transform.position = blockFactory.Roof(gameNode);
+                        sprites.Add(sprite);
+                    }
+                }
+            }
+
+            // Now we stack the sprites on top of the roof of the building in
+            // ascending order of their widths.
+            {
+                // The space that we put in between two subsequent erosion issue sprites.
+                Vector3 delta = Vector3.up / 100.0f;
+                Vector3 currentRoof = blockFactory.Roof(gameNode);
+                sprites.Sort(Comparer<GameObject>.Create((left, right) => GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
+                foreach (GameObject sprite in sprites)
+                {
+                    Vector3 size = GetSizeOfSprite(sprite);
+                    // Note: Consider that the position of the sprite is its center.
+                    Vector3 halfHeight = (size.y / 2.0f) * Vector3.up;
+                    sprite.transform.position = currentRoof + delta + halfHeight;
+                    currentRoof = sprite.transform.position + halfHeight;
+                }
+            }
+        }
+
+        protected static Vector3 GetSizeOfSprite(GameObject go)
+        {
+            // The game object representing an erosion is a composite of 
+            // multiple LOD child objects to be drawn depending how close
+            // the camera is. The container object 'go' itself does not
+            // have a renderer. We need to obtain the renderer of the
+            // first child hat represents the object at LOD 0 instead.
+            Renderer renderer = go.GetComponentInChildren<Renderer>();
+            // Note: renderer.sprite.bounds.size yields the original size
+            // of the sprite of the prefab. It does not consider the scaling.
+            // It depends only upon the imported graphic. That is why we
+            // need to use renderer.bounds.size.
+            return renderer.bounds.size;
         }
     }
 }
