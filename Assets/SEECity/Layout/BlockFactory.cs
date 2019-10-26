@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SEE.Layout
 {
@@ -53,23 +54,29 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="block">block to be scaled</param>
         /// <param name="scale">scaling factor</param>
-        public abstract void ScaleBlock(GameObject block, Vector3 scale);
+        public virtual void ScaleBlock(GameObject block, Vector3 scale)
+        {
+            block.transform.localScale = scale;
+        }
 
         /// <summary>
-        /// Sets the position of the current block. The given x and z positions are interpreted
-        /// as the center of the block and the y co-ordinate specifies the ground level of the 
-        /// block.
+        /// Sets the position of the current block. The given position is
+        /// interpreted as the center (x,z) of the block on the ground (y).
         /// </summary>
         /// <param name="block">block to be positioned</param>
-        /// <param name="position">where to position the block</param>
-        public abstract void SetPosition(GameObject block, Vector3 position);
+        /// <param name="position">where to position the block (its center) on the ground y</param>
+        public virtual void SetGroundPosition(GameObject block, Vector3 position)
+        {
+            Vector3 extent = GetSize(block) / 2.0f;
+            block.transform.position = new Vector3(position.x, position.y + extent.y, position.z);
+        }
 
         /// <summary>
         /// Sets the local position of the current block. The given position is
         /// interpreted as the center of the block.
         /// </summary>
         /// <param name="block">block to be positioned</param>
-        /// <param name="position">where to position the block</param>
+        /// <param name="position">where to position the block (its center)</param>
         public virtual void SetLocalPosition(GameObject block, Vector3 position)
         {
             // the default position of a game object in Unity is its center
@@ -98,6 +105,18 @@ namespace SEE.Layout
             Vector3 result = block.transform.position;
             result.y -= GetSize(block).y / 2.0f;
             return result;
+        }
+
+        /// <summary>
+        /// The center position of the block.
+        /// </summary>
+        /// <param name="block">block for which to retrieve the center position</param>
+        /// <returns>center position of the block</returns>
+        public virtual Vector3 GetCenterPosition(GameObject block)
+        {
+            // The center position in Unity is normally its transform.position
+            // (as opposed to CScape buildings).
+            return block.transform.position;
         }
     }
 }

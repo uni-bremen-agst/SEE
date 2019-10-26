@@ -287,7 +287,7 @@ namespace SEE.Layout
         private void DrawLeaf(Node node, Vector3 position, float radius)
         {
             GameObject gameObject = gameNodes[node];
-            blockFactory.SetPosition(gameObject, position);
+            blockFactory.SetGroundPosition(gameObject, position);
 
             // FIXME: We do without garden for the time being
             //AddGarden(parent);
