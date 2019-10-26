@@ -65,33 +65,37 @@ namespace SEE.Layout
             foreach (var gameNode in gameNodes)
             {
                 Node node = gameNode.Key;
-                GameObject block = gameNode.Value;
-
-                column++;
-                if (column > numberOfBuildingsPerRow)
+                // We only draw leaves.
+                if (node.IsLeaf())
                 {
-                    // exceeded length of the square => start a new row
-                    row++;
-                    column = 1;
-                    positionZ += maxZ + distanceBetweenBuildings;
-                    maxZ = 0.0f;
-                    positionX = 0.0f;
-                }
+                    GameObject block = gameNode.Value;
 
-                // size is independent of the sceneNode
-                Vector3 size = blockFactory.GetSize(block);
-                if (size.z > maxZ)
-                {
-                    maxZ = size.z;
-                }
+                    column++;
+                    if (column > numberOfBuildingsPerRow)
+                    {
+                        // exceeded length of the square => start a new row
+                        row++;
+                        column = 1;
+                        positionZ += maxZ + distanceBetweenBuildings;
+                        maxZ = 0.0f;
+                        positionX = 0.0f;
+                    }
 
-                // center position of the block to be placed
-                positionX += size.x / 2.0f;
-                // The position is the center of a GameObject. We want all GameObjects
-                // be placed at the same ground level 0.
-                result[block] = new NodeTransform(new Vector3(positionX, groundLevel, positionZ), Vector3.one);
-                // right border position of the block to be placed + space in between buildings
-                positionX += size.x / 2.0f + distanceBetweenBuildings;
+                    // size is independent of the sceneNode
+                    Vector3 size = blockFactory.GetSize(block);
+                    if (size.z > maxZ)
+                    {
+                        maxZ = size.z;
+                    }
+
+                    // center position of the block to be placed
+                    positionX += size.x / 2.0f;
+                    // The position is the center of a GameObject. We want all GameObjects
+                    // be placed at the same ground level 0.
+                    result[block] = new NodeTransform(new Vector3(positionX, groundLevel, positionZ), Vector3.one);
+                    // right border position of the block to be placed + space in between buildings
+                    positionX += size.x / 2.0f + distanceBetweenBuildings;
+                }
             }
             return result;
         }
