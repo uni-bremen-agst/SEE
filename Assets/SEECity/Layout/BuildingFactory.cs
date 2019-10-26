@@ -195,21 +195,28 @@ namespace SEE.Layout
             }
         }
 
-        public override void SetPosition(GameObject block, Vector3 position)
+        public override void SetGroundPosition(GameObject block, Vector3 position)
         {
             // the default position of a game object in Unity is its center, but the
-            // position of a CScape building is its left corner
+            // position of a CScape building is its left front corner
             Vector3 extent = GetSize(block) / 2.0f;
-            Vector3 newPosition = position - extent;
-            newPosition.y = position.y;
-            block.transform.position = newPosition;
+            position.x -= extent.x;
+            position.z -= extent.z;
+            // The y position is already interpreted as the ground by CScape buildings.
+            block.transform.position = position;
         }
 
         public override void SetLocalPosition(GameObject block, Vector3 position)
         {
             Vector3 extent = GetSize(block) / 2.0f;
-            Vector3 newPosition = position - extent;
-            block.transform.localPosition = newPosition;
+            block.transform.localPosition = position - extent;
+        }
+
+        public override Vector3 GetCenterPosition(GameObject block)
+        {
+            // transform.position denotes the left front corner of a building in CScape
+            Vector3 extent = GetSize(block) / 2.0f;
+            return block.transform.position + extent;
         }
 
         /// <summary>
