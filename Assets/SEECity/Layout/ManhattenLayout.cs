@@ -1,5 +1,4 @@
 ﻿using SEE.DataModel;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,29 +14,6 @@ namespace SEE.Layout
             : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, showErosions)
         {
             name = "Manhattan";
-        }
-
-        // The minimal length of any axis (width, breadth, height) of a block.
-        // Must not exceed 1.0f.
-        protected const float minimalLength = 0.1f;
-
-        // The maximal height of all blocks. If edges are drawn above the blocks, they
-        // will be drawn somewhat above this value relative to the blocks ground.
-        private float maxBlockHeight = 0.0f;
-
-        /// <summary>
-        /// The position and scaling of a node game object as determined by a node layout.
-        /// </summary>
-        /// Note: Structs are value types and are copied on assignment. 
-        public struct NodeTransform
-        {
-            public NodeTransform(Vector3 position, Vector3 scale)
-            {
-                this.position = position;
-                this.scale = scale;
-            }
-            public Vector3 position;
-            public Vector3 scale;
         }
 
         private Dictionary<Node, GameObject> CreateGameObjects(IList<Node> nodes)
@@ -76,15 +52,14 @@ namespace SEE.Layout
         {
             Dictionary<GameObject, NodeTransform> result = new Dictionary<GameObject, NodeTransform>();
 
+            // Simple grid layout with the same number of blocks in each row and column (roughly).
             int numberOfBuildingsPerRow = (int)Mathf.Sqrt(gameNodes.Count);
             int column = 0;
             int row = 1;
             const float distanceBetweenBuildings = 1.0f;
             float maxZ = 0.0f;         // maximal depth of a building in a row
-            float maxZinFirstRow = 0.0f; // the value of maxZ in the first row
             float positionX = 0.0f;    // co-ordinate in a column of the grid
             float positionZ = 0.0f;    // co-ordinate in a row of the grid
-            float maxPositionX = 0.0f; // maximal value of any positionX
 
             // Draw all nodes on a grid. position
             foreach (var gameNode in gameNodes)
@@ -96,21 +71,10 @@ namespace SEE.Layout
                 if (column > numberOfBuildingsPerRow)
                 {
                     // exceeded length of the square => start a new row
-                    if (row == 1)
-                    {
-                        // we are about to start the first column in the second row;
-                        // thus, we have seen a blocks in the first row and can set
-                        // maxZinFirstRow accordingly
-                        maxZinFirstRow = maxZ;
-                    }
                     row++;
                     column = 1;
                     positionZ += maxZ + distanceBetweenBuildings;
                     maxZ = 0.0f;
-                    if (positionX > maxPositionX)
-                    {
-                        maxPositionX = positionX;
-                    }
                     positionX = 0.0f;
                 }
 
@@ -120,18 +84,14 @@ namespace SEE.Layout
                 {
                     maxZ = size.z;
                 }
-                if (size.y > maxBlockHeight)
-                {
-                    maxBlockHeight = size.y;
-                }
 
+                // center position of the block to be placed
                 positionX += size.x / 2.0f;
                 // The position is the center of a GameObject. We want all GameObjects
                 // be placed at the same ground level 0.
                 result[block] = new NodeTransform(new Vector3(positionX, groundLevel, positionZ), Vector3.one);
-
+                // right border position of the block to be placed + space in between buildings
                 positionX += size.x / 2.0f + distanceBetweenBuildings;
-
             }
             return result;
         }
