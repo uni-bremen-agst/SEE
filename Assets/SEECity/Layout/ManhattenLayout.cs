@@ -4,49 +4,36 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
-    public class ManhattenLayout : INodeLayout
+    public class ManhattenLayout //: INodeLayout
     {
-        public ManhattenLayout(string widthMetric, string heightMetric, string breadthMetric, 
-                               SerializableDictionary<string, IconFactory.Erosion> issueMap,
-                               BlockFactory blockFactory,
-                               IScale scaler,
-                               bool showErosions)
-            : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, showErosions)
+        public ManhattenLayout(float groundLevel,
+                               BlockFactory blockFactory)
         {
             name = "Manhattan";
+            this.groundLevel = groundLevel;
+            this.blockFactory = blockFactory;
         }
 
-        private Dictionary<Node, GameObject> CreateGameObjects(IList<Node> nodes)
+        // name of the layout
+        protected readonly string name;
+
+        /// <summary>
+        /// The unique name of a layout.
+        /// </summary>
+        public string Name
         {
-            Dictionary<Node, GameObject> result = new Dictionary<Node, GameObject>();
-
-            foreach (Node node in nodes)
-            {
-                // We only draw leaves.
-                if (node.IsLeaf())
-                {
-                    GameObject block = blockFactory.NewBlock();
-                    block.name = node.LinkName;
-                    
-                    AttachNode(block, node);
-                    // Scaled metric values for the dimensions.
-                    Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, widthMetric),
-                                                scaler.GetNormalizedValue(node, heightMetric),
-                                                scaler.GetNormalizedValue(node, breadthMetric));
-
-                    // Scale according to the metrics.
-                    blockFactory.ScaleBlock(block, scale);
-
-                    if (showErosions)
-                    {
-                        AddErosionIssues(block);
-                    }
-
-                    result[node] = block;
-                }
-            }
-            return result;
+            get => name;
         }
+
+        /// <summary>
+        /// The y co-ordinate of the ground where blocks are placed.
+        /// </summary>
+        protected readonly float groundLevel;
+
+        /// <summary>
+        /// A factory to create visual representations of graph nodes (e.g., cubes or CScape buildings).
+        /// </summary>
+        protected readonly BlockFactory blockFactory;
 
         public Dictionary<GameObject, NodeTransform> Layout(Dictionary<Node, GameObject> gameNodes)
         {
@@ -98,82 +85,6 @@ namespace SEE.Layout
                 }
             }
             return result;
-        }
-
-        public void Apply(Dictionary<GameObject, NodeTransform> layout)
-        {
-            foreach (var entry in layout)
-            {
-                GameObject block = entry.Key;
-                NodeTransform transform = entry.Value;
-                // Note: We need to first scale a block and only then set its position
-                // because the scaling behavior differs between Cubes and CScape buildings.
-                // Cubes scale from its center up and downward, which CScape buildings
-                // scale only up.
-                blockFactory.ScaleBlock(block, transform.scale);
-                blockFactory.SetGroundPosition(block, transform.position);
-            }
-        }
-
-        public override void Draw(Graph graph)
-        {
-            gameNodes = CreateGameObjects(graph.Nodes());
-            Dictionary<GameObject, NodeTransform> layout = Layout(gameNodes);
-            Apply(layout);
-            BoundingBox(gameNodes.Values, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-            PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel, Color.gray);
-        }
-
-        private void BoundingBox(ICollection<GameObject> gameNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
-        {
-            if (gameNodes.Count == 0)
-            {
-                leftLowerCorner = Vector2.zero;
-                rightUpperCorner = Vector2.zero;
-            }
-            else
-            {
-                leftLowerCorner = new Vector2(Mathf.Infinity, Mathf.Infinity);
-                rightUpperCorner = new Vector2(Mathf.NegativeInfinity, Mathf.NegativeInfinity);
-
-                foreach (GameObject go in gameNodes)
-                {
-                    // Note: go.transform.position denotes the center of the object
-                    Vector3 extent = blockFactory.GetSize(go) / 2.0f;
-                    Vector3 position = blockFactory.GetCenterPosition(go);
-                    {
-                        // x co-ordinate of lower left corner
-                        float x = position.x - extent.x;
-                        if (x < leftLowerCorner.x)
-                        {
-                            leftLowerCorner.x = x;
-                        }
-                    }
-                    {
-                        // z co-ordinate of lower left corner
-                        float z = position.z - extent.z;
-                        if (z < leftLowerCorner.y)
-                        {
-                            leftLowerCorner.y = z;
-                        }
-                    }
-                    {   // x co-ordinate of upper right corner
-                        float x = position.x + extent.x;
-                        if (x > rightUpperCorner.x)
-                        {
-                            rightUpperCorner.x = x;
-                        }
-                    }
-                    {
-                        // z co-ordinate of upper right corner
-                        float z = position.z + extent.z;
-                        if (z > rightUpperCorner.y)
-                        {
-                            rightUpperCorner.y = z;
-                        }
-                    }
-                }
-            }
         }
     }
 }
