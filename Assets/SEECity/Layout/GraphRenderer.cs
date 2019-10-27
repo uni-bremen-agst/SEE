@@ -51,8 +51,10 @@ namespace SEE.Layout
         public void Draw(Graph graph)
         {
             SetScaler(graph);
+            graph.SortHierarchyByName();
 
-            if (settings.NodeLayout == GraphSettings.NodeLayouts.Manhattan)
+            if (settings.NodeLayout == GraphSettings.NodeLayouts.Manhattan
+                || settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
             {
                 DrawCity(graph);
             }
@@ -109,24 +111,24 @@ namespace SEE.Layout
             {
                 case GraphSettings.NodeLayouts.Balloon:
                     {
-                        layout = new SEE.Layout.BalloonLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
-                                                      settings.IssueMap(),
-                                                      settings.InnerNodeMetrics,
-                                                      blockFactory,
-                                                      scaler,
-                                                      settings.ShowErosions,
-                                                      settings.ShowDonuts);
+                        layout = new BalloonLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
+                                                   settings.IssueMap(),
+                                                   settings.InnerNodeMetrics,
+                                                   blockFactory,
+                                                   scaler,
+                                                   settings.ShowErosions,
+                                                   settings.ShowDonuts);
                         break;
                     }
                 case GraphSettings.NodeLayouts.CirclePacking:
                     {
-                        layout = new SEE.Layout.CirclePackingLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
-                                                      settings.IssueMap(),
-                                                      settings.InnerNodeMetrics,
-                                                      blockFactory,
-                                                      scaler,
-                                                      settings.ShowErosions,
-                                                      settings.ShowDonuts);
+                        layout = new CirclePackingLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
+                                                         settings.IssueMap(),
+                                                         settings.InnerNodeMetrics,
+                                                         blockFactory,
+                                                         scaler,
+                                                         settings.ShowErosions,
+                                                         settings.ShowDonuts);
                         break;
                     }
                 default:
@@ -145,16 +147,29 @@ namespace SEE.Layout
 
         protected void DrawCity(Graph graph)
         {
-            Dictionary<Node, GameObject> gameNodes = CreateGameObjects(graph.Nodes());
-            Dictionary<GameObject, NodeTransform> layout = new ManhattenLayout(groundLevel, blockFactory).Layout(gameNodes);
+            Dictionary<Node, GameObject> nodeMap = CreateGameObjects(graph.Nodes());
+            ICollection<GameObject> gameNodes = nodeMap.Values;
+            Dictionary<GameObject, NodeTransform> layout;
+            switch (settings.NodeLayout)
+            {
+                case GraphSettings.NodeLayouts.Manhattan:
+                    layout = new ManhattenLayout(groundLevel, blockFactory).Layout(gameNodes);
+                    break;
+                case GraphSettings.NodeLayouts.Treemap:
+                    layout = new TreemapLayout(groundLevel, blockFactory, 100.0f, 100.0f).Layout(gameNodes);
+                    break;
+                default:
+                    throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
+            }
+            
             Apply(layout);
             // Decorations must be applied after the blocks have been placed, so that
             // we also know their positions.
             if (settings.ShowErosions)
             {
-                AddErosionIssues(gameNodes.Values);
+                AddErosionIssues(gameNodes);
             }
-            BoundingBox(gameNodes.Values, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+            BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel, Color.gray);
         }
 
