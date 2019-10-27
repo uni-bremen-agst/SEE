@@ -4,24 +4,21 @@ using UnityEngine;
 
 public class LobbyController : MonoBehaviourPunCallbacks
 {
-
     [SerializeField]
-    private GameObject QuickStartButton;
+    private GameObject CreateRoomButton;
     [SerializeField]
-    private GameObject QuickCancelButton;
+    private GameObject JoinRoomButton;
     [SerializeField]
     private int RoomSize;
 
     public override void OnConnectedToMaster()
     {
         PhotonNetwork.AutomaticallySyncScene = true;
-        QuickStartButton.SetActive(true);
+
     }
 
     public void QuickStart()
     {
-        QuickStartButton.SetActive(false);
-        QuickCancelButton.SetActive(true);
         PhotonNetwork.JoinRandomRoom();
     }
 
@@ -44,8 +41,6 @@ public class LobbyController : MonoBehaviourPunCallbacks
 
     public void QuickCancel()
     {
-        QuickCancelButton.SetActive(false);
-        QuickStartButton.SetActive(true);
         PhotonNetwork.LeaveRoom();
     }
 }

@@ -16,6 +16,8 @@ public class NetworkController : MonoBehaviourPunCallbacks
         Debug.Log("Region: " + PhotonNetwork.CloudRegion);
     }
 
+
+
     // Update is called once per frame
     void Update()
     {
