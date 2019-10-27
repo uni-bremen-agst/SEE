@@ -35,7 +35,7 @@ namespace SEE.Layout
         public override void Draw(Graph graph)
         {
             LevelUnit = Vector3.zero;
-            graph.SortHierarchyByName();
+            
             RootNodes = new GameObject("Nodes");
             RootNodes.tag = Tags.Node;
             List<Node> roots = graph.GetRoots();

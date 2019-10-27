@@ -4,38 +4,16 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
-    public class ManhattenLayout //: INodeLayout
+    public class ManhattenLayout : NodeLayout
     {
         public ManhattenLayout(float groundLevel,
                                BlockFactory blockFactory)
+            : base(groundLevel, blockFactory)
         {
             name = "Manhattan";
-            this.groundLevel = groundLevel;
-            this.blockFactory = blockFactory;
         }
 
-        // name of the layout
-        protected readonly string name;
-
-        /// <summary>
-        /// The unique name of a layout.
-        /// </summary>
-        public string Name
-        {
-            get => name;
-        }
-
-        /// <summary>
-        /// The y co-ordinate of the ground where blocks are placed.
-        /// </summary>
-        protected readonly float groundLevel;
-
-        /// <summary>
-        /// A factory to create visual representations of graph nodes (e.g., cubes or CScape buildings).
-        /// </summary>
-        protected readonly BlockFactory blockFactory;
-
-        public Dictionary<GameObject, NodeTransform> Layout(Dictionary<Node, GameObject> gameNodes)
+        public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
         {
             Dictionary<GameObject, NodeTransform> result = new Dictionary<GameObject, NodeTransform>();
 
@@ -51,12 +29,10 @@ namespace SEE.Layout
             // Draw all nodes on a grid. position
             foreach (var gameNode in gameNodes)
             {
-                Node node = gameNode.Key;
+                Node node = gameNode.GetComponent<NodeRef>().node;
                 // We only draw leaves.
                 if (node.IsLeaf())
                 {
-                    GameObject block = gameNode.Value;
-
                     column++;
                     if (column > numberOfBuildingsPerRow)
                     {
@@ -69,7 +45,7 @@ namespace SEE.Layout
                     }
 
                     // size is independent of the sceneNode
-                    Vector3 size = blockFactory.GetSize(block);
+                    Vector3 size = blockFactory.GetSize(gameNode);
                     if (size.z > maxZ)
                     {
                         maxZ = size.z;
@@ -79,7 +55,7 @@ namespace SEE.Layout
                     positionX += size.x / 2.0f;
                     // The position is the center of a GameObject. We want all GameObjects
                     // be placed at the same ground level 0.
-                    result[block] = new NodeTransform(new Vector3(positionX, groundLevel, positionZ), Vector3.one);
+                    result[gameNode] = new NodeTransform(new Vector3(positionX, groundLevel, positionZ), Vector3.one);
                     // right border position of the block to be placed + space in between buildings
                     positionX += size.x / 2.0f + distanceBetweenBuildings;
                 }
