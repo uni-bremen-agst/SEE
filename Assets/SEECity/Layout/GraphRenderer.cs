@@ -54,7 +54,8 @@ namespace SEE.Layout
             graph.SortHierarchyByName();
 
             if (settings.NodeLayout == GraphSettings.NodeLayouts.Manhattan
-                || settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
+                || settings.NodeLayout == GraphSettings.NodeLayouts.Treemap
+                || settings.NodeLayout == GraphSettings.NodeLayouts.BallonNode)
             {
                 DrawCity(graph);
             }
@@ -147,16 +148,23 @@ namespace SEE.Layout
 
         protected void DrawCity(Graph graph)
         {
-            Dictionary<Node, GameObject> nodeMap = CreateGameObjects(graph.Nodes());
-            ICollection<GameObject> gameNodes = nodeMap.Values;
+            Dictionary<Node, GameObject> nodeMap;
             Dictionary<GameObject, NodeTransform> layout;
+            List<Node> nodes = graph.Nodes();
             switch (settings.NodeLayout)
             {
                 case GraphSettings.NodeLayouts.Manhattan:
-                    layout = new ManhattenLayout(groundLevel, blockFactory).Layout(gameNodes);
+                    nodeMap = CreateBlocks(nodes); // only leaves
+                    layout = new ManhattenLayout(groundLevel, blockFactory).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.Treemap:
-                    layout = new TreemapLayout(groundLevel, blockFactory, 100.0f, 100.0f).Layout(gameNodes);
+                    nodeMap = CreateBlocks(nodes); // only leaves
+                    layout = new TreemapLayout(groundLevel, blockFactory, 100.0f, 100.0f).Layout(nodeMap.Values);
+                    break;
+                case GraphSettings.NodeLayouts.BallonNode:
+                    nodeMap = CreateBlocks(nodes); // leaves
+                    AddContainers(nodeMap, nodes); // and inner nodes
+                    layout = new BalloonNodeLayout(groundLevel, blockFactory).Layout(nodeMap.Values);
                     break;
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
@@ -167,10 +175,10 @@ namespace SEE.Layout
             // we also know their positions.
             if (settings.ShowErosions)
             {
-                AddErosionIssues(gameNodes);
+                AddErosionIssues(nodeMap.Values);
             }
-            BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-            PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel, Color.gray);
+            BoundingBox(nodeMap.Values, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+            PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
         }
 
         protected void AddErosionIssues(ICollection<GameObject> gameNodes)
@@ -187,63 +195,23 @@ namespace SEE.Layout
             {
                 GameObject block = entry.Key;
                 NodeTransform transform = entry.Value;
-                // Note: We need to first scale a block and only then set its position
-                // because the scaling behavior differs between Cubes and CScape buildings.
-                // Cubes scale from its center up and downward, which CScape buildings
-                // scale only up.
-                blockFactory.ScaleBlock(block, transform.scale);
-                blockFactory.SetGroundPosition(block, transform.position);
-            }
-        }
+                Node node = block.GetComponent<NodeRef>().node;
 
-        private void BoundingBox(ICollection<GameObject> gameNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
-        {
-            if (gameNodes.Count == 0)
-            {
-                leftLowerCorner = Vector2.zero;
-                rightUpperCorner = Vector2.zero;
-            }
-            else
-            {
-                leftLowerCorner = new Vector2(Mathf.Infinity, Mathf.Infinity);
-                rightUpperCorner = new Vector2(Mathf.NegativeInfinity, Mathf.NegativeInfinity);
-
-                foreach (GameObject go in gameNodes)
+                if (node.IsLeaf())
                 {
-                    // Note: go.transform.position denotes the center of the object
-                    Vector3 extent = blockFactory.GetSize(go) / 2.0f;
-                    Vector3 position = blockFactory.GetCenterPosition(go);
-                    {
-                        // x co-ordinate of lower left corner
-                        float x = position.x - extent.x;
-                        if (x < leftLowerCorner.x)
-                        {
-                            leftLowerCorner.x = x;
-                        }
-                    }
-                    {
-                        // z co-ordinate of lower left corner
-                        float z = position.z - extent.z;
-                        if (z < leftLowerCorner.y)
-                        {
-                            leftLowerCorner.y = z;
-                        }
-                    }
-                    {   // x co-ordinate of upper right corner
-                        float x = position.x + extent.x;
-                        if (x > rightUpperCorner.x)
-                        {
-                            rightUpperCorner.x = x;
-                        }
-                    }
-                    {
-                        // z co-ordinate of upper right corner
-                        float z = position.z + extent.z;
-                        if (z > rightUpperCorner.y)
-                        {
-                            rightUpperCorner.y = z;
-                        }
-                    }
+                    // Leave nodes were created as blocks by blockFactory.
+                    // Note: We need to first scale a block and only then set its position
+                    // because the scaling behavior differs between Cubes and CScape buildings.
+                    // Cubes scale from its center up and downward, which CScape buildings
+                    // scale only up.
+                    blockFactory.ScaleBlock(block, transform.scale);
+                    blockFactory.SetGroundPosition(block, transform.position);
+                }
+                else
+                {
+                    // Inner nodes were not created by blockFactory.
+                    block.transform.position = transform.position;
+                    block.transform.localScale = transform.scale;
                 }
             }
         }
@@ -269,13 +237,18 @@ namespace SEE.Layout
             nodeRef.node = node;
         }
 
-        private Dictionary<Node, GameObject> CreateGameObjects(IList<Node> nodes)
+        /// <summary>
+        /// Creates and scales blocks for all leaf nodes in given list of nodes.
+        /// </summary>
+        /// <param name="nodes">list of nodes for which to create blocks</param>
+        /// <returns>blocks for all leaf nodes in given list of nodes</returns>
+        private Dictionary<Node, GameObject> CreateBlocks(IList<Node> nodes)
         {
             Dictionary<Node, GameObject> result = new Dictionary<Node, GameObject>();
 
             foreach (Node node in nodes)
             {
-                // We only draw leaves.
+                // We add only leaves.
                 if (node.IsLeaf())
                 {
                     GameObject block = blockFactory.NewBlock();
@@ -294,6 +267,62 @@ namespace SEE.Layout
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// Adds game objects for all inner nodes in given list of nodes to nodeMap.
+        /// Note: added game objectsfor inner nodes are not scaled.
+        /// </summary>
+        /// <param name="nodeMap">nodeMap to which the game objects are to be added</param>
+        /// <param name="nodes">list of nodes for which to create blocks</param>
+        private void AddContainers(Dictionary<Node, GameObject> nodeMap, IList<Node> nodes)
+        {
+            foreach (Node node in nodes)
+            {
+                // We add only inner nodes.
+                if (! node.IsLeaf())
+                {
+                    GameObject innerGameObject = new GameObject
+                    {
+                        name = node.LinkName,
+                        tag = Tags.Node
+                    };
+
+                    AttachNode(innerGameObject, node);
+                    AttachCircleLine(innerGameObject, 1.0f, 0.1f * blockFactory.Unit());
+                    nodeMap[node] = innerGameObject;
+                }
+            }
+        }
+
+        private static void AttachCircleLine(GameObject circle, float radius, float lineWidth)
+        {
+            // Number of line segments constituting the circle
+            const int segments = 360;
+
+            LineRenderer line = circle.AddComponent<LineRenderer>();
+
+            LineFactory.SetDefaults(line);
+            LineFactory.SetColor(line, Color.white);
+            LineFactory.SetWidth(line, lineWidth);
+
+            // We want to set the points of the circle lines relative to the game object.
+            line.useWorldSpace = false;
+
+            // FIXME: We do not want to create a new material. The fewer materials, the lesser
+            // drawing calls at run-time.
+            line.sharedMaterial = new Material(LineFactory.DefaultLineMaterial);
+
+            line.positionCount = segments + 1;
+            const int pointCount = segments + 1; // add extra point to make startpoint and endpoint the same to close the circle
+            Vector3[] points = new Vector3[pointCount];
+
+            for (int i = 0; i < pointCount; i++)
+            {
+                float rad = Mathf.Deg2Rad * (i * 360f / segments);
+                points[i] = new Vector3(Mathf.Sin(rad) * radius, 0, Mathf.Cos(rad) * radius);
+            }
+            line.SetPositions(points);
         }
 
         /// <summary>
@@ -365,6 +394,60 @@ namespace SEE.Layout
             // It depends only upon the imported graphic. That is why we
             // need to use renderer.bounds.size.
             return renderer.bounds.size;
+        }
+
+        private void BoundingBox(ICollection<GameObject> gameNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
+        {
+            if (gameNodes.Count == 0)
+            {
+                leftLowerCorner = Vector2.zero;
+                rightUpperCorner = Vector2.zero;
+            }
+            else
+            {
+                leftLowerCorner = new Vector2(Mathf.Infinity, Mathf.Infinity);
+                rightUpperCorner = new Vector2(Mathf.NegativeInfinity, Mathf.NegativeInfinity);
+
+                foreach (GameObject go in gameNodes)
+                {
+                    Node node = go.GetComponent<NodeRef>().node;
+
+                    // Note: go.transform.position denotes the center of the object
+                    Vector3 extent = node.IsLeaf() ? blockFactory.GetSize(go) / 2.0f : go.GetComponent<Renderer>().bounds.extents;
+                    Vector3 position = node.IsLeaf() ? blockFactory.GetCenterPosition(go) : go.transform.position;
+                    {
+                        // x co-ordinate of lower left corner
+                        float x = position.x - extent.x;
+                        if (x < leftLowerCorner.x)
+                        {
+                            leftLowerCorner.x = x;
+                        }
+                    }
+                    {
+                        // z co-ordinate of lower left corner
+                        float z = position.z - extent.z;
+                        if (z < leftLowerCorner.y)
+                        {
+                            leftLowerCorner.y = z;
+                        }
+                    }
+                    {   // x co-ordinate of upper right corner
+                        float x = position.x + extent.x;
+                        if (x > rightUpperCorner.x)
+                        {
+                            rightUpperCorner.x = x;
+                        }
+                    }
+                    {
+                        // z co-ordinate of upper right corner
+                        float z = position.z + extent.z;
+                        if (z > rightUpperCorner.y)
+                        {
+                            rightUpperCorner.y = z;
+                        }
+                    }
+                }
+            }
         }
     }
 }
