@@ -133,7 +133,7 @@ namespace SEE.DataModel
             List<Node> result = new List<Node>();
             foreach (Node node in nodes.Values)
             {
-                if (node.Parent == null)
+                if (node.IsRoot())
                 {
                     result.Add(node);
                 }
