@@ -102,57 +102,12 @@ namespace SEE.Layout
                     i++;
                 }
             }
-            DrawPlane(roots, max_radius);
         }
 
         /// <summary>
         /// The maximal depth of the node hierarchy.
         /// </summary>
         private int maxDepth = 0;
-
-        // The plane underneath the nodes.
-        private GameObject plane;
-
-        ~BalloonLayout()
-        {
-            if (plane != null)
-            {
-                Destroyer.DestroyGameObject(plane);
-            }
-        }
-
-        /// <summary>
-        /// Draws the plane underneath the nodes. Defines attribute 'plane'.
-        /// </summary>
-        /// <param name="roots">the roots of the graph</param>
-        /// <param name="max_radius">the maximal radius of all roots</param>
-        private void DrawPlane(Node[] roots, float max_radius)
-        {
-            // The factor by which we enlarge the plane somewhat. The plane may be a bit
-            // larger than the maximal extents of the circles. That solves may also solve the issue
-            // of the line width of the circle drawn (which depends upon its tree depth) that is not 
-            // capture by the radius.
-            const float enlargementFactor = 1.12f; // should not be smaller than 1.0
-
-            // Width of the plane underneath the root circles determined by the left-most and right-most circle.
-            float width = (gameNodes[roots[roots.Length - 1]].transform.position.x - gameNodes[roots[0]].transform.position.x
-                + nodeInfos[roots[0]].outer_radius + nodeInfos[roots[roots.Length - 1]].outer_radius)
-                * enlargementFactor;
-
-            // Breadth of the plane: double the radius. 
-            float depth = (2.0f * max_radius) * enlargementFactor;
-
-            // Height of the plane.
-            float height = 1.0f;
-
-            Vector3 leftRootCenter = gameNodes[roots[0]].transform.position;
-            float planePositionX = (leftRootCenter.x - nodeInfos[roots[0]].outer_radius) + (width / enlargementFactor / 2.0f);
-            float planePositionY = leftRootCenter.y - 1.0f; // somewhat underneath roots
-            float planePositionZ = leftRootCenter.z;
-            Vector3 centerPosition = new Vector3(planePositionX, planePositionY, planePositionZ);
-
-            plane = PlaneFactory.NewPlane(centerPosition, Color.gray, width, depth, height);
-        }
 
         /// <summary>
         /// If node is a leaf, a block is drawn. If node is an inner node, a circle is drawn
