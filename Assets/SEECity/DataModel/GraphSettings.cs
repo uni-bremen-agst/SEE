@@ -112,7 +112,8 @@ namespace SEE
         {
             Balloon = 0,
             Manhattan = 1,
-            CirclePacking = 2
+            CirclePacking = 2,
+            Treemap = 3
         }
 
         public enum EdgeLayouts
