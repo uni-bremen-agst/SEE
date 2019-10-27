@@ -62,7 +62,7 @@ namespace SEE.Layout
         /// Adds padding to the rectangle.
         /// </summary>
         /// <param name="rect">rectangle for which to add padding</param>
-        private static void pad_rectangle(ref Rectangle rect)
+        private static void Add_Padding(ref Rectangle rect)
         {
             if (rect.width > 2 * padding)
             {
@@ -285,7 +285,7 @@ namespace SEE.Layout
         private static List<Rectangle> Squarified_Layout_With_Padding(List<NodeSize> sizes, float x, float z, float width, float depth)
         {
             List<Rectangle> result = Squarified_Layout(sizes, x, z, width, depth);
-            result.ForEach(rect => pad_rectangle(ref rect));
+            result.ForEach(rect => Add_Padding(ref rect));
             return result;
         }
 
@@ -303,36 +303,6 @@ namespace SEE.Layout
             foreach (NodeSize node in sizes)
             {
                 node.size *= total_area / total_size;
-            }
-        }
-
-        // Just for testing. FIXME: Remove it later.
-        public void Draw()
-        {
-            List<float> sizes = new List<float>() { 1, 3, 6, 2, 2, 6, 4 };
-            List<NodeSize> nodes = new List<NodeSize>();
-            foreach (float size in sizes)
-            {
-                GameObject o = blockFactory.NewBlock();
-                blockFactory.ScaleBlock(o, new Vector3(size, 1.0f, size));
-                nodes.Add(new NodeSize(o, size));
-            }
-            Normalize(nodes, this.width, this.depth);
-            nodes.Sort(delegate (NodeSize x, NodeSize y) { return y.size.CompareTo(x.size); });
-            List<Rectangle> rects = Squarified_Layout_With_Padding(nodes, 0, 0, this.width, this.depth);
-            Show(nodes, rects);
-        }
-
-        // Just for testing. FIXME: Remove it later.
-        private void Show(List<NodeSize> nodes, List<Rectangle> rects)
-        {
-            int i = 0;
-            foreach (Rectangle rect in rects)
-            {
-                GameObject o = nodes[i].gameNode;
-                blockFactory.ScaleBlock(o, new Vector3(rect.width / blockFactory.Unit(), 1.0f, rect.depth / blockFactory.Unit()));
-                blockFactory.SetGroundPosition(o, new Vector3(rect.x + rect.width / 2.0f, 0.0f, rect.z + rect.depth / 2.0f));
-                i++;
             }
         }
 
