@@ -10,8 +10,6 @@ namespace SEE.Layout
     /// </summary>
     public class CirclePackingLayout : INodeLayout
     {
-        private GameObject RootNodes;
-        
         private readonly string[] InnerNodeMetrics;
 
         public static Vector3 LevelUnit;
@@ -35,12 +33,12 @@ namespace SEE.Layout
         public override void Draw(Graph graph)
         {
             LevelUnit = Vector3.zero;
-            
-            RootNodes = new GameObject("Nodes");
-            RootNodes.tag = Tags.Node;
+
+            GameObject artificialRootNode = new GameObject("Nodes");
+            artificialRootNode.tag = Tags.Node;
             List<Node> roots = graph.GetRoots();
-            DrawNodes(RootNodes, roots, out float out_radius);
-            DrawPlane(RootNodes, out_radius);
+            DrawNodes(artificialRootNode, roots, out float out_radius);
+            DrawPlane(artificialRootNode, out_radius);
         }
 
         private void DrawNodes(GameObject parent, List<Node> nodes, out float out_radius)
@@ -70,8 +68,10 @@ namespace SEE.Layout
                 gameObject.transform.parent = parent.transform;
 
                 float radians = ((float)i / (float)nodes.Count) * (2.0f * Mathf.PI);
-                gameObject.transform.localPosition = new Vector3(Mathf.Cos(radians), 0.0f, Mathf.Sin(radians)) * radius;
-                gameObject.transform.position = gameObject.transform.position + new Vector3(0.0f, 0.1f, 0.0f);
+                blockFactory.SetLocalGroundPosition(gameObject, 
+                                                    new Vector3(Mathf.Cos(radians), 0.0f, Mathf.Sin(radians)) * radius
+                                                    + new Vector3(0.0f, 0.1f, 0.0f));
+                //gameObject.transform.localPosition = new Vector3(Mathf.Cos(radians), 0.0f, Mathf.Sin(radians)) * radius;
                 circles.Add(new Circle(gameObject.transform, radius));
             }
 
@@ -94,7 +94,7 @@ namespace SEE.Layout
             block.name = node.LinkName + " Block";
             blockFactory.ScaleBlock(block, GetScale(node));
             Vector3 size = blockFactory.GetSize(block);
-            blockFactory.SetLocalPosition(block, new Vector3(0.0f, size.y / 2.0f, 0.0f));
+            //blockFactory.SetLocalPosition(block, new Vector3(0.0f, size.y / 2.0f, 0.0f));
             out_leaf_radius = Mathf.Sqrt(size.x * size.x + size.z * size.z);
 
             if (showErosions)
