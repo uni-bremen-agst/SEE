@@ -18,7 +18,7 @@ public class CCAStateManager : MonoBehaviour
     private readonly Dictionary<string, AbstractCCALayout> layouts = new Dictionary<string, AbstractCCALayout>();
     private IScale scaler;
 
-    private bool _isEndlessMode = false;
+    private bool _isAutoplay = false;
 
     public GraphSettings Settings => graphLoader.settings;
     private Dictionary<string, Graph> Graphs => graphLoader.graphs;
@@ -50,13 +50,13 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
-    public bool IsEndlessMode
+    public bool IsAutoPlay
     {
-        get => _isEndlessMode;
+        get => _isAutoplay;
         private set
         {
             ViewDataChangedEvent.Invoke();
-            _isEndlessMode = value;
+            _isAutoplay = value;
         }
     }
 
@@ -135,7 +135,7 @@ public class CCAStateManager : MonoBehaviour
     /// </summary>
     public void ShowNextGraph()
     {
-        if (render.IsStillAnimating || IsEndlessMode)
+        if (render.IsStillAnimating || IsAutoPlay)
         {
             Debug.Log("The render is already occupied with animating, wait till animations are finished.");
             return;
@@ -153,7 +153,7 @@ public class CCAStateManager : MonoBehaviour
     /// </summary>
     public void ShowPreviousGraph()
     {
-        if (render.IsStillAnimating || IsEndlessMode)
+        if (render.IsStillAnimating || IsAutoPlay)
         {
             Debug.Log("The render is already occupied with animating, wait till animations are finished.");
             return;
@@ -176,12 +176,12 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
-    internal void ToggleEndlessMode()
+    internal void ToggleAutoplay()
     {
-        IsEndlessMode = !IsEndlessMode;
-        if (IsEndlessMode)
+        IsAutoPlay = !IsAutoPlay;
+        if (IsAutoPlay)
         {
-            render.AnimationFinishedEvent.AddListener(OnEndlessModeCanContinue);
+            render.AnimationFinishedEvent.AddListener(OnAutoplayCanContinue);
             var canShowNext = ShowNextIfPossible();
             if (!canShowNext)
             {
@@ -190,7 +190,7 @@ public class CCAStateManager : MonoBehaviour
         }
         else
         {
-            render.AnimationFinishedEvent.RemoveListener(OnEndlessModeCanContinue);
+            render.AnimationFinishedEvent.RemoveListener(OnAutoplayCanContinue);
         }
         ViewDataChangedEvent.Invoke();
     }
@@ -215,12 +215,12 @@ public class CCAStateManager : MonoBehaviour
         return true;
     }
 
-    internal void OnEndlessModeCanContinue()
+    internal void OnAutoplayCanContinue()
     {
         var canShowNext = ShowNextIfPossible();
         if (!canShowNext)
         {
-            ToggleEndlessMode();
+            ToggleAutoplay();
         }
     }
 }

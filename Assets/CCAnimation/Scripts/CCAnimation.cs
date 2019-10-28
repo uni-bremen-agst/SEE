@@ -19,7 +19,7 @@ public class CCAnimation : MonoBehaviour
     private MainMenuView mainMenu;
 
     public Text revisionNumberText;
-    public Toggle endlessModeToggle;
+    public Toggle autoplayToggle;
 
     public CCAStateManager stateManager;
 
@@ -51,7 +51,7 @@ public class CCAnimation : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.Tab))
         {
-            stateManager.ToggleEndlessMode();
+            stateManager.ToggleAutoplay();
         }
         else if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -80,6 +80,6 @@ public class CCAnimation : MonoBehaviour
     void OnViewDataChanged()
     {
         UpdateText();
-        endlessModeToggle.isOn = stateManager.IsEndlessMode;
+        autoplayToggle.isOn = stateManager.IsAutoPlay;
     }
 }
