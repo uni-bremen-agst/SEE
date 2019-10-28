@@ -194,8 +194,8 @@ public class CCALayout : ILayout
         float planePositionZ = leftRootCenter.z;
         plane.transform.position = new Vector3(planePositionX, planePositionY, planePositionZ);
 
-        // TODO: Circle lines way below the nodes.
-        // TODO: Plane below everything else.
+        // obsoletetodo : Circle lines way below the nodes.
+        // obsoletetodo : Plane below everything else.
 
         Renderer planeRenderer = plane.GetComponent<Renderer>();
         planeRenderer.sharedMaterial = new Material(planeRenderer.sharedMaterial);
@@ -645,7 +645,7 @@ public class CCALayout : ILayout
             inner_sum *= 2;
 
             // min_rad is the minimal circumference to accommodate all the children
-            // TODO: If a metric determines the radius of leaves, they may have
+            // If a metric determines the radius of leaves, they may have
             // different radii and we cannot just multiply the number of children
             // with the minimal diameter
             float min_rad = 0.0f; // factor * node.NumberOfChildren();

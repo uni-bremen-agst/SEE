@@ -5,7 +5,7 @@ using SEE.DataModel;
 using UnityEngine;
 
 /// <summary>
-/// TODO flo:
+/// TODO flo doc:
 /// </summary>
 public class SimpleCCAAnimator : AbstractCCAAnimator
 {
@@ -61,13 +61,13 @@ public class SimpleCCAAnimator : AbstractCCAAnimator
         }
     }
 
-    protected override void AnimateToAndInternal(Node node, GameObject gameObject, Vector3 position, Vector3 scale, Action<object> callback)
+    protected override void AnimateToAndInternal(Node node, GameObject gameObject, Vector3 position, Vector3 scale, GameObject callBackTarget, string callbackName)
     {
         iTween.MoveTo(gameObject, iTween.Hash(
             "y", -100,
             "time", MaxAnimationTime,
-            "oncompletetarget", ((MonoBehaviour)callback.Target).gameObject,
-            "oncomplete", callback.Method.Name,
+            "oncompletetarget", callBackTarget,
+            "oncomplete", callbackName,
             "oncompleteparams", gameObject
         ));
     }

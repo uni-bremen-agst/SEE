@@ -8,105 +8,69 @@ using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// TODO: doc
+/// Allows loading of multiple gxl files from a directory and stores them.
+/// !!! At the moment data for Metric.Clone_Rate is copied from Metric.LOC for better visualisation during test !!!
 /// </summary>
 public class CCALoader
 {
+    /// <summary>
+    /// Contains all loaded graphs after calling LoadGraphData().
+    /// </summary>
+    public readonly List<Graph> graphs = new List<Graph>();
 
-    public readonly GraphSettings settings = new GraphSettings();
-    public readonly Dictionary<string, Graph> graphs = new Dictionary<string, Graph>();
-    public readonly List<string> graphOrder = new List<string>();
-
-    public void Init()
-    {
-        string projectPath = Application.dataPath.Replace('/', '\\') + '\\';
-        settings.pathPrefix = projectPath;
-        settings.ShowDonuts = false;
-    }
-
-    public void LoadGraphData()
+    /// <summary>
+    /// Loads all gxl files from GraphSettings.AnimatedPath() sorted by numbers in the file names.
+    /// !!! At the moment data for Metric.Clone_Rate is copied from Metric.LOC for better visualisation during test !!!
+    /// </summary>
+    /// <param name="graphSettings">The GraphSettings defining the location of gxl files.</param>
+    public void LoadGraphData(GraphSettings graphSettings)
     {
         graphs.Clear();
-        graphOrder.Clear();
-        AddAllRevisions();
-    }
-
-    private string GetAnimatedPath()
-    {
-        return settings.pathPrefix + "..\\Data\\GXL\\animation-clones\\";
+        AddAllRevisions(graphSettings);
     }
 
     /// <summary>
-    /// TODO: doc 
+    /// Internal function that loads all gxl files from the path set in GraphSettings and
+    /// and saves all loaded graph data.
     /// </summary>
-    private void AddAllRevisions()
+    /// <param name="graphSettings">The GraphSettings defining the location of gxl files.</param>
+    private void AddAllRevisions(GraphSettings graphSettings)
     {
-        SEE.Performance p = SEE.Performance.Begin("loading animated graph data from " + GetAnimatedPath());
+        SEE.Performance p = SEE.Performance.Begin("loading animated graph data from " + graphSettings.GetAnimatedPath());
+
+        // clear possible old data
         graphs.Clear();
-        graphOrder.Clear();
-        var settingsOldGxlPath = settings.gxlPath;
-        var newGraphName = Directory
-            .GetFiles(GetAnimatedPath(), "*.gxl", SearchOption.TopDirectoryOnly)
+
+        // get all gxl files sorted by numbers in their name
+        var sortedGraphNames = Directory
+            .GetFiles(graphSettings.GetAnimatedPath(), "*.gxl", SearchOption.TopDirectoryOnly)
+            .Where(e => !string.IsNullOrEmpty(e))
+            .Distinct()
             .NumericalSort();
-        graphOrder.AddRange(newGraphName);
-        foreach (string gxlPath in graphOrder)
-        {
-            settings.gxlPath = gxlPath.Replace(settings.pathPrefix, "");
-            Add(settings);
-        }
-        settings.gxlPath = settingsOldGxlPath;
-        p.End();
-        Debug.Log("Number of graphs loaded: " + graphOrder.Count + "\n");
-    }
 
-    /// <summary>
-    /// TODO: doc 
-    /// </summary>
-    private Graph Add(GraphSettings settings)
-    {
-        if (string.IsNullOrEmpty(settings.GXLPath()))
+        // for all found gxl files load and save the graph data
+        foreach (string gxlPath in sortedGraphNames)
         {
-            Debug.LogError("No graph path given.\n");
-            return null;
-        }
-        if (graphs.ContainsKey(settings.GXLPath()))
-        {
-            Debug.LogError("graph " + settings.GXLPath() + " is already loaded.");
-            return null;
-        }
-        Graph graph = Load(settings);
-        if (graph == null)
-        {
-            Debug.LogError("graph " + settings.GXLPath() + " could not be loaded.");
-        }
-        else
-        {
-            graphs.Add(settings.GXLPath(), graph);
-        }
-        return graph;
-    }
-
-    /// <summary>
-    /// TODO: doc 
-    /// </summary>
-    private Graph Load(GraphSettings settings)
-    {
-        // GraphCreator graphCreator = new GraphCreator(settings.GXLPath(), settings.HierarchicalEdges, new SEELogger());
-        GraphReader graphCreator = new GraphReader(settings.GXLPath(), settings.HierarchicalEdges, new SEELogger());
-        if (string.IsNullOrEmpty(settings.GXLPath()))
-        {
-            Debug.LogError("Empty graph path.\n");
-            return null;
-        }
-        else
-        {
+            // load graph
+            GraphReader graphCreator = new GraphReader(gxlPath, graphSettings.HierarchicalEdges, new SEELogger());
             graphCreator.Load();
             Graph graph = graphCreator.GetGraph();
 
-            // TODO generate random test data for CloneRate
+            // TODO flo: remove for real data
             graph.Traverse(leafNode => leafNode.SetFloat("Metric.Clone_Rate", leafNode.GetInt("Metric.LOC")));
 
-            return graph;
+            // if graph was loaded put in graphs
+            if (graph == null)
+            {
+                Debug.LogError("graph " + gxlPath + " could not be loaded.");
+            }
+            else
+            {
+                graphs.Add(graph);
+            }
         }
+
+        p.End();
+        Debug.Log("Number of graphs loaded: " + graphs.Count + "\n");
     }
 }
