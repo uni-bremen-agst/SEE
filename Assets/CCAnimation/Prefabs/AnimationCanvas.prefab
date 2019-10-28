@@ -85,7 +85,7 @@ GameObject:
   - component: {fileID: 4024162108191095473}
   - component: {fileID: 1992955808648693269}
   m_Layer: 5
-  m_Name: Toggle
+  m_Name: AutoplayToggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -237,7 +237,7 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'Use L and K-key to view the next and previous graph revision.
 
-    Toggle endless-mode with Tab-Key.'
+    Toggle autoplay with Tab-Key.'
 --- !u!1 &4461994104216227615
 GameObject:
   m_ObjectHideFlags: 0

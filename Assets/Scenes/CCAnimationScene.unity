@@ -1188,12 +1188,6 @@ Transform:
   m_Father: {fileID: 1665265245}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &768054136 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5740635153240536284, guid: 39c6f07ca63915048a64d1ab7a27203c,
-    type: 3}
-  m_PrefabInstance: {fileID: 1591275266}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &983722603
 GameObject:
   m_ObjectHideFlags: 0
@@ -1734,12 +1728,6 @@ Transform:
   m_Father: {fileID: 1665265245}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1553916573 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2245381400701509102, guid: 39c6f07ca63915048a64d1ab7a27203c,
-    type: 3}
-  m_PrefabInstance: {fileID: 1591275266}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1561606484
 GameObject:
   m_ObjectHideFlags: 0
@@ -1833,41 +1821,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2637723665296559952, guid: 39c6f07ca63915048a64d1ab7a27203c,
         type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2637723665296559952, guid: 39c6f07ca63915048a64d1ab7a27203c,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2637723665296559952, guid: 39c6f07ca63915048a64d1ab7a27203c,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2637723665296559952, guid: 39c6f07ca63915048a64d1ab7a27203c,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2637723665296559952, guid: 39c6f07ca63915048a64d1ab7a27203c,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2637723665296559952, guid: 39c6f07ca63915048a64d1ab7a27203c,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2637723665296559952, guid: 39c6f07ca63915048a64d1ab7a27203c,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2637723665296559952, guid: 39c6f07ca63915048a64d1ab7a27203c,
-        type: 3}
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
@@ -1901,16 +1854,6 @@ PrefabInstance:
       propertyPath: FlyCamera
       value: 
       objectReference: {fileID: 1770187549}
-    - target: {fileID: 2637723665296559955, guid: 39c6f07ca63915048a64d1ab7a27203c,
-        type: 3}
-      propertyPath: InGameCanvas
-      value: 
-      objectReference: {fileID: 1553916573}
-    - target: {fileID: 2637723665296559955, guid: 39c6f07ca63915048a64d1ab7a27203c,
-        type: 3}
-      propertyPath: MainMenuCanvas
-      value: 
-      objectReference: {fileID: 768054136}
     - target: {fileID: 8157221115155232187, guid: 39c6f07ca63915048a64d1ab7a27203c,
         type: 3}
       propertyPath: m_AnchoredPosition.y

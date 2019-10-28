@@ -72,11 +72,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dd2938650329b34ba9a997725d94bd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flyCamera: {fileID: 0}
-  inGameCanvas: {fileID: 2245381400701509102}
-  mainMenuCanvas: {fileID: 5740635153240536284}
+  FlyCamera: {fileID: 0}
+  InGameCanvas: {fileID: 2245381400701509102}
+  MainMenuCanvas: {fileID: 5740635153240536284}
   revisionNumberText: {fileID: 868880175780350678}
-  endlessModeToggle: {fileID: 4138099131160302820}
+  autoplayToggle: {fileID: 4138099131160302820}
   stateManager: {fileID: 7167062139765021778}
 --- !u!1001 &2505441218421789425
 PrefabInstance:
