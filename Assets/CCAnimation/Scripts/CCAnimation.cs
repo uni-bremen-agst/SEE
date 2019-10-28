@@ -12,14 +12,31 @@ using UnityEngine.UI;
 /// </summary>
 public class CCAnimation : MonoBehaviour
 {
+    public FlyCamera FlyCamera;
+    public GameObject InGameCanvas;
+    public GameObject MainMenuCanvas;
+
+    private MainMenuView mainMenu;
+
     public Text revisionNumberText;
     public Toggle endlessModeToggle;
+
     public CCAStateManager stateManager;
 
     void Start()
     {
+        mainMenu = MainMenuCanvas.GetComponent<MainMenuView>();
+        if (mainMenu == null)
+        {
+            Debug.LogError("MainMenuCanvas has no MainMenuView assigned!");
+        }
+
+        mainMenu.CloseViewButton.onClick.AddListener(ToogleMainMenu);
+
+        ToogleMainMenu(true);
         UpdateText();
         stateManager.ViewDataChangedEvent.AddListener(OnViewDataChanged);
+        // TODO flo: subscribe to toggle changed
     }
 
     void Update()
@@ -36,6 +53,23 @@ public class CCAnimation : MonoBehaviour
         {
             stateManager.ToggleEndlessMode();
         }
+        else if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ToogleMainMenu(FlyCamera.IsEnabled);
+        }
+    }
+
+    void ToogleMainMenu()
+    {
+        ToogleMainMenu(FlyCamera.IsEnabled);
+    }
+
+    void ToogleMainMenu(bool enabled)
+    {
+        FlyCamera.IsEnabled = !enabled;
+        InGameCanvas.SetActive(!enabled);
+        MainMenuCanvas.SetActive(enabled);
+        // TODO inform stateManager
     }
 
     void UpdateText()

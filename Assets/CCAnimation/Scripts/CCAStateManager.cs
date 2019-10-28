@@ -20,7 +20,7 @@ public class CCAStateManager : MonoBehaviour
 
     private bool _isEndlessMode = false;
 
-    private GraphSettings EditorSettings => graphLoader.settings;
+    public GraphSettings Settings => graphLoader.settings;
     private Dictionary<string, Graph> Graphs => graphLoader.graphs;
 
     private List<string> GraphOrder => graphLoader.graphOrder;
@@ -81,19 +81,19 @@ public class CCAStateManager : MonoBehaviour
             Debug.LogError("There ist no Layout available at index " + index);
             return false;
         }
-        if (EditorSettings == null)
+        if (Settings == null)
         {
             Debug.LogError("There ist no GraphSettings available");
             return false;
         }
-        loadedGraph = new LoadedGraph(graph, layout, EditorSettings);
+        loadedGraph = new LoadedGraph(graph, layout, Settings);
         return true;
     }
 
     [Obsolete]
     void InitRandomLayouts()
     {
-        Graphs.Keys.ToList().ForEach(key => layouts[key] = new RandomCCALayout(EditorSettings, null, scaler));
+        Graphs.Keys.ToList().ForEach(key => layouts[key] = new RandomCCALayout(Settings, null, scaler));
     }
 
 
@@ -105,16 +105,17 @@ public class CCAStateManager : MonoBehaviour
             return;
         }
 
-        EditorSettings.MinimalBlockLength = 1;
-        EditorSettings.MaximalBlockLength = 10;
-        EditorSettings.ZScoreScale = false;
+        Settings.MinimalBlockLength = 1;
+        Settings.MaximalBlockLength = 10;
+        Settings.ZScoreScale = false;
 
         graphLoader.Init();
+        graphLoader.LoadGraphData(); // TODO execute on press
         ViewDataChangedEvent.Invoke();
 
-        List<string> nodeMetrics = new List<string>() { EditorSettings.WidthMetric, EditorSettings.HeightMetric, EditorSettings.DepthMetric };
-        nodeMetrics.AddRange(EditorSettings.IssueMap().Keys);
-        scaler = new LinearMultiScale(Graphs.Values.ToList(), EditorSettings.MinimalBlockLength, EditorSettings.MaximalBlockLength, nodeMetrics);
+        List<string> nodeMetrics = new List<string>() { Settings.WidthMetric, Settings.HeightMetric, Settings.DepthMetric };
+        nodeMetrics.AddRange(Settings.IssueMap().Keys);
+        scaler = new LinearMultiScale(Graphs.Values.ToList(), Settings.MinimalBlockLength, Settings.MaximalBlockLength, nodeMetrics);
 
         // TODO Flo: load layouts
         InitRandomLayouts();
