@@ -206,10 +206,11 @@ namespace SEE.Layout
             block.transform.position = position;
         }
 
-        public override void SetLocalPosition(GameObject block, Vector3 position)
+        public override void SetLocalGroundPosition(GameObject block, Vector3 position)
         {
             Vector3 extent = GetSize(block) / 2.0f;
-            block.transform.localPosition = position - extent;
+            block.transform.localPosition = new Vector3(position.x - extent.x, position.y, position.z - extent.z);
+            //block.transform.localPosition = position - extent;
         }
 
         public override Vector3 GetCenterPosition(GameObject block)
