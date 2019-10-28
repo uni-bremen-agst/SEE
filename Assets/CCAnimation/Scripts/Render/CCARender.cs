@@ -8,6 +8,8 @@ using UnityEngine;
 
 public class CCARender : AbstractCCARender
 {
+    private readonly AbstractCCAAnimator Animator = new SimpleCCAAnimator();
+
     protected override void RenderRoot(Node node)
     {
         var isPlaneNew = !ObjectManager.GetRoot(out GameObject root);
@@ -53,57 +55,22 @@ public class CCARender : AbstractCCARender
     protected override void RenderLeaf(Node node)
     {
         var isLeafNew = !ObjectManager.GetLeaf(node, out GameObject leaf);
-
         if (isLeafNew)
         {
-            leaf.transform.position = Layout.GetPositon(node);
-            leaf.transform.localScale = Layout.GetScale(node);
-
-            iTween.MoveFrom(leaf, iTween.Hash(
-                "y", -100, // TODO flo: -Sizeofbuilding
-                "time", 2
-            ));
+            Animator.AnimateTo(node, leaf, Layout.GetPositon(node), Layout.GetScale(node));
         }
         else if (node.WasModified())
         {
-            iTween.MoveTo(leaf, iTween.Hash(
-                "position", Layout.GetPositon(node),
-                "time", 2
-            ));
-            iTween.ScaleTo(leaf, iTween.Hash(
-                "scale", Layout.GetScale(node),
-                "time", 2
-            ));
-            iTween.ShakeRotation(leaf, iTween.Hash(
-                "amount", new Vector3(0, 10, 0),
-                "time", 1,
-                "delay", 1
-            ));
+            Animator.AnimateTo(node, leaf, Layout.GetPositon(node), Layout.GetScale(node));
         }
         else if (node.WasRelocated(out string oldLinkageName))
         {
-            iTween.MoveTo(leaf, iTween.Hash(
-                "position", Layout.GetPositon(node),
-                "time", 2
-            ));
-            iTween.ScaleTo(leaf, iTween.Hash(
-                "scale", Layout.GetScale(node),
-                "time", 2
-            ));
+            Animator.AnimateTo(node, leaf, Layout.GetPositon(node), Layout.GetScale(node));
         }
         else
         {
-            iTween.MoveTo(leaf, iTween.Hash(
-                "position", Layout.GetPositon(node),
-                "time", 2
-            ));
-            iTween.ScaleTo(leaf, iTween.Hash(
-                "scale", Layout.GetScale(node),
-                "time", 2
-            ));
+            Animator.AnimateTo(node, leaf, Layout.GetPositon(node), Layout.GetScale(node));
         }
-        //leaf.transform.position = Layout.GetPositon(node);
-        //leaf.transform.localScale = Layout.GetScale(node);
     }
 
     protected override void RenderEdge(Edge edge)
@@ -122,22 +89,9 @@ public class CCARender : AbstractCCARender
 
     protected override void RenderRemovedOldLeaf(Node node)
     {
-        //var isLeafNew = !ObjectManager.GetLeaf(node, out GameObject leaf);
         if(ObjectManager.RemoveNode(node, out GameObject leaf))
         {
-            iTween.MoveTo(leaf, iTween.Hash(
-                "y", -100, // TODO flo: -Sizeofbuilding
-                "time", 2,
-                "oncompletetarget", this.gameObject,
-                "oncomplete", "OnRemovedNodeFinishedAnimation",
-                "oncompleteparams", leaf
-            ));
-            /*
-            if (gameObject != null)
-            {
-                Destroy(gameObject);
-            }
-            */
+            Animator.AnimateToAnd(node, leaf, Vector3.one, Vector3.one, OnRemovedNodeFinishedAnimation);
         }
     }
 
