@@ -22,6 +22,12 @@ public class CCALoader
         string projectPath = Application.dataPath.Replace('/', '\\') + '\\';
         settings.pathPrefix = projectPath;
         settings.ShowDonuts = false;
+    }
+
+    public void LoadGraphData()
+    {
+        graphs.Clear();
+        graphOrder.Clear();
         AddAllRevisions();
     }
 
