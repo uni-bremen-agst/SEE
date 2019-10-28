@@ -114,7 +114,8 @@ namespace SEE
             Manhattan = 1,
             CirclePacking = 2,
             Treemap = 3,
-            BallonNode = 4 // FIXME: Remove later
+            BallonNode = 4,       // FIXME: Remove later
+            CirclePackingNode = 5 // FIXME: Remove later
         }
 
         public enum EdgeLayouts

@@ -14,26 +14,6 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Returns all root graph nodes within gameNodes.
-        /// </summary>
-        /// <param name="gameNodes">game nodes for which to determine root nodes</param>
-        /// <returns>all root graph nodes within gameNodes</returns>
-        private static List<Node> GetRoots(ICollection<GameObject> gameNodes)
-        {
-            List<Node> roots = new List<Node>();
-
-            foreach (GameObject gameObject in gameNodes)
-            {
-                Node node = gameObject.GetComponent<NodeRef>().node;
-                if (node.IsRoot())
-                {
-                    roots.Add(node);
-                }
-            }
-            return roots;
-        }
-
-        /// <summary>
         /// The maximal depth of the node hierarchy.
         /// </summary>
         private int maxDepth = 0;
@@ -65,19 +45,6 @@ namespace SEE.Layout
         private Dictionary<Node, NodeInfo> nodeInfos = new Dictionary<Node, NodeInfo>();
 
         private Dictionary<GameObject, NodeTransform> layout_result;
-
-        private Dictionary<Node, GameObject> to_game_node;
-
-        private static Dictionary<Node, GameObject> NodeMapping(ICollection<GameObject> gameNodes)
-        {
-            Dictionary<Node, GameObject> map = new Dictionary<Node, GameObject>();
-            foreach (GameObject gameNode in gameNodes)
-            {
-                Node node = gameNode.GetComponent<NodeRef>().node;
-                map[node] = gameNode;
-            }
-            return map;
-        }
 
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
         {

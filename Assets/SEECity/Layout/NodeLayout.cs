@@ -48,5 +48,37 @@ namespace SEE.Layout
         /// <returns>node layout</returns>
         public abstract Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes);
 
+        protected Dictionary<Node, GameObject> to_game_node;
+
+        protected static Dictionary<Node, GameObject> NodeMapping(ICollection<GameObject> gameNodes)
+        {
+            Dictionary<Node, GameObject> map = new Dictionary<Node, GameObject>();
+            foreach (GameObject gameNode in gameNodes)
+            {
+                Node node = gameNode.GetComponent<NodeRef>().node;
+                map[node] = gameNode;
+            }
+            return map;
+        }
+
+        /// <summary>
+        /// Returns all root graph nodes within gameNodes.
+        /// </summary>
+        /// <param name="gameNodes">game nodes for which to determine root nodes</param>
+        /// <returns>all root graph nodes within gameNodes</returns>
+        protected static List<Node> GetRoots(ICollection<GameObject> gameNodes)
+        {
+            List<Node> roots = new List<Node>();
+
+            foreach (GameObject gameObject in gameNodes)
+            {
+                Node node = gameObject.GetComponent<NodeRef>().node;
+                if (node.IsRoot())
+                {
+                    roots.Add(node);
+                }
+            }
+            return roots;
+        }
     }
 }
