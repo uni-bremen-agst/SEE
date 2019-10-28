@@ -1,44 +1,23 @@
 ﻿using SEE;
 using SEE.DataModel;
-using SEE.Layout;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>
+/// 
+/// </summary>
 public abstract class AbstractCCARender : MonoBehaviour
 {
-    protected UnityEvent _animationStartedEvent;
+    public readonly UnityEvent AnimationStartedEvent = new UnityEvent();
 
-    public UnityEvent AnimationStartedEvent
-    {
-        get
-        {
-            if (_animationStartedEvent == null)
-            {
-                _animationStartedEvent = new UnityEvent();
-            }
-            return _animationStartedEvent;
-        }
-    }
-
-    protected UnityEvent _animationFinishedEvent;
-    public UnityEvent AnimationFinishedEvent
-    {
-        get
-        {
-            if (_animationFinishedEvent == null)
-            {
-                _animationFinishedEvent = new UnityEvent();
-            }
-            return _animationFinishedEvent;
-        }
-    }
+    public readonly UnityEvent AnimationFinishedEvent = new UnityEvent();
 
     private bool _isStillAnimating = false;
-    public bool IsStillAnimating => _isStillAnimating;
+    public bool IsStillAnimating { get => _isStillAnimating; set => _isStillAnimating = value; }
+
 
     private LoadedGraph _loadedGraph;
     private LoadedGraph _nextGraph;
@@ -109,7 +88,7 @@ public abstract class AbstractCCARender : MonoBehaviour
 
     private void RenderGraph()
     {
-        _isStillAnimating = true;
+        IsStillAnimating = true;
         AnimationStartedEvent.Invoke();
         OldGraph?
             .Nodes().Except(Graph.Nodes(), nodeEqualityComparer).ToList()
@@ -136,7 +115,7 @@ public abstract class AbstractCCARender : MonoBehaviour
 
     private void OnAnimationsFinished()
     {
-        _isStillAnimating = false;
+        IsStillAnimating = false;
         AnimationFinishedEvent.Invoke();
     }
 
@@ -158,32 +137,6 @@ public abstract class AbstractCCARender : MonoBehaviour
             {
                 DestroyImmediate(o);
             }
-        }
-    }
-
-    private class NodeEqualityComparer : IEqualityComparer<Node>
-    {
-        public bool Equals(Node x, Node y)
-        {
-            return x.LinkName.Equals(y.LinkName);
-        }
-
-        public int GetHashCode(Node obj)
-        {
-            return obj.LinkName.GetHashCode();
-        }
-    }
-
-    private class EdgeEqualityComparer : IEqualityComparer<Edge>
-    {
-        public bool Equals(Edge x, Edge y)
-        {
-            return (x.Source.LinkName + x.Target.LinkName).Equals((y.Source.LinkName + y.Target.LinkName));
-        }
-
-        public int GetHashCode(Edge obj)
-        {
-            return (obj.Source.LinkName + obj.Target.LinkName).GetHashCode();
         }
     }
 }

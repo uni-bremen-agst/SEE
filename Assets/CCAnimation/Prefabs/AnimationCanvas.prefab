@@ -237,7 +237,7 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'Use L and K-key to view the next and previous graph revision.
 
-    Toggle autoplay with Tab-Key.'
+    Esc for menu and Tab-Key to toggle endless-mode.'
 --- !u!1 &4461994104216227615
 GameObject:
   m_ObjectHideFlags: 0

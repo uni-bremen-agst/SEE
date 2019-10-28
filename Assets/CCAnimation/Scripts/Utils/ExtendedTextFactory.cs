@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// TODO flo: doc und vll die eigentliche Factory nutzen
+/// </summary>
 internal class ExtendedTextFactory
 {
     public static void UpdateText(GameObject textObject, string text, Vector3 position, float width, bool lift = true)

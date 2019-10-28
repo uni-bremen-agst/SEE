@@ -15,31 +15,30 @@ public class CCAStateManager : MonoBehaviour
     public AbstractCCARender render;
 
     private readonly CCALoader graphLoader = new CCALoader();
-    private readonly Dictionary<string, AbstractCCALayout> layouts = new Dictionary<string, AbstractCCALayout>();
+    private readonly Dictionary<Graph, AbstractCCALayout> layouts = new Dictionary<Graph, AbstractCCALayout>();
     private IScale scaler;
 
     private bool _isAutoplay = false;
 
-    public GraphSettings Settings => graphLoader.settings;
-    private Dictionary<string, Graph> Graphs => graphLoader.graphs;
+    private GraphSettings _settings;
 
-    private List<string> GraphOrder => graphLoader.graphOrder;
+    private List<Graph> Graphs => graphLoader.graphs;
 
-    public int GraphCount => GraphOrder.Count;
+
+    public int GraphCount => Graphs.Count;
 
     private int _openGraphIndex = 0;
     public int OpenGraphIndex
     {
         get => _openGraphIndex;
-        set
+        private set
         {
             _openGraphIndex = value;
             ViewDataChangedEvent.Invoke();
-
         }
     }
 
-    private UnityEvent _viewDataChangedEvent;
+    private UnityEvent _viewDataChangedEvent = new UnityEvent();
     public UnityEvent ViewDataChangedEvent
     {
         get
@@ -60,6 +59,16 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
+    public GraphSettings Settings
+    {
+        get
+        {
+            if (_settings == null)
+                _settings = GraphSettingsExtension.DefaultCCAnimationSettings();
+            return _settings;
+        }
+    }
+
     private bool HasLoadedGraph(out LoadedGraph loadedGraph)
     {
         return HasLoadedGraph(_openGraphIndex, out loadedGraph);
@@ -69,14 +78,14 @@ public class CCAStateManager : MonoBehaviour
     {
         // TODO FLo: KeyNotFoundException
         loadedGraph = null;
-        var graph = Graphs[GraphOrder[index]];
+        var graph = Graphs[index];
         if (graph == null)
         {
             Debug.LogError("There ist no Graph available at index " + index);
             return false;
         }
-        var layout = layouts[GraphOrder[index]];
-        if (layout == null)
+        var hasLayout = layouts.TryGetValue(graph, out AbstractCCALayout layout);
+        if (layout == null || !hasLayout)
         {
             Debug.LogError("There ist no Layout available at index " + index);
             return false;
@@ -93,7 +102,7 @@ public class CCAStateManager : MonoBehaviour
     [Obsolete]
     void InitRandomLayouts()
     {
-        Graphs.Keys.ToList().ForEach(key => layouts[key] = new RandomCCALayout(Settings, null, scaler));
+        Graphs.ForEach(key => layouts[key] = new RandomCCALayout(Settings, null, scaler));
     }
 
 
@@ -109,13 +118,12 @@ public class CCAStateManager : MonoBehaviour
         Settings.MaximalBlockLength = 10;
         Settings.ZScoreScale = false;
 
-        graphLoader.Init();
-        graphLoader.LoadGraphData(); // TODO execute on press
+        graphLoader.LoadGraphData(Settings);
         ViewDataChangedEvent.Invoke();
 
         List<string> nodeMetrics = new List<string>() { Settings.WidthMetric, Settings.HeightMetric, Settings.DepthMetric };
         nodeMetrics.AddRange(Settings.IssueMap().Keys);
-        scaler = new LinearMultiScale(Graphs.Values.ToList(), Settings.MinimalBlockLength, Settings.MaximalBlockLength, nodeMetrics);
+        scaler = new LinearMultiScale(Graphs, Settings.MinimalBlockLength, Settings.MaximalBlockLength, nodeMetrics);
 
         // TODO Flo: load layouts
         InitRandomLayouts();
@@ -197,7 +205,7 @@ public class CCAStateManager : MonoBehaviour
 
     private bool ShowNextIfPossible()
     {
-        if (_openGraphIndex == GraphOrder.Count - 1)
+        if (_openGraphIndex == Graphs.Count - 1)
         {
             return false;
         }

@@ -412,17 +412,17 @@ public class CAALayoutStateless : AbstractCCALayout
                                             scaler.GetNormalizedValue(node, heightMetric),
                                             scaler.GetNormalizedValue(node, breadthMetric));
 
-                // TODO update xxx blockFactory.ScaleBlock(block, scale);
+                // obsoletetodo update xxx blockFactory.ScaleBlock(block, scale);
             }
 
-            /* TODO update
+            /* obsoletetodo  update
             Vector3 size = blockFactory.GetSize(block);
 
             float diagonal = Mathf.Sqrt(size.x * size.x + size.z * size.z);
 
             out_rad = diagonal / 2.0f;
             */
-            out_rad = 0; // TODO remove only fortesting
+            out_rad = 0; // obsoletetodo  remove only fortesting
             rad = 0.0f;
 
             //Debug.LogFormat("size of block = {0}, radius = {1}\n", size, out_rad);
@@ -474,7 +474,7 @@ public class CAALayoutStateless : AbstractCCALayout
             inner_sum *= 2;
 
             // min_rad is the minimal circumference to accommodate all the children
-            // TODO: If a metric determines the radius of leaves, they may have
+            // If a metric determines the radius of leaves, they may have
             // different radii and we cannot just multiply the number of children
             // with the minimal diameter
             float min_rad = 0.0f; // factor * node.NumberOfChildren();
@@ -518,7 +518,7 @@ public class CAALayoutStateless : AbstractCCALayout
         circlePositions[node.LinkName] = position;
         circleRadiuses[node.LinkName] = 2.0f * radius * 0.3f;
 
-        //TODO update AttachCircleLine(circle, radius, lineWidth);
+        //obsoletetodo  update AttachCircleLine(circle, radius, lineWidth);
     }
 
     private void SetColor(GameObject gameObject, Color color)
@@ -802,7 +802,7 @@ public class CAALayoutStateless : AbstractCCALayout
     private GameObject getNewOrOldEdge(Edge edge)
     {
         GameObject go = null;
-        /* TODO update
+        /* obsoletetodo  update
         var edgeLinkName = edge.Source.LinkName + edge.Target.LinkName;
         if (oldLayout != null && oldLayout.edges.ContainsKey(edgeLinkName))
         {
