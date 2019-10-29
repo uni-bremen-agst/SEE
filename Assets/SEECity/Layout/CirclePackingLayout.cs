@@ -12,8 +12,6 @@ namespace SEE.Layout
     {
         private readonly string[] InnerNodeMetrics;
 
-        public static Vector3 LevelUnit;
-
         public CirclePackingLayout(string widthMetric, string heightMetric, string breadthMetric,
                              SerializableDictionary<string, IconFactory.Erosion> issueMap,
                              string[] innerNodeMetrics,
@@ -32,8 +30,6 @@ namespace SEE.Layout
 
         public override void Draw(Graph graph)
         {
-            LevelUnit = Vector3.zero;
-
             GameObject artificialRootNode = new GameObject("Nodes");
             artificialRootNode.tag = Tags.Node;
             List<Node> roots = graph.GetRoots();
@@ -94,15 +90,12 @@ namespace SEE.Layout
             block.name = node.LinkName + " Block";
             blockFactory.ScaleBlock(block, GetScale(node));
             Vector3 size = blockFactory.GetSize(block);
-            //blockFactory.SetLocalPosition(block, new Vector3(0.0f, size.y / 2.0f, 0.0f));
             out_leaf_radius = Mathf.Sqrt(size.x * size.x + size.z * size.z);
 
             if (showErosions)
             {
                 AddErosionIssues(node);
             }
-    
-            LevelUnit.y = Mathf.Max(LevelUnit.y, size.y);
 
             return block;
         }
