@@ -43,7 +43,7 @@ public class CCAnimation : MonoBehaviour
 
     void Update()
     {
-        if(IsMainMenuOpen)
+        if(!IsMainMenuOpen)
         {
             if (Input.GetKeyDown("k"))
             {
