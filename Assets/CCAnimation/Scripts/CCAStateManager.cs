@@ -186,7 +186,12 @@ public class CCAStateManager : MonoBehaviour
 
     internal void ToggleAutoplay()
     {
-        IsAutoPlay = !IsAutoPlay;
+        ToggleAutoplay(!IsAutoPlay);
+    }
+
+    internal void ToggleAutoplay(bool enabled)
+    {
+        IsAutoPlay = enabled;
         if (IsAutoPlay)
         {
             render.AnimationFinishedEvent.AddListener(OnAutoplayCanContinue);

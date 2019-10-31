@@ -10,9 +10,9 @@ public class LoadedGraph
 
     public LoadedGraph(Graph graph, AbstractCCALayout layout, GraphSettings graphSettings)
     {
-        this.graph = graph;
-        this.layout = layout;
-        this.graphSettings = graphSettings;
+        this.graph = graph.AssertNotNull("graph");
+        this.layout = layout.AssertNotNull("layout");
+        this.graphSettings = graphSettings.AssertNotNull("graphSettings");
     }
 
     public Graph Graph => graph;

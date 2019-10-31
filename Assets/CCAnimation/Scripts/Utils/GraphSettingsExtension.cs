@@ -14,6 +14,7 @@ public static class GraphSettingsExtension
     /// <param name="graphSettings">GraphSettings where the pathPrefix is updated.</param>
     public static void UpdateProjectPath(this GraphSettings graphSettings)
     {
+        graphSettings.AssertNotNull("graphSettings");
         graphSettings.pathPrefix = Application.dataPath.Replace('/', '\\') + '\\';
     }
 
@@ -24,6 +25,7 @@ public static class GraphSettingsExtension
     /// <returns>Path to test data for animated graphs.</returns>
     public static string GetAnimatedPath(this GraphSettings graphSettings)
     {
+        graphSettings.AssertNotNull("graphSettings");
         return graphSettings.pathPrefix + "..\\Data\\GXL\\animation-clones\\";
     }
 

@@ -25,7 +25,6 @@ public abstract class AbstractCCARender : MonoBehaviour
     private readonly NodeEqualityComparer nodeEqualityComparer = new NodeEqualityComparer();
     private readonly EdgeEqualityComparer edgeEqualityComparer = new EdgeEqualityComparer();
 
-    [Obsolete("Cannot Create ObjectManager in a Constructor or initializer func")]
     private AbstractCCAObjectManager _objectManager;
 
     protected Graph Graph => _nextGraph?.Graph;
@@ -52,11 +51,14 @@ public abstract class AbstractCCARender : MonoBehaviour
 
     public void DisplayGraph(LoadedGraph loadedGraph)
     {
+        loadedGraph.AssertNotNull("loadedGraph");
+
         if (IsStillAnimating)
         {
-            Debug.LogError("Graph changes are not allowed while animations are running.");
+            Debug.LogWarning("Graph changes are blocked while animations are running.");
             return;
         }
+
         ClearGraphObjects();
         _nextGraph = loadedGraph;
         RenderGraph();
@@ -64,11 +66,15 @@ public abstract class AbstractCCARender : MonoBehaviour
 
     public void TransitionToNextGraph(LoadedGraph actual, LoadedGraph next)
     {
+        actual.AssertNotNull("actual");
+        next.AssertNotNull("next");
+
         if (IsStillAnimating)
         {
             Debug.LogError("Graph changes are not allowed while animations are running.");
             return;
         }
+
         _loadedGraph = actual;
         _nextGraph = next;
         RenderGraph();
@@ -76,11 +82,15 @@ public abstract class AbstractCCARender : MonoBehaviour
 
     public void TransitionToPreviousGraph(LoadedGraph actual, LoadedGraph previous)
     {
+        actual.AssertNotNull("actual");
+        previous.AssertNotNull("previous");
+
         if (IsStillAnimating)
         {
             Debug.LogError("Graph changes are not allowed while animations are running.");
             return;
         }
+
         _loadedGraph = actual;
         _nextGraph = previous;
         RenderGraph();
@@ -90,6 +100,7 @@ public abstract class AbstractCCARender : MonoBehaviour
     {
         IsStillAnimating = true;
         AnimationStartedEvent.Invoke();
+
         OldGraph?
             .Nodes().Except(Graph.Nodes(), nodeEqualityComparer).ToList()
             .ForEach(node =>
@@ -124,8 +135,21 @@ public abstract class AbstractCCARender : MonoBehaviour
     protected abstract void RenderLeaf(Node node);
     protected abstract void RenderEdge(Edge edge);
 
+    /// <summary>
+    /// Object is not auto destroyed
+    /// </summary>
+    /// <param name="node"></param>
     protected abstract void RenderRemovedOldInnerNode(Node node);
+    /// <summary>
+    /// Object is not auto destroyed
+    /// </summary>
+    /// <param name="node"></param>
     protected abstract void RenderRemovedOldLeaf(Node node);
+
+    /// <summary>
+    /// Object is not auto destroyed
+    /// </summary>
+    /// <param name="edge"></param>
     protected abstract void RenderRemovedOldEdge(Edge edge);
 
     private void ClearGraphObjects()

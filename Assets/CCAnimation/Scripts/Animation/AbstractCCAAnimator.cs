@@ -40,6 +40,11 @@ public abstract class AbstractCCAAnimator
     /// <param name="scale"></param>
     public void AnimateTo(Node node, GameObject gameObject, Vector3 position, Vector3 scale)
     {
+        node.AssertNotNull("node");
+        gameObject.AssertNotNull("gameObject");
+        position.AssertNotNull("position");
+        scale.AssertNotNull("scale");
+
         if (AnimationsDisabled)
         {
             gameObject.transform.position = position;
@@ -70,6 +75,12 @@ public abstract class AbstractCCAAnimator
     /// <param name="callback"></param>
     public void AnimateToAnd(Node node, GameObject gameObject, Vector3 position, Vector3 scale, Action<object> callback)
     {
+        node.AssertNotNull("node");
+        gameObject.AssertNotNull("gameObject");
+        position.AssertNotNull("position");
+        scale.AssertNotNull("scale");
+        callback.AssertNotNull("callback");
+
         if (callback.Target.GetType() == typeof(GameObject))
         {
             Debug.LogError("Callback needs to be a function inside of a MonoBehaviour");
