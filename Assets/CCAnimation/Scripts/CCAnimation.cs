@@ -38,7 +38,6 @@ public class CCAnimation : MonoBehaviour
         ToogleMainMenu(true);
         UpdateText();
         stateManager.ViewDataChangedEvent.AddListener(OnViewDataChanged);
-        // TODO flo: subscribe to toggle changed
     }
 
     void Update()
