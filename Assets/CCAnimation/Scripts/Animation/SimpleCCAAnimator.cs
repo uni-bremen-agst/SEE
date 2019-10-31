@@ -11,17 +11,7 @@ public class SimpleCCAAnimator : AbstractCCAAnimator
 {
     protected override void AnimateToInternal(Node node, GameObject gameObject, Vector3 position, Vector3 scale)
     {
-        if (node.WasAdded())
-        {
-            gameObject.transform.position = position;
-            gameObject.transform.localScale = scale;
-
-            iTween.MoveFrom(gameObject, iTween.Hash(
-                "y", -100, // TODO flo: -Sizeofbuilding
-                "time", MaxAnimationTime
-            ));
-        }
-        else if (node.WasModified())
+        if (node.WasModified())
         {
             iTween.MoveTo(gameObject, iTween.Hash(
                 "position", position,
@@ -33,8 +23,8 @@ public class SimpleCCAAnimator : AbstractCCAAnimator
             ));
             iTween.ShakeRotation(gameObject, iTween.Hash(
                 "amount", new Vector3(0, 10, 0),
-                "time", 1,
-                "delay", 1
+                "time", MaxAnimationTime / 2,
+                "delay", MaxAnimationTime / 2
             ));
         }
         else if (node.WasRelocated(out string oldLinkageName))
@@ -64,11 +54,15 @@ public class SimpleCCAAnimator : AbstractCCAAnimator
     protected override void AnimateToAndInternal(Node node, GameObject gameObject, Vector3 position, Vector3 scale, GameObject callBackTarget, string callbackName)
     {
         iTween.MoveTo(gameObject, iTween.Hash(
-            "y", -100,
+            "position", position,
             "time", MaxAnimationTime,
             "oncompletetarget", callBackTarget,
             "oncomplete", callbackName,
             "oncompleteparams", gameObject
+        ));
+        iTween.ScaleTo(gameObject, iTween.Hash(
+            "scale", scale,
+            "time", MaxAnimationTime
         ));
     }
 }

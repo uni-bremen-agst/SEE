@@ -11,6 +11,7 @@ using UnityEngine.Events;
 /// </summary>
 public abstract class AbstractCCARender : MonoBehaviour
 {
+    private float MinimalWaitTimeForNextRevision = 0.1f;
     public readonly UnityEvent AnimationStartedEvent = new UnityEvent();
 
     public readonly UnityEvent AnimationFinishedEvent = new UnityEvent();
@@ -18,6 +19,25 @@ public abstract class AbstractCCARender : MonoBehaviour
     private bool _isStillAnimating = false;
     public bool IsStillAnimating { get => _isStillAnimating; set => _isStillAnimating = value; }
 
+    private readonly List<AbstractCCAAnimator> animators = new List<AbstractCCAAnimator>();
+
+    private float _animationTime = AbstractCCAAnimator.DefaultAnimationTime;
+    public float AnimationTime
+    {
+        get => _animationTime;
+        set
+        {
+            if (value >= 0)
+            {
+                _animationTime = value;
+                animators.ForEach(animator =>
+                {
+                    animator.MaxAnimationTime = value;
+                    animator.AnimationsDisabled = value == 0;
+                });
+            }
+        }
+    }
 
     private LoadedGraph _loadedGraph;
     private LoadedGraph _nextGraph;
@@ -47,6 +67,11 @@ public abstract class AbstractCCARender : MonoBehaviour
             }
             return _objectManager;
         }
+    }
+
+    public AbstractCCARender()
+    {
+        RegisterAllAnimators(animators);
     }
 
     public void DisplayGraph(LoadedGraph loadedGraph)
@@ -121,7 +146,7 @@ public abstract class AbstractCCARender : MonoBehaviour
 
         Graph.Traverse(RenderRoot, RenderInnerNode, RenderLeaf);
         Graph.Edges().ForEach(RenderEdge);
-        Invoke("OnAnimationsFinished", 2); // TODO Flo remove: register animation and wait for Finish
+        Invoke("OnAnimationsFinished", Math.Max(AnimationTime, MinimalWaitTimeForNextRevision));
     }
 
     private void OnAnimationsFinished()
@@ -130,6 +155,11 @@ public abstract class AbstractCCARender : MonoBehaviour
         AnimationFinishedEvent.Invoke();
     }
 
+    /// <summary>
+    /// Is called on Constructor
+    /// </summary>
+    /// <param name="animators"></param>
+    protected abstract void RegisterAllAnimators(List<AbstractCCAAnimator> animators);
     protected abstract void RenderRoot(Node node);
     protected abstract void RenderInnerNode(Node node);
     protected abstract void RenderLeaf(Node node);

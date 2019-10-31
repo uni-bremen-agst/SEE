@@ -16,10 +16,8 @@ public class CCAnimation : MonoBehaviour
     public GameObject InGameCanvas;
     public GameObject MainMenuCanvas;
 
+    private InGameMenuModel inGameMenu;
     private MainMenuModel mainMenu;
-
-    public Text revisionNumberText;
-    public Toggle autoplayToggle;
 
     public CCAStateManager stateManager;
 
@@ -30,19 +28,24 @@ public class CCAnimation : MonoBehaviour
         mainMenu = MainMenuCanvas.GetComponent<MainMenuModel>();
         if (mainMenu == null)
         {
-            Debug.LogError("MainMenuCanvas has no MainMenuView assigned!");
+            Debug.LogError("MainMenuCanvas has no MainMenuModel assigned!");
+        }
+        inGameMenu = InGameCanvas.GetComponent<InGameMenuModel>();
+        if (inGameMenu == null)
+        {
+            Debug.LogError("InGameMenuCanvas has no InGameMenuModel assigned!");
         }
 
         mainMenu.CloseViewButton.onClick.AddListener(ToogleMainMenu);
 
         ToogleMainMenu(true);
-        UpdateText();
+        OnViewDataChanged();
         stateManager.ViewDataChangedEvent.AddListener(OnViewDataChanged);
     }
 
     void Update()
     {
-        if(!IsMainMenuOpen)
+        if (!IsMainMenuOpen)
         {
             if (Input.GetKeyDown("k"))
             {
@@ -55,6 +58,16 @@ public class CCAnimation : MonoBehaviour
             else if (Input.GetKeyDown(KeyCode.Tab))
             {
                 stateManager.ToggleAutoplay();
+            }
+
+            string[] animationTimeKeys = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
+            float[] animationTimeValues = { 0.1f, 0.5f, 1, 2, 3, 4, 5, 8, 16, 0 };
+            for (int i = 0; i < animationTimeKeys.Length; i++)
+            {
+                if (Input.GetKeyDown(animationTimeKeys[i]))
+                {
+                    stateManager.AnimationTime = animationTimeValues[i];
+                }
             }
         }
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -76,14 +89,10 @@ public class CCAnimation : MonoBehaviour
         stateManager.ToggleAutoplay(false);
     }
 
-    void UpdateText()
-    {
-        revisionNumberText.text = (stateManager.OpenGraphIndex + 1) + " / " + stateManager.GraphCount;
-    }
-
     void OnViewDataChanged()
     {
-        UpdateText();
-        autoplayToggle.isOn = stateManager.IsAutoPlay;
+        inGameMenu.RevisionNumberText.text = (stateManager.OpenGraphIndex + 1) + " / " + stateManager.GraphCount;
+        inGameMenu.AutoplayToggle.isOn = stateManager.IsAutoPlay;
+        inGameMenu.AnimationTimeText.text = "Revision animation time: " + stateManager.AnimationTime + "s";
     }
 }

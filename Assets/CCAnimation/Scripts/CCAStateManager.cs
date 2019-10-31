@@ -24,8 +24,16 @@ public class CCAStateManager : MonoBehaviour
 
     private List<Graph> Graphs => graphLoader.graphs;
 
-
     public int GraphCount => Graphs.Count;
+
+    public float AnimationTime
+    {
+        get => render.AnimationTime;
+        set {
+            render.AnimationTime = value;
+            ViewDataChangedEvent.Invoke();
+        }
+    }
 
     private int _openGraphIndex = 0;
     public int OpenGraphIndex
