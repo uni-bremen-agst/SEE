@@ -9,6 +9,11 @@ using UnityEngine;
 /// </summary>
 public abstract class AbstractCCAAnimator
 {
+    /// <summary>
+    /// TODO flo: doc
+    /// </summary>
+    public const int DefaultAnimationTime = 2;
+
     private float _maxAnimationTime;
     private bool _animationsDisabled = false;
 
@@ -26,7 +31,7 @@ public abstract class AbstractCCAAnimator
     /// TODO flo doc:
     /// </summary>
     /// <param name="maxAnimationTime">The maximum time the animation is allowed to run.</param>
-    public AbstractCCAAnimator(float maxAnimationTime = 2)
+    public AbstractCCAAnimator(float maxAnimationTime = DefaultAnimationTime)
     {
         this.MaxAnimationTime = maxAnimationTime;
     }
@@ -38,7 +43,8 @@ public abstract class AbstractCCAAnimator
     /// <param name="gameObject"></param>
     /// <param name="position"></param>
     /// <param name="scale"></param>
-    public void AnimateTo(Node node, GameObject gameObject, Vector3 position, Vector3 scale)
+    /// <param name="callback"></param>
+    public void AnimateTo(Node node, GameObject gameObject, Vector3 position, Vector3 scale, Action<object> callback = null)
     {
         node.AssertNotNull("node");
         gameObject.AssertNotNull("gameObject");
@@ -49,10 +55,15 @@ public abstract class AbstractCCAAnimator
         {
             gameObject.transform.position = position;
             gameObject.transform.localScale = scale;
+            callback?.Invoke(gameObject);
+        }
+        else if(callback == null)
+        {
+            AnimateToInternal(node, gameObject, position, scale);
         }
         else
         {
-            AnimateToInternal(node, gameObject, position, scale);
+            AnimateToAndInternal(node, gameObject, position, scale, ((MonoBehaviour)callback.Target).gameObject, callback.Method.Name);
         }
     }
 
@@ -64,30 +75,6 @@ public abstract class AbstractCCAAnimator
     /// <param name="position"></param>
     /// <param name="scale"></param>
     protected abstract void AnimateToInternal(Node node, GameObject gameObject, Vector3 position, Vector3 scale);
-
-    /// <summary>
-    /// TODO flo doc:
-    /// </summary>
-    /// <param name="node"></param>
-    /// <param name="gameObject"></param>
-    /// <param name="position"></param>
-    /// <param name="scale"></param>
-    /// <param name="callback"></param>
-    public void AnimateToAnd(Node node, GameObject gameObject, Vector3 position, Vector3 scale, Action<object> callback)
-    {
-        node.AssertNotNull("node");
-        gameObject.AssertNotNull("gameObject");
-        position.AssertNotNull("position");
-        scale.AssertNotNull("scale");
-        callback.AssertNotNull("callback");
-
-        if (callback.Target.GetType() == typeof(GameObject))
-        {
-            Debug.LogError("Callback needs to be a function inside of a MonoBehaviour");
-            return;
-        }
-        AnimateToAndInternal(node, gameObject, position, scale, ((MonoBehaviour)callback.Target).gameObject, callback.Method.Name);
-    }
 
     /// <summary>
     /// TODO flo doc:

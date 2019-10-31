@@ -8,7 +8,14 @@ using UnityEngine;
 
 public class CCARender : AbstractCCARender
 {
-    private readonly AbstractCCAAnimator Animator = new SimpleCCAAnimator();
+    private readonly AbstractCCAAnimator SimpleAnim = new SimpleCCAAnimator();
+    private readonly AbstractCCAAnimator MoveAnim = new MoveCCAAnimator();
+
+    protected override void RegisterAllAnimators(List<AbstractCCAAnimator> animators)
+    {
+        animators.Add(SimpleAnim);
+        animators.Add(MoveAnim);
+    }
 
     protected override void RenderRoot(Node node)
     {
@@ -55,21 +62,33 @@ public class CCARender : AbstractCCARender
     protected override void RenderLeaf(Node node)
     {
         var isLeafNew = !ObjectManager.GetLeaf(node, out GameObject leaf);
+        var position = Layout.GetPositon(node);
+        var scale = Layout.GetScale(node);
+        // TODO more leaf initialisation
+        void animateWith(AbstractCCAAnimator animator)
+        {
+            animator.AnimateTo(node, leaf, Layout.GetPositon(node), Layout.GetScale(node));
+        }
+
         if (isLeafNew)
         {
-            Animator.AnimateTo(node, leaf, Layout.GetPositon(node), Layout.GetScale(node));
+            var height = 100; // TODO object size
+            position.y -= height;
+            leaf.transform.position = position;
+            position.y += height;
+            MoveAnim.AnimateTo(node, leaf, position, scale);
         }
         else if (node.WasModified())
         {
-            Animator.AnimateTo(node, leaf, Layout.GetPositon(node), Layout.GetScale(node));
+            animateWith(SimpleAnim);
         }
         else if (node.WasRelocated(out string oldLinkageName))
         {
-            Animator.AnimateTo(node, leaf, Layout.GetPositon(node), Layout.GetScale(node));
+            animateWith(SimpleAnim);
         }
         else
         {
-            Animator.AnimateTo(node, leaf, Layout.GetPositon(node), Layout.GetScale(node));
+            animateWith(SimpleAnim);
         }
     }
 
@@ -91,7 +110,12 @@ public class CCARender : AbstractCCARender
     {
         if(ObjectManager.RemoveNode(node, out GameObject leaf))
         {
-            Animator.AnimateToAnd(node, leaf, Vector3.one, Vector3.one, OnRemovedNodeFinishedAnimation);
+            var height = 100; // TODO object size
+            var position = Layout.GetPositon(node);
+            var scale = Layout.GetScale(node);
+            gameObject.transform.position = position;
+            position.y -= height;
+            MoveAnim.AnimateTo(node, leaf, position, scale, OnRemovedNodeFinishedAnimation);
         }
     }
 
