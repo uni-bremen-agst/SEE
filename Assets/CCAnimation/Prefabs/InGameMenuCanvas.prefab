@@ -150,7 +150,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1414452447223662581}
   toggleTransition: 1
   graphic: {fileID: 6172590501756043823}
@@ -251,7 +251,7 @@ GameObject:
   - component: {fileID: 4461994104216227613}
   - component: {fileID: 4461994104216227612}
   m_Layer: 5
-  m_Name: AnimationCanvas
+  m_Name: InGameMenuCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
