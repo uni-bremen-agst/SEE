@@ -11,6 +11,11 @@ internal class ExtendedTextFactory
 {
     public static void UpdateText(GameObject textObject, string text, Vector3 position, float width, bool lift = true)
     {
+        textObject.AssertNotNull("textObject");
+        text.AssertNotNull("text");
+        position.AssertNotNull("position");
+        width.AssertNotNull("width");
+
         textObject.name = "Text " + text;
         textObject.transform.position = position;
 
@@ -50,6 +55,10 @@ internal class ExtendedTextFactory
     /// <returns>the game object representing the text</returns>
     public static GameObject GetText(string text, Vector3 position, float width, bool lift = true)
     {
+        text.AssertNotNull("text");
+        position.AssertNotNull("position");
+        width.AssertNotNull("width");
+
         GameObject result = new GameObject("Text " + text)
         {
             tag = Tags.Text
@@ -105,6 +114,8 @@ internal class ExtendedTextFactory
     /// <returns>the game object representing the text</returns>
     public static GameObject GetEmpty(string text)
     {
+        text.AssertNotNull("text");
+
         GameObject result = new GameObject("Text " + text)
         {
             tag = Tags.Text

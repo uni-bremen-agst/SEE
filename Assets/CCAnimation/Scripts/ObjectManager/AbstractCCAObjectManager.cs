@@ -29,6 +29,8 @@ public abstract class AbstractCCAObjectManager
     /// <param name="blockFactory">The given BlockFactory.</param>
     public AbstractCCAObjectManager(BlockFactory blockFactory)
     {
+        blockFactory.AssertNotNull("blockFactory");
+
         _blockFactory = blockFactory;
     }
 

@@ -25,6 +25,7 @@ public class CCALoader
     /// <param name="graphSettings">The GraphSettings defining the location of gxl files.</param>
     public void LoadGraphData(GraphSettings graphSettings)
     {
+        graphSettings.AssertNotNull("graphSettings");
         graphs.Clear();
         AddAllRevisions(graphSettings);
     }

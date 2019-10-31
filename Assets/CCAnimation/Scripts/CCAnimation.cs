@@ -16,16 +16,18 @@ public class CCAnimation : MonoBehaviour
     public GameObject InGameCanvas;
     public GameObject MainMenuCanvas;
 
-    private MainMenuView mainMenu;
+    private MainMenuModel mainMenu;
 
     public Text revisionNumberText;
     public Toggle autoplayToggle;
 
     public CCAStateManager stateManager;
 
+    public bool IsMainMenuOpen => !FlyCamera.IsEnabled;
+
     void Start()
     {
-        mainMenu = MainMenuCanvas.GetComponent<MainMenuView>();
+        mainMenu = MainMenuCanvas.GetComponent<MainMenuModel>();
         if (mainMenu == null)
         {
             Debug.LogError("MainMenuCanvas has no MainMenuView assigned!");
@@ -41,19 +43,22 @@ public class CCAnimation : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown("k"))
+        if(IsMainMenuOpen)
         {
-            stateManager.ShowPreviousGraph();
+            if (Input.GetKeyDown("k"))
+            {
+                stateManager.ShowPreviousGraph();
+            }
+            else if (Input.GetKeyDown("l"))
+            {
+                stateManager.ShowNextGraph();
+            }
+            else if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                stateManager.ToggleAutoplay();
+            }
         }
-        else if (Input.GetKeyDown("l"))
-        {
-            stateManager.ShowNextGraph();
-        }
-        else if (Input.GetKeyDown(KeyCode.Tab))
-        {
-            stateManager.ToggleAutoplay();
-        }
-        else if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             ToogleMainMenu(FlyCamera.IsEnabled);
         }
@@ -69,7 +74,7 @@ public class CCAnimation : MonoBehaviour
         FlyCamera.IsEnabled = !enabled;
         InGameCanvas.SetActive(!enabled);
         MainMenuCanvas.SetActive(enabled);
-        // TODO inform stateManager
+        stateManager.ToggleAutoplay(false);
     }
 
     void UpdateText()

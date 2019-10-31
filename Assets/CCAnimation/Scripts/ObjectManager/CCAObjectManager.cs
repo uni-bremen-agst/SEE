@@ -41,6 +41,8 @@ public class CCAObjectManager : AbstractCCAObjectManager
 
     public override bool GetInnerNode(Node node, out GameObject innerNode)
     {
+        node.AssertNotNull("node");
+
         var hasInnerNode = nodes.TryGetValue(node.LinkName, out innerNode);
         if (!hasInnerNode)
         {
@@ -75,6 +77,8 @@ public class CCAObjectManager : AbstractCCAObjectManager
 
     public override bool GetLeaf(Node node, out GameObject leaf)
     {
+        node.AssertNotNull("node");
+
         var hasLeaf = nodes.TryGetValue(node.LinkName, out leaf);
         if (!hasLeaf)
         {
@@ -95,6 +99,8 @@ public class CCAObjectManager : AbstractCCAObjectManager
 
     public override bool RemoveNode(Node node, out GameObject gameObject)
     {
+        node.AssertNotNull("node");
+
         var wasNodeRemoved = nodes.TryGetValue(node.LinkName, out gameObject);
         nodes.Remove(node.LinkName);
         return wasNodeRemoved;
