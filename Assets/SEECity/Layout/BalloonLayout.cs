@@ -389,7 +389,7 @@ namespace SEE.Layout
 
                     // We scale the block before it becomes a child of parent so that its scale
                     // is not relative to its parent.
-                    blockFactory.ScaleBlock(block, scale);
+                    blockFactory.SetSize(block, scale);
                 }
 
                 // Necessary size of the block independent of the parent

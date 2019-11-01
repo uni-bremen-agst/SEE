@@ -88,7 +88,7 @@ namespace SEE.Layout
             gameNodes[node] = block;
             
             block.name = node.LinkName + " Block";
-            blockFactory.ScaleBlock(block, GetScale(node));
+            blockFactory.SetSize(block, GetScale(node));
             Vector3 size = blockFactory.GetSize(block);
             out_leaf_radius = Mathf.Sqrt(size.x * size.x + size.z * size.z);
 
@@ -172,7 +172,7 @@ namespace SEE.Layout
         {
             return new Vector3(scaler.GetNormalizedValue(node, widthMetric), 
                                scaler.GetNormalizedValue(node, heightMetric), 
-                               scaler.GetNormalizedValue(node, breadthMetric)); ;
+                               scaler.GetNormalizedValue(node, breadthMetric));
         }
 
         private void DrawPlane(GameObject parent, float maxRadius)

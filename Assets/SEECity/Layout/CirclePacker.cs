@@ -42,9 +42,13 @@ namespace SEE.Layout
         {
             out_outer_radius = 0.0f;
             Vector3 center = Vector3.zero;
+            // Sort circles descendingly based on radius
             circles.Sort(Comparator);
-            for (int it = 0; it < circles.Count; it++)
+            float last_out_radius = Mathf.Infinity;
+            int max_iterations = 100; // FIXME: What would be a suitable number of maximal iterations? circles.Count?
+            for (int it = 0; it < max_iterations; it++)
             {
+                // Each step draws all pairs of circles closer together.
                 for (int i = 0; i < circles.Count - 1; i++)
                 {
                     for (int j = i + 1; j < circles.Count; j++)
@@ -55,7 +59,7 @@ namespace SEE.Layout
                         Vector3 ab = circles[j].Transform.localPosition - circles[i].Transform.localPosition;
                         ab.y = 0.0f;
                         float r = circles[i].Radius + circles[j].Radius;
-
+                        // Length squared = (dx * dx) + (dy * dy);
                         float d = Mathf.Max(0.0f, Vector3.SqrMagnitude(ab));
 
                         if (d < (r * r) - 0.01)
@@ -71,6 +75,19 @@ namespace SEE.Layout
                 EnclosingCircleIntersectingCircles(circles, out Vector3 out_center, out float out_radius);
                 out_outer_radius = out_radius;
                 center = out_center;
+
+                float improvement = out_radius / last_out_radius;
+                if (last_out_radius != Mathf.Infinity && improvement < 1.01f)
+                {
+                    // If the degree of improvement falls below 1%, we will stop.
+                    Debug.LogFormat("Minor improvement of {0} after {1} iterations.\n", improvement, it);
+                    break;
+                }
+                //else
+                //{
+                //    Debug.LogFormat("Improvement: {0}\n", improvement);
+                //}
+                last_out_radius = out_radius;
             }
 
             for (int i = 0; i < circles.Count; i++)
@@ -184,19 +201,19 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Returns <see langword="true"/> if circle with <paramref name="position1"/> and
-        /// <paramref name="radius1"/> contains <paramref name="c1"/>.
+        /// Returns <see langword="true"/> if circle with <paramref name="position"/> and
+        /// <paramref name="radius"/> contains <paramref name="circle"/>.
         /// </summary>
         /// 
-        /// <param name="position1">Position of containing circle.</param>
-        /// <param name="radius1">Radius of containing circle.</param>
-        /// <param name="c1">Contained circle.</param>
+        /// <param name="position">Position of containing circle.</param>
+        /// <param name="radius">Radius of containing circle.</param>
+        /// <param name="circle">Contained circle.</param>
         /// <returns></returns>
-        private static bool CircleContainsCircle(Vector3 position1, float radius1, Circle c1)
+        private static bool CircleContainsCircle(Vector3 position, float radius, Circle circle)
         {
-            var xc0 = position1.x - c1.Transform.position.x;
-            var yc0 = position1.z - c1.Transform.position.z;
-            return Mathf.Sqrt(xc0 * xc0 + yc0 * yc0) < radius1 - c1.Radius + float.Epsilon;
+            var xc0 = position.x - circle.Transform.position.x;
+            var yc0 = position.z - circle.Transform.position.z;
+            return Mathf.Sqrt(xc0 * xc0 + yc0 * yc0) < radius - circle.Radius + float.Epsilon;
         }
 
         /// <summary>
@@ -261,18 +278,18 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Compares <paramref name="p1"/> and <paramref name="p2"/> by radius (descending).
+        /// Compares <paramref name="c1"/> and <paramref name="c2"/> by radius (descending).
         /// </summary>
-        /// <param name="p1">First circle.</param>
-        /// <param name="p2">Second circle.</param>
+        /// <param name="c1">First circle.</param>
+        /// <param name="c2">Second circle.</param>
         /// <returns></returns>
-        private static int Comparator(Circle p1, Circle p2)
+        private static int Comparator(Circle c1, Circle c2)
         {
-            float d1 = p1.Radius;
-            float d2 = p2.Radius;
-            if (d1 < d2)
+            float r1 = c1.Radius;
+            float r2 = c2.Radius;
+            if (r1 < r2)
                 return 1;
-            else if (d1 > d2)
+            else if (r1 > r2)
                 return -1;
             else return 0;
         }

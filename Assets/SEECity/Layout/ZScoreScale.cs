@@ -45,9 +45,9 @@ namespace SEE.Layout
         protected Dictionary<string, float> Initial(IList<string> metrics)
         {
             Dictionary<string, float> result = new Dictionary<string, float>();
-            foreach(string metric in metrics)
+            foreach (string metric in metrics)
             {
-                result.Add(metric, 0.0f);
+                result[metric] = 0.0f;
             }
             return result;
         }
@@ -77,7 +77,7 @@ namespace SEE.Layout
             statistics = new Dictionary<string, Statistics>();
             foreach (string metric in metrics)
             {
-                statistics.Add(metric, new Statistics(0.0f, 0.0f));
+                statistics[metric] = new Statistics(0.0f, 0.0f);
             }
 
             // Calculate the mean value of each metric
