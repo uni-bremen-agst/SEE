@@ -165,17 +165,16 @@ namespace SEEEditor
             GUILayout.Label("VR settings", EditorStyles.boldLabel);
             VRenabled = EditorGUILayout.Toggle("Enable VR", VRenabled);
 
-            GUILayout.Label("Visual attributes", EditorStyles.boldLabel);
+            GUILayout.Label("Visual node attributes", EditorStyles.boldLabel);
             editorSettings.NodeLayout = (GraphSettings.NodeLayouts)EditorGUILayout.EnumPopup("Layout", editorSettings.NodeLayout);
             editorSettings.CScapeBuildings = EditorGUILayout.Toggle("CScape buildings", editorSettings.CScapeBuildings);
             editorSettings.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", editorSettings.ZScoreScale);
             editorSettings.ShowDonuts = EditorGUILayout.Toggle("Show Donut charts", editorSettings.ShowDonuts);
+            editorSettings.ShowErosions = EditorGUILayout.Toggle("Show erosions", editorSettings.ShowErosions);
 
             GUILayout.Label("Visual edge attributes", EditorStyles.boldLabel);
             editorSettings.EdgeLayout = (GraphSettings.EdgeLayouts)EditorGUILayout.EnumPopup("Layout", editorSettings.EdgeLayout);
             editorSettings.EdgeWidth = EditorGUILayout.FloatField("Edge width", editorSettings.EdgeWidth);
-            editorSettings.ShowEdges = EditorGUILayout.Toggle("Show edges", editorSettings.ShowEdges);
-            editorSettings.ShowErosions = EditorGUILayout.Toggle("Show erosions", editorSettings.ShowErosions);
             editorSettings.EdgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", editorSettings.EdgesAboveBlocks);
             
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
@@ -183,6 +182,7 @@ namespace SEEEditor
 
             //groupEnabled = EditorGUILayout.BeginToggleGroup("Optional Settings", groupEnabled);
             //myBool = EditorGUILayout.Toggle("Toggle", myBool);
+            //myFloat = EditorGUILayout.Slider("Slider", myFloat, -3, 3);
             //myFloat = EditorGUILayout.Slider("Slider", myFloat, -3, 3);
             //EditorGUILayout.EndToggleGroup();
 
