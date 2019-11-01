@@ -310,7 +310,7 @@ namespace SEE.Layout
                     };
 
                     AttachNode(innerGameObject, node);
-                    AttachCircleLine(innerGameObject, 1.0f, 0.1f * blockFactory.Unit());
+                    AttachCircleLine(innerGameObject, 0.5f, 0.1f * blockFactory.Unit());
                     nodeMap[node] = innerGameObject;
                 }
             }
