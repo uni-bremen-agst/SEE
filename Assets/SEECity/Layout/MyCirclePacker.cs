@@ -52,7 +52,7 @@ namespace SEEC.Layout
             // List<Circle> mCircles = CreateCirclesInLine(pNumCircles, pMinRadius, pMaxRadius);
             List<MyCircle> mCircles = CreateCirclesInCircle(pNumCircles, pMinRadius, pMaxRadius);
 
-            Pack(mCircles, out Vector2 center, out float out_outer_radius);
+            Pack(mCircles, out float out_outer_radius);
             Draw(mCircles);
         }
 
@@ -160,64 +160,107 @@ namespace SEEC.Layout
 
         /// <summary>
         /// Packs the <paramref name="circles"/> as close together within reasonable time.
+        /// 
+        /// Precondition: circles are sorted in descending order of their radius.
         /// </summary>
         /// <param name="circles">The circles to be packed.</param>
         /// <param name="out_outer_radius">The radius of the appoximated minimal enclosing circle.</param>
-        internal static void Pack(List<MyCircle> circles, out Vector2 center, out float out_outer_radius)
+        internal static void Pack(List<MyCircle> circles, out float out_outer_radius)
         {
-            out_outer_radius = 0.0f;
-            center = Vector3.zero;
-            // Sort circles descendingly based on radius
-            //mCircles.Sort(DistanceToCenterComparer);
-            circles.Sort(DescendingRadiusComparator);
-            //mCircles.Sort(AscendingRadiusComparator);
+            //if (circles.Count == 0)
+            //{
+            //    center = Vector2.zero;
+            //    out_outer_radius = 0.0f;
+            //}
+            //else if (circles.Count == 1)
+            //{
+            //    center = Vector2.zero;
+            //    circles[0].center = center;
+            //    out_outer_radius = circles[0].radius;
+            //}
+            //else if (circles.Count == 2)
+            //{
+            //    float r0 = circles[0].radius;
+            //    float r1 = circles[1].radius;
+            //    Debug.Assert(r0 >= r1);
+            //    circles[0].center = Vector2.zero;
+            //    circles[1].center = circles[0].center + (r0 + r1) * Vector2.right;
+            //    // distance between centers of both circles (they are to touch each other)
+            //    SmallestEnclosingCircle(circles, out center, out out_outer_radius);
 
-            float last_out_radius = Mathf.Infinity;
-            float minSeparationSq = mMinSeparation * mMinSeparation;
-            int max_iterations = 100; // FIXME: What would be a suitable number of maximal iterations? mCircles.Count?
-            for (int iterations = 1; iterations <= max_iterations; iterations++)
+            //    //{
+            //    //    List<MyCircle> debugCircles = new List<MyCircle>();
+            //    //    debugCircles.AddRange(circles);
+            //    //    debugCircles.Add(new MyCircle(null, center, out_outer_radius));
+            //    //    DrawCircles(debugCircles);
+            //    //}
+            //}
+            //else
             {
-                // Each step draws all pairs of circles closer together.
-                for (int i = 0; i < circles.Count - 1; i++)
+                out_outer_radius = 0.0f;
+                // Sort circles descendingly based on radius
+                //mCircles.Sort(DistanceToCenterComparer);
+                circles.Sort(DescendingRadiusComparator);
+                //mCircles.Sort(AscendingRadiusComparator);
+
+                Vector2 center = Vector2.zero;
+                float last_out_radius = Mathf.Infinity;
+                float minSeparationSq = mMinSeparation * mMinSeparation;
+                int max_iterations = circles.Count; // FIXME: What would be a suitable number of maximal iterations? mCircles.Count?
+                for (int iterations = 1; iterations <= max_iterations; iterations++)
                 {
-                    for (int j = i + 1; j < circles.Count; j++)
+                    // Each step draws all pairs of circles closer together.
+                    for (int i = 0; i < circles.Count - 1; i++)
                     {
-                        if (i == j)
-                            continue;
-
-                        Vector2 AB = circles[j].center - circles[i].center;
-                        float r = circles[i].radius + circles[j].radius;
-
-                        // Length squared = (dx * dx) + (dy * dy);
-                        float d = AB.SqrMagnitude() - minSeparationSq;
-                        float minSepSq = Math.Min(d, minSeparationSq);
-                        d -= minSepSq;
-
-                        if (d < (r * r) - 0.01)
+                        for (int j = i + 1; j < circles.Count; j++)
                         {
-                            AB.Normalize();
+                            if (i == j)
+                                continue;
 
-                            AB *= (float)((r - Math.Sqrt(d)) * 0.5f);
+                            // vector between the two centers
+                            Vector2 AB = circles[j].center - circles[i].center;
+                            // the minimal distance between the two centers so 
+                            // that the circles don't overlap
+                            float r = circles[i].radius + circles[j].radius;
 
-                            circles[j].center += AB;
-                            circles[i].center -= AB;
+                            // Length squared = (dx * dx) + (dy * dy);
+                            float d = AB.SqrMagnitude() - minSeparationSq;
+                            float minSepSq = Math.Min(d, minSeparationSq);
+                            d -= minSepSq;
+
+                            if (d < (r * r) - 0.01)
+                            {
+                                AB.Normalize();
+
+                                AB *= (float)((r - Math.Sqrt(d)) * 0.5f);
+
+                                circles[j].center += AB;
+                                circles[i].center -= AB;
+                            }
                         }
                     }
-                }
-                SmallestEnclosingCircle(circles, out center, out out_outer_radius);
+                    SmallestEnclosingCircle(circles, out center, out out_outer_radius);
 
-                float improvement = out_outer_radius / last_out_radius;
-                if (last_out_radius != Mathf.Infinity && improvement < 1.01f)
-                {
-                    // If the degree of improvement falls below 1%, we will stop.
-                    Debug.LogFormat("Minor improvement of {0} after {1} iterations.\n", improvement, iterations);
-                    break;
+                    float improvement = out_outer_radius / last_out_radius;
+                    if (last_out_radius != Mathf.Infinity && improvement < 1.01f)
+                    {
+                        // If the degree of improvement falls below 1%, we will stop.
+                        Debug.LogFormat("Minor improvement of {0} after {1} iterations.\n", improvement, iterations);
+                        //break;
+                    }
+                    //else
+                    //{
+                    //    Debug.LogFormat("Improvement: {0}\n", improvement);
+                    //}
+                    last_out_radius = out_outer_radius;
                 }
-                //else
-                //{
-                //    Debug.LogFormat("Improvement: {0}\n", improvement);
-                //}
-                last_out_radius = out_outer_radius;
+                // Clients of CirclePacker assume that all co-ordinates of children are relative to Vector3.zero.
+                // SmallestEnclosingCircle() may have given us a different center. That is why we need to make
+                // adjustments here by subtracting center as delivered by SmallestEnclosingCircle().
+                for (int i = 0; i < circles.Count; i++)
+                {
+                    circles[i].center -= center;
+                }
             }
         }
 
@@ -228,6 +271,23 @@ namespace SEEC.Layout
                 GameObject gameObject = c.gameObject;
                 gameObject.transform.position = new Vector3(c.center.x, 0.0f, c.center.y);
                 gameObject.transform.localScale = new Vector3(c.radius, 1.0f, c.radius);
+            }
+        }
+
+        private static void DrawCircles(List<MyCircle> mCircles)
+        {
+            int i = 0;
+            foreach (MyCircle c in mCircles)
+            {
+                bool exists = c.gameObject != null;
+                GameObject gameObject = exists ? GameObject.Instantiate(c.gameObject) : NewCylinder();
+                gameObject.transform.position = new Vector3(c.center.x, 0.0f, c.center.y);
+                if (! exists)
+                {
+                    gameObject.name = "circle " + i;
+                    gameObject.transform.localScale = new Vector3(2 * c.radius, 0.1f, 2 * c.radius);
+                }
+                i++;
             }
         }
 
@@ -296,8 +356,7 @@ namespace SEEC.Layout
         {
             MyCircle myCircle = new MyCircle(null, Vector2.zero, 1.0f);
             List<MyCircle> circles = new List<MyCircle>() { myCircle };
-            Pack(circles, out Vector2 center, out float radius);
-            AssertCenter(myCircle.center, center);
+            Pack(circles, out float radius);
             AssertRadius(myCircle.radius, radius);
         }
 
@@ -309,9 +368,8 @@ namespace SEEC.Layout
             List<MyCircle> circles = PrepareForPack(radii);
             float savedMinSeparation = mMinSeparation;
             mMinSeparation = 0.0f;
-            Pack(circles, out Vector2 center, out float radius);
+            Pack(circles, out float radius);
             mMinSeparation = savedMinSeparation;
-            AssertCenter(Vector2.zero + (r1 + r2) * Vector2.right / 2.0f, center);
             AssertRadius(r1 + r2, radius);
         }
 
