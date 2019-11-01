@@ -14,12 +14,12 @@ namespace SEE
         public string pathPrefix = null;
 
         /// Clone graph with one directory and two files contained therein.
-        public string gxlPath = "..\\Data\\GXL\\two_files.gxl";
-        public string csvPath = "..\\Data\\GXL\\two_files.csv";
+        //public string gxlPath = "..\\Data\\GXL\\two_files.gxl";
+        //public string csvPath = "..\\Data\\GXL\\two_files.csv";
 
         /// Clone graph with one directory and three files contained therein.
-        //public string gxlPath = "..\\Data\\GXL\\three_files.gxl";
-        //public string csvPath = "..\\Data\\GXL\\three_files.csv";
+        public string gxlPath = "..\\Data\\GXL\\three_files.gxl";
+        public string csvPath = "..\\Data\\GXL\\three_files.csv";
 
         /// Very tiny clone graph with single root, two children with two children
         /// each to experiment with.
