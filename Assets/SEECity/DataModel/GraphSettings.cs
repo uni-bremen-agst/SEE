@@ -13,9 +13,22 @@ namespace SEE
         /// </summary>        
         public string pathPrefix = null;
 
+        /// Clone graph with one directory and two files contained therein.
+        public string gxlPath = "..\\Data\\GXL\\two_files.gxl";
+        public string csvPath = "..\\Data\\GXL\\two_files.csv";
+
+        /// Clone graph with one directory and three files contained therein.
+        //public string gxlPath = "..\\Data\\GXL\\three_files.gxl";
+        //public string csvPath = "..\\Data\\GXL\\three_files.csv";
+
+        /// Very tiny clone graph with single root, two children with two children
+        /// each to experiment with.
+        //public string gxlPath = "..\\Data\\GXL\\micro_clones.gxl";
+        //public string csvPath = "..\\Data\\GXL\\micro_clones.csv";
+
         /// Tiny clone graph with single root to experiment with.
-        public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
-        public string csvPath = "..\\Data\\GXL\\minimal_erosions.csv";
+        //public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
+        //public string csvPath = "..\\Data\\GXL\\minimal_erosions.csv";
 
         /// Tiny clone graph with single roots to check edge bundling.
         //public string gxlPath = "..\\Data\\GXL\\controlPoints.gxl";
@@ -110,19 +123,20 @@ namespace SEE
 
         public enum NodeLayouts
         {
-            Balloon = 0,
-            Manhattan = 1,
-            CirclePacking = 2,
-            Treemap = 3,
-            BallonNode = 4,       // FIXME: Remove later
-            CirclePackingNode = 5 // FIXME: Remove later
+            CirclePackingNode = 0, // FIXME: Remove later
+            Balloon = 1,
+            Manhattan = 2,
+            CirclePacking = 3,
+            Treemap = 4,
+            BallonNode = 5       // FIXME: Remove later
         }
 
         public enum EdgeLayouts
         {
-            Straight = 0,
-            Spline = 1,
-            Bundling = 2
+            None = 0,
+            Straight = 1,
+            Spline = 2,
+            Bundling = 3
         }
 
         // The layout that should be used for nodes.
@@ -136,7 +150,7 @@ namespace SEE
         public bool ZScoreScale = true;
 
         // Whether CScape building should be used to visualize graph nodes. If false, cubes are used.
-        public bool CScapeBuildings = true;
+        public bool CScapeBuildings = false;
 
         // The width of edges.
         public float EdgeWidth = 0.3f;
@@ -144,17 +158,12 @@ namespace SEE
         /// <summary>
         /// Whether erosions should be visible above blocks.
         /// </summary>
-        public bool ShowErosions = true;
+        public bool ShowErosions = false;
 
         /// <summary>
         /// Whether Donut charts should be visible for circles in the Ballon layout.
         /// </summary>
-        public bool ShowDonuts = true;
-
-        /// <summary>
-        /// Whether edges should be shown.
-        /// </summary>
-        public bool ShowEdges = true;
+        public bool ShowDonuts = false;
 
         /// <summary>
         /// Orientation of the edges; 

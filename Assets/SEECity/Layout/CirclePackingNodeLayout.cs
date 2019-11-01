@@ -1,5 +1,5 @@
 ﻿using SEE.DataModel;
-using System;
+using SEEC.Layout;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +11,8 @@ namespace SEE.Layout
             : base(groundLevel, blockFactory)
         {
             name = "CirclePackingNode"; // FIXME: change to "CirclePacking".
+
+            MyCirclePacker.TestCirclePacker(); // FIXME: Remove this line.
         }
 
         Dictionary<GameObject, NodeTransform> layout;
@@ -22,68 +24,112 @@ namespace SEE.Layout
             List<Node> roots = GetRoots(gameNodes);
             if (roots.Count == 0)
             {
-                throw new System.Exception("Graph has no root nodes.");
+                throw new System.Exception("Graph has no root node.");
+            }
+            else if (roots.Count > 1)
+            {
+                throw new System.Exception("Graph has more than one root node.");
             }
             to_game_node = NodeMapping(gameNodes);
-            GameObject artificialRootNode = new GameObject("Nodes");
-            artificialRootNode.tag = Tags.Node;
-            DrawNodes(artificialRootNode, roots, out float out_radius);
-
+            float out_radius = DrawNodes(roots[0]);
+            Vector3 position = new Vector3(0.0f, groundLevel, 0.0f);
+            layout[to_game_node[roots[0]]] = new NodeTransform(position,
+                                                               GetScale(to_game_node[roots[0]], out_radius));
+            MakeGlobal(position, roots);
             return layout;
         }
 
-        private void DrawNodes(GameObject parent, List<Node> children, out float out_radius)
+        private void MakeGlobal(Vector3 position, List<Node> children)
         {
-            List<Circle> circles = new List<Circle>(children.Count);
-
-            int i = 0;
             foreach (Node child in children)
             {
                 GameObject childObject = to_game_node[child];
-
-                float radius;
-                if (child.IsLeaf())
-                {
-                    DrawLeaf(childObject, out float out_leaf_radius);
-                    radius = out_leaf_radius;
-                }
-                else
-                {
-                    DrawNodes(childObject, child.Children(), out float out_nodes_radius);
-                    radius = out_nodes_radius;
-                }
-
-                childObject.transform.parent = parent.transform;
-
-                float radians = ((float)i / (float)children.Count) * (2.0f * Mathf.PI);
-                childObject.transform.localPosition = new Vector3(Mathf.Cos(radians), 0.0f, Mathf.Sin(radians)) * radius;
-                childObject.transform.position = childObject.transform.position + new Vector3(0.0f, 0.1f, 0.0f);
-                circles.Add(new Circle(childObject.transform, radius));
-                i++;
+                NodeTransform childTransform = layout[childObject];
+                childTransform.position += position;
+                layout[childObject] = childTransform;
+                MakeGlobal(childTransform.position, child.Children());
             }
-
-            Vector3 position = parent.transform.position;
-            parent.transform.position = position;
-
-            CirclePacker.Pack(circles, out float out_outer_radius);
-            if (circles.Count > 1)
-            {
-                DrawOutline(parent, ref out_outer_radius);
-            }
-            out_radius = out_outer_radius;
         }
 
-        private void DrawOutline(GameObject parent, ref float out_outer_radius)
+        private float DrawNodes(Node parent)
         {
-            throw new NotImplementedException();
+            List<Node> children = parent.Children();
+
+            if (children.Count == 0)
+            {
+                // No scaling for leaves because they are already scaled.
+                // Position Vector3.zero because they are located relative to their parent.
+                // This position may be overridden later in the context of parent's parent.
+                //layout[to_game_node[parent]] = new NodeTransform(Vector3.zero, Vector3.one);
+                return LeafRadius(to_game_node[parent]);
+            }
+            else
+            { 
+                List<MyCircle> circles = new List<MyCircle>(children.Count);
+
+                int i = 0;
+                foreach (Node child in children)
+                {
+                    GameObject childObject = to_game_node[child];
+
+                    float radius = child.IsLeaf() ? LeafRadius(childObject) : DrawNodes(child);
+                    // Position the children on a circle as required by CirclePacker.Pack.
+                    float radians = ((float)i / (float)children.Count) * (2.0f * Mathf.PI);
+                    circles.Add(new MyCircle(childObject, new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * radius, radius));
+                    i++;
+                }
+
+                // The co-ordinates returned in circles are local, that is, relative to the zero center.
+                // The resulting center and out_outer_radius relate to the circle object comprising
+                // the children we just packed. By necessity, the objects whose children we are
+                // currently processing is a composed object represented by a circle, otherwise
+                // we would not have any children here.
+                MyCirclePacker.Pack(circles, out Vector2 center, out float out_outer_radius);
+
+                //layout[to_game_node[parent]] = new NodeTransform(new Vector3(center.x, groundLevel, center.y), 
+                //                                                 GetScale(to_game_node[parent], out_outer_radius));
+
+                foreach (MyCircle circle in circles)
+                {
+                    // Note: The position of the transform is currently only local, relative to the zero center
+                    // within the parent node
+                    layout[circle.gameObject] = new NodeTransform(new Vector3(circle.center.x, groundLevel, circle.center.y),
+                                                                  GetScale(circle.gameObject, circle.radius));
+                }
+                return out_outer_radius;
+            }
         }
 
-        private void DrawLeaf(GameObject block, out float out_leaf_radius)
+        private const float circleHeight = 0.1f;
+
+        /// <summary>
+        /// Returns the scaling vector for given node. If the node is a leaf, it will be the node's original size
+        /// because leaves are not scaled at all. We do not want to change their size. Its predetermined
+        /// by the client of this class. If the node is not a leaf, it will be represented by a circle
+        /// whose scaling in x and y axes is twice the given radius (we do not scale along the y axis,
+        /// hence, co-ordinate y of the resulting vector is always circleHeight.
+        /// </summary>
+        /// <param name="node">game node whose size is to be determined</param>
+        /// <param name="radius">the radius for the game node if it is an inner node</param>
+        /// <returns></returns>
+        private Vector3 GetScale(GameObject node, float radius)
+        {
+            Node n = node.GetComponent<NodeRef>().node;
+            // FIXME: Do we need multiply radius by Unit()?
+            return n.IsLeaf() ? blockFactory.GetSize(node) : new Vector3(2 * radius, circleHeight, 2 * radius);
+        }
+
+        /// <summary>
+        /// Yields the radius of the minimal circle containing the given block.
+        /// 
+        /// Precondition: node must be a leaf node, a block generated by blockFactory.
+        /// </summary>
+        /// <param name="block">block whose radius is required</param>
+        /// <returns>radius of the minimal circle containing the given block</returns>
+        private float LeafRadius(GameObject block)
         {
             Vector3 size = blockFactory.GetSize(block);
-            // FIXME: This is the local position
-            layout[block] = new NodeTransform(new Vector3(0.0f, size.y / 2.0f, 0.0f), Vector3.zero);
-            out_leaf_radius = Mathf.Sqrt(size.x * size.x + size.z * size.z);
+            return Mathf.Sqrt(size.x * size.x + size.z * size.z) / 2.0f;
         }
     }
 }

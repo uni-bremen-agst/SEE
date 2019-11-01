@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel;
+using SEEC.Layout;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -55,14 +56,15 @@ namespace SEE.Layout
 
             if (settings.NodeLayout == GraphSettings.NodeLayouts.Manhattan
                 || settings.NodeLayout == GraphSettings.NodeLayouts.Treemap
-                || settings.NodeLayout == GraphSettings.NodeLayouts.BallonNode)
+                || settings.NodeLayout == GraphSettings.NodeLayouts.BallonNode
+                || settings.NodeLayout == GraphSettings.NodeLayouts.CirclePackingNode)
             {
                 DrawCity(graph);
             }
             else
             {
                 Dictionary<Node, GameObject> gameNodes = NodeLayout(graph, scaler);
-                if (settings.ShowEdges)
+                if (settings.EdgeLayout != GraphSettings.EdgeLayouts.None)
                 {
                     EdgeLayout(graph, gameNodes);
                 }
@@ -148,6 +150,12 @@ namespace SEE.Layout
 
         protected void DrawCity(Graph graph)
         {
+            if (settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
+            {
+                MyCirclePacker.Test();
+                return;
+            }
+            
             Dictionary<Node, GameObject> nodeMap;
             Dictionary<GameObject, NodeTransform> layout;
             List<Node> nodes = graph.Nodes();
@@ -165,6 +173,11 @@ namespace SEE.Layout
                     nodeMap = CreateBlocks(nodes); // leaves
                     AddContainers(nodeMap, nodes); // and inner nodes
                     layout = new BalloonNodeLayout(groundLevel, blockFactory).Layout(nodeMap.Values);
+                    break;
+                case GraphSettings.NodeLayouts.CirclePackingNode:
+                    nodeMap = CreateBlocks(nodes); // leaves
+                    AddContainers(nodeMap, nodes); // and inner nodes
+                    layout = new CirclePackingNodeLayout(groundLevel, blockFactory).Layout(nodeMap.Values);
                     break;
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
@@ -199,12 +212,20 @@ namespace SEE.Layout
 
                 if (node.IsLeaf())
                 {
+
                     // Leave nodes were created as blocks by blockFactory.
                     // Note: We need to first scale a block and only then set its position
                     // because the scaling behavior differs between Cubes and CScape buildings.
-                    // Cubes scale from its center up and downward, which CScape buildings
+                    // Cubes scale from its center up and downward, whereas CScape buildings
                     // scale only up.
-                    blockFactory.ScaleBlock(block, transform.scale);
+
+                    // FIXME: The above comment is misleading as we do no longer scale
+                    // leaves here.
+
+                    // Leaf nodes have their size set before the layout is computed. We will
+                    // not change their size.
+
+                    // blockFactory.SetSize(block, transform.scale);
                     blockFactory.SetGroundPosition(block, transform.position);
                 }
                 else
@@ -261,7 +282,7 @@ namespace SEE.Layout
                                                 scaler.GetNormalizedValue(node, settings.DepthMetric));
 
                     // Scale according to the metrics.
-                    blockFactory.ScaleBlock(block, scale);
+                    blockFactory.SetSize(block, scale);
 
                     result[node] = block;
                 }
