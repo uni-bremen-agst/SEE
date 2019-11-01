@@ -40,56 +40,92 @@ namespace SEE.Layout
         /// <param name="out_outer_radius">The radius of the appoximated minimal enclosing circle.</param>
         public static void Pack(List<Circle> circles, out float out_outer_radius)
         {
-            out_outer_radius = 0.0f;
             Vector3 center = Vector3.zero;
-            // Sort circles descendingly based on radius
-            circles.Sort(Comparator);
-            float last_out_radius = Mathf.Infinity;
-            int max_iterations = 100; // FIXME: What would be a suitable number of maximal iterations? circles.Count?
-            for (int it = 0; it < max_iterations; it++)
+
+            //if (circles.Count == 0)
+            //{
+            //    center = Vector3.zero;
+            //    out_outer_radius = 0.0f;
+            //}
+            //else if (circles.Count == 1)
+            //{
+            //    center = Vector3.zero;
+            //    circles[0].Transform.position = Vector3.zero;
+            //    out_outer_radius = circles[0].Radius;
+            //}
+            //else if (circles.Count == 2)
+            //{
+            //    float r0 = circles[0].Radius;
+            //    float r1 = circles[1].Radius;
+            //    Debug.Assert(r0 >= r1);
+            //    circles[0].Transform.position = Vector3.zero;
+            //    circles[1].Transform.position = circles[0].Transform.position + (r0 + r1) * Vector3.right;
+            //    // distance between centers of both circles (they are to touch each other)
+            //    EnclosingCircleIntersectingCircles(circles, out center, out out_outer_radius);
+
+            //    //{
+            //    //    List<MyCircle> debugCircles = new List<MyCircle>();
+            //    //    debugCircles.AddRange(circles);
+            //    //    debugCircles.Add(new MyCircle(null, center, out_outer_radius));
+            //    //    DrawCircles(debugCircles);
+            //    //}
+            //}
+            //else
             {
-                // Each step draws all pairs of circles closer together.
-                for (int i = 0; i < circles.Count - 1; i++)
+                out_outer_radius = 0.0f;
+                // Sort circles descendingly based on radius
+                circles.Sort(Comparator);
+                float last_out_radius = Mathf.Infinity;
+                int max_iterations = 100; // FIXME: What would be a suitable number of maximal iterations? circles.Count?
+                for (int it = 0; it < max_iterations; it++)
                 {
-                    for (int j = i + 1; j < circles.Count; j++)
+                    // Each step draws all pairs of circles closer together.
+                    for (int i = 0; i < circles.Count - 1; i++)
                     {
-                        if (i == j)
-                            continue;
-
-                        Vector3 ab = circles[j].Transform.localPosition - circles[i].Transform.localPosition;
-                        ab.y = 0.0f;
-                        float r = circles[i].Radius + circles[j].Radius;
-                        // Length squared = (dx * dx) + (dy * dy);
-                        float d = Mathf.Max(0.0f, Vector3.SqrMagnitude(ab));
-
-                        if (d < (r * r) - 0.01)
+                        for (int j = i + 1; j < circles.Count; j++)
                         {
-                            ab.Normalize();
-                            ab *= (float)((r - Math.Sqrt(d)) * 0.5f);
-                            circles[j].Transform.localPosition += ab;
-                            circles[i].Transform.localPosition -= ab;
+                            if (i == j)
+                                continue;
+
+                            Vector3 ab = circles[j].Transform.localPosition - circles[i].Transform.localPosition;
+                            ab.y = 0.0f;
+                            float r = circles[i].Radius + circles[j].Radius;
+                            // Length squared = (dx * dx) + (dy * dy);
+                            float d = Mathf.Max(0.0f, Vector3.SqrMagnitude(ab));
+
+                            if (d < (r * r) - 0.01)
+                            {
+                                ab.Normalize();
+                                ab *= (float)((r - Math.Sqrt(d)) * 0.5f);
+                                circles[j].Transform.localPosition += ab;
+                                circles[i].Transform.localPosition -= ab;
+                            }
                         }
                     }
+
+                    SmallestEnclosingCircle(circles, out Vector3 out_center, out float out_radius);
+                    out_outer_radius = out_radius;
+                    center = out_center;
+
+                    float improvement = out_radius / last_out_radius;
+                    if (last_out_radius != Mathf.Infinity && improvement < 1.01f)
+                    {
+                        // If the degree of improvement falls below 1%, we will stop.
+                        Debug.LogFormat("Minor improvement of {0} after {1} iterations.\n", improvement, it);
+                        break;
+                    }
+                    //else
+                    //{
+                    //    Debug.LogFormat("Improvement: {0}\n", improvement);
+                    //}
+                    last_out_radius = out_radius;
                 }
 
-                EnclosingCircleIntersectingCircles(circles, out Vector3 out_center, out float out_radius);
-                out_outer_radius = out_radius;
-                center = out_center;
 
-                float improvement = out_radius / last_out_radius;
-                if (last_out_radius != Mathf.Infinity && improvement < 1.01f)
-                {
-                    // If the degree of improvement falls below 1%, we will stop.
-                    Debug.LogFormat("Minor improvement of {0} after {1} iterations.\n", improvement, it);
-                    break;
-                }
-                //else
-                //{
-                //    Debug.LogFormat("Improvement: {0}\n", improvement);
-                //}
-                last_out_radius = out_radius;
             }
-
+            // Clients of CirclePacker assume that all co-ordinates of children are relative to Vector3.zero.
+            // SmallestEnclosingCircle() may have given us a different center. That is why we need to make
+            // adjustments here by subtracting center as delivered by SmallestEnclosingCircle().
             for (int i = 0; i < circles.Count; i++)
             {
                 circles[i].Transform.localPosition -= center;
@@ -113,16 +149,16 @@ namespace SEE.Layout
         /// 
         /// <param name="out_radius">The radius of <paramref name="circles"/> enclosing
         /// circle.</param>
-        private static void EnclosingCircleIntersectingCircles(List<Circle> circles, out Vector3 out_center, out float out_radius)
+        private static void SmallestEnclosingCircle(List<Circle> circles, out Vector3 out_center, out float out_radius)
         {
-            EnclosingCircleIntersectingCirclesImpl(new List<Circle>(circles), new List<Circle>(), out Vector3 center, out float radius);
+            SmallestEnclosingCircleImpl(new List<Circle>(circles), new List<Circle>(), out Vector3 center, out float radius);
             out_center = center;
             out_radius = radius;
         }
 
         /// <summary>
         /// Implementation of
-        /// <see cref="EnclosingCircleIntersectingCircles(List{Circle}, out Vector3, out float)"/>
+        /// <see cref="SmallestEnclosingCircle(List{Circle}, out Vector3, out float)"/>
         /// .
         /// </summary>
         /// 
@@ -136,7 +172,7 @@ namespace SEE.Layout
         /// 
         /// <param name="out_radius">The radius of <paramref name="borderCircles"/> enclosing
         /// circle.</param>
-        private static void EnclosingCircleIntersectingCirclesImpl(List<Circle> circles, List<Circle> borderCircles, out Vector3 out_center, out float out_radius)
+        private static void SmallestEnclosingCircleImpl(List<Circle> circles, List<Circle> borderCircles, out Vector3 out_center, out float out_radius)
         {
             out_center = Vector3.zero;
             out_radius = 0.0f;
@@ -181,14 +217,14 @@ namespace SEE.Layout
             List<Circle> cmc = new List<Circle>(circles);
             cmc.RemoveAt(smallestCircleIndex);
 
-            EnclosingCircleIntersectingCirclesImpl(cmc, borderCircles, out Vector3 out_center_cmc, out float out_radius_cmc);
+            SmallestEnclosingCircleImpl(cmc, borderCircles, out Vector3 out_center_cmc, out float out_radius_cmc);
 
             if (!CircleContainsCircle(out_center_cmc, out_radius_cmc, smallestCircle))
             {
                 List<Circle> bcpc = new List<Circle>(borderCircles);
                 bcpc.Add(smallestCircle);
 
-                EnclosingCircleIntersectingCirclesImpl(cmc, bcpc, out Vector3 out_center_cmc_bcpc, out float out_radius_cmc_bcpc);
+                SmallestEnclosingCircleImpl(cmc, bcpc, out Vector3 out_center_cmc_bcpc, out float out_radius_cmc_bcpc);
 
                 out_center = out_center_cmc_bcpc;
                 out_radius = out_radius_cmc_bcpc;

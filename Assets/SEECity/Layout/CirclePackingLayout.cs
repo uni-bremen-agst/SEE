@@ -71,8 +71,8 @@ namespace SEE.Layout
                 circles.Add(new Circle(gameObject.transform, radius));
             }
 
-            Vector3 position = parent.transform.position;
-            parent.transform.position = position;
+            //Vector3 position = parent.transform.position;
+            //parent.transform.position = position;
 
             CirclePacker.Pack(circles, out float out_outer_radius);
             if (circles.Count > 1)

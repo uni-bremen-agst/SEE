@@ -12,7 +12,7 @@ namespace SEE.Layout
         {
             name = "CirclePackingNode"; // FIXME: change to "CirclePacking".
 
-            MyCirclePacker.TestCirclePacker(); // FIXME: Remove this line.
+            //MyCirclePacker.TestCirclePacker(); // FIXME: Remove this line.
         }
 
         Dictionary<GameObject, NodeTransform> layout;
@@ -84,7 +84,7 @@ namespace SEE.Layout
                 // the children we just packed. By necessity, the objects whose children we are
                 // currently processing is a composed object represented by a circle, otherwise
                 // we would not have any children here.
-                MyCirclePacker.Pack(circles, out Vector2 center, out float out_outer_radius);
+                MyCirclePacker.Pack(circles, out float out_outer_radius);
 
                 //layout[to_game_node[parent]] = new NodeTransform(new Vector3(center.x, groundLevel, center.y), 
                 //                                                 GetScale(to_game_node[parent], out_outer_radius));
@@ -92,7 +92,7 @@ namespace SEE.Layout
                 foreach (MyCircle circle in circles)
                 {
                     // Note: The position of the transform is currently only local, relative to the zero center
-                    // within the parent node
+                    // within the parent node. The co-ordinates will later be adjusted to the world scope.
                     layout[circle.gameObject] = new NodeTransform(new Vector3(circle.center.x, groundLevel, circle.center.y),
                                                                   GetScale(circle.gameObject, circle.radius));
                 }
@@ -128,8 +128,8 @@ namespace SEE.Layout
         /// <returns>radius of the minimal circle containing the given block</returns>
         private float LeafRadius(GameObject block)
         {
-            Vector3 size = blockFactory.GetSize(block);
-            return Mathf.Sqrt(size.x * size.x + size.z * size.z) / 2.0f;
+            Vector3 extent = blockFactory.GetSize(block) / 2.0f;
+            return Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);
         }
     }
 }
