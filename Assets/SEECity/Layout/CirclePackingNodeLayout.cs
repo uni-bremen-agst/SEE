@@ -11,42 +11,16 @@ namespace SEE.Layout
             : base(groundLevel, blockFactory)
         {
             name = "CirclePackingNode"; // FIXME: change to "CirclePacking".
-
-            //MyCirclePacker.TestCirclePacker(); // FIXME: Remove this line.
         }
 
-        Dictionary<GameObject, NodeTransform> layout;
-
-        private static void Dump(Dictionary<GameObject, NodeTransform> layout, string message = "")
-        {
-            if (! string.IsNullOrEmpty(message))
-            {
-                Debug.Log(message + "\n");
-            }
-            foreach (var entry in layout)
-            {
-                Debug.LogFormat("node {0}: layout={1}\n", entry.Key.name, entry.Value.ToString());
-            }
-        }
-
-        private static void Dump(List<MyCircle> circles, string message = "", string prefix = "")
-        {
-            string p = string.IsNullOrEmpty(message) ? "" : "[" + prefix + "] ";
-            if (!string.IsNullOrEmpty(message))
-            {
-                Debug.Log(p + message + "\n");
-            }
-            int i = 0;
-            foreach (var circle in circles)
-            {
-                Debug.LogFormat(p + "circle {0}: {1}\n", i, circle.ToString());
-                i++;
-            }
-        }
+        /// <summary>
+        /// The node layout we compute as a result.
+        /// </summary>
+        Dictionary<GameObject, NodeTransform> layout_result;
 
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
         {
-            layout = new Dictionary<GameObject, NodeTransform>();
+            layout_result = new Dictionary<GameObject, NodeTransform>();
 
             List<Node> roots = GetRoots(gameNodes);
             if (roots.Count == 0)
@@ -61,12 +35,11 @@ namespace SEE.Layout
             Node root = roots[0];
             float out_radius = DrawNodes(root);
             Vector3 position = new Vector3(0.0f, groundLevel, 0.0f);
-            layout[to_game_node[root]] = new NodeTransform(position,
-                                                           GetScale(to_game_node[root], out_radius));
-            //Dump(layout, "BEFORE");
+            layout_result[to_game_node[root]] = new NodeTransform(position,
+                                                                  GetScale(to_game_node[root], out_radius));
             MakeGlobal(position, root.Children());
-            //Dump(layout, "AFTER");
-            return layout;
+            to_game_node = null;
+            return layout_result;
         }
 
         /// <summary>
@@ -81,9 +54,9 @@ namespace SEE.Layout
             foreach (Node child in children)
             {
                 GameObject childObject = to_game_node[child];
-                NodeTransform childTransform = layout[childObject];
+                NodeTransform childTransform = layout_result[childObject];
                 childTransform.position += position;
-                layout[childObject] = childTransform;
+                layout_result[childObject] = childTransform;
                 MakeGlobal(childTransform.position, child.Children());
             }
         }
@@ -121,9 +94,7 @@ namespace SEE.Layout
                 // the children we just packed. By necessity, the objects whose children we are
                 // currently processing is a composed object represented by a circle, otherwise
                 // we would not have any children here.
-                Dump(circles, "BEFORE for " + to_game_node[parent].name, "PACK");
                 MyCirclePacker.Pack(circles, out float out_outer_radius);
-                Dump(circles, "AFTER for " + to_game_node[parent].name, "PACK");
 
                 //layout[to_game_node[parent]] = new NodeTransform(new Vector3(center.x, groundLevel, center.y), 
                 //                                                 GetScale(to_game_node[parent], out_outer_radius));
@@ -132,14 +103,12 @@ namespace SEE.Layout
                 {
                     // Note: The position of the transform is currently only local, relative to the zero center
                     // within the parent node. The co-ordinates will later be adjusted to the world scope.
-                    layout[circle.gameObject] = new NodeTransform(new Vector3(circle.center.x, groundLevel, circle.center.y),
+                    layout_result[circle.gameObject] = new NodeTransform(new Vector3(circle.center.x, groundLevel, circle.center.y),
                                                                   GetScale(circle.gameObject, circle.radius));
                 }
                 return out_outer_radius;
             }
         }
-
-        private const float circleHeight = 0.1f;
 
         /// <summary>
         /// Returns the scaling vector for given node. If the node is a leaf, it will be the node's original size
