@@ -38,6 +38,11 @@ namespace SEE.Layout
         protected readonly NodeFactory blockFactory;
 
         /// <summary>
+        /// The height of circles (y co-ordinate) drawn for inner nodes.
+        /// </summary>
+        protected const float circleHeight = 0.1f;
+
+        /// <summary>
         /// Yields layout information for all nodes given.
         /// For every game object g in gameNodes: result[g] is the node transforms,
         /// i.e., the game object's position and scale.
