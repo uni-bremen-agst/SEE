@@ -46,15 +46,9 @@ namespace SEEEditor
         private SEE.GraphSettings editorSettings = new SEE.GraphSettings();
 
         /// <summary>
-        /// The factory for the kinds of node visualizations to be used as requested by the user.
+        /// Returns the path to our Unity project folder.
         /// </summary>
-        private SEE.Layout.INodeLayout layout;
-
-        /// <summary>
-        /// The factory for the kinds of node visualizations to be used as requested by the user.
-        /// </summary>
-        BlockFactory blockFactory;
-
+        /// <returns>path to our Unity project folder</returns>
         private static string ProjectPath()
         {
             string result = Application.dataPath;
@@ -253,11 +247,6 @@ namespace SEEEditor
         {
             SceneGraphs.DeleteAll();
             graph = null;
-            blockFactory = null;
-            if (layout != null)
-            {
-                layout = null;
-            }
             // delete all left-overs if there are any
             foreach (string tag in SEE.DataModel.Tags.All)
             {
