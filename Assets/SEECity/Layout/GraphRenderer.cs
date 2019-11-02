@@ -75,7 +75,7 @@ namespace SEE.Layout
 
             if (settings.NodeLayout == GraphSettings.NodeLayouts.Manhattan
                 || settings.NodeLayout == GraphSettings.NodeLayouts.Treemap
-                || settings.NodeLayout == GraphSettings.NodeLayouts.BallonNode
+                || settings.NodeLayout == GraphSettings.NodeLayouts.BalloonNode
                 || settings.NodeLayout == GraphSettings.NodeLayouts.CirclePackingNode)
             {
                 DrawCity(graph);
@@ -176,13 +176,13 @@ namespace SEE.Layout
             {
                 case GraphSettings.NodeLayouts.Manhattan:
                     nodeMap = CreateBlocks(nodes); // only leaves
-                    layout = new ManhattenLayout(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
+                    layout = new ManhattanLayout(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.Treemap:
                     nodeMap = CreateBlocks(nodes); // only leaves
                     layout = new TreemapLayout(groundLevel, leaveNodeFactory, 100.0f, 100.0f).Layout(nodeMap.Values);
                     break;
-                case GraphSettings.NodeLayouts.BallonNode:
+                case GraphSettings.NodeLayouts.BalloonNode:
                     nodeMap = CreateBlocks(nodes); // leaves
                     AddContainers(nodeMap, nodes); // and inner nodes
                     layout = new BalloonNodeLayout(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
@@ -204,7 +204,6 @@ namespace SEE.Layout
                 AddErosionIssues(nodeMap.Values);
             }
             BoundingBox(nodeMap.Values, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-            Debug.LogFormat("New plane: left front corner = {0}, right back corner = {1}\n", leftFrontCorner, rightBackCorner);
             PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
         }
 
@@ -234,8 +233,9 @@ namespace SEE.Layout
                 else
                 {
                     // Inner nodes were not created by blockFactory.
-                    innerNodeFactory.SetGroundPosition(gameNode, transform.position);
                     innerNodeFactory.SetSize(gameNode, transform.scale);
+                    innerNodeFactory.SetGroundPosition(gameNode, transform.position);
+                    
                 }
             }
         }
@@ -318,7 +318,6 @@ namespace SEE.Layout
             innerGameObject.name = node.LinkName;
             innerGameObject.tag = Tags.Node;
             AttachNode(innerGameObject, node);
-            Debug.LogFormat("size of inner node {0} = {1}\n", innerGameObject.name, innerNodeFactory.GetSize(innerGameObject));
             return innerGameObject;
         }
 
@@ -412,7 +411,6 @@ namespace SEE.Layout
                     // Note: go.transform.position denotes the center of the object
 
                     Vector3 extent = node.IsLeaf() ? leaveNodeFactory.GetSize(go) / 2.0f : innerNodeFactory.GetSize(go) / 2.0f;
-                    Debug.LogFormat("extent of {0} = {1}\n", go.name, extent);
                     Vector3 position = node.IsLeaf() ? leaveNodeFactory.GetCenterPosition(go) : innerNodeFactory.GetCenterPosition(go);
                     {
                         // x co-ordinate of lower left corner
