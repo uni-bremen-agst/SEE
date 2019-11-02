@@ -1,28 +1,28 @@
 ﻿using UnityEngine;
 
-namespace Assets.SEECity.Layout
+namespace SEE.Layout
 {
-    public class CylinderFactory
+    /// <summary>
+    /// A factory for cylinder game objects.
+    /// </summary>
+    public class CylinderFactory : NodeFactory
     {
-        public static GameObject NewCylinder(Color color, float height = 1.0f)
+        private Material material;
+
+        public static Color DefaultColor = Color.black;
+
+        public CylinderFactory()
+        {
+            material = new Material(Materials.DefaultMaterial());
+            material.color = DefaultColor;
+        }
+
+        public override GameObject NewBlock()
         {
             GameObject result = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            
             Renderer renderer = result.GetComponent<Renderer>();
-            // FIXME: Re-use material for all cylinders.
-            renderer.sharedMaterial = new Material(renderer.sharedMaterial);
-            renderer.sharedMaterial.color = color;
-
-            // Turn off reflection of plane
-            renderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
-            renderer.sharedMaterial.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
-            renderer.sharedMaterial.SetFloat("_SpecularHighlights", 0.0f);
-            // To turn reflection on again, use (_SPECULARHIGHLIGHTS_OFF and _GLOSSYREFLECTIONS_OFF
-            // work as toggle, there is no _SPECULARHIGHLIGHTS_ON and _GLOSSYREFLECTIONS_ON):
-            //planeRenderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
-            //planeRenderer.sharedMaterial.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
-            //planeRenderer.sharedMaterial.SetFloat("_SpecularHighlights", 1.0f);
-
+            // Re-use default material for all cylinders.
+            renderer.sharedMaterial = material;
             return result;
         }
     }
