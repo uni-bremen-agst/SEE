@@ -132,9 +132,9 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 470676902}
-        m_MethodName: SetRoomName
-        m_Mode: 0
+      - m_Target: {fileID: 4785625271760674028}
+        m_MethodName: set_roomName
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -652,8 +652,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 470676902}
-        m_MethodName: SetRoomSize
+      - m_Target: {fileID: 4785625271760674028}
+        m_MethodName: set_maxPlayers
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1497,13 +1497,13 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 817652151448753666}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 470676902}
-        m_MethodName: CreateAndJoinRoom
+      - m_Target: {fileID: 4785625271760674028}
+        m_MethodName: CreateRoom
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2116,7 +2116,7 @@ MonoBehaviour:
   m_FontData:
     m_Font: {fileID: 12800000, guid: 04a842e316b6f44bf8da702de26a8ed6, type: 3}
     m_FontSize: 12
-    m_FontStyle: 0
+    m_FontStyle: 2
     m_BestFit: 0
     m_MinSize: 1
     m_MaxSize: 40
@@ -2126,7 +2126,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Create And Join
+  m_Text: Connecting...
 --- !u!1 &817652152348314552
 GameObject:
   m_ObjectHideFlags: 0
@@ -2475,6 +2475,7 @@ GameObject:
   - component: {fileID: 817652152635664664}
   - component: {fileID: 817652152635664665}
   - component: {fileID: 470676902}
+  - component: {fileID: 4785625271760674028}
   m_Layer: 5
   m_Name: CreateOnlineRoomMenu
   m_TagString: Untagged
@@ -2552,7 +2553,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba7cca313a354d2408f912de4762acd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MultiplayerSceneIndex: 1
+--- !u!114 &4785625271760674028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 817652152635664667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 213f147a002752f4c92e41a559622b75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  createRoomButton: {fileID: 817652151448753789}
 --- !u!1 &8701038767869883987
 GameObject:
   m_ObjectHideFlags: 0
@@ -2643,4 +2656,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba7cca313a354d2408f912de4762acd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MultiplayerSceneIndex: 0
