@@ -121,6 +121,28 @@ namespace SEE
         public string StyleIssue = "Metric.Style";
         public string UniversalIssue = "Metric.Universal";
 
+        public enum LeafNodeKinds
+        {
+            Blocks,
+            Buildings,
+        }
+
+        public enum InnerNodeKinds
+        {
+            Circles,
+            Cylinders
+        }
+
+        /// <summary>
+        /// What kinds of game objects are to be created for leaf nodes in the graph.
+        /// </summary>
+        public LeafNodeKinds LeafObjects;
+
+        /// <summary>
+        /// What kinds of game objects are to be created for inner graph nodes.
+        /// </summary>
+        public InnerNodeKinds InnerNodeObjects;
+
         public enum NodeLayouts
         {
             CirclePackingNode = 0, // FIXME: Remove later
@@ -148,9 +170,6 @@ namespace SEE
         // Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
         // for range [0, max-value] is used, where max-value is the maximum value of a metric.
         public bool ZScoreScale = true;
-
-        // Whether CScape building should be used to visualize graph nodes. If false, cubes are used.
-        public bool CScapeBuildings = false;
 
         // The width of edges.
         public float EdgeWidth = 0.3f;
