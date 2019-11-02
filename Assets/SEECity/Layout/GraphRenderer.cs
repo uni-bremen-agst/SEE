@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Assets.SEECity.Layout;
 using SEE.DataModel;
 using SEEC.Layout;
 using UnityEngine;
@@ -22,13 +21,27 @@ namespace SEE.Layout
         public GraphRenderer(GraphSettings settings)
         {
             this.settings = settings;
-            if (this.settings.CScapeBuildings)
+            switch (this.settings.LeafObjects)
             {
-                blockFactory = new BuildingFactory();
+                case GraphSettings.LeafNodeKinds.Blocks:
+                    leaveNodeFactory = new CubeFactory();
+                    break;
+                case GraphSettings.LeafNodeKinds.Buildings:
+                    leaveNodeFactory = new BuildingFactory();
+                    break;
+                default:
+                    throw new Exception("Unhandled GraphSettings.LeafNodeKinds");
             }
-            else
+            switch (this.settings.InnerNodeObjects)
             {
-                blockFactory = new CubeFactory();
+                case GraphSettings.InnerNodeKinds.Circles:
+                    innerNodeFactory = new CircleFactory();
+                    break;
+                case GraphSettings.InnerNodeKinds.Cylinders:
+                    innerNodeFactory = new CylinderFactory();
+                    break;
+                default:
+                    throw new Exception("Unhandled GraphSettings.InnerNodeKinds");
             }
         }
 
@@ -38,9 +51,14 @@ namespace SEE.Layout
         private readonly GraphSettings settings;
 
         /// <summary>
-        /// The factory used to create blocks.
+        /// The factory used to create blocks for leaves.
         /// </summary>
-        private readonly NodeFactory blockFactory;
+        private readonly NodeFactory leaveNodeFactory;
+
+        /// <summary>
+        /// The factory used to create game nodes for inner graph nodes.
+        /// </summary>
+        private readonly NodeFactory innerNodeFactory;
 
         /// <summary>
         /// The scale used to normalize the metrics determining the lengths of the blocks.
@@ -92,13 +110,13 @@ namespace SEE.Layout
             switch (settings.EdgeLayout)
             {
                 case GraphSettings.EdgeLayouts.Straight:
-                    layout = new StraightEdgeLayout(blockFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
+                    layout = new StraightEdgeLayout(leaveNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
                     break;
                 case GraphSettings.EdgeLayouts.Spline:
-                    layout = new SplineEdgeLayout(blockFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
+                    layout = new SplineEdgeLayout(leaveNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
                     break;
                 case GraphSettings.EdgeLayouts.Bundling:
-                    layout = new BundledEdgeLayout(blockFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
+                    layout = new BundledEdgeLayout(leaveNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
                     break;
                 default:
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
@@ -118,7 +136,7 @@ namespace SEE.Layout
                         layout = new BalloonLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
                                                    settings.IssueMap(),
                                                    settings.InnerNodeMetrics,
-                                                   blockFactory,
+                                                   leaveNodeFactory,
                                                    scaler,
                                                    settings.ShowErosions,
                                                    settings.ShowDonuts);
@@ -129,7 +147,7 @@ namespace SEE.Layout
                         layout = new CirclePackingLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
                                                          settings.IssueMap(),
                                                          settings.InnerNodeMetrics,
-                                                         blockFactory,
+                                                         leaveNodeFactory,
                                                          scaler,
                                                          settings.ShowErosions,
                                                          settings.ShowDonuts);
@@ -150,13 +168,7 @@ namespace SEE.Layout
         protected const float groundLevel = 0.0f;
 
         protected void DrawCity(Graph graph)
-        {
-            if (settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
-            {
-                MyCirclePacker.Test();
-                return;
-            }
-            
+        {            
             Dictionary<Node, GameObject> nodeMap;
             Dictionary<GameObject, NodeTransform> layout;
             List<Node> nodes = graph.Nodes();
@@ -164,21 +176,21 @@ namespace SEE.Layout
             {
                 case GraphSettings.NodeLayouts.Manhattan:
                     nodeMap = CreateBlocks(nodes); // only leaves
-                    layout = new ManhattenLayout(groundLevel, blockFactory).Layout(nodeMap.Values);
+                    layout = new ManhattenLayout(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.Treemap:
                     nodeMap = CreateBlocks(nodes); // only leaves
-                    layout = new TreemapLayout(groundLevel, blockFactory, 100.0f, 100.0f).Layout(nodeMap.Values);
+                    layout = new TreemapLayout(groundLevel, leaveNodeFactory, 100.0f, 100.0f).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.BallonNode:
                     nodeMap = CreateBlocks(nodes); // leaves
                     AddContainers(nodeMap, nodes); // and inner nodes
-                    layout = new BalloonNodeLayout(groundLevel, blockFactory).Layout(nodeMap.Values);
+                    layout = new BalloonNodeLayout(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.CirclePackingNode:
                     nodeMap = CreateBlocks(nodes); // leaves
                     AddContainers(nodeMap, nodes); // and inner nodes
-                    layout = new CirclePackingNodeLayout(groundLevel, blockFactory).Layout(nodeMap.Values);
+                    layout = new CirclePackingNodeLayout(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
                     break;
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
@@ -208,33 +220,22 @@ namespace SEE.Layout
         {
             foreach (var entry in layout)
             {
-                GameObject block = entry.Key;
+                GameObject gameNode = entry.Key;
                 NodeTransform transform = entry.Value;
-                Node node = block.GetComponent<NodeRef>().node;
+                Node node = gameNode.GetComponent<NodeRef>().node;
 
                 if (node.IsLeaf())
                 {
-
-                    // Leave nodes were created as blocks by blockFactory.
-                    // Note: We need to first scale a block and only then set its position
-                    // because the scaling behavior differs between Cubes and CScape buildings.
-                    // Cubes scale from its center up and downward, whereas CScape buildings
-                    // scale only up.
-
-                    // FIXME: The above comment is misleading as we do no longer scale
-                    // leaves here.
-
+                    // Leaf nodes were created as blocks by leaveNodeFactory.
                     // Leaf nodes have their size set before the layout is computed. We will
                     // not change their size.
-
-                    // blockFactory.SetSize(block, transform.scale);
-                    blockFactory.SetGroundPosition(block, transform.position);
+                    leaveNodeFactory.SetGroundPosition(gameNode, transform.position);
                 }
                 else
                 {
                     // Inner nodes were not created by blockFactory.
-                    block.transform.position = transform.position;
-                    block.transform.localScale = transform.scale;
+                    innerNodeFactory.SetGroundPosition(gameNode, transform.position);
+                    innerNodeFactory.SetSize(gameNode, transform.scale);
                 }
             }
         }
@@ -246,17 +247,17 @@ namespace SEE.Layout
         /// <returns>unit of the world</returns>
         public float Unit()
         {
-            return blockFactory.Unit();
+            return leaveNodeFactory.Unit();
         }
 
         /// <summary>
-        /// Adds a NodeRef component to given block referencing to given node.
+        /// Adds a NodeRef component to given game node referencing to given graph node.
         /// </summary>
-        /// <param name="block"></param>
+        /// <param name="gameNode"></param>
         /// <param name="node"></param>
-        protected void AttachNode(GameObject block, Node node)
+        protected void AttachNode(GameObject gameNode, Node node)
         {
-            NodeRef nodeRef = block.AddComponent<NodeRef>();
+            NodeRef nodeRef = gameNode.AddComponent<NodeRef>();
             nodeRef.node = node;
         }
 
@@ -274,7 +275,7 @@ namespace SEE.Layout
                 // We add only leaves.
                 if (node.IsLeaf())
                 {
-                    GameObject block = blockFactory.NewBlock();
+                    GameObject block = leaveNodeFactory.NewBlock();
                     block.name = node.LinkName;
 
                     AttachNode(block, node);
@@ -284,7 +285,7 @@ namespace SEE.Layout
                                                 scaler.GetNormalizedValue(node, settings.DepthMetric));
 
                     // Scale according to the metrics.
-                    blockFactory.SetSize(block, scale);
+                    leaveNodeFactory.SetSize(block, scale);
 
                     result[node] = block;
                 }
@@ -305,70 +306,20 @@ namespace SEE.Layout
                 // We add only inner nodes.
                 if (! node.IsLeaf())
                 {
-                    GameObject innerGameObject = NewInnerNode(node, InnerNodeType.Circle);
+                    GameObject innerGameObject = NewInnerNode(node);
                     nodeMap[node] = innerGameObject;
                 }
             }
         }
 
-        private enum InnerNodeType
+        private GameObject NewInnerNode(Node node)
         {
-            Circle,
-            Cylinder
-        }
-
-        private GameObject NewInnerNode(Node node, InnerNodeType type)
-        {
-            GameObject innerGameObject;
-
-            switch (type)
-            {
-                case InnerNodeType.Circle:
-                    innerGameObject = new GameObject();
-                    AttachCircleLine(innerGameObject, 0.5f, 0.1f * blockFactory.Unit(), Color.white);
-                    break;
-                case InnerNodeType.Cylinder:
-                    innerGameObject = CylinderFactory.NewCylinder(Color.white);
-                    break;
-                default:
-                    throw new Exception("Unhandled inner node type " + type.ToString());
-            }
+            GameObject innerGameObject = innerNodeFactory.NewBlock();
             innerGameObject.name = node.LinkName;
             innerGameObject.tag = Tags.Node;
             AttachNode(innerGameObject, node);
-            Debug.LogFormat("extent of inner node {0} = {1}\n", innerGameObject.name, innerGameObject.GetComponent<Renderer>().bounds.extents);
-            Debug.LogFormat("size of inner node {0} = {1}\n", innerGameObject.name, innerGameObject.GetComponent<Renderer>().bounds.size);
+            Debug.LogFormat("size of inner node {0} = {1}\n", innerGameObject.name, innerNodeFactory.GetSize(innerGameObject));
             return innerGameObject;
-        }
-
-        private static void AttachCircleLine(GameObject circle, float radius, float lineWidth, Color color)
-        {
-            // Number of line segments constituting the circle
-            const int segments = 360;
-
-            LineRenderer line = circle.AddComponent<LineRenderer>();
-
-            LineFactory.SetDefaults(line);
-            LineFactory.SetColor(line, color);
-            LineFactory.SetWidth(line, lineWidth);
-
-            // We want to set the points of the circle lines relative to the game object.
-            line.useWorldSpace = false;
-
-            // FIXME: We do not want to create a new material. The fewer materials, the lesser
-            // drawing calls at run-time.
-            line.sharedMaterial = new Material(LineFactory.DefaultLineMaterial);
-
-            line.positionCount = segments + 1;
-            const int pointCount = segments + 1; // add extra point to make startpoint and endpoint the same to close the circle
-            Vector3[] points = new Vector3[pointCount];
-
-            for (int i = 0; i < pointCount; i++)
-            {
-                float rad = Mathf.Deg2Rad * (i * 360f / segments);
-                points[i] = new Vector3(Mathf.Sin(rad) * radius, 0, Mathf.Cos(rad) * radius);
-            }
-            line.SetPositions(points);
         }
 
         /// <summary>
@@ -400,10 +351,10 @@ namespace SEE.Layout
                         // Scale the erosion issue by normalization.
                         float metricScale = scaler.GetNormalizedValue(node, issue.Key);
                         // First: scale its width to unit size 1.0 maintaining the aspect ratio
-                        sprite.transform.localScale *= spriteScale * blockFactory.Unit();
+                        sprite.transform.localScale *= spriteScale * leaveNodeFactory.Unit();
                         // Now scale it by the normalized metric.
                         sprite.transform.localScale *= metricScale;
-                        sprite.transform.position = blockFactory.Roof(gameNode);
+                        sprite.transform.position = leaveNodeFactory.Roof(gameNode);
                         sprites.Add(sprite);
                     }
                 }
@@ -414,7 +365,7 @@ namespace SEE.Layout
             {
                 // The space that we put in between two subsequent erosion issue sprites.
                 Vector3 delta = Vector3.up / 100.0f;
-                Vector3 currentRoof = blockFactory.Roof(gameNode);
+                Vector3 currentRoof = leaveNodeFactory.Roof(gameNode);
                 sprites.Sort(Comparer<GameObject>.Create((left, right) => GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
                 foreach (GameObject sprite in sprites)
                 {
@@ -459,10 +410,10 @@ namespace SEE.Layout
                     Node node = go.GetComponent<NodeRef>().node;
 
                     // Note: go.transform.position denotes the center of the object
-                    
-                    Vector3 extent = node.IsLeaf() ? blockFactory.GetSize(go) / 2.0f : go.GetComponent<Renderer>().bounds.extents;
+
+                    Vector3 extent = node.IsLeaf() ? leaveNodeFactory.GetSize(go) / 2.0f : innerNodeFactory.GetSize(go) / 2.0f;
                     Debug.LogFormat("extent of {0} = {1}\n", go.name, extent);
-                    Vector3 position = node.IsLeaf() ? blockFactory.GetCenterPosition(go) : go.transform.position;
+                    Vector3 position = node.IsLeaf() ? leaveNodeFactory.GetCenterPosition(go) : innerNodeFactory.GetCenterPosition(go);
                     {
                         // x co-ordinate of lower left corner
                         float x = position.x - extent.x;
