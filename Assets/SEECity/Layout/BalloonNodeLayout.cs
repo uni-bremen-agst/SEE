@@ -44,6 +44,9 @@ namespace SEE.Layout
         /// </summary>
         private Dictionary<Node, NodeInfo> nodeInfos = new Dictionary<Node, NodeInfo>();
 
+        /// <summary>
+        /// The node layout we compute as a result.
+        /// </summary>
         private Dictionary<GameObject, NodeTransform> layout_result;
 
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
@@ -61,12 +64,14 @@ namespace SEE.Layout
             {
                 throw new System.Exception("Graph has no root nodes.");
             }
+            // The maximal depth of the tree rooted by any of the root nodes of the graph
             int[] max_depths = new int[roots.Count];
 
             // the maximal radius over all root circles; required to create the plane underneath
             float max_radius = 0.0f;
 
-            // first calculate all radii including those for the roots
+            // First calculate all radii including those for the roots as well
+            // as max_depths, maxDepth, max_radius.
             {
                 int i = 0;
                 foreach (Node root in roots)
@@ -85,7 +90,7 @@ namespace SEE.Layout
                 }
             }
 
-            // now we know the minimal distance between two subsequent roots so that
+            // Now we know the minimal distance between two subsequent roots so that
             // their outer circles do not overlap
             {
                 Vector3 position = Vector3.zero;
@@ -100,7 +105,7 @@ namespace SEE.Layout
                 }
             }
 
-            // FIXME: define layout_result
+            // FIXME: define layout_result for roots?
             to_game_node = null;
             return layout_result;
         }
@@ -259,14 +264,17 @@ namespace SEE.Layout
             if (children.Count == 0)
             {
                 // leaf
+                // leaves will only be positions, but not scaled; hence, we can use any value
+                // for the scale, e.g., Vector3.one.
                 layout_result[to_game_node[node]] = new NodeTransform(position, Vector3.one);
             }
             else
             {
                 // inner node
+                // inner nodes will be positoned and scaled, but only in x and z axes, not in y axis
                 layout_result[to_game_node[node]] 
                     = new NodeTransform(position, 
-                                        new Vector3(nodeInfos[node].outer_radius, 1.0f, nodeInfos[node].outer_radius));
+                                        new Vector3(2 * nodeInfos[node].outer_radius, circleHeight, 2 * nodeInfos[node].outer_radius));
 
                 // The center points of the children circles are located on the circle
                 // with center point 'position' and radius of the inner circle of the
@@ -277,8 +285,6 @@ namespace SEE.Layout
                 // Placing all children of the inner circle defined by the 
                 // center point (the given position) and the radius with some
                 // space in between if that is possible.
-
-                Vector3 child_center = new Vector3(position.x, position.y, position.z);
 
                 // The space in between neighboring child circles if there is any left.
                 double space_between_child_circles = 0.0;
@@ -356,7 +362,9 @@ namespace SEE.Layout
 
                         }
                         // Convert polar coordinate back to cartesian coordinate.
+                        Vector3 child_center;
                         child_center.x = position.x + (float)(parent_inner_radius * System.Math.Cos(accummulated_alpha));
+                        child_center.y = groundLevel;
                         child_center.z = position.z + (float)(parent_inner_radius * System.Math.Sin(accummulated_alpha));
 
                         DrawCircles(child, child_center, depth + 1, max_depth);
