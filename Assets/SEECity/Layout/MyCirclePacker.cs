@@ -29,7 +29,7 @@ namespace SEEC.Layout
         /// <returns>string representation of the circle</returns>
         public override string ToString()
         {
-            return "Rad: " + radius + " _ Center: " + center.ToString();
+            return "(center= " + center.ToString() + ", radius=" + radius + ")";
         }
     }
 
@@ -161,7 +161,7 @@ namespace SEEC.Layout
         /// <summary>
         /// Packs the <paramref name="circles"/> as close together within reasonable time.
         /// 
-        /// Precondition: circles are sorted in descending order of their radius.
+        /// Important note: the order of circles may have changed afterward.
         /// </summary>
         /// <param name="circles">The circles to be packed.</param>
         /// <param name="out_outer_radius">The radius of the appoximated minimal enclosing circle.</param>
@@ -487,7 +487,7 @@ namespace SEEC.Layout
                             break;
                         }
                 }
-                out_center.y = 0.0f;
+                //out_center.y = 0.0f;
 
                 if (circles.Count == 0)
                 {
@@ -567,7 +567,7 @@ namespace SEEC.Layout
         /// <param name="out_radius">Radius of smallest enclosing circle.</param>
         private static void CircleIntersectingThreeCircles(MyCircle c1, MyCircle c2, MyCircle c3, out Vector2 out_center, out float out_radius)
         {
-            Vector2 p0 = new Vector2(c1.center.x, c1.center.y);
+            Vector2 p0 = new Vector2(c1.center.x, c1.center.y);  // FIXME: Can be simplified to p0 = c1.center
             Vector2 p1 = new Vector2(c2.center.x, c2.center.y);
             Vector2 p2 = new Vector2(c3.center.x, c3.center.y);
 
