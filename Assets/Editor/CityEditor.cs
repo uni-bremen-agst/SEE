@@ -160,8 +160,10 @@ namespace SEEEditor
             VRenabled = EditorGUILayout.Toggle("Enable VR", VRenabled);
 
             GUILayout.Label("Visual node attributes", EditorStyles.boldLabel);
+            editorSettings.LeafObjects = (GraphSettings.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", editorSettings.LeafObjects);
+            editorSettings.InnerNodeObjects = (GraphSettings.InnerNodeKinds)EditorGUILayout.EnumPopup("Inner nodes", editorSettings.InnerNodeObjects);
             editorSettings.NodeLayout = (GraphSettings.NodeLayouts)EditorGUILayout.EnumPopup("Layout", editorSettings.NodeLayout);
-            editorSettings.CScapeBuildings = EditorGUILayout.Toggle("CScape buildings", editorSettings.CScapeBuildings);
+            
             editorSettings.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", editorSettings.ZScoreScale);
             editorSettings.ShowDonuts = EditorGUILayout.Toggle("Show Donut charts", editorSettings.ShowDonuts);
             editorSettings.ShowErosions = EditorGUILayout.Toggle("Show erosions", editorSettings.ShowErosions);
