@@ -37,6 +37,21 @@ namespace SEE.Layout
             DrawPlane(artificialRootNode, out_radius);
         }
 
+        private static void Dump(List<Circle> circles, string message = "", string prefix = "")
+        {
+            string p = string.IsNullOrEmpty(message) ? "" : "[" + prefix + "] ";
+            if (!string.IsNullOrEmpty(message))
+            {
+                Debug.Log(p + message + "\n");
+            }
+            int i = 0;
+            foreach (var circle in circles)
+            {
+                Debug.LogFormat(p + "circle {0}: {1}\n", i, circle.ToString());
+                i++;
+            }
+        }
+
         private void DrawNodes(GameObject parent, List<Node> nodes, out float out_radius)
         {
             List<Circle> circles = new List<Circle>(nodes.Count);
@@ -48,7 +63,8 @@ namespace SEE.Layout
                 GameObject gameObject;
 
                 float radius;
-                if (node.IsLeaf())
+                bool isLeaf = node.IsLeaf();
+                if (isLeaf)
                 {
                     gameObject = DrawLeaf(node, out float out_leaf_radius);
                     radius = out_leaf_radius;
@@ -64,17 +80,28 @@ namespace SEE.Layout
                 gameObject.transform.parent = parent.transform;
 
                 float radians = ((float)i / (float)nodes.Count) * (2.0f * Mathf.PI);
-                blockFactory.SetLocalGroundPosition(gameObject, 
-                                                    new Vector3(Mathf.Cos(radians), 0.0f, Mathf.Sin(radians)) * radius
-                                                    + new Vector3(0.0f, 0.1f, 0.0f));
-                //gameObject.transform.localPosition = new Vector3(Mathf.Cos(radians), 0.0f, Mathf.Sin(radians)) * radius;
+                Vector3 position = new Vector3(Mathf.Cos(radians), 0.0f, Mathf.Sin(radians)) * radius
+                                                        + new Vector3(0.0f, 0.01f, 0.0f);
+                if (isLeaf)
+                {
+                    blockFactory.SetLocalGroundPosition(gameObject, position);
+                }
+                else
+                {
+                    // FIXME: Later when we introduced a factory for inner nodes, we need to use its 
+                    // function to set the position.
+                    gameObject.transform.localPosition = position;
+                }
                 circles.Add(new Circle(gameObject.transform, radius));
             }
 
             //Vector3 position = parent.transform.position;
             //parent.transform.position = position;
 
+            Dump(circles, "BEFORE for " + parent.name, "PACK");
             CirclePacker.Pack(circles, out float out_outer_radius);
+            Dump(circles, "AFTER for " + parent.name, "PACK");
+
             if (circles.Count > 1)
             {
                 DrawOutline(parent, ref out_outer_radius);
@@ -89,14 +116,13 @@ namespace SEE.Layout
             
             block.name = node.LinkName + " Block";
             blockFactory.SetSize(block, GetScale(node));
-            Vector3 size = blockFactory.GetSize(block);
-            out_leaf_radius = Mathf.Sqrt(size.x * size.x + size.z * size.z);
+            Vector3 extent = blockFactory.GetSize(block) / 2.0f;
+            out_leaf_radius = Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);
 
             if (showErosions)
             {
                 AddErosionIssues(node);
             }
-
             return block;
         }
 
