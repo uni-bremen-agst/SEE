@@ -248,8 +248,8 @@ namespace SEE
                 }
                 else
                 {
-                    Debug.LogWarningFormat("No UI textfield named {0} found. Please add one to the scene within the Unity editor.\n",
-                                           TextFieldObjectName);
+                    // TODO: Annoying
+                    // Debug.LogWarningFormat("No UI textfield named {0} found. Please add one to the scene within the Unity editor.\n", TextFieldObjectName);
                 }
             }
 
