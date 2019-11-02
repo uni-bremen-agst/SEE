@@ -45,7 +45,9 @@ namespace SEE.Layout
             LineFactory.SetWidth(line, lineWidth);
 
             // We want to set the points of the circle lines relative to the game object.
+            // If the containing object moves, the line renderer should move along with it.
             line.useWorldSpace = false;
+
             // All circles lines have the same material to reduce the number of drawing calls.
             line.sharedMaterial = material;
 
