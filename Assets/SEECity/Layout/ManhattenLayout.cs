@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
-    public class ManhattenLayout : NodeLayout
+    public class ManhattanLayout : NodeLayout
     {
-        public ManhattenLayout(float groundLevel,
+        public ManhattanLayout(float groundLevel,
                                NodeFactory blockFactory)
             : base(groundLevel, blockFactory)
         {
