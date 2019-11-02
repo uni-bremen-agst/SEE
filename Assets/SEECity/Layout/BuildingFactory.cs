@@ -4,7 +4,7 @@ using SEE.DataModel;
 
 namespace SEE.Layout
 {
-    public class BuildingFactory : BlockFactory
+    public class BuildingFactory : NodeFactory
     {
         private static readonly string pathPrefix = "Assets/CScape/Editor/Resources/BuildingTemplates/Buildings/";
 

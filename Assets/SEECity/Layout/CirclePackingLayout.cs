@@ -15,7 +15,7 @@ namespace SEE.Layout
         public CirclePackingLayout(string widthMetric, string heightMetric, string breadthMetric,
                              SerializableDictionary<string, IconFactory.Erosion> issueMap,
                              string[] innerNodeMetrics,
-                             BlockFactory blockFactory,
+                             NodeFactory blockFactory,
                              IScale scaler,
                              bool showErosions,
                              bool showDonuts)

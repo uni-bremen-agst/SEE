@@ -12,7 +12,7 @@ namespace SEE.Layout
     public class TreemapLayout : NodeLayout
     {
         public TreemapLayout(float groundLevel,
-                             BlockFactory blockFactory,
+                             NodeFactory blockFactory,
                              float width,
                              float depth)
         : base(groundLevel, blockFactory)

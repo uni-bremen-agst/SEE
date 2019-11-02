@@ -7,7 +7,7 @@ namespace SEE.Layout
 {
     public class StraightEdgeLayout : IEdgeLayout
     {
-        public StraightEdgeLayout(BlockFactory blockFactory, float edgeWidth, bool edgesAboveBlocks) 
+        public StraightEdgeLayout(NodeFactory blockFactory, float edgeWidth, bool edgesAboveBlocks) 
             : base(blockFactory, edgeWidth, edgesAboveBlocks)
         {
         }

@@ -5,7 +5,7 @@ namespace SEE.Layout
     /// <summary>
     /// A factory for visual representations of graph nodes in the scene.
     /// </summary>
-    public abstract class BlockFactory
+    public abstract class NodeFactory
     {
         /// <summary>
         /// Creates and returns a new block representation of a graph node.

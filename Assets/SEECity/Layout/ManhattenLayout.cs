@@ -7,7 +7,7 @@ namespace SEE.Layout
     public class ManhattenLayout : NodeLayout
     {
         public ManhattenLayout(float groundLevel,
-                               BlockFactory blockFactory)
+                               NodeFactory blockFactory)
             : base(groundLevel, blockFactory)
         {
             name = "Manhattan";

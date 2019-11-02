@@ -6,7 +6,7 @@ namespace SEE.Layout
 {
     public abstract class IEdgeLayout
     {
-        public IEdgeLayout(BlockFactory blockFactory, float edgeWidth, bool edgesAboveBlocks)
+        public IEdgeLayout(NodeFactory blockFactory, float edgeWidth, bool edgesAboveBlocks)
         {
             this.blockFactory = blockFactory;
             this.edgeWidth = edgeWidth;
@@ -21,7 +21,7 @@ namespace SEE.Layout
         /// <summary>
         /// A factory to create visual representations of graph nodes (e.g., cubes or CScape buildings).
         /// </summary>
-        protected readonly BlockFactory blockFactory;
+        protected readonly NodeFactory blockFactory;
 
         /// <summary>
         /// Orientation of the edges; 
