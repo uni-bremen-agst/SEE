@@ -17,6 +17,33 @@ namespace SEE.Layout
 
         Dictionary<GameObject, NodeTransform> layout;
 
+        private static void Dump(Dictionary<GameObject, NodeTransform> layout, string message = "")
+        {
+            if (! string.IsNullOrEmpty(message))
+            {
+                Debug.Log(message + "\n");
+            }
+            foreach (var entry in layout)
+            {
+                Debug.LogFormat("node {0}: layout={1}\n", entry.Key.name, entry.Value.ToString());
+            }
+        }
+
+        private static void Dump(List<MyCircle> circles, string message = "", string prefix = "")
+        {
+            string p = string.IsNullOrEmpty(message) ? "" : "[" + prefix + "] ";
+            if (!string.IsNullOrEmpty(message))
+            {
+                Debug.Log(p + message + "\n");
+            }
+            int i = 0;
+            foreach (var circle in circles)
+            {
+                Debug.LogFormat(p + "circle {0}: {1}\n", i, circle.ToString());
+                i++;
+            }
+        }
+
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
         {
             layout = new Dictionary<GameObject, NodeTransform>();
@@ -31,14 +58,24 @@ namespace SEE.Layout
                 throw new System.Exception("Graph has more than one root node.");
             }
             to_game_node = NodeMapping(gameNodes);
-            float out_radius = DrawNodes(roots[0]);
+            Node root = roots[0];
+            float out_radius = DrawNodes(root);
             Vector3 position = new Vector3(0.0f, groundLevel, 0.0f);
-            layout[to_game_node[roots[0]]] = new NodeTransform(position,
-                                                               GetScale(to_game_node[roots[0]], out_radius));
-            MakeGlobal(position, roots);
+            layout[to_game_node[root]] = new NodeTransform(position,
+                                                           GetScale(to_game_node[root], out_radius));
+            //Dump(layout, "BEFORE");
+            MakeGlobal(position, root.Children());
+            //Dump(layout, "AFTER");
             return layout;
         }
 
+        /// <summary>
+        /// "Globalizes" the layout. Initially, the position of children are relative to
+        /// their parent assuming that the parent has position Vector3.zero. This 
+        /// function adjusts the co-ordinates of all nodes to the world's co-ordinates.
+        /// </summary>
+        /// <param name="position">the position of the parent of all children</param>
+        /// <param name="children">the children to be laid out</param>
         private void MakeGlobal(Vector3 position, List<Node> children)
         {
             foreach (Node child in children)
@@ -84,7 +121,9 @@ namespace SEE.Layout
                 // the children we just packed. By necessity, the objects whose children we are
                 // currently processing is a composed object represented by a circle, otherwise
                 // we would not have any children here.
+                Dump(circles, "BEFORE for " + to_game_node[parent].name, "PACK");
                 MyCirclePacker.Pack(circles, out float out_outer_radius);
+                Dump(circles, "AFTER for " + to_game_node[parent].name, "PACK");
 
                 //layout[to_game_node[parent]] = new NodeTransform(new Vector3(center.x, groundLevel, center.y), 
                 //                                                 GetScale(to_game_node[parent], out_outer_radius));
