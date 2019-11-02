@@ -15,5 +15,10 @@ namespace SEE.Layout
         }
         public Vector3 position;
         public Vector3 scale;
+
+        public override string ToString()
+        {
+            return "position=" + position.ToString() + " scale=" + scale.ToString();
+        }
     }
 }
