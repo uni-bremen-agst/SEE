@@ -40,7 +40,7 @@ namespace SEE.Layout
         /// <summary>
         /// The factory used to create blocks.
         /// </summary>
-        private readonly BlockFactory blockFactory;
+        private readonly NodeFactory blockFactory;
 
         /// <summary>
         /// The scale used to normalize the metrics determining the lengths of the blocks.

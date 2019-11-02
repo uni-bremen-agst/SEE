@@ -7,7 +7,7 @@ namespace SEE.Layout
 {
     public class CirclePackingNodeLayout : NodeLayout
     {
-        public CirclePackingNodeLayout(float groundLevel, BlockFactory blockFactory) 
+        public CirclePackingNodeLayout(float groundLevel, NodeFactory blockFactory) 
             : base(groundLevel, blockFactory)
         {
             name = "CirclePackingNode"; // FIXME: change to "CirclePacking".

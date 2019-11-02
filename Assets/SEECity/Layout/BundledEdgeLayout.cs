@@ -7,7 +7,7 @@ namespace SEE.Layout
 {
     public class BundledEdgeLayout : IEdgeLayout
     {
-        public BundledEdgeLayout(BlockFactory blockFactory, float edgeWidth, bool edgesAboveBlocks)
+        public BundledEdgeLayout(NodeFactory blockFactory, float edgeWidth, bool edgesAboveBlocks)
             : base(blockFactory, edgeWidth, edgesAboveBlocks)
         {
         }

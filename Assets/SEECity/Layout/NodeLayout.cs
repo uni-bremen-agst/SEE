@@ -8,7 +8,7 @@ namespace SEE.Layout
     public abstract class NodeLayout
     {
         public NodeLayout(float groundLevel,
-                          BlockFactory blockFactory)
+                          NodeFactory blockFactory)
         {
             this.groundLevel = groundLevel;
             this.blockFactory = blockFactory;
@@ -35,7 +35,7 @@ namespace SEE.Layout
         /// <summary>
         /// A factory to create visual representations of graph nodes (e.g., cubes or CScape buildings).
         /// </summary>
-        protected readonly BlockFactory blockFactory;
+        protected readonly NodeFactory blockFactory;
 
         /// <summary>
         /// Yields layout information for all nodes given.

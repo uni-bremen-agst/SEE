@@ -7,7 +7,7 @@ namespace SEE.Layout
 {
     public class BalloonNodeLayout : NodeLayout
     {
-        public BalloonNodeLayout(float groundLevel, BlockFactory blockFactory) 
+        public BalloonNodeLayout(float groundLevel, NodeFactory blockFactory) 
             : base(groundLevel, blockFactory)
         {
             name = "BalloonNode"; // FIXME: change to "Balloon".

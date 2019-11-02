@@ -6,7 +6,7 @@ namespace SEE.Layout
     /// <summary>
     /// A factory for cubes as visual representations of graph nodes in the scene.
     /// </summary>
-    public class CubeFactory : BlockFactory
+    public class CubeFactory : NodeFactory
     {
         private SerializableDictionary<PrimitiveType, GameObject> primitiveMeshes = new SerializableDictionary<PrimitiveType, GameObject>();
 

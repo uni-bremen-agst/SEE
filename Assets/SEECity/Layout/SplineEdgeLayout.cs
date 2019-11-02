@@ -6,7 +6,7 @@ namespace SEE.Layout
 {
     public class SplineEdgeLayout : IEdgeLayout
     {
-        public SplineEdgeLayout(BlockFactory blockFactory, float edgeWidth, bool edgesAboveBlocks) : base(blockFactory, edgeWidth, edgesAboveBlocks)
+        public SplineEdgeLayout(NodeFactory blockFactory, float edgeWidth, bool edgesAboveBlocks) : base(blockFactory, edgeWidth, edgesAboveBlocks)
         {
         }
 

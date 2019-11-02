@@ -8,7 +8,7 @@ namespace SEE.Layout
     {
         public INodeLayout(string widthMetric, string heightMetric, string breadthMetric,
                SerializableDictionary<string, IconFactory.Erosion> issueMap,
-               BlockFactory blockFactory,
+               NodeFactory blockFactory,
                IScale scaler,
                bool showErosions)
         {
@@ -37,7 +37,7 @@ namespace SEE.Layout
         /// <summary>
         /// A factory to create visual representations of graph nodes (e.g., cubes or CScape buildings).
         /// </summary>
-        protected readonly BlockFactory blockFactory;
+        protected readonly NodeFactory blockFactory;
 
         /// <summary>
         /// Whether the erosions should be drawn.
