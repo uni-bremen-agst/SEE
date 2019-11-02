@@ -18,17 +18,17 @@ namespace SEE
         //public string csvPath = "..\\Data\\GXL\\two_files.csv";
 
         /// Clone graph with one directory and three files contained therein.
-        public string gxlPath = "..\\Data\\GXL\\three_files.gxl";
-        public string csvPath = "..\\Data\\GXL\\three_files.csv";
+        //public string gxlPath = "..\\Data\\GXL\\three_files.gxl";
+        //public string csvPath = "..\\Data\\GXL\\three_files.csv";
 
-        /// Very tiny clone graph with single root, two children with two children
-        /// each to experiment with.
+        /// Very tiny clone graph with single root, one child as a leaf and 
+        /// two more children with two children each to experiment with.
         //public string gxlPath = "..\\Data\\GXL\\micro_clones.gxl";
         //public string csvPath = "..\\Data\\GXL\\micro_clones.csv";
 
         /// Tiny clone graph with single root to experiment with.
-        //public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
-        //public string csvPath = "..\\Data\\GXL\\minimal_erosions.csv";
+        public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
+        public string csvPath = "..\\Data\\GXL\\minimal_clones.csv";
 
         /// Tiny clone graph with single roots to check edge bundling.
         //public string gxlPath = "..\\Data\\GXL\\controlPoints.gxl";
