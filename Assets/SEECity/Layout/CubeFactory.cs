@@ -87,47 +87,13 @@ namespace SEE.Layout
             renderer.receiveShadows = false;
 
             // 3) Assigns a material to the object.
-            Material newMat;
-            if (string.IsNullOrEmpty(materialPath))
-            {
-                if (defaultMaterial == null)
-                {
-                    if (shader != null)
-                    {
-                        defaultMaterial = new Material(shader);
-                    }
-                    else
-                    {
-                        Debug.LogError("Could not find shader " + shaderName + "\n");
-                    }
-                }
-                newMat = defaultMaterial;
-            } 
-            else
-            {
-                newMat = Resources.Load<Material>(materialPath);
-            }
-            
-            if (newMat != null)
-            {
-                //renderer.material = newMat;
-                renderer.sharedMaterial = newMat;
-            }
-            else
-            {
-                Debug.LogError("Could not find material " + materialPath + "\n");
-            }
+            renderer.sharedMaterial = Materials.DefaultMaterial();
 
             // 4) Add collider so that we can interact with it the object
             gameObject.AddComponent<BoxCollider>();
 
             // Object should be static so that we save rendering time at run-time.
             gameObject.isStatic = true;
-
-            // Turn off reflection
-            renderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
-            renderer.sharedMaterial.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
-            renderer.sharedMaterial.SetFloat("_SpecularHighlights", 0.0f);
         }
 
         /// <summary>
