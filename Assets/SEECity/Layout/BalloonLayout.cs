@@ -123,7 +123,7 @@ namespace SEE.Layout
 
             if (children.Count == 0)
             {
-                DrawLeaf(node, position, nodeInfos[node].outer_radius);
+                DrawLeaf(node, position);
             }
             else
             {
@@ -138,8 +138,6 @@ namespace SEE.Layout
                 // Placing all children of the inner circle defined by the 
                 // center point (the given position) and the radius with some
                 // space in between if that is possible.
-
-                Vector3 child_center = new Vector3(position.x, position.y, position.z);
 
                 // The space in between neighboring child circles if there is any left.
                 double space_between_child_circles = 0.0;
@@ -217,7 +215,9 @@ namespace SEE.Layout
 
                         }
                         // Convert polar coordinate back to cartesian coordinate.
+                        Vector3 child_center;
                         child_center.x = position.x + (float)(parent_inner_radius * System.Math.Cos(accummulated_alpha));
+                        child_center.y = groundLevel;
                         child_center.z = position.z + (float)(parent_inner_radius * System.Math.Sin(accummulated_alpha));
 
                         DrawCircles(child, child_center, depth + 1, max_depth, scaler, factory);
@@ -230,47 +230,20 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// We will draw a leaf nodes as two objects: cube and cylinder. Both become children
-        /// of the node's game object. The cube represents the metrics and is put onto the
-        /// cylinder. The cylinder is the Ballon circle.
+        /// Sets the position of the game node corresponding to given graph node.
+        /// If required, software-erosion icons are put atop of its roof.
         /// </summary>
         /// <param name="node">leaf node to be drawn</param>
         /// <param name="position">center point of the node where it is to be positioned</param>
-        /// <param name="radius">the radius for the cylinder</param>
-        private void DrawLeaf(Node node, Vector3 position, float radius)
+        private void DrawLeaf(Node node, Vector3 position)
         {
             GameObject gameObject = gameNodes[node];
             blockFactory.SetGroundPosition(gameObject, position);
-
-            // FIXME: We do without garden for the time being
-            //AddGarden(parent);
 
             if (showErosions)
             {
                 AddErosionIssues(node);
             }
-        }
-
-        private void AddGarden(GameObject parent)
-        {
-            // Second child: the cylinder.
-            // The cylinder will be placed just below the center of the cube;
-            // it will fill the complete plane of the parent;
-            // the "garden" will be the second child; IMPORTANT NOTE: If we
-            // ever change the order of the children, we need to adjust Roof().
-            GameObject cylinder = new GameObject
-            {
-                name = "garden " + parent.name
-            };
-            // FIXME: Re-enable this:
-            //blockFactory.AddFrontYard(cylinder.gameObject);
-            // game object of node becomes the parent of cube
-            cylinder.transform.parent = parent.transform;
-            // relative position within parent
-            cylinder.transform.localPosition = Vector3.zero;
-            // Scale to full extent of the parent's width and breadth (chosen to
-            // be twice the radius above). The cylinder's height should be minimal.
-            cylinder.transform.localScale = new Vector3(1.0f, cylinder_height, 1.0f);
         }
 
         /// <summary>
@@ -491,6 +464,7 @@ namespace SEE.Layout
             // If we wanted to have the nesting of circles on different ground levels depending
             // on the depth of the node, we would use position.y - (max_depth - depth + 1) * cylinder_height
             // for the y co-ordinate.
+            // FIXME: Here we should use the node factory for inner nodes that created this node.
             sceneNode.transform.position = position; 
 
             // Roots have depth 0. We want the line to be thicker for nodes higher in the hierarchy.
