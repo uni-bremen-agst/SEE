@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.SEECity.Layout;
 using SEE.DataModel;
 using SEEC.Layout;
 using UnityEngine;
@@ -191,6 +192,7 @@ namespace SEE.Layout
                 AddErosionIssues(nodeMap.Values);
             }
             BoundingBox(nodeMap.Values, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+            Debug.LogFormat("New plane: left front corner = {0}, right back corner = {1}\n", leftFrontCorner, rightBackCorner);
             PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
         }
 
@@ -292,7 +294,7 @@ namespace SEE.Layout
 
         /// <summary>
         /// Adds game objects for all inner nodes in given list of nodes to nodeMap.
-        /// Note: added game objectsfor inner nodes are not scaled.
+        /// Note: added game objects for inner nodes are not scaled.
         /// </summary>
         /// <param name="nodeMap">nodeMap to which the game objects are to be added</param>
         /// <param name="nodes">list of nodes for which to create blocks</param>
@@ -303,20 +305,43 @@ namespace SEE.Layout
                 // We add only inner nodes.
                 if (! node.IsLeaf())
                 {
-                    GameObject innerGameObject = new GameObject
-                    {
-                        name = node.LinkName,
-                        tag = Tags.Node
-                    };
-
-                    AttachNode(innerGameObject, node);
-                    AttachCircleLine(innerGameObject, 0.5f, 0.1f * blockFactory.Unit());
+                    GameObject innerGameObject = NewInnerNode(node, InnerNodeType.Circle);
                     nodeMap[node] = innerGameObject;
                 }
             }
         }
 
-        private static void AttachCircleLine(GameObject circle, float radius, float lineWidth)
+        private enum InnerNodeType
+        {
+            Circle,
+            Cylinder
+        }
+
+        private GameObject NewInnerNode(Node node, InnerNodeType type)
+        {
+            GameObject innerGameObject;
+
+            switch (type)
+            {
+                case InnerNodeType.Circle:
+                    innerGameObject = new GameObject();
+                    AttachCircleLine(innerGameObject, 0.5f, 0.1f * blockFactory.Unit(), Color.white);
+                    break;
+                case InnerNodeType.Cylinder:
+                    innerGameObject = CylinderFactory.NewCylinder(Color.white);
+                    break;
+                default:
+                    throw new Exception("Unhandled inner node type " + type.ToString());
+            }
+            innerGameObject.name = node.LinkName;
+            innerGameObject.tag = Tags.Node;
+            AttachNode(innerGameObject, node);
+            Debug.LogFormat("extent of inner node {0} = {1}\n", innerGameObject.name, innerGameObject.GetComponent<Renderer>().bounds.extents);
+            Debug.LogFormat("size of inner node {0} = {1}\n", innerGameObject.name, innerGameObject.GetComponent<Renderer>().bounds.size);
+            return innerGameObject;
+        }
+
+        private static void AttachCircleLine(GameObject circle, float radius, float lineWidth, Color color)
         {
             // Number of line segments constituting the circle
             const int segments = 360;
@@ -324,7 +349,7 @@ namespace SEE.Layout
             LineRenderer line = circle.AddComponent<LineRenderer>();
 
             LineFactory.SetDefaults(line);
-            LineFactory.SetColor(line, Color.white);
+            LineFactory.SetColor(line, color);
             LineFactory.SetWidth(line, lineWidth);
 
             // We want to set the points of the circle lines relative to the game object.
@@ -434,7 +459,9 @@ namespace SEE.Layout
                     Node node = go.GetComponent<NodeRef>().node;
 
                     // Note: go.transform.position denotes the center of the object
+                    
                     Vector3 extent = node.IsLeaf() ? blockFactory.GetSize(go) / 2.0f : go.GetComponent<Renderer>().bounds.extents;
+                    Debug.LogFormat("extent of {0} = {1}\n", go.name, extent);
                     Vector3 position = node.IsLeaf() ? blockFactory.GetCenterPosition(go) : go.transform.position;
                     {
                         // x co-ordinate of lower left corner
