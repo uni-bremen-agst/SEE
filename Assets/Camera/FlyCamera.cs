@@ -29,6 +29,8 @@ namespace SEE
     /// </summary>
     public class FlyCamera : MonoBehaviour
     {
+        public bool isActive { get; set; }
+
         // These variables are exposed to the editor and can be changed by the user.
         // These parameters determine the principal speed of movement but their
         // actual value is also function of the distance to the ground. The lower we 
@@ -231,6 +233,9 @@ namespace SEE
         /// </summary>
         void Update()
         {
+            if (!isActive)
+                return;
+
             if (Input.GetMouseButtonDown(0))
             {
                 // If a node is hit by a left mouse click, the name of the selected
