@@ -6,11 +6,11 @@ public class GameSetupController : MonoBehaviour
 {
     void Start()
     {
-        CreatePlayer();
+        SpawnPlayer();
     }
 
-    private void CreatePlayer()
+    private void SpawnPlayer()
     {
-        PhotonNetwork.Instantiate(Path.Combine("Player", "Player"), Vector3.zero, Quaternion.identity);
+        PhotonNetwork.Instantiate(Path.Combine("Prefabs", "Player"), Vector3.zero, Quaternion.identity);
     }
 }
