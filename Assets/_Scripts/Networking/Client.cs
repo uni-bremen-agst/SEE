@@ -4,10 +4,11 @@ using UnityEngine.UI;
 
 public class Client : MonoBehaviourPunCallbacks
 {
-    public string roomName { get; set; }
+    public Text roomNameText;
+
     public GameObject joinRoomButton;
 
-    public override void OnEnable() { PhotonNetwork.AddCallbackTarget(this); }
+    public override void OnEnable()  { PhotonNetwork.AddCallbackTarget(this); }
     public override void OnDisable() { PhotonNetwork.RemoveCallbackTarget(this); }
 
     void Start() {
@@ -23,6 +24,8 @@ public class Client : MonoBehaviourPunCallbacks
 
     public void JoinRoom()
     {
+        string roomName = roomNameText.text;
+        // TODO password
         NetworkController.JoinRoom(roomName);
     }
 
@@ -41,5 +44,12 @@ public class Client : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         SceneController.LoadScene(SceneController.Scene.Multiplayer);
+    }
+
+    public override void OnJoinRandomFailed(short returnCode, string message)
+    {
+        base.OnJoinRandomFailed(returnCode, message);
+        Debug.Log("Joining room failed!");
+        Debug.Log("Error code: \"" + returnCode + "\". Error message: \"" + message + "\"");
     }
 }
