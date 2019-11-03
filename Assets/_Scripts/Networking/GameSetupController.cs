@@ -2,15 +2,20 @@
 using System.IO;
 using UnityEngine;
 
-public class GameSetupController : MonoBehaviour
+namespace SEE
 {
-    void Start()
+
+    public class GameSetupController : MonoBehaviour
     {
-        SpawnPlayer();
+        void Start()
+        {
+            SpawnPlayer();
+        }
+
+        private void SpawnPlayer()
+        {
+            PhotonNetwork.Instantiate(Path.Combine("Prefabs", "Player"), Vector3.zero, Quaternion.identity);
+        }
     }
 
-    private void SpawnPlayer()
-    {
-        PhotonNetwork.Instantiate(Path.Combine("Prefabs", "Player"), Vector3.zero, Quaternion.identity);
-    }
-}
+}// namespace SEE

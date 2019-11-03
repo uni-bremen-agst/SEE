@@ -205,6 +205,7 @@ namespace SEE
         void Start()
         {
             Debug.Log("Starting FlyCamera\n");
+            isActive = true;
             if (guiObjectNameTextField == null)
             {
                 guiObjectNameTextField = GameObject.Find(TextFieldObjectName);
