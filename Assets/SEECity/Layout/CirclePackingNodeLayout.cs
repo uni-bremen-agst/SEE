@@ -5,12 +5,22 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
+    /// <summary>
+    /// This layout packs circles closely together as a set of nested circles to decrease 
+    /// the total area of city.
+    /// </summary>
     public class CirclePackingNodeLayout : NodeLayout
     {
-        public CirclePackingNodeLayout(float groundLevel, NodeFactory blockFactory) 
-            : base(groundLevel, blockFactory)
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
+        /// placed on this level</param>
+        /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
+        public CirclePackingNodeLayout(float groundLevel, NodeFactory leafNodeFactory) 
+            : base(groundLevel, leafNodeFactory)
         {
-            name = "CirclePackingNode"; // FIXME: change to "CirclePacking".
+            name = "Circle Packing";
         }
 
         /// <summary>
@@ -33,7 +43,7 @@ namespace SEE.Layout
             }
             to_game_node = NodeMapping(gameNodes);
             Node root = roots[0];
-            float out_radius = DrawNodes(root);
+            float out_radius = PlaceNodes(root);
             Vector3 position = new Vector3(0.0f, groundLevel, 0.0f);
             layout_result[to_game_node[root]] = new NodeTransform(position,
                                                                   GetScale(to_game_node[root], out_radius));
@@ -61,7 +71,13 @@ namespace SEE.Layout
             }
         }
 
-        private float DrawNodes(Node parent)
+        /// <summary>
+        /// Places all children of the given parent node (recursively for all descendants
+        /// of the given parent).
+        /// </summary>
+        /// <param name="parent">node whose descendants are to be placed</param>
+        /// <returns>the radius required for a circle represent parent</returns>
+        private float PlaceNodes(Node parent)
         {
             List<Node> children = parent.Children();
 
@@ -82,7 +98,7 @@ namespace SEE.Layout
                 {
                     GameObject childObject = to_game_node[child];
 
-                    float radius = child.IsLeaf() ? LeafRadius(childObject) : DrawNodes(child);
+                    float radius = child.IsLeaf() ? LeafRadius(childObject) : PlaceNodes(child);
                     // Position the children on a circle as required by CirclePacker.Pack.
                     float radians = ((float)i / (float)children.Count) * (2.0f * Mathf.PI);
                     circles.Add(new MyCircle(childObject, new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * radius, radius));
@@ -96,15 +112,13 @@ namespace SEE.Layout
                 // we would not have any children here.
                 MyCirclePacker.Pack(circles, out float out_outer_radius);
 
-                //layout[to_game_node[parent]] = new NodeTransform(new Vector3(center.x, groundLevel, center.y), 
-                //                                                 GetScale(to_game_node[parent], out_outer_radius));
-
                 foreach (MyCircle circle in circles)
                 {
                     // Note: The position of the transform is currently only local, relative to the zero center
                     // within the parent node. The co-ordinates will later be adjusted to the world scope.
-                    layout_result[circle.gameObject] = new NodeTransform(new Vector3(circle.center.x, groundLevel, circle.center.y),
-                                                                  GetScale(circle.gameObject, circle.radius));
+                    layout_result[circle.gameObject] 
+                         = new NodeTransform(new Vector3(circle.center.x, groundLevel, circle.center.y),
+                                             GetScale(circle.gameObject, circle.radius));
                 }
                 return out_outer_radius;
             }
@@ -123,8 +137,8 @@ namespace SEE.Layout
         private Vector3 GetScale(GameObject node, float radius)
         {
             Node n = node.GetComponent<NodeRef>().node;
-            // FIXME: Do we need multiply radius by Unit()?
-            return n.IsLeaf() ? blockFactory.GetSize(node) : new Vector3(2 * radius, circleHeight, 2 * radius);
+            return n.IsLeaf() ? leafNodeFactory.GetSize(node) 
+                              : new Vector3(2 * radius, circleHeight, 2 * radius);
         }
 
         /// <summary>
@@ -136,7 +150,7 @@ namespace SEE.Layout
         /// <returns>radius of the minimal circle containing the given block</returns>
         private float LeafRadius(GameObject block)
         {
-            Vector3 extent = blockFactory.GetSize(block) / 2.0f;
+            Vector3 extent = leafNodeFactory.GetSize(block) / 2.0f;
             return Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);
         }
     }

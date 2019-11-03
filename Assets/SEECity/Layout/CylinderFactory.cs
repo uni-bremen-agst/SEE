@@ -5,7 +5,7 @@ namespace SEE.Layout
     /// <summary>
     /// A factory for cylinder game objects.
     /// </summary>
-    public class CylinderFactory : NodeFactory
+    public class CylinderFactory : InnerNodeFactory
     {
         private Material material;
 

@@ -1,9 +1,11 @@
 ﻿using SEE.DataModel;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
 {
+    [Obsolete("INodeLayout is deprecated, please use NodeLayout instead.")]
     public abstract class INodeLayout
     {
         public INodeLayout(string widthMetric, string heightMetric, string breadthMetric,

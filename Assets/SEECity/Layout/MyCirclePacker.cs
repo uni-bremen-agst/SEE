@@ -1,14 +1,25 @@
-﻿using SEE.DataModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEEC.Layout
 {
+    /// <summary>
+    /// Represents a circle by its center and radius for a given game object to be laid out.
+    /// </summary>
     internal class MyCircle
     {
+        /// <summary>
+        /// Center of the circle.
+        /// </summary>
         public Vector2 center;
+        /// <summary>
+        /// Radius of the circle
+        /// </summary>
         public float radius;
+        /// <summary>
+        /// The game object represented by this circle.
+        /// </summary>
         public GameObject gameObject;
 
         /// <summary>
@@ -34,13 +45,22 @@ namespace SEEC.Layout
     }
 
     /// <summary>
-    /// This class holds a list of <see cref="MyCircle"/>-Objects and can pack them closely.
-    /// The original source can be found <see href="https://www.codeproject.com/Articles/42067/D-Circle-Packing-Algorithm-Ported-to-Csharp">HERE</see>.
+    /// This class holds a list of <see cref="MyCircle"/> objects and packs them closely.
+    /// The original source can be found 
+    /// <see href="https://www.codeproject.com/Articles/42067/D-Circle-Packing-Algorithm-Ported-to-Csharp">HERE</see>.
     /// </summary>
     public static class MyCirclePacker
     {
-        // FIXME: Should be relative to Unit()
-        public static float mMinSeparation = 0.01f;
+        /// <summary>
+        /// The default minimal separation between two circles to be placed next to each other.
+        /// </summary>
+        public const float DefaultMinimalSeparation = 0.1f;
+
+        /// <summary>
+        /// The minimal separation between two circles to be placed next to each other,
+        /// initially DefaultMinimalSeparation but possibly later adjusted by the world unit.
+        /// </summary>
+        private static float MinimalSeparation = DefaultMinimalSeparation;
 
         /// <summary>
         /// Compares <paramref name="c1"/> and <paramref name="c2"/> by radius (descending).
@@ -59,11 +79,6 @@ namespace SEEC.Layout
             else return 0;
         }
 
-        private static int AscendingRadiusComparator(MyCircle c1, MyCircle c2)
-        {
-            return -DescendingRadiusComparator(c1, c2);
-        }
-
         /// <summary>
         /// Packs the <paramref name="circles"/> as close together within reasonable time.
         /// 
@@ -79,7 +94,7 @@ namespace SEEC.Layout
 
             Vector2 center = Vector2.zero;
             float last_out_radius = Mathf.Infinity;
-            float minSeparationSq = mMinSeparation * mMinSeparation;
+            float minSeparationSq = MinimalSeparation * MinimalSeparation;
             int max_iterations = circles.Count; // FIXME: What would be a suitable number of maximal iterations? mCircles.Count?
             for (int iterations = 1; iterations <= max_iterations; iterations++)
             {
@@ -115,11 +130,19 @@ namespace SEEC.Layout
                 }
                 SmallestEnclosingCircle(circles, out center, out out_outer_radius);
 
-                float improvement = out_outer_radius / last_out_radius;
-                if (last_out_radius != Mathf.Infinity && improvement < 1.01f)
+                // This check and the early termination of the loop may result in fewer
+                // iterations. However, it must not create layouts in which the circles
+                // overlap. The reason is that initially the circles may overlap 
+                // and then the layout is actually expanding to create non-overlapping
+                // circles. The phase of expansion is characterized by 
+                // out_outer_radius > last_out_radius. In case of out_outer_radius < last_out_radius,
+                // the shrinking phase has begun. In the shrinking phase, we will terminate early
+                // when the ratio of the new and old radius drops below the threshold.
+                float ratio = out_outer_radius / last_out_radius;
+                if (last_out_radius != Mathf.Infinity && !(out_outer_radius > last_out_radius || ratio < 0.99f))
                 {
                     // If the degree of improvement falls below 1%, we will stop.
-                    //Debug.LogFormat("Minor improvement of {0} after {1} iterations.\n", improvement, iterations);
+                    //Debug.LogFormat("Minor improvement of {0} after {1} iterations out of {2}.\n", ratio.ToString("0.0000"), iterations, max_iterations);
                     break;
                 }
                 last_out_radius = out_outer_radius;

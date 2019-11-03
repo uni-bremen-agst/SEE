@@ -8,6 +8,7 @@ namespace SEE.Layout
     /// <summary>
     /// A Circle can be used by the <see cref="CirclePacker"/>.
     /// </summary>
+    [Obsolete("Circle is deprecated, please use MyCircle instead.")]
     public struct Circle
     {
         // The position of the transform will be changed by the circle packer.
@@ -35,11 +36,12 @@ namespace SEE.Layout
             return "(center= " + transform.localPosition.ToString() + ", radius=" + radius + ")";
         }
     }
-    
+
     /// <summary>
     /// This class holds a list of <see cref="Circle"/>-Objects and can pack them closely.
     /// The original source can be found <see href="https://www.codeproject.com/Articles/42067/D-Circle-Packing-Algorithm-Ported-to-Csharp">HERE</see>.
     /// </summary>
+    [Obsolete("CirclePacker is deprecated, please use MyCirclePacker instead.")]
     public static class CirclePacker
     {
         /// <summary>
@@ -52,87 +54,57 @@ namespace SEE.Layout
         public static void Pack(List<Circle> circles, out float out_outer_radius)
         {
             Vector3 center = Vector3.zero;
-
-            //if (circles.Count == 0)
-            //{
-            //    center = Vector3.zero;
-            //    out_outer_radius = 0.0f;
-            //}
-            //else if (circles.Count == 1)
-            //{
-            //    center = Vector3.zero;
-            //    circles[0].Transform.position = Vector3.zero;
-            //    out_outer_radius = circles[0].Radius;
-            //}
-            //else if (circles.Count == 2)
-            //{
-            //    float r0 = circles[0].Radius;
-            //    float r1 = circles[1].Radius;
-            //    Debug.Assert(r0 >= r1);
-            //    circles[0].Transform.position = Vector3.zero;
-            //    circles[1].Transform.position = circles[0].Transform.position + (r0 + r1) * Vector3.right;
-            //    // distance between centers of both circles (they are to touch each other)
-            //    EnclosingCircleIntersectingCircles(circles, out center, out out_outer_radius);
-
-            //    //{
-            //    //    List<MyCircle> debugCircles = new List<MyCircle>();
-            //    //    debugCircles.AddRange(circles);
-            //    //    debugCircles.Add(new MyCircle(null, center, out_outer_radius));
-            //    //    DrawCircles(debugCircles);
-            //    //}
-            //}
-            //else
+            out_outer_radius = 0.0f;
+            // Sort circles descendingly based on radius
+            circles.Sort(Comparator);
+            float last_out_radius = Mathf.Infinity;
+            int max_iterations = 100; // FIXME: What would be a suitable number of maximal iterations? circles.Count?
+            for (int it = 0; it < max_iterations; it++)
             {
-                out_outer_radius = 0.0f;
-                // Sort circles descendingly based on radius
-                circles.Sort(Comparator);
-                float last_out_radius = Mathf.Infinity;
-                int max_iterations = 100; // FIXME: What would be a suitable number of maximal iterations? circles.Count?
-                for (int it = 0; it < max_iterations; it++)
+                // Each step draws all pairs of circles closer together.
+                for (int i = 0; i < circles.Count - 1; i++)
                 {
-                    // Each step draws all pairs of circles closer together.
-                    for (int i = 0; i < circles.Count - 1; i++)
+                    for (int j = i + 1; j < circles.Count; j++)
                     {
-                        for (int j = i + 1; j < circles.Count; j++)
+                        if (i == j)
+                            continue;
+
+                        Vector3 ab = circles[j].transform.localPosition - circles[i].transform.localPosition;
+                        ab.y = 0.0f;
+                        float r = circles[i].radius + circles[j].radius;
+                        // Length squared = (dx * dx) + (dy * dy);
+                        float d = Mathf.Max(0.0f, Vector3.SqrMagnitude(ab));
+
+                        if (d < (r * r) - 0.01)
                         {
-                            if (i == j)
-                                continue;
-
-                            Vector3 ab = circles[j].transform.localPosition - circles[i].transform.localPosition;
-                            ab.y = 0.0f;
-                            float r = circles[i].radius + circles[j].radius;
-                            // Length squared = (dx * dx) + (dy * dy);
-                            float d = Mathf.Max(0.0f, Vector3.SqrMagnitude(ab));
-
-                            if (d < (r * r) - 0.01)
-                            {
-                                ab.Normalize();
-                                ab *= (float)((r - Math.Sqrt(d)) * 0.5f);
-                                circles[j].transform.localPosition += ab;
-                                circles[i].transform.localPosition -= ab;
-                            }
+                            ab.Normalize();
+                            ab *= (float)((r - Math.Sqrt(d)) * 0.5f);
+                            circles[j].transform.localPosition += ab;
+                            circles[i].transform.localPosition -= ab;
                         }
                     }
-
-                    SmallestEnclosingCircle(circles, out Vector3 out_center, out float out_radius);
-                    out_outer_radius = out_radius;
-                    center = out_center;
-
-                    float improvement = out_radius / last_out_radius;
-                    if (last_out_radius != Mathf.Infinity && improvement < 1.01f)
-                    {
-                        // If the degree of improvement falls below 1%, we will stop.
-                        Debug.LogFormat("Minor improvement of {0} after {1} iterations.\n", improvement, it);
-                        break;
-                    }
-                    //else
-                    //{
-                    //    Debug.LogFormat("Improvement: {0}\n", improvement);
-                    //}
-                    last_out_radius = out_radius;
                 }
 
+                SmallestEnclosingCircle(circles, out Vector3 out_center, out float out_radius);
+                out_outer_radius = out_radius;
+                center = out_center;
 
+                // This check and the early termination of the loop may result in fewer
+                // iterations. However, it must not create layouts in which the circles
+                // overlap. The reason is that initially the circles may overlap 
+                // and then the layout is actually expanding to create non-overlapping
+                // circles. The phase of expansion is characterized by 
+                // out_outer_radius > last_out_radius. In case of out_outer_radius < last_out_radius,
+                // the shrinking phase has begun. In the shrinking phase, we will terminate early
+                // when the ratio of the new and old radius drops below the threshold.
+                float ratio = out_outer_radius / last_out_radius;
+                if (last_out_radius != Mathf.Infinity && !(out_outer_radius > last_out_radius || ratio < 0.99f))
+                {
+                    // If the degree of improvement falls below 1%, we will stop.
+                    //Debug.LogFormat("Minor improvement of {0} after {1} iterations out of {2}.\n", ratio.ToString("0.0000"), iterations, max_iterations);
+                    break;
+                }
+                last_out_radius = out_outer_radius;
             }
             // Clients of CirclePacker assume that all co-ordinates of children are relative to Vector3.zero.
             // SmallestEnclosingCircle() may have given us a different center. That is why we need to make
