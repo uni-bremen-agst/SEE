@@ -1,45 +1,48 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using SEE;//TODO
+﻿using UnityEngine;
 
-public class GameStateController : MonoBehaviour
+namespace SEE
 {
-    public GameObject ingameMenu;
 
-    private FlyCamera cameraScript;
-
-    void Start()
+    public class GameStateController : MonoBehaviour
     {
-        ingameMenu.SetActive(false);
-        cameraScript = Camera.main.GetComponent<FlyCamera>();
-        cameraScript.isActive = true;
-    }
+        private GameObject ingameMenu;
+        private FlyCamera cameraScript;
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        void Start()
         {
-            ToggleMenu();
+            ingameMenu = GameObject.Find("IngameMenu");
+            cameraScript = Camera.main.GetComponent<FlyCamera>();
+
+            ingameMenu.SetActive(false);
+            cameraScript.isActive = true;
+        }
+
+        void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                ToggleMenu();
+            }
+        }
+
+        public void ToggleMenu()
+        {
+            bool menuOpened = !ingameMenu.activeSelf;
+            ingameMenu.SetActive(menuOpened);
+            cameraScript.isActive = !menuOpened;
+        }
+
+        public void OpenMenu()
+        {
+            ingameMenu.SetActive(true);
+            cameraScript.isActive = false;
+        }
+
+        public void CloseMenu()
+        {
+            ingameMenu.SetActive(false);
+            cameraScript.isActive = true;
         }
     }
 
-    public void ToggleMenu()
-    {
-        bool menuOpened = !ingameMenu.activeSelf;
-        ingameMenu.SetActive(menuOpened);
-        cameraScript.isActive = !menuOpened;
-    }
-
-    public void OpenMenu()
-    {
-        ingameMenu.SetActive(true);
-        cameraScript.isActive = false;
-    }
-
-    public void CloseMenu()
-    {
-        ingameMenu.SetActive(false);
-        cameraScript.isActive = true;
-    }
-}
+}// namespace SEE
