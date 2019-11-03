@@ -145,12 +145,12 @@ namespace SEE
 
         public enum NodeLayouts
         {
-            CirclePackingNode = 0, // FIXME: Remove later
-            Balloon = 1,
-            Manhattan = 2,
-            CirclePacking = 3,
-            Treemap = 4,
-            BalloonNode = 5       // FIXME: Remove later
+            CirclePacking = 0,
+            Manhattan = 1,
+            Treemap = 2,
+            Balloon = 3,
+            CirclePackingObsolete = 4, // FIXME: Remove later
+            BalloonObsolete = 5        // FIXME: Remove later
         }
 
         public enum EdgeLayouts

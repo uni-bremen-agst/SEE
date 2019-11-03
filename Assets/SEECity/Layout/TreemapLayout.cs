@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -11,11 +10,19 @@ namespace SEE.Layout
     /// </summary>
     public class TreemapLayout : NodeLayout
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
+        /// placed on this level</param>
+        /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
+        /// <param name="width">width of the rectangle in which to place all nodes</param>
+        /// <param name="depth">width of the rectangle in which to place all nodes</param>
         public TreemapLayout(float groundLevel,
-                             NodeFactory blockFactory,
+                             NodeFactory leafNodeFactory,
                              float width,
                              float depth)
-        : base(groundLevel, blockFactory)
+        : base(groundLevel, leafNodeFactory)
         {
             name = "Treemap";
             this.width = width;
@@ -205,12 +212,12 @@ namespace SEE.Layout
         /// Note: This function implements function 'worst' described in the paper by Bruls et al.
         /// 
         /// </summary>
-        /// <param name="sizes"></param>
-        /// <param name="x"></param>
-        /// <param name="z"></param>
-        /// <param name="width"></param>
-        /// <param name="depth"></param>
-        /// <returns></returns>
+        /// <param name="sizes">area size of the rectangles to compute the treemap for</param>
+        /// <param name="x">x co-ordinate of the "origin"</param>
+        /// <param name="z">z co-ordinate of the "origin"</param>
+        /// <param name="width">full width of the treemap</param>
+        /// <param name="depth">full depth of the treemap</param>
+        /// <returns>worst aspect ratio of the layout for the given sizes</returns>
         private static float Worst_Aspect_Ratio(List<NodeSize> sizes, float x, float z, float width, float depth)
         {
             float max = 0.0f;
@@ -338,7 +345,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="nodes">the game nodes</param>
         /// <param name="rects">their corresponding rectangle</param>
-        /// <returns></returns>
+        /// <returns>the transforms (position, scale) of the game objects</returns>
         private Dictionary<GameObject, NodeTransform> To_Transforms(List<NodeSize> nodes, List<Rectangle> rects)
         {
             Dictionary<GameObject, NodeTransform> result = new Dictionary<GameObject, NodeTransform>();
@@ -347,7 +354,7 @@ namespace SEE.Layout
             {
                 GameObject o = nodes[i].gameNode;
                 Vector3 position = new Vector3(rect.x + rect.width / 2.0f, groundLevel, rect.z + rect.depth / 2.0f);
-                Vector3 scale = new Vector3(rect.width / blockFactory.Unit(), 1.0f, rect.depth / blockFactory.Unit());
+                Vector3 scale = new Vector3(rect.width / leafNodeFactory.Unit(), 1.0f, rect.depth / leafNodeFactory.Unit());
                 result[o] = new NodeTransform(position, scale);
                 i++;
             }
@@ -365,7 +372,7 @@ namespace SEE.Layout
             List<NodeSize> result = new List<NodeSize>();
             foreach (GameObject gameNode in gameNodes)
             {
-                Vector3 size = blockFactory.GetSize(gameNode);
+                Vector3 size = leafNodeFactory.GetSize(gameNode);
                 // x and z lenghts may differ; we need to consider the larger value
                 result.Add(new NodeSize(gameNode, Mathf.Max(size.x, size.z)));
             }

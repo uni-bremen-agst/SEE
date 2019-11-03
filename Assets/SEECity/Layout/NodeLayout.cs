@@ -1,5 +1,4 @@
-﻿
-using SEE.DataModel;
+﻿using SEE.DataModel;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,11 +6,17 @@ namespace SEE.Layout
 {
     public abstract class NodeLayout
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
+        /// placed on this level</param>
+        /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
         public NodeLayout(float groundLevel,
-                          NodeFactory blockFactory)
+                          NodeFactory leafNodeFactory)
         {
             this.groundLevel = groundLevel;
-            this.blockFactory = blockFactory;
+            this.leafNodeFactory = leafNodeFactory;
         }
 
         /// <summary>
@@ -33,9 +38,10 @@ namespace SEE.Layout
         protected readonly float groundLevel;
 
         /// <summary>
-        /// A factory to create visual representations of graph nodes (e.g., cubes or CScape buildings).
+        /// The factory that createed visual representations of graph nodes for leaves 
+        /// (e.g., cubes or CScape buildings).
         /// </summary>
-        protected readonly NodeFactory blockFactory;
+        protected readonly NodeFactory leafNodeFactory;
 
         /// <summary>
         /// The height of circles (y co-ordinate) drawn for inner nodes.
@@ -53,8 +59,19 @@ namespace SEE.Layout
         /// <returns>node layout</returns>
         public abstract Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes);
 
+        /// <summary>
+        /// A mapping of graph nodes onto their game nodes.
+        /// </summary>
         protected Dictionary<Node, GameObject> to_game_node;
 
+        /// <summary>
+        /// Returns a mapping of graph nodes onto their game nodes.
+        /// 
+        /// Precondition: Every game object must contain a NodeRef component referencing 
+        /// a graph node.
+        /// </summary>
+        /// <param name="gameNodes">the game nodes to be mapped (target objects of the mapping)</param>
+        /// <returns>mapping of graph nodes onto their game nodes</returns>
         protected static Dictionary<Node, GameObject> NodeMapping(ICollection<GameObject> gameNodes)
         {
             Dictionary<Node, GameObject> map = new Dictionary<Node, GameObject>();

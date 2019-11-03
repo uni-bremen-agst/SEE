@@ -1,13 +1,14 @@
 ﻿using SEE.DataModel;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
-{
-
+{ 
     /// <summary>
     /// This layout packs circles closely together to decrease total area of city.
     /// </summary>
+    [Obsolete("CirclePackingLayout is deprecated, please use CirclePackingNodeLayout instead.")]
     public class CirclePackingLayout : INodeLayout
     {
         private readonly string[] InnerNodeMetrics;
@@ -21,7 +22,7 @@ namespace SEE.Layout
                              bool showDonuts)
         : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, showErosions)
         {
-            name = "Circle Packing";
+            name = "Circle Packing (obsolete)";
             ShowDonuts = showDonuts;
             InnerNodeMetrics = innerNodeMetrics;
         }

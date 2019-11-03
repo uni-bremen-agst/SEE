@@ -11,6 +11,7 @@ namespace SEE.Layout
     /// Published in: Proceeding INFOVIS '98 Proceedings of the 1998 IEEE Symposium on 
     /// Information Visualization, Pages 19-25.
     /// </summary>
+    [Obsolete("BalloonLayout is deprecated, please use BalloonNodeLayout instead.")]
     public class BalloonLayout : INodeLayout
     {
         public BalloonLayout(string widthMetric, string heightMetric, string breadthMetric, 
@@ -22,7 +23,7 @@ namespace SEE.Layout
                              bool showDonuts)
         : base(widthMetric, heightMetric, breadthMetric, issueMap, blockFactory, scaler, showErosions)
         {
-            name = "Ballon";
+            name = "Balloon (obsolete)";
             this.showDonuts = showDonuts;
             this.innerNodeMetrics = innerNodeMetrics;
         }

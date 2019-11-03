@@ -5,12 +5,24 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
+    /// <summary>
+    /// Creates a balloon layout according to "Reconfigurable Disc Trees for Visualizing 
+    /// Large Hierarchical Information Space" by Chang-Sung Jeong and Alex Pang.
+    /// Published in: Proceeding INFOVIS '98 Proceedings of the 1998 IEEE Symposium on 
+    /// Information Visualization, Pages 19-25.
+    /// </summary>
     public class BalloonNodeLayout : NodeLayout
     {
-        public BalloonNodeLayout(float groundLevel, NodeFactory blockFactory) 
-            : base(groundLevel, blockFactory)
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
+        /// placed on this level</param>
+        /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
+        public BalloonNodeLayout(float groundLevel, NodeFactory leafNodeFactory) 
+            : base(groundLevel, leafNodeFactory)
         {
-            name = "BalloonNode"; // FIXME: change to "Balloon".
+            name = "Balloon";
         }
 
         /// <summary>
@@ -182,7 +194,7 @@ namespace SEE.Layout
                 GameObject block = to_game_node[node];
 
                 // Necessary size of the block independent of the parent
-                Vector3 size = blockFactory.GetSize(block);
+                Vector3 size = leafNodeFactory.GetSize(block);
 
                 // The outer radius of an inner-most node is determined by the ground
                 // rectangle of the block to be drawn for the node.
