@@ -4,8 +4,10 @@ using UnityEngine.UI;
 
 public class Server : MonoBehaviourPunCallbacks
 {
-    public string roomName           { get; set; }
-    public int maxPlayers            { get; set; }
+    public Text roomNameText;
+    public Dropdown maxPlayersDropdown;
+    public Dropdown visibilityDropdown;
+
     public GameObject createRoomButton;
 
     public override void OnEnable()  { PhotonNetwork.AddCallbackTarget(this); }
@@ -25,7 +27,13 @@ public class Server : MonoBehaviourPunCallbacks
 
     public void CreateRoom()
     {
-        NetworkController.CreateRoom(roomName, (byte)maxPlayers);
+        string roomName = roomNameText.text;
+        byte maxPlayers = (byte)(maxPlayersDropdown.value + 1);
+        NetworkController.Visibility v = visibilityDropdown.value == 0
+            ? NetworkController.Visibility.Private
+            : NetworkController.Visibility.Public;
+
+        NetworkController.CreateRoom(roomName, maxPlayers, v);
     }
 
     public override void OnConnectedToMaster()

@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class NetworkController : MonoBehaviourPunCallbacks
 {
+    void Start()                             { PhotonNetwork.AddCallbackTarget(this); }
+    void OnDestroy()                         { PhotonNetwork.RemoveCallbackTarget(this); }
+
     public override void OnEnable()          { PhotonNetwork.AddCallbackTarget(this); }
     public override void OnDisable()         { PhotonNetwork.RemoveCallbackTarget(this); }
 
@@ -13,15 +16,26 @@ public class NetworkController : MonoBehaviourPunCallbacks
     public static void Disconnect()          { if (IsConnected()) PhotonNetwork.Disconnect(); }
 
     public static void JoinRoom(string name) { PhotonNetwork.JoinRoom(name);  }
+    public static void JoinRandomRoom()      { PhotonNetwork.JoinRandomRoom(); }
     public static void LeaveRoom()           { PhotonNetwork.LeaveRoom(); }
 
-    public static void CreateRoom(string name, byte maxPlayers)
+    public enum Visibility
+    {
+        Private, Public
+    }
+
+    public static void CreateRoom(string name, byte maxPlayers, Visibility visibility)
     {
         RoomOptions roomOptions = new RoomOptions();
 
-        roomOptions.IsVisible = false;
+        switch (visibility)
+        {
+            case Visibility.Private: roomOptions.IsVisible = false; break;
+            case Visibility.Public:  roomOptions.IsVisible = true;  break;
+        }
+
         roomOptions.IsOpen = true;
-        roomOptions.MaxPlayers = maxPlayers;
+        roomOptions.MaxPlayers = (byte)maxPlayers;
 
         PhotonNetwork.CreateRoom(name, roomOptions);
     }
@@ -42,7 +56,7 @@ public class NetworkController : MonoBehaviourPunCallbacks
     public override void OnCreatedRoom()
     {
         base.OnCreatedRoom();
-        Debug.Log("Successfully created and joined room!");
+        Debug.Log("Successfully created room!");
     }
 
     public override void OnCreateRoomFailed(short returnCode, string message)
