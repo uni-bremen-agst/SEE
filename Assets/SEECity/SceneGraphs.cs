@@ -20,21 +20,21 @@ namespace SEE
             {
                 Debug.LogError("No graph path given.\n");
             }
-            else if (!graphs.ContainsKey(settings.GXLPath()))
+            else 
             {
+                if (!graphs.ContainsKey(settings.GXLPath()))
+                {
+                    Debug.LogWarningFormat("graph {0} is already loaded.\n", settings.GXLPath());
+                }
                 graph = Load(settings);
                 if (graph == null)
                 {
-                    Debug.LogError("graph " + settings.GXLPath() + " could not be loaded.");
+                    Debug.LogErrorFormat("graph {0} could not be loaded.\n", settings.GXLPath());
                 }
                 else
                 {
                     graphs.Add(settings.GXLPath(), graph);
                 }
-            }
-            else
-            {
-                Debug.LogError("graph " + settings.GXLPath() + " is already loaded.");
             }
             return graph;
         }

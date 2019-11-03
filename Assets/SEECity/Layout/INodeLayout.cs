@@ -1,67 +1,35 @@
 ﻿using SEE.DataModel;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
 {
-    public abstract class ILayout
+    [Obsolete("INodeLayout is deprecated, please use NodeLayout instead.")]
+    public abstract class INodeLayout
     {
-        public ILayout(bool showEdges,
-               string widthMetric, string heightMetric, string breadthMetric,
+        public INodeLayout(string widthMetric, string heightMetric, string breadthMetric,
                SerializableDictionary<string, IconFactory.Erosion> issueMap,
-               BlockFactory blockFactory,
+               NodeFactory blockFactory,
                IScale scaler,
-               float edgeWidth,
-               bool showErosions,
-               bool edgesAboveBlocks)
+               bool showErosions)
         {
-            this.showEdges = showEdges;
             this.widthMetric = widthMetric;
             this.heightMetric = heightMetric;
             this.breadthMetric = breadthMetric;
             this.issueMap = issueMap;
             this.blockFactory = blockFactory;
             this.scaler = scaler;
-            this.edgeWidth = edgeWidth;
             this.showErosions = showErosions;
-            this.edgesAboveBlocks = edgesAboveBlocks;
-        }
-
-        public virtual void Draw(Graph graph)
-        {
-            Performance p;
-            p = Performance.Begin(name + " layout of nodes");
-            DrawNodes(graph);
-            p.End();
-            if (showEdges)
-            {
-                p = Performance.Begin(name + " layout of edges");
-                DrawEdges(graph);
-                p.End();
-            }
         }
 
         // A mapping of graph nodes onto the game objects representing them visually in the scene
-        protected Dictionary<Node, GameObject> gameObjects = new Dictionary<Node, GameObject>();
+        protected Dictionary<Node, GameObject> gameNodes = new Dictionary<Node, GameObject>();
 
-        /// <summary>
-        /// Orientation of the edges; 
-        /// if false, the edges are drawn below the houses;
-        /// if true, the edges are drawn above the houses;
-        /// </summary>
-        protected readonly bool edgesAboveBlocks;
-
-        /// <summary>
-        /// Path to the material used for edges.
-        /// </summary>
-        protected const string materialPath = "Legacy Shaders/Particles/Additive";
-        // protected const string materialPath = "BrickTextures/BricksTexture13/BricksTexture13";
-        // protected const string materialPath = "Particles/Standard Surface";
-
-        /// <summary>
-        /// The material used for edges.
-        /// </summary>
-        protected readonly static Material defaultLineMaterial = LineMaterial();
+        public Dictionary<Node, GameObject> Nodes()
+        {
+            return gameNodes;
+        }
 
         /// <summary>
         /// Mapping of node attributes onto erosion issue icons.
@@ -69,14 +37,9 @@ namespace SEE.Layout
         protected readonly SerializableDictionary<string, IconFactory.Erosion> issueMap;
 
         /// <summary>
-        /// Whether edges should be shown.
-        /// </summary>
-        protected readonly bool showEdges;
-
-        /// <summary>
         /// A factory to create visual representations of graph nodes (e.g., cubes or CScape buildings).
         /// </summary>
-        protected readonly BlockFactory blockFactory;
+        protected readonly NodeFactory blockFactory;
 
         /// <summary>
         /// Whether the erosions should be drawn.
@@ -89,34 +52,12 @@ namespace SEE.Layout
         protected const float groundLevel = 0.0f;
 
         /// <summary>
-        /// Returns the default material for edges using the materialPath.
-        /// </summary>
-        /// <returns>default material for edges</returns>
-        private static Material LineMaterial()
-        {
-            Material material = new Material(Shader.Find(materialPath));
-            if (material == null)
-            {
-                Debug.LogError("Could not find material " + materialPath + "\n");
-            }
-            return material;
-        }
-
-        /// <summary>
         /// Creates the GameObjects representing the nodes of the graph.
         /// The graph must have been loaded before via Load().
         /// Intended to be overriden by subclasses.
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
-        protected virtual void DrawNodes(Graph graph) { }
-
-        /// <summary>
-        /// Creates the GameObjects representing the edges of the graph.
-        /// The graph must have been loaded before via Load().
-        /// Intended to be overriden by subclasses.
-        /// </summary>
-        /// <param name="graph">graph whose edges are to be drawn</param>
-        protected virtual void DrawEdges(Graph graph) { }
+        public abstract void Draw(Graph graph);
 
         // name of the layout
         protected string name = "";
@@ -125,11 +66,6 @@ namespace SEE.Layout
         /// Used to determine the lengths of the node blocks.
         /// </summary>
         protected readonly IScale scaler;
-
-        /// <summary>
-        /// The width of every edge.
-        /// </summary>
-        protected readonly float edgeWidth;
 
         /// <summary>
         /// The unique name of a layout.
@@ -151,6 +87,17 @@ namespace SEE.Layout
         /// The metric used to determine the breadth of a node.
         /// </summary>
         protected readonly string breadthMetric;
+
+        /// <summary>
+        /// Adds a NodeRef component to given block referencing to given node.
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="node"></param>
+        protected void AttachNode(GameObject block, Node node)
+        {
+            NodeRef nodeRef = block.AddComponent<NodeRef>();
+            nodeRef.node = node;
+        }
 
         /// <summary>
         /// Returns the first immediate child of parent with given tag or null
@@ -187,24 +134,9 @@ namespace SEE.Layout
             return renderer.bounds.size;
         }
 
-        // Comparer for the widths of sprites.
-        private readonly IComparer<GameObject> comparer = new WidthComparer();
-
-        /// <summary>
-        /// Comparer for the widths of sprites. Let width(x) be the width
-        /// of a sprite. Yields:
-        /// -1 if width(left) < width(right) 
-        /// 0 if width(left) = width(right)
-        /// 1 if width(left) ></width> width(right)
-        /// </summary>
-        private class WidthComparer : IComparer<GameObject>
+        protected void AddErosionIssues(Node node)
         {
-            public int Compare(GameObject left, GameObject right)
-            {
-                float widthLeft = GetSizeOfSprite(left).x;
-                float widthRight = GetSizeOfSprite(right).x;
-                return widthLeft.CompareTo(widthRight);
-            }
+            AddErosionIssues(gameNodes[node]);
         }
 
         /// <summary>
@@ -213,9 +145,10 @@ namespace SEE.Layout
         /// to the normalized metric value for the erosion issue.
         /// </summary>
         /// <param name="node"></param>
-        /// <param name="scaler"></param>
-        protected void AddErosionIssues(Node node, IScale scaler)
+        protected void AddErosionIssues(GameObject gameNode)
         {
+            Node node = gameNode.GetComponent<NodeRef>().node;
+
             // The list of sprites for the erosion issues.
             List<GameObject> sprites = new List<GameObject>();
 
@@ -227,25 +160,20 @@ namespace SEE.Layout
                     if (value > 0.0f)
                     {
                         GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
-                        // The sprite will not become a child of node so that we can more easily
-                        // scale it. If the sprite had a parent, localScale would be relative to
-                        // the parent's size. That just complicates things.
+                        sprite.name = sprite.name + " " + node.SourceName;
+                        // The sprite becomes a child of the node.
+                        sprite.transform.parent = gameNode.transform;
+
                         Vector3 spriteSize = GetSizeOfSprite(sprite);
                         // Scale the sprite to one Unity unit.
                         float spriteScale = 1.0f / spriteSize.x;
                         // Scale the erosion issue by normalization.
                         float metricScale = scaler.GetNormalizedValue(node, issue.Key);
-                        //Debug.LogFormat("sprite {0} before scaling: size={1}.\n",
-                        //                sprite.name, GetSizeOfSprite(sprite));
                         // First: scale its width to unit size 1.0 maintaining the aspect ratio
                         sprite.transform.localScale *= spriteScale * blockFactory.Unit();
-                        //Debug.LogFormat("sprite {0} scaled to unit size: size={1}.\n",
-                        //                sprite.name, GetSizeOfSprite(sprite));
                         // Now scale it by the normalized metric.
-                        sprite.transform.localScale *= metricScale;
-                        //Debug.LogFormat("sprite {0} after scaling: size={1}.\n",
-                        //                sprite.name, GetSizeOfSprite(sprite));
-                        sprite.name = sprite.name + " " + node.SourceName;
+                        sprite.transform.localScale *= metricScale; 
+
                         sprites.Add(sprite);
                     }
                 }
@@ -256,9 +184,8 @@ namespace SEE.Layout
             {
                 // The space that we put in between two subsequent erosion issue sprites.
                 Vector3 delta = Vector3.up / 100.0f;
-                Vector3 currentRoof = blockFactory.Roof(gameObjects[node]);
-                sprites.Sort(comparer);
-                //Debug.Log("---------------------------------\n");
+                Vector3 currentRoof = blockFactory.Roof(gameNode);
+                sprites.Sort(Comparer<GameObject>.Create((left, right) => GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
                 foreach (GameObject sprite in sprites)
                 {
                     Vector3 size = GetSizeOfSprite(sprite);
@@ -266,9 +193,6 @@ namespace SEE.Layout
                     Vector3 halfHeight = (size.y / 2.0f) * Vector3.up;
                     sprite.transform.position = currentRoof + delta + halfHeight;
                     currentRoof = sprite.transform.position + halfHeight;
-
-                    //Debug.LogFormat("sprite {0}: size={1} position={2} halfHeight={3}.\n",
-                    //                sprite.name, size, sprite.transform.position, halfHeight);
                 }
             }
         }

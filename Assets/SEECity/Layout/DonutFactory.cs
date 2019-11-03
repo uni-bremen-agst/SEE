@@ -212,7 +212,7 @@ namespace SEE.Layout
         /// <summary>
         /// Draws the donut chart at donutChart's position with given radius. 
         /// That is, an inner circle is added depicting innerValue, and
-        /// one outer donut circle sectors are added for each other value.
+        /// outer donut circle sectors are added for each other value.
         /// For these elements, new game objects are created and added as
         /// children to donutChart.
         /// 
