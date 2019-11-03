@@ -1,33 +1,38 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SceneController : MonoBehaviour
+namespace SEE
 {
-    public enum Scene
+
+    public class SceneController : MonoBehaviour
     {
-        MainMenu,
-        Singleplayer,
-        Multiplayer
+        public enum Scene
+        {
+            MainMenu,
+            Singleplayer,
+            Multiplayer
+        }
+
+        public void LoadMainMenuScene()
+        {
+            LoadScene(Scene.MainMenu);
+        }
+
+        public void LoadSingleplayerScene()
+        {
+            LoadScene(Scene.Singleplayer);
+        }
+
+        public void LoadMultiplayerScene()
+        {
+            LoadScene(Scene.Multiplayer);
+        }
+
+        public static void LoadScene(Scene scene)
+        {
+            Debug.Log("Loading \"" + scene + "\" scene...");
+            SceneManager.LoadScene((int)scene);
+        }
     }
 
-    public void LoadMainMenuScene()
-    {
-        LoadScene(Scene.MainMenu);
-    }
-
-    public void LoadSingleplayerScene()
-    {
-        LoadScene(Scene.Singleplayer);
-    }
-
-    public void LoadMultiplayerScene()
-    {
-        LoadScene(Scene.Multiplayer);
-    }
-
-    public static void LoadScene(Scene scene)
-    {
-        Debug.Log("Loading \"" + scene + "\" scene...");
-        SceneManager.LoadScene((int)scene);
-    }
-}
+}// namespace SEE
