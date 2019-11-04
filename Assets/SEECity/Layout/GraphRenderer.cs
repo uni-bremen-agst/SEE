@@ -207,8 +207,20 @@ namespace SEE.Layout
                 {
                     // Leaf nodes were created as blocks by leaveNodeFactory.
                     // Leaf nodes have their size set before the layout is computed. We will
-                    // not change their size.
+                    // not change their size unless a layout requires that.
                     leaveNodeFactory.SetGroundPosition(gameNode, transform.position);
+                    if (settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
+                    {
+                        // Treemaps adjust the size of the object's ground area according to
+                        // the total space we allow it to use. The x length was initially
+                        // mapped onto the area of the ground. The treemap layout yields
+                        // an x and z co-ordinate that defines this area, which we use
+                        // here to set the width and depth of the game node.
+                        // The height (y axis) is not modified by the treemap layout and,
+                        // hence, does not need any adustment.
+                        leaveNodeFactory.SetWidth(gameNode, transform.scale.x);
+                        leaveNodeFactory.SetDepth(gameNode, transform.scale.z);
+                    }
                 }
                 else
                 {
@@ -268,7 +280,18 @@ namespace SEE.Layout
                                                 scaler.GetNormalizedValue(node, settings.DepthMetric));
 
                     // Scale according to the metrics.
-                    leaveNodeFactory.SetSize(block, scale);
+                    if (settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
+                    {
+                        // In case of treemaps, the width metric is mapped on the ground area.
+                        float widthOfSquare = Mathf.Sqrt(scale.x);
+                        leaveNodeFactory.SetWidth(block, widthOfSquare);
+                        leaveNodeFactory.SetDepth(block, widthOfSquare);
+                        leaveNodeFactory.SetHeight(block, scale.y);
+                    }
+                    else
+                    {
+                        leaveNodeFactory.SetSize(block, scale);
+                    }
 
                     result[node] = block;
                 }
