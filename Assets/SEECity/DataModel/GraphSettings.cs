@@ -129,6 +129,7 @@ namespace SEE
 
         public enum InnerNodeKinds
         {
+            Empty,
             Circles,
             Cylinders
         }

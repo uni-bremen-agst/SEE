@@ -34,6 +34,9 @@ namespace SEE.Layout
             }
             switch (this.settings.InnerNodeObjects)
             {
+                case GraphSettings.InnerNodeKinds.Empty:
+                    innerNodeFactory = new VanillaFactory();
+                    break;
                 case GraphSettings.InnerNodeKinds.Circles:
                     innerNodeFactory = new CircleFactory();
                     break;
@@ -149,7 +152,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="graph">graph whose nodes and edges are to be laid out</param>
         protected void DrawCity(Graph graph)
-        {            
+        {
             Dictionary<Node, GameObject> nodeMap;
             Dictionary<GameObject, NodeTransform> layout;
             List<Node> nodes = graph.Nodes();
@@ -176,8 +179,20 @@ namespace SEE.Layout
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }
-            
+
             Apply(layout);
+            AddDecorations(nodeMap);
+            if (settings.EdgeLayout != GraphSettings.EdgeLayouts.None)
+            {
+                EdgeLayout(graph, nodeMap);
+            }
+            BoundingBox(nodeMap.Values, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+            // Place the plane somewhat under ground level.
+            PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
+        }
+
+        private void AddDecorations(Dictionary<Node, GameObject> nodeMap)
+        {
             // Decorations must be applied after the blocks have been placed, so that
             // we also know their positions.
             if (settings.ShowErosions)
@@ -190,13 +205,17 @@ namespace SEE.Layout
                 DonutDecorator donateDecorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric, settings.IssueMap().Keys.ToArray<string>());
                 donateDecorator.Add(InnerNodes(nodeMap.Values));
             }
-            if (settings.EdgeLayout != GraphSettings.EdgeLayouts.None)
+            else
             {
-                EdgeLayout(graph, nodeMap);
+                // Draw the inner nodes as circle lines.
+                foreach (GameObject gameNode in InnerNodes(nodeMap.Values))
+                {
+                    // Set line widths in relation to the radius of the object.
+                    Vector3 extent = innerNodeFactory.GetSize(gameNode) / 2.0f;
+                    float radius = Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);
+                    innerNodeFactory.SetLineWidth(gameNode, radius / 100.0f);
+                }
             }
-            BoundingBox(nodeMap.Values, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-            // Place the plane somewhat under ground level.
-            PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
         }
 
         /// <summary>
@@ -265,10 +284,8 @@ namespace SEE.Layout
                     // Inner nodes were not created by blockFactory.
                     innerNodeFactory.SetSize(gameNode, transform.scale);
                     innerNodeFactory.SetGroundPosition(gameNode, transform.position);
-                    // Set line widths in relation to the radius of the object.
-                    Vector3 extent = innerNodeFactory.GetSize(gameNode) / 2.0f;
-                    float radius = Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);
-                    innerNodeFactory.SetLineWidth(gameNode, radius / 100.0f);
+                    // Inner nodes will be drawn later when we add decorations because
+                    // they can be drawn as a single circle line or a Donut chart.
                 }
             }
         }

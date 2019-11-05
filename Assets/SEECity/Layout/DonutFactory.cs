@@ -219,17 +219,19 @@ namespace SEE.Layout
         /// <param name="radius">radius of the circle</param>
         /// <param name="innerValue">the value to be put onto the inner circle</param>
         /// <param name="values">the values to be put onto the outer donut circle sectors</param>
+        /// <param name="fractionOfInnerCircle">defines the fraction of the radius of the inner circle w.r.t. radius</param>
         /// <returns>composite game object containing the inner circle and the outer
         /// circle sectors as children</returns>
         public GameObject DonutChart(Vector3 center,
                                      float radius,
                                      float innerValue,
-                                     float[] values)
+                                     float[] values,
+                                     float fractionOfInnerCircle = 0.75f)
         {
             GameObject donutChart = new GameObject();
             donutChart.transform.position = center;
             donutChart.tag = Tags.Decoration;
-            DonutChart(donutChart, radius, innerValue, values);
+            DonutChart(donutChart, radius, innerValue, values, fractionOfInnerCircle);
             return donutChart;
         }
 
@@ -251,13 +253,14 @@ namespace SEE.Layout
         /// <param name="radius">radius of the circle</param>
         /// <param name="innerValue">the value to be put onto the inner circle</param>
         /// <param name="values">the values to be put onto the outer donut circle sectors</param>
+        /// <param name="fractionOfInnerCircle">defines the fraction of the radius of the inner circle w.r.t. radius</param>
         /// <returns>composite game object containing the inner circle and the outer
         /// circle sectors as children</returns>
         public void DonutChart(GameObject donutChart,
                                float radius,
                                float innerValue,
                                float[] values,
-                               float innerScale = 0.75f)
+                               float fractionOfInnerCircle = 0.75f)
         {
             if (values.Length != materials.Length)
             {
@@ -268,16 +271,20 @@ namespace SEE.Layout
             {
                 throw new System.Exception("[DonutChart] value for inner circle must be in the range [0, 1].");
             }
-            if (innerScale < 0.0f || innerScale > 1.0f)
+            if (fractionOfInnerCircle < 0.0f || fractionOfInnerCircle > 1.0f)
             {
-                throw new System.Exception("[DonutChart] value for inner scale must be in the range [0, 1].");
+                throw new System.Exception("[DonutChart] value for fraction of inner circle must be in the range [0, 1].");
             }
 
-            donutChart.isStatic = true;     
+            donutChart.isStatic = true;
+            // FIXME: We might need to introduce different levels of height because circles may be stacked.
+            // TODO: Add a level value to all nodes when the graph is loaded so that we can stack their visualizations
+            // accordingly.
             donutChart.transform.localScale = new Vector3(2.0f * radius, 0.05f, 2.0f * radius);
 
             if (metrics.Length > 0)
             {
+                // total sum of values; required to select the circle segments proportionally
                 float sum = 0.0f;
                 foreach (float value in values)
                 {
@@ -289,26 +296,31 @@ namespace SEE.Layout
                 }
                 if (sum > 0)
                 {
+                    // Create and add the circle segments to donutChart
+                    float previousRadian = 0.0f;
+                    int i = 0;
+                    foreach (float value in values)
                     {
-                        float previousRadian = 0.0f;
-                        int i = 0;
-                        foreach (float value in values)
-                        {
-                            float newRadian = (value / sum) * 2.0f * Mathf.PI + previousRadian;
-                            GameObject child = CreateCircleSector(donutChart.transform.position, radius, previousRadian, newRadian, materials[i]);
-                            child.name = metrics[i] + " = " + value;
-                            child.tag = Tags.Decoration;
-                            child.transform.parent = donutChart.transform;
-                            previousRadian = newRadian;
-                            i++;
-                        }
+                        float newRadian = (value / sum) * 2.0f * Mathf.PI + previousRadian;
+                        GameObject child = CreateCircleSector(donutChart.transform.position, radius, previousRadian, newRadian, materials[i]);
+                        child.name = metrics[i] + " = " + value;
+                        child.tag = Tags.Decoration;
+                        child.transform.parent = donutChart.transform;
+                        previousRadian = newRadian;
+                        i++;
                     }
                 }
             }
             {
-                // Add inner circle.
+                // Create and add inner circle to donutChart.
                 //GameObject innerCircle = GameObject.CreatePrimitive(PrimitiveType.Cylinder);//~64 segments
-                GameObject innerCircle = new GameObject("Cylinder");
+                GameObject innerCircle = new GameObject
+                {
+                    name = innerMetric + " = " + innerValue,
+                    tag = Tags.Decoration,
+                    isStatic = true
+                };
+
                 innerCircle.AddComponent<MeshFilter>();
                 innerCircle.AddComponent<MeshRenderer>();
 
@@ -383,12 +395,9 @@ namespace SEE.Layout
                     mesh.triangles = triangles;
                 }
 
-                innerCircle.name = innerMetric + " = " + innerValue;
-                innerCircle.tag = Tags.Decoration;
-                innerCircle.isStatic = true;
                 innerCircle.transform.parent = donutChart.transform;
                 innerCircle.transform.localPosition = Vector3.zero;
-                innerCircle.transform.localScale = new Vector3(innerScale, 1.0f, innerScale);
+                innerCircle.transform.localScale = new Vector3(fractionOfInnerCircle, 1.0f, fractionOfInnerCircle);
                 Renderer renderer = innerCircle.GetComponent<Renderer>();
                 // We need to create a new material so that we can change its color
                 // independently from other cylinders.
