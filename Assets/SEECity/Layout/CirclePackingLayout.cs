@@ -192,9 +192,9 @@ namespace SEE.Layout
 
         private Vector3 GetScale(Node node)
         {
-            return new Vector3(scaler.GetNormalizedValue(node, widthMetric), 
-                               scaler.GetNormalizedValue(node, heightMetric), 
-                               scaler.GetNormalizedValue(node, breadthMetric));
+            return new Vector3(scaler.GetNormalizedValue(widthMetric, node), 
+                               scaler.GetNormalizedValue(heightMetric, node), 
+                               scaler.GetNormalizedValue(breadthMetric, node));
         }
 
         private void DrawPlane(GameObject parent, float maxRadius)

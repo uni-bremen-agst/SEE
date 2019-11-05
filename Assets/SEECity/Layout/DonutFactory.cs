@@ -17,6 +17,7 @@ namespace SEE.Layout
         /// Precondition: 1 <= metrics.Length <= 13; otherwise an exception will be raised.
         /// </summary>
         /// <param name="metrics">the names of the metrics to be visualized</param>
+        [Obsolete("DonutFactory(string[] metrics) is deprecated, please use DonutFactory(string innerMetric, string[] metrics) instead.")]
         public DonutFactory(string[] metrics)
         {
             if (metrics.Length == 0)
@@ -25,14 +26,37 @@ namespace SEE.Layout
             }
             // the number of metrics to be put onto the Donut circle sectors.
             int numberOfDonutMetrics = metrics.Length - 1;
-            if (numberOfDonutMetrics > c.Length)
+            if (numberOfDonutMetrics > colorPalette.Length)
             {
-                throw new System.Exception("[DonutFactory] number of metrics must not exceed " + (c.Length + 1) + ".");
+                throw new System.Exception("[DonutFactory] number of metrics must not exceed " + (colorPalette.Length + 1) + ".");
             }
             this.materials = GetMaterials(numberOfDonutMetrics);
             innerMetric = metrics[0];
             this.metrics = new string[numberOfDonutMetrics];
             Array.Copy(metrics, 1, this.metrics, 0, numberOfDonutMetrics);
+        }
+
+        /// <summary>
+        /// Constructor of DonutFactory specifying the names of the metrics to be visualized.
+        /// Metric <paramref name="innerMetric"/> will be used for the inner
+        /// circle (values for it must be in the range [0,1]. All remaining 
+        /// <paramref name="metrics"/> will be put on outer Donut circle sectors.
+        /// 
+        /// Precondition: metrics.Length <= 12; otherwise an exception will be raised.
+        /// </summary>
+        /// <param name="innerMetric">the name of the metric for the inner circle</param>
+        /// <param name="metrics">the names of the metrics to be visualized on the outer circle segments</param>
+        public DonutFactory(string innerMetric, string[] metrics)
+        {
+            // the number of metrics to be put onto the Donut circle sectors.
+            int numberOfDonutMetrics = metrics.Length;
+            if (numberOfDonutMetrics > colorPalette.Length)
+            {
+                throw new System.Exception("[DonutFactory] number of metrics must not exceed " + (colorPalette.Length + 1) + ".");
+            }
+            this.materials = GetMaterials(numberOfDonutMetrics);
+            this.innerMetric = innerMetric;
+            this.metrics = metrics;
         }
 
         /// <summary>
@@ -70,18 +94,18 @@ namespace SEE.Layout
             switch(howMany)
             {
                 case 0: return NewMaterials();
-                case 1: return NewMaterials(c[0]);
-                case 2: return NewMaterials(c[0], c[11]);
-                case 3: return NewMaterials(c[0], c[5], c[11]);
-                case 4: return NewMaterials(c[0], c[3], c[6], c[11]);
-                case 5: return NewMaterials(c[0], c[3], c[5], c[8], c[11]);
-                case 6: return NewMaterials(c[0], c[2], c[4], c[6], c[8], c[11]);
-                case 7: return NewMaterials(c[0], c[2], c[4], c[6], c[8], c[10], c[11]);
-                case 8: return NewMaterials(c[0], c[2], c[4], c[6], c[8], c[9], c[10], c[11]);
-                case 9: return NewMaterials(c[0], c[2], c[3], c[4], c[6], c[8], c[9], c[10], c[11]);
-                case 10: return NewMaterials(c[0], c[1], c[2], c[3], c[4], c[6], c[8], c[9], c[10], c[11]);
-                case 11: return NewMaterials(c[0], c[1], c[2], c[3], c[4], c[6], c[7], c[8], c[9], c[10], c[11]);
-                case 12: return NewMaterials(c);
+                case 1: return NewMaterials(colorPalette[0]);
+                case 2: return NewMaterials(colorPalette[0], colorPalette[11]);
+                case 3: return NewMaterials(colorPalette[0], colorPalette[5], colorPalette[11]);
+                case 4: return NewMaterials(colorPalette[0], colorPalette[3], colorPalette[6], colorPalette[11]);
+                case 5: return NewMaterials(colorPalette[0], colorPalette[3], colorPalette[5], colorPalette[8], colorPalette[11]);
+                case 6: return NewMaterials(colorPalette[0], colorPalette[2], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[11]);
+                case 7: return NewMaterials(colorPalette[0], colorPalette[2], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[10], colorPalette[11]);
+                case 8: return NewMaterials(colorPalette[0], colorPalette[2], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]);
+                case 9: return NewMaterials(colorPalette[0], colorPalette[2], colorPalette[3], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]);
+                case 10: return NewMaterials(colorPalette[0], colorPalette[1], colorPalette[2], colorPalette[3], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]);
+                case 11: return NewMaterials(colorPalette[0], colorPalette[1], colorPalette[2], colorPalette[3], colorPalette[4], colorPalette[6], colorPalette[7], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]);
+                case 12: return NewMaterials(colorPalette);
                 default: return null; // cannot happen
             }
         }
@@ -118,7 +142,7 @@ namespace SEE.Layout
         }
 
         // viridis color palette from which we choose the colors of the materials
-        private readonly Color[] c = GetPalette();
+        private readonly Color[] colorPalette = GetPalette();
 
         /// <summary>
         /// Returns the viridis palette, which offers a wide perceptual range in brightness in blue-yellow
@@ -405,8 +429,6 @@ namespace SEE.Layout
 
             MeshFilter meshFilter = circleSector.AddComponent<MeshFilter>();
             MeshRenderer renderer = circleSector.AddComponent<MeshRenderer>();
-
-
 
             // The circle segment is drawn by a set of consecutive triangles defined by
             // the center point and two additional points on the circle line.

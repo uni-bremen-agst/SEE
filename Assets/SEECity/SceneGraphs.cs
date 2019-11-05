@@ -24,7 +24,7 @@ namespace SEE
             {
                 if (!graphs.ContainsKey(settings.GXLPath()))
                 {
-                    Debug.LogWarningFormat("graph {0} is already loaded.\n", settings.GXLPath());
+                    Debug.LogWarningFormat("graph {0} is already loaded and will be overridden.\n", settings.GXLPath());
                 }
                 graph = Load(settings);
                 if (graph == null)

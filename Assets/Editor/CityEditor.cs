@@ -5,6 +5,7 @@ using SEE;
 using SEE.Layout;
 using System.Collections.Generic;
 using UnityEngine.XR;
+using System.Linq;
 
 namespace SEEEditor
 {
@@ -99,14 +100,14 @@ namespace SEEEditor
                 {
                     // The camera for the monitor game is at top-level.
                     camera.SetActive(!enableVR);
-                    Debug.LogFormat("main camera at top level: {0}\n", !enableVR);
+                    //Debug.LogFormat("main camera at top level: {0}\n", !enableVR);
                 }
                 else if (camera.transform.parent.name == "Leap Rig")
                 {
                     // The camera of the Leap Rig is nested in a game object named accordingly.
                     // We set the Leap Rig itself in which the found camera is directly nested.
                     camera.transform.parent.gameObject.SetActive(enableVR);
-                    Debug.LogFormat("Leap rig camera: {0}\n", enableVR);
+                    //Debug.LogFormat("Leap rig camera: {0}\n", enableVR);
                 }
             }
             EnableCanvas(enableVR);
@@ -193,14 +194,18 @@ namespace SEEEditor
                     EnableVR(VRenabled);
   
                     graph = SceneGraphs.Add(editorSettings);
-                    int numberOfErrors = MetricImporter.Load(graph, editorSettings.CSVPath());
-                    if (numberOfErrors > 0)
-                    {
-                        Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", editorSettings.CSVPath(), numberOfErrors);
-                    }
-
                     if (graph != null)
                     {
+                        int numberOfErrors = MetricImporter.Load(graph, editorSettings.CSVPath());
+                        if (numberOfErrors > 0)
+                        {
+                            Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", editorSettings.CSVPath(), numberOfErrors);
+                        }
+                        {
+                            string[] metrics = editorSettings.IssueMap().Keys.ToArray<string>();
+                            MetricAggregator.AggregateSum(graph, metrics);
+                            MetricAggregator.DeriveSum(graph, metrics, editorSettings.InnerDonutMetric);
+                        }
                         GraphRenderer renderer = new GraphRenderer(editorSettings);
                         renderer.Draw(graph);
                         // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.

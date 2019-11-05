@@ -29,7 +29,8 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// The names of the metrics for inner nodes to be put onto the 
+        /// The names of the metrics for inner nodes to be put onto the Donut chart
+        /// (both inner circle and outer circle segments).
         /// </summary>
         private readonly string[] innerNodeMetrics;
 
@@ -357,9 +358,9 @@ namespace SEE.Layout
 
                 {
                     // The block's width and breadth are proportional to the two metrics.
-                    Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, widthMetric),
-                                                scaler.GetNormalizedValue(node, heightMetric),
-                                                scaler.GetNormalizedValue(node, breadthMetric));
+                    Vector3 scale = new Vector3(scaler.GetNormalizedValue(widthMetric, node),
+                                                scaler.GetNormalizedValue(heightMetric, node),
+                                                scaler.GetNormalizedValue(breadthMetric, node));
 
                     // We scale the block before it becomes a child of parent so that its scale
                     // is not relative to its parent.
