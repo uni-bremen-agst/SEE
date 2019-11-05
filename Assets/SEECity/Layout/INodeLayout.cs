@@ -168,7 +168,7 @@ namespace SEE.Layout
                         // Scale the sprite to one Unity unit.
                         float spriteScale = 1.0f / spriteSize.x;
                         // Scale the erosion issue by normalization.
-                        float metricScale = scaler.GetNormalizedValue(node, issue.Key);
+                        float metricScale = scaler.GetNormalizedValue(issue.Key, node);
                         // First: scale its width to unit size 1.0 maintaining the aspect ratio
                         sprite.transform.localScale *= spriteScale * blockFactory.Unit();
                         // Now scale it by the normalized metric.

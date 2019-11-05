@@ -145,12 +145,12 @@ namespace SEE
 
         public enum NodeLayouts
         {
-            CirclePacking = 0,
-            Manhattan = 1,
-            Treemap = 2,
-            Balloon = 3,
-            CirclePackingObsolete = 4, // FIXME: Remove later
-            BalloonObsolete = 5        // FIXME: Remove later
+            Balloon,
+            CirclePacking,
+            Manhattan,
+            Treemap,
+            CirclePackingObsolete, // FIXME: Remove later
+            BalloonObsolete        // FIXME: Remove later
         }
 
         public enum EdgeLayouts
@@ -196,6 +196,11 @@ namespace SEE
                                                           "Metric.Number_Of_Statements.sum",
                                                           "Metric.Lines.Comment.sum",
                                                           "Metric.Lines.LOC.sum" };
+
+        /// <summary>
+        /// The metric to be put in the inner circle of a Donut chart.
+        /// </summary>
+        public string InnerDonutMetric = "Metric.IssuesTotal";
 
         /// <summary>
         /// Yields a mapping of all node attribute names that define erosion issues in the GXL file

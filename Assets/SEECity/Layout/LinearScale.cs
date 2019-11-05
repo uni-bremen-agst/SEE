@@ -20,101 +20,56 @@ namespace SEE.Layout
         /// <param name="maximalLength">the maximal value a node length can have</param>
         /// <param name="metrics">node metrics for scaling</param>
         public LinearScale(Graph graph, float minimalLength, float maximalLength, IList<string> metrics)
-            : base(metrics, minimalLength, maximalLength)
+            : base(graph, metrics, minimalLength, maximalLength)
         {
-            metricMaxima = DetermineMetricMaxima(graph, metrics);
         }
-
-        /// <summary>
-        /// The maximal values of all metrics as a map metric-name -> maximal value.
-        /// </summary>
-        private readonly Dictionary<string, float> metricMaxima;
 
         /// <summary>
         /// Yields a linear interpolation of the normalized value of the given node metric.
         /// The range of the linear interpolation is set by [minimalLength, maximalLength].
         /// The normalization is done by dividing the value by the maximal value of
         /// the metric. The assumption is that metric values are non-negative. If a node
-        /// does not have metric attribute, minimalLength will be returned.
+        /// does not have the metric attribute, minimalLength will be returned.
         /// </summary>
-        /// <param name="node">node for which to determine the normalized value</param>
         /// <param name="metric">name of the node metric</param>
+        /// <param name="node">node for which to determine the normalized value</param>
         /// <returns>normalized value of node metric</returns>
-        public override float GetNormalizedValue(Node node, string metric)
+        public override float GetNormalizedValue(string metric, Node node)
         {
-            return Mathf.Lerp(minimalLength, maximalLength, NormalizedMetric(metricMaxima, node, metric));
-        }
-
-        /// <summary>
-        /// Returns a value in the range [0.0, 1.0] representing the relative value of the given
-        /// metric in the metrics value range for the given node.
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="metric"></param>
-        /// <returns></returns>
-        protected float NormalizedMetric(Dictionary<string, float> metricMaxima, Node node, string metric)
-        {
-            float max = metricMaxima[metric];
-
-            if (max <= 0.0f)
+            if (node.TryGetNumeric(metric, out float value))
             {
-                return 0.0f;
-            }
-            else if (node.TryGetNumeric(metric, out float width))
-            {
-                if (width <= 0.0f)
-                {
-                    return 0.0f;
-                }
-                else
-                {
-                    return (float)width / max;
-                }
+                return GetNormalizedValue(metric, value);
             }
             else
             {
-                return 0.0f;
+                return minimalLength;
             }
         }
 
         /// <summary>
-        /// Returns the maximal values of the given node metrics.
+        /// Yields a linear interpolation of the normalized value of the given node metric.
+        /// The range of the linear interpolation is set by [minimalLength, maximalLength].
+        /// The normalization is done by dividing the value by the maximal value of
+        /// the metric. The assumption is that metric values are non-negative.
         /// </summary>
-        /// <param name="metrics">the metrics for which the maxima are to be gathered</param>
-        /// <returns>metric maxima</returns>
-        protected Dictionary<string, float> DetermineMetricMaxima(Graph graph, IList<string> metrics)
+        /// <param name="metric">name of the node metric</param>
+        /// <param name="node">node for which to determine the normalized value</param>
+        /// <returns>normalized value of node metric</returns>
+        public override float GetNormalizedValue(string metric, float value)
         {
-            Dictionary<string, float> result = new Dictionary<string, float>();
-            foreach (string metric in metrics)
-            {
-                result[metric] = 0.0f;
-            }
+            float result;
 
-            foreach (Node node in graph.Nodes())
-            {
-                foreach (string metric in metrics)
-                {
-                    if (node.TryGetNumeric(metric, out float value))
-                    {
-                        if (value > result[metric])
-                        {
-                            result[metric] = value;
-                        }
-                    }
-                }
-            }
-            return result;
-        }
+            float max = metricMaxima[metric];
 
-        /// <summary>
-        /// Dumps metricMaxima for debugging.
-        /// </summary>
-        protected void DumpMetricMaxima(Dictionary<string, float> metricMaxima)
-        {
-            foreach (var item in metricMaxima)
+            if (max <= 0.0f || value <= 0.0f)
             {
-                Debug.Log("maximum of " + item.Key + ": " + item.Value + "\n");
+                result = 0.0f;
             }
+            else
+            {
+                result = (float)value / max;
+            }
+            return Mathf.Lerp(minimalLength, maximalLength, result);
         }
     }
 }

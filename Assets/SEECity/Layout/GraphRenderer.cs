@@ -99,6 +99,8 @@ namespace SEE.Layout
         {
             List<string> nodeMetrics = new List<string>() { settings.WidthMetric, settings.HeightMetric, settings.DepthMetric };
             nodeMetrics.AddRange(settings.IssueMap().Keys);
+            nodeMetrics.Add(settings.InnerDonutMetric);
+
             if (settings.ZScoreScale)
             {
                 scaler = new ZScoreScale(graph, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
@@ -181,7 +183,12 @@ namespace SEE.Layout
             if (settings.ShowErosions)
             {
                 ErosionIssues issueDecorator = new ErosionIssues(settings.IssueMap(), leaveNodeFactory, scaler);
-                issueDecorator.Add(nodeMap.Values);
+                issueDecorator.Add(LeafNodes(nodeMap.Values));
+            }
+            if (settings.ShowDonuts)
+            {
+                DonutDecorator donateDecorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric, settings.IssueMap().Keys.ToArray<string>());
+                donateDecorator.Add(InnerNodes(nodeMap.Values));
             }
             if (settings.EdgeLayout != GraphSettings.EdgeLayouts.None)
             {
@@ -190,6 +197,36 @@ namespace SEE.Layout
             BoundingBox(nodeMap.Values, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             // Place the plane somewhat under ground level.
             PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
+        }
+
+        /// <summary>
+        /// Returns only the inner nodes in gameNodes as a list.
+        /// </summary>
+        /// <param name="gameNodes"></param>
+        /// <returns>the inner nodes in gameNodes as a list</returns>
+        private ICollection<GameObject> InnerNodes(ICollection<GameObject> gameNodes)
+        {
+            return gameNodes.Where(o => ! IsLeaf(o)).ToList();
+        }
+
+        /// <summary>
+        /// Returns only the leaf nodes in gameNodes as a list.
+        /// </summary>
+        /// <param name="gameNodes"></param>
+        /// <returns>the leaf nodes in gameNodes as a list</returns>
+        private ICollection<GameObject> LeafNodes(ICollection<GameObject> gameNodes)
+        {
+            return gameNodes.Where(o => IsLeaf(o)).ToList();
+        }
+
+        /// <summary>
+        /// True iff gameNode is a leaf in the graph.
+        /// </summary>
+        /// <param name="gameNode">game node to be checked</param>
+        /// <returns>true iff gameNode is a leaf in the graph</returns>
+        private static bool IsLeaf(GameObject gameNode)
+        {
+            return gameNode.GetComponent<NodeRef>().node.IsLeaf();
         }
 
         /// <summary>
@@ -276,9 +313,9 @@ namespace SEE.Layout
 
                     AttachNode(block, node);
                     // Scaled metric values for the dimensions.
-                    Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, settings.WidthMetric),
-                                                scaler.GetNormalizedValue(node, settings.HeightMetric),
-                                                scaler.GetNormalizedValue(node, settings.DepthMetric));
+                    Vector3 scale = new Vector3(scaler.GetNormalizedValue(settings.WidthMetric, node),
+                                                scaler.GetNormalizedValue(settings.HeightMetric, node),
+                                                scaler.GetNormalizedValue(settings.DepthMetric, node));
 
                     // Scale according to the metrics.
                     if (settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
