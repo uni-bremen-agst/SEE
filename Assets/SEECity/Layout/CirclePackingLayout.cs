@@ -187,7 +187,7 @@ namespace SEE.Layout
 
             const float innerScale = 0.95f;
             radius += (1.0f - innerScale) * radius;
-            new DonutFactory(InnerNodeMetrics).DonutChart(donut, radius, innerValue, new float[] { m1, m2, m2, m3 }, innerScale);
+            new DonutFactory(InnerNodeMetrics).AttachDonutChart(donut, innerValue, new float[] { m1, m2, m2, m3 }, innerScale);
         }
 
         private Vector3 GetScale(Node node)

@@ -502,7 +502,7 @@ namespace SEE.Layout
             float m2 = UnityEngine.Random.Range(0.0f, 90.0f);
             float m3 = UnityEngine.Random.Range(0.0f, 150.0f);
             float m4 = UnityEngine.Random.Range(0.0f, 200.0f);
-            factory.DonutChart(sceneNode, 0.3f * radius, innerValue, new float[] {m1, m2, m2, m3 });
+            factory.AttachDonutChart(sceneNode, innerValue, new float[] {m1, m2, m2, m3 }, groundLevel);
         }
 
         private void SetColor(GameObject gameObject, Color color)

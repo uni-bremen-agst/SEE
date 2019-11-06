@@ -53,6 +53,7 @@ namespace SEE
                 SEE.Performance p = SEE.Performance.Begin("loading graph data from " + settings.GXLPath());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
+                graph.CalculateLevels();
                 p.End();
                 Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
                 Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
