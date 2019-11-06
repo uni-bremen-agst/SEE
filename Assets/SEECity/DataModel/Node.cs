@@ -69,6 +69,26 @@ namespace SEE.DataModel
         }
 
         /// <summary>
+        /// Returns the maximal depth of the tree rooted by this node, that is,
+        /// the longest path to any of its leaves.
+        /// </summary>
+        /// <returns>maximal depth of the tree rooted by this node</returns>
+        internal int Depth()
+        {
+            int maxDepth = 0;
+
+            foreach (Node child in children)
+            {
+                int depth = child.Depth();
+                if (depth > maxDepth)
+                {
+                    maxDepth = depth;
+                }
+            }
+            return maxDepth + 1;
+        }
+
+        /// <summary>
         /// The ancestor of the node in the hierarchy. May be null if the node
         /// is a root.
         /// </summary>
