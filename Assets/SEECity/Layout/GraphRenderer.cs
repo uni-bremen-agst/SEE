@@ -34,6 +34,7 @@ namespace SEE.Layout
             switch (this.settings.InnerNodeObjects)
             {
                 case GraphSettings.InnerNodeKinds.Empty:
+                case GraphSettings.InnerNodeKinds.Donuts:
                     innerNodeFactory = new VanillaFactory();
                     break;
                 case GraphSettings.InnerNodeKinds.Circles:
@@ -199,15 +200,28 @@ namespace SEE.Layout
                 ErosionIssues issueDecorator = new ErosionIssues(settings.IssueMap(), leaveNodeFactory, scaler);
                 issueDecorator.Add(LeafNodes(nodeMap.Values));
             }
-            if (settings.ShowDonuts)
+            switch (settings.InnerNodeObjects)
             {
-                DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric, settings.IssueMap().Keys.ToArray<string>());
-                decorator.Add(InnerNodes(nodeMap.Values));
-            }
-            else
-            {
-                CircleDecorator decorator = new CircleDecorator(innerNodeFactory, Color.white);
-                decorator.Add(InnerNodes(nodeMap.Values));
+                case GraphSettings.InnerNodeKinds.Empty:
+                    // do nothing
+                    break;
+                case GraphSettings.InnerNodeKinds.Circles:
+                    {
+                        CircleDecorator decorator = new CircleDecorator(innerNodeFactory, Color.white);
+                        decorator.Add(InnerNodes(nodeMap.Values));
+                    }
+                    break;
+                case GraphSettings.InnerNodeKinds.Donuts:
+                    {
+                        DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric, settings.IssueMap().Keys.ToArray<string>());
+                        decorator.Add(InnerNodes(nodeMap.Values));
+                    }
+                    break;
+                case GraphSettings.InnerNodeKinds.Cylinders:
+                    // TODO
+                    break;
+                default:
+                    throw new Exception("Unhandled GraphSettings.InnerNodeKinds " + settings.InnerNodeObjects);
             }
         }
 
@@ -463,22 +477,22 @@ namespace SEE.Layout
                     {
                         layout = new BalloonLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
                                                    settings.IssueMap(),
-                                                   settings.InnerNodeMetrics,
+                                                   settings.IssueMap().Keys.ToArray<string>(),
                                                    leaveNodeFactory,
                                                    scaler,
                                                    settings.ShowErosions,
-                                                   settings.ShowDonuts);
+                                                   true);
                         break;
                     }
                 case GraphSettings.NodeLayouts.CirclePackingObsolete:
                     {
                         layout = new CirclePackingLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
                                                          settings.IssueMap(),
-                                                         settings.InnerNodeMetrics,
+                                                         settings.IssueMap().Keys.ToArray<string>(),
                                                          leaveNodeFactory,
                                                          scaler,
                                                          settings.ShowErosions,
-                                                         settings.ShowDonuts);
+                                                         true);
                         break;
                     }
                 default:
