@@ -47,7 +47,7 @@ namespace SEE.Layout
             return depth + 1;
         }
 
-        public override void DrawEdges(Graph graph, IList<GameObject> nodes)
+        public override void DrawEdges(Graph graph, ICollection<GameObject> nodes)
         {
             SetGameNodes(nodes);
             SetLevel(graph);

@@ -10,7 +10,7 @@ namespace SEE.Layout
         {
         }
 
-        public override void DrawEdges(Graph graph, IList<GameObject> nodes)
+        public override void DrawEdges(Graph graph, ICollection<GameObject> nodes)
         {
             SetGameNodes(nodes);
             float maxBlockHeight = GetMaxBlockHeight(nodes);

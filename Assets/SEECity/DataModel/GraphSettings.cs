@@ -151,8 +151,7 @@ namespace SEE
             Balloon,
             CirclePacking,
             Manhattan,
-            Treemap,
-            CirclePackingObsolete, // FIXME: Remove later
+            Treemap
         }
 
         public enum EdgeLayouts
