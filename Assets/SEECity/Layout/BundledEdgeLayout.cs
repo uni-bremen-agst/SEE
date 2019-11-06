@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
+    /// <summary>
+    /// Draws edges as hierarchically bundled edges.
+    /// </summary>
     public class BundledEdgeLayout : IEdgeLayout
     {
         public BundledEdgeLayout(NodeFactory blockFactory, float edgeWidth, bool edgesAboveBlocks)

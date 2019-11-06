@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
+    /// <summary>
+    /// Draws edges as splines with three control points between either the roof or ground of
+    /// game objects.
+    /// </summary>
     public class SplineEdgeLayout : IEdgeLayout
     {
         public SplineEdgeLayout(NodeFactory blockFactory, float edgeWidth, bool edgesAboveBlocks) : base(blockFactory, edgeWidth, edgesAboveBlocks)
