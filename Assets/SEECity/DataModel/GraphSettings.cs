@@ -153,7 +153,6 @@ namespace SEE
             Manhattan,
             Treemap,
             CirclePackingObsolete, // FIXME: Remove later
-            BalloonObsolete        // FIXME: Remove later
         }
 
         public enum EdgeLayouts
