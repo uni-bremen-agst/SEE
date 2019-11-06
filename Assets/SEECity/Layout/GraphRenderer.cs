@@ -473,17 +473,6 @@ namespace SEE.Layout
             INodeLayout layout;
             switch (settings.NodeLayout)
             {
-                case GraphSettings.NodeLayouts.BalloonObsolete:
-                    {
-                        layout = new BalloonLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
-                                                   settings.IssueMap(),
-                                                   settings.IssueMap().Keys.ToArray<string>(),
-                                                   leaveNodeFactory,
-                                                   scaler,
-                                                   settings.ShowErosions,
-                                                   true);
-                        break;
-                    }
                 case GraphSettings.NodeLayouts.CirclePackingObsolete:
                     {
                         layout = new CirclePackingLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
