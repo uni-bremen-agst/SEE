@@ -1,4 +1,5 @@
 ﻿using SEE.Layout;
+using System;
 using System.Collections.Generic;
 
 namespace SEE
@@ -131,7 +132,8 @@ namespace SEE
         {
             Empty,
             Circles,
-            Cylinders
+            Cylinders,
+            Donuts
         }
 
         /// <summary>
@@ -181,22 +183,11 @@ namespace SEE
         public bool ShowErosions = false;
 
         /// <summary>
-        /// Whether Donut charts should be visible for circles in the Ballon layout.
-        /// </summary>
-        public bool ShowDonuts = false;
-
-        /// <summary>
         /// Orientation of the edges; 
         /// if false, the edges are drawn below the houses;
         /// if true, the edges are drawn above the houses;
         /// </summary>
         public bool EdgesAboveBlocks = true;
-
-        public string[] InnerNodeMetrics = new string[] { "Metric.Quality",
-                                                          "Metric.McCabe_Complexity.sum",
-                                                          "Metric.Number_Of_Statements.sum",
-                                                          "Metric.Lines.Comment.sum",
-                                                          "Metric.Lines.LOC.sum" };
 
         /// <summary>
         /// The metric to be put in the inner circle of a Donut chart.
