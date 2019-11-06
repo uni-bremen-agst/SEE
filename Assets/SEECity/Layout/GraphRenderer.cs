@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel;
-using SEEC.Layout;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -202,19 +201,13 @@ namespace SEE.Layout
             }
             if (settings.ShowDonuts)
             {
-                DonutDecorator donateDecorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric, settings.IssueMap().Keys.ToArray<string>());
-                donateDecorator.Add(InnerNodes(nodeMap.Values));
+                DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric, settings.IssueMap().Keys.ToArray<string>());
+                decorator.Add(InnerNodes(nodeMap.Values));
             }
             else
             {
-                // Draw the inner nodes as circle lines.
-                foreach (GameObject gameNode in InnerNodes(nodeMap.Values))
-                {
-                    // Set line widths in relation to the radius of the object.
-                    Vector3 extent = innerNodeFactory.GetSize(gameNode) / 2.0f;
-                    float radius = Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);
-                    innerNodeFactory.SetLineWidth(gameNode, radius / 100.0f);
-                }
+                CircleDecorator decorator = new CircleDecorator(innerNodeFactory, Color.white);
+                decorator.Add(InnerNodes(nodeMap.Values));
             }
         }
 

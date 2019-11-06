@@ -296,5 +296,17 @@ namespace SEE.DataModel
             result += "}\n";
             return result;
         }
+
+        /// <summary>
+        /// Sets the level of each node in the graph. The level of a root node is 0.
+        /// For all other nodes, the level is the level of its parent + 1.
+        /// </summary>
+        public void CalculateLevels()
+        {
+            foreach (Node root in GetRoots())
+            {
+                root.SetLevel(0);
+            }
+        }
     }
 }

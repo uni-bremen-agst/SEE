@@ -283,7 +283,10 @@ namespace SEE.Layout
             else
             {
                 // inner node
-                // inner nodes will be positoned and scaled, but only in x and z axes, not in y axis
+                // inner nodes will be positoned and scaled, primarily in x and z axes; 
+                // the inner nodes will be slightly lifted along the y axis according to their
+                // tree depth so that they can be stacked visually (level 0 is at the bottom)
+                position.y += depth * 0.01f;
                 layout_result[to_game_node[node]] 
                     = new NodeTransform(position, 
                                         new Vector3(2 * nodeInfos[node].outer_radius, circleHeight, 2 * nodeInfos[node].outer_radius));
