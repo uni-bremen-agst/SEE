@@ -75,23 +75,7 @@ namespace SEE.Layout
         {
             SetScaler(graph);
             graph.SortHierarchyByName();
-
-            if (settings.NodeLayout == GraphSettings.NodeLayouts.Manhattan
-                || settings.NodeLayout == GraphSettings.NodeLayouts.Treemap
-                || settings.NodeLayout == GraphSettings.NodeLayouts.Balloon
-                || settings.NodeLayout == GraphSettings.NodeLayouts.CirclePacking)
-            {
-                DrawCity(graph);
-            }
-            else
-            {
-                // These are the obsolete layouts. This code will be removed soon. FIXME
-                Dictionary<Node, GameObject> gameNodes = NodeLayout(graph, scaler);
-                if (settings.EdgeLayout != GraphSettings.EdgeLayouts.None)
-                {
-                    EdgeLayout(graph, gameNodes);
-                }
-            }
+            DrawCity(graph);
         }
 
         /// <summary>
@@ -119,7 +103,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
-        private void EdgeLayout(Graph graph, Dictionary<Node, GameObject> gameNodes)
+        private void EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
         {
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
@@ -133,11 +117,14 @@ namespace SEE.Layout
                 case GraphSettings.EdgeLayouts.Bundling:
                     layout = new BundledEdgeLayout(leaveNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
                     break;
+                case GraphSettings.EdgeLayouts.None:
+                    // nothing to be done
+                    return;
                 default:
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
             }
             Performance p = Performance.Begin(layout.Name + " layout of edges");
-            layout.DrawEdges(graph, gameNodes.Values.ToList());
+            layout.DrawEdges(graph, gameNodes);
             p.End();
         }
 
@@ -181,24 +168,26 @@ namespace SEE.Layout
             }
 
             Apply(layout);
-            AddDecorations(nodeMap);
-            if (settings.EdgeLayout != GraphSettings.EdgeLayouts.None)
-            {
-                EdgeLayout(graph, nodeMap);
-            }
-            BoundingBox(nodeMap.Values, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+            ICollection<GameObject> gameNodes = nodeMap.Values;
+            AddDecorations(gameNodes);
+            EdgeLayout(graph, gameNodes);           
+            BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             // Place the plane somewhat under ground level.
             PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
         }
 
-        private void AddDecorations(Dictionary<Node, GameObject> nodeMap)
+        /// <summary>
+        /// Draws the decorations of the given game nodes.
+        /// </summary>
+        /// <param name="gameNodes">game nodes to be decorated</param>
+        private void AddDecorations(ICollection<GameObject> gameNodes)
         {
             // Decorations must be applied after the blocks have been placed, so that
             // we also know their positions.
             if (settings.ShowErosions)
             {
                 ErosionIssues issueDecorator = new ErosionIssues(settings.IssueMap(), leaveNodeFactory, scaler);
-                issueDecorator.Add(LeafNodes(nodeMap.Values));
+                issueDecorator.Add(LeafNodes(gameNodes));
             }
             switch (settings.InnerNodeObjects)
             {
@@ -208,13 +197,13 @@ namespace SEE.Layout
                 case GraphSettings.InnerNodeKinds.Circles:
                     {
                         CircleDecorator decorator = new CircleDecorator(innerNodeFactory, Color.white);
-                        decorator.Add(InnerNodes(nodeMap.Values));
+                        decorator.Add(InnerNodes(gameNodes));
                     }
                     break;
                 case GraphSettings.InnerNodeKinds.Donuts:
                     {
                         DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric, settings.IssueMap().Keys.ToArray<string>());
-                        decorator.Add(InnerNodes(nodeMap.Values));
+                        decorator.Add(InnerNodes(gameNodes));
                     }
                     break;
                 case GraphSettings.InnerNodeKinds.Cylinders:
@@ -453,44 +442,6 @@ namespace SEE.Layout
                     }
                 }
             }
-        }
-
-        /// --------------------------------------------
-        /// Obsolete code follows here.
-        /// --------------------------------------------
-
-        /// <summary>
-        /// Applies the node layout.
-        /// 
-        /// This method is obsolete and will soon disappear.
-        /// </summary>
-        /// <param name="graph">graph whose nodes are to be laid out</param>
-        /// <param name="scaler">the scaler defining the lengths of the leaf nodes</param>
-        /// <returns>mapping of graph nodes onto their associated game objects</returns>
-        [Obsolete("This method is obsolete and will soon disappear.")]
-        private Dictionary<Node, GameObject> NodeLayout(Graph graph, IScale scaler)
-        {
-            INodeLayout layout;
-            switch (settings.NodeLayout)
-            {
-                case GraphSettings.NodeLayouts.CirclePackingObsolete:
-                    {
-                        layout = new CirclePackingLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
-                                                         settings.IssueMap(),
-                                                         settings.IssueMap().Keys.ToArray<string>(),
-                                                         leaveNodeFactory,
-                                                         scaler,
-                                                         settings.ShowErosions,
-                                                         true);
-                        break;
-                    }
-                default:
-                    throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
-            }
-            Performance p = Performance.Begin(layout.Name + " layout of nodes");
-            layout.Draw(graph);
-            p.End();
-            return layout.Nodes();
         }
     }
 }
