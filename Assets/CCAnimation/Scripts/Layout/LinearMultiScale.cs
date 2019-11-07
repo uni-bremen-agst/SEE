@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// TODO Flo: Doku
+/// TODO flo doc
 /// Provides x, y, z lengths of a node based on a linear interpolation
 /// of the node's metrics.
 /// </summary>

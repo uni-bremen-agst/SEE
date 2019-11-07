@@ -5,11 +5,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// TODO flo doc
+/// </summary>
 public class CCAObjectManager : AbstractCCAObjectManager
 {
+    /// <summary>
+    /// TODO flo doc
+    /// </summary>
     private GameObject _root;
+
+    /// <summary>
+    /// TODO flo doc
+    /// </summary>
     private readonly Dictionary<string, GameObject> nodes = new Dictionary<string, GameObject>();
 
+    /// <summary>
+    /// TODO flo doc
+    /// </summary>
     public CCAObjectManager() : base(new BuildingFactory())
     {
 
