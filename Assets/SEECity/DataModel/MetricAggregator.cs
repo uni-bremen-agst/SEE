@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SEE.DataModel
 {
@@ -48,13 +49,16 @@ namespace SEE.DataModel
         /// <param name="func">function to be used for the aggregation</param>
         private static void Aggregate(Graph graph, string[] metrics, Func<float, float, float> func)
         {
+            IList<Node> list = graph.GetRoots();
+
             foreach (string metric in metrics)
             {
-                foreach (Node root in graph.GetRoots())
+                foreach (Node root in list)
                 {
                     Aggregate(root, metric, func);
                 }
             }
+
         }
 
         private static void Aggregate(Node node, string metric, Func<float, float, float> func)
@@ -105,9 +109,10 @@ namespace SEE.DataModel
         /// <param name="graph">graph whose nodes are to be treated</param>
         /// <param name="metrics">the metrics to be accumulated for each node</param>
         /// <param name="newMetric">the name of the new metric to which the accumulated value is assigned</param>
-        public static void DeriveSum(Graph graph, string[] metrics, string newMetric)
+        /// <param name="Skip_Single_Root">if true, the metric value will be set to 0 for a single root node</param>
+        public static void DeriveSum(Graph graph, string[] metrics, string newMetric, bool Skip_Single_Root = false)
         {
-            Derive(graph, metrics, newMetric, Sum);
+            Derive(graph, metrics, newMetric, Sum, Skip_Single_Root);
         }
 
         /// <summary>
@@ -118,11 +123,17 @@ namespace SEE.DataModel
         /// <param name="metrics">the metrics to be accumulated for each node</param>
         /// <param name="newMetric">the name of the new metric to which the accumulated value is assigned</param>
         /// <param name="func">function used for the accumulation</param>
-        private static void Derive(Graph graph, string[] metrics, string newMetric, Func<float, float, float> func)
+        /// <param name="Skip_Single_Root">if true, the metric value will be set to 0 for a single root node</param>
+        private static void Derive(Graph graph, string[] metrics, string newMetric, Func<float, float, float> func, bool Skip_Single_Root)
         {
-            foreach (Node root in graph.GetRoots())
+            IList<Node> list = graph.GetRoots();
+            foreach (Node root in list)
             {
                 Derive(root, metrics, newMetric, func);
+                if (list.Count == 1 && Skip_Single_Root)
+                {
+                    root.SetFloat(newMetric, 0.0f);
+                }
             }
         }
 

@@ -203,7 +203,14 @@ namespace SEEEditor
                         {
                             string[] metrics = editorSettings.IssueMap().Keys.ToArray<string>();
                             MetricAggregator.AggregateSum(graph, metrics);
-                            MetricAggregator.DeriveSum(graph, metrics, editorSettings.InnerDonutMetric);
+                            // Note: We do not want to compute the derived metric editorSettings.InnerDonutMetric for
+                            // when we have a single root node in the graph. This metric will be used to define the color
+                            // of inner circles of Donut charts. Because the color is a linear interpolation of the whole
+                            // metric value range, the inner circle would always have the maximal value (it is the total
+                            // sum over all) and hence the maximal color gradient. The color of the other nodes would be
+                            // hardly distinguishable. 
+                            // FIXME: We need a better solution. This is a kind of hack.
+                            MetricAggregator.DeriveSum(graph, metrics, editorSettings.InnerDonutMetric, true);
                         }
                         GraphRenderer renderer = new GraphRenderer(editorSettings);
                         renderer.Draw(graph);
