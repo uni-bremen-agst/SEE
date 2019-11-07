@@ -133,7 +133,7 @@ namespace SEE.Layout
                 {
                     UnityEngine.Object prefab = null;
 #if UNITY_EDITOR
-                    UnityEditor.AssetDatabase.LoadAssetAtPath(filename, typeof(GameObject));
+                    prefab = UnityEditor.AssetDatabase.LoadAssetAtPath(filename, typeof(GameObject));
 #endif
                     if (prefab == null)
                     {

@@ -13,7 +13,7 @@ namespace SEE
             ingameMenu = GameObject.Find("IngameMenu");
             cameraScript = Camera.main.GetComponent<FlyCamera>();
 
-            ingameMenu.SetActive(false);
+            ingameMenu.SetActive(false); //TODO: singleplayer should also have menu
             cameraScript.isActive = true;
         }
 
