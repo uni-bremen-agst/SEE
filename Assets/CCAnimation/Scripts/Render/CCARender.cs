@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+/// <summary>
+/// TODO flo doc
+/// </summary>
 public class CCARender : AbstractCCARender
 {
     private readonly AbstractCCAAnimator SimpleAnim = new SimpleCCAAnimator();
@@ -124,6 +127,10 @@ public class CCARender : AbstractCCARender
 
     }
 
+    /// <summary>
+    /// TODO flo doc
+    /// </summary>
+    /// <param name="gameObject"></param>
     void OnRemovedNodeFinishedAnimation(object gameObject)
     {
         if (gameObject != null && gameObject.GetType() == typeof(GameObject) )

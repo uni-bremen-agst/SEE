@@ -11,6 +11,7 @@ public class SimpleCCAAnimator : AbstractCCAAnimator
 {
     protected override void AnimateToInternal(Node node, GameObject gameObject, Vector3 position, Vector3 scale)
     {
+        // TODO remove if things
         if (node.WasModified())
         {
             iTween.MoveTo(gameObject, iTween.Hash(
@@ -25,17 +26,6 @@ public class SimpleCCAAnimator : AbstractCCAAnimator
                 "amount", new Vector3(0, 10, 0),
                 "time", MaxAnimationTime / 2,
                 "delay", MaxAnimationTime / 2
-            ));
-        }
-        else if (node.WasRelocated(out string oldLinkageName))
-        {
-            iTween.MoveTo(gameObject, iTween.Hash(
-                "position", position,
-                "time", MaxAnimationTime
-            ));
-            iTween.ScaleTo(gameObject, iTween.Hash(
-                "scale", scale,
-                "time", MaxAnimationTime
             ));
         }
         else

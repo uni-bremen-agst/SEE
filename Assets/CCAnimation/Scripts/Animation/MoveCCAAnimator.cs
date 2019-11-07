@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using SEE.DataModel;
 using UnityEngine;
 
+/// <summary>
+/// TODO flo doc
+/// </summary>
 public class MoveCCAAnimator : AbstractCCAAnimator
 {
     protected override void AnimateToInternal(Node node, GameObject gameObject, Vector3 position, Vector3 scale)
