@@ -1,4 +1,5 @@
 ﻿using SEE.Layout;
+using System;
 using System.Collections.Generic;
 
 namespace SEE
@@ -13,9 +14,22 @@ namespace SEE
         /// </summary>        
         public string pathPrefix = null;
 
+        /// Clone graph with one directory and two files contained therein.
+        //public string gxlPath = "..\\Data\\GXL\\two_files.gxl";
+        //public string csvPath = "..\\Data\\GXL\\two_files.csv";
+
+        /// Clone graph with one directory and three files contained therein.
+        //public string gxlPath = "..\\Data\\GXL\\three_files.gxl";
+        //public string csvPath = "..\\Data\\GXL\\three_files.csv";
+
+        /// Very tiny clone graph with single root, one child as a leaf and 
+        /// two more children with two children each to experiment with.
+        //public string gxlPath = "..\\Data\\GXL\\micro_clones.gxl";
+        //public string csvPath = "..\\Data\\GXL\\micro_clones.csv";
+
         /// Tiny clone graph with single root to experiment with.
-        //public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
-        //public string csvPath = "..\\Data\\GXL\\minimal_erosions.csv";
+        public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
+        public string csvPath = "..\\Data\\GXL\\minimal_clones.csv";
 
         /// Tiny clone graph with single roots to check edge bundling.
         //public string gxlPath = "..\\Data\\GXL\\controlPoints.gxl";
@@ -26,8 +40,8 @@ namespace SEE
         //public string csvPath = "..\\Data\\GXL\\linux-clones\\fs.csv";
 
         // Smaller clone graph with single root (Linux directory "net").
-        public string gxlPath = "..\\Data\\GXL\\linux-clones\\net.gxl";
-        public string csvPath = "..\\Data\\GXL\\linux-clones\\net.csv";
+        //public string gxlPath = "..\\Data\\GXL\\linux-clones\\net.gxl";
+        //public string csvPath = "..\\Data\\GXL\\linux-clones\\net.csv";
 
         // Larger clone graph with single root (Linux directory "drivers"): 16.920 nodes, 10583 edges.
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\drivers.gxl";
@@ -108,22 +122,68 @@ namespace SEE
         public string StyleIssue = "Metric.Style";
         public string UniversalIssue = "Metric.Universal";
 
-        public enum Layouts
+        /// <summary>
+        /// How leaf graph nodes should be depicted.
+        /// </summary>
+        public enum LeafNodeKinds
         {
-            Balloon = 0,
-            Manhattan = 1,
-            CirclePacking = 2
+            Blocks,
+            Buildings,
         }
 
-        // The layout that should be used.
-        public Layouts Layout;
+        /// <summary>
+        /// How inner graph nodes should be depicted.
+        /// </summary>
+        public enum InnerNodeKinds
+        {
+            Donuts,
+            Circles,
+            Empty,
+            Cylinders,
+        
+        }
+
+        /// <summary>
+        /// What kinds of game objects are to be created for leaf nodes in the graph.
+        /// </summary>
+        public LeafNodeKinds LeafObjects;
+
+        /// <summary>
+        /// What kinds of game objects are to be created for inner graph nodes.
+        /// </summary>
+        public InnerNodeKinds InnerNodeObjects;
+
+        /// <summary>
+        /// The kinds of node layouts available.
+        /// </summary>
+        public enum NodeLayouts
+        {
+            Balloon,
+            CirclePacking,
+            Manhattan,
+            Treemap
+        }
+
+        /// <summary>
+        /// The kinds of edge layouts available.
+        /// </summary>
+        public enum EdgeLayouts
+        {
+            None = 0,        // no edges are to be drawn
+            Straight = 1,
+            Spline = 2,
+            Bundling = 3
+        }
+
+        // The layout that should be used for nodes.
+        public NodeLayouts NodeLayout;
+
+        // The layout that should be used for edges.
+        public EdgeLayouts EdgeLayout;
 
         // Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
         // for range [0, max-value] is used, where max-value is the maximum value of a metric.
         public bool ZScoreScale = true;
-
-        // Whether CScape building should be used to visualize graph nodes. If false, cubes are used.
-        public bool CScapeBuildings = true;
 
         // The width of edges.
         public float EdgeWidth = 0.3f;
@@ -131,17 +191,7 @@ namespace SEE
         /// <summary>
         /// Whether erosions should be visible above blocks.
         /// </summary>
-        public bool ShowErosions = true;
-
-        /// <summary>
-        /// Whether Donut charts should be visible for circles in the Ballon layout.
-        /// </summary>
-        public bool ShowDonuts = true;
-
-        /// <summary>
-        /// Whether edges should be shown.
-        /// </summary>
-        public bool ShowEdges = true;
+        public bool ShowErosions = false;
 
         /// <summary>
         /// Orientation of the edges; 
@@ -150,11 +200,10 @@ namespace SEE
         /// </summary>
         public bool EdgesAboveBlocks = true;
 
-        public string[] InnerNodeMetrics = new string[] { "Metric.Quality",
-                                                          "Metric.McCabe_Complexity.sum",
-                                                          "Metric.Number_Of_Statements.sum",
-                                                          "Metric.Lines.Comment.sum",
-                                                          "Metric.Lines.LOC.sum" };
+        /// <summary>
+        /// The metric to be put in the inner circle of a Donut chart.
+        /// </summary>
+        public string InnerDonutMetric = "Metric.IssuesTotal";
 
         /// <summary>
         /// Yields a mapping of all node attribute names that define erosion issues in the GXL file

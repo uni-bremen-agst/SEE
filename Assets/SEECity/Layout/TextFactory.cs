@@ -29,7 +29,7 @@ namespace SEE.Layout
 
             TextMeshPro tm = result.AddComponent<TextMeshPro>();
             tm.text = text;
-            tm.color = Color.black;
+            tm.color = Color.white;
             tm.alignment = TextAlignmentOptions.Center;
             
             RectTransform rect = tm.GetComponent<RectTransform>();

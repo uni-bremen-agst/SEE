@@ -43,6 +43,51 @@ namespace SEE.DataModel
         [SerializeField]
         private Node parent;
 
+        // level of a node in the hierarchy
+        private int level = 0;
+
+        /// <summary>
+        /// The level of a node in the hierarchy. The level of a root node is 0.
+        /// For all other nodes, the level is the level of its parent + 1.
+        /// </summary>
+        public int Level
+        {
+            get => level;
+        }
+
+        /// <summary>
+        /// Sets the level of the node as specified by the parameter and sets
+        /// the respective level values of each of its (transitive) descendants. 
+        /// </summary>
+        internal void SetLevel(int level)
+        {
+            this.level = level;
+            foreach (Node child in children)
+            {
+                child.SetLevel(level + 1);
+            }
+        }
+
+        /// <summary>
+        /// Returns the maximal depth of the tree rooted by this node, that is,
+        /// the longest path to any of its leaves.
+        /// </summary>
+        /// <returns>maximal depth of the tree rooted by this node</returns>
+        internal int Depth()
+        {
+            int maxDepth = 0;
+
+            foreach (Node child in children)
+            {
+                int depth = child.Depth();
+                if (depth > maxDepth)
+                {
+                    maxDepth = depth;
+                }
+            }
+            return maxDepth + 1;
+        }
+
         /// <summary>
         /// The ancestor of the node in the hierarchy. May be null if the node
         /// is a root.
@@ -52,6 +97,15 @@ namespace SEE.DataModel
         {
             get => parent;
             set => parent = value;
+        }
+
+        /// <summary>
+        /// True iff node has no parent.
+        /// </summary>
+        /// <returns>true iff node is a root node</returns>
+        public bool IsRoot()
+        {
+            return parent == null;
         }
 
         public override string ToString()
