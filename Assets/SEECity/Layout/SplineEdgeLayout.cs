@@ -4,13 +4,17 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
+    /// <summary>
+    /// Draws edges as splines with three control points between either the roof or ground of
+    /// game objects.
+    /// </summary>
     public class SplineEdgeLayout : IEdgeLayout
     {
         public SplineEdgeLayout(NodeFactory blockFactory, float edgeWidth, bool edgesAboveBlocks) : base(blockFactory, edgeWidth, edgesAboveBlocks)
         {
         }
 
-        public override void DrawEdges(Graph graph, IList<GameObject> nodes)
+        public override void DrawEdges(Graph graph, ICollection<GameObject> nodes)
         {
             SetGameNodes(nodes);
             float maxBlockHeight = GetMaxBlockHeight(nodes);

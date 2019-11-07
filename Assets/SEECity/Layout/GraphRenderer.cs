@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel;
-using SEEC.Layout;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -34,6 +33,10 @@ namespace SEE.Layout
             }
             switch (this.settings.InnerNodeObjects)
             {
+                case GraphSettings.InnerNodeKinds.Empty:
+                case GraphSettings.InnerNodeKinds.Donuts:
+                    innerNodeFactory = new VanillaFactory();
+                    break;
                 case GraphSettings.InnerNodeKinds.Circles:
                     innerNodeFactory = new CircleFactory();
                     break;
@@ -72,23 +75,7 @@ namespace SEE.Layout
         {
             SetScaler(graph);
             graph.SortHierarchyByName();
-
-            if (settings.NodeLayout == GraphSettings.NodeLayouts.Manhattan
-                || settings.NodeLayout == GraphSettings.NodeLayouts.Treemap
-                || settings.NodeLayout == GraphSettings.NodeLayouts.Balloon
-                || settings.NodeLayout == GraphSettings.NodeLayouts.CirclePacking)
-            {
-                DrawCity(graph);
-            }
-            else
-            {
-                // These are the obsolete layouts. This code will be removed soon. FIXME
-                Dictionary<Node, GameObject> gameNodes = NodeLayout(graph, scaler);
-                if (settings.EdgeLayout != GraphSettings.EdgeLayouts.None)
-                {
-                    EdgeLayout(graph, gameNodes);
-                }
-            }
+            DrawCity(graph);
         }
 
         /// <summary>
@@ -99,6 +86,8 @@ namespace SEE.Layout
         {
             List<string> nodeMetrics = new List<string>() { settings.WidthMetric, settings.HeightMetric, settings.DepthMetric };
             nodeMetrics.AddRange(settings.IssueMap().Keys);
+            nodeMetrics.Add(settings.InnerDonutMetric);
+
             if (settings.ZScoreScale)
             {
                 scaler = new ZScoreScale(graph, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
@@ -114,7 +103,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
-        private void EdgeLayout(Graph graph, Dictionary<Node, GameObject> gameNodes)
+        private void EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
         {
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
@@ -128,11 +117,14 @@ namespace SEE.Layout
                 case GraphSettings.EdgeLayouts.Bundling:
                     layout = new BundledEdgeLayout(leaveNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
                     break;
+                case GraphSettings.EdgeLayouts.None:
+                    // nothing to be done
+                    return;
                 default:
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
             }
             Performance p = Performance.Begin(layout.Name + " layout of edges");
-            layout.DrawEdges(graph, gameNodes.Values.ToList());
+            layout.DrawEdges(graph, gameNodes);
             p.End();
         }
 
@@ -147,7 +139,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="graph">graph whose nodes and edges are to be laid out</param>
         protected void DrawCity(Graph graph)
-        {            
+        {
             Dictionary<Node, GameObject> nodeMap;
             Dictionary<GameObject, NodeTransform> layout;
             List<Node> nodes = graph.Nodes();
@@ -174,21 +166,103 @@ namespace SEE.Layout
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }
-            
+
             Apply(layout);
+            ICollection<GameObject> gameNodes = nodeMap.Values;
+            AddDecorations(gameNodes);
+            EdgeLayout(graph, gameNodes);           
+            BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+            // Place the plane somewhat under ground level.
+            PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
+        }
+
+        /// <summary>
+        /// Draws the decorations of the given game nodes.
+        /// </summary>
+        /// <param name="gameNodes">game nodes to be decorated</param>
+        private void AddDecorations(ICollection<GameObject> gameNodes)
+        {
             // Decorations must be applied after the blocks have been placed, so that
             // we also know their positions.
             if (settings.ShowErosions)
             {
-                AddErosionIssues(nodeMap.Values);
+                ErosionIssues issueDecorator = new ErosionIssues(settings.IssueMap(), leaveNodeFactory, scaler);
+                issueDecorator.Add(LeafNodes(gameNodes));
             }
-            if (settings.EdgeLayout != GraphSettings.EdgeLayouts.None)
+
+            if (settings.NodeLayout == GraphSettings.NodeLayouts.Balloon)
             {
-                EdgeLayout(graph, nodeMap);
+                AddLabels(InnerNodes(gameNodes));
             }
-            BoundingBox(nodeMap.Values, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-            // Place the plane somewhat under ground level.
-            PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
+            switch (settings.InnerNodeObjects)
+            {
+                case GraphSettings.InnerNodeKinds.Empty:
+                    // do nothing
+                    break;
+                case GraphSettings.InnerNodeKinds.Circles:
+                    {
+                        CircleDecorator decorator = new CircleDecorator(innerNodeFactory, Color.white);
+                        decorator.Add(InnerNodes(gameNodes));
+                    }
+                    break;
+                case GraphSettings.InnerNodeKinds.Donuts:
+                    {
+                        DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric, settings.IssueMap().Keys.ToArray<string>());
+                        decorator.Add(InnerNodes(gameNodes));
+                    }
+                    break;
+                case GraphSettings.InnerNodeKinds.Cylinders:
+                    // TODO
+                    break;
+                default:
+                    throw new Exception("Unhandled GraphSettings.InnerNodeKinds " + settings.InnerNodeObjects);
+            }
+        }
+
+        /// <summary>
+        /// Adds the source name as a label to the center of the given game nodes.
+        /// </summary>
+        /// <param name="gameNodes">game nodes whose source name is to be added</param>
+        private void AddLabels(ICollection<GameObject> gameNodes)
+        {
+            foreach (GameObject node in gameNodes)
+            {
+                Vector3 size = innerNodeFactory.GetSize(node);
+                float length = Mathf.Min(size.x, size.z);
+                // The text may occupy up to 30% of the length.
+                GameObject text = TextFactory.GetText(node.GetComponent<NodeRef>().node.SourceName, 
+                                                      node.transform.position, length * 0.3f);
+            }
+        }
+
+        /// <summary>
+        /// Returns only the inner nodes in gameNodes as a list.
+        /// </summary>
+        /// <param name="gameNodes"></param>
+        /// <returns>the inner nodes in gameNodes as a list</returns>
+        private ICollection<GameObject> InnerNodes(ICollection<GameObject> gameNodes)
+        {
+            return gameNodes.Where(o => ! IsLeaf(o)).ToList();
+        }
+
+        /// <summary>
+        /// Returns only the leaf nodes in gameNodes as a list.
+        /// </summary>
+        /// <param name="gameNodes"></param>
+        /// <returns>the leaf nodes in gameNodes as a list</returns>
+        private ICollection<GameObject> LeafNodes(ICollection<GameObject> gameNodes)
+        {
+            return gameNodes.Where(o => IsLeaf(o)).ToList();
+        }
+
+        /// <summary>
+        /// True iff gameNode is a leaf in the graph.
+        /// </summary>
+        /// <param name="gameNode">game node to be checked</param>
+        /// <returns>true iff gameNode is a leaf in the graph</returns>
+        private static bool IsLeaf(GameObject gameNode)
+        {
+            return gameNode.GetComponent<NodeRef>().node.IsLeaf();
         }
 
         /// <summary>
@@ -207,18 +281,28 @@ namespace SEE.Layout
                 {
                     // Leaf nodes were created as blocks by leaveNodeFactory.
                     // Leaf nodes have their size set before the layout is computed. We will
-                    // not change their size.
+                    // not change their size unless a layout requires that.
                     leaveNodeFactory.SetGroundPosition(gameNode, transform.position);
+                    if (settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
+                    {
+                        // Treemaps adjust the size of the object's ground area according to
+                        // the total space we allow it to use. The x length was initially
+                        // mapped onto the area of the ground. The treemap layout yields
+                        // an x and z co-ordinate that defines this area, which we use
+                        // here to set the width and depth of the game node.
+                        // The height (y axis) is not modified by the treemap layout and,
+                        // hence, does not need any adustment.
+                        leaveNodeFactory.SetWidth(gameNode, transform.scale.x);
+                        leaveNodeFactory.SetDepth(gameNode, transform.scale.z);
+                    }
                 }
                 else
                 {
                     // Inner nodes were not created by blockFactory.
                     innerNodeFactory.SetSize(gameNode, transform.scale);
                     innerNodeFactory.SetGroundPosition(gameNode, transform.position);
-                    // Set line widths in relation to the radius of the object.
-                    Vector3 extent = innerNodeFactory.GetSize(gameNode) / 2.0f;
-                    float radius = Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);
-                    innerNodeFactory.SetLineWidth(gameNode, radius / 100.0f);
+                    // Inner nodes will be drawn later when we add decorations because
+                    // they can be drawn as a single circle line or a Donut chart.
                 }
             }
         }
@@ -263,12 +347,23 @@ namespace SEE.Layout
 
                     AttachNode(block, node);
                     // Scaled metric values for the dimensions.
-                    Vector3 scale = new Vector3(scaler.GetNormalizedValue(node, settings.WidthMetric),
-                                                scaler.GetNormalizedValue(node, settings.HeightMetric),
-                                                scaler.GetNormalizedValue(node, settings.DepthMetric));
+                    Vector3 scale = new Vector3(scaler.GetNormalizedValue(settings.WidthMetric, node),
+                                                scaler.GetNormalizedValue(settings.HeightMetric, node),
+                                                scaler.GetNormalizedValue(settings.DepthMetric, node));
 
                     // Scale according to the metrics.
-                    leaveNodeFactory.SetSize(block, scale);
+                    if (settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
+                    {
+                        // In case of treemaps, the width metric is mapped on the ground area.
+                        float widthOfSquare = Mathf.Sqrt(scale.x);
+                        leaveNodeFactory.SetWidth(block, widthOfSquare);
+                        leaveNodeFactory.SetDepth(block, widthOfSquare);
+                        leaveNodeFactory.SetHeight(block, scale.y);
+                    }
+                    else
+                    {
+                        leaveNodeFactory.SetSize(block, scale);
+                    }
 
                     result[node] = block;
                 }
@@ -307,95 +402,6 @@ namespace SEE.Layout
             innerGameObject.tag = Tags.Node;
             AttachNode(innerGameObject, node);
             return innerGameObject;
-        }
-
-        /// <summary>
-        /// Creates sprites for software-erosion indicators for all given game nodes.
-        /// </summary>
-        /// <param name="gameNodes">list of game nodes for which to create erosion visualizations</param>
-        protected void AddErosionIssues(ICollection<GameObject> gameNodes)
-        {
-            foreach (GameObject block in gameNodes)
-            {
-                AddErosionIssues(block);
-            }
-        }
-
-        /// <summary>
-        /// Stacks sprites for software-erosion issues atop of the roof of the given node
-        /// in ascending order in terms of the sprite width. The sprite width is proportional
-        /// to the normalized metric value for the erosion issue.
-        /// </summary>
-        /// <param name="node"></param>
-        protected void AddErosionIssues(GameObject gameNode)
-        {
-            Node node = gameNode.GetComponent<NodeRef>().node;
-
-            // The list of sprites for the erosion issues.
-            List<GameObject> sprites = new List<GameObject>();
-
-            // Create and scale the sprites and add them to the list of sprites.
-            foreach (KeyValuePair<string, IconFactory.Erosion> issue in settings.IssueMap())
-            {
-                if (node.TryGetNumeric(issue.Key, out float value))
-                {
-                    if (value > 0.0f)
-                    {
-                        GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
-                        sprite.name = sprite.name + " " + node.SourceName;
-
-                        Vector3 spriteSize = GetSizeOfSprite(sprite);
-                        // Scale the sprite to one Unity unit.
-                        float spriteScale = 1.0f / spriteSize.x;
-                        // Scale the erosion issue by normalization.
-                        float metricScale = scaler.GetNormalizedValue(node, issue.Key);
-                        // First: scale its width to unit size 1.0 maintaining the aspect ratio
-                        sprite.transform.localScale *= spriteScale * leaveNodeFactory.Unit();
-                        // Now scale it by the normalized metric.
-                        sprite.transform.localScale *= metricScale;
-                        sprite.transform.position = leaveNodeFactory.Roof(gameNode);
-                        sprites.Add(sprite);
-                    }
-                }
-            }
-
-            // Now we stack the sprites on top of the roof of the building in
-            // ascending order of their widths.
-            {
-                // The space that we put in between two subsequent erosion issue sprites.
-                Vector3 delta = Vector3.up / 100.0f;
-                Vector3 currentRoof = leaveNodeFactory.Roof(gameNode);
-                sprites.Sort(Comparer<GameObject>.Create((left, right) => GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
-                foreach (GameObject sprite in sprites)
-                {
-                    Vector3 size = GetSizeOfSprite(sprite);
-                    // Note: Consider that the position of the sprite is its center.
-                    Vector3 halfHeight = (size.y / 2.0f) * Vector3.up;
-                    sprite.transform.position = currentRoof + delta + halfHeight;
-                    currentRoof = sprite.transform.position + halfHeight;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Returns the size of the sprite for given game node that was drawn for 
-        /// a software-erosion indicator above the roof of the node.
-        /// </summary>
-        /// <param name="gameNode"></param>
-        /// <returns>size of the sprite</returns>
-        protected static Vector3 GetSizeOfSprite(GameObject gameNode)
-        {
-            // The game object representing an erosion is a composite of 
-            // multiple LOD child objects to be drawn depending how close
-            // the camera is. The container object 'go' itself does not
-            // have a renderer. We need to obtain the renderer of the
-            // first child hat represents the object at LOD 0 instead.
-            Renderer renderer = gameNode.GetComponentInChildren<Renderer>();
-            // Note: renderer.sprite.bounds.size yields the original size
-            // of the sprite of the prefab. It does not consider the scaling.
-            // It depends only upon the imported graphic. That is why we
-            // need to use renderer.bounds.size.
-            return renderer.bounds.size;
         }
 
         /// <summary>
@@ -457,55 +463,6 @@ namespace SEE.Layout
                     }
                 }
             }
-        }
-
-        /// --------------------------------------------
-        /// Obsolete code follows here.
-        /// --------------------------------------------
-
-        /// <summary>
-        /// Applies the node layout.
-        /// 
-        /// This method is obsolete and will soon disappear.
-        /// </summary>
-        /// <param name="graph">graph whose nodes are to be laid out</param>
-        /// <param name="scaler">the scaler defining the lengths of the leaf nodes</param>
-        /// <returns>mapping of graph nodes onto their associated game objects</returns>
-        [Obsolete("This method is obsolete and will soon disappear.")]
-        private Dictionary<Node, GameObject> NodeLayout(Graph graph, IScale scaler)
-        {
-            INodeLayout layout;
-            switch (settings.NodeLayout)
-            {
-                case GraphSettings.NodeLayouts.BalloonObsolete:
-                    {
-                        layout = new BalloonLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
-                                                   settings.IssueMap(),
-                                                   settings.InnerNodeMetrics,
-                                                   leaveNodeFactory,
-                                                   scaler,
-                                                   settings.ShowErosions,
-                                                   settings.ShowDonuts);
-                        break;
-                    }
-                case GraphSettings.NodeLayouts.CirclePackingObsolete:
-                    {
-                        layout = new CirclePackingLayout(settings.WidthMetric, settings.HeightMetric, settings.DepthMetric,
-                                                         settings.IssueMap(),
-                                                         settings.InnerNodeMetrics,
-                                                         leaveNodeFactory,
-                                                         scaler,
-                                                         settings.ShowErosions,
-                                                         settings.ShowDonuts);
-                        break;
-                    }
-                default:
-                    throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
-            }
-            Performance p = Performance.Begin(layout.Name + " layout of nodes");
-            layout.Draw(graph);
-            p.End();
-            return layout.Nodes();
         }
     }
 }

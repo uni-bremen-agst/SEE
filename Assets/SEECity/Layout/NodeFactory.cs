@@ -59,6 +59,36 @@ namespace SEE.Layout
         }
 
         /// <summary>
+        /// Sets the width of the object (x axis) to the given value.
+        /// </summary>
+        /// <param name="block">block to be adjusted</param>
+        /// <param name="value">new value for width</param>
+        public virtual void SetWidth(GameObject block, float value)
+        {
+            block.transform.localScale = new Vector3(value, block.transform.localScale.y, block.transform.localScale.z);
+        }
+
+        /// <summary>
+        /// Sets the height of the object (y axis) to the given value.
+        /// </summary>
+        /// <param name="block">block to be adjusted</param>
+        /// <param name="value">new value for height</param>
+        public virtual void SetHeight(GameObject block, float value)
+        {
+            block.transform.localScale = new Vector3(block.transform.localScale.x, value, block.transform.localScale.z);
+        }
+
+        /// <summary>
+        /// Sets the depth of the object (y axis) to the given value.
+        /// </summary>
+        /// <param name="block">block to be adjusted</param>
+        /// <param name="value">new value for depth</param>
+        public virtual void SetDepth(GameObject block, float value)
+        {
+            block.transform.localScale = new Vector3(block.transform.localScale.x, block.transform.localScale.y, value);
+        }
+
+        /// <summary>
         /// Sets the position of the current block. The given position is
         /// interpreted as the center (x,z) of the block on the ground (y).
         /// </summary>

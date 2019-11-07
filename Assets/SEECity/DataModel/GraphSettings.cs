@@ -1,4 +1,5 @@
 ﻿using SEE.Layout;
+using System;
 using System.Collections.Generic;
 
 namespace SEE
@@ -121,16 +122,25 @@ namespace SEE
         public string StyleIssue = "Metric.Style";
         public string UniversalIssue = "Metric.Universal";
 
+        /// <summary>
+        /// How leaf graph nodes should be depicted.
+        /// </summary>
         public enum LeafNodeKinds
         {
             Blocks,
             Buildings,
         }
 
+        /// <summary>
+        /// How inner graph nodes should be depicted.
+        /// </summary>
         public enum InnerNodeKinds
         {
+            Donuts,
             Circles,
-            Cylinders
+            Empty,
+            Cylinders,
+        
         }
 
         /// <summary>
@@ -143,19 +153,23 @@ namespace SEE
         /// </summary>
         public InnerNodeKinds InnerNodeObjects;
 
+        /// <summary>
+        /// The kinds of node layouts available.
+        /// </summary>
         public enum NodeLayouts
         {
-            CirclePacking = 0,
-            Manhattan = 1,
-            Treemap = 2,
-            Balloon = 3,
-            CirclePackingObsolete = 4, // FIXME: Remove later
-            BalloonObsolete = 5        // FIXME: Remove later
+            Balloon,
+            CirclePacking,
+            Manhattan,
+            Treemap
         }
 
+        /// <summary>
+        /// The kinds of edge layouts available.
+        /// </summary>
         public enum EdgeLayouts
         {
-            None = 0,
+            None = 0,        // no edges are to be drawn
             Straight = 1,
             Spline = 2,
             Bundling = 3
@@ -180,22 +194,16 @@ namespace SEE
         public bool ShowErosions = false;
 
         /// <summary>
-        /// Whether Donut charts should be visible for circles in the Ballon layout.
-        /// </summary>
-        public bool ShowDonuts = false;
-
-        /// <summary>
         /// Orientation of the edges; 
         /// if false, the edges are drawn below the houses;
         /// if true, the edges are drawn above the houses;
         /// </summary>
         public bool EdgesAboveBlocks = true;
 
-        public string[] InnerNodeMetrics = new string[] { "Metric.Quality",
-                                                          "Metric.McCabe_Complexity.sum",
-                                                          "Metric.Number_Of_Statements.sum",
-                                                          "Metric.Lines.Comment.sum",
-                                                          "Metric.Lines.LOC.sum" };
+        /// <summary>
+        /// The metric to be put in the inner circle of a Donut chart.
+        /// </summary>
+        public string InnerDonutMetric = "Metric.IssuesTotal";
 
         /// <summary>
         /// Yields a mapping of all node attribute names that define erosion issues in the GXL file

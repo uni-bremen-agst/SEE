@@ -17,6 +17,7 @@ namespace SEE.Layout
         /// Precondition: 1 <= metrics.Length <= 13; otherwise an exception will be raised.
         /// </summary>
         /// <param name="metrics">the names of the metrics to be visualized</param>
+        [Obsolete("DonutFactory(string[] metrics) is deprecated, please use DonutFactory(string innerMetric, string[] metrics) instead.")]
         public DonutFactory(string[] metrics)
         {
             if (metrics.Length == 0)
@@ -25,14 +26,37 @@ namespace SEE.Layout
             }
             // the number of metrics to be put onto the Donut circle sectors.
             int numberOfDonutMetrics = metrics.Length - 1;
-            if (numberOfDonutMetrics > c.Length)
+            if (numberOfDonutMetrics > colorPalette.Length)
             {
-                throw new System.Exception("[DonutFactory] number of metrics must not exceed " + (c.Length + 1) + ".");
+                throw new System.Exception("[DonutFactory] number of metrics must not exceed " + (colorPalette.Length + 1) + ".");
             }
             this.materials = GetMaterials(numberOfDonutMetrics);
             innerMetric = metrics[0];
             this.metrics = new string[numberOfDonutMetrics];
             Array.Copy(metrics, 1, this.metrics, 0, numberOfDonutMetrics);
+        }
+
+        /// <summary>
+        /// Constructor of DonutFactory specifying the names of the metrics to be visualized.
+        /// Metric <paramref name="innerMetric"/> will be used for the inner
+        /// circle (values for it must be in the range [0,1]. All remaining 
+        /// <paramref name="metrics"/> will be put on outer Donut circle sectors.
+        /// 
+        /// Precondition: metrics.Length <= 12; otherwise an exception will be raised.
+        /// </summary>
+        /// <param name="innerMetric">the name of the metric for the inner circle</param>
+        /// <param name="metrics">the names of the metrics to be visualized on the outer circle segments</param>
+        public DonutFactory(string innerMetric, string[] metrics)
+        {
+            // the number of metrics to be put onto the Donut circle sectors.
+            int numberOfDonutMetrics = metrics.Length;
+            if (numberOfDonutMetrics > colorPalette.Length)
+            {
+                throw new System.Exception("[DonutFactory] number of metrics must not exceed " + (colorPalette.Length + 1) + ".");
+            }
+            this.materials = GetMaterials(numberOfDonutMetrics);
+            this.innerMetric = innerMetric;
+            this.metrics = metrics;
         }
 
         /// <summary>
@@ -70,18 +94,18 @@ namespace SEE.Layout
             switch(howMany)
             {
                 case 0: return NewMaterials();
-                case 1: return NewMaterials(c[0]);
-                case 2: return NewMaterials(c[0], c[11]);
-                case 3: return NewMaterials(c[0], c[5], c[11]);
-                case 4: return NewMaterials(c[0], c[3], c[6], c[11]);
-                case 5: return NewMaterials(c[0], c[3], c[5], c[8], c[11]);
-                case 6: return NewMaterials(c[0], c[2], c[4], c[6], c[8], c[11]);
-                case 7: return NewMaterials(c[0], c[2], c[4], c[6], c[8], c[10], c[11]);
-                case 8: return NewMaterials(c[0], c[2], c[4], c[6], c[8], c[9], c[10], c[11]);
-                case 9: return NewMaterials(c[0], c[2], c[3], c[4], c[6], c[8], c[9], c[10], c[11]);
-                case 10: return NewMaterials(c[0], c[1], c[2], c[3], c[4], c[6], c[8], c[9], c[10], c[11]);
-                case 11: return NewMaterials(c[0], c[1], c[2], c[3], c[4], c[6], c[7], c[8], c[9], c[10], c[11]);
-                case 12: return NewMaterials(c);
+                case 1: return NewMaterials(colorPalette[0]);
+                case 2: return NewMaterials(colorPalette[0], colorPalette[11]);
+                case 3: return NewMaterials(colorPalette[0], colorPalette[5], colorPalette[11]);
+                case 4: return NewMaterials(colorPalette[0], colorPalette[3], colorPalette[6], colorPalette[11]);
+                case 5: return NewMaterials(colorPalette[0], colorPalette[3], colorPalette[5], colorPalette[8], colorPalette[11]);
+                case 6: return NewMaterials(colorPalette[0], colorPalette[2], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[11]);
+                case 7: return NewMaterials(colorPalette[0], colorPalette[2], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[10], colorPalette[11]);
+                case 8: return NewMaterials(colorPalette[0], colorPalette[2], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]);
+                case 9: return NewMaterials(colorPalette[0], colorPalette[2], colorPalette[3], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]);
+                case 10: return NewMaterials(colorPalette[0], colorPalette[1], colorPalette[2], colorPalette[3], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]);
+                case 11: return NewMaterials(colorPalette[0], colorPalette[1], colorPalette[2], colorPalette[3], colorPalette[4], colorPalette[6], colorPalette[7], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]);
+                case 12: return NewMaterials(colorPalette);
                 default: return null; // cannot happen
             }
         }
@@ -118,7 +142,7 @@ namespace SEE.Layout
         }
 
         // viridis color palette from which we choose the colors of the materials
-        private readonly Color[] c = GetPalette();
+        private readonly Color[] colorPalette = GetPalette();
 
         /// <summary>
         /// Returns the viridis palette, which offers a wide perceptual range in brightness in blue-yellow
@@ -195,17 +219,21 @@ namespace SEE.Layout
         /// <param name="radius">radius of the circle</param>
         /// <param name="innerValue">the value to be put onto the inner circle</param>
         /// <param name="values">the values to be put onto the outer donut circle sectors</param>
+        /// <param name="fractionOfInnerCircle">defines the fraction of the radius of the inner circle w.r.t. radius</param>
         /// <returns>composite game object containing the inner circle and the outer
         /// circle sectors as children</returns>
         public GameObject DonutChart(Vector3 center,
                                      float radius,
                                      float innerValue,
-                                     float[] values)
+                                     float[] values,
+                                     float fractionOfInnerCircle = 0.95f)
         {
             GameObject donutChart = new GameObject();
             donutChart.transform.position = center;
             donutChart.tag = Tags.Decoration;
-            DonutChart(donutChart, radius, innerValue, values);
+            donutChart.isStatic = true;
+            donutChart.transform.localScale = new Vector3(2.0f * radius, 0.1f, 2.0f * radius);
+            AttachDonutChart(donutChart, innerValue, values, fractionOfInnerCircle);
             return donutChart;
         }
 
@@ -227,33 +255,39 @@ namespace SEE.Layout
         /// <param name="radius">radius of the circle</param>
         /// <param name="innerValue">the value to be put onto the inner circle</param>
         /// <param name="values">the values to be put onto the outer donut circle sectors</param>
+        /// <param name="fractionOfInnerCircle">defines the fraction of the radius of the inner circle w.r.t. radius</param>
         /// <returns>composite game object containing the inner circle and the outer
         /// circle sectors as children</returns>
-        public void DonutChart(GameObject donutChart,
-                               float radius,
-                               float innerValue,
-                               float[] values,
-                               float innerScale = 0.75f)
+        public void AttachDonutChart(GameObject donutChart,
+                                     float innerValue,
+                                     float[] values,
+                                     float fractionOfInnerCircle = 0.95f)
         {
             if (values.Length != materials.Length)
             {
-                throw new System.Exception("[DonutChart] expected " + materials.Length + " values; "
+                throw new Exception("[DonutChart] expected " + materials.Length + " values; "
                                            + " received " + values.Length + " values.");
             }
             if (innerValue < 0.0f || innerValue > 1.0f)
             {
-                throw new System.Exception("[DonutChart] value for inner circle must be in the range [0, 1].");
+                throw new Exception("[DonutChart] value for inner circle must be in the range [0, 1].");
             }
-            if (innerScale < 0.0f || innerScale > 1.0f)
+            if (fractionOfInnerCircle < 0.0f || fractionOfInnerCircle > 1.0f)
             {
-                throw new System.Exception("[DonutChart] value for inner scale must be in the range [0, 1].");
+                throw new Exception("[DonutChart] value for fraction of inner circle must be in the range [0, 1].");
             }
 
-            donutChart.isStatic = true;     
-            donutChart.transform.localScale = new Vector3(2.0f * radius, 0.05f, 2.0f * radius);
+            // The circle segments are actually pies. The inner circle is drawn above them, so that they
+            // appear as circle segments. The inner circle needs to cover them partly.
+            CreateCircleSegments(donutChart, values);
+            CreateInnerCircle(donutChart, innerValue, fractionOfInnerCircle);
+        }
 
+        private void CreateCircleSegments(GameObject donutChart, float[] values)
+        {
             if (metrics.Length > 0)
             {
+                // total sum of values; required to select the circle segments proportionally
                 float sum = 0.0f;
                 foreach (float value in values)
                 {
@@ -265,116 +299,133 @@ namespace SEE.Layout
                 }
                 if (sum > 0)
                 {
+                    // Create and add the circle segments to donutChart
+                    float previousRadian = 0.0f;
+                    int i = 0;
+                    foreach (float value in values)
                     {
-                        float previousRadian = 0.0f;
-                        int i = 0;
-                        foreach (float value in values)
-                        {
-                            float newRadian = (value / sum) * 2.0f * Mathf.PI + previousRadian;
-                            GameObject child = CreateCircleSector(donutChart.transform.position, radius, previousRadian, newRadian, materials[i]);
-                            child.name = metrics[i] + " = " + value;
-                            child.tag = Tags.Decoration;
-                            child.transform.parent = donutChart.transform;
-                            previousRadian = newRadian;
-                            i++;
-                        }
+                        float newRadian = (value / sum) * 2.0f * Mathf.PI + previousRadian;
+                        GameObject child = CreateCircleSector(Vector3.zero, 0.5f, previousRadian, newRadian, materials[i]);
+                        //GameObject child = CreateCircleSector(donutChart.transform.position, radius, previousRadian, newRadian, materials[i]);
+                        child.name = metrics[i] + " = " + value;
+                        child.tag = Tags.Decoration;
+                        child.transform.parent = donutChart.transform;
+                        // circle segments are put at the bottom of its parent
+                        child.transform.localPosition = new Vector3(0.0f, -0.49f, 0.0f);
+                        child.transform.localScale = Vector3.one; //new Vector3(1.0f, 0.01f, 1.0f);
+                        previousRadian = newRadian;
+                        i++;
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Creates and adds inner circle to donutChart as a child.
+        /// </summary>
+        /// <param name="donutChart">the Donut chart parent object</param>
+        /// <param name="innerValue">the metric value to be represented by the inner circle</param>
+        /// <param name="fractionOfInnerCircle">the fraction the inner circle should relative to the size of the donutChart</param>
+        private void CreateInnerCircle(GameObject donutChart, float innerValue, float fractionOfInnerCircle)
+        {
+            GameObject innerCircle = new GameObject
             {
-                // Add inner circle.
-                //GameObject innerCircle = GameObject.CreatePrimitive(PrimitiveType.Cylinder);//~64 segments
-                GameObject innerCircle = new GameObject("Cylinder");
-                innerCircle.AddComponent<MeshFilter>();
-                innerCircle.AddComponent<MeshRenderer>();
+                name = innerMetric + " = " + innerValue,
+                tag = Tags.Decoration,
+                isStatic = true
+            };
 
+            innerCircle.AddComponent<MeshFilter>();
+            innerCircle.AddComponent<MeshRenderer>();
+
+            {
+                // TODO create only once
+                const int segments = 64;
+                const int vertexCount = 2 * segments + 2;
+                const int circleTriangleCount = segments;
+                const int sidesTriangleCount = 2 * segments;
+                const int triangleCount = 2 * circleTriangleCount + sidesTriangleCount;
+                const int indicesCount = 3 * triangleCount;
+
+                Vector3[] vertices = new Vector3[vertexCount];
+                Vector2[] uv = new Vector2[vertexCount];
+                int[] triangles = new int[indicesCount];
+
+                // vertices
+                const float y = 0.5f;
+                vertices[0] = new Vector3(0.0f, -y, 0.0f);
+                for (int i = 0; i < segments; i++)
                 {
-                    // TODO create only once
-                    const int segments = 64;
-                    const int vertexCount = 2 * segments + 2;
-                    const int circleTriangleCount = segments;
-                    const int sidesTriangleCount = 2 * segments;
-                    const int triangleCount = 2 * circleTriangleCount + sidesTriangleCount;
-                    const int indicesCount = 3 * triangleCount;
+                    float x = 0.5f * Mathf.Cos(((float)i / (float)segments) * 2.0f * Mathf.PI);
+                    float z = 0.5f * Mathf.Sin(((float)i / (float)segments) * 2.0f * Mathf.PI);
 
-                    Vector3[] vertices = new Vector3[vertexCount];
-                    Vector2[] uv = new Vector2[vertexCount];
-                    int[] triangles = new int[indicesCount];
+                    Vector3 bottomVertex = new Vector3((float)x, -y, (float)z);
+                    Vector3 topVertex = new Vector3((float)x, y, (float)z);
+                    Vector2 textureCoordinates = new Vector2(x, z);
 
-                    // vertices
-                    const float y = 0.5f;
-                    vertices[0] = new Vector3(0.0f, -y, 0.0f);
-                    for (int i = 0; i < segments; i++)
-                    {
-                        float x = 0.5f * Mathf.Cos(((float)i / (float)segments) * 2.0f * Mathf.PI);
-                        float z = 0.5f * Mathf.Sin(((float)i / (float)segments) * 2.0f * Mathf.PI);
-
-                        Vector3 bottomVertex = new Vector3((float)x, -y, (float)z);
-                        Vector3 topVertex = new Vector3((float)x, y, (float)z);
-                        Vector2 textureCoordinates = new Vector2(x, z);
-
-                        vertices[1 + i] = bottomVertex;
-                        vertices[1 + i + segments] = topVertex;
-                        uv[1 + i] = textureCoordinates;
-                        uv[1 + i + segments] = textureCoordinates;
-                    }
-                    vertices[vertexCount - 1] = new Vector3(0.0f, y, 0.0f);
-
-                    // triangles
-                    for (int i = 0; i < segments - 1; i++)
-                    {
-                        triangles[3 * i + 0] = 0;
-                        triangles[3 * i + 1] = i + 1;
-                        triangles[3 * i + 2] = i + 2;
-
-                        triangles[3 * segments + 6 * i + 0] = i + 2 + segments;
-                        triangles[3 * segments + 6 * i + 1] = i + 2;
-                        triangles[3 * segments + 6 * i + 2] = i + 1;
-                        triangles[3 * segments + 6 * i + 3] = i + 1;
-                        triangles[3 * segments + 6 * i + 4] = i + 1 + segments;
-                        triangles[3 * segments + 6 * i + 5] = i + 2 + segments;
-
-                        triangles[9 * segments + 3 * i + 0] = vertexCount - 1;
-                        triangles[9 * segments + 3 * i + 1] = i + 2 + segments;
-                        triangles[9 * segments + 3 * i + 2] = i + 1 + segments;
-                    }
-                    triangles[3 * (segments - 1) + 0] = 0;
-                    triangles[3 * (segments - 1) + 1] = (segments - 1) + 1;
-                    triangles[3 * (segments - 1) + 2] = 1;
-
-                    triangles[3 * segments + 6 * (segments - 1) + 0] = 1 + segments;
-                    triangles[3 * segments + 6 * (segments - 1) + 1] = 1;
-                    triangles[3 * segments + 6 * (segments - 1) + 2] = (segments - 1) + 1;
-                    triangles[3 * segments + 6 * (segments - 1) + 3] = (segments - 1) + 1;
-                    triangles[3 * segments + 6 * (segments - 1) + 4] = (segments - 1) + 1 + segments;
-                    triangles[3 * segments + 6 * (segments - 1) + 5] = 1 + segments;
-
-                    triangles[9 * segments + 3 * (segments - 1) + 0] = vertexCount - 1;
-                    triangles[9 * segments + 3 * (segments - 1) + 1] = 1 + segments;
-                    triangles[9 * segments + 3 * (segments - 1) + 2] = (segments - 1) + 1 + segments;
-
-                    Mesh mesh = new Mesh();
-                    innerCircle.GetComponent<MeshFilter>().mesh = mesh;
-                    mesh.vertices = vertices;
-                    mesh.triangles = triangles;
+                    vertices[1 + i] = bottomVertex;
+                    vertices[1 + i + segments] = topVertex;
+                    uv[1 + i] = textureCoordinates;
+                    uv[1 + i + segments] = textureCoordinates;
                 }
+                vertices[vertexCount - 1] = new Vector3(0.0f, y, 0.0f);
 
-                innerCircle.name = innerMetric + " = " + innerValue;
-                innerCircle.tag = Tags.Decoration;
-                innerCircle.isStatic = true;
-                innerCircle.transform.parent = donutChart.transform;
-                innerCircle.transform.localPosition = Vector3.zero;
-                innerCircle.transform.localScale = new Vector3(innerScale, 1.0f, innerScale);
-                Renderer renderer = innerCircle.GetComponent<Renderer>();
-                // We need to create a new material so that we can change its color
-                // independently from other cylinders.
-                // FIXME: All segments of the same color should have the very same material.
-                // The fewer materials we have, the fewer rendering calls do we have at run-time.
-                renderer.sharedMaterial = new Material(Shader.Find("Diffuse"));
-                renderer.sharedMaterial.color = Color.Lerp(Color.white, Color.black, innerValue);
-                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                renderer.receiveShadows = false;
+                // triangles
+                for (int i = 0; i < segments - 1; i++)
+                {
+                    triangles[3 * i + 0] = 0;
+                    triangles[3 * i + 1] = i + 1;
+                    triangles[3 * i + 2] = i + 2;
+
+                    triangles[3 * segments + 6 * i + 0] = i + 2 + segments;
+                    triangles[3 * segments + 6 * i + 1] = i + 2;
+                    triangles[3 * segments + 6 * i + 2] = i + 1;
+                    triangles[3 * segments + 6 * i + 3] = i + 1;
+                    triangles[3 * segments + 6 * i + 4] = i + 1 + segments;
+                    triangles[3 * segments + 6 * i + 5] = i + 2 + segments;
+
+                    triangles[9 * segments + 3 * i + 0] = vertexCount - 1;
+                    triangles[9 * segments + 3 * i + 1] = i + 2 + segments;
+                    triangles[9 * segments + 3 * i + 2] = i + 1 + segments;
+                }
+                triangles[3 * (segments - 1) + 0] = 0;
+                triangles[3 * (segments - 1) + 1] = (segments - 1) + 1;
+                triangles[3 * (segments - 1) + 2] = 1;
+
+                triangles[3 * segments + 6 * (segments - 1) + 0] = 1 + segments;
+                triangles[3 * segments + 6 * (segments - 1) + 1] = 1;
+                triangles[3 * segments + 6 * (segments - 1) + 2] = (segments - 1) + 1;
+                triangles[3 * segments + 6 * (segments - 1) + 3] = (segments - 1) + 1;
+                triangles[3 * segments + 6 * (segments - 1) + 4] = (segments - 1) + 1 + segments;
+                triangles[3 * segments + 6 * (segments - 1) + 5] = 1 + segments;
+
+                triangles[9 * segments + 3 * (segments - 1) + 0] = vertexCount - 1;
+                triangles[9 * segments + 3 * (segments - 1) + 1] = 1 + segments;
+                triangles[9 * segments + 3 * (segments - 1) + 2] = (segments - 1) + 1 + segments;
+
+                Mesh mesh = new Mesh();
+                innerCircle.GetComponent<MeshFilter>().mesh = mesh;
+                mesh.vertices = vertices;
+                mesh.triangles = triangles;
             }
+
+            innerCircle.transform.parent = donutChart.transform;
+            // the inner circle is put at the bottom of the parent but somewhat above
+            // the circle segements in order to cover their inner part
+            innerCircle.transform.localPosition = new Vector3(0.0f, -0.48f, 0.0f);
+            innerCircle.transform.localScale = new Vector3(fractionOfInnerCircle, 0.01f, fractionOfInnerCircle);
+
+            //innerCircle.transform.localPosition = Vector3.zero;
+            //innerCircle.transform.localScale = new Vector3(fractionOfInnerCircle, 1.0f, fractionOfInnerCircle);
+            Renderer renderer = innerCircle.GetComponent<Renderer>();
+            // We need to create a new material so that we can change its color
+            // independently from other cylinders.
+            // FIXME: All segments of the same color should have the very same material.
+            // The fewer materials we have, the fewer rendering calls do we have at run-time.
+            renderer.sharedMaterial = new Material(Shader.Find("Diffuse"));
+            renderer.sharedMaterial.color = Color.Lerp(Color.white, Color.black, innerValue);
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
         }
 
         /// <summary>
@@ -385,11 +436,12 @@ namespace SEE.Layout
         /// 0 radian is to the right of the center, pi/2 is above the center,
         /// pi is to left of the center; 3*pi/2 degree is below the center
         /// </summary>
-        /// <param name="center"></param>
-        /// <param name="radius"></param>
-        /// <param name="startRadian"></param>
-        /// <param name="endRadian"></param>
-        /// <param name="material"></param>
+        /// <param name="center">center position of the circle</param>
+        /// <param name="radius">radius of the circle</param>
+        /// <param name="startRadian">the radian on the circle where to start the circle segment</param>
+        /// <param name="endRadian">the radian on the circle where to end the circle segment</param>
+        /// <param name="groundLevel">the level of the ground on which to place the circle segment</param>
+        /// <param name="material">the material used for the circle segment</param>
         /// <returns>the circle sector</returns>
         private GameObject CreateCircleSector(Vector3 center,
                                               float radius,
@@ -405,8 +457,6 @@ namespace SEE.Layout
 
             MeshFilter meshFilter = circleSector.AddComponent<MeshFilter>();
             MeshRenderer renderer = circleSector.AddComponent<MeshRenderer>();
-
-
 
             // The circle segment is drawn by a set of consecutive triangles defined by
             // the center point and two additional points on the circle line.
