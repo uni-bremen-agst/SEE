@@ -122,18 +122,25 @@ namespace SEE
         public string StyleIssue = "Metric.Style";
         public string UniversalIssue = "Metric.Universal";
 
+        /// <summary>
+        /// How leaf graph nodes should be depicted.
+        /// </summary>
         public enum LeafNodeKinds
         {
             Blocks,
             Buildings,
         }
 
+        /// <summary>
+        /// How inner graph nodes should be depicted.
+        /// </summary>
         public enum InnerNodeKinds
         {
-            Empty,
+            Donuts,
             Circles,
+            Empty,
             Cylinders,
-            Donuts
+        
         }
 
         /// <summary>
@@ -146,6 +153,9 @@ namespace SEE
         /// </summary>
         public InnerNodeKinds InnerNodeObjects;
 
+        /// <summary>
+        /// The kinds of node layouts available.
+        /// </summary>
         public enum NodeLayouts
         {
             Balloon,
@@ -154,9 +164,12 @@ namespace SEE
             Treemap
         }
 
+        /// <summary>
+        /// The kinds of edge layouts available.
+        /// </summary>
         public enum EdgeLayouts
         {
-            None = 0,
+            None = 0,        // no edges are to be drawn
             Straight = 1,
             Spline = 2,
             Bundling = 3
