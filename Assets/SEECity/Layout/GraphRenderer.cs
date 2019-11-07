@@ -189,6 +189,11 @@ namespace SEE.Layout
                 ErosionIssues issueDecorator = new ErosionIssues(settings.IssueMap(), leaveNodeFactory, scaler);
                 issueDecorator.Add(LeafNodes(gameNodes));
             }
+
+            if (settings.NodeLayout == GraphSettings.NodeLayouts.Balloon)
+            {
+                AddLabels(InnerNodes(gameNodes));
+            }
             switch (settings.InnerNodeObjects)
             {
                 case GraphSettings.InnerNodeKinds.Empty:
@@ -211,6 +216,22 @@ namespace SEE.Layout
                     break;
                 default:
                     throw new Exception("Unhandled GraphSettings.InnerNodeKinds " + settings.InnerNodeObjects);
+            }
+        }
+
+        /// <summary>
+        /// Adds the source name as a label to the center of the given game nodes.
+        /// </summary>
+        /// <param name="gameNodes">game nodes whose source name is to be added</param>
+        private void AddLabels(ICollection<GameObject> gameNodes)
+        {
+            foreach (GameObject node in gameNodes)
+            {
+                Vector3 size = innerNodeFactory.GetSize(node);
+                float length = Mathf.Min(size.x, size.z);
+                // The text may occupy up to 30% of the length.
+                GameObject text = TextFactory.GetText(node.GetComponent<NodeRef>().node.SourceName, 
+                                                      node.transform.position, length * 0.3f);
             }
         }
 
