@@ -14,7 +14,7 @@ namespace SEE.Layout
         public override GameObject NewBlock()
         {
             GameObject gameObject = new GameObject();
-            
+            gameObject.isStatic = true;
             return gameObject;
         }
 
