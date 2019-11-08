@@ -38,16 +38,12 @@ namespace SEE.Layout
             public readonly float radius;
             public readonly float outer_radius;
             public readonly float reference_length_children;
-            // The level of node, that is, the distance from the root node to this node.
-            // The root node has always level 0. 
-            public readonly int level;
 
-            public NodeInfo(float radius, int level, float outer_radius, float reference_length_children)
+            public NodeInfo(float radius, float outer_radius, float reference_length_children)
             {
                 this.radius = radius;
                 this.outer_radius = outer_radius;
                 this.reference_length_children = reference_length_children;
-                this.level = level;
             }
         }
 
@@ -88,7 +84,7 @@ namespace SEE.Layout
                 int i = 0;
                 foreach (Node root in roots)
                 {
-                    CalculateRadius2D(root, 0, out float out_rad, out int max_depth_of_this_tree);
+                    CalculateRadius2D(root, out float out_rad, out int max_depth_of_this_tree);
                     max_depths[i] = max_depth_of_this_tree;
                     i++;
                     if (out_rad > max_radius)
@@ -178,12 +174,11 @@ namespace SEE.Layout
         /// This algorithm is described in the paper.
         /// </summary>
         /// <param name="node">the node for which the ballon layout is to be computed</param>
-        /// <param name="level">the level of the currently visited node; a root has level 0</param>
         /// <param name="rad">radius of the circle around node at which the center of every circle 
         ///                   of its direct children is located</param>
         /// <param name="out_rad">radius of the minimal circle around node that includes every circle 
         ///                       of its descendants</param>
-        private void CalculateRadius2D(Node node, int level, out float out_rad, out int max_depth)
+        private void CalculateRadius2D(Node node, out float out_rad, out int max_depth)
         {
             float rad = 0.0f;
             float rl_child = 0.0f;
@@ -218,7 +213,7 @@ namespace SEE.Layout
                 {
 
                     // Find the radius rad_k and outer-radius out_rad_k for each child k of node i.
-                    CalculateRadius2D(child, level + 1, out float child_out_rad, out int child_depth);
+                    CalculateRadius2D(child, out float child_out_rad, out int child_depth);
                     if (child_depth > max_child_depth)
                     {
                         max_child_depth = child_depth;
@@ -256,7 +251,7 @@ namespace SEE.Layout
 
                 rl_child = max_children_rad;
             }
-            nodeInfos.Add(node, new NodeInfo(rad, level, out_rad, rl_child));
+            nodeInfos.Add(node, new NodeInfo(rad, out_rad, rl_child));
         }
 
         /// <summary>
