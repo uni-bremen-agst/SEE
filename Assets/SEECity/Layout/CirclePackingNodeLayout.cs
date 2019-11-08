@@ -56,6 +56,7 @@ namespace SEE.Layout
         /// "Globalizes" the layout. Initially, the position of children are relative to
         /// their parent assuming that the parent has position Vector3.zero. This 
         /// function adjusts the co-ordinates of all nodes to the world's co-ordinates.
+        /// We also adjust the ground level of each inner node by its level lift.
         /// </summary>
         /// <param name="position">the position of the parent of all children</param>
         /// <param name="children">the children to be laid out</param>
@@ -65,6 +66,12 @@ namespace SEE.Layout
             {
                 GameObject childObject = to_game_node[child];
                 NodeTransform childTransform = layout_result[childObject];
+                if (! child.IsLeaf())
+                {
+                    // The inner nodes will be slightly lifted along the y axis according to their
+                    // tree depth so that they can be stacked visually (level 0 is at the bottom).
+                    position.y += LevelLift(child);
+                }
                 childTransform.position += position;
                 layout_result[childObject] = childTransform;
                 MakeGlobal(childTransform.position, child.Children());
