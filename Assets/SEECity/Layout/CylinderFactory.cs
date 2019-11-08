@@ -20,6 +20,7 @@ namespace SEE.Layout
         public override GameObject NewBlock()
         {
             GameObject result = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            result.isStatic = true;
             Renderer renderer = result.GetComponent<Renderer>();
             // Re-use default material for all cylinders.
             renderer.sharedMaterial = material;

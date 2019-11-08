@@ -26,6 +26,7 @@ namespace SEE.Layout
         public override GameObject NewBlock()
         {
             GameObject result = new GameObject();
+            result.isStatic = true;
             AttachCircleLine(result, defaultRadius, defaultLineWidth * Unit(), DefaultColor);
             return result;
         }
