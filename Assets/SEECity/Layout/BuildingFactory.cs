@@ -4,12 +4,21 @@ using SEE.DataModel;
 
 namespace SEE.Layout
 {
+    /// <summary>
+    /// A factory for game objects represented by CScape buildings.
+    /// </summary>
     public class BuildingFactory : NodeFactory
     {
-        private static readonly string pathPrefix = "Assets/CScape/Editor/Resources/BuildingTemplates/Buildings/";
+        /// <summary>
+        /// Path to the folder assumed to be contained in a folder named Resources 
+        /// in the Assets directory where the prefabs for the buildings are located.
+        /// </summary>
+        private static readonly string pathPrefix = "BuildingTemplates/Buildings/";
 
-        private static readonly string fileExtension = ".prefab";
 
+        /// <summary>
+        /// Filenames of the prefabs for the buildings excluding their file extension .prefab
+        /// </summary>
         private static readonly string[] prefabFiles = new string[]
             {                 // floor, depth, width
               "CSTemplate30", // 1, 1, 1
@@ -43,16 +52,23 @@ namespace SEE.Layout
               "Build1" // 5, 7, 7
             };
 
+        /// <summary>
+        /// The loaded prefabs for the CScape building we use for their instantiation.
+        /// </summary>
         private static readonly UnityEngine.Object[] prefabs = LoadAllPrefabs();
 
+        /// <summary>
+        /// Loads and returns all prefabs listed in prefabFiles.
+        /// </summary>
+        /// <returns>all prefabs listed in prefabFiles</returns>
         private static UnityEngine.Object[] LoadAllPrefabs()
         {
             UnityEngine.Object[] result = new UnityEngine.Object[prefabFiles.Length];
             int i = 0;
             foreach (string filename in prefabFiles)
             {
-                string path = pathPrefix + filename + fileExtension;
-                result[i] = UnityEditor.AssetDatabase.LoadAssetAtPath(path, typeof(GameObject));
+                string path = pathPrefix + filename;
+                result[i] = Resources.Load<GameObject>(path);
 
                 //result[i] = Resources.Load<UnityEngine.Object>(filename);
                 if (result[i] == null)
@@ -64,6 +80,11 @@ namespace SEE.Layout
             return result;
         }
 
+        /// <summary>
+        /// Adds one instance of each type of CScape building. This function can be
+        /// used to create all buildings for inspection. It is not actually used
+        /// for a real scene.
+        /// </summary>
         private static void GenerateAllBuildingPrefabs()
         {
             Vector3 position = Vector3.zero;
@@ -95,9 +116,14 @@ namespace SEE.Layout
             return NewBuilding(0); // Random.Range(0, prefabs.Length - 1)
         }
 
-        private static GameObject NewBuilding(int i)
+        /// <summary>
+        /// Returns the CScape building with given index relative to prefabs.
+        /// </summary>
+        /// <param name="index">index of the building to be returned</param>
+        /// <returns>CScape building with given index</returns>
+        private static GameObject NewBuilding(int index)
         {
-            return NewBuilding(prefabs[i]);
+            return NewBuilding(prefabs[index]);
         }
 
         public override float Unit()
@@ -105,8 +131,19 @@ namespace SEE.Layout
             return CScapeUnit;
         }
 
+        /// <summary>
+        /// One CScape unit (floor level height) is three Unity units.
+        /// One Unity unit represents one meter in real world. Three meters
+        /// resembles the height of a floor in real world.
+        /// </summary>
         private const float CScapeUnit = 3.0f;
 
+        /// <summary>
+        /// Instantiates the given prefab (a CScape building) and sets various
+        /// parameters.
+        /// </summary>
+        /// <param name="prefab"></param>
+        /// <returns></returns>
         private static GameObject NewBuilding(UnityEngine.Object prefab)
         {
             GameObject building = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
