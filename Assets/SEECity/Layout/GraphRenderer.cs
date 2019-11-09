@@ -84,8 +84,9 @@ namespace SEE.Layout
         /// <param name="graph">graph whose node metrics are to be scaled</param>
         private void SetScaler(Graph graph)
         {
-            List<string> nodeMetrics = new List<string>() { settings.WidthMetric, settings.HeightMetric, settings.DepthMetric };
-            nodeMetrics.AddRange(settings.IssueMap().Keys);
+            List<string> nodeMetrics = new List<string>() { settings.WidthMetric, settings.HeightMetric, settings.DepthMetric, settings.ColorMetric };
+            nodeMetrics.AddRange(settings.AllLeafIssues());
+            nodeMetrics.AddRange(settings.AllInnerNodeIssues());
             nodeMetrics.Add(settings.InnerDonutMetric);
 
             if (settings.ZScoreScale)
@@ -186,7 +187,7 @@ namespace SEE.Layout
             // we also know their positions.
             if (settings.ShowErosions)
             {
-                ErosionIssues issueDecorator = new ErosionIssues(settings.IssueMap(), leaveNodeFactory, scaler);
+                ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leaveNodeFactory, scaler);
                 issueDecorator.Add(LeafNodes(gameNodes));
             }
 
@@ -207,7 +208,7 @@ namespace SEE.Layout
                     break;
                 case GraphSettings.InnerNodeKinds.Donuts:
                     {
-                        DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric, settings.IssueMap().Keys.ToArray<string>());
+                        DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric, settings.AllInnerNodeIssues().ToArray<string>());
                         decorator.Add(InnerNodes(gameNodes));
                     }
                     break;
@@ -337,12 +338,19 @@ namespace SEE.Layout
         {
             Dictionary<Node, GameObject> result = new Dictionary<Node, GameObject>();
 
+            float metricMaximum = scaler.GetNormalizedMaximum(settings.ColorMetric);
+
             foreach (Node node in nodes)
             {
                 // We add only leaves.
                 if (node.IsLeaf())
                 {
-                    GameObject block = leaveNodeFactory.NewBlock();
+                    int material = Mathf.RoundToInt(Mathf.Lerp(0.0f,
+                                                               (float)(leaveNodeFactory.NumberOfMaterials() - 1),
+                                                               scaler.GetNormalizedValue(settings.ColorMetric, node)
+                                                                 / metricMaximum));
+                    Debug.LogFormat("metric={0} material={1}\n", scaler.GetNormalizedValue(settings.ColorMetric, node), material);
+                    GameObject block = leaveNodeFactory.NewBlock(material);
                     block.name = node.LinkName;
 
                     AttachNode(block, node);

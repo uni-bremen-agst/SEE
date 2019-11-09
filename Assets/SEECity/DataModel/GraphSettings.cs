@@ -91,9 +91,9 @@ namespace SEE
             return result;
         }
 
-        //-------------------------------
-        // Size attributes of a building
-        //-------------------------------
+        //---------------------------------
+        // Visual attributes of a leaf node
+        //---------------------------------
         //
         // Width of a building (x co-ordinate)
         public string WidthMetric = "Metric.Number_of_Tokens";
@@ -101,6 +101,8 @@ namespace SEE
         public string HeightMetric = "Metric.Clone_Rate";
         // Breadth of a building (y co-ordinate)
         public string DepthMetric = "Metric.LOC";
+        // Metric determining the color gradient of leaf nodes.
+        public string ColorMetric = "Metric.Complexity";
 
         // This parameter determines the minimal width, breadth, and height of each block
         // representing a graph node visually. Must not be greater than MaximalBlockLength.
@@ -109,18 +111,6 @@ namespace SEE
         // This parameter determines the maximal width, breadth, and height of each block
         // representing a graph node visually. Must not be smaller than MinimalBlockLength.
         public float MaximalBlockLength = 100.0f;
-
-        //------------------------------------------------------
-        // Software erosion issues shown as icons above building
-        //------------------------------------------------------
-        //
-        public string ArchitectureIssue = "Metric.Architecture_Violations";
-        public string CloneIssue = "Metric.Clone";
-        public string CycleIssue = "Metric.Cycle";
-        public string Dead_CodeIssue = "Metric.Dead_Code";
-        public string MetricIssue = "Metric.Metric";
-        public string StyleIssue = "Metric.Style";
-        public string UniversalIssue = "Metric.Universal";
 
         /// <summary>
         /// How leaf graph nodes should be depicted.
@@ -140,7 +130,6 @@ namespace SEE
             Circles,
             Empty,
             Cylinders,
-        
         }
 
         /// <summary>
@@ -200,17 +189,71 @@ namespace SEE
         /// </summary>
         public bool EdgesAboveBlocks = true;
 
+        //--------------------------------------------------------
+        // Software erosion issues shown as icons above leaf nodes
+        //--------------------------------------------------------
+        //
+        public string ArchitectureIssue = "Metric.Architecture_Violations";
+        public string CloneIssue = "Metric.Clone";
+        public string CycleIssue = "Metric.Cycle";
+        public string Dead_CodeIssue = "Metric.Dead_Code";
+        public string MetricIssue = "Metric.Metric";
+        public string StyleIssue = "Metric.Style";
+        public string UniversalIssue = "Metric.Universal";
+
+        public IList<string> AllLeafIssues()
+        {
+            List<string> result = new List<string>()
+               {
+                  ArchitectureIssue,
+                  CloneIssue,
+                  CycleIssue,
+                  Dead_CodeIssue,
+                  MetricIssue,
+                  StyleIssue,
+                  UniversalIssue
+               };
+            return result;
+        }
+
+        //-----------------------------------------------------------------------
+        // Software erosion issues shown as icons on Donut charts for inner nodes
+        //-----------------------------------------------------------------------
+        //
+        public string ArchitectureIssue_SUM = "Metric.Architecture_Violations_SUM";
+        public string CloneIssue_SUM = "Metric.Clone_SUM";
+        public string CycleIssue_SUM = "Metric.Cycle_SUM";
+        public string Dead_CodeIssue_SUM = "Metric.Dead_Code_SUM";
+        public string MetricIssue_SUM = "Metric.Metric_SUM";
+        public string StyleIssue_SUM = "Metric.Style_SUM";
+        public string UniversalIssue_SUM = "Metric.Universal_SUM";
+
+        public IList<string> AllInnerNodeIssues()
+        {
+            List<string> result = new List<string>()
+               {
+                  ArchitectureIssue_SUM,
+                  CloneIssue_SUM,
+                  CycleIssue_SUM,
+                  Dead_CodeIssue_SUM,
+                  MetricIssue_SUM,
+                  StyleIssue_SUM,
+                  UniversalIssue_SUM
+               };
+            return result;
+        }
+
         /// <summary>
         /// The metric to be put in the inner circle of a Donut chart.
         /// </summary>
         public string InnerDonutMetric = "Metric.IssuesTotal";
 
         /// <summary>
-        /// Yields a mapping of all node attribute names that define erosion issues in the GXL file
-        /// onto the icons to be used for visualizing them.
+        /// Yields a mapping of all node attribute names that define erosion issues 
+        /// for leaf nodes in the GXL file onto the icons to be used for visualizing them.
         /// </summary>
-        /// <returns>mapping of all node attribute names onto icon ids</returns>
-        public SerializableDictionary<string, IconFactory.Erosion> IssueMap()
+        /// <returns>mapping of all node attribute names for leaves onto icon ids</returns>
+        public SerializableDictionary<string, IconFactory.Erosion> LeafIssueMap()
         {
             SerializableDictionary<string, IconFactory.Erosion> result = new SerializableDictionary<string, IconFactory.Erosion>
             {
