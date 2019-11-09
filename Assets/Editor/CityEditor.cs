@@ -152,10 +152,11 @@ namespace SEEEditor
             editorSettings.gxlPath = EditorGUILayout.TextField("GXL file", editorSettings.gxlPath);
             editorSettings.csvPath = EditorGUILayout.TextField("CSV file", editorSettings.csvPath);
 
-            GUILayout.Label("Lengths of buildings", EditorStyles.boldLabel);
+            GUILayout.Label("Attributes of leaf nodes", EditorStyles.boldLabel);
             editorSettings.WidthMetric = EditorGUILayout.TextField("Width", editorSettings.WidthMetric);
             editorSettings.HeightMetric = EditorGUILayout.TextField("Height", editorSettings.HeightMetric);
             editorSettings.DepthMetric = EditorGUILayout.TextField("Depth", editorSettings.DepthMetric);
+            editorSettings.ColorMetric = EditorGUILayout.TextField("Color", editorSettings.ColorMetric);
 
             GUILayout.Label("VR settings", EditorStyles.boldLabel);
             VRenabled = EditorGUILayout.Toggle("Enable VR", VRenabled);
