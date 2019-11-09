@@ -10,11 +10,19 @@ namespace SEE.Layout
     public class BuildingFactory : NodeFactory
     {
         /// <summary>
+        /// The number of building types offered.
+        /// </summary>
+        /// <returns>number of building types offered</returns>
+        public override int NumberOfMaterials()
+        {
+            return prefabFiles.Length;
+        }
+
+        /// <summary>
         /// Path to the folder assumed to be contained in a folder named Resources 
         /// in the Assets directory where the prefabs for the buildings are located.
         /// </summary>
         private static readonly string pathPrefix = "BuildingTemplates/Buildings/";
-
 
         /// <summary>
         /// Filenames of the prefabs for the buildings excluding their file extension .prefab
@@ -109,11 +117,12 @@ namespace SEE.Layout
             }
         }
 
-        public override GameObject NewBlock()
+        public override GameObject NewBlock(int index = 0)
         {
-            // We will always returns an instance of CSTemplate30 because that kind of
-            // building can be scaled down to (1 floors, 1 depth, 1 width) 
-            return NewBuilding(0); // Random.Range(0, prefabs.Length - 1)
+            // The most suitable CScape building is CSTemplate30 because that kind of
+            // building can be scaled down to (1 floors, 1 depth, 1 width).
+            index = Mathf.Clamp(0, prefabs.Length - 1, index);
+            return NewBuilding(index);
         }
 
         /// <summary>

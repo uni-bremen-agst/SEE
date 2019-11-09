@@ -15,7 +15,8 @@ namespace SEE.Layout
 
         public CircleFactory()
         {
-            material = new Material(Materials.DefaultMaterial());
+            materials = new Materials(1, DefaultColor, DefaultColor);
+            material = new Material(materials.DefaultMaterial(0));
             material.color = DefaultColor;
         }
 
@@ -23,7 +24,7 @@ namespace SEE.Layout
 
         private const float defaultRadius = 0.5f;
 
-        public override GameObject NewBlock()
+        public override GameObject NewBlock(int index = 0)
         {
             GameObject result = new GameObject();
             result.isStatic = true;
