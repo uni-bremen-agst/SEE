@@ -37,6 +37,10 @@ namespace SEE
                 gs.ShowDonuts);
             l.Draw(g);
 #endif
+            FindObjectOfType<SearchManager>().Initialize();
+            FindObjectOfType<MenuBackdropGenerator>().Initialize();
+            FindObjectOfType<IngameMenu>().Initialize();
+            FindObjectOfType<GameStateController>().Initialize();
         }
     }
 
