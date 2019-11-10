@@ -125,11 +125,11 @@ namespace SEE
         /// </summary>
         public enum InnerNodeKinds
         {
+            Rectangles,
             Donuts,
             Circles,
             Empty,
             Cylinders,
-            Rectangles,
         }
 
         /// <summary>
@@ -147,10 +147,10 @@ namespace SEE
         /// </summary>
         public enum NodeLayouts
         {
+            Treemap,
             Balloon,
             CirclePacking,
             Manhattan,
-            Treemap
         }
 
         /// <summary>
