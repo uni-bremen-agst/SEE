@@ -43,6 +43,9 @@ namespace SEE.Layout
                 case GraphSettings.InnerNodeKinds.Cylinders:
                     innerNodeFactory = new CylinderFactory();
                     break;
+                case GraphSettings.InnerNodeKinds.Rectangles:
+                    innerNodeFactory = new RectangleFactory();
+                    break;
                 default:
                     throw new Exception("Unhandled GraphSettings.InnerNodeKinds");
             }
@@ -213,6 +216,7 @@ namespace SEE.Layout
                     }
                     break;
                 case GraphSettings.InnerNodeKinds.Cylinders:
+                case GraphSettings.InnerNodeKinds.Rectangles:
                     // TODO
                     break;
                 default:
@@ -349,7 +353,6 @@ namespace SEE.Layout
                                                                (float)(leaveNodeFactory.NumberOfMaterials() - 1),
                                                                scaler.GetNormalizedValue(settings.ColorMetric, node)
                                                                  / metricMaximum));
-                    Debug.LogFormat("metric={0} material={1}\n", scaler.GetNormalizedValue(settings.ColorMetric, node), material);
                     GameObject block = leaveNodeFactory.NewBlock(material);
                     block.name = node.LinkName;
 

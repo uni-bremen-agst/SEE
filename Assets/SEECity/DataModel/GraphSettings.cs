@@ -1,5 +1,4 @@
 ﻿using SEE.Layout;
-using System;
 using System.Collections.Generic;
 
 namespace SEE
@@ -130,6 +129,7 @@ namespace SEE
             Circles,
             Empty,
             Cylinders,
+            Rectangles,
         }
 
         /// <summary>

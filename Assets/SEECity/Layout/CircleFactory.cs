@@ -3,9 +3,9 @@
 namespace SEE.Layout
 {
     /// <summary>
-    /// A factory for circle game objects.
+    /// A factory for circle inner game objects.
     /// </summary>
-    public class CircleFactory : InnerNodeFactory
+    public class CircleFactory : LineInnerNodeFactory
     {
         // The material we use for the circle lines.
         private Material material;
@@ -20,8 +20,6 @@ namespace SEE.Layout
             material.color = DefaultColor;
         }
 
-        private const float defaultLineWidth = 0.1f;
-
         private const float defaultRadius = 0.5f;
 
         public override GameObject NewBlock(int index = 0)
@@ -30,21 +28,6 @@ namespace SEE.Layout
             result.isStatic = true;
             AttachCircleLine(result, defaultRadius, defaultLineWidth * Unit(), DefaultColor);
             return result;
-        }
-
-        /// <summary>
-        /// Sets the width of lines drawn for the given object.
-        /// 
-        /// Precondition: circle must have been created by this factory and must contain
-        /// a LineRenderer component.
-        /// </summary>
-        /// <param name="circle">game object to be drawn with different line width</param>
-        /// <param name="lineWidth">new width of the lines</param>
-        /// <summary>
-        public override void SetLineWidth(GameObject circle, float lineWidth)
-        {
-            LineRenderer line = circle.GetComponent<LineRenderer>();
-            LineFactory.SetWidth(line, lineWidth);
         }
 
         /// <summary>
