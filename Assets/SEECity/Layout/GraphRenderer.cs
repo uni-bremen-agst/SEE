@@ -154,7 +154,8 @@ namespace SEE.Layout
                     layout = new ManhattanLayout(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.Treemap:
-                    nodeMap = CreateBlocks(nodes); // only leaves
+                    nodeMap = CreateBlocks(nodes); // leaves
+                    AddContainers(nodeMap, nodes); // and inner nodes
                     layout = new TreemapLayout(groundLevel, leaveNodeFactory, 100.0f, 100.0f).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.Balloon:
