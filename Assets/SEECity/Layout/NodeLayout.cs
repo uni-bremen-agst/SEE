@@ -44,9 +44,9 @@ namespace SEE.Layout
         protected readonly NodeFactory leafNodeFactory;
 
         /// <summary>
-        /// The height of circles (y co-ordinate) drawn for inner nodes.
+        /// The height of objects (y co-ordinate) drawn for inner nodes.
         /// </summary>
-        protected const float circleHeight = 0.1f;
+        protected const float innerNodeHeight = 0.01f;
 
         /// <summary>
         /// If inner nodes are represented as visible objects covering their total area
