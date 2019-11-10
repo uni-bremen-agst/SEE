@@ -1,17 +1,17 @@
 ﻿using UnityEngine;
-using SEE.DataModel;
 using SEE.Layout;
 
 namespace SEE
 {
 
-    public class SearchManager : MonoBehaviour
+    public class ListItemManager : MonoBehaviour
     {
         private ListItem[] listItems = null;
 
         public void Initialize()
         {
             GameObject listItemPrefab = Resources.Load("Prefabs/ListItem") as GameObject;
+            SearchMenu searchMenu = GameObject.FindObjectOfType<SearchMenu>();
 
             NodeRef[] nodeRefs = FindObjectsOfType<NodeRef>();
             listItems = new ListItem[nodeRefs.Length];
@@ -21,8 +21,10 @@ namespace SEE
                 GameObject go = GameObject.Instantiate(listItemPrefab, transform);
                 ListItem li = go.GetComponent<ListItem>();
                 listItems[i] = li;
+
                 GameObject nodeRefGO = nodeRefs[i].gameObject;
                 li.NodeGameObject = nodeRefGO;
+                li.searchMenu = searchMenu;
             }
         }
 

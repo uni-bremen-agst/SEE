@@ -40,10 +40,16 @@ namespace SEE
                 l.Draw(g);
             }
 #endif
-            FindObjectOfType<SearchManager>().Initialize();
-            FindObjectOfType<MenuBackdropGenerator>().Initialize();
-            FindObjectOfType<IngameMenu>().Initialize();
-            FindObjectOfType<GameStateController>().Initialize();
+            MenuBackdropGenerator mbg = GameObject.FindObjectOfType<MenuBackdropGenerator>();
+            mbg.Initialize();
+
+            SearchMenu sm = GameObject.FindObjectOfType<SearchMenu>();
+            sm.Initialize();
+            IngameMenu im = GameObject.FindObjectOfType<IngameMenu>();
+            im.Initialize();
+
+            GameStateController gsc = GameObject.FindObjectOfType<GameStateController>();
+            gsc.Initialize();
         }
     }
 
