@@ -17,7 +17,6 @@ public class LeapMovementSEE : MonoBehaviour
     {
         Debug.Log("Starting LeapMovementSEE\n");
         controller = new Controller();
-        rig = GameObject.Find("Leap Rig");
     }
 
     void Update()
