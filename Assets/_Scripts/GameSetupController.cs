@@ -19,23 +19,26 @@ namespace SEE
             GraphSettings gs = new GraphSettings();
             gs.pathPrefix = Application.dataPath.Replace('/', '\\') + '\\';
             Graph g = SceneGraphs.Add(gs);
-            List<string> nm = new List<string>() {
-                gs.WidthMetric,
-                gs.HeightMetric,
-                gs.DepthMetric
-            };
-            ILayout l = new SEE.Layout.BalloonLayout(
-                gs.ShowEdges,
-                gs.WidthMetric, gs.HeightMetric, gs.DepthMetric,
-                gs.IssueMap(),
-                gs.InnerNodeMetrics,
-                new BuildingFactory(),
-                new ZScoreScale(g, gs.MinimalBlockLength, gs.MaximalBlockLength, nm),
-                gs.EdgeWidth,
-                gs.ShowErosions,
-                gs.EdgesAboveBlocks,
-                gs.ShowDonuts);
-            l.Draw(g);
+            if (g != null) // TODO fix .Add function
+            {
+                List<string> nm = new List<string>() {
+                    gs.WidthMetric,
+                    gs.HeightMetric,
+                    gs.DepthMetric
+                };
+                ILayout l = new SEE.Layout.BalloonLayout(
+                    gs.ShowEdges,
+                    gs.WidthMetric, gs.HeightMetric, gs.DepthMetric,
+                    gs.IssueMap(),
+                    gs.InnerNodeMetrics,
+                    new BuildingFactory(),
+                    new ZScoreScale(g, gs.MinimalBlockLength, gs.MaximalBlockLength, nm),
+                    gs.EdgeWidth,
+                    gs.ShowErosions,
+                    gs.EdgesAboveBlocks,
+                    gs.ShowDonuts);
+                l.Draw(g);
+            }
 #endif
             FindObjectOfType<SearchManager>().Initialize();
             FindObjectOfType<MenuBackdropGenerator>().Initialize();

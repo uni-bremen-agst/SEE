@@ -55,11 +55,13 @@ namespace SEE.Layout
                 result[i] = null;
 #if UNITY_EDITOR
                 result[i] = UnityEditor.AssetDatabase.LoadAssetAtPath(path, typeof(GameObject));
+#else
+                result[i] = Resources.Load<GameObject>(path); //TODO doesnt work, assets are inside some UnityEditor folder, probably not compatible with runtime generation at all...
 #endif
-                //result[i] = Resources.Load<UnityEngine.Object>(filename);
                 if (result[i] == null)
                 {
                     Debug.LogErrorFormat("[BuildingFactory] Could not load building prefab {0}.\n", path);
+                    result[i] = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 }
                 i++;
             }

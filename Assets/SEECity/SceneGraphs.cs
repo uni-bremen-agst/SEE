@@ -41,7 +41,6 @@ namespace SEE
 
         private static Graph Load(GraphSettings settings)
         {
-            // GraphCreator graphCreator = new GraphCreator(settings.GXLPath(), settings.HierarchicalEdges, new SEELogger());
             GraphReader graphCreator = new GraphReader(settings.GXLPath(), settings.HierarchicalEdges, new SEELogger());
             if (string.IsNullOrEmpty(settings.GXLPath()))
             {
@@ -50,10 +49,22 @@ namespace SEE
             }
             else
             {
+#if UNITY_EDITOR
                 SEE.Performance p = SEE.Performance.Begin("loading graph data from " + settings.GXLPath());
+#endif
+#if UNITY_EDITOR
                 graphCreator.Load();
+#else
+                // TODO some alternative of fix above
+#endif
                 Graph graph = graphCreator.GetGraph();
+                if (graph == null)
+                {
+                    return null;
+                }
+#if UNITY_EDITOR
                 p.End();
+#endif
                 Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
                 Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
                 return graph;
