@@ -134,6 +134,8 @@ namespace SEE.Layout
                     UnityEngine.Object prefab = null;
 #if UNITY_EDITOR
                     prefab = UnityEditor.AssetDatabase.LoadAssetAtPath(filename, typeof(GameObject));
+#else
+                    prefab = (UnityEngine.Object)Resources.Load(filename, typeof(UnityEngine.Object));//TODO untested. Solution should work in built game
 #endif
                     if (prefab == null)
                     {
