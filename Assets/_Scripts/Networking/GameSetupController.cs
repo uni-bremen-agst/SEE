@@ -13,8 +13,8 @@ namespace SEE
         void Start()
         {
             PhotonNetwork.Instantiate(Path.Combine("Prefabs", "Player"), Vector3.zero, Quaternion.identity);
-            GameObject hands = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "Hand Models"), Vector3.zero, Quaternion.identity);
-            hands.transform.parent = GameObject.Find("Leap Rig").transform;
+
+            // TODO cities must be able to be generated outside of editor
 #if true
             GraphSettings gs = new GraphSettings();
             gs.pathPrefix = Application.dataPath.Replace('/', '\\') + '\\';
