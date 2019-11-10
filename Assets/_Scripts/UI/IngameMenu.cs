@@ -20,6 +20,11 @@ namespace SEE
         {
             gameStateController.SetState(GameState.Ingame);
         }
+
+        public void GoToMainMenu()
+        {
+            SceneController.LoadScene(SceneController.Scene.MainMenu);
+        }
     }
 
 }// namespace SEE
