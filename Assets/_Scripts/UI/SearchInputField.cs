@@ -8,7 +8,7 @@ namespace SEE
     public class SearchInputField : MonoBehaviour
     {
         public GameObject scrollView;
-        public SearchManager searchManager;
+        public ListItemManager searchManager;
         public InputField searchField;
 
         private bool isSelected;
