@@ -70,6 +70,12 @@ namespace SEE.Layout
             return layout_result;
         }
 
+        /// <summary>
+        /// Adds positioning and scaling to layout_result for all root nodes (nodes with no parent)
+        /// within a rectangle whose center position is Vector3.zero and whose width and depth is 
+        /// as specified by the constructor call. This function is then called recursively for the 
+        /// children of each root (until leaves are reached).
+        /// </summary>
         private void CalculateLayout()
         {
             if (roots.Count == 1)
@@ -85,6 +91,17 @@ namespace SEE.Layout
             }
         }
 
+        /// <summary>
+        /// Adds positioning and scaling to layout_result for all given siblings (children of the same
+        /// immediate parent in the node tree) within a rectangle with left front corner (x, z) and
+        /// given width and depth. This function is then called recursively for the children of the
+        /// given siblings.
+        /// </summary>
+        /// <param name="siblings">hildren of the same immediate parent in the node tree</param>
+        /// <param name="x">x co-ordinate of the left front corner of the rectangle in which to place the nodes</param>
+        /// <param name="z">z co-ordinate of the left front corner of the rectangle</param>
+        /// <param name="width">width of the rectangle</param>
+        /// <param name="depth">depth of the rectangle</param>
         private void CalculateLayout(List<Node> siblings, float x, float z, float width, float depth)
         {
             List<RectangleTiling.NodeSize> sizes = GetSizes(siblings);
