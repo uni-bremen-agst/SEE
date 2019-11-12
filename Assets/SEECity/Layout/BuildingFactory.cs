@@ -117,12 +117,28 @@ namespace SEE.Layout
             }
         }
 
+        /// <summary>
+        /// If true, NewBlock(index) should return different types of buildings
+        /// depending upon the index, otherwise the same building type is 
+        /// created independent of the index.
+        /// </summary>
+        private const bool createDifferentBuildingTypes = true;
+
         public override GameObject NewBlock(int index = 0)
         {
-            // The most suitable CScape building is CSTemplate30 because that kind of
-            // building can be scaled down to (1 floors, 1 depth, 1 width).
-            index = Mathf.Clamp(0, prefabs.Length - 1, index);
-            return NewBuilding(index);
+            if (createDifferentBuildingTypes)
+            {
+                index = Mathf.Clamp(0, prefabs.Length - 1, index);
+                return NewBuilding(index);
+            }
+            else
+            {
+                // The most suitable CScape building is CSTemplate30 because that kind of
+                // building can be scaled down to (1 floors, 1 depth, 1 width).
+                return NewBuilding(0);
+            }
+            
+
         }
 
         /// <summary>
