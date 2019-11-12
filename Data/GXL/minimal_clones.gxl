@@ -491,6 +491,48 @@
         <string>dir_root</string>
       </attr>
     </node>
+	<node id="N24">
+      <type xlink:href="Directory"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Source.Name">
+        <string>dir_D</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>dir_D</string>
+      </attr>
+    </node>
+	    <node id="N25">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>490</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>211</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.25</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>25</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>d.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>d.cpp</string>
+      </attr>
+    </node>
     <edge id="E1" from="N4" to="N1">
       <type xlink:href="Enclosing"/>
     </edge>
@@ -610,6 +652,12 @@
     </edge>	
 	<edge id="E40" from="N16" to="N17">
       <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E41" from="N24" to="N23">
+      <type xlink:href="Enclosing"/>
+    </edge>
+	 <edge id="E19" from="N25" to="N24">
+      <type xlink:href="Enclosing"/>
     </edge>
   </graph>
 </gxl>
