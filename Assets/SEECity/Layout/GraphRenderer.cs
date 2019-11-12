@@ -368,13 +368,13 @@ namespace SEE.Layout
                     {
                         // In case of treemaps, the width metric is mapped on the ground area.
                         float widthOfSquare = Mathf.Sqrt(scale.x);
-                        leaveNodeFactory.SetWidth(block, widthOfSquare);
-                        leaveNodeFactory.SetDepth(block, widthOfSquare);
-                        leaveNodeFactory.SetHeight(block, scale.y);
+                        leaveNodeFactory.SetWidth(block, leaveNodeFactory.Unit() * widthOfSquare);
+                        leaveNodeFactory.SetDepth(block, leaveNodeFactory.Unit() * widthOfSquare);
+                        leaveNodeFactory.SetHeight(block, leaveNodeFactory.Unit() * scale.y);
                     }
                     else
                     {
-                        leaveNodeFactory.SetSize(block, scale);
+                        leaveNodeFactory.SetSize(block, leaveNodeFactory.Unit() * scale);
                     }
 
                     result[node] = block;

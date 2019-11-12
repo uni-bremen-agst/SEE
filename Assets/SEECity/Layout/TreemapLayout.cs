@@ -256,7 +256,7 @@ namespace SEE.Layout
             {
                 GameObject o = nodes[i].gameNode;
                 Vector3 position = new Vector3(rect.x + rect.width / 2.0f, groundLevel, rect.z + rect.depth / 2.0f);
-                Vector3 scale = new Vector3(rect.width / leafNodeFactory.Unit(), o.transform.localScale.y, rect.depth / leafNodeFactory.Unit());
+                Vector3 scale = new Vector3(rect.width, o.transform.localScale.y, rect.depth);
                 layout_result[o] = new NodeTransform(position, scale);
                 i++;
             }
