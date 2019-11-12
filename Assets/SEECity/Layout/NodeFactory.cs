@@ -9,9 +9,27 @@ namespace SEE.Layout
     {
         /// <summary>
         /// Creates and returns a new block representation of a graph node.
+        /// The interpretation of the given index depends upon the subclasses.
+        /// It can be used to specify a visual property of the objects such
+        /// as the color. The allowed range of it depends upon the subclasses, too.
         /// </summary>
+        /// <param name="index">specifies an additional visual parameter of the object</param>
         /// <returns>new block representation</returns>
-        public abstract GameObject NewBlock();
+        public abstract GameObject NewBlock(int index = 0);
+
+        /// <summary>
+        /// The collection of materials to be used by this node factory.
+        /// </summary>
+        protected Materials materials;
+
+        /// <summary>
+        /// The number of materials offered.
+        /// </summary>
+        /// <returns>number of materials offered</returns>
+        public virtual int NumberOfMaterials()
+        {
+            return materials.NumberOfMaterials();
+        }
 
         /// <summary>
         /// The length unit of a block representation in Unity measures.

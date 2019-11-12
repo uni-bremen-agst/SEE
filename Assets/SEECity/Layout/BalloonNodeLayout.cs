@@ -260,7 +260,8 @@ namespace SEE.Layout
                 position.y += LevelLift(node);
                 layout_result[to_game_node[node]]
                     = new NodeTransform(position,
-                                        new Vector3(2 * nodeInfos[node].outer_radius, circleHeight, 2 * nodeInfos[node].outer_radius));
+                                        new Vector3(2 * nodeInfos[node].outer_radius, 
+                                                    innerNodeHeight, 2 * nodeInfos[node].outer_radius));
 
                 // The center points of the children circles are located on the circle
                 // with center point 'position' and radius of the inner circle of the
