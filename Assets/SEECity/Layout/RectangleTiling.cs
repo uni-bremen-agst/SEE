@@ -229,10 +229,6 @@ namespace SEE.Layout
             {
                 return new List<Rectangle>();
             }
-            if (sizes.Count == 1)
-            {
-                return Layout(sizes, x, z, width, depth);
-            }
             NormalizeAndSort(sizes, width, depth);
 
             // The position at which to split.
