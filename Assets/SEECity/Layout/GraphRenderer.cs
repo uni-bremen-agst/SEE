@@ -156,7 +156,7 @@ namespace SEE.Layout
                 case GraphSettings.NodeLayouts.Treemap:
                     nodeMap = CreateBlocks(nodes); // leaves
                     AddContainers(nodeMap, nodes); // and inner nodes
-                    layout = new TreemapLayout(groundLevel, leaveNodeFactory, 100.0f, 100.0f).Layout(nodeMap.Values);
+                    layout = new TreemapLayout(groundLevel, leaveNodeFactory, 100.0f * Unit(), 100.0f * Unit()).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.Balloon:
                     nodeMap = CreateBlocks(nodes); // leaves
