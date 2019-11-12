@@ -13,13 +13,13 @@ namespace SEE.Layout
     public class TreemapLayout : NodeLayout
     {
         /// <summary>
-        /// Constructor.
+        /// Constructor. The width and depth are assumed to be in Unity units.
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
         /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
-        /// <param name="width">width of the rectangle in which to place all nodes</param>
-        /// <param name="depth">width of the rectangle in which to place all nodes</param>
+        /// <param name="width">width of the rectangle in which to place all nodes in Unity units</param>
+        /// <param name="depth">width of the rectangle in which to place all nodes in Unity units</param>
         public TreemapLayout(float groundLevel,
                              NodeFactory leafNodeFactory,
                              float width,
@@ -32,12 +32,12 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// The width of the rectangle in which to place all nodes.
+        /// The width of the rectangle in which to place all nodes in Unity units.
         /// </summary>
         private readonly float width;
 
         /// <summary>
-        /// The depth of the rectangle in which to place all nodes.
+        /// The depth of the rectangle in which to place all nodes in Unity units.
         /// </summary>
         private readonly float depth;
 
