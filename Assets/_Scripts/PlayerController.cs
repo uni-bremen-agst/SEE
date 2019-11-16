@@ -16,9 +16,11 @@ namespace SEE
         void Update()
         {
             if (photonView.IsMine == false && PhotonNetwork.IsConnected == true)
+            {
                 return;
+            }
 
-            transform.position = Camera.main.transform.position;
+            transform.position = Camera.main.transform.position + 3*Camera.main.transform.forward;
             transform.rotation = Camera.main.transform.rotation;
         }
     }

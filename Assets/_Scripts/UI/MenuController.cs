@@ -12,18 +12,21 @@ namespace SEE
         private GameObject MainMenu;
         private GameObject CreateOnlineRoomMenu;
         private GameObject JoinOnlineRoomMenu;
+        private GameObject EditCharacterMenu;
 
         private void Start()
         {
             this.MainMenu             = (GameObject)Resources.Load("Prefabs/MainMenu",             typeof(GameObject));
             this.CreateOnlineRoomMenu = (GameObject)Resources.Load("Prefabs/CreateOnlineRoomMenu", typeof(GameObject));
             this.JoinOnlineRoomMenu   = (GameObject)Resources.Load("Prefabs/JoinOnlineRoomMenu",   typeof(GameObject));
+            this.EditCharacterMenu    = (GameObject)Resources.Load("Prefabs/EditCharacterMenu",    typeof(GameObject));
         }
 
         public void GoToMainMenu()             { SwitchToMenu(this.MainMenu); }
         public void StartSingleplayer()        { SceneController.LoadScene(SceneController.Scene.Singleplayer); }
         public void GoToCreateOnlineRoomMenu() { SwitchToMenu(this.CreateOnlineRoomMenu); }
         public void GoToJoinOnlineRoomMenu()   { SwitchToMenu(this.JoinOnlineRoomMenu); }
+        public void GoToEditCharacterMenu()    { SceneController.LoadScene(SceneController.Scene.EditCharacter); }
 
         private void SwitchToMenu(GameObject prefab)
         {

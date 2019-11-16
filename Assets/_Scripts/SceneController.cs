@@ -10,7 +10,8 @@ namespace SEE
         {
             MainMenu,
             Singleplayer,
-            Multiplayer
+            Multiplayer,
+            EditCharacter,
         }
 
         public void LoadMainMenuScene()
@@ -26,6 +27,11 @@ namespace SEE
         public void LoadMultiplayerScene()
         {
             LoadScene(Scene.Multiplayer);
+        }
+
+        public void LoadEditCharacterScene()
+        {
+            LoadScene(Scene.EditCharacter);
         }
 
         public static void LoadScene(Scene scene)
