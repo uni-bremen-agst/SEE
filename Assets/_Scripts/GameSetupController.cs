@@ -12,7 +12,7 @@ namespace SEE
     {
         void Start()
         {
-            PhotonNetwork.Instantiate(Path.Combine("Prefabs", "Player"), Vector3.zero, Quaternion.identity);
+            InitializePlayer();
 
             // TODO cities must be able to be generated outside of editor
 #if true
@@ -50,6 +50,20 @@ namespace SEE
 
             GameStateController gsc = GameObject.FindObjectOfType<GameStateController>();
             gsc.Initialize();
+        }
+
+        private void InitializePlayer()
+        {
+            GameObject player = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "Player"), Vector3.zero, Quaternion.identity);
+            GameObject playerHead = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerHead"), Vector3.zero, Quaternion.identity);
+            GameObject staticPlayerHead = PlayerData.playerHead;
+
+            playerHead.transform.parent = player.transform;
+            PhotonView.Get(playerHead).RPC("InitializeMaterial", RpcTarget.All);
+            PhotonView.Get(playerHead).RPC("SetTextureScaleX", RpcTarget.All, staticPlayerHead.GetComponentInChildren<MeshRenderer>().material.mainTextureScale.x);
+            PhotonView.Get(playerHead).RPC("SetTextureScaleY", RpcTarget.All, staticPlayerHead.GetComponentInChildren<MeshRenderer>().material.mainTextureScale.y);
+            PhotonView.Get(playerHead).RPC("SetTextureOffsetX", RpcTarget.All, staticPlayerHead.GetComponentInChildren<MeshRenderer>().material.mainTextureOffset.x);
+            PhotonView.Get(playerHead).RPC("SetTextureOffsetY", RpcTarget.All, staticPlayerHead.GetComponentInChildren<MeshRenderer>().material.mainTextureOffset.y);
         }
     }
 

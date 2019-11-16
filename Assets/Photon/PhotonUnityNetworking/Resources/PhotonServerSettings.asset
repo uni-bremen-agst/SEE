@@ -34,5 +34,12 @@ MonoBehaviour:
   - DestroySpaceship
   - Fire
   - RespawnSpaceship
+  - TestMessage
+  - SetTextureScaleX
+  - SetMaterial
+  - InitializeMaterial
+  - SetTextureOffsetX
+  - SetTextureOffsetY
+  - SetTextureScaleY
   DisableAutoOpenWizard: 1
   ShowSettings: 0
