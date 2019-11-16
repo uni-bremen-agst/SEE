@@ -5,29 +5,49 @@ namespace SEE
 
     public class HeadGenerator : MonoBehaviour
     {
+        public static readonly Vector3 HEAD_POSITION = new Vector3(0.0f, 2.0f, 0.0f);
+
+        private Material headMaterial;
+        private Material prefabHeadMaterial;
+
         void Start()
         {
-            PlayerData.playerHead.transform.position = new Vector3(0.0f, 2.0f, 0.0f);
+            GameObject playerHead = GameObject.Instantiate(PlayerData.GetPlayerHeadPrefab());
+            playerHead.transform.position = HEAD_POSITION;
+
+            headMaterial = playerHead.GetComponentInChildren<MeshRenderer>().material;
+            prefabHeadMaterial = PlayerData.GetPlayerHeadPrefab().GetComponentInChildren<MeshRenderer>().sharedMaterial;
+
+            headMaterial.mainTextureScale = prefabHeadMaterial.mainTextureScale;
+            headMaterial.mainTextureOffset = prefabHeadMaterial.mainTextureOffset;
         }
 
         public void SetTextureScaleX(float xScale)
         {
-            PlayerData.playerHead.GetComponentInChildren<Head>().SetTextureScaleX(xScale);
+            Vector2 scale = new Vector2(xScale, headMaterial.mainTextureScale.y);
+            headMaterial.mainTextureScale = scale;
+            prefabHeadMaterial.mainTextureScale = scale;
         }
 
         public void SetTextureScaleY(float yScale)
         {
-            PlayerData.playerHead.GetComponentInChildren<Head>().SetTextureScaleY(yScale);
+            Vector2 scale = new Vector2(headMaterial.mainTextureScale.x, yScale);
+            headMaterial.mainTextureScale = scale;
+            prefabHeadMaterial.mainTextureScale = scale;
         }
 
         public void SetTextureOffsetX(float xOffset)
         {
-            PlayerData.playerHead.GetComponentInChildren<Head>().SetTextureOffsetX(xOffset);
+            Vector2 offset = new Vector2(xOffset, headMaterial.mainTextureOffset.y);
+            headMaterial.mainTextureOffset = offset;
+            prefabHeadMaterial.mainTextureOffset = offset;
         }
 
         public void SetTextureOffsetY(float yOffset)
         {
-            PlayerData.playerHead.GetComponentInChildren<Head>().SetTextureOffsetY(yOffset);
+            Vector2 offset = new Vector2(headMaterial.mainTextureOffset.x, yOffset);
+            headMaterial.mainTextureOffset = offset;
+            prefabHeadMaterial.mainTextureOffset = offset;
         }
 
     }

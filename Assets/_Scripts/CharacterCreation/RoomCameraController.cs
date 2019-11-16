@@ -6,7 +6,7 @@ namespace SEE
 
     public class RoomCameraController : MonoBehaviour
     {
-        private GameObject Target;
+        private Vector3 target;
 
         private float distanceFromTarget = 4.0f;
         private float rotationSensibility = 0.1f;
@@ -22,7 +22,7 @@ namespace SEE
 
         void Start()
         {
-            Target = PlayerData.playerHead;
+            target = HeadGenerator.HEAD_POSITION;
             lastMouse = Input.mousePosition;
             pitch = 0.0f;
             yaw = 0.0f;
@@ -75,7 +75,7 @@ namespace SEE
                     yaw = -maxYaw;
                 }
 
-                transform.position = Target.transform.position;
+                transform.position = target;
                 Vector3 euler = new Vector3(pitch, yaw, roll);
                 transform.rotation = Quaternion.Euler(euler);
                 transform.position -= transform.forward * distanceFromTarget;

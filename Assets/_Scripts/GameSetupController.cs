@@ -56,14 +56,14 @@ namespace SEE
         {
             GameObject player = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "Player"), Vector3.zero, Quaternion.identity);
             GameObject playerHead = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerHead"), Vector3.zero, Quaternion.identity);
-            GameObject staticPlayerHead = PlayerData.playerHead;
+            GameObject playerHeadPrefab = PlayerData.GetPlayerHeadPrefab();
 
             playerHead.transform.parent = player.transform;
             PhotonView.Get(playerHead).RPC("InitializeMaterial", RpcTarget.All);
-            PhotonView.Get(playerHead).RPC("SetTextureScaleX", RpcTarget.All, staticPlayerHead.GetComponentInChildren<MeshRenderer>().material.mainTextureScale.x);
-            PhotonView.Get(playerHead).RPC("SetTextureScaleY", RpcTarget.All, staticPlayerHead.GetComponentInChildren<MeshRenderer>().material.mainTextureScale.y);
-            PhotonView.Get(playerHead).RPC("SetTextureOffsetX", RpcTarget.All, staticPlayerHead.GetComponentInChildren<MeshRenderer>().material.mainTextureOffset.x);
-            PhotonView.Get(playerHead).RPC("SetTextureOffsetY", RpcTarget.All, staticPlayerHead.GetComponentInChildren<MeshRenderer>().material.mainTextureOffset.y);
+            PhotonView.Get(playerHead).RPC("SetTextureScaleX", RpcTarget.All, playerHeadPrefab.GetComponentInChildren<MeshRenderer>().sharedMaterial.mainTextureScale.x);
+            PhotonView.Get(playerHead).RPC("SetTextureScaleY", RpcTarget.All, playerHeadPrefab.GetComponentInChildren<MeshRenderer>().sharedMaterial.mainTextureScale.y);
+            PhotonView.Get(playerHead).RPC("SetTextureOffsetX", RpcTarget.All, playerHeadPrefab.GetComponentInChildren<MeshRenderer>().sharedMaterial.mainTextureOffset.x);
+            PhotonView.Get(playerHead).RPC("SetTextureOffsetY", RpcTarget.All, playerHeadPrefab.GetComponentInChildren<MeshRenderer>().sharedMaterial.mainTextureOffset.y);
         }
     }
 
