@@ -74,6 +74,8 @@ namespace SEE
             Debug.Log("Failed to join room!");
             Debug.Log(message);
         }
+
+        //TODO: OnPhotonPlayerConnected: send other player info to this sad guy
     }
 
 }

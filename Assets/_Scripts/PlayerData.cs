@@ -5,28 +5,29 @@ namespace SEE
 
     public static class PlayerData
     {
-        public static GameObject playerHead = InitializePlayer();
-        public static GameObject PlayerHead
+        public static readonly float DEFAULT_TEXTURE_SCALE_X = 3.0f;
+        public static readonly float DEFAULT_TEXTURE_SCALE_Y = 1.1f;
+        public static readonly float DEFAULT_TEXTURE_OFFSET_X = -1.0f;
+        public static readonly float DEFAULT_TEXTURE_OFFSET_Y = -0.19f;
+
+        public static readonly Vector2 DEFAULT_TEXTURE_SCALE = new Vector2(DEFAULT_TEXTURE_SCALE_X, DEFAULT_TEXTURE_SCALE_Y);
+        public static readonly Vector2 DEFAULT_TEXTURE_OFFSET = new Vector2(DEFAULT_TEXTURE_OFFSET_X, DEFAULT_TEXTURE_OFFSET_Y);
+
+        private static GameObject playerHeadPrefab = LoadPlayerHeadPrefab();
+
+        public static GameObject GetPlayerHeadPrefab()
         {
-            get
-            {
-                return playerHead;
-            }
-            private set
-            {
-                playerHead = value;
-            }
+            return playerHeadPrefab;
         }
 
-        public static GameObject InitializePlayer()
+        public static GameObject LoadPlayerHeadPrefab()
         {
             GameObject prefab = (GameObject)Resources.Load("Prefabs/PlayerHead", typeof(GameObject));
-            GameObject playerHead = Object.Instantiate(prefab);
+            Material prefabMaterial = prefab.GetComponentInChildren<MeshRenderer>().sharedMaterial;
+            prefabMaterial.mainTextureScale = DEFAULT_TEXTURE_SCALE;
+            prefabMaterial.mainTextureOffset = DEFAULT_TEXTURE_OFFSET;
             Object.DontDestroyOnLoad(prefab);
-            Object.DontDestroyOnLoad(playerHead);
-            Object.DontDestroyOnLoad(playerHead.GetComponentInChildren<MeshRenderer>());
-            Object.DontDestroyOnLoad(playerHead.GetComponentInChildren<MeshRenderer>().material);
-            return playerHead;
+            return prefab;
         }
     }
 
