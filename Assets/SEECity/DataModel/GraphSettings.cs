@@ -147,6 +147,7 @@ namespace SEE
         /// </summary>
         public enum NodeLayouts
         {
+            FlatRectanglePacking,
             Treemap,
             Balloon,
             CirclePacking,

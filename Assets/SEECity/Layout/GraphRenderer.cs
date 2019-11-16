@@ -153,6 +153,10 @@ namespace SEE.Layout
                     nodeMap = CreateBlocks(nodes); // only leaves
                     layout = new ManhattanLayout(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
                     break;
+                case GraphSettings.NodeLayouts.FlatRectanglePacking:
+                    nodeMap = CreateBlocks(nodes); // only leaves
+                    layout = new RectanglePacker(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
+                    break;
                 case GraphSettings.NodeLayouts.Treemap:
                     nodeMap = CreateBlocks(nodes); // leaves
                     AddContainers(nodeMap, nodes); // and inner nodes
