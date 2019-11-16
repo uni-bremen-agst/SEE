@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
+    /// <summary>
+    /// Calculates a simple grid layout for leaf nodes (only). The order is
+    /// random. 
+    /// </summary>
     public class ManhattanLayout : NodeLayout
     {
         public ManhattanLayout(float groundLevel,
