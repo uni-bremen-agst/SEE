@@ -128,5 +128,40 @@ namespace SEE.Layout
             }
             return roots;
         }
+
+        /// <summary>
+        /// Creates the relevant tree consisting of the nodes to be laid out
+        /// (a subtree of the node hierarchy of the original graph).
+        /// 
+        /// </summary>
+        /// <param name="nodes">the nodes whose hierarchy is to be determined</param>
+        /// <param name="roots">the root nodes of the hierarchy</param>
+        /// <param name="children">mapping of nodes onto their immediate children</param>
+        protected static void CreateTree(ICollection<Node> nodes,
+                                         out List<Node> roots,
+                                         out Dictionary<Node, List<Node>> children)
+        {
+            // The subset of nodes of the graph for which the layout is requested.
+            HashSet<Node> allNodes = new HashSet<Node>(nodes);
+            roots = new List<Node>();
+            children = new Dictionary<Node, List<Node>>();
+
+            foreach (Node node in allNodes)
+            {
+                // Only children that are in the set of nodes to be laid out.
+                HashSet<Node> kids = new HashSet<Node>(node.Children());
+                kids.IntersectWith(allNodes);
+                children[node] = new List<Node>(kids);
+                {
+                    Node parent = node.Parent;
+                    // A node is considered a root if it has either no parent in the
+                    // graph or its parent is not contained in the set of nodes to be laid out.
+                    if (parent == null || !allNodes.Contains(parent))
+                    {
+                        roots.Add(node);
+                    }
+                }
+            }
+        }
     }
 }
