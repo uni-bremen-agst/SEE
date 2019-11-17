@@ -144,31 +144,32 @@ namespace SEE.Layout
         /// <param name="graph">graph whose nodes and edges are to be laid out</param>
         protected void DrawCity(Graph graph)
         {
-            Dictionary<Node, GameObject> nodeMap;
+            Dictionary<Node, GameObject> nodeMap = CreateBlocks(nodes);
             Dictionary<GameObject, NodeTransform> layout;
             List<Node> nodes = graph.Nodes();
             switch (settings.NodeLayout)
             {
                 case GraphSettings.NodeLayouts.Manhattan:
-                    nodeMap = CreateBlocks(nodes); // only leaves
+                    // only leaves
                     layout = new ManhattanLayout(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.FlatRectanglePacking:
-                    nodeMap = CreateBlocks(nodes); // only leaves
+                    // only leaves
                     layout = new RectanglePacker(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
                     break;
+                case GraphSettings.NodeLayouts.EvoStreets:
+                    AddContainers(nodeMap, nodes); // and inner nodes
+                    layout = new EvoStreetsNodeLayout(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
+                    break;
                 case GraphSettings.NodeLayouts.Treemap:
-                    nodeMap = CreateBlocks(nodes); // leaves
                     AddContainers(nodeMap, nodes); // and inner nodes
                     layout = new TreemapLayout(groundLevel, leaveNodeFactory, 100.0f * Unit(), 100.0f * Unit()).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.Balloon:
-                    nodeMap = CreateBlocks(nodes); // leaves
                     AddContainers(nodeMap, nodes); // and inner nodes
                     layout = new BalloonNodeLayout(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.CirclePacking:
-                    nodeMap = CreateBlocks(nodes); // leaves
                     AddContainers(nodeMap, nodes); // and inner nodes
                     layout = new CirclePackingNodeLayout(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
                     break;
@@ -199,7 +200,8 @@ namespace SEE.Layout
                 issueDecorator.Add(LeafNodes(gameNodes));
             }
 
-            if (settings.NodeLayout == GraphSettings.NodeLayouts.Balloon)
+            if (settings.NodeLayout == GraphSettings.NodeLayouts.Balloon 
+                || settings.NodeLayout == GraphSettings.NodeLayouts.EvoStreets)
             {
                 AddLabels(InnerNodes(gameNodes));
             }
