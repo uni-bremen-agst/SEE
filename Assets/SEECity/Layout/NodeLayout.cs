@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -137,6 +138,7 @@ namespace SEE.Layout
         /// <param name="nodes">the nodes whose hierarchy is to be determined</param>
         /// <param name="roots">the root nodes of the hierarchy</param>
         /// <param name="children">mapping of nodes onto their immediate children</param>
+        /// 
         protected static void CreateTree(ICollection<Node> nodes,
                                          out List<Node> roots,
                                          out Dictionary<Node, List<Node>> children)
@@ -162,6 +164,49 @@ namespace SEE.Layout
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the maximal depth of the forest with the given root nodes.
+        /// If roots.Count == 0, 0 is the maximal depth. If there is at least
+        /// one root, the minimum value of the maximal depth is 1.
+        /// </summary>
+        /// <param name="roots">set of root tree nodes of the forest</param>
+        /// <param name="children">mapping of nodes onto their children</param>
+        /// <returns>maximal depth of the forest</returns>
+        protected static int MaxDepth(List<Node> roots, Dictionary<Node, List<Node>> children)
+        {
+            int result = 0;
+            foreach (Node root in roots)
+            {
+                int depth = MaxDepth(root, children);
+                if (depth > result)
+                {
+                    result = depth;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the maximal depth of the tree rooted by given node. The depth of
+        /// a node with only one node is 1.
+        /// </summary>
+        /// <param name="node">root node of the tree</param>
+        /// <param name="children">mapping of nodes onto their children</param>
+        /// <returns>maximal depth of the tree</returns>
+        protected static int MaxDepth(Node node, Dictionary<Node, List<Node>> children)
+        {
+            int result = 0;
+            foreach (Node child in children[node])
+            {
+                int depth = MaxDepth(child, children);
+                if (depth > result)
+                {
+                    result = depth;
+                }
+            }
+            return result + 1;
         }
     }
 }

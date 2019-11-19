@@ -125,6 +125,7 @@ namespace SEE
         /// </summary>
         public enum InnerNodeKinds
         {
+            Blocks,
             Rectangles,
             Donuts,
             Circles,
@@ -147,12 +148,13 @@ namespace SEE
         /// </summary>
         public enum NodeLayouts
         {
-            EvoStreets,
             Balloon,
             FlatRectanglePacking,
             Treemap,
             CirclePacking,
             Manhattan,
+            ScoopEvoStreets,
+            EvoStreets,
         }
 
         /// <summary>
