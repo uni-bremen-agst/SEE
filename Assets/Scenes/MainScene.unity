@@ -556,10 +556,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 777166b103fd6964f95e4c82cbdd85f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  relativeBaseSpeed: 30
-  relativeMaximalSpeed: 300
+  relativeBaseSpeed: 10
+  relativeMaximalSpeed: 100
   absoluteMinimumSpeed: 0.5
-  absoluteMaximumSpeed: 900
+  absoluteMaximumSpeed: 300
   acceleration: 10
   rotationFactor: 50
   groundDistanceFactor: 0.1
