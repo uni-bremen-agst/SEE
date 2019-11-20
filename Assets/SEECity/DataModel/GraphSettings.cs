@@ -1,5 +1,6 @@
 ﻿using SEE.Layout;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE
 {
@@ -27,8 +28,8 @@ namespace SEE
         //public string csvPath = "..\\Data\\GXL\\micro_clones.csv";
 
         /// Tiny clone graph with single root to experiment with.
-        public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
-        public string csvPath = "..\\Data\\GXL\\minimal_clones.csv";
+        //public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
+        //public string csvPath = "..\\Data\\GXL\\minimal_clones.csv";
 
         /// Tiny clone graph with single roots to check edge bundling.
         //public string gxlPath = "..\\Data\\GXL\\controlPoints.gxl";
@@ -39,8 +40,8 @@ namespace SEE
         //public string csvPath = "..\\Data\\GXL\\linux-clones\\fs.csv";
 
         // Smaller clone graph with single root (Linux directory "net").
-        //public string gxlPath = "..\\Data\\GXL\\linux-clones\\net.gxl";
-        //public string csvPath = "..\\Data\\GXL\\linux-clones\\net.csv";
+        public string gxlPath = "..\\Data\\GXL\\linux-clones\\net.gxl";
+        public string csvPath = "..\\Data\\GXL\\linux-clones\\net.csv";
 
         // Larger clone graph with single root (Linux directory "drivers"): 16.920 nodes, 10583 edges.
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\drivers.gxl";
@@ -69,7 +70,12 @@ namespace SEE
         {
             return pathPrefix + csvPath;
         }
-        
+
+        /// <summary>
+        /// The center origin where the graph should be placed in the world scene.
+        /// </summary>
+        public Vector3 origin = Vector3.zero;
+
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>

@@ -87,6 +87,24 @@ namespace SEE.Layout
         public abstract Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes);
 
         /// <summary>
+        /// Add the given offset to every node position in the given layout.
+        /// </summary>
+        /// <param name="layout">node layout to be adjusted</param>
+        /// <param name="offset">offset to be added</param>
+        /// <returns></returns>
+        public static Dictionary<GameObject, NodeTransform> Move(Dictionary<GameObject, NodeTransform> layout, Vector3 offset)
+        {
+            Dictionary<GameObject, NodeTransform> result = new Dictionary<GameObject, NodeTransform>();
+            foreach(var entry in layout)
+            {
+                NodeTransform transform = entry.Value;
+                transform.position += offset;
+                result[entry.Key] = transform;
+            }
+            return result;
+        }
+
+        /// <summary>
         /// A mapping of graph nodes onto their game nodes.
         /// </summary>
         protected Dictionary<Node, GameObject> to_game_node;

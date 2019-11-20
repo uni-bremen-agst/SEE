@@ -189,7 +189,7 @@ namespace SEE.Layout
 
             if (settings.NodeLayout != GraphSettings.NodeLayouts.ScoopEvoStreets) // FIXME
             {
-                Apply(layout);
+                Apply(layout, settings.origin);
             }
             // ICollection<GameObject> gameNodes = nodeMap.Values;
             ICollection<GameObject> gameNodes = layout.Keys;
@@ -299,12 +299,13 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Applies the layout to all nodes.
+        /// Applies the layout to all nodes at given origin.
         /// </summary>
         /// <param name="layout">node layout to be applied</param>
-        public void Apply(Dictionary<GameObject, NodeTransform> layout)
-        {
-            foreach (var entry in layout)
+        /// <param name="origin">the center origin where the graph should be placed in the world scene</param>
+        public void Apply(Dictionary<GameObject, NodeTransform> layout, Vector3 origin)
+        {      
+            foreach (var entry in NodeLayout.Move(layout, origin))
             {
                 GameObject gameNode = entry.Key;
                 NodeTransform transform = entry.Value;
