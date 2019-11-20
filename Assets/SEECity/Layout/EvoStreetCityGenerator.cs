@@ -14,15 +14,13 @@ namespace SEE.Layout
 
         public float OffsetBetweenBuildings = 4.5f;
 
-        public float StreetWidth = 3.0f;
+        // The street width that will be adjusted by the "depth" of the street.
+        public float StreetWidth = 2.0f;
 
+        // The height of the street (y co-ordinate)
         public float StreetHeight = 0.1f;
 
-        public bool bUseRootX = false;
-
         private IScale scaler;
-
-        public float RootX = 1.3f;
 
         private const float CM_TO_M = 1.0f;
 
@@ -261,9 +259,12 @@ namespace SEE.Layout
         private void CalcScale(ENode node)
         {
             // Scaled metric values for the dimensions.
+            // FIXME: Currently, y and z axes are swapped (verbatim Unreal -> Unity migration) that is why
+            // we also need the HeightMetric and DepthMetric metric. We need to revert this swapping
+            // as soon as we have adjusted the code here to Unity's co-ordinate system.
             node.Scale = new Vector3(scaler.GetNormalizedValue(graphSettings.WidthMetric,  node.GraphNode),
-                                     scaler.GetNormalizedValue(graphSettings.HeightMetric, node.GraphNode),
-                                     scaler.GetNormalizedValue(graphSettings.DepthMetric,  node.GraphNode));
+                                     scaler.GetNormalizedValue(graphSettings.DepthMetric,  node.GraphNode),
+                                     scaler.GetNormalizedValue(graphSettings.HeightMetric, node.GraphNode));
         }
 
         private float maxLeftY(ENode node, float offset)
