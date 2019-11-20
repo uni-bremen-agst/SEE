@@ -147,7 +147,7 @@ namespace SEE.Layout.EvoStreets
             var rotation = Quaternion.Euler(0, nodeRotationZ, 0); // this needs to be assigned to y due to difference between unity and unreal
             var o = NewLeaf(node.GraphNode);
             o.transform.localScale = nodeScale;
-            o.transform.position = node.Location;
+            o.transform.position = node.Location + graphSettings.origin;
             o.transform.rotation = rotation;
             o.name = (node.IsHouse() ? "House " : (node.IsStreet()) ? "Street " : "None ") + node.GraphNode.LinkName;
             AttachNode(o, node.GraphNode);
@@ -182,7 +182,7 @@ namespace SEE.Layout.EvoStreets
             // TODO: instantiate some kind of actor/gameobj to display street
             var rotation = Quaternion.Euler(0, nodeRotationZ, 0); // this needs to be assigned to y due to difference between unity and unreal
             var o = streetFactory.NewBlock(0);
-            o.transform.position = node.Location;
+            o.transform.position = node.Location + graphSettings.origin;
             o.transform.rotation = rotation;
             o.transform.localScale = nodeScale;
             o.name = (node.IsHouse() ? "House " : (node.IsStreet()) ? "Street " : "None ") + node.GraphNode.LinkName;
