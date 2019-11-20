@@ -399,12 +399,7 @@ namespace SEE.Layout
             //innerCircle.transform.localPosition = Vector3.zero;
             //innerCircle.transform.localScale = new Vector3(fractionOfInnerCircle, 1.0f, fractionOfInnerCircle);
             Renderer renderer = innerCircle.GetComponent<Renderer>();
-            // We need to create a new material so that we can change its color
-            // independently from other meshes.
-            // FIXME: All segments of the same color should have the very same material.
-            // The fewer materials we have, the fewer rendering calls do we have at run-time.
-            renderer.sharedMaterial = new Material(Shader.Find("Diffuse"));
-            renderer.sharedMaterial.color = Color.Lerp(Color.white, Color.black, innerValue);
+            renderer.sharedMaterial = ShadesOfGrey.GetGreyMaterial(innerValue);
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
         }
