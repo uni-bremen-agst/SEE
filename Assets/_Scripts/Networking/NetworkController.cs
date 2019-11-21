@@ -10,8 +10,8 @@ namespace SEE
         void Start()                             { PhotonNetwork.AddCallbackTarget(this); }
         void OnDestroy()                         { PhotonNetwork.RemoveCallbackTarget(this); }
 
-        public override void OnEnable()          { PhotonNetwork.AddCallbackTarget(this); }
-        public override void OnDisable()         { PhotonNetwork.RemoveCallbackTarget(this); }
+        public override void OnEnable()          { base.OnEnable(); PhotonNetwork.AddCallbackTarget(this); }
+        public override void OnDisable()         { base.OnDisable(); PhotonNetwork.RemoveCallbackTarget(this); }
 
         public static bool IsConnected()         { return PhotonNetwork.IsConnected; }
         public static void Connect()             { if (!IsConnected()) PhotonNetwork.ConnectUsingSettings(); }
@@ -26,6 +26,7 @@ namespace SEE
             Private, Public
         }
 
+        #region Non Overrides
         public static void CreateRoom(string name, byte maxPlayers, Visibility visibility)
         {
             RoomOptions roomOptions = new RoomOptions();
@@ -41,7 +42,15 @@ namespace SEE
 
             PhotonNetwork.CreateRoom(name, roomOptions);
         }
+        
+        [PunRPC]
+        public static void OnPlayerConnected(PhotonView photonView)
+        {
 
+        }
+        #endregion
+
+        #region Overrides
         public override void OnConnectedToMaster()
         {
             base.OnConnectedToMaster();
@@ -74,8 +83,7 @@ namespace SEE
             Debug.Log("Failed to join room!");
             Debug.Log(message);
         }
-
-        //TODO: OnPhotonPlayerConnected: send other player info to this sad guy
+        #endregion
     }
 
 }
