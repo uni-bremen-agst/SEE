@@ -15,7 +15,7 @@ namespace SEE
             InitializePlayer();
 
             // TODO cities must be able to be generated outside of editor
-#if true
+#if false
             GraphSettings gs = new GraphSettings();
             gs.pathPrefix = Application.dataPath.Replace('/', '\\') + '\\';
             Graph g = SceneGraphs.Add(gs);

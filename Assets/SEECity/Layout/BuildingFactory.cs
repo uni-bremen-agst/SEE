@@ -4,70 +4,95 @@ using SEE.DataModel;
 
 namespace SEE.Layout
 {
-    public class BuildingFactory : BlockFactory
+    /// <summary>
+    /// A factory for game objects represented by CScape buildings.
+    /// </summary>
+    public class BuildingFactory : NodeFactory
     {
-        private static readonly string pathPrefix = "Assets/CScape/Editor/Resources/BuildingTemplates/Buildings/";
+        /// <summary>
+        /// The number of building types offered.
+        /// </summary>
+        /// <returns>number of building types offered</returns>
+        public override int NumberOfMaterials()
+        {
+            return prefabFiles.Length;
+        }
 
-        private static readonly string fileExtension = ".prefab";
+        /// <summary>
+        /// Path to the folder assumed to be contained in a folder named Resources 
+        /// in the Assets directory where the prefabs for the buildings are located.
+        /// </summary>
+        private static readonly string pathPrefix = "BuildingTemplates/Buildings/";
 
+        /// <summary>
+        /// Filenames of the prefabs for the buildings excluding their file extension .prefab
+        /// </summary>
         private static readonly string[] prefabFiles = new string[]
-            {
-              "CSTemplate03",
-              "CSTemplate05",
-              "CSTemplate06",
-              "CSTemplate07",
-              "CSTemplate09",
-              "CSTemplate11",
-              "CSTemplate12",
-              "CSTemplate13",
-              "CSTemplate14",
-              "CSTemplate15",
-              "CSTemplate16",
-              "CSTemplate17",
-              "CSTemplate18",
-              "CSTemplate19",
-              "CSTemplate20",
-              "CSTemplate22",
-              "CSTemplate23",
-              "CSTemplate24",
-              "CSTemplate25",          
-              "CSTemplate26",        
-              "CSTemplate27",        
-              "CSTemplate28",        
-              "CSTemplate29",    
-              "CSTemplate30",
-              "CSTemplate-SlantedRoofSmall",
-              "CSTemplateForEdit",
-              "Build0Small",
-              "Build0SmallSlantedroof",
-              "Build1"
+            {                 // floor, depth, width
+              "CSTemplate30", // 1, 1, 1
+              "CSTemplate03", // 3, 3, 3
+              "CSTemplate05", // 4, 4, 4
+              "CSTemplate06", // 4, 8, 7
+              "CSTemplate07", // 5, 7, 7
+              "CSTemplate09", // 3, 3, 3
+              "CSTemplate11", // 3, 4, 4
+              "CSTemplate12", // 4, 4, 4
+              "CSTemplate13", // 8, 9, 9
+              "CSTemplate14", // 8, 10, 10
+              "CSTemplate15", // 7, 3, 3
+              "CSTemplate16", // 7, 3, 3
+              "CSTemplate17", // 4, 5, 5
+              "CSTemplate18", // 3, 5, 6
+              "CSTemplate19", // 12, 3, 3
+              "CSTemplate20", // 3, 8, 8
+              "CSTemplate22", // 8, 10, 10
+              "CSTemplate23", // 8, 9, 9
+              "CSTemplate24", // 4, 8, 7
+              "CSTemplate25", // 8, 4, 4
+              "CSTemplate26", // 7, 3, 3
+              "CSTemplate27", // 3, 4, 4
+              "CSTemplate28", // 6, 8, 9
+              "CSTemplate29", // 4, 3, 3   
+              "CSTemplate-SlantedRoofSmall", // 3, 2, 2
+              "CSTemplateForEdit", // 4, 5, 5   
+              "Build0Small", // 2, 1, 1
+              "Build0SmallSlantedroof", // 1, 1, 1
+              "Build1" // 5, 7, 7
             };
 
+        /// <summary>
+        /// The loaded prefabs for the CScape building we use for their instantiation.
+        /// </summary>
         private static readonly UnityEngine.Object[] prefabs = LoadAllPrefabs();
 
+        /// <summary>
+        /// Loads and returns all prefabs listed in prefabFiles.
+        /// </summary>
+        /// <returns>all prefabs listed in prefabFiles</returns>
         private static UnityEngine.Object[] LoadAllPrefabs()
         {
             UnityEngine.Object[] result = new UnityEngine.Object[prefabFiles.Length];
             int i = 0;
             foreach (string filename in prefabFiles)
             {
-                string path = pathPrefix + filename + fileExtension;
-                result[i] = null;
-#if UNITY_EDITOR
-                result[i] = UnityEditor.AssetDatabase.LoadAssetAtPath(path, typeof(GameObject));
-#else
-                result[i] = Resources.Load<GameObject>(path); //TODO doesnt work, assets are inside some UnityEditor folder, probably not compatible with runtime generation at all...
-#endif
+                string path = pathPrefix + filename;
+                result[i] = Resources.Load<GameObject>(path);
+
+                //result[i] = Resources.Load<UnityEngine.Object>(filename);
                 if (result[i] == null)
                 {
                     Debug.LogErrorFormat("[BuildingFactory] Could not load building prefab {0}.\n", path);
-                    result[i] = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 }
                 i++;
             }
             return result;
         }
 
+        /// <summary>
+        /// Adds one instance of each type of CScape building. This function can be
+        /// used to create all buildings for inspection. It is not actually used
+        /// for a real scene.
+        /// </summary>
         private static void GenerateAllBuildingPrefabs()
         {
             Vector3 position = Vector3.zero;
@@ -92,14 +117,36 @@ namespace SEE.Layout
             }
         }
 
-        public override GameObject NewBlock()
+        /// <summary>
+        /// If true, NewBlock(index) should return different types of buildings
+        /// depending upon the index, otherwise the same building type is 
+        /// created independent of the index.
+        /// </summary>
+        private const bool createDifferentBuildingTypes = false;
+
+        public override GameObject NewBlock(int index = 0)
         {
-            return NewBuilding(Random.Range(0, prefabs.Length - 1));
+            if (createDifferentBuildingTypes)
+            {
+                index = Mathf.Clamp(0, prefabs.Length - 1, index);
+                return NewBuilding(index);
+            }
+            else
+            {
+                // The most suitable CScape building is CSTemplate30 because that kind of
+                // building can be scaled down to (1 floors, 1 depth, 1 width).
+                return NewBuilding(0);
+            }
         }
 
-        private static GameObject NewBuilding(int i)
+        /// <summary>
+        /// Returns the CScape building with given index relative to prefabs.
+        /// </summary>
+        /// <param name="index">index of the building to be returned</param>
+        /// <returns>CScape building with given index</returns>
+        private static GameObject NewBuilding(int index)
         {
-            return NewBuilding(prefabs[i]);
+            return NewBuilding(prefabs[index]);
         }
 
         public override float Unit()
@@ -107,8 +154,19 @@ namespace SEE.Layout
             return CScapeUnit;
         }
 
+        /// <summary>
+        /// One CScape unit (floor level height) is three Unity units.
+        /// One Unity unit represents one meter in real world. Three meters
+        /// resembles the height of a floor in real world.
+        /// </summary>
         private const float CScapeUnit = 3.0f;
 
+        /// <summary>
+        /// Instantiates the given prefab (a CScape building) and sets various
+        /// parameters.
+        /// </summary>
+        /// <param name="prefab"></param>
+        /// <returns></returns>
         private static GameObject NewBuilding(UnityEngine.Object prefab)
         {
             GameObject building = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
@@ -174,14 +232,18 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Scales the given block by the given scale. Note: The unit of scaling 
-        /// is as follows: x -> building width, y -> number of floors, z -> building depth
+        /// Scales the given block to the given size. Note: The unit of size 
+        /// is the Unit size and mapped on building length attributes as follows:
+        ///
+        ///    x -> building width / Unit()
+        ///    y -> number of floors / Unit()
+        ///    z -> building depth / Unit()
         /// 
         /// Precondition: The given block must have been generated by this factory.
         /// </summary>
         /// <param name="block">block to be scaled</param>
-        /// <param name="scale">scaling factor</param>
-        public override void ScaleBlock(GameObject block, Vector3 scale)
+        /// <param name="size">new size in Unity units</param>
+        public override void SetSize(GameObject block, Vector3 size)
         {
             // Scale by the number of floors of a building.
             BuildingModifier bm = block.GetComponent<BuildingModifier>();
@@ -191,29 +253,114 @@ namespace SEE.Layout
             }
             else
             {
-                bm.buildingWidth = (int)scale.x;
-                bm.floorNumber = (int)scale.y;
-                bm.buildingDepth = (int)scale.z;
+                bm.buildingWidth = (int)(size.x / Unit());
+                bm.floorNumber = (int)(size.y / Unit());
+                bm.buildingDepth = (int)(size.z / Unit());
                 bm.UpdateCity();
                 bm.AwakeCity();
             }
         }
 
-        public override void SetPosition(GameObject block, Vector3 position)
+        private enum Length
         {
-            // the default position of a game object in Unity is its center, but the
-            // position of a CScape building is its left corner
-            Vector3 extent = GetSize(block) / 2.0f;
-            Vector3 newPosition = position - extent;
-            newPosition.y = position.y;
-            block.transform.position = newPosition;
+            width,  // building width
+            height, // number of floors
+            depth   // building depth
         }
 
-        public override void SetLocalPosition(GameObject block, Vector3 position)
+        /// <summary>
+        /// Sets the length of the block to the given value in Unity units. Which length is set is
+        /// specified by parameter length:
+        /// 
+        ///   width => building width  / Unit()
+        ///   height => number of floors / Unit()
+        ///   depth  => building depth / Unit()
+        /// 
+        /// Precondition: The given block must have been generated by this factory.
+        /// </summary>
+        /// <param name="block">block whose length is to be set</param>
+        /// <param name="value">new value to be set</param>
+        /// <param name="length">which length to be set</param>
+        private void SetSize(GameObject block, float value, Length length)
+        {
+            // Scale by the number of floors of a building.
+            BuildingModifier bm = block.GetComponent<BuildingModifier>();
+            if (bm == null)
+            {
+                Debug.LogErrorFormat("CScape building {0} has no building modifier.\n", block.name);
+            }
+            else
+            {
+                switch (length)
+                {
+                    case Length.width:
+                        bm.buildingWidth = (int)(value / Unit());
+                        break;
+                    case Length.height:
+                        bm.floorNumber = (int)(value / Unit());
+                        break;
+                    case Length.depth:
+                        bm.buildingDepth = (int)(value / Unit());
+                        break;
+                }
+                bm.UpdateCity();
+                bm.AwakeCity();
+            }
+        }
+
+        /// <summary>
+        /// Sets the width of the object (x axis) to the given value in Unity units.
+        /// </summary>
+        /// <param name="block">block to be adjusted</param>
+        /// <param name="value">new value for width</param>
+        public override void SetWidth(GameObject block, float value)
+        {
+            SetSize(block, value, Length.width);
+        }
+
+        /// <summary>
+        /// Sets the height of the object (y axis) to the given value in Unity units.
+        /// </summary>
+        /// <param name="block">block to be adjusted</param>
+        /// <param name="value">new value for height</param>
+        public override void SetHeight(GameObject block, float value)
+        {
+            SetSize(block, value, Length.height);
+        }
+
+        /// <summary>
+        /// Sets the depth of the object (y axis) to the given value in Unity units.
+        /// </summary>
+        /// <param name="block">block to be adjusted</param>
+        /// <param name="value">new value for depth</param>
+        public override void SetDepth(GameObject block, float value)
+        {
+            SetSize(block, value, Length.depth);
+        }
+
+        public override void SetGroundPosition(GameObject block, Vector3 position)
+        {
+            // the default position of a game object in Unity is its center, but the
+            // position of a CScape building is its left front corner
+            Vector3 extent = GetSize(block) / 2.0f;
+            position.x -= extent.x;
+            position.z -= extent.z;
+            // The y position is already interpreted as the ground by CScape buildings.
+            block.transform.position = position;
+        }
+
+        public override void SetLocalGroundPosition(GameObject block, Vector3 position)
         {
             Vector3 extent = GetSize(block) / 2.0f;
-            Vector3 newPosition = position - extent;
-            block.transform.localPosition = newPosition;
+            block.transform.localPosition = new Vector3(position.x - extent.x, position.y, position.z - extent.z);
+            //block.transform.localPosition = position - extent;
+        }
+
+        public override Vector3 GetCenterPosition(GameObject block)
+        {
+            // transform.position denotes the left front corner of a building in CScape
+            Vector3 extent = GetSize(block) / 2.0f;
+            return block.transform.position + extent;
         }
 
         /// <summary>

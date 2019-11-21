@@ -1,5 +1,4 @@
-﻿using System.IO;
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using SEE.DataModel;
 
@@ -64,17 +63,20 @@ namespace SEE.Layout
         /// The viewBox of the original SVG files from which those prefabs were
         /// create is 0 0 1194.11 1161.28. Thus, the aspect ratio is roughly 1194:1161,
         /// or even more roughly 1:1.
+        /// Note: The path is relative to any folder named Resources inside the Assets folder of your project.
+        /// Note: Extensions must be omitted.
+        /// Note: All asset names and paths in Unity use forward slashes, paths using backslashes will not work.
         /// </summary>
         private static readonly string[] paths = new string[]
-            {
-            "Assets/Resources/Icons/architectureSprite.prefab",
-            "Assets/Resources/Icons/cloneSprite.prefab",
-            "Assets/Resources/Icons/cycleSprite.prefab",
-            "Assets/Resources/Icons/deadcodeSprite.prefab",
-            "Assets/Resources/Icons/metricSprite.prefab",
-            "Assets/Resources/Icons/stilSprite.prefab",
-            "Assets/Resources/Icons/universalSprite.prefab"
-            };
+        {
+            "Icons/architectureSprite",
+            "Icons/cloneSprite",
+            "Icons/cycleSprite",
+            "Icons/deadcodeSprite",
+            "Icons/metricSprite",
+            "Icons/stilSprite",
+            "Icons/universalSprite"
+        };
 
         /// <summary>
         /// Constructor is made private to prevent instantiations outside of
@@ -124,29 +126,18 @@ namespace SEE.Layout
         /// be loaded.
         /// </summary>
         /// <param name="filename">name of the file containing the sprite prefab</param>
-        /// <returns></returns>
+        /// <returns>the game objects loaded as a prefab from given file</returns>
         private static UnityEngine.Object LoadSprite(string filename)
         {
             try
             {
-                if (File.Exists(filename))
+                UnityEngine.Object prefab = Resources.Load<GameObject>(filename);
+                if (prefab == null)
                 {
-                    UnityEngine.Object prefab = null;
-#if UNITY_EDITOR
-                    prefab = UnityEditor.AssetDatabase.LoadAssetAtPath(filename, typeof(GameObject));
-#else
-                    prefab = (UnityEngine.Object)Resources.Load(filename, typeof(UnityEngine.Object));//TODO untested. Solution should work in built game
-#endif
-                    if (prefab == null)
-                    {
-                        Debug.LogErrorFormat("Loading sprite prefab from file {0} failed.\n", filename);
-                    }
-                    return prefab;
+                    Debug.LogErrorFormat("Loading sprite prefab from file {0} failed.\n", filename);
                 }
-                else
-                {
-                    Debug.LogErrorFormat("Sprite prefab file does not exist: {0}.\n", filename);
-                }
+                return prefab;
+
             }
             catch (System.Exception e)
             {

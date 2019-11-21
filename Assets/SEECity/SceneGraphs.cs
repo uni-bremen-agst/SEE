@@ -20,27 +20,28 @@ namespace SEE
             {
                 Debug.LogError("No graph path given.\n");
             }
-            else if (!graphs.ContainsKey(settings.GXLPath()))
+            else 
             {
+                if (!graphs.ContainsKey(settings.GXLPath()))
+                {
+                    Debug.LogWarningFormat("graph {0} is already loaded and will be overridden.\n", settings.GXLPath());
+                }
                 graph = Load(settings);
                 if (graph == null)
                 {
-                    Debug.LogError("graph " + settings.GXLPath() + " could not be loaded.");
+                    Debug.LogErrorFormat("graph {0} could not be loaded.\n", settings.GXLPath());
                 }
                 else
                 {
                     graphs.Add(settings.GXLPath(), graph);
                 }
             }
-            else
-            {
-                Debug.LogError("graph " + settings.GXLPath() + " is already loaded.");
-            }
             return graph;
         }
 
         private static Graph Load(GraphSettings settings)
         {
+            // GraphCreator graphCreator = new GraphCreator(settings.GXLPath(), settings.HierarchicalEdges, new SEELogger());
             GraphReader graphCreator = new GraphReader(settings.GXLPath(), settings.HierarchicalEdges, new SEELogger());
             if (string.IsNullOrEmpty(settings.GXLPath()))
             {
@@ -49,22 +50,11 @@ namespace SEE
             }
             else
             {
-#if UNITY_EDITOR
                 SEE.Performance p = SEE.Performance.Begin("loading graph data from " + settings.GXLPath());
-#endif
-#if UNITY_EDITOR
                 graphCreator.Load();
-#else
-                // TODO some alternative of fix above
-#endif
                 Graph graph = graphCreator.GetGraph();
-                if (graph == null)
-                {
-                    return null;
-                }
-#if UNITY_EDITOR
+                graph.CalculateLevels();
                 p.End();
-#endif
                 Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
                 Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
                 return graph;
