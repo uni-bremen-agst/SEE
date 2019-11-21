@@ -64,6 +64,8 @@ namespace SEE
             PhotonView.Get(playerHead).RPC("SetTextureScaleY", RpcTarget.All, playerHeadPrefab.GetComponentInChildren<MeshRenderer>().sharedMaterial.mainTextureScale.y);
             PhotonView.Get(playerHead).RPC("SetTextureOffsetX", RpcTarget.All, playerHeadPrefab.GetComponentInChildren<MeshRenderer>().sharedMaterial.mainTextureOffset.x);
             PhotonView.Get(playerHead).RPC("SetTextureOffsetY", RpcTarget.All, playerHeadPrefab.GetComponentInChildren<MeshRenderer>().sharedMaterial.mainTextureOffset.y);
+
+            //TODO NetworkController.OnPlayerConnected(PhotonView photonView)
         }
     }
 

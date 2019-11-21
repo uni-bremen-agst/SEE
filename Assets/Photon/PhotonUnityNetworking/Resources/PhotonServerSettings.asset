@@ -41,5 +41,6 @@ MonoBehaviour:
   - SetTextureOffsetX
   - SetTextureOffsetY
   - SetTextureScaleY
+  - OnPlayerConnected
   DisableAutoOpenWizard: 1
   ShowSettings: 0
