@@ -6,16 +6,31 @@ public class LeapMovementCV : MonoBehaviour
 {
     private Leap.Controller controller;
     public GameObject rig; // assign in inspector
-    public Canvas menu; // assign in inspector
+
+    public GameObject handAnchor; //assign in inspector
+    public GameObject roomAnchor; // assign in inspector
+    public LineRenderer line; // assign in inspector
+
+    private bool presentRight = false;
 
     void Start()
     {
         Debug.Log("Starting LeapMovementCV\n");
         controller = new Controller();
-        menu.enabled = false;
+
+        //make cubes spawn at camera offset
+        //handAnchor.transform.Translate(Camera.main.transform.position);
+        //handAnchor.transform.Translate(Vector3.down * 0.2f);
+
+        roomAnchor.SetActive(false);
+
     }
 
-    // Update is called once per frame
+    private void Awake()
+    {
+        
+    }
+
     void Update()
     {
         if (controller.IsConnected)
@@ -26,6 +41,7 @@ public class LeapMovementCV : MonoBehaviour
             Hand left = new Hand();
             Hand right = new Hand();
             List<Hand> hands = frame.Hands;
+            presentRight = false;
 
                 for (int i = 0; i < hands.Count; i++)
                 {
@@ -34,6 +50,7 @@ public class LeapMovementCV : MonoBehaviour
                     if (!hand.IsLeft)
                     {
                         right = hand;
+                        presentRight = true;
                     }
                     else
                     {
@@ -41,10 +58,22 @@ public class LeapMovementCV : MonoBehaviour
                     }
                 }
 
-            //observing the triggers
-            menu.enabled = palmUp(right);
-            menu.transform.LookAt(Camera.main.transform);
+            
+            
+            if(presentRight && fist(right))
+            {
+                roomAnchor.SetActive(true);
+                line.SetPosition(0, handAnchor.transform.position);
+                line.SetPosition(1, roomAnchor.transform.position);
 
+                rig.transform.Translate((handAnchor.transform.position - roomAnchor.transform.position) * 0.01f);
+            }
+            else
+            {
+                roomAnchor.SetActive(false);
+                line.SetPosition(0, handAnchor.transform.position);
+                line.SetPosition(1, handAnchor.transform.position);
+            }
         }
     }
 
@@ -55,5 +84,17 @@ public class LeapMovementCV : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    bool fist(Hand hand)
+    {
+        if (hand.PinchDistance < 20)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }
