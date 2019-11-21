@@ -42,6 +42,11 @@ namespace SEE
 
             PhotonNetwork.CreateRoom(name, roomOptions);
         }
+
+        public static bool IsMasterClient()
+        {
+            return PhotonNetwork.IsMasterClient;
+        }
         
         [PunRPC]
         public static void OnPlayerConnected(PhotonView photonView)

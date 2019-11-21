@@ -13,17 +13,31 @@ namespace SEE
 
         void Awake()
         {
-            InitializeMaterial();
+            InitializeMaterial(NetworkController.IsMasterClient());
         }
 
         [PunRPC]
-        public void InitializeMaterial()
+        public void InitializeMaterial(bool fromMaster)
         {
-            Material prefab = (Material)Resources.Load("Materials/FaceMaterial/FaceMaterial", typeof(Material));
-            Material material = new Material(prefab);
-            GetComponentInChildren<MeshRenderer>().material = material;
-            material.mainTextureScale = new Vector2(DEFAULT_TEXTURE_SCALE_X, DEFAULT_TEXTURE_SCALE_Y);
-            material.mainTextureOffset = new Vector2(DEFAULT_TEXTURE_OFFSET_X, DEFAULT_TEXTURE_OFFSET_Y);
+            Material prefab;
+            Material material;
+            if (fromMaster)
+            {
+                // TODO THIS WHOLE IF STATEMENT MUST BE REMOVED AFTER ESE! USE ELSE ONLY
+                prefab = (Material)Resources.Load("Materials/FaceMaterial/ESE_ONLY_FaceMaterial", typeof(Material));
+                material = new Material(prefab);
+                GetComponentInChildren<MeshRenderer>().material = material;
+                material.mainTextureScale = new Vector2(2.2f, 1.2f);
+                material.mainTextureOffset = new Vector2(-0.58f, -0.2f);
+            }
+            else
+            {
+                prefab = (Material)Resources.Load("Materials/FaceMaterial/FaceMaterial", typeof(Material));
+                material = new Material(prefab);
+                GetComponentInChildren<MeshRenderer>().material = material;
+                material.mainTextureScale = new Vector2(DEFAULT_TEXTURE_SCALE_X, DEFAULT_TEXTURE_SCALE_Y);
+                material.mainTextureOffset = new Vector2(DEFAULT_TEXTURE_OFFSET_X, DEFAULT_TEXTURE_OFFSET_Y);
+            }
         }
 
         [PunRPC]
