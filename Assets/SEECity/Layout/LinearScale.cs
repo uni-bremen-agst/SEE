@@ -87,7 +87,7 @@ namespace SEE.Layout
             Dictionary<string, float> result = new Dictionary<string, float>();
             foreach (string metric in metrics)
             {
-                result[metric] = 0.0f;
+                result.Add(metric, 0.0f);
             }
 
             foreach (Node node in graph.Nodes())

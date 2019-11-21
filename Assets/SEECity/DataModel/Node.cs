@@ -54,15 +54,6 @@ namespace SEE.DataModel
             set => parent = value;
         }
 
-        /// <summary>
-        /// True iff node has no parent.
-        /// </summary>
-        /// <returns>true iff node is a root node</returns>
-        public bool IsRoot()
-        {
-            return parent == null;
-        }
-
         public override string ToString()
         {
             string result = "{\n";
