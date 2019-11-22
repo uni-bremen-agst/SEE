@@ -27,8 +27,8 @@ namespace SEE
                 prefab = (Material)Resources.Load("Materials/FaceMaterial/ESE_ONLY_FaceMaterial", typeof(Material));
                 material = new Material(prefab);
                 GetComponentInChildren<MeshRenderer>().material = material;
-                material.mainTextureScale = new Vector2(2.2f, 1.2f);
-                material.mainTextureOffset = new Vector2(-0.58f, -0.2f);
+                material.mainTextureScale = new Vector2(2.0f, 1.0f);
+                material.mainTextureOffset = new Vector2(-0.5f, -0.1f);
             }
             else
             {

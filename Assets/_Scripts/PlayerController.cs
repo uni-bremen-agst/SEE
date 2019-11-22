@@ -20,7 +20,7 @@ namespace SEE
                 return;
             }
 
-            transform.position = Camera.main.transform.position + 3*Camera.main.transform.forward;
+            transform.position = Camera.main.transform.position;
             transform.rotation = Camera.main.transform.rotation;
         }
     }
