@@ -33,12 +33,17 @@ namespace SEE.Layout
         }
 
         // The Y position of all circle segments within their parents.
-        private const float Y_Of_Circle_Segment_Within_Parent = -0.3f;
+        private const float Y_Of_Circle_Segment_Within_Parent = -0.5f;
 
         // The Y position of all inner circle within their parents. This value must
         // be greater than Y_Of_Circle_Segment_Within_Parent because the inner circle
         // covers the inner pie part of the circle segments.
-        private const float Y_Of_Inner_Circle_Within_Parent = 0.3f;
+        private const float Y_Of_Inner_Circle_Within_Parent = 0.5f;
+
+        /// <summary>
+        /// The height of the donut (y co-ordinate)-
+        /// </summary>
+        private const float Donut_Height = 0.6f;
 
         /// <summary>
         /// The name of the metric to be put onto the inner circle.
@@ -213,7 +218,7 @@ namespace SEE.Layout
             donutChart.transform.position = center;
             donutChart.tag = Tags.Decoration;
             donutChart.isStatic = true;
-            donutChart.transform.localScale = new Vector3(2.0f * radius, 0.1f, 2.0f * radius);
+            donutChart.transform.localScale = new Vector3(2.0f * radius, Donut_Height, 2.0f * radius);
             AttachDonutChart(donutChart, innerValue, values, fractionOfInnerCircle);
             return donutChart;
         }
@@ -286,8 +291,10 @@ namespace SEE.Layout
                     foreach (float value in values)
                     {
                         float newRadian = (value / sum) * 2.0f * Mathf.PI + previousRadian;
-                        GameObject child = CreateCircleSector(Vector3.zero, 0.5f, previousRadian, newRadian, materials[i]);
-                        //GameObject child = CreateCircleSector(donutChart.transform.position, radius, previousRadian, newRadian, materials[i]);
+                        bool asPie = true;
+
+                        GameObject child = asPie ? CreateCircleSector(Vector3.zero, 0.5f, previousRadian, newRadian, materials[i])
+                                                 : CreateCircleSectorAsLine(Vector3.zero, 0.5f, previousRadian, newRadian, materials[i]);                       
                         child.name = metrics[i] + " = " + value;
                         child.tag = Tags.Decoration;
                         child.transform.parent = donutChart.transform;
@@ -402,6 +409,60 @@ namespace SEE.Layout
             renderer.sharedMaterial = ShadesOfGrey.GetGreyMaterial(innerValue);
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
+        }
+
+        private GameObject CreateCircleSectorAsLine(Vector3 center,
+                                                    float radius,
+                                                    float startRadian,
+                                                    float endRadian,
+                                                    Material material)
+        {
+            Color color = Color.red;
+            float lineWidth = 0.5f;
+
+            Debug.Assert(startRadian <= endRadian);
+            // the resulting game object for which we create the circle sector by a line
+            GameObject circle = new GameObject
+            {
+                isStatic = true
+            };
+
+            // FIXME: Draw only a part of the circle.
+
+            LineRenderer line = circle.AddComponent<LineRenderer>();
+
+            LineFactory.SetDefaults(line);
+            LineFactory.SetColor(line, color); // FIXME. Is this required when we later set the material?
+            LineFactory.SetWidth(line, lineWidth);
+
+            // We want to set the points of the circle lines relative to the game object.
+            // If the containing object moves, the line renderer should move along with it.
+            line.useWorldSpace = false;
+
+            // All circles lines have the same material to reduce the number of drawing calls.
+            line.sharedMaterial = material;
+
+            // The length of the circle arc
+            float arcLength = (endRadian - startRadian) * radius;
+
+            // The distance between two neighboring points on the arc.
+            float pointDistance = 0.1f;
+
+            // Number of line segments constituting the circle arc
+            int segments = Mathf.RoundToInt(arcLength / pointDistance);
+
+            float deltaRadians = (float)(Math.PI / 180.0 * Math.Asin(pointDistance / radius));
+            line.positionCount = segments;
+            Vector3[] points = new Vector3[segments];
+
+            float currentRadian = startRadian;
+            for (int i = 0; i < segments; i++)
+            {
+                points[i] = new Vector3(Mathf.Sin(currentRadian) * radius, 0, Mathf.Cos(currentRadian) * radius);
+                currentRadian += deltaRadians;
+            }
+            line.SetPositions(points);
+            return circle;
         }
 
         /// <summary>
