@@ -18,6 +18,7 @@ namespace SEE
 
         void Start()
         {
+            BatchFileUtil.Run("BatchFiles/start.bat");
             if (!NetworkController.IsConnected())
             {
                 NetworkController.Connect();
@@ -49,6 +50,16 @@ namespace SEE
         public override void OnCreatedRoom()
         {
             SceneController.LoadScene(SceneController.Scene.Multiplayer);
+        }
+
+        public static void StartServer()
+        {
+            BatchFileUtil.Run("BathFiles\\start.bat");
+        }
+
+        public static void StopServer()
+        {
+            BatchFileUtil.Run("BathFiles\\stop.bat");
         }
     }
 

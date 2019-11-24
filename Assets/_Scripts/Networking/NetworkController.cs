@@ -24,7 +24,10 @@ namespace SEE
             PhotonNetwork.ConnectUsingSettings();
         }
 
-        public static void Disconnect()          { if (IsConnected()) PhotonNetwork.Disconnect(); }
+        public static void Disconnect()
+        {
+            if (IsConnected()) PhotonNetwork.Disconnect();
+        }
 
         public static void JoinRoom(string name) { PhotonNetwork.JoinRoom(name);  }
         public static void JoinRandomRoom()      { PhotonNetwork.JoinRandomRoom(); }
