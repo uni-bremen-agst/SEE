@@ -12,3 +12,101 @@
 2019-11-24 16:57:29,837 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
 2019-11-24 17:07:07,236 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
 2019-11-24 17:07:07,256 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 20:46:36,329 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 20:46:36,348 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 20:46:46,044 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 20:46:46,092 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 20:47:06,199 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 20:47:06,218 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 20:47:12,756 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 20:47:12,804 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 20:48:28,967 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 20:48:28,986 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 20:48:31,323 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 20:48:31,372 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 20:48:56,617 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 20:48:56,635 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:18:09,239 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:18:09,288 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:18:25,531 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:18:25,558 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:20:46,570 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:20:46,635 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:20:55,110 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:20:55,135 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:20:56,188 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:20:56,239 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:21:02,988 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:21:03,008 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:21:04,809 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:21:04,874 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:25:07,958 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:25:07,979 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:25:19,041 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:25:19,101 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:25:56,630 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:25:56,649 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:25:57,668 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:25:57,717 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:39:49,615 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:39:49,637 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:39:53,494 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:39:53,546 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:41:00,619 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:41:00,638 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:41:13,254 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:41:13,316 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:41:49,617 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:41:49,639 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:41:50,986 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:41:51,037 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:43:29,530 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:43:29,550 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:44:49,357 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:44:49,430 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:45:42,004 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:45:42,026 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:45:43,092 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:45:43,148 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:47:07,440 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:47:07,463 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:47:23,392 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:47:23,462 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:47:26,961 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:47:26,982 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:47:55,180 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:47:55,249 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:47:58,683 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:47:58,704 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:48:42,025 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:48:42,093 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:48:45,573 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:48:45,594 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:48:48,152 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:48:48,202 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:48:51,646 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:48:51,666 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:48:56,321 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:48:56,387 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:48:59,828 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:48:59,848 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:49:02,486 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:49:02,535 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:49:08,318 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:49:08,339 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:49:09,430 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:49:09,482 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:49:21,298 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:49:21,319 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:49:25,216 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:49:25,279 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:49:28,715 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:49:28,736 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:49:29,828 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:49:29,883 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:51:08,945 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:51:08,965 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
+2019-11-24 21:53:28,585 [1] INFO  Photon.SocketServer.ApplicationBase - Application is stopping: AppId=CounterPublisher
+2019-11-24 21:53:28,652 [1] INFO  Photon.SocketServer.ApplicationBase - Application stop: AppId=CounterPublisher
+2019-11-24 21:53:36,253 [1] INFO  Photon.SocketServer.ApplicationBase - Application start: AppId=CounterPublisher; AppPath=C:\Users\Torben\dev\SEE\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\CounterPublisher, Type=Photon.CounterPublisher.Application 
+2019-11-24 21:53:36,273 [1] INFO  Photon.SocketServer.Diagnostics.CounterPublisher - CounterPublisher started publishing ExitGames.Diagnostics.Monitoring.CounterSamplePublisher to ExitGames.Diagnostics.Monitoring.CounterSampleSender
