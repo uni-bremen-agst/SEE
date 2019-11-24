@@ -1,0 +1,12 @@
+8648: 16:43:29.524 - ---
+8648: 16:43:29.524 - Service: "Photon Socket Server" starting
+8648: 16:43:29.524 - Config File: C:\Users\Torben\Desktop\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\bin_Win64\PhotonServer.config
+8648: 16:43:29.526 - Will produce at most: 10 crash dumps
+8648: 16:43:29.526 - Service shutting down
+8648: 16:43:29.528 - Service shut down complete
+5096: 16:57:29.800 - ---
+5096: 16:57:29.800 - Service: "Photon Socket Server" starting
+5096: 16:57:29.801 - Config File: C:\Users\Torben\Desktop\Photon Server\Photon-OnPremise-Server-SDK_v4-0-29-11263\deploy\bin_Win64\PhotonServer.config
+5096: 16:57:29.802 - Will produce at most: 10 crash dumps
+5096: 16:57:29.802 - Service shutting down
+5096: 16:57:29.803 - Service shut down complete

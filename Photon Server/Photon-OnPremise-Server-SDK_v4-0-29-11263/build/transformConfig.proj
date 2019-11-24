@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Error" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	
+	<Import Project="..\lib\ExitGames.MSBuild.Tasks\1.0.1.1\EGTBuildTasks.Targets"/>
+	
+	<PropertyGroup>
+		<!-- per default, check all replacements --> 
+		<Check>true</Check>
+	</PropertyGroup>
+	
+	<Target Name="TransformConfig">
+
+	<!--check that there is ANY token -->
+    <!--
+    <ItemGroup>
+      <ConfigFilesPreCheck Include="$(RootDir)\**\*.config" />
+    </ItemGroup>
+    
+    <EGTFileContentValidation
+      Files="@(ConfigFilesPreCheck)"
+      Pattern="{#"
+      ThrowOnMatch="false"
+	/>-->
+	
+	<!-- Update generic config files (well, all files might contain generic placeholders...) --> 							
+	<EGTRenameReplace 
+		PropertyFile="$(PropertyFile)"
+		RootDir="$(RootDir)"
+		FilePattern=".config"
+		FilePatternTrimmed=".config"
+		PlaceholderPrefix="{#"
+		PlaceholderSuffix="#}"
+	/>
+
+    <ItemGroup>
+      <ConfigFiles Include="$(RootDir)\**\*.config" />
+    </ItemGroup>
+
+	<!-- Check --> 
+		<EGTFileContentValidation
+			Condition="'$(Check)'=='true'"
+			Files="@(ConfigFiles)"
+			Pattern="{#"
+			ThrowOnMatch="true"
+		/>
+	
+	<EGTFileContentValidation
+		Condition="'$(Check)'=='true'"
+		Files="@(ConfigFiles)"
+		Pattern="#}"
+		ThrowOnMatch="true"
+	/>	
+	
+	</Target>
+</Project>

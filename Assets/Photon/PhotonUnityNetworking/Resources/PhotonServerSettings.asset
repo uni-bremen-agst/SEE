@@ -17,10 +17,10 @@ MonoBehaviour:
     AppIdChat: 
     AppIdVoice: 
     AppVersion: 
-    UseNameServer: 1
+    UseNameServer: 0
     FixedRegion: 
-    Server: 
-    Port: 0
+    Server: 127.0.0.1
+    Port: 5055
     Protocol: 0
     EnableLobbyStatistics: 0
     NetworkLogging: 1
@@ -43,4 +43,4 @@ MonoBehaviour:
   - SetTextureScaleY
   - OnPlayerConnected
   DisableAutoOpenWizard: 1
-  ShowSettings: 0
+  ShowSettings: 1
