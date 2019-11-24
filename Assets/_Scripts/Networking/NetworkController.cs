@@ -14,7 +14,16 @@ namespace SEE
         public override void OnDisable()         { base.OnDisable(); PhotonNetwork.RemoveCallbackTarget(this); }
 
         public static bool IsConnected()         { return PhotonNetwork.IsConnected; }
-        public static void Connect()             { if (!IsConnected()) PhotonNetwork.ConnectUsingSettings(); }
+
+        public static void Connect()
+        {
+            if (IsConnected()) return;
+            
+            AppSettings appSettings = PhotonNetwork.PhotonServerSettings.AppSettings;
+            appSettings.Server = "127.0.0.1";
+            PhotonNetwork.ConnectUsingSettings();
+        }
+
         public static void Disconnect()          { if (IsConnected()) PhotonNetwork.Disconnect(); }
 
         public static void JoinRoom(string name) { PhotonNetwork.JoinRoom(name);  }
