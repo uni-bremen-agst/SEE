@@ -1,5 +1,4 @@
-﻿using System;
-using SEE.DataModel;
+﻿using SEE.DataModel;
 using SEE.Layout;
 using UnityEngine;
 
@@ -165,13 +164,14 @@ namespace SEE
         public float camSens = 0.15f;   // Mouse sensitivity
         
         // the position of the mouse cursor of the last tick
-        private Vector3 lastMouse = new Vector3(255, 255, 255);  // kind of in the middle of the screen, rather than at the top (play)
+        private Vector3 lastMouse = false ? new Vector3(0, 0, 0)
+                                         : new Vector3(255, 255, 255);  // kind of in the middle of the screen, rather than at the top (play)
 
         // the accumulated time of the acceleration across ticks
         private float accelerationPeriod = 1.0f;
 
-        private Vector3 previousPosition = new Vector3(0f, 0f, 0f);
-        private Quaternion previousRotation = new Quaternion(0f, 0f, 0f, 0f);
+        private Vector3 previousPosition = Vector3.zero;
+        private Quaternion previousRotation = Quaternion.identity;
 
         // The scene graph this camera observes.
         // private SceneGraph sceneGraph = null; // TODO: Re-enable
@@ -186,6 +186,16 @@ namespace SEE
             transform.RotateAround(transform.position, direction, degree * Time.deltaTime);
         }
 
+        /// <summary>
+        /// Centers the mouse cursor in the screen.
+        /// </summary>
+        private void CenterCursor()
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.lockState = CursorLockMode.None;
+            lastMouse = Input.mousePosition;
+        }
+        
         /// <summary>
         /// Intializes sceneGraph and guiObjectNameTextField.
         /// 
@@ -203,6 +213,7 @@ namespace SEE
         void Start()
         {
             Debug.Log("Starting FlyCamera\n");
+            CenterCursor();
             if (guiObjectNameTextField == null)
             {
                 guiObjectNameTextField = GameObject.Find(TextFieldObjectName);
@@ -231,6 +242,11 @@ namespace SEE
         /// </summary>
         void Update()
         {
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                CenterCursor();
+            }
+
             if (Input.GetMouseButtonDown(0))
             {
                 // If a node is hit by a left mouse click, the name of the selected
@@ -277,14 +293,6 @@ namespace SEE
             {
                 Rotate(Vector3.down, accelerationMode);
             }
-            else if (Input.GetKey(KeyCode.Y))
-            {
-                Rotate(Vector3.left, accelerationMode);
-            }
-            else if (Input.GetKey(KeyCode.X))
-            {
-                Rotate(Vector3.right, accelerationMode);
-            }
             else
             {
                 lastMouse = Input.mousePosition - lastMouse;
@@ -320,12 +328,12 @@ namespace SEE
 
             if (previousPosition != transform.position)
             {
-                // Debug.Log("position: " + transform.position + "\n");
+                //Debug.Log("position: " + transform.position + "\n");
                 previousPosition = transform.position;
             }
             if (previousRotation != transform.rotation)
             {
-                // Debug.Log("rotation: " + transform.rotation + "\n");
+                //Debug.Log("rotation: " + transform.rotation + "\n");
                 previousRotation = transform.rotation;
             }
         }
@@ -362,7 +370,7 @@ namespace SEE
                         Dump(objectHit);
                     }
                 }
-                else if (objectHit.TryGetComponent<Edge>(out Edge edge))
+                else if (objectHit.TryGetComponent<EdgeRef>(out EdgeRef edge))
                 {
                     text.text = "Edge " + objectHit.name;
                     Debug.Log("Edge hit.\n");
@@ -417,11 +425,11 @@ namespace SEE
                 p_Velocity += Vector3.right;
 
             // Up
-            if (Input.GetKey(KeyCode.Space))
+            if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.Y))
                 p_Velocity += Vector3.up;
 
             // Down
-            if (Input.GetKey(KeyCode.LeftControl))
+            if (Input.GetKey(KeyCode.X))
                 p_Velocity += Vector3.down;
 
             return p_Velocity;
