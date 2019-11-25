@@ -5,6 +5,7 @@ using SEE;
 using SEE.Layout;
 using System.Collections.Generic;
 using UnityEngine.XR;
+using System.Linq;
 
 namespace SEEEditor
 {
@@ -99,14 +100,14 @@ namespace SEEEditor
                 {
                     // The camera for the monitor game is at top-level.
                     camera.SetActive(!enableVR);
-                    Debug.LogFormat("main camera at top level: {0}\n", !enableVR);
+                    //Debug.LogFormat("main camera at top level: {0}\n", !enableVR);
                 }
                 else if (camera.transform.parent.name == "Leap Rig")
                 {
                     // The camera of the Leap Rig is nested in a game object named accordingly.
                     // We set the Leap Rig itself in which the found camera is directly nested.
                     camera.transform.parent.gameObject.SetActive(enableVR);
-                    Debug.LogFormat("Leap rig camera: {0}\n", enableVR);
+                    //Debug.LogFormat("Leap rig camera: {0}\n", enableVR);
                 }
             }
             EnableCanvas(enableVR);
@@ -151,10 +152,11 @@ namespace SEEEditor
             editorSettings.gxlPath = EditorGUILayout.TextField("GXL file", editorSettings.gxlPath);
             editorSettings.csvPath = EditorGUILayout.TextField("CSV file", editorSettings.csvPath);
 
-            GUILayout.Label("Lengths of buildings", EditorStyles.boldLabel);
+            GUILayout.Label("Attributes of leaf nodes", EditorStyles.boldLabel);
             editorSettings.WidthMetric = EditorGUILayout.TextField("Width", editorSettings.WidthMetric);
             editorSettings.HeightMetric = EditorGUILayout.TextField("Height", editorSettings.HeightMetric);
             editorSettings.DepthMetric = EditorGUILayout.TextField("Depth", editorSettings.DepthMetric);
+            editorSettings.ColorMetric = EditorGUILayout.TextField("Color", editorSettings.ColorMetric);
 
             GUILayout.Label("VR settings", EditorStyles.boldLabel);
             VRenabled = EditorGUILayout.Toggle("Enable VR", VRenabled);
@@ -165,7 +167,6 @@ namespace SEEEditor
             editorSettings.NodeLayout = (GraphSettings.NodeLayouts)EditorGUILayout.EnumPopup("Layout", editorSettings.NodeLayout);
             
             editorSettings.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", editorSettings.ZScoreScale);
-            editorSettings.ShowDonuts = EditorGUILayout.Toggle("Show Donut charts", editorSettings.ShowDonuts);
             editorSettings.ShowErosions = EditorGUILayout.Toggle("Show erosions", editorSettings.ShowErosions);
 
             GUILayout.Label("Visual edge attributes", EditorStyles.boldLabel);
@@ -193,14 +194,24 @@ namespace SEEEditor
                     EnableVR(VRenabled);
   
                     graph = SceneGraphs.Add(editorSettings);
-                    int numberOfErrors = MetricImporter.Load(graph, editorSettings.CSVPath());
-                    if (numberOfErrors > 0)
-                    {
-                        Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", editorSettings.CSVPath(), numberOfErrors);
-                    }
-
                     if (graph != null)
                     {
+                        int numberOfErrors = MetricImporter.Load(graph, editorSettings.CSVPath());
+                        if (numberOfErrors > 0)
+                        {
+                            Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", editorSettings.CSVPath(), numberOfErrors);
+                        }
+                        {
+                            MetricAggregator.AggregateSum(graph, editorSettings.AllLeafIssues().ToArray<string>());
+                            // Note: We do not want to compute the derived metric editorSettings.InnerDonutMetric
+                            // when we have a single root node in the graph. This metric will be used to define the color
+                            // of inner circles of Donut charts. Because the color is a linear interpolation of the whole
+                            // metric value range, the inner circle would always have the maximal value (it is the total
+                            // sum over all) and hence the maximal color gradient. The color of the other nodes would be
+                            // hardly distinguishable. 
+                            // FIXME: We need a better solution. This is a kind of hack.
+                            MetricAggregator.DeriveSum(graph, editorSettings.AllInnerNodeIssues().ToArray<string>(), editorSettings.InnerDonutMetric, true);
+                        }
                         GraphRenderer renderer = new GraphRenderer(editorSettings);
                         renderer.Draw(graph);
                         // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.

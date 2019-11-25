@@ -26,11 +26,6 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// The maximal depth of the node hierarchy.
-        /// </summary>
-        private int maxDepth = 0;
-
-        /// <summary>
         /// Information about a node necessary to draw it.
         /// </summary>
         private struct NodeInfo
@@ -38,16 +33,12 @@ namespace SEE.Layout
             public readonly float radius;
             public readonly float outer_radius;
             public readonly float reference_length_children;
-            // The level of node, that is, the distance from the root node to this node.
-            // The root node has always level 0. 
-            public readonly int level;
 
-            public NodeInfo(float radius, int level, float outer_radius, float reference_length_children)
+            public NodeInfo(float radius, float outer_radius, float reference_length_children)
             {
                 this.radius = radius;
                 this.outer_radius = outer_radius;
                 this.reference_length_children = reference_length_children;
-                this.level = level;
             }
         }
 
@@ -76,28 +67,20 @@ namespace SEE.Layout
             {
                 throw new System.Exception("Graph has no root nodes.");
             }
-            // The maximal depth of the tree rooted by any of the root nodes of the graph
-            int[] max_depths = new int[roots.Count];
 
             // the maximal radius over all root circles; required to create the plane underneath
             float max_radius = 0.0f;
 
-            // First calculate all radii including those for the roots as well
-            // as max_depths, maxDepth, max_radius.
+            // First calculate all radii including those for the roots as well as max_radius.
             {
                 int i = 0;
                 foreach (Node root in roots)
                 {
-                    CalculateRadius2D(root, 0, out float out_rad, out int max_depth_of_this_tree);
-                    max_depths[i] = max_depth_of_this_tree;
+                    CalculateRadius2D(root, out float out_rad);
                     i++;
                     if (out_rad > max_radius)
                     {
                         max_radius = out_rad;
-                    }
-                    if (max_depth_of_this_tree > maxDepth)
-                    {
-                        maxDepth = max_depth_of_this_tree;
                     }
                 }
             }
@@ -112,7 +95,7 @@ namespace SEE.Layout
                     // for two neighboring circles the distance must be the sum of the their two radii;
                     // in case we draw the very first circle, no distance must be kept
                     position.x += i == 0 ? 0.0f : nodeInfos[roots[i - 1]].outer_radius + nodeInfos[roots[i]].outer_radius + offset;
-                    DrawCircles(root, position, 0, max_depths[i]);
+                    DrawCircles(root, position);
                     i++;
                 }
             }
@@ -178,19 +161,17 @@ namespace SEE.Layout
         /// This algorithm is described in the paper.
         /// </summary>
         /// <param name="node">the node for which the ballon layout is to be computed</param>
-        /// <param name="level">the level of the currently visited node; a root has level 0</param>
-        /// <param name="rad">radius of the circle around node at which the center of every circle 
-        ///                   of its direct children is located</param>
         /// <param name="out_rad">radius of the minimal circle around node that includes every circle 
         ///                       of its descendants</param>
-        private void CalculateRadius2D(Node node, int level, out float out_rad, out int max_depth)
+        private void CalculateRadius2D(Node node, out float out_rad)
         {
+            // radius of the circle around node at which the center of every circle
+            // of its direct children is located
             float rad = 0.0f;
             float rl_child = 0.0f;
 
             if (node.IsLeaf())
             {
-                max_depth = 1;
                 GameObject block = to_game_node[node];
 
                 // Necessary size of the block independent of the parent
@@ -213,23 +194,17 @@ namespace SEE.Layout
                 // maximal out_rad_k over all children k of i
                 float max_children_rad = 0.0f;
 
-                int max_child_depth = 0;
                 foreach (Node child in node.Children())
                 {
 
                     // Find the radius rad_k and outer-radius out_rad_k for each child k of node i.
-                    CalculateRadius2D(child, level + 1, out float child_out_rad, out int child_depth);
-                    if (child_depth > max_child_depth)
-                    {
-                        max_child_depth = child_depth;
-                    }
+                    CalculateRadius2D(child, out float child_out_rad);
                     inner_sum += child_out_rad;
                     if (max_children_rad < child_out_rad)
                     {
                         max_children_rad = child_out_rad;
                     }
                 }
-                max_depth = max_child_depth + 1;
                 inner_sum *= 2;
 
                 // min_rad is the minimal circumference to accommodate all the children
@@ -256,7 +231,7 @@ namespace SEE.Layout
 
                 rl_child = max_children_rad;
             }
-            nodeInfos.Add(node, new NodeInfo(rad, level, out_rad, rl_child));
+            nodeInfos.Add(node, new NodeInfo(rad, out_rad, rl_child));
         }
 
         /// <summary>
@@ -265,11 +240,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">node to be drawn</param>
         /// <param name="position">position at which to place the node</param>
-        /// <param name="depth">depth of node in the hierarchy used to determine the width of the line</param>
-        /// <param name="max_depth">maximal depth of the hierarchy</param>
-        /// <param name="scaler">a scaler for the metrics to be drawn</param>
-        /// <param name="factory">the factory to create the Donut charts </param>
-        private void DrawCircles(Node node, Vector3 position, int depth, int max_depth)
+        private void DrawCircles(Node node, Vector3 position)
         {
             List<Node> children = node.Children();
 
@@ -283,10 +254,14 @@ namespace SEE.Layout
             else
             {
                 // inner node
-                // inner nodes will be positoned and scaled, but only in x and z axes, not in y axis
-                layout_result[to_game_node[node]] 
-                    = new NodeTransform(position, 
-                                        new Vector3(2 * nodeInfos[node].outer_radius, circleHeight, 2 * nodeInfos[node].outer_radius));
+                // inner nodes will be positoned and scaled, primarily in x and z axes; 
+                // the inner nodes will be slightly lifted along the y axis according to their
+                // tree depth so that they can be stacked visually (level 0 is at the bottom)
+                position.y += LevelLift(node);
+                layout_result[to_game_node[node]]
+                    = new NodeTransform(position,
+                                        new Vector3(2 * nodeInfos[node].outer_radius, 
+                                                    innerNodeHeight, 2 * nodeInfos[node].outer_radius));
 
                 // The center points of the children circles are located on the circle
                 // with center point 'position' and radius of the inner circle of the
@@ -379,7 +354,7 @@ namespace SEE.Layout
                         child_center.y = groundLevel;
                         child_center.z = position.z + (float)(parent_inner_radius * System.Math.Sin(accummulated_alpha));
 
-                        DrawCircles(child, child_center, depth + 1, max_depth);
+                        DrawCircles(child, child_center);
 
                         // The next available circle must be located outside of the child circle
                         accummulated_alpha += alpha + space_between_child_circles;

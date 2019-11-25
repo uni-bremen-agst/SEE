@@ -57,7 +57,7 @@ namespace SEE.Layout
         /// an exception is thrown.
         /// </summary>
         /// <param name="nodes">list of game nodes whose contained graph nodes are to be mapped</param>
-        protected void SetGameNodes(IList<GameObject> nodes)
+        protected void SetGameNodes(ICollection<GameObject> nodes)
         {
             foreach (GameObject gameNode in nodes)
             {
@@ -88,7 +88,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="nodes">the list of nodes whose edges are to be drawn</param>
-        public abstract void DrawEdges(Graph graph, IList<GameObject> nodes);
+        public abstract void DrawEdges(Graph graph, ICollection<GameObject> nodes);
 
         /// <summary>
         /// Returns the default material for edges using the materialPath.
@@ -109,7 +109,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="nodes">list of nodes whose greatest y co-ordinate is required</param>
         /// <returns>greatest y co-ordinate of all nodes given</returns>
-        protected float GetMaxBlockHeight(IList<GameObject> nodes)
+        protected float GetMaxBlockHeight(ICollection<GameObject> nodes)
         {
             float result = Mathf.NegativeInfinity;
             foreach (GameObject node in nodes)

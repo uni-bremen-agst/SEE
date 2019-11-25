@@ -24,7 +24,7 @@ namespace SEE
             {
                 if (!graphs.ContainsKey(settings.GXLPath()))
                 {
-                    Debug.LogWarningFormat("graph {0} is already loaded.\n", settings.GXLPath());
+                    Debug.LogWarningFormat("graph {0} is already loaded and will be overridden.\n", settings.GXLPath());
                 }
                 graph = Load(settings);
                 if (graph == null)
@@ -53,6 +53,7 @@ namespace SEE
                 SEE.Performance p = SEE.Performance.Begin("loading graph data from " + settings.GXLPath());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
+                graph.CalculateLevels();
                 p.End();
                 Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
                 Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
