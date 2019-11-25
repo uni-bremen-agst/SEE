@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
+    /// <summary>
+    /// Draws edges as hierarchically bundled edges.
+    /// </summary>
     public class BundledEdgeLayout : IEdgeLayout
     {
         public BundledEdgeLayout(NodeFactory blockFactory, float edgeWidth, bool edgesAboveBlocks)
@@ -12,45 +15,15 @@ namespace SEE.Layout
         {
         }
 
-        private Dictionary<Node, int> nodeLevel = new Dictionary<Node, int>();
-
+        /// <summary>
+        /// The maximal depth of node hierarchy of the graph.
+        /// </summary>
         private int maxDepth = 0;
 
-        private void SetLevel(Graph graph)
-        {
-            maxDepth = 0;
-
-            foreach (Node root in graph.GetRoots())
-            {
-                int depth = SetLevel(root, 0);
-                if (depth > maxDepth)
-                {
-                    maxDepth = depth;
-                }
-            }
-        }
-
-        private int SetLevel(Node node, int level)
-        {
-            nodeLevel[node] = level;
-
-            int depth = 0;
-
-            foreach (Node child in node.Children())
-            {
-                int childDepth = SetLevel(child, level + 1);
-                if (childDepth > depth)
-                {
-                    depth = childDepth;
-                }
-            }
-            return depth + 1;
-        }
-
-        public override void DrawEdges(Graph graph, IList<GameObject> nodes)
+        public override void DrawEdges(Graph graph, ICollection<GameObject> nodes)
         {
             SetGameNodes(nodes);
-            SetLevel(graph);
+            maxDepth = graph.GetMaxDepth();
             // The distance between of the control points at the subsequent levels of the hierarchy.
             levelUnit = MaximalNodeHeight();
 
@@ -202,7 +175,7 @@ namespace SEE.Layout
                                 // Note that a root has level 0 and the level is increases along 
                                 // the childrens' depth. That is why we need to choose the height
                                 // as a measure relative to maxDepth.
-                                controlPoints[i] = gameNodes[fullPath[i]].transform.position + (maxDepth - nodeLevel[fullPath[i]]) * levelUnit;
+                                controlPoints[i] = gameNodes[fullPath[i]].transform.position + (maxDepth - fullPath[i].Level) * levelUnit;
                             }
                             controlPoints[controlPoints.Length - 1] = blockFactory.Roof(targetObject);
                             //Dump(controlPoints);
@@ -239,8 +212,8 @@ namespace SEE.Layout
         /// <returns>path from child to ancestor in the tree</returns>
         private Node[] Ancestors(Node child, Node ancestor)
         {
-            int childLevel = nodeLevel[child];
-            int ancestorLevel = nodeLevel[ancestor];
+            int childLevel = child.Level;
+            int ancestorLevel = ancestor.Level;
             // Note: roots have level 0, lower nodes have a level greater than 0;
             // thus, childLevel >= ancestorLevel
 

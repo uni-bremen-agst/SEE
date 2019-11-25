@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SEE.DataModel;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -11,13 +13,13 @@ namespace SEE.Layout
     public class TreemapLayout : NodeLayout
     {
         /// <summary>
-        /// Constructor.
+        /// Constructor. The width and depth are assumed to be in Unity units.
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
         /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
-        /// <param name="width">width of the rectangle in which to place all nodes</param>
-        /// <param name="depth">width of the rectangle in which to place all nodes</param>
+        /// <param name="width">width of the rectangle in which to place all nodes in Unity units</param>
+        /// <param name="depth">width of the rectangle in which to place all nodes in Unity units</param>
         public TreemapLayout(float groundLevel,
                              NodeFactory leafNodeFactory,
                              float width,
@@ -30,353 +32,234 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// The width of the rectangle in which to place all nodes.
+        /// The width of the rectangle in which to place all nodes in Unity units.
         /// </summary>
         private readonly float width;
 
         /// <summary>
-        /// The depth of the rectangle in which to place all nodes.
+        /// The depth of the rectangle in which to place all nodes in Unity units.
         /// </summary>
         private readonly float depth;
 
         /// <summary>
-        /// Representation of a rectangle in the tree map. Must be a class (not a
-        /// struct) because we need reference semantics when we iterate
-        /// on the rectangles using ForEach below.
+        /// The node layout we compute as a result.
         /// </summary>
-        private class Rectangle
-        {
-            public Rectangle(float x, float z, float width, float depth)
-            {
-                this.x = x;
-                this.z = z;
-                this.width = width;
-                this.depth = depth;
-            }
-            public float x;      // x co-ordinate at corner
-            public float z;      // z co-ordinate at corner
-            public float width;  // width
-            public float depth;  // depth (breadth)
-        }
-
-        /// <summary>
-        /// The absolute padding to be added in between neighboring rectangles
-        /// so that they can be distinguished.
-        /// </summary>
-        private const float padding = 0.1f;
-
-        /// <summary>
-        /// Adds padding to the rectangle.
-        /// </summary>
-        /// <param name="rect">rectangle for which to add padding</param>
-        private static void Add_Padding(ref Rectangle rect)
-        {
-            if (rect.width > 2 * padding)
-            {
-                rect.x += padding;
-                rect.width -= 2 * padding;
-            }
-            if (rect.depth > 2 * padding)
-            {
-                rect.z += padding;
-                rect.depth -= 2 * padding;
-            }
-        }
-
-        /// <summary>
-        /// Returns rectangles, one for each size in sizes along the z axis. 
-        /// The rectangles will fill up given depth. Their width will be determined by 
-        /// their area sizes.
-        /// </summary>
-        /// <param name="sizes">list of area sizes of siblings</param>
-        /// <param name="x">x co-ordinate at which to start layouting</param>
-        /// <param name="z">y co-ordinate at which to start layouting</param>
-        /// <param name="depth">the available depth into which to squeeze the rectangles</param>
-        /// <returns>rectangles filling depth with area proportional to sizes</returns>
-        private static List<Rectangle> Layout_In_Z(List<NodeSize> sizes, float x, float z, float depth)
-        {
-            List<Rectangle> result = new List<Rectangle>();
-            float width = Sum(sizes) / depth;
-            foreach (NodeSize node in sizes)
-            {
-                result.Add(new Rectangle(x, z, width, node.size / width));
-                z += node.size / width;
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Returns rectangles, one for each size in sizes along the z axis. 
-        /// The rectangles will fill up given width. Their depth will be determined by 
-        /// their area sizes.
-        /// </summary>
-        /// <param name="sizes">list of area sizes of siblings</param>
-        /// <param name="x">x co-ordinate at which to start layouting</param>
-        /// <param name="z">y co-ordinate at which to start layouting</param>
-        /// <param name="width">the available width into which to squeeze the rectangles</param>
-        /// <returns>rectangles filling width with area proportional to sizes</returns>
-        private static List<Rectangle> Layout_In_X(List<NodeSize> sizes, float x, float z, float width)
-        {
-            List<Rectangle> result = new List<Rectangle>();
-            float depth = Sum(sizes) / width;
-            foreach (NodeSize node in sizes)
-            {
-                result.Add(new Rectangle(x, z, node.size / depth, depth));
-                x += node.size / depth;
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Returns the sum of all sizes.
-        /// </summary>
-        /// <param name="sizes">list of sizes to be summed up</param>
-        /// <returns>sum of all sizes</returns>
-        private static float Sum(List<NodeSize> sizes)
-        {
-            float result = 0.0f;
-
-            foreach (NodeSize node in sizes)
-            {
-                result += node.size;
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Returns rectangles, one for each size in sizes along the either the z or x axis
-        /// depending upon width >= depth.
-        /// The rectangles will fill up the given space (depth if width >= depth, otherwise
-        /// width). Their other length (width if width >= depth, otherwise depth) will be determined by 
-        /// their area sizes.
-        /// </summary>
-        /// <param name="sizes">list of area sizes of siblings</param>
-        /// <param name="x">x co-ordinate at which to start layouting</param>
-        /// <param name="z">y co-ordinate at which to start layouting</param>
-        /// <param name="width">the available width into which to squeeze the rectangles</param>
-        /// <param name="depth">the available depth into which to squeeze the rectangles</param>
-        /// <returns>rectangles filling width with area proportional to sizes</returns>
-        private static List<Rectangle> Layout(List<NodeSize> sizes, float x, float z, float width, float depth)
-        {
-            return width >= depth ? Layout_In_Z(sizes, x, z, depth) : Layout_In_X(sizes, x, z, width);
-        }
-
-        /// <summary>
-        /// Returns the remaining rectangle in a row (for the case width >= depth).
-        /// </summary>
-        /// <param name="sizes">list of area sizes of siblings</param>
-        /// <param name="x">x co-ordinate at which to start layouting</param>
-        /// <param name="z">y co-ordinate at which to start layouting</param>
-        /// <param name="width">the available width into which to squeeze the rectangles</param>
-        /// <param name="depth">the available depth into which to squeeze the rectangles</param>
-        /// <returns>remaining rectangle</returns>
-        private static Rectangle Remaining_Rectangle_In_Row(List<NodeSize> sizes, float x, float z, float width, float depth)
-        {
-            float relative_width = Sum(sizes) / depth;
-            return new Rectangle(x + relative_width, z, width - relative_width, depth);
-        }
-
-        /// <summary>
-        /// Returns the remaining rectangle in a column (for the case width < depth).
-        /// </summary>
-        /// <param name="sizes">list of area sizes of siblings</param>
-        /// <param name="x">x co-ordinate at which to start layouting</param>
-        /// <param name="z">y co-ordinate at which to start layouting</param>
-        /// <param name="width">the available width into which to squeeze the rectangles</param>
-        /// <param name="depth">the available depth into which to squeeze the rectangles</param>
-        /// <returns>remaining rectangle</returns>
-        private static Rectangle Remaining_Rectangle_In_Column(List<NodeSize> sizes, float x, float z, float width, float depth)
-        {
-            float relative_width = Sum(sizes) / width;
-            return new Rectangle(x, z + relative_width, width, depth - relative_width);
-        }
-
-        /// <summary>
-        /// Returns the remaining rectangle in a row or column, depending upon whether width >= depth.
-        /// </summary>
-        /// <param name="sizes">list of area sizes of siblings</param>
-        /// <param name="x">x co-ordinate at which to start layouting</param>
-        /// <param name="z">y co-ordinate at which to start layouting</param>
-        /// <param name="width">the available width into which to squeeze the rectangles</param>
-        /// <param name="depth">the available depth into which to squeeze the rectangles</param>
-        /// <returns>remaining rectangle</returns>
-        private static Rectangle Remaining_Rectangle(List<NodeSize> sizes, float x, float z, float width, float depth)
-        {
-            return width >= depth ? Remaining_Rectangle_In_Row(sizes, x, z, width, depth) 
-                                  : Remaining_Rectangle_In_Column(sizes, x, z, width, depth);
-        }
-
-        /// <summary>
-        /// Returns the worst aspect ratio of the layout for the given sizes. 
-        /// 
-        /// Note: This function implements function 'worst' described in the paper by Bruls et al.
-        /// 
-        /// </summary>
-        /// <param name="sizes">area size of the rectangles to compute the treemap for</param>
-        /// <param name="x">x co-ordinate of the "origin"</param>
-        /// <param name="z">z co-ordinate of the "origin"</param>
-        /// <param name="width">full width of the treemap</param>
-        /// <param name="depth">full depth of the treemap</param>
-        /// <returns>worst aspect ratio of the layout for the given sizes</returns>
-        private static float Worst_Aspect_Ratio(List<NodeSize> sizes, float x, float z, float width, float depth)
-        {
-            float max = 0.0f;
-            foreach (Rectangle rect in Layout(sizes, x, z, width, depth))
-            {
-                float ratio = Mathf.Max(rect.width / rect.depth, rect.depth / rect.width);
-                if (ratio > max)
-                {
-                    max = ratio;
-                }
-            }
-            return max;
-        }
-
-        /// <summary>
-        /// Yields a squarified treemap for rectangles that are "padded" to allow for a visible border.
-        /// The rectangles are kept in the rectangle defined by given width and depth.
-        ///
-        /// Preconditions: 
-        ///  1) Every size in `sizes` must be positive.
-        ///  2) Every size is normalized such that width * depth = Sum(sizes).
-        ///  3) 'sizes' must be sorted in descending order.
-        /// </summary>
-        /// <param name="sizes">area size of the rectangles to compute the treemap for</param>
-        /// <param name="x">x co-ordinate of the "origin"</param>
-        /// <param name="z">z co-ordinate of the "origin"</param>
-        /// <param name="width">full width of the treemap</param>
-        /// <param name="depth">full depth of the treemap</param>
-        /// <returns>list of rectangles in the treemap; the order corresponds to the input order of the sizes.</returns>
-        private static List<Rectangle> Squarified_Layout(List<NodeSize> sizes, float x, float z, float width, float depth)
-        {
-            if (sizes.Count == 0)
-            {
-                return new List<Rectangle>();
-            }
-            if (sizes.Count == 1)
-            {
-                return Layout(sizes, x, z, width, depth);
-            }
-            // The position at which to split.
-            int i = 1;
-            while (i < sizes.Count
-                   && Worst_Aspect_Ratio(sizes.GetRange(0, i), x, z, width, depth) 
-                      >= Worst_Aspect_Ratio(sizes.GetRange(0, i + 1), x, z, width, depth))
-            {
-                i++;
-            }
-
-            List<NodeSize> current = sizes.GetRange(0, i); // sizes from the beginning through i-1
-            List<NodeSize> remaining = sizes.GetRange(i, sizes.Count - current.Count); // sizes i through the rest of the list
-            Rectangle rect = Remaining_Rectangle(current, x, z, width, depth);
-            List<Rectangle> result = Layout(current, x, z, width, depth);
-            result.AddRange(Squarified_Layout(remaining, rect.x, rect.z, rect.width, rect.depth));
-            return result;
-        }
-
-        /// <summary>
-        /// Yields a squarified treemap for rectangles that are "padded" to allow for a visible border.
-        /// The rectangles are kept in the rectangle defined by given width and depth.
-        ///
-        /// Preconditions: 
-        ///  1) Every size in `sizes` must be positive.
-        ///  2) Every size is normalized such that width * depth = Sum(sizes).
-        ///  3) 'sizes' must be sorted in descending order.
-        /// </summary>
-        /// <param name="sizes">area size of the rectangles to compute the treemap for</param>
-        /// <param name="x">x co-ordinate of the "origin"</param>
-        /// <param name="z">z co-ordinate of the "origin"</param>
-        /// <param name="width">full width of the treemap</param>
-        /// <param name="depth">full depth of the treemap</param>
-        /// <returns>list of rectangles in the treemap; the order corresponds to the input order of the sizes.</returns>
-        private static List<Rectangle> Squarified_Layout_With_Padding(List<NodeSize> sizes, float x, float z, float width, float depth)
-        {
-            List<Rectangle> result = Squarified_Layout(sizes, x, z, width, depth);
-            result.ForEach(rect => Add_Padding(ref rect));
-            return result;
-        }
-
-        /// <summary>
-        /// Normalizes given sizes so that Sum(sizes) = width * depth.
-        /// </summary>
-        /// <param name="sizes">Input list of numeric values to normalize.</param>
-        /// <param name="width">x dimension of the rectangle to be normalized</param>
-        /// <param name="depth">z dimension of the rectangle to be normalized</param>
-
-        private static void Normalize(List<NodeSize> sizes, float width, float depth)
-        {
-            float total_size = Sum(sizes);
-            float total_area = width * depth;
-            foreach (NodeSize node in sizes)
-            {
-                node.size *= total_area / total_size;
-            }
-        }
-
-        /// <summary>
-        /// The information about the size of a game node.
-        /// </summary>
-        private class NodeSize
-        {
-            public NodeSize(GameObject gameNode, float size)
-            {
-                this.gameNode = gameNode;
-                this.size = size;
-            }
-            public GameObject gameNode;
-            public float size;
-        }
+        private Dictionary<GameObject, NodeTransform> layout_result;
 
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
         {
-            List<NodeSize> sizes = GetSizes(gameNodes);
-            Normalize(sizes, this.width, this.depth);
-            sizes.Sort(delegate (NodeSize x, NodeSize y) { return y.size.CompareTo(x.size); });
-            List<Rectangle> rects = Squarified_Layout_With_Padding(sizes, 0, 0, this.width, this.depth);
-            return To_Transforms(sizes, rects);
+            layout_result = new Dictionary<GameObject, NodeTransform>();
+
+            if (gameNodes.Count == 0)
+            {
+                throw new Exception("No nodes to be laid out.");
+            }
+            else if (gameNodes.Count == 1)
+            {
+                GameObject gameNode = gameNodes.GetEnumerator().Current;
+                layout_result[gameNode] = new NodeTransform(Vector3.zero, 
+                                                            new Vector3(width, gameNode.transform.localScale.y, depth));
+            }
+            else
+            {
+                to_game_node = NodeMapping(gameNodes);
+                CreateTree(gameNodes);
+                CalculateSize();
+                CalculateLayout();
+            }
+            return layout_result;
         }
 
         /// <summary>
-        /// Returns the transforms (position, scale) of the game objects (nodes) according to their
-        /// corresponding rectangle in rects. 
+        /// Adds positioning and scaling to layout_result for all root nodes (nodes with no parent)
+        /// within a rectangle whose center position is Vector3.zero and whose width and depth is 
+        /// as specified by the constructor call. This function is then called recursively for the 
+        /// children of each root (until leaves are reached).
+        /// </summary>
+        private void CalculateLayout()
+        {
+            if (roots.Count == 1)
+            {
+                GameObject root = to_game_node[roots[0]];
+                layout_result[root] = new NodeTransform(Vector3.zero, 
+                                                        new Vector3(width, root.transform.localScale.y, depth));
+                CalculateLayout(children[roots[0]], -width / 2.0f, -depth / 2.0f, width, depth);
+            }
+            else
+            {
+                CalculateLayout(roots, -width / 2.0f, -depth / 2.0f, width, depth);
+            }
+        }
+
+        /// <summary>
+        /// Adds positioning and scaling to layout_result for all given siblings (children of the same
+        /// immediate parent in the node tree) within a rectangle with left front corner (x, z) and
+        /// given width and depth. This function is then called recursively for the children of the
+        /// given siblings.
+        /// </summary>
+        /// <param name="siblings">hildren of the same immediate parent in the node tree</param>
+        /// <param name="x">x co-ordinate of the left front corner of the rectangle in which to place the nodes</param>
+        /// <param name="z">z co-ordinate of the left front corner of the rectangle</param>
+        /// <param name="width">width of the rectangle</param>
+        /// <param name="depth">depth of the rectangle</param>
+        private void CalculateLayout(List<Node> siblings, float x, float z, float width, float depth)
+        {
+            List<RectangleTiling.NodeSize> sizes = GetSizes(siblings);
+            float padding = Mathf.Min(width, depth) * 0.01f;
+            List<RectangleTiling.Rectangle> rects = RectangleTiling.Squarified_Layout_With_Padding(sizes, x, z, width, depth, padding);
+            Add_To_Layout(sizes, rects);
+
+            foreach (Node node in siblings)
+            {
+                List<Node> kids = children[node];
+                if (kids.Count > 0)
+                {
+                    // Note: nodeTransform.position is the center position, while 
+                    // CalculateLayout assumes co-ordinates x and z as the left front corner
+                    NodeTransform nodeTransform = layout_result[to_game_node[node]];
+                    CalculateLayout(kids, 
+                                    nodeTransform.position.x - nodeTransform.scale.x / 2.0f, 
+                                    nodeTransform.position.z - nodeTransform.scale.z / 2.0f,
+                                    nodeTransform.scale.x, 
+                                    nodeTransform.scale.z);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The set of children of each node. This is a subset of the node's children
+        /// in the graph, limited to the children for which a layout is requested.
+        /// </summary>
+        private Dictionary<Node, List<Node>> children = new Dictionary<Node, List<Node>>();
+
+        /// <summary>
+        /// The roots of the subtrees of the original graph that are to be laid out.
+        /// A node is considered a root if it has either no parent in the original
+        /// graph or its parent is not contained in the set of nodes to be laid out.
+        /// </summary>
+        private List<Node> roots = new List<Node>();
+
+        /// <summary>
+        /// Creates the relevant tree consisting of the nodes to be laid out
+        /// (a subtree of the node hierarchy of the original graph).
+        /// 
+        /// Precondition: to_game_node is computed.
+        /// </summary>
+        /// <param name="nodes">nodes to be laid out</param>
+        private void CreateTree(ICollection<GameObject> nodes)
+        {
+            // The subset of nodes of the graph for which the layout is requested.
+            HashSet<Node> allNodes = new HashSet<Node>(to_game_node.Keys);
+            
+            foreach(Node node in allNodes)
+            {
+                // Only children that are in the set of nodes to be laid out.
+                HashSet<Node> kids = new HashSet<Node>(node.Children());
+                kids.IntersectWith(allNodes);
+                children[node] = new List<Node>(kids);
+                {
+                    Node parent = node.Parent;
+                    // A node is considered a root if it has either no parent in the
+                    // graph or its parent is not contained in the set of nodes to be laid out.
+                    if (parent == null || !allNodes.Contains(parent))
+                    {
+                        roots.Add(node);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calculates the size of all nodes. The size of a leaf is the maximum of 
+        /// its width and depth. The size of an inner node is the sum of the sizes 
+        /// of all its children.
+        /// </summary>
+        /// <returns>total size of all node</returns>
+        private float CalculateSize()
+        {
+            float total_size = 0.0f;
+            foreach(Node root in roots)
+            {
+                total_size += CalculateSize(root);
+            }
+            return total_size;
+        }
+
+        /// <summary>
+        /// The size metric of each node. The area of the rectangle is proportional to a node's size.
+        /// </summary>
+        private Dictionary<Node, RectangleTiling.NodeSize> sizes = new Dictionary<Node, RectangleTiling.NodeSize>();
+
+        /// <summary>
+        /// Calculates the size of node and all its descendants. The size of a leaf
+        /// is the maximum of its width and depth. The size of an inner node is the
+        /// sum of the sizes of all its children.
+        /// </summary>
+        /// <param name="node">node whose size it to be determined</param>
+        /// <returns>size of node</returns>
+        private float CalculateSize(Node node)
+        {
+            GameObject gameNode = to_game_node[node];
+
+            if (children[node].Count == 0)
+            {
+                // a leaf      
+                Vector3 size = leafNodeFactory.GetSize(gameNode);
+                // x and z lenghts may differ; we need to consider the larger value
+                float result = Mathf.Max(size.x, size.z);
+                sizes[node] = new RectangleTiling.NodeSize(gameNode, result);
+                return result;
+            }
+            else
+            {
+                float total_size = 0.0f;
+                foreach (Node child in children[node])
+                {
+                    total_size += CalculateSize(child);
+                }
+                sizes[node] = new RectangleTiling.NodeSize(gameNode, total_size);
+                return total_size;
+            }
+        }
+
+        /// <summary>
+        /// Returns the list of node area sizes; one for each node in nodes as
+        /// defined in sizes.
+        /// </summary>
+        /// <param name="nodes">list of nodes whose sizes are to be determined</param>
+        /// <returns>list of node area sizes</returns>
+        private List<RectangleTiling.NodeSize> GetSizes(ICollection<Node> nodes)
+        {
+            List<RectangleTiling.NodeSize> result = new List<RectangleTiling.NodeSize>();
+            foreach (Node node in nodes)
+            {
+                result.Add(sizes[node]);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Adds the transforms (position, scale) of the game objects (nodes) according to their
+        /// corresponding rectangle in rects to layout_result. 
         /// 
         /// Precondition: For every i in the range of nodes: rects[i] is the transform
         /// corresponding to nodes[i].
         /// </summary>
         /// <param name="nodes">the game nodes</param>
         /// <param name="rects">their corresponding rectangle</param>
-        /// <returns>the transforms (position, scale) of the game objects</returns>
-        private Dictionary<GameObject, NodeTransform> To_Transforms(List<NodeSize> nodes, List<Rectangle> rects)
+        private void Add_To_Layout
+           (List<RectangleTiling.NodeSize> nodes,
+            List<RectangleTiling.Rectangle> rects)
         {
-            Dictionary<GameObject, NodeTransform> result = new Dictionary<GameObject, NodeTransform>();
             int i = 0;
-            foreach (Rectangle rect in rects)
+            foreach (RectangleTiling.Rectangle rect in rects)
             {
                 GameObject o = nodes[i].gameNode;
                 Vector3 position = new Vector3(rect.x + rect.width / 2.0f, groundLevel, rect.z + rect.depth / 2.0f);
-                Vector3 scale = new Vector3(rect.width / leafNodeFactory.Unit(), 1.0f, rect.depth / leafNodeFactory.Unit());
-                result[o] = new NodeTransform(position, scale);
+                Vector3 scale = new Vector3(rect.width, o.transform.localScale.y, rect.depth);
+                layout_result[o] = new NodeTransform(position, scale);
                 i++;
             }
-            return result;
-        }
-
-        /// <summary>
-        /// Returns the list of node sizes; one for each game node in gameNodes. The
-        /// size of a game node is the maximum of its width and depth.
-        /// </summary>
-        /// <param name="gameNodes">list of game nodes whose sizes are to be determined</param>
-        /// <returns>list of maximal lengths</returns>
-        private List<NodeSize> GetSizes(ICollection<GameObject> gameNodes)
-        {
-            List<NodeSize> result = new List<NodeSize>();
-            foreach (GameObject gameNode in gameNodes)
-            {
-                Vector3 size = leafNodeFactory.GetSize(gameNode);
-                // x and z lenghts may differ; we need to consider the larger value
-                result.Add(new NodeSize(gameNode, Mathf.Max(size.x, size.z)));
-            }
-            return result;
         }
     }
 }

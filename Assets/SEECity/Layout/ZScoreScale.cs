@@ -24,15 +24,10 @@ namespace SEE.Layout
         /// <param name="maximalLength">the maximal value a node length can have</param>
         /// <param name="metrics">node metrics for scaling</param>
         public ZScoreScale(Graph graph, float minimalLength, float maximalLength, IList<string> metrics)
-        : base(metrics, minimalLength, maximalLength)
+        : base(graph, metrics, minimalLength, maximalLength)
         {
             Determine_Statistics(graph);
         }
-
-        /// <summary>
-        /// The average metric should be mapped onto this length of a building.
-        /// </summary>
-        public float standard_length = 1.0f; // FIXME: Re-set to 0.5f;
 
         // The statistics gathered for the node metrics.
         private Dictionary<string, Statistics> statistics;
@@ -139,14 +134,32 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Yields a z-score normalized value of the given node metric.
-        /// The minimal value is specified by minimalLength. There is no maximal value,
-        /// but generally values greater than 30 are unlikely.
+        /// Yields a z-score normalized value of the given node metric clamped
+        /// into the range [minimalLength, maximalLength].
         /// </summary>
-        /// <param name="node">node for which to determine the normalized value</param>
         /// <param name="metric">name of the node metric</param>
+        /// <param name="node">node for which to determine the normalized value</param>
         /// <returns>normalized value of node metric</returns>
-        public override float GetNormalizedValue(Node node, string metric)
+        public override float GetNormalizedValue(string metric, Node node)
+        {
+            if (node.TryGetNumeric(metric, out float value))
+            {
+                return GetNormalizedValue(metric, value);
+            }
+            else
+            {
+                return minimalLength;
+            }
+        }
+
+        /// <summary>
+        /// Yields a z-score normalized value of the given node metric value
+        /// clamped into the range [minimalLength, maximalLength].
+        /// </summary>
+        /// <param name="metric">name of the node metric</param>
+        /// <param name="value">value for which to determine the normalized value</param>
+        /// <returns>normalized value of node metric</returns>
+        public override float GetNormalizedValue(string metric, float value)
         {
             // We normalize x by z-score(x), which is defined as (x - mean)/sd where sd is
             // the standard deviation. The z-score can be viewed as a linear function
@@ -154,27 +167,30 @@ namespace SEE.Layout
             // value onto the standard size of a building. That is why we add 1 to the
             // factor by which we multiply the standard length. Thus, if the metric value
             // is the means, the factor is 1.0.
+            // Note: There is no maximal value for z-score, but larger values get increasingly
+            // unlikely.
+            float sd = statistics[metric].standard_deviation;
+            if (sd == 0.0f)
             {
-                float result = minimalLength;
-
-                if (node.TryGetNumeric(metric, out float value))
-                {
-                    float sd = statistics[metric].standard_deviation;
-                    if (sd == 0.0f)
-                    {
-                        result = minimalLength;
-                    }
-                    else
-                    {
-                        result = ((value - statistics[metric].mean) / sd + 1.0f) * standard_length;
-                        if (result < minimalLength)
-                        {
-                            result = minimalLength;
-                        }
-                    }
-                }
-                return WithinLimits(result);
+                return minimalLength;
             }
+            else
+            {
+                return WithinLimits(((value - statistics[metric].mean) / sd + 1.0f));
+            }
+        }
+
+        /// <summary>
+        /// Clamps value within range [minimalLength, maximalLength], that is,
+        /// if minimalLength <= value <= maximalLength, value is returned
+        /// if value < minimalLength, minimalLength is returned
+        /// if maximalLength < value, maximalLength is returned
+        /// </summary>
+        /// <param name="value">value to be clamped</param>
+        /// <returns>clamped value</returns>
+        protected float WithinLimits(float value)
+        {
+            return Mathf.Clamp(value, minimalLength, maximalLength);
         }
     }
 }
