@@ -629,6 +629,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rig: {fileID: 0}
   speedFactor: 0.5
+  _OnLeftFist:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!120 &201373173
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -7420,6 +7423,7 @@ MonoBehaviour:
   text: {fileID: 45900340}
   colorOnHit: {r: 1, g: 0, b: 0, a: 1}
   defaultColor: {r: 0, g: 1, b: 0, a: 1}
+  fileName: buildings.csv
 --- !u!120 &1082297754
 LineRenderer:
   m_ObjectHideFlags: 0

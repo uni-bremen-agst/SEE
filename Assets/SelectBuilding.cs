@@ -12,9 +12,16 @@ public class SelectBuilding : MonoBehaviour
     public Color colorOnHit = Color.green;
     public Color defaultColor = Color.red;
 
+    private bool hit = false;
+    private RaycastHit hitInfo;
     private bool active = false;
     private bool show = false;
     private GameObject house;
+    private string currentName;
+
+    private List<string> data = new List<string>();
+    public string fileName = "buildings.csv";
+    private const string delemiter = ";";
 
     private void Start()
     {
@@ -24,8 +31,8 @@ public class SelectBuilding : MonoBehaviour
 
     private void Update()
     {
-        RaycastHit hitInfo = new RaycastHit();
-        bool hit = Physics.Raycast(direction.position, direction.TransformDirection(Vector3.down), out hitInfo, Mathf.Infinity);
+        hitInfo = new RaycastHit();
+        hit = Physics.Raycast(direction.position, direction.TransformDirection(Vector3.down), out hitInfo, Mathf.Infinity);
 
             line.SetPosition(0, direction.position);
             line.SetPosition(1, direction.TransformDirection(Vector3.down)*1000);
@@ -62,6 +69,37 @@ public class SelectBuilding : MonoBehaviour
         }
     }
 
+
+    // This is the same source code like it is used for the implementation of the camera position tracking
+    public void saveBuildig()
+    {
+        if (hit && hitInfo.collider.gameObject.CompareTag("Building"))
+        {
+            data.Add(currentName);
+        }
+    }
+
+    void OnApplicationQuit()
+    {
+        if (data.Count == 0)
+        {
+            Debug.Log("The building information are not stored.\n");
+        }
+        else
+        {
+            SaveFile();
+        }
+    }
+
+    public void SaveFile()
+    {
+        // WriteAllLines creates a file, writes a collection of strings to the file,
+        // and then closes the file.  You do NOT need to call Flush() or Close().
+        string path = Application.persistentDataPath + "/" + fileName;
+        System.IO.File.WriteAllLines(path, data);
+        Debug.LogFormat("Saved camera path to {0}\n", path);
+    }
+
     public void RayOnOff()
     {
         active = !active;
@@ -71,6 +109,6 @@ public class SelectBuilding : MonoBehaviour
 
     private void MarkBuilding()
     {
-
+        
     }
 }
