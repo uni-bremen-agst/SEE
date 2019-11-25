@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using Leap;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 public class LeapMovementSEE : MonoBehaviour
 {
@@ -11,6 +13,12 @@ public class LeapMovementSEE : MonoBehaviour
     private float speed = 1f;
     private bool move = false;
     private Vector3 dir = new Vector3(0,0,0);
+
+    [SerializeField]
+    [FormerlySerializedAs("OnLeftFist")]
+    private UnityEvent _OnLeftFist = new UnityEvent();
+
+    public 
 
 
     void Start()
@@ -93,6 +101,11 @@ public class LeapMovementSEE : MonoBehaviour
                 }
             }
 
+            if(fist(left))
+            {
+
+            }
+
             if (move)
             {
                 rig.transform.Translate(dir * hightFactor);
@@ -125,6 +138,18 @@ public class LeapMovementSEE : MonoBehaviour
     bool TwoThumbsToIndex(Hand right, Hand left)
     {
         if (left.PinchDistance < 20f && right.PinchDistance < 20f)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    bool fist(Hand hand)
+    {
+        if (hand.PinchDistance < 20)
         {
             return true;
         }
