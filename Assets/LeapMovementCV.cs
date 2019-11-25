@@ -8,8 +8,13 @@ public class LeapMovementCV : MonoBehaviour
     public GameObject rig; // assign in inspector
 
     public GameObject handAnchor; //assign in inspector
-    public GameObject roomAnchor; // assign in inspector
     public LineRenderer line; // assign in inspector
+
+    public GameObject grid;
+    private Vector3 gridOffset = new Vector3(0, 0.2f, 0);
+
+    private bool collision = false;
+    private GameObject collisionCube;
 
     private bool presentRight = false;
 
@@ -19,10 +24,8 @@ public class LeapMovementCV : MonoBehaviour
         controller = new Controller();
 
         //make cubes spawn at camera offset
-        //handAnchor.transform.Translate(Camera.main.transform.position);
-        //handAnchor.transform.Translate(Vector3.down * 0.2f);
-
-        roomAnchor.SetActive(false);
+        grid = Instantiate(grid, Camera.main.transform.position - gridOffset, Quaternion.identity);
+        grid.transform.SetParent(gameObject.transform);
 
     }
 
@@ -58,21 +61,22 @@ public class LeapMovementCV : MonoBehaviour
                     }
                 }
 
-            
-            
-            if(presentRight && fist(right))
-            {
-                roomAnchor.SetActive(true);
-                line.SetPosition(0, handAnchor.transform.position);
-                line.SetPosition(1, roomAnchor.transform.position);
+            grid.transform.position = Camera.main.transform.position - gridOffset;
 
-                rig.transform.Translate((handAnchor.transform.position - roomAnchor.transform.position) * 0.01f);
-            }
-            else
+            if (collision)
             {
-                roomAnchor.SetActive(false);
-                line.SetPosition(0, handAnchor.transform.position);
-                line.SetPosition(1, handAnchor.transform.position);
+                if (fist(left))
+                {
+                    line.SetPosition(0, handAnchor.transform.position);
+                    line.SetPosition(1, collisionCube.transform.position);
+
+                    rig.transform.Translate((handAnchor.transform.position - collisionCube.transform.position) * 0.05f);
+                }
+                else
+                {
+                    line.SetPosition(0, handAnchor.transform.position);
+                    line.SetPosition(1, handAnchor.transform.position);
+                }
             }
         }
     }
@@ -96,5 +100,19 @@ public class LeapMovementCV : MonoBehaviour
         {
             return false;
         }
+    }
+
+    void ShowUp(GameObject [] obj)
+    {
+        Debug.Log("Collsision Enter Method\n");
+        collision = true;
+        collisionCube = obj[0];
+        Debug.Log(obj[1].name);
+
+    }
+
+    void Hide(GameObject obj)
+    {
+        collision = false;
     }
 }
