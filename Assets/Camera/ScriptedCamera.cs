@@ -65,6 +65,11 @@ public class ScriptedCamera : MonoBehaviour
     private const char delimiter = ';';
 
     /// <summary>
+    /// The minimal number of columns a CSV file containing path data must have.
+    /// </summary>
+    private const int minimalColumns = 4;
+
+    /// <summary>
     /// Loads the path data from a the file.
     /// </summary>
     private void ReadPath()
@@ -80,10 +85,11 @@ public class ScriptedCamera : MonoBehaviour
         {
             string[] coordinates = line.Split(delimiter);
             Vector4 coordinate = Vector4.zero;
-            if (coordinates.Length != 4)
+            if (coordinates.Length < minimalColumns)
             {
-                Debug.LogErrorFormat("Data format error. Expected 4 entries separated by {0}. Got: {1} in '{2}'.\n",
-                                     delimiter, coordinates.Length, line);
+                Debug.LogErrorFormat
+                    ("Data format error at line {0} in file {1}: expected at least {2} entries separated by {3}. Got: {4} in '{5}'.\n",
+                     i+1, path, minimalColumns, delimiter, coordinates.Length, line);
             }
             else
             {
@@ -91,6 +97,7 @@ public class ScriptedCamera : MonoBehaviour
                 coordinate.y = float.Parse(coordinates[1], CultureInfo.InvariantCulture);
                 coordinate.z = float.Parse(coordinates[2], CultureInfo.InvariantCulture);
                 coordinate.w = float.Parse(coordinates[3], CultureInfo.InvariantCulture);
+                // Note: We ignore all remaining columns.
             }
             locations[i] = coordinate;
             i++;
