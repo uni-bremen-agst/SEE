@@ -151,6 +151,7 @@ namespace SEEEditor
             editorSettings.pathPrefix = EditorGUILayout.TextField("Project path prefix", editorSettings.pathPrefix);
             editorSettings.gxlPath = EditorGUILayout.TextField("GXL file", editorSettings.gxlPath);
             editorSettings.csvPath = EditorGUILayout.TextField("CSV file", editorSettings.csvPath);
+            editorSettings.origin = EditorGUILayout.Vector3Field("Origin", editorSettings.origin);
 
             GUILayout.Label("Attributes of leaf nodes", EditorStyles.boldLabel);
             editorSettings.WidthMetric = EditorGUILayout.TextField("Width", editorSettings.WidthMetric);
