@@ -14,11 +14,14 @@ public class LeapMovementSEE : MonoBehaviour
     private bool move = false;
     private Vector3 dir = new Vector3(0,0,0);
 
+    //hand trigger status
+    private bool onLeftFistTrigger = false;
+
+    private bool leftFistLastFrame = false;
+
     [SerializeField]
     [FormerlySerializedAs("OnLeftFist")]
     private UnityEvent _OnLeftFist = new UnityEvent();
-
-    public 
 
 
     void Start()
@@ -67,24 +70,24 @@ public class LeapMovementSEE : MonoBehaviour
                 }
                 // checking if the left hand is pinching and the right not to moving leftwards
                 // movement speed depends on teh distance between both thumbs
-                else if (left.PinchDistance < 20f && right.PinchDistance > 50f)
-                {
-                    speed = left.Fingers[0].TipPosition.DistanceTo(right.Fingers[0].TipPosition) * Time.deltaTime * speedFactor;
-                    dir = -Camera.main.transform.right * speed;
-                    move = true;
+                //else if (left.PinchDistance < 20f && right.PinchDistance > 50f)
+                //{
+                //    speed = left.Fingers[0].TipPosition.DistanceTo(right.Fingers[0].TipPosition) * Time.deltaTime * speedFactor;
+                //    dir = -Camera.main.transform.right * speed;
+                //    move = true;
 
-                    MoveUpAndDown(right, left, ref dir);
-                }
+                //    MoveUpAndDown(right, left, ref dir);
+                //}
                 // checking if the right hand is pinching and the left not for moving rightwards
                 // movement speed depends on teh distance between both thumbs
-                else if(left.PinchDistance > 50f && right.PinchDistance < 20f)
-                {
-                    speed = left.Fingers[0].TipPosition.DistanceTo(right.Fingers[0].TipPosition) * Time.deltaTime * speedFactor;
-                    dir = Camera.main.transform.right * speed;
-                    move = true;
+                //else if(left.PinchDistance > 50f && right.PinchDistance < 20f)
+                //{
+                //    speed = left.Fingers[0].TipPosition.DistanceTo(right.Fingers[0].TipPosition) * Time.deltaTime * speedFactor;
+                //    dir = Camera.main.transform.right * speed;
+                //    move = true;
 
-                    MoveUpAndDown(right, left, ref dir);
-                }
+                //    MoveUpAndDown(right, left, ref dir);
+                //}
                 //checking if the thumbs are together and the indexfinger not for moving bachwards
                 // movement speed depends on the distance between the indexfingers
                 else if(left.Fingers[0].TipPosition.DistanceTo(right.Fingers[0].TipPosition) < 30f && left.Fingers[1].TipPosition.DistanceTo(right.Fingers[1].TipPosition) > 120f)
@@ -101,9 +104,11 @@ public class LeapMovementSEE : MonoBehaviour
                 }
             }
 
-            if(fist(left))
-            {
+            fist(left);
 
+            if(onLeftFistTrigger)
+            {
+                _OnLeftFist.Invoke();
             }
 
             if (move)
@@ -151,10 +156,20 @@ public class LeapMovementSEE : MonoBehaviour
     {
         if (hand.PinchDistance < 20)
         {
+            if (!leftFistLastFrame)
+            {
+                onLeftFistTrigger = true;
+                leftFistLastFrame = true;
+            }
+            else
+            {
+                onLeftFistTrigger = false;
+            }
             return true;
         }
         else
         {
+            leftFistLastFrame = false;
             return false;
         }
     }
