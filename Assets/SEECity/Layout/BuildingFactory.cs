@@ -122,13 +122,13 @@ namespace SEE.Layout
         /// depending upon the index, otherwise the same building type is 
         /// created independent of the index.
         /// </summary>
-        private const bool createDifferentBuildingTypes = false;
+        private const bool createDifferentBuildingTypes = true;
 
         public override GameObject NewBlock(int index = 0)
         {
             if (createDifferentBuildingTypes)
             {
-                index = Mathf.Clamp(0, prefabs.Length - 1, index);
+                index = Mathf.Clamp(index, 0, prefabs.Length - 1);
                 return NewBuilding(index);
             }
             else

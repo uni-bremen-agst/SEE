@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: e735cf060455fa74abb5819a0b673a13
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Fresh Marker
+  fontNames:
+  - Fresh Marker
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 83a5d6c0096e4ec48858aed1626527f1, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
