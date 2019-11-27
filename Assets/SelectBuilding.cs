@@ -18,10 +18,11 @@ public class SelectBuilding : MonoBehaviour
     private bool show = false;
     private GameObject house;
     private string currentName;
+    private bool lockBuilding = false;
 
     private List<string> data = new List<string>();
     public string fileName = "buildings.csv";
-    private const string delemiter = ";";
+    private const string delimiter = ";";
 
     private void Start()
     {
@@ -41,13 +42,16 @@ public class SelectBuilding : MonoBehaviour
             {
                 line.SetPosition(1, hitInfo.point);
                 line.material.color = colorOnHit;
-                text.text = hitInfo.collider.gameObject.name;
+                currentName = hitInfo.collider.gameObject.name;
             }
             else
             {
-                text.text = "";
+                currentName = "";
                 line.material.color = defaultColor;
             }
+
+            if (!lockBuilding)
+                text.text = currentName;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -73,9 +77,31 @@ public class SelectBuilding : MonoBehaviour
     {
         if (hit && hitInfo.collider.gameObject.CompareTag("Building"))
         {
-            data.Add(currentName);
+            string output = currentName 
+                            + delimiter + FloatToString(Camera.main.transform.position.x) 
+                            + delimiter + FloatToString(Camera.main.transform.position.y)
+                            + delimiter + FloatToString(Camera.main.transform.position.z)
+                            + delimiter + Mathf.RoundToInt(Time.realtimeSinceStartup);
+            data.Add(output);
             Debug.Log("building saved");
+            lockBuilding = true;
+            text.text = currentName;
+            text.color = defaultColor;
         }
+    }
+
+    public void resetBuilding()
+    {
+            string output = "building reset"
+                            + delimiter + FloatToString(Camera.main.transform.position.x)
+                            + delimiter + FloatToString(Camera.main.transform.position.y)
+                            + delimiter + FloatToString(Camera.main.transform.position.z)
+                            + delimiter + Mathf.RoundToInt(Time.realtimeSinceStartup);
+        data.Add(output);
+        Debug.Log("building reset");
+        lockBuilding = false;
+        text.color = Color.white;
+        text.text = "";
     }
 
     void OnApplicationQuit()
@@ -109,5 +135,10 @@ public class SelectBuilding : MonoBehaviour
     private void MarkBuilding()
     {
         
+    }
+
+    private string FloatToString(float value)
+    {
+        return value.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
     }
 }
