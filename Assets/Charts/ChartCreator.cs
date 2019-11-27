@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class ChartCreator : MonoBehaviour
 {
@@ -9,21 +10,37 @@ public class ChartCreator : MonoBehaviour
 	GameObject markerPrefab;
 	[SerializeField]
 	GameObject entries;
+	[SerializeField]
+	GameObject dataPanel;
+	[SerializeField]
+	TextMeshProUGUI xLabel;
+	[SerializeField]
+	TextMeshProUGUI yLabel;
 
+	/// <summary>
+	/// Calls methods that should be called when the user presses a button in the final version - for testing.
+	/// </summary>
 	private void Start()
 	{
 		FindDataObjects();
-		Debug.Log(dataObjects.Length);
 		DrawData();
 	}
 
+	/// <summary>
+	/// Fills a List with all objects that will be in the chart. Right now that's all buildings.
+	/// </summary>
 	void FindDataObjects()
 	{
 		dataObjects = GameObject.FindGameObjectsWithTag("Building");
 	}
 
+	/// <summary>
+	/// Fills the chart with data.
+	/// </summary>
 	void DrawData()
 	{
+		xLabel.text = "Local Scale X";
+		yLabel.text = "Local Scale Y";
 		float minX = dataObjects[0].transform.localScale.x;
 		float maxX = dataObjects[0].transform.localScale.x;
 		float minY = dataObjects[0].transform.localScale.y;
@@ -49,18 +66,14 @@ public class ChartCreator : MonoBehaviour
 				minY = tempY;
 			}
 		}
-		Debug.Log(maxX + " " + minX + " " + maxY + " " + minY);
-		RectTransform field = GetComponent<RectTransform>();
+		RectTransform field = dataPanel.GetComponent<RectTransform>();
 		float width = field.rect.width / (maxX - minX);
 		float height = field.rect.height / (maxY - minY);
 		foreach (GameObject data in dataObjects)
 		{
-			GameObject marker = Instantiate(markerPrefab);
+			GameObject marker = Instantiate(markerPrefab, entries.transform);
 			marker.GetComponent<ChartMarker>().LinkedObject = data;
-			marker.transform.SetParent(entries.transform);
-			marker.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-			marker.transform.position = new Vector3(((data.transform.localScale.x - minX) / maxX) * width + entries.transform.position.x, ((data.transform.localScale.y - minY) / maxY)
-				* height + entries.transform.position.y, field.transform.position.z);
+			marker.GetComponent<RectTransform>().anchoredPosition = new Vector3((data.transform.localScale.x - minX) * width, (data.transform.localScale.y - minY) * height, 0);
 		}
 	}
 }
