@@ -35,11 +35,15 @@ public class CCARender : AbstractCCARender
          void onAnimateTo
          void onAnimateRemove
         */
-        root.transform.position = Layout.PlanePositon;
+        var nodeTransform = Layout.GetNodeTransform(node);
+
+
+
+        root.transform.position = nodeTransform.position;
         var scal = new Vector3(100, 1, 100);
-        scal.Scale(Layout.GetScale(node));
+        scal.Scale(nodeTransform.scale);
         iTween.ScaleTo(root, iTween.Hash(
-            "scale", scal,
+            "scale", nodeTransform.scale,
             "time", 2
         ));
         //root.transform.localScale = scal;
@@ -65,14 +69,19 @@ public class CCARender : AbstractCCARender
     protected override void RenderLeaf(Node node)
     {
         var isLeafNew = !ObjectManager.GetLeaf(node, out GameObject leaf);
-        var position = Layout.GetPositon(node);
-        var scale = Layout.GetScale(node);
+        var nodeTransform = Layout.GetNodeTransform(node);
+        var position = nodeTransform.position;
+        var scale = nodeTransform.scale;
         // TODO more leaf initialisation
         void animateWith(AbstractCCAAnimator animator)
         {
-            animator.AnimateTo(node, leaf, Layout.GetPositon(node), Layout.GetScale(node));
+            animator.AnimateTo(node, leaf, position, scale);
         }
-
+        ObjectManager.NodeFactory.SetGroundPosition(leaf, position);
+        // TODO calculate smaller size to correctly scale
+        ObjectManager.NodeFactory.SetSize(leaf, scale);
+        //leaf.transform.localScale = scale;
+        /*
         if (isLeafNew)
         {
             var height = 100; // TODO object size
@@ -93,6 +102,7 @@ public class CCARender : AbstractCCARender
         {
             animateWith(SimpleAnim);
         }
+        */
     }
 
     protected override void RenderEdge(Edge edge)
@@ -114,8 +124,9 @@ public class CCARender : AbstractCCARender
         if(ObjectManager.RemoveNode(node, out GameObject leaf))
         {
             var height = 100; // TODO object size
-            var position = Layout.GetPositon(node);
-            var scale = Layout.GetScale(node);
+            var nodeTransform = Layout.GetNodeTransform(node);
+            var position = nodeTransform.position;
+            var scale = nodeTransform.scale;
             gameObject.transform.position = position;
             position.y -= height;
             MoveAnim.AnimateTo(node, leaf, position, scale, OnRemovedNodeFinishedAnimation);

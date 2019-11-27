@@ -26,7 +26,7 @@ public static class GraphExtension
             rootNode =>
             {
                 rootAction?.Invoke(rootNode);
-                TraverseTree(rootNode, innerNodeAction, leafAction);
+                rootNode.Children().ForEach(child => TraverseTree(child, innerNodeAction, leafAction));
             }
         );
     }

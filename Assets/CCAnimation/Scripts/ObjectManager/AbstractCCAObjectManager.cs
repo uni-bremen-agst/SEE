@@ -16,22 +16,30 @@ public abstract class AbstractCCAObjectManager
     /// The BlockFactory used internally for creating missing
     /// GameObjects.
     /// </summary>
-    private readonly BlockFactory _blockFactory;
+    private readonly NodeFactory _nodeFactory;
 
     /// <summary>
     /// Returns the internally used BlockFactory.
     /// </summary>
-    public BlockFactory BlockFactory => _blockFactory;
+    public NodeFactory NodeFactory => _nodeFactory;
 
     /// <summary>
     /// Creates a new ObjectManager with the given BlackFactory.
     /// </summary>
-    /// <param name="blockFactory">The given BlockFactory.</param>
-    public AbstractCCAObjectManager(BlockFactory blockFactory)
+    /// <param name="nodeFactory">The given BlockFactory.</param>
+    public AbstractCCAObjectManager(NodeFactory nodeFactory)
     {
-        blockFactory.AssertNotNull("blockFactory");
+        nodeFactory.AssertNotNull("nodeFactory");
 
-        _blockFactory = blockFactory;
+        _nodeFactory = nodeFactory;
+    }
+
+    /// <summary>
+    /// Returns all created GameObjects till now
+    /// </summary>
+    public abstract List<GameObject> GameObjects
+    {
+        get;
     }
 
     /// <summary>

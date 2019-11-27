@@ -57,16 +57,18 @@ public abstract class AbstractCCARender : MonoBehaviour
 
     protected enum GraphDirection { First, Next, Previous };
 
-    protected AbstractCCAObjectManager ObjectManager
+    /// <summary>
+    /// Can be null if not set
+    /// TODO needs to be set
+    /// </summary>
+    public AbstractCCAObjectManager ObjectManager
     {
-        get
+        set
         {
-            if (_objectManager == null)
-            {
-                _objectManager = new CCAObjectManager();
-            }
-            return _objectManager;
+            value.AssertNotNull("ObjectManager");
+            _objectManager = value;
         }
+        get => _objectManager;
     }
 
     public AbstractCCARender()
@@ -184,7 +186,7 @@ public abstract class AbstractCCARender : MonoBehaviour
 
     private void ClearGraphObjects()
     {
-        ObjectManager.Clear();
+        ObjectManager?.Clear();
         foreach (string tag in SEE.DataModel.Tags.All)
         {
             foreach (GameObject o in GameObject.FindGameObjectsWithTag(tag))

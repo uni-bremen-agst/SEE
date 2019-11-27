@@ -8,9 +8,6 @@ using UnityEngine.UI;
 /// </summary>
 public class MainMenuModel : MonoBehaviour
 {
-    public InputField GraphPathInputField;
-    public Button GraphLoadButton;
-    public Button GraphClearButton;
     public Dropdown OpenVersionDropdown;
     public Button CloseViewButton;
 
@@ -19,9 +16,6 @@ public class MainMenuModel : MonoBehaviour
     /// </summary>
     void Start()
     {
-        GraphPathInputField.AssertNotNull("GraphPathInputField");
-        GraphLoadButton.AssertNotNull("GraphLoadButton");
-        GraphClearButton.AssertNotNull("GraphClearButton");
         OpenVersionDropdown.AssertNotNull("OpenVersionDropdown");
         CloseViewButton.AssertNotNull("CloseViewButton");
     }

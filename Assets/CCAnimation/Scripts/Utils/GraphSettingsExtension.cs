@@ -38,7 +38,7 @@ public static class GraphSettingsExtension
         var graphSettings = new GraphSettings();
 
         graphSettings.UpdateProjectPath();
-        graphSettings.ShowDonuts = false;
+        // Needed?graphSettings.ShowDonuts = false;
 
         return graphSettings;
     }
