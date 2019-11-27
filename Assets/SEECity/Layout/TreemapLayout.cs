@@ -46,6 +46,19 @@ namespace SEE.Layout
         /// </summary>
         private Dictionary<GameObject, NodeTransform> layout_result;
 
+        /// <summary>
+        /// The set of children of each node. This is a subset of the node's children
+        /// in the graph, limited to the children for which a layout is requested.
+        /// </summary>
+        private Dictionary<Node, List<Node>> children;
+
+        /// <summary>
+        /// The roots of the subtrees of the original graph that are to be laid out.
+        /// A node is considered a root if it has either no parent in the original
+        /// graph or its parent is not contained in the set of nodes to be laid out.
+        /// </summary>
+        private List<Node> roots;
+
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
         {
             layout_result = new Dictionary<GameObject, NodeTransform>();
@@ -63,7 +76,7 @@ namespace SEE.Layout
             else
             {
                 to_game_node = NodeMapping(gameNodes);
-                CreateTree(gameNodes);
+                CreateTree(to_game_node.Keys, out roots, out children);
                 CalculateSize();
                 CalculateLayout();
             }
@@ -122,49 +135,6 @@ namespace SEE.Layout
                                     nodeTransform.position.z - nodeTransform.scale.z / 2.0f,
                                     nodeTransform.scale.x, 
                                     nodeTransform.scale.z);
-                }
-            }
-        }
-
-        /// <summary>
-        /// The set of children of each node. This is a subset of the node's children
-        /// in the graph, limited to the children for which a layout is requested.
-        /// </summary>
-        private Dictionary<Node, List<Node>> children = new Dictionary<Node, List<Node>>();
-
-        /// <summary>
-        /// The roots of the subtrees of the original graph that are to be laid out.
-        /// A node is considered a root if it has either no parent in the original
-        /// graph or its parent is not contained in the set of nodes to be laid out.
-        /// </summary>
-        private List<Node> roots = new List<Node>();
-
-        /// <summary>
-        /// Creates the relevant tree consisting of the nodes to be laid out
-        /// (a subtree of the node hierarchy of the original graph).
-        /// 
-        /// Precondition: to_game_node is computed.
-        /// </summary>
-        /// <param name="nodes">nodes to be laid out</param>
-        private void CreateTree(ICollection<GameObject> nodes)
-        {
-            // The subset of nodes of the graph for which the layout is requested.
-            HashSet<Node> allNodes = new HashSet<Node>(to_game_node.Keys);
-            
-            foreach(Node node in allNodes)
-            {
-                // Only children that are in the set of nodes to be laid out.
-                HashSet<Node> kids = new HashSet<Node>(node.Children());
-                kids.IntersectWith(allNodes);
-                children[node] = new List<Node>(kids);
-                {
-                    Node parent = node.Parent;
-                    // A node is considered a root if it has either no parent in the
-                    // graph or its parent is not contained in the set of nodes to be laid out.
-                    if (parent == null || !allNodes.Contains(parent))
-                    {
-                        roots.Add(node);
-                    }
                 }
             }
         }
