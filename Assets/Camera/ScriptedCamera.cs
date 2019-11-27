@@ -2,6 +2,7 @@
 using UnityEngine;
 using System;
 using TinySpline;
+using System.Globalization;
 
 /// <summary>
 /// A script to move a camera programmatically along a path. This
@@ -12,7 +13,12 @@ public class ScriptedCamera : MonoBehaviour
     /// <summary>
     /// The coordinates to interpolate. W stores the time.
     /// </summary>
-    public Vector4[] locations = new Vector4[2];
+    private Vector4[] locations = new Vector4[2];
+
+    /// <summary>
+    /// Name of the file where to load the captured data camera path points from.
+    /// </summary>
+    public string filename = "path.csv";
 
     /// <summary>
     /// The interpolated spline.
@@ -54,10 +60,57 @@ public class ScriptedCamera : MonoBehaviour
     }
 
     /// <summary>
+    /// The delimiter to separate data points within the same line.
+    /// </summary>
+    private const char delimiter = ';';
+
+    /// <summary>
+    /// The minimal number of columns a CSV file containing path data must have.
+    /// </summary>
+    private const int minimalColumns = 4;
+
+    /// <summary>
+    /// Loads the path data from a the file.
+    /// </summary>
+    private void ReadPath()
+    {
+        // WriteAllLines creates a file, writes a collection of strings to the file,
+        // and then closes the file.  You do NOT need to call Flush() or Close().
+        string path = Application.persistentDataPath + "/" + filename;
+        string [] data = System.IO.File.ReadAllLines(path);
+        locations = new Vector4[data.Length];
+
+        int i = 0;
+        foreach (string line in data)
+        {
+            string[] coordinates = line.Split(delimiter);
+            Vector4 coordinate = Vector4.zero;
+            if (coordinates.Length < minimalColumns)
+            {
+                Debug.LogErrorFormat
+                    ("Data format error at line {0} in file {1}: expected at least {2} entries separated by {3}. Got: {4} in '{5}'.\n",
+                     i+1, path, minimalColumns, delimiter, coordinates.Length, line);
+            }
+            else
+            {
+                coordinate.x = float.Parse(coordinates[0], CultureInfo.InvariantCulture);
+                coordinate.y = float.Parse(coordinates[1], CultureInfo.InvariantCulture);
+                coordinate.z = float.Parse(coordinates[2], CultureInfo.InvariantCulture);
+                coordinate.w = float.Parse(coordinates[3], CultureInfo.InvariantCulture);
+                // Note: We ignore all remaining columns.
+            }
+            locations[i] = coordinate;
+            i++;
+        }
+        Debug.LogFormat("Read camera path from {0}\n", path);
+    }
+
+    /// <summary>
     /// Is called whenever a value is changed in the editor.
     /// </summary>
     void OnValidate()
     {
+        ReadPath();
         if (locations.Length < 2)
         {
             Debug.LogWarning("ScriptedCamera: Requiring at least two locations\n");
@@ -69,6 +122,7 @@ public class ScriptedCamera : MonoBehaviour
     void Start()
     {
         Debug.Log("Starting ScriptedCamera\n");
+        ReadPath();
         try
         {
             spline = TinySpline.Utils.interpolateCubic(VectorsToList(locations), 4);
