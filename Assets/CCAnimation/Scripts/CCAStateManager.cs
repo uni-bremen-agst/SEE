@@ -12,15 +12,65 @@ using UnityEngine.Events;
 /// </summary>
 public class CCAStateManager : MonoBehaviour
 {
+    private GraphSettings _settings;
+
+    private NodeFactory _nodeFactory;
+
+    private AbstractCCAObjectManager _objectManager;
+
+
+    public GraphSettings Settings
+    {
+        get
+        {
+            if (_settings == null)
+            {
+                _settings = GraphSettingsExtension.DefaultCCAnimationSettings();
+            }
+            return _settings;
+        }
+    }
+
+    public NodeFactory NodeFactory
+    {
+        get
+        {
+            if (_nodeFactory == null)
+            {
+                _nodeFactory = new BuildingFactory();
+            }
+            return _nodeFactory;
+        }
+    }
+
+    public AbstractCCAObjectManager ObjectManager
+    {
+        get
+        {
+            if (_objectManager == null)
+            {
+                _objectManager = new CCAObjectManager(NodeFactory);
+            }
+            return _objectManager;
+        }
+    }
+
+    // Needs to be set via Ui
     public AbstractCCARender render;
+
+    [Obsolete]
+    private IEdgeLayout EdgeLayout;
+
+
 
     private readonly CCALoader graphLoader = new CCALoader();
     private readonly Dictionary<Graph, AbstractCCALayout> layouts = new Dictionary<Graph, AbstractCCALayout>();
     private IScale scaler;
-
     private bool _isAutoplay = false;
 
-    private GraphSettings _settings;
+
+
+
 
     private List<Graph> Graphs => graphLoader.graphs;
 
@@ -29,7 +79,8 @@ public class CCAStateManager : MonoBehaviour
     public float AnimationTime
     {
         get => render.AnimationTime;
-        set {
+        set
+        {
             render.AnimationTime = value;
             ViewDataChangedEvent.Invoke();
         }
@@ -67,16 +118,6 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
-    public GraphSettings Settings
-    {
-        get
-        {
-            if (_settings == null)
-                _settings = GraphSettingsExtension.DefaultCCAnimationSettings();
-            return _settings;
-        }
-    }
-
     private bool HasLoadedGraph(out LoadedGraph loadedGraph)
     {
         return HasLoadedGraph(_openGraphIndex, out loadedGraph);
@@ -107,20 +148,10 @@ public class CCAStateManager : MonoBehaviour
         return true;
     }
 
-    [Obsolete]
-    void InitRandomLayouts()
-    {
-        Graphs.ForEach(key => layouts[key] = new RandomCCALayout(Settings, null, scaler));
-    }
-
-
     void Start()
     {
-        if (render == null)
-        {
-            Debug.LogError("There ist no render selected for this StateManager");
-            return;
-        }
+        render.AssertNotNull("render");
+        render.ObjectManager = ObjectManager;
 
         Settings.MinimalBlockLength = 1;
         Settings.MaximalBlockLength = 10;
@@ -133,9 +164,12 @@ public class CCAStateManager : MonoBehaviour
         nodeMetrics.AddRange(Settings.IssueMap().Keys);
         scaler = new LinearMultiScale(Graphs, Settings.MinimalBlockLength, Settings.MaximalBlockLength, nodeMetrics);
 
-        // TODO Flo: load layouts
-        InitRandomLayouts();
-
+        //TODO Flo: load layouts
+        Graphs.ForEach(key =>
+        {
+            layouts[key] = new AbstractCCALayout();
+            layouts[key].Calculate(ObjectManager, scaler, new BalloonNodeLayout(0, NodeFactory), key, Settings);
+        });
         if (HasLoadedGraph(out LoadedGraph loadedGraph))
         {
             render.DisplayGraph(loadedGraph);
@@ -144,6 +178,33 @@ public class CCAStateManager : MonoBehaviour
         {
             Debug.LogError("Could not create LoadedGraph to render.");
         }
+    }
+
+    public bool TryShowSpecificGraph(int value)
+    {
+        if (render.IsStillAnimating || IsAutoPlay)
+        {
+            Debug.Log("The render is already occupied with animating, wait till animations are finished.");
+            return false;
+        }
+
+        if (value < 0 || value >= GraphCount)
+        {
+            Debug.Log("value is no valid index.");
+            return false;
+        }
+        OpenGraphIndex = value;
+
+        if (HasLoadedGraph(out LoadedGraph loadedGraph))
+        {
+            render.DisplayGraph(loadedGraph);
+            return true;
+        }
+        else
+        {
+            Debug.LogError("Could not create LoadedGraph to render.");
+        }
+        return false;
     }
 
     /// <summary>

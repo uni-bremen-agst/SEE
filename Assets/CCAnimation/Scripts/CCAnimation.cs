@@ -4,6 +4,7 @@ using SEE.Layout;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,17 +27,13 @@ public class CCAnimation : MonoBehaviour
     void Start()
     {
         mainMenu = MainMenuCanvas.GetComponent<MainMenuModel>();
-        if (mainMenu == null)
-        {
-            Debug.LogError("MainMenuCanvas has no MainMenuModel assigned!");
-        }
         inGameMenu = InGameCanvas.GetComponent<InGameMenuModel>();
-        if (inGameMenu == null)
-        {
-            Debug.LogError("InGameMenuCanvas has no InGameMenuModel assigned!");
-        }
+
+        mainMenu.AssertNotNull("mainMenu");
+        inGameMenu.AssertNotNull("inGameMenu");
 
         mainMenu.CloseViewButton.onClick.AddListener(ToogleMainMenu);
+        mainMenu.OpenVersionDropdown.onValueChanged.AddListener(OnDropDownChanged);
 
         ToogleMainMenu(true);
         OnViewDataChanged();
@@ -87,6 +84,16 @@ public class CCAnimation : MonoBehaviour
         InGameCanvas.SetActive(!enabled);
         MainMenuCanvas.SetActive(enabled);
         stateManager.ToggleAutoplay(false);
+        if (enabled)
+        {
+            mainMenu.OpenVersionDropdown.ClearOptions();
+            var options = Enumerable
+                .Range(1, stateManager.GraphCount)
+                .Select(i => new Dropdown.OptionData(i.ToString()))
+                .ToList();
+            mainMenu.OpenVersionDropdown.AddOptions(options);
+            mainMenu.OpenVersionDropdown.value = stateManager.OpenGraphIndex;
+        }
     }
 
     void OnViewDataChanged()
@@ -94,5 +101,13 @@ public class CCAnimation : MonoBehaviour
         inGameMenu.RevisionNumberText.text = (stateManager.OpenGraphIndex + 1) + " / " + stateManager.GraphCount;
         inGameMenu.AutoplayToggle.isOn = stateManager.IsAutoPlay;
         inGameMenu.AnimationTimeText.text = "Revision animation time: " + stateManager.AnimationTime + "s";
+    }
+
+    void OnDropDownChanged(int value)
+    {
+        if (value != stateManager.OpenGraphIndex)
+        {
+            stateManager.TryShowSpecificGraph(value);
+        }
     }
 }

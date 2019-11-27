@@ -3,6 +3,7 @@ using SEE.DataModel;
 using SEE.Layout;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -23,10 +24,10 @@ public class CCAObjectManager : AbstractCCAObjectManager
     /// <summary>
     /// TODO flo doc
     /// </summary>
-    public CCAObjectManager() : base(new BuildingFactory())
-    {
+    public CCAObjectManager(NodeFactory nodeFactory) : base(nodeFactory)
+    { }
 
-    }
+    public override List<GameObject> GameObjects => nodes.Values.ToList();
 
     public override bool GetRoot(out GameObject root)
     {
@@ -95,7 +96,7 @@ public class CCAObjectManager : AbstractCCAObjectManager
         var hasLeaf = nodes.TryGetValue(node.LinkName, out leaf);
         if (!hasLeaf)
         {
-            leaf = BlockFactory.NewBlock();
+            leaf = NodeFactory.NewBlock();
             leaf.name = node.LinkName;
             nodes[node.LinkName] = leaf;
         }
