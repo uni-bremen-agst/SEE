@@ -356,10 +356,10 @@
         <float>150</float>
       </attr>
       <attr name="Source.Name">
-        <string>MAX.cpp</string>
+        <string>c1_MAX.cpp</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>MAX.cpp</string>
+        <string>c1_MAX.cpp</string>
       </attr>
     </node>
     <node id="N19">
