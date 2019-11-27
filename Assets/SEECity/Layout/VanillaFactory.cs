@@ -11,7 +11,7 @@ namespace SEE.Layout
         /// Returns a new empty plain game object with an ordinary Renderer component.
         /// </summary>
         /// <returns></returns>
-        public override GameObject NewBlock()
+        public override GameObject NewBlock(int index = 0)
         {
             GameObject gameObject = new GameObject();
             gameObject.isStatic = true;

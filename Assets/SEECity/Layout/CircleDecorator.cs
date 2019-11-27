@@ -77,7 +77,12 @@ namespace SEE.Layout
             const int segments = 360;
             Vector3 center = nodeFactory.GetCenterPosition(gameObject);
 
-            LineRenderer line = gameObject.AddComponent<LineRenderer>();
+            LineRenderer line;
+            line = gameObject.GetComponent<LineRenderer>();
+            if (line == null)
+            {
+                line = gameObject.AddComponent<LineRenderer>();
+            }
 
             LineFactory.SetDefaults(line);
             LineFactory.SetColor(line, color);

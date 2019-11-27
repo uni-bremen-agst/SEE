@@ -145,7 +145,7 @@ namespace SEE.Layout
         {
             Node n = node.GetComponent<NodeRef>().node;
             return n.IsLeaf() ? leafNodeFactory.GetSize(node) 
-                              : new Vector3(2 * radius, circleHeight, 2 * radius);
+                              : new Vector3(2 * radius, innerNodeHeight, 2 * radius);
         }
 
         /// <summary>
