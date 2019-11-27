@@ -39,11 +39,9 @@ public class SelectBuilding : MonoBehaviour
 
             if (hit && hitInfo.collider.gameObject.CompareTag("Building"))
             {
-                Debug.Log("Ray hit House");
                 line.SetPosition(1, hitInfo.point);
                 line.material.color = colorOnHit;
                 text.text = hitInfo.collider.gameObject.name;
-
             }
             else
             {
@@ -76,6 +74,7 @@ public class SelectBuilding : MonoBehaviour
         if (hit && hitInfo.collider.gameObject.CompareTag("Building"))
         {
             data.Add(currentName);
+            Debug.Log("building saved");
         }
     }
 
