@@ -9,6 +9,11 @@ namespace SEE.Layout
     /// </summary>
     public class BuildingFactory : NodeFactory
     {
+        public BuildingFactory()
+        {
+            Unit = CScapeUnit;
+        }
+
         /// <summary>
         /// The number of building types offered.
         /// </summary>
@@ -149,11 +154,6 @@ namespace SEE.Layout
             return NewBuilding(prefabs[index]);
         }
 
-        public override float Unit()
-        {
-            return CScapeUnit;
-        }
-
         /// <summary>
         /// One CScape unit (floor level height) is three Unity units.
         /// One Unity unit represents one meter in real world. Three meters
@@ -253,9 +253,9 @@ namespace SEE.Layout
             }
             else
             {
-                bm.buildingWidth = (int)(size.x / Unit());
-                bm.floorNumber = (int)(size.y / Unit());
-                bm.buildingDepth = (int)(size.z / Unit());
+                bm.buildingWidth = (int)(size.x / Unit);
+                bm.floorNumber = (int)(size.y / Unit);
+                bm.buildingDepth = (int)(size.z / Unit);
                 bm.UpdateCity();
                 bm.AwakeCity();
             }
@@ -294,13 +294,13 @@ namespace SEE.Layout
                 switch (length)
                 {
                     case Length.width:
-                        bm.buildingWidth = (int)(value / Unit());
+                        bm.buildingWidth = (int)(value / Unit);
                         break;
                     case Length.height:
-                        bm.floorNumber = (int)(value / Unit());
+                        bm.floorNumber = (int)(value / Unit);
                         break;
                     case Length.depth:
-                        bm.buildingDepth = (int)(value / Unit());
+                        bm.buildingDepth = (int)(value / Unit);
                         break;
                 }
                 bm.UpdateCity();

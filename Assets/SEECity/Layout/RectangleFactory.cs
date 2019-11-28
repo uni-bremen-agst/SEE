@@ -8,9 +8,13 @@ namespace SEE.Layout
     public class RectangleFactory : LineInnerNodeFactory
     {
         /// <summary>
-        /// Constructor.
+        /// Constructor allowing to set the initial unit for the width of the lines that render this inner node.
+        /// Every line width passed as a parameter to methods of this class will be multiplied by this factor
+        /// for the actual rendering.
         /// </summary>
-        public RectangleFactory()
+        /// <param name="unit">initial unit for the width of all lines</param>
+        public RectangleFactory(float unit)
+            : base(unit)
         {
             materials = new Materials(1, DefaultColor, DefaultColor);
             material = new Material(materials.DefaultMaterial(0));
@@ -34,7 +38,7 @@ namespace SEE.Layout
         {
             GameObject result = new GameObject();
             result.isStatic = true;
-            AttachLine(result, defaultLength, defaultLineWidth * Unit(), DefaultColor);
+            AttachLine(result, defaultLength, defaultLineWidth * Unit, DefaultColor);
             return result;
         }
 

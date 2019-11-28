@@ -9,9 +9,20 @@ namespace SEE.Layout
     public abstract class LineInnerNodeFactory : InnerNodeFactory
     {
         /// <summary>
+        /// Constructor allowing to set the initial unit for the width of the lines that render this inner node.
+        /// Every line width passed as a parameter to methods of this class will be multiplied by this factor
+        /// for the actual rendering.
+        /// </summary>
+        /// <param name="unit">initial unit for the width of all lines</param>
+        public LineInnerNodeFactory(float unit)
+        {
+            this.unit = unit;
+        }
+
+        /// <summary>
         /// The default width of lines when inner nodes are drawn by lines.
         /// </summary>
-        protected const float defaultLineWidth = 0.1f;
+        protected const float defaultLineWidth = 1.0f;
 
         /// <summary>
         /// Sets the width of lines drawn for the given object.
@@ -20,12 +31,13 @@ namespace SEE.Layout
         /// a LineRenderer component.
         /// </summary>
         /// <param name="circle">game object to be drawn with different line width</param>
-        /// <param name="lineWidth">new width of the lines</param>
+        /// <param name="lineWidth">new width of the lines (this value will be multiplied by Unit
+        /// for rendering the line)</param>
         /// <summary>
         public override void SetLineWidth(GameObject circle, float lineWidth)
         {
             LineRenderer line = circle.GetComponent<LineRenderer>();
-            LineFactory.SetWidth(line, lineWidth);
+            LineFactory.SetWidth(line, lineWidth * Unit);
         }
     }
 }
