@@ -7,7 +7,7 @@ using TMPro;
 public class SelectBuilding : MonoBehaviour
 {
     private Transform direction;
-    public LineRenderer line; // assigne in inspector
+    private LineRenderer line;
     public TextMeshPro text; // assign in inspector
     public Color colorOnHit = Color.green;
     public Color defaultColor = Color.red;
@@ -28,6 +28,7 @@ public class SelectBuilding : MonoBehaviour
     {
         transform.gameObject.SetActive(false);
         direction = transform.parent.transform;
+        line = gameObject.GetComponent<LineRenderer>();
     }
 
     private void Update()
