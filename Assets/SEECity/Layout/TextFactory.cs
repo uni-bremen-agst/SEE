@@ -10,6 +10,11 @@ namespace SEE.Layout
     internal class TextFactory
     {
         /// <summary>
+        /// Color of the text.
+        /// </summary>
+        private readonly static Color TextColor = new Color(0.5f, 0.5f, 0.5f, 1); // Color.white;
+
+        /// <summary>
         /// Returns a game object showing the tiven text at given position. The
         /// text rotates towards the main camera.
         /// </summary>
@@ -29,7 +34,7 @@ namespace SEE.Layout
 
             TextMeshPro tm = result.AddComponent<TextMeshPro>();
             tm.text = text;
-            tm.color = Color.white;
+            tm.color = TextColor;
             tm.alignment = TextAlignmentOptions.Center;
             
             RectTransform rect = tm.GetComponent<RectTransform>();
