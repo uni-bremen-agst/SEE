@@ -170,7 +170,7 @@ namespace SEE.Layout
                     break;
                 case GraphSettings.NodeLayouts.Treemap:
                     AddContainers(nodeMap, nodes); // and inner nodes
-                    layout = new TreemapLayout(groundLevel, leafNodeFactory, 100.0f * Unit(), 100.0f * Unit()).Layout(nodeMap.Values);
+                    layout = new TreemapLayout(groundLevel, leafNodeFactory, 1000.0f * Unit(), 1000.0f * Unit()).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.Balloon:
                     AddContainers(nodeMap, nodes); // and inner nodes
