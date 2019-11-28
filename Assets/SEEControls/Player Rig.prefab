@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1389590774274413566
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2642093389995892950}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2642093389995892950
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1389590774274413566}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.0019, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 4365969144323872539}
+  m_Father: {fileID: 3258190901767896464}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!1 &1604120570380893558
 GameObject:
   m_ObjectHideFlags: 0
@@ -2521,7 +2552,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3253423551773827604}
   m_LocalRotation: {x: -0.6953024, y: -0.12866463, z: 0.12866464, w: 0.6953024}
-  m_LocalPosition: {x: -0.007000002, y: 0.0066000028, z: -0.0125999935}
+  m_LocalPosition: {x: 0.0943, y: 0.0296, z: -0.0547}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3253423551828139442}
@@ -4645,6 +4676,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  _OnLeftTouchButtonPressed:
+    m_PersistentCalls:
+      m_Calls: []
+  _OnLeftTouchButtonReleased:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3253423552608448329
 GameObject:
   m_ObjectHideFlags: 0
@@ -6051,7 +6088,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3253423553264330048}
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: -0.0158, y: -0.0126, z: -0.0547}
+  m_LocalPosition: {x: 0.0038, y: -0.0126, z: -0.0547}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3253423551297834709}
@@ -6818,8 +6855,8 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 0.5
-  m_fontSizeBase: 0.5
+  m_fontSize: 0.6
+  m_fontSizeBase: 0.6
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -7172,12 +7209,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7389510351251176454}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 3258190901767896464}
-  m_RootOrder: 5
+  m_Father: {fileID: 2642093389995892950}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5604461489026653909
 MonoBehaviour:
@@ -9458,6 +9495,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2aa010a1e75292e49a24f3f71bb9cddb, type: 3}
+--- !u!4 &3257888493564638923 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4542260197562760, guid: 2aa010a1e75292e49a24f3f71bb9cddb,
+    type: 3}
+  m_PrefabInstance: {fileID: 3253423552074690371}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &3224278770782853061 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 114994683550464134, guid: 2aa010a1e75292e49a24f3f71bb9cddb,
@@ -9470,12 +9513,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e0ed5922e911b343b8400997c95409c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &3257888493564638923 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4542260197562760, guid: 2aa010a1e75292e49a24f3f71bb9cddb,
-    type: 3}
-  m_PrefabInstance: {fileID: 3253423552074690371}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3253423552196801826
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9483,6 +9520,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3253423552975131865}
     m_Modifications:
+    - target: {fileID: 114446365300099102, guid: 72368278d054cda4bb18e5aa08ce971d,
+        type: 3}
+      propertyPath: _deviceJoystickTokens
+      value: openvr controller right
+      objectReference: {fileID: 0}
+    - target: {fileID: 114446365300099102, guid: 72368278d054cda4bb18e5aa08ce971d,
+        type: 3}
+      propertyPath: graspButtonAxis
+      value: RightVRGripButton
+      objectReference: {fileID: 0}
     - target: {fileID: 1257637052428748, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -9519,36 +9566,8 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 5
       objectReference: {fileID: 0}
-    - target: {fileID: 114446365300099102, guid: 72368278d054cda4bb18e5aa08ce971d,
-        type: 3}
-      propertyPath: _deviceJoystickTokens
-      value: openvr controller right
-      objectReference: {fileID: 0}
-    - target: {fileID: 114446365300099102, guid: 72368278d054cda4bb18e5aa08ce971d,
-        type: 3}
-      propertyPath: graspButtonAxis
-      value: RightVRGripButton
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
---- !u!1 &3252175812938450158 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1257637052428748, guid: 72368278d054cda4bb18e5aa08ce971d,
-    type: 3}
-  m_PrefabInstance: {fileID: 3253423552196801826}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &3257913286107051604 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4527397571117942, guid: 72368278d054cda4bb18e5aa08ce971d,
-    type: 3}
-  m_PrefabInstance: {fileID: 3253423552196801826}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &3258190901767896464 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4802836220905650, guid: 72368278d054cda4bb18e5aa08ce971d,
-    type: 3}
-  m_PrefabInstance: {fileID: 3253423552196801826}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &3220323491707911484 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 114446365300099102, guid: 72368278d054cda4bb18e5aa08ce971d,
@@ -9561,6 +9580,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e55d3703de8ab5d418cb97104179cb49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &3257913286107051604 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4527397571117942, guid: 72368278d054cda4bb18e5aa08ce971d,
+    type: 3}
+  m_PrefabInstance: {fileID: 3253423552196801826}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3252175812938450158 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1257637052428748, guid: 72368278d054cda4bb18e5aa08ce971d,
+    type: 3}
+  m_PrefabInstance: {fileID: 3253423552196801826}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3258190901767896464 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4802836220905650, guid: 72368278d054cda4bb18e5aa08ce971d,
+    type: 3}
+  m_PrefabInstance: {fileID: 3253423552196801826}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3253423553072832449
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9625,6 +9662,36 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3253423552975131865}
     m_Modifications:
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
+        type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
+        type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[2]
+      value: 
+      objectReference: {fileID: 3253423553264330048}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
+        type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[3]
+      value: 
+      objectReference: {fileID: 3253423551828139445}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
+        type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[4]
+      value: 
+      objectReference: {fileID: 3253423551820831095}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
+        type: 3}
+      propertyPath: _deviceJoystickTokens
+      value: openvr controller left
+      objectReference: {fileID: 0}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
+        type: 3}
+      propertyPath: graspButtonAxis
+      value: LeftVRGripButton
+      objectReference: {fileID: 0}
     - target: {fileID: 1393620680427892, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -9661,50 +9728,8 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 4
       objectReference: {fileID: 0}
-    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
-        type: 3}
-      propertyPath: _enableObjectsOnlyWhenTracked.Array.size
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
-        type: 3}
-      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[2]
-      value: 
-      objectReference: {fileID: 3253423553264330048}
-    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
-        type: 3}
-      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[3]
-      value: 
-      objectReference: {fileID: 3253423551828139445}
-    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
-        type: 3}
-      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[4]
-      value: 
-      objectReference: {fileID: 3253423551820831095}
-    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
-        type: 3}
-      propertyPath: _deviceJoystickTokens
-      value: openvr controller left
-      objectReference: {fileID: 0}
-    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
-        type: 3}
-      propertyPath: graspButtonAxis
-      value: LeftVRGripButton
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
---- !u!1 &3252311441997738186 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1393620680427892, guid: 80e9754fad44e784f97f6c76a2c7255b,
-    type: 3}
-  m_PrefabInstance: {fileID: 3253423553305737662}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &3254138818147119234 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4360080876800316, guid: 80e9754fad44e784f97f6c76a2c7255b,
-    type: 3}
-  m_PrefabInstance: {fileID: 3253423553305737662}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &3220104501821764040 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
@@ -9717,3 +9742,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e55d3703de8ab5d418cb97104179cb49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &3254138818147119234 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4360080876800316, guid: 80e9754fad44e784f97f6c76a2c7255b,
+    type: 3}
+  m_PrefabInstance: {fileID: 3253423553305737662}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3252311441997738186 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1393620680427892, guid: 80e9754fad44e784f97f6c76a2c7255b,
+    type: 3}
+  m_PrefabInstance: {fileID: 3253423553305737662}
+  m_PrefabAsset: {fileID: 0}
