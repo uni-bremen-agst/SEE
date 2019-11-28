@@ -50,7 +50,7 @@ namespace SEE.Layout
                     factor * (Vector3.Lerp(sourcePosition, targetPosition, 0.7f) + levelUnit),
                     targetPosition
                 };
-                BSplineFactory.Draw(gameEdge, controlPoints, edgeWidth * blockFactory.Unit(), edgeMaterial);
+                BSplineFactory.Draw(gameEdge, controlPoints, edgeWidth * blockFactory.Unit, edgeMaterial);
             }
         }
     }
