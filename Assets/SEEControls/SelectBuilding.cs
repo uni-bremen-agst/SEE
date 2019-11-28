@@ -55,22 +55,22 @@ public class SelectBuilding : MonoBehaviour
                 text.text = currentName;
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log("collision detected");
-        if(collision.gameObject.CompareTag("House") && !show)
-        {
-            house = collision.gameObject;
-            collision.gameObject.GetComponent<MeshRenderer>().material = Resources.Load("BrickTextures/BricksTexture01/BricksTexture01", typeof(Material)) as Material;
-            show = true;
-            Debug.Log("Trigger has been pulled");
-        }
-        else if(collision.gameObject.CompareTag("House") && show && house == collision.gameObject)
-        {
-            collision.gameObject.GetComponent<MeshRenderer>().material = Resources.Load("BrickTextures/BricksTexture13/BricksTexture13", typeof(Material)) as Material;
-            show = false;
-        }
-    }
+    //private void OnCollisionEnter(Collision collision)
+    //{
+    //    Debug.Log("collision detected");
+    //    if(collision.gameObject.CompareTag("House") && !show)
+    //    {
+    //        house = collision.gameObject;
+    //        collision.gameObject.GetComponent<MeshRenderer>().material = Resources.Load("BrickTextures/BricksTexture01/BricksTexture01", typeof(Material)) as Material;
+    //        show = true;
+    //        Debug.Log("Trigger has been pulled");
+    //    }
+    //    else if(collision.gameObject.CompareTag("House") && show && house == collision.gameObject)
+    //    {
+    //        collision.gameObject.GetComponent<MeshRenderer>().material = Resources.Load("BrickTextures/BricksTexture13/BricksTexture13", typeof(Material)) as Material;
+    //        show = false;
+    //    }
+    //}
 
 
     // This is the same source code like it is used for the implementation of the camera position tracking
@@ -87,7 +87,7 @@ public class SelectBuilding : MonoBehaviour
             Debug.Log("building saved");
             lockBuilding = true;
             text.text = currentName;
-            text.color = defaultColor;
+            text.color = colorOnHit;
         }
     }
 
@@ -131,11 +131,6 @@ public class SelectBuilding : MonoBehaviour
         active = !active;
         transform.gameObject.SetActive(active);
         Debug.Log("Ray on/off");
-    }
-
-    private void MarkBuilding()
-    {
-        
     }
 
     private string FloatToString(float value)
