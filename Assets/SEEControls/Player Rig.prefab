@@ -1735,7 +1735,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3253423551525537410}
   m_LocalRotation: {x: -0.6166827, y: 0.05771054, z: -0.061381117, w: 0.78269047}
-  m_LocalPosition: {x: -0.04387057, y: 2.167502, z: 0.25771794}
+  m_LocalPosition: {x: -0.04387057, y: 25.087502, z: 0.25771794}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3253423552077917421}
@@ -1945,8 +1945,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3253423551609585009}
-  m_LocalRotation: {x: 0.07411185, y: -0.08401716, z: 0.006266225, w: 0.99368477}
-  m_LocalPosition: {x: -0.011, y: -0.133, z: 0.066}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3253423552107798342}
@@ -1964,6 +1964,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d171cba1147555a4fac9cc97c28edfab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  direction: {fileID: 0}
   text: {fileID: 3253423552718361298}
   colorOnHit: {r: 1, g: 0, b: 0, a: 1}
   defaultColor: {r: 0, g: 1, b: 0, a: 1}
@@ -3356,13 +3357,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3253423552107798393}
   m_LocalRotation: {x: -0.6755902, y: 0.000000059061975, z: 0.00000006445483, w: 0.7372773}
-  m_LocalPosition: {x: 0.08000001, y: 3.6695414, z: 0.23954336}
+  m_LocalPosition: {x: 0.08000001, y: 26.589542, z: 0.23954336}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3253423551609585022}
   m_Father: {fileID: 3253423552497913563}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!114 &3253423552107798343
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4458,7 +4459,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LeapMotion: 0
-  ViveControler: 0
+  ViveControler: 1
 --- !u!1 &3253423552553498074
 GameObject:
   m_ObjectHideFlags: 0
@@ -5770,7 +5771,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3253423553111714413}
   m_LocalRotation: {x: -0.6166827, y: -0.057710476, z: 0.06138118, w: 0.78269047}
-  m_LocalPosition: {x: 0.04387059, y: 3.7675018, z: 0.25771794}
+  m_LocalPosition: {x: 0.04387059, y: 26.687502, z: 0.25771794}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3253423552497913563}
@@ -5815,7 +5816,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3253423553148083715}
   m_LocalRotation: {x: -0.6755902, y: 1.0701312e-15, z: 1.1678433e-15, w: 0.7372773}
-  m_LocalPosition: {x: -0.08, y: 2.0695412, z: 0.23954338}
+  m_LocalPosition: {x: -0.08, y: 24.989542, z: 0.23954338}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3253423552478562636}
@@ -7228,6 +7229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d171cba1147555a4fac9cc97c28edfab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  direction: {fileID: 3257913286107051604}
   text: {fileID: 3669723077077989371}
   colorOnHit: {r: 0, g: 1, b: 0, a: 1}
   defaultColor: {r: 1, g: 0, b: 0, a: 1}
@@ -9520,16 +9522,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3253423552975131865}
     m_Modifications:
-    - target: {fileID: 114446365300099102, guid: 72368278d054cda4bb18e5aa08ce971d,
-        type: 3}
-      propertyPath: _deviceJoystickTokens
-      value: openvr controller right
-      objectReference: {fileID: 0}
-    - target: {fileID: 114446365300099102, guid: 72368278d054cda4bb18e5aa08ce971d,
-        type: 3}
-      propertyPath: graspButtonAxis
-      value: RightVRGripButton
-      objectReference: {fileID: 0}
     - target: {fileID: 1257637052428748, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -9565,6 +9557,36 @@ PrefabInstance:
     - target: {fileID: 4527397571117942, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
       propertyPath: m_RootOrder
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4802836220905650, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4802836220905650, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4802836220905650, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4802836220905650, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4802836220905650, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114446365300099102, guid: 72368278d054cda4bb18e5aa08ce971d,
+        type: 3}
+      propertyPath: _deviceJoystickTokens
+      value: openvr controller right
+      objectReference: {fileID: 0}
+    - target: {fileID: 114446365300099102, guid: 72368278d054cda4bb18e5aa08ce971d,
+        type: 3}
+      propertyPath: graspButtonAxis
+      value: RightVRGripButton
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
@@ -9662,36 +9684,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3253423552975131865}
     m_Modifications:
-    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
-        type: 3}
-      propertyPath: _enableObjectsOnlyWhenTracked.Array.size
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
-        type: 3}
-      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[2]
-      value: 
-      objectReference: {fileID: 3253423553264330048}
-    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
-        type: 3}
-      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[3]
-      value: 
-      objectReference: {fileID: 3253423551828139445}
-    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
-        type: 3}
-      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[4]
-      value: 
-      objectReference: {fileID: 3253423551820831095}
-    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
-        type: 3}
-      propertyPath: _deviceJoystickTokens
-      value: openvr controller left
-      objectReference: {fileID: 0}
-    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
-        type: 3}
-      propertyPath: graspButtonAxis
-      value: LeftVRGripButton
-      objectReference: {fileID: 0}
     - target: {fileID: 1393620680427892, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -9727,6 +9719,36 @@ PrefabInstance:
     - target: {fileID: 4360080876800316, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
       propertyPath: m_RootOrder
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
+        type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
+        type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[2]
+      value: 
+      objectReference: {fileID: 3253423553264330048}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
+        type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[3]
+      value: 
+      objectReference: {fileID: 3253423551828139445}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
+        type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[4]
+      value: 
+      objectReference: {fileID: 3253423551820831095}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
+        type: 3}
+      propertyPath: _deviceJoystickTokens
+      value: openvr controller left
+      objectReference: {fileID: 0}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
+        type: 3}
+      propertyPath: graspButtonAxis
+      value: LeftVRGripButton
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
