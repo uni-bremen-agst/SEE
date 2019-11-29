@@ -317,7 +317,6 @@ PlayerSettings:
     m_Enabled: 1
     m_Devices:
     - OpenVR
-    - Oculus
   openGLRequireES31: 0
   openGLRequireES31AEP: 0
   openGLRequireES32: 0

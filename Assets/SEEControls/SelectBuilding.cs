@@ -37,7 +37,7 @@ public class SelectBuilding : MonoBehaviour
         hit = Physics.Raycast(direction.position, direction.TransformDirection(Vector3.down), out hitInfo, Mathf.Infinity);
 
             line.SetPosition(0, direction.position);
-            line.SetPosition(1, direction.TransformDirection(Vector3.down)*1000);
+            line.SetPosition(1, direction.position);
 
             if (hit && hitInfo.collider.gameObject.CompareTag("Building"))
             {

@@ -9,6 +9,8 @@ public class VRControlerMovement : MonoBehaviour
     public GameObject Rig;
     public GameObject Controler;
 
+    private float hightFactor = 1f;
+
     private bool leftTriggerLastFrame = false;
     private bool leftTouchButtonPressed = false;
 
@@ -31,8 +33,14 @@ public class VRControlerMovement : MonoBehaviour
 
     void Update()
     {
+        hightFactor = Mathf.Pow(Rig.transform.position.y, 2) * 0.01f + 1;
+        if (hightFactor > 5)
+        {
+            hightFactor = 5;
+        }
+
         float movementAxis = Input.GetAxis("RightVRTriggerMovement");
-        Rig.transform.Translate(Controler.transform.forward * movementAxis);
+        Rig.transform.Translate(Controler.transform.forward * movementAxis * hightFactor);
 
         float leftTriggerAxis = Input.GetAxis("LeftVRTrigger");
         if(leftTriggerAxis >0.5f && !leftTriggerLastFrame)
