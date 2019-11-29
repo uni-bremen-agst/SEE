@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 public class SelectBuilding : MonoBehaviour
@@ -84,7 +82,7 @@ public class SelectBuilding : MonoBehaviour
                             + delimiter + FloatToString(Camera.main.transform.position.z)
                             + delimiter + Mathf.RoundToInt(Time.realtimeSinceStartup);
             data.Add(output);
-            Debug.Log("building saved");
+            Debug.Log("building saved\n");
             lockBuilding = true;
             text.text = currentName;
             text.color = colorOnHit;
@@ -99,7 +97,7 @@ public class SelectBuilding : MonoBehaviour
                             + delimiter + FloatToString(Camera.main.transform.position.z)
                             + delimiter + Mathf.RoundToInt(Time.realtimeSinceStartup);
         data.Add(output);
-        Debug.Log("building reset");
+        Debug.Log("building reset\n");
         lockBuilding = false;
         text.color = Color.white;
         text.text = "";
@@ -109,7 +107,7 @@ public class SelectBuilding : MonoBehaviour
     {
         if (data.Count == 0)
         {
-            Debug.Log("The building information are not stored.\n");
+            Debug.Log("The building information is not stored.\n");
         }
         else
         {
@@ -130,7 +128,7 @@ public class SelectBuilding : MonoBehaviour
     {
         active = !active;
         transform.gameObject.SetActive(active);
-        Debug.Log("Ray on/off");
+        Debug.Log("Ray on/off\n");
     }
 
     private string FloatToString(float value)
