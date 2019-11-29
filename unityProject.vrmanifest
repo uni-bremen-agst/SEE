@@ -1,0 +1,16 @@
+{
+  "source": "Unity",
+  "applications": [
+    {
+      "app_key": "application.generated.unity.seecity.exe",
+      "launch_type": "url",
+      "url": "steam://launch/",
+      "action_manifest_path": "D:\\Users\\Jan-Eric\\SEE\\actions.json",
+      "strings": {
+        "en_us": {
+          "name": "SEECity [Testing]"
+        }
+      }
+    }
+  ]
+}
