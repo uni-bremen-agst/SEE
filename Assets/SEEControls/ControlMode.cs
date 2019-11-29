@@ -5,11 +5,13 @@ public class ControlMode : MonoBehaviour
     /// <summary>
     /// If true, leap motion controller is activated.
     /// </summary>
-    public bool LeapMotion;
+    [SerializeField]
+    public bool LeapMotion = false;
     /// <summary>
     /// If true, HTC Vive handheld controller is activated.
     /// </summary>
-    public bool ViveController;
+    [SerializeField]
+    public bool ViveController = true;
 
     void Start()
     {
