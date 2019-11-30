@@ -78,7 +78,7 @@ namespace SEE.Layout
                         // Scale the erosion issue by normalization.
                         float metricScale = scaler.GetNormalizedValue(issue.Key, node);
                         // First: scale its width to unit size 1.0 maintaining the aspect ratio
-                        sprite.transform.localScale *= spriteScale * leaveNodeFactory.Unit();
+                        sprite.transform.localScale *= spriteScale * leaveNodeFactory.Unit;
                         // Now scale it by the normalized metric.
                         sprite.transform.localScale *= metricScale;
                         sprite.transform.position = leaveNodeFactory.Roof(gameNode);

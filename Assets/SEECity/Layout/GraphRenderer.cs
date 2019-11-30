@@ -38,13 +38,13 @@ namespace SEE.Layout
                     innerNodeFactory = new VanillaFactory();
                     break;
                 case GraphSettings.InnerNodeKinds.Circles:
-                    innerNodeFactory = new CircleFactory();
+                    innerNodeFactory = new CircleFactory(leafNodeFactory.Unit);
                     break;
                 case GraphSettings.InnerNodeKinds.Cylinders:
                     innerNodeFactory = new CylinderFactory();
                     break;
                 case GraphSettings.InnerNodeKinds.Rectangles:
-                    innerNodeFactory = new RectangleFactory();
+                    innerNodeFactory = new RectangleFactory(leafNodeFactory.Unit);
                     break;
                 case GraphSettings.InnerNodeKinds.Blocks:
                     innerNodeFactory = new CubeFactory();
@@ -170,7 +170,7 @@ namespace SEE.Layout
                     break;
                 case GraphSettings.NodeLayouts.Treemap:
                     AddContainers(nodeMap, nodes); // and inner nodes
-                    layout = new TreemapLayout(groundLevel, leafNodeFactory, 100.0f * Unit(), 100.0f * Unit()).Layout(nodeMap.Values);
+                    layout = new TreemapLayout(groundLevel, leafNodeFactory, 1000.0f * Unit(), 1000.0f * Unit()).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.Balloon:
                     AddContainers(nodeMap, nodes); // and inner nodes
@@ -348,7 +348,7 @@ namespace SEE.Layout
         /// <returns>unit of the world</returns>
         public float Unit()
         {
-            return leafNodeFactory.Unit();
+            return leafNodeFactory.Unit;
         }
 
         /// <summary>
@@ -396,13 +396,13 @@ namespace SEE.Layout
                     {
                         // In case of treemaps, the width metric is mapped on the ground area.
                         float widthOfSquare = Mathf.Sqrt(scale.x);
-                        leafNodeFactory.SetWidth(block, leafNodeFactory.Unit() * widthOfSquare);
-                        leafNodeFactory.SetDepth(block, leafNodeFactory.Unit() * widthOfSquare);
-                        leafNodeFactory.SetHeight(block, leafNodeFactory.Unit() * scale.y);
+                        leafNodeFactory.SetWidth(block, leafNodeFactory.Unit * widthOfSquare);
+                        leafNodeFactory.SetDepth(block, leafNodeFactory.Unit * widthOfSquare);
+                        leafNodeFactory.SetHeight(block, leafNodeFactory.Unit * scale.y);
                     }
                     else
                     {
-                        leafNodeFactory.SetSize(block, leafNodeFactory.Unit() * scale);
+                        leafNodeFactory.SetSize(block, leafNodeFactory.Unit * scale);
                     }
 
                     result[node] = block;
