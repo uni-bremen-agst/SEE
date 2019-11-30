@@ -1,79 +1,65 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using TMPro;
 using UnityEngine;
-using TMPro;
 
-public class ChartCreator : MonoBehaviour
+namespace Assets.Charts
 {
-	GameObject[] dataObjects;
-	[SerializeField]
-	GameObject markerPrefab;
-	[SerializeField]
-	GameObject entries;
-	[SerializeField]
-	GameObject dataPanel;
-	[SerializeField]
-	TextMeshProUGUI xLabel;
-	[SerializeField]
-	TextMeshProUGUI yLabel;
-
-	/// <summary>
-	/// Calls methods that should be called when the user presses a button in the final version - for testing.
-	/// </summary>
-	private void Start()
+	public class ChartCreator : MonoBehaviour
 	{
-		FindDataObjects();
-		DrawData();
-	}
+		private GameObject[] dataObjects;
+		[SerializeField] private GameObject markerPrefab;
+		[SerializeField] private GameObject entries;
+		[SerializeField] private GameObject dataPanel;
+		[SerializeField] private TextMeshProUGUI xLabel;
+		[SerializeField] private TextMeshProUGUI yLabel;
 
-	/// <summary>
-	/// Fills a List with all objects that will be in the chart. Right now that's all buildings.
-	/// </summary>
-	void FindDataObjects()
-	{
-		dataObjects = GameObject.FindGameObjectsWithTag("Building");
-	}
-
-	/// <summary>
-	/// Fills the chart with data.
-	/// </summary>
-	void DrawData()
-	{
-		xLabel.text = "Local Scale X";
-		yLabel.text = "Local Scale Y";
-		float minX = dataObjects[0].transform.localScale.x;
-		float maxX = dataObjects[0].transform.localScale.x;
-		float minY = dataObjects[0].transform.localScale.y;
-		float maxY = dataObjects[0].transform.localScale.y;
-		foreach (GameObject data in dataObjects)
+		/// <summary>
+		/// Calls methods that should be called when the user presses a button in the final version - for testing.
+		/// </summary>
+		private void Start()
 		{
-			float tempX = data.transform.localScale.x;
-			if (tempX < minX)
-			{
-				minX = tempX;
-			}
-			if (tempX > maxX)
-			{
-				maxX = tempX;
-			}
-			float tempY = data.transform.localScale.y;
-			if (tempY > maxY)
-			{
-				maxY = tempY;
-			}
-			if (tempY < minY)
-			{
-				minY = tempY;
-			}
+			FindDataObjects();
+			DrawData();
 		}
-		RectTransform field = dataPanel.GetComponent<RectTransform>();
-		float width = field.rect.width / (maxX - minX);
-		float height = field.rect.height / (maxY - minY);
-		foreach (GameObject data in dataObjects)
+
+		/// <summary>
+		/// Fills a List with all objects that will be in the chart. Right now that's all buildings.
+		/// </summary>
+		private void FindDataObjects()
 		{
-			GameObject marker = Instantiate(markerPrefab, entries.transform);
-			marker.GetComponent<ChartMarker>().LinkedObject = data;
-			marker.GetComponent<RectTransform>().anchoredPosition = new Vector3((data.transform.localScale.x - minX) * width, (data.transform.localScale.y - minY) * height, 0);
+			dataObjects = GameObject.FindGameObjectsWithTag("Building");
+		}
+
+		/// <summary>
+		/// Fills the chart with data.
+		/// </summary>
+		private void DrawData()
+		{
+			xLabel.text = "Local Scale X";
+			yLabel.text = "Local Scale Y";
+			var minX = dataObjects[0].transform.localScale.x;
+			var maxX = dataObjects[0].transform.localScale.x;
+			var minY = dataObjects[0].transform.localScale.y;
+			var maxY = dataObjects[0].transform.localScale.y;
+			foreach (var data in dataObjects)
+			{
+				var tempX = data.transform.localScale.x;
+				if (tempX < minX) minX = tempX;
+				if (tempX > maxX) maxX = tempX;
+				var tempY = data.transform.localScale.y;
+				if (tempY > maxY) maxY = tempY;
+				if (tempY < minY) minY = tempY;
+			}
+
+			var field = dataPanel.GetComponent<RectTransform>();
+			var width = field.rect.width / (maxX - minX);
+			var height = field.rect.height / (maxY - minY);
+			foreach (var data in dataObjects)
+			{
+				var marker = Instantiate(markerPrefab, entries.transform);
+				marker.GetComponent<ChartMarker>().LinkedObject = data;
+				marker.GetComponent<RectTransform>().anchoredPosition = new Vector3(
+					(data.transform.localScale.x - minX) * width, (data.transform.localScale.y - minY) * height, 0);
+			}
 		}
 	}
 }
