@@ -2,22 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChartUIController : MonoBehaviour
+namespace Assets.Charts
 {
-	[SerializeField]
-	GameObject chartsClosed;
-	[SerializeField]
-	GameObject chartsOpen;
-
-	public void OpenCharts()
+	public class ChartUIController : MonoBehaviour
 	{
-		chartsClosed.SetActive(false);
-		chartsOpen.SetActive(true);
-	}
+		[SerializeField] private GameObject chartsClosed;
+		[SerializeField] private GameObject chartsOpen;
 
-	public void CloseCharts()
-	{
-		chartsClosed.SetActive(true);
-		chartsOpen.SetActive(false);
+		/// <summary>
+		/// Opens the chart view.
+		/// </summary>
+		public void OpenCharts()
+		{
+			chartsClosed.SetActive(false);
+			chartsOpen.SetActive(true);
+		}
+
+		/// <summary>
+		/// Closes the chart view.
+		/// </summary>
+		public void CloseCharts()
+		{
+			chartsClosed.SetActive(true);
+			chartsOpen.SetActive(false);
+		}
 	}
 }
