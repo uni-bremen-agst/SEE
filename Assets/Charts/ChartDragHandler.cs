@@ -9,7 +9,6 @@ namespace Assets.Charts
 	public class ChartDragHandler : MonoBehaviour, IDragHandler
 	{
 		[SerializeField] private RectTransform chart;
-		[SerializeField] private RectTransform canvas;
 
 		/// <summary>
 		/// Checks the current mouse position and moves the chart to the corresponding position on the canvas.
@@ -18,8 +17,9 @@ namespace Assets.Charts
 		public void OnDrag(PointerEventData eventData)
 		{
 			RectTransform pos = GetComponent<RectTransform>();
-			chart.position = new Vector2(Input.mousePosition.x - pos.anchoredPosition.x * canvas.localScale.x,
-				Input.mousePosition.y - pos.anchoredPosition.y * canvas.localScale.y);
+			chart.position =
+				new Vector2(Input.mousePosition.x - pos.anchoredPosition.x * pos.lossyScale.x,
+					Input.mousePosition.y - pos.anchoredPosition.y * pos.lossyScale.y);
 		}
 	}
 }

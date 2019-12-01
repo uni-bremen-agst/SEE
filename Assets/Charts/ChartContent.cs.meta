@@ -1,9 +1,11 @@
 fileFormatVersion: 2
-guid: 3f778dd0a9d44bb419d2e4193f2b7435
+guid: ffdce63f2160cee4f9e3f92a286c0ef4
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - markerPrefab: {fileID: 7900548257253700385, guid: 1b7447dbbbeee5b459fcbc17d2feae1c,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

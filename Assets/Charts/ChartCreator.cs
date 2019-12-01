@@ -1,64 +1,44 @@
-﻿using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Charts
 {
+	/// <summary>
+	/// Contains all options the user has for content on the two axes.
+	/// </summary>
+	public enum AxisContent
+	{
+		LocalScaleX,
+		LocalScaleY
+	}
+
+	/// <summary>
+	/// Contains all the information needed to create the next chart.
+	/// </summary>
 	public class ChartCreator : MonoBehaviour
 	{
-		private GameObject[] dataObjects;
-		[SerializeField] private GameObject markerPrefab;
-		[SerializeField] private GameObject entries;
-		[SerializeField] private GameObject dataPanel;
-		[SerializeField] private TextMeshProUGUI xLabel;
-		[SerializeField] private TextMeshProUGUI yLabel;
+		private AxisContent _xAxisContent;
+		private AxisContent _yAxisContent;
+		[SerializeField] private GameObject _chartPrefab;
+		[SerializeField] private Transform _chartsCanvas;
 
-		/// <summary>
-		/// Calls methods that should be called when the user presses a button in the final version - for testing.
-		/// </summary>
-		private void Start()
+		public void CreateChart()
 		{
-			FindDataObjects();
-			DrawData();
+			ChartContent content =
+				Instantiate(_chartPrefab, _chartsCanvas).GetComponent<ChartContent>();
+			content.Initialize(_xAxisContent, _yAxisContent);
+			gameObject.SetActive(false);
 		}
 
-		/// <summary>
-		/// Fills a List with all objects that will be in the chart. Right now that's all buildings.
-		/// </summary>
-		private void FindDataObjects()
+		public void SetXAxisContent(int content)
 		{
-			dataObjects = GameObject.FindGameObjectsWithTag("Building");
-		}
-
-		/// <summary>
-		/// Fills the chart with data.
-		/// </summary>
-		private void DrawData()
-		{
-			xLabel.text = "Local Scale X";
-			yLabel.text = "Local Scale Y";
-			float minX = dataObjects[0].transform.localScale.x;
-			float maxX = dataObjects[0].transform.localScale.x;
-			float minY = dataObjects[0].transform.localScale.y;
-			float maxY = dataObjects[0].transform.localScale.y;
-			foreach (GameObject data in dataObjects)
+			switch (content)
 			{
-				float tempX = data.transform.localScale.x;
-				if (tempX < minX) minX = tempX;
-				if (tempX > maxX) maxX = tempX;
-				float tempY = data.transform.localScale.y;
-				if (tempY > maxY) maxY = tempY;
-				if (tempY < minY) minY = tempY;
-			}
-
-			RectTransform field = dataPanel.GetComponent<RectTransform>();
-			float width = field.rect.width / (maxX - minX);
-			float height = field.rect.height / (maxY - minY);
-			foreach (GameObject data in dataObjects)
-			{
-				GameObject marker = Instantiate(markerPrefab, entries.transform);
-				marker.GetComponent<ChartMarker>().LinkedObject = data;
-				marker.GetComponent<RectTransform>().anchoredPosition = new Vector3(
-					(data.transform.localScale.x - minX) * width, (data.transform.localScale.y - minY) * height, 0);
+				case 1:
+					_xAxisContent = AxisContent.LocalScaleX;
+					break;
+				case 2:
+					_xAxisContent = AxisContent.LocalScaleY;
+					break;
 			}
 		}
 	}

@@ -1,30 +1,31 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Charts
 {
+	/// <summary>
+	/// Contains methods for controlling the chart UI.
+	/// </summary>
 	public class ChartUIController : MonoBehaviour
 	{
 		[SerializeField] private GameObject chartsClosed;
 		[SerializeField] private GameObject chartsOpen;
+		[SerializeField] private GameObject chartCreator;
 
 		/// <summary>
-		/// Opens the chart view.
+		/// Toggles the chart view.
 		/// </summary>
-		public void OpenCharts()
+		public void ToggleCharts(bool open)
 		{
-			chartsClosed.SetActive(false);
-			chartsOpen.SetActive(true);
+			chartsClosed.SetActive(!open);
+			chartsOpen.SetActive(open);
 		}
 
 		/// <summary>
-		/// Closes the chart view.
+		/// Opens the window for creating new charts.
 		/// </summary>
-		public void CloseCharts()
+		public void OpenChartCreator()
 		{
-			chartsClosed.SetActive(true);
-			chartsOpen.SetActive(false);
+			chartCreator.SetActive(true);
 		}
 	}
 }
