@@ -36,26 +36,26 @@ namespace Assets.Charts
 		{
 			xLabel.text = "Local Scale X";
 			yLabel.text = "Local Scale Y";
-			var minX = dataObjects[0].transform.localScale.x;
-			var maxX = dataObjects[0].transform.localScale.x;
-			var minY = dataObjects[0].transform.localScale.y;
-			var maxY = dataObjects[0].transform.localScale.y;
-			foreach (var data in dataObjects)
+			float minX = dataObjects[0].transform.localScale.x;
+			float maxX = dataObjects[0].transform.localScale.x;
+			float minY = dataObjects[0].transform.localScale.y;
+			float maxY = dataObjects[0].transform.localScale.y;
+			foreach (GameObject data in dataObjects)
 			{
-				var tempX = data.transform.localScale.x;
+				float tempX = data.transform.localScale.x;
 				if (tempX < minX) minX = tempX;
 				if (tempX > maxX) maxX = tempX;
-				var tempY = data.transform.localScale.y;
+				float tempY = data.transform.localScale.y;
 				if (tempY > maxY) maxY = tempY;
 				if (tempY < minY) minY = tempY;
 			}
 
-			var field = dataPanel.GetComponent<RectTransform>();
-			var width = field.rect.width / (maxX - minX);
-			var height = field.rect.height / (maxY - minY);
-			foreach (var data in dataObjects)
+			RectTransform field = dataPanel.GetComponent<RectTransform>();
+			float width = field.rect.width / (maxX - minX);
+			float height = field.rect.height / (maxY - minY);
+			foreach (GameObject data in dataObjects)
 			{
-				var marker = Instantiate(markerPrefab, entries.transform);
+				GameObject marker = Instantiate(markerPrefab, entries.transform);
 				marker.GetComponent<ChartMarker>().LinkedObject = data;
 				marker.GetComponent<RectTransform>().anchoredPosition = new Vector3(
 					(data.transform.localScale.x - minX) * width, (data.transform.localScale.y - minY) * height, 0);

@@ -89,7 +89,7 @@ namespace Assets.Charts
 					runningCamera = null;
 				}
 
-				var lookPos = linkedObject.transform.position - activeCamera.transform.position;
+				Vector3 lookPos = linkedObject.transform.position - activeCamera.transform.position;
 				runningCamera = StartCoroutine(MoveCameraTo(
 					Vector3.MoveTowards(activeCamera.transform.position, linkedObject.transform.position,
 						lookPos.magnitude - cameraDistance), Quaternion.LookRotation(lookPos)));
@@ -115,11 +115,11 @@ namespace Assets.Charts
 		/// <returns></returns>
 		private IEnumerator MoveCameraTo(Vector3 newPos, Quaternion lookAt)
 		{
-			var oldPos = activeCamera.transform.position;
+			Vector3 oldPos = activeCamera.transform.position;
 			if (newPos != linkedObject.transform.position)
 			{
-				var oldRot = activeCamera.transform.rotation;
-				for (var time = 0f; time <= cameraFlightTime; time += Time.deltaTime)
+				Quaternion oldRot = activeCamera.transform.rotation;
+				for (float time = 0f; time <= cameraFlightTime; time += Time.deltaTime)
 				{
 					activeCamera.transform.position = Vector3.Lerp(oldPos, newPos, time * (1 / cameraFlightTime));
 					activeCamera.transform.rotation = Quaternion.Slerp(oldRot, lookAt, time * (1 / cameraFlightTime));
@@ -138,7 +138,7 @@ namespace Assets.Charts
 		/// <returns></returns>
 		private IEnumerator MoveCameraTo(Vector3 newPos)
 		{
-			var oldPos = activeCamera.transform.position;
+			Vector3 oldPos = activeCamera.transform.position;
 			for (float time = 0; time <= cameraFlightTime; time += Time.deltaTime)
 			{
 				activeCamera.transform.position = Vector3.Lerp(oldPos, newPos, time * (1 / cameraFlightTime));
