@@ -318,7 +318,7 @@ namespace SEE.Layout
                     // position because transform.scale refers to the center position.
                     if (settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
                     {
-                        // Treemaps adjust the size of the object's ground area according to
+                        // The Treemap layout adjusts the size of the object's ground area according to
                         // the total space we allow it to use. The x length was initially
                         // mapped onto the area of the ground. The treemap layout yields
                         // an x and z co-ordinate that defines this area, which we use
