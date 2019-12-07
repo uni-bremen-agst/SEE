@@ -68,29 +68,53 @@ namespace SEE.Layout
         /// <summary>
         /// The loaded prefabs for the CScape building we use for their instantiation.
         /// </summary>
-        private static readonly UnityEngine.Object[] prefabs = LoadAllPrefabs();
+        private static readonly GameObject[] prefabs = LoadAllPrefabs();
 
         /// <summary>
         /// Loads and returns all prefabs listed in prefabFiles.
         /// </summary>
         /// <returns>all prefabs listed in prefabFiles</returns>
-        private static UnityEngine.Object[] LoadAllPrefabs()
+        private static GameObject[] LoadAllPrefabs()
         {
-            UnityEngine.Object[] result = new UnityEngine.Object[prefabFiles.Length];
+            GameObject[] result = new GameObject[prefabFiles.Length];
             int i = 0;
             foreach (string filename in prefabFiles)
             {
                 string path = pathPrefix + filename;
                 result[i] = Resources.Load<GameObject>(path);
-
-                //result[i] = Resources.Load<UnityEngine.Object>(filename);
                 if (result[i] == null)
                 {
                     Debug.LogErrorFormat("[BuildingFactory] Could not load building prefab {0}.\n", path);
                 }
+                else
+                {
+                    ResetChildren(result[i]);
+                }
                 i++;
             }
             return result;
+        }
+
+        /// <summary>
+        /// Re-sets all children to the default values concerning shadowing and collision
+        /// (both are turned off).
+        /// </summary>
+        /// <param name="parent">parent game object whose children game object are to be reset</param>
+        private static void ResetChildren(GameObject parent)
+        {
+            // Set default values for all children (rooftops)
+            foreach (Transform child in parent.transform)
+            {
+                GameObject kid = child.gameObject;
+                kid.isStatic = true;
+                NoShadows(kid);
+                // disable colliders
+                Collider collider = kid.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    collider.enabled = false;
+                }
+            }
         }
 
         /// <summary>
@@ -218,7 +242,18 @@ namespace SEE.Layout
             {
                 Debug.LogWarningFormat("[BuildingFactory] {0} has no building modifier.\n", building.name);
             }
-            Renderer renderer = building.GetComponent<Renderer>();
+            NoShadows(building);
+            ResetChildren(building);
+            return building;
+        }
+
+        /// <summary>
+        /// Turns off shadow casting and receiving.
+        /// </summary>
+        /// <param name="gameObject">game object for which to disable shadowing</param>
+        private static void NoShadows(GameObject gameObject)
+        {
+            Renderer renderer = gameObject.GetComponent<Renderer>();
             if (renderer != null)
             {
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
@@ -226,9 +261,8 @@ namespace SEE.Layout
             }
             else
             {
-                Debug.LogWarningFormat("[BuildingFactory] {0} has no renderer.\n", building.name);
+                Debug.LogWarningFormat("[BuildingFactory] {0} has no renderer.\n", gameObject.name);
             }
-            return building;
         }
 
         /// <summary>
@@ -291,20 +325,20 @@ namespace SEE.Layout
             }
             else
             {
+                Debug.LogFormat("BuildingFactory.SetSize block={0} length={1} value given={2} value used={3}\n", 
+                                 block.name, length, value, Mathf.RoundToInt(value / Unit));
                 switch (length)
                 {
                     case Length.width:
-                        bm.buildingWidth = (int)(value / Unit);
+                        bm.buildingWidth = Mathf.RoundToInt(value / Unit);
                         break;
                     case Length.height:
-                        bm.floorNumber = (int)(value / Unit);
+                        bm.floorNumber = Mathf.RoundToInt(value / Unit);
                         break;
                     case Length.depth:
-                        bm.buildingDepth = (int)(value / Unit);
+                        bm.buildingDepth = Mathf.RoundToInt(value / Unit);
                         break;
                 }
-                bm.UpdateCity();
-                bm.AwakeCity();
             }
         }
 
