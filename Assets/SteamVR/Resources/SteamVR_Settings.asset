@@ -21,10 +21,10 @@ MonoBehaviour:
   poseUpdateMode: 8
   activateFirstActionSetOnStart: 1
   editorAppKey: application.generated.unity.seecity.exe
-  autoEnableVR: 0
+  autoEnableVR: 1
   legacyMixedRealityCamera: 1
   mixedRealityCameraPose:
     actionPath: /actions/mixedreality/in/ExternalCamera
     needsReinit: 0
   mixedRealityCameraInputSource: 11
-  mixedRealityActionSetAutoEnable: 0
+  mixedRealityActionSetAutoEnable: 1
