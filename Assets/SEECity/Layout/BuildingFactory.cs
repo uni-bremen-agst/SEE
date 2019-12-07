@@ -165,15 +165,15 @@ namespace SEE.Layout
         /// Instantiates the given prefab (a CScape building) and sets various
         /// parameters.
         /// </summary>
-        /// <param name="prefab"></param>
-        /// <returns></returns>
+        /// <param name="prefab">building prefab to be instantiated</param>
+        /// <returns>returns an instantiation of the given building prefab with default settings</returns>
         private static GameObject NewBuilding(UnityEngine.Object prefab)
         {
             GameObject building = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
             building.tag = Tags.Building;
             building.isStatic = true;
 
-            CSRooftops csRooftopsModifier = building.GetComponent(typeof(CSRooftops)) as CSRooftops;
+            CSRooftops csRooftopsModifier = building.GetComponent<CSRooftops>();
             if (csRooftopsModifier != null)
             {
                 csRooftopsModifier.randomSeed = UnityEngine.Random.Range(0, 1000000);
@@ -185,7 +185,7 @@ namespace SEE.Layout
                 Debug.LogWarningFormat("[BuildingFactory] {0} has no rooftop modifier.\n", building.name);
             }
 
-            CSAdvertising csAdverts = building.GetComponent(typeof(CSAdvertising)) as CSAdvertising;
+            CSAdvertising csAdverts = building.GetComponent<CSAdvertising>();
             if (csAdverts != null)
             {
                 csAdverts.randomSeed = UnityEngine.Random.Range(0, 1000000);
@@ -198,13 +198,13 @@ namespace SEE.Layout
             // A building modifier allows us to modify basic properties such as the facade shape, Graffiti, etc.
             // The kinds of properties and their effect can be investigated in the Unity Inspector when a building
             // is selected.
-            BuildingModifier buildingModifier = building.GetComponent(typeof(BuildingModifier)) as BuildingModifier;
+            BuildingModifier buildingModifier = building.GetComponent<BuildingModifier>();
             if (buildingModifier != null)
             {
                 // Set width and depth of building in terms of building units, not Unity units.
                 // A city is real world scaled (1 meter = 1 unity unit) so that it looks natural in VR. 
                 // CScape is using a unit of 3 meters as a standard CScape unit (CScape unit = 3m), 
-                // as the developer found that that unit is a best measure for distances (3m for floor 
+                // as the developer found that that unit is a good measure for distances (3m for floor 
                 // heights, 3m for street lanes). 
                 buildingModifier.buildingWidth = 10;
                 buildingModifier.buildingDepth = 5;
