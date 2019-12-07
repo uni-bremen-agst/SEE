@@ -325,8 +325,6 @@ namespace SEE.Layout
             }
             else
             {
-                Debug.LogFormat("BuildingFactory.SetSize block={0} length={1} value given={2} value used={3}\n", 
-                                 block.name, length, value, Mathf.RoundToInt(value / Unit));
                 switch (length)
                 {
                     case Length.width:
