@@ -70,13 +70,22 @@ public class ScriptedCamera : MonoBehaviour
     private const int minimalColumns = 4;
 
     /// <summary>
+    /// Returns the name of the file from which to read the path data.
+    /// </summary>
+    /// <returns>name of the file from which to read the path data</returns>
+    private string Filename()
+    {
+        return Application.persistentDataPath + "/" + filename;
+    }
+
+    /// <summary>
     /// Loads the path data from a the file.
     /// </summary>
     private void ReadPath()
     {
         // WriteAllLines creates a file, writes a collection of strings to the file,
-        // and then closes the file.  You do NOT need to call Flush() or Close().
-        string path = Application.persistentDataPath + "/" + filename;
+        // and then closes the file. You do NOT need to call Flush() or Close().
+        string path = Filename();
         string [] data = System.IO.File.ReadAllLines(path);
         locations = new Vector4[data.Length];
 
@@ -105,24 +114,23 @@ public class ScriptedCamera : MonoBehaviour
         Debug.LogFormat("Read camera path from {0}\n", path);
     }
 
-    /// <summary>
-    /// Is called whenever a value is changed in the editor.
-    /// </summary>
-    void OnValidate()
-    {
-        ReadPath();
-        if (locations.Length < 2)
-        {
-            Debug.LogWarning("ScriptedCamera: Requiring at least two locations\n");
-            System.Array.Resize(ref locations, 2);
-        }
-    }
-
     // Start is called before the first frame update.
     void Start()
     {
-        Debug.Log("Starting ScriptedCamera\n");
-        ReadPath();
+        try
+        {
+            ReadPath();
+        }
+        catch (Exception e)
+        {
+            Debug.LogErrorFormat("ScriptedCamera: Could not read path from file {0}: {1}\n", Filename(), e.ToString());
+            return;
+        }
+        if (locations.Length < 2)
+        {
+            Debug.LogWarning("ScriptedCamera: Requiring at least two locations.\n");
+            return;
+        }
         try
         {
             spline = TinySpline.Utils.interpolateCubic(VectorsToList(locations), 4);
@@ -130,7 +138,7 @@ public class ScriptedCamera : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogWarning($"ScriptedCamera: Interpolation failed with error '{e.Message}'\n");
-            Debug.LogWarning($"ScriptedCamera: Createing spline with default location\n");
+            Debug.LogWarning($"ScriptedCamera: Creating spline with default location\n");
             spline = new BSpline(1, 4, 0);
             spline.controlPoints = new List<double> { 0, 0, 0, 0 };
         }
