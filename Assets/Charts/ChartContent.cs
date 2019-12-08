@@ -11,7 +11,7 @@ namespace Assets.Charts
 
 		[SerializeField] private GameObject markerPrefab;
 		[SerializeField] private GameObject entries;
-		[SerializeField] private GameObject dataPanel;
+		[SerializeField] private RectTransform dataPanel;
 		[SerializeField] private TextMeshProUGUI xLabel;
 		[SerializeField] private TextMeshProUGUI yLabel;
 
@@ -61,9 +61,8 @@ namespace Assets.Charts
 				if (tempY < minY) minY = tempY;
 			}
 
-			RectTransform field = dataPanel.GetComponent<RectTransform>();
-			float width = field.rect.width / (maxX - minX);
-			float height = field.rect.height / (maxY - minY);
+			float width = dataPanel.rect.width / (maxX - minX);
+			float height = dataPanel.rect.height / (maxY - minY);
 			foreach (GameObject data in _dataObjects)
 			{
 				GameObject marker = Instantiate(markerPrefab, entries.transform);
@@ -72,6 +71,56 @@ namespace Assets.Charts
 					(data.transform.localScale.x - minX) * width,
 					(data.transform.localScale.y - minY) * height, 0);
 			}
+		}
+
+		private void Fill()
+		{
+			xLabel.text = _xAxisContent.ToString();
+			yLabel.text = _yAxisContent.ToString();
+			Vector3[] vectors = new Vector3[_dataObjects.Length];
+			float minX;
+			float maxX;
+			float minY;
+			float maxY;
+			switch (_xAxisContent)
+			{
+				case AxisContent.LocalScaleX:
+					(minX, maxX, vectors) = FillLocalScaleX(vectors);
+					break;
+				case AxisContent.LocalScaleY:
+					(minX, maxX, vectors) = FillLocalScaleY(vectors);
+					break;
+			}
+		}
+
+		private (float, float, Vector3[]) FillLocalScaleX(Vector3[] vectors)
+		{
+			float min = _dataObjects[0].transform.localScale.x;
+			float max = _dataObjects[0].transform.localScale.x;
+			foreach (GameObject data in _dataObjects)
+			{
+				float temp = data.transform.localScale.x;
+				if (temp < min)
+					min = temp;
+				else if (temp > max) max = temp;
+			}
+
+			return (min, max, vectors);
+		}
+
+		private (float, float, Vector3[]) FillLocalScaleY(Vector3[] vectors)
+		{
+			float min = _dataObjects[0].transform.localScale.y;
+			float max = _dataObjects[0].transform.localScale.y;
+			foreach (GameObject data in _dataObjects)
+			{
+				float temp = data.transform.localScale.y;
+				if (temp < min)
+					min = temp;
+				else if (temp > max) max = temp;
+			}
+
+			return (min, max, vectors);
 		}
 
 		/// <summary>

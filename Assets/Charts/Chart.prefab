@@ -319,7 +319,7 @@ MonoBehaviour:
   markerPrefab: {fileID: 7900548257253700385, guid: 1b7447dbbbeee5b459fcbc17d2feae1c,
     type: 3}
   entries: {fileID: 4785276354356836142}
-  dataPanel: {fileID: 4785276354708113208}
+  dataPanel: {fileID: 4785276354708113209}
   xLabel: {fileID: 4785276354606700251}
   yLabel: {fileID: 4785276355519773888}
 --- !u!1 &4785276354975924673

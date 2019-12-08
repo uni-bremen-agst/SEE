@@ -21,6 +21,9 @@ namespace Assets.Charts
 		[SerializeField] private GameObject _chartPrefab;
 		[SerializeField] private Transform _chartsCanvas;
 
+		/// <summary>
+		/// Initializes the new chart as GameObject.
+		/// </summary>
 		public void CreateChart()
 		{
 			ChartContent content =
@@ -29,14 +32,18 @@ namespace Assets.Charts
 			gameObject.SetActive(false);
 		}
 
+		/// <summary>
+		/// Sets the content of the x-Axis of the created chart.
+		/// </summary>
+		/// <param name="content">The number of the AxisContent enum.</param>
 		public void SetXAxisContent(int content)
 		{
 			switch (content)
 			{
-				case 1:
+				case 0:
 					_xAxisContent = AxisContent.LocalScaleX;
 					break;
-				case 2:
+				case 1:
 					_xAxisContent = AxisContent.LocalScaleY;
 					break;
 			}
