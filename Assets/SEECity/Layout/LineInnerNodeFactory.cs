@@ -39,5 +39,10 @@ namespace SEE.Layout
             LineRenderer line = circle.GetComponent<LineRenderer>();
             LineFactory.SetWidth(line, lineWidth * Unit);
         }
+
+        public override Vector3 GetSize(GameObject block)
+        {
+            return block.transform.localScale;
+        }
     }
 }

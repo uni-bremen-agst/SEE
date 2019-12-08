@@ -313,13 +313,12 @@ namespace SEE.Layout
 
                 if (node.IsLeaf())
                 {
-                    // Leaf nodes were created as blocks by leaveNodeFactory.
-                    // Leaf nodes have their size set before the layout is computed. We will
-                    // not change their size unless a layout requires that.
-                    leafNodeFactory.SetGroundPosition(gameNode, transform.position);
+                    Debug.LogFormat("GraphRenderer.Apply setting node {0} with layout {1}\n", gameNode.name, transform);
+                    // We need to first scale the game node and only afterwards set its
+                    // position because transform.scale refers to the center position.
                     if (settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
                     {
-                        // Treemaps adjust the size of the object's ground area according to
+                        // The Treemap layout adjusts the size of the object's ground area according to
                         // the total space we allow it to use. The x length was initially
                         // mapped onto the area of the ground. The treemap layout yields
                         // an x and z co-ordinate that defines this area, which we use
@@ -329,6 +328,10 @@ namespace SEE.Layout
                         leafNodeFactory.SetWidth(gameNode, transform.scale.x);
                         leafNodeFactory.SetDepth(gameNode, transform.scale.z);
                     }
+                    // Leaf nodes were created as blocks by leaveNodeFactory.
+                    // Leaf nodes have their size set before the layout is computed. We will
+                    // not change their size unless a layout requires that.
+                    leafNodeFactory.SetGroundPosition(gameNode, transform.position);
                 }
                 else
                 {
