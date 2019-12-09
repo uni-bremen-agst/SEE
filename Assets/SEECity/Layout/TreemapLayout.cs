@@ -76,11 +76,8 @@ namespace SEE.Layout
             else
             {
                 to_game_node = NodeMapping(gameNodes);
-                Debug.Log("TreemapLayout creating tree\n");
                 CreateTree(to_game_node.Keys, out roots, out children);
-                Debug.Log("TreemapLayout calculating size\n");
                 CalculateSize();
-                Debug.Log("TreemapLayout calculating layout\n");
                 CalculateLayout();
             }
             return layout_result;
