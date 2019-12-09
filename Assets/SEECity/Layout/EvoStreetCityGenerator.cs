@@ -6,29 +6,46 @@ namespace SEE.Layout
 {
     public class EvostreetCityGenerator
     {
-        // The set of nodes already visited.
-        private Dictionary<string, ENode> checkedNodes = new Dictionary<string, ENode>();
+        /// <summary>
+        /// The set of nodes already visited.
+        /// </summary>
+        private Dictionary<string, ENode> visitedNodes = new Dictionary<string, ENode>();
 
-        // The maximal depth of the tree.
+        /// <summary>
+        /// The maximal depth of the tree.
+        /// </summary>
         private int MaxDepth;
 
+        /// <summary>
+        /// The distance between two neighboring leaf-node representations.
+        /// </summary>
         public float OffsetBetweenBuildings = 4.5f;
 
-        // The street width that will be adjusted by the "depth" of the street.
+        /// <summary>
+        /// The street width that will be adjusted by the "depth" of the street.
+        /// </summary>
         public float StreetWidth = 2.0f;
 
-        // The height of the street (y co-ordinate)
+        /// <summary>
+        /// The height of the street (y co-ordinate).
+        /// </summary>
         public float StreetHeight = 0.1f;
 
+        /// <summary>
+        /// Scaling used for the node metrics.
+        /// </summary>
         private IScale scaler;
 
         private const float CM_TO_M = 1.0f;
 
+        /// <summary>
+        /// The settings to be considered for the layout.
+        /// </summary>
         private GraphSettings graphSettings;
 
-        public ENode GenerateCity(SEE.DataModel.Graph graph, IScale scaler, GraphSettings graphSettings)
+        public ENode GenerateCity(DataModel.Graph graph, IScale scaler, GraphSettings graphSettings)
         {
-            checkedNodes.Clear();
+            visitedNodes.Clear();
 
             this.graphSettings = graphSettings;
             this.scaler = scaler;
@@ -46,7 +63,7 @@ namespace SEE.Layout
             GenerateNode(rootNode);
             CalculationNodeLocation(rootNode, Vector3.zero);
 
-            Debug.Log($"Statistics: Generated unique Nodes: {checkedNodes.Count}\n");
+            Debug.Log($"Statistics: Generated unique Nodes: {visitedNodes.Count}\n");
 
             return rootNode;
         }
@@ -71,21 +88,19 @@ namespace SEE.Layout
 
             if (node.IsHouse())
             {
-                //house		
                 node.Location = newLoc * CM_TO_M + toGoal;
             }
-            else if (node.IsStreet())
+            else
             {
-                //street
+                // street
                 //surrounding plane
                 //~~~~// spawnBox(ISMPlane, (InNewLoc + Vector3(0.f, 0.f, -MAX_LEVELS + InParentNode.Depth)) * CM_TO_M + toGoal, InParentNode.RotationZ, Vector3(InParentNode.Scale.X, InParentNode.Scale.Y, 0.2));
 
                 //the street
                 Vector2 StreetfromPivo = new Vector2(node.Scale.x / 2, node.YPivot) * CM_TO_M;
                 Vector2 StreetRotatedfromPivo = StreetfromPivo.GetRotated(node.RotationZ);
-                float relStreetWidth = relativeStreetWidth(node);
-                Vector3 StreetToGoal = new Vector3(StreetRotatedfromPivo.x, StreetRotatedfromPivo.y,
-                    (StreetHeight / 2.0f) * CM_TO_M);
+                float relStreetWidth = RelativeStreetWidth(node);
+                Vector3 StreetToGoal = new Vector3(StreetRotatedfromPivo.x, StreetRotatedfromPivo.y, (StreetHeight / 2.0f) * CM_TO_M);
                 //~~~~// spawnBox(ISMStreet, InNewLoc*CM_TO_M + StreetToGoal, InParentNode.RotationZ, Vector3(InParentNode.Scale.X, relStreetWidth, StreetHeight));
 
                 node.Location = newLoc * CM_TO_M + StreetToGoal;
@@ -99,10 +114,8 @@ namespace SEE.Layout
                     Vector2 relMy = new Vector2(0.0f, node.YPivot + streetMod);
                     relMy = relMy.GetRotated(node.RotationZ);
 
-
                     nextX = newLoc.x + relChild.x + relMy.x;
                     nextY = newLoc.y + relChild.y + relMy.y;
-
 
                     Vector3 nextLoc = new Vector3(nextX, nextY, 0);
                     CalculationNodeLocation(node.Children[i], nextLoc);
@@ -110,22 +123,31 @@ namespace SEE.Layout
             }
         }
 
+        /// <summary>
+        /// If overForest has exactly one child, that child is returned. If
+        /// overForest has multiple children, overForest is returned. 
+        /// If overForest has no children, null is returned.
+        /// </summary>
+        /// <param name="overForest">a forest of trees</param>
+        /// <returns>root of the forest or null</returns>
         private ENode DefineRootNode(ENode overForest)
         {
             if (overForest.Children.Count == 0)
             {
                 return null;
             }
-
-            if (overForest.Children.Count == 1)
+            else if (overForest.Children.Count == 1)
             {
                 return overForest.Children[0];
             }
-
-            return overForest;
+            else
+            {
+                return overForest;
+            }
         }
 
-        private ENode GenerateHierarchy(SEE.DataModel.Graph graph) //TODO: Create Hierarchy only once per import
+        // FIXME: This can be removed. We already have functions elsehwere to generate the hierarchy.
+        private ENode GenerateHierarchy(DataModel.Graph graph) //TODO: Create Hierarchy only once per import
         {
             // 1. Find Node with no children of visible type
             // 2. Find most outer node of given edge type (default: Enclosing)
@@ -136,10 +158,10 @@ namespace SEE.Layout
             var overForest = new ENode { IsOverForest = true, Depth = 0 };
 
             // 1.
-            foreach (SEE.DataModel.Node graphNode in graph.Nodes())
+            foreach (DataModel.Node graphNode in graph.Nodes())
             {
-                if (checkedNodes.ContainsKey(graphNode.LinkName))
-                    continue; // if not already Created as a Child Node of some other Node
+                if (visitedNodes.ContainsKey(graphNode.LinkName))
+                    continue; // if not already created as a child node of some other node
 
                 if (graphNode.IsRoot())
                 {
@@ -150,27 +172,25 @@ namespace SEE.Layout
                     Debug.Log($"Attached NewChildNode: {graphNode.LinkName} to OverForest\n");
                 }
             }
-
             return overForest;
         }
 
-        private ENode GenerateNodeAndChildren(ENode parentNode, SEE.DataModel.Node graphNode)
+        private ENode GenerateNodeAndChildren(ENode parentNode, DataModel.Node graphNode)
         {
-            ENode newNode = new ENode();
-            newNode.GraphNode = graphNode;
-            newNode.ParentNode = parentNode;
-            newNode.Depth = parentNode.Depth + 1;
-
-            checkedNodes.Add(newNode.GraphNode.LinkName, newNode); // Add Created ENode to List of CheckedNodesMap worked on
-
+            ENode newNode = new ENode
+            {
+                GraphNode = graphNode,
+                ParentNode = parentNode,
+                Depth = parentNode.Depth + 1
+            };
+            visitedNodes.Add(newNode.GraphNode.LinkName, newNode); // Add Created ENode to List of CheckedNodesMap worked on
             AddChildren(newNode);
-
             return newNode;
         }
 
         private void AddChildren(ENode parentNode)
         {
-            foreach (SEE.DataModel.Node child in parentNode.GraphNode.Children())
+            foreach (DataModel.Node child in parentNode.GraphNode.Children())
             {
                 ENode newNode = GenerateNodeAndChildren(parentNode, child);
                 parentNode.Children.Add(newNode);
@@ -185,8 +205,13 @@ namespace SEE.Layout
                 return;
             }
 
-            if (! node.GraphNode.IsLeaf()) // street
+            if (node.GraphNode.IsLeaf())
             {
+                CalcScale(node);
+            }
+            else
+            {
+                // street
                 float leftPivotX = OffsetBetweenBuildings;
                 float RightPivotX = OffsetBetweenBuildings;
                 ENode newChildNode;
@@ -194,14 +219,14 @@ namespace SEE.Layout
                 {
                     newChildNode = (node.Children[i]);
                     newChildNode.RotationZ =
-                        (leftPivotX <= RightPivotX) ? node.RotationZ - 90.0f : node.RotationZ + 90.0f; //could be a street
+                        (leftPivotX <= RightPivotX) ? node.RotationZ - 90.0f : node.RotationZ + 90.0f; // could be a street
                     newChildNode.RotationZ = (Mathf.FloorToInt(newChildNode.RotationZ) + 360) % 360;
                     GenerateNode(newChildNode);
-                    //Pivo setting
+                    // Pivot setting
                     if (leftPivotX <= RightPivotX)
                     {
                         // left
-                        newChildNode.Left = true; //is default value
+                        newChildNode.Left = true; // is default value
                         if (newChildNode.GraphNode.IsLeaf())
                         {
                             // house
@@ -245,14 +270,10 @@ namespace SEE.Layout
                 }
                 //for InParentNode is a street calculate its size
 
-                node.Scale = new Vector3(maxXOfChildren(node, OffsetBetweenBuildings),
-                    maxYOfChildNodes(node, OffsetBetweenBuildings), node.MaxChildZ);
-                node.YPivot = maxLeftY(node, OffsetBetweenBuildings);
-            }
-            else if (node.GraphNode.IsLeaf())
-            {
-                // house
-                CalcScale(node);
+                node.Scale = new Vector3(MaxXOfChildren(node, OffsetBetweenBuildings),
+                                        MaxYOfChildNodes(node, OffsetBetweenBuildings), 
+                                        node.MaxChildZ);
+                node.YPivot = MaxLeftY(node, OffsetBetweenBuildings);
             }
         }
 
@@ -267,7 +288,7 @@ namespace SEE.Layout
                                      scaler.GetNormalizedValue(graphSettings.HeightMetric, node.GraphNode));
         }
 
-        private float maxLeftY(ENode node, float offset)
+        private float MaxLeftY(ENode node, float offset)
         {
             float sum = 0.0f;
             for (int i = 0; i < node.Children.Count; i++)
@@ -277,33 +298,45 @@ namespace SEE.Layout
                 {
                     if (node.Children[i].IsHouse())
                     {
-                        if (node.Children[i].Scale.y > sum) sum = node.Children[i].Scale.y;
+                        if (node.Children[i].Scale.y > sum)
+                        {
+                            sum = node.Children[i].Scale.y;
+                        }
                     }
                     else if (node.Children[i].IsStreet())
                     {
-                        if (node.Children[i].Scale.x > sum) sum = node.Children[i].Scale.x;
+                        if (node.Children[i].Scale.x > sum)
+                        {
+                            sum = node.Children[i].Scale.x;
+                        }
                     }
                 }
             }
-
             return sum;
         }
 
-        private float maxYOfChildNodes(ENode node, float offset)
+        private float MaxYOfChildNodes(ENode node, float offset)
         {
             float left = 0.0f;
             float right = 0.0f;
+
             for (int i = 0; i < node.Children.Count; i++)
             {
                 if (node.Children[i].Left)
                 {
                     if (node.Children[i].IsHouse())
                     {
-                        if (node.Children[i].Scale.y > left) left = node.Children[i].Scale.y;
+                        if (node.Children[i].Scale.y > left)
+                        {
+                            left = node.Children[i].Scale.y;
+                        }
                     }
                     else
                     {
-                        if (node.Children[i].Scale.x > left) left = node.Children[i].Scale.x;
+                        if (node.Children[i].Scale.x > left)
+                        {
+                            left = node.Children[i].Scale.x;
+                        }
                     }
                 }
                 else
@@ -318,34 +351,38 @@ namespace SEE.Layout
                     }
                 }
             }
-
-            return left + right + relativeStreetWidth(node);
+            return left + right + RelativeStreetWidth(node);
         }
 
-        private float maxXOfChildren(ENode node, float offset)
+        private float MaxXOfChildren(ENode node, float offset)
         {
-            float left = sumXOfChildren(node, offset, true);
-            float right = sumXOfChildren(node, offset, false);
-            float max = left < right ? right : left;
-            return max;
+            float left = SumXOfChildren(node, offset, true);
+            float right = SumXOfChildren(node, offset, false);
+            return left < right ? right : left;
         }
 
-        private float sumXOfChildren(ENode node, float offset, bool left)
+        private float SumXOfChildren(ENode node, float offset, bool left)
         {
             float sum = offset;
+
             for (int i = 0; i < node.Children.Count; i++)
             {
                 if (node.Children[i].Left == left)
                 {
-                    if (node.Children[i].IsHouse()) sum += node.Children[i].Scale.x + offset;
-                    else if (node.Children[i].IsStreet()) sum += node.Children[i].Scale.y + offset;
+                    if (node.Children[i].IsHouse())
+                    {
+                        sum += node.Children[i].Scale.x + offset;
+                    }
+                    else if (node.Children[i].IsStreet())
+                    {
+                        sum += node.Children[i].Scale.y + offset;
+                    }
                 }
             }
-
-            return sum + relativeStreetWidth(node);
+            return sum + RelativeStreetWidth(node);
         }
 
-        private float relativeStreetWidth(ENode node)
+        private float RelativeStreetWidth(ENode node)
         {
             return StreetWidth * ((MaxDepth + 1) - node.Depth) / (MaxDepth + 1);
         }
