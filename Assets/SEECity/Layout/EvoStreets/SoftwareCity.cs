@@ -6,23 +6,31 @@ namespace SEE.Layout.EvoStreets
 {
     public class SoftwareCity
     {
-        private EvostreetCityGenerator
-            _cityGenerator = new EvostreetCityGenerator(); //TODO make this changeable from inspector
+        //TODO make this changeable from inspector
+        private EvostreetCityGenerator cityGenerator = new EvostreetCityGenerator(); 
 
-        private SEE.DataModel.Graph _graph;
+        /// <summary>
+        /// The leaf and inner nodes to be laid out.
+        /// </summary>
+        private List<GameObject> gameObjects = new List<GameObject>();
 
-        private List<GameObject> _gameObjects = new List<GameObject>();
-
+        /// <summary>
+        /// Determines how to scale the node metrics.
+        /// </summary>
         private IScale scaler;
 
+        /// <summary>
+        /// The settings to be considered for the layout.
+        /// </summary>
         private GraphSettings graphSettings;
 
+        /// <summary>
+        /// The resulting layout.
+        /// </summary>
         private Dictionary<GameObject, NodeTransform> layout_result;
 
-        public Dictionary<GameObject, NodeTransform> GenerateCity(SEE.DataModel.Graph graph, IScale scaler, GraphSettings graphSettings)
+        public Dictionary<GameObject, NodeTransform> GenerateCity(DataModel.Graph graph, IScale scaler, GraphSettings graphSettings)
         {
-            _graph = graph;
-
             layout_result = new Dictionary<GameObject, NodeTransform>();
 
             DateTime before = DateTime.Now;
@@ -30,8 +38,7 @@ namespace SEE.Layout.EvoStreets
             this.graphSettings = graphSettings;
             this.scaler = scaler;
 
-            ENode rootNode = _cityGenerator.GenerateCity(_graph, scaler, graphSettings);
-            int maxDepth = graph.GetMaxDepth();
+            ENode rootNode = cityGenerator.GenerateCity(graph, scaler, graphSettings);
             bool rootStreetDimensionless = rootNode.Depth != 0 && !rootNode.IsOverForest;
 
             SwapZWithY(rootNode);
@@ -108,13 +115,13 @@ namespace SEE.Layout.EvoStreets
                     return;
                 }
 
-                _gameObjects.Add(spawnedHouse);
+                gameObjects.Add(spawnedHouse);
             } // End isHouse
 
             if (node.IsStreet())
             {
                 var spawnedStreet = SpawnStreet(node, parentGameObject, node.Location,
-                    new Vector3(node.Scale.x, _cityGenerator.StreetHeight, node.Scale.z), node.RotationZ);
+                    new Vector3(node.Scale.x, cityGenerator.StreetHeight, node.Scale.z), node.RotationZ);
 
                 if (spawnedStreet == null)
                 {
@@ -122,7 +129,7 @@ namespace SEE.Layout.EvoStreets
                     return;
                 }
 
-                _gameObjects.Add(spawnedStreet);
+                gameObjects.Add(spawnedStreet);
 
                 foreach (var child in node.Children)
                 {
