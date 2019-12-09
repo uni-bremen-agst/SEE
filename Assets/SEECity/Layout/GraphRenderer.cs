@@ -313,7 +313,6 @@ namespace SEE.Layout
 
                 if (node.IsLeaf())
                 {
-                    Debug.LogFormat("GraphRenderer.Apply setting node {0} with layout {1}\n", gameNode.name, transform);
                     // We need to first scale the game node and only afterwards set its
                     // position because transform.scale refers to the center position.
                     if (settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
