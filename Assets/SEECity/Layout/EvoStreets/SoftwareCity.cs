@@ -27,7 +27,6 @@ namespace SEE.Layout.EvoStreets
         /// </summary>
         private Dictionary<GameObject, NodeTransform> layout_result;
 
-
         public Dictionary<GameObject, NodeTransform> GenerateCity(DataModel.Graph graph, IScale scaler, GraphSettings graphSettings)
         {
             layout_result = new Dictionary<GameObject, NodeTransform>();
@@ -70,8 +69,10 @@ namespace SEE.Layout.EvoStreets
             foreach (Node node in graph.Nodes())
             {
                 GameObject gameObject = new GameObject(node.LinkName);
+                gameObject.tag = Tags.Block;
                 NodeRef nodeRef = gameObject.AddComponent<NodeRef>();
                 nodeRef.node = node;
+                gameObjects.Add(gameObject);
             }
             return gameObjects;
         }
@@ -99,8 +100,7 @@ namespace SEE.Layout.EvoStreets
 
             if (node.IsHouse())
             {
-                var spawnedHouse = SpawnHouse(node, parentGameObject, node.Location, node.Scale,
-                    node.Rotation);
+                var spawnedHouse = SpawnHouse(node);
 
                 // TODO: Root Point Calculation for RelationshipGenerator
 
@@ -115,11 +115,7 @@ namespace SEE.Layout.EvoStreets
 
             if (node.IsStreet())
             {
-                var spawnedStreet = SpawnStreet(node, 
-                                                parentGameObject, 
-                                                node.Location,
-                                                new Vector3(node.Scale.x, EvoStreetsNodeLayout.StreetHeight, node.Scale.z), 
-                                                node.Rotation);
+                var spawnedStreet = SpawnStreet(node);
 
                 if (spawnedStreet == null)
                 {
@@ -138,11 +134,7 @@ namespace SEE.Layout.EvoStreets
             } // End isStreet
         }
 
-        private GameObject SpawnHouse(ENode node, 
-                                      GameObject parentGameObject,
-                                      Vector3 nodeLocation, 
-                                      Vector3 nodeScale,
-                                      float nodeRotationZ)
+        private GameObject SpawnHouse(ENode node)
         {
             if (node == null)
             {
@@ -151,9 +143,9 @@ namespace SEE.Layout.EvoStreets
             }
 
             // TODO: instantiate some kind of actor/gameobj to display house
-            var rotation = Quaternion.Euler(0, nodeRotationZ, 0); // this needs to be assigned to y due to difference between unity and unreal
+            var rotation = Quaternion.Euler(0, node.Rotation, 0); // this needs to be assigned to y due to difference between unity and unreal
             var o = NewLeaf(node.GraphNode);
-            o.transform.localScale = nodeScale;
+            o.transform.localScale = node.Scale;
             o.transform.position = node.Location + graphSettings.origin;
             o.transform.rotation = rotation;
             o.name = (node.IsHouse() ? "House " : (node.IsStreet()) ? "Street " : "None ") + node.GraphNode.LinkName;
@@ -176,11 +168,7 @@ namespace SEE.Layout.EvoStreets
 
         private CubeFactory streetFactory = new CubeFactory();
 
-        private GameObject SpawnStreet(ENode node, 
-                                       GameObject parentGameObject,
-                                       Vector3 nodeLocation, 
-                                       Vector3 nodeScale,
-                                       float nodeRotationZ)
+        private GameObject SpawnStreet(ENode node)
         {
             if (node == null)
             {
@@ -188,11 +176,12 @@ namespace SEE.Layout.EvoStreets
                 return null;
             }
 
-            var rotation = Quaternion.Euler(0, nodeRotationZ, 0); // this needs to be assigned to y due to difference between unity and unreal
+            // this needs to be assigned to y due to difference between unity and unreal
+            var rotation = Quaternion.Euler(0, node.Rotation, 0);
             var o = streetFactory.NewBlock(0);
             o.transform.position = node.Location + graphSettings.origin;
             o.transform.rotation = rotation;
-            o.transform.localScale = nodeScale;
+            o.transform.localScale = new Vector3(node.Scale.x, EvoStreetsNodeLayout.StreetHeight, node.Scale.z);
             o.name = (node.IsHouse() ? "House " : (node.IsStreet()) ? "Street " : "None ") + node.GraphNode.LinkName;
             AttachNode(o, node.GraphNode);
             layout_result[o] = new NodeTransform(o.transform.position, o.transform.localScale);
