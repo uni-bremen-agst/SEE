@@ -154,13 +154,13 @@ namespace SEE
         /// </summary>
         public enum NodeLayouts
         {
+            ScoopEvoStreets,
             EvoStreets,
             Balloon,
             FlatRectanglePacking,
             Treemap,
             CirclePacking,
             Manhattan,
-            ScoopEvoStreets,
         }
 
         /// <summary>
