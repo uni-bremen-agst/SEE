@@ -158,14 +158,6 @@ namespace SEE.Layout
 
         private void CalculationNodeLocation(ENode node, Vector3 newLoc)
         {
-            if (node == null)
-            {
-                Debug.Log("InParentNode = Nullptr in EvoStreetsNodeLayout::CalculationNodeLocation\n");
-                return;
-            }
-
-            //FRotator rot = FRotator(0, node.RotationZ, 0);
-
             float nextX;
             float nextY;
 
@@ -402,7 +394,7 @@ namespace SEE.Layout
         /// This fixes the fact that height in unity is the y component of a 
         /// vector while in unreal it's the z component.
         /// </summary>
-        /// <param name="node">node whose z and y are to be swapped</param>
+        /// <param name="node">node whose z and y co-ordinates of location and scale are to be swapped</param>
         private void SwapZWithY(ENode node)
         {
             // Swap scale
