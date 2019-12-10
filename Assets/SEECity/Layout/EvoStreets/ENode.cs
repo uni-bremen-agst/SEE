@@ -18,7 +18,7 @@ namespace SEE.Layout.EvoStreets
         }
 
         /// <summary>
-        /// The scaling of the node (width, depth, height).
+        /// The scaling of the node (width, height, depth).
         /// </summary>
         public Vector3 Scale;
 
