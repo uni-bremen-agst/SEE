@@ -4,17 +4,24 @@ using SEE.Layout.EvoStreets;
 
 namespace SEE.Layout
 {
-    public class EvostreetCityGenerator
+    public class EvoStreetsNodeLayout : NodeLayout
     {
         /// <summary>
-        /// The set of nodes already visited.
+        /// Constructor.
         /// </summary>
-        private Dictionary<string, ENode> visitedNodes = new Dictionary<string, ENode>();
-
-        /// <summary>
-        /// The maximal depth of the tree.
-        /// </summary>
-        private int MaxDepth;
+        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
+        /// placed on this level</param>
+        /// <param name="leafNodeFactory">the factory used to create leaf nodes</param>
+        public EvoStreetsNodeLayout(float groundLevel,
+                                      NodeFactory leafNodeFactory, 
+                                      IScale scaler, 
+                                      GraphSettings graphSettings)
+        : base(groundLevel, leafNodeFactory)
+        {
+            name = "EvoStreets";
+            this.graphSettings = graphSettings;
+            this.scaler = scaler;
+        }
 
         /// <summary>
         /// The distance between two neighboring leaf-node representations.
@@ -29,43 +36,105 @@ namespace SEE.Layout
         /// <summary>
         /// The height of the street (y co-ordinate).
         /// </summary>
-        public float StreetHeight = 0.1f;
+        public static float StreetHeight = 0.1f;
 
         /// <summary>
         /// Scaling used for the node metrics.
         /// </summary>
-        private IScale scaler;
+        private readonly IScale scaler;
 
         private const float CM_TO_M = 1.0f;
 
         /// <summary>
+        /// The set of children of each node. This is a subset of the node's children
+        /// in the graph, limited to the children for which a layout is requested.
+        /// </summary>
+        private Dictionary<DataModel.Node, List<DataModel.Node>> children;
+
+        /// <summary>
+        /// The roots of the subtrees of the original graph that are to be laid out.
+        /// A node is considered a root if it has either no parent in the original
+        /// graph or its parent is not contained in the set of nodes to be laid out.
+        /// </summary>
+        private List<DataModel.Node> roots;
+
+        /// <summary>
         /// The settings to be considered for the layout.
         /// </summary>
-        private GraphSettings graphSettings;
+        private readonly GraphSettings graphSettings;
 
-        public ENode GenerateCity(DataModel.Graph graph, IScale scaler, GraphSettings graphSettings)
+        private ENode rootNode;
+
+        public ENode GetRoot()
         {
-            visitedNodes.Clear();
-
-            this.graphSettings = graphSettings;
-            this.scaler = scaler;
-
-            MaxDepth = graph.GetMaxDepth();
-
-            ENode rootNode = DefineRootNode(GenerateHierarchy(graph));
-
-            if (rootNode == null)
-            {
-                Debug.Log("RootNode ist nullptr nach DefineRootNode: OverForest hat keine Kinder...\n");
-                return null;
-            }
-
-            GenerateNode(rootNode);
-            CalculationNodeLocation(rootNode, Vector3.zero);
-
-            Debug.Log($"Statistics: Generated unique Nodes: {visitedNodes.Count}\n");
-
             return rootNode;
+        }
+
+        /// <summary>
+        /// The node layout we compute as a result.
+        /// </summary>
+        private Dictionary<GameObject, NodeTransform> layout_result;
+
+        public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
+        {
+            layout_result = new Dictionary<GameObject, NodeTransform>();
+
+            if (gameNodes.Count == 0)
+            {
+                throw new System.Exception("No nodes to be laid out.");
+            }
+            else if (gameNodes.Count == 1)
+            {
+                GameObject gameNode = gameNodes.GetEnumerator().Current;
+                layout_result[gameNode] = new NodeTransform(Vector3.zero, gameNode.transform.localScale);
+            }
+            else
+            {
+                to_game_node = NodeMapping(gameNodes);
+                CreateTree(to_game_node.Keys, out roots, out children);
+                if (roots.Count == 0)
+                {
+                    throw new System.Exception("Graph has no root node.");
+                }
+                else if (roots.Count > 1)
+                {
+                    throw new System.Exception("Graph has multiple roots.");
+                }
+                rootNode = GenerateHierarchy(roots[0]);
+                maximalDepth = MaxDepth(roots[0], children);
+                GenerateNode(rootNode);
+                CalculationNodeLocation(rootNode, Vector3.zero);
+            }
+            return layout_result;
+        }
+
+        private ENode GenerateHierarchy(DataModel.Node root)
+        {
+            ENode result = new ENode(root)
+            {
+                Depth = 0
+            };
+            foreach (DataModel.Node child in children[root])
+            {
+                ENode kid = GenerateHierarchy(result, child);
+                result.Children.Add(kid);
+            }
+            return result;
+        }
+
+        private ENode GenerateHierarchy(ENode parent, DataModel.Node node)
+        {
+            ENode result = new ENode(node)
+            {
+                Depth = parent.Depth + 1,
+                ParentNode = parent
+            };
+            foreach (DataModel.Node child in children[node])
+            {
+                ENode kid = GenerateHierarchy(result, child);
+                result.Children.Add(kid);
+            }
+            return result;
         }
 
         private void CalculationNodeLocation(ENode node, Vector3 newLoc)
@@ -82,7 +151,7 @@ namespace SEE.Layout
             float nextY;
 
             Vector2 fromPivot = new Vector2(node.Scale.x / 2, node.Scale.y / 2) * CM_TO_M;
-            Vector2 rotatedfromPivot = fromPivot.GetRotated(node.RotationZ);
+            Vector2 rotatedfromPivot = fromPivot.GetRotated(node.Rotation);
             Vector2 toPivot = rotatedfromPivot;
             Vector3 toGoal = new Vector3(toPivot.x, toPivot.y, (node.Scale.z / 2.0f) * CM_TO_M);
 
@@ -97,8 +166,8 @@ namespace SEE.Layout
                 //~~~~// spawnBox(ISMPlane, (InNewLoc + Vector3(0.f, 0.f, -MAX_LEVELS + InParentNode.Depth)) * CM_TO_M + toGoal, InParentNode.RotationZ, Vector3(InParentNode.Scale.X, InParentNode.Scale.Y, 0.2));
 
                 //the street
-                Vector2 StreetfromPivo = new Vector2(node.Scale.x / 2, node.YPivot) * CM_TO_M;
-                Vector2 StreetRotatedfromPivo = StreetfromPivo.GetRotated(node.RotationZ);
+                Vector2 StreetfromPivo = new Vector2(node.Scale.x / 2, node.ZPivot) * CM_TO_M;
+                Vector2 StreetRotatedfromPivo = StreetfromPivo.GetRotated(node.Rotation);
                 float relStreetWidth = RelativeStreetWidth(node);
                 Vector3 StreetToGoal = new Vector3(StreetRotatedfromPivo.x, StreetRotatedfromPivo.y, (StreetHeight / 2.0f) * CM_TO_M);
                 //~~~~// spawnBox(ISMStreet, InNewLoc*CM_TO_M + StreetToGoal, InParentNode.RotationZ, Vector3(InParentNode.Scale.X, relStreetWidth, StreetHeight));
@@ -110,9 +179,9 @@ namespace SEE.Layout
                 {
                     float streetMod = (node.Children[i].Left) ? -relStreetWidth / 2 : +relStreetWidth / 2;
                     Vector2 relChild = new Vector2(node.Children[i].XPivot, 0.0f);
-                    relChild = relChild.GetRotated(node.RotationZ);
-                    Vector2 relMy = new Vector2(0.0f, node.YPivot + streetMod);
-                    relMy = relMy.GetRotated(node.RotationZ);
+                    relChild = relChild.GetRotated(node.Rotation);
+                    Vector2 relMy = new Vector2(0.0f, node.ZPivot + streetMod);
+                    relMy = relMy.GetRotated(node.Rotation);
 
                     nextX = newLoc.x + relChild.x + relMy.x;
                     nextY = newLoc.y + relChild.y + relMy.y;
@@ -123,85 +192,11 @@ namespace SEE.Layout
             }
         }
 
-        /// <summary>
-        /// If overForest has exactly one child, that child is returned. If
-        /// overForest has multiple children, overForest is returned. 
-        /// If overForest has no children, null is returned.
-        /// </summary>
-        /// <param name="overForest">a forest of trees</param>
-        /// <returns>root of the forest or null</returns>
-        private ENode DefineRootNode(ENode overForest)
-        {
-            if (overForest.Children.Count == 0)
-            {
-                return null;
-            }
-            else if (overForest.Children.Count == 1)
-            {
-                return overForest.Children[0];
-            }
-            else
-            {
-                return overForest;
-            }
-        }
-
-        // FIXME: This can be removed. We already have functions elsehwere to generate the hierarchy.
-        private ENode GenerateHierarchy(DataModel.Graph graph) //TODO: Create Hierarchy only once per import
-        {
-            // 1. Find Node with no children of visible type
-            // 2. Find most outer node of given edge type (default: Enclosing)
-            // 3. Find all nodes of visible type starting from Node found in 2.
-
-            // var checkedNodes = new Dictionary<string, Graph.Node>(); TODO: check if this is not the cleaner solution
-
-            var overForest = new ENode { IsOverForest = true, Depth = 0 };
-
-            // 1.
-            foreach (DataModel.Node graphNode in graph.Nodes())
-            {
-                if (visitedNodes.ContainsKey(graphNode.LinkName))
-                    continue; // if not already created as a child node of some other node
-
-                if (graphNode.IsRoot())
-                {
-                    ENode node = GenerateNodeAndChildren(overForest, graphNode);
-                    node.ParentNode = overForest; //TODO: redundant? See GenerateNodeAndChildren
-                    overForest.Children.Add(node);
-
-                    Debug.Log($"Attached NewChildNode: {graphNode.LinkName} to OverForest\n");
-                }
-            }
-            return overForest;
-        }
-
-        private ENode GenerateNodeAndChildren(ENode parentNode, DataModel.Node graphNode)
-        {
-            ENode newNode = new ENode
-            {
-                GraphNode = graphNode,
-                ParentNode = parentNode,
-                Depth = parentNode.Depth + 1
-            };
-            visitedNodes.Add(newNode.GraphNode.LinkName, newNode); // Add Created ENode to List of CheckedNodesMap worked on
-            AddChildren(newNode);
-            return newNode;
-        }
-
-        private void AddChildren(ENode parentNode)
-        {
-            foreach (DataModel.Node child in parentNode.GraphNode.Children())
-            {
-                ENode newNode = GenerateNodeAndChildren(parentNode, child);
-                parentNode.Children.Add(newNode);
-            }
-        }
-
         private void GenerateNode(ENode node)
         {
             if (node == null)
             {
-                Debug.Log("node ist null in EvostreetCityGenerator::GenerateNode\n");
+                Debug.Log("Node ist null in EvostreetCityGenerator::GenerateNode\n");
                 return;
             }
 
@@ -218,9 +213,9 @@ namespace SEE.Layout
                 for (int i = 0; i < node.Children.Count; i++)
                 {
                     newChildNode = (node.Children[i]);
-                    newChildNode.RotationZ =
-                        (leftPivotX <= RightPivotX) ? node.RotationZ - 90.0f : node.RotationZ + 90.0f; // could be a street
-                    newChildNode.RotationZ = (Mathf.FloorToInt(newChildNode.RotationZ) + 360) % 360;
+                    newChildNode.Rotation =
+                        (leftPivotX <= RightPivotX) ? node.Rotation - 90.0f : node.Rotation + 90.0f; // could be a street
+                    newChildNode.Rotation = (Mathf.FloorToInt(newChildNode.Rotation) + 360) % 360;
                     GenerateNode(newChildNode);
                     // Pivot setting
                     if (leftPivotX <= RightPivotX)
@@ -263,9 +258,9 @@ namespace SEE.Layout
 
                     if (newChildNode.GraphNode.IsLeaf())
                     {   // house
-                        newChildNode.RotationZ =
-                            (newChildNode.Left) ? node.RotationZ - 180.0f : node.RotationZ; //is not a street
-                        newChildNode.RotationZ = (Mathf.FloorToInt(newChildNode.RotationZ) + 360) % 360;
+                        newChildNode.Rotation =
+                            (newChildNode.Left) ? node.Rotation - 180.0f : node.Rotation; //is not a street
+                        newChildNode.Rotation = (Mathf.FloorToInt(newChildNode.Rotation) + 360) % 360;
                     }
                 }
                 //for InParentNode is a street calculate its size
@@ -273,7 +268,7 @@ namespace SEE.Layout
                 node.Scale = new Vector3(MaxXOfChildren(node, OffsetBetweenBuildings),
                                         MaxYOfChildNodes(node, OffsetBetweenBuildings), 
                                         node.MaxChildZ);
-                node.YPivot = MaxLeftY(node, OffsetBetweenBuildings);
+                node.ZPivot = MaxLeftY(node, OffsetBetweenBuildings);
             }
         }
 
@@ -382,9 +377,11 @@ namespace SEE.Layout
             return sum + RelativeStreetWidth(node);
         }
 
+        private int maximalDepth;
+
         private float RelativeStreetWidth(ENode node)
         {
-            return StreetWidth * ((MaxDepth + 1) - node.Depth) / (MaxDepth + 1);
+            return StreetWidth * ((maximalDepth + 1) - node.Depth) / (maximalDepth + 1);
         }
     }
 }

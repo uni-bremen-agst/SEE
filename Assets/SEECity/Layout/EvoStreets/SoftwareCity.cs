@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using SEE.DataModel;
 using UnityEngine;
 
 namespace SEE.Layout.EvoStreets
 {
     public class SoftwareCity
     {
-        //TODO make this changeable from inspector
-        private EvostreetCityGenerator cityGenerator = new EvostreetCityGenerator(); 
-
         /// <summary>
         /// The leaf and inner nodes to be laid out.
         /// </summary>
@@ -29,6 +27,7 @@ namespace SEE.Layout.EvoStreets
         /// </summary>
         private Dictionary<GameObject, NodeTransform> layout_result;
 
+
         public Dictionary<GameObject, NodeTransform> GenerateCity(DataModel.Graph graph, IScale scaler, GraphSettings graphSettings)
         {
             layout_result = new Dictionary<GameObject, NodeTransform>();
@@ -38,8 +37,17 @@ namespace SEE.Layout.EvoStreets
             this.graphSettings = graphSettings;
             this.scaler = scaler;
 
-            ENode rootNode = cityGenerator.GenerateCity(graph, scaler, graphSettings);
-            bool rootStreetDimensionless = rootNode.Depth != 0 && !rootNode.IsOverForest;
+            NodeFactory leafNodeFactory = new CubeFactory(); // FIXME
+            float groundLevel = 0.0f; // FIXME
+
+            gameObjects = AllNodes(graph);
+
+            EvoStreetsNodeLayout evoStreetLayout = new EvoStreetsNodeLayout(groundLevel, leafNodeFactory, scaler, graphSettings);
+            Dictionary<GameObject, NodeTransform> layout = evoStreetLayout.Layout(gameObjects);
+            ENode rootNode = evoStreetLayout.GetRoot();
+
+            //ENode rootNode = cityGenerator.GenerateCity(graph, scaler, graphSettings);
+            bool rootStreetDimensionless = rootNode.Depth != 0;
 
             SwapZWithY(rootNode);
 
@@ -54,6 +62,20 @@ namespace SEE.Layout.EvoStreets
             Debug.Log("Duration in milliseconds: " + duration.Milliseconds + "\n");
 
             return layout_result;
+        }
+
+        // FIXME: Can be removed later.
+        private List<GameObject> AllNodes(Graph graph)
+        {
+            List<GameObject> gameObjects = new List<GameObject>();
+
+            foreach (Node node in graph.Nodes())
+            {
+                GameObject gameObject = new GameObject(node.LinkName);
+                NodeRef nodeRef = gameObject.AddComponent<NodeRef>();
+                nodeRef.node = node;
+            }
+            return gameObjects;
         }
 
         /**
@@ -105,7 +127,7 @@ namespace SEE.Layout.EvoStreets
             if (node.IsHouse())
             {
                 var spawnedHouse = SpawnHouse(node, parentGameObject, node.Location, node.Scale,
-                    node.RotationZ);
+                    node.Rotation);
 
                 // TODO: Root Point Calculation for RelationshipGenerator
 
@@ -121,7 +143,7 @@ namespace SEE.Layout.EvoStreets
             if (node.IsStreet())
             {
                 var spawnedStreet = SpawnStreet(node, parentGameObject, node.Location,
-                    new Vector3(node.Scale.x, cityGenerator.StreetHeight, node.Scale.z), node.RotationZ);
+                    new Vector3(node.Scale.x, EvoStreetsNodeLayout.StreetHeight, node.Scale.z), node.Rotation);
 
                 if (spawnedStreet == null)
                 {
