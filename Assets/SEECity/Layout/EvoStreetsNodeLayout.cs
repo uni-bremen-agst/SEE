@@ -48,8 +48,6 @@ namespace SEE.Layout
         /// </summary>
         private readonly IScale scaler;
 
-        private const float CM_TO_M = 1.0f;
-
         /// <summary>
         /// The set of children of each node. This is a subset of the node's children
         /// in the graph, limited to the children for which a layout is requested.
@@ -171,24 +169,24 @@ namespace SEE.Layout
             float nextX;
             float nextY;
 
-            Vector2 fromPivot = new Vector2(node.Scale.x / 2, node.Scale.y / 2) * CM_TO_M;
+            Vector2 fromPivot = new Vector2(node.Scale.x / 2, node.Scale.y / 2);
             Vector2 rotatedfromPivot = fromPivot.GetRotated(node.Rotation);
             Vector2 toPivot = rotatedfromPivot;
-            Vector3 toGoal = new Vector3(toPivot.x, toPivot.y, (node.Scale.z / 2.0f) * CM_TO_M);
+            Vector3 toGoal = new Vector3(toPivot.x, toPivot.y, node.Scale.z / 2.0f);
 
             if (node.IsHouse())
             {
-                node.Location = newLoc * CM_TO_M + toGoal;
+                node.Location = newLoc + toGoal;
             }
             else
             {
                 // street
-                Vector2 StreetfromPivo = new Vector2(node.Scale.x / 2, node.ZPivot) * CM_TO_M;
+                Vector2 StreetfromPivo = new Vector2(node.Scale.x / 2, node.ZPivot);
                 Vector2 StreetRotatedfromPivo = StreetfromPivo.GetRotated(node.Rotation);
                 float relStreetWidth = RelativeStreetWidth(node);
-                Vector3 StreetToGoal = new Vector3(StreetRotatedfromPivo.x, StreetRotatedfromPivo.y, (groundLevel + StreetLevel / 2.0f) * CM_TO_M);
+                Vector3 StreetToGoal = new Vector3(StreetRotatedfromPivo.x, StreetRotatedfromPivo.y, groundLevel + StreetLevel / 2.0f);
 
-                node.Location = newLoc * CM_TO_M + StreetToGoal;
+                node.Location = newLoc + StreetToGoal;
                 node.Scale = new Vector3(node.Scale.x, relStreetWidth, node.Scale.z);
 
                 for (int i = 0; i < node.Children.Count; i++)
