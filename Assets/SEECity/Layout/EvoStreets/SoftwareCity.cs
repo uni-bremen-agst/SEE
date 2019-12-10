@@ -49,8 +49,6 @@ namespace SEE.Layout.EvoStreets
             //ENode rootNode = cityGenerator.GenerateCity(graph, scaler, graphSettings);
             bool rootStreetDimensionless = rootNode.Depth != 0;
 
-            SwapZWithY(rootNode);
-
             GameObject gameObject = new GameObject();
             gameObject.tag = DataModel.Tags.Block;
             gameObject.name = "ROOT";
@@ -76,31 +74,6 @@ namespace SEE.Layout.EvoStreets
                 nodeRef.node = node;
             }
             return gameObjects;
-        }
-
-        /**
-         * This fixes the fact that height in unity is the y component of a vector while in unreal it's the z component.
-         */
-        private void SwapZWithY(ENode node)
-        {
-            // Swap scale
-            var origScaleZ = node.Scale.z;
-            var origScaleX = node.Scale.x;
-            node.Scale.x = node.Scale.y;
-            node.Scale.y = origScaleZ;
-            node.Scale.z = origScaleX;
-
-            // Swap location
-            var origLocationZ = node.Location.z;
-            var origLocationX = node.Location.x;
-            node.Location.x = node.Location.y;
-            node.Location.y = origLocationZ;
-            node.Location.z = origLocationX;
-
-            foreach (var child in node.Children)
-            {
-                SwapZWithY(child);
-            }
         }
 
         private NodeFactory leafNodeFactory = new CubeFactory();
