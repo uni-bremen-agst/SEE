@@ -70,15 +70,8 @@ namespace SEE.Layout
             return rootNode;
         }
 
-        /// <summary>
-        /// The node layout we compute as a result.
-        /// </summary>
-        private Dictionary<GameObject, NodeTransform> layout_result;
-
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
         {
-            layout_result = new Dictionary<GameObject, NodeTransform>();
-
             if (gameNodes.Count == 0)
             {
                 throw new System.Exception("No nodes to be laid out.");
@@ -86,7 +79,9 @@ namespace SEE.Layout
             else if (gameNodes.Count == 1)
             {
                 GameObject gameNode = gameNodes.GetEnumerator().Current;
+                Dictionary<GameObject, NodeTransform> layout_result = new Dictionary<GameObject, NodeTransform>();
                 layout_result[gameNode] = new NodeTransform(Vector3.zero, gameNode.transform.localScale);
+                return layout_result;
             }
             else
             {
@@ -105,8 +100,40 @@ namespace SEE.Layout
                 GenerateNode(rootNode);
                 CalculationNodeLocation(rootNode, Vector3.zero);
                 SwapZWithY(rootNode);
+                Dictionary<GameObject, NodeTransform> layout_result = new Dictionary<GameObject, NodeTransform>();
+                To_Layout(rootNode, ref layout_result);
+                return layout_result;
             }
-            return layout_result;
+        }
+
+        private void To_Layout(ENode node, ref Dictionary<GameObject, NodeTransform> layout_result)
+        {
+            if (node.IsHouse())
+            {
+                Place_House(node, ref layout_result);
+            }
+            else
+            {
+                // Street
+                Place_Street(node, ref layout_result);
+                foreach (var child in node.Children)
+                {
+                    To_Layout(child, ref layout_result);
+                }
+            }
+        }
+
+        private void Place_House(ENode node, ref Dictionary<GameObject, NodeTransform> layout_result)
+        {
+            Vector3 position = node.Location + graphSettings.origin;
+            layout_result[to_game_node[node.GraphNode]] = new NodeTransform(position, node.Scale, node.Rotation);
+        }
+
+        // FIXME: This is almost identical to Place_House.
+        private void Place_Street(ENode node, ref Dictionary<GameObject, NodeTransform> layout_result)
+        {
+            Vector3 position = node.Location + graphSettings.origin;
+            layout_result[to_game_node[node.GraphNode]] = new NodeTransform(position, new Vector3(node.Scale.x, EvoStreetsNodeLayout.StreetHeight, node.Scale.z), node.Rotation);
         }
 
         private ENode GenerateHierarchy(DataModel.Node root)
