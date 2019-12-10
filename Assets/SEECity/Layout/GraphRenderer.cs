@@ -149,9 +149,7 @@ namespace SEE.Layout
         {
             List<Node> nodes = graph.Nodes();
 
-            // FIXME
-            Dictionary<Node, GameObject> nodeMap = settings.NodeLayout != GraphSettings.NodeLayouts.ScoopEvoStreets ?
-                                                   CreateBlocks(nodes) : new Dictionary<Node, GameObject>();
+            Dictionary<Node, GameObject> nodeMap = CreateBlocks(nodes);
             Dictionary<GameObject, NodeTransform> layout;
            
             switch (settings.NodeLayout)
@@ -181,29 +179,20 @@ namespace SEE.Layout
                     layout = new CirclePackingNodeLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.ScoopEvoStreets:
-                    layout = CreateScoopEvoStreets(graph); // FIXME
+                    AddContainers(nodeMap, nodes); // and inner nodes
+                    layout = new EvoStreetsNodeLayout(groundLevel, leafNodeFactory, scaler, settings).Layout(nodeMap.Values);
                     break;
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }
 
-            if (settings.NodeLayout != GraphSettings.NodeLayouts.ScoopEvoStreets) // FIXME
-            {
-                Apply(layout, settings.origin);
-            }
-            // ICollection<GameObject> gameNodes = nodeMap.Values;
+            Apply(layout, settings.origin);
             ICollection<GameObject> gameNodes = layout.Keys;
             AddDecorations(gameNodes);
             EdgeLayout(graph, gameNodes);
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             // Place the plane somewhat under ground level.
             PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
-        }
-
-        private Dictionary<GameObject, NodeTransform> CreateScoopEvoStreets(Graph graph)
-        {
-            EvoStreets.SoftwareCity sc = new EvoStreets.SoftwareCity();
-            return sc.GenerateCity(graph, scaler, settings);
         }
 
         /// <summary>
