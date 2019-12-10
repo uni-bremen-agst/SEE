@@ -154,7 +154,6 @@ namespace SEE
         /// </summary>
         public enum NodeLayouts
         {
-            ScoopEvoStreets,
             EvoStreets,
             Balloon,
             FlatRectanglePacking,
