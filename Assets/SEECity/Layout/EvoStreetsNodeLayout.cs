@@ -14,14 +14,19 @@ namespace SEE.Layout
         /// <param name="leafNodeFactory">the factory used to create leaf nodes</param>
         public EvoStreetsNodeLayout(float groundLevel,
                                       NodeFactory leafNodeFactory, 
-                                      IScale scaler, 
-                                      GraphSettings graphSettings)
+                                      InnerNodeFactory innerNodeFactory,
+                                      IScale scaler)
         : base(groundLevel, leafNodeFactory)
         {
             name = "EvoStreets";
-            this.graphSettings = graphSettings;
             this.scaler = scaler;
+            this.innerNodeFactory = innerNodeFactory;
         }
+
+        /// <summary>
+        /// The node factory that created the game objects for inner nodes of the hierarchy.
+        /// </summary>
+        private readonly InnerNodeFactory innerNodeFactory;
 
         /// <summary>
         /// The distance between two neighboring leaf-node representations.
@@ -57,11 +62,6 @@ namespace SEE.Layout
         /// graph or its parent is not contained in the set of nodes to be laid out.
         /// </summary>
         private List<DataModel.Node> roots;
-
-        /// <summary>
-        /// The settings to be considered for the layout.
-        /// </summary>
-        private readonly GraphSettings graphSettings;
 
         private ENode rootNode;
 
@@ -125,15 +125,15 @@ namespace SEE.Layout
 
         private void Place_House(ENode node, ref Dictionary<GameObject, NodeTransform> layout_result)
         {
-            Vector3 position = node.Location + graphSettings.origin;
-            layout_result[to_game_node[node.GraphNode]] = new NodeTransform(position, node.Scale, node.Rotation);
+            layout_result[to_game_node[node.GraphNode]] = new NodeTransform(node.Location, node.Scale, node.Rotation);
         }
 
-        // FIXME: This is almost identical to Place_House.
         private void Place_Street(ENode node, ref Dictionary<GameObject, NodeTransform> layout_result)
         {
-            Vector3 position = node.Location + graphSettings.origin;
-            layout_result[to_game_node[node.GraphNode]] = new NodeTransform(position, new Vector3(node.Scale.x, EvoStreetsNodeLayout.StreetHeight, node.Scale.z), node.Rotation);
+            // We maintain the original height of a street game object but set its x and z scale
+            GameObject gameNode = to_game_node[node.GraphNode];
+            float height = innerNodeFactory.GetSize(gameNode).y;
+            layout_result[gameNode] = new NodeTransform(node.Location, new Vector3(node.Scale.x, height, node.Scale.z), node.Rotation);
         }
 
         private ENode GenerateHierarchy(DataModel.Node root)
@@ -230,7 +230,7 @@ namespace SEE.Layout
 
             if (node.GraphNode.IsLeaf())
             {
-                CalcScale(node);
+                SetHouseScale(node);
             }
             else
             {
@@ -300,15 +300,14 @@ namespace SEE.Layout
             }
         }
 
-        private void CalcScale(ENode node)
+        private void SetHouseScale(ENode node)
         {
             // Scaled metric values for the dimensions.
             // FIXME: Currently, y and z axes are swapped (verbatim Unreal -> Unity migration) that is why
             // we also need the HeightMetric and DepthMetric metric. We need to revert this swapping
             // as soon as we have adjusted the code here to Unity's co-ordinate system.
-            node.Scale = new Vector3(scaler.GetNormalizedValue(graphSettings.WidthMetric,  node.GraphNode),
-                                     scaler.GetNormalizedValue(graphSettings.DepthMetric,  node.GraphNode),
-                                     scaler.GetNormalizedValue(graphSettings.HeightMetric, node.GraphNode));
+            Vector3 size = leafNodeFactory.GetSize(to_game_node[node.GraphNode]);
+            node.Scale = new Vector3(size.x, size.z, size.y);
         }
 
         private float MaxLeftY(ENode node, float offset)
