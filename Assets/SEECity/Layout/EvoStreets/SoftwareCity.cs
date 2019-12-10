@@ -115,8 +115,11 @@ namespace SEE.Layout.EvoStreets
 
             if (node.IsStreet())
             {
-                var spawnedStreet = SpawnStreet(node, parentGameObject, node.Location,
-                    new Vector3(node.Scale.x, EvoStreetsNodeLayout.StreetHeight, node.Scale.z), node.Rotation);
+                var spawnedStreet = SpawnStreet(node, 
+                                                parentGameObject, 
+                                                node.Location,
+                                                new Vector3(node.Scale.x, EvoStreetsNodeLayout.StreetHeight, node.Scale.z), 
+                                                node.Rotation);
 
                 if (spawnedStreet == null)
                 {
@@ -135,8 +138,10 @@ namespace SEE.Layout.EvoStreets
             } // End isStreet
         }
 
-        private GameObject SpawnHouse(ENode node, GameObject parentGameObject,
-                                      Vector3 nodeLocation, Vector3 nodeScale,
+        private GameObject SpawnHouse(ENode node, 
+                                      GameObject parentGameObject,
+                                      Vector3 nodeLocation, 
+                                      Vector3 nodeScale,
                                       float nodeRotationZ)
         {
             if (node == null)
@@ -171,8 +176,10 @@ namespace SEE.Layout.EvoStreets
 
         private CubeFactory streetFactory = new CubeFactory();
 
-        private GameObject SpawnStreet(ENode node, GameObject parentGameObject,
-                                       Vector3 nodeLocation, Vector3 nodeScale,
+        private GameObject SpawnStreet(ENode node, 
+                                       GameObject parentGameObject,
+                                       Vector3 nodeLocation, 
+                                       Vector3 nodeScale,
                                        float nodeRotationZ)
         {
             if (node == null)
@@ -181,7 +188,6 @@ namespace SEE.Layout.EvoStreets
                 return null;
             }
 
-            // TODO: instantiate some kind of actor/gameobj to display street
             var rotation = Quaternion.Euler(0, nodeRotationZ, 0); // this needs to be assigned to y due to difference between unity and unreal
             var o = streetFactory.NewBlock(0);
             o.transform.position = node.Location + graphSettings.origin;
