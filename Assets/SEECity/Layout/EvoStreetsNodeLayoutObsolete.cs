@@ -528,7 +528,6 @@ namespace SEE.Layout
 
                 layout_result[gameNode] = new NodeTransform(AdjustToCenterLength(position, roadLength, horizontal, onLeftLane), scale);
 
-
                 return boundingBox;
             }
         }
