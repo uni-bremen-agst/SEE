@@ -340,6 +340,9 @@ namespace SEE.Layout
                     // Inner nodes will be drawn later when we add decorations because
                     // they can be drawn as a single circle line or a Donut chart.
                 }
+                // Rotate the game object.
+                Quaternion rotation = Quaternion.Euler(0, transform.rotation, 0);
+                gameNode.transform.rotation = rotation;
             }
         }
 
