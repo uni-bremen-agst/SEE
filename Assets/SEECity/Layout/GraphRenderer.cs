@@ -164,7 +164,7 @@ namespace SEE.Layout
                     break;
                 case GraphSettings.NodeLayouts.EvoStreets:
                     AddContainers(nodeMap, nodes); // and inner nodes
-                    layout = new EvoStreetsNodeLayoutObsolete(groundLevel, leafNodeFactory, innerNodeFactory).Layout(nodeMap.Values);
+                    layout = new EvoStreetsNodeLayout(groundLevel, leafNodeFactory, scaler, settings).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.Treemap:
                     AddContainers(nodeMap, nodes); // and inner nodes
@@ -177,10 +177,6 @@ namespace SEE.Layout
                 case GraphSettings.NodeLayouts.CirclePacking:
                     AddContainers(nodeMap, nodes); // and inner nodes
                     layout = new CirclePackingNodeLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
-                    break;
-                case GraphSettings.NodeLayouts.ScoopEvoStreets:
-                    AddContainers(nodeMap, nodes); // and inner nodes
-                    layout = new EvoStreetsNodeLayout(groundLevel, leafNodeFactory, scaler, settings).Layout(nodeMap.Values);
                     break;
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
