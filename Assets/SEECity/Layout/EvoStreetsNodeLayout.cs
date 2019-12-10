@@ -31,17 +31,17 @@ namespace SEE.Layout
         /// <summary>
         /// The distance between two neighboring leaf-node representations.
         /// </summary>
-        public float OffsetBetweenBuildings = 4.5f;
+        private float OffsetBetweenBuildings = 1.0f;
 
         /// <summary>
         /// The street width that will be adjusted by the "depth" of the street.
         /// </summary>
-        public float StreetWidth = 2.0f;
+        private float StreetWidth = 2.0f;
 
         /// <summary>
-        /// The height of the street (y co-ordinate).
+        /// The level of the street relative to the ground level (y co-ordinate).
         /// </summary>
-        public static float StreetHeight = 0.1f;
+        public static float StreetLevel = 0.1f;
 
         /// <summary>
         /// Scaling used for the node metrics.
@@ -62,13 +62,6 @@ namespace SEE.Layout
         /// graph or its parent is not contained in the set of nodes to be laid out.
         /// </summary>
         private List<DataModel.Node> roots;
-
-        private ENode rootNode;
-
-        public ENode GetRoot()
-        {
-            return rootNode;
-        }
 
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
         {
@@ -95,7 +88,7 @@ namespace SEE.Layout
                 {
                     throw new System.Exception("Graph has multiple roots.");
                 }
-                rootNode = GenerateHierarchy(roots[0]);
+                ENode rootNode = GenerateHierarchy(roots[0]);
                 maximalDepth = MaxDepth(roots[0], children);
                 GenerateNode(rootNode);
                 CalculationNodeLocation(rootNode, Vector3.zero);
@@ -169,7 +162,7 @@ namespace SEE.Layout
         {
             if (node == null)
             {
-                Debug.Log("InParentNode = Nullptr in USCOOPCityGeneratorComponent::CalculationNodeLocation\n");
+                Debug.Log("InParentNode = Nullptr in EvoStreetsNodeLayout::CalculationNodeLocation\n");
                 return;
             }
 
@@ -190,15 +183,10 @@ namespace SEE.Layout
             else
             {
                 // street
-                //surrounding plane
-                //~~~~// spawnBox(ISMPlane, (InNewLoc + Vector3(0.f, 0.f, -MAX_LEVELS + InParentNode.Depth)) * CM_TO_M + toGoal, InParentNode.RotationZ, Vector3(InParentNode.Scale.X, InParentNode.Scale.Y, 0.2));
-
-                //the street
                 Vector2 StreetfromPivo = new Vector2(node.Scale.x / 2, node.ZPivot) * CM_TO_M;
                 Vector2 StreetRotatedfromPivo = StreetfromPivo.GetRotated(node.Rotation);
                 float relStreetWidth = RelativeStreetWidth(node);
-                Vector3 StreetToGoal = new Vector3(StreetRotatedfromPivo.x, StreetRotatedfromPivo.y, (StreetHeight / 2.0f) * CM_TO_M);
-                //~~~~// spawnBox(ISMStreet, InNewLoc*CM_TO_M + StreetToGoal, InParentNode.RotationZ, Vector3(InParentNode.Scale.X, relStreetWidth, StreetHeight));
+                Vector3 StreetToGoal = new Vector3(StreetRotatedfromPivo.x, StreetRotatedfromPivo.y, (groundLevel + StreetLevel / 2.0f) * CM_TO_M);
 
                 node.Location = newLoc * CM_TO_M + StreetToGoal;
                 node.Scale = new Vector3(node.Scale.x, relStreetWidth, node.Scale.z);
@@ -224,7 +212,7 @@ namespace SEE.Layout
         {
             if (node == null)
             {
-                Debug.Log("Node ist null in EvostreetCityGenerator::GenerateNode\n");
+                Debug.Log("Node ist null in EvoStreetsNodeLayout::GenerateNode\n");
                 return;
             }
 
