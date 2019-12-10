@@ -104,6 +104,7 @@ namespace SEE.Layout
                 maximalDepth = MaxDepth(roots[0], children);
                 GenerateNode(rootNode);
                 CalculationNodeLocation(rootNode, Vector3.zero);
+                SwapZWithY(rootNode);
             }
             return layout_result;
         }
@@ -382,6 +383,34 @@ namespace SEE.Layout
         private float RelativeStreetWidth(ENode node)
         {
             return StreetWidth * ((maximalDepth + 1) - node.Depth) / (maximalDepth + 1);
+        }
+
+        /// <summary>
+        /// Swaps z and y co-ordinate for given node and all its descendants.
+        /// This fixes the fact that height in unity is the y component of a 
+        /// vector while in unreal it's the z component.
+        /// </summary>
+        /// <param name="node">node whose z and y are to be swapped</param>
+        private void SwapZWithY(ENode node)
+        {
+            // Swap scale
+            var origScaleZ = node.Scale.z;
+            var origScaleX = node.Scale.x;
+            node.Scale.x = node.Scale.y;
+            node.Scale.y = origScaleZ;
+            node.Scale.z = origScaleX;
+
+            // Swap location
+            var origLocationZ = node.Location.z;
+            var origLocationX = node.Location.x;
+            node.Location.x = node.Location.y;
+            node.Location.y = origLocationZ;
+            node.Location.z = origLocationX;
+
+            foreach (var child in node.Children)
+            {
+                SwapZWithY(child);
+            }
         }
     }
 }
