@@ -34,9 +34,10 @@ namespace SEE.Layout
         }
     }
 
-    public class EvoStreetsNodeLayout : NodeLayout
+    [Obsolete("Use EvoStreetsNodeLayout instead.")]
+    public class EvoStreetsNodeLayoutObsolete : NodeLayout
     {
-        public EvoStreetsNodeLayout(float groundLevel, NodeFactory leafNodeFactory, InnerNodeFactory innerNodeFactory) 
+        public EvoStreetsNodeLayoutObsolete(float groundLevel, NodeFactory leafNodeFactory, InnerNodeFactory innerNodeFactory) 
             : base(groundLevel, leafNodeFactory)
         {
             this.innerNodeFactory = innerNodeFactory;
