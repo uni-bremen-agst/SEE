@@ -149,9 +149,7 @@ namespace SEE.Layout
         {
             List<Node> nodes = graph.Nodes();
 
-            // FIXME
-            Dictionary<Node, GameObject> nodeMap = settings.NodeLayout != GraphSettings.NodeLayouts.ScoopEvoStreets ?
-                                                   CreateBlocks(nodes) : new Dictionary<Node, GameObject>();
+            Dictionary<Node, GameObject> nodeMap = CreateBlocks(nodes);
             Dictionary<GameObject, NodeTransform> layout;
            
             switch (settings.NodeLayout)
@@ -166,7 +164,7 @@ namespace SEE.Layout
                     break;
                 case GraphSettings.NodeLayouts.EvoStreets:
                     AddContainers(nodeMap, nodes); // and inner nodes
-                    layout = new EvoStreetsNodeLayout(groundLevel, leafNodeFactory, innerNodeFactory).Layout(nodeMap.Values);
+                    layout = new EvoStreetsNodeLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.Treemap:
                     AddContainers(nodeMap, nodes); // and inner nodes
@@ -180,30 +178,17 @@ namespace SEE.Layout
                     AddContainers(nodeMap, nodes); // and inner nodes
                     layout = new CirclePackingNodeLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
-                case GraphSettings.NodeLayouts.ScoopEvoStreets:
-                    layout = CreateScoopEvoStreets(graph); // FIXME
-                    break;
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }
 
-            if (settings.NodeLayout != GraphSettings.NodeLayouts.ScoopEvoStreets) // FIXME
-            {
-                Apply(layout, settings.origin);
-            }
-            // ICollection<GameObject> gameNodes = nodeMap.Values;
+            Apply(layout, settings.origin);
             ICollection<GameObject> gameNodes = layout.Keys;
             AddDecorations(gameNodes);
             EdgeLayout(graph, gameNodes);
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             // Place the plane somewhat under ground level.
             PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
-        }
-
-        private Dictionary<GameObject, NodeTransform> CreateScoopEvoStreets(Graph graph)
-        {
-            EvoStreets.SoftwareCity sc = new EvoStreets.SoftwareCity();
-            return sc.GenerateCity(graph, scaler, settings);
         }
 
         /// <summary>
@@ -313,7 +298,6 @@ namespace SEE.Layout
 
                 if (node.IsLeaf())
                 {
-                    Debug.LogFormat("GraphRenderer.Apply setting node {0} with layout {1}\n", gameNode.name, transform);
                     // We need to first scale the game node and only afterwards set its
                     // position because transform.scale refers to the center position.
                     if (settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
@@ -341,6 +325,27 @@ namespace SEE.Layout
                     // Inner nodes will be drawn later when we add decorations because
                     // they can be drawn as a single circle line or a Donut chart.
                 }
+                //Rotate(gameNode, transform.rotation);
+                // Rotate the game object.
+                Rotate(gameNode, transform.rotation);
+            }
+        }
+
+        /// <summary>
+        /// Rotates the given object by the given degree along the y axis (i.e., relative to the ground).
+        /// </summary>
+        /// <param name="gameNode">object to be rotated</param>
+        /// <param name="degree">degree of rotation</param>
+        private void Rotate(GameObject gameNode, float degree)
+        {
+            Node node = gameNode.GetComponent<NodeRef>().node;
+            if (node.IsLeaf())
+            {
+                leafNodeFactory.Rotate(gameNode, degree);
+            }
+            else
+            {
+                innerNodeFactory.Rotate(gameNode, degree);
             }
         }
 

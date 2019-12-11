@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SEE.Layout
 {
@@ -168,6 +169,17 @@ namespace SEE.Layout
             // The center position in Unity is normally its transform.position
             // (as opposed to CScape buildings).
             return block.transform.position;
+        }
+
+        /// <summary>
+        /// Rotates the given object by the given degree along the y axis (i.e., relative to the ground).
+        /// </summary>
+        /// <param name="gameNode">object to be rotated</param>
+        /// <param name="degree">degree of rotation</param>
+        public virtual void Rotate(GameObject block, float degree)
+        {
+            Quaternion rotation = Quaternion.Euler(0, degree, 0);
+            block.transform.rotation = rotation;
         }
     }
 }
