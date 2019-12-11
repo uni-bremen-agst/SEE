@@ -325,9 +325,27 @@ namespace SEE.Layout
                     // Inner nodes will be drawn later when we add decorations because
                     // they can be drawn as a single circle line or a Donut chart.
                 }
+                //Rotate(gameNode, transform.rotation);
                 // Rotate the game object.
-                Quaternion rotation = Quaternion.Euler(0, transform.rotation, 0);
-                gameNode.transform.rotation = rotation;
+                Rotate(gameNode, transform.rotation);
+            }
+        }
+
+        /// <summary>
+        /// Rotates the given object by the given degree along the y axis (i.e., relative to the ground).
+        /// </summary>
+        /// <param name="gameNode">object to be rotated</param>
+        /// <param name="degree">degree of rotation</param>
+        private void Rotate(GameObject gameNode, float degree)
+        {
+            Node node = gameNode.GetComponent<NodeRef>().node;
+            if (node.IsLeaf())
+            {
+                leafNodeFactory.Rotate(gameNode, degree);
+            }
+            else
+            {
+                innerNodeFactory.Rotate(gameNode, degree);
             }
         }
 

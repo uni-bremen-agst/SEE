@@ -17,28 +17,28 @@ namespace SEE.Layout
         : base(groundLevel, leafNodeFactory)
         {
             name = "EvoStreets";
+            OffsetBetweenBuildings *= leafNodeFactory.Unit;
+            StreetWidth *= leafNodeFactory.Unit;
+            StreetHeight *= leafNodeFactory.Unit;
         }
 
         /// <summary>
         /// The distance between two neighboring leaf-node representations.
+        /// The actual value used will be multiplied by leafNodeFactory.Unit.
         /// </summary>
         private readonly float OffsetBetweenBuildings = 1.0f;
 
         /// <summary>
         /// The street width that will be adjusted by the "depth" of the street.
+        /// The actual value used will be multiplied by leafNodeFactory.Unit.
         /// </summary>
         private readonly float StreetWidth = 2.0f;
 
         /// <summary>
         /// The height (y co-ordinate) of game objects (inner tree nodes) represented by streets.
-        /// The actual value used will be multiplied by Unit().
+        /// The actual value used will be multiplied by UnleafNodeFactory.Unit.
         /// </summary>
         private readonly float StreetHeight = 0.05f;
-
-        /// <summary>
-        /// Scaling used for the node metrics.
-        /// </summary>
-        private readonly IScale scaler;
 
         /// <summary>
         /// The set of children of each node. This is a subset of the node's children
@@ -139,7 +139,7 @@ namespace SEE.Layout
         {
             layout_result[to_game_node[node.GraphNode]] 
                 = new NodeTransform(node.Location, 
-                                    new Vector3(node.Scale.x, StreetHeight * leafNodeFactory.Unit, node.Scale.z), node.Rotation);
+                                    new Vector3(node.Scale.x, StreetHeight, node.Scale.z), node.Rotation);
         }
 
         /// <summary>
