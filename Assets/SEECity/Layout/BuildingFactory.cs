@@ -428,5 +428,17 @@ namespace SEE.Layout
             result.y = block.transform.position.y;
             return result;
         }
+
+        /// <summary>
+        /// Rotates the given object by the given degree along the y axis (i.e., relative to the ground).
+        /// </summary>
+        /// <param name="gameNode">object to be rotated</param>
+        /// <param name="degree">degree of rotation</param>
+        public override void Rotate(GameObject block, float degree)
+        {
+            // Unlike normal Unity objects, CScape buildings are rotated relative to the left front corner
+            // at ground level. That is why we need to select the ground center as the anchor of rotation.
+            block.transform.RotateAround(Ground(block), Vector3.up, degree);
+        }
     }
 }
