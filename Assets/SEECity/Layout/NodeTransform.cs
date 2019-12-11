@@ -23,7 +23,10 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// The position in the scene.
+        /// The position in the scene. 
+        /// 
+        /// IMPORTANT NOTE: The y co-ordinate will be interpreted as the ground position of 
+        /// the game object (unlike in Unity where it is the center height).
         /// </summary>
         public Vector3 position;
         /// <summary>

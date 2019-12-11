@@ -13,35 +13,27 @@ namespace SEE.Layout
         /// placed on this level</param>
         /// <param name="leafNodeFactory">the factory used to create leaf nodes</param>
         public EvoStreetsNodeLayout(float groundLevel,
-                                      NodeFactory leafNodeFactory, 
-                                      InnerNodeFactory innerNodeFactory,
-                                      IScale scaler)
+                                    NodeFactory leafNodeFactory)
         : base(groundLevel, leafNodeFactory)
         {
             name = "EvoStreets";
-            this.scaler = scaler;
-            this.innerNodeFactory = innerNodeFactory;
         }
-
-        /// <summary>
-        /// The node factory that created the game objects for inner nodes of the hierarchy.
-        /// </summary>
-        private readonly InnerNodeFactory innerNodeFactory;
 
         /// <summary>
         /// The distance between two neighboring leaf-node representations.
         /// </summary>
-        private float OffsetBetweenBuildings = 1.0f;
+        private readonly float OffsetBetweenBuildings = 1.0f;
 
         /// <summary>
         /// The street width that will be adjusted by the "depth" of the street.
         /// </summary>
-        private float StreetWidth = 2.0f;
+        private readonly float StreetWidth = 2.0f;
 
         /// <summary>
-        /// The level of the street relative to the ground level (y co-ordinate).
+        /// The height (y co-ordinate) of game objects (inner tree nodes) represented by streets.
+        /// The actual value used will be multiplied by Unit().
         /// </summary>
-        public static float StreetLevel = 0.1f;
+        private readonly float StreetHeight = 0.05f;
 
         /// <summary>
         /// Scaling used for the node metrics.
@@ -99,7 +91,6 @@ namespace SEE.Layout
                     maximalDepth = MaxDepth(roots[0], children);
                     SetScalePivotsRotation(rootNode);
                     CalculationNodeLocation(rootNode, Vector3.zero);
-                    SwapZWithY(rootNode);
                     Dictionary<GameObject, NodeTransform> layout_result = new Dictionary<GameObject, NodeTransform>();
                     To_Layout(rootNode, ref layout_result);
                     return layout_result;
@@ -146,14 +137,14 @@ namespace SEE.Layout
         /// <param name="layout_result">layout result</param>
         private void Place_Street(ENode node, ref Dictionary<GameObject, NodeTransform> layout_result)
         {
-            // We maintain the original height of a street game object but set its x and z scale
-            GameObject gameNode = to_game_node[node.GraphNode];
-            float height = innerNodeFactory.GetSize(gameNode).y;
-            layout_result[gameNode] = new NodeTransform(node.Location, new Vector3(node.Scale.x, height, node.Scale.z), node.Rotation);
+            layout_result[to_game_node[node.GraphNode]] 
+                = new NodeTransform(node.Location, 
+                                    new Vector3(node.Scale.x, StreetHeight * leafNodeFactory.Unit, node.Scale.z), node.Rotation);
         }
 
         /// <summary>
-        /// Creates the ENode tree hierarchy starting at given root node.
+        /// Creates the ENode tree hierarchy starting at given root node. The root has
+        /// depth 0.
         /// </summary>
         /// <param name="root">root of the hierarchy</param>
         /// <returns>root ENode</returns>
@@ -201,41 +192,41 @@ namespace SEE.Layout
         private void CalculationNodeLocation(ENode node, Vector3 newLoc)
         {
             float nextX;
-            float nextY;
+            float nextZ;
 
-            Vector2 fromPivot = new Vector2(node.Scale.x / 2, node.Scale.y / 2);
+            // Note: pivots are 2D vectors where the y component actually represents a value on the z axis in 3D
+            Vector2 fromPivot = new Vector2(node.Scale.x / 2, node.Scale.z / 2);
             Vector2 rotatedfromPivot = fromPivot.GetRotated(node.Rotation);
             Vector2 toPivot = rotatedfromPivot;
-            Vector3 toGoal = new Vector3(toPivot.x, toPivot.y, node.Scale.z / 2.0f);
 
             if (node.IsHouse())
             {
+                Vector3 toGoal = new Vector3(toPivot.x, groundLevel, toPivot.y);
                 node.Location = newLoc + toGoal;
             }
             else
             {
                 // street
-                Vector2 StreetfromPivo = new Vector2(node.Scale.x / 2, node.ZPivot);
-                Vector2 StreetRotatedfromPivo = StreetfromPivo.GetRotated(node.Rotation);
+                Vector2 StreetfromPivot = new Vector2(node.Scale.x / 2, node.ZPivot);
+                Vector2 StreetRotatedfromPivot = StreetfromPivot.GetRotated(node.Rotation);
                 float relStreetWidth = RelativeStreetWidth(node);
-                Vector3 StreetToGoal = new Vector3(StreetRotatedfromPivo.x, StreetRotatedfromPivo.y, groundLevel + StreetLevel / 2.0f);
+                Vector3 StreetToGoal = new Vector3(StreetRotatedfromPivot.x, groundLevel, StreetRotatedfromPivot.y);
 
                 node.Location = newLoc + StreetToGoal;
-                node.Scale = new Vector3(node.Scale.x, relStreetWidth, node.Scale.z);
+                node.Scale = new Vector3(node.Scale.x, node.Scale.y, relStreetWidth);
 
-                for (int i = 0; i < node.Children.Count; i++)
-                {
-                    float streetMod = (node.Children[i].Left) ? -relStreetWidth / 2 : +relStreetWidth / 2;
-                    Vector2 relChild = new Vector2(node.Children[i].XPivot, 0.0f);
+                foreach (ENode eNode in node.Children)
+                {           
+                    float streetMod = eNode.Left ? -relStreetWidth / 2 : +relStreetWidth / 2;
+                    Vector2 relChild = new Vector2(eNode.XPivot, 0.0f);
                     relChild = relChild.GetRotated(node.Rotation);
                     Vector2 relMy = new Vector2(0.0f, node.ZPivot + streetMod);
                     relMy = relMy.GetRotated(node.Rotation);
 
                     nextX = newLoc.x + relChild.x + relMy.x;
-                    nextY = newLoc.y + relChild.y + relMy.y;
+                    nextZ = newLoc.z + relChild.y + relMy.y;
 
-                    Vector3 nextLoc = new Vector3(nextX, nextY, 0);
-                    CalculationNodeLocation(node.Children[i], nextLoc);
+                    CalculationNodeLocation(eNode, new Vector3(nextX, groundLevel, nextZ));
                 }
             }
         }
@@ -278,7 +269,7 @@ namespace SEE.Layout
                         else 
                         {   // street
                             newChildNode.XPivot = leftPivotX;
-                            leftPivotX += newChildNode.Scale.y;
+                            leftPivotX += newChildNode.Scale.z;
                             leftPivotX += OffsetBetweenBuildings;
                         }
                     }
@@ -296,7 +287,7 @@ namespace SEE.Layout
                         else
                         {
                             // street
-                            RightPivotX += newChildNode.Scale.y;
+                            RightPivotX += newChildNode.Scale.z;
                             newChildNode.XPivot = RightPivotX;
                             RightPivotX += OffsetBetweenBuildings;
                         }
@@ -312,9 +303,9 @@ namespace SEE.Layout
                 //for InParentNode is a street calculate its size
 
                 node.Scale = new Vector3(MaxWidthRequired(node, OffsetBetweenBuildings),
-                                         DepthRequired(node), 
-                                         node.MaxChildZ);
-                node.ZPivot = MaxLeftY(node);
+                                         node.MaxChildZ,
+                                         DepthRequired(node));
+                node.ZPivot = MaxLeftZ(node);
             }
         }
 
@@ -328,11 +319,8 @@ namespace SEE.Layout
         private void SetHouseScale(ENode node)
         {
             // Scaled metric values for the dimensions.
-            // FIXME: Currently, y and z axes are swapped (verbatim Unreal -> Unity migration) that is why
-            // we also need the HeightMetric and DepthMetric metric. We need to revert this swapping
-            // as soon as we have adjusted the code here to Unity's co-ordinate system.
             Vector3 size = leafNodeFactory.GetSize(to_game_node[node.GraphNode]);
-            node.Scale = new Vector3(size.x, size.z, size.y);
+            node.Scale = new Vector3(size.x, size.y, size.z);
         }
 
         /// <summary>
@@ -341,7 +329,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">node whose maximum is to be determined</param>
         /// <returns>maximum depth of width</returns>
-        private float MaxLeftY(ENode node)
+        private float MaxLeftZ(ENode node)
         {
             float max = 0.0f;
             foreach (ENode child in node.Children)
@@ -351,9 +339,9 @@ namespace SEE.Layout
                 {
                     if (child.IsHouse())
                     {
-                        if (child.Scale.y > max)
+                        if (child.Scale.z > max)
                         {
-                            max = child.Scale.y;
+                            max = child.Scale.z;
                         }
                     }
                     else
@@ -384,9 +372,9 @@ namespace SEE.Layout
                 {
                     if (eNode.IsHouse())
                     {
-                        if (eNode.Scale.y > leftMax)
+                        if (eNode.Scale.z > leftMax)
                         {
-                            leftMax = eNode.Scale.y;
+                            leftMax = eNode.Scale.z;
                         }
                     }
                     else
@@ -401,9 +389,9 @@ namespace SEE.Layout
                 {
                     if (eNode.IsHouse())
                     {
-                        if (eNode.Scale.y > rightMax)
+                        if (eNode.Scale.z > rightMax)
                         {
-                            rightMax = eNode.Scale.y;
+                            rightMax = eNode.Scale.z;
                         }
                     }
                     else
@@ -459,7 +447,7 @@ namespace SEE.Layout
                     }
                     else
                     {
-                        sum += eNode.Scale.y + offset;
+                        sum += eNode.Scale.z + offset;
                     }
                 }
             }
@@ -474,34 +462,6 @@ namespace SEE.Layout
         private float RelativeStreetWidth(ENode node)
         {
             return StreetWidth * ((maximalDepth + 1) - node.Depth) / (maximalDepth + 1);
-        }
-
-        /// <summary>
-        /// Swaps z and y co-ordinate for given node and all its descendants.
-        /// This fixes the fact that height in unity is the y component of a 
-        /// vector while in unreal it's the z component.
-        /// </summary>
-        /// <param name="node">node whose z and y co-ordinates of location and scale are to be swapped</param>
-        private void SwapZWithY(ENode node)
-        {
-            // Swap scale
-            var origScaleZ = node.Scale.z;
-            var origScaleX = node.Scale.x;
-            node.Scale.x = node.Scale.y;
-            node.Scale.y = origScaleZ;
-            node.Scale.z = origScaleX;
-
-            // Swap location
-            var origLocationZ = node.Location.z;
-            var origLocationX = node.Location.x;
-            node.Location.x = node.Location.y;
-            node.Location.y = origLocationZ;
-            node.Location.z = origLocationX;
-
-            foreach (var child in node.Children)
-            {
-                SwapZWithY(child);
-            }
         }
     }
 }

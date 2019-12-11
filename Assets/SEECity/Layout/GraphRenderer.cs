@@ -164,7 +164,7 @@ namespace SEE.Layout
                     break;
                 case GraphSettings.NodeLayouts.EvoStreets:
                     AddContainers(nodeMap, nodes); // and inner nodes
-                    layout = new EvoStreetsNodeLayout(groundLevel, leafNodeFactory, innerNodeFactory, scaler).Layout(nodeMap.Values);
+                    layout = new EvoStreetsNodeLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.Treemap:
                     AddContainers(nodeMap, nodes); // and inner nodes
