@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 
-namespace Assets.Charts
+namespace Assets.SEECity.Charts.Scripts
 {
 	/// <summary>
 	/// Contains methods for controlling the chart UI.
 	/// </summary>
-	public class ChartUIController : MonoBehaviour
+	public class ChartInterfaceController : MonoBehaviour
 	{
 		[SerializeField] private GameObject chartsClosed;
 		[SerializeField] private GameObject chartsOpen;
