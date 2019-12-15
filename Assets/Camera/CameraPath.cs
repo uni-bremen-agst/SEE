@@ -70,7 +70,8 @@ public class CameraPath
                           + delimiter + FloatToString(d.rotation.y)
                           + delimiter + FloatToString(d.rotation.z)
                           + delimiter + FloatToString(d.rotation.w)
-                          + delimiter + d.time;
+                          + delimiter + FloatToString(d.time);
+            outputs.Add(output);
         }
 
         // WriteAllLines creates a file, writes a collection of strings to the file,
