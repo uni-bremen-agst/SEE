@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using UnityEngine;
 
 namespace SEE
@@ -17,9 +16,9 @@ namespace SEE
         private Camera mainCamera;
 
         /// <summary>
-        /// The list of data points on the path captured and to be stored.
+        /// The recorded path.
         /// </summary>
-        private List<string> data = new List<string>();
+        private CameraPath path = new CameraPath();
 
         /// <summary>
         /// Base name of the file where to store the captured data points.
@@ -83,56 +82,10 @@ namespace SEE
         /// </summary>
         public bool Interactive = false;
 
-        /// <summary>
-        /// If true, only the position and the time is recorded. Otherwise rotation is 
-        /// recorded, too.
-        /// </summary>
-        public bool PositionOnly = false;
-
         void Start()
         {
-            //This gets the Main Camera from the Scene
+            // This gets the Main Camera from the Scene
             mainCamera = Camera.main;
-        }
-
-        /// <summary>
-        /// The delimiter to separate data points within the same line.
-        /// </summary>
-        private const string delimiter = ";";
-
-        /// <summary>
-        /// Converts a float value to a string with two digits and a period as a 
-        /// decimal separator.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns>the float as a string in the requested format</returns>
-        private string FloatToString(float value)
-        {
-            return value.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
-        }
-
-        /// <summary>
-        /// Returns the position data. If not only the position is requested,
-        /// the result includes the rotation as a Quaternion.
-        /// </summary>
-        /// <returns>position data to be output</returns>
-        private string Output()
-        {
-            Vector3 position = mainCamera.transform.position;
-            string output = FloatToString(position.x)
-                            + delimiter + FloatToString(position.y)
-                            + delimiter + FloatToString(position.z);
-            if (!PositionOnly)
-            {
-                Quaternion rotation = mainCamera.transform.rotation;
-                output += delimiter + FloatToString(rotation.x)
-                            + delimiter + FloatToString(rotation.y)
-                            + delimiter + FloatToString(rotation.z)
-                            + delimiter + FloatToString(rotation.w);
-            }
-            output += delimiter + (Interactive ? Mathf.RoundToInt(Time.realtimeSinceStartup).ToString() 
-                                               : FloatToString(Time.realtimeSinceStartup));
-            return output;
         }
 
         void Update()
@@ -147,7 +100,9 @@ namespace SEE
             // been completed, the position is saved, too, if recording is not interactive.
             if (Input.GetKeyDown(KeyCode.P) || (! Interactive && accumulatedTime == 0.0f))
             {
-                data.Add(Output());
+                Vector3 position = mainCamera.transform.position;
+                Quaternion rotation = mainCamera.transform.rotation;
+                path.Add(position, rotation, Interactive ? Mathf.RoundToInt(Time.realtimeSinceStartup) : Time.realtimeSinceStartup);
             }
         }
 
@@ -159,7 +114,7 @@ namespace SEE
         /// </summary>
         void OnApplicationQuit()
         {
-            if (data.Count == 0)
+            if (path.Count == 0)
             {
                 Debug.Log("Empty camera path is not stored.\n");
             }
@@ -174,11 +129,9 @@ namespace SEE
         /// </summary>
         public void SaveFile()
         {
-            // WriteAllLines creates a file, writes a collection of strings to the file,
-            // and then closes the file.  You do NOT need to call Flush() or Close().
-            string path = Filename();
-            System.IO.File.WriteAllLines(path, data);
-            Debug.LogFormat("Saved camera path to {0}\n", path);
+            string filename = Filename();
+            path.Save(filename);
+            Debug.LogFormat("Saved camera path to {0}\n", filename);
         }
     }
 }
