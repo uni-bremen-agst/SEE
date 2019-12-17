@@ -133,7 +133,7 @@ namespace SEE.DataModel
             List<Node> result = new List<Node>();
             foreach (Node node in nodes.Values)
             {
-                if (node.Parent == null)
+                if (node.IsRoot())
                 {
                     result.Add(node);
                 }
@@ -240,6 +240,28 @@ namespace SEE.DataModel
             return GetMaxDepth(GetRoots(), -1);
         }
 
+        /// <summary>
+        /// Returns all edges of graph whose source and target is contained in 
+        /// selectedNodes.
+        /// </summary>
+        /// <param name="graph">graph whose edges are to be filtered</param>
+        /// <param name="selectedNodes">source and target nodes of required edges</param>
+        /// <returns>all edges of graph whose source and target is contained in selectedNodes</returns>
+        public IList<Edge> ConnectingEdges(ICollection<Node> selectedNodes)
+        {
+            IList<Edge> result = new List<Edge>();
+            HashSet<Node> nodes = new HashSet<Node>(selectedNodes);
+
+            foreach (Edge edge in this.Edges())
+            {
+                if (nodes.Contains(edge.Source) && nodes.Contains(edge.Target))
+                {
+                    result.Add(edge);
+                }
+            }
+            return result;
+        }
+
         private int GetMaxDepth(List<Node> nodes, int currentDepth)
         {
             int max = currentDepth + 1;
@@ -273,6 +295,18 @@ namespace SEE.DataModel
             }
             result += "}\n";
             return result;
+        }
+
+        /// <summary>
+        /// Sets the level of each node in the graph. The level of a root node is 0.
+        /// For all other nodes, the level is the level of its parent + 1.
+        /// </summary>
+        public void CalculateLevels()
+        {
+            foreach (Node root in GetRoots())
+            {
+                root.SetLevel(0);
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ using SEE;
 using SEE.Layout;
 using System.Collections.Generic;
 using UnityEngine.XR;
+using System.Linq;
 
 namespace SEEEditor
 {
@@ -46,15 +47,9 @@ namespace SEEEditor
         private SEE.GraphSettings editorSettings = new SEE.GraphSettings();
 
         /// <summary>
-        /// The factory for the kinds of node visualizations to be used as requested by the user.
+        /// Returns the path to our Unity project folder.
         /// </summary>
-        private SEE.Layout.ILayout layout;
-
-        /// <summary>
-        /// The factory for the kinds of node visualizations to be used as requested by the user.
-        /// </summary>
-        BlockFactory blockFactory;
-
+        /// <returns>path to our Unity project folder</returns>
         private static string ProjectPath()
         {
             string result = Application.dataPath;
@@ -105,14 +100,14 @@ namespace SEEEditor
                 {
                     // The camera for the monitor game is at top-level.
                     camera.SetActive(!enableVR);
-                    Debug.LogFormat("main camera at top level: {0}\n", !enableVR);
+                    //Debug.LogFormat("main camera at top level: {0}\n", !enableVR);
                 }
                 else if (camera.transform.parent.name == "Leap Rig")
                 {
                     // The camera of the Leap Rig is nested in a game object named accordingly.
                     // We set the Leap Rig itself in which the found camera is directly nested.
                     camera.transform.parent.gameObject.SetActive(enableVR);
-                    Debug.LogFormat("Leap rig camera: {0}\n", enableVR);
+                    //Debug.LogFormat("Leap rig camera: {0}\n", enableVR);
                 }
             }
             EnableCanvas(enableVR);
@@ -156,25 +151,28 @@ namespace SEEEditor
             editorSettings.pathPrefix = EditorGUILayout.TextField("Project path prefix", editorSettings.pathPrefix);
             editorSettings.gxlPath = EditorGUILayout.TextField("GXL file", editorSettings.gxlPath);
             editorSettings.csvPath = EditorGUILayout.TextField("CSV file", editorSettings.csvPath);
+            editorSettings.origin = EditorGUILayout.Vector3Field("Origin", editorSettings.origin);
 
-            GUILayout.Label("Lengths of buildings", EditorStyles.boldLabel);
+            GUILayout.Label("Attributes of leaf nodes", EditorStyles.boldLabel);
             editorSettings.WidthMetric = EditorGUILayout.TextField("Width", editorSettings.WidthMetric);
             editorSettings.HeightMetric = EditorGUILayout.TextField("Height", editorSettings.HeightMetric);
             editorSettings.DepthMetric = EditorGUILayout.TextField("Depth", editorSettings.DepthMetric);
+            editorSettings.ColorMetric = EditorGUILayout.TextField("Color", editorSettings.ColorMetric);
 
             GUILayout.Label("VR settings", EditorStyles.boldLabel);
             VRenabled = EditorGUILayout.Toggle("Enable VR", VRenabled);
 
-            GUILayout.Label("Visual attributes", EditorStyles.boldLabel);
-            editorSettings.Layout = (GraphSettings.Layouts)EditorGUILayout.EnumPopup("Layout", editorSettings.Layout);
-            editorSettings.CScapeBuildings = EditorGUILayout.Toggle("CScape buildings", editorSettings.CScapeBuildings);
+            GUILayout.Label("Visual node attributes", EditorStyles.boldLabel);
+            editorSettings.LeafObjects = (GraphSettings.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", editorSettings.LeafObjects);
+            editorSettings.InnerNodeObjects = (GraphSettings.InnerNodeKinds)EditorGUILayout.EnumPopup("Inner nodes", editorSettings.InnerNodeObjects);
+            editorSettings.NodeLayout = (GraphSettings.NodeLayouts)EditorGUILayout.EnumPopup("Layout", editorSettings.NodeLayout);
+            
             editorSettings.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", editorSettings.ZScoreScale);
-            editorSettings.ShowDonuts = EditorGUILayout.Toggle("Show Donut charts", editorSettings.ShowDonuts);
+            editorSettings.ShowErosions = EditorGUILayout.Toggle("Show erosions", editorSettings.ShowErosions);
 
             GUILayout.Label("Visual edge attributes", EditorStyles.boldLabel);
+            editorSettings.EdgeLayout = (GraphSettings.EdgeLayouts)EditorGUILayout.EnumPopup("Layout", editorSettings.EdgeLayout);
             editorSettings.EdgeWidth = EditorGUILayout.FloatField("Edge width", editorSettings.EdgeWidth);
-            editorSettings.ShowEdges = EditorGUILayout.Toggle("Show edges", editorSettings.ShowEdges);
-            editorSettings.ShowErosions = EditorGUILayout.Toggle("Show erosions", editorSettings.ShowErosions);
             editorSettings.EdgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", editorSettings.EdgesAboveBlocks);
             
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
@@ -182,6 +180,7 @@ namespace SEEEditor
 
             //groupEnabled = EditorGUILayout.BeginToggleGroup("Optional Settings", groupEnabled);
             //myBool = EditorGUILayout.Toggle("Toggle", myBool);
+            //myFloat = EditorGUILayout.Slider("Slider", myFloat, -3, 3);
             //myFloat = EditorGUILayout.Slider("Slider", myFloat, -3, 3);
             //EditorGUILayout.EndToggleGroup();
 
@@ -192,86 +191,32 @@ namespace SEEEditor
 
             switch (selectedAction)
             {
-                case 0: // Load City
-                    // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
+                case 0: // Load City  
                     EnableVR(VRenabled);
-                    if (editorSettings.CScapeBuildings)
-                    {
-                        blockFactory = new BuildingFactory();
-                    }
-                    else
-                    {
-                        blockFactory = new CubeFactory();
-                    }
-                    AdjustCameraSpeed(blockFactory.Unit());
+  
                     graph = SceneGraphs.Add(editorSettings);
-                    int numberOfErrors = MetricImporter.Load(graph, editorSettings.CSVPath());
-                    if (numberOfErrors > 0)
-                    {
-                        Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", editorSettings.CSVPath(), numberOfErrors);
-                    }
-
                     if (graph != null)
                     {
-                        //CubeFactory.Reset();            
-                        IScale scaler;
+                        int numberOfErrors = MetricImporter.Load(graph, editorSettings.CSVPath());
+                        if (numberOfErrors > 0)
                         {
-                            List<string> nodeMetrics = new List<string>() { editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric };
-                            nodeMetrics.AddRange(editorSettings.IssueMap().Keys);
-                            if (editorSettings.ZScoreScale)
-                            {
-                                scaler = new ZScoreScale(graph, editorSettings.MinimalBlockLength, editorSettings.MaximalBlockLength, nodeMetrics);
-                            }
-                            else
-                            {
-                                scaler = new LinearScale(graph, editorSettings.MinimalBlockLength, editorSettings.MaximalBlockLength, nodeMetrics);
-                            }
+                            Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", editorSettings.CSVPath(), numberOfErrors);
                         }
-
-                        switch (editorSettings.Layout)
                         {
-                            case GraphSettings.Layouts.Balloon:
-                                {
-                                    layout = new SEE.Layout.BalloonLayout(editorSettings.ShowEdges,
-                                                                  editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric,
-                                                                  editorSettings.IssueMap(),
-                                                                  editorSettings.InnerNodeMetrics,
-                                                                  blockFactory,
-                                                                  scaler,
-                                                                  editorSettings.EdgeWidth,
-                                                                  editorSettings.ShowErosions,
-                                                                  editorSettings.EdgesAboveBlocks,
-                                                                  editorSettings.ShowDonuts);
-                                    break;
-                                }
-                            case GraphSettings.Layouts.Manhattan:
-                                {
-                                    layout = new SEE.Layout.ManhattenLayout(editorSettings.ShowEdges,
-                                                                    editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric,
-                                                                    editorSettings.IssueMap(),
-                                                                    blockFactory,
-                                                                    scaler,
-                                                                    editorSettings.EdgeWidth,
-                                                                    editorSettings.ShowErosions,
-                                                                    editorSettings.EdgesAboveBlocks);
-                                    break;
-                                }
-                            case GraphSettings.Layouts.CirclePacking:
-                                {
-                                    layout = new SEE.Layout.CirclePackingLayout(editorSettings.ShowEdges,
-                                                                  editorSettings.WidthMetric, editorSettings.HeightMetric, editorSettings.DepthMetric,
-                                                                  editorSettings.IssueMap(),
-                                                                  editorSettings.InnerNodeMetrics,
-                                                                  blockFactory,
-                                                                  scaler,
-                                                                  editorSettings.EdgeWidth,
-                                                                  editorSettings.ShowErosions,
-                                                                  editorSettings.EdgesAboveBlocks,
-                                                                  editorSettings.ShowDonuts);
-                                    break;
-                                }
+                            MetricAggregator.AggregateSum(graph, editorSettings.AllLeafIssues().ToArray<string>());
+                            // Note: We do not want to compute the derived metric editorSettings.InnerDonutMetric
+                            // when we have a single root node in the graph. This metric will be used to define the color
+                            // of inner circles of Donut charts. Because the color is a linear interpolation of the whole
+                            // metric value range, the inner circle would always have the maximal value (it is the total
+                            // sum over all) and hence the maximal color gradient. The color of the other nodes would be
+                            // hardly distinguishable. 
+                            // FIXME: We need a better solution. This is a kind of hack.
+                            MetricAggregator.DeriveSum(graph, editorSettings.AllInnerNodeIssues().ToArray<string>(), editorSettings.InnerDonutMetric, true);
                         }
-                        layout.Draw(graph);
+                        GraphRenderer renderer = new GraphRenderer(editorSettings);
+                        renderer.Draw(graph);
+                        // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
+                        AdjustCameraSpeed(renderer.Unit());
                     }
                     else
                     {
@@ -286,7 +231,6 @@ namespace SEEEditor
                 default:
                     break;
             }
-            //this.Repaint();
         }
 
         /// <summary>
@@ -317,11 +261,6 @@ namespace SEEEditor
         {
             SceneGraphs.DeleteAll();
             graph = null;
-            blockFactory = null;
-            if (layout != null)
-            {
-                layout = null;
-            }
             // delete all left-overs if there are any
             foreach (string tag in SEE.DataModel.Tags.All)
             {

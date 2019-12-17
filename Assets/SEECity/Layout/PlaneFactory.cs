@@ -50,26 +50,25 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Returns a newly created plane with the two corners (x0, z0) and (x1, z1).
+        /// Returns a newly created plane with the two corners leftFrontCorner = (x0, z0) 
+        /// and rightBackCorner = (x1, z1).
         /// 
         /// with given color, width, depth, and height.
         /// Draws a plane in rectangle with  at ground level.
         /// 
         /// Preconditions: x1 > x1 and z1 > z0 (Exception is thrown otherwise)
         /// </summary>
-        /// <param name="x0">x co-ordinate of the left front corner</param>
-        /// <param name="z0">z co-ordinate of the left front corner</param>
-        /// <param name="x1">x co-ordinate of the right back corner</param>
-        /// <param name="z1">z co-ordinate of the right back corner</param>
+        /// <param name="leftFrontCorner">2D co-ordinate of the left front corner</param>
+        /// <param name="rightBackCorner">2D co-ordinate of the right back corner</param>
         /// <param name="y">y co-ordinate fo the plane</param>
         /// <param name="color">color of the plane</param>
         /// <param name="height">height (thickness) of the plane</param>
-        public static GameObject NewPlane(float x0, float z0, float x1, float z1, float y, Color color, float height = 0.1f)
+        public static GameObject NewPlane(Vector2 leftFrontCorner, Vector2 rightBackCorner, float y, Color color, float height = 0.1f)
         {
-            float width = Distance(x0, x1);
-            float depth = Distance(z0, z1);
+            float width = Distance(leftFrontCorner.x, rightBackCorner.x);
+            float depth = Distance(leftFrontCorner.y, rightBackCorner.y);
 
-            Vector3 centerPosition = new Vector3(x0 + width / 2.0f, y, z0 + depth / 2.0f);
+            Vector3 centerPosition = new Vector3(leftFrontCorner.x + width / 2.0f, y, leftFrontCorner.y + depth / 2.0f);
             return NewPlane(centerPosition, color, width, depth, height);
         }
 
