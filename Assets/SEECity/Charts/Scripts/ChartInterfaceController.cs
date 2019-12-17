@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE;
+using UnityEngine;
 
 namespace Assets.SEECity.Charts.Scripts
 {
@@ -7,11 +8,6 @@ namespace Assets.SEECity.Charts.Scripts
 	/// </summary>
 	public class ChartInterfaceController : MonoBehaviour
 	{
-		/// <summary>
-		/// UI when charts are closed.
-		/// </summary>
-		[SerializeField] private GameObject _chartsClosed;
-
 		/// <summary>
 		/// UI when charts are open.
 		/// </summary>
@@ -23,12 +19,26 @@ namespace Assets.SEECity.Charts.Scripts
 		[SerializeField] private GameObject _chartCreator;
 
 		/// <summary>
+		/// The script controlling the camera.
+		/// </summary>
+		[SerializeField] private FlyCamera _flyCamera;
+
+		/// <summary>
+		/// Checks if keys for chart interaction have been pressed.
+		/// </summary>
+		private void Update()
+		{
+			if (Input.GetButtonDown("ToggleCharts")) ToggleCharts(!_chartsOpen.activeInHierarchy);
+		}
+
+		/// <summary>
 		/// Toggles the chart view.
 		/// </summary>
 		public void ToggleCharts(bool open)
 		{
-			_chartsClosed.SetActive(!open);
 			_chartsOpen.SetActive(open);
+			_flyCamera.SetLastMouse();
+			_flyCamera.enabled = !open;
 		}
 
 		/// <summary>

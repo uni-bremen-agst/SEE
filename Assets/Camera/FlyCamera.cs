@@ -435,6 +435,11 @@ namespace SEE
             return p_Velocity;
         }
 
+        public void SetLastMouse()
+        {
+	        lastMouse = Input.mousePosition;
+        }
+
         /*
         void OnScene(SceneView sceneview)
         {
