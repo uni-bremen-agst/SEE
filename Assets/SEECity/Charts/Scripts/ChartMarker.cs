@@ -10,7 +10,7 @@ namespace Assets.SEECity.Charts.Scripts
 	public class ChartMarker : MonoBehaviour, IPointerDownHandler
 	{
 		/// <summary>
-		/// The object in the code city that is connected with this button.
+		/// The <see cref="GameObject" /> in the code city that is connected with this button.
 		/// </summary>
 		private GameObject _linkedObject;
 
@@ -20,7 +20,7 @@ namespace Assets.SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// The active camera in the scene.
+		/// The active <see cref="Camera" /> in the scene.
 		/// </summary>
 		private Camera _activeCamera;
 
@@ -29,24 +29,29 @@ namespace Assets.SEECity.Charts.Scripts
 		private Coroutine _runningCamera;
 
 		[Header("Camera Controls"), SerializeField]
-		private readonly float cameraDistance = 50f;
+		private float cameraDistance = 50f;
 
 		[SerializeField] private bool moveWithRotation = true;
 		[SerializeField] private float cameraFlightTime = 0.5f;
 
 		[Header("User Inputs"), SerializeField, Range(0.1f, 1f)]
-		private readonly float clickDelay = 0.5f;
+		private float clickDelay = 0.5f;
 
 		/// <summary>
-		/// The material making the object look highlighted.
+		/// The <see cref="Material" /> making the object look highlighted.
 		/// </summary>
 		[Header("Highlight Properties"), SerializeField]
 		private Material _highlightMaterial;
 
 		/// <summary>
-		/// The thickness of the highlight outline.
+		/// The thickness of the highlight outline of <see cref="_highlightMaterial"/>.
 		/// </summary>
 		[SerializeField] private float _highlightOutline = 0.001f;
+
+		/// <summary>
+		/// The original value of <see cref="_highlightOutline"/>
+		/// </summary>
+		private float _highlightOutlineOld;
 
 		/// <summary>
 		/// Copy of the linked object with different material to make it look highlighted.
@@ -54,18 +59,26 @@ namespace Assets.SEECity.Charts.Scripts
 		private GameObject _highlightCopy;
 
 		/// <summary>
-		/// 
+		/// Indicates if any <see cref="ChartMarker" /> is currently animating the highlights in the scene.
 		/// </summary>
 		private static bool _animating;
 
 		/// <summary>
-		/// 
+		/// Saves the original values of <see cref="_highlightMaterial" />
+		/// </summary>
+		private void Start()
+		{
+			_highlightOutlineOld = _highlightMaterial.GetFloat("g_flOutlineWidth");
+		}
+
+		/// <summary>
+		/// Animates the highlights in the scene if no other <see cref="ChartMarker" /> is currently animating
+		/// them.
 		/// </summary>
 		private void Update()
 		{
 			if (!_animating)
 			{
-				Debug.Log("Test");
 				_animating = true;
 				StartCoroutine(HighlightAnimation());
 			}
@@ -81,7 +94,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Checks for a double or a single click when the mouse is clicked.
 		/// </summary>
-		/// <param name="eventData"></param>
+		/// <param name="eventData">Event payload associated with pointer (mouse / touch) events.</param>
 		public void OnPointerDown(PointerEventData eventData)
 		{
 			if (_runningClick)
@@ -100,24 +113,31 @@ namespace Assets.SEECity.Charts.Scripts
 			_waiting = true;
 			yield return new WaitForSeconds(clickDelay);
 			if (_waiting)
+			{
 				HighlightLinkedObject();
+			}
 			else
+			{
 				ShowLinkedObject();
+				HighlightLinkedObject(); //TODO: Replace with long
+			}
+
 			_waiting = false;
 			_runningClick = false;
 		}
 
 		/// <summary>
-		/// Highlights the object linked to this one.
+		/// Highlights the <see cref="_linkedObject" />.
 		/// </summary>
 		public void HighlightLinkedObject()
 		{
 			_highlightCopy = Instantiate(_linkedObject, _linkedObject.transform);
 			_highlightCopy.GetComponent<Renderer>().material = _highlightMaterial;
 		}
+		//TODO: Create separate methods for short and for continuous highlights.
 
 		/// <summary>
-		/// Moves the camera to view the linked object.
+		/// Moves the camera to view the <see cref="_linkedObject" />.
 		/// </summary>
 		private void ShowLinkedObject()
 		{
@@ -153,8 +173,8 @@ namespace Assets.SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Moves the camera smoothly from one position to another and rotates it to look towards a specified
-		/// position.
+		/// Moves the <see cref="Camera" /> smoothly from one position to another and rotates it to look
+		/// towards a specified position.
 		/// </summary>
 		/// <param name="newPos">The target position.</param>
 		/// <param name="lookAt">The position to look at.</param>
@@ -180,7 +200,7 @@ namespace Assets.SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Moves the camera smoothly from one position to another.
+		/// Moves the camera smoothly from one position to another without rotation.
 		/// </summary>
 		/// <param name="newPos">The target position.</param>
 		/// <returns></returns>
@@ -195,6 +215,15 @@ namespace Assets.SEECity.Charts.Scripts
 			}
 
 			_activeCamera.transform.position = newPos;
+		}
+
+		/// <summary>
+		/// Resets the <see cref="_highlightMaterial" />
+		/// </summary>
+		private void OnDestroy()
+		{
+			if (_highlightMaterial.GetFloat("g_flOutlineWidth") != _highlightOutlineOld)
+				_highlightMaterial.SetFloat("g_flOutlineWidth", _highlightOutlineOld);
 		}
 	}
 }

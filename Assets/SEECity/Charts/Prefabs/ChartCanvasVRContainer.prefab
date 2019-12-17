@@ -522,6 +522,11 @@ PrefabInstance:
       propertyPath: parent
       value: 
       objectReference: {fileID: 2946852908261956161}
+    - target: {fileID: 4785276354945708475, guid: 7845d136e1a6173458ce440b23366580,
+        type: 3}
+      propertyPath: _parent
+      value: 
+      objectReference: {fileID: 2946852908261956161}
     - target: {fileID: 4785276354975924673, guid: 7845d136e1a6173458ce440b23366580,
         type: 3}
       propertyPath: m_IsActive

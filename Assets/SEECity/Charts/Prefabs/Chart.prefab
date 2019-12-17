@@ -1079,13 +1079,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffdce63f2160cee4f9e3f92a286c0ef4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xAxisDropdown: {fileID: 2968349814188293729}
-  yAxisDropdown: {fileID: 434839543762435658}
-  markerPrefab: {fileID: 7900548257253700385, guid: 1b7447dbbbeee5b459fcbc17d2feae1c,
+  _xAxisDropdown: {fileID: 2097291809304348039}
+  _yAxisDropdown: {fileID: 8374560118427697955}
+  _markerPrefab: {fileID: 7900548257253700385, guid: 1b7447dbbbeee5b459fcbc17d2feae1c,
     type: 3}
-  entries: {fileID: 4785276354356836142}
-  dataPanel: {fileID: 4785276354708113209}
-  parent: {fileID: 4785276354945708473}
+  _entries: {fileID: 4785276354356836142}
+  _dataPanel: {fileID: 4785276354708113209}
+  _parent: {fileID: 4785276354945708473}
 --- !u!1 &4785276354975924673
 GameObject:
   m_ObjectHideFlags: 0
@@ -1424,6 +1424,7 @@ GameObject:
   - component: {fileID: 5851447376116918441}
   - component: {fileID: 8939810708710379977}
   - component: {fileID: 434839543762435658}
+  - component: {fileID: 8374560118427697955}
   m_Layer: 5
   m_Name: YAxisDropdown
   m_TagString: Untagged
@@ -1450,8 +1451,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -275, y: 0}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: -300, y: 0}
+  m_SizeDelta: {x: 220, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5851447376116918441
 CanvasRenderer:
@@ -1545,7 +1546,31 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8374560118427697955}
+        m_MethodName: ChangeValue
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &8374560118427697955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4934274375767402394}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58a8e41cbd98a744287e5c9fc3d6379a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _chartContent: {fileID: 4785276354945708475}
 --- !u!1 &4978104512134982168
 GameObject:
   m_ObjectHideFlags: 0
@@ -2371,6 +2396,7 @@ GameObject:
   - component: {fileID: 5785562636238227506}
   - component: {fileID: 6124298205718682434}
   - component: {fileID: 2968349814188293729}
+  - component: {fileID: 2097291809304348039}
   m_Layer: 5
   m_Name: XAxisDropdown
   m_TagString: Untagged
@@ -2397,8 +2423,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -275}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: 0, y: -300}
+  m_SizeDelta: {x: 220, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5785562636238227506
 CanvasRenderer:
@@ -2492,7 +2518,31 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2097291809304348039}
+        m_MethodName: ChangeValue
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &2097291809304348039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7680662938147339375}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58a8e41cbd98a744287e5c9fc3d6379a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _chartContent: {fileID: 4785276354945708475}
 --- !u!1 &7947034562188005046
 GameObject:
   m_ObjectHideFlags: 0
