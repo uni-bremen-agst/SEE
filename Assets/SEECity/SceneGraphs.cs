@@ -20,21 +20,21 @@ namespace SEE
             {
                 Debug.LogError("No graph path given.\n");
             }
-            else if (!graphs.ContainsKey(settings.GXLPath()))
+            else 
             {
                 graph = Load(settings);
                 if (graph == null)
                 {
-                    Debug.LogError("graph " + settings.GXLPath() + " could not be loaded.");
+                    Debug.LogErrorFormat("graph {0} could not be loaded.\n", settings.GXLPath());
                 }
                 else
                 {
-                    graphs.Add(settings.GXLPath(), graph);
+                    if (graphs.ContainsKey(settings.GXLPath()))
+                    {
+                        Debug.LogWarningFormat("graph {0} is already loaded and will be overridden.\n", settings.GXLPath());
+                    }
+                    graphs[settings.GXLPath()] = graph;
                 }
-            }
-            else
-            {
-                Debug.LogError("graph " + settings.GXLPath() + " is already loaded.");
             }
             return graph;
         }
@@ -53,6 +53,7 @@ namespace SEE
                 SEE.Performance p = SEE.Performance.Begin("loading graph data from " + settings.GXLPath());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
+                graph.CalculateLevels();
                 p.End();
                 Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
                 Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
