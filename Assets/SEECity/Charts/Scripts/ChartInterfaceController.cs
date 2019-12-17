@@ -3,29 +3,40 @@
 namespace Assets.SEECity.Charts.Scripts
 {
 	/// <summary>
-	/// Contains methods for controlling the chart UI.
+	/// Sets the active states of different layers of the chart UI.
 	/// </summary>
 	public class ChartInterfaceController : MonoBehaviour
 	{
-		[SerializeField] private GameObject chartsClosed;
-		[SerializeField] private GameObject chartsOpen;
-		[SerializeField] private GameObject chartCreator;
+		/// <summary>
+		/// UI when charts are closed.
+		/// </summary>
+		[SerializeField] private GameObject _chartsClosed;
+
+		/// <summary>
+		/// UI when charts are open.
+		/// </summary>
+		[SerializeField] private GameObject _chartsOpen;
+
+		/// <summary>
+		/// UI for creating new charts.
+		/// </summary>
+		[SerializeField] private GameObject _chartCreator;
 
 		/// <summary>
 		/// Toggles the chart view.
 		/// </summary>
 		public void ToggleCharts(bool open)
 		{
-			chartsClosed.SetActive(!open);
-			chartsOpen.SetActive(open);
+			_chartsClosed.SetActive(!open);
+			_chartsOpen.SetActive(open);
 		}
 
 		/// <summary>
-		/// Opens the window for creating new charts.
+		/// Opens the dialogue for creating new charts.
 		/// </summary>
 		public void OpenChartCreator()
 		{
-			chartCreator.SetActive(true);
+			_chartCreator.SetActive(true);
 		}
 	}
 }

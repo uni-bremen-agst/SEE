@@ -1,52 +1,74 @@
-﻿using TMPro;
+﻿using System.Collections;
+using System.Collections.Generic;
+using SEE.Layout;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Assets.SEECity.Charts.Scripts
 {
 	/// <summary>
-	/// Fills Charts with data.
+	/// Fills Charts with data and manages that data.
 	/// </summary>
 	public class ChartContent : MonoBehaviour
 	{
 		private GameObject[] _dataObjects;
 
-		[SerializeField] private TMP_Dropdown _xAxisDropdown;
-		[SerializeField] private TMP_Dropdown _yAxisDropdown;
+		/// <summary>
+		/// The <see cref="AxisContentDropdown" /> containing Values for the X-Axis.
+		/// </summary>
+		[SerializeField] private AxisContentDropdown _xAxisDropdown;
 
 		/// <summary>
-		/// A marker to display content in charts.
+		/// The <see cref="AxisContentDropdown" /> containing Values for the Y-Axis.
 		/// </summary>
-		[SerializeField] private GameObject markerPrefab;
+		[SerializeField] private AxisContentDropdown _yAxisDropdown;
+
+		/// <summary>
+		/// A <see cref="ChartMarker" /> to display content in charts.
+		/// </summary>
+		[SerializeField] private GameObject _markerPrefab;
+
+		/// <summary>
+		/// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
+		/// </summary>
+		private List<GameObject> _activeMarkers = new List<GameObject>();
 
 		/// <summary>
 		/// Game Object to group all content entries of a chart.
 		/// </summary>
-		[SerializeField] private GameObject entries;
+		[SerializeField] private GameObject _entries;
 
 		/// <summary>
-		/// The panel on which the markers are instantiated.
+		/// The panel on which the <see cref="ChartMarker" />s are instantiated.
 		/// </summary>
-		[SerializeField] private RectTransform dataPanel;
+		[SerializeField] private RectTransform _dataPanel;
 
 		/// <summary>
 		/// A parent of this object. Used in VR to destroy the whole construct of a moveable chart.
 		/// </summary>
-		[SerializeField] private GameObject parent;
+		[SerializeField] private GameObject _parent;
 
 		/// <summary>
-		/// Calls methods that should be called when the user presses a button in the final version - for
-		/// testing.
+		/// Calls methods to initialize a chart.
 		/// </summary>
 		private void Start()
 		{
-			FindDataObjects();
+			StartCoroutine(FirstInitialization());
+		}
+
+		/// <summary>
+		/// Calls <see cref="DrawData" /> during the first initialization after everything else has been
+		/// initialized.
+		/// </summary>
+		/// <returns>A <see cref="WaitForEndOfFrame" />.</returns>
+		private IEnumerator FirstInitialization()
+		{
+			yield return new WaitForEndOfFrame();
 			DrawData();
 		}
 
 		/// <summary>
-		/// Fills a List with all objects that will be in the chart. Right now that's all buildings.
-		/// TODO: Show different types of objects in chart?
+		/// Fills a List with all objects that will be in the chart.
+		/// TODO: Show different types of objects in chart (edges, nodes)?
 		/// </summary>
 		private void FindDataObjects()
 		{
@@ -54,67 +76,54 @@ namespace Assets.SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Fills the chart with data.
+		/// Fills the chart with data depending on the values of <see cref="_xAxisDropdown" /> and
+		/// <see cref="_yAxisDropdown" />.
 		/// </summary>
-		private void DrawData()
+		public void DrawData()
 		{
-			float minX = _dataObjects[0].transform.localScale.x;
-			float maxX = _dataObjects[0].transform.localScale.x;
-			float minY = _dataObjects[0].transform.localScale.y;
-			float maxY = _dataObjects[0].transform.localScale.y;
+			foreach (GameObject marker in _activeMarkers) Destroy(marker);
+			_activeMarkers.Clear();
+			FindDataObjects();
+			_dataObjects[0].GetComponent<NodeRef>().node
+				.TryGetNumeric(_xAxisDropdown.Value, out float minX);
+			float maxX = minX;
+			_dataObjects[0].GetComponent<NodeRef>().node
+				.TryGetNumeric(_yAxisDropdown.Value, out float minY);
+			float maxY = minY;
 			foreach (GameObject data in _dataObjects)
 			{
-				float tempX = data.transform.localScale.x;
+				data.GetComponent<NodeRef>().node
+					.TryGetNumeric(_xAxisDropdown.Value, out float tempX);
 				if (tempX < minX) minX = tempX;
 				if (tempX > maxX) maxX = tempX;
-				float tempY = data.transform.localScale.y;
+				data.GetComponent<NodeRef>().node
+					.TryGetNumeric(_yAxisDropdown.Value, out float tempY);
 				if (tempY > maxY) maxY = tempY;
 				if (tempY < minY) minY = tempY;
 			}
 
-			float width = dataPanel.rect.width / (maxX - minX);
-			float height = dataPanel.rect.height / (maxY - minY);
+			float width = _dataPanel.rect.width / (maxX - minX);
+			float height = _dataPanel.rect.height / (maxY - minY);
 			foreach (GameObject data in _dataObjects)
 			{
-				GameObject marker = Instantiate(markerPrefab, entries.transform);
+				GameObject marker = Instantiate(_markerPrefab, _entries.transform);
 				marker.GetComponent<ChartMarker>().LinkedObject = data;
+				data.GetComponent<NodeRef>().node
+					.TryGetNumeric(_xAxisDropdown.Value, out float valueX);
+				data.GetComponent<NodeRef>().node
+					.TryGetNumeric(_yAxisDropdown.Value, out float valueY);
 				marker.GetComponent<RectTransform>().anchoredPosition = new Vector2(
-					(data.transform.localScale.x - minX) * width,
-					(data.transform.localScale.y - minY) * height);
+					(valueX - minX) * width, (valueY - minY) * height);
+				_activeMarkers.Add(marker);
 			}
 		}
 
 		/// <summary>
-		/// Fills the chart with data.
-		/// </summary>
-		private void Fill()
-		{
-			Vector3[] vectors = new Vector3[_dataObjects.Length];
-			float minX = 0;
-			float maxX = 0;
-			float minY = 0;
-			float maxY = 0;
-
-			//Create entries
-			float width = dataPanel.rect.width / (maxX - minX);
-			float height = dataPanel.rect.height / (maxY - minY);
-
-			for (int i = 0; i < vectors.Length; i++)
-			{
-				GameObject marker = Instantiate(markerPrefab, entries.transform);
-				marker.GetComponent<ChartMarker>().LinkedObject = _dataObjects[i];
-				Vector3 vector = vectors[i];
-				marker.GetComponent<RectTransform>().anchoredPosition =
-					new Vector2((vector.x - minX) * width, (vector.y - minY) * height);
-			}
-		}
-
-		/// <summary>
-		/// Destroys the chart.
+		/// Destroys the chart including its container if VR is activated.
 		/// </summary>
 		public void Destroy()
 		{
-			Destroy(parent);
+			Destroy(_parent);
 		}
 	}
 }
