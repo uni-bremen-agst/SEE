@@ -4398,6 +4398,18 @@ RectTransform:
   m_AnchoredPosition: {x: 24.618526, y: 0.53494143}
   m_SizeDelta: {x: 3.1016023, y: 3.1016023}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &742963504 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3345049773760567414, guid: db3bfb72d0ee2784ebea15a0c9c8b774,
+    type: 3}
+  m_PrefabInstance: {fileID: 1953399681}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b743370ac3e4ec2a1668f5455a8ef8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &860536664
 GameObject:
   m_ObjectHideFlags: 0
@@ -7897,6 +7909,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1492335098870306909, guid: db3bfb72d0ee2784ebea15a0c9c8b774,
+        type: 3}
+      propertyPath: onHandClick.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1492335098870306909, guid: db3bfb72d0ee2784ebea15a0c9c8b774,
+        type: 3}
+      propertyPath: onHandClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 742963504}
+    - target: {fileID: 1492335098870306909, guid: db3bfb72d0ee2784ebea15a0c9c8b774,
+        type: 3}
+      propertyPath: onHandClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Select
+      objectReference: {fileID: 0}
     - target: {fileID: 2946852908261956161, guid: db3bfb72d0ee2784ebea15a0c9c8b774,
         type: 3}
       propertyPath: m_Name

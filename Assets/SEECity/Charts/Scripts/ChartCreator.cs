@@ -13,7 +13,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Initializes the new chart as GameObject.
 		/// </summary>
-		public void CreateChart()
+		[SerializeField] private void CreateChart()
 		{
 			ChartContent content =
 				Instantiate(_chartPrefab, _chartsCanvas).GetComponent<ChartContent>();
