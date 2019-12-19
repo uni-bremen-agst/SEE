@@ -20,6 +20,9 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private TMP_Dropdown _dropdown;
 
+		/// <summary>
+		/// A list containing all options for the <see cref="_dropdown"/>
+		/// </summary>
 		private readonly List<string> _options = new List<string>();
 
 		/// <summary>
@@ -43,7 +46,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Updates <see cref="Value" /> to match the selected option of <see cref="_dropdown" />
 		/// </summary>
-		public void ChangeValue()
+		[SerializeField] private void ChangeValue()
 		{
 			Value = _dropdown.options[_dropdown.value].text;
 			_chartContent.DrawData();

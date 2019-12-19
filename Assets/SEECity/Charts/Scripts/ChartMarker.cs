@@ -91,17 +91,13 @@ namespace Assets.SEECity.Charts.Scripts
 			_animating = false;
 		}
 
-		/// <summary>
-		/// Checks for a double or a single click when the mouse is clicked.
-		/// </summary>
-		/// <param name="eventData">Event payload associated with pointer (mouse / touch) events.</param>
-		public void OnPointerDown(PointerEventData eventData)
-		{
-			if (_runningClick)
-				_waiting = false;
-			else
-				StartCoroutine(WaitForDoubleClick());
-		}
+        public void ButtonClicked()
+        {
+            if (_runningClick)
+                _waiting = false;
+            else
+                StartCoroutine(WaitForDoubleClick());
+        }
 
 		/// <summary>
 		/// Checks if one or two clicks happen in a given interval.
@@ -141,6 +137,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private void ShowLinkedObject()
 		{
+            Debug.Log("DoubleClick");
 			_activeCamera = Camera.main; //TODO: Change to active camera and not just main camera.
 			if (moveWithRotation)
 			{
