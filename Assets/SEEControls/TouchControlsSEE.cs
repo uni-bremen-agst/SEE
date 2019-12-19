@@ -50,7 +50,6 @@ public class TouchControlsSEE : MonoBehaviour
         {
             if (Input.touchCount == 1 && EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId) == false)
             {
-
                 if (Input.GetTouch(0).phase == TouchPhase.Began)
                 {
                     mode = 1;
@@ -104,8 +103,6 @@ public class TouchControlsSEE : MonoBehaviour
         
         if(Lock && Rig.transform.position != transObject.transform.position)
         {
-            Debug.Log(timeCount);
-            Debug.Log(Rig.transform.position.x);
             MoveToTarget();
         }
         else
