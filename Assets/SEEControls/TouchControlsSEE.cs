@@ -37,6 +37,9 @@ public class TouchControlsSEE : MonoBehaviour
     //locks all actions for the time of camera auto movement
     private bool Lock = false;
 
+    //holds if the UI was touched last frame
+    private bool UITouch = false;
+
     void Start()
     {
         transObject = new GameObject();
@@ -46,9 +49,9 @@ public class TouchControlsSEE : MonoBehaviour
 
     void Update()
     {
-        if (!Lock)
+        if (!Lock && Input.touchCount > 0)
         {
-            if (Input.touchCount == 1 && EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId) == false)
+            if (Input.touchCount == 1 && !UiIsTouched())
             {
                 if (Input.GetTouch(0).phase == TouchPhase.Began)
                 {
@@ -79,7 +82,12 @@ public class TouchControlsSEE : MonoBehaviour
                 {
                     distanceDelta = Vector2.Distance(Input.GetTouch(0).position, Input.GetTouch(1).position) - distance;
                     distance = Vector2.Distance(Input.GetTouch(0).position, Input.GetTouch(1).position);
-                    Rig.transform.position += Rig.transform.forward * distanceDelta * ZoomFactor * Time.deltaTime;
+
+                    Vector3 newPosition = Rig.transform.position + Rig.transform.forward * distanceDelta * ZoomFactor * Time.deltaTime;
+
+                    //prevents the camera from moving beneath the city
+                    if (newPosition.y >= 1)
+                        Rig.transform.position = newPosition;
                 }
             }
             else if (Input.touchCount == 3)
@@ -88,17 +96,35 @@ public class TouchControlsSEE : MonoBehaviour
                 {
                     mode = 3;
                     pos = Input.GetTouch(2).position;
-                    Debug.Log(pos.y);
                 }
-                else if (Input.GetTouch(2).phase == TouchPhase.Moved)
+                else if (Input.GetTouch(2).phase == TouchPhase.Moved && mode == 3)
                 {
                     float distanceFactor = Vector3.Distance(Rig.transform.position, target.position) / movementEnv;
-                    Rig.transform.position += Rig.transform.right * (Input.GetTouch(2).position.x - pos.x) * SpeedFactor * distanceFactor * Time.deltaTime;
-                    Rig.transform.position += Rig.transform.up * (Input.GetTouch(2).position.y - pos.y) * SpeedFactor * distanceFactor * Time.deltaTime;
-                    Rig.transform.LookAt(target);
-                    pos = Input.GetTouch(2).position;
+
+                    GameObject PositionAhead = new GameObject();
+                    PositionAhead.transform.position = Rig.transform.position;
+                    PositionAhead.transform.position += Rig.transform.right * (Input.GetTouch(2).position.x - pos.x) * SpeedFactor * distanceFactor * Time.deltaTime;
+                    PositionAhead.transform.position += Rig.transform.up * (Input.GetTouch(2).position.y - pos.y) * SpeedFactor * distanceFactor * Time.deltaTime;
+                    PositionAhead.transform.LookAt(target);
+
+                    //prevents the camera from moving beneath the city
+                    if (PositionAhead.transform.position.y >= 1 && Vector3.Angle(PositionAhead.transform.forward, target.transform.up) < 160)
+                    {
+                        Rig.transform.position = PositionAhead.transform.position;
+                        Rig.transform.LookAt(target);
+                    }
+                }
+                pos = Input.GetTouch(2).position;
+            }
+            else if (Input.touchCount == 4)
+            {
+                if(Input.GetTouch(3).phase == TouchPhase.Began)
+                {
+                    mode = 4;
                 }
             }
+
+            UITouch = EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId);
         }
         
         if(Lock && Rig.transform.position != transObject.transform.position)
@@ -131,5 +157,13 @@ public class TouchControlsSEE : MonoBehaviour
         Rig.transform.position = Vector3.Slerp(startPos.position, transObject.transform.position, timeCount);
         Rig.transform.rotation = Quaternion.Slerp(startPos.rotation, transObject.transform.rotation, timeCount);
         timeCount = timeCount + (Time.deltaTime / 5);
+    }
+
+    private bool UiIsTouched()
+    {
+        if (!EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId) && !UITouch)
+            return false;
+        else
+            return true;
     }
 }
