@@ -90,7 +90,6 @@ GameObject:
   - component: {fileID: 7900548257253700397}
   - component: {fileID: 7900548257253700396}
   - component: {fileID: 7900548257253700399}
-  - component: {fileID: 8098944518698568058}
   - component: {fileID: 4215612926701407641}
   - component: {fileID: 8460701208539418836}
   - component: {fileID: 2832773573625707244}
@@ -229,25 +228,6 @@ MonoBehaviour:
   clickDelay: 0.5
   _highlightMaterial: {fileID: 2100000, guid: 9d631e931375b5242b8903c497a12c74, type: 2}
   _highlightOutline: 0.001
---- !u!95 &8098944518698568058
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7900548257253700385}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: fa0710ea10747f74cb4577ed5c593676, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &4215612926701407641
 MonoBehaviour:
   m_ObjectHideFlags: 0

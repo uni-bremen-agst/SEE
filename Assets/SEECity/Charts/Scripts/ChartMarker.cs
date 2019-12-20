@@ -1,14 +1,32 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace Assets.SEECity.Charts.Scripts
 {
 	/// <summary>
 	/// Contains the logic for the markers representing entries linked to objects in the chart.
 	/// </summary>
-	public class ChartMarker : MonoBehaviour, IPointerDownHandler
+	public class ChartMarker : MonoBehaviour
 	{
+		private GameManager _gameManager;
+
+		//User Variables
+		private float _cameraDistance;
+		private bool _moveWithRotation;
+		private float _cameraFlightTime;
+		private float _clickDelay;
+
+		/// <summary>
+		/// The <see cref="Material" /> making the object look highlighted.
+		/// </summary>
+		[Header("Highlight Properties"), SerializeField]
+		private Material _highlightMaterial;
+
+		/// <summary>
+		/// Copy of the linked object with different material to make it look highlighted.
+		/// </summary>
+		private GameObject _highlightCopy;
+
 		/// <summary>
 		/// The <see cref="GameObject" /> in the code city that is connected with this button.
 		/// </summary>
@@ -24,80 +42,50 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private Camera _activeCamera;
 
-		private bool _waiting;
-		private bool _runningClick;
 		private Coroutine _runningCamera;
 
-		[Header("Camera Controls"), SerializeField]
-		private float cameraDistance = 50f;
-
-		[SerializeField] private bool moveWithRotation = true;
-		[SerializeField] private float cameraFlightTime = 0.5f;
-
-		[Header("User Inputs"), SerializeField, Range(0.1f, 1f)]
-		private float clickDelay = 0.5f;
-
+		//Double click booleans
 		/// <summary>
-		/// The <see cref="Material" /> making the object look highlighted.
+		/// Determines if a second click happened during <see cref="_clickDelay" />.
 		/// </summary>
-		[Header("Highlight Properties"), SerializeField]
-		private Material _highlightMaterial;
+		private bool _waiting;
 
 		/// <summary>
-		/// The thickness of the highlight outline of <see cref="_highlightMaterial"/>.
+		/// Determines if <see cref="WaitForDoubleClick" /> is currently running.
 		/// </summary>
-		[SerializeField] private float _highlightOutline = 0.001f;
+		private bool _runningClick;
 
 		/// <summary>
-		/// The original value of <see cref="_highlightOutline"/>
-		/// </summary>
-		private float _highlightOutlineOld;
-
-		/// <summary>
-		/// Copy of the linked object with different material to make it look highlighted.
-		/// </summary>
-		private GameObject _highlightCopy;
-
-		/// <summary>
-		/// Indicates if any <see cref="ChartMarker" /> is currently animating the highlights in the scene.
-		/// </summary>
-		private static bool _animating;
-
-		/// <summary>
-		/// Saves the original values of <see cref="_highlightMaterial" />
+		/// Links the <see cref="GameManager" /> and calls methods for initialization.
 		/// </summary>
 		private void Start()
 		{
-			_highlightOutlineOld = _highlightMaterial.GetFloat("g_flOutlineWidth");
+			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
+				.GetComponent<GameManager>();
+			GetSettingData();
 		}
 
 		/// <summary>
-		/// Animates the highlights in the scene if no other <see cref="ChartMarker" /> is currently animating
-		/// them.
+		/// Takes the setting data from <see cref="GameManager" /> for use in <see cref="ChartMarker" />.
 		/// </summary>
-		private void Update()
+		private void GetSettingData()
 		{
-			if (!_animating)
-			{
-				_animating = true;
-				StartCoroutine(HighlightAnimation());
-			}
+			_cameraDistance = _gameManager.CameraDistance;
+			_moveWithRotation = _gameManager.MoveWithRotation;
+			_cameraFlightTime = _gameManager.CameraFlightTime;
+			_clickDelay = _gameManager.ClickDelay;
 		}
 
-		private IEnumerator HighlightAnimation()
+		/// <summary>
+		/// Called by Unity when the button assigned to the <see cref="ChartMarker" /> is pressed.
+		/// </summary>
+		public void ButtonClicked()
 		{
-			_highlightMaterial.SetFloat("g_flOutlineWidth", _highlightOutline);
-			yield return new WaitForEndOfFrame();
-			_animating = false;
+			if (_runningClick)
+				_waiting = false;
+			else
+				StartCoroutine(WaitForDoubleClick());
 		}
-
-        public void ButtonClicked()
-        {
-            if (_runningClick)
-                _waiting = false;
-            else
-                StartCoroutine(WaitForDoubleClick());
-        }
 
 		/// <summary>
 		/// Checks if one or two clicks happen in a given interval.
@@ -107,7 +95,7 @@ namespace Assets.SEECity.Charts.Scripts
 		{
 			_runningClick = true;
 			_waiting = true;
-			yield return new WaitForSeconds(clickDelay);
+			yield return new WaitForSeconds(_clickDelay);
 			if (_waiting)
 			{
 				HighlightLinkedObject();
@@ -137,9 +125,8 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private void ShowLinkedObject()
 		{
-            Debug.Log("DoubleClick");
 			_activeCamera = Camera.main; //TODO: Change to active camera and not just main camera.
-			if (moveWithRotation)
+			if (_moveWithRotation)
 			{
 				if (_runningCamera != null)
 				{
@@ -152,7 +139,7 @@ namespace Assets.SEECity.Charts.Scripts
 				_runningCamera = StartCoroutine(MoveCameraTo(
 					Vector3.MoveTowards(_activeCamera.transform.position,
 						_linkedObject.transform.position,
-						lookPos.magnitude - cameraDistance), Quaternion.LookRotation(lookPos)));
+						lookPos.magnitude - _cameraDistance), Quaternion.LookRotation(lookPos)));
 			}
 			else
 			{
@@ -165,7 +152,7 @@ namespace Assets.SEECity.Charts.Scripts
 				_runningCamera = StartCoroutine(MoveCameraTo(new Vector3(
 					_linkedObject.transform.position.x,
 					_activeCamera.transform.position.y,
-					_linkedObject.transform.position.z - cameraDistance)));
+					_linkedObject.transform.position.z - _cameraDistance)));
 			}
 		}
 
@@ -182,12 +169,12 @@ namespace Assets.SEECity.Charts.Scripts
 			if (newPos != _linkedObject.transform.position)
 			{
 				Quaternion oldRot = _activeCamera.transform.rotation;
-				for (float time = 0f; time <= cameraFlightTime; time += Time.deltaTime)
+				for (float time = 0f; time <= _cameraFlightTime; time += Time.deltaTime)
 				{
 					_activeCamera.transform.position =
-						Vector3.Lerp(oldPos, newPos, time * (1 / cameraFlightTime));
+						Vector3.Lerp(oldPos, newPos, time * (1 / _cameraFlightTime));
 					_activeCamera.transform.rotation =
-						Quaternion.Slerp(oldRot, lookAt, time * (1 / cameraFlightTime));
+						Quaternion.Slerp(oldRot, lookAt, time * (1 / _cameraFlightTime));
 					yield return new WaitForEndOfFrame();
 				}
 
@@ -204,23 +191,14 @@ namespace Assets.SEECity.Charts.Scripts
 		private IEnumerator MoveCameraTo(Vector3 newPos)
 		{
 			Vector3 oldPos = _activeCamera.transform.position;
-			for (float time = 0; time <= cameraFlightTime; time += Time.deltaTime)
+			for (float time = 0; time <= _cameraFlightTime; time += Time.deltaTime)
 			{
 				_activeCamera.transform.position =
-					Vector3.Lerp(oldPos, newPos, time * (1 / cameraFlightTime));
+					Vector3.Lerp(oldPos, newPos, time * (1 / _cameraFlightTime));
 				yield return new WaitForEndOfFrame();
 			}
 
 			_activeCamera.transform.position = newPos;
-		}
-
-		/// <summary>
-		/// Resets the <see cref="_highlightMaterial" />
-		/// </summary>
-		private void OnDestroy()
-		{
-			if (_highlightMaterial.GetFloat("g_flOutlineWidth") != _highlightOutlineOld)
-				_highlightMaterial.SetFloat("g_flOutlineWidth", _highlightOutlineOld);
 		}
 	}
 }

@@ -30,7 +30,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
 		/// </summary>
-		private List<GameObject> _activeMarkers = new List<GameObject>();
+		private readonly List<GameObject> _activeMarkers = new List<GameObject>();
 
 		/// <summary>
 		/// Game Object to group all content entries of a chart.
