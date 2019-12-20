@@ -21,13 +21,14 @@ namespace Assets.SEECity.Charts.Scripts
 		private TMP_Dropdown _dropdown;
 
 		/// <summary>
-		/// A list containing all options for the <see cref="_dropdown"/>
+		/// A list containing all options for the <see cref="_dropdown" />
 		/// </summary>
 		private readonly List<string> _options = new List<string>();
 
 		/// <summary>
 		/// The currently selected option of <see cref="_dropdown" />.
 		/// </summary>
+		[HideInInspector]
 		public string Value { get; private set; }
 
 		/// <summary>
@@ -37,16 +38,25 @@ namespace Assets.SEECity.Charts.Scripts
 		{
 			_dropdown = GetComponent<TMP_Dropdown>();
 			_dropdown.ClearOptions();
-			_options.Add("Metric.Clone_Rate");
-			_options.Add("Metric.Number_of_Tokens");
+			AddMetrics();
 			_dropdown.AddOptions(_options);
 			Value = _dropdown.options[0].text;
 		}
 
 		/// <summary>
+		/// Retrieves all possible Metrics and adds them to the <see cref="_options" /> list.
+		/// </summary>
+		private void AddMetrics()
+		{
+			_options.Add("Metric.Clone_Rate");
+			_options.Add("Metric.Number_of_Tokens");
+		}
+
+		/// <summary>
 		/// Updates <see cref="Value" /> to match the selected option of <see cref="_dropdown" />
 		/// </summary>
-		[SerializeField] private void ChangeValue()
+		[SerializeField]
+		private void ChangeValue()
 		{
 			Value = _dropdown.options[_dropdown.value].text;
 			_chartContent.DrawData();

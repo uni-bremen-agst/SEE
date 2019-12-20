@@ -7,13 +7,21 @@ namespace Assets.SEECity.Charts.Scripts
 	/// </summary>
 	public class ChartCreator : MonoBehaviour
 	{
+		/// <summary>
+		/// The prefab for a new chart.
+		/// </summary>
 		[SerializeField] private GameObject _chartPrefab;
+
+		/// <summary>
+		/// The <see cref="Canvas" /> on which the chart is created.
+		/// </summary>
 		[SerializeField] private Transform _chartsCanvas;
 
 		/// <summary>
 		/// Initializes the new chart as GameObject.
 		/// </summary>
-		[SerializeField] private void CreateChart()
+		[SerializeField]
+		private void CreateChart()
 		{
 			ChartContent content =
 				Instantiate(_chartPrefab, _chartsCanvas).GetComponent<ChartContent>();
