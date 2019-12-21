@@ -14,7 +14,8 @@ namespace Assets.SEECity.Charts.Scripts
 		[SerializeField] private RectTransform _chart;
 
 		/// <summary>
-		/// Checks the current mouse position and moves the chart to the corresponding position on the canvas.
+		/// Checks the current <see cref="Input.mousePosition" /> and moves the chart to the corresponding
+		/// position on the canvas.
 		/// </summary>
 		/// <param name="eventData">Event payload associated with pointer (mouse / touch) events.</param>
 		public void OnDrag(PointerEventData eventData)

@@ -38,6 +38,11 @@ namespace Assets.SEECity.Charts.Scripts
 		[SerializeField] private float _highlightOutline = 0.005f;
 
 		/// <summary>
+		/// Determines if the scene is being played in VR or not.
+		/// </summary>
+		[Header("Virtual Reality")] public bool IsVirtualReality;
+
+		/// <summary>
 		/// The current thickness of the highlight outline of <see cref="_highlightMaterial" /> used in
 		/// animations.
 		/// </summary>

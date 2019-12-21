@@ -38,14 +38,23 @@ namespace Assets.SEECity.Charts.Scripts
 		[SerializeField] private GameObject _entries;
 
 		/// <summary>
-		/// The panel on which the <see cref="ChartMarker" />s are instantiated.
-		/// </summary>
-		[SerializeField] private RectTransform _dataPanel;
-
-		/// <summary>
 		/// A parent of this object. Used in VR to destroy the whole construct of a moveable chart.
 		/// </summary>
 		[SerializeField] private GameObject _parent;
+
+		/// <summary>
+		/// The panel on which the <see cref="ChartMarker" />s are instantiated.
+		/// </summary>
+		[Header("For Resizing"), SerializeField]
+		private RectTransform _dataPanel;
+
+		[SerializeField] private RectTransform _labelsPanel;
+
+		[SerializeField] private RectTransform _destroyButton;
+
+		[SerializeField] private RectTransform _dragButton;
+
+		[SerializeField] private RectTransform _chart;
 
 		/// <summary>
 		/// Calls methods to initialize a chart.
@@ -116,6 +125,37 @@ namespace Assets.SEECity.Charts.Scripts
 					(valueX - minX) * width, (valueY - minY) * height);
 				_activeMarkers.Add(marker);
 			}
+		}
+
+		/// <summary>
+		/// Changes the width and height of the chart.
+		/// </summary>
+		/// <param name="width">The new width of the chart.</param>
+		/// <param name="height">The new height of the chart.</param>
+		public void ChangeSize(float width, float height)
+		{
+			//DataPanel
+			_dataPanel.sizeDelta = new Vector2(width - 100, height - 100);
+			_dataPanel.anchoredPosition = new Vector2(width / 2, height / 2);
+			//LabelsPanel
+			_labelsPanel.sizeDelta = new Vector2(width, height);
+			_labelsPanel.anchoredPosition = new Vector2(width / 2, height / 2);
+			//xDropdown
+			RectTransform xDropdown = _xAxisDropdown.GetComponent<RectTransform>();
+			xDropdown.anchoredPosition = new Vector2(width / 2, xDropdown.anchoredPosition.y);
+			xDropdown.sizeDelta = new Vector2(width / 3, xDropdown.sizeDelta.y);
+			//yDropdown
+			RectTransform yDropdown = _yAxisDropdown.GetComponent<RectTransform>();
+			yDropdown.anchoredPosition = new Vector2(yDropdown.anchoredPosition.x, height / 2);
+			yDropdown.sizeDelta = new Vector2(height / 3, yDropdown.sizeDelta.y);
+			//Chart
+			_chart.sizeDelta = new Vector2(width, height);
+			//DestroyButton
+			_destroyButton.anchoredPosition = new Vector2(-width / 2 + 25, height / 2 - 25);
+			//DragButton
+			_dragButton.anchoredPosition = new Vector2(width / 2 - 25, -height / 2 + 25);
+
+			DrawData();
 		}
 
 		/// <summary>
