@@ -18,7 +18,12 @@ namespace SEE
         /// <summary>
         /// The recorded path.
         /// </summary>
-        private CameraPath path = new CameraPath();
+        private CameraPath path;
+
+        /// <summary>
+        /// The directory in which to store path files.
+        /// </summary>
+        public string Directory;
 
         /// <summary>
         /// Base name of the file where to store the captured data points.
@@ -37,11 +42,11 @@ namespace SEE
         /// <returns>filename for the recording</returns>
         private string Filename()
         {
-            string result = NewName(Application.persistentDataPath, Basename, Take, CameraPath.DotPathFileExtension);
+            string result = NewName(Directory, Basename, Take, CameraPath.DotPathFileExtension);
             while (File.Exists(result))
             {
                 Take++;
-                result = NewName(Application.persistentDataPath, Basename, Take, CameraPath.DotPathFileExtension);
+                result = NewName(Directory, Basename, Take, CameraPath.DotPathFileExtension);
             }
             return result;
         }
@@ -52,13 +57,17 @@ namespace SEE
         /// may not already exist.
         /// </summary>
         /// <param name="path">leading path</param>
-        /// <param name="basename">base name of the ile</param>
+        /// <param name="basename">base name of the file</param>
         /// <param name="take">the number of the take</param>
         /// <param name="extension">file extension</param>
-        /// <returns>filename for the recording</returns>
+        /// <returns>filename for the recording as a concatenation of all given input parameters</returns>
         private string NewName(string path, string basename, int take, string extension)
         {
-            return path + "/" + basename + take + extension;
+            if (!path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            {
+                path += Path.DirectorySeparatorChar;
+            }
+            return path + basename + take + extension;
         }
 
         /// <summary>
@@ -81,6 +90,11 @@ namespace SEE
         {
             // This gets the Main Camera from the Scene
             mainCamera = Camera.main;
+            path = new CameraPath();
+            if (string.IsNullOrEmpty(Directory))
+            {
+                Directory = UnityProject.GetPath();
+            }
         }
 
         void Update()
@@ -109,7 +123,7 @@ namespace SEE
         /// </summary>
         void OnApplicationQuit()
         {
-            if (path.Count == 0)
+            if (path == null || path.Count == 0)
             {
                 Debug.Log("Empty camera path is not stored.\n");
             }
