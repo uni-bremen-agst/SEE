@@ -31,6 +31,11 @@ namespace SEE
         public string filename = "path" + CameraPath.DotPathFileExtension;
 
         /// <summary>
+        /// As to whether the path should be drawn as a sequence of lines in the game.
+        /// </summary>
+        public bool ShowPath = false;
+
+        /// <summary>
         /// The interpolated spline.
         /// </summary>
         private BSpline spline;
@@ -94,7 +99,7 @@ namespace SEE
         /// <returns>name of the file from which to read the path data</returns>
         private string Filename()
         {
-            return Application.persistentDataPath + "/" + filename;
+            return filename;
         }
 
         /// <summary>
@@ -113,6 +118,10 @@ namespace SEE
                 string filename = Filename();
                 path = CameraPath.ReadPath(filename);
                 Debug.LogFormat("Read camera path from {0}\n", filename);
+                if (ShowPath)
+                {
+                    path.Draw();
+                }
             }
             catch (Exception e)
             {
