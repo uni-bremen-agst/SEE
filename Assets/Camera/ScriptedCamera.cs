@@ -28,7 +28,7 @@ namespace SEE
         /// <summary>
         /// Name of the file where to load the captured data camera path points from.
         /// </summary>
-        public string filename = "path.csv";
+        public string filename = "path" + CameraPath.DotPathFileExtension;
 
         /// <summary>
         /// The interpolated spline.
