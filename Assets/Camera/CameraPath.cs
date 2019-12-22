@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Collections;
+using SEE.Layout;
 
 namespace SEE
 {
@@ -12,11 +13,41 @@ namespace SEE
     public class CameraPath : IEnumerable
     {
         /// <summary>
+        /// The file extension of files storing path data.
+        /// </summary>
+        public const string PathFileExtension    = "csv";
+        public const string DotPathFileExtension = ".csv";
+
+        /// <summary>
         /// The number of path data captured so far.
         /// </summary>
         public int Count { get => data.Count; }
 
-        public object Current => throw new System.NotImplementedException();
+        public CameraPath()
+        {
+            path = "";
+        }
+
+        private CameraPath(string path)
+        {
+            this.path = path;
+        }
+
+        // The default color for the start of the lines of a path.
+        public static Color StartDefaultColor = Color.blue;
+
+        // The default color for the end of the lines of a path.
+        public static Color EndDefaultColor = Color.blue;
+
+        /// <summary>
+        /// The material we use for the line drawing the path. All paths share the same material.
+        /// </summary>
+        private static Material material; // FIXME = LineFactory.NewLineMaterial();
+
+        /// <summary>
+        /// The line width for drawing paths.
+        /// </summary>
+        private const float lineWidth = 0.5f;
 
         /// <summary>
         /// The path data captured.
@@ -99,12 +130,18 @@ namespace SEE
         private static readonly int minimalColumns = 7;
 
         /// <summary>
+        /// Name of the file from which the path was loaded. May be the empty string
+        /// if the path was not loaded but created differently.
+        /// </summary>
+        private readonly string path = "";
+
+        /// <summary>
         /// Loads the path data from a the file.
         /// </summary>
         public static CameraPath ReadPath(string path)
         {
             string[] data = System.IO.File.ReadAllLines(path);
-            CameraPath result = new CameraPath();
+            CameraPath result = new CameraPath(path);
 
             int i = 0;
             foreach (string line in data)
@@ -134,16 +171,52 @@ namespace SEE
                     time = float.Parse(coordinates[7], CultureInfo.InvariantCulture);
 
                     result.Add(position, rotation, time);
-                    // Note: We ignore all remaining columns.
+                    // Note: We ignore all remaining columns if there are any.
                 }
                 i++;
             }
             return result;
         }
 
+        /// <summary>
+        /// Returns an enumerator over all path data entries in the path.
+        /// 
+        /// Implements interface IEnumerable.
+        /// </summary>
+        /// <returns>an enumerator over all path data entries in the path</returns>
         public IEnumerator GetEnumerator()
         {
             return (IEnumerator)this.data.GetEnumerator();
+        }
+
+        public GameObject Draw()
+        {
+            GameObject result = new GameObject(string.IsNullOrEmpty(path) ? "anonymous path" : path);
+
+            LineRenderer line = result.AddComponent<LineRenderer>();
+
+            LineFactory.SetDefaults(line);
+            LineFactory.SetColors(line, StartDefaultColor, EndDefaultColor);
+            LineFactory.SetWidth(line, lineWidth);
+
+            line.useWorldSpace = true;
+
+            // All lines have the same material to reduce the number of drawing calls.
+            line.sharedMaterial = material;
+
+            // Set the line positions along the path.
+            Vector3[] positions = new Vector3[data.Count];
+            int i = 0;
+            foreach (PathData d in data)
+            {
+                positions[i] = d.position;
+                i++;
+            }
+
+            line.positionCount = positions.Length;
+            line.SetPositions(positions);
+
+            return result;
         }
     }
 }
