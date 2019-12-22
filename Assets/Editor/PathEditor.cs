@@ -40,7 +40,7 @@ namespace SEE
         /// <summary>
         /// The list of paths added.
         /// </summary>
-        public List<string> files = new List<string>(0);
+        public SerializableDictionary<string, GameObject> files = new SerializableDictionary<string, GameObject>();
 
         /// <summary>
         /// Creates a new window offering the path editor commands.
@@ -103,24 +103,29 @@ namespace SEE
             GUILayout.Label("List of paths", EditorStyles.boldLabel); //Making a label in our vertical view, declaring its contents, and adding editor flare.
             GUIContent content = EditorGUIUtility.IconContent("d_Toolbar Minus");
 
-            int selectedIndex = -1;
-            for (int i = 0; i < files.Count; i++)
+            string selectedIndex = "";
+            int i = 0;
+            foreach (var fileData in files)
             {
-                if (!string.IsNullOrEmpty(files[i]))
+                if (!string.IsNullOrEmpty(fileData.Key))
                 {
                     EditorGUILayout.BeginHorizontal();
-                    files[i] = EditorGUILayout.TextField("Path[" + i + "]", files[i]);
+                    string file = EditorGUILayout.TextField("Path[" + i + "]", fileData.Key);
+                    if (! file.Equals(fileData.Key))
+                    {
+                        // FIXME: Update
+                    }
                     bool pressed = GUILayout.Button(content, GUILayout.Width(20));
                     EditorGUILayout.EndHorizontal();
                     if (pressed)
                     {
-                        Debug.LogFormat("path selected: {0}\n", files[i]);
-                        selectedIndex = i;
+                        selectedIndex = file;
                     }
                 }
+                i++;
             }
             EditorGUILayout.EndVertical(); // And closing our last area.
-            if (0 <= selectedIndex && selectedIndex < files.Count)
+            if (!string.IsNullOrEmpty(selectedIndex))
             {
                 RemovePath(selectedIndex);
             }
@@ -162,7 +167,7 @@ namespace SEE
         private void SelectFile()
         {
             string file = Filenames.OnCurrentPlatform(EditorUtility.OpenFilePanel("Select path file", pathsDirectory, CameraPath.PathFileExtension));
-            if (!string.IsNullOrEmpty(file) && file.EndsWith(CameraPath.DotPathFileExtension) && !files.Contains(file))
+            if (!string.IsNullOrEmpty(file) && file.EndsWith(CameraPath.DotPathFileExtension) && !files.ContainsKey(file))
             {
                 AddPath(file);
             }
@@ -181,7 +186,7 @@ namespace SEE
                 foreach (string file in Directory.GetFiles(pathsDirectory))
                 {
                     string normalizedFile = Filenames.OnCurrentPlatform(file);
-                    if (normalizedFile.EndsWith(CameraPath.DotPathFileExtension) && !files.Contains(normalizedFile))
+                    if (normalizedFile.EndsWith(CameraPath.DotPathFileExtension) && !files.ContainsKey(normalizedFile))
                     {
                         AddPath(normalizedFile);
                     }
@@ -195,17 +200,25 @@ namespace SEE
         /// <param name="file">path file to be added</param>
         private void AddPath(string file)
         {
-            files.Add(file);
+            try
+            {
+                CameraPath path = CameraPath.ReadPath(file);
+                GameObject o = path.Draw();
+                files.Add(file, o);
+            } catch (Exception e)
+            {
+                Debug.LogErrorFormat("Failure in loading camera path {0}: {1}\n", file, e.ToString());
+            }
         }
 
         /// <summary>
         /// Removes the path with given index in the list of paths loaded.
         /// </summary>
         /// <param name="selectedIndex">index of the path file to be removed</param>
-        private void RemovePath(int selectedIndex)
+        private void RemovePath(string selectedIndex)
         {
             ClearPath(files[selectedIndex]);
-            files.RemoveAt(selectedIndex);
+            files.Remove(selectedIndex);
         }
 
         /// <summary>
@@ -213,20 +226,20 @@ namespace SEE
         /// </summary>
         private void RemoveAll()
         {
-            foreach (string file in files)
+            foreach (var file in files)
             {
-                ClearPath(file);
+                ClearPath(file.Value);
             }
             files.Clear();
         }
 
         /// <summary>
-        /// Last clean up operations when a path file is to be removed.
+        /// Last clean up operations when a path game object is to be removed.
         /// </summary>
-        /// <param name="file">path file that is to be removed</param>
-        private void ClearPath(string file)
+        /// <param name="pathObject">path game object that is to be removed</param>
+        private void ClearPath(GameObject pathObject)
         {
-            // FIXME: Whatever needs to be done.
+            Destroyer.DestroyGameObject(pathObject);
         }
     }
 }
