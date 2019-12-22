@@ -119,7 +119,7 @@ public class SelectBuilding : MonoBehaviour
     {
         // WriteAllLines creates a file, writes a collection of strings to the file,
         // and then closes the file.  You do NOT need to call Flush() or Close().
-        string path = Application.persistentDataPath + "/" + fileName;
+        string path = UnityProject.GetPath() + fileName;
         System.IO.File.WriteAllLines(path, data);
         Debug.LogFormat("Saved camera path to {0}\n", path);
     }
