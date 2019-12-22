@@ -26,11 +26,6 @@ namespace SEE
         public string Basename = "path";
 
         /// <summary>
-        /// Filename extension.
-        /// </summary>
-        public string Extension = ".csv";
-
-        /// <summary>
         /// The number of recording to be used for the filename.
         /// </summary>
         public int Take = 1;
@@ -42,11 +37,11 @@ namespace SEE
         /// <returns>filename for the recording</returns>
         private string Filename()
         {
-            string result = NewName(Application.persistentDataPath, Basename, Take, Extension);
+            string result = NewName(Application.persistentDataPath, Basename, Take, CameraPath.DotPathFileExtension);
             while (File.Exists(result))
             {
                 Take++;
-                result = NewName(Application.persistentDataPath, Basename, Take, Extension);
+                result = NewName(Application.persistentDataPath, Basename, Take, CameraPath.DotPathFileExtension);
             }
             return result;
         }
