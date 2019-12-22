@@ -137,6 +137,8 @@ namespace SEE
 
         /// <summary>
         /// Loads the path data from a the file.
+        /// 
+        /// May throw any exception that can be thrown by System.IO.File.ReadAllLines.
         /// </summary>
         public static CameraPath ReadPath(string path)
         {
