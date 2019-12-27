@@ -2,8 +2,13 @@
 
 namespace Assets.SEECity.Charts.Scripts
 {
+	/// <summary>
+	/// Contains most settings and some methods needed across all charts.
+	/// </summary>
 	public class GameManager : MonoBehaviour
 	{
+		private static GameManager _instance;
+
 		/// <summary>
 		/// The distance the camera will keep to the <see cref="GameObject" /> to focus on.
 		/// </summary>
@@ -27,6 +32,8 @@ namespace Assets.SEECity.Charts.Scripts
 		[Header("User Inputs"), Range(0.1f, 1f)]
 		public float ClickDelay = 0.5f;
 
+		[Range(0.1f, 1f)] public float DragDelay = 0.2f;
+
 		/// <summary>
 		/// The <see cref="Material" /> making the object look highlighted.
 		/// </summary>
@@ -48,6 +55,16 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		[Header("DO NOT CHANGE THIS"), SerializeField]
 		private float _highlightOutlineAnim = 0.001f;
+
+		/// <summary>
+		/// Enforces singleton pattern.
+		/// </summary>
+		private void Start()
+		{
+			if (_instance == null)
+				_instance = this;
+			else if (_instance == this) Destroy(gameObject);
+		}
 
 		/// <summary>
 		/// Update is called once per frame.
