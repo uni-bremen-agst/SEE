@@ -80,6 +80,8 @@ namespace SEE.DataModel
         [SerializeField]
         private StringFloatDictionary floatAttributes = new StringFloatDictionary();
 
+        public StringFloatDictionary FloatAttributes => floatAttributes;
+
         public void SetFloat(string attributeName, float value)
         {
             floatAttributes[attributeName] = value;
@@ -104,6 +106,8 @@ namespace SEE.DataModel
 
         [SerializeField]
         private StringIntDictionary intAttributes = new StringIntDictionary();
+
+        public StringIntDictionary IntAttributes => intAttributes;
 
         public void SetInt(string attributeName, int value)
         {

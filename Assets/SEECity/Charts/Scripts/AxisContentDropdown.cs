@@ -23,7 +23,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// A list containing all options for the <see cref="_dropdown" />
 		/// </summary>
-		private readonly List<string> _options = new List<string>();
+		private List<string> _options;
 
 		/// <summary>
 		/// The currently selected option of <see cref="_dropdown" />.
@@ -37,19 +37,15 @@ namespace Assets.SEECity.Charts.Scripts
 		private void Start()
 		{
 			_dropdown = GetComponent<TMP_Dropdown>();
-			_dropdown.ClearOptions();
-			AddMetrics();
-			_dropdown.AddOptions(_options);
+			GetKeys();
 			Value = _dropdown.options[0].text;
 		}
 
-		/// <summary>
-		/// Retrieves all possible Metrics and adds them to the <see cref="_options" /> list.
-		/// </summary>
-		private void AddMetrics()
+		private void GetKeys()
 		{
-			_options.Add("Metric.Clone_Rate");
-			_options.Add("Metric.Number_of_Tokens");
+			_dropdown.ClearOptions();
+			_options = _chartContent.AllKeys;
+			_dropdown.AddOptions(_options);
 		}
 
 		/// <summary>

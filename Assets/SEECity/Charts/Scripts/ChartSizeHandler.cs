@@ -16,7 +16,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// The minimum size a chart can have for width and height.
 		/// </summary>
-		private const int MinimumSize = 300;
+		private const int MinimumSize = 400;
 
 		/// <summary>
 		/// Checks the current <see cref="Input.mousePosition" /> and calls

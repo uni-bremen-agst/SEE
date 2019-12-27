@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using SEE.Layout;
+using TMPro;
 using UnityEngine;
 
 namespace Assets.SEECity.Charts.Scripts
@@ -10,7 +11,17 @@ namespace Assets.SEECity.Charts.Scripts
 	/// </summary>
 	public class ChartContent : MonoBehaviour
 	{
+		/// <summary>
+		/// The color of the chart to better distinguish it from others.
+		/// </summary>
+		private Color _color;
+
+		/// <summary>
+		/// All objects to be listed in the chart.
+		/// </summary>
 		private GameObject[] _dataObjects;
+
+		public List<string> AllKeys { get; } = new List<string>();
 
 		/// <summary>
 		/// The <see cref="AxisContentDropdown" /> containing Values for the X-Axis.
@@ -37,6 +48,14 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		[SerializeField] private GameObject _entries;
 
+		[SerializeField] private TextMeshProUGUI _minX;
+
+		[SerializeField] private TextMeshProUGUI _maxX;
+
+		[SerializeField] private TextMeshProUGUI _minY;
+
+		[SerializeField] private TextMeshProUGUI _maxY;
+
 		/// <summary>
 		/// A parent of this object. Used in VR to destroy the whole construct of a moveable chart.
 		/// </summary>
@@ -46,7 +65,13 @@ namespace Assets.SEECity.Charts.Scripts
 		/// The panel on which the <see cref="ChartMarker" />s are instantiated.
 		/// </summary>
 		[Header("For Resizing"), SerializeField]
-		private RectTransform _dataPanel;
+		private Transform _topRight;
+
+		[SerializeField] private Transform _topLeft;
+		[SerializeField] private Transform _bottomRight;
+		[SerializeField] private Transform _bottomLeft;
+
+		[SerializeField] private RectTransform _dataPanel;
 
 		[SerializeField] private RectTransform _labelsPanel;
 
@@ -56,12 +81,37 @@ namespace Assets.SEECity.Charts.Scripts
 
 		[SerializeField] private RectTransform _chart;
 
+		[SerializeField] private RectTransform _colorButton;
+
+		[SerializeField] private GameObject _sizeButton;
+
+		private bool _minimized;
+
 		/// <summary>
 		/// Calls methods to initialize a chart.
 		/// </summary>
 		private void Start()
 		{
+			FindDataObjects();
+			GetAllFloats();
+			GetAllIntegers();
 			StartCoroutine(FirstInitialization());
+		}
+
+		private void GetAllFloats()
+		{
+			foreach (GameObject data in _dataObjects)
+			foreach (string key in data.GetComponent<NodeRef>().node.FloatAttributes.Keys)
+				if (!AllKeys.Contains(key))
+					AllKeys.Add(key);
+		}
+
+		private void GetAllIntegers()
+		{
+			foreach (GameObject data in _dataObjects)
+			foreach (string key in data.GetComponent<NodeRef>().node.IntAttributes.Keys)
+				if (!AllKeys.Contains(key))
+					AllKeys.Add(key);
 		}
 
 		/// <summary>
@@ -125,6 +175,11 @@ namespace Assets.SEECity.Charts.Scripts
 					(valueX - minX) * width, (valueY - minY) * height);
 				_activeMarkers.Add(marker);
 			}
+
+			_minX.text = minX.ToString("0.00");
+			_maxX.text = maxX.ToString("0.00");
+			_minY.text = minY.ToString("0.00");
+			_maxY.text = maxY.ToString("0.00");
 		}
 
 		/// <summary>
@@ -150,12 +205,30 @@ namespace Assets.SEECity.Charts.Scripts
 			yDropdown.sizeDelta = new Vector2(height / 3, yDropdown.sizeDelta.y);
 			//Chart
 			_chart.sizeDelta = new Vector2(width, height);
-			//DestroyButton
-			_destroyButton.anchoredPosition = new Vector2(-width / 2 + 25, height / 2 - 25);
-			//DragButton
-			_dragButton.anchoredPosition = new Vector2(width / 2 - 25, -height / 2 + 25);
+			_topRight.localPosition = new Vector2(width / 2, height / 2);
+			_topLeft.localPosition = new Vector2(-width / 2, height / 2);
+			_bottomRight.localPosition = new Vector2(width / 2, -height / 2);
+			_bottomLeft.localPosition = new Vector2(-width / 2, -height / 2);
+			////DestroyButton
+			//_destroyButton.anchoredPosition = new Vector2(-width / 2 + 25, height / 2 - 25);
+			////DragButton
+			//_dragButton.anchoredPosition = new Vector2(width / 2 - 25, -height / 2 + 25);
+			////ColorButton
+			//_colorButton.anchoredPosition = new Vector2(width / 2 - 25, -height / 2 + 80);
 
 			DrawData();
+		}
+
+		/// <summary>
+		/// Toggles the minimization of the chart.
+		/// </summary>
+		public void ToggleMinimize()
+		{
+			//_labelsPanel.gameObject.SetActive(_minimized);
+			//_dataPanel.gameObject.SetActive(_minimized);
+			//_sizeButton.SetActive(_minimized);
+			//_destroyButton.gameObject.SetActive(_minimized);
+			_minimized = !_minimized;
 		}
 
 		/// <summary>
