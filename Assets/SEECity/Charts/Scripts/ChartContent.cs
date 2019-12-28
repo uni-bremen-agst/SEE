@@ -64,7 +64,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// The panel on which the <see cref="ChartMarker" />s are instantiated.
 		/// </summary>
-		[Header("For Resizing"), SerializeField]
+		[Header("For resizing and minimizing"), SerializeField]
 		private Transform _topRight;
 
 		[SerializeField] private Transform _topLeft;
@@ -75,15 +75,11 @@ namespace Assets.SEECity.Charts.Scripts
 
 		[SerializeField] private RectTransform _labelsPanel;
 
-		[SerializeField] private RectTransform _destroyButton;
-
-		[SerializeField] private RectTransform _dragButton;
-
 		[SerializeField] private RectTransform _chart;
 
-		[SerializeField] private RectTransform _colorButton;
-
 		[SerializeField] private GameObject _sizeButton;
+
+		[SerializeField] private Transform _dragButton;
 
 		private bool _minimized;
 
@@ -143,27 +139,49 @@ namespace Assets.SEECity.Charts.Scripts
 			foreach (GameObject marker in _activeMarkers) Destroy(marker);
 			_activeMarkers.Clear();
 			FindDataObjects();
-			_dataObjects[0].GetComponent<NodeRef>().node
+
+			int i = 0;
+			bool contained = _dataObjects[i].GetComponent<NodeRef>().node
 				.TryGetNumeric(_xAxisDropdown.Value, out float minX);
+			while (!contained)
+				contained = _dataObjects[i].GetComponent<NodeRef>().node
+					.TryGetNumeric(_xAxisDropdown.Value, out minX);
 			float maxX = minX;
-			_dataObjects[0].GetComponent<NodeRef>().node
+			i = 0;
+			contained = _dataObjects[0].GetComponent<NodeRef>().node
 				.TryGetNumeric(_yAxisDropdown.Value, out float minY);
+			while (!contained)
+				contained = _dataObjects[0].GetComponent<NodeRef>().node
+					.TryGetNumeric(_yAxisDropdown.Value, out minY);
 			float maxY = minY;
+
+			List<GameObject> toDraw = new List<GameObject>();
 			foreach (GameObject data in _dataObjects)
 			{
-				data.GetComponent<NodeRef>().node
-					.TryGetNumeric(_xAxisDropdown.Value, out float tempX);
-				if (tempX < minX) minX = tempX;
-				if (tempX > maxX) maxX = tempX;
-				data.GetComponent<NodeRef>().node
-					.TryGetNumeric(_yAxisDropdown.Value, out float tempY);
-				if (tempY > maxY) maxY = tempY;
-				if (tempY < minY) minY = tempY;
+				bool inX = false;
+				bool inY = false;
+				if (data.GetComponent<NodeRef>().node
+					.TryGetNumeric(_xAxisDropdown.Value, out float tempX))
+				{
+					if (tempX < minX) minX = tempX;
+					if (tempX > maxX) maxX = tempX;
+					inX = true;
+				}
+
+				if (data.GetComponent<NodeRef>().node
+					.TryGetNumeric(_yAxisDropdown.Value, out float tempY))
+				{
+					if (tempY > maxY) maxY = tempY;
+					if (tempY < minY) minY = tempY;
+					inY = true;
+				}
+
+				if (inX && inY) toDraw.Add(data);
 			}
 
 			float width = _dataPanel.rect.width / (maxX - minX);
 			float height = _dataPanel.rect.height / (maxY - minY);
-			foreach (GameObject data in _dataObjects)
+			foreach (GameObject data in toDraw)
 			{
 				GameObject marker = Instantiate(_markerPrefab, _entries.transform);
 				marker.GetComponent<ChartMarker>().LinkedObject = data;
@@ -189,32 +207,22 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <param name="height">The new height of the chart.</param>
 		public void ChangeSize(float width, float height)
 		{
-			//DataPanel
 			_dataPanel.sizeDelta = new Vector2(width - 100, height - 100);
 			_dataPanel.anchoredPosition = new Vector2(width / 2, height / 2);
-			//LabelsPanel
 			_labelsPanel.sizeDelta = new Vector2(width, height);
 			_labelsPanel.anchoredPosition = new Vector2(width / 2, height / 2);
-			//xDropdown
 			RectTransform xDropdown = _xAxisDropdown.GetComponent<RectTransform>();
 			xDropdown.anchoredPosition = new Vector2(width / 2, xDropdown.anchoredPosition.y);
 			xDropdown.sizeDelta = new Vector2(width / 3, xDropdown.sizeDelta.y);
-			//yDropdown
 			RectTransform yDropdown = _yAxisDropdown.GetComponent<RectTransform>();
 			yDropdown.anchoredPosition = new Vector2(yDropdown.anchoredPosition.x, height / 2);
 			yDropdown.sizeDelta = new Vector2(height / 3, yDropdown.sizeDelta.y);
-			//Chart
 			_chart.sizeDelta = new Vector2(width, height);
 			_topRight.localPosition = new Vector2(width / 2, height / 2);
 			_topLeft.localPosition = new Vector2(-width / 2, height / 2);
 			_bottomRight.localPosition = new Vector2(width / 2, -height / 2);
 			_bottomLeft.localPosition = new Vector2(-width / 2, -height / 2);
-			////DestroyButton
-			//_destroyButton.anchoredPosition = new Vector2(-width / 2 + 25, height / 2 - 25);
-			////DragButton
-			//_dragButton.anchoredPosition = new Vector2(width / 2 - 25, -height / 2 + 25);
-			////ColorButton
-			//_colorButton.anchoredPosition = new Vector2(width / 2 - 25, -height / 2 + 80);
+			_dragButton.localPosition = _bottomRight.localPosition - new Vector3(25f, -25f);
 
 			DrawData();
 		}
@@ -224,10 +232,9 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		public void ToggleMinimize()
 		{
-			//_labelsPanel.gameObject.SetActive(_minimized);
-			//_dataPanel.gameObject.SetActive(_minimized);
-			//_sizeButton.SetActive(_minimized);
-			//_destroyButton.gameObject.SetActive(_minimized);
+			_labelsPanel.gameObject.SetActive(_minimized);
+			_dataPanel.gameObject.SetActive(_minimized);
+			_sizeButton.SetActive(_minimized);
 			_minimized = !_minimized;
 		}
 

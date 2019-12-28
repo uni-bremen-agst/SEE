@@ -56,7 +56,7 @@ namespace Assets.SEECity.Charts.Scripts
 
 		/// <summary>
 		/// Checks the current <see cref="Input.mousePosition" /> and moves the chart to the corresponding
-		/// position on the canvas.
+		/// position on the canvas. //TODO: Does this work in VR?
 		/// </summary>
 		/// <param name="eventData">Event payload associated with pointer (mouse / touch) events.</param>
 		public void OnDrag(PointerEventData eventData)
