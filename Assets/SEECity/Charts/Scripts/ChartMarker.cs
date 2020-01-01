@@ -20,7 +20,11 @@ namespace Assets.SEECity.Charts.Scripts
 		/// The <see cref="Material" /> making the object look highlighted.
 		/// </summary>
 		[Header("Highlight Properties"), SerializeField]
-		private Material _highlightMaterial;
+		private Material _buildingHighlightMaterial;
+
+		[SerializeField] private GameObject _markerHighlight;
+
+		[SerializeField] private float _highlightDuration;
 
 		/// <summary>
 		/// Copy of the linked object with different material to make it look highlighted.
@@ -74,6 +78,7 @@ namespace Assets.SEECity.Charts.Scripts
 			_moveWithRotation = _gameManager.MoveWithRotation;
 			_cameraFlightTime = _gameManager.CameraFlightTime;
 			_clickDelay = _gameManager.ClickDelay;
+			_highlightDuration = _gameManager.HighlightDuration;
 		}
 
 		/// <summary>
@@ -98,12 +103,12 @@ namespace Assets.SEECity.Charts.Scripts
 			yield return new WaitForSeconds(_clickDelay);
 			if (_waiting)
 			{
-				HighlightLinkedObject();
+				StartCoroutine(TimedHighlight(_highlightDuration));
 			}
 			else
 			{
 				ShowLinkedObject();
-				HighlightLinkedObject(); //TODO: Replace with long
+				HighlightLinkedObjectToggle(true); //TODO: Deactivate when user switches target.
 			}
 
 			_waiting = false;
@@ -113,12 +118,20 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Highlights the <see cref="_linkedObject" />.
 		/// </summary>
-		public void HighlightLinkedObject()
+		private void HighlightLinkedObjectToggle(bool highlight)
 		{
-			_highlightCopy = Instantiate(_linkedObject, _linkedObject.transform);
-			_highlightCopy.GetComponent<Renderer>().material = _highlightMaterial;
+			if (highlight)
+			{
+				_highlightCopy = Instantiate(_linkedObject, _linkedObject.transform);
+				_highlightCopy.GetComponent<Renderer>().material = _buildingHighlightMaterial;
+			}
+			else
+			{
+				Destroy(_highlightCopy);
+			}
+
+			ToggleMarkerHighlight(highlight);
 		}
-		//TODO: Create separate methods for short and for continuous highlights.
 
 		/// <summary>
 		/// Moves the camera to view the <see cref="_linkedObject" />.
@@ -156,6 +169,11 @@ namespace Assets.SEECity.Charts.Scripts
 			}
 		}
 
+		public void ToggleMarkerHighlight(bool active)
+		{
+			_markerHighlight.SetActive(active);
+		}
+
 		/// <summary>
 		/// Moves the <see cref="Camera" /> smoothly from one position to another and rotates it to look
 		/// towards a specified position.
@@ -181,6 +199,13 @@ namespace Assets.SEECity.Charts.Scripts
 				_activeCamera.transform.rotation = lookAt;
 				_activeCamera.transform.position = newPos;
 			}
+		}
+
+		private IEnumerator TimedHighlight(float time)
+		{
+			HighlightLinkedObjectToggle(true);
+			yield return new WaitForSeconds(time);
+			HighlightLinkedObjectToggle(false);
 		}
 
 		/// <summary>

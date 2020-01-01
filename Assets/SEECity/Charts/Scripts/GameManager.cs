@@ -44,6 +44,8 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		[SerializeField] private float _highlightOutline = 0.005f;
 
+		public float HighlightDuration = 5f;
+
 		/// <summary>
 		/// Determines if the scene is being played in VR or not.
 		/// </summary>
