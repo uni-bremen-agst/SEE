@@ -184,11 +184,14 @@ namespace Assets.SEECity.Charts.Scripts
 			foreach (GameObject data in toDraw)
 			{
 				GameObject marker = Instantiate(_markerPrefab, _entries.transform);
-				marker.GetComponent<ChartMarker>().LinkedObject = data;
+				ChartMarker script = marker.GetComponent<ChartMarker>();
+				script.LinkedObject = data;
 				data.GetComponent<NodeRef>().node
 					.TryGetNumeric(_xAxisDropdown.Value, out float valueX);
 				data.GetComponent<NodeRef>().node
 					.TryGetNumeric(_yAxisDropdown.Value, out float valueY);
+				script.SetInfoText("X: " + valueX.ToString("0.00") + ", Y: " +
+				                   valueY.ToString("0.00"));
 				marker.GetComponent<RectTransform>().anchoredPosition = new Vector2(
 					(valueX - minX) * width, (valueY - minY) * height);
 				_activeMarkers.Add(marker);

@@ -1,12 +1,14 @@
 ﻿using System.Collections;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Assets.SEECity.Charts.Scripts
 {
 	/// <summary>
 	/// Contains the logic for the markers representing entries linked to objects in the chart.
 	/// </summary>
-	public class ChartMarker : MonoBehaviour
+	public class ChartMarker : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	{
 		private GameManager _gameManager;
 
@@ -25,6 +27,8 @@ namespace Assets.SEECity.Charts.Scripts
 		[SerializeField] private GameObject _markerHighlight;
 
 		[SerializeField] private float _highlightDuration;
+
+		[SerializeField] private TextMeshProUGUI _infoText;
 
 		/// <summary>
 		/// Copy of the linked object with different material to make it look highlighted.
@@ -224,6 +228,21 @@ namespace Assets.SEECity.Charts.Scripts
 			}
 
 			_activeCamera.transform.position = newPos;
+		}
+
+		public void SetInfoText(string info)
+		{
+			_infoText.text = info;
+		}
+
+		public void OnPointerEnter(PointerEventData eventData)
+		{
+			_infoText.gameObject.SetActive(true);
+		}
+
+		public void OnPointerExit(PointerEventData eventData)
+		{
+			_infoText.gameObject.SetActive(false);
 		}
 	}
 }
