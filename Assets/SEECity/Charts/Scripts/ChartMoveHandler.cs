@@ -19,6 +19,8 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		[SerializeField] private RectTransform _chart;
 
+		private RectTransform _screenSize;
+
 		/// <summary>
 		/// The time between <see cref="OnPointerDown" /> and <see cref="OnPointerUp" /> to be recognized as
 		/// click instead of a drag.
@@ -44,6 +46,7 @@ namespace Assets.SEECity.Charts.Scripts
 			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
 				.GetComponent<GameManager>();
 			_dragDelay = _gameManager.DragDelay;
+			_screenSize = _chart.transform.parent.parent.GetComponent<RectTransform>();
 		}
 
 		/// <summary>
@@ -62,9 +65,14 @@ namespace Assets.SEECity.Charts.Scripts
 		public void OnDrag(PointerEventData eventData)
 		{
 			RectTransform pos = GetComponent<RectTransform>();
-			_chart.position =
-				new Vector2(Input.mousePosition.x - pos.anchoredPosition.x * pos.lossyScale.x,
-					Input.mousePosition.y - pos.anchoredPosition.y * pos.lossyScale.y);
+			Vector2 newPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+			if (newPosition.x > 0 &&
+			    newPosition.x < _screenSize.sizeDelta.x * _screenSize.lossyScale.x &&
+			    newPosition.y > 0 &&
+			    newPosition.y < _screenSize.sizeDelta.y * _screenSize.lossyScale.y)
+				_chart.position =
+					new Vector2(newPosition.x - pos.anchoredPosition.x * pos.lossyScale.x,
+						newPosition.y - pos.anchoredPosition.y * pos.lossyScale.y);
 		}
 
 		/// <summary>
