@@ -190,8 +190,8 @@ namespace Assets.SEECity.Charts.Scripts
 					.TryGetNumeric(_xAxisDropdown.Value, out float valueX);
 				data.GetComponent<NodeRef>().node
 					.TryGetNumeric(_yAxisDropdown.Value, out float valueY);
-				script.SetInfoText("X: " + valueX.ToString("0.00") + ", Y: " +
-				                   valueY.ToString("0.00"));
+				script.SetInfoText("Building: " + script.LinkedObject.name + "\nX: " +
+				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("0.00"));
 				marker.GetComponent<RectTransform>().anchoredPosition = new Vector2(
 					(valueX - minX) * width, (valueY - minY) * height);
 				_activeMarkers.Add(marker);
@@ -239,6 +239,19 @@ namespace Assets.SEECity.Charts.Scripts
 			_dataPanel.gameObject.SetActive(_minimized);
 			_sizeButton.SetActive(_minimized);
 			_minimized = !_minimized;
+		}
+
+		public void AreaSelection(Vector2 a, Vector2 c)
+		{
+			foreach (GameObject marker in _activeMarkers)
+			{
+				RectTransform rect = marker.GetComponent<RectTransform>();
+				Vector2 b = new Vector2(-a.x, -c.y);
+				Vector2 d = new Vector2(-c.x, -a.y);
+				Vector2 p = rect.position;
+				float area = Vector2.Distance(a, b) * Vector2.Distance(a, d);
+				float apd = Vector2.Distance(a, p) * Vector2.Distance(a, d);
+			}
 		}
 
 		/// <summary>

@@ -17,6 +17,7 @@ namespace Assets.SEECity.Charts.Scripts
 		private bool _moveWithRotation;
 		private float _cameraFlightTime;
 		private float _clickDelay;
+		private float _highlightDuration;
 
 		/// <summary>
 		/// The <see cref="Material" /> making the object look highlighted.
@@ -25,8 +26,6 @@ namespace Assets.SEECity.Charts.Scripts
 		private Material _buildingHighlightMaterial;
 
 		[SerializeField] private GameObject _markerHighlight;
-
-		[SerializeField] private float _highlightDuration;
 
 		[SerializeField] private TextMeshProUGUI _infoText;
 
@@ -38,12 +37,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// The <see cref="GameObject" /> in the code city that is connected with this button.
 		/// </summary>
-		private GameObject _linkedObject;
-
-		public GameObject LinkedObject
-		{
-			set => _linkedObject = value;
-		}
+		public GameObject LinkedObject;
 
 		/// <summary>
 		/// The active <see cref="Camera" /> in the scene.
@@ -120,13 +114,13 @@ namespace Assets.SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Highlights the <see cref="_linkedObject" />.
+		/// Highlights the <see cref="LinkedObject" />.
 		/// </summary>
 		private void HighlightLinkedObjectToggle(bool highlight)
 		{
 			if (highlight)
 			{
-				_highlightCopy = Instantiate(_linkedObject, _linkedObject.transform);
+				_highlightCopy = Instantiate(LinkedObject, LinkedObject.transform);
 				_highlightCopy.GetComponent<Renderer>().material = _buildingHighlightMaterial;
 			}
 			else
@@ -138,7 +132,7 @@ namespace Assets.SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Moves the camera to view the <see cref="_linkedObject" />.
+		/// Moves the camera to view the <see cref="LinkedObject" />.
 		/// </summary>
 		private void ShowLinkedObject()
 		{
@@ -152,10 +146,10 @@ namespace Assets.SEECity.Charts.Scripts
 				}
 
 				Vector3 lookPos =
-					_linkedObject.transform.position - _activeCamera.transform.position;
+					LinkedObject.transform.position - _activeCamera.transform.position;
 				_runningCamera = StartCoroutine(MoveCameraTo(
 					Vector3.MoveTowards(_activeCamera.transform.position,
-						_linkedObject.transform.position,
+						LinkedObject.transform.position,
 						lookPos.magnitude - _cameraDistance), Quaternion.LookRotation(lookPos)));
 			}
 			else
@@ -167,9 +161,9 @@ namespace Assets.SEECity.Charts.Scripts
 				}
 
 				_runningCamera = StartCoroutine(MoveCameraTo(new Vector3(
-					_linkedObject.transform.position.x,
+					LinkedObject.transform.position.x,
 					_activeCamera.transform.position.y,
-					_linkedObject.transform.position.z - _cameraDistance)));
+					LinkedObject.transform.position.z - _cameraDistance)));
 			}
 		}
 
@@ -188,7 +182,7 @@ namespace Assets.SEECity.Charts.Scripts
 		private IEnumerator MoveCameraTo(Vector3 newPos, Quaternion lookAt)
 		{
 			Vector3 oldPos = _activeCamera.transform.position;
-			if (newPos != _linkedObject.transform.position)
+			if (newPos != LinkedObject.transform.position)
 			{
 				Quaternion oldRot = _activeCamera.transform.rotation;
 				for (float time = 0f; time <= _cameraFlightTime; time += Time.deltaTime)
