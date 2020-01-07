@@ -12,7 +12,12 @@ namespace Assets.SEECity.Charts.Scripts
 	public class ChartContent : MonoBehaviour
 	{
 		/// <summary>
-		/// The color of the chart to better distinguish it from others.
+		/// Contains settings used by <see cref="ChartContent" />.
+		/// </summary>
+		private GameManager _gameManager;
+
+		/// <summary>
+		/// The color of the chart to better distinguish it from others. TODO: Add colors?
 		/// </summary>
 		private Color _color;
 
@@ -21,6 +26,9 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private GameObject[] _dataObjects;
 
+		/// <summary>
+		/// Contains all keys contained in any <see cref="GameObject" /> of <see cref="_dataObjects" />.
+		/// </summary>
 		public List<string> AllKeys { get; } = new List<string>();
 
 		/// <summary>
@@ -34,7 +42,7 @@ namespace Assets.SEECity.Charts.Scripts
 		[SerializeField] private AxisContentDropdown _yAxisDropdown;
 
 		/// <summary>
-		/// A <see cref="ChartMarker" /> to display content in charts.
+		/// The prefab used to display content in charts.
 		/// </summary>
 		[SerializeField] private GameObject _markerPrefab;
 
@@ -65,14 +73,16 @@ namespace Assets.SEECity.Charts.Scripts
 		/// The panel on which the <see cref="ChartMarker" />s are instantiated.
 		/// </summary>
 		[Header("For resizing and minimizing"), SerializeField]
-		private Transform _topRight;
+		private RectTransform _dataPanel;
 
+		[SerializeField] private Transform _topRight;
 		[SerializeField] private Transform _topLeft;
 		[SerializeField] private Transform _bottomRight;
 		[SerializeField] private Transform _bottomLeft;
 
-		[SerializeField] private RectTransform _dataPanel;
-
+		/// <summary>
+		/// The panel on which the buttons and scales of the chart are displayed.
+		/// </summary>
 		[SerializeField] private RectTransform _labelsPanel;
 
 		[SerializeField] private RectTransform _chart;
@@ -81,6 +91,9 @@ namespace Assets.SEECity.Charts.Scripts
 
 		[SerializeField] private Transform _dragButton;
 
+		/// <summary>
+		/// If the chart is currently minimized or not.
+		/// </summary>
 		private bool _minimized;
 
 		/// <summary>
@@ -88,12 +101,18 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private void Start()
 		{
+			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
+				.GetComponent<GameManager>();
 			FindDataObjects();
 			GetAllFloats();
 			GetAllIntegers();
 			StartCoroutine(FirstInitialization());
 		}
 
+		/// <summary>
+		/// Gets all keys for <see cref="float" /> values contained in the <see cref="NodeRef" /> of each
+		/// <see cref="GameObject" /> in <see cref="_dataObjects" />.
+		/// </summary>
 		private void GetAllFloats()
 		{
 			foreach (GameObject data in _dataObjects)
@@ -102,6 +121,10 @@ namespace Assets.SEECity.Charts.Scripts
 					AllKeys.Add(key);
 		}
 
+		/// <summary>
+		/// Gets all keys for <see cref="int" /> values contained in the <see cref="NodeRef" /> of each
+		/// <see cref="GameObject" /> in <see cref="_dataObjects" />.
+		/// </summary>
 		private void GetAllIntegers()
 		{
 			foreach (GameObject data in _dataObjects)
@@ -123,7 +146,6 @@ namespace Assets.SEECity.Charts.Scripts
 
 		/// <summary>
 		/// Fills a List with all objects that will be in the chart.
-		/// TODO: Show different types of objects in chart (edges, nodes)?
 		/// </summary>
 		private void FindDataObjects()
 		{
@@ -241,17 +263,25 @@ namespace Assets.SEECity.Charts.Scripts
 			_minimized = !_minimized;
 		}
 
-		public void AreaSelection(Vector2 a, Vector2 c)
+		public void AreaSelection(Vector2 min, Vector2 max, bool direction)
 		{
-			foreach (GameObject marker in _activeMarkers)
-			{
-				RectTransform rect = marker.GetComponent<RectTransform>();
-				Vector2 b = new Vector2(-a.x, -c.y);
-				Vector2 d = new Vector2(-c.x, -a.y);
-				Vector2 p = rect.position;
-				float area = Vector2.Distance(a, b) * Vector2.Distance(a, d);
-				float apd = Vector2.Distance(a, p) * Vector2.Distance(a, d);
-			}
+			float highlightDuration = _gameManager.HighlightDuration;
+			if (direction)
+				foreach (GameObject marker in _activeMarkers)
+				{
+					Vector2 markerPos = marker.transform.position;
+					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y &&
+					    markerPos.y < max.y)
+						marker.GetComponent<ChartMarker>().TimedHighlight(highlightDuration);
+				}
+			else
+				foreach (GameObject marker in _activeMarkers)
+				{
+					Vector2 markerPos = marker.transform.position;
+					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y &&
+					    markerPos.y > max.y)
+						marker.GetComponent<ChartMarker>().TimedHighlight(highlightDuration);
+				}
 		}
 
 		/// <summary>
