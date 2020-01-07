@@ -9,8 +9,19 @@ namespace Assets.SEECity.Charts.Scripts
 	public class MultiSelectHandler : MonoBehaviour, IPointerDownHandler, IDragHandler,
 		IPointerUpHandler
 	{
+		/// <summary>
+		/// The rectangle used to visualize the selection process for the user.
+		/// </summary>
 		[SerializeField] private RectTransform _selectionRect;
 
+		/// <summary>
+		/// Needed for access to <see cref="ChartContent.AreaSelection" />.
+		/// </summary>
+		[SerializeField] private ChartContent _chartContent;
+
+		/// <summary>
+		/// The position the user started the drag at.
+		/// </summary>
 		private Vector3 _startingPos;
 
 		/// <summary>
@@ -89,7 +100,12 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <param name="eventData"></param>
 		public void OnPointerUp(PointerEventData eventData)
 		{
-			//TODO: Activate markers
+			Vector2 finalPos = Input.mousePosition;
+			if (_startingPos.x < finalPos.x)
+				_chartContent.AreaSelection(_startingPos, finalPos, _startingPos.y < finalPos.y);
+			else
+				_chartContent.AreaSelection(finalPos, _startingPos, _startingPos.y > finalPos.y);
+
 			_selectionRect.gameObject.SetActive(false);
 		}
 	}

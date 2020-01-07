@@ -10,9 +10,12 @@ namespace Assets.SEECity.Charts.Scripts
 	/// </summary>
 	public class ChartMarker : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	{
+		/// <summary>
+		/// Contains some settings used by <see cref="ChartMarker" />.
+		/// </summary>
 		private GameManager _gameManager;
 
-		//User Variables
+		//User Variables from GameManager
 		private float _cameraDistance;
 		private bool _moveWithRotation;
 		private float _cameraFlightTime;
@@ -25,12 +28,18 @@ namespace Assets.SEECity.Charts.Scripts
 		[Header("Highlight Properties"), SerializeField]
 		private Material _buildingHighlightMaterial;
 
+		/// <summary>
+		/// The <see cref="GameObject" /> making the marker look highlighted when active.
+		/// </summary>
 		[SerializeField] private GameObject _markerHighlight;
 
-		[SerializeField] private TextMeshProUGUI _infoText;
+		/// <summary>
+		/// A text popup containing useful information about the marker and its <see cref="LinkedObject" />.
+		/// </summary>
+		[Header("Other"), SerializeField] private TextMeshProUGUI _infoText;
 
 		/// <summary>
-		/// Copy of the linked object with different material to make it look highlighted.
+		/// Copy of the <see cref="LinkedObject" /> with different material to make it look highlighted.
 		/// </summary>
 		private GameObject _highlightCopy;
 
@@ -44,9 +53,11 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private Camera _activeCamera;
 
-		private Coroutine _runningCamera;
+		/// <summary>
+		/// The currently running camera movement <see cref="Coroutine" />.
+		/// </summary>
+		private Coroutine _cameraMoving;
 
-		//Double click booleans
 		/// <summary>
 		/// Determines if a second click happened during <see cref="_clickDelay" />.
 		/// </summary>
@@ -56,6 +67,11 @@ namespace Assets.SEECity.Charts.Scripts
 		/// Determines if <see cref="WaitForDoubleClick" /> is currently running.
 		/// </summary>
 		private bool _runningClick;
+
+		/// <summary>
+		/// The currently running <see cref="TimedHighlightRoutine" />.
+		/// </summary>
+		private Coroutine _timedHighlight;
 
 		/// <summary>
 		/// Links the <see cref="GameManager" /> and calls methods for initialization.
@@ -101,7 +117,7 @@ namespace Assets.SEECity.Charts.Scripts
 			yield return new WaitForSeconds(_clickDelay);
 			if (_waiting)
 			{
-				StartCoroutine(TimedHighlight(_highlightDuration));
+				TimedHighlight(_highlightDuration);
 			}
 			else
 			{
@@ -131,6 +147,33 @@ namespace Assets.SEECity.Charts.Scripts
 			ToggleMarkerHighlight(highlight);
 		}
 
+		public void ToggleMarkerHighlight(bool active)
+		{
+			_markerHighlight.SetActive(active);
+		}
+
+		/// <summary>
+		/// Highlights this marker and its <see cref="LinkedObject" /> for a given amount of time.
+		/// </summary>
+		/// <param name="time">How long the highlight will last.</param>
+		public void TimedHighlight(float time)
+		{
+			if (_timedHighlight != null)
+			{
+				StopCoroutine(_timedHighlight);
+				HighlightLinkedObjectToggle(false);
+			}
+
+			_timedHighlight = StartCoroutine(TimedHighlightRoutine(time));
+		}
+
+		public IEnumerator TimedHighlightRoutine(float time)
+		{
+			HighlightLinkedObjectToggle(true);
+			yield return new WaitForSeconds(time);
+			HighlightLinkedObjectToggle(false);
+		}
+
 		/// <summary>
 		/// Moves the camera to view the <see cref="LinkedObject" />.
 		/// </summary>
@@ -139,37 +182,32 @@ namespace Assets.SEECity.Charts.Scripts
 			_activeCamera = Camera.main; //TODO: Change to active camera and not just main camera.
 			if (_moveWithRotation)
 			{
-				if (_runningCamera != null)
+				if (_cameraMoving != null)
 				{
-					StopCoroutine(_runningCamera);
-					_runningCamera = null;
+					StopCoroutine(_cameraMoving);
+					_cameraMoving = null;
 				}
 
 				Vector3 lookPos =
 					LinkedObject.transform.position - _activeCamera.transform.position;
-				_runningCamera = StartCoroutine(MoveCameraTo(
+				_cameraMoving = StartCoroutine(MoveCameraTo(
 					Vector3.MoveTowards(_activeCamera.transform.position,
 						LinkedObject.transform.position,
 						lookPos.magnitude - _cameraDistance), Quaternion.LookRotation(lookPos)));
 			}
 			else
 			{
-				if (_runningCamera != null)
+				if (_cameraMoving != null)
 				{
-					StopCoroutine(_runningCamera);
-					_runningCamera = null;
+					StopCoroutine(_cameraMoving);
+					_cameraMoving = null;
 				}
 
-				_runningCamera = StartCoroutine(MoveCameraTo(new Vector3(
+				_cameraMoving = StartCoroutine(MoveCameraTo(new Vector3(
 					LinkedObject.transform.position.x,
 					_activeCamera.transform.position.y,
 					LinkedObject.transform.position.z - _cameraDistance)));
 			}
-		}
-
-		public void ToggleMarkerHighlight(bool active)
-		{
-			_markerHighlight.SetActive(active);
 		}
 
 		/// <summary>
@@ -199,13 +237,6 @@ namespace Assets.SEECity.Charts.Scripts
 			}
 		}
 
-		private IEnumerator TimedHighlight(float time)
-		{
-			HighlightLinkedObjectToggle(true);
-			yield return new WaitForSeconds(time);
-			HighlightLinkedObjectToggle(false);
-		}
-
 		/// <summary>
 		/// Moves the camera smoothly from one position to another without rotation.
 		/// </summary>
@@ -224,16 +255,28 @@ namespace Assets.SEECity.Charts.Scripts
 			_activeCamera.transform.position = newPos;
 		}
 
+		/// <summary>
+		/// Changes the <see cref="_infoText" /> of this marker.
+		/// </summary>
+		/// <param name="info">The new text.</param>
 		public void SetInfoText(string info)
 		{
 			_infoText.text = info;
 		}
 
+		/// <summary>
+		/// Activates the <see cref="_infoText" />.
+		/// </summary>
+		/// <param name="eventData"></param>
 		public void OnPointerEnter(PointerEventData eventData)
 		{
 			_infoText.gameObject.SetActive(true);
 		}
 
+		/// <summary>
+		/// Deactivates the <see cref="_infoText" />.
+		/// </summary>
+		/// <param name="eventData"></param>
 		public void OnPointerExit(PointerEventData eventData)
 		{
 			_infoText.gameObject.SetActive(false);

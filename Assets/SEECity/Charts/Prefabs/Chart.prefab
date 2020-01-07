@@ -1613,6 +1613,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _selectionRect: {fileID: 1369683637068924532}
+  _chartContent: {fileID: 4785276354945708475}
 --- !u!1 &4785276354945708473
 GameObject:
   m_ObjectHideFlags: 0
