@@ -23,86 +23,70 @@ public class CCARender : AbstractCCARender
     protected override void RenderRoot(Node node)
     {
         var isPlaneNew = !ObjectManager.GetRoot(out GameObject root);
-
-        if (isPlaneNew)
-        {
-
-        }
-
-        /*
-         * TODO Animation
-         void onAnimateStart
-         void onAnimateTo
-         void onAnimateRemove
-        */
         var nodeTransform = Layout.GetNodeTransform(node);
-
-
-
-        root.transform.position = nodeTransform.position;
-        var scal = new Vector3(100, 1, 100);
-        scal.Scale(nodeTransform.scale);
-        iTween.ScaleTo(root, iTween.Hash(
-            "scale", nodeTransform.scale,
-            "time", 2
-        ));
-        //root.transform.localScale = scal;
+        if(isPlaneNew)
+        {
+            root.transform.position = Vector3.zero;
+            root.transform.localScale = nodeTransform.scale;
+        }
+        else
+        {
+            SimpleAnim.AnimateTo(node, root, Vector3.zero, nodeTransform.scale);
+        }
     }
 
     protected override void RenderInnerNode(Node node)
     {
-        //var isCircleNew = !objectManager.GetInnerNode(node, out GameObject circle);
+        var isCircleNew = !ObjectManager.GetInnerNode(node, out GameObject circle);
+        var nodeTransform = Layout.GetNodeTransform(node);
+        var circlePosition = nodeTransform.position;
+        var circleRadius = nodeTransform.scale;
 
-        //var circlePosition = Layout.CirclePosition(node);
-        //var circleRadius = Layout.CircleRadius(node);
-
-        /*
-         * TODO Animation
-         void onAnimateStart
-         void onAnimateTo
-         void onAnimateRemove
-        */
-
-        //ExtendedTextFactory.UpdateText(circleText, node.SourceName, circlePosition, circleRadius);
+        ExtendedTextFactory.UpdateText(circle, node.SourceName, circlePosition, circleRadius.x);
     }
 
     protected override void RenderLeaf(Node node)
     {
         var isLeafNew = !ObjectManager.GetLeaf(node, out GameObject leaf);
         var nodeTransform = Layout.GetNodeTransform(node);
-        var position = nodeTransform.position;
-        var scale = nodeTransform.scale;
-        // TODO more leaf initialisation
-        void animateWith(AbstractCCAAnimator animator)
-        {
-            animator.AnimateTo(node, leaf, position, scale);
-        }
-        ObjectManager.NodeFactory.SetGroundPosition(leaf, position);
-        // TODO calculate smaller size to correctly scale
-        ObjectManager.NodeFactory.SetSize(leaf, scale);
-        //leaf.transform.localScale = scale;
-        /*
+        var nextPosition = nodeTransform.position;
+        var nextScale = nodeTransform.scale;
+
+        var oldPosition = leaf.transform.position;
+        var oldSize = ObjectManager.NodeFactory.GetSize(leaf);
+        ObjectManager.NodeFactory.SetSize(leaf, nextScale);
+        ObjectManager.NodeFactory.SetGroundPosition(leaf, nextPosition);
+        var realNewPosition = leaf.transform.position;
+        
+        var actualSize = ObjectManager.NodeFactory.GetSize(leaf);
+        var sizeDifference = new Vector3(oldSize.x / actualSize.x, oldSize.y / actualSize.y, oldSize.z / actualSize.z);
+
         if (isLeafNew)
         {
-            var height = 100; // TODO object size
-            position.y -= height;
-            leaf.transform.position = position;
-            position.y += height;
-            MoveAnim.AnimateTo(node, leaf, position, scale);
+            actualSize.y += 1; // Für eine glattere Animation
+            actualSize.x = 0;
+            actualSize.z = 0;
+            leaf.transform.position -= actualSize;
+            SimpleAnim.AnimateTo(node, leaf, realNewPosition, Vector3.one);
         }
         else if (node.WasModified())
         {
-            animateWith(SimpleAnim);
+            leaf.transform.position = oldPosition;
+            leaf.transform.localScale = sizeDifference;
+            SimpleAnim.AnimateTo(node, leaf, realNewPosition, Vector3.one);
         }
         else if (node.WasRelocated(out string oldLinkageName))
         {
-            animateWith(SimpleAnim);
+            leaf.transform.position = oldPosition;
+            leaf.transform.localScale = sizeDifference;
+            SimpleAnim.AnimateTo(node, leaf, realNewPosition, Vector3.one);
         }
         else
         {
-            animateWith(SimpleAnim);
+            leaf.transform.position = oldPosition;
+            leaf.transform.localScale = sizeDifference;
+            SimpleAnim.AnimateTo(node, leaf, realNewPosition, Vector3.one);
         }
-        */
     }
 
     protected override void RenderEdge(Edge edge)
@@ -123,13 +107,12 @@ public class CCARender : AbstractCCARender
     {
         if(ObjectManager.RemoveNode(node, out GameObject leaf))
         {
-            var height = 100; // TODO object size
             var nodeTransform = Layout.GetNodeTransform(node);
-            var position = nodeTransform.position;
-            var scale = nodeTransform.scale;
-            gameObject.transform.position = position;
-            position.y -= height;
-            MoveAnim.AnimateTo(node, leaf, position, scale, OnRemovedNodeFinishedAnimation);
+            var actualSize = ObjectManager.NodeFactory.GetSize(leaf);
+            actualSize.x = 0;
+            actualSize.z = 0;
+            var nextPosition = leaf.transform.position - actualSize;
+            MoveAnim.AnimateTo(node, leaf, nextPosition, Vector3.one, OnRemovedNodeFinishedAnimation);
         }
     }
 

@@ -11,32 +11,21 @@ public class SimpleCCAAnimator : AbstractCCAAnimator
 {
     protected override void AnimateToInternal(Node node, GameObject gameObject, Vector3 position, Vector3 scale)
     {
-        // TODO remove if things
-        if (node.WasModified())
-        {
-            iTween.MoveTo(gameObject, iTween.Hash(
+        iTween.MoveTo(gameObject, iTween.Hash(
                 "position", position,
                 "time", MaxAnimationTime
             ));
-            iTween.ScaleTo(gameObject, iTween.Hash(
-                "scale", scale,
-                "time", MaxAnimationTime
-            ));
+        iTween.ScaleTo(gameObject, iTween.Hash(
+            "scale", scale,
+            "time", MaxAnimationTime
+        ));
+
+        if (node.WasModified())
+        {
             iTween.ShakeRotation(gameObject, iTween.Hash(
                 "amount", new Vector3(0, 10, 0),
                 "time", MaxAnimationTime / 2,
                 "delay", MaxAnimationTime / 2
-            ));
-        }
-        else
-        {
-            iTween.MoveTo(gameObject, iTween.Hash(
-                "position", position,
-                "time", MaxAnimationTime
-            ));
-            iTween.ScaleTo(gameObject, iTween.Hash(
-                "scale", scale,
-                "time", MaxAnimationTime
             ));
         }
     }
@@ -54,5 +43,14 @@ public class SimpleCCAAnimator : AbstractCCAAnimator
             "scale", scale,
             "time", MaxAnimationTime
         ));
+
+        if (node.WasModified())
+        {
+            iTween.ShakeRotation(gameObject, iTween.Hash(
+                "amount", new Vector3(0, 10, 0),
+                "time", MaxAnimationTime / 2,
+                "delay", MaxAnimationTime / 2
+            ));
+        }
     }
 }
