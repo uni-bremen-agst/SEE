@@ -15,6 +15,7 @@ TagManager:
   - Block
   - Decoration
   - GameManager
+  - Pointer
   layers:
   - Default
   - TransparentFX

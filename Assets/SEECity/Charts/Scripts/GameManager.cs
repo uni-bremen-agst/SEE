@@ -51,6 +51,8 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		[Header("Virtual Reality")] public bool IsVirtualReality;
 
+		public float PointerLength = 5f;
+
 		/// <summary>
 		/// The current thickness of the highlight outline of <see cref="_highlightMaterial" /> used in
 		/// animations.
@@ -61,7 +63,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Enforces singleton pattern.
 		/// </summary>
-		private void Start()
+		private void Awake()
 		{
 			if (_instance == null)
 				_instance = this;
