@@ -9,6 +9,11 @@ namespace SEE.Layout
     /// </summary>
     public class BuildingFactory : NodeFactory
     {
+        public BuildingFactory()
+        {
+            Unit = CScapeUnit;
+        }
+
         /// <summary>
         /// The number of building types offered.
         /// </summary>
@@ -63,29 +68,53 @@ namespace SEE.Layout
         /// <summary>
         /// The loaded prefabs for the CScape building we use for their instantiation.
         /// </summary>
-        private static readonly UnityEngine.Object[] prefabs = LoadAllPrefabs();
+        private static readonly GameObject[] prefabs = LoadAllPrefabs();
 
         /// <summary>
         /// Loads and returns all prefabs listed in prefabFiles.
         /// </summary>
         /// <returns>all prefabs listed in prefabFiles</returns>
-        private static UnityEngine.Object[] LoadAllPrefabs()
+        private static GameObject[] LoadAllPrefabs()
         {
-            UnityEngine.Object[] result = new UnityEngine.Object[prefabFiles.Length];
+            GameObject[] result = new GameObject[prefabFiles.Length];
             int i = 0;
             foreach (string filename in prefabFiles)
             {
                 string path = pathPrefix + filename;
                 result[i] = Resources.Load<GameObject>(path);
-
-                //result[i] = Resources.Load<UnityEngine.Object>(filename);
                 if (result[i] == null)
                 {
                     Debug.LogErrorFormat("[BuildingFactory] Could not load building prefab {0}.\n", path);
                 }
+                else
+                {
+                    ResetChildren(result[i]);
+                }
                 i++;
             }
             return result;
+        }
+
+        /// <summary>
+        /// Re-sets all children to the default values concerning shadowing and collision
+        /// (both are turned off).
+        /// </summary>
+        /// <param name="parent">parent game object whose children game object are to be reset</param>
+        private static void ResetChildren(GameObject parent)
+        {
+            // Set default values for all children (rooftops)
+            foreach (Transform child in parent.transform)
+            {
+                GameObject kid = child.gameObject;
+                kid.isStatic = true;
+                NoShadows(kid);
+                // disable colliders
+                Collider collider = kid.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    collider.enabled = false;
+                }
+            }
         }
 
         /// <summary>
@@ -149,11 +178,6 @@ namespace SEE.Layout
             return NewBuilding(prefabs[index]);
         }
 
-        public override float Unit()
-        {
-            return CScapeUnit;
-        }
-
         /// <summary>
         /// One CScape unit (floor level height) is three Unity units.
         /// One Unity unit represents one meter in real world. Three meters
@@ -165,15 +189,15 @@ namespace SEE.Layout
         /// Instantiates the given prefab (a CScape building) and sets various
         /// parameters.
         /// </summary>
-        /// <param name="prefab"></param>
-        /// <returns></returns>
+        /// <param name="prefab">building prefab to be instantiated</param>
+        /// <returns>returns an instantiation of the given building prefab with default settings</returns>
         private static GameObject NewBuilding(UnityEngine.Object prefab)
         {
             GameObject building = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
             building.tag = Tags.Building;
             building.isStatic = true;
 
-            CSRooftops csRooftopsModifier = building.GetComponent(typeof(CSRooftops)) as CSRooftops;
+            CSRooftops csRooftopsModifier = building.GetComponent<CSRooftops>();
             if (csRooftopsModifier != null)
             {
                 csRooftopsModifier.randomSeed = UnityEngine.Random.Range(0, 1000000);
@@ -185,7 +209,7 @@ namespace SEE.Layout
                 Debug.LogWarningFormat("[BuildingFactory] {0} has no rooftop modifier.\n", building.name);
             }
 
-            CSAdvertising csAdverts = building.GetComponent(typeof(CSAdvertising)) as CSAdvertising;
+            CSAdvertising csAdverts = building.GetComponent<CSAdvertising>();
             if (csAdverts != null)
             {
                 csAdverts.randomSeed = UnityEngine.Random.Range(0, 1000000);
@@ -198,13 +222,13 @@ namespace SEE.Layout
             // A building modifier allows us to modify basic properties such as the facade shape, Graffiti, etc.
             // The kinds of properties and their effect can be investigated in the Unity Inspector when a building
             // is selected.
-            BuildingModifier buildingModifier = building.GetComponent(typeof(BuildingModifier)) as BuildingModifier;
+            BuildingModifier buildingModifier = building.GetComponent<BuildingModifier>();
             if (buildingModifier != null)
             {
                 // Set width and depth of building in terms of building units, not Unity units.
                 // A city is real world scaled (1 meter = 1 unity unit) so that it looks natural in VR. 
                 // CScape is using a unit of 3 meters as a standard CScape unit (CScape unit = 3m), 
-                // as the developer found that that unit is a best measure for distances (3m for floor 
+                // as the developer found that that unit is a good measure for distances (3m for floor 
                 // heights, 3m for street lanes). 
                 buildingModifier.buildingWidth = 10;
                 buildingModifier.buildingDepth = 5;
@@ -218,7 +242,18 @@ namespace SEE.Layout
             {
                 Debug.LogWarningFormat("[BuildingFactory] {0} has no building modifier.\n", building.name);
             }
-            Renderer renderer = building.GetComponent<Renderer>();
+            NoShadows(building);
+            ResetChildren(building);
+            return building;
+        }
+
+        /// <summary>
+        /// Turns off shadow casting and receiving.
+        /// </summary>
+        /// <param name="gameObject">game object for which to disable shadowing</param>
+        private static void NoShadows(GameObject gameObject)
+        {
+            Renderer renderer = gameObject.GetComponent<Renderer>();
             if (renderer != null)
             {
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
@@ -226,9 +261,8 @@ namespace SEE.Layout
             }
             else
             {
-                Debug.LogWarningFormat("[BuildingFactory] {0} has no renderer.\n", building.name);
+                Debug.LogWarningFormat("[BuildingFactory] {0} has no renderer.\n", gameObject.name);
             }
-            return building;
         }
 
         /// <summary>
@@ -253,9 +287,9 @@ namespace SEE.Layout
             }
             else
             {
-                bm.buildingWidth = (int)(size.x / Unit());
-                bm.floorNumber = (int)(size.y / Unit());
-                bm.buildingDepth = (int)(size.z / Unit());
+                bm.buildingWidth = (int)(size.x / Unit);
+                bm.floorNumber = (int)(size.y / Unit);
+                bm.buildingDepth = (int)(size.z / Unit);
                 bm.UpdateCity();
                 bm.AwakeCity();
             }
@@ -294,17 +328,15 @@ namespace SEE.Layout
                 switch (length)
                 {
                     case Length.width:
-                        bm.buildingWidth = (int)(value / Unit());
+                        bm.buildingWidth = Mathf.RoundToInt(value / Unit);
                         break;
                     case Length.height:
-                        bm.floorNumber = (int)(value / Unit());
+                        bm.floorNumber = Mathf.RoundToInt(value / Unit);
                         break;
                     case Length.depth:
-                        bm.buildingDepth = (int)(value / Unit());
+                        bm.buildingDepth = Mathf.RoundToInt(value / Unit);
                         break;
                 }
-                bm.UpdateCity();
-                bm.AwakeCity();
             }
         }
 
@@ -395,6 +427,18 @@ namespace SEE.Layout
             // bottom below the center
             result.y = block.transform.position.y;
             return result;
+        }
+
+        /// <summary>
+        /// Rotates the given object by the given degree along the y axis (i.e., relative to the ground).
+        /// </summary>
+        /// <param name="gameNode">object to be rotated</param>
+        /// <param name="degree">degree of rotation</param>
+        public override void Rotate(GameObject block, float degree)
+        {
+            // Unlike normal Unity objects, CScape buildings are rotated relative to the left front corner
+            // at ground level. That is why we need to select the ground center as the anchor of rotation.
+            block.transform.RotateAround(Ground(block), Vector3.up, degree);
         }
     }
 }

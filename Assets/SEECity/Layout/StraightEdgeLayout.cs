@@ -24,7 +24,7 @@ namespace SEE.Layout
             // to the height of the largest block.
             // This offset is used to draw the line somewhat below
             // or above the house (depending on the orientation).
-            float offset = blockFactory.Unit(); // must be positive
+            float offset = blockFactory.Unit; // must be positive
             // The level at which edges are drawn. This value is used only if the
             // edges are to be drawn above the blocks.
             float edgeLevel = maxBlockHeight + offset;
@@ -53,7 +53,7 @@ namespace SEE.Layout
                     line.sharedMaterial = defaultLineMaterial;
 
                     LineFactory.SetDefaults(line);
-                    LineFactory.SetWidth(line, edgeWidth * blockFactory.Unit());
+                    LineFactory.SetWidth(line, edgeWidth * blockFactory.Unit);
 
                     // If enabled, the lines are defined in world space.
                     // This means the object's position is ignored, and the lines are rendered around 

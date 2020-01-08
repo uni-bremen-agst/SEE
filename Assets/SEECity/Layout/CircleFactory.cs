@@ -7,26 +7,40 @@ namespace SEE.Layout
     /// </summary>
     public class CircleFactory : LineInnerNodeFactory
     {
-        // The material we use for the circle lines.
-        private Material material;
-
-        // The default color for circle lines.
-        public static Color DefaultColor = Color.blue;
-
-        public CircleFactory()
+        /// <summary>
+        /// Constructor allowing to set the initial unit for the width of the lines that render this inner node.
+        /// Every line width passed as a parameter to methods of this class will be multiplied by this factor
+        /// for the actual rendering.
+        /// </summary>
+        /// <param name="unit">initial unit for the width of all lines</param>
+        public CircleFactory(float unit)
+            : base(unit)
         {
             materials = new Materials(1, DefaultColor, DefaultColor);
             material = new Material(materials.DefaultMaterial(0));
             material.color = DefaultColor;
         }
 
+        /// <summary>
+        /// The default color for circle lines.
+        /// </summary>
+        public static Color DefaultColor = Color.blue;
+
+        /// <summary>
+        /// The material we use for the circle lines.
+        /// </summary>
+        private Material material;
+
+        /// <summary>
+        /// The default radius of a circle if none is given.
+        /// </summary>
         private const float defaultRadius = 0.5f;
 
         public override GameObject NewBlock(int index = 0)
         {
             GameObject result = new GameObject();
             result.isStatic = true;
-            AttachCircleLine(result, defaultRadius, defaultLineWidth * Unit(), DefaultColor);
+            AttachCircleLine(result, defaultRadius, Unit * defaultLineWidth, DefaultColor);
             return result;
         }
 

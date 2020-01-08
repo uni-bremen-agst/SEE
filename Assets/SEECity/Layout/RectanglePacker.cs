@@ -30,7 +30,7 @@ namespace SEE.Layout
             : base(groundLevel, leafNodeFactory)
         {
             name = "Rectangle Packing";
-            this.padding = padding * leafNodeFactory.Unit();
+            this.padding = padding * leafNodeFactory.Unit;
         }
 
         private readonly float padding;

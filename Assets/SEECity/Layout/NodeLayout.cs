@@ -1,10 +1,12 @@
 ﻿using SEE.DataModel;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
 {
+    /// <summary>
+    /// The abstract super class of all node layouts.
+    /// </summary>
     public abstract class NodeLayout
     {
         /// <summary>
@@ -81,6 +83,10 @@ namespace SEE.Layout
         /// i.e., the game object's position and scale.
         /// 
         /// Precondition: each game node must contain a NodeRef component.
+        /// 
+        /// IMPORTANT NOTE: The y co-ordinate of the position in NodeTransform will 
+        /// be interpreted as the ground position of the game object (unlike in Unity 
+        /// where it is the center height).
         /// </summary>
         /// <param name="gameNodes">set of game nodes for which to compute the layout</param>
         /// <returns>node layout</returns>
