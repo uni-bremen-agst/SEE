@@ -160,8 +160,26 @@ public class CCAStateManager : MonoBehaviour
         graphLoader.LoadGraphData(Settings);
         ViewDataChangedEvent.Invoke();
 
-        List<string> nodeMetrics = new List<string>() { Settings.WidthMetric, Settings.HeightMetric, Settings.DepthMetric };
-        nodeMetrics.AddRange(Settings.IssueMap().Keys);
+
+
+        List<string> nodeMetrics = new List<string>() { Settings.WidthMetric, Settings.HeightMetric, Settings.DepthMetric, Settings.ColorMetric };
+        nodeMetrics.AddRange(Settings.AllLeafIssues());
+        nodeMetrics.AddRange(Settings.AllInnerNodeIssues());
+        nodeMetrics.Add(Settings.InnerDonutMetric);
+
+        //if (settings.ZScoreScale)
+        //{
+        //    scaler = new ZScoreScale(graph, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
+        //}
+        //else
+        //{
+        //    scaler = new LinearScale(graph, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
+        //}
+
+
+
+        //List<string> nodeMetrics = new List<string>() { Settings.WidthMetric, Settings.HeightMetric, Settings.DepthMetric };
+        //nodeMetrics.AddRange(Settings.IssueMap().Keys);
         scaler = new LinearMultiScale(Graphs, Settings.MinimalBlockLength, Settings.MaximalBlockLength, nodeMetrics);
 
         //TODO Flo: load layouts

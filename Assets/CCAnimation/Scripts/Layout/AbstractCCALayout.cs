@@ -8,17 +8,17 @@ using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// TODO
+/// TODO DOKU
 /// </summary>
 public class AbstractCCALayout
 {
     /// <summary>
-    /// TODO
+    /// TODO DOKU
     /// </summary>
     public readonly Dictionary<string, NodeTransform> nodeTransforms = new Dictionary<string, NodeTransform>();
 
     /// <summary>
-    /// TODO
+    /// TODO DOKU
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
