@@ -8,7 +8,8 @@ namespace SEE.Layout
     public abstract class InnerNodeFactory : NodeFactory
     {
         /// <summary>
-        /// Sets the width of lines drawn for the given object.
+        /// Sets the width of lines drawn for the given object. If an object is not
+        /// drawn by lines, this method has no effect.
         /// 
         /// Precondition: The given object must have been created by subclasses.
         /// </summary>

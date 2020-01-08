@@ -17,7 +17,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
-        /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
+        /// <param name="leafNodeFactory">the factory used to create leaf nodes</param>
         /// <param name="width">width of the rectangle in which to place all nodes in Unity units</param>
         /// <param name="depth">width of the rectangle in which to place all nodes in Unity units</param>
         public TreemapLayout(float groundLevel,
