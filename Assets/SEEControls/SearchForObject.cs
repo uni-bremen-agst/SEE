@@ -9,13 +9,27 @@ public class SearchForObject : MonoBehaviour
     private List<GameObject> RecentFinds;
     public GameObject panel; //Content Object in Sroll View
     public GameObject button; //Button to be shown in list
-    private InputField Input;
+    public GameObject keyboard;
+    private InputField TextInput;
 
 
     void Start()
     {
         RecentFinds = new List<GameObject> { };
-        Input = gameObject.GetComponent<InputField>();
+        TextInput = gameObject.GetComponent<InputField>();
+        keyboard.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (TextInput.isFocused)
+        {
+            keyboard.SetActive(true);
+        }
+        else
+        {
+            //keyboard.SetActive(false);
+        }
     }
 
     private List<GameObject> LookFor(string name)
@@ -51,7 +65,7 @@ public class SearchForObject : MonoBehaviour
     public void OnInput()
     {
         ClearParent(panel);
-        string name = Input.text;
+        string name = TextInput.text;
 
         if (name.Length > 0)
         {
@@ -68,9 +82,9 @@ public class SearchForObject : MonoBehaviour
         }
     }
 
-    public void OnEnter(string name)
+    public void OnEnter()
     {
-
+        Debug.Log("pressed enter");
     }
 
     private void ClearParent(GameObject parent)
