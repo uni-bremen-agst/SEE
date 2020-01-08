@@ -21,6 +21,8 @@ namespace Assets.SEECity.Charts.Scripts
 
 		private RectTransform _screenSize;
 
+		private bool _isVirtualReality;
+
 		/// <summary>
 		/// The time between <see cref="OnPointerDown" /> and <see cref="OnPointerUp" /> to be recognized as
 		/// click instead of a drag.
@@ -41,12 +43,18 @@ namespace Assets.SEECity.Charts.Scripts
 		/// Links the <see cref="GameManager" /> and initializes settings with the values from the
 		/// <see cref="_gameManager" />.
 		/// </summary>
-		private void Start()
+		private void Awake()
+		{
+			GetSettingData();
+			_screenSize = _chart.transform.parent.parent.GetComponent<RectTransform>();
+		}
+
+		private void GetSettingData()
 		{
 			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
 				.GetComponent<GameManager>();
 			_dragDelay = _gameManager.DragDelay;
-			_screenSize = _chart.transform.parent.parent.GetComponent<RectTransform>();
+			_isVirtualReality = _gameManager.IsVirtualReality;
 		}
 
 		/// <summary>
@@ -59,20 +67,23 @@ namespace Assets.SEECity.Charts.Scripts
 
 		/// <summary>
 		/// Checks the current <see cref="Input.mousePosition" /> and moves the chart to the corresponding
-		/// position on the canvas. //TODO: Does this work in VR?
+		/// position on the canvas.
 		/// </summary>
 		/// <param name="eventData">Event payload associated with pointer (mouse / touch) events.</param>
 		public void OnDrag(PointerEventData eventData)
 		{
-			RectTransform pos = GetComponent<RectTransform>();
-			Vector2 newPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-			if (newPosition.x > 0 &&
-			    newPosition.x < _screenSize.sizeDelta.x * _screenSize.lossyScale.x &&
-			    newPosition.y > 0 &&
-			    newPosition.y < _screenSize.sizeDelta.y * _screenSize.lossyScale.y)
-				_chart.position =
-					new Vector2(newPosition.x - pos.anchoredPosition.x * pos.lossyScale.x,
-						newPosition.y - pos.anchoredPosition.y * pos.lossyScale.y);
+			if (!_isVirtualReality)
+			{
+				RectTransform pos = GetComponent<RectTransform>();
+				Vector2 newPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+				if (newPosition.x > 0 &&
+				    newPosition.x < _screenSize.sizeDelta.x * _screenSize.lossyScale.x &&
+				    newPosition.y > 0 &&
+				    newPosition.y < _screenSize.sizeDelta.y * _screenSize.lossyScale.y)
+					_chart.position =
+						new Vector2(newPosition.x - pos.anchoredPosition.x * pos.lossyScale.x,
+							newPosition.y - pos.anchoredPosition.y * pos.lossyScale.y);
+			}
 		}
 
 		/// <summary>

@@ -99,7 +99,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Calls methods to initialize a chart.
 		/// </summary>
-		private void Start()
+		private void Awake()
 		{
 			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
 				.GetComponent<GameManager>();

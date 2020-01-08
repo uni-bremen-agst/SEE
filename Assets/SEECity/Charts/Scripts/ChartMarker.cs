@@ -46,7 +46,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// The <see cref="GameObject" /> in the code city that is connected with this button.
 		/// </summary>
-		public GameObject LinkedObject;
+		[HideInInspector] public GameObject LinkedObject;
 
 		/// <summary>
 		/// The active <see cref="Camera" /> in the scene.
@@ -76,10 +76,8 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Links the <see cref="GameManager" /> and calls methods for initialization.
 		/// </summary>
-		private void Start()
+		private void Awake()
 		{
-			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
-				.GetComponent<GameManager>();
 			GetSettingData();
 		}
 
@@ -88,6 +86,8 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private void GetSettingData()
 		{
+			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
+				.GetComponent<GameManager>();
 			_cameraDistance = _gameManager.CameraDistance;
 			_moveWithRotation = _gameManager.MoveWithRotation;
 			_cameraFlightTime = _gameManager.CameraFlightTime;
