@@ -21,11 +21,15 @@ public class CCAObjectManager : AbstractCCAObjectManager
     /// </summary>
     private readonly Dictionary<string, GameObject> nodes = new Dictionary<string, GameObject>();
 
+    private readonly CircleFactory CircleFactory;
+
     /// <summary>
     /// TODO flo doc
     /// </summary>
     public CCAObjectManager(NodeFactory nodeFactory) : base(nodeFactory)
-    { }
+    {
+        CircleFactory = new CircleFactory(nodeFactory.Unit);
+    }
 
     public override List<GameObject> GameObjects => nodes.Values.ToList();
 
@@ -37,6 +41,16 @@ public class CCAObjectManager : AbstractCCAObjectManager
             _root = GameObject.CreatePrimitive(PrimitiveType.Plane);
             _root.name = "RootPlane";
             _root.tag = Tags.Decoration;
+
+            var rootCircle = CircleFactory.NewBlock();
+            rootCircle.name = "RootCircle";
+            rootCircle.tag = Tags.Decoration;
+            var newPosition = rootCircle.transform.position;
+            newPosition.y = 50F;
+            rootCircle.transform.localPosition = newPosition;
+            rootCircle.transform.localScale = Vector3.one * 1.1F;
+
+            rootCircle.transform.parent = _root.transform;
 
             var planeRenderer = _root.GetComponent<Renderer>();
             planeRenderer.sharedMaterial = new Material(planeRenderer.sharedMaterial)
@@ -60,12 +74,16 @@ public class CCAObjectManager : AbstractCCAObjectManager
         var hasInnerNode = nodes.TryGetValue(node.LinkName, out innerNode);
         if (!hasInnerNode)
         {
-            innerNode = new GameObject
-            {
-                name = node.LinkName,
-                tag = Tags.Node
-            };
+            innerNode = CircleFactory.NewBlock();
+            innerNode.name = node.LinkName;
+            innerNode.tag = Tags.Node;
             nodes[node.LinkName] = innerNode;
+
+            var textPosition = Vector3.zero;
+            textPosition.y = 1;
+            var nodeText = TextFactory.GetText(node.LinkName, textPosition, 10, false);
+            nodeText.transform.localScale = new Vector3(0.035F, 0.035F, 0.035F);
+            nodeText.transform.parent = innerNode.transform;
         }
 
         NodeRef noderef = innerNode.GetComponent<NodeRef>();
