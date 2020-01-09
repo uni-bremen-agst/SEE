@@ -11,17 +11,39 @@ using UnityEngine.Events;
 /// </summary>
 public abstract class AbstractCCARender : MonoBehaviour
 {
+    /// <summary>
+    /// Die kürzeste Zeit, in der eine Animation ablaufen kann.
+    /// </summary>
     private float MinimalWaitTimeForNextRevision = 0.1f;
+
+    /// <summary>
+    /// Ein Event, der beim Start der Animationen ausgelöst wird.
+    /// </summary>
     public readonly UnityEvent AnimationStartedEvent = new UnityEvent();
 
+    /// <summary>
+    /// Ein Event, der nach dem abschließen der gestarteten Animation ausgelöst wird.
+    /// </summary>
     public readonly UnityEvent AnimationFinishedEvent = new UnityEvent();
 
     private bool _isStillAnimating = false;
+
+    /// <summary>
+    /// Gibt zurück, ob gerade Animationen im gange sind.
+    /// </summary>
     public bool IsStillAnimating { get => _isStillAnimating; set => _isStillAnimating = value; }
 
+    /// <summary>
+    /// Ein Sammlung der registrierten <see cref="AbstractCCAAnimator"/>, die bei 
+    /// Änderungen in der Animationszeit automatisch aktualisiert werden.
+    /// </summary>
     private readonly List<AbstractCCAAnimator> animators = new List<AbstractCCAAnimator>();
 
     private float _animationTime = AbstractCCAAnimator.DefaultAnimationTime;
+
+    /// <summary>
+    /// Die Zeit, die Animationen maximal nach ihrem Start andauern dürfen.
+    /// </summary>
     public float AnimationTime
     {
         get => _animationTime;
@@ -39,14 +61,31 @@ public abstract class AbstractCCARender : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Der aktuell geladene Graph.
+    /// </summary>
     private LoadedGraph _loadedGraph;
+
+    /// <summary>
+    /// Der Graph, der als nächstes angezeigt werden soll.
+    /// </summary>
     private LoadedGraph _nextGraph;
 
+    /// <summary>
+    /// Eine Instanz zum Vergleichen zweier <see cref="Node"/>.
+    /// </summary>
     private readonly NodeEqualityComparer nodeEqualityComparer = new NodeEqualityComparer();
+
+    /// <summary>
+    /// Eine Instanz zum Vergleichen zweier <see cref="Edge"/>.
+    /// </summary>
     private readonly EdgeEqualityComparer edgeEqualityComparer = new EdgeEqualityComparer();
 
     private AbstractCCAObjectManager _objectManager;
 
+    /// <summary>
+    /// Gibt den aktuellen, bzw. 
+    /// </summary>
     protected Graph Graph => _nextGraph?.Graph;
     protected AbstractCCALayout Layout => _nextGraph?.Layout;
     protected GraphSettings Settings => _nextGraph?.Settings;

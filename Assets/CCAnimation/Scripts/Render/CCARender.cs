@@ -40,9 +40,33 @@ public class CCARender : AbstractCCARender
         var isCircleNew = !ObjectManager.GetInnerNode(node, out GameObject circle);
         var nodeTransform = Layout.GetNodeTransform(node);
         var circlePosition = nodeTransform.position;
-        var circleRadius = nodeTransform.scale;
+        circlePosition.y = 0.5F;
 
-        ExtendedTextFactory.UpdateText(circle, node.SourceName, circlePosition, circleRadius.x);
+        var circleRadius = nodeTransform.scale;
+        circleRadius.x += 5;
+        circleRadius.z += 5;
+
+        if (isCircleNew)
+        {
+            circlePosition.y = -3;
+            circle.transform.position = circlePosition;
+            circle.transform.localScale = circleRadius;
+
+            circlePosition.y = 0.5F;
+            SimpleAnim.AnimateTo(node, circle, circlePosition, circleRadius);
+        }
+        else if (node.WasModified())
+        {
+            SimpleAnim.AnimateTo(node, circle, circlePosition, circleRadius);
+        }
+        else if (node.WasRelocated(out string oldLinkageName))
+        {
+            SimpleAnim.AnimateTo(node, circle, circlePosition, circleRadius);
+        }
+        else
+        {
+            SimpleAnim.AnimateTo(node, circle, circlePosition, circleRadius);
+        }
     }
 
     protected override void RenderLeaf(Node node)
@@ -96,10 +120,11 @@ public class CCARender : AbstractCCARender
 
     protected override void RenderRemovedOldInnerNode(Node node)
     {
-        ObjectManager.RemoveNode(node, out GameObject gameObject);
-        if (gameObject != null)
+        if (ObjectManager.RemoveNode(node, out GameObject gameObject))
         {
-            Destroy(gameObject);
+            var nextPosition = gameObject.transform.position;
+            nextPosition.y = -2;
+            MoveAnim.AnimateTo(node, gameObject, nextPosition, gameObject.transform.localScale, OnRemovedNodeFinishedAnimation);
         }
     }
 
