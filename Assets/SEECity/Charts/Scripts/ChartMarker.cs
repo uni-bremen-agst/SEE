@@ -25,18 +25,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// The <see cref="Material" /> making the object look highlighted.
 		/// </summary>
-		[Header("Highlight Properties"), SerializeField]
 		private Material _buildingHighlightMaterial;
-
-		/// <summary>
-		/// The <see cref="GameObject" /> making the marker look highlighted when active.
-		/// </summary>
-		[SerializeField] private GameObject _markerHighlight;
-
-		/// <summary>
-		/// A text popup containing useful information about the marker and its <see cref="LinkedObject" />.
-		/// </summary>
-		[Header("Other"), SerializeField] private TextMeshProUGUI _infoText;
 
 		/// <summary>
 		/// Copy of the <see cref="LinkedObject" /> with different material to make it look highlighted.
@@ -74,6 +63,17 @@ namespace Assets.SEECity.Charts.Scripts
 		private Coroutine _timedHighlight;
 
 		/// <summary>
+		/// The <see cref="GameObject" /> making the marker look highlighted when active.
+		/// </summary>
+		[Header("Highlight Properties"), SerializeField]
+		private GameObject _markerHighlight = null;
+
+		/// <summary>
+		/// A text popup containing useful information about the marker and its <see cref="LinkedObject" />.
+		/// </summary>
+		[Header("Other"), SerializeField] private TextMeshProUGUI _infoText = null;
+
+		/// <summary>
 		/// Links the <see cref="GameManager" /> and calls methods for initialization.
 		/// </summary>
 		private void Awake()
@@ -93,6 +93,7 @@ namespace Assets.SEECity.Charts.Scripts
 			_cameraFlightTime = _gameManager.CameraFlightTime;
 			_clickDelay = _gameManager.ClickDelay;
 			_highlightDuration = _gameManager.HighlightDuration;
+			_buildingHighlightMaterial = _gameManager.BuildingHighlightMaterial;
 		}
 
 		/// <summary>

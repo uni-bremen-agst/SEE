@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SEE.Layout;
 using TMPro;
 using UnityEngine;
@@ -17,34 +16,9 @@ namespace Assets.SEECity.Charts.Scripts
 		private GameManager _gameManager;
 
 		/// <summary>
-		/// The color of the chart to better distinguish it from others. TODO: Add colors?
-		/// </summary>
-		private Color _color;
-
-		/// <summary>
 		/// All objects to be listed in the chart.
 		/// </summary>
 		private GameObject[] _dataObjects;
-
-		/// <summary>
-		/// Contains all keys contained in any <see cref="GameObject" /> of <see cref="_dataObjects" />.
-		/// </summary>
-		public List<string> AllKeys { get; } = new List<string>();
-
-		/// <summary>
-		/// The <see cref="AxisContentDropdown" /> containing Values for the X-Axis.
-		/// </summary>
-		[SerializeField] private AxisContentDropdown _xAxisDropdown;
-
-		/// <summary>
-		/// The <see cref="AxisContentDropdown" /> containing Values for the Y-Axis.
-		/// </summary>
-		[SerializeField] private AxisContentDropdown _yAxisDropdown;
-
-		/// <summary>
-		/// The prefab used to display content in charts.
-		/// </summary>
-		[SerializeField] private GameObject _markerPrefab;
 
 		/// <summary>
 		/// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
@@ -52,49 +26,54 @@ namespace Assets.SEECity.Charts.Scripts
 		private readonly List<GameObject> _activeMarkers = new List<GameObject>();
 
 		/// <summary>
+		/// The <see cref="AxisContentDropdown" /> containing Values for the X-Axis.
+		/// </summary>
+		public AxisContentDropdown AxisDropdownX;
+
+		/// <summary>
+		/// The <see cref="AxisContentDropdown" /> containing Values for the Y-Axis.
+		/// </summary>
+		public AxisContentDropdown AxisDropdownY;
+
+		/// <summary>
+		/// The prefab used to display content in charts.
+		/// </summary>
+		[SerializeField] private GameObject _markerPrefab = null;
+
+		/// <summary>
 		/// Game Object to group all content entries of a chart.
 		/// </summary>
-		[SerializeField] private GameObject _entries;
+		[SerializeField] private GameObject _entries = null;
 
-		[SerializeField] private TextMeshProUGUI _minX;
+		[SerializeField] private TextMeshProUGUI _minX = null;
 
-		[SerializeField] private TextMeshProUGUI _maxX;
+		[SerializeField] private TextMeshProUGUI _maxX = null;
 
-		[SerializeField] private TextMeshProUGUI _minY;
+		[SerializeField] private TextMeshProUGUI _minY = null;
 
-		[SerializeField] private TextMeshProUGUI _maxY;
+		[SerializeField] private TextMeshProUGUI _maxY = null;
 
 		/// <summary>
 		/// A parent of this object. Used in VR to destroy the whole construct of a moveable chart.
 		/// </summary>
-		[SerializeField] private GameObject _parent;
+		[SerializeField] private GameObject _parent = null;
 
 		/// <summary>
 		/// The panel on which the <see cref="ChartMarker" />s are instantiated.
 		/// </summary>
-		[Header("For resizing and minimizing"), SerializeField]
-		private RectTransform _dataPanel;
-
-		[SerializeField] private Transform _topRight;
-		[SerializeField] private Transform _topLeft;
-		[SerializeField] private Transform _bottomRight;
-		[SerializeField] private Transform _bottomLeft;
+		[Header("For resizing and minimizing")]
+		public RectTransform DataPanel;
 
 		/// <summary>
 		/// The panel on which the buttons and scales of the chart are displayed.
 		/// </summary>
-		[SerializeField] private RectTransform _labelsPanel;
-
-		[SerializeField] private RectTransform _chart;
-
-		[SerializeField] private GameObject _sizeButton;
-
-		[SerializeField] private Transform _dragButton;
+		public RectTransform LabelsPanel;
 
 		/// <summary>
-		/// If the chart is currently minimized or not.
+		/// Contains all keys contained in any <see cref="GameObject" /> of <see cref="_dataObjects" />.
 		/// </summary>
-		private bool _minimized;
+		[HideInInspector]
+		public List<string> AllKeys { get; } = new List<string>();
 
 		/// <summary>
 		/// Calls methods to initialize a chart.
@@ -106,7 +85,11 @@ namespace Assets.SEECity.Charts.Scripts
 			FindDataObjects();
 			GetAllFloats();
 			GetAllIntegers();
-			StartCoroutine(FirstInitialization());
+		}
+
+		private void Start()
+		{
+			//DrawData();
 		}
 
 		/// <summary>
@@ -134,17 +117,6 @@ namespace Assets.SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Calls <see cref="DrawData" /> during the first initialization after everything else has been
-		/// initialized.
-		/// </summary>
-		/// <returns>A <see cref="WaitForEndOfFrame" />.</returns>
-		private IEnumerator FirstInitialization()
-		{
-			yield return new WaitForEndOfFrame();
-			DrawData();
-		}
-
-		/// <summary>
 		/// Fills a List with all objects that will be in the chart.
 		/// </summary>
 		private void FindDataObjects()
@@ -153,8 +125,8 @@ namespace Assets.SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Fills the chart with data depending on the values of <see cref="_xAxisDropdown" /> and
-		/// <see cref="_yAxisDropdown" />.
+		/// Fills the chart with data depending on the values of <see cref="AxisDropdownX" /> and
+		/// <see cref="AxisDropdownY" />.
 		/// </summary>
 		public void DrawData()
 		{
@@ -164,26 +136,24 @@ namespace Assets.SEECity.Charts.Scripts
 
 			int i = 0;
 			bool contained = _dataObjects[i].GetComponent<NodeRef>().node
-				.TryGetNumeric(_xAxisDropdown.Value, out float minX);
+				.TryGetNumeric(AxisDropdownX.Value, out float minX);
 			while (!contained)
 				contained = _dataObjects[i].GetComponent<NodeRef>().node
-					.TryGetNumeric(_xAxisDropdown.Value, out minX);
+					.TryGetNumeric(AxisDropdownX.Value, out minX);
 			float maxX = minX;
-			i = 0;
 			contained = _dataObjects[0].GetComponent<NodeRef>().node
-				.TryGetNumeric(_yAxisDropdown.Value, out float minY);
+				.TryGetNumeric(AxisDropdownY.Value, out float minY);
 			while (!contained)
 				contained = _dataObjects[0].GetComponent<NodeRef>().node
-					.TryGetNumeric(_yAxisDropdown.Value, out minY);
+					.TryGetNumeric(AxisDropdownY.Value, out minY);
 			float maxY = minY;
-
 			List<GameObject> toDraw = new List<GameObject>();
 			foreach (GameObject data in _dataObjects)
 			{
 				bool inX = false;
 				bool inY = false;
 				if (data.GetComponent<NodeRef>().node
-					.TryGetNumeric(_xAxisDropdown.Value, out float tempX))
+					.TryGetNumeric(AxisDropdownX.Value, out float tempX))
 				{
 					if (tempX < minX) minX = tempX;
 					if (tempX > maxX) maxX = tempX;
@@ -191,7 +161,7 @@ namespace Assets.SEECity.Charts.Scripts
 				}
 
 				if (data.GetComponent<NodeRef>().node
-					.TryGetNumeric(_yAxisDropdown.Value, out float tempY))
+					.TryGetNumeric(AxisDropdownY.Value, out float tempY))
 				{
 					if (tempY > maxY) maxY = tempY;
 					if (tempY < minY) minY = tempY;
@@ -201,17 +171,17 @@ namespace Assets.SEECity.Charts.Scripts
 				if (inX && inY) toDraw.Add(data);
 			}
 
-			float width = _dataPanel.rect.width / (maxX - minX);
-			float height = _dataPanel.rect.height / (maxY - minY);
+			float width = DataPanel.rect.width / (maxX - minX);
+			float height = DataPanel.rect.height / (maxY - minY);
 			foreach (GameObject data in toDraw)
 			{
 				GameObject marker = Instantiate(_markerPrefab, _entries.transform);
 				ChartMarker script = marker.GetComponent<ChartMarker>();
 				script.LinkedObject = data;
 				data.GetComponent<NodeRef>().node
-					.TryGetNumeric(_xAxisDropdown.Value, out float valueX);
+					.TryGetNumeric(AxisDropdownX.Value, out float valueX);
 				data.GetComponent<NodeRef>().node
-					.TryGetNumeric(_yAxisDropdown.Value, out float valueY);
+					.TryGetNumeric(AxisDropdownY.Value, out float valueY);
 				script.SetInfoText("Building: " + script.LinkedObject.name + "\nX: " +
 				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("0.00"));
 				marker.GetComponent<RectTransform>().anchoredPosition = new Vector2(
@@ -223,44 +193,6 @@ namespace Assets.SEECity.Charts.Scripts
 			_maxX.text = maxX.ToString("0.00");
 			_minY.text = minY.ToString("0.00");
 			_maxY.text = maxY.ToString("0.00");
-		}
-
-		/// <summary>
-		/// Changes the width and height of the chart.
-		/// </summary>
-		/// <param name="width">The new width of the chart.</param>
-		/// <param name="height">The new height of the chart.</param>
-		public void ChangeSize(float width, float height)
-		{
-			_dataPanel.sizeDelta = new Vector2(width - 100, height - 100);
-			_dataPanel.anchoredPosition = new Vector2(width / 2, height / 2);
-			_labelsPanel.sizeDelta = new Vector2(width, height);
-			_labelsPanel.anchoredPosition = new Vector2(width / 2, height / 2);
-			RectTransform xDropdown = _xAxisDropdown.GetComponent<RectTransform>();
-			xDropdown.anchoredPosition = new Vector2(width / 2, xDropdown.anchoredPosition.y);
-			xDropdown.sizeDelta = new Vector2(width / 3, xDropdown.sizeDelta.y);
-			RectTransform yDropdown = _yAxisDropdown.GetComponent<RectTransform>();
-			yDropdown.anchoredPosition = new Vector2(yDropdown.anchoredPosition.x, height / 2);
-			yDropdown.sizeDelta = new Vector2(height / 3, yDropdown.sizeDelta.y);
-			_chart.sizeDelta = new Vector2(width, height);
-			_topRight.localPosition = new Vector2(width / 2, height / 2);
-			_topLeft.localPosition = new Vector2(-width / 2, height / 2);
-			_bottomRight.localPosition = new Vector2(width / 2, -height / 2);
-			_bottomLeft.localPosition = new Vector2(-width / 2, -height / 2);
-			_dragButton.localPosition = _bottomRight.localPosition - new Vector3(25f, -25f);
-
-			DrawData();
-		}
-
-		/// <summary>
-		/// Toggles the minimization of the chart.
-		/// </summary>
-		public void ToggleMinimize()
-		{
-			_labelsPanel.gameObject.SetActive(_minimized);
-			_dataPanel.gameObject.SetActive(_minimized);
-			_sizeButton.SetActive(_minimized);
-			_minimized = !_minimized;
 		}
 
 		public void AreaSelection(Vector2 min, Vector2 max, bool direction)
@@ -287,7 +219,8 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Destroys the chart including its container if VR is activated.
 		/// </summary>
-		public void Destroy()
+		[SerializeField]
+		private void Destroy()
 		{
 			Destroy(_parent);
 		}

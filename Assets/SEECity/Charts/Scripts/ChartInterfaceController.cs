@@ -9,19 +9,24 @@ namespace Assets.SEECity.Charts.Scripts
 	public class ChartInterfaceController : MonoBehaviour
 	{
 		/// <summary>
+		/// The script controlling the camera.
+		/// </summary>
+		private FlyCamera _flyCamera;
+
+		/// <summary>
 		/// UI when charts are open.
 		/// </summary>
-		[SerializeField] private GameObject _chartsOpen;
+		[SerializeField] private GameObject _chartsOpen = null;
 
 		/// <summary>
 		/// UI for creating new charts.
 		/// </summary>
-		[SerializeField] private GameObject _chartCreator;
+		[SerializeField] private GameObject _chartCreator = null;
 
-		/// <summary>
-		/// The script controlling the camera.
-		/// </summary>
-		[SerializeField] private FlyCamera _flyCamera;
+		private void Awake()
+		{
+			_flyCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<FlyCamera>();
+		}
 
 		/// <summary>
 		/// Checks if keys for chart interaction have been pressed.
@@ -34,7 +39,8 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Toggles the chart view.
 		/// </summary>
-		[SerializeField] private void ToggleCharts(bool open)
+		[SerializeField]
+		private void ToggleCharts(bool open)
 		{
 			_chartsOpen.SetActive(open);
 			_flyCamera.SetLastMouse();
@@ -44,7 +50,8 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Opens the dialogue for creating new charts.
 		/// </summary>
-		[SerializeField] private void OpenChartCreator()
+		[SerializeField]
+		private void OpenChartCreator()
 		{
 			_chartCreator.SetActive(true);
 		}

@@ -1,13 +1,34 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using Valve.VR;
 
-namespace Assets.SEECity.Charts.Scripts
+namespace Assets.SEECity.Charts.Scripts.VR
 {
 	public class VRInputModule : BaseInputModule
 	{
-		[SerializeField] private VRPointer _pointer;
+		private GameManager _gameManager;
+
+		private VRPointer _pointer;
+
+		private SteamVR_Input_Sources _source;
+		private SteamVR_Action_Boolean _click;
 
 		public PointerEventData EventData { get; private set; }
+
+		protected override void Awake()
+		{
+			base.Awake();
+			GetSettingData();
+			_pointer = GameObject.FindGameObjectWithTag("Pointer").GetComponent<VRPointer>();
+		}
+
+		private void GetSettingData()
+		{
+			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
+				.GetComponent<GameManager>();
+			_source = _gameManager.Source;
+			_click = _gameManager.Click;
+		}
 
 		protected override void Start()
 		{
@@ -24,9 +45,11 @@ namespace Assets.SEECity.Charts.Scripts
 			EventData.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
 			HandlePointerExitAndEnter(EventData, EventData.pointerCurrentRaycast.gameObject);
 			ExecuteEvents.Execute(EventData.pointerDrag, EventData, ExecuteEvents.dragHandler);
+			if (_click.GetStateDown(_source)) Press();
+			if (_click.GetStateUp(_source)) Release();
 		}
 
-		public void Press()
+		private void Press()
 		{
 			EventData.pointerPressRaycast = EventData.pointerCurrentRaycast;
 
@@ -42,7 +65,7 @@ namespace Assets.SEECity.Charts.Scripts
 			ExecuteEvents.Execute(EventData.pointerDrag, EventData, ExecuteEvents.beginDragHandler);
 		}
 
-		public void Release()
+		private void Release()
 		{
 			GameObject pointerRelease =
 				ExecuteEvents.GetEventHandler<IPointerClickHandler>(EventData.pointerCurrentRaycast

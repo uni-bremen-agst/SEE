@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8607808889711346682}
   - component: {fileID: 8607808889711346681}
   m_Layer: 0
-  m_Name: Dot
+  m_Name: HitDot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -92,7 +92,7 @@ GameObject:
   - component: {fileID: 8607808890012322458}
   m_Layer: 0
   m_Name: VRPointer
-  m_TagString: Untagged
+  m_TagString: Pointer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -125,7 +125,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _hitDot: {fileID: 8607808889711346679}
-  _inputModule: {fileID: 0}
 --- !u!20 &8607808890012322459
 Camera:
   m_ObjectHideFlags: 0
@@ -133,7 +132,7 @@ Camera:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8607808890012322457}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 4
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}

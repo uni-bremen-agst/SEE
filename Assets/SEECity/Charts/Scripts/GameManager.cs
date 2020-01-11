@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Valve.VR;
 
 namespace Assets.SEECity.Charts.Scripts
 {
@@ -27,6 +28,11 @@ namespace Assets.SEECity.Charts.Scripts
 		public float CameraFlightTime = 0.5f;
 
 		/// <summary>
+		/// The minimum size a chart can have for width and height.
+		/// </summary>
+		public int MinimumSize = 400;
+
+		/// <summary>
 		/// The maximum time between two clicks to recognize them as double click.
 		/// </summary>
 		[Header("User Inputs"), Range(0.1f, 1f)]
@@ -37,10 +43,10 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// The <see cref="Material" /> making the object look highlighted.
 		/// </summary>
-		[Header("Highlights"), SerializeField] private Material _highlightMaterial;
+		[Header("Highlights")] public Material BuildingHighlightMaterial = null;
 
 		/// <summary>
-		/// The thickness of the highlight outline of <see cref="_highlightMaterial" />.
+		/// The thickness of the highlight outline of <see cref="BuildingHighlightMaterial" />.
 		/// </summary>
 		[SerializeField] private float _highlightOutline = 0.005f;
 
@@ -49,12 +55,16 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Determines if the scene is being played in VR or not.
 		/// </summary>
-		[Header("Virtual Reality")] public bool IsVirtualReality;
+		[Header("Virtual Reality"), SerializeField]
+		private bool _isVirtualReality;
 
 		public float PointerLength = 5f;
 
+		public SteamVR_Input_Sources Source = SteamVR_Input_Sources.RightHand;
+		public SteamVR_Action_Boolean Click;
+
 		/// <summary>
-		/// The current thickness of the highlight outline of <see cref="_highlightMaterial" /> used in
+		/// The current thickness of the highlight outline of <see cref="BuildingHighlightMaterial" /> used in
 		/// animations.
 		/// </summary>
 		[Header("DO NOT CHANGE THIS"), SerializeField]
@@ -83,15 +93,15 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private void AnimateHighlight()
 		{
-			_highlightMaterial.SetFloat("g_flOutlineWidth", _highlightOutlineAnim);
+			BuildingHighlightMaterial.SetFloat("g_flOutlineWidth", _highlightOutlineAnim);
 		}
 
 		/// <summary>
-		/// Sets the properties of <see cref="_highlightMaterial" /> to their original state.
+		/// Sets the properties of <see cref="BuildingHighlightMaterial" /> to their original state.
 		/// </summary>
 		private void OnDestroy()
 		{
-			_highlightMaterial.SetFloat("g_flOutlineWidth", _highlightOutline);
+			BuildingHighlightMaterial.SetFloat("g_flOutlineWidth", _highlightOutline);
 		}
 	}
 }

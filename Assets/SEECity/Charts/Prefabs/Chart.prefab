@@ -1488,7 +1488,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2a0670c18bd13d47bfe46fa6aede31f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _chart: {fileID: 4785276354945708475}
+  _dragButton: {fileID: 4050145415860662125}
+  _topRight: {fileID: 3149090192216141726}
+  _topLeft: {fileID: 7666291602270018169}
+  _bottomRight: {fileID: 2046218871948644341}
+  _bottomLeft: {fileID: 647585029249839164}
 --- !u!1 &4785276354356836142
 GameObject:
   m_ObjectHideFlags: 0
@@ -1613,7 +1617,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _selectionRect: {fileID: 1369683637068924532}
-  _chartContent: {fileID: 4785276354945708475}
 --- !u!1 &4785276354945708473
 GameObject:
   m_ObjectHideFlags: 0
@@ -1626,7 +1629,7 @@ GameObject:
   - component: {fileID: 4785276354945708475}
   m_Layer: 5
   m_Name: Chart
-  m_TagString: Untagged
+  m_TagString: Chart
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1666,8 +1669,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffdce63f2160cee4f9e3f92a286c0ef4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _xAxisDropdown: {fileID: 2097291809304348039}
-  _yAxisDropdown: {fileID: 8374560118427697955}
+  AxisDropdownX: {fileID: 2097291809304348039}
+  AxisDropdownY: {fileID: 8374560118427697955}
   _markerPrefab: {fileID: 7900548257253700385, guid: 1b7447dbbbeee5b459fcbc17d2feae1c,
     type: 3}
   _entries: {fileID: 4785276354356836142}
@@ -1676,15 +1679,8 @@ MonoBehaviour:
   _minY: {fileID: 137086097441516839}
   _maxY: {fileID: 4713178530221229291}
   _parent: {fileID: 4785276354945708473}
-  _dataPanel: {fileID: 4785276354708113209}
-  _topRight: {fileID: 3149090192216141726}
-  _topLeft: {fileID: 7666291602270018169}
-  _bottomRight: {fileID: 2046218871948644341}
-  _bottomLeft: {fileID: 647585029249839164}
-  _labelsPanel: {fileID: 4785276354985796253}
-  _chart: {fileID: 4785276354945708474}
-  _sizeButton: {fileID: 4699780545081809820}
-  _dragButton: {fileID: 4050145415860662125}
+  DataPanel: {fileID: 4785276354708113209}
+  LabelsPanel: {fileID: 4785276354985796253}
 --- !u!1 &4785276354985796252
 GameObject:
   m_ObjectHideFlags: 0
@@ -1942,7 +1938,7 @@ GameObject:
   - component: {fileID: 434839543762435658}
   - component: {fileID: 8374560118427697955}
   m_Layer: 5
-  m_Name: YAxisDropdown
+  m_Name: AxisDropdownY
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2086,7 +2082,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58a8e41cbd98a744287e5c9fc3d6379a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _chartContent: {fileID: 4785276354945708475}
 --- !u!1 &4978104512134982168
 GameObject:
   m_ObjectHideFlags: 0
@@ -3142,7 +3137,7 @@ GameObject:
   - component: {fileID: 2968349814188293729}
   - component: {fileID: 2097291809304348039}
   m_Layer: 5
-  m_Name: XAxisDropdown
+  m_Name: AxisDropdownX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3286,7 +3281,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58a8e41cbd98a744287e5c9fc3d6379a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _chartContent: {fileID: 4785276354945708475}
 --- !u!1 &7947034562188005046
 GameObject:
   m_ObjectHideFlags: 0
@@ -3529,7 +3523,7 @@ GameObject:
   - component: {fileID: 24547320150245890}
   - component: {fileID: 6148391239924467288}
   m_Layer: 5
-  m_Name: DragButton
+  m_Name: DragAndMinimizeButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3645,7 +3639,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dae322eaf880b14abd6d35cdcdf39fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _chart: {fileID: 4785276354945708474}
+  _sizeButton: {fileID: 4699780545081809820}
 --- !u!1 &8238871806022463350
 GameObject:
   m_ObjectHideFlags: 0

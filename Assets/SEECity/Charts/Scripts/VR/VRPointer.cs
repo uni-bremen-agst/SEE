@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Assets.SEECity.Charts.Scripts
+namespace Assets.SEECity.Charts.Scripts.VR
 {
 	public class VRPointer : MonoBehaviour
 	{
@@ -10,7 +10,7 @@ namespace Assets.SEECity.Charts.Scripts
 		private float _pointerLength;
 		private LineRenderer _lineRenderer;
 		private VRInputModule _inputModule;
-		[SerializeField] private GameObject _hitDot;
+		[SerializeField] private GameObject _hitDot = null;
 
 		public Camera Camera { get; private set; }
 
