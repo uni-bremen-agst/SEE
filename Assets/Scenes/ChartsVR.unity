@@ -44,7 +44,7 @@ RenderSettings:
 LightmapSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 11
-  m_GIWorkflowMode: 0
+  m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -96,7 +96,8 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: 5417dceb3840b1b478038badc6a4df57,
+    type: 2}
   m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
@@ -6651,6 +6652,11 @@ PrefabInstance:
       propertyPath: IsVirtualReality
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2342395875013397700, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: _isVirtualReality
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7961,11 +7967,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: ChartCanvasVRContainer
       objectReference: {fileID: 0}
-    - target: {fileID: 3430223323271747794, guid: db3bfb72d0ee2784ebea15a0c9c8b774,
-        type: 3}
-      propertyPath: m_Camera
-      value: 
-      objectReference: {fileID: 1213092699}
     - target: {fileID: 4986896678664368332, guid: db3bfb72d0ee2784ebea15a0c9c8b774,
         type: 3}
       propertyPath: m_textInfo.characterCount

@@ -16,6 +16,7 @@ TagManager:
   - Decoration
   - GameManager
   - Pointer
+  - Chart
   layers:
   - Default
   - TransparentFX

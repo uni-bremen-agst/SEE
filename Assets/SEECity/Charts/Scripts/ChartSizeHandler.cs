@@ -8,15 +8,41 @@ namespace Assets.SEECity.Charts.Scripts
 	/// </summary>
 	public class ChartSizeHandler : MonoBehaviour, IDragHandler
 	{
-		/// <summary>
-		/// The script attached to the chart.
-		/// </summary>
-		[SerializeField] private ChartContent _chart;
+		private GameManager _gameManager;
 
 		/// <summary>
 		/// The minimum size a chart can have for width and height.
 		/// </summary>
-		private const int MinimumSize = 400;
+		private int _minimumSize;
+
+		[Header("For resizing"), SerializeField]
+		private Transform _dragButton = null;
+		[SerializeField] private Transform _topRight = null;
+		[SerializeField] private Transform _topLeft = null;
+		[SerializeField] private Transform _bottomRight = null;
+		[SerializeField] private Transform _bottomLeft = null;
+
+		/// <summary>
+		/// The script attached to the chart.
+		/// </summary>
+		private ChartContent _chartContent;
+
+		private RectTransform _chart;
+
+		private void Awake()
+		{
+			GetSettingData();
+			GameObject chart = GameObject.FindGameObjectWithTag("Chart");
+			_chartContent = chart.GetComponent<ChartContent>();
+			_chart = chart.GetComponent<RectTransform>();
+		}
+
+		private void GetSettingData()
+		{
+			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
+				.GetComponent<GameManager>();
+			_minimumSize = _gameManager.MinimumSize;
+		}
 
 		/// <summary>
 		/// Checks the current <see cref="Input.mousePosition" /> and calls
@@ -28,9 +54,38 @@ namespace Assets.SEECity.Charts.Scripts
 			RectTransform pos = GetComponent<RectTransform>();
 			Vector2 oldPos = new Vector2(pos.position.x, pos.position.y);
 			pos.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-			if (pos.anchoredPosition.x / pos.lossyScale.x < MinimumSize ||
-			    pos.anchoredPosition.y / pos.lossyScale.y < MinimumSize) pos.position = oldPos;
-			_chart.ChangeSize(pos.anchoredPosition.x, pos.anchoredPosition.y);
+			if (pos.anchoredPosition.x / pos.lossyScale.x < _minimumSize ||
+			    pos.anchoredPosition.y / pos.lossyScale.y < _minimumSize) pos.position = oldPos;
+			ChangeSize(pos.anchoredPosition.x, pos.anchoredPosition.y);
+		}
+
+		/// <summary>
+		/// Changes the width and height of the chart.
+		/// </summary>
+		/// <param name="width">The new width of the chart.</param>
+		/// <param name="height">The new height of the chart.</param>
+		public void ChangeSize(float width, float height)
+		{
+			RectTransform dataPanel = _chartContent.DataPanel;
+			dataPanel.sizeDelta = new Vector2(width - 100, height - 100);
+			dataPanel.anchoredPosition = new Vector2(width / 2, height / 2);
+			RectTransform _labelsPanel = _chartContent.LabelsPanel;
+			_labelsPanel.sizeDelta = new Vector2(width, height);
+			_labelsPanel.anchoredPosition = new Vector2(width / 2, height / 2);
+			RectTransform xDropdown = _chartContent.AxisDropdownX.GetComponent<RectTransform>();
+			xDropdown.anchoredPosition = new Vector2(width / 2, xDropdown.anchoredPosition.y);
+			xDropdown.sizeDelta = new Vector2(width / 3, xDropdown.sizeDelta.y);
+			RectTransform yDropdown = _chartContent.AxisDropdownY.GetComponent<RectTransform>();
+			yDropdown.anchoredPosition = new Vector2(yDropdown.anchoredPosition.x, height / 2);
+			yDropdown.sizeDelta = new Vector2(height / 3, yDropdown.sizeDelta.y);
+			_chart.sizeDelta = new Vector2(width, height);
+			_topRight.localPosition = new Vector2(width / 2, height / 2);
+			_topLeft.localPosition = new Vector2(-width / 2, height / 2);
+			_bottomRight.localPosition = new Vector2(width / 2, -height / 2);
+			_bottomLeft.localPosition = new Vector2(-width / 2, -height / 2);
+			_dragButton.localPosition = _bottomRight.localPosition - new Vector3(25f, -25f);
+
+			_chartContent.DrawData();
 		}
 	}
 }

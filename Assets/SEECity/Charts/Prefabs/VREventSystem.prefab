@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8713363818721090911}
   - component: {fileID: 8713363818721090908}
-  - component: {fileID: 5967425174676566546}
+  - component: {fileID: 8226672809330839672}
   m_Layer: 0
   m_Name: VREventSystem
   m_TagString: Untagged
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
---- !u!114 &5967425174676566546
+--- !u!114 &8226672809330839672
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -56,7 +56,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8713363818721090882}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d39767b578ba9047bc009a773cf944b, type: 3}
+  m_Script: {fileID: 11500000, guid: bb04906b776d8a44e87ad7b6d0b564db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _pointer: {fileID: 0}

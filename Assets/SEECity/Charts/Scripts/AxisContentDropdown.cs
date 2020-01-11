@@ -13,7 +13,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Visualizes the content displayed in the chart.
 		/// </summary>
-		[SerializeField] private ChartContent _chartContent;
+		private ChartContent _chartContent;
 
 		/// <summary>
 		/// A dropdown containing options for different metrics to display on a charts axes.
@@ -36,6 +36,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private void Start()
 		{
+			_chartContent = GameObject.FindGameObjectWithTag("Chart").GetComponent<ChartContent>();
 			_dropdown = GetComponent<TMP_Dropdown>();
 			GetKeys();
 			Value = _dropdown.options[0].text;

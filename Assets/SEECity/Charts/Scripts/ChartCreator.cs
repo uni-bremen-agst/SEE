@@ -10,12 +10,12 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// The prefab for a new chart.
 		/// </summary>
-		[SerializeField] private GameObject _chartPrefab;
+		[SerializeField] private GameObject _chartPrefab = null;
 
 		/// <summary>
 		/// The <see cref="Canvas" /> on which the chart is created.
 		/// </summary>
-		[SerializeField] private Transform _chartsCanvas;
+		[SerializeField] private Transform _chartsCanvas = null;
 
 		/// <summary>
 		/// Initializes the new chart as GameObject.

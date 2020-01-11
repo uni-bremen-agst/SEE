@@ -17,11 +17,9 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Contains the position of the chart on the <see cref="Canvas" />.
 		/// </summary>
-		[SerializeField] private RectTransform _chart;
+		private RectTransform _chart;
 
 		private RectTransform _screenSize;
-
-		private bool _isVirtualReality;
 
 		/// <summary>
 		/// The time between <see cref="OnPointerDown" /> and <see cref="OnPointerUp" /> to be recognized as
@@ -40,12 +38,20 @@ namespace Assets.SEECity.Charts.Scripts
 		private bool _pointerDown;
 
 		/// <summary>
+		/// If the chart is currently minimized or not.
+		/// </summary>
+		private bool _minimized;
+
+		[SerializeField] private GameObject _sizeButton = null;
+
+		/// <summary>
 		/// Links the <see cref="GameManager" /> and initializes settings with the values from the
 		/// <see cref="_gameManager" />.
 		/// </summary>
 		private void Awake()
 		{
 			GetSettingData();
+			_chart = GameObject.FindGameObjectWithTag("Chart").GetComponent<RectTransform>();
 			_screenSize = _chart.transform.parent.parent.GetComponent<RectTransform>();
 		}
 
@@ -54,7 +60,6 @@ namespace Assets.SEECity.Charts.Scripts
 			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
 				.GetComponent<GameManager>();
 			_dragDelay = _gameManager.DragDelay;
-			_isVirtualReality = _gameManager.IsVirtualReality;
 		}
 
 		/// <summary>
@@ -72,18 +77,15 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <param name="eventData">Event payload associated with pointer (mouse / touch) events.</param>
 		public void OnDrag(PointerEventData eventData)
 		{
-			if (!_isVirtualReality)
-			{
-				RectTransform pos = GetComponent<RectTransform>();
-				Vector2 newPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-				if (newPosition.x > 0 &&
-				    newPosition.x < _screenSize.sizeDelta.x * _screenSize.lossyScale.x &&
-				    newPosition.y > 0 &&
-				    newPosition.y < _screenSize.sizeDelta.y * _screenSize.lossyScale.y)
-					_chart.position =
-						new Vector2(newPosition.x - pos.anchoredPosition.x * pos.lossyScale.x,
-							newPosition.y - pos.anchoredPosition.y * pos.lossyScale.y);
-			}
+			RectTransform pos = GetComponent<RectTransform>();
+			Vector2 newPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+			if (newPosition.x > 0 &&
+			    newPosition.x < _screenSize.sizeDelta.x * _screenSize.lossyScale.x &&
+			    newPosition.y > 0 &&
+			    newPosition.y < _screenSize.sizeDelta.y * _screenSize.lossyScale.y)
+				_chart.position =
+					new Vector2(newPosition.x - pos.anchoredPosition.x * pos.lossyScale.x,
+						newPosition.y - pos.anchoredPosition.y * pos.lossyScale.y);
 		}
 
 		/// <summary>
@@ -103,7 +105,19 @@ namespace Assets.SEECity.Charts.Scripts
 		public void OnPointerUp(PointerEventData eventData)
 		{
 			_pointerDown = false;
-			if (_timer < _dragDelay) _chart.GetComponent<ChartContent>().ToggleMinimize();
+			if (_timer < _dragDelay) ToggleMinimize();
+		}
+
+		/// <summary>
+		/// Toggles the minimization of the chart.
+		/// </summary>
+		private void ToggleMinimize()
+		{
+			ChartContent chart = _chart.GetComponent<ChartContent>();
+			chart.LabelsPanel.gameObject.SetActive(_minimized);
+			chart.DataPanel.gameObject.SetActive(_minimized);
+			_sizeButton.SetActive(_minimized);
+			_minimized = !_minimized;
 		}
 	}
 }

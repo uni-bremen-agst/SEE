@@ -12,17 +12,22 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// The rectangle used to visualize the selection process for the user.
 		/// </summary>
-		[SerializeField] private RectTransform _selectionRect;
+		[SerializeField] private RectTransform _selectionRect = null;
 
 		/// <summary>
 		/// Needed for access to <see cref="ChartContent.AreaSelection" />.
 		/// </summary>
-		[SerializeField] private ChartContent _chartContent;
+		private ChartContent _chartContent;
 
 		/// <summary>
 		/// The position the user started the drag at.
 		/// </summary>
 		private Vector3 _startingPos;
+
+		private void Awake()
+		{
+			_chartContent = GameObject.FindGameObjectWithTag("Chart").GetComponent<ChartContent>();
+		}
 
 		/// <summary>
 		/// Activates and sets starting position of <see cref="_selectionRect" />.
