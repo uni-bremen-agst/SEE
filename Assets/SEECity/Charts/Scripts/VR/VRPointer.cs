@@ -3,9 +3,12 @@ using UnityEngine.EventSystems;
 
 namespace Assets.SEECity.Charts.Scripts.VR
 {
+	/// <summary>
+	/// Manages the pointer used to interact with canvases in VR.
+	/// </summary>
 	public class VRPointer : MonoBehaviour
 	{
-		private GameManager _gameManager;
+		private ChartManager _chartManager;
 
 		private float _pointerLength;
 		private LineRenderer _lineRenderer;
@@ -27,11 +30,14 @@ namespace Assets.SEECity.Charts.Scripts.VR
 			_inputModule = EventSystem.current.gameObject.GetComponent<VRInputModule>();
 		}
 
+		/// <summary>
+		/// Links the <see cref="ChartManager" /> and gets its setting data.
+		/// </summary>
 		private void GetSettingData()
 		{
-			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
-				.GetComponent<GameManager>();
-			_pointerLength = _gameManager.PointerLength;
+			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
+				.GetComponent<ChartManager>();
+			_pointerLength = _chartManager.PointerLength;
 		}
 
 		private void Update()

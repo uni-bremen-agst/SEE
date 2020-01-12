@@ -4,9 +4,15 @@ using Valve.VR;
 
 namespace Assets.SEECity.Charts.Scripts.VR
 {
+	/// <summary>
+	/// Extends the standard <see cref="BaseInputModule" /> for usage in VR.
+	/// </summary>
 	public class VRInputModule : BaseInputModule
 	{
-		private GameManager _gameManager;
+		/// <summary>
+		/// Contains some settings used in this script.
+		/// </summary>
+		private ChartManager _chartManager;
 
 		private VRPointer _pointer;
 
@@ -15,6 +21,9 @@ namespace Assets.SEECity.Charts.Scripts.VR
 
 		public PointerEventData EventData { get; private set; }
 
+		/// <summary>
+		/// Calls methods for initialization and links the <see cref="VRPointer" /> script.
+		/// </summary>
 		protected override void Awake()
 		{
 			base.Awake();
@@ -22,12 +31,15 @@ namespace Assets.SEECity.Charts.Scripts.VR
 			_pointer = GameObject.FindGameObjectWithTag("Pointer").GetComponent<VRPointer>();
 		}
 
+		/// <summary>
+		/// Links the <see cref="ChartManager" /> and gets its setting data.
+		/// </summary>
 		private void GetSettingData()
 		{
-			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
-				.GetComponent<GameManager>();
-			_source = _gameManager.Source;
-			_click = _gameManager.Click;
+			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
+				.GetComponent<ChartManager>();
+			_source = _chartManager.Source;
+			_click = _chartManager.Click;
 		}
 
 		protected override void Start()

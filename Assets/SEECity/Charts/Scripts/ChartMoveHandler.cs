@@ -10,9 +10,9 @@ namespace Assets.SEECity.Charts.Scripts
 		IPointerUpHandler
 	{
 		/// <summary>
-		/// Contains user input settings.
+		/// Contains some settings used in this script.
 		/// </summary>
-		private GameManager _gameManager;
+		private ChartManager _chartManager;
 
 		/// <summary>
 		/// Contains the position of the chart on the <see cref="Canvas" />.
@@ -45,8 +45,8 @@ namespace Assets.SEECity.Charts.Scripts
 		[SerializeField] private GameObject _sizeButton = null;
 
 		/// <summary>
-		/// Links the <see cref="GameManager" /> and initializes settings with the values from the
-		/// <see cref="_gameManager" />.
+		/// Links the <see cref="ChartManager" /> and initializes settings with the values from the
+		/// <see cref="_chartManager" />.
 		/// </summary>
 		private void Awake()
 		{
@@ -55,11 +55,14 @@ namespace Assets.SEECity.Charts.Scripts
 			_screenSize = _chart.transform.parent.parent.GetComponent<RectTransform>();
 		}
 
+		/// <summary>
+		/// Links the <see cref="ChartManager" /> and gets its setting data.
+		/// </summary>
 		private void GetSettingData()
 		{
-			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
-				.GetComponent<GameManager>();
-			_dragDelay = _gameManager.DragDelay;
+			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
+				.GetComponent<ChartManager>();
+			_dragDelay = _chartManager.DragDelay;
 		}
 
 		/// <summary>

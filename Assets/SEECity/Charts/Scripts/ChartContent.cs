@@ -11,9 +11,9 @@ namespace Assets.SEECity.Charts.Scripts
 	public class ChartContent : MonoBehaviour
 	{
 		/// <summary>
-		/// Contains settings used by <see cref="ChartContent" />.
+		/// Contains some settings used in this script.
 		/// </summary>
-		private GameManager _gameManager;
+		private ChartManager _chartManager;
 
 		/// <summary>
 		/// All objects to be listed in the chart.
@@ -23,7 +23,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
 		/// </summary>
-		private readonly List<GameObject> _activeMarkers = new List<GameObject>();
+		private List<GameObject> _activeMarkers = new List<GameObject>();
 
 		/// <summary>
 		/// The <see cref="AxisContentDropdown" /> containing Values for the X-Axis.
@@ -80,8 +80,8 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private void Awake()
 		{
-			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
-				.GetComponent<GameManager>();
+			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
+				.GetComponent<ChartManager>();
 			FindDataObjects();
 			GetAllFloats();
 			GetAllIntegers();
@@ -130,8 +130,6 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		public void DrawData()
 		{
-			foreach (GameObject marker in _activeMarkers) Destroy(marker);
-			_activeMarkers.Clear();
 			FindDataObjects();
 
 			int i = 0;
@@ -171,8 +169,30 @@ namespace Assets.SEECity.Charts.Scripts
 				if (inX && inY) toDraw.Add(data);
 			}
 
+			AddMarkers(toDraw, minX, maxX, minY, maxY);
+
+			_minX.text = minX.ToString("0.00");
+			_maxX.text = maxX.ToString("0.00");
+			_minY.text = minY.ToString("0.00");
+			_maxY.text = maxY.ToString("0.00");
+		}
+
+		/// <summary>
+		/// Adds new markers to the chart and removes the old ones.
+		/// </summary>
+		/// <param name="toDraw">The markers to add to the chart.</param>
+		/// <param name="minX">The minimum value on the x-axis.</param>
+		/// <param name="maxX">The maximum value on the x-axis.</param>
+		/// <param name="minY">The minimum value on the y-axis.</param>
+		/// <param name="maxY">The maximum value on the y-axis.</param>
+		private void AddMarkers(List<GameObject> toDraw, float minX, float maxX, float minY,
+			float maxY)
+		{
+			List<GameObject> updatedMarkers = new List<GameObject>();
 			float width = DataPanel.rect.width / (maxX - minX);
 			float height = DataPanel.rect.height / (maxY - minY);
+
+
 			foreach (GameObject data in toDraw)
 			{
 				GameObject marker = Instantiate(_markerPrefab, _entries.transform);
@@ -182,29 +202,40 @@ namespace Assets.SEECity.Charts.Scripts
 					.TryGetNumeric(AxisDropdownX.Value, out float valueX);
 				data.GetComponent<NodeRef>().node
 					.TryGetNumeric(AxisDropdownY.Value, out float valueY);
-				script.SetInfoText("Building: " + script.LinkedObject.name + "\nX: " +
+				script.SetInfoText("Linked to: " + script.LinkedObject.name + "\nX: " +
 				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("0.00"));
 				marker.GetComponent<RectTransform>().anchoredPosition = new Vector2(
 					(valueX - minX) * width, (valueY - minY) * height);
-				_activeMarkers.Add(marker);
+				updatedMarkers.Add(marker);
+				foreach (GameObject oldMarker in _activeMarkers)
+				{
+					ChartMarker oldScript = oldMarker.GetComponent<ChartMarker>();
+					if (oldScript.LinkedObject.GetInstanceID() == data.GetInstanceID() &&
+					    oldScript.TimedHighlight != null)
+						script.TriggerTimedHighlight(_chartManager.HighlightDuration);
+				}
 			}
 
-			_minX.text = minX.ToString("0.00");
-			_maxX.text = maxX.ToString("0.00");
-			_minY.text = minY.ToString("0.00");
-			_maxY.text = maxY.ToString("0.00");
+			foreach (GameObject marker in _activeMarkers) Destroy(marker);
+			_activeMarkers = updatedMarkers;
 		}
 
+		/// <summary>
+		/// Calls <see cref="ChartMarker.TriggerTimedHighlight" /> for all Markers in a rectangle in the chart.
+		/// </summary>
+		/// <param name="min">The starting edge of the rectangle.</param>
+		/// <param name="max">The ending edge of the rectangle.</param>
+		/// <param name="direction">True if min lies below max, false if not.</param>
 		public void AreaSelection(Vector2 min, Vector2 max, bool direction)
 		{
-			float highlightDuration = _gameManager.HighlightDuration;
+			float highlightDuration = _chartManager.HighlightDuration;
 			if (direction)
 				foreach (GameObject marker in _activeMarkers)
 				{
 					Vector2 markerPos = marker.transform.position;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y &&
 					    markerPos.y < max.y)
-						marker.GetComponent<ChartMarker>().TimedHighlight(highlightDuration);
+						marker.GetComponent<ChartMarker>().TriggerTimedHighlight(highlightDuration);
 				}
 			else
 				foreach (GameObject marker in _activeMarkers)
@@ -212,7 +243,7 @@ namespace Assets.SEECity.Charts.Scripts
 					Vector2 markerPos = marker.transform.position;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y &&
 					    markerPos.y > max.y)
-						marker.GetComponent<ChartMarker>().TimedHighlight(highlightDuration);
+						marker.GetComponent<ChartMarker>().TriggerTimedHighlight(highlightDuration);
 				}
 		}
 

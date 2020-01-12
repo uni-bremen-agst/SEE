@@ -6,9 +6,9 @@ namespace Assets.SEECity.Charts.Scripts
 	/// <summary>
 	/// Contains most settings and some methods needed across all charts.
 	/// </summary>
-	public class GameManager : MonoBehaviour
+	public class ChartManager : MonoBehaviour
 	{
-		private static GameManager _instance;
+		private static ChartManager _instance;
 
 		/// <summary>
 		/// The distance the camera will keep to the <see cref="GameObject" /> to focus on.
