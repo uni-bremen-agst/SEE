@@ -11,11 +11,11 @@ namespace Assets.SEECity.Charts.Scripts
 	public class ChartMarker : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	{
 		/// <summary>
-		/// Contains some settings used by <see cref="ChartMarker" />.
+		/// Contains some settings used in this script.
 		/// </summary>
-		private GameManager _gameManager;
+		private ChartManager _chartManager;
 
-		//User Variables from GameManager
+		//User Variables from ChartManager
 		private float _cameraDistance;
 		private bool _moveWithRotation;
 		private float _cameraFlightTime;
@@ -60,7 +60,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// The currently running <see cref="TimedHighlightRoutine" />.
 		/// </summary>
-		private Coroutine _timedHighlight;
+		public Coroutine TimedHighlight { get; private set; }
 
 		/// <summary>
 		/// The <see cref="GameObject" /> making the marker look highlighted when active.
@@ -74,7 +74,7 @@ namespace Assets.SEECity.Charts.Scripts
 		[Header("Other"), SerializeField] private TextMeshProUGUI _infoText = null;
 
 		/// <summary>
-		/// Links the <see cref="GameManager" /> and calls methods for initialization.
+		/// Calls methods for initialization.
 		/// </summary>
 		private void Awake()
 		{
@@ -82,18 +82,18 @@ namespace Assets.SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Takes the setting data from <see cref="GameManager" /> for use in <see cref="ChartMarker" />.
+		/// Links the <see cref="ChartManager" /> and gets its setting data.
 		/// </summary>
 		private void GetSettingData()
 		{
-			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
-				.GetComponent<GameManager>();
-			_cameraDistance = _gameManager.CameraDistance;
-			_moveWithRotation = _gameManager.MoveWithRotation;
-			_cameraFlightTime = _gameManager.CameraFlightTime;
-			_clickDelay = _gameManager.ClickDelay;
-			_highlightDuration = _gameManager.HighlightDuration;
-			_buildingHighlightMaterial = _gameManager.BuildingHighlightMaterial;
+			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
+				.GetComponent<ChartManager>();
+			_cameraDistance = _chartManager.CameraDistance;
+			_moveWithRotation = _chartManager.MoveWithRotation;
+			_cameraFlightTime = _chartManager.CameraFlightTime;
+			_clickDelay = _chartManager.ClickDelay;
+			_highlightDuration = _chartManager.HighlightDuration;
+			_buildingHighlightMaterial = _chartManager.BuildingHighlightMaterial;
 		}
 
 		/// <summary>
@@ -118,7 +118,7 @@ namespace Assets.SEECity.Charts.Scripts
 			yield return new WaitForSeconds(_clickDelay);
 			if (_waiting)
 			{
-				TimedHighlight(_highlightDuration);
+				TriggerTimedHighlight(_highlightDuration);
 			}
 			else
 			{
@@ -138,37 +138,38 @@ namespace Assets.SEECity.Charts.Scripts
 			if (highlight)
 			{
 				_highlightCopy = Instantiate(LinkedObject, LinkedObject.transform);
+				_highlightCopy.tag = "Untagged";
 				_highlightCopy.GetComponent<Renderer>().material = _buildingHighlightMaterial;
 			}
 			else
 			{
-				Destroy(_highlightCopy);
+				if (_highlightCopy != null) Destroy(_highlightCopy);
 			}
 
-			ToggleMarkerHighlight(highlight);
-		}
-
-		public void ToggleMarkerHighlight(bool active)
-		{
-			_markerHighlight.SetActive(active);
+			_markerHighlight.SetActive(highlight);
 		}
 
 		/// <summary>
 		/// Highlights this marker and its <see cref="LinkedObject" /> for a given amount of time.
 		/// </summary>
 		/// <param name="time">How long the highlight will last.</param>
-		public void TimedHighlight(float time)
+		public void TriggerTimedHighlight(float time)
 		{
-			if (_timedHighlight != null)
+			if (TimedHighlight != null)
 			{
-				StopCoroutine(_timedHighlight);
+				StopCoroutine(TimedHighlight);
 				HighlightLinkedObjectToggle(false);
 			}
 
-			_timedHighlight = StartCoroutine(TimedHighlightRoutine(time));
+			TimedHighlight = StartCoroutine(TimedHighlightRoutine(time));
 		}
 
-		public IEnumerator TimedHighlightRoutine(float time)
+		/// <summary>
+		/// The <see cref="Coroutine" /> stopping the highlight after the given time has passed.
+		/// </summary>
+		/// <param name="time">The time after which to stop the highlight.</param>
+		/// <returns></returns>
+		private IEnumerator TimedHighlightRoutine(float time)
 		{
 			HighlightLinkedObjectToggle(true);
 			yield return new WaitForSeconds(time);
@@ -281,6 +282,14 @@ namespace Assets.SEECity.Charts.Scripts
 		public void OnPointerExit(PointerEventData eventData)
 		{
 			_infoText.gameObject.SetActive(false);
+		}
+
+		/// <summary>
+		/// Destroys the <see cref="_highlightCopy" /> if it exists.
+		/// </summary>
+		private void OnDestroy()
+		{
+			if (_highlightCopy != null) Destroy(_highlightCopy);
 		}
 	}
 }

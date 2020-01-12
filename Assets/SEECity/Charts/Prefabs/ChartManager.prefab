@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 2342395875013397700}
   - component: {fileID: 2342395875013397703}
   m_Layer: 0
-  m_Name: GameManager
-  m_TagString: GameManager
+  m_Name: ChartManager
+  m_TagString: ChartManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -47,6 +47,7 @@ MonoBehaviour:
   CameraDistance: 40
   MoveWithRotation: 1
   CameraFlightTime: 0.5
+  MinimumSize: 400
   ClickDelay: 0.5
   DragDelay: 0.2
   BuildingHighlightMaterial: {fileID: 2100000, guid: 9d631e931375b5242b8903c497a12c74,
@@ -55,6 +56,10 @@ MonoBehaviour:
   HighlightDuration: 5
   _isVirtualReality: 0
   PointerLength: 5
+  Source: 2
+  Click:
+    actionPath: 
+    needsReinit: 0
   _highlightOutlineAnim: 0.001
 --- !u!95 &2342395875013397703
 Animator:

@@ -8,7 +8,10 @@ namespace Assets.SEECity.Charts.Scripts
 	/// </summary>
 	public class ChartSizeHandler : MonoBehaviour, IDragHandler
 	{
-		private GameManager _gameManager;
+		/// <summary>
+		/// Contains some settings used in this script.
+		/// </summary>
+		private ChartManager _chartManager;
 
 		/// <summary>
 		/// The minimum size a chart can have for width and height.
@@ -17,6 +20,7 @@ namespace Assets.SEECity.Charts.Scripts
 
 		[Header("For resizing"), SerializeField]
 		private Transform _dragButton = null;
+
 		[SerializeField] private Transform _topRight = null;
 		[SerializeField] private Transform _topLeft = null;
 		[SerializeField] private Transform _bottomRight = null;
@@ -27,6 +31,9 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private ChartContent _chartContent;
 
+		/// <summary>
+		/// Contains the size of the chart.
+		/// </summary>
 		private RectTransform _chart;
 
 		private void Awake()
@@ -37,16 +44,19 @@ namespace Assets.SEECity.Charts.Scripts
 			_chart = chart.GetComponent<RectTransform>();
 		}
 
+		/// <summary>
+		/// Links the <see cref="ChartManager" /> and gets its setting data.
+		/// </summary>
 		private void GetSettingData()
 		{
-			_gameManager = GameObject.FindGameObjectWithTag("GameManager")
-				.GetComponent<GameManager>();
-			_minimumSize = _gameManager.MinimumSize;
+			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
+				.GetComponent<ChartManager>();
+			_minimumSize = _chartManager.MinimumSize;
 		}
 
 		/// <summary>
 		/// Checks the current <see cref="Input.mousePosition" /> and calls
-		/// <see cref="ChartContent.ChangeSize" /> to resize the chart accordingly.
+		/// <see cref="ChangeSize" /> to resize the chart accordingly.
 		/// </summary>
 		/// <param name="eventData">Event payload associated with pointer (mouse / touch) events.</param>
 		public void OnDrag(PointerEventData eventData)

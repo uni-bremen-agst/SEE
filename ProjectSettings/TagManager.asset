@@ -14,9 +14,9 @@ TagManager:
   - Building
   - Block
   - Decoration
-  - GameManager
   - Pointer
   - Chart
+  - ChartManager
   layers:
   - Default
   - TransparentFX
