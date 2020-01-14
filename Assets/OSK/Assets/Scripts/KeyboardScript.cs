@@ -46,7 +46,7 @@ public class KeyboardScript : MonoBehaviour
     // Added this function to original source code to cover all "enter" events in once.
     public void OnEnter()
     {
-        TextField.GetComponent<SearchForObject>().OnEnter();
+        TextField.GetComponent<SearchForObject>().OnPressEnter(TextField.text);
     }
 
 }

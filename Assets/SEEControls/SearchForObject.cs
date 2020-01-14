@@ -5,11 +5,32 @@ using UnityEngine.UI;
 
 public class SearchForObject : MonoBehaviour
 {
+    /// <summary>
+    /// The panel where the found objects are going to be displayed.
+    /// Has to be assigned in the editor.
+    /// </summary>
+    public GameObject panel;
 
-    private List<GameObject> RecentFinds;
-    public GameObject panel; //Content Object in Sroll View
-    public GameObject button; //Button to be shown in list
+    /// <summary>
+    /// A prefab of the button the content is going to be shown on.
+    /// Has to be assigned in the editor.
+    /// </summary>
+    public GameObject button;
+
+    /// <summary>
+    /// The onscreen keyboard which puts its text into the attached inputfield.
+    /// Has to assigned in the editor.
+    /// </summary>
     public GameObject keyboard;
+
+    /// <summary>
+    /// A list of game objects which where recently selected.
+    /// </summary>
+    private List<GameObject> RecentFinds;
+
+    /// <summary>
+    /// The input field this script is attached to.
+    /// </summary>
     private InputField TextInput;
 
 
@@ -32,9 +53,14 @@ public class SearchForObject : MonoBehaviour
         }
     }
 
-    private List<GameObject> LookFor(string name)
+    /// <summary>
+    /// Filters all existing game objects with tag "Building" and returns those with the given infix.
+    /// </summary>
+    /// <param name="name">the infix to look for</param>
+    /// <returns>a list of all GameObjects in the game with the given infix</returns>
+    private List<GameObject> LookForInfix(string name)
     {
-        List<GameObject> finds = new List<GameObject> { };
+        List<GameObject> finds = new List<GameObject>();
         var allObjects = GameObject.FindGameObjectsWithTag("Building");
 
         foreach( GameObject obj in allObjects)
@@ -47,6 +73,11 @@ public class SearchForObject : MonoBehaviour
         return finds;
     }
 
+    /// <summary>
+    /// Adds the given GameObject to the list of recently visited GameObjects.
+    /// Order: most recently used
+    /// </summary>
+    /// <param name="find">the GameObject to add to the list</param>
     private void AddToRecentFinds(GameObject find)
     {
         if(RecentFinds.Contains(find))
@@ -57,57 +88,85 @@ public class SearchForObject : MonoBehaviour
         RecentFinds.Insert(0, find);
     }
 
-    public GameObject[] GetRecentFinds()
+    public List<GameObject> GetRecentFinds()
     {
-        return RecentFinds.ToArray();
+        return RecentFinds;
     }
 
+    /// <summary>
+    /// Is called when the attached input field is changed.
+    /// Updates the list on the attached panel.
+    /// </summary>
     public void OnInput()
     {
-        ClearParent(panel);
+        ClearObject(panel);
         string name = TextInput.text;
 
-        if (name.Length > 0)
+        List<GameObject> objs = LookForInfix(name);
+
+        if(name.Length > 0)
         {
-            List<GameObject> objs = LookFor(name);
-            GameObject newObj;
-            foreach (GameObject obj in objs)
-            {
-                newObj = (GameObject)Instantiate(button);
-                newObj.name = obj.name;
-                Text oldText = newObj.GetComponentInChildren<Text>();
-                oldText.text = obj.name;
-                newObj.transform.SetParent(panel.transform);
-            }
+            ShowOnPanel(objs);
+        }
+        else
+        {
+            ShowOnPanel(RecentFinds);
         }
     }
 
-    public void OnEnter()
+    /// <summary>
+    /// This function can be called to process the string inside the attached text field.
+    /// </summary>
+    /// <param name="name">the name of the object</param>
+    public void OnPressEnter(string name)
     {
         Debug.Log("pressed enter");
     }
 
-    private void ClearParent(GameObject parent)
+    /// <summary>
+    /// Calls the control script on the main camera to move the rig towards the specified object.
+    /// Also clears the panel and displays the list of recently found Objects.
+    /// </summary>
+    /// <param name="obj">the GameObject to focus</param>
+    public void OnEnter(GameObject obj)
     {
-        List<GameObject> objs = new List<GameObject>();
-        foreach(Transform child in parent.transform)
-        {
-            objs.Add(child.gameObject);
-        }
-
-        objs.ForEach(Destroy);
+        AddToRecentFinds(obj);
+        Camera.main.GetComponent<TouchControlsSEE>().SetTarget(obj.transform);
+        ClearObject(panel);
+        ShowOnPanel(RecentFinds);
     }
 
+    /// <summary>
+    /// Creates a button for each element in the given list and attaches it to the szezified panel.
+    /// Each button calls the OnEnter method on the onClick event with the GameObject it is representing.
+    /// </summary>
+    /// <param name="objs">the list of GameObjects to show on the specified panel</param>
+    private void ShowOnPanel(List<GameObject> objs)
+    {
+        foreach (GameObject obj in objs)
+        {
+            GameObject newObj = Instantiate(button);
+            newObj.name = obj.name;
 
-    //notes
-    /*
-     * differentiate between Leaf and Note by tag (GameObject.tag)
-     * 
-     * looking for infix with String.Contains(string)
-     * 
-     * change unity Objects into tree structure
-     */
+            Text oldText = newObj.GetComponentInChildren<Text>();
+            oldText.text = obj.name;
 
-    
+            newObj.GetComponentInChildren<Button>().onClick.AddListener(delegate { OnEnter(obj); });
+
+            newObj.transform.SetParent(panel.transform);
+        }
+    }
+
+    /// <summary>
+    /// Destroys all child objects of the given GameObject.
+    /// </summary>
+    /// <param name="parent">the GameObject to clear</param>
+    private void ClearObject(GameObject parent)
+    {
+        foreach(Transform child in parent.transform)
+        {
+            Destroy(child.gameObject);
+        }
+    }
 }
 
