@@ -17,15 +17,15 @@ namespace SEE.Layout
         // protected const string materialPath = "Particles/Standard Surface";
 
         /// <summary>
-        /// The material used for edges.
+        /// The material used for lines.
         /// </summary>
-        public readonly static Material DefaultLineMaterial = LineMaterial();
+        public readonly static Material DefaultLineMaterial = NewLineMaterial();
 
         /// <summary>
-        /// Returns the default material for edges using the materialPath.
+        /// Returns a new material for lines.
         /// </summary>
         /// <returns>default material for edges</returns>
-        private static Material LineMaterial()
+        public static Material NewLineMaterial()
         {
             Material material = new Material(Shader.Find(materialPath));
             if (material == null)
