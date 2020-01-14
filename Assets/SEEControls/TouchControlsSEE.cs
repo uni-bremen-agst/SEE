@@ -63,12 +63,7 @@ public class TouchControlsSEE : MonoBehaviour
 
                 if (hit && Input.GetTouch(0).phase == TouchPhase.Ended && mode == 1)
                 {
-                    target = hitInfo.transform;
-                    SetOffset();
-                    startPos = Rig.transform;
-                    timeCount = 0;
-                    Lock = true;
-                    Debug.Log(hitInfo.transform.name);
+                    SetTarget(target = hitInfo.transform);
                 }
             }
             else if (Input.touchCount == 2)
@@ -165,5 +160,14 @@ public class TouchControlsSEE : MonoBehaviour
             return false;
         else
             return true;
+    }
+
+    public void SetTarget(Transform obj)
+    {
+        target = obj;
+        SetOffset();
+        startPos = Rig.transform;
+        timeCount = 0;
+        Lock = true;
     }
 }
