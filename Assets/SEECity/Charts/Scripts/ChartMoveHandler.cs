@@ -51,7 +51,7 @@ namespace Assets.SEECity.Charts.Scripts
 		private void Awake()
 		{
 			GetSettingData();
-			_chart = GameObject.FindGameObjectWithTag("Chart").GetComponent<RectTransform>();
+			_chart = transform.parent.GetComponent<RectTransform>();
 			_screenSize = _chart.transform.parent.parent.GetComponent<RectTransform>();
 		}
 

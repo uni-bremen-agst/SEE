@@ -26,7 +26,7 @@ namespace Assets.SEECity.Charts.Scripts
 
 		private void Awake()
 		{
-			_chartContent = GameObject.FindGameObjectWithTag("Chart").GetComponent<ChartContent>();
+			_chartContent = transform.parent.GetComponent<ChartContent>();
 		}
 
 		/// <summary>

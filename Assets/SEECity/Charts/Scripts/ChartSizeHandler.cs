@@ -39,7 +39,7 @@ namespace Assets.SEECity.Charts.Scripts
 		private void Awake()
 		{
 			GetSettingData();
-			GameObject chart = GameObject.FindGameObjectWithTag("Chart");
+			GameObject chart = transform.parent.gameObject;
 			_chartContent = chart.GetComponent<ChartContent>();
 			_chart = chart.GetComponent<RectTransform>();
 		}
