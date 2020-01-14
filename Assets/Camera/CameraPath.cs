@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Collections;
 using SEE.Layout;
 using SEE.DataModel;
-using System;
 
 namespace SEE
 {
@@ -96,6 +95,11 @@ namespace SEE
         /// <summary>
         /// Saves the captured path data in a file with given filename. The file will
         /// be overwritten if it exists.
+        /// 
+        /// The file format is as follows. Each line has exactly minimalColumns entries
+        /// seperated by the delimiter. The first three entries form the position
+        /// vector, the second three entries the rotation in Euler angles, and the
+        /// the last entry contains the time. Each value is a float.
         /// </summary>
         /// <param name="filename">name of the output file</param>
         public void Save(string filename)
@@ -104,13 +108,13 @@ namespace SEE
 
             foreach (PathData d in data)
             {
+                Vector3 rotation = d.rotation.eulerAngles;
                 string output = FloatToString(d.position.x)
                               + delimiter + FloatToString(d.position.y)
                               + delimiter + FloatToString(d.position.z)
-                              + delimiter + FloatToString(d.rotation.x)
-                              + delimiter + FloatToString(d.rotation.y)
-                              + delimiter + FloatToString(d.rotation.z)
-                              + delimiter + FloatToString(d.rotation.w)
+                              + delimiter + FloatToString(rotation.x)
+                              + delimiter + FloatToString(rotation.y)
+                              + delimiter + FloatToString(rotation.z)
                               + delimiter + FloatToString(d.time);
                 outputs.Add(output);
             }
@@ -140,7 +144,7 @@ namespace SEE
         /// The minimal number of columns a CSV file containing path data must have:
         /// 3 (position = Vector3) + 4 (rotation = Quaternion) + 1 (time = float) = 7.
         /// </summary>
-        private static readonly int minimalColumns = 7;
+        private static readonly int minimalColumns = 6;
 
         /// <summary>
         /// Name of the file from which the path was loaded. May be the empty string
@@ -151,12 +155,19 @@ namespace SEE
         /// <summary>
         /// Loads the path data from a the file.
         /// 
+        /// Precondition: Each line in the file has at least minimalColumns entries
+        /// seperated by the delimiter. The first three entries form the position
+        /// vector, the second three entries the rotation in Euler angles, and the
+        /// the last entry contains the time. Each value must be a float. There 
+        /// may be additional columns, which are ignored.
+        /// 
         /// May throw any exception that can be thrown by System.IO.File.ReadAllLines.
         /// </summary>
-        public static CameraPath ReadPath(string path)
+        /// <param name="filename">name of the file containing the path data</param>
+        public static CameraPath ReadPath(string filename)
         {
-            string[] data = System.IO.File.ReadAllLines(path);
-            CameraPath result = new CameraPath(path);
+            string[] data = System.IO.File.ReadAllLines(filename);
+            CameraPath result = new CameraPath(filename);
 
             int i = 0;
             foreach (string line in data)
@@ -167,7 +178,7 @@ namespace SEE
                 {
                     Debug.LogErrorFormat
                         ("Data format error at line {0} in file {1}: expected at least {2} entries separated by {3}. Got: {4} in '{5}'.\n",
-                         i + 1, path, minimalColumns, delimiter, coordinates.Length, line);
+                         i + 1, filename, minimalColumns, delimiter, coordinates.Length, line);
                 }
                 else
                 {
@@ -177,13 +188,15 @@ namespace SEE
                     position.z = float.Parse(coordinates[2], CultureInfo.InvariantCulture);
 
                     Quaternion rotation;
-                    rotation.x = float.Parse(coordinates[3], CultureInfo.InvariantCulture);
-                    rotation.y = float.Parse(coordinates[4], CultureInfo.InvariantCulture);
-                    rotation.z = float.Parse(coordinates[5], CultureInfo.InvariantCulture);
-                    rotation.w = float.Parse(coordinates[6], CultureInfo.InvariantCulture);
+                    {
+                        Vector3 eulerAngles;
+                        eulerAngles.x = float.Parse(coordinates[3], CultureInfo.InvariantCulture);
+                        eulerAngles.y = float.Parse(coordinates[4], CultureInfo.InvariantCulture);
+                        eulerAngles.z = float.Parse(coordinates[5], CultureInfo.InvariantCulture);
+                        rotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+                    }
 
-                    float time;
-                    time = float.Parse(coordinates[7], CultureInfo.InvariantCulture);
+                    float time = float.Parse(coordinates[6], CultureInfo.InvariantCulture);
 
                     result.Add(position, rotation, time);
                     // Note: We ignore all remaining columns if there are any.
@@ -445,6 +458,26 @@ namespace SEE
 
             line.positionCount = positions.Length;
             line.SetPositions(positions);
+        }
+       
+        private string Dump(Vector3 v)
+        {
+            return ("("    + v.x.ToString("0.00000")
+                    + ", " + v.y.ToString("0.00000")
+                    + ", " + v.z.ToString("0.00000") + ")");
+        }
+
+        public void Dump()
+        {
+            foreach(PathData d in data)
+            {
+                Debug.LogFormat("position(x,y,z)={0} rotation={1}, rotation(x, y, z, w)= ({2}, {3}, {4}, {5}), rotation(Euler angles)={6}, time={7})\n", 
+                                d.position, 
+                                d.rotation,
+                                d.rotation.x.ToString("0.000"), d.rotation.y.ToString("0.000"), d.rotation.z.ToString("0.000"), d.rotation.w.ToString("0.000"),
+                                Dump(d.rotation.eulerAngles),
+                                d.time);
+            }
         }
     }
 }
