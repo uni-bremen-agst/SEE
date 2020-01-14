@@ -27,7 +27,7 @@ namespace Assets.SEECity.Charts.Scripts.VR
 
 		private void Start()
 		{
-			_inputModule = EventSystem.current.gameObject.GetComponent<VRInputModule>();
+			_inputModule = GameObject.FindGameObjectWithTag("VREventSystem").GetComponent<VRInputModule>();
 		}
 
 		/// <summary>
