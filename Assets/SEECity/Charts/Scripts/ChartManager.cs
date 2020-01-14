@@ -65,13 +65,14 @@ namespace Assets.SEECity.Charts.Scripts
 
 		[Header("Prefabs"), SerializeField] private GameObject _chartsPrefab;
 
-		[SerializeField] private GameObject _chartsVirtualRealityPrefab;
+        [SerializeField] private GameObject _nonVRCamera;
+
+		[SerializeField] private GameObject[] _virtualRealityObjects;
 
 		/// <summary>
 		/// The current thickness of the highlight outline of <see cref="BuildingHighlightMaterial" /> used in
 		/// animations.
 		/// </summary>
-		[Header("DO NOT CHANGE THIS"), SerializeField]
 		private float _highlightOutlineAnim = 0.001f;
 
 		/// <summary>
@@ -87,7 +88,19 @@ namespace Assets.SEECity.Charts.Scripts
 		private void Start()
 		{
 			_isVirtualReality = XRDevice.isPresent;
-		}
+            if (!_isVirtualReality)
+            {
+                foreach (GameObject vrObject in _virtualRealityObjects)
+                {
+                    Destroy(vrObject);
+                }
+                Instantiate(_chartsPrefab);
+            }
+            else
+            {
+                Destroy(_nonVRCamera);
+            }
+        }
 
 		/// <summary>
 		/// Update is called once per frame.
@@ -95,7 +108,6 @@ namespace Assets.SEECity.Charts.Scripts
 		private void Update()
 		{
 			AnimateHighlight();
-			Debug.Log(XRDevice.isPresent);
 		}
 
 		/// <summary>

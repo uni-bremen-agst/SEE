@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8226672809330839672}
   m_Layer: 0
   m_Name: VREventSystem
-  m_TagString: Untagged
+  m_TagString: VREventSystem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -59,8 +59,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb04906b776d8a44e87ad7b6d0b564db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pointer: {fileID: 0}
-  Source: 2
-  Click:
-    actionPath: /actions/default/in/GrabPinch
-    needsReinit: 0
