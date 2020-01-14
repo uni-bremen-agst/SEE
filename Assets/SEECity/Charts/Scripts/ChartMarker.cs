@@ -63,6 +63,17 @@ namespace Assets.SEECity.Charts.Scripts
 		public Coroutine TimedHighlight { get; private set; }
 
 		/// <summary>
+		/// Counts the time <see cref="TimedHighlight" /> has been running for.
+		/// </summary>
+		public float HighlightTime { get; private set; }
+
+		/// <summary>
+		/// Tells if <see cref="TimedHighlight" /> was running when script was deactivated due to minimization
+		/// of the chart.
+		/// </summary>
+		private bool _reactivateHighlight;
+
+		/// <summary>
 		/// The <see cref="GameObject" /> making the marker look highlighted when active.
 		/// </summary>
 		[Header("Highlight Properties"), SerializeField]
@@ -94,6 +105,11 @@ namespace Assets.SEECity.Charts.Scripts
 			_clickDelay = _chartManager.ClickDelay;
 			_highlightDuration = _chartManager.HighlightDuration;
 			_buildingHighlightMaterial = _chartManager.BuildingHighlightMaterial;
+		}
+
+		private void Update()
+		{
+			if (TimedHighlight != null) HighlightTime += Time.deltaTime;
 		}
 
 		/// <summary>
@@ -171,6 +187,11 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <returns></returns>
 		private IEnumerator TimedHighlightRoutine(float time)
 		{
+			if (time < _highlightDuration)
+				HighlightTime = _highlightDuration - time;
+			else
+				HighlightTime = 0f;
+
 			HighlightLinkedObjectToggle(true);
 			yield return new WaitForSeconds(time);
 			HighlightLinkedObjectToggle(false);
@@ -282,6 +303,27 @@ namespace Assets.SEECity.Charts.Scripts
 		public void OnPointerExit(PointerEventData eventData)
 		{
 			_infoText.gameObject.SetActive(false);
+		}
+
+		/// <summary>
+		/// If <see cref="TimedHighlight" /> was running, this will be saved to
+		/// <see cref="_reactivateHighlight" />.
+		/// </summary>
+		private void OnDisable()
+		{
+			if (TimedHighlight != null) _reactivateHighlight = true;
+		}
+
+		/// <summary>
+		/// Reactivates the highlight if it was running before disable.
+		/// </summary>
+		private void OnEnable()
+		{
+			if (_reactivateHighlight)
+			{
+				TriggerTimedHighlight(_highlightDuration - HighlightTime);
+				_reactivateHighlight = false;
+			}
 		}
 
 		/// <summary>

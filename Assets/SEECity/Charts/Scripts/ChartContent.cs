@@ -212,7 +212,7 @@ namespace Assets.SEECity.Charts.Scripts
 					ChartMarker oldScript = oldMarker.GetComponent<ChartMarker>();
 					if (oldScript.LinkedObject.GetInstanceID() == data.GetInstanceID() &&
 					    oldScript.TimedHighlight != null)
-						script.TriggerTimedHighlight(_chartManager.HighlightDuration);
+						script.TriggerTimedHighlight(_chartManager.HighlightDuration - oldScript.HighlightTime);
 				}
 			}
 

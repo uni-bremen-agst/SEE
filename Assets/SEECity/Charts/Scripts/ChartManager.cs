@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.XR;
 using Valve.VR;
 
 namespace Assets.SEECity.Charts.Scripts
@@ -55,13 +56,16 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Determines if the scene is being played in VR or not.
 		/// </summary>
-		[Header("Virtual Reality"), SerializeField]
 		private bool _isVirtualReality;
 
-		public float PointerLength = 5f;
+		[Header("Virtual Reality")] public float PointerLength = 5f;
 
 		public SteamVR_Input_Sources Source = SteamVR_Input_Sources.RightHand;
 		public SteamVR_Action_Boolean Click;
+
+		[Header("Prefabs"), SerializeField] private GameObject _chartsPrefab;
+
+		[SerializeField] private GameObject _chartsVirtualRealityPrefab;
 
 		/// <summary>
 		/// The current thickness of the highlight outline of <see cref="BuildingHighlightMaterial" /> used in
@@ -80,12 +84,18 @@ namespace Assets.SEECity.Charts.Scripts
 			else if (_instance == this) Destroy(gameObject);
 		}
 
+		private void Start()
+		{
+			_isVirtualReality = XRDevice.isPresent;
+		}
+
 		/// <summary>
 		/// Update is called once per frame.
 		/// </summary>
 		private void Update()
 		{
 			AnimateHighlight();
+			Debug.Log(XRDevice.isPresent);
 		}
 
 		/// <summary>

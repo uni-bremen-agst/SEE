@@ -36,7 +36,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private void Start()
 		{
-			_chartContent = GameObject.FindGameObjectWithTag("Chart").GetComponent<ChartContent>();
+			_chartContent = transform.parent.parent.GetComponent<ChartContent>();
 			_dropdown = GetComponent<TMP_Dropdown>();
 			GetKeys();
 			Value = _dropdown.options[0].text;

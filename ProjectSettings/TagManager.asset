@@ -15,7 +15,6 @@ TagManager:
   - Block
   - Decoration
   - Pointer
-  - Chart
   - ChartManager
   layers:
   - Default
