@@ -1678,7 +1678,7 @@ MonoBehaviour:
   _maxX: {fileID: 6611437823145618348}
   _minY: {fileID: 137086097441516839}
   _maxY: {fileID: 4713178530221229291}
-  _parent: {fileID: 4785276354945708473}
+  Parent: {fileID: 4785276354945708473}
   DataPanel: {fileID: 4785276354708113209}
   LabelsPanel: {fileID: 4785276354985796253}
 --- !u!1 &4785276354985796252
@@ -3639,7 +3639,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dae322eaf880b14abd6d35cdcdf39fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _minimizeThis: {fileID: 4699780545081809820}
+  _sizeButton: {fileID: 0}
 --- !u!1 &8238871806022463350
 GameObject:
   m_ObjectHideFlags: 0

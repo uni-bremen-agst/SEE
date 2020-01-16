@@ -42,13 +42,13 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		protected bool _minimized;
 
-		[SerializeField] protected GameObject _minimizeThis = null;
+		[SerializeField] protected GameObject _sizeButton = null;
 
 		/// <summary>
 		/// Links the <see cref="ChartManager" /> and initializes settings with the values from the
 		/// <see cref="_chartManager" />.
 		/// </summary>
-		private void Awake()
+		protected virtual void Awake()
 		{
 			GetSettingData();
 			_chart = transform.parent.GetComponent<RectTransform>();
@@ -68,7 +68,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Adds the time passed since the last frame to the <see cref="_timer" />
 		/// </summary>
-		private void Update()
+		protected virtual void Update()
 		{
 			if (_pointerDown) _timer += Time.deltaTime;
 		}
@@ -119,7 +119,7 @@ namespace Assets.SEECity.Charts.Scripts
 			ChartContent chart = _chart.GetComponent<ChartContent>();
 			chart.LabelsPanel.gameObject.SetActive(_minimized);
 			chart.DataPanel.gameObject.SetActive(_minimized);
-			_minimizeThis.SetActive(_minimized);
+			_sizeButton.SetActive(_minimized);
 			_minimized = !_minimized;
 		}
 	}
