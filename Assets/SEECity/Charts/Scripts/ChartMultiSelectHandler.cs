@@ -6,13 +6,13 @@ namespace Assets.SEECity.Charts.Scripts
 	/// <summary>
 	/// Handles selection of multiple markers in selection mode.
 	/// </summary>
-	public class MultiSelectHandler : MonoBehaviour, IPointerDownHandler, IDragHandler,
+	public class ChartMultiSelectHandler : MonoBehaviour, IPointerDownHandler, IDragHandler,
 		IPointerUpHandler
 	{
 		/// <summary>
 		/// The rectangle used to visualize the selection process for the user.
 		/// </summary>
-		[SerializeField] private RectTransform _selectionRect = null;
+		[SerializeField] protected RectTransform _selectionRect = null;
 
 		/// <summary>
 		/// Needed for access to <see cref="ChartContent.AreaSelection" />.
@@ -22,7 +22,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// The position the user started the drag at.
 		/// </summary>
-		private Vector3 _startingPos;
+		protected Vector3 _startingPos;
 
 		private void Awake()
 		{
@@ -33,7 +33,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// Activates and sets starting position of <see cref="_selectionRect" />.
 		/// </summary>
 		/// <param name="eventData"></param>
-		public void OnPointerDown(PointerEventData eventData)
+		public virtual void OnPointerDown(PointerEventData eventData)
 		{
 			_selectionRect.gameObject.SetActive(true);
 			_selectionRect.position = Input.mousePosition;
@@ -103,7 +103,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// Highlights all markers in <see cref="_selectionRect" /> and deactivates it.
 		/// </summary>
 		/// <param name="eventData"></param>
-		public void OnPointerUp(PointerEventData eventData)
+		public virtual void OnPointerUp(PointerEventData eventData)
 		{
 			Vector2 finalPos = Input.mousePosition;
 			if (_startingPos.x < finalPos.x)

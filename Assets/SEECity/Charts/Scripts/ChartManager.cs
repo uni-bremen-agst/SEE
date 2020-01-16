@@ -73,7 +73,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// The current thickness of the highlight outline of <see cref="BuildingHighlightMaterial" /> used in
 		/// animations.
 		/// </summary>
-		private float _highlightOutlineAnim = 0.001f;
+		[SerializeField] private float _highlightOutlineAnim = 0.001f;
 
 		/// <summary>
 		/// Enforces singleton pattern.

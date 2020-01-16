@@ -3639,7 +3639,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dae322eaf880b14abd6d35cdcdf39fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sizeButton: {fileID: 4699780545081809820}
+  _minimizeThis: {fileID: 4699780545081809820}
 --- !u!1 &8238871806022463350
 GameObject:
   m_ObjectHideFlags: 0

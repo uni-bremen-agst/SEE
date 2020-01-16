@@ -89,7 +89,7 @@ namespace Assets.SEECity.Charts.Scripts
 
 		private void Start()
 		{
-			//DrawData();
+			InvokeRepeating("DrawData", 0.5f, 5f);
 		}
 
 		/// <summary>
