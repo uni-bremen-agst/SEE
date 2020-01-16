@@ -54,15 +54,16 @@ MonoBehaviour:
     type: 2}
   _highlightOutline: 0.005
   HighlightDuration: 5
-  PointerLength: 5
+  PointerLength: 7
   Source: 2
   Click:
     actionPath: /actions/default/in/GrabPinch
     needsReinit: 0
   _chartsPrefab: {fileID: 2535476864626067673, guid: 378b3c326bb846e49b4ca1fda9245e3f,
     type: 3}
-  _chartsVirtualRealityPrefab: {fileID: 8786689694287401766, guid: 4a9c83b6772eac942910d6b48bda7cc0,
-    type: 3}
+  _nonVRCamera: {fileID: 0}
+  _virtualRealityObjects: []
+  _highlightOutlineAnim: 0.001
 --- !u!95 &2342395875013397703
 Animator:
   serializedVersion: 3

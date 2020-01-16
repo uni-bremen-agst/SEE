@@ -56,7 +56,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// A parent of this object. Used in VR to destroy the whole construct of a moveable chart.
 		/// </summary>
-		[SerializeField] private GameObject _parent = null;
+		public GameObject Parent = null;
 
 		/// <summary>
 		/// The panel on which the <see cref="ChartMarker" />s are instantiated.
@@ -253,7 +253,7 @@ namespace Assets.SEECity.Charts.Scripts
 		[SerializeField]
 		private void Destroy()
 		{
-			Destroy(_parent);
+			Destroy(Parent);
 		}
 	}
 }
