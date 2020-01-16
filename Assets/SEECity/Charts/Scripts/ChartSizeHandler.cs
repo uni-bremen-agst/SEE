@@ -59,7 +59,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <see cref="ChangeSize" /> to resize the chart accordingly.
 		/// </summary>
 		/// <param name="eventData">Event payload associated with pointer (mouse / touch) events.</param>
-		public void OnDrag(PointerEventData eventData)
+		public virtual void OnDrag(PointerEventData eventData)
 		{
 			RectTransform pos = GetComponent<RectTransform>();
 			Vector2 oldPos = new Vector2(pos.position.x, pos.position.y);
@@ -74,7 +74,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		/// <param name="width">The new width of the chart.</param>
 		/// <param name="height">The new height of the chart.</param>
-		public void ChangeSize(float width, float height)
+		private void ChangeSize(float width, float height)
 		{
 			RectTransform dataPanel = _chartContent.DataPanel;
 			dataPanel.sizeDelta = new Vector2(width - 100, height - 100);

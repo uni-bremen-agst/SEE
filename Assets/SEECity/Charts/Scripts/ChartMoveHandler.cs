@@ -40,9 +40,9 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// If the chart is currently minimized or not.
 		/// </summary>
-		private bool _minimized;
+		protected bool _minimized;
 
-		[SerializeField] private GameObject _sizeButton = null;
+		[SerializeField] protected GameObject _minimizeThis = null;
 
 		/// <summary>
 		/// Links the <see cref="ChartManager" /> and initializes settings with the values from the
@@ -78,7 +78,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// position on the canvas.
 		/// </summary>
 		/// <param name="eventData">Event payload associated with pointer (mouse / touch) events.</param>
-		public void OnDrag(PointerEventData eventData)
+		public virtual void OnDrag(PointerEventData eventData)
 		{
 			RectTransform pos = GetComponent<RectTransform>();
 			Vector2 newPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
@@ -114,12 +114,12 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Toggles the minimization of the chart.
 		/// </summary>
-		private void ToggleMinimize()
+		protected virtual void ToggleMinimize()
 		{
 			ChartContent chart = _chart.GetComponent<ChartContent>();
 			chart.LabelsPanel.gameObject.SetActive(_minimized);
 			chart.DataPanel.gameObject.SetActive(_minimized);
-			_sizeButton.SetActive(_minimized);
+			_minimizeThis.SetActive(_minimized);
 			_minimized = !_minimized;
 		}
 	}

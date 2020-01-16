@@ -195,6 +195,7 @@ namespace Assets.SEECity.Charts.Scripts
 			HighlightLinkedObjectToggle(true);
 			yield return new WaitForSeconds(time);
 			HighlightLinkedObjectToggle(false);
+			TimedHighlight = null;
 		}
 
 		/// <summary>
