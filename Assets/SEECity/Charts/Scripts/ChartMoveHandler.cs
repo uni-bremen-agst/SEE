@@ -12,7 +12,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Contains some settings used in this script.
 		/// </summary>
-		private ChartManager _chartManager;
+		protected ChartManager _chartManager;
 
 		/// <summary>
 		/// Contains the position of the chart on the <see cref="Canvas" />.
@@ -35,7 +35,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// If the pointer is currently down or not.
 		/// </summary>
-		private bool _pointerDown;
+		protected bool _pointerDown;
 
 		/// <summary>
 		/// If the chart is currently minimized or not.
@@ -58,7 +58,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Links the <see cref="ChartManager" /> and gets its setting data.
 		/// </summary>
-		private void GetSettingData()
+		protected virtual void GetSettingData()
 		{
 			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
