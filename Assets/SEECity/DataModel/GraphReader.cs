@@ -134,6 +134,15 @@ namespace SEE.DataModel
                     if (String.IsNullOrEmpty(node.LinkName))
                     {
                         LogError("Node has no attribute " + Node.LinknameAttribute);
+                        // let's try to use the Source.Name for the linkname instead, hoping it is unique
+                        if (String.IsNullOrEmpty(node.SourceName))
+                        {
+                            LogError("Node has not even an attribute " + Node.SourceNameAttribute);
+                        }
+                        else
+                        {
+                            node.LinkName = node.SourceName;
+                        }
                     }
                     else
                     {
