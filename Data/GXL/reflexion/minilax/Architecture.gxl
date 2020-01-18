@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="Architecture" edgeids="true">
+    <node id="N3232">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Memory Manager</string>
+      </attr>
+    </node>
+    <node id="N3233">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Print AST</string>
+      </attr>
+    </node>
+    <node id="N3234">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>AST2IL</string>
+      </attr>
+    </node>
+    <node id="N3235">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Optimizer</string>
+      </attr>
+    </node>
+    <node id="N3236">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Error Handler</string>
+      </attr>
+    </node>
+    <node id="N3237">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Constants Table</string>
+      </attr>
+    </node>
+    <node id="N3238">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Main</string>
+      </attr>
+    </node>
+    <node id="N3239">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Semantic Analysis</string>
+      </attr>
+    </node>
+    <node id="N3240">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Parser</string>
+      </attr>
+    </node>
+    <node id="N3241">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Scanner</string>
+      </attr>
+    </node>
+    <node id="N3242">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Symbol Table</string>
+      </attr>
+    </node>
+    <node id="N3243">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>IL</string>
+      </attr>
+    </node>
+    <node id="N3244">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>AST</string>
+      </attr>
+    </node>
+    <node id="N3245">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Middleend</string>
+      </attr>
+    </node>
+    <node id="N3246">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Backend</string>
+      </attr>
+    </node>
+    <node id="N3247">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Frontend</string>
+      </attr>
+    </node>
+    <node id="N3248">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Compiler</string>
+      </attr>
+    </node>
+    <node id="N3249">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Infrastructure</string>
+      </attr>
+    </node>
+    <node id="N3250">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Macros</string>
+      </attr>
+    </node>
+    <node id="N3251">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Global Controls</string>
+      </attr>
+    </node>
+    <node id="N3252">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>AST2Code</string>
+      </attr>
+    </node>
+    <node id="N3253">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>IL2Code</string>
+      </attr>
+    </node>
+    <node id="N3254">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Machine Description</string>
+      </attr>
+    </node>
+    <node id="N3255">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Type Info</string>
+      </attr>
+    </node>
+    <node id="N3256">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Target Program</string>
+      </attr>
+    </node>
+    <node id="N3257">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>AST-Main</string>
+      </attr>
+    </node>
+    <node id="N3258">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Semantic Main</string>
+      </attr>
+    </node>
+    <edge id="E12607" from="N3253" to="N3256">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12608" from="N3252" to="N3256">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12609" from="N3256" to="N3246">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12610" from="N3234" to="N3237">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12611" from="N3252" to="N3237">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12612" from="N3252" to="N3255">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12613" from="N3236" to="N3250">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12614" from="N3241" to="N3237">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12615" from="N3243" to="N3237">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12616" from="N3252" to="N3246">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12617" from="N3253" to="N3246">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12618" from="N3254" to="N3246">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12619" from="N3252" to="N3254">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12620" from="N3253" to="N3254">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12621" from="N3238" to="N3251">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12622" from="N3248" to="N3251">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12623" from="N3234" to="N3243">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12624" from="N3255" to="N3239">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12625" from="N3234" to="N3255">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12626" from="N3252" to="N3244">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12627" from="N3232" to="N3236">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12628" from="N3241" to="N3247">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12629" from="N3240" to="N3247">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12630" from="N3239" to="N3247">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12631" from="N3238" to="N3245">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12632" from="N3238" to="N3246">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12633" from="N3245" to="N3244">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12634" from="N3245" to="N3243">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12635" from="N3246" to="N3243">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12636" from="N3240" to="N3242">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12637" from="N3239" to="N3242">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12638" from="N3240" to="N3244">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12639" from="N3239" to="N3244">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12640" from="N3240" to="N3241">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12641" from="N3235" to="N3245">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12642" from="N3233" to="N3244">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12643" from="N3238" to="N3234">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12644" from="N3234" to="N3244">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12645" from="N3238" to="N3233">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12646" from="N3232" to="N3249">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12647" from="N3236" to="N3249">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12648" from="N3244" to="N3248">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12649" from="N3245" to="N3248">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12650" from="N3234" to="N3248">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12651" from="N3246" to="N3248">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12652" from="N3232" to="N3250">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12653" from="N3256" to="N3237">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12654" from="N3242" to="N3248">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12655" from="N3234" to="N3242">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12656" from="N3238" to="N3249">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12657" from="N3233" to="N3237">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12658" from="N3248" to="N3249">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12659" from="N3238" to="N3247">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12660" from="N3244" to="N3242">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12661" from="N3251" to="N3250">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12662" from="N3245" to="N3242">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12663" from="N3252" to="N3242">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12664" from="N3250" to="N3249">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12665" from="N3256" to="N3254">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12666" from="N3243" to="N3248">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12667" from="N3247" to="N3248">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12668" from="N3237" to="N3248">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12669" from="N3257" to="N3244">
+      <type xlink:href="Part_Of"/>
+    </edge>
+    <edge id="E12670" from="N3258" to="N3239">
+      <type xlink:href="Part_Of"/>
+    </edge>
+  </graph>
+</gxl>
