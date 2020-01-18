@@ -13,15 +13,29 @@ namespace SEE.DataModel
         // Important note: Nodes should be created only by calling Graph.newNode().
         // Do not use 'new Node()'.
 
+        /// <summary>
+        /// The attribute name for unique identifiers (within a graph).
+        /// </summary>
         public const string LinknameAttribute = "Linkage.Name";
 
         /// <summary>
-        /// The unique identifier of a node.
+        /// The unique identifier of a node. May be the empty string if the node has
+        /// no such identifier set.
         /// </summary>
         [SerializeField]
         public string LinkName
         {
-            get => GetString(LinknameAttribute);
+            get
+            {
+                if (TryGetString(LinknameAttribute, out string linkname))
+                {
+                    return linkname;
+                }
+                else
+                {
+                    return "";
+                }
+            }
             // This will only set the linkname attribute, but does not alter the
             // hashed linknames of the underlying graph. You will likely want to
             // use Graph.SetLinkname instead. Otherwise expect inconsistencies.
@@ -29,15 +43,18 @@ namespace SEE.DataModel
             set => SetString(LinknameAttribute, value);
         }
 
-        private const string sourcenameAttribute = "Source.Name";
+        /// <summary>
+        /// The attribute name for the name of nodes. They may or may not be unique.
+        /// </summary>
+        public const string SourceNameAttribute = "Source.Name";
 
         /// <summary>
         /// The name of the node (which is not necessarily unique).
         /// </summary>
         public string SourceName
         {
-            get => GetString(sourcenameAttribute);
-            set => SetString(sourcenameAttribute, value);
+            get => GetString(SourceNameAttribute);
+            set => SetString(SourceNameAttribute, value);
         }
 
         [SerializeField]
