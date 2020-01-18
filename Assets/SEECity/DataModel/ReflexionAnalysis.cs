@@ -1,8 +1,4 @@
 ﻿/*
-The Bauhaus Project
-University of Bremen, Germany.
-Axivion GmbH.
-
 Copyright (C) Axivion GmbH, 2011-2020
 
 @author Rainer Koschke
@@ -68,10 +64,10 @@ namespace SEE.DataModel
         //              Use advanced logic for resolving
         //              of declaration mapping targets.
         public Reflexion(Graph dg,
-                        Graph arch,
-                        Graph map,
-                        string name,
-                        string root_edge_type)
+                         Graph arch,
+                         Graph map,
+                         string name,
+                         string root_edge_type)
         {
             _graph = dg;
             _architecture = arch;
@@ -524,7 +520,8 @@ namespace SEE.DataModel
         // Precondition: source_node is node in dependencies
         private bool is_relevant(Edge source_edge)
         {
-            return false; // FIXME
+            return true;
+            // FIXME: For the time being, we consider every node to be relevant.
         }
 
         // *****************************************
@@ -554,10 +551,11 @@ namespace SEE.DataModel
             }
 
 #if DEBUG
-            Debug.Log("explicit mapping\n");
-            dump_table(_explicit_maps_to_table);
             Debug.Log("implicit mapping\n");
             dump_table(_implicit_maps_to_table);
+            Debug.Log("explicit mapping\n");
+            dump_table(_explicit_maps_to_table);
+
 #endif
         }
 
@@ -572,7 +570,7 @@ namespace SEE.DataModel
         // and maps them to 'target'
         private void add_subtree_to_implicit_map(Node root, Node target)
         {
-            foreach(Node child in root.Children())
+            foreach (Node child in root.Children())
             {
                 if (!is_mapper(child))
                 {
