@@ -69,6 +69,7 @@ namespace SEE.DataModel
             Graph result = graphCreator.GetGraph();
             Assert.That(result, !Is.Null);
             Debug.LogFormat("Loaded {0} nodes and {1} edges.\n", result.NodeCount, result.EdgeCount);
+            //result.DumpTree();
             return result;
         }
         private void LoadAll(string v)
