@@ -59,23 +59,28 @@ namespace Assets.SEECity.Charts.Scripts
 		private bool _isVirtualReality;
 
 		[Header("Virtual Reality")] public float PointerLength = 5f;
-        public float ChartSpeed = 10f;
+		public float ChartSpeed = 10f;
 
 		public SteamVR_Input_Sources Source = SteamVR_Input_Sources.RightHand;
 		public SteamVR_Action_Boolean Click;
-        public SteamVR_Action_Vector2 MoveInOut;
+		public SteamVR_Action_Vector2 MoveInOut;
 
 		[Header("Prefabs"), SerializeField] private GameObject _chartsPrefab;
 
-        [SerializeField] private GameObject _nonVRCamera;
+		[SerializeField] private GameObject _nonVRCamera;
 
 		[SerializeField] private GameObject[] _virtualRealityObjects;
+
+		public Sprite MaximizedSprite;
+
+		public Sprite MinimizedSprite;
 
 		/// <summary>
 		/// The current thickness of the highlight outline of <see cref="BuildingHighlightMaterial" /> used in
 		/// animations.
 		/// </summary>
-		[SerializeField] private float _highlightOutlineAnim = 0.001f;
+		[Header("DO NOT CHANGE THIS"), SerializeField]
+		private float _highlightOutlineAnim = 0.001f;
 
 		/// <summary>
 		/// Enforces singleton pattern.
@@ -90,19 +95,16 @@ namespace Assets.SEECity.Charts.Scripts
 		private void Start()
 		{
 			_isVirtualReality = XRDevice.isPresent;
-            if (!_isVirtualReality)
-            {
-                foreach (GameObject vrObject in _virtualRealityObjects)
-                {
-                    Destroy(vrObject);
-                }
-                Instantiate(_chartsPrefab);
-            }
-            else
-            {
-                Destroy(_nonVRCamera);
-            }
-        }
+			if (!_isVirtualReality)
+			{
+				foreach (GameObject vrObject in _virtualRealityObjects) Destroy(vrObject);
+				Instantiate(_chartsPrefab);
+			}
+			else
+			{
+				Destroy(_nonVRCamera);
+			}
+		}
 
 		/// <summary>
 		/// Update is called once per frame.

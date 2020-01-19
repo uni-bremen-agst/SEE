@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Assets.SEECity.Charts.Scripts
 {
@@ -12,13 +13,16 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Contains some settings used in this script.
 		/// </summary>
-		protected ChartManager _chartManager;
+		protected ChartManager ChartManager;
 
 		/// <summary>
 		/// Contains the position of the chart on the <see cref="Canvas" />.
 		/// </summary>
 		private RectTransform _chart;
 
+		/// <summary>
+		/// The current size of the screen the charts can be displayed on.
+		/// </summary>
 		private RectTransform _screenSize;
 
 		/// <summary>
@@ -35,18 +39,26 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// If the pointer is currently down or not.
 		/// </summary>
-		protected bool _pointerDown;
+		protected bool PointerDown;
 
 		/// <summary>
 		/// If the chart is currently minimized or not.
 		/// </summary>
-		protected bool _minimized;
+		protected bool Minimized;
 
-		[SerializeField] protected GameObject _sizeButton = null;
+		private Sprite _maximizedSprite;
+
+		private Sprite _minimizedSprite;
 
 		/// <summary>
-		/// Links the <see cref="ChartManager" /> and initializes settings with the values from the
-		/// <see cref="_chartManager" />.
+		/// The TODO: Comment
+		/// </summary>
+		[SerializeField] protected GameObject SizeButton = null;
+
+		/// <summary>
+		/// Links the <see cref="Scripts.ChartManager" /> and initializes some values and settings with the
+		/// values from
+		/// the <see cref="ChartManager" />.
 		/// </summary>
 		protected virtual void Awake()
 		{
@@ -56,13 +68,15 @@ namespace Assets.SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Links the <see cref="ChartManager" /> and gets its setting data.
+		/// Links the <see cref="Scripts.ChartManager" /> and gets its setting data.
 		/// </summary>
 		protected virtual void GetSettingData()
 		{
-			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
+			ChartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
-			_dragDelay = _chartManager.DragDelay;
+			_dragDelay = ChartManager.DragDelay;
+			_maximizedSprite = ChartManager.MaximizedSprite;
+			_minimizedSprite = ChartManager.MinimizedSprite;
 		}
 
 		/// <summary>
@@ -70,25 +84,23 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		protected virtual void Update()
 		{
-			if (_pointerDown) _timer += Time.deltaTime;
+			if (PointerDown) _timer += Time.deltaTime;
 		}
 
 		/// <summary>
-		/// Checks the current <see cref="Input.mousePosition" /> and moves the chart to the corresponding
-		/// position on the canvas.
+		/// Moves the chart to the position the player dragged it to.
 		/// </summary>
-		/// <param name="eventData">Event payload associated with pointer (mouse / touch) events.</param>
+		/// <param name="eventData">Contains the position data.</param>
 		public virtual void OnDrag(PointerEventData eventData)
 		{
 			RectTransform pos = GetComponent<RectTransform>();
-			Vector2 newPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-			if (newPosition.x > 0 &&
-			    newPosition.x < _screenSize.sizeDelta.x * _screenSize.lossyScale.x &&
-			    newPosition.y > 0 &&
-			    newPosition.y < _screenSize.sizeDelta.y * _screenSize.lossyScale.y)
+			if (eventData.position.x > 0 &&
+			    eventData.position.x < _screenSize.sizeDelta.x * _screenSize.lossyScale.x &&
+			    eventData.position.y > 0 &&
+			    eventData.position.y < _screenSize.sizeDelta.y * _screenSize.lossyScale.y)
 				_chart.position =
-					new Vector2(newPosition.x - pos.anchoredPosition.x * pos.lossyScale.x,
-						newPosition.y - pos.anchoredPosition.y * pos.lossyScale.y);
+					new Vector2(eventData.position.x - pos.anchoredPosition.x * pos.lossyScale.x,
+						eventData.position.y - pos.anchoredPosition.y * pos.lossyScale.y);
 		}
 
 		/// <summary>
@@ -98,7 +110,7 @@ namespace Assets.SEECity.Charts.Scripts
 		public void OnPointerDown(PointerEventData eventData)
 		{
 			_timer = 0f;
-			_pointerDown = true;
+			PointerDown = true;
 		}
 
 		/// <summary>
@@ -107,7 +119,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <param name="eventData">Event payload associated with pointer (mouse / touch) events.</param>
 		public void OnPointerUp(PointerEventData eventData)
 		{
-			_pointerDown = false;
+			PointerDown = false;
 			if (_timer < _dragDelay) ToggleMinimize();
 		}
 
@@ -117,10 +129,14 @@ namespace Assets.SEECity.Charts.Scripts
 		protected virtual void ToggleMinimize()
 		{
 			ChartContent chart = _chart.GetComponent<ChartContent>();
-			chart.LabelsPanel.gameObject.SetActive(_minimized);
-			chart.DataPanel.gameObject.SetActive(_minimized);
-			_sizeButton.SetActive(_minimized);
-			_minimized = !_minimized;
+			chart.LabelsPanel.gameObject.SetActive(Minimized);
+			chart.DataPanel.gameObject.SetActive(Minimized);
+			SizeButton.SetActive(Minimized);
+			if (Minimized)
+				GetComponent<Image>().sprite = _maximizedSprite;
+			else
+				GetComponent<Image>().sprite = _minimizedSprite;
+			Minimized = !Minimized;
 		}
 	}
 }
