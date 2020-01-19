@@ -69,11 +69,12 @@ namespace SEE.DataModel
                          string name,
                          string root_edge_type)
         {
-            _graph = dg;
+            _implementation = dg;
             _architecture = arch;
             _mapping = map;
             _reflexion = null;
             register_attributes();
+            RegisterNodes();
             //add_parents(_hierarchy); // this must be called before all other methods
             //add_parents(_architecture);
             add_transitive_mapping();
@@ -131,7 +132,7 @@ namespace SEE.DataModel
         //
         public Graph get_graph()
         {
-            return _graph;
+            return _implementation;
         }
         //
         // @return the architecture view
@@ -402,7 +403,7 @@ namespace SEE.DataModel
         // dumps the convergences, absences, divergences to the logging channel
         public void dump_results()
         {
-            Debug.Log("REFLEXION RESULT\n");
+            Debug.LogFormat("REFLEXION RESULT ({0} nodes and {1} edges): \n", _reflexion.NodeCount, _reflexion.EdgeCount);
             foreach (Edge edge in _reflexion.Edges())
             {
                 // edge counter state
@@ -422,7 +423,7 @@ namespace SEE.DataModel
         // the content of the other views.
 
         // the RFG containing the views below
-        private Graph _graph;
+        private Graph _implementation;
 
         // *****************************************
         // involved views
@@ -439,15 +440,18 @@ namespace SEE.DataModel
         // the result of the reflexion analysis derived from the above views
         private Graph _reflexion;
 
+        // ******************************************************************
+        // node mappings from node linknames onto nodes in the various graphs
+        // ******************************************************************
+
+        private SerializableDictionary<string, Node> InImplementation;
+        private SerializableDictionary<string, Node> InArchitecture;
+        private SerializableDictionary<string, Node> InMapping;
+
         // *****************************************
         // nodes and edge types; cached for performance reasons
         // *****************************************
         private string _source_dependency;
-
-        // edges of this type are followed to obtain additional mapping targets.
-        private string _edge_type_for_transitive_mapping_targets;
-
-        private string _declare_edge;
 
         // initializes the caching attributes for node and edge types
         // @param root_type - user specified root type for the check, NULL for
@@ -528,12 +532,14 @@ namespace SEE.DataModel
         // mapping
         // *****************************************
 
-        // the explicit mapping as derived from _mapping; as opposed to _mapping,
-        // the implicit mapping for each entity in _dependencies
+        // The explicit mapping as derived from _mapping; as opposed to _mapping,
+        // the implicit mapping for each entity in _dependencies.
+        // Note: key is a node in implementation and target a node in architecture
         private SerializableDictionary<Node, Node> _implicit_maps_to_table;
 
-        // the explicit mapping for each entity in _dependencies; this is exactly the content
-        // of the mapping view
+        // The explicit mapping for each entity in _dependencies; this is exactly the content
+        // of the mapping view.
+        // Note: key is a node in implementation and target a node in architecture
         private SerializableDictionary<Node, Node> _explicit_maps_to_table;
 
         // creates the transitive closure for the mapping view so that we
@@ -542,24 +548,43 @@ namespace SEE.DataModel
         //
         private void add_transitive_mapping()
         {
+            // Because add_subtree_to_implicit_map() will check whether a node is a 
+            // mapper, which is done by consulting _explicit_maps_to_table, we need
+            // to first create the explicit mapping and can only then map the otherwise
+            // unmapped children
+            _explicit_maps_to_table = new SerializableDictionary<Node, Node>();
             foreach (Edge mapsto in _mapping.Edges())
             {
                 Node source = mapsto.Source;
                 Node target = mapsto.Target;
-                _explicit_maps_to_table[source] = target;
-                add_subtree_to_implicit_map(source, target);
+                Debug.Assert(!String.IsNullOrEmpty(source.LinkName));
+                Debug.Assert(!String.IsNullOrEmpty(target.LinkName));
+                //Debug.Log(source.LinkName + "\n");
+                Debug.Assert(InImplementation[source.LinkName] != null);
+                //Debug.Log(target.LinkName + "\n");
+                Debug.Assert(InArchitecture[target.LinkName] != null);
+                _explicit_maps_to_table[InImplementation[source.LinkName]] = InArchitecture[target.LinkName];
+            }
+
+            _implicit_maps_to_table = new SerializableDictionary<Node, Node>();
+            foreach (Edge mapsto in _mapping.Edges())
+            {
+                Node source = mapsto.Source;
+                Node target = mapsto.Target;
+                add_subtree_to_implicit_map(InImplementation[source.LinkName], InArchitecture[target.LinkName]);
             }
 
 #if DEBUG
-            Debug.Log("implicit mapping\n");
-            dump_table(_implicit_maps_to_table);
-            Debug.Log("explicit mapping\n");
+            Debug.Log("\nexplicit mapping\n");
             dump_table(_explicit_maps_to_table);
 
+            Debug.Log("\nimplicit mapping\n");
+            dump_table(_implicit_maps_to_table);
 #endif
         }
 
         // true if node is explicitly mapped
+        // Precondition: node is a node of the implementation graph
         private bool is_mapper(Node node)
         {
             return _explicit_maps_to_table.ContainsKey(node);
@@ -568,13 +593,30 @@ namespace SEE.DataModel
         // adds all descendants of 'root' in _hierarchy that are implicitly
         // mapped onto the same target as 'root' to the implicit mapping table
         // and maps them to 'target'
+        // Preconditions:
+        // (1) root is a node in implementation
+        // (2) target is a node in architecture
         private void add_subtree_to_implicit_map(Node root, Node target)
         {
-            foreach (Node child in root.Children())
+            List<Node> children = root.Children();
+#if DEBUG
+            // Debug.LogFormat("node {0} has {1} children\n", root.LinkName, children.Count);
+#endif            
+            foreach (Node child in children)
             {
+#if DEBUG
+                //Debug.LogFormat("mapping child {0} of {1}\n", child.LinkName, root.LinkName);
+#endif
+                // child is contained in implementation
                 if (!is_mapper(child))
                 {
                     add_subtree_to_implicit_map(child, target);
+                }
+                else
+                {
+#if DEBUG
+                    //Debug.LogFormat("child {0} of {1} is a mapper\n", child.LinkName, root.LinkName);
+#endif
                 }
             }
             _implicit_maps_to_table[root] = target;
@@ -728,8 +770,7 @@ namespace SEE.DataModel
         // architecture dependency
         private class Candidate_Edges
         {
-            public
-                    Edge allowing_edge;
+            public Edge allowing_edge;
             public Edge architecture_dep;
 
             public Candidate_Edges()
@@ -764,9 +805,35 @@ namespace SEE.DataModel
         // runs reflexion analysis from scratch, i.e., non-incrementally
         private void from_scratch(string name)
         {
+            _reflexion = new Graph();
             Reset();
+            RegisterNodes();
             calculate_convergences_and_divergences();
             calculate_absences();
+        }
+
+        /// <summary>
+        /// Registers all nodes of all graphs under their linkname in the respective mappings.
+        /// </summary>
+        private void RegisterNodes()
+        {
+            InImplementation = new SerializableDictionary<string, Node>();
+            foreach (Node n in _implementation.Nodes())
+            {
+                InImplementation[n.LinkName] = n;
+            }
+
+            InArchitecture = new SerializableDictionary<string, Node>();
+            foreach (Node n in _architecture.Nodes())
+            {
+                InArchitecture[n.LinkName] = n;
+            }
+
+            InMapping = new SerializableDictionary<string, Node>();
+            foreach (Node n in _mapping.Nodes())
+            {
+                InMapping[n.LinkName] = n;
+            }
         }
 
         // resets architecture and implementation markings
@@ -790,7 +857,7 @@ namespace SEE.DataModel
         // resets the counter of all source dependencies in reflexion to 0
         private void ResetImplementation()
         {
-            foreach (Edge edge in _graph.Edges())
+            foreach (Edge edge in _implementation.Edges())
             {
                 set_state(edge, State.undefined);
                 set_counter(edge, 0); // FIXME: do implementation edges have counters at all?
