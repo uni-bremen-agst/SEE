@@ -67,6 +67,8 @@ MonoBehaviour:
     type: 3}
   _nonVRCamera: {fileID: 0}
   _virtualRealityObjects: []
+  MaximizedSprite: {fileID: 21300000, guid: 3dd8a1777d7c2dd4f9faf31f3a995232, type: 3}
+  MinimizedSprite: {fileID: 21300000, guid: 582af9fbe4fe81b4680058a1f0485806, type: 3}
   _highlightOutlineAnim: 0.001
 --- !u!95 &2342395875013397703
 Animator:

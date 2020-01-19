@@ -1,67 +1,118 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using System.Collections;
 using Valve.VR;
 
 namespace Assets.SEECity.Charts.Scripts.VR
 {
+	/// <summary>
+	/// Handles the dragging and minimization of charts in VR.
+	/// </summary>
 	public class ChartMoveHandlerVR : ChartMoveHandler
 	{
-        private ChartContent _chartContent;
-        private Camera _mainCamera;
-        private SteamVR_Input_Sources _source;
-        private SteamVR_Action_Vector2 _moveInOut;
-        private float _chartSpeed;
-        private Camera _pointerCamera;
-        
-        [SerializeField] private GameObject _physicalOpen = null;
-		[SerializeField] private GameObject _physicalClosed = null;
-        private Vector3 _chartOffset = new Vector3(0, 0, -0.03f);
+		private ChartContentVR _chartContent;
 
-        protected override void Awake()
-        {
-            base.Awake();
-            _chartContent = transform.parent.GetComponent<ChartContent>();
-            _mainCamera = Camera.main;
-            _pointerCamera = GameObject.FindGameObjectWithTag("Pointer").GetComponent<Camera>();
-        }
+		/// <summary>
+		/// The transform of the ChartCanvasVRContainer (Contains world space <see cref="Canvas" /> and 3D
+		/// objects for the canvas to sit on).
+		/// </summary>
+		private Transform _parent;
 
-        protected override void GetSettingData()
-        {
-            base.GetSettingData();
-            _chartSpeed = _chartManager.ChartSpeed;
-            _source = _chartManager.Source;
-            _moveInOut = _chartManager.MoveInOut;
-        }
+		/// <summary>
+		/// The camera the player sees through.
+		/// </summary>
+		private Camera _mainCamera;
 
-        protected override void Update()
-        {
-            base.Update();
-            Transform chart = _chartContent.Parent.transform;
-            chart.LookAt(chart.position - (_mainCamera.transform.position - chart.position));
-            if (_pointerDown)
-            {
-                //TODO: Specify source
-                if (_moveInOut.axis.y != 0)
-                {
-                    Debug.Log(_moveInOut.axis.y);
-                    Vector3 direction = _pointerCamera.transform.position - GetComponent<RectTransform>().position;
-                    _chartContent.Parent.transform.position -= direction * _moveInOut.axis.y * _chartSpeed * Time.deltaTime;
-                }
-            }
-        }
+		/// <summary>
+		/// The source of which to take the inputs for scrolling with <see cref="_moveInOut" /> from.
+		/// </summary>
+		private SteamVR_Input_Sources _source;
 
-        public override void OnDrag(PointerEventData eventData)
+		/// <summary>
+		/// Contains the scrolling information for moving charts in or out.
+		/// </summary>
+		private SteamVR_Action_Vector2 _moveInOut;
+
+		/// <summary>
+		/// The speed to charts with when scrolling.
+		/// </summary>
+		private float _chartSpeed;
+
+		/// <summary>
+		/// The <see cref="Camera" /> attached to the pointer.
+		/// </summary>
+		private Camera _pointerCamera;
+
+		/// <summary>
+		/// 3D representation of the chart when not minimized.
+		/// </summary>
+		private GameObject _physicalOpen;
+
+		/// <summary>
+		/// 3D representation of the chart when minimized.
+		/// </summary>
+		private GameObject _physicalClosed;
+
+		/// <summary>
+		/// The offset of the <see cref="Canvas" /> to <see cref="_physicalOpen" /> so the two don't clip.
+		/// </summary>
+		private readonly Vector3 _chartOffset = new Vector3(0, 0, -0.03f);
+
+		protected override void Awake()
 		{
-            Vector3 diff = transform.position - (_chartContent.Parent.transform.position + _chartOffset);
-            _chartContent.Parent.transform.position = eventData.pointerCurrentRaycast.worldPosition - diff - _chartOffset;
-        }
+			base.Awake();
+			_parent = transform.parent.GetComponent<ChartContent>().Parent.transform;
+			_mainCamera = Camera.main;
+			_pointerCamera = GameObject.FindGameObjectWithTag("Pointer").GetComponent<Camera>();
+			_chartContent = transform.parent.GetComponent<ChartContentVR>();
+			_physicalOpen = _chartContent.PhysicalOpen;
+			_physicalClosed = _chartContent.PhysicalClosed;
+		}
 
-        protected override void ToggleMinimize()
+		protected override void GetSettingData()
 		{
-			_physicalOpen.SetActive(_minimized);
-			_physicalClosed.SetActive(!_minimized);
-            base.ToggleMinimize();
+			base.GetSettingData();
+			_chartSpeed = ChartManager.ChartSpeed;
+			_source = ChartManager.Source;
+			_moveInOut = ChartManager.MoveInOut;
+		}
+
+
+		protected override void Update()
+		{
+			base.Update();
+			_parent.LookAt(_parent.position - (_mainCamera.transform.position - _parent.position));
+			ScrollInOut();
+		}
+
+		/// <summary>
+		/// Checks if the player scrolled while moving a chart and if so, moves it towards or away from the
+		/// player.
+		/// </summary>
+		private void ScrollInOut()
+		{
+			if (PointerDown)
+				//TODO: Specify source
+				if (_moveInOut.GetChanged(_source))
+				{
+					Vector3 direction = _pointerCamera.transform.position -
+					                    GetComponent<RectTransform>().position;
+					_parent.position -= direction * _moveInOut.GetAxis(_source).y * _chartSpeed *
+					                    Time.deltaTime;
+				}
+		}
+
+		public override void OnDrag(PointerEventData eventData)
+		{
+			_parent.position = eventData.pointerCurrentRaycast.worldPosition -
+			                   (transform.position - (_parent.position + _chartOffset)) -
+			                   _chartOffset;
+		}
+
+		protected override void ToggleMinimize()
+		{
+			_physicalOpen.SetActive(Minimized);
+			_physicalClosed.SetActive(!Minimized);
+			base.ToggleMinimize();
 		}
 	}
 }

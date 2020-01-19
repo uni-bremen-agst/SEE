@@ -18,9 +18,11 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private int _minimumSize;
 
+		/// <summary>
+		/// The objects that have to be moved individually when resizing the chart.
+		/// </summary>
 		[Header("For resizing"), SerializeField]
 		private Transform _dragButton = null;
-
 		[SerializeField] private Transform _topRight = null;
 		[SerializeField] private Transform _topLeft = null;
 		[SerializeField] private Transform _bottomRight = null;
@@ -34,14 +36,16 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Contains the size of the chart.
 		/// </summary>
-		private RectTransform _chart;
+		protected RectTransform Chart;
 
-		private void Awake()
+		/// <summary>
+		/// Initializes some attributes.
+		/// </summary>
+		protected virtual void Awake()
 		{
 			GetSettingData();
-			GameObject chart = transform.parent.gameObject;
-			_chartContent = chart.GetComponent<ChartContent>();
-			_chart = chart.GetComponent<RectTransform>();
+			_chartContent = transform.parent.GetComponent<ChartContent>();
+			Chart = transform.parent.GetComponent<RectTransform>();
 		}
 
 		/// <summary>
@@ -55,15 +59,15 @@ namespace Assets.SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Checks the current <see cref="Input.mousePosition" /> and calls
+		/// Checks the current <see cref="PointerEventData.position" /> and calls
 		/// <see cref="ChangeSize" /> to resize the chart accordingly.
 		/// </summary>
-		/// <param name="eventData">Event payload associated with pointer (mouse / touch) events.</param>
+		/// <param name="eventData">Contains the position data.</param>
 		public virtual void OnDrag(PointerEventData eventData)
 		{
 			RectTransform pos = GetComponent<RectTransform>();
 			Vector2 oldPos = new Vector2(pos.position.x, pos.position.y);
-			pos.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+			pos.position = eventData.position;
 			if (pos.anchoredPosition.x / pos.lossyScale.x < _minimumSize ||
 			    pos.anchoredPosition.y / pos.lossyScale.y < _minimumSize) pos.position = oldPos;
 			ChangeSize(pos.anchoredPosition.x, pos.anchoredPosition.y);
@@ -74,21 +78,21 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		/// <param name="width">The new width of the chart.</param>
 		/// <param name="height">The new height of the chart.</param>
-		private void ChangeSize(float width, float height)
+		protected virtual void ChangeSize(float width, float height)
 		{
 			RectTransform dataPanel = _chartContent.DataPanel;
 			dataPanel.sizeDelta = new Vector2(width - 100, height - 100);
 			dataPanel.anchoredPosition = new Vector2(width / 2, height / 2);
-			RectTransform _labelsPanel = _chartContent.LabelsPanel;
-			_labelsPanel.sizeDelta = new Vector2(width, height);
-			_labelsPanel.anchoredPosition = new Vector2(width / 2, height / 2);
+			RectTransform labelsPanel = _chartContent.LabelsPanel;
+			labelsPanel.sizeDelta = new Vector2(width, height);
+			labelsPanel.anchoredPosition = new Vector2(width / 2, height / 2);
 			RectTransform xDropdown = _chartContent.AxisDropdownX.GetComponent<RectTransform>();
 			xDropdown.anchoredPosition = new Vector2(width / 2, xDropdown.anchoredPosition.y);
 			xDropdown.sizeDelta = new Vector2(width / 3, xDropdown.sizeDelta.y);
 			RectTransform yDropdown = _chartContent.AxisDropdownY.GetComponent<RectTransform>();
 			yDropdown.anchoredPosition = new Vector2(yDropdown.anchoredPosition.x, height / 2);
 			yDropdown.sizeDelta = new Vector2(height / 3, yDropdown.sizeDelta.y);
-			_chart.sizeDelta = new Vector2(width, height);
+			Chart.sizeDelta = new Vector2(width, height);
 			_topRight.localPosition = new Vector2(width / 2, height / 2);
 			_topLeft.localPosition = new Vector2(-width / 2, height / 2);
 			_bottomRight.localPosition = new Vector2(width / 2, -height / 2);
