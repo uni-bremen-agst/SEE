@@ -873,6 +873,7 @@ namespace SEE.DataModel
 
             foreach (var mapsto in _implicit_maps_to_table)
             {
+                // source_node is in implementation
                 Node source_node = mapsto.Key;
                 if (is_relevant(source_node))
                 {
