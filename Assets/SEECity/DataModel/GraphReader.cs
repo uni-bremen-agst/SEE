@@ -142,6 +142,7 @@ namespace SEE.DataModel
                         else
                         {
                             node.LinkName = node.SourceName;
+                            graph.AddNode(node);
                         }
                     }
                     else
