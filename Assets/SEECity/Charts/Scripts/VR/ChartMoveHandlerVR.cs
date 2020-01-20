@@ -32,10 +32,14 @@ namespace Assets.SEECity.Charts.Scripts.VR
 		/// </summary>
 		private SteamVR_Action_Vector2 _moveInOut;
 
+        private float _minimumDistance = 1f;
+
+        private float _maximumDistance;
+
 		/// <summary>
 		/// The speed to charts with when scrolling.
 		/// </summary>
-		private float _chartSpeed;
+		private float _chartScrollSpeed;
 
 		/// <summary>
 		/// The <see cref="Camera" /> attached to the pointer.
@@ -71,9 +75,11 @@ namespace Assets.SEECity.Charts.Scripts.VR
 		protected override void GetSettingData()
 		{
 			base.GetSettingData();
-			_chartSpeed = ChartManager.ChartSpeed;
+			_chartScrollSpeed = ChartManager.ChartScrollSpeed;
 			_source = ChartManager.Source;
 			_moveInOut = ChartManager.MoveInOut;
+            //minDist
+            _maximumDistance = ChartManager.PointerLength;
 		}
 
 
@@ -96,8 +102,11 @@ namespace Assets.SEECity.Charts.Scripts.VR
 				{
 					Vector3 direction = _pointerCamera.transform.position -
 					                    GetComponent<RectTransform>().position;
-					_parent.position -= direction * _moveInOut.GetAxis(_source).y * _chartSpeed *
-					                    Time.deltaTime;
+                    float moveBy = _moveInOut.GetAxis(_source).y * _chartScrollSpeed * Time.deltaTime;
+                    if (!(_moveInOut.GetAxis(_source).y < 0 && direction.magnitude < _minimumDistance + moveBy || _moveInOut.GetAxis(_source).y > 0 && direction.magnitude > _maximumDistance - moveBy))
+                    {
+                        _parent.position -= direction * moveBy;
+                    }
 				}
 		}
 

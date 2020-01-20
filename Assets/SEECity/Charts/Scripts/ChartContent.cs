@@ -250,8 +250,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Destroys the chart including its container if VR is activated.
 		/// </summary>
-		[SerializeField]
-		private void Destroy()
+		public void Destroy()
 		{
 			Destroy(Parent);
 		}

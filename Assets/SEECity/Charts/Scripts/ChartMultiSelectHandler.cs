@@ -24,6 +24,9 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		protected Vector3 _startingPos;
 
+        /// <summary>
+        /// TODO
+        /// </summary>
 		private void Awake()
 		{
 			_chartContent = transform.parent.GetComponent<ChartContent>();

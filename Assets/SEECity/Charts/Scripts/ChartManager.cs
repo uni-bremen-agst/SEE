@@ -59,7 +59,8 @@ namespace Assets.SEECity.Charts.Scripts
 		private bool _isVirtualReality;
 
 		[Header("Virtual Reality")] public float PointerLength = 5f;
-		public float ChartSpeed = 10f;
+		public float ChartScrollSpeed = 10f;
+        public float DistanceThreshold = 0.5f;
 
 		public SteamVR_Input_Sources Source = SteamVR_Input_Sources.RightHand;
 		public SteamVR_Action_Boolean Click;

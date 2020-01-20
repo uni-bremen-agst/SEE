@@ -39,8 +39,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Toggles the chart view.
 		/// </summary>
-		[SerializeField]
-		private void ToggleCharts(bool open)
+		public void ToggleCharts(bool open)
 		{
 			_chartsOpen.SetActive(open);
 			_flyCamera.SetLastMouse();
@@ -50,8 +49,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Opens the dialogue for creating new charts.
 		/// </summary>
-		[SerializeField]
-		private void OpenChartCreator()
+		public void OpenChartCreator()
 		{
 			_chartCreator.SetActive(true);
 		}
