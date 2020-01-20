@@ -52,8 +52,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// Updates <see cref="Value" /> to match the selected option of <see cref="_dropdown" />
 		/// </summary>
-		[SerializeField]
-		private void ChangeValue()
+		public void ChangeValue()
 		{
 			Value = _dropdown.options[_dropdown.value].text;
 			_chartContent.DrawData();
