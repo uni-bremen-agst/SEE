@@ -30,6 +30,7 @@ public class CCAStateManager : MonoBehaviour
 
     protected NodeFactory CreateNodeFactory()
     {
+        //return new CubeFactory();
         return new BuildingFactory();
     }
 
@@ -54,7 +55,9 @@ public class CCAStateManager : MonoBehaviour
 
     protected NodeLayout CreateLayout(NodeFactory nodeFactory)
     {
-        return new BalloonNodeLayout(0, nodeFactory);
+        //return new EvoStreetsNodeLayout(0, nodeFactory);
+        return new TreemapLayout(0, nodeFactory, 1000, 1000);
+        //return new BalloonNodeLayout(0, nodeFactory);
     }
 
     private GraphSettings _settings;
