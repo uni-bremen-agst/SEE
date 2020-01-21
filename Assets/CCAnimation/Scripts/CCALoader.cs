@@ -37,14 +37,14 @@ public class CCALoader
     /// <param name="graphSettings">The GraphSettings defining the location of gxl files.</param>
     private void AddAllRevisions(GraphSettings graphSettings)
     {
-        SEE.Performance p = SEE.Performance.Begin("loading animated graph data from " + graphSettings.GetAnimatedPath());
+        SEE.Performance p = SEE.Performance.Begin("loading animated graph data from " + graphSettings.GXLPath());
 
         // clear possible old data
         graphs.Clear();
 
         // get all gxl files sorted by numbers in their name
         var sortedGraphNames = Directory
-            .GetFiles(graphSettings.GetAnimatedPath(), "*.gxl", SearchOption.TopDirectoryOnly)
+            .GetFiles(graphSettings.GXLPath(), "*.gxl", SearchOption.TopDirectoryOnly)
             .Where(e => !string.IsNullOrEmpty(e))
             .Distinct()
             .NumericalSort();
@@ -54,6 +54,7 @@ public class CCALoader
         {
             // load graph
             GraphReader graphCreator = new GraphReader(gxlPath, graphSettings.HierarchicalEdges, new SEELogger());
+            Debug.Log("Loading graph: " + gxlPath);
             graphCreator.Load();
             Graph graph = graphCreator.GetGraph();
 

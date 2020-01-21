@@ -43,8 +43,8 @@ public class CCARender : AbstractCCARender
         circlePosition.y = 0.5F;
 
         var circleRadius = nodeTransform.scale;
-        circleRadius.x += 5;
-        circleRadius.z += 5;
+        circleRadius.x += 2;
+        circleRadius.z += 2;
 
         if (isCircleNew)
         {
@@ -87,7 +87,7 @@ public class CCARender : AbstractCCARender
 
         if (isLeafNew)
         {
-            actualSize.y += 1; // Für eine glattere Animation
+            actualSize.y += 5; // Für eine glattere Animation
             actualSize.x = 0;
             actualSize.z = 0;
             leaf.transform.position -= actualSize;
@@ -133,7 +133,7 @@ public class CCARender : AbstractCCARender
         if(ObjectManager.RemoveNode(node, out GameObject leaf))
         {
             var nodeTransform = Layout.GetNodeTransform(node);
-            var actualSize = ObjectManager.NodeFactory.GetSize(leaf);
+            var actualSize = ObjectManager.NodeFactory.GetSize(leaf) * 1.5F;
             actualSize.x = 0;
             actualSize.z = 0;
             var nextPosition = leaf.transform.position - actualSize;
