@@ -1,27 +1,39 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ChangePanel : MonoBehaviour
 {
-    public GameObject FirstPanel;
-    public GameObject SecondPanel;
+    /// <summary>
+    /// Unity Event that gets invoked when the panel, this script is attached to, closes.
+    /// </summary>
+    public UnityEvent OnPanelClose;
 
-    public void open()
+    private void Start()
     {
-        if (FirstPanel != null && SecondPanel != null)
+        if(OnPanelClose == null)
         {
-            Animator firstAnimator = FirstPanel.GetComponent<Animator>();
-            Animator secondAnimator = SecondPanel.GetComponent<Animator>();
-
-            if (firstAnimator != null && secondAnimator!= null)
-            {
-                bool firstIsOpen = firstAnimator.GetBool("isOpen");
-                bool secondIsOpen = secondAnimator.GetBool("isOpen");
-
-                firstAnimator.SetBool("isOpen", !firstIsOpen);
-                secondAnimator.SetBool("isOpen", !secondIsOpen);
-            }
+            OnPanelClose = new UnityEvent();
         }
+    }
+
+    /// <summary>
+    /// Opens the given panel by using its animator component.
+    /// Also closes the panel this script is attached to.
+    /// </summary>
+    /// <param name="panel">the panel which should be opened</param>
+    public void OpenOtherPanel(GameObject panel)
+    {
+        Animator currentPanelAnimator = gameObject.GetComponent<Animator>();
+        Animator newPanelAnimator = panel.GetComponent<Animator>();
+
+        if(currentPanelAnimator != null && newPanelAnimator != null)
+        {
+            currentPanelAnimator.SetBool("isOpen", !currentPanelAnimator.GetBool("isOpen"));
+            newPanelAnimator.SetBool("isOpen", !newPanelAnimator.GetBool("isOpen"));
+        }
+
+        OnPanelClose.Invoke();
     }
 }

@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 3514673523911974930}
   - component: {fileID: 7764398954385024405}
   - component: {fileID: 2867755052025481757}
-  - component: {fileID: 8402656894184824038}
   m_Layer: 5
   m_Name: ButtonSearch
   m_TagString: Untagged
@@ -119,31 +118,17 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8402656894184824038}
-        m_MethodName: open
-        m_Mode: 1
+      - m_Target: {fileID: 90431601863052844}
+        m_MethodName: OpenOtherPanel
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 986507627096229781}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &8402656894184824038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 777319357788393640}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb2094eef5c6cd544a8c075ae2186e5a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  FirstPanel: {fileID: 5327765405386658502}
-  SecondPanel: {fileID: 986507627096229781}
 --- !u!1 &986507627096229781
 GameObject:
   m_ObjectHideFlags: 0
@@ -156,6 +141,7 @@ GameObject:
   - component: {fileID: 8663492877537639459}
   - component: {fileID: 1332210880086065626}
   - component: {fileID: 742597449425999888}
+  - component: {fileID: 5231441884083493646}
   m_Layer: 5
   m_Name: SearchPanel
   m_TagString: Untagged
@@ -239,6 +225,18 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &5231441884083493646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 986507627096229781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb2094eef5c6cd544a8c075ae2186e5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1211625093950786190
 GameObject:
   m_ObjectHideFlags: 0
@@ -337,7 +335,6 @@ GameObject:
   - component: {fileID: 9046417461878849679}
   - component: {fileID: 2535698644536121988}
   - component: {fileID: 2452689043716764934}
-  - component: {fileID: 6852903291411939404}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -444,31 +441,17 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6852903291411939404}
-        m_MethodName: open
-        m_Mode: 1
+      - m_Target: {fileID: 8906386169479906900}
+        m_MethodName: OpenOtherPanel
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 5327765405386658502}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &6852903291411939404
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267449458067589652}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb2094eef5c6cd544a8c075ae2186e5a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  FirstPanel: {fileID: 5855007435051728405}
-  SecondPanel: {fileID: 5327765405386658502}
 --- !u!1 &1612648141614191077
 GameObject:
   m_ObjectHideFlags: 0
@@ -635,7 +618,6 @@ GameObject:
   - component: {fileID: 5702114785992543517}
   - component: {fileID: 1773652536515868245}
   - component: {fileID: 8162734495410314902}
-  - component: {fileID: 7648640864972946896}
   m_Layer: 5
   m_Name: ButtonInformation
   m_TagString: Untagged
@@ -742,31 +724,17 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7648640864972946896}
-        m_MethodName: open
-        m_Mode: 1
+      - m_Target: {fileID: 90431601863052844}
+        m_MethodName: OpenOtherPanel
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 5855007435051728405}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &7648640864972946896
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2304527401103898782}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb2094eef5c6cd544a8c075ae2186e5a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  FirstPanel: {fileID: 5327765405386658502}
-  SecondPanel: {fileID: 5855007435051728405}
 --- !u!1 &3015500398983316437
 GameObject:
   m_ObjectHideFlags: 0
@@ -876,7 +844,6 @@ GameObject:
   - component: {fileID: 3307816776220682716}
   - component: {fileID: 8819185263025757760}
   - component: {fileID: 6574041478931846550}
-  - component: {fileID: 2884168245335155810}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -983,31 +950,17 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2884168245335155810}
-        m_MethodName: open
-        m_Mode: 1
+      - m_Target: {fileID: 5231441884083493646}
+        m_MethodName: OpenOtherPanel
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 5327765405386658502}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &2884168245335155810
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5307870123412869444}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb2094eef5c6cd544a8c075ae2186e5a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  FirstPanel: {fileID: 986507627096229781}
-  SecondPanel: {fileID: 5327765405386658502}
 --- !u!1 &5327765405386658502
 GameObject:
   m_ObjectHideFlags: 0
@@ -1020,6 +973,7 @@ GameObject:
   - component: {fileID: 3316875556591646298}
   - component: {fileID: 7636873014196436284}
   - component: {fileID: 4458603330080212483}
+  - component: {fileID: 90431601863052844}
   m_Layer: 5
   m_Name: MenuPanel
   m_TagString: Untagged
@@ -1105,6 +1059,18 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &90431601863052844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5327765405386658502}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb2094eef5c6cd544a8c075ae2186e5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5714985745520931565
 GameObject:
   m_ObjectHideFlags: 0
@@ -1247,8 +1213,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb2094eef5c6cd544a8c075ae2186e5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FirstPanel: {fileID: 5327765405386658502}
-  SecondPanel: {fileID: 986507627096229781}
 --- !u!1 &5855007435051728405
 GameObject:
   m_ObjectHideFlags: 0
@@ -1261,6 +1225,8 @@ GameObject:
   - component: {fileID: 5242925751069386218}
   - component: {fileID: 6357950132219884424}
   - component: {fileID: 3102981212567721547}
+  - component: {fileID: 27632028919491399}
+  - component: {fileID: 8906386169479906900}
   m_Layer: 5
   m_Name: Information Panel
   m_TagString: Untagged
@@ -1344,6 +1310,31 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &27632028919491399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5855007435051728405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c59188d336f45f448cf9bd214470e51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NamePanel: {fileID: 6792882597259104433}
+--- !u!114 &8906386169479906900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5855007435051728405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb2094eef5c6cd544a8c075ae2186e5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6257385455481738574
 GameObject:
   m_ObjectHideFlags: 0
@@ -1742,8 +1733,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb2094eef5c6cd544a8c075ae2186e5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FirstPanel: {fileID: 5327765405386658502}
-  SecondPanel: {fileID: 986507627096229781}
 --- !u!1 &6985570575327325045
 GameObject:
   m_ObjectHideFlags: 0
@@ -2105,8 +2094,13 @@ PrefabInstance:
     - target: {fileID: 1947391113209403472, guid: a86f07d9843d94649ad79a6359cd360e,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0.0031243418
+      value: 0.000018656254
       objectReference: {fileID: 0}
+    - target: {fileID: 4347651131102990303, guid: a86f07d9843d94649ad79a6359cd360e,
+        type: 3}
+      propertyPath: informationPanel
+      value: 
+      objectReference: {fileID: 5855007435051728405}
     - target: {fileID: 4765043208743977761, guid: a86f07d9843d94649ad79a6359cd360e,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -2130,7 +2124,7 @@ PrefabInstance:
     - target: {fileID: 5615171012465983186, guid: a86f07d9843d94649ad79a6359cd360e,
         type: 3}
       propertyPath: m_Size
-      value: 0.6997899
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7805136209081477894, guid: a86f07d9843d94649ad79a6359cd360e,
         type: 3}
