@@ -46,11 +46,11 @@ public class CCAObjectManager : AbstractCCAObjectManager
             rootCircle.name = "RootCircle";
             rootCircle.tag = Tags.Decoration;
             var newPosition = rootCircle.transform.position;
-            newPosition.y = 50F;
+            newPosition.y = 1F;
             rootCircle.transform.localPosition = newPosition;
             rootCircle.transform.localScale = Vector3.one * 1.1F;
 
-            rootCircle.transform.parent = _root.transform;
+            rootCircle.transform.SetParent(_root.transform);
 
             var planeRenderer = _root.GetComponent<Renderer>();
             planeRenderer.sharedMaterial = new Material(planeRenderer.sharedMaterial)
@@ -80,10 +80,10 @@ public class CCAObjectManager : AbstractCCAObjectManager
             nodes[node.LinkName] = innerNode;
 
             var textPosition = Vector3.zero;
-            textPosition.y = 1;
+            textPosition.y = 1F;
             var nodeText = TextFactory.GetText(node.LinkName, textPosition, 10, false);
             nodeText.transform.localScale = new Vector3(0.035F, 0.035F, 0.035F);
-            nodeText.transform.parent = innerNode.transform;
+            nodeText.transform.SetParent(innerNode.transform);
         }
 
         NodeRef noderef = innerNode.GetComponent<NodeRef>();

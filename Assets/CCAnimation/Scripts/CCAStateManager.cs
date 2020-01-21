@@ -12,21 +12,63 @@ using UnityEngine.Events;
 /// </summary>
 public class CCAStateManager : MonoBehaviour
 {
+    /// <summary>
+    /// Possible Animations:
+    /// "animation-clones"
+    /// "animation-clones-tinylog"
+    /// "animation-clones-log4j"
+    /// </summary>
+    public string gxlFolderName = "animation-clones";
+
+    protected GraphSettings CreateGraphSetting()
+    {
+        var _settings = GraphSettingsExtension.DefaultCCAnimationSettings(gxlFolderName);
+        _settings.MinimalBlockLength = 1;
+        _settings.MaximalBlockLength = 100;
+        return _settings;
+    }
+
+    protected NodeFactory CreateNodeFactory()
+    {
+        return new BuildingFactory();
+    }
+
+    protected AbstractCCAObjectManager createObjectManager()
+    {
+        return new CCAObjectManager(NodeFactory);
+    }
+
+    protected List<string> CreateNodeMetrics(GraphSettings graphSettings)
+    {
+        List<string> nodeMetrics = new List<string>() { graphSettings.WidthMetric, graphSettings.HeightMetric, graphSettings.DepthMetric, graphSettings.ColorMetric };
+        nodeMetrics.AddRange(graphSettings.AllLeafIssues());
+        nodeMetrics.AddRange(graphSettings.AllInnerNodeIssues());
+        nodeMetrics.Add(graphSettings.InnerDonutMetric);
+        return nodeMetrics;
+    }
+
+    protected IScale CreateScaler(List<Graph> graphs, GraphSettings graphSettings, List<string> nodeMetrics)
+    {
+        return new LinearMultiScale(graphs, graphSettings.MinimalBlockLength, graphSettings.MaximalBlockLength, nodeMetrics);
+    }
+
+    protected NodeLayout CreateLayout(NodeFactory nodeFactory)
+    {
+        return new BalloonNodeLayout(0, nodeFactory);
+    }
+
     private GraphSettings _settings;
 
     private NodeFactory _nodeFactory;
 
     private AbstractCCAObjectManager _objectManager;
 
-
     public GraphSettings Settings
     {
         get
         {
             if (_settings == null)
-            {
-                _settings = GraphSettingsExtension.DefaultCCAnimationSettings();
-            }
+                _settings = CreateGraphSetting();
             return _settings;
         }
     }
@@ -36,9 +78,7 @@ public class CCAStateManager : MonoBehaviour
         get
         {
             if (_nodeFactory == null)
-            {
-                _nodeFactory = new BuildingFactory();
-            }
+                _nodeFactory = CreateNodeFactory();
             return _nodeFactory;
         }
     }
@@ -48,9 +88,7 @@ public class CCAStateManager : MonoBehaviour
         get
         {
             if (_objectManager == null)
-            {
-                _objectManager = new CCAObjectManager(NodeFactory);
-            }
+                _objectManager = createObjectManager();
             return _objectManager;
         }
     }
@@ -61,16 +99,13 @@ public class CCAStateManager : MonoBehaviour
     [Obsolete]
     private IEdgeLayout EdgeLayout;
 
-
-
     private readonly CCALoader graphLoader = new CCALoader();
+
     private readonly Dictionary<Graph, AbstractCCALayout> layouts = new Dictionary<Graph, AbstractCCALayout>();
+
     private IScale scaler;
+
     private bool _isAutoplay = false;
-
-
-
-
 
     private List<Graph> Graphs => graphLoader.graphs;
 
@@ -125,7 +160,6 @@ public class CCAStateManager : MonoBehaviour
 
     private bool HasLoadedGraph(int index, out LoadedGraph loadedGraph)
     {
-        // TODO FLo: KeyNotFoundException
         loadedGraph = null;
         var graph = Graphs[index];
         if (graph == null)
@@ -153,40 +187,18 @@ public class CCAStateManager : MonoBehaviour
         render.AssertNotNull("render");
         render.ObjectManager = ObjectManager;
 
-        Settings.MinimalBlockLength = 1;
-        Settings.MaximalBlockLength = 10;
-        Settings.ZScoreScale = false;
-
         graphLoader.LoadGraphData(Settings);
+
         ViewDataChangedEvent.Invoke();
 
+        var nodeMetrics = CreateNodeMetrics(Settings);
 
+        scaler = CreateScaler(Graphs, Settings, nodeMetrics);
 
-        List<string> nodeMetrics = new List<string>() { Settings.WidthMetric, Settings.HeightMetric, Settings.DepthMetric, Settings.ColorMetric };
-        nodeMetrics.AddRange(Settings.AllLeafIssues());
-        nodeMetrics.AddRange(Settings.AllInnerNodeIssues());
-        nodeMetrics.Add(Settings.InnerDonutMetric);
-
-        //if (settings.ZScoreScale)
-        //{
-        //    scaler = new ZScoreScale(graph, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
-        //}
-        //else
-        //{
-        //    scaler = new LinearScale(graph, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
-        //}
-
-
-
-        //List<string> nodeMetrics = new List<string>() { Settings.WidthMetric, Settings.HeightMetric, Settings.DepthMetric };
-        //nodeMetrics.AddRange(Settings.IssueMap().Keys);
-        scaler = new LinearMultiScale(Graphs, Settings.MinimalBlockLength, Settings.MaximalBlockLength, nodeMetrics);
-
-        //TODO Flo: load layouts
         Graphs.ForEach(key =>
         {
             layouts[key] = new AbstractCCALayout();
-            layouts[key].Calculate(ObjectManager, scaler, new BalloonNodeLayout(0, NodeFactory), key, Settings);
+            layouts[key].Calculate(ObjectManager, scaler, CreateLayout(NodeFactory), key, Settings);
         });
         if (HasLoadedGraph(out LoadedGraph loadedGraph))
         {

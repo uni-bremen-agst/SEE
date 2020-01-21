@@ -9,36 +9,16 @@ using UnityEngine;
 public static class GraphSettingsExtension
 {
     /// <summary>
-    /// Updates GraphSettings.pathprefis with the real path on the current machine.
-    /// </summary>
-    /// <param name="graphSettings">GraphSettings where the pathPrefix is updated.</param>
-    public static void UpdateProjectPath(this GraphSettings graphSettings)
-    {
-        graphSettings.AssertNotNull("graphSettings");
-        graphSettings.pathPrefix = Application.dataPath.Replace('/', '\\') + '\\';
-    }
-
-    /// <summary>
-    /// Returns the path to the test data for animated graphs.
-    /// They reside under "Data\\GXL\\animation-clones".
-    /// </summary>
-    /// <returns>Path to test data for animated graphs.</returns>
-    public static string GetAnimatedPath(this GraphSettings graphSettings)
-    {
-        graphSettings.AssertNotNull("graphSettings");
-        return graphSettings.pathPrefix + "..\\Data\\GXL\\animation-clones\\";
-    }
-
-    /// <summary>
     /// Returns a GraphSettings instance with the default settings for usage in CCAnimation
     /// </summary>
     /// <returns>An initialized GraphSettings instance.</returns>
-    public static GraphSettings DefaultCCAnimationSettings()
+    public static GraphSettings DefaultCCAnimationSettings(string gxlFolderName)
     {
         var graphSettings = new GraphSettings();
 
-        graphSettings.UpdateProjectPath();
-        // Needed?graphSettings.ShowDonuts = false;
+        graphSettings.pathPrefix = Application.dataPath.Replace('/', '\\') + '\\';
+
+        graphSettings.gxlPath = $"..\\Data\\GXL\\{gxlFolderName}\\";
 
         return graphSettings;
     }
