@@ -19,6 +19,9 @@ public class TouchControlsSEE : MonoBehaviour
     private bool hit = false;
     private RaycastHit hitInfo;
 
+    private Transform lastTarget;
+    private bool TwoStepMove = false;
+
     //contains the targets transform after selection
     private Transform target;
     public UnityEvent OnTargetChanged;
@@ -34,6 +37,7 @@ public class TouchControlsSEE : MonoBehaviour
     private Transform startPos;
     //this Object represents the camera end transform
     private GameObject transObject;
+    private GameObject lookAtObject;
     private float timeCount = 1f;
 
     //locks all actions for the time of camera auto movement
@@ -45,6 +49,7 @@ public class TouchControlsSEE : MonoBehaviour
     void Start()
     {
         transObject = new GameObject();
+        lookAtObject = new GameObject();
         target = GameObject.Find("Plane").transform;
         Rig.transform.LookAt(target);
 
@@ -136,21 +141,42 @@ public class TouchControlsSEE : MonoBehaviour
         else
         {
             Lock = false;
+            if (TwoStepMove)
+            {
+                SetOffset();
+                timeCount = 0;
+                TwoStepMove = false;
+                Lock = true;
+            }
         }
     }
 
     //sets the offset position vector relativ to the targets position in root and its radius
     private void SetOffset()
     {
-        Vector3 offSet = new Vector3();
-        float radius = target.transform.localScale.x;
-        Vector3 dir = target.transform.position.normalized;
-        offSet.x = dir.x * radius;
-        offSet.z = dir.z * radius;
-        offSet.y = radius;
+        Vector3 midPos = (lastTarget.position - target.position)/2;
+        float midHight = Vector3.Distance(lastTarget.position, target.position) * 1.7f;
+        Vector3 bowVector = midPos;
+        bowVector.y = midHight;
+        lookAtObject.transform.position = lastTarget.transform.position - midPos;
+        if (Rig.transform.position.y < midHight)
+        {
+            TwoStepMove = true;
+            transObject.transform.position = bowVector;
+            transObject.transform.LookAt(lookAtObject.transform);
+        }
+        else
+        {
+            Vector3 offSet = new Vector3();
+            float radius = target.transform.localScale.x;
+            Vector3 dir = target.transform.position.normalized;
+            offSet.x = dir.x * radius;
+            offSet.z = dir.z * radius;
+            offSet.y = radius;
 
-        transObject.transform.position = target.position + offSet;
-        transObject.transform.LookAt(target);
+            transObject.transform.position = target.position + offSet;
+            transObject.transform.LookAt(target);
+        }
 
     }
     //moves the camera to offset position relative to the target
@@ -171,6 +197,7 @@ public class TouchControlsSEE : MonoBehaviour
 
     public void SetTarget(Transform obj)
     {
+        lastTarget = target;
         target = obj;
         SetOffset();
         startPos = Rig.transform;
@@ -183,4 +210,5 @@ public class TouchControlsSEE : MonoBehaviour
     {
         return target;
     }
+
 }
