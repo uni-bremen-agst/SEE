@@ -24,6 +24,12 @@ public class SearchForObject : MonoBehaviour
     public GameObject keyboard;
 
     /// <summary>
+    /// A panel that can be opened after clicking an option in the list.
+    /// Can be assigned in editor but is not necessary.
+    /// </summary>
+    public GameObject informationPanel;
+
+    /// <summary>
     /// A list of game objects which where recently selected.
     /// </summary>
     private List<GameObject> RecentFinds;
@@ -38,7 +44,8 @@ public class SearchForObject : MonoBehaviour
     {
         RecentFinds = new List<GameObject> { };
         TextInput = gameObject.GetComponent<InputField>();
-        keyboard.SetActive(false);
+        CloseKeyboard();
+        transform.parent.GetComponent<ChangePanel>().OnPanelClose.AddListener(CloseKeyboard);
     }
 
     private void Update()
@@ -46,10 +53,6 @@ public class SearchForObject : MonoBehaviour
         if (TextInput.isFocused)
         {
             keyboard.SetActive(true);
-        }
-        else
-        {
-            //keyboard.SetActive(false);
         }
     }
 
@@ -126,6 +129,7 @@ public class SearchForObject : MonoBehaviour
     /// <summary>
     /// Calls the control script on the main camera to move the rig towards the specified object.
     /// Also clears the panel and displays the list of recently found Objects.
+    /// If the variable "Information Panel" is specified it will be opened.
     /// </summary>
     /// <param name="obj">the GameObject to focus</param>
     public void OnEnter(GameObject obj)
@@ -134,6 +138,11 @@ public class SearchForObject : MonoBehaviour
         Camera.main.GetComponent<TouchControlsSEE>().SetTarget(obj.transform);
         ClearObject(panel);
         ShowOnPanel(RecentFinds);
+
+        if(informationPanel != null)
+        {
+            transform.parent.GetComponent<ChangePanel>().OpenOtherPanel(informationPanel);
+        }
     }
 
     /// <summary>
@@ -167,6 +176,14 @@ public class SearchForObject : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+    }
+
+    /// <summary>
+    /// Closes the attached on screen keyboard.
+    /// </summary>
+    private void CloseKeyboard()
+    {
+        keyboard.SetActive(false);
     }
 }
 

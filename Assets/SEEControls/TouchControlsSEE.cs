@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 public class TouchControlsSEE : MonoBehaviour
@@ -20,6 +21,7 @@ public class TouchControlsSEE : MonoBehaviour
 
     //contains the targets transform after selection
     private Transform target;
+    public UnityEvent OnTargetChanged;
 
     //variables to hold the distance from 2 fingers on the screen while zooming
     private float distance = 0;
@@ -45,6 +47,11 @@ public class TouchControlsSEE : MonoBehaviour
         transObject = new GameObject();
         target = GameObject.Find("Plane").transform;
         Rig.transform.LookAt(target);
+
+        if(OnTargetChanged == null)
+        {
+            OnTargetChanged = new UnityEvent();
+        }
     }
 
     void Update()
@@ -169,5 +176,11 @@ public class TouchControlsSEE : MonoBehaviour
         startPos = Rig.transform;
         timeCount = 0;
         Lock = true;
+        OnTargetChanged.Invoke();
+    }
+
+    public Transform GetTarget()
+    {
+        return target;
     }
 }
