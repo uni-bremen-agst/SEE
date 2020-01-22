@@ -16,7 +16,7 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// The minimum size a chart can have for width and height.
 		/// </summary>
-		private int _minimumSize;
+		protected int _minimumSize;
 
 		/// <summary>
 		/// The objects that have to be moved individually when resizing the chart.
@@ -67,7 +67,7 @@ namespace SEECity.Charts.Scripts
 		public virtual void OnDrag(PointerEventData eventData)
 		{
 			RectTransform pos = GetComponent<RectTransform>();
-			Vector2 oldPos = new Vector2(pos.position.x, pos.position.y);
+			Vector2 oldPos = pos.position;
 			pos.position = eventData.position;
 			if (pos.anchoredPosition.x / pos.lossyScale.x < _minimumSize ||
 			    pos.anchoredPosition.y / pos.lossyScale.y < _minimumSize) pos.position = oldPos;
