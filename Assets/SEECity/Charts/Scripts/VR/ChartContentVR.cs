@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 
-namespace Assets.SEECity.Charts.Scripts.VR
+namespace SEECity.Charts.Scripts.VR
 {
 	public class ChartContentVR : ChartContent
 	{
-		public GameObject PhysicalOpen;
-		public GameObject PhysicalClosed;
+		public GameObject physicalOpen;
+		public GameObject physicalClosed;
 	}
 }

@@ -2,7 +2,7 @@
 using UnityEngine.EventSystems;
 using Valve.VR;
 
-namespace Assets.SEECity.Charts.Scripts.VR
+namespace SEECity.Charts.Scripts.VR
 {
 	/// <summary>
 	/// Extends the standard <see cref="BaseInputModule" /> for usage in VR.
@@ -38,8 +38,8 @@ namespace Assets.SEECity.Charts.Scripts.VR
 		{
 			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
-			_source = _chartManager.Source;
-			_click = _chartManager.Click;
+			_source = _chartManager.source;
+			_click = _chartManager.click;
 		}
 
 		protected override void Start()

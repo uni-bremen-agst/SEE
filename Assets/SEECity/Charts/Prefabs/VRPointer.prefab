@@ -124,7 +124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5576be042dcfd44899776070ac77f9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _hitDot: {fileID: 8607808889711346679}
+  hitDot: {fileID: 8607808889711346679}
 --- !u!20 &8607808890012322459
 Camera:
   m_ObjectHideFlags: 0

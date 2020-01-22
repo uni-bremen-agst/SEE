@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Assets.SEECity.Charts.Scripts.VR
+namespace SEECity.Charts.Scripts.VR
 {
 	public class ChartSizeHandlerVR : ChartSizeHandler
 	{
@@ -17,8 +17,8 @@ namespace Assets.SEECity.Charts.Scripts.VR
 			base.Awake();
 			_chartContent = transform.parent.GetComponent<ChartContentVR>();
 			_virtualRealityCanvas = Chart.parent.GetComponent<RectTransform>();
-			_physicalOpen = _chartContent.PhysicalOpen;
-			_physicalClosed = _chartContent.PhysicalClosed;
+			_physicalOpen = _chartContent.physicalOpen;
+			_physicalClosed = _chartContent.physicalClosed;
 		}
 
 		public override void OnDrag(PointerEventData eventData)

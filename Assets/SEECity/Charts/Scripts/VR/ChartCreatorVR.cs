@@ -1,17 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class ChartCreatorVR : MonoBehaviour
+namespace SEECity.Charts.Scripts.VR
 {
-    [SerializeField] private GameObject _chartPrefab;
+	public class ChartCreatorVR : MonoBehaviour
+	{
+		[SerializeField] private GameObject chartPrefab;
 
-    [SerializeField] private Transform _parent;
+		[SerializeField] private Transform parent;
 
-    public void CreateChart()
-    {
-        Transform cameraPosition = Camera.main.transform;
+		public void CreateChart()
+		{
+			Transform cameraPosition = Camera.main.transform;
 
-        Instantiate(_chartPrefab, cameraPosition.position + 2 * cameraPosition.forward, Quaternion.identity, _parent);
-    }
+			Instantiate(chartPrefab, cameraPosition.position + 2 * cameraPosition.forward,
+				Quaternion.identity, parent);
+		}
+	}
 }

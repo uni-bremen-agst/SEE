@@ -393,6 +393,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea367a7da397b1044bbc466e04b185ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LinkedObject: {fileID: 0}
-  _markerHighlight: {fileID: 4103084839615680333}
+  linkedObject: {fileID: 0}
+  markerHighlight: {fileID: 4103084839615680333}
   _infoText: {fileID: 2199698873300044687}

@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Assets.SEECity.Charts.Scripts
+namespace SEECity.Charts.Scripts
 {
 	/// <summary>
 	/// Contains the logic for the markers representing entries linked to objects in the chart.
@@ -28,14 +28,14 @@ namespace Assets.SEECity.Charts.Scripts
 		private Material _buildingHighlightMaterial;
 
 		/// <summary>
-		/// Copy of the <see cref="LinkedObject" /> with different material to make it look highlighted.
+		/// Copy of the <see cref="linkedObject" /> with different material to make it look highlighted.
 		/// </summary>
 		private GameObject _highlightCopy;
 
 		/// <summary>
 		/// The <see cref="GameObject" /> in the code city that is connected with this button.
 		/// </summary>
-		[HideInInspector] public GameObject LinkedObject;
+		[HideInInspector] public GameObject linkedObject;
 
 		/// <summary>
 		/// The active <see cref="Camera" /> in the scene.
@@ -77,12 +77,12 @@ namespace Assets.SEECity.Charts.Scripts
 		/// The <see cref="GameObject" /> making the marker look highlighted when active.
 		/// </summary>
 		[Header("Highlight Properties"), SerializeField]
-		private GameObject _markerHighlight = null;
+		private GameObject markerHighlight;
 
 		/// <summary>
-		/// A text popup containing useful information about the marker and its <see cref="LinkedObject" />.
+		/// A text popup containing useful information about the marker and its <see cref="linkedObject" />.
 		/// </summary>
-		[Header("Other"), SerializeField] private TextMeshProUGUI _infoText = null;
+		[Header("Other"), SerializeField] private TextMeshProUGUI _infoText;
 
 		/// <summary>
 		/// Calls methods for initialization.
@@ -99,12 +99,12 @@ namespace Assets.SEECity.Charts.Scripts
 		{
 			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
-			_cameraDistance = _chartManager.CameraDistance;
-			_moveWithRotation = _chartManager.MoveWithRotation;
-			_cameraFlightTime = _chartManager.CameraFlightTime;
-			_clickDelay = _chartManager.ClickDelay;
-			_highlightDuration = _chartManager.HighlightDuration;
-			_buildingHighlightMaterial = _chartManager.BuildingHighlightMaterial;
+			_cameraDistance = _chartManager.cameraDistance;
+			_moveWithRotation = _chartManager.moveWithRotation;
+			_cameraFlightTime = _chartManager.cameraFlightTime;
+			_clickDelay = _chartManager.clickDelay;
+			_highlightDuration = _chartManager.highlightDuration;
+			_buildingHighlightMaterial = _chartManager.buildingHighlightMaterial;
 		}
 
 		private void Update()
@@ -147,13 +147,13 @@ namespace Assets.SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Highlights the <see cref="LinkedObject" />.
+		/// Highlights the <see cref="linkedObject" />.
 		/// </summary>
 		private void HighlightLinkedObjectToggle(bool highlight)
 		{
 			if (highlight)
 			{
-				_highlightCopy = Instantiate(LinkedObject, LinkedObject.transform);
+				_highlightCopy = Instantiate(linkedObject, linkedObject.transform);
 				_highlightCopy.tag = "Untagged";
 				_highlightCopy.GetComponent<Renderer>().material = _buildingHighlightMaterial;
 			}
@@ -162,11 +162,11 @@ namespace Assets.SEECity.Charts.Scripts
 				if (_highlightCopy != null) Destroy(_highlightCopy);
 			}
 
-			_markerHighlight.SetActive(highlight);
+			markerHighlight.SetActive(highlight);
 		}
 
 		/// <summary>
-		/// Highlights this marker and its <see cref="LinkedObject" /> for a given amount of time.
+		/// Highlights this marker and its <see cref="linkedObject" /> for a given amount of time.
 		/// </summary>
 		/// <param name="time">How long the highlight will last.</param>
 		public void TriggerTimedHighlight(float time)
@@ -199,7 +199,7 @@ namespace Assets.SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Moves the camera to view the <see cref="LinkedObject" />.
+		/// Moves the camera to view the <see cref="linkedObject" />.
 		/// </summary>
 		private void ShowLinkedObject()
 		{
@@ -213,10 +213,10 @@ namespace Assets.SEECity.Charts.Scripts
 				}
 
 				Vector3 lookPos =
-					LinkedObject.transform.position - _activeCamera.transform.position;
+					linkedObject.transform.position - _activeCamera.transform.position;
 				_cameraMoving = StartCoroutine(MoveCameraTo(
 					Vector3.MoveTowards(_activeCamera.transform.position,
-						LinkedObject.transform.position,
+						linkedObject.transform.position,
 						lookPos.magnitude - _cameraDistance), Quaternion.LookRotation(lookPos)));
 			}
 			else
@@ -228,9 +228,9 @@ namespace Assets.SEECity.Charts.Scripts
 				}
 
 				_cameraMoving = StartCoroutine(MoveCameraTo(new Vector3(
-					LinkedObject.transform.position.x,
+					linkedObject.transform.position.x,
 					_activeCamera.transform.position.y,
-					LinkedObject.transform.position.z - _cameraDistance)));
+					linkedObject.transform.position.z - _cameraDistance)));
 			}
 		}
 
@@ -244,7 +244,7 @@ namespace Assets.SEECity.Charts.Scripts
 		private IEnumerator MoveCameraTo(Vector3 newPos, Quaternion lookAt)
 		{
 			Vector3 oldPos = _activeCamera.transform.position;
-			if (newPos != LinkedObject.transform.position)
+			if (newPos != linkedObject.transform.position)
 			{
 				Quaternion oldRot = _activeCamera.transform.rotation;
 				for (float time = 0f; time <= _cameraFlightTime; time += Time.deltaTime)

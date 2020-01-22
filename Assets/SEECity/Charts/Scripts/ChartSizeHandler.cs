@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Assets.SEECity.Charts.Scripts
+namespace SEECity.Charts.Scripts
 {
 	/// <summary>
 	/// Handles the resizing of charts.
@@ -22,11 +22,12 @@ namespace Assets.SEECity.Charts.Scripts
 		/// The objects that have to be moved individually when resizing the chart.
 		/// </summary>
 		[Header("For resizing"), SerializeField]
-		private Transform _dragButton = null;
-		[SerializeField] private Transform _topRight = null;
-		[SerializeField] private Transform _topLeft = null;
-		[SerializeField] private Transform _bottomRight = null;
-		[SerializeField] private Transform _bottomLeft = null;
+		private Transform dragButton;
+
+		[SerializeField] private Transform topRight;
+		[SerializeField] private Transform topLeft;
+		[SerializeField] private Transform bottomRight;
+		[SerializeField] private Transform bottomLeft;
 
 		/// <summary>
 		/// The script attached to the chart.
@@ -55,7 +56,7 @@ namespace Assets.SEECity.Charts.Scripts
 		{
 			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
-			_minimumSize = _chartManager.MinimumSize;
+			_minimumSize = _chartManager.minimumSize;
 		}
 
 		/// <summary>
@@ -80,10 +81,10 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <param name="height">The new height of the chart.</param>
 		protected virtual void ChangeSize(float width, float height)
 		{
-			RectTransform dataPanel = _chartContent.DataPanel;
+			RectTransform dataPanel = _chartContent.dataPanel;
 			dataPanel.sizeDelta = new Vector2(width - 100, height - 100);
 			dataPanel.anchoredPosition = new Vector2(width / 2, height / 2);
-			RectTransform labelsPanel = _chartContent.LabelsPanel;
+			RectTransform labelsPanel = _chartContent.labelsPanel;
 			labelsPanel.sizeDelta = new Vector2(width, height);
 			labelsPanel.anchoredPosition = new Vector2(width / 2, height / 2);
 			RectTransform xDropdown = _chartContent.AxisDropdownX.GetComponent<RectTransform>();
@@ -93,11 +94,11 @@ namespace Assets.SEECity.Charts.Scripts
 			yDropdown.anchoredPosition = new Vector2(yDropdown.anchoredPosition.x, height / 2);
 			yDropdown.sizeDelta = new Vector2(height / 3, yDropdown.sizeDelta.y);
 			Chart.sizeDelta = new Vector2(width, height);
-			_topRight.localPosition = new Vector2(width / 2, height / 2);
-			_topLeft.localPosition = new Vector2(-width / 2, height / 2);
-			_bottomRight.localPosition = new Vector2(width / 2, -height / 2);
-			_bottomLeft.localPosition = new Vector2(-width / 2, -height / 2);
-			_dragButton.localPosition = _bottomRight.localPosition - new Vector3(25f, -25f);
+			topRight.localPosition = new Vector2(width / 2, height / 2);
+			topLeft.localPosition = new Vector2(-width / 2, height / 2);
+			bottomRight.localPosition = new Vector2(width / 2, -height / 2);
+			bottomLeft.localPosition = new Vector2(-width / 2, -height / 2);
+			dragButton.localPosition = bottomRight.localPosition - new Vector3(25f, -25f);
 
 			_chartContent.DrawData();
 		}
