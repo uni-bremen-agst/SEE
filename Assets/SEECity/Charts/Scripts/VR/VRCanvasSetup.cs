@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Assets.SEECity.Charts.Scripts.VR
+namespace SEECity.Charts.Scripts.VR
 {
 	/// <summary>
 	/// Handles setup of new charts entering the scene.

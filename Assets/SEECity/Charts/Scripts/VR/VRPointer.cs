@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Assets.SEECity.Charts.Scripts.VR
+namespace SEECity.Charts.Scripts.VR
 {
 	/// <summary>
 	/// Manages the pointer used to interact with canvases in VR.
@@ -13,7 +13,7 @@ namespace Assets.SEECity.Charts.Scripts.VR
 		private float _pointerLength;
 		private LineRenderer _lineRenderer;
 		private VRInputModule _inputModule;
-		[SerializeField] private GameObject _hitDot = null;
+		[SerializeField] private GameObject hitDot;
 
 		public Camera Camera { get; private set; }
 
@@ -27,7 +27,8 @@ namespace Assets.SEECity.Charts.Scripts.VR
 
 		private void Start()
 		{
-			_inputModule = GameObject.FindGameObjectWithTag("VREventSystem").GetComponent<VRInputModule>();
+			_inputModule = GameObject.FindGameObjectWithTag("VREventSystem")
+				.GetComponent<VRInputModule>();
 		}
 
 		/// <summary>
@@ -37,7 +38,7 @@ namespace Assets.SEECity.Charts.Scripts.VR
 		{
 			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
-			_pointerLength = _chartManager.PointerLength;
+			_pointerLength = _chartManager.pointerLength;
 		}
 
 		private void Update()
@@ -55,7 +56,7 @@ namespace Assets.SEECity.Charts.Scripts.VR
 				: data.pointerCurrentRaycast.distance;
 			float targetLength = Mathf.Min(colliderDistance, canvasDistance);
 			Vector3 hitPosition = transform.position + transform.forward * targetLength;
-			_hitDot.transform.position = hitPosition;
+			hitDot.transform.position = hitPosition;
 			_lineRenderer.SetPosition(0, transform.position);
 			_lineRenderer.SetPosition(1, hitPosition);
 		}

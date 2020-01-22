@@ -1,7 +1,7 @@
 ﻿using SEE;
 using UnityEngine;
 
-namespace Assets.SEECity.Charts.Scripts
+namespace SEECity.Charts.Scripts
 {
 	/// <summary>
 	/// Sets the active states of different layers of the chart UI.
@@ -16,12 +16,12 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// UI when charts are open.
 		/// </summary>
-		[SerializeField] private GameObject _chartsOpen = null;
+		[SerializeField] private GameObject chartsOpen;
 
 		/// <summary>
 		/// UI for creating new charts.
 		/// </summary>
-		[SerializeField] private GameObject _chartCreator = null;
+		[SerializeField] private GameObject chartCreator;
 
 		private void Awake()
 		{
@@ -33,7 +33,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private void Update()
 		{
-			if (Input.GetButtonDown("ToggleCharts")) ToggleCharts(!_chartsOpen.activeInHierarchy);
+			if (Input.GetButtonDown("ToggleCharts")) ToggleCharts(!chartsOpen.activeInHierarchy);
 		}
 
 		/// <summary>
@@ -41,7 +41,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		public void ToggleCharts(bool open)
 		{
-			_chartsOpen.SetActive(open);
+			chartsOpen.SetActive(open);
 			_flyCamera.SetLastMouse();
 			_flyCamera.enabled = !open;
 		}
@@ -51,7 +51,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		public void OpenChartCreator()
 		{
-			_chartCreator.SetActive(true);
+			chartCreator.SetActive(true);
 		}
 	}
 }

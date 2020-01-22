@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Assets.SEECity.Charts.Scripts
+namespace SEECity.Charts.Scripts
 {
 	/// <summary>
 	/// Contains all the information needed to create the next chart.
@@ -10,12 +10,12 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// The prefab for a new chart.
 		/// </summary>
-		[SerializeField] private GameObject _chartPrefab = null;
+		[SerializeField] private GameObject chartPrefab;
 
 		/// <summary>
 		/// The <see cref="Canvas" /> on which the chart is created.
 		/// </summary>
-		[SerializeField] private Transform _chartsCanvas = null;
+		[SerializeField] private Transform chartsCanvas;
 
 		/// <summary>
 		/// Initializes the new chart as GameObject.
@@ -24,7 +24,7 @@ namespace Assets.SEECity.Charts.Scripts
 		private void CreateChart()
 		{
 			ChartContent content =
-				Instantiate(_chartPrefab, _chartsCanvas).GetComponent<ChartContent>();
+				Instantiate(chartPrefab, chartsCanvas).GetComponent<ChartContent>();
 			gameObject.SetActive(false);
 		}
 	}

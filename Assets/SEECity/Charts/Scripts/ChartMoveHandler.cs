@@ -2,7 +2,7 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Assets.SEECity.Charts.Scripts
+namespace SEECity.Charts.Scripts
 {
 	/// <summary>
 	/// Handles the dragging and minimization of charts.
@@ -53,7 +53,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// The TODO: Comment
 		/// </summary>
-		[SerializeField] protected GameObject SizeButton = null;
+		[SerializeField] protected GameObject sizeButton;
 
 		/// <summary>
 		/// Links the <see cref="Scripts.ChartManager" /> and initializes some values and settings with the
@@ -74,9 +74,9 @@ namespace Assets.SEECity.Charts.Scripts
 		{
 			ChartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
-			_dragDelay = ChartManager.DragDelay;
-			_maximizedSprite = ChartManager.MaximizedSprite;
-			_minimizedSprite = ChartManager.MinimizedSprite;
+			_dragDelay = ChartManager.dragDelay;
+			_maximizedSprite = ChartManager.maximizedSprite;
+			_minimizedSprite = ChartManager.minimizedSprite;
 		}
 
 		/// <summary>
@@ -129,13 +129,10 @@ namespace Assets.SEECity.Charts.Scripts
 		protected virtual void ToggleMinimize()
 		{
 			ChartContent chart = _chart.GetComponent<ChartContent>();
-			chart.LabelsPanel.gameObject.SetActive(Minimized);
-			chart.DataPanel.gameObject.SetActive(Minimized);
-			SizeButton.SetActive(Minimized);
-			if (Minimized)
-				GetComponent<Image>().sprite = _maximizedSprite;
-			else
-				GetComponent<Image>().sprite = _minimizedSprite;
+			chart.labelsPanel.gameObject.SetActive(Minimized);
+			chart.dataPanel.gameObject.SetActive(Minimized);
+			sizeButton.SetActive(Minimized);
+			GetComponent<Image>().sprite = Minimized ? _maximizedSprite : _minimizedSprite;
 			Minimized = !Minimized;
 		}
 	}

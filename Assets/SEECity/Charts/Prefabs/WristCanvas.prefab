@@ -267,9 +267,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ddffef3b35e86c498c70fe9c6405a02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _chartPrefab: {fileID: 5335390132035948169, guid: db3bfb72d0ee2784ebea15a0c9c8b774,
+  chartPrefab: {fileID: 5335390132035948169, guid: db3bfb72d0ee2784ebea15a0c9c8b774,
     type: 3}
-  _parent: {fileID: 0}
+  parent: {fileID: 0}
 --- !u!1 &8399030166203837916
 GameObject:
   m_ObjectHideFlags: 0

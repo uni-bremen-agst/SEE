@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7567182439884994513}
   m_Layer: 0
-  m_Name: Charts
+  m_Name: NonVRCharts
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -218,8 +218,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 452586a5006308b4aa9c9ba67e9a8692, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _chartsOpen: {fileID: 5985644969679305242}
-  _chartCreator: {fileID: 5985644968203102680}
+  chartsOpen: {fileID: 5985644969679305242}
+  chartCreator: {fileID: 5985644968203102680}
 --- !u!1 &5985644967794734867
 GameObject:
   m_ObjectHideFlags: 0
@@ -899,9 +899,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f778dd0a9d44bb419d2e4193f2b7435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _chartPrefab: {fileID: 4785276354945708473, guid: 7845d136e1a6173458ce440b23366580,
+  chartPrefab: {fileID: 4785276354945708473, guid: 7845d136e1a6173458ce440b23366580,
     type: 3}
-  _chartsCanvas: {fileID: 5985644969679305243}
+  chartsCanvas: {fileID: 5985644967764807510}
 --- !u!1 &5985644968236634949
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,7 +2,7 @@
 using UnityEngine.EventSystems;
 using Valve.VR;
 
-namespace Assets.SEECity.Charts.Scripts.VR
+namespace SEECity.Charts.Scripts.VR
 {
 	/// <summary>
 	/// Handles the dragging and minimization of charts in VR.
@@ -32,9 +32,9 @@ namespace Assets.SEECity.Charts.Scripts.VR
 		/// </summary>
 		private SteamVR_Action_Vector2 _moveInOut;
 
-        private float _minimumDistance = 1f;
+		private float _minimumDistance = 1f;
 
-        private float _maximumDistance;
+		private float _maximumDistance;
 
 		/// <summary>
 		/// The speed to charts with when scrolling.
@@ -64,22 +64,22 @@ namespace Assets.SEECity.Charts.Scripts.VR
 		protected override void Awake()
 		{
 			base.Awake();
-			_parent = transform.parent.GetComponent<ChartContent>().Parent.transform;
+			_parent = transform.parent.GetComponent<ChartContent>().parent.transform;
 			_mainCamera = Camera.main;
 			_pointerCamera = GameObject.FindGameObjectWithTag("Pointer").GetComponent<Camera>();
 			_chartContent = transform.parent.GetComponent<ChartContentVR>();
-			_physicalOpen = _chartContent.PhysicalOpen;
-			_physicalClosed = _chartContent.PhysicalClosed;
+			_physicalOpen = _chartContent.physicalOpen;
+			_physicalClosed = _chartContent.physicalClosed;
 		}
 
 		protected override void GetSettingData()
 		{
 			base.GetSettingData();
-			_chartScrollSpeed = ChartManager.ChartScrollSpeed;
-			_source = ChartManager.Source;
-			_moveInOut = ChartManager.MoveInOut;
-            //minDist
-            _maximumDistance = ChartManager.PointerLength;
+			_chartScrollSpeed = ChartManager.chartScrollSpeed;
+			_source = ChartManager.source;
+			_moveInOut = ChartManager.moveInOut;
+			//minDist
+			_maximumDistance = ChartManager.pointerLength;
 		}
 
 
@@ -102,11 +102,13 @@ namespace Assets.SEECity.Charts.Scripts.VR
 				{
 					Vector3 direction = _pointerCamera.transform.position -
 					                    GetComponent<RectTransform>().position;
-                    float moveBy = _moveInOut.GetAxis(_source).y * _chartScrollSpeed * Time.deltaTime;
-                    if (!(_moveInOut.GetAxis(_source).y < 0 && direction.magnitude < _minimumDistance + moveBy || _moveInOut.GetAxis(_source).y > 0 && direction.magnitude > _maximumDistance - moveBy))
-                    {
-                        _parent.position -= direction * moveBy;
-                    }
+					float moveBy = _moveInOut.GetAxis(_source).y * _chartScrollSpeed *
+					               Time.deltaTime;
+					if (!(_moveInOut.GetAxis(_source).y < 0 &&
+					      direction.magnitude < _minimumDistance + moveBy ||
+					      _moveInOut.GetAxis(_source).y > 0 &&
+					      direction.magnitude > _maximumDistance - moveBy))
+						_parent.position -= direction * moveBy;
 				}
 		}
 

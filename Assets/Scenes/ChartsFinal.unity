@@ -1322,6 +1322,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2342395875013397700, guid: 51821f11a04e1ab4d9151f06c2366bbc,
         type: 3}
+      propertyPath: virtualRealityObjects.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2342395875013397700, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
       propertyPath: _virtualRealityObjects.Array.data[0]
       value: 
       objectReference: {fileID: 0}
@@ -1335,6 +1340,16 @@ PrefabInstance:
       propertyPath: _nonVRCamera
       value: 
       objectReference: {fileID: 647391936}
+    - target: {fileID: 2342395875013397700, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: nonVRCamera
+      value: 
+      objectReference: {fileID: 647391936}
+    - target: {fileID: 2342395875013397700, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: virtualRealityObjects.Array.data[0]
+      value: 
+      objectReference: {fileID: 1334954065}
     - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6126,6 +6141,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4ccd5ea94039989458149588b86c9e40, type: 3}
+--- !u!1 &1334954065 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8909484703925744154, guid: 4ccd5ea94039989458149588b86c9e40,
+    type: 3}
+  m_PrefabInstance: {fileID: 1334954064}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1359664066
 GameObject:
   m_ObjectHideFlags: 0

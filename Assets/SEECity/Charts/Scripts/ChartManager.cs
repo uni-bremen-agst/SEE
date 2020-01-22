@@ -2,7 +2,7 @@
 using UnityEngine.XR;
 using Valve.VR;
 
-namespace Assets.SEECity.Charts.Scripts
+namespace SEECity.Charts.Scripts
 {
 	/// <summary>
 	/// Contains most settings and some methods needed across all charts.
@@ -15,73 +15,73 @@ namespace Assets.SEECity.Charts.Scripts
 		/// The distance the camera will keep to the <see cref="GameObject" /> to focus on.
 		/// </summary>
 		[Header("Settings"), Header("Camera Controls")]
-		public float CameraDistance = 40f;
+		public float cameraDistance = 40f;
 
 		/// <summary>
 		/// When checked, the <see cref="Camera" /> will rotate while moving.
 		/// </summary>
-		public bool MoveWithRotation = true;
+		public bool moveWithRotation = true;
 
 		/// <summary>
 		/// The time the <see cref="Camera" /> needs to reach it's destination when moving from one
 		/// <see cref="GameObject" /> to another.
 		/// </summary>
-		public float CameraFlightTime = 0.5f;
+		public float cameraFlightTime = 0.5f;
 
 		/// <summary>
 		/// The minimum size a chart can have for width and height.
 		/// </summary>
-		public int MinimumSize = 400;
+		public int minimumSize = 400;
 
 		/// <summary>
 		/// The maximum time between two clicks to recognize them as double click.
 		/// </summary>
 		[Header("User Inputs"), Range(0.1f, 1f)]
-		public float ClickDelay = 0.5f;
+		public float clickDelay = 0.5f;
 
-		[Range(0.1f, 1f)] public float DragDelay = 0.2f;
+		[Range(0.1f, 1f)] public float dragDelay = 0.2f;
 
 		/// <summary>
 		/// The <see cref="Material" /> making the object look highlighted.
 		/// </summary>
-		[Header("Highlights")] public Material BuildingHighlightMaterial = null;
+		[Header("Highlights")] public Material buildingHighlightMaterial;
 
 		/// <summary>
-		/// The thickness of the highlight outline of <see cref="BuildingHighlightMaterial" />.
+		/// The thickness of the highlight outline of <see cref="buildingHighlightMaterial" />.
 		/// </summary>
-		[SerializeField] private float _highlightOutline = 0.005f;
+		[SerializeField] private float highlightOutline = 0.005f;
 
-		public float HighlightDuration = 5f;
+		public float highlightDuration = 5f;
 
 		/// <summary>
 		/// Determines if the scene is being played in VR or not.
 		/// </summary>
 		private bool _isVirtualReality;
 
-		[Header("Virtual Reality")] public float PointerLength = 5f;
-		public float ChartScrollSpeed = 10f;
-        public float DistanceThreshold = 0.5f;
+		[Header("Virtual Reality")] public float pointerLength = 5f;
+		public float chartScrollSpeed = 10f;
+		public float distanceThreshold = 0.5f;
 
-		public SteamVR_Input_Sources Source = SteamVR_Input_Sources.RightHand;
-		public SteamVR_Action_Boolean Click;
-		public SteamVR_Action_Vector2 MoveInOut;
+		public SteamVR_Input_Sources source = SteamVR_Input_Sources.RightHand;
+		public SteamVR_Action_Boolean click;
+		public SteamVR_Action_Vector2 moveInOut;
 
-		[Header("Prefabs"), SerializeField] private GameObject _chartsPrefab;
+		[Header("Prefabs"), SerializeField] private GameObject chartsPrefab;
 
-		[SerializeField] private GameObject _nonVRCamera;
+		[SerializeField] private GameObject nonVRCamera;
 
-		[SerializeField] private GameObject[] _virtualRealityObjects;
+		[SerializeField] private GameObject[] virtualRealityObjects;
 
-		public Sprite MaximizedSprite;
+		public Sprite maximizedSprite;
 
-		public Sprite MinimizedSprite;
+		public Sprite minimizedSprite;
 
 		/// <summary>
-		/// The current thickness of the highlight outline of <see cref="BuildingHighlightMaterial" /> used in
+		/// The current thickness of the highlight outline of <see cref="buildingHighlightMaterial" /> used in
 		/// animations.
 		/// </summary>
 		[Header("DO NOT CHANGE THIS"), SerializeField]
-		private float _highlightOutlineAnim = 0.001f;
+		private float highlightOutlineAnim = 0.001f;
 
 		/// <summary>
 		/// Enforces singleton pattern.
@@ -98,12 +98,12 @@ namespace Assets.SEECity.Charts.Scripts
 			_isVirtualReality = XRDevice.isPresent;
 			if (!_isVirtualReality)
 			{
-				foreach (GameObject vrObject in _virtualRealityObjects) Destroy(vrObject);
-				Instantiate(_chartsPrefab);
+				foreach (GameObject vrObject in virtualRealityObjects) Destroy(vrObject);
+				Instantiate(chartsPrefab);
 			}
 			else
 			{
-				Destroy(_nonVRCamera);
+				Destroy(nonVRCamera);
 			}
 		}
 
@@ -120,15 +120,15 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		private void AnimateHighlight()
 		{
-			BuildingHighlightMaterial.SetFloat("g_flOutlineWidth", _highlightOutlineAnim);
+			buildingHighlightMaterial.SetFloat("g_flOutlineWidth", highlightOutlineAnim);
 		}
 
 		/// <summary>
-		/// Sets the properties of <see cref="BuildingHighlightMaterial" /> to their original state.
+		/// Sets the properties of <see cref="buildingHighlightMaterial" /> to their original state.
 		/// </summary>
 		private void OnDestroy()
 		{
-			BuildingHighlightMaterial.SetFloat("g_flOutlineWidth", _highlightOutline);
+			buildingHighlightMaterial.SetFloat("g_flOutlineWidth", highlightOutline);
 		}
 	}
 }

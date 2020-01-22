@@ -44,32 +44,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e460e911cf837cf4ab51fe6330360685, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CameraDistance: 40
-  MoveWithRotation: 1
-  CameraFlightTime: 0.5
-  MinimumSize: 400
-  ClickDelay: 0.5
-  DragDelay: 0.2
-  BuildingHighlightMaterial: {fileID: 2100000, guid: 9d631e931375b5242b8903c497a12c74,
+  cameraDistance: 40
+  moveWithRotation: 1
+  cameraFlightTime: 0.5
+  minimumSize: 400
+  clickDelay: 0.5
+  dragDelay: 0.2
+  buildingHighlightMaterial: {fileID: 2100000, guid: 9d631e931375b5242b8903c497a12c74,
     type: 2}
-  _highlightOutline: 0.005
-  HighlightDuration: 5
-  PointerLength: 5
-  ChartSpeed: 10
-  Source: 2
-  Click:
+  highlightOutline: 0.005
+  highlightDuration: 5
+  pointerLength: 5
+  chartScrollSpeed: 10
+  distanceThreshold: 0.5
+  source: 2
+  click:
     actionPath: /actions/default/in/GrabPinch
     needsReinit: 0
-  MoveInOut:
+  moveInOut:
     actionPath: /actions/default/in/MoveInOut
     needsReinit: 0
-  _chartsPrefab: {fileID: 4785276354945708473, guid: 7845d136e1a6173458ce440b23366580,
+  chartsPrefab: {fileID: 2535476864626067673, guid: 378b3c326bb846e49b4ca1fda9245e3f,
     type: 3}
-  _nonVRCamera: {fileID: 0}
-  _virtualRealityObjects: []
-  MaximizedSprite: {fileID: 21300000, guid: 3dd8a1777d7c2dd4f9faf31f3a995232, type: 3}
-  MinimizedSprite: {fileID: 21300000, guid: 582af9fbe4fe81b4680058a1f0485806, type: 3}
-  _highlightOutlineAnim: 0.001
+  nonVRCamera: {fileID: 0}
+  virtualRealityObjects: []
+  maximizedSprite: {fileID: 21300000, guid: 3dd8a1777d7c2dd4f9faf31f3a995232, type: 3}
+  minimizedSprite: {fileID: 21300000, guid: 582af9fbe4fe81b4680058a1f0485806, type: 3}
+  highlightOutlineAnim: 0.001
 --- !u!95 &2342395875013397703
 Animator:
   serializedVersion: 3

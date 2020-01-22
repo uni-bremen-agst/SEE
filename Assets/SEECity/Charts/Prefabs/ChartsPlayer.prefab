@@ -173,6 +173,11 @@ PrefabInstance:
       propertyPath: _parent
       value: 
       objectReference: {fileID: 9163227840733831270}
+    - target: {fileID: 4384949083286861094, guid: a2a3e52154e7cbd48b32f0ca06ba6f8f,
+        type: 3}
+      propertyPath: parent
+      value: 
+      objectReference: {fileID: 9163227840733831270}
     - target: {fileID: 7973073649127259891, guid: a2a3e52154e7cbd48b32f0ca06ba6f8f,
         type: 3}
       propertyPath: m_Name

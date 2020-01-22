@@ -3,7 +3,7 @@ using SEE.Layout;
 using TMPro;
 using UnityEngine;
 
-namespace Assets.SEECity.Charts.Scripts
+namespace SEECity.Charts.Scripts
 {
 	/// <summary>
 	/// Fills Charts with data and manages that data.
@@ -38,36 +38,36 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <summary>
 		/// The prefab used to display content in charts.
 		/// </summary>
-		[SerializeField] private GameObject _markerPrefab = null;
+		[SerializeField] private GameObject markerPrefab;
 
 		/// <summary>
 		/// Game Object to group all content entries of a chart.
 		/// </summary>
-		[SerializeField] private GameObject _entries = null;
+		[SerializeField] private GameObject entries;
 
-		[SerializeField] private TextMeshProUGUI _minX = null;
+		[SerializeField] private TextMeshProUGUI minX;
 
-		[SerializeField] private TextMeshProUGUI _maxX = null;
+		[SerializeField] private TextMeshProUGUI maxX;
 
-		[SerializeField] private TextMeshProUGUI _minY = null;
+		[SerializeField] private TextMeshProUGUI minY;
 
-		[SerializeField] private TextMeshProUGUI _maxY = null;
+		[SerializeField] private TextMeshProUGUI maxY;
 
 		/// <summary>
 		/// A parent of this object. Used in VR to destroy the whole construct of a moveable chart.
 		/// </summary>
-		public GameObject Parent = null;
+		public GameObject parent;
 
 		/// <summary>
 		/// The panel on which the <see cref="ChartMarker" />s are instantiated.
 		/// </summary>
 		[Header("For resizing and minimizing")]
-		public RectTransform DataPanel;
+		public RectTransform dataPanel;
 
 		/// <summary>
 		/// The panel on which the buttons and scales of the chart are displayed.
 		/// </summary>
-		public RectTransform LabelsPanel;
+		public RectTransform labelsPanel;
 
 		/// <summary>
 		/// Contains all keys contained in any <see cref="GameObject" /> of <see cref="_dataObjects" />.
@@ -89,7 +89,7 @@ namespace Assets.SEECity.Charts.Scripts
 
 		private void Start()
 		{
-			InvokeRepeating("DrawData", 0.5f, 5f);
+			InvokeRepeating(nameof(DrawData), 0.5f, 5f);
 		}
 
 		/// <summary>
@@ -171,48 +171,49 @@ namespace Assets.SEECity.Charts.Scripts
 
 			AddMarkers(toDraw, minX, maxX, minY, maxY);
 
-			_minX.text = minX.ToString("0.00");
-			_maxX.text = maxX.ToString("0.00");
-			_minY.text = minY.ToString("0.00");
-			_maxY.text = maxY.ToString("0.00");
+			this.minX.text = minX.ToString("0.00");
+			this.maxX.text = maxX.ToString("0.00");
+			this.minY.text = minY.ToString("0.00");
+			this.maxY.text = maxY.ToString("0.00");
 		}
 
 		/// <summary>
 		/// Adds new markers to the chart and removes the old ones.
 		/// </summary>
 		/// <param name="toDraw">The markers to add to the chart.</param>
-		/// <param name="minX">The minimum value on the x-axis.</param>
-		/// <param name="maxX">The maximum value on the x-axis.</param>
-		/// <param name="minY">The minimum value on the y-axis.</param>
-		/// <param name="maxY">The maximum value on the y-axis.</param>
-		private void AddMarkers(List<GameObject> toDraw, float minX, float maxX, float minY,
-			float maxY)
+		/// <param name="minimumX">The minimum value on the x-axis.</param>
+		/// <param name="maximumX">The maximum value on the x-axis.</param>
+		/// <param name="minimumY">The minimum value on the y-axis.</param>
+		/// <param name="maximumY">The maximum value on the y-axis.</param>
+		private void AddMarkers(List<GameObject> toDraw, float minimumX, float maximumX,
+			float minimumY, float maximumY)
 		{
 			List<GameObject> updatedMarkers = new List<GameObject>();
-			float width = DataPanel.rect.width / (maxX - minX);
-			float height = DataPanel.rect.height / (maxY - minY);
+			float width = dataPanel.rect.width / (maximumX - minimumX);
+			float height = dataPanel.rect.height / (maximumY - minimumY);
 
 
 			foreach (GameObject data in toDraw)
 			{
-				GameObject marker = Instantiate(_markerPrefab, _entries.transform);
+				GameObject marker = Instantiate(markerPrefab, entries.transform);
 				ChartMarker script = marker.GetComponent<ChartMarker>();
-				script.LinkedObject = data;
+				script.linkedObject = data;
 				data.GetComponent<NodeRef>().node
 					.TryGetNumeric(AxisDropdownX.Value, out float valueX);
 				data.GetComponent<NodeRef>().node
 					.TryGetNumeric(AxisDropdownY.Value, out float valueY);
-				script.SetInfoText("Linked to: " + script.LinkedObject.name + "\nX: " +
+				script.SetInfoText("Linked to: " + script.linkedObject.name + "\nX: " +
 				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("0.00"));
 				marker.GetComponent<RectTransform>().anchoredPosition = new Vector2(
-					(valueX - minX) * width, (valueY - minY) * height);
+					(valueX - minimumX) * width, (valueY - minimumY) * height);
 				updatedMarkers.Add(marker);
 				foreach (GameObject oldMarker in _activeMarkers)
 				{
 					ChartMarker oldScript = oldMarker.GetComponent<ChartMarker>();
-					if (oldScript.LinkedObject.GetInstanceID() == data.GetInstanceID() &&
+					if (oldScript.linkedObject.GetInstanceID() == data.GetInstanceID() &&
 					    oldScript.TimedHighlight != null)
-						script.TriggerTimedHighlight(_chartManager.HighlightDuration - oldScript.HighlightTime);
+						script.TriggerTimedHighlight(
+							_chartManager.highlightDuration - oldScript.HighlightTime);
 				}
 			}
 
@@ -228,7 +229,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// <param name="direction">True if min lies below max, false if not.</param>
 		public void AreaSelection(Vector2 min, Vector2 max, bool direction)
 		{
-			float highlightDuration = _chartManager.HighlightDuration;
+			float highlightDuration = _chartManager.highlightDuration;
 			if (direction)
 				foreach (GameObject marker in _activeMarkers)
 				{
@@ -252,7 +253,7 @@ namespace Assets.SEECity.Charts.Scripts
 		/// </summary>
 		public void Destroy()
 		{
-			Destroy(Parent);
+			Destroy(parent);
 		}
 	}
 }
