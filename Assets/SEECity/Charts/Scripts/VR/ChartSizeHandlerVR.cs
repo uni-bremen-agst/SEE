@@ -10,7 +10,7 @@ namespace SEECity.Charts.Scripts.VR
 		private GameObject _physicalOpen;
 		private GameObject _physicalClosed;
 		private float _dropdownThickness = 100f;
-		private float _physicalClosedPosition;
+		private float _physicalClosedPosition = 0.4575f * 600f;
 
 		protected override void Awake()
 		{
@@ -23,6 +23,12 @@ namespace SEECity.Charts.Scripts.VR
 
 		public override void OnDrag(PointerEventData eventData)
 		{
+            RectTransform pos = GetComponent<RectTransform>();
+            Vector3 oldPos = pos.position;
+            pos.position = eventData.pointerCurrentRaycast.worldPosition;
+            pos.anchoredPosition3D = new Vector3(pos.anchoredPosition.x, pos.anchoredPosition.y, 0);
+            if (pos.anchoredPosition.x < _minimumSize || pos.anchoredPosition.y < _minimumSize) pos.position = oldPos;
+            ChangeSize(pos.anchoredPosition.x, pos.anchoredPosition.y);
 		}
 
 		protected override void ChangeSize(float width, float height)
@@ -30,6 +36,8 @@ namespace SEECity.Charts.Scripts.VR
 			base.ChangeSize(width, height);
 			_virtualRealityCanvas.sizeDelta =
 				new Vector2(width + _dropdownThickness, height + _dropdownThickness);
+            _physicalOpen.transform.localScale = new Vector2(width / 600f, height / 600f);
+            _physicalClosed.transform.localPosition = new Vector2(width / _physicalClosedPosition, -(height / _physicalClosedPosition));
 			//TODO: Change Physical Open Size and move Physical closed.
 		}
 	}

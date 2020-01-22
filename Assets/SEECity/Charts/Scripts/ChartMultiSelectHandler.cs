@@ -17,7 +17,7 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// Needed for access to <see cref="ChartContent.AreaSelection" />.
 		/// </summary>
-		private ChartContent _chartContent;
+		protected ChartContent _chartContent;
 
 		/// <summary>
 		/// The position the user started the drag at.
