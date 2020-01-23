@@ -20,6 +20,15 @@ namespace SEE.DataModel
         [SerializeField]
         private List<Edge> edges = new List<Edge>();
 
+        // The (view) name of the graph.
+        [SerializeField]
+        private string viewName = "";
+
+        // The path of the file from which this graph was loaded. Could be the
+        /// empty string if the graph was not created by loading it from disk.
+        [SerializeField]
+        private string path = "";
+
         /// Adds a node to the graph. 
         /// Preconditions:
         ///   (1) node must not be null
@@ -45,6 +54,26 @@ namespace SEE.DataModel
         }
 
         /// <summary>
+        /// Returns true of this graph contains a node with the same unique linkname
+        /// as the given node.
+        /// Throws an exception if node is null or node has no valid linkname.
+        /// </summary>
+        /// <param name="node">node to be checked for containment</param>
+        /// <returns>true iff there is a node contained in the graph with node.LinkName</returns>
+        public bool Contains(Node node)
+        {
+            if (node == null)
+            {
+                throw new System.Exception("node must not be null");
+            }
+            if (String.IsNullOrEmpty(node.LinkName))
+            {
+                throw new System.Exception("linkname of a node must neither be null nor empty");
+            }
+            return nodes.ContainsKey(node.LinkName);
+        }
+
+        /// <summary>
         /// Adds a non-hierarchical edge to the graph.
         /// Precondition: edge must not be null.
         /// </summary>
@@ -63,14 +92,6 @@ namespace SEE.DataModel
         /// </summary>
         public int EdgeCount => edges.Count;
 
-        //private void Awake()
-        //{
-        //    Debug.Log("Graph " + name + " with " + NodeCount + " nodes and " + EdgeCount + " edges.\n");
-        //}
-
-        [SerializeField]
-        private string viewName = "";
-
         /// <summary>
         /// Name of the graph (the view name of the underlying RFG).
         /// </summary>
@@ -80,12 +101,9 @@ namespace SEE.DataModel
             set => viewName = value;
         }
 
-        [SerializeField]
-        private string path = "";
-
         /// <summary>
         /// The path of the file from which this graph was loaded. Could be the
-        /// empty string if the graph was created by loading it from disk.
+        /// empty string if the graph was not created by loading it from disk.
         /// </summary>
         public string Path
         {
@@ -142,15 +160,6 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// Returns the game object representing the graph in the scene.
-        /// </summary>
-        /// <returns>game object representing the graph in the scene</returns>
-        //public GameObject GetGraph()
-        //{
-        //    return this.gameObject;
-        //}
-
-        /// <summary>
         /// Dumps the hierarchy for each root. Used for debugging.
         /// </summary>
         internal void DumpTree()
@@ -194,20 +203,8 @@ namespace SEE.DataModel
         /// </summary>
         public void Destroy()
         {
-            // FIXME
-            //foreach (Edge edge in edges)
-            //{
-            //    Destroyer.DestroyGameObject(edge.gameObject);
-            //}
             edges.Clear();
-            // FIXME
-            //foreach (Node node in nodes.Values)
-            //{
-            //    Destroyer.DestroyGameObject(node.gameObject);
-            //}
             nodes.Clear();
-            // FIXME
-            //Destroyer.DestroyGameObject(this.gameObject);
         }
 
         /// <summary>
@@ -306,6 +303,106 @@ namespace SEE.DataModel
             foreach (Node root in GetRoots())
             {
                 root.SetLevel(0);
+            }
+        }
+
+        /// <summary>
+        /// Creates deep copies of attributes where necessary. Is called by
+        /// Clone() once the copy is created. Must be extended by every 
+        /// subclass that adds fields that should be cloned, too.
+        /// 
+        /// IMPORTANT NOTE: Cloning a graph means to create deep copies of
+        /// its node and children, too. The hierarchy will be isomporph.
+        /// </summary>
+        /// <param name="clone">the clone receiving the copied attributes</param>
+        protected override void HandleCloned(object clone)
+        {
+            base.HandleCloned(clone);
+            Graph target = (Graph)clone;
+            target.viewName = this.viewName;
+            target.path = this.path;
+            target.nodes = CopyNodes(this.nodes);
+            target.edges = CopyEdges(this.edges);
+            CopyHierarchy(this, target);
+        }
+
+        private StringNodeDictionary CopyNodes(StringNodeDictionary nodes)
+        {
+            StringNodeDictionary result = new StringNodeDictionary();
+            foreach (var entry in nodes)
+            {
+                result.Add(entry.Key, (Node)entry.Value.Clone());
+            }
+            return result;
+        }
+
+        private List<Edge> CopyEdges(List<Edge> edges)
+        {
+            List<Edge> result = new List<Edge>();
+            foreach (Edge edge in edges)
+            {
+                Edge clone = (Edge)edge.Clone();
+                // set corresponding source
+                if (TryGetNode(edge.Source.LinkName, out Node source))
+                {
+                    clone.Source = source;
+                }
+                else
+                {
+                    throw new Exception("target graph does not have a node with linkname " + edge.Source.LinkName);
+                }
+                // set corresponding target
+                if (TryGetNode(edge.Target.LinkName, out Node target))
+                {
+                    clone.Target = target;
+                }
+                else
+                {
+                    throw new Exception("target graph does not have a node with linkname " + edge.Target.LinkName);
+                }
+                result.Add(clone);
+            }
+            return result;
+        }
+
+        private static void CopyHierarchy(Graph fromGraph, Graph toGraph)
+        {
+            foreach (Node fromRoot in fromGraph.GetRoots())
+            {
+                if (toGraph.TryGetNode(fromRoot.LinkName, out Node toRoot))
+                {
+                    CopyHierarchy(fromRoot, toRoot, toGraph);
+                }
+                else
+                {
+                    throw new Exception("target graph does not have a node with linkname " + fromRoot.LinkName);
+                }
+            }
+            toGraph.CalculateLevels();
+        }
+
+        /// <summary>
+        /// Adds the children to toParent corresponding to the children of fromParent in toGraph.
+        /// </summary>
+        /// <param name="fromParent">a parent node in the original graph</param>
+        /// <param name="toParent">a parent node in copied graph (toGraph) whose children are to be added</param>
+        /// <param name="toGraph">the graph copy containing toParent and its children</param>
+        private static void CopyHierarchy(Node fromParent, Node toParent, Graph toGraph)
+        {
+            foreach (Node fromChild in fromParent.Children())
+            {
+                // Get the node in toGraph corresponding to fromChild.
+                if (toGraph.TryGetNode(fromChild.LinkName, out Node toChild))
+                {
+                    // fromChild is a parent of fromParent and
+                    // toChild must become a child of toParent
+                    toParent.AddChild(toChild);
+                    CopyHierarchy(fromChild, toChild, toGraph);
+                }
+                else
+                {
+                    throw new Exception("target graph does not have a node with linkname " + fromChild.LinkName);
+                }
             }
         }
     }

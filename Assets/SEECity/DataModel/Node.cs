@@ -10,8 +10,12 @@ namespace SEE.DataModel
     [System.Serializable]
     public class Node : GraphElement
     {
-        // Important note: Nodes should be created only by calling Graph.newNode().
-        // Do not use 'new Node()'.
+        // IMPORTANT NOTES:
+        //
+        // If you use Clone() to create a copy of a node, be aware that the clone
+        // will have a deep copy of all attributes and the type of the node only.
+        // The hierarchy information (parent, children, level) is not copied at all.
+        // The clone will appear as a node without parent and children at level 0.
 
         /// <summary>
         /// The attribute name for unique identifiers (within a graph).
@@ -134,13 +138,16 @@ namespace SEE.DataModel
             return result;
         }
 
+        /// <summary>
+        /// The list of immediate children of this node in the hierarchy.
+        /// </summary>
         [SerializeField]
         private List<Node> children = new List<Node>();
 
         /// <summary>
-        /// The number of descendants of this node.
+        /// The number of immediate children of this node in the hierarchy.
         /// </summary>
-        /// <returns>number of descendants</returns>
+        /// <returns>number of immediate children</returns>
         public int NumberOfChildren()
         {
             return children.Count;
@@ -248,6 +255,27 @@ namespace SEE.DataModel
         public bool IsLeaf()
         {
             return children.Count == 0;
+        }
+
+        /// <summary>
+        /// Creates deep copies of attributes where necessary. Is called by
+        /// Clone() once the copy is created. Must be extended by every 
+        /// subclass that adds fields that should be cloned, too.
+        /// 
+        /// IMPORTANT NOTE: Cloning a node means only to create copy of its
+        /// type and attributes. The hierarchy information (parent, level,
+        /// and children) are not copied. Instead the copy will become a 
+        /// node without parent and children at level 0. If we copied the
+        /// hierarchy information, the hierarchy were no longer a forrest.
+        /// </summary>
+        /// <param name="clone">the clone receiving the copied attributes</param>
+        protected override void HandleCloned(object clone)
+        {
+            base.HandleCloned(clone);
+            Node target = (Node)clone;
+            target.parent = null;
+            target.level = 0;
+            target.children = new List<Node>();
         }
     }
 }
