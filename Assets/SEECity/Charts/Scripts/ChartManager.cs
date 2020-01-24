@@ -68,9 +68,9 @@ namespace SEECity.Charts.Scripts
 
 		[Header("Prefabs"), SerializeField] private GameObject chartsPrefab;
 
-		[SerializeField] private GameObject nonVRCamera;
+		[SerializeField] private GameObject[] nonVrObjects;
 
-		[SerializeField] private GameObject[] virtualRealityObjects;
+		[SerializeField] private GameObject[] vrObjects;
 
 		public Sprite maximizedSprite;
 
@@ -98,12 +98,12 @@ namespace SEECity.Charts.Scripts
 			_isVirtualReality = XRDevice.isPresent;
 			if (!_isVirtualReality)
 			{
-				foreach (GameObject vrObject in virtualRealityObjects) Destroy(vrObject);
+				foreach (GameObject vrObject in vrObjects) Destroy(vrObject);
 				Instantiate(chartsPrefab);
 			}
 			else
 			{
-				Destroy(nonVRCamera);
+				foreach (GameObject nonVrObject in nonVrObjects) Destroy(nonVrObject);
 			}
 		}
 
