@@ -6,7 +6,7 @@ namespace SEECity.Charts.Scripts
 	/// <summary>
 	/// Handles the resizing of charts.
 	/// </summary>
-	public class ChartSizeHandler : MonoBehaviour, IDragHandler
+	public class ChartSizeHandler : MonoBehaviour, IDragHandler, IPointerUpHandler
 	{
 		/// <summary>
 		/// Contains some settings used in this script.
@@ -74,6 +74,11 @@ namespace SEECity.Charts.Scripts
 			ChangeSize(pos.anchoredPosition.x, pos.anchoredPosition.y);
 		}
 
+		public void OnPointerUp(PointerEventData eventData)
+		{
+			_chartContent.DrawData(false);
+		}
+
 		/// <summary>
 		/// Changes the width and height of the chart.
 		/// </summary>
@@ -100,7 +105,7 @@ namespace SEECity.Charts.Scripts
 			bottomLeft.localPosition = new Vector2(-width / 2, -height / 2);
 			dragButton.localPosition = bottomRight.localPosition - new Vector3(25f, -25f);
 
-			_chartContent.DrawData();
+			_chartContent.DrawData(false);
 		}
 	}
 }
