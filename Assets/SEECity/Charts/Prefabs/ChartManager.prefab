@@ -47,7 +47,7 @@ MonoBehaviour:
   cameraDistance: 40
   moveWithRotation: 1
   cameraFlightTime: 0.5
-  minimumSize: 400
+  minimumSize: 300
   clickDelay: 0.5
   dragDelay: 0.2
   buildingHighlightMaterial: {fileID: 2100000, guid: 9d631e931375b5242b8903c497a12c74,
@@ -66,8 +66,8 @@ MonoBehaviour:
     needsReinit: 0
   chartsPrefab: {fileID: 753839275229978629, guid: 87467f28fd5c34148a88077659a86497,
     type: 3}
-  nonVRCamera: {fileID: 0}
-  virtualRealityObjects: []
+  nonVrObjects: []
+  vrObjects: []
   maximizedSprite: {fileID: 21300000, guid: 3dd8a1777d7c2dd4f9faf31f3a995232, type: 3}
   minimizedSprite: {fileID: 21300000, guid: 582af9fbe4fe81b4680058a1f0485806, type: 3}
   highlightOutlineAnim: 0.001

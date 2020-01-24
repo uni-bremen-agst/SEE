@@ -55,7 +55,7 @@ namespace SEECity.Charts.Scripts
 		public void ChangeValue()
 		{
 			Value = _dropdown.options[_dropdown.value].text;
-			_chartContent.DrawData();
+			_chartContent.DrawData(true);
 		}
 	}
 }

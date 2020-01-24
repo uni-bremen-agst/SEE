@@ -114,9 +114,12 @@ namespace SEECity.Charts.Scripts.VR
 
 		public override void OnDrag(PointerEventData eventData)
 		{
-			_parent.position = eventData.pointerCurrentRaycast.worldPosition -
-			                   (transform.position - (_parent.position + _chartOffset)) -
-			                   _chartOffset;
+			if (eventData.pointerCurrentRaycast.worldPosition != Vector3.zero)
+			{
+				_parent.position = eventData.pointerCurrentRaycast.worldPosition -
+								   (transform.position - (_parent.position + _chartOffset)) -
+								   _chartOffset;
+			}
 		}
 
 		protected override void ToggleMinimize()

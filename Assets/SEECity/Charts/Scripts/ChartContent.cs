@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using SEE.DataModel;
 using SEE.Layout;
 using TMPro;
 using UnityEngine;
@@ -89,7 +91,7 @@ namespace SEECity.Charts.Scripts
 
 		private void Start()
 		{
-			InvokeRepeating(nameof(DrawData), 0.5f, 5f);
+			InvokeRepeating(nameof(CallDrawData), 0.2f, 10f);
 		}
 
 		/// <summary>
@@ -121,45 +123,67 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private void FindDataObjects()
 		{
-			_dataObjects = GameObject.FindGameObjectsWithTag("Building");
+			GameObject[] buildings = GameObject.FindGameObjectsWithTag("Building");
+			GameObject[] nodes = GameObject.FindGameObjectsWithTag("Node");
+			GameObject[] combined = new GameObject[buildings.Length + nodes.Length];
+			Array.Copy(buildings, combined, buildings.Length);
+			Array.Copy(nodes, 0, combined, buildings.Length, nodes.Length);
+			_dataObjects = combined;
+		}
+
+		/// <summary>
+		/// Since <see cref="InvokeRepeating"/> does not support calls with parameter, it calls this method to do the work.
+		/// </summary>
+		private void CallDrawData()
+		{
+			DrawData(true);
 		}
 
 		/// <summary>
 		/// Fills the chart with data depending on the values of <see cref="AxisDropdownX" /> and
 		/// <see cref="AxisDropdownY" />.
 		/// </summary>
-		public void DrawData()
+		public void DrawData(bool needData)
 		{
-			FindDataObjects();
+			if (needData)
+			{
+				FindDataObjects();
+			}
 
 			int i = 0;
-			bool contained = _dataObjects[i].GetComponent<NodeRef>().node
-				.TryGetNumeric(AxisDropdownX.Value, out float minX);
+			Node node = _dataObjects[i].GetComponent<NodeRef>().node;
+			bool contained = node.TryGetNumeric(AxisDropdownX.Value, out float minX);
 			while (!contained)
-				contained = _dataObjects[i].GetComponent<NodeRef>().node
-					.TryGetNumeric(AxisDropdownX.Value, out minX);
+			{
+				i++;
+				node = _dataObjects[i].GetComponent<NodeRef>().node;
+				contained = node.TryGetNumeric(AxisDropdownX.Value, out minX);
+			}
 			float maxX = minX;
-			contained = _dataObjects[0].GetComponent<NodeRef>().node
-				.TryGetNumeric(AxisDropdownY.Value, out float minY);
+			i = 0;
+			node = _dataObjects[i].GetComponent<NodeRef>().node;
+			contained = node.TryGetNumeric(AxisDropdownY.Value, out float minY);
 			while (!contained)
-				contained = _dataObjects[0].GetComponent<NodeRef>().node
-					.TryGetNumeric(AxisDropdownY.Value, out minY);
+			{
+				i++;
+				node = _dataObjects[i].GetComponent<NodeRef>().node;
+				contained = node.TryGetNumeric(AxisDropdownY.Value, out minY);
+			}
 			float maxY = minY;
 			List<GameObject> toDraw = new List<GameObject>();
 			foreach (GameObject data in _dataObjects)
 			{
+				node = data.GetComponent<NodeRef>().node;
 				bool inX = false;
 				bool inY = false;
-				if (data.GetComponent<NodeRef>().node
-					.TryGetNumeric(AxisDropdownX.Value, out float tempX))
+				if (node.TryGetNumeric(AxisDropdownX.Value, out float tempX))
 				{
 					if (tempX < minX) minX = tempX;
 					if (tempX > maxX) maxX = tempX;
 					inX = true;
 				}
 
-				if (data.GetComponent<NodeRef>().node
-					.TryGetNumeric(AxisDropdownY.Value, out float tempY))
+				if (node.TryGetNumeric(AxisDropdownY.Value, out float tempY))
 				{
 					if (tempY > maxY) maxY = tempY;
 					if (tempY < minY) minY = tempY;
@@ -198,12 +222,11 @@ namespace SEECity.Charts.Scripts
 				GameObject marker = Instantiate(markerPrefab, entries.transform);
 				ChartMarker script = marker.GetComponent<ChartMarker>();
 				script.linkedObject = data;
-				data.GetComponent<NodeRef>().node
-					.TryGetNumeric(AxisDropdownX.Value, out float valueX);
-				data.GetComponent<NodeRef>().node
-					.TryGetNumeric(AxisDropdownY.Value, out float valueY);
-				script.SetInfoText("Linked to: " + script.linkedObject.name + "\nX: " +
-				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("0.00"));
+				Node node = data.GetComponent<NodeRef>().node;
+				node.TryGetNumeric(AxisDropdownX.Value, out float valueX);
+				node.TryGetNumeric(AxisDropdownY.Value, out float valueY);
+				string type = node.IsLeaf() ? "Building" : "Node";
+				script.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " + valueX.ToString("0.00") + ", Y: " + valueY.ToString("0.00"));
 				marker.GetComponent<RectTransform>().anchoredPosition = new Vector2(
 					(valueX - minimumX) * width, (valueY - minimumY) * height);
 				updatedMarkers.Add(marker);

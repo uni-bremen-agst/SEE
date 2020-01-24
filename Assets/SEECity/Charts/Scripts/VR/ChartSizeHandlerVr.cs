@@ -23,12 +23,15 @@ namespace SEECity.Charts.Scripts.VR
 
 		public override void OnDrag(PointerEventData eventData)
 		{
-            RectTransform pos = GetComponent<RectTransform>();
-            Vector3 oldPos = pos.position;
-            pos.position = eventData.pointerCurrentRaycast.worldPosition;
-            pos.anchoredPosition3D = new Vector3(pos.anchoredPosition.x, pos.anchoredPosition.y, 0);
-            if (pos.anchoredPosition.x < _minimumSize || pos.anchoredPosition.y < _minimumSize) pos.position = oldPos;
-            ChangeSize(pos.anchoredPosition.x, pos.anchoredPosition.y);
+			if (eventData.pointerCurrentRaycast.worldPosition != Vector3.zero)
+			{
+				RectTransform pos = GetComponent<RectTransform>();
+				Vector3 oldPos = pos.position;
+				pos.position = eventData.pointerCurrentRaycast.worldPosition;
+				pos.anchoredPosition3D = new Vector3(pos.anchoredPosition.x, pos.anchoredPosition.y, 0);
+				if (pos.anchoredPosition.x < _minimumSize || pos.anchoredPosition.y < _minimumSize) pos.position = oldPos;
+				ChangeSize(pos.anchoredPosition.x, pos.anchoredPosition.y);
+			}
 		}
 
 		protected override void ChangeSize(float width, float height)
@@ -38,7 +41,6 @@ namespace SEECity.Charts.Scripts.VR
 				new Vector2(width + _dropdownThickness, height + _dropdownThickness);
             _physicalOpen.transform.localScale = new Vector2(width / 600f, height / 600f);
             _physicalClosed.transform.localPosition = new Vector2(width / _physicalClosedPosition, -(height / _physicalClosedPosition));
-			//TODO: Change Physical Open Size and move Physical closed.
 		}
 	}
 }
