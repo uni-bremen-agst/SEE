@@ -1,13 +1,14 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SEECity.Charts.Scripts.VR
 {
-	public class ChartPosition : MonoBehaviour
+	public class ChartPositionVr : MonoBehaviour
 	{
 		private ChartManager _chartManager;
 
-		[SerializeField] private Transform _camera;
+		[SerializeField] private Transform cameraTransform;
 
 		private float _distanceThreshold;
 
@@ -27,7 +28,7 @@ namespace SEECity.Charts.Scripts.VR
 
 		private void Update()
 		{
-			if (Vector3.Distance(transform.position, _camera.position) > _distanceThreshold)
+			if (Vector3.Distance(transform.position, cameraTransform.position) > _distanceThreshold)
 			{
 				if (_movingChart != null) StopCoroutine(_movingChart);
 				_movingChart = StartCoroutine(MoveChart());
@@ -39,7 +40,7 @@ namespace SEECity.Charts.Scripts.VR
 			Vector3 startPosition = transform.position;
 			for (float time = 0f; time < 1f; time += Time.deltaTime)
 			{
-				transform.position = Vector3.Lerp(startPosition, _camera.position, time);
+				transform.position = Vector3.Lerp(startPosition, cameraTransform.position, time);
 				yield return new WaitForEndOfFrame();
 			}
 
