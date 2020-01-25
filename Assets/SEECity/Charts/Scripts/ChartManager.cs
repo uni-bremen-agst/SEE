@@ -9,6 +9,9 @@ namespace SEECity.Charts.Scripts
 	/// </summary>
 	public class ChartManager : MonoBehaviour
 	{
+		/// <summary>
+		/// The instance of the <see cref="ChartManager" />, to ensure there will be only one.
+		/// </summary>
 		private static ChartManager _instance;
 
 		/// <summary>
@@ -39,6 +42,9 @@ namespace SEECity.Charts.Scripts
 		[Header("User Inputs"), Range(0.1f, 1f)]
 		public float clickDelay = 0.5f;
 
+		/// <summary>
+		/// The minimum time for a drag to be recognized as a drag and not a click.
+		/// </summary>
 		[Range(0.1f, 1f)] public float dragDelay = 0.2f;
 
 		/// <summary>
@@ -51,6 +57,9 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		[SerializeField] private float highlightOutline = 0.005f;
 
+		/// <summary>
+		/// The time an object will be highlighted for.
+		/// </summary>
 		public float highlightDuration = 5f;
 
 		/// <summary>
@@ -58,22 +67,61 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private bool _isVirtualReality;
 
+		/// <summary>
+		/// The length of the pointer attached to the controller.
+		/// </summary>
 		[Header("Virtual Reality")] public float pointerLength = 5f;
+
+		/// <summary>
+		/// The speed at which charts will be moved in or out when the player scrolls.
+		/// </summary>
 		public float chartScrollSpeed = 10f;
+
+		/// <summary>
+		/// The minimum distance between the players head and the <see cref="GameObject" /> the charts are
+		/// attached to to trigger it to follow the players head.
+		/// </summary>
 		public float distanceThreshold = 0.5f;
 
+		/// <summary>
+		/// The input source for controlling charts in VR.
+		/// </summary>
 		public SteamVR_Input_Sources source = SteamVR_Input_Sources.RightHand;
+
+		/// <summary>
+		/// The action boolean assigned to interacting with canvases in VR.
+		/// </summary>
 		public SteamVR_Action_Boolean click;
+
+		/// <summary>
+		/// Contains the scrolling information for moving charts in or out.
+		/// </summary>
 		public SteamVR_Action_Vector2 moveInOut;
 
+		/// <summary>
+		/// The canvas setup for charts that is used in non VR.
+		/// </summary>
 		[Header("Prefabs"), SerializeField] private GameObject chartsPrefab;
 
+		/// <summary>
+		/// All objects in the scene that are used by the non VR representation of charts before the game
+		/// starts.
+		/// </summary>
 		[SerializeField] private GameObject[] nonVrObjects;
 
+		/// <summary>
+		/// All objects in the scene that are used by the VR representation of charts before the game starts.
+		/// </summary>
 		[SerializeField] private GameObject[] vrObjects;
 
+		/// <summary>
+		/// The sprite for the drag button when the chart is maximized.
+		/// </summary>
 		public Sprite maximizedSprite;
 
+		/// <summary>
+		/// The sprite for the drag button when the chart is minimized.
+		/// </summary>
 		public Sprite minimizedSprite;
 
 		/// <summary>
@@ -84,7 +132,7 @@ namespace SEECity.Charts.Scripts
 		private float highlightOutlineAnim = 0.001f;
 
 		/// <summary>
-		/// Enforces singleton pattern.
+		/// Enforces the singleton pattern.
 		/// </summary>
 		private void Awake()
 		{
@@ -93,6 +141,9 @@ namespace SEECity.Charts.Scripts
 			else if (_instance == this) Destroy(gameObject);
 		}
 
+		/// <summary>
+		/// Checks if the scene is started in VR and initializes it accordingly.
+		/// </summary>
 		private void Start()
 		{
 			_isVirtualReality = XRDevice.isPresent;

@@ -82,7 +82,7 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// A text popup containing useful information about the marker and its <see cref="linkedObject" />.
 		/// </summary>
-		[Header("Other"), SerializeField] private TextMeshProUGUI _infoText;
+		[Header("Other"), SerializeField] private TextMeshProUGUI infoText;
 
 		/// <summary>
 		/// Calls methods for initialization.
@@ -107,6 +107,9 @@ namespace SEECity.Charts.Scripts
 			_buildingHighlightMaterial = _chartManager.buildingHighlightMaterial;
 		}
 
+		/// <summary>
+		/// Adds the time that passed since the last <see cref="Update" /> to the <see cref="HighlightTime" />.
+		/// </summary>
 		private void Update()
 		{
 			if (TimedHighlight != null) HighlightTime += Time.deltaTime;
@@ -203,7 +206,10 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private void ShowLinkedObject()
 		{
-			_activeCamera = Camera.main; //TODO: Change to active camera and not just main camera.
+			_activeCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+			//TODO: Change to active camera and not just main camera.
+			Vector3 cameraPos = _activeCamera.transform.position;
+
 			if (_moveWithRotation)
 			{
 				if (_cameraMoving != null)
@@ -212,11 +218,9 @@ namespace SEECity.Charts.Scripts
 					_cameraMoving = null;
 				}
 
-				Vector3 lookPos =
-					linkedObject.transform.position - _activeCamera.transform.position;
+				Vector3 lookPos = linkedObject.transform.position - cameraPos;
 				_cameraMoving = StartCoroutine(MoveCameraTo(
-					Vector3.MoveTowards(_activeCamera.transform.position,
-						linkedObject.transform.position,
+					Vector3.MoveTowards(cameraPos, linkedObject.transform.position,
 						lookPos.magnitude - _cameraDistance), Quaternion.LookRotation(lookPos)));
 			}
 			else
@@ -227,10 +231,10 @@ namespace SEECity.Charts.Scripts
 					_cameraMoving = null;
 				}
 
-				_cameraMoving = StartCoroutine(MoveCameraTo(new Vector3(
-					linkedObject.transform.position.x,
-					_activeCamera.transform.position.y,
-					linkedObject.transform.position.z - _cameraDistance)));
+				Vector3 pos = linkedObject.transform.position;
+				_cameraMoving =
+					StartCoroutine(MoveCameraTo(new Vector3(pos.x, cameraPos.y,
+						pos.z - _cameraDistance)));
 			}
 		}
 
@@ -280,30 +284,30 @@ namespace SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Changes the <see cref="_infoText" /> of this marker.
+		/// Changes the <see cref="infoText" /> of this marker.
 		/// </summary>
 		/// <param name="info">The new text.</param>
 		public void SetInfoText(string info)
 		{
-			_infoText.text = info;
+			infoText.text = info;
 		}
 
 		/// <summary>
-		/// Activates the <see cref="_infoText" />.
+		/// Activates the <see cref="infoText" />.
 		/// </summary>
 		/// <param name="eventData"></param>
 		public void OnPointerEnter(PointerEventData eventData)
 		{
-			_infoText.gameObject.SetActive(true);
+			infoText.gameObject.SetActive(true);
 		}
 
 		/// <summary>
-		/// Deactivates the <see cref="_infoText" />.
+		/// Deactivates the <see cref="infoText" />.
 		/// </summary>
 		/// <param name="eventData"></param>
 		public void OnPointerExit(PointerEventData eventData)
 		{
-			_infoText.gameObject.SetActive(false);
+			infoText.gameObject.SetActive(false);
 		}
 
 		/// <summary>

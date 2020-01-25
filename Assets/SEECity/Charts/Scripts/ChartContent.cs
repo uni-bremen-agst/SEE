@@ -89,6 +89,9 @@ namespace SEECity.Charts.Scripts
 			GetAllIntegers();
 		}
 
+		/// <summary>
+		/// Makes the chart refresh every 10 seconds.
+		/// </summary>
 		private void Start()
 		{
 			InvokeRepeating(nameof(CallDrawData), 0.2f, 10f);
@@ -132,7 +135,8 @@ namespace SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Since <see cref="InvokeRepeating"/> does not support calls with parameter, it calls this method to do the work.
+		/// Since <see cref="InvokeRepeating" /> does not support calls with parameter, it calls this method to
+		/// do the work.
 		/// </summary>
 		private void CallDrawData()
 		{
@@ -145,10 +149,7 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		public void DrawData(bool needData)
 		{
-			if (needData)
-			{
-				FindDataObjects();
-			}
+			if (needData) FindDataObjects();
 
 			int i = 0;
 			Node node = _dataObjects[i].GetComponent<NodeRef>().node;
@@ -159,6 +160,7 @@ namespace SEECity.Charts.Scripts
 				node = _dataObjects[i].GetComponent<NodeRef>().node;
 				contained = node.TryGetNumeric(AxisDropdownX.Value, out minX);
 			}
+
 			float maxX = minX;
 			i = 0;
 			node = _dataObjects[i].GetComponent<NodeRef>().node;
@@ -169,6 +171,7 @@ namespace SEECity.Charts.Scripts
 				node = _dataObjects[i].GetComponent<NodeRef>().node;
 				contained = node.TryGetNumeric(AxisDropdownY.Value, out minY);
 			}
+
 			float maxY = minY;
 			List<GameObject> toDraw = new List<GameObject>();
 			foreach (GameObject data in _dataObjects)
@@ -226,7 +229,8 @@ namespace SEECity.Charts.Scripts
 				node.TryGetNumeric(AxisDropdownX.Value, out float valueX);
 				node.TryGetNumeric(AxisDropdownY.Value, out float valueY);
 				string type = node.IsLeaf() ? "Building" : "Node";
-				script.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " + valueX.ToString("0.00") + ", Y: " + valueY.ToString("0.00"));
+				script.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
+				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("0.00"));
 				marker.GetComponent<RectTransform>().anchoredPosition = new Vector2(
 					(valueX - minimumX) * width, (valueY - minimumY) * height);
 				updatedMarkers.Add(marker);

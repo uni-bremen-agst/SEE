@@ -23,6 +23,9 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		[SerializeField] private GameObject chartCreator;
 
+		/// <summary>
+		/// Assigns attributes.
+		/// </summary>
 		private void Awake()
 		{
 			_flyCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<FlyCamera>();
