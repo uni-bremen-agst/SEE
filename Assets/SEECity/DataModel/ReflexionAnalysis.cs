@@ -808,7 +808,7 @@ namespace SEE.DataModel
         // runs reflexion analysis from scratch, i.e., non-incrementally
         private void from_scratch(string name)
         {
-            _reflexion = new Graph();
+            _reflexion = (Graph)_architecture.Clone();
             Reset();
             RegisterNodes();
             calculate_convergences_and_divergences();
@@ -892,12 +892,35 @@ namespace SEE.DataModel
             // FIXME
         }
 
+        /// <summary>
+        /// Returns propagated dependency in architecture graph matching the type of
+        /// of the implementation dependency Edge exactly;
+        /// returns null if none can be found.
+        /// Precondition: From and To are two architecture entities in architecture
+        /// view onto which the implementation dependency of type Its_Type is
+        /// to be propagated.
+        /// Postcondition: resulting edge is in architecture or null
+        /// </summary>
+        /// <param name="source">source node of propagated dependency in architecture</param>
+        /// <param name="target">target node of propagated dependency in architecture</param>
+        /// <param name="its_type">the edge type of the propagated dependency</param>
+        /// <returns>the propagated edge in the architecture graph between source and target
+        /// with given type</returns>
         private Edge get_propagated_dependency(
             Node source, // source of edge; must be in architecture
             Node target, // target of edge; must be in architecture
             string its_type) // the edge type that must match exactly
         {
-            return null; // FIXME
+            List<Edge> connectings = source.from_to(target, its_type);
+
+            foreach (Edge edge in connectings)
+            {
+                if (!is_specified(edge))
+                {
+                    return edge;
+                }
+            }
+            return null;
         }
 
         private bool must_be_propagated(Edge implementation_dep)
@@ -905,8 +928,12 @@ namespace SEE.DataModel
             return false; // FIXME
         }
 
-        // propagates and lifts dependency edge from dependencies to architecture
-        // Precondition: implementation_dep is in implementation
+
+        /// <summary>
+        /// Propagates and lifts dependency edge from implementation to architecture graph.
+        /// Precondition: implementation_dep is in implementation.
+        /// </summary>
+        /// <param name="implementation_dep">the implementation edge to be propagated</param>
         private void propagate_and_lift_dependency(Edge implementation_dep)
         {
 #if DEBUG
@@ -920,6 +947,7 @@ namespace SEE.DataModel
 
             Node arch_source = maps_to(impl_source);
             Node arch_target = maps_to(impl_target);
+            // Assert: arch_source and arch_target are in architecture or null
 
             if (arch_source == null || arch_target == null)
             {
@@ -927,16 +955,19 @@ namespace SEE.DataModel
                 return; 
             }
             Edge architecture_dep = get_propagated_dependency(arch_source, arch_target, impl_type);
+            // Assert: architecture_dep is in architecture graph or null.
             Edge allowing_edge = null;
             if (architecture_dep == null)
             {   // has not existed yet
                 architecture_dep
                   = new_impl_dep_in_architecture
                       (arch_source, arch_target, impl_type, ref allowing_edge);
+                // Assert: architecture_dep is in architecture graph
             }
             else
             {
-                int impl_counter = get_impl_counter();
+                int impl_counter = get_impl_counter(implementation_dep);
+                // Assert: architecture_dep.Source and architecture_dep.Target are in architecture.
                 lift(architecture_dep.Source,
                      architecture_dep.Target,
                      impl_type,
@@ -955,10 +986,15 @@ namespace SEE.DataModel
             // FIXME
         }
 
-        // returns the node upon which 'node' is mapped;
-        // if 'node' is not mapped, NULL is returned.
-        // Precondition: node is in implementation.
-        // Postcondition: either result is null or result is in architecture
+
+        /// <summary>
+        /// Returns the architecture node upon which 'node' is mapped;
+        /// if 'node' is not mapped, NULL is returned.
+        /// Precondition: node is in implementation.
+        /// Postcondition: either result is null or result is in architecture
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns>Returns the architecture node upon which </returns>
         private Node maps_to(Node node)
         {
             return _explicit_maps_to_table[node];
@@ -988,14 +1024,22 @@ namespace SEE.DataModel
             return ancestor == target;
         }
 
-        // Creates and returns a new edge of type its_type from 'from' to 'to' in 'view'.
-        // use this function for source dependencies; otherwise use Insert below;
-        // source dependencies are a special case because there may be two
-        // equivalent source dependencies between the same node pair: one
-        // specified and one propagated.
+
+        /// <summary>
+        /// Creates and returns a new edge of type its_type from 'from' to 'to' in give 'graph'.
+        /// Use this function for source dependencies; otherwise use Insert below.
+        /// Source dependencies are a special case because there may be two
+        /// equivalent source dependencies between the same node pair: one
+        /// specified and one propagated.
+        /// </summary>
+        /// <param name="from">the source of the edge</param>
+        /// <param name="to">the target of the edge</param>
+        /// <param name="its_type">the type of the edge</param>
+        /// <param name="graph">the graph in which to add the new edge</param>
+        /// <returns>the new edge</returns>
         Edge add (Node from, Node to, string its_type, Graph graph)
         {
-            // there may be a specified as well as a propagated edge between the
+            // Note: there may be a specified as well as a propagated edge between the
             // same two architectural entities; hence, we may have multiple edges
             // in between
 
@@ -1013,26 +1057,44 @@ namespace SEE.DataModel
             return result;
         }
 
-        // Adds a propagated dependency to architecture corresponding to the
-        // implementation dependency implementation_dep from dependencies.
-        // This procedure adds a new dependency between the two nodes upon which
-        // source and target of implementation_dep are mapped to in the architecture of
-        // exactly the type of implementation_dep and the appropriate counter
-        // of implementation_dep.
-        // Assumption: the corresponding entities in the architecture exist
-        // (the maps-to targets); once the new implementation_dep is added,
-        // it is lifted.
-        // Returns the newly created dependency propagated to architecture view.
+        /// <summary>
+        /// Adds a propagated dependency to the architecture graph corresponding to the
+        /// from arch_source to arch_target with given edge type. This edge is lifted
+        /// to an allowing specified architecture dependency if there is one (if that
+        /// is the case the specified architecture dependency allowing this implementation
+        /// dependency is returned in the output parameter allowing_edge_out. The state
+        /// of the allowing specified architecture dependency is set to convergent if 
+        /// such an edge exists. Likewise, the state of the propagated dependency is
+        /// set to either allowed, implicitly_allowed, or divergent.
+        /// 
+        /// Preconditions:
+        /// (1) there is no propagated edge from arch_source to arch_target with the given edge_type yet
+        /// (2) the corresponding entities in the architecture exist
+        /// (the maps-to targets); once the new implementation_dep is added,
+        /// it is lifted.
+        /// (3) arch_source and arch_target are in architecture.
+        /// Postcondition: the newly created and returned dependency is contained in
+        /// the architecture graph and marked as propagated.
+        /// </summary>
+        /// <param name="arch_source">architecture node that is the source of the propagated edge</param>
+        /// <param name="arch_target">architecture node that is the target of the propagated edge</param>
+        /// <param name="edge_type">type of the propagated implementation edge</param>
+        /// <param name="allowing_edge_out">the specified architecture dependency allowing the implementation
+        /// dependency if there is one; otherwise null</param>
+        /// <returns>a new propagated dependency in the architecture graph</returns>
         private Edge new_impl_dep_in_architecture(Node arch_source,
                                                   Node arch_target,
-                                                  string impl_edge_type,
+                                                  string edge_type,
                                                   ref Edge allowing_edge_out)
         {
             int new_counter = get_impl_counter();
-            Edge architecture_dep = add(arch_source, arch_target, impl_edge_type, _reflexion);
-
+            Edge architecture_dep = add(arch_source, arch_target, edge_type, _architecture);
             set_counter(architecture_dep, new_counter);
-            if (lift(arch_source, arch_target, impl_edge_type, new_counter, ref allowing_edge_out))
+            // TODO: Mark architecture_dep as propagated. Or maybe that is not necessary at all
+            // because we have the edge state from which we can derive whether an edge is specified
+            // or propagated.
+
+            if (lift(arch_source, arch_target, edge_type, new_counter, ref allowing_edge_out))
             {
                 set_initial(architecture_dep, State.allowed);
             }
@@ -1048,8 +1110,21 @@ namespace SEE.DataModel
             return architecture_dep;
         }
 
-        // returns true if a matching architecture dependency is found, also
-        // sets allowing_edge_out to that edge in that case
+        /// <summary>
+        /// Returns true if a matching architecture dependency is found, also
+        /// sets allowing_edge_out to that edge in that case. If no such matchitng
+        /// edge is found, false is returned and allowing_edge_out is null.
+        /// Precondition: from and to are in the architecture graph.
+        /// Postcondition: allowing_edge_out is a specified dependency in architecture graph or null.
+        /// </summary>
+        /// <param name="from">source of the edge</param>
+        /// <param name="to">target of the edge</param>
+        /// <param name="edge_type">type of the edge</param>
+        /// <param name="counter">the multiplicity of the edge, i.e. the number of other
+        /// edges covered by it</param>
+        /// <param name="allowing_edge_out">the specified architecture dependency allowing the implementation
+        /// dependency if there is any; otherwise null</param>
+        /// <returns></returns>
         private bool lift(Node from,
                           Node to,
                           string edge_type,
@@ -1057,7 +1132,52 @@ namespace SEE.DataModel
                           ref Edge allowing_edge_out)
 
         {
-            return false; // FIXME
+            List<Node> parents = ascendants(to);
+            // Assert: all parents are in architecture
+            Node cursor = from;
+            // Assert: cursor is in architecture
+#if DEBUG
+            Debug.Log("lift: lift an edge from "
+                + qualified_node_name(from, true)
+                + " to "
+                + qualified_node_name(to, true)
+                + " of type "
+                + edge_type
+                + " and counter value "
+                + counter
+                + "\n");
+
+            Debug.Log("parents(to):\n");
+            dump_node_set(parents);
+#endif
+
+            while (cursor != null)
+            {
+#if DEBUG
+                Debug.Log("cursor: " + qualified_node_name(cursor, false) + "\n");
+#endif
+                List<Edge> outs = cursor.Outgoings();
+                // Assert: all edges in outs are in architecture.
+                foreach (Edge edge in outs)
+                { 
+                    // Assert: edge is in architecture
+                    if (is_specified(edge)
+                        && edge.has_supertype_of(edge_type)
+                        && parents.Contains(edge.Target))
+                    {   // matching architecture dependency found
+                        change_architecture_dependency(edge, counter);
+                        allowing_edge_out = edge;
+                        return true;
+                    }
+                }
+                cursor = get_parent(cursor);
+            }
+            // no matching architecture dependency found
+#if DEBUG
+            Debug.Log("lift: no matching architecture dependency found" + "\n";
+#endif
+            allowing_edge_out = null;
+            return false;
         }
 
         // adds all children of 'mapped_node' to 'result_view' and adds the
