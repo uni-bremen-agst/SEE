@@ -47,40 +47,22 @@ namespace SEE.DataModel
 
     public class Reflexion
     {
-        //
-        // @param rfg   the RFG for the reflexion analysis is to be calculated
-        // @param arch  the architecture view
-        // @param deps  the dependency view
-        // @param hier  the hierarchy view
-        // @param map   the mapping view
-        // @param name  the name of the resulting reflexion view
-        // @param root_type  the root of the type hierarchy to be checked, NULL
-        //                   for the traditional default (Source_Dependency)
-        // @param edge_type_for_tansitive_mapping_targets
-        //              Mapping targets for nodes reachable by a sequence
-        //              of edges of this type are also considered as possible
-        //              mapping targets.
-        // @param declaration_forwarding
-        //              Use advanced logic for resolving
-        //              of declaration mapping targets.
-        public Reflexion(Graph dg,
-                         Graph arch,
-                         Graph map,
-                         string name,
-                         string root_edge_type)
+        /// <summary>
+        /// Constructor for setting up and running the reflexion analysis.
+        /// </summary>
+        /// <param name="implementation">the implementation graph</param>
+        /// <param name="architecture">the architecture model</param>
+        /// <param name="mapping">the mapping of implementation nodes onto architecture nodes</param>
+        public Reflexion(Graph implementation,
+                         Graph architecture,
+                         Graph mapping)
         {
-            _implementation = dg;
-            _architecture = arch;
-            _mapping = map;
-            _reflexion = null;
-            register_attributes();
+            _implementation = implementation;
+            _architecture = architecture;
+            _mapping = mapping;
             RegisterNodes();
-            //add_parents(_hierarchy); // this must be called before all other methods
-            //add_parents(_architecture);
             add_transitive_mapping();
-            from_scratch(name);
-            // dump resulting reflexion (debugging)
-            // dump_view(graph, reflexion);
+            from_scratch();
         }
 
         // Cleans up architecture view by removing the reflexion-specific
@@ -94,36 +76,159 @@ namespace SEE.DataModel
         { }
 
         // --------------------------------------------------------------------
-        //                      reflexion edge information
+        // State edge attribute
         // --------------------------------------------------------------------
+
+        /// <summary>
+        /// State of a dependency in the architecture or implementation within the 
+        /// reflexion model.
+        /// </summary>
         public enum State
         {
-            undefined = 0, // initial undefined state
-            allowed = 1, // propagated edge towards a convergence
-            divergent = 2, // divergence
-            absent = 3, // absence
-            convergent = 4, // convergence
+            undefined = 0,          // initial undefined state
+            allowed = 1,            // propagated edge towards a convergence
+            divergent = 2,          // divergence
+            absent = 3,             // absence
+            convergent = 4,         // convergence
             implicitly_allowed = 5, // self-usage is always implicitly allowed
-            allowed_absent = 6 // absence, but is_optional attribute set
+            allowed_absent = 6,     // absence, but is_optional attribute set
+            specified = 7           // tags an architecture edge that was created by the architect, i.e., is a specified edge
         };
 
+        /// <summary>
+        /// Name of the edge attribute for the state of a dependency.
+        /// </summary>
+        private const string state_attribute = "Reflexion.State";
 
-        // @param edge  an edge in the reflexion view
-        // @return  the state of 'edge' in the reflexion view
-        // precondition: edge must be in the reflexion view
-        //
+        /// <summary>
+        /// Returns the state of an architecture dependency.
+        /// Precondition: edge must be in the architecture graph.
+        /// </summary>
+        /// <param name="edge">a dependency in the architecture</param>
+        /// <returns>the state of 'edge' in the architecture</returns>
         public State get_state(Edge edge)
         {
-            return State.undefined;  // FIXME
+            if (edge.TryGetInt(state_attribute, out int value))
+            {
+                return (State)value;
+            }
+            else
+            {
+                return State.undefined;
+            }
         }
 
-        // @param edge  an edge in the reflexion view
-        // @return  the counter of 'edge' in the reflexion view
-        // precondition: edge must be in the reflexion view
+        /// <summary>
+        /// Returns true if edge is a specified edge in the architecture (has state 'specified').
+        /// Precondition: edge must be in the architecture graph.
+        /// </summary>
+        /// <param name="edge">architecture dependency</param>
+        /// <returns>true if edge is a specified architecture dependency</returns>
+        private bool is_specified(Edge edge)
+        {
+            return get_state(edge) == State.specified;
+        }
+
+        // --------------------------------------------------------------------
+        // Edge counter attribute
+        // --------------------------------------------------------------------
+
+        /// <summary>
+        /// Name of the edge attribute for the counter of a dependency.
+        /// </summary>
+        private const string counter_attribute = "Reflexion.Counter";
+
+        /// <summary>
+        /// Sets counter of given architecture dependency to given value.
+        /// Precondition: edge is in the architecture graph.
+        /// </summary>
+        /// <param name="edge">an architecture dependency whose counter is to be set</param>
+        /// <param name="value">value to be set</param>
+        private void set_counter(Edge edge, int value)
+        {
+            edge.SetInt(counter_attribute, value);
+        }
+
+        /// <summary>
+        /// Adds value to the counter attribute of given edge. The value may be negative.
+        /// Precondition: edge is in the architecture graph.
+        /// </summary>
+        /// <param name="edge">an architecture dependency whose counter is to be changed</param>
+        /// <param name="value">value to be added</param>
+        private void change_counter(Edge edge, int value)
+        {
+            if (edge.TryGetInt(counter_attribute, out int oldValue))
+            {
+                edge.SetInt(counter_attribute, oldValue + value);
+            }
+            else
+            {
+                edge.SetInt(counter_attribute, value);
+            }
+        }
+
+        /// <summary>
+        /// Returns the the counter of given architecture dependency 'edge'.
+        /// Precondition: edge is in the architecture graph.
+        /// </summary>
+        /// <param name="edge">an architecture dependency whose counter is to be retrieved</param>
+        /// <returns>the counter of 'edge'</returns>
         public int get_counter(Edge edge)
         {
-            return 0;  // FIXME
+            if (edge.TryGetInt(counter_attribute, out int value))
+            {
+                return value;
+            }
+            else
+            {
+                return 0;
+            }
         }
+
+        /// <summary>
+        /// Increases counter of edge by value (may be negative).
+        /// If its counter drops to zero, the edge is removed.
+        /// Notifies if edge's state changes.
+        /// Precondition: edge is a dependency in architecture graph that
+        /// was propagated from the implementation graph (i.e., !is_specified(edge)).
+        /// </summary>
+        /// <param name="edge">propagated dependency in architecture graph</param>
+        /// <param name="value">value to be added</param>
+        private void change_impl_ref(Edge edge, int value)
+        {
+            int old_value = get_counter(edge);
+            int new_value = old_value + value;
+
+            if (new_value == 0)
+            {
+                if (get_state(edge) == State.divergent)
+                {
+                    transition(edge, State.divergent, State.undefined);
+                }
+                // we can drop this edge; it is no longer needed
+                _architecture.RemoveEdge(edge);
+            }
+            else
+            {
+                set_counter(edge, new_value);
+            }
+        }
+
+        /// <summary>
+        /// Returns the value of the counter attribute of an implementation dependency.
+        /// Currently, always 1 is returned.
+        /// Precondition: edge is in the implementation graph.
+        /// </summary>
+        /// <param name="edge">an architecture dependency whose counter is to be retrieved</param>
+        /// <returns>value of the counter attribute of given implementation dependency</returns>
+        private int get_impl_counter(Edge edge = null)
+        {
+            // returns the value of the counter attribute of edge
+            // at present, dependencies extracted from the source
+            // do not have an edge counter; therefore, we return just 1
+            return 1;
+        }
+
         // --------------------------------------------------------------------
         //                      context information
         // --------------------------------------------------------------------
@@ -412,88 +517,88 @@ namespace SEE.DataModel
             }
         }
 
-        // --------------------------------------------------------------------
-        //                           private section
-        // --------------------------------------------------------------------
+        // *****************************************
+        // involved graphs
+        // *****************************************
 
-        // The following attributes provide a context for incremental reflexion analysis.
-        // A context defines the views involved in the analysis: architecture, hierarchy,
-        // dependencies, mapping, reflexion result. The reflexion result is
-        // created and updated by the incremental reflexion analysis based on
-        // the content of the other views.
-
-        // the RFG containing the views below
+        /// <summary>
+        /// The graph representing the implementation.
+        /// </summary>
         private Graph _implementation;
 
-        // *****************************************
-        // involved views
-        // *****************************************
-
-        // architecture view containing the specified architecture model
+        /// <summary>
+        /// The graph representing the specified architecture model.
+        /// </summary>
         private Graph _architecture;
-        // hierarchy where the part-of relation is specified for the implementation model
-        // private View _hierarchy;
-        // the view that specified the implementation entities and their dependencies
-        // private View _dependencies;
-        // the view describing the mapping of implementation entities onto architecture entities
+
+        /// <summary>
+        /// The graph describing the mapping of implementation entities onto architecture entities.
+        /// </summary>
         private Graph _mapping;
-        // the result of the reflexion analysis derived from the above views
-        private Graph _reflexion;
 
         // ******************************************************************
         // node mappings from node linknames onto nodes in the various graphs
         // ******************************************************************
 
+        /// <summary>
+        /// Mapping of linknames onto nodes in the implementation graph.
+        /// </summary>
         private SerializableDictionary<string, Node> InImplementation;
+        /// <summary>
+        /// Mapping of linknames onto nodes in the architecture graph.
+        /// </summary>
         private SerializableDictionary<string, Node> InArchitecture;
+        /// <summary>
+        /// Mapping of linknames onto nodes in the mapping graph.
+        /// </summary>
         private SerializableDictionary<string, Node> InMapping;
 
         // *****************************************
-        // nodes and edge types; cached for performance reasons
-        // *****************************************
-        private string _source_dependency;
-
-        // initializes the caching attributes for node and edge types
-        // @param root_type - user specified root type for the check, NULL for
-        //                    the traditional default (Source_Dependency)
-        // @edge_type_for_tansitive_mapping_targets
-        //                   - Edge type for additional mapping targets
-        private void set_node_and_edge_types(string root_type,
-                             string edge_type_for_transitive_mapping)
-        {
-            // FIXME
-        }
-
-        // *****************************************
-        // parents
+        // Node hierarchy
         // *****************************************
 
-        // contains the parent of a node according to hierarchy; we
-        // are caching this information from hierarchy because it is
-        // relatively expensive to compute
-        private SerializableDictionary<Node, Node> _parent;
-
-        // yields the parent of node in hierarchy or NULL if it has no parent
+        /// <summary>
+        /// Yields the parent of node in hierarchy or null if it has no parent.
+        /// Works for all nodes in all graphs. The parent returned is in the same
+        /// graph where the given node is contained.
+        /// </summary>
+        /// <param name="node">node whose parent is to be retrieved</param>
+        /// <returns>parent node or null</returns>
         private Node get_parent(Node node)
         {
-            return null; // FIXME
+            return node.Parent;
         }
 
-        // yields the set of all transitive parents of node in hierarchy
-        // including node itself
+        /// <summary>
+        /// Yields the set of all transitive parents of node in hierarchy
+        /// including node itself
+        /// </summary>
+        /// <param name="node">node whose ascendants are to be retrieved</param>
+        /// <returns>ascendants of node in the hierarchy including node itself</returns>
         private List<Node> ascendants(Node node)
         {
-            return null; // FIXME
+            List<Node> result = new List<Node>();
+            Node cursor = node;
+            while (cursor != null)
+            {
+                result.Add(cursor);
+                cursor = cursor.Parent;
+            }
+            return result;
         }
 
         // ********************************************************************************
-        // predicates for nodes and edges from dependencies relevant for reflexion analysis
+        // predicates for nodes and edges from implementation relevant for reflexion analysis
         // ********************************************************************************
 
-        // If false, source_node will be ignored in the analysis.
-        // Artificial nodes, template instances, and nodes with ambiguous definitions
-        // are to be ignored.
-        // Precondition: source_node is node in dependencies
+        /// <summary>
+        /// Returns false for given node if it should be ignored in the reflexion analysis.
+        /// For instance, artificial nodes, template instances, and nodes with ambiguous definitions
+        /// are to be ignored.
+        /// Precondition: source_node is node in implementation graph.
+        /// </summary>
+        /// <param name="source_node">implementation node</param>
+        /// <returns>true if node should be considered in the reflexion analysis</returns>
         private bool is_relevant(Node source_node)
         {
             return true;
@@ -518,34 +623,47 @@ namespace SEE.DataModel
             //}
         }
 
-        // If false, source_edge will be ignored in the analysis.
-        // Artificial edges and edges for which at least one end is an irrelevant node
+        /// <summary>
+        /// Returns false for given edge if it should be ignored in the reflexion analysis.
+        /// For instance, artificial edges and edges for which at least one end is an irrelevant node
         // are to be ignored.
-        // Precondition: source_node is node in dependencies
+        /// Precondition: source_edge is node in implementation graph.
+        /// </summary>
+        /// <param name="source_edge">implementation dependency</param>
+        /// <returns>true if edge should be considered in the reflexion analysis</returns>
         private bool is_relevant(Edge source_edge)
         {
-            return true;
-            // FIXME: For the time being, we consider every node to be relevant.
+            return is_relevant(source_edge.Source) && is_relevant(source_edge.Target);
+            // FIXME: For the time being, we consider every edge to be relevant.
         }
 
         // *****************************************
         // mapping
         // *****************************************
 
-        // The explicit mapping as derived from _mapping; as opposed to _mapping,
-        // the implicit mapping for each entity in _dependencies.
-        // Note: key is a node in implementation and target a node in architecture
+        /// <summary>
+        /// The implicit mapping as derived from _explicit_maps_to_table.
+        /// Note: the mapping key is a node in implementation and the mapping value a node in architecture
+        /// </summary>
         private SerializableDictionary<Node, Node> _implicit_maps_to_table;
 
-        // The explicit mapping for each entity in _dependencies; this is exactly the content
-        // of the mapping view.
-        // Note: key is a node in implementation and target a node in architecture
+        /// <summary>
+        /// The explicit mapping from implementation nodes onto architecture nodes
+        /// as derived from the mappings graph. This is equivalent to the content
+        /// of the mapping graph where the corresponding nodes of the implementation
+        /// (source of a mapping) and architecture (target of a mapping) are used-
+        /// The correspondence of nodes between these three graphs is established
+        /// by way of the unique Linkage.Name attribute.
+        /// Note: key is a node in the implementation and target a node in the 
+        /// architecture graph.
+        /// </summary>
         private SerializableDictionary<Node, Node> _explicit_maps_to_table;
 
-        // creates the transitive closure for the mapping view so that we
-        // know immediately where an implementation entity is mapped to;
-        // the result is stored in _map_to_table
-        //
+        /// <summary>
+        /// Creates the transitive closure for the mapping so that we
+        /// know immediately where an implementation entity is mapped to.
+        /// The result is stored in _explicit_maps_to_table and _implicit_maps_to_table.
+        /// </summary>
         private void add_transitive_mapping()
         {
             // Because add_subtree_to_implicit_map() will check whether a node is a 
@@ -583,19 +701,29 @@ namespace SEE.DataModel
 #endif
         }
 
-        // true if node is explicitly mapped
-        // Precondition: node is a node of the implementation graph
+        /// <summary>
+        /// Returns true if node is explicitly mapped, that is, contained in _explicit_maps_to_table
+        /// as a key.
+        /// Precondition: node is a node of the implementation graph
+        /// </summary>
+        /// <param name="node">implementation node</param>
+        /// <returns>true if node is explicitly mapped</returns>
         private bool is_mapper(Node node)
         {
             return _explicit_maps_to_table.ContainsKey(node);
         }
 
-        // adds all descendants of 'root' in _hierarchy that are implicitly
-        // mapped onto the same target as 'root' to the implicit mapping table
-        // and maps them to 'target'
-        // Preconditions:
-        // (1) root is a node in implementation
-        // (2) target is a node in architecture
+        /// <summary>
+        /// Adds all descendants of 'root' in the implementation that are implicitly
+        /// mapped onto the same target as 'root' to the implicit mapping table
+        /// _implicit_maps_to_table and maps them onto 'target'. This function recurses
+        /// into all subtrees unless the root of a subtree is an explicitly mapped node.
+        /// Preconditions:
+        /// (1) root is a node in implementation
+        /// (2) target is a node in architecture
+        /// </summary>
+        /// <param name="root">implementation node that is the root of a subtree to be mapped implicitly</param>
+        /// <param name="target">architecture node that is the target of the implicit mapping</param>
         private void add_subtree_to_implicit_map(Node root, Node target)
         {
             List<Node> children = root.Children();
@@ -661,80 +789,6 @@ namespace SEE.DataModel
         //{
         //    // FIXME
         //}
-
-        // true if edge is a specified edge in the architecture
-        private bool is_specified(Edge edge) 
-        {
-            return false; // FIXME
-        }
-
-        // *****************************************
-        // edge attributes
-        // *****************************************
-
-        // the number of edges causing a given derived edge
-        private /* Attr_Key */ string _causing_edge_counter_attribute;
-        // the state of an edge (absent, convergent, allowed, divergent, etc.)
-        private /* Attr_Key */ string _edge_state_attribute;
-        // these are attributes indicating that am edge should be ignored
-        // in the reflexion analysis:
-        private /* Attr_Key */ string _edge_is_artificial_attribute;
-
-        private /* Attr_Key */ string _edge_no_declaration_forwarding;
-
-        // *****************************************
-        // node attributes
-        // *****************************************
-        // these are attributes indicating that a node should be ignored
-        // in the reflexion analysis
-        private /* Attr_Key */ string _node_is_artificial_attribute;
-        private /* Attr_Key */ string _node_is_inherited_attribute;
-        private /* Attr_Key */ string _node_is_template_instance_attribute;
-        private /* Attr_Key */ string _node_has_ambiguous_definition_attribute;
-
-        private /* Attr_Key */ string _node_is_definition_attribute;
-
-        // registers all required attributes
-        private void register_attributes()
-        {
-            // FIXME
-        }
-
-        // attributes of architecture dependencies
-
-        // *****************************************
-        // counter
-        // *****************************************
-
-        // sets counter of edge to value
-        private void set_counter(Edge edge, int value)
-        {
-            // FIXME
-        }
-        // Note: get_counter() is public
-
-        // adds value to the counter attribute of edge;
-        // value may be negative
-        private void change_counter(Edge edge, int value)
-        {
-            // FIXME
-        }
-
-        // attributes of implementation dependencies
-
-        // returns the value of the counter attribute of edge
-        private int get_impl_counter(Edge edge = null) 
-        {
-            // returns the value of the counter attribute of edge
-            // at present, dependencies extracted from the source
-            // do not have an edge counter; therefore, we return just 1
-            return 1;
-        }
-
-        private void change_impl_ref(Edge edge, int value)
-        {
-            // FIXME
-        }
 
         // Adds value to counter of edge and transforms its state.
         // Notifies if edge state changes.
@@ -805,10 +859,12 @@ namespace SEE.DataModel
         // analysis steps
         // *****************************************
 
-        // runs reflexion analysis from scratch, i.e., non-incrementally
-        private void from_scratch(string name)
+        /// <summary>
+        /// Runs reflexion analysis from scratch, i.e., non-incrementally.
+        /// </summary>
+        private void from_scratch()
         {
-            _reflexion = (Graph)_architecture.Clone();
+            // _reflexion = (Graph)_architecture.Clone();
             Reset();
             RegisterNodes();
             calculate_convergences_and_divergences();
@@ -816,22 +872,61 @@ namespace SEE.DataModel
         }
 
         /// <summary>
+        /// Resets architecture and implementation markings.
+        /// </summary>
+        private void Reset()
+        {
+            ResetArchitecture();
+            ResetImplementation();
+        }
+
+        /// <summary>
+        /// The state of all architectural dependencies will be set to 'undefined'
+        /// and their counters be set to zero again. Propagated dependencies are
+        /// removed.
+        /// </summary>
+        private void ResetArchitecture()
+        {
+            foreach (Edge edge in _architecture.Edges())
+            {
+                // TODO/FIXME: We should also remove all propagated dependencies.
+                set_state(edge, State.undefined);
+                set_counter(edge, 0); // FIXME: do architecture edges have counters at all?
+            }
+        }
+
+        /// <summary>
+        /// The state of all implementation dependencies will be set to 'undefined'.
+        /// </summary>
+        private void ResetImplementation()
+        {
+            foreach (Edge edge in _implementation.Edges())
+            {
+                set_state(edge, State.undefined);
+                //set_counter(edge, 0); // FIXME: do implementation edges have counters at all?
+            }
+        }
+
+        /// <summary>
         /// Registers all nodes of all graphs under their linkname in the respective mappings.
         /// </summary>
         private void RegisterNodes()
         {
+            // Mapping of linknames onto nodes in the implementation graph.
             InImplementation = new SerializableDictionary<string, Node>();
             foreach (Node n in _implementation.Nodes())
             {
                 InImplementation[n.LinkName] = n;
             }
 
+            // Mapping of linknames onto nodes in the architecture graph.
             InArchitecture = new SerializableDictionary<string, Node>();
             foreach (Node n in _architecture.Nodes())
             {
                 InArchitecture[n.LinkName] = n;
             }
 
+            // Mapping of linknames onto nodes in the mapping graph.
             InMapping = new SerializableDictionary<string, Node>();
             foreach (Node n in _mapping.Nodes())
             {
@@ -839,35 +934,9 @@ namespace SEE.DataModel
             }
         }
 
-        // resets architecture and implementation markings
-        private void Reset()
-        {
-            ResetArchitecture();
-            ResetImplementation();
-        }
-
-        // the state of all architectural dependencies will be
-        // set to 'undefined'
-        private void ResetArchitecture()
-        {
-            foreach (Edge edge in _architecture.Edges())
-            {
-                set_state(edge, State.undefined);
-                set_counter(edge, 0); // FIXME: do architecture edges have counters at all?
-            }
-        }
-
-        // resets the counter of all source dependencies in reflexion to 0
-        private void ResetImplementation()
-        {
-            foreach (Edge edge in _implementation.Edges())
-            {
-                set_state(edge, State.undefined);
-                set_counter(edge, 0); // FIXME: do implementation edges have counters at all?
-            }
-        }
-
-        // calculates convergences and divergences non-incrementally
+        /// <summary>
+        /// Calculates convergences and divergences non-incrementally.
+        /// </summary>
         private void calculate_convergences_and_divergences()
         {
             // Iterate on all nodes in the range of implicit_maps_to_table

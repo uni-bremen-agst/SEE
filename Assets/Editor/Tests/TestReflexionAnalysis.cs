@@ -55,7 +55,7 @@ namespace SEE.DataModel
         public void TestMinilax()
         {
             LoadAll("minilax");
-            reflexion = new Reflexion(impl, arch, mapping, "Reflexion", "Source_Dependency");
+            reflexion = new Reflexion(impl, arch, mapping);
             reflexion.dump_results();
         }
 
