@@ -83,6 +83,15 @@ namespace SEE.DataModel
         }
 
         /// <summary>
+        /// Removes the given edge from the graph.
+        /// </summary>
+        /// <param name="edge">edge to be removed</param>
+        public void RemoveEdge(Edge edge)
+        {
+            edges.Remove(edge);
+        }
+
+        /// <summary>
         /// The number of nodes of the graph.
         /// </summary>
         public int NodeCount => nodes.Count;
