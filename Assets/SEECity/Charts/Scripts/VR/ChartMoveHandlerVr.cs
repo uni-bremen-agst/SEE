@@ -37,7 +37,7 @@ namespace SEECity.Charts.Scripts.VR
 		private float _maximumDistance;
 
 		/// <summary>
-		/// The speed to charts with when scrolling.
+		/// The speed at which charts will be moved in or out when the player scrolls.
 		/// </summary>
 		private float _chartScrollSpeed;
 
@@ -72,13 +72,16 @@ namespace SEECity.Charts.Scripts.VR
 			_physicalClosed = _chartContent.physicalClosed;
 		}
 
+		/// <summary>
+		/// Links the <see cref="ChartManager" /> and gets its setting data.
+		/// </summary>
 		protected override void GetSettingData()
 		{
 			base.GetSettingData();
 			_chartScrollSpeed = ChartManager.chartScrollSpeed;
 			_source = ChartManager.source;
 			_moveInOut = ChartManager.moveInOut;
-			//minDist
+			//TODO: minDist
 			_maximumDistance = ChartManager.pointerLength;
 		}
 
@@ -115,11 +118,9 @@ namespace SEECity.Charts.Scripts.VR
 		public override void OnDrag(PointerEventData eventData)
 		{
 			if (eventData.pointerCurrentRaycast.worldPosition != Vector3.zero)
-			{
 				_parent.position = eventData.pointerCurrentRaycast.worldPosition -
-								   (transform.position - (_parent.position + _chartOffset)) -
-								   _chartOffset;
-			}
+				                   (transform.position - (_parent.position + _chartOffset)) -
+				                   _chartOffset;
 		}
 
 		protected override void ToggleMinimize()

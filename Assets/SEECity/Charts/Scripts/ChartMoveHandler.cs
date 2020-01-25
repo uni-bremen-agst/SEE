@@ -46,19 +46,23 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		protected bool Minimized;
 
+		/// <summary>
+		/// The sprite for the drag button when the chart is maximized.
+		/// </summary>
 		private Sprite _maximizedSprite;
 
+		/// <summary>
+		/// The sprite for the drag button when the chart is minimized.
+		/// </summary>
 		private Sprite _minimizedSprite;
 
 		/// <summary>
-		/// The TODO: Comment
+		/// The button to resize the chart with. Needs to be minimized too.
 		/// </summary>
 		[SerializeField] protected GameObject sizeButton;
 
 		/// <summary>
-		/// Links the <see cref="Scripts.ChartManager" /> and initializes some values and settings with the
-		/// values from
-		/// the <see cref="ChartManager" />.
+		/// Links the <see cref="Scripts.ChartManager" /> and initializes attributes.
 		/// </summary>
 		protected virtual void Awake()
 		{

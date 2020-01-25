@@ -42,6 +42,9 @@ namespace SEECity.Charts.Scripts
 			Value = _dropdown.options[0].text;
 		}
 
+		/// <summary>
+		/// Adds all metrics contained in the chart to the dropdown.
+		/// </summary>
 		private void GetKeys()
 		{
 			_dropdown.ClearOptions();

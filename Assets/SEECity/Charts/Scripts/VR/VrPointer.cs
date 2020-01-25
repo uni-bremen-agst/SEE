@@ -8,15 +8,39 @@ namespace SEECity.Charts.Scripts.VR
 	/// </summary>
 	public class VrPointer : MonoBehaviour
 	{
+		/// <summary>
+		/// Contains some settings used in this script.
+		/// </summary>
 		private ChartManager _chartManager;
 
+		/// <summary>
+		/// The length of the pointer attached to the controller.
+		/// </summary>
 		private float _pointerLength;
+
+		/// <summary>
+		/// Renders the line visualizing the pointer.
+		/// </summary>
 		private LineRenderer _lineRenderer;
+
+		/// <summary>
+		/// TODO
+		/// </summary>
 		private VrInputModule _inputModule;
+
+		/// <summary>
+		/// Visualizes the position at which the line of the pointer hits a target.
+		/// </summary>
 		[SerializeField] private GameObject hitDot;
 
+		/// <summary>
+		/// Attached to the players controller to create raycasts from it.
+		/// </summary>
 		public Camera Camera { get; private set; }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		private void Awake()
 		{
 			GetSettingData();
@@ -25,6 +49,9 @@ namespace SEECity.Charts.Scripts.VR
 			_lineRenderer = GetComponent<LineRenderer>();
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		private void Start()
 		{
 			_inputModule = GameObject.FindGameObjectWithTag("VREventSystem")
@@ -41,11 +68,17 @@ namespace SEECity.Charts.Scripts.VR
 			_pointerLength = _chartManager.pointerLength;
 		}
 
+		/// <summary>
+		/// Update is called once per frame.
+		/// </summary>
 		private void Update()
 		{
 			UpdateLine();
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		private void UpdateLine()
 		{
 			PointerEventData data = _inputModule.EventData;
@@ -61,6 +94,10 @@ namespace SEECity.Charts.Scripts.VR
 			_lineRenderer.SetPosition(1, hitPosition);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
+		/// <returns></returns>
 		private RaycastHit CreateRaycast()
 		{
 			Ray ray = new Ray(transform.position, transform.forward);

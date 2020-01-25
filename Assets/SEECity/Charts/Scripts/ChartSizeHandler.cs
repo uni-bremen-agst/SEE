@@ -6,7 +6,7 @@ namespace SEECity.Charts.Scripts
 	/// <summary>
 	/// Handles the resizing of charts.
 	/// </summary>
-	public class ChartSizeHandler : MonoBehaviour, IDragHandler, IPointerUpHandler
+	public class ChartSizeHandler : MonoBehaviour, IDragHandler
 	{
 		/// <summary>
 		/// Contains some settings used in this script.
@@ -16,7 +16,7 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// The minimum size a chart can have for width and height.
 		/// </summary>
-		protected int _minimumSize;
+		protected int MinimumSize;
 
 		/// <summary>
 		/// The objects that have to be moved individually when resizing the chart.
@@ -45,8 +45,9 @@ namespace SEECity.Charts.Scripts
 		protected virtual void Awake()
 		{
 			GetSettingData();
-			_chartContent = transform.parent.GetComponent<ChartContent>();
-			Chart = transform.parent.GetComponent<RectTransform>();
+			Transform parent = transform.parent;
+			_chartContent = parent.GetComponent<ChartContent>();
+			Chart = parent.GetComponent<RectTransform>();
 		}
 
 		/// <summary>
@@ -56,7 +57,7 @@ namespace SEECity.Charts.Scripts
 		{
 			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
-			_minimumSize = _chartManager.minimumSize;
+			MinimumSize = _chartManager.minimumSize;
 		}
 
 		/// <summary>
@@ -69,18 +70,13 @@ namespace SEECity.Charts.Scripts
 			RectTransform pos = GetComponent<RectTransform>();
 			Vector2 oldPos = pos.position;
 			pos.position = eventData.position;
-			if (pos.anchoredPosition.x / pos.lossyScale.x < _minimumSize ||
-			    pos.anchoredPosition.y / pos.lossyScale.y < _minimumSize) pos.position = oldPos;
+			if (pos.anchoredPosition.x / pos.lossyScale.x < MinimumSize ||
+			    pos.anchoredPosition.y / pos.lossyScale.y < MinimumSize) pos.position = oldPos;
 			ChangeSize(pos.anchoredPosition.x, pos.anchoredPosition.y);
 		}
 
-		public void OnPointerUp(PointerEventData eventData)
-		{
-			_chartContent.DrawData(false);
-		}
-
 		/// <summary>
-		/// Changes the width and height of the chart.
+		/// Changes the width and height of the chart and its contents.
 		/// </summary>
 		/// <param name="width">The new width of the chart.</param>
 		/// <param name="height">The new height of the chart.</param>

@@ -14,9 +14,19 @@ namespace SEECity.Charts.Scripts.VR
 		/// </summary>
 		private ChartManager _chartManager;
 
+		/// <summary>
+		/// Manages the VR pointer used to interact with canvases.
+		/// </summary>
 		private VrPointer _pointer;
 
+		/// <summary>
+		/// The input source for controlling charts in VR.
+		/// </summary>
 		private SteamVR_Input_Sources _source;
+
+		/// <summary>
+		/// The action boolean assigned to interacting with canvases in VR.
+		/// </summary>
 		private SteamVR_Action_Boolean _click;
 
 		public PointerEventData EventData { get; private set; }
