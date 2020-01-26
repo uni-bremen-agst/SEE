@@ -763,11 +763,13 @@ namespace SEE.DataModel
             }
 
 #if DEBUG
+            /*
             Debug.Log("\nexplicit mapping\n");
             dump_table(_explicit_maps_to_table);
 
             Debug.Log("\nimplicit mapping\n");
             dump_table(_implicit_maps_to_table);
+            */
 #endif
         }
 
@@ -984,14 +986,14 @@ namespace SEE.DataModel
         /// </summary>
         private void calculate_convergences_and_divergences()
         {
-            // Iterate on all nodes in the range of implicit_maps_to_table
-            // (N.B.: these are nodes that are in 'dependencies'), and
-            // propagate and lift their dependencies
-
+            // Iterate on all nodes in the domain of implicit_maps_to_table
+            // (N.B.: these are nodes that are in 'implementation'), and
+            // propagate and lift their dependencies in the architecture
             foreach (var mapsto in _implicit_maps_to_table)
             {
                 // source_node is in implementation
                 Node source_node = mapsto.Key;
+                System.Diagnostics.Debug.Assert(source_node.ItsGraph == _implementation);
                 if (is_relevant(source_node))
                 {
                     // Node is visible in dependencies and explicit_maps_to_table
@@ -1019,7 +1021,7 @@ namespace SEE.DataModel
         /// <param name="target">target node of propagated dependency in architecture</param>
         /// <param name="its_type">the edge type of the propagated dependency</param>
         /// <returns>the propagated edge in the architecture graph between source and target
-        /// with given type</returns>
+        /// with given type; null if there is no such edge</returns>
         private Edge get_propagated_dependency(
             Node source, // source of edge; must be in architecture
             Node target, // target of edge; must be in architecture
@@ -1037,23 +1039,21 @@ namespace SEE.DataModel
             return null;
         }
 
-        private bool must_be_propagated(Edge implementation_dep)
-        {
-            return false; // FIXME
-        }
-
-
         /// <summary>
         /// Propagates and lifts dependency edge from implementation to architecture graph.
+        /// 
         /// Precondition: implementation_dep is in implementation.
         /// </summary>
         /// <param name="implementation_dep">the implementation edge to be propagated</param>
         private void propagate_and_lift_dependency(Edge implementation_dep)
         {
 #if DEBUG
+            /*
             Debug.LogFormat("propagate_and_lift_dependency: propagated implementation_dep = {0}\n",
                             edge_name(implementation_dep, true));
+            */
 #endif
+            System.Diagnostics.Debug.Assert(implementation_dep.ItsGraph == _implementation);
             Node impl_source = implementation_dep.Source;
             Node impl_target = implementation_dep.Target;
             // Assert: impl_source and impl_target are in implementation
@@ -1070,6 +1070,7 @@ namespace SEE.DataModel
             }
             Edge architecture_dep = get_propagated_dependency(arch_source, arch_target, impl_type);
             // Assert: architecture_dep is in architecture graph or null.
+            System.Diagnostics.Debug.Assert(architecture_dep == null ||architecture_dep.ItsGraph == _architecture);
             Edge allowing_edge = null;
             if (architecture_dep == null)
             {   // has not existed yet
@@ -1093,33 +1094,63 @@ namespace SEE.DataModel
             // (allowing_edge ? allowing_edge : architecture_dep, implementation_dep));
         }
 
-        // propagates the outgoing dependencies of node from dependencies
-        // to architecture
+        /// <summary>
+        /// Propagates the outgoing dependencies of node from implementation to architecture 
+        /// graph and lifts them in architecture (if and only if an outgoing dependency is
+        /// relevant).
+        /// 
+        /// Precondition: node is in implementation graph.
+        /// </summary>
+        /// <param name="node">implementation node whose outgoings are to be propagated and lifted</param>
         private void propagate_and_lift_outgoing_dependencies(Node node)
         {
-            // FIXME
+            System.Diagnostics.Debug.Assert(node.ItsGraph == _implementation);
+            foreach (Edge edge in node.Outgoings)
+            {
+                // edge is in implementation
+                // only relevant dependencies may be propagated and lifted
+                if (is_relevant(edge))
+                {
+                    propagate_and_lift_dependency(edge);
+                }
+            }
         }
-
 
         /// <summary>
         /// Returns the architecture node upon which 'node' is mapped;
-        /// if 'node' is not mapped, NULL is returned.
+        /// if 'node' is not mapped, null is returned.
         /// Precondition: node is in implementation.
         /// Postcondition: either result is null or result is in architecture
         /// </summary>
         /// <param name="node"></param>
-        /// <returns>Returns the architecture node upon which </returns>
+        /// <returns>the architecture node upon which node is mapped or null</returns>
         private Node maps_to(Node node)
         {
-            return _explicit_maps_to_table[node];
+            System.Diagnostics.Debug.Assert(node.ItsGraph == _implementation);
+            if (_explicit_maps_to_table.TryGetValue(node, out Node target))
+            {
+                return target;
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        // returns true if this causing edge is a dependency from child to
-        // parent in the sense of the "allow dependencies to parents" option
+        /// <summary>
+        /// Returns true if this causing implementation edge is a dependency from child to
+        /// parent in the sense of the "allow dependencies to parents" option.
+        /// 
+        /// Precondition: edge is in implementation graph.
+        /// </summary>
+        /// <param name="edge">dependency edge to be checked</param>
+        /// <returns>true if this causing edge is a dependency from child to
+        /// parent</returns>
         private bool is_dependency_to_parent(Edge edge) 
         {
             Node mapped_source = maps_to(edge.Source);
             Node mapped_target = maps_to(edge.Target);
+            // Assert: mapped_source and mapped_target are in architecture
             if (mapped_source != null && mapped_target != null)
             {
                 return is_descendant_of(mapped_source, mapped_target);
@@ -1127,17 +1158,23 @@ namespace SEE.DataModel
             return false;
         }
 
-        // returns true if 'source' is a descendant of 'target'
-        private bool is_descendant_of(Node source, Node target)
+        /// <summary>
+        /// Returns true if 'child' is a descendant of 'ancestor' in the hierarchy.
+        /// 
+        /// Precondition: child and ancestor are in the same graph.
+        /// </summary>
+        /// <param name="child">source node</param>
+        /// <param name="ancestor">target node</param>
+        /// <returns>true if 'source' is a descendant of 'target'</returns>
+        private bool is_descendant_of(Node child, Node ancestor)
         {
-            Node ancestor = get_parent(source);
-            while (ancestor != null && ancestor != target)
+            Node cursor = get_parent(child);
+            while (cursor != null && cursor != ancestor)
             {
-                ancestor = get_parent(ancestor);
+                cursor = get_parent(cursor);
             }
-            return ancestor == target;
+            return cursor == ancestor;
         }
-
 
         /// <summary>
         /// Creates and returns a new edge of type its_type from 'from' to 'to' in give 'graph'.
@@ -1151,7 +1188,7 @@ namespace SEE.DataModel
         /// <param name="its_type">the type of the edge</param>
         /// <param name="graph">the graph in which to add the new edge</param>
         /// <returns>the new edge</returns>
-        Edge add (Node from, Node to, string its_type, Graph graph)
+        Edge add(Node from, Node to, string its_type, Graph graph)
         {
             // Note: there may be a specified as well as a propagated edge between the
             // same two architectural entities; hence, we may have multiple edges
@@ -1398,7 +1435,7 @@ namespace SEE.DataModel
         {
             foreach (Node node in node_set)
             {
-                Debug.Log(qualified_node_name(node, true));
+                Debug.Log(qualified_node_name(node, true) + "\n");
             }
         }
 
@@ -1407,7 +1444,7 @@ namespace SEE.DataModel
         {
             foreach (Edge edge in edge_set)
             {
-                Debug.Log(as_qualified_clause(edge));
+                Debug.Log(as_qualified_clause(edge) + "\n");
             }
         }
 
@@ -1416,36 +1453,10 @@ namespace SEE.DataModel
         {
             foreach(var entry in table)
             {
-                Debug.Log(qualified_node_name(entry.Key, true)
-                     + " --maps_to--> "
-                     + qualified_node_name(entry.Value, true));
+                Debug.LogFormat("{0} --maps_to--> {1}\n",
+                                qualified_node_name(entry.Key, true),
+                                qualified_node_name(entry.Value, true));
             }
         }
-
-        // *****************************************
-        // declaration forwarding
-        // *****************************************
-
-        /*
-    bool _use_declaration_forwarding;
-
-    // A cache for admissible mapping targets of nodes.
-    std::unordered_map<Node_Idx, std::shared_ptr<Node_Set>> _declaration_cache;
-    // Try to detect a defintion of node by following outgoing Declare
-    // edges.
-    Node get_definition_node(Node node) const;
-    // Compute all possible mapping candidates for the (dependency)
-    // target node *with* taking permission attributes
-    // at the edges into account.
-    std::shared_ptr<Node_Set> get_mapping_candidates(Node target);
-    // Return in result all nodes that are reachable from start
-    // by a (possibly empty) sequence of edges
-    // that allow to forward declarations.
-    void
-    compute_forward_restriction(Node definition_node,
-                                const Node_Set& all_declarations,
-                        Node_Set& marked_declaration_predecessors) const;
-    };
-    */
     } // namespace SEE
 } // namespace DataModel
