@@ -34,6 +34,7 @@ namespace SEE.DataModel
         ///   (1) node must not be null
         ///   (2) node.Linkname must be defined.
         ///   (3) a node with node.Linkname must not have been added before
+        ///   (4) node must not be contained in another graph
         /// </summary>
         /// <param name="node"></param>
         public void AddNode(Node node)
@@ -42,15 +43,60 @@ namespace SEE.DataModel
             {
                 throw new System.Exception("node must not be null");
             }
-            if (String.IsNullOrEmpty(node.LinkName))
+            else if (String.IsNullOrEmpty(node.LinkName))
             {
                 throw new System.Exception("linkname of a node must neither be null nor empty");
             }
-            if (nodes.ContainsKey(node.LinkName))
+            else if (nodes.ContainsKey(node.LinkName))
             {
                 throw new System.Exception("linknames must be unique");
             }
-            nodes[node.LinkName] = node;
+            else if (node.ItsGraph != null)
+            {
+                throw new Exception("node " + node.ToString() + " is already in a graph " + node.ItsGraph.Name);
+            }
+            else
+            {
+                nodes[node.LinkName] = node;
+                node.ItsGraph = this;
+            }
+        }
+
+        /// <summary>
+        /// Removes the given node from the graph. Its incoming and outgoing edges are removed,
+        /// along with it.
+        /// 
+        /// Precondition: node must not be null and must be contained in this graph.
+        /// </summary>
+        /// <param name="node">node to be removed</param>
+        public void RemoveNode(Node node)
+        {
+            if (node == null)
+            {
+                throw new System.Exception("node must not be null");
+            }
+            else if (node.ItsGraph != this)
+            {
+                if (node.ItsGraph == null)
+                {
+                    throw new Exception("node " + node.ToString() + " is not contained in any graph");
+                }
+                else
+                {
+                    throw new Exception("node " + node.ToString() + " is contained in a different graph " + node.ItsGraph.Name);
+                }
+            }
+            else
+            {
+                if (nodes.Remove(node.LinkName))
+                {
+                    // FIXME/TODO: If a node is removed, all the incoming and outgoing edges must be removed, too.
+                }
+                else
+                {
+                    throw new Exception("node " + node.ToString() + " is not contained in this graph " + Name);
+                }
+            }
         }
 
         /// <summary>
@@ -75,11 +121,26 @@ namespace SEE.DataModel
 
         /// <summary>
         /// Adds a non-hierarchical edge to the graph.
-        /// Precondition: edge must not be null.
+        /// Preconditions: 
+        /// (1) edge must not be null.
+        /// (2) its source and target nodes must be in the graph already
+        /// (3) the edge must not be in any other graph
         /// </summary>
         public void AddEdge(Edge edge)
         {
-            edges.Add(edge);
+            if (edge == null)
+            {
+                throw new Exception("edge must not be null");
+            }
+            else if (edge.ItsGraph == null)
+            {
+                edge.ItsGraph = this;
+                edges.Add(edge);
+            }
+            else
+            {
+                throw new Exception("edge " + edge.ToString() + " is already in a graph " + edge.ItsGraph.Name);
+            }
         }
 
         /// <summary>
@@ -88,7 +149,32 @@ namespace SEE.DataModel
         /// <param name="edge">edge to be removed</param>
         public void RemoveEdge(Edge edge)
         {
-            edges.Remove(edge);
+            if (edge == null)
+            {
+                throw new Exception("edge must not be null");
+            }
+            else if (edge.ItsGraph != this)
+            {
+                if (edge.ItsGraph == null)
+                {
+                    throw new Exception("edge " + edge.ToString() + " is not contained in any graph");
+                }
+                else
+                {
+                    throw new Exception("edge " + edge.ToString() + " is contained in a different graph " + edge.ItsGraph.Name);
+                }
+            }
+            else
+            {
+                if (!edges.Remove(edge))
+                {
+                    throw new Exception("edge " + edge.ToString() + " is not contained in graph " + Name);
+                }
+                else
+                {
+                    edge.ItsGraph = null;
+                }
+            }
         }
 
         /// <summary>
