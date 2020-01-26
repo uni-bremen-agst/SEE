@@ -100,7 +100,7 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// Returns true of this graph contains a node with the same unique linkname
+        /// Returns true if this graph contains a node with the same unique linkname
         /// as the given node.
         /// Throws an exception if node is null or node has no valid linkname.
         /// </summary>
@@ -117,6 +117,27 @@ namespace SEE.DataModel
                 throw new System.Exception("linkname of a node must neither be null nor empty");
             }
             return nodes.ContainsKey(node.LinkName);
+        }
+
+        /// <summary>
+        /// Returns the node with the given unique linkname if it exists; otherwise null.
+        /// </summary>
+        /// <param name="linkname">unique linkname</param>
+        /// <returns>node with the given unique linkname if it exists; otherwise null</returns>
+        public Node GetNode(string linkname)
+        {
+            if (String.IsNullOrEmpty(linkname))
+            {
+                throw new System.Exception("linkname must neither be null nor empty");
+            }
+            else if (nodes.TryGetValue(linkname, out Node node))
+            {
+                return node;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
