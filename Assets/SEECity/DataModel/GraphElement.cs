@@ -57,6 +57,14 @@ namespace SEE.DataModel
             }
         }
 
+        public bool Has_Supertype_Of(string type)
+        {
+            // FIXME: We currently do not have the type hierarchy, so we cannot know
+            // which type subsumes which other type. For the time being, we insist that
+            // the types must be the same.
+            return this.type == type;
+        }
+
         public override string ToString()
         {
             return " \"type\": " + type + "\",\n" + base.ToString();
