@@ -71,12 +71,113 @@ namespace SEE.DataModel
             //result.DumpTree();
             return result;
         }
+
         private void LoadAll(string v)
         {
             string path = Application.dataPath + "/../Data/GXL/reflexion/" + v + "/";
             impl = Load(path + "CodeFacts.gxl");
             arch = Load(path + "Architecture.gxl");
             mapping = Load(path + "Mapping.gxl");
+        }
+
+        private static Node NewNode(Graph graph, string linkname)
+        {
+            Node result = new Node();
+            result.LinkName = linkname;
+            result.Type = "Routine";
+            graph.AddNode(result);
+            return result;
+        }
+
+        private static Edge NewEdge(Graph graph, Node from, Node to, string type)
+        {
+            Edge result = new Edge();
+            result.Type = type;
+            result.Source = from;
+            result.Target = to;
+            graph.AddEdge(result);
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a graph with the following node hierarchy:
+        ///  n1
+        ///   -- n1_c1
+        ///         -- n1_c1_c1
+        ///         -- n1_c1_c2
+        ///   -- n1_c2
+        ///  n2
+        ///   -- n2_c1
+        ///  n3
+        ///  
+        /// edges:
+        ///   import(n1, n2)
+        ///   import(n2, n3)
+        ///   import(n2, n3)
+        /// </summary>
+        /// <returns>new graph with a hierarchy of nodes</returns>
+        private Graph NewImplementationNodeHierarchy()
+        {
+            Graph graph = new Graph();
+            graph.Path = "path";
+            graph.Name = "name";
+
+            // Root nodes
+            Node n1 = NewNode(graph, "n1");
+            Node n2 = NewNode(graph, "n2");
+            Node n3 = NewNode(graph, "n3");
+            graph.AddNode(n1);
+            graph.AddNode(n2);
+            graph.AddNode(n3);
+
+            // Second level
+            Node n1_c1 = NewNode(graph, "n1_c1");
+            Node n1_c2 = NewNode(graph, "n1_c2");
+            graph.AddNode(n1_c1);
+            graph.AddNode(n1_c2);
+            n1.AddChild(n1_c1);
+            n1.AddChild(n1_c2);
+
+            Node n2_c1 = NewNode(graph, "n2_c1");
+            graph.AddNode(n2_c1);
+            n2.AddChild(n2_c1);
+
+            // Third level
+            Node n1_c1_c1 = NewNode(graph, "n1_c1_c1");
+            Node n1_c1_c2 = NewNode(graph, "n1_c1_c2");
+            graph.AddNode(n1_c1_c1);
+            graph.AddNode(n1_c1_c2);
+            n1_c1.AddChild(n1_c1_c1);
+            n1_c1.AddChild(n1_c1_c2);
+
+            // Note: The levels must be calculated when the hierarchy has been
+            // established. This is not done automatically.
+            graph.CalculateLevels();
+
+            return graph;
+        }
+
+        /// <summary>
+        /// Returns the implementation graph created by NewImplementationNodeHierarchy()
+        /// with the following additional edges:
+        ///   import(n1, n2)
+        ///   import(n2, n3)
+        ///   import(n2, n3)
+        /// </summary>
+        /// <returns>implementation graph</returns>
+        private Graph ImportGraph()
+        {
+            Graph graph = NewImplementationNodeHierarchy();
+            Node n1 = graph.GetNode("n1");
+            Node n2 = graph.GetNode("n2");
+            Node n3 = graph.GetNode("n3");
+            Edge e1 = NewEdge(graph, n1, n2, "import");
+            Edge e2 = NewEdge(graph, n2, n3, "import");
+            Edge e3 = NewEdge(graph, n2, n3, "import");
+            graph.AddEdge(e1);
+            graph.AddEdge(e2);
+            graph.AddEdge(e3);
+            return graph;
         }
     }
 }
