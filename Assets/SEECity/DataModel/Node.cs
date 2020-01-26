@@ -16,6 +16,7 @@ namespace SEE.DataModel
         // will have a deep copy of all attributes and the type of the node only.
         // The hierarchy information (parent, children, level) is not copied at all.
         // The clone will appear as a node without parent and children at level 0.
+        // Neither will its incoming and outgoing edges be copied.
 
         /// <summary>
         /// The attribute name for unique identifiers (within a graph).
@@ -61,10 +62,17 @@ namespace SEE.DataModel
             set => SetString(SourceNameAttribute, value);
         }
 
+        /// <summary>
+        /// The parent of this node. Is null if it has none.
+        /// </summary>
         [SerializeField]
         private Node parent;
 
-        // level of a node in the hierarchy
+        /// <summary>
+        /// The level of the node in the hierarchy. The top-most level has level 
+        /// number 0. The number is the length of the path in the hierarchy from
+        /// the node to its ancestor that has no parent.
+        /// </summary>
         private int level = 0;
 
         /// <summary>
@@ -136,6 +144,74 @@ namespace SEE.DataModel
             result += base.ToString();
             result += "}";
             return result;
+        }
+
+        /// <summary>
+        /// The outgoing edges of this node.
+        /// </summary>
+        [SerializeField]
+        private List<Edge> outgoings = new List<Edge>();
+
+        /// <summary>
+        /// The outgoing edges of this node.
+        /// </summary>
+        [SerializeField]
+        public List<Edge> Outgoings
+        {
+            get => outgoings;
+        }
+
+        /// <summary>
+        /// Adds given edge to the list of outgoing edges of this node.
+        /// 
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        /// should use Graph.AddEdge() instead.
+        /// 
+        /// Precondition: edge != null and edge.Source == this
+        /// </summary>
+        /// <param name="edge">edge to be added as one of the node's outgoing edges</param>
+        public void AddOutgoing(Edge edge)
+        {
+            if (edge == null)
+            {
+                throw new Exception("edge must not be null");
+            }
+            else if (edge.Source != this)
+            {
+                throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + this.ToString());
+            }
+            else
+            {
+                outgoings.Add(edge);
+            }
+        }
+
+        /// <summary>
+        /// Removes given edge from the list of outgoing edges of this node.
+        /// 
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        /// should use Graph.RemoveEdge() instead.
+        /// 
+        /// Precondition: edge != null and edge.Source == this
+        /// </summary>
+        /// <param name="edge">edge to be removed from the node's outgoing edges</param>
+        public void RemoveOutgoing(Edge edge)
+        {
+            if (edge == null)
+            {
+                throw new Exception("edge must not be null");
+            }
+            else if (edge.Source != this)
+            {
+                throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + this.ToString());
+            }
+            else
+            {
+                if (! outgoings.Remove(edge))
+                {
+                    throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + this.ToString());
+                }
+            }
         }
 
         /// <summary>
@@ -276,6 +352,36 @@ namespace SEE.DataModel
             target.parent = null;
             target.level = 0;
             target.children = new List<Node>();
+        }
+
+        /// <summary>
+        /// Returns the list of outgoing edges from this node to the given 
+        /// target node that have exactly the given edge type.
+        /// 
+        /// Precondition: target must not be null
+        /// </summary>
+        /// <param name="target">target node</param>
+        /// <param name="its_type">requested edge type</param>
+        /// <returns>all edges from this node to target node with exactly the given edge type</returns>
+        public List<Edge> From_To(Node target, string its_type)
+        {
+            if (target == null)
+            {
+                throw new Exception("target node must not be null");
+            }
+            else
+            {
+                List<Edge> result = new List<Edge>();
+
+                foreach (Edge edge in outgoings)
+                {
+                    if (edge.Target == target && edge.Type == its_type)
+                    {
+                        result.Add(edge);
+                    }
+                }
+                return result;
+            }
         }
     }
 }

@@ -132,10 +132,26 @@ namespace SEE.DataModel
             {
                 throw new Exception("edge must not be null");
             }
+            else if (edge.Source == null || edge.Target == null)
+            {
+                throw new Exception("source/target of this node is null");
+            }
             else if (edge.ItsGraph == null)
             {
-                edge.ItsGraph = this;
-                edges.Add(edge);
+                if (edge.Source.ItsGraph != this)
+                {
+                    throw new Exception("source node " + edge.Source.ToString() + " is not in the graph");
+                }
+                else if (edge.Target.ItsGraph != this)
+                {
+                    throw new Exception("target node " + edge.Target.ToString() + " is not in the graph");
+                }
+                else
+                {
+                    edge.ItsGraph = this;
+                    edges.Add(edge);
+                    edge.Source.AddOutgoing(edge);
+                }
             }
             else
             {
@@ -172,6 +188,7 @@ namespace SEE.DataModel
                 }
                 else
                 {
+                    edge.Source.RemoveOutgoing(edge);
                     edge.ItsGraph = null;
                 }
             }
