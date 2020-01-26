@@ -8,8 +8,31 @@ namespace SEE.DataModel
     [System.Serializable]
     public abstract class GraphElement : Attributable
     {
+        /// <summary>
+        /// The type of the graph element.
+        /// </summary>
         [SerializeField]
         private string type;
+
+        /// <summary>
+        /// The graph this graph element is contained in. May be null if
+        /// the element is currently not in a graph.
+        /// </summary>
+        [SerializeField]
+        protected Graph graph;
+
+        /// <summary>
+        /// The graph this graph element is contained in. May be null if
+        /// the element is currently not in a graph.
+        /// 
+        /// Note: The set operation is intended only for Graph.
+        /// </summary>
+        [SerializeField]
+        public Graph ItsGraph
+        {
+            get => graph;
+            set => graph = value;
+        }
 
         /// <summary>
         /// The type of this graph element.
