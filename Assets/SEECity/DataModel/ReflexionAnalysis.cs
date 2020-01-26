@@ -45,7 +45,56 @@ namespace SEE.DataModel
 
     public class Corrupt_State : DG_Exception {}
 
-    public class Reflexion
+    /// <summary>
+    /// State of a dependency in the architecture or implementation within the 
+    /// reflexion model.
+    /// </summary>
+    public enum State
+    {
+        undefined = 0,          // initial undefined state
+        allowed = 1,            // propagated edge towards a convergence
+        divergent = 2,          // divergence
+        absent = 3,             // absence
+        convergent = 4,         // convergence
+        implicitly_allowed = 5, // self-usage is always implicitly allowed
+        allowed_absent = 6,     // absence, but is_optional attribute set
+        specified = 7           // tags an architecture edge that was created by the architect, i.e., is a specified edge
+    };
+
+    public class EdgeChange : ChangeEvent
+    {
+        /// <summary>
+        /// The edge being changed.
+        /// </summary>
+        public Edge edge;
+        /// <summary>
+        /// The previous state of the edge before the change.
+        /// </summary>
+        public State oldState;
+        /// <summary>
+        /// The new state of the edge after the change.
+        /// </summary>
+        public State newState;
+
+        /// <summary>
+        /// Constructor for a change of an edge event.
+        /// </summary>
+        /// <param name="edge">edge being changed</param>
+        /// <param name="old_state">the old state of the edge</param>
+        /// <param name="new_state">the new state of the edge after the change</param>
+        public EdgeChange(Edge edge, State oldState, State newState)
+        {
+            this.edge = edge;
+            this.oldState = oldState;
+            this.newState = newState;
+        }
+    }
+
+    /// <summary>
+    /// Implements the reflexion analysis, which compares an implementation against an expected
+    /// architecture based on a mapping between the two.
+    /// </summary>
+    public class Reflexion : Observable
     {
         /// <summary>
         /// Constructor for setting up and running the reflexion analysis.
@@ -80,22 +129,6 @@ namespace SEE.DataModel
         // --------------------------------------------------------------------
 
         /// <summary>
-        /// State of a dependency in the architecture or implementation within the 
-        /// reflexion model.
-        /// </summary>
-        public enum State
-        {
-            undefined = 0,          // initial undefined state
-            allowed = 1,            // propagated edge towards a convergence
-            divergent = 2,          // divergence
-            absent = 3,             // absence
-            convergent = 4,         // convergence
-            implicitly_allowed = 5, // self-usage is always implicitly allowed
-            allowed_absent = 6,     // absence, but is_optional attribute set
-            specified = 7           // tags an architecture edge that was created by the architect, i.e., is a specified edge
-        };
-
-        /// <summary>
         /// Name of the edge attribute for the state of a dependency.
         /// </summary>
         private const string state_attribute = "Reflexion.State";
@@ -116,6 +149,40 @@ namespace SEE.DataModel
             {
                 return State.undefined;
             }
+        }
+
+        /// <summary>
+        /// Sets the initial state of edge to state.
+        /// Precondition: edge has no state attribute yet.
+        /// </summary>
+        /// <param name="edge">edge whose initial state is to be set</param>
+        /// <param name="initial_state">the initial state to be set</param>
+        private void set_initial(Edge edge, State initial_state)
+        {
+            edge.SetInt(state_attribute, (int)initial_state);
+        }
+
+        /// <summary>
+        /// Sets the state of edge to new state.
+        /// Precondition: edge has a state attribute.
+        /// </summary>
+        /// <param name="edge">edge whose state is to be set</param>
+        /// <param name="new_state">the state to be set</param>
+        private void set_state(Edge edge, State new_state)
+        {
+            edge.SetInt(state_attribute, (int)initial_state);
+        }
+
+        /// <summary>
+        /// Transfers edge from its old_state to new_state; notifies all observers.
+        /// </summary>
+        /// <param name="edge">edge being changed</param>
+        /// <param name="old_state">the old state of the edge</param>
+        /// <param name="new_state">the new state of the edge after the change</param>
+        private void transition(Edge edge, State old_state, State new_state)
+        {
+            set_state(edge, new_state);
+            Notify(new EdgeChange(edge, old_state, new_state));
         }
 
         /// <summary>
@@ -317,7 +384,7 @@ namespace SEE.DataModel
         // by the update message.
         // Never modify the underlying views directly; always use the following
         // methods. Otherwise the reflexion view may be in an inconsistent state.
-        // Implementation detail: in case of a state change, notifyObservers(Object arg)
+        // Implementation detail: in case of a state change, Notify(ChangeEvent arg)
         // will be called where arg describes the type of change; such change information
         // consists of the object changed (either a single edge or node) and the kind
         // of change, namely, addition/removal or a counter increment/decrement.
@@ -506,6 +573,7 @@ namespace SEE.DataModel
         // --------------------------------------------------------------------
 
         // dumps the convergences, absences, divergences to the logging channel
+        /*
         public void dump_results()
         {
             Debug.LogFormat("REFLEXION RESULT ({0} nodes and {1} edges): \n", _reflexion.NodeCount, _reflexion.EdgeCount);
@@ -516,6 +584,7 @@ namespace SEE.DataModel
 
             }
         }
+        */
 
         // *****************************************
         // involved graphs
@@ -634,7 +703,8 @@ namespace SEE.DataModel
         private bool is_relevant(Edge source_edge)
         {
             return is_relevant(source_edge.Source) && is_relevant(source_edge.Target);
-            // FIXME: For the time being, we consider every edge to be relevant.
+            // FIXME: For the time being, we consider every edge to be relevant as long as their
+            // source and target are relevant.
         }
 
         // *****************************************
@@ -794,31 +864,6 @@ namespace SEE.DataModel
         // Notifies if edge state changes.
         // Assumption: edge is in Architecture view.
         private void change_architecture_dependency(Edge edge, int value)
-        {
-            // FIXME
-        }
-
-        // *****************************************
-        // edge state
-        // *****************************************
-
-        // sets the initial state of edge to state;
-        // assumption: edge has no state attribute yet
-        private void set_initial(Edge edge, State initial_state)
-        {
-            // FIXME
-        }
-
-        // sets the state of edge to new state
-        // assumption: edge has a state attribute
-        private void set_state(Edge edge, State new_state)
-        {
-            // FIXME
-        }
-
-        // transfers edge from its old_state to new_state; notifies all
-        // observers
-        private void transition(Edge edge, State old_state, State new_state)
         {
             // FIXME
         }
@@ -1231,7 +1276,7 @@ namespace SEE.DataModel
                 { 
                     // Assert: edge is in architecture
                     if (is_specified(edge)
-                        && edge.has_supertype_of(edge_type)
+                        && edge.Has_Supertype_Of(edge_type)
                         && parents.Contains(edge.Target))
                     {   // matching architecture dependency found
                         change_architecture_dependency(edge, counter);
@@ -1243,7 +1288,7 @@ namespace SEE.DataModel
             }
             // no matching architecture dependency found
 #if DEBUG
-            Debug.Log("lift: no matching architecture dependency found" + "\n";
+            Debug.Log("lift: no matching architecture dependency found" + "\n");
 #endif
             allowing_edge_out = null;
             return false;
