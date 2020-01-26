@@ -56,7 +56,7 @@ namespace SEE.DataModel
         {
             LoadAll("minilax");
             reflexion = new Reflexion(impl, arch, mapping);
-            reflexion.dump_results();
+            //reflexion.dump_results();
         }
 
         private Graph Load(string path)
