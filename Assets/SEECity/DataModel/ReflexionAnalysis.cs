@@ -170,7 +170,7 @@ namespace SEE.DataModel
         /// <param name="new_state">the state to be set</param>
         private void set_state(Edge edge, State new_state)
         {
-            edge.SetInt(state_attribute, (int)initial_state);
+            edge.SetInt(state_attribute, (int)new_state);
         }
 
         /// <summary>
@@ -1025,7 +1025,7 @@ namespace SEE.DataModel
             Node target, // target of edge; must be in architecture
             string its_type) // the edge type that must match exactly
         {
-            List<Edge> connectings = source.from_to(target, its_type);
+            List<Edge> connectings = source.From_To(target, its_type);
 
             foreach (Edge edge in connectings)
             {
@@ -1270,7 +1270,7 @@ namespace SEE.DataModel
 #if DEBUG
                 Debug.Log("cursor: " + qualified_node_name(cursor, false) + "\n");
 #endif
-                List<Edge> outs = cursor.Outgoings();
+                List<Edge> outs = cursor.Outgoings;
                 // Assert: all edges in outs are in architecture.
                 foreach (Edge edge in outs)
                 { 
