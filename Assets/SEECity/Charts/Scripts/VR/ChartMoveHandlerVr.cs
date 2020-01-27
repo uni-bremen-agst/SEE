@@ -100,7 +100,6 @@ namespace SEECity.Charts.Scripts.VR
 		private void ScrollInOut()
 		{
 			if (PointerDown)
-				//TODO: Specify source
 				if (_moveInOut.GetChanged(_source))
 				{
 					Vector3 direction = _pointerCamera.transform.position -

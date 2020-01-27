@@ -30,12 +30,8 @@ namespace SEECity.Charts.Scripts.VR
 
 			if (_referencePos.x - StartingPos.x < 0)
 			{
-				selectionRect.sizeDelta =
-					new Vector2(Mathf.Abs(_referencePos.x - StartingPos.x) / lossyScale.x,
-						(_referencePos.y - StartingPos.y) / lossyScale.y);
-				selectionRect.position = new Vector3(
-					StartingPos.x - selectionRect.sizeDelta.x / 2 * lossyScale.x,
-					StartingPos.y + selectionRect.sizeDelta.y / 2 * lossyScale.y, 0);
+				selectionRect.sizeDelta = new Vector2(Mathf.Abs(_referencePos.x - StartingPos.x), _referencePos.y - StartingPos.y);
+				selectionRect.anchoredPosition = new Vector3((StartingPos.x - selectionRect.sizeDelta.x / 2), (StartingPos.y + selectionRect.sizeDelta.y / 2), 0);
 				negative = true;
 			}
 
@@ -43,31 +39,21 @@ namespace SEECity.Charts.Scripts.VR
 			{
 				if (negative)
 				{
-					selectionRect.sizeDelta = new Vector2(selectionRect.sizeDelta.x,
-						Mathf.Abs(_referencePos.y - StartingPos.y) / lossyScale.y);
-					selectionRect.position = new Vector3(selectionRect.position.x,
-						StartingPos.y - selectionRect.sizeDelta.y / 2 * lossyScale.y, 0);
+					selectionRect.sizeDelta = new Vector2(selectionRect.sizeDelta.x, Mathf.Abs(_referencePos.y - StartingPos.y));
+					selectionRect.anchoredPosition = new Vector3(selectionRect.anchoredPosition.x, StartingPos.y - selectionRect.sizeDelta.y / 2, 0);
 				}
 				else
 				{
-					selectionRect.sizeDelta =
-						new Vector2((_referencePos.x - StartingPos.x) / lossyScale.x,
-							Mathf.Abs(_referencePos.y - StartingPos.y) / lossyScale.y);
-					selectionRect.position =
-						new Vector3(StartingPos.x + selectionRect.sizeDelta.x / 2 * lossyScale.x,
-							StartingPos.y - selectionRect.sizeDelta.y / 2 * lossyScale.y, 0);
+					selectionRect.sizeDelta = new Vector2((_referencePos.x - StartingPos.x), Mathf.Abs(_referencePos.y - StartingPos.y));
+					selectionRect.anchoredPosition = new Vector3(StartingPos.x + selectionRect.sizeDelta.x / 2, StartingPos.y - selectionRect.sizeDelta.y / 2, 0);
 					negative = true;
 				}
 			}
 
 			if (!negative)
 			{
-				selectionRect.sizeDelta =
-					new Vector2((_referencePos.x - StartingPos.x) / lossyScale.x,
-						(_referencePos.y - StartingPos.y) / lossyScale.y);
-				selectionRect.position =
-					new Vector3(StartingPos.x + selectionRect.sizeDelta.x / 2 * lossyScale.x,
-						StartingPos.y + selectionRect.sizeDelta.y / 2 * lossyScale.y, 0);
+				selectionRect.sizeDelta = new Vector2((_referencePos.x - StartingPos.x), (_referencePos.y - StartingPos.y));
+				selectionRect.anchoredPosition = new Vector3(StartingPos.x + selectionRect.sizeDelta.x / 2, StartingPos.y + selectionRect.sizeDelta.y / 2, 0);
 			}
 		}
 

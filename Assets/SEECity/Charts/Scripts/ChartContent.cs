@@ -15,7 +15,7 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// Contains some settings used in this script.
 		/// </summary>
-		private ChartManager _chartManager;
+		protected ChartManager _chartManager;
 
 		/// <summary>
 		/// All objects to be listed in the chart.
@@ -25,7 +25,7 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
 		/// </summary>
-		private List<GameObject> _activeMarkers = new List<GameObject>();
+		protected List<GameObject> _activeMarkers = new List<GameObject>();
 
 		/// <summary>
 		/// The <see cref="AxisContentDropdown" /> containing Values for the X-Axis.
@@ -254,7 +254,7 @@ namespace SEECity.Charts.Scripts
 		/// <param name="min">The starting edge of the rectangle.</param>
 		/// <param name="max">The ending edge of the rectangle.</param>
 		/// <param name="direction">True if min lies below max, false if not.</param>
-		public void AreaSelection(Vector2 min, Vector2 max, bool direction)
+		public virtual void AreaSelection(Vector2 min, Vector2 max, bool direction)
 		{
 			float highlightDuration = _chartManager.highlightDuration;
 			if (direction)

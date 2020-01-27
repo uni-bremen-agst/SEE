@@ -20,8 +20,7 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// Initializes the new chart as GameObject.
 		/// </summary>
-		[SerializeField]
-		private void CreateChart()
+		public void CreateChart()
 		{
 			ChartContent content =
 				Instantiate(chartPrefab, chartsCanvas).GetComponent<ChartContent>();

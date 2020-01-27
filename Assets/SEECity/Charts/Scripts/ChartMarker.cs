@@ -80,6 +80,16 @@ namespace SEECity.Charts.Scripts
 		private GameObject markerHighlight;
 
 		/// <summary>
+		/// The prefab containing the <see cref="LineRenderer"/> that creates the beam above highlighted objects.
+		/// </summary>
+		[SerializeField] private GameObject highlightLine;
+
+		/// <summary>
+		/// The lenght of the beam appearing above highlighted objects.
+		/// </summary>
+		private float highlightLineLength;
+
+		/// <summary>
 		/// A text popup containing useful information about the marker and its <see cref="linkedObject" />.
 		/// </summary>
 		[Header("Other"), SerializeField] private TextMeshProUGUI infoText;
@@ -105,6 +115,7 @@ namespace SEECity.Charts.Scripts
 			_clickDelay = _chartManager.clickDelay;
 			_highlightDuration = _chartManager.highlightDuration;
 			_buildingHighlightMaterial = _chartManager.buildingHighlightMaterial;
+			highlightLineLength = _chartManager.HighlightLineLength;
 		}
 
 		/// <summary>
@@ -159,6 +170,9 @@ namespace SEECity.Charts.Scripts
 				_highlightCopy = Instantiate(linkedObject, linkedObject.transform);
 				_highlightCopy.tag = "Untagged";
 				_highlightCopy.GetComponent<Renderer>().material = _buildingHighlightMaterial;
+				LineRenderer line = Instantiate(highlightLine, _highlightCopy.transform).GetComponent<LineRenderer>();
+				Vector3 linePos = _highlightCopy.transform.localPosition;
+				line.SetPositions(new [] { linePos, linePos + new Vector3(0f, highlightLineLength) });
 			}
 			else
 			{

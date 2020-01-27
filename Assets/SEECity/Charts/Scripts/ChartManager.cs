@@ -58,6 +58,11 @@ namespace SEECity.Charts.Scripts
 		[SerializeField] private float highlightOutline = 0.005f;
 
 		/// <summary>
+		/// The lenght of the beam appearing above highlighted objects.
+		/// </summary>
+		public float HighlightLineLength = 20f;
+
+		/// <summary>
 		/// The time an object will be highlighted for.
 		/// </summary>
 		public float highlightDuration = 5f;
@@ -97,6 +102,8 @@ namespace SEECity.Charts.Scripts
 		/// Contains the scrolling information for moving charts in or out.
 		/// </summary>
 		public SteamVR_Action_Vector2 moveInOut;
+
+		[SerializeField] private SteamVR_Action_Boolean resetPosition;
 
 		/// <summary>
 		/// The canvas setup for charts that is used in non VR.
@@ -164,6 +171,10 @@ namespace SEECity.Charts.Scripts
 		private void Update()
 		{
 			AnimateHighlight();
+			if (_isVirtualReality && resetPosition.GetChanged(source))
+			{
+				ResetPosition();
+			}
 		}
 
 		/// <summary>
@@ -172,6 +183,18 @@ namespace SEECity.Charts.Scripts
 		private void AnimateHighlight()
 		{
 			buildingHighlightMaterial.SetFloat("g_flOutlineWidth", highlightOutlineAnim);
+		}
+
+		private void ResetPosition()
+		{
+			Transform cameraPosition = Camera.main.transform;
+			GameObject[] charts = GameObject.FindGameObjectsWithTag("Chart");
+			float offset = 0f;
+			foreach (GameObject chart in charts)
+			{
+				chart.transform.position = cameraPosition.position + (2 + offset) * cameraPosition.forward;
+				offset += 0.01f;
+			}
 		}
 
 		/// <summary>
