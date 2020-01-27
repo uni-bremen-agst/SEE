@@ -18,6 +18,7 @@ TagManager:
   - Pointer
   - ChartManager
   - VREventSystem
+  - Chart
   layers:
   - Default
   - TransparentFX

@@ -395,4 +395,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   linkedObject: {fileID: 0}
   markerHighlight: {fileID: 4103084839615680333}
-  _infoText: {fileID: 2199698873300044687}
+  highlightLine: {fileID: 5584465320866608993, guid: 1cf6c2eb644155f4c89e9332602e0a16,
+    type: 3}
+  infoText: {fileID: 2199698873300044687}
