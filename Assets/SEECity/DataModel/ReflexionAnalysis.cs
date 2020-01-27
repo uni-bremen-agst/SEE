@@ -52,15 +52,20 @@ namespace SEE.DataModel
     public enum State
     {
         undefined = 0,          // initial undefined state
-        allowed = 1,            // propagated edge towards a convergence
-        divergent = 2,          // divergence
-        absent = 3,             // absence
-        convergent = 4,         // convergence
-        implicitly_allowed = 5, // self-usage is always implicitly allowed
+        allowed = 1,            // propagated edge towards a convergence; only for implementation dependencies
+        divergent = 2,          // divergence; only for implementation dependencies
+        absent = 3,             // absence; only for architecture dependencies
+        convergent = 4,         // convergence; only for architecture dependencies
+        implicitly_allowed = 5, // self-usage is always implicitly allowed; only for implementation dependencies
         allowed_absent = 6,     // absence, but is_optional attribute set
-        specified = 7           // tags an architecture edge that was created by the architect, i.e., is a specified edge
+        specified = 7           // tags an architecture edge that was created by the architect, 
+                                // i.e., is a specified edge; this is the initial state of a specified
+                                // architecture dependency; only for architecture dependencies
     };
 
+    /// <summary>
+    /// A change event fired when the state of an edge changed.
+    /// </summary>
     public class EdgeChange : ChangeEvent
     {
         /// <summary>
@@ -88,6 +93,65 @@ namespace SEE.DataModel
             this.oldState = oldState;
             this.newState = newState;
         }
+
+        public override string ToString()
+        {
+            return edge.ToString() + " changed from " + oldState + " to " + newState;
+        }
+    }
+
+    /// <summary>
+    /// A change event fired when an implementation dependency was propagated to
+    /// the architecture.
+    /// </summary>
+    public class PropagatedEdge : ChangeEvent
+    {
+        /// <summary>
+        /// The implementation dependency propagated from the implementation to the architecture.
+        /// </summary>
+        public Edge propagatedEdge;
+
+        /// <summary>
+        /// Constructor preserving the implementation dependency propagated from the 
+        /// implementation to the architecture.
+        /// </summary>
+        /// <param name="propagatedEdge">the propagated edge</param>
+        public PropagatedEdge(Edge propagatedEdge)
+        {
+            this.propagatedEdge = propagatedEdge;
+        }
+
+        public override string ToString()
+        {
+            return "new propagated edge " + propagatedEdge.ToString();
+        }
+    }
+
+    /// <summary>
+    /// A change event fired when an edge was removed by the analysis.
+    /// </summary>
+    public class RemovedEdge : ChangeEvent
+    {
+        /// <summary>
+        /// The edge being removed. It still exists in the graph until all observers 
+        /// have been notified. But then it will be removed from the graph it is 
+        /// contained in. An observer can fullfil his last wishes with it.
+        /// </summary>
+        public Edge edge;
+
+        /// <summary>
+        /// Constructor passing on the edge to be removed.
+        /// </summary>
+        /// <param name="edge">edge to be removed</param>
+        public RemovedEdge(Edge edge)
+        {
+            this.edge = edge;
+        }
+
+        public override string ToString()
+        {
+            return "removed edge " + edge.ToString();
+        }
     }
 
     /// <summary>
@@ -98,6 +162,8 @@ namespace SEE.DataModel
     {
         /// <summary>
         /// Constructor for setting up and running the reflexion analysis.
+        /// Note: This does not really run the reflexion analysis. Use
+        /// method Run() to start the analysis.
         /// </summary>
         /// <param name="implementation">the implementation graph</param>
         /// <param name="architecture">the architecture model</param>
@@ -109,6 +175,14 @@ namespace SEE.DataModel
             _implementation = implementation;
             _architecture = architecture;
             _mapping = mapping;
+        }
+
+        /// <summary>
+        /// Runs the reflexion analysis. If an observer has registered before,
+        /// the observer will receive the results via the callback Update(ChangeEvent).
+        /// </summary>
+        public void Run()
+        {
             RegisterNodes();
             add_transitive_mapping();
             from_scratch();
@@ -174,26 +248,32 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// Transfers edge from its old_state to new_state; notifies all observers.
+        /// Transfers edge from its old_state to new_state; notifies all observers
+        /// if old_state and new_state actually differ.
         /// </summary>
         /// <param name="edge">edge being changed</param>
         /// <param name="old_state">the old state of the edge</param>
         /// <param name="new_state">the new state of the edge after the change</param>
         private void transition(Edge edge, State old_state, State new_state)
         {
-            set_state(edge, new_state);
-            Notify(new EdgeChange(edge, old_state, new_state));
+            if (old_state != new_state)
+            {
+                set_state(edge, new_state);
+                Notify(new EdgeChange(edge, old_state, new_state));
+            }
         }
 
         /// <summary>
-        /// Returns true if edge is a specified edge in the architecture (has state 'specified').
+        /// Returns true if edge is a specified edge in the architecture (has one of the
+        /// following states: specified, convergent, absent).
         /// Precondition: edge must be in the architecture graph.
         /// </summary>
         /// <param name="edge">architecture dependency</param>
         /// <returns>true if edge is a specified architecture dependency</returns>
         private bool is_specified(Edge edge)
         {
-            return get_state(edge) == State.specified;
+            State state = get_state(edge);
+            return state == State.specified || state == State.convergent || state == State.absent;
         }
 
         // --------------------------------------------------------------------
@@ -273,6 +353,7 @@ namespace SEE.DataModel
                     transition(edge, State.divergent, State.undefined);
                 }
                 // we can drop this edge; it is no longer needed
+                Notify(new RemovedEdge(edge));
                 _architecture.RemoveEdge(edge);
             }
             else
@@ -862,12 +943,28 @@ namespace SEE.DataModel
         //    // FIXME
         //}
 
-        // Adds value to counter of edge and transforms its state.
-        // Notifies if edge state changes.
-        // Assumption: edge is in Architecture view.
+        /// <summary>
+        /// Adds value to counter of edge and transforms its state.
+        /// Notifies if edge state changes.
+        /// Precondition: edge is in architecture graph.
+        /// </summary>
+        /// <param name="edge">architecture dependency to be changed</param>
+        /// <param name="value">the value to be added to the edge's counter</param>
         private void change_architecture_dependency(Edge edge, int value)
         {
-            // FIXME
+            int old_value = get_counter(edge);
+            int new_value = old_value + value;
+            State state = get_state(edge);
+
+            if (old_value == 0)
+            {
+                transition(edge, state, State.convergent);
+            }
+            else if (new_value == 0)
+            {
+                transition(edge, state, State.absent);
+            }
+            set_counter(edge, new_value);
         }
 
         // Helper struct storing an allowing edge and a propagated
@@ -911,7 +1008,6 @@ namespace SEE.DataModel
         /// </summary>
         private void from_scratch()
         {
-            // _reflexion = (Graph)_architecture.Clone();
             Reset();
             RegisterNodes();
             calculate_convergences_and_divergences();
@@ -936,9 +1032,26 @@ namespace SEE.DataModel
         {
             foreach (Edge edge in _architecture.Edges())
             {
-                // TODO/FIXME: We should also remove all propagated dependencies.
-                set_state(edge, State.undefined);
-                set_counter(edge, 0); // FIXME: do architecture edges have counters at all?
+                State state = get_state(edge);
+                switch (state)
+                {
+                    case State.undefined:
+                    case State.specified:
+                        set_counter(edge, 0); // Note: architecture edges have a counter
+                        break; 
+                    case State.absent:
+                    case State.convergent:
+                        // The initial state of an architecture dependency that was not propagated is specified.
+                        transition(edge, state, State.specified);
+                        set_counter(edge, 0); // Note: architecture edges have a counter
+                        break;
+                    default:
+                        // The edge is a left-over from a previous analysis and should be
+                        // removed. Before we actually do that, we need to notify all observers.
+                        Notify(new RemovedEdge(edge));
+                        _architecture.RemoveEdge(edge);
+                        break;
+                }
             }
         }
 
@@ -950,6 +1063,7 @@ namespace SEE.DataModel
             foreach (Edge edge in _implementation.Edges())
             {
                 set_state(edge, State.undefined);
+                // FIXME: Do edges in _implementation actually have a state?
                 //set_counter(edge, 0); // FIXME: do implementation edges have counters at all?
             }
         }
@@ -1002,10 +1116,29 @@ namespace SEE.DataModel
             }
         }
 
-        // calculates absences non-incrementally
+        /// <summary>
+        /// Calculates absences non-incrementally.
+        /// </summary>
         private void calculate_absences()
         {
-            // FIXME
+            // after calculate_convergences_and_divergences() all
+            // architectural dependencies not marked as 'convergent'
+            // are 'absent' (unless the architecture edge is marked 'optional'
+            foreach (Edge edge in _architecture.Edges())
+            {
+                State state = get_state(edge);
+                if (is_specified(edge) && state != State.convergent)
+                {
+                    if (edge.HasToggle("Architecture.Is_Optional"))
+                    {
+                        transition(edge, state, State.allowed_absent);
+                    }
+                    else
+                    {
+                        transition(edge, state, State.absent);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -1238,25 +1371,31 @@ namespace SEE.DataModel
                                                   string edge_type,
                                                   ref Edge allowing_edge_out)
         {
-            int new_counter = get_impl_counter();
+            int counter = get_impl_counter();
             Edge architecture_dep = add(arch_source, arch_target, edge_type, _architecture);
-            set_counter(architecture_dep, new_counter);
+            set_counter(architecture_dep, counter);
+
             // TODO: Mark architecture_dep as propagated. Or maybe that is not necessary at all
             // because we have the edge state from which we can derive whether an edge is specified
             // or propagated.
 
-            if (lift(arch_source, arch_target, edge_type, new_counter, ref allowing_edge_out))
+            // architecture_dep is a dependency propagated from the implementation onto the architecture;
+            // it was just created and, hence, has no state yet (which means it is State.undefined);
+            // because it has just come into existence, we need to let our observers know about it
+            Notify(new PropagatedEdge(architecture_dep));
+
+            if (lift(arch_source, arch_target, edge_type, counter, ref allowing_edge_out))
             {
-                set_initial(architecture_dep, State.allowed);
+                transition(architecture_dep, State.undefined, State.allowed);
             }
             else if (arch_source == arch_target)
             {
                 // by default, every entity may use itself
-                set_initial(architecture_dep, State.implicitly_allowed);
+                transition(architecture_dep, State.undefined, State.implicitly_allowed);
             }
             else
             {
-                set_initial(architecture_dep, State.divergent);
+                transition(architecture_dep, State.undefined, State.divergent);
             }
             return architecture_dep;
         }
@@ -1297,15 +1436,13 @@ namespace SEE.DataModel
                 + " and counter value "
                 + counter
                 + "\n");
-
-            Debug.Log("parents(to):\n");
-            dump_node_set(parents);
+            dump_node_set(parents, "parents(to)");
 #endif
 
             while (cursor != null)
             {
 #if DEBUG
-                Debug.Log("cursor: " + qualified_node_name(cursor, false) + "\n");
+                //Debug.Log("cursor: " + qualified_node_name(cursor, false) + "\n");
 #endif
                 List<Edge> outs = cursor.Outgoings;
                 // Assert: all edges in outs are in architecture.
@@ -1431,8 +1568,9 @@ namespace SEE.DataModel
         }
 
         // dumps node_set
-        static void dump_node_set(List<Node> node_set)
+        static void dump_node_set(List<Node> node_set, string message)
         {
+            Debug.Log(message + "\n");
             foreach (Node node in node_set)
             {
                 Debug.Log(qualified_node_name(node, true) + "\n");
