@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using TinySpline;
 
 public class TouchControlsSEE : MonoBehaviour
 {
@@ -40,6 +41,11 @@ public class TouchControlsSEE : MonoBehaviour
     private GameObject lookAtObject;
     private float timeCount = 1f;
 
+    //used for tiny spline implementation
+    private BSpline spline;
+    private float time = 0.0f;
+    private Vector4[] locations = new Vector4[3];
+
     //locks all actions for the time of camera auto movement
     private bool Lock = false;
 
@@ -57,10 +63,14 @@ public class TouchControlsSEE : MonoBehaviour
         {
             OnTargetChanged = new UnityEvent();
         }
+
     }
 
     void Update()
     {
+        //for tiny spline implementation
+        time += Time.deltaTime;
+
         if (!Lock && Input.touchCount > 0)
         {
             if (Input.touchCount == 1 && !UiIsTouched())
@@ -178,6 +188,13 @@ public class TouchControlsSEE : MonoBehaviour
             transObject.transform.LookAt(target);
         }
 
+        //for tiny spline implementation
+        locations[0] = ToVector4(Rig.transform.position, time);
+        locations[1] = ToVector4(transObject.transform.position, time + 2);
+
+        //creating spline for MoveToTarget
+        spline = TinySpline.Utils.interpolateCubic(VectorsToList(locations), 4);
+
     }
     //moves the camera to offset position relative to the target
     private void MoveToTarget()
@@ -185,6 +202,10 @@ public class TouchControlsSEE : MonoBehaviour
         Rig.transform.position = Vector3.Slerp(startPos.position, transObject.transform.position, timeCount);
         Rig.transform.rotation = Quaternion.Slerp(startPos.rotation, transObject.transform.rotation, timeCount);
         timeCount = timeCount + (Time.deltaTime / 5);
+
+        //Spline inplementation
+        //The convertings function for lists should be put into a until class
+        //Rig.transform.position = ListToVectors(spline.bisect(time, 0.001, false, 3).result)[0];
     }
 
     private bool UiIsTouched()
@@ -211,4 +232,46 @@ public class TouchControlsSEE : MonoBehaviour
         return target;
     }
 
+    //create Vector4 with time component
+    private Vector4 ToVector4(Vector3 position, float splineTime)
+    {
+        Vector4 splineVector = Vector4.zero;
+        splineVector.x = position.x;
+        splineVector.y = position.y;
+        splineVector.z = position.z;
+        splineVector.w = splineTime;
+
+        return splineVector;
+    }
+
+    //copied from ScriptedCamera script
+    private IList<double> VectorsToList(Vector4[] vectors)
+    {
+        List<double> list = new List<double>();
+        foreach (Vector4 vec in vectors)
+        {
+            list.Add(vec.x);
+            list.Add(vec.y);
+            list.Add(vec.z);
+            list.Add(vec.w);
+        }
+        return list;
+    }
+
+    //copied from ScriptedCamera script
+    private Vector4[] ListToVectors(IList<double> list)
+    {
+        int num = list.Count / 4;
+        Vector4[] vectors = new Vector4[num];
+        for (int i = 0; i < num; i++)
+        {
+            vectors[i] = new Vector4(
+                (float)list[i * 4],
+                (float)list[i * 4 + 1],
+                (float)list[i * 4 + 2],
+                (float)list[i * 4 + 3]
+                );
+        }
+        return vectors;
+    }
 }
