@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.XR;
 using Valve.VR;
 
@@ -13,6 +14,8 @@ namespace SEECity.Charts.Scripts
 		/// The instance of the <see cref="ChartManager" />, to ensure there will be only one.
 		/// </summary>
 		private static ChartManager _instance;
+
+		public bool selectionMode;
 
 		/// <summary>
 		/// The distance the camera will keep to the <see cref="GameObject" /> to focus on.
@@ -58,9 +61,10 @@ namespace SEECity.Charts.Scripts
 		[SerializeField] private float highlightOutline = 0.005f;
 
 		/// <summary>
-		/// The lenght of the beam appearing above highlighted objects.
+		/// The length of the beam appearing above highlighted objects.
 		/// </summary>
-		public float HighlightLineLength = 20f;
+		[FormerlySerializedAs("HighlightLineLength")]
+		public float highlightLineLength = 20f;
 
 		/// <summary>
 		/// The time an object will be highlighted for.
@@ -171,9 +175,23 @@ namespace SEECity.Charts.Scripts
 		private void Update()
 		{
 			AnimateHighlight();
-			if (_isVirtualReality && resetPosition.GetChanged(source))
+			if (_isVirtualReality)
 			{
-				ResetPosition();
+				if (resetPosition.GetChanged(source)) ResetPosition();
+			}
+			else
+			{
+				if (Input.GetMouseButtonDown(0))
+				{
+					Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+					if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+						HighlightHitObject(hit.transform.gameObject);
+				}
+
+				if (Input.GetButtonDown("SelectionMode")) selectionMode = true;
+
+				if (Input.GetButtonUp("SelectionMode")) selectionMode = false;
 			}
 		}
 
@@ -188,13 +206,21 @@ namespace SEECity.Charts.Scripts
 		private void ResetPosition()
 		{
 			Transform cameraPosition = Camera.main.transform;
-			GameObject[] charts = GameObject.FindGameObjectsWithTag("Chart");
+			GameObject[] charts = GameObject.FindGameObjectsWithTag("ChartContainer");
 			float offset = 0f;
 			foreach (GameObject chart in charts)
 			{
-				chart.transform.position = cameraPosition.position + (2 + offset) * cameraPosition.forward;
+				chart.transform.position =
+					cameraPosition.position + (2 + offset) * cameraPosition.forward;
 				offset += 0.01f;
 			}
+		}
+
+		private void HighlightHitObject(GameObject hitObject)
+		{
+			GameObject[] charts = GameObject.FindGameObjectsWithTag("Chart");
+			foreach (GameObject chart in charts)
+				chart.GetComponent<ChartContent>().HighlightCorrespondingMarker(hitObject);
 		}
 
 		/// <summary>

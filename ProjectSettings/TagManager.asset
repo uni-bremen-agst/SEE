@@ -19,6 +19,7 @@ TagManager:
   - ChartManager
   - VREventSystem
   - Chart
+  - ChartContainer
   layers:
   - Default
   - TransparentFX

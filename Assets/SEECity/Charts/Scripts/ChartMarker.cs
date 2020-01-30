@@ -80,14 +80,15 @@ namespace SEECity.Charts.Scripts
 		private GameObject markerHighlight;
 
 		/// <summary>
-		/// The prefab containing the <see cref="LineRenderer"/> that creates the beam above highlighted objects.
+		/// The prefab containing the <see cref="LineRenderer" /> that creates the beam above highlighted
+		/// objects.
 		/// </summary>
 		[SerializeField] private GameObject highlightLine;
 
 		/// <summary>
 		/// The lenght of the beam appearing above highlighted objects.
 		/// </summary>
-		private float highlightLineLength;
+		private float _highlightLineLength;
 
 		/// <summary>
 		/// A text popup containing useful information about the marker and its <see cref="linkedObject" />.
@@ -115,7 +116,7 @@ namespace SEECity.Charts.Scripts
 			_clickDelay = _chartManager.clickDelay;
 			_highlightDuration = _chartManager.highlightDuration;
 			_buildingHighlightMaterial = _chartManager.buildingHighlightMaterial;
-			highlightLineLength = _chartManager.HighlightLineLength;
+			_highlightLineLength = _chartManager.highlightLineLength;
 		}
 
 		/// <summary>
@@ -170,9 +171,10 @@ namespace SEECity.Charts.Scripts
 				_highlightCopy = Instantiate(linkedObject, linkedObject.transform);
 				_highlightCopy.tag = "Untagged";
 				_highlightCopy.GetComponent<Renderer>().material = _buildingHighlightMaterial;
-				LineRenderer line = Instantiate(highlightLine, _highlightCopy.transform).GetComponent<LineRenderer>();
+				LineRenderer line = Instantiate(highlightLine, _highlightCopy.transform)
+					.GetComponent<LineRenderer>();
 				Vector3 linePos = _highlightCopy.transform.localPosition;
-				line.SetPositions(new [] { linePos, linePos + new Vector3(0f, highlightLineLength) });
+				line.SetPositions(new[] {linePos, linePos + new Vector3(0f, _highlightLineLength)});
 			}
 			else
 			{
@@ -188,13 +190,17 @@ namespace SEECity.Charts.Scripts
 		/// <param name="time">How long the highlight will last.</param>
 		public void TriggerTimedHighlight(float time)
 		{
+			bool reactivate = false;
+
 			if (TimedHighlight != null)
 			{
 				StopCoroutine(TimedHighlight);
 				HighlightLinkedObjectToggle(false);
+				TimedHighlight = null;
+				if (_chartManager.selectionMode) reactivate = true;
 			}
 
-			TimedHighlight = StartCoroutine(TimedHighlightRoutine(time));
+			if (!reactivate) TimedHighlight = StartCoroutine(TimedHighlightRoutine(time));
 		}
 
 		/// <summary>
@@ -211,6 +217,7 @@ namespace SEECity.Charts.Scripts
 
 			HighlightLinkedObjectToggle(true);
 			yield return new WaitForSeconds(time);
+			while (_chartManager.selectionMode) yield return new WaitForEndOfFrame();
 			HighlightLinkedObjectToggle(false);
 			TimedHighlight = null;
 		}
@@ -220,7 +227,7 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private void ShowLinkedObject()
 		{
-			_activeCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+			_activeCamera = Camera.main.GetComponent<Camera>();
 			//TODO: Change to active camera and not just main camera.
 			Vector3 cameraPos = _activeCamera.transform.position;
 

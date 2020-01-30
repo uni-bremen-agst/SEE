@@ -121,15 +121,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c692bbed2d72b054ba16dd1783c77ffb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AxisDropdownX: {fileID: 2102787184858922773}
-  AxisDropdownY: {fileID: 8362586420495727025}
+  moveHandler: {fileID: 0}
+  axisDropdownX: {fileID: 2102787184858922773}
+  axisDropdownY: {fileID: 8362586420495727025}
   markerPrefab: {fileID: 7900548257253700385, guid: 1b7447dbbbeee5b459fcbc17d2feae1c,
     type: 3}
   entries: {fileID: 4782045973292355004}
-  minX: {fileID: 5245416985551805784}
-  maxX: {fileID: 6626204280074490174}
-  minY: {fileID: 131322439434704821}
-  maxY: {fileID: 131322439434704821}
+  minXText: {fileID: 5245416985551805784}
+  maxXText: {fileID: 6626204280074490174}
+  minYText: {fileID: 131322439434704821}
+  maxYText: {fileID: 131322439434704821}
   parent: {fileID: 5335390132035948169}
   dataPanel: {fileID: 4782045973236579755}
   labelsPanel: {fileID: 4782045971908352015}
@@ -238,7 +239,7 @@ GameObject:
   - component: {fileID: 6153170922150999573}
   m_Layer: 0
   m_Name: ChartCanvasVRContainer
-  m_TagString: Chart
+  m_TagString: ChartContainer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -272,6 +273,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f9110f0aa9ac7241ab9ffb6593a891c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  chartInfo: {fileID: 0}
   sizeButton: {fileID: 4687529802294026510}
 --- !u!1 &8359109650499819823
 GameObject:
