@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -8,7 +9,7 @@ namespace SEECity.Charts.Scripts
 	/// Handles the dragging and minimization of charts.
 	/// </summary>
 	public class ChartMoveHandler : MonoBehaviour, IDragHandler, IPointerDownHandler,
-		IPointerUpHandler
+		IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
 	{
 		/// <summary>
 		/// Contains some settings used in this script.
@@ -55,6 +56,8 @@ namespace SEECity.Charts.Scripts
 		/// The sprite for the drag button when the chart is minimized.
 		/// </summary>
 		private Sprite _minimizedSprite;
+
+		[SerializeField] private GameObject chartInfo;
 
 		/// <summary>
 		/// The button to resize the chart with. Needs to be minimized too.
@@ -115,6 +118,7 @@ namespace SEECity.Charts.Scripts
 		{
 			_timer = 0f;
 			PointerDown = true;
+			chartInfo.SetActive(false);
 		}
 
 		/// <summary>
@@ -125,6 +129,22 @@ namespace SEECity.Charts.Scripts
 		{
 			PointerDown = false;
 			if (_timer < _dragDelay) ToggleMinimize();
+			if (Minimized) chartInfo.SetActive(true);
+		}
+
+		public void OnPointerEnter(PointerEventData eventData)
+		{
+			if (Minimized && !PointerDown) chartInfo.SetActive(true);
+		}
+
+		public void OnPointerExit(PointerEventData eventData)
+		{
+			chartInfo.SetActive(false);
+		}
+
+		public void SetInfoText(string text)
+		{
+			chartInfo.GetComponent<TextMeshProUGUI>().text = text;
 		}
 
 		/// <summary>
