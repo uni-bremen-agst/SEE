@@ -40,6 +40,7 @@ namespace SEECity.Charts.Scripts
 			_dropdown = GetComponent<TMP_Dropdown>();
 			GetKeys();
 			Value = _dropdown.options[0].text;
+			_chartContent.SetInfoText();
 		}
 
 		/// <summary>
@@ -59,6 +60,7 @@ namespace SEECity.Charts.Scripts
 		{
 			Value = _dropdown.options[_dropdown.value].text;
 			_chartContent.DrawData(true);
+			_chartContent.SetInfoText();
 		}
 	}
 }

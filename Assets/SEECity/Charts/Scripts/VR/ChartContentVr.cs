@@ -9,9 +9,9 @@ namespace SEECity.Charts.Scripts.VR
 
 		public override void AreaSelection(Vector2 min, Vector2 max, bool direction)
 		{
-			float highlightDuration = _chartManager.highlightDuration;
+			float highlightDuration = ChartManager.highlightDuration;
 			if (direction)
-				foreach (GameObject marker in _activeMarkers)
+				foreach (GameObject marker in ActiveMarkers)
 				{
 					Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y &&
@@ -19,7 +19,7 @@ namespace SEECity.Charts.Scripts.VR
 						marker.GetComponent<ChartMarker>().TriggerTimedHighlight(highlightDuration);
 				}
 			else
-				foreach (GameObject marker in _activeMarkers)
+				foreach (GameObject marker in ActiveMarkers)
 				{
 					Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y &&

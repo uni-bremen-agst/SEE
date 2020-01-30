@@ -88,10 +88,10 @@ namespace SEECity.Charts.Scripts
 			RectTransform labelsPanel = _chartContent.labelsPanel;
 			labelsPanel.sizeDelta = new Vector2(width, height);
 			labelsPanel.anchoredPosition = new Vector2(width / 2, height / 2);
-			RectTransform xDropdown = _chartContent.AxisDropdownX.GetComponent<RectTransform>();
+			RectTransform xDropdown = _chartContent.axisDropdownX.GetComponent<RectTransform>();
 			xDropdown.anchoredPosition = new Vector2(width / 2, xDropdown.anchoredPosition.y);
 			xDropdown.sizeDelta = new Vector2(width / 3, xDropdown.sizeDelta.y);
-			RectTransform yDropdown = _chartContent.AxisDropdownY.GetComponent<RectTransform>();
+			RectTransform yDropdown = _chartContent.axisDropdownY.GetComponent<RectTransform>();
 			yDropdown.anchoredPosition = new Vector2(yDropdown.anchoredPosition.x, height / 2);
 			yDropdown.sizeDelta = new Vector2(height / 3, yDropdown.sizeDelta.y);
 			Chart.sizeDelta = new Vector2(width, height);
