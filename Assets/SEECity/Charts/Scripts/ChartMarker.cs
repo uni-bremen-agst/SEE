@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace SEECity.Charts.Scripts
 {
@@ -86,9 +87,11 @@ namespace SEECity.Charts.Scripts
 		[SerializeField] private GameObject highlightLine;
 
 		/// <summary>
-		/// The lenght of the beam appearing above highlighted objects.
+		/// The length of the beam appearing above highlighted objects.
 		/// </summary>
 		private float _highlightLineLength;
+
+		private bool _accentuated;
 
 		/// <summary>
 		/// A text popup containing useful information about the marker and its <see cref="linkedObject" />.
@@ -117,6 +120,19 @@ namespace SEECity.Charts.Scripts
 			_highlightDuration = _chartManager.highlightDuration;
 			_buildingHighlightMaterial = _chartManager.buildingHighlightMaterial;
 			_highlightLineLength = _chartManager.highlightLineLength;
+		}
+
+		private void Start()
+		{
+			for (int i = 0; i < linkedObject.transform.childCount; i++)
+			{
+				Transform child = linkedObject.transform.GetChild(i);
+				if (child.name.Equals(linkedObject.name + "(Clone)"))
+				{
+					TriggerTimedHighlight(_chartManager.highlightDuration);
+					break;
+				}
+			}
 		}
 
 		/// <summary>
@@ -149,7 +165,7 @@ namespace SEECity.Charts.Scripts
 			yield return new WaitForSeconds(_clickDelay);
 			if (_waiting)
 			{
-				TriggerTimedHighlight(_highlightDuration);
+				_chartManager.HighlightObject(linkedObject);
 			}
 			else
 			{
@@ -168,13 +184,24 @@ namespace SEECity.Charts.Scripts
 		{
 			if (highlight)
 			{
-				_highlightCopy = Instantiate(linkedObject, linkedObject.transform);
-				_highlightCopy.tag = "Untagged";
-				_highlightCopy.GetComponent<Renderer>().material = _buildingHighlightMaterial;
-				LineRenderer line = Instantiate(highlightLine, _highlightCopy.transform)
-					.GetComponent<LineRenderer>();
-				Vector3 linePos = _highlightCopy.transform.localPosition;
-				line.SetPositions(new[] {linePos, linePos + new Vector3(0f, _highlightLineLength)});
+				bool highlighted = false;
+
+				for (int i = 0; i < linkedObject.transform.childCount; i++)
+					if (linkedObject.transform.GetChild(i).gameObject.name
+						.Equals(linkedObject.name + "(Clone)"))
+						highlighted = true;
+
+				if (!highlighted)
+				{
+					_highlightCopy = Instantiate(linkedObject, linkedObject.transform);
+					_highlightCopy.tag = "Untagged";
+					_highlightCopy.GetComponent<Renderer>().material = _buildingHighlightMaterial;
+					LineRenderer line = Instantiate(highlightLine, _highlightCopy.transform)
+						.GetComponent<LineRenderer>();
+					Vector3 linePos = _highlightCopy.transform.localPosition;
+					line.SetPositions(new[]
+						{linePos, linePos + new Vector3(0f, _highlightLineLength)});
+				}
 			}
 			else
 			{
@@ -304,6 +331,14 @@ namespace SEECity.Charts.Scripts
 			_activeCamera.transform.position = newPos;
 		}
 
+		public void Accentuate()
+		{
+			markerHighlight.GetComponent<Image>().color = _accentuated
+				? _chartManager.standardColor
+				: _chartManager.accentuationColor;
+			_accentuated = !_accentuated;
+		}
+
 		/// <summary>
 		/// Changes the <see cref="infoText" /> of this marker.
 		/// </summary>
@@ -320,6 +355,7 @@ namespace SEECity.Charts.Scripts
 		public void OnPointerEnter(PointerEventData eventData)
 		{
 			infoText.gameObject.SetActive(true);
+			if (TimedHighlight != null) _chartManager.Accentuate(linkedObject);
 		}
 
 		/// <summary>
@@ -329,6 +365,7 @@ namespace SEECity.Charts.Scripts
 		public void OnPointerExit(PointerEventData eventData)
 		{
 			infoText.gameObject.SetActive(false);
+			if (_accentuated) _chartManager.Accentuate(linkedObject);
 		}
 
 		/// <summary>

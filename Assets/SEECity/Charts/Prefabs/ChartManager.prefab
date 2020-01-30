@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e460e911cf837cf4ab51fe6330360685, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectionMode: 0
   cameraDistance: 40
   moveWithRotation: 1
   cameraFlightTime: 0.5
@@ -53,7 +54,9 @@ MonoBehaviour:
   buildingHighlightMaterial: {fileID: 2100000, guid: 9d631e931375b5242b8903c497a12c74,
     type: 2}
   highlightOutline: 0.005
-  HighlightLineLength: 20
+  standardColor: {r: 1, g: 0.9721673, b: 0.24056602, a: 1}
+  accentuationColor: {r: 1, g: 0.23921567, b: 0.9197777, a: 1}
+  highlightLineLength: 20
   highlightDuration: 5
   pointerLength: 5
   chartScrollSpeed: 10
