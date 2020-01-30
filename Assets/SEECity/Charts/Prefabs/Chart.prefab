@@ -1397,7 +1397,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.21698111, g: 0.21698111, b: 0.21698111, a: 0.84313726}
+  m_Color: {r: 0.16981131, g: 0.16981131, b: 0.16981131, a: 0.74509805}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -1437,7 +1437,7 @@ GameObject:
   - component: {fileID: 4785276354945708475}
   m_Layer: 5
   m_Name: Chart
-  m_TagString: Untagged
+  m_TagString: Chart
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1483,10 +1483,10 @@ MonoBehaviour:
   markerPrefab: {fileID: 7900548257253700385, guid: 1b7447dbbbeee5b459fcbc17d2feae1c,
     type: 3}
   entries: {fileID: 4785276354356836142}
-  minX: {fileID: 5259919525468694474}
-  maxX: {fileID: 6611437823145618348}
-  minY: {fileID: 137086097441516839}
-  maxY: {fileID: 4713178530221229291}
+  minXText: {fileID: 5259919525468694474}
+  maxXText: {fileID: 6611437823145618348}
+  minYText: {fileID: 137086097441516839}
+  maxYText: {fileID: 4713178530221229291}
   parent: {fileID: 4785276354945708473}
   dataPanel: {fileID: 4785276354708113209}
   labelsPanel: {fileID: 4785276354985796253}

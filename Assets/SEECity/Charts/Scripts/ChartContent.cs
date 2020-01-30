@@ -367,6 +367,16 @@ namespace SEECity.Charts.Scripts
 				                        axisDropdownY.Value);
 		}
 
+		public void HighlightCorrespondingMarker(GameObject highlight)
+		{
+			foreach (GameObject activeMarker in ActiveMarkers)
+			{
+				ChartMarker script = activeMarker.GetComponent<ChartMarker>();
+				if (script.linkedObject.Equals(highlight))
+					script.TriggerTimedHighlight(ChartManager.highlightDuration);
+			}
+		}
+
 		/// <summary>
 		/// Destroys the chart including its container if VR is activated.
 		/// </summary>
