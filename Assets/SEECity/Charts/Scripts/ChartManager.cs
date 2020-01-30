@@ -60,6 +60,10 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		[SerializeField] private float highlightOutline = 0.005f;
 
+		public Color standardColor;
+
+		public Color accentuationColor;
+
 		/// <summary>
 		/// The length of the beam appearing above highlighted objects.
 		/// </summary>
@@ -186,7 +190,7 @@ namespace SEECity.Charts.Scripts
 					Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
 					if (Physics.Raycast(ray, out RaycastHit hit, 100f))
-						HighlightHitObject(hit.transform.gameObject);
+						HighlightObject(hit.transform.gameObject);
 				}
 
 				if (Input.GetButtonDown("SelectionMode")) selectionMode = true;
@@ -216,11 +220,44 @@ namespace SEECity.Charts.Scripts
 			}
 		}
 
-		private void HighlightHitObject(GameObject hitObject)
+		public void HighlightObject(GameObject highlight)
 		{
 			GameObject[] charts = GameObject.FindGameObjectsWithTag("Chart");
 			foreach (GameObject chart in charts)
-				chart.GetComponent<ChartContent>().HighlightCorrespondingMarker(hitObject);
+				chart.GetComponent<ChartContent>().HighlightCorrespondingMarker(highlight);
+		}
+
+		public void Accentuate(GameObject highlight)
+		{
+			GameObject[] charts = GameObject.FindGameObjectsWithTag("Chart");
+			foreach (GameObject chart in charts)
+				chart.GetComponent<ChartContent>().AccentuateCorrespondingMarker(highlight);
+
+			Transform highlightTransform = highlight.transform;
+
+			for (int i = 0; i < highlightTransform.childCount; i++)
+			{
+				Transform child = highlightTransform.GetChild(i);
+				if (child.gameObject.name.Equals(highlight.name + "(Clone)"))
+				{
+					for (int x = 0; x < child.childCount; x++)
+					{
+						Transform secondChild = child.GetChild(x);
+						if (secondChild.gameObject.name.Equals("HighlightLine(Clone)"))
+						{
+							Debug.Log(secondChild.gameObject.name);
+							LineRenderer line = secondChild.GetComponent<LineRenderer>();
+							line.startColor = line.startColor.Equals(standardColor)
+								? accentuationColor
+								: standardColor;
+
+							break;
+						}
+					}
+
+					break;
+				}
+			}
 		}
 
 		/// <summary>

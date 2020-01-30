@@ -24,7 +24,6 @@ namespace SEECity.Charts.Scripts
 		{
 			ChartContent content =
 				Instantiate(chartPrefab, chartsCanvas).GetComponent<ChartContent>();
-			gameObject.SetActive(false);
 		}
 	}
 }

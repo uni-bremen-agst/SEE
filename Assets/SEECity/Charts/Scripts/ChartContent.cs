@@ -99,11 +99,11 @@ namespace SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Makes the chart refresh every 10 seconds.
+		/// Fills the chart for the first time.
 		/// </summary>
 		private void Start()
 		{
-			InvokeRepeating(nameof(CallDrawData), 0.2f, 10f);
+			Invoke(nameof(CallDrawData), 0.2f);
 		}
 
 		/// <summary>
@@ -144,8 +144,8 @@ namespace SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Since <see cref="MonoBehaviour.InvokeRepeating" /> does not support calls with parameter, it calls
-		/// this method to do the work.
+		/// Since <see cref="MonoBehaviour.Invoke" /> does not support calls with parameter, it calls this
+		/// method to do the work.
 		/// </summary>
 		private void CallDrawData()
 		{
@@ -322,6 +322,7 @@ namespace SEECity.Charts.Scripts
 					    oldScript.TimedHighlight != null)
 						script.TriggerTimedHighlight(
 							ChartManager.highlightDuration - oldScript.HighlightTime);
+					break;
 				}
 			}
 
@@ -338,13 +339,15 @@ namespace SEECity.Charts.Scripts
 		public virtual void AreaSelection(Vector2 min, Vector2 max, bool direction)
 		{
 			float highlightDuration = ChartManager.highlightDuration;
+
 			if (direction)
 				foreach (GameObject marker in ActiveMarkers)
 				{
 					Vector2 markerPos = marker.transform.position;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y &&
 					    markerPos.y < max.y)
-						marker.GetComponent<ChartMarker>().TriggerTimedHighlight(highlightDuration);
+						ChartManager.HighlightObject(
+							marker.GetComponent<ChartMarker>().linkedObject);
 				}
 			else
 				foreach (GameObject marker in ActiveMarkers)
@@ -352,7 +355,8 @@ namespace SEECity.Charts.Scripts
 					Vector2 markerPos = marker.transform.position;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y &&
 					    markerPos.y > max.y)
-						marker.GetComponent<ChartMarker>().TriggerTimedHighlight(highlightDuration);
+						ChartManager.HighlightObject(
+							marker.GetComponent<ChartMarker>().linkedObject);
 				}
 		}
 
@@ -373,7 +377,23 @@ namespace SEECity.Charts.Scripts
 			{
 				ChartMarker script = activeMarker.GetComponent<ChartMarker>();
 				if (script.linkedObject.Equals(highlight))
+				{
 					script.TriggerTimedHighlight(ChartManager.highlightDuration);
+					break;
+				}
+			}
+		}
+
+		public void AccentuateCorrespondingMarker(GameObject highlight)
+		{
+			foreach (GameObject activeMarker in ActiveMarkers)
+			{
+				ChartMarker script = activeMarker.GetComponent<ChartMarker>();
+				if (script.linkedObject.Equals(highlight))
+				{
+					script.Accentuate();
+					break;
+				}
 			}
 		}
 
