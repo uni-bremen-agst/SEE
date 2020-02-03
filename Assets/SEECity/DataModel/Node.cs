@@ -172,7 +172,7 @@ namespace SEE.DataModel
         /// <param name="edge">edge to be added as one of the node's outgoing edges</param>
         public void AddOutgoing(Edge edge)
         {
-            if (edge == null)
+            if (ReferenceEquals(edge, null))
             {
                 throw new Exception("edge must not be null");
             }
@@ -197,7 +197,7 @@ namespace SEE.DataModel
         /// <param name="edge">edge to be removed from the node's outgoing edges</param>
         public void RemoveOutgoing(Edge edge)
         {
-            if (edge == null)
+            if (ReferenceEquals(edge, null))
             {
                 throw new Exception("edge must not be null");
             }
@@ -246,7 +246,7 @@ namespace SEE.DataModel
         /// <param name="child">descendant to be added to node</param>
         public void AddChild(Node child)
         {
-            if (child.Parent == null)
+            if (ReferenceEquals(child.Parent, null))
             {
                 children.Add(child);
                 child.Parent = this;
@@ -286,9 +286,9 @@ namespace SEE.DataModel
         /// <returns></returns>
         public static int CompareTo(Node first, Node second)
         {
-            if (first == null)
+            if (ReferenceEquals(first, null))
             {
-                if (second == null)
+                if (ReferenceEquals(second, null))
                 {
                     // If first is null and second is null, they're equal. 
                     return 0;
@@ -302,7 +302,7 @@ namespace SEE.DataModel
             else
             {
                 // If first is not null...
-                if (second == null)
+                if (ReferenceEquals(second, null))
                 // ...and second is null, first is greater.
                 {
                     return 1;
@@ -365,7 +365,7 @@ namespace SEE.DataModel
         /// <returns>all edges from this node to target node with exactly the given edge type</returns>
         public List<Edge> From_To(Node target, string its_type)
         {
-            if (target == null)
+            if (ReferenceEquals(target, null))
             {
                 throw new Exception("target node must not be null");
             }

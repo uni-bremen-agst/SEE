@@ -6,7 +6,6 @@ using SEE.Layout;
 using System.Collections.Generic;
 using UnityEngine.XR;
 using System.Linq;
-using System.IO;
 
 namespace SEEEditor
 {
@@ -184,7 +183,11 @@ namespace SEEEditor
                     EnableVR(VRenabled);
   
                     graph = SceneGraphs.Add(editorSettings);
-                    if (graph != null)
+                    if (ReferenceEquals(graph, null))
+                    {
+                        Debug.LogError("No graph loaded.\n");
+                    }
+                    else
                     {
                         int numberOfErrors = MetricImporter.Load(graph, editorSettings.CSVPath());
                         if (numberOfErrors > 0)
@@ -206,10 +209,6 @@ namespace SEEEditor
                         renderer.Draw(graph);
                         // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
                         AdjustCameraSpeed(renderer.Unit());
-                    }
-                    else
-                    {
-                        Debug.LogError("No graph loaded.\n");
                     }
                     break;
 

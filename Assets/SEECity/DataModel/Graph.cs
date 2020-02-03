@@ -39,19 +39,19 @@ namespace SEE.DataModel
         /// <param name="node"></param>
         public void AddNode(Node node)
         {
-            if (node == null)
+            if (ReferenceEquals(node, null))
             {
-                throw new System.Exception("node must not be null");
+                throw new Exception("node must not be null");
             }
             else if (String.IsNullOrEmpty(node.LinkName))
             {
-                throw new System.Exception("linkname of a node must neither be null nor empty");
+                throw new Exception("linkname of a node must neither be null nor empty");
             }
             else if (nodes.ContainsKey(node.LinkName))
             {
-                throw new System.Exception("linknames must be unique");
+                throw new Exception("linknames must be unique");
             }
-            else if (node.ItsGraph != null)
+            else if (!ReferenceEquals(node.ItsGraph, null))
             {
                 throw new Exception("node " + node.ToString() + " is already in a graph " + node.ItsGraph.Name);
             }
@@ -71,13 +71,13 @@ namespace SEE.DataModel
         /// <param name="node">node to be removed</param>
         public void RemoveNode(Node node)
         {
-            if (node == null)
+            if (ReferenceEquals(node, null))
             {
                 throw new System.Exception("node must not be null");
             }
             else if (node.ItsGraph != this)
             {
-                if (node.ItsGraph == null)
+                if (ReferenceEquals(node.ItsGraph, null))
                 {
                     throw new Exception("node " + node.ToString() + " is not contained in any graph");
                 }
@@ -108,15 +108,18 @@ namespace SEE.DataModel
         /// <returns>true iff there is a node contained in the graph with node.LinkName</returns>
         public bool Contains(Node node)
         {
-            if (node == null)
+            if (ReferenceEquals(node, null))
             {
                 throw new System.Exception("node must not be null");
             }
-            if (String.IsNullOrEmpty(node.LinkName))
+            else if (String.IsNullOrEmpty(node.LinkName))
             {
                 throw new System.Exception("linkname of a node must neither be null nor empty");
             }
-            return nodes.ContainsKey(node.LinkName);
+            else
+            {
+                return nodes.ContainsKey(node.LinkName);
+            }
         }
 
         /// <summary>
@@ -149,15 +152,15 @@ namespace SEE.DataModel
         /// </summary>
         public void AddEdge(Edge edge)
         {
-            if (edge == null)
+            if (ReferenceEquals(edge, null))
             {
                 throw new Exception("edge must not be null");
             }
-            else if (edge.Source == null || edge.Target == null)
+            else if (ReferenceEquals(edge.Source, null) || ReferenceEquals(edge.Target, null))
             {
                 throw new Exception("source/target of this node is null");
             }
-            else if (edge.ItsGraph == null)
+            else if (ReferenceEquals(edge.ItsGraph, null))
             {
                 if (edge.Source.ItsGraph != this)
                 {
@@ -186,13 +189,13 @@ namespace SEE.DataModel
         /// <param name="edge">edge to be removed</param>
         public void RemoveEdge(Edge edge)
         {
-            if (edge == null)
+            if (ReferenceEquals(edge, null))
             {
                 throw new Exception("edge must not be null");
             }
             else if (edge.ItsGraph != this)
             {
-                if (edge.ItsGraph == null)
+                if (ReferenceEquals(edge.ItsGraph, null))
                 {
                     throw new Exception("edge " + edge.ToString() + " is not contained in any graph");
                 }

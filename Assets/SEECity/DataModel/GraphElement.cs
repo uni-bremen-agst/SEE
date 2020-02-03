@@ -19,6 +19,7 @@ namespace SEE.DataModel
         /// the element is currently not in a graph.
         /// </summary>
         [SerializeField]
+        //[System.NonSerialized]
         protected Graph graph;
 
         /// <summary>
@@ -27,7 +28,7 @@ namespace SEE.DataModel
         /// 
         /// Note: The set operation is intended only for Graph.
         /// </summary>
-        [SerializeField]
+        //[SerializeField]
         public Graph ItsGraph
         {
             get => graph;
