@@ -24,6 +24,8 @@ namespace SEECity.Charts.Scripts
 		[Header("For resizing"), SerializeField]
 		private Transform dragButton;
 
+		[SerializeField] private RectTransform noDataWarning;
+
 		[SerializeField] private Transform topRight;
 		[SerializeField] private Transform topLeft;
 		[SerializeField] private Transform bottomRight;
@@ -85,6 +87,7 @@ namespace SEECity.Charts.Scripts
 			RectTransform dataPanel = _chartContent.dataPanel;
 			dataPanel.sizeDelta = new Vector2(width - 100, height - 100);
 			dataPanel.anchoredPosition = new Vector2(width / 2, height / 2);
+			noDataWarning.sizeDelta = new Vector2(width - 150, height - 150);
 			RectTransform labelsPanel = _chartContent.labelsPanel;
 			labelsPanel.sizeDelta = new Vector2(width, height);
 			labelsPanel.anchoredPosition = new Vector2(width / 2, height / 2);

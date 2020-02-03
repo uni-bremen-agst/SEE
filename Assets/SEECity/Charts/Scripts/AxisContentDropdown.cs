@@ -62,5 +62,10 @@ namespace SEECity.Charts.Scripts
 			_chartContent.DrawData(true);
 			_chartContent.SetInfoText();
 		}
+
+		public void SetText(string text)
+		{
+			_dropdown.captionText.text = text;
+		}
 	}
 }

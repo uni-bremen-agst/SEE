@@ -53,6 +53,9 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		[SerializeField] private GameObject entries;
 
+		[FormerlySerializedAs("_noDataWarning"), SerializeField]
+		private GameObject noDataWarning;
+
 		[FormerlySerializedAs("minX"), SerializeField]
 		private TextMeshProUGUI minXText;
 
@@ -159,14 +162,21 @@ namespace SEECity.Charts.Scripts
 		public void DrawData(bool needData)
 		{
 			if (needData) FindDataObjects();
+			noDataWarning.SetActive(false);
 
 			if (axisDropdownX.Value.Equals(axisDropdownY.Value))
-				DrawOne();
+				DrawOneAxis();
 			else
-				DrawTwo();
+				DrawTwoAxes();
+
+			if (ActiveMarkers.Count == 0) noDataWarning.SetActive(true);
 		}
 
-		private void DrawTwo()
+		/// <summary>
+		/// Adds a marker for every <see cref="Node" /> containing the metrics from both axes. It's position
+		/// depends on the values of those metrics.
+		/// </summary>
+		private void DrawTwoAxes()
 		{
 			int i = 0;
 			Node node = _dataObjects[i].GetComponent<NodeRef>().node;
@@ -213,21 +223,39 @@ namespace SEECity.Charts.Scripts
 				if (inX && inY) toDraw.Add(data);
 			}
 
-			AddMarkers(toDraw, minX, maxX, minY, maxY);
-
-			minXText.text = minX.ToString("0.00");
-			maxXText.text = maxX.ToString("0.00");
-			minYText.text = minY.ToString("0.00");
-			maxYText.text = maxY.ToString("0.00");
+			bool xEqual = minX.Equals(maxX);
+			bool yEqual = minY.Equals(maxY);
+			if (xEqual || yEqual)
+			{
+				(float min, float max) = minX.Equals(maxX) ? (minY, maxY) : (minX, maxX);
+				AddMarkers(toDraw, min, max);
+				minXText.text = xEqual ? "0" : minX.ToString("0.00");
+				maxXText.text = xEqual ? toDraw.Count.ToString() : maxX.ToString("0.00");
+				minYText.text = yEqual ? "0" : minY.ToString("0.00");
+				maxYText.text = yEqual ? toDraw.Count.ToString() : maxY.ToString("0.00");
+			}
+			else
+			{
+				AddMarkers(toDraw, minX, maxX, minY, maxY);
+				minXText.text = minX.ToString("0.00");
+				maxXText.text = maxX.ToString("0.00");
+				minYText.text = minY.ToString("0.00");
+				maxYText.text = maxY.ToString("0.00");
+			}
 		}
 
-		private void DrawOne()
+		/// <summary>
+		/// Adds a marker for every <see cref="Node" /> containing the metric that is the same for both axes.
+		/// Therefore markers will be ordered by that one value and the distance between markers on the x-Axis
+		/// will be consistent.
+		/// </summary>
+		private void DrawOneAxis()
 		{
 			List<GameObject> toDraw = new List<GameObject>();
 			string metric = axisDropdownY.Value;
 
 			foreach (GameObject dataObject in _dataObjects)
-				if (dataObject.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float value))
+				if (dataObject.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float _))
 					toDraw.Add(dataObject);
 
 			toDraw.Sort(delegate(GameObject go1, GameObject go2)
@@ -278,14 +306,11 @@ namespace SEECity.Charts.Scripts
 				marker.GetComponent<RectTransform>().anchoredPosition =
 					new Vector2((valueX - minX) * width, (valueY - minY) * height);
 				updatedMarkers.Add(marker);
-				foreach (GameObject oldMarker in ActiveMarkers)
-				{
-					ChartMarker oldScript = oldMarker.GetComponent<ChartMarker>();
-					if (oldScript.linkedObject.GetInstanceID() == data.GetInstanceID() &&
-					    oldScript.TimedHighlight != null)
-						script.TriggerTimedHighlight(
-							ChartManager.highlightDuration - oldScript.HighlightTime);
-				}
+
+				float highlightTimeLeft = CheckOldMarkers(data);
+				if (highlightTimeLeft > 0f)
+					script.TriggerTimedHighlight(ChartManager.highlightDuration -
+					                             highlightTimeLeft, true);
 			}
 
 			foreach (GameObject marker in ActiveMarkers) Destroy(marker);
@@ -294,12 +319,56 @@ namespace SEECity.Charts.Scripts
 
 		private void AddMarkers(List<GameObject> toDraw, float min, float max)
 		{
+			if (min.Equals(max))
+			{
+				AddMarkers(toDraw);
+			}
+			else
+			{
+				List<GameObject> updatedMarkers = new List<GameObject>();
+				Rect dataRect = dataPanel.rect;
+				float width = dataRect.width / (toDraw.Count - 1);
+				float height = dataRect.height / (max - min);
+				string metric = axisDropdownY.Value;
+				//toDraw[0].GetComponent<NodeRef>().node
+				//	.TryGetNumeric(axisDropdownX.Value, out float dropdownValue);
+				//axisDropdownX.SetText(axisDropdownX.Value + " " + dropdownValue.ToString("0.00"));
+				int x = 0;
+
+				foreach (GameObject data in toDraw)
+				{
+					GameObject marker = Instantiate(markerPrefab, entries.transform);
+					ChartMarker script = marker.GetComponent<ChartMarker>();
+					script.linkedObject = data;
+					Node node = data.GetComponent<NodeRef>().node;
+					node.TryGetNumeric(metric, out float value);
+					string type = node.IsLeaf() ? "Building" : "Node";
+					script.SetInfoText("Linked to: " + data.name + " of type " + type + "\n" +
+					                   metric +
+					                   ": " + value.ToString("0.00"));
+					marker.GetComponent<RectTransform>().anchoredPosition =
+						new Vector2(x++ * width, (value - min) * height);
+					updatedMarkers.Add(marker);
+
+					float highlightTimeLeft = CheckOldMarkers(data);
+					if (highlightTimeLeft > 0f)
+						script.TriggerTimedHighlight(ChartManager.highlightDuration -
+						                             highlightTimeLeft, true);
+				}
+
+				foreach (GameObject marker in ActiveMarkers) Destroy(marker);
+				ActiveMarkers = updatedMarkers;
+			}
+		}
+
+		private void AddMarkers(List<GameObject> toDraw)
+		{
 			List<GameObject> updatedMarkers = new List<GameObject>();
 			Rect dataRect = dataPanel.rect;
-			float width = dataRect.width / (toDraw.Count - 1);
-			float height = dataRect.height / (max - min);
-			string metric = axisDropdownY.Value;
-			int i = 0;
+			float width = dataRect.width / toDraw.Count;
+			float height = dataRect.height / toDraw.Count;
+			int x = 0;
+			int y = 0;
 
 			foreach (GameObject data in toDraw)
 			{
@@ -307,27 +376,35 @@ namespace SEECity.Charts.Scripts
 				ChartMarker script = marker.GetComponent<ChartMarker>();
 				script.linkedObject = data;
 				Node node = data.GetComponent<NodeRef>().node;
-				node.TryGetNumeric(metric, out float value);
+				node.TryGetNumeric(axisDropdownX.Value, out float valueX);
+				node.TryGetNumeric(axisDropdownY.Value, out float valueY);
 				string type = node.IsLeaf() ? "Building" : "Node";
-				script.SetInfoText("Linked to: " + data.name + " of type " + type + "\n" + metric +
-				                   ": " + value.ToString("0.00"));
+				script.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
+				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("0.00"));
 				marker.GetComponent<RectTransform>().anchoredPosition =
-					new Vector2(i++ * width, (value - min) * height);
+					new Vector2(x++ * width, y++ * height);
 				updatedMarkers.Add(marker);
 
-				foreach (GameObject oldMarker in ActiveMarkers)
-				{
-					ChartMarker oldScript = oldMarker.GetComponent<ChartMarker>();
-					if (oldScript.linkedObject.GetInstanceID() == data.GetInstanceID() &&
-					    oldScript.TimedHighlight != null)
-						script.TriggerTimedHighlight(
-							ChartManager.highlightDuration - oldScript.HighlightTime);
-					break;
-				}
+				float highlightTimeLeft = CheckOldMarkers(data);
+				if (highlightTimeLeft > 0f)
+					script.TriggerTimedHighlight(ChartManager.highlightDuration -
+					                             highlightTimeLeft, true);
 			}
 
 			foreach (GameObject marker in ActiveMarkers) Destroy(marker);
 			ActiveMarkers = updatedMarkers;
+		}
+
+		private float CheckOldMarkers(GameObject marker)
+		{
+			foreach (GameObject oldMarker in ActiveMarkers)
+			{
+				ChartMarker oldScript = oldMarker.GetComponent<ChartMarker>();
+				if (oldScript.linkedObject.GetInstanceID() == marker.GetInstanceID() &&
+				    oldScript.TimedHighlight != null) return oldScript.HighlightTime;
+			}
+
+			return 0f;
 		}
 
 		/// <summary>
@@ -338,8 +415,6 @@ namespace SEECity.Charts.Scripts
 		/// <param name="direction">True if min lies below max, false if not.</param>
 		public virtual void AreaSelection(Vector2 min, Vector2 max, bool direction)
 		{
-			float highlightDuration = ChartManager.highlightDuration;
-
 			if (direction)
 				foreach (GameObject marker in ActiveMarkers)
 				{
@@ -378,7 +453,7 @@ namespace SEECity.Charts.Scripts
 				ChartMarker script = activeMarker.GetComponent<ChartMarker>();
 				if (script.linkedObject.Equals(highlight))
 				{
-					script.TriggerTimedHighlight(ChartManager.highlightDuration);
+					script.TriggerTimedHighlight(ChartManager.highlightDuration, false);
 					break;
 				}
 			}

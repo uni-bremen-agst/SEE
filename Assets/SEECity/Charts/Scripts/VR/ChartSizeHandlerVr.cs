@@ -5,7 +5,7 @@ namespace SEECity.Charts.Scripts.VR
 {
 	public class ChartSizeHandlerVr : ChartSizeHandler
 	{
-		private ChartContentVr _chartContent;
+		private ChartContentVr _chartContentVirtualR;
 		private RectTransform _virtualRealityCanvas;
 		private GameObject _physicalOpen;
 		private GameObject _physicalClosed;
@@ -15,10 +15,10 @@ namespace SEECity.Charts.Scripts.VR
 		protected override void Awake()
 		{
 			base.Awake();
-			_chartContent = transform.parent.GetComponent<ChartContentVr>();
+			_chartContentVirtualR = transform.parent.GetComponent<ChartContentVr>();
 			_virtualRealityCanvas = Chart.parent.GetComponent<RectTransform>();
-			_physicalOpen = _chartContent.physicalOpen;
-			_physicalClosed = _chartContent.physicalClosed;
+			_physicalOpen = _chartContentVirtualR.physicalOpen;
+			_physicalClosed = _chartContentVirtualR.physicalClosed;
 		}
 
 		public override void OnDrag(PointerEventData eventData)
