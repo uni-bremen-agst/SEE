@@ -41,7 +41,7 @@
       "requirement": "optional"
     },
     {
-      "name": "/actions/default/in/MoveInOut",
+      "name": "/actions/default/in/MoveChartInOut",
       "type": "vector2"
     },
     {
@@ -146,8 +146,7 @@
       "/actions/default/in/SkeletonRightHand": "Skeleton (Right)",
       "/actions/default/in/Teleport": "Teleport",
       "/actions/default/out/Haptic": "Haptic",
-      "/actions/platformer/in/Jump": "Jump",
-      "/actions/default/in/MoveInOut": "Move in/out"
+      "/actions/platformer/in/Jump": "Jump"
     }
   ]
 }

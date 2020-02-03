@@ -1374,6 +1374,12 @@ Transform:
   m_Father: {fileID: 1704335111}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &417235960 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8909484703925855460, guid: 4ccd5ea94039989458149588b86c9e40,
+    type: 3}
+  m_PrefabInstance: {fileID: 1334954064}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &484404145
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1441,6 +1447,11 @@ PrefabInstance:
       propertyPath: vrObjects.Array.data[0]
       value: 
       objectReference: {fileID: 1334954065}
+    - target: {fileID: 2342395875013397700, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: pointerLength
+      value: 80
+      objectReference: {fileID: 0}
     - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6173,7 +6184,7 @@ PrefabInstance:
     - target: {fileID: 8909484703925551714, guid: 4ccd5ea94039989458149588b86c9e40,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 4.63
       objectReference: {fileID: 0}
     - target: {fileID: 8909484703925551714, guid: 4ccd5ea94039989458149588b86c9e40,
         type: 3}
@@ -6238,6 +6249,32 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1334954064}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1334954068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334954065}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e2aa1509d12c0249873ef9f92ea2c53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Rig: {fileID: 1334954065}
+  Controler: {fileID: 417235960}
+  _OnLeftTrigger:
+    m_PersistentCalls:
+      m_Calls: []
+  _OnLeftTouchButtonPressed:
+    m_PersistentCalls:
+      m_Calls: []
+  _OnLeftTouchButtonReleased:
+    m_PersistentCalls:
+      m_Calls: []
+  test:
+    actionPath: /actions/default/in/Squeeze
+    needsReinit: 0
 --- !u!1 &1359664066
 GameObject:
   m_ObjectHideFlags: 0

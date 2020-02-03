@@ -89,11 +89,11 @@ namespace Valve.VR
             }
         }
         
-        public virtual SteamVR_Action_Vector2 MoveInOut
+        public virtual SteamVR_Action_Vector2 MoveChartInOut
         {
             get
             {
-                return SteamVR_Actions.default_MoveInOut;
+                return SteamVR_Actions.default_MoveChartInOut;
             }
         }
         

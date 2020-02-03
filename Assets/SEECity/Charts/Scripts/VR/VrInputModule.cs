@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Layout;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using Valve.VR;
 
@@ -52,6 +53,9 @@ namespace SEECity.Charts.Scripts.VR
 			_click = _chartManager.click;
 		}
 
+		/// <summary>
+		/// Initializes <see cref="EventData"/>.
+		/// </summary>
 		protected override void Start()
 		{
 			EventData = new PointerEventData(eventSystem)
@@ -61,6 +65,9 @@ namespace SEECity.Charts.Scripts.VR
 			};
 		}
 
+		/// <summary>
+		/// Sends a raycast and triggers actions depending on the users input.
+		/// </summary>
 		public override void Process()
 		{
 			eventSystem.RaycastAll(EventData, m_RaycastResultCache);
@@ -71,6 +78,9 @@ namespace SEECity.Charts.Scripts.VR
 			if (_click.GetStateUp(_source)) Release();
 		}
 
+		/// <summary>
+		/// Finds handlers on the object the user pressed on, that should react to the press and triggers them.
+		/// </summary>
 		private void Press()
 		{
 			EventData.pointerPressRaycast = EventData.pointerCurrentRaycast;
@@ -85,8 +95,15 @@ namespace SEECity.Charts.Scripts.VR
 			ExecuteEvents.Execute(EventData.pointerPress, EventData,
 				ExecuteEvents.pointerDownHandler);
 			ExecuteEvents.Execute(EventData.pointerDrag, EventData, ExecuteEvents.beginDragHandler);
+
+			Ray ray = new Ray(_pointer.transform.position, _pointer.transform.forward);
+			if (Physics.Raycast(ray, out RaycastHit hit, _chartManager.pointerLength) && hit.transform.gameObject.TryGetComponent(out NodeRef _)) _chartManager.HighlightObject(hit.transform.gameObject);
+			
 		}
 
+		/// <summary>
+		/// Finds handlers on the object the user released on, that should react to a release and triggers them.
+		/// </summary>
 		private void Release()
 		{
 			GameObject pointerRelease =

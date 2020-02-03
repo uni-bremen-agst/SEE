@@ -39,7 +39,7 @@ namespace SEECity.Charts.Scripts.VR
 		public Camera Camera { get; private set; }
 
 		/// <summary>
-		/// TODO
+		/// Initializes some Attributes.
 		/// </summary>
 		private void Awake()
 		{
@@ -50,7 +50,7 @@ namespace SEECity.Charts.Scripts.VR
 		}
 
 		/// <summary>
-		/// TODO
+		/// Initializes some attributes.
 		/// </summary>
 		private void Start()
 		{
@@ -77,7 +77,7 @@ namespace SEECity.Charts.Scripts.VR
 		}
 
 		/// <summary>
-		/// TODO
+		/// Checks the distance to the hit object and sets the length of the pointer accordingly.
 		/// </summary>
 		private void UpdateLine()
 		{
@@ -95,9 +95,9 @@ namespace SEECity.Charts.Scripts.VR
 		}
 
 		/// <summary>
-		/// TODO
+		/// Sends out a new Raycast and returns the hit data.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Information about the hit.</returns>
 		private RaycastHit CreateRaycast()
 		{
 			Ray ray = new Ray(transform.position, transform.forward);

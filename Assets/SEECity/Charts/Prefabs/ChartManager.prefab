@@ -54,11 +54,11 @@ MonoBehaviour:
   buildingHighlightMaterial: {fileID: 2100000, guid: 9d631e931375b5242b8903c497a12c74,
     type: 2}
   highlightOutline: 0.005
-  standardColor: {r: 1, g: 0.9721673, b: 0.24056602, a: 1}
-  accentuationColor: {r: 1, g: 0.23921567, b: 0.9197777, a: 1}
+  standardColor: {r: 1, g: 0.9721673, b: 0.24056599, a: 1}
+  accentuationColor: {r: 1, g: 0.23921567, b: 0.62098527, a: 1}
   highlightLineLength: 20
   highlightDuration: 5
-  pointerLength: 5
+  pointerLength: 10
   chartScrollSpeed: 10
   distanceThreshold: 0.5
   source: 2
@@ -66,7 +66,7 @@ MonoBehaviour:
     actionPath: /actions/default/in/GrabPinch
     needsReinit: 0
   moveInOut:
-    actionPath: /actions/default/in/MoveInOut
+    actionPath: /actions/default/in/MoveChartInOut
     needsReinit: 0
   resetPosition:
     actionPath: /actions/default/in/GrabGrip

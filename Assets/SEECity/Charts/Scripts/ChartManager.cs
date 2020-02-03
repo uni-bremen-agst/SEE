@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Layout;
+using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.XR;
 using Valve.VR;
@@ -15,7 +16,7 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private static ChartManager _instance;
 
-		public bool selectionMode;
+		[HideInInspector] public bool selectionMode;
 
 		/// <summary>
 		/// The distance the camera will keep to the <see cref="GameObject" /> to focus on.
@@ -189,8 +190,7 @@ namespace SEECity.Charts.Scripts
 				{
 					Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-					if (Physics.Raycast(ray, out RaycastHit hit, 100f))
-						HighlightObject(hit.transform.gameObject);
+					if (Physics.Raycast(ray, out RaycastHit hit, 100f) && hit.transform.gameObject.TryGetComponent(out NodeRef _)) HighlightObject(hit.transform.gameObject);
 				}
 
 				if (Input.GetButtonDown("SelectionMode")) selectionMode = true;
@@ -245,12 +245,7 @@ namespace SEECity.Charts.Scripts
 						Transform secondChild = child.GetChild(x);
 						if (secondChild.gameObject.name.Equals("HighlightLine(Clone)"))
 						{
-							Debug.Log(secondChild.gameObject.name);
-							LineRenderer line = secondChild.GetComponent<LineRenderer>();
-							line.startColor = line.startColor.Equals(standardColor)
-								? accentuationColor
-								: standardColor;
-
+							secondChild.GetComponent<HighlightLine>().ToggleAccentuation();
 							break;
 						}
 					}
