@@ -129,7 +129,7 @@ namespace SEECity.Charts.Scripts
 				Transform child = linkedObject.transform.GetChild(i);
 				if (child.name.Equals(linkedObject.name + "(Clone)"))
 				{
-					TriggerTimedHighlight(_chartManager.highlightDuration);
+					TriggerTimedHighlight(_chartManager.highlightDuration, false);
 					break;
 				}
 			}
@@ -215,7 +215,7 @@ namespace SEECity.Charts.Scripts
 		/// Highlights this marker and its <see cref="linkedObject" /> for a given amount of time.
 		/// </summary>
 		/// <param name="time">How long the highlight will last.</param>
-		public void TriggerTimedHighlight(float time)
+		public void TriggerTimedHighlight(float time, bool updateCall)
 		{
 			bool reactivate = false;
 
@@ -224,7 +224,7 @@ namespace SEECity.Charts.Scripts
 				StopCoroutine(TimedHighlight);
 				HighlightLinkedObjectToggle(false);
 				TimedHighlight = null;
-				if (_chartManager.selectionMode) reactivate = true;
+				if (_chartManager.selectionMode || updateCall) reactivate = true;
 			}
 
 			if (!reactivate) TimedHighlight = StartCoroutine(TimedHighlightRoutine(time));
@@ -384,7 +384,7 @@ namespace SEECity.Charts.Scripts
 		{
 			if (_reactivateHighlight)
 			{
-				TriggerTimedHighlight(_highlightDuration - HighlightTime);
+				TriggerTimedHighlight(_highlightDuration - HighlightTime, true);
 				_reactivateHighlight = false;
 			}
 		}
