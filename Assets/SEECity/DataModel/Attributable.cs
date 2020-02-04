@@ -28,7 +28,7 @@ namespace SEE.DataModel
     /// Specifies and implements attributable objects with named toggle, int, float, and string attributes.
     /// </summary>
     [System.Serializable]
-    public abstract class Attributable : UnityEngine.ScriptableObject, ICloneable
+    public abstract class Attributable : ICloneable
     {
         /// <summary>
         /// The set of toggle attributes. A toggle is set if it is contained in this
