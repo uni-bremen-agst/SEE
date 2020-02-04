@@ -9,6 +9,7 @@ namespace SEE.DataModel
     /// </summary>
     internal class TestReflexionAnalysis : Observer
     {
+        private const string call = "call";
         private Graph impl;
         private Graph arch;
         private Graph mapping;
@@ -34,6 +35,9 @@ namespace SEE.DataModel
             mapping = NewMapping();
             reflexion = new Reflexion(impl, arch, mapping);
             reflexion.Register(this);
+            edgeChanges = new List<EdgeChange>();
+            propagatedEdges = new List<PropagatedEdge>();
+            removedEdges = new List<RemovedEdge>();
         }
 
         /// <summary>
@@ -60,6 +64,72 @@ namespace SEE.DataModel
             reflexion = null;
             HierarchicalEdges = null;
             logger = null;
+            edgeChanges = null;
+            propagatedEdges = null;
+            removedEdges = null;
+        }
+
+        /// <summary>
+        /// List of edges changed for a single reflexion-analysis run.
+        /// </summary>
+        private List<EdgeChange> edgeChanges = new List<EdgeChange>();
+        /// <summary>
+        /// List of edges propagated from the implementation onto the architecture for 
+        /// a single reflexion-analysis run.
+        /// </summary>
+        private List<PropagatedEdge> propagatedEdges = new List<PropagatedEdge>();
+        /// <summary>
+        /// List of edges removed for a single reflexion-analysis run.
+        /// </summary>
+        private List<RemovedEdge> removedEdges = new List<RemovedEdge>();
+
+        /// <summary>
+        /// Dumps the results collected in edgeChanges, propagatedEdges, and removedEdges
+        /// to standard output.
+        /// </summary>
+        private void DumpEvents()
+        {
+            Debug.Log("DEPENDENCIES PROPAGATED TO ARCHITECTURE\n");
+            foreach (PropagatedEdge e in propagatedEdges)
+            {
+                Debug.LogFormat("propagated {0}\n", e.propagatedEdge.ToString());
+            }
+            Debug.Log("DEPENDENCIES CHANGED IN ARCHITECTURE\n");
+            foreach (EdgeChange e in edgeChanges)
+            {
+                Debug.LogFormat("changed {0} from {1} to {2}\n", e.edge.ToString(), e.oldState, e.newState);
+            }
+            Debug.Log("DEPENDENCIES REMOVED FROM ARCHITECTURE\n");
+            foreach (RemovedEdge e in removedEdges)
+            {
+                Debug.LogFormat("removed {0}\n", e.edge.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Callback of reflexion analysis. Will be called by reflexion analysis on every
+        /// state change. Collects the events in the respective change-event lists
+        /// edgeChanges, propagatedEdges, removedEdges.
+        /// </summary>
+        /// <param name="changeEvent">the event that occurred</param>
+        public void Update(ChangeEvent changeEvent)
+        {
+            if (changeEvent is EdgeChange)
+            {
+                edgeChanges.Add(changeEvent as EdgeChange);
+            }
+            else if (changeEvent is PropagatedEdge)
+            {
+                propagatedEdges.Add(changeEvent as PropagatedEdge);
+            }
+            else if (changeEvent is RemovedEdge)
+            {
+                removedEdges.Add(changeEvent as RemovedEdge);
+            }
+            else
+            {
+                Debug.LogErrorFormat("UNHANDLED CALLBACK: {0}\n", changeEvent.ToString());
+            }
         }
 
         [Test]
@@ -150,10 +220,10 @@ namespace SEE.DataModel
             Node n2_c1 = NewNode(graph, "N2_C1", "Component");
             n2.AddChild(n2_c1);
 
-            NewEdge(graph, n1_c1, n2_c1, "call");
-            NewEdge(graph, n2, n1, "call");
-            NewEdge(graph, n3, n2_c1, "call");
-            NewEdge(graph, n3, n1_c2, "call");
+            NewEdge(graph, n1_c1, n2_c1, call);
+            NewEdge(graph, n2, n1, call);
+            NewEdge(graph, n3, n2_c1, call);
+            NewEdge(graph, n3, n1_c2, call);
 
             return graph;
         }
@@ -261,15 +331,15 @@ namespace SEE.DataModel
         ///   call(n2, n3)
         /// </summary>
         /// <returns>implementation graph</returns>
-        private Graph ImportGraph()
+        private Graph CallGraph()
         {
             Graph graph = NewImplementationNodeHierarchy();
             Node n1 = graph.GetNode("n1");
             Node n2 = graph.GetNode("n2");
             Node n3 = graph.GetNode("n3");
-            NewEdge(graph, n1, n2, "call");
-            NewEdge(graph, n2, n3, "call");
-            NewEdge(graph, n2, n3, "call");
+            NewEdge(graph, n1, n2, call);
+            NewEdge(graph, n2, n3, call);
+            NewEdge(graph, n2, n3, call);
             return graph;
         }
 
@@ -280,22 +350,28 @@ namespace SEE.DataModel
             Node n2 = impl.GetNode("n2");
             Node n3 = impl.GetNode("n3");
 
+            Node n1_c1 = impl.GetNode("n1_c1");
+            Node n1_c2 = impl.GetNode("n1_c2");
             Node n1_c1_c1 = impl.GetNode("n1_c1_c1");
             Node n1_c1_c2 = impl.GetNode("n1_c1_c2");
             Node n2_c1 = impl.GetNode("n2_c1");
 
-            NewEdge(impl, n2, n1, "call");
-            NewEdge(impl, n3, n2_c1, "call");
-            NewEdge(impl, n1, n2, "call");
-            NewEdge(impl, n2, n3, "call");
-            NewEdge(impl, n2, n3, "call");
+            NewEdge(impl, n2, n1, call);
+            NewEdge(impl, n3, n2_c1, call);
+            NewEdge(impl, n3, n1_c2, call);
+            NewEdge(impl, n1_c1, n2_c1, call);
 
             reflexion.Run();
-        }
+            DumpEvents();
 
-        public void Update(ChangeEvent changeEvent)
-        {
-            Debug.Log(changeEvent.ToString());
+            // 4 propagated edges
+            Assert.Equals(4, propagatedEdges.Count);
+            // 4 convergent architecture dependencies and 4 allowed propagated dependencies
+            Assert.Equals(8, edgeChanges.Count);
+            // 0 removed edges
+            Assert.Equals(0, removedEdges.Count);
+
+            
         }
     }
 }
