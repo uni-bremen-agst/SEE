@@ -5,8 +5,8 @@ using SEE.Layout;
 
 namespace SEEEditor
 {
-    [CustomEditor(typeof(NodeRef))]
-    [CanEditMultipleObjects]
+    //[CustomEditor(typeof(NodeRef))]
+    //[CanEditMultipleObjects]
     public class GraphElementEditor : Editor
     {
         public override void OnInspectorGUI()
