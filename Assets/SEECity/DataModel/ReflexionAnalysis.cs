@@ -1038,6 +1038,7 @@ namespace SEE.DataModel
                     case State.undefined:
                     case State.specified:
                         set_counter(edge, 0); // Note: architecture edges have a counter
+                        set_initial(edge, State.specified); // initial state must be State.specified
                         break; 
                     case State.absent:
                     case State.convergent:
@@ -1186,10 +1187,9 @@ namespace SEE.DataModel
         private void propagate_and_lift_dependency(Edge implementation_dep)
         {
 #if DEBUG
-            /*
+
             Debug.LogFormat("propagate_and_lift_dependency: propagated implementation_dep = {0}\n",
                             edge_name(implementation_dep, true));
-            */
 #endif
             System.Diagnostics.Debug.Assert(implementation_dep.ItsGraph == _implementation);
             Node impl_source = implementation_dep.Source;
@@ -1204,6 +1204,9 @@ namespace SEE.DataModel
             if (arch_source == null || arch_target == null)
             {
                 // source or target are not mapped; so we cannot do anything
+#if DEBUG
+                Debug.Log("source or target are not mapped; bailing out\n");
+#endif
                 return; 
             }
             Edge architecture_dep = get_propagated_dependency(arch_source, arch_target, impl_type);
@@ -1212,6 +1215,9 @@ namespace SEE.DataModel
             Edge allowing_edge = null;
             if (architecture_dep == null)
             {   // a propagated dependency has not existed yet; we need to create one
+#if DEBUG
+                Debug.Log("new propagated dependency in architecture created\n");
+#endif
                 architecture_dep
                   = new_impl_dep_in_architecture
                       (arch_source, arch_target, impl_type, ref allowing_edge);
@@ -1220,6 +1226,9 @@ namespace SEE.DataModel
             else
             {
                 // a propagated dependency exists already
+#if DEBUG
+                Debug.Log("a propagated dependency exists already\n");
+#endif
                 int impl_counter = get_impl_counter(implementation_dep);
                 change_impl_ref(architecture_dep, impl_counter);
                 // Assert: architecture_dep.Source and architecture_dep.Target are in architecture.
@@ -1444,7 +1453,7 @@ namespace SEE.DataModel
                 + " and counter value "
                 + counter
                 + "\n");
-            dump_node_set(parents, "parents(to)");
+            //dump_node_set(parents, "parents(to)");
 #endif
 
             while (cursor != null)
@@ -1456,7 +1465,9 @@ namespace SEE.DataModel
                 // Assert: all edges in outs are in architecture.
                 foreach (Edge edge in outs)
                 { 
-                    // Assert: edge is in architecture
+                    // Assert: edge is in architecture; edge_type is the type of edge
+                    // being propagated and lifted; it may be more concrete than the
+                    // type of the specified architecture dependency.
                     if (is_specified(edge)
                         && edge.Has_Supertype_Of(edge_type)
                         && parents.Contains(edge.Target))
