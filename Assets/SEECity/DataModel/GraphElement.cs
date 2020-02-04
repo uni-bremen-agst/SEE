@@ -17,9 +17,11 @@ namespace SEE.DataModel
         /// <summary>
         /// The graph this graph element is contained in. May be null if
         /// the element is currently not in a graph.
+        /// 
+        /// IMPORTANT NOTE: This attribute will not be serialized. It may
+        /// be null at run-time or in the editor inspection view.
         /// </summary>
-        [SerializeField]
-        //[System.NonSerialized]
+        [System.NonSerialized]
         protected Graph graph;
 
         /// <summary>
@@ -27,8 +29,10 @@ namespace SEE.DataModel
         /// the element is currently not in a graph.
         /// 
         /// Note: The set operation is intended only for Graph.
+        /// 
+        /// IMPORTANT NOTE: This attribute will not be serialized. It may
+        /// be null at run-time or in the editor inspection view.
         /// </summary>
-        //[SerializeField]
         public Graph ItsGraph
         {
             get => graph;
@@ -58,6 +62,15 @@ namespace SEE.DataModel
             }
         }
 
+        /// <summary>
+        /// True if the type of this graph element is a super type of given type or equal to
+        /// given type. In other words, type --extends*--> this.Type.
+        /// 
+        /// IMPORTANT NOTE: Currently, we do not have a type hierarchy of the underlying
+        /// graph, hence, we only test whether both types are equal.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns>true iff type --extends*--> this.Type</returns>
         public bool Has_Supertype_Of(string type)
         {
             // FIXME: We currently do not have the type hierarchy, so we cannot know
