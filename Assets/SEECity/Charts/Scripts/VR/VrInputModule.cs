@@ -121,13 +121,6 @@ namespace SEECity.Charts.Scripts.VR
 			ExecuteEvents.Execute(EventData.pointerPress, EventData,
 				ExecuteEvents.pointerDownHandler);
 			ExecuteEvents.Execute(EventData.pointerDrag, EventData, ExecuteEvents.beginDragHandler);
-
-			//Ray ray = new Ray(_pointer.transform.position, _pointer.transform.forward);
-			//if (Physics.Raycast(ray, out RaycastHit hit, _chartManager.pointerLength) && hit.transform.gameObject.TryGetComponent(out NodeRef _))
-			//{
-			//	_chartManager.HighlightObject(hit.transform.gameObject);
-			//}
-			
 		}
 
 		/// <summary>
