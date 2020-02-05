@@ -246,11 +246,9 @@ namespace SEECity.Charts.Scripts
 						if (secondChild.gameObject.name.Equals("HighlightLine(Clone)"))
 						{
 							secondChild.GetComponent<HighlightLine>().ToggleAccentuation();
-							break;
+							return;
 						}
 					}
-
-					break;
 				}
 			}
 		}
