@@ -72,43 +72,71 @@ namespace SEECity.Charts.Scripts.VR
 		{
 			eventSystem.RaycastAll(EventData, m_RaycastResultCache);
 			EventData.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
+			Ray ray = new Ray(_pointer.transform.position, _pointer.transform.forward);
+			Physics.Raycast(ray, out RaycastHit hitData, _chartManager.pointerLength);
+			float colliderDistance = hitData.distance == 0 ? _chartManager.pointerLength : hitData.distance;
+			float canvasDistance = EventData.pointerCurrentRaycast.distance == 0
+				? _chartManager.pointerLength
+				: EventData.pointerCurrentRaycast.distance;
+
+			if (colliderDistance.CompareTo(canvasDistance) < 0)
+			{
+				ExecutePhysical(hitData);
+			}
+			else
+			{
+				ExecuteCanvas();
+			}
+			
+		}
+
+		private void ExecutePhysical(RaycastHit hitData)
+		{
+			HandlePointerExitAndEnter(EventData, hitData.transform.gameObject);
+			ExecuteEvents.Execute(EventData.pointerDrag, EventData, ExecuteEvents.dragHandler);
+			if (_click.GetStateDown(_source)) Press(hitData.transform.gameObject);
+			if (_click.GetStateUp(_source)) Release(hitData.transform.gameObject);
+		}
+
+		private void ExecuteCanvas()
+		{
 			HandlePointerExitAndEnter(EventData, EventData.pointerCurrentRaycast.gameObject);
 			ExecuteEvents.Execute(EventData.pointerDrag, EventData, ExecuteEvents.dragHandler);
-			if (_click.GetStateDown(_source)) Press();
-			if (_click.GetStateUp(_source)) Release();
+			if (_click.GetStateDown(_source)) Press(EventData.pointerCurrentRaycast.gameObject);
+			if (_click.GetStateUp(_source)) Release(EventData.pointerCurrentRaycast.gameObject);
 		}
 
 		/// <summary>
 		/// Finds handlers on the object the user pressed on, that should react to the press and triggers them.
 		/// </summary>
-		private void Press()
+		private void Press(GameObject hitObject)
 		{
 			EventData.pointerPressRaycast = EventData.pointerCurrentRaycast;
 
 			EventData.pointerPress =
-				ExecuteEvents.GetEventHandler<IPointerClickHandler>(EventData.pointerPressRaycast
-					.gameObject);
+				ExecuteEvents.GetEventHandler<IPointerClickHandler>(hitObject);
 			EventData.pointerDrag =
-				ExecuteEvents.GetEventHandler<IDragHandler>(
-					EventData.pointerPressRaycast.gameObject);
+				ExecuteEvents.GetEventHandler<IDragHandler>(hitObject);
 
 			ExecuteEvents.Execute(EventData.pointerPress, EventData,
 				ExecuteEvents.pointerDownHandler);
 			ExecuteEvents.Execute(EventData.pointerDrag, EventData, ExecuteEvents.beginDragHandler);
 
-			Ray ray = new Ray(_pointer.transform.position, _pointer.transform.forward);
-			if (Physics.Raycast(ray, out RaycastHit hit, _chartManager.pointerLength) && hit.transform.gameObject.TryGetComponent(out NodeRef _)) _chartManager.HighlightObject(hit.transform.gameObject);
+			//Ray ray = new Ray(_pointer.transform.position, _pointer.transform.forward);
+			//if (Physics.Raycast(ray, out RaycastHit hit, _chartManager.pointerLength) && hit.transform.gameObject.TryGetComponent(out NodeRef _))
+			//{
+			//	_chartManager.HighlightObject(hit.transform.gameObject);
+			//}
 			
 		}
 
 		/// <summary>
 		/// Finds handlers on the object the user released on, that should react to a release and triggers them.
 		/// </summary>
-		private void Release()
+		private void Release(GameObject hitObject)
 		{
 			GameObject pointerRelease =
-				ExecuteEvents.GetEventHandler<IPointerClickHandler>(EventData.pointerCurrentRaycast
-					.gameObject);
+				ExecuteEvents.GetEventHandler<IPointerClickHandler>(hitObject);
 
 			if (EventData.pointerPress == pointerRelease)
 				ExecuteEvents.Execute(EventData.pointerPress, EventData,

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel;
+using SEECity.Charts.Scripts;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -370,6 +371,11 @@ namespace SEE.Layout
             nodeRef.node = node;
         }
 
+        protected void AttachHighlighter(GameObject gameNode)
+        {
+            gameNode.AddComponent<NodeHighlights>();
+        }
+
         /// <summary>
         /// Creates and scales blocks for all leaf nodes in given list of nodes.
         /// </summary>
@@ -394,6 +400,7 @@ namespace SEE.Layout
                     block.name = node.LinkName;
 
                     AttachNode(block, node);
+                    AttachHighlighter(block);
                     // Scaled metric values for the dimensions.
                     Vector3 scale = new Vector3(scaler.GetNormalizedValue(settings.WidthMetric, node),
                                                 scaler.GetNormalizedValue(settings.HeightMetric, node),
@@ -449,6 +456,7 @@ namespace SEE.Layout
             innerGameObject.name = node.LinkName;
             innerGameObject.tag = Tags.Node;
             AttachNode(innerGameObject, node);
+            AttachHighlighter(innerGameObject);
             return innerGameObject;
         }
 

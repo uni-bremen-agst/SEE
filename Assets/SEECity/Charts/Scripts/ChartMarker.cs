@@ -206,6 +206,7 @@ namespace SEECity.Charts.Scripts
 			else
 			{
 				if (_highlightCopy != null) Destroy(_highlightCopy);
+				_accentuated = false;
 			}
 
 			markerHighlight.SetActive(highlight);

@@ -63,7 +63,7 @@ MonoBehaviour:
   distanceThreshold: 0.5
   source: 2
   click:
-    actionPath: /actions/default/in/GrabPinch
+    actionPath: /actions/default/in/GrabGrip
     needsReinit: 0
   moveInOut:
     actionPath: /actions/default/in/MoveChartInOut

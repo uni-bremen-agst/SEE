@@ -55,7 +55,11 @@ namespace SEECity.Charts.Scripts.VR
 		{
 			if (Vector3.Distance(transform.position, cameraTransform.position) > _distanceThreshold)
 			{
-				if (_movingChart != null) StopCoroutine(_movingChart);
+				if (_movingChart != null)
+				{
+					StopCoroutine(_movingChart);
+					gameObject.SetActive(true);
+				}
 				_movingChart = StartCoroutine(MoveChart());
 			}
 		}
@@ -66,7 +70,7 @@ namespace SEECity.Charts.Scripts.VR
 		/// <returns></returns>
 		private IEnumerator MoveChart()
 		{
-			gameObject.SetActive(false);
+			//gameObject.SetActive(false);
 			Vector3 startPosition = transform.position;
 			for (float time = 0f; time < 1f; time += Time.deltaTime)
 			{
