@@ -20,6 +20,45 @@ namespace SEE.DataModel
         /// </summary>
         private HashSet<string> HierarchicalEdges;
 
+        // implementation nodes
+        private Node n1;
+        private Node n1_c1;
+        private Node n1_c1_c1;
+        private Node n1_c1_c2;
+        private Node n1_c2;
+        private Node n2;
+        private Node n2_c1;
+        private Node n3;
+
+        /// <summary>
+        /// Sets the implementation nodes (retrieved from impl graph).
+        /// </summary>
+        private void SetImplementationNodes()
+        {
+            n1 = impl.GetNode("n1");
+            n1_c1 = impl.GetNode("n1_c1");
+            n1_c2 = impl.GetNode("n1_c2");
+            n1_c1_c1 = impl.GetNode("n1_c1_c1");
+            n1_c1_c2 = impl.GetNode("n1_c1_c2");
+            n2 = impl.GetNode("n2");
+            n2_c1 = impl.GetNode("n2_c1");
+            n3 = impl.GetNode("n3");
+        }
+        /// <summary>
+        /// Resets the implementation nodes to null (retrieved from impl graph).
+        /// </summary>
+        private void ClearImplementationNodes()
+        {
+            n1 = null;
+            n1_c1 = null;
+            n1_c2 = null;
+            n1_c1_c1 = null;
+            n1_c1_c2 = null;
+            n2 = null;
+            n2_c1 = null;
+            n3 = null;
+        }
+
         /// <summary>
         /// Sets up all three graphs (implementation, architecture,
         /// mapping) and registers itself at the reflexion analysis
@@ -35,6 +74,16 @@ namespace SEE.DataModel
             mapping = NewMapping();
             reflexion = new Reflexion(impl, arch, mapping);
             reflexion.Register(this);
+            ClearEvents();
+            SetImplementationNodes();
+        }
+
+        /// <summary>
+        /// Sets the event chaches edgeChanges, propagatedEdges, and removedEdges to
+        /// to their initial value (empty).
+        /// </summary>
+        private void ClearEvents()
+        {
             edgeChanges = new List<EdgeChange>();
             propagatedEdges = new List<PropagatedEdge>();
             removedEdges = new List<RemovedEdge>();
@@ -67,6 +116,7 @@ namespace SEE.DataModel
             edgeChanges = null;
             propagatedEdges = null;
             removedEdges = null;
+            ClearImplementationNodes();
         }
 
         /// <summary>
@@ -344,19 +394,29 @@ namespace SEE.DataModel
         }
 
         [Test]
-        public void TestConvergences()
+        public void TestConvergences1()
         {
-            Node n1 = impl.GetNode("n1");
-            Node n2 = impl.GetNode("n2");
-            Node n3 = impl.GetNode("n3");
-
-            Node n1_c1 = impl.GetNode("n1_c1");
-            Node n1_c2 = impl.GetNode("n1_c2");
-            Node n1_c1_c1 = impl.GetNode("n1_c1_c1");
-            Node n1_c1_c2 = impl.GetNode("n1_c1_c2");
-            Node n2_c1 = impl.GetNode("n2_c1");
-
             NewEdge(impl, n2, n1, call);
+            reflexion.Run();
+
+            // 4 propagated edges
+            Assert.Equals(1, propagatedEdges.Count);
+            // 1 convergences
+            // 1 allowed propagated dependencies
+            // 3 absences
+            Assert.Equals(5, edgeChanges.Count);
+            // 0 removed edges
+            Assert.Equals(0, removedEdges.Count);
+
+
+        }
+
+        [Test]
+        public void TestConvergences10()
+        {
+            NewEdge(impl, n2, n1, call);
+            reflexion.Run();
+
             NewEdge(impl, n3, n2_c1, call);
             NewEdge(impl, n3, n1_c2, call);
             NewEdge(impl, n1_c1, n2_c1, call);
@@ -370,8 +430,6 @@ namespace SEE.DataModel
             Assert.Equals(8, edgeChanges.Count);
             // 0 removed edges
             Assert.Equals(0, removedEdges.Count);
-
-            
         }
     }
 }
