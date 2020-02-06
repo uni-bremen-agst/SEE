@@ -1056,6 +1056,8 @@ namespace SEE.DataModel
         /// </summary>
         private void ResetArchitecture()
         {
+            List<Edge> toBeRemoved = new List<Edge>();
+
             foreach (Edge edge in _architecture.Edges())
             {
                 State state = get_state(edge);
@@ -1076,9 +1078,15 @@ namespace SEE.DataModel
                         // The edge is a left-over from a previous analysis and should be
                         // removed. Before we actually do that, we need to notify all observers.
                         Notify(new RemovedEdge(edge));
-                        _architecture.RemoveEdge(edge);
+                        toBeRemoved.Add(edge);
                         break;
                 }
+            }
+            // Removal of edges from _architecture must be done outside of the loop
+            // because the loop iterates on _architecture.Edges().
+            foreach (Edge edge in toBeRemoved)
+            {
+                _architecture.RemoveEdge(edge);
             }
         }
 
