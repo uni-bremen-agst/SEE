@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -20,35 +21,100 @@ namespace SEE.DataModel
         /// </summary>
         private HashSet<string> HierarchicalEdges;
 
+        //----------------------------
         // implementation nodes
+        //----------------------------
+        /// <summary>
+        /// Node "n1" in implementation.
+        /// </summary>
         private Node n1;
+        /// <summary>
+        /// Node "n1_c1" in implementation.
+        /// </summary>
         private Node n1_c1;
+        /// <summary>
+        /// Node "n1_c1_c2" in implementation.
+        /// </summary>
         private Node n1_c1_c1;
+        /// <summary>
+        /// Node "n1_c1_c1" in implementation.
+        /// </summary>
         private Node n1_c1_c2;
+        /// <summary>
+        /// Node "n1_c1_c2" in implementation.
+        /// </summary>
         private Node n1_c2;
+        /// <summary>
+        /// Node "n2" in implementation.
+        /// </summary>
         private Node n2;
+        /// <summary>
+        /// Node "n2_c1" in implementation.
+        /// </summary>
         private Node n2_c1;
+        /// <summary>
+        /// Node "n3" in implementation.
+        /// </summary>
         private Node n3;
 
+        //----------------------------
+        // architecture nodes
+        //----------------------------
         /// <summary>
-        /// Sets the implementation nodes (retrieved from impl graph).
+        /// Node "N1" in architecture.
         /// </summary>
-        private void SetImplementationNodes()
+        private Node N1;
+        /// <summary>
+        /// Node "N1_C1" in architecture.
+        /// </summary>
+        private Node N1_C1;
+        /// <summary>
+        /// Node "N1_C2" in architecture.
+        /// </summary>
+        private Node N1_C2;
+        /// <summary>
+        /// Node "N2" in architecture.
+        /// </summary>
+        private Node N2;
+        /// <summary>
+        /// Node "N2_C1" in architecture.
+        /// </summary>
+        private Node N2_C1;
+        /// <summary>
+        /// Node "N3" in architecture.
+        /// </summary>
+        private Node N3;
+
+        /// <summary>
+        /// Sets the implementation nodes (retrieved from impl graph) and architecture
+        /// nodes (retrieved from arch graph).
+        /// </summary>
+        private void SetNodes()
         {
-            n1 = impl.GetNode("n1");
-            n1_c1 = impl.GetNode("n1_c1");
-            n1_c2 = impl.GetNode("n1_c2");
+            // implementation nodes
+            n1       = impl.GetNode("n1");
+            n1_c1    = impl.GetNode("n1_c1");
+            n1_c2    = impl.GetNode("n1_c2");
             n1_c1_c1 = impl.GetNode("n1_c1_c1");
             n1_c1_c2 = impl.GetNode("n1_c1_c2");
-            n2 = impl.GetNode("n2");
-            n2_c1 = impl.GetNode("n2_c1");
-            n3 = impl.GetNode("n3");
+            n2       = impl.GetNode("n2");
+            n2_c1    = impl.GetNode("n2_c1");
+            n3       = impl.GetNode("n3");
+            // architecture nodes
+            N1    = arch.GetNode("N1");
+            N1_C1 = arch.GetNode("N1_C1");
+            N1_C2 = arch.GetNode("N1_C2");
+            N2    = arch.GetNode("N2");
+            N2_C1 = arch.GetNode("N2_C1");
+            N3    = arch.GetNode("N3");
         }
         /// <summary>
-        /// Resets the implementation nodes to null (retrieved from impl graph).
+        /// Resets the implementation nodes (retrieved from impl graph) and architecture
+        /// nodes (retrieved from arch graph) to null.
         /// </summary>
-        private void ClearImplementationNodes()
+        private void ClearNodes()
         {
+            // implementation nodes
             n1 = null;
             n1_c1 = null;
             n1_c2 = null;
@@ -57,6 +123,13 @@ namespace SEE.DataModel
             n2 = null;
             n2_c1 = null;
             n3 = null;
+            // architecture nodes
+            N1 = null;
+            N1_C1 = null;
+            N1_C2 = null;
+            N2 = null;
+            N2_C1 = null;
+            N3 = null;
         }
 
         /// <summary>
@@ -75,7 +148,7 @@ namespace SEE.DataModel
             reflexion = new Reflexion(impl, arch, mapping);
             reflexion.Register(this);
             ClearEvents();
-            SetImplementationNodes();
+            SetNodes();
         }
 
         /// <summary>
@@ -116,7 +189,7 @@ namespace SEE.DataModel
             edgeChanges = null;
             propagatedEdges = null;
             removedEdges = null;
-            ClearImplementationNodes();
+            ClearNodes();
         }
 
         /// <summary>
@@ -399,16 +472,144 @@ namespace SEE.DataModel
             NewEdge(impl, n2, n1, call);
             reflexion.Run();
 
-            // 4 propagated edges
-            Assert.Equals(1, propagatedEdges.Count);
+            // 1 propagated edges
+            Assert.AreEqual(1, propagatedEdges.Count);
+
             // 1 convergences
+            Assert.That(IsConvergent(edgeChanges, N2, N1, call));
             // 1 allowed propagated dependencies
+            Assert.That(IsAllowed(edgeChanges, N2, N1, call));
             // 3 absences
-            Assert.Equals(5, edgeChanges.Count);
+            //   call(N1_C1, N2_C1)
+            //   call(N3, N1_C2)
+            //   call(N3, N2_C1)   
+            Assert.That(IsAbsent(edgeChanges, N1_C1, N2_C1, call));
+            Assert.That(IsAbsent(edgeChanges, N3, N1_C2, call));
+            Assert.That(IsAbsent(edgeChanges, N3, N2_C1, call));
+            // 0 divergences
+            Assert.AreEqual(5, edgeChanges.Count);
             // 0 removed edges
-            Assert.Equals(0, removedEdges.Count);
+            Assert.AreEqual(0, removedEdges.Count);
+        }
 
+        [Test]
+        public void TestImplicitlyAllowed1()
+        {
+            NewEdge(impl, n1_c1_c1, n1_c1_c2, call);
+            reflexion.Run();
 
+            // 1 propagated edges
+            Assert.AreEqual(1, propagatedEdges.Count);
+
+            // 1 implicitly allowed
+            Assert.That(IsImplicitlyAllowed(edgeChanges, N1_C1, N1_C1, call));
+            // 1 allowed propagated dependencies
+            Assert.That(IsAllowed(edgeChanges, N1_C1, N1_C1, call));
+            // 4 absences
+            //   call(N1_C1, N2_C1)
+            //   call(N3, N1_C2)
+            //   call(N3, N2_C1)   
+            Assert.That(IsAbsent(edgeChanges, N2, N1, call));
+            Assert.That(IsAbsent(edgeChanges, N1_C1, N2_C1, call));
+            Assert.That(IsAbsent(edgeChanges, N3, N1_C2, call));
+            Assert.That(IsAbsent(edgeChanges, N3, N2_C1, call));
+            // 0 divergences
+            Assert.AreEqual(5, edgeChanges.Count);
+
+            // 0 removed edges
+            Assert.AreEqual(0, removedEdges.Count);
+        }
+
+        /// <summary>
+        /// True if edgeChanges has an edge from source to target with given edgeType whose new state is the
+        /// given state.
+        /// </summary>
+        /// <param name="edgeChanges">list of edge-change events</param>
+        /// <param name="source">source of edge</param>
+        /// <param name="target">target of edge</param>
+        /// <param name="edgeType">type of edge</param>
+        /// <param name="state">new state</param>
+        /// <returns>true if such an edge exists</returns>
+        private bool HasNewState(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType, State state)
+        {
+            foreach (EdgeChange e in edgeChanges)
+            {
+                if (e.edge.Source == source && e.edge.Target == target && e.edge.Type == edgeType && e.newState == state)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.convergent).
+        /// </summary>
+        /// <param name="edgeChanges">list of edge-change events</param>
+        /// <param name="source">source of edge</param>
+        /// <param name="target">target of edge</param>
+        /// <param name="edgeType">type of edge</param>
+        /// <param name="state">new state</param>
+        /// <returns>true if such an edge exists</returns>
+        private bool IsConvergent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        {
+            return HasNewState(edgeChanges, source, target, edgeType, State.convergent);
+        }
+
+        /// <summary>
+        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.allowed).
+        /// </summary>
+        /// <param name="edgeChanges">list of edge-change events</param>
+        /// <param name="source">source of edge</param>
+        /// <param name="target">target of edge</param>
+        /// <param name="edgeType">type of edge</param>
+        /// <param name="state">new state</param>
+        /// <returns>true if such an edge exists</returns>
+        private bool IsAllowed(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        {
+            return HasNewState(edgeChanges, source, target, edgeType, State.allowed);
+        }
+
+        /// <summary>
+        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.absent).
+        /// </summary>
+        /// <param name="edgeChanges">list of edge-change events</param>
+        /// <param name="source">source of edge</param>
+        /// <param name="target">target of edge</param>
+        /// <param name="edgeType">type of edge</param>
+        /// <param name="state">new state</param>
+        /// <returns>true if such an edge exists</returns>
+        private bool IsAbsent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        {
+            return HasNewState(edgeChanges, source, target, edgeType, State.absent);
+        }
+
+        /// <summary>
+        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.implicitly_allowed).
+        /// </summary>
+        /// <param name="edgeChanges">list of edge-change events</param>
+        /// <param name="source">source of edge</param>
+        /// <param name="target">target of edge</param>
+        /// <param name="edgeType">type of edge</param>
+        /// <param name="state">new state</param>
+        /// <returns>true if such an edge exists</returns>
+        private bool IsImplicitlyAllowed(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        {
+            return HasNewState(edgeChanges, source, target, edgeType, State.implicitly_allowed);
+        }
+
+        /// <summary>
+        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.allowed_absent).
+        /// </summary>
+        /// <param name="edgeChanges">list of edge-change events</param>
+        /// <param name="source">source of edge</param>
+        /// <param name="target">target of edge</param>
+        /// <param name="edgeType">type of edge</param>
+        /// <param name="state">new state</param>
+        /// <returns>true if such an edge exists</returns>
+        private bool IsAllowedAbsent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        {
+            return HasNewState(edgeChanges, source, target, edgeType, State.allowed_absent);
         }
 
         [Test]
@@ -425,11 +626,11 @@ namespace SEE.DataModel
             DumpEvents();
 
             // 4 propagated edges
-            Assert.Equals(4, propagatedEdges.Count);
+            Assert.AreEqual(4, propagatedEdges.Count);
             // 4 convergent architecture dependencies and 4 allowed propagated dependencies
-            Assert.Equals(8, edgeChanges.Count);
+            Assert.AreEqual(8, edgeChanges.Count);
             // 0 removed edges
-            Assert.Equals(0, removedEdges.Count);
+            Assert.AreEqual(0, removedEdges.Count);
         }
     }
 }
