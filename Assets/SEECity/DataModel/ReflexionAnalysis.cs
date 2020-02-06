@@ -155,6 +155,32 @@ namespace SEE.DataModel
     }
 
     /// <summary>
+    /// A change event fired when a specified architecture dependency edge was classified as
+    /// absent by the analysis.
+    /// </summary>
+    public class AbsenceEdge : ChangeEvent
+    {
+        /// <summary>
+        /// The specified architecture dependency edge was classified as absence.
+        /// </summary>
+        public Edge edge;
+
+        /// <summary>
+        /// Constructor passing on the specified architecture dependency edge classified as absence.
+        /// </summary>
+        /// <param name="edge">edge classified as absence</param>
+        public AbsenceEdge(Edge edge)
+        {
+            this.edge = edge;
+        }
+
+        public override string ToString()
+        {
+            return "absence edge " + edge.ToString();
+        }
+    }
+
+    /// <summary>
     /// Implements the reflexion analysis, which compares an implementation against an expected
     /// architecture based on a mapping between the two.
     /// </summary>
