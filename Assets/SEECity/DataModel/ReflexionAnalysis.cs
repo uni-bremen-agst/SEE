@@ -57,7 +57,7 @@ namespace SEE.DataModel
         absent = 3,             // absence; only for architecture dependencies
         convergent = 4,         // convergence; only for architecture dependencies
         implicitly_allowed = 5, // self-usage is always implicitly allowed; only for implementation dependencies
-        allowed_absent = 6,     // absence, but is_optional attribute set
+        allowed_absent = 6,     // absence, but Architecture.Is_Optional attribute set
         specified = 7           // tags an architecture edge that was created by the architect, 
                                 // i.e., is a specified edge; this is the initial state of a specified
                                 // architecture dependency; only for architecture dependencies
@@ -155,32 +155,6 @@ namespace SEE.DataModel
     }
 
     /// <summary>
-    /// A change event fired when a specified architecture dependency edge was classified as
-    /// absent by the analysis.
-    /// </summary>
-    public class AbsenceEdge : ChangeEvent
-    {
-        /// <summary>
-        /// The specified architecture dependency edge was classified as absence.
-        /// </summary>
-        public Edge edge;
-
-        /// <summary>
-        /// Constructor passing on the specified architecture dependency edge classified as absence.
-        /// </summary>
-        /// <param name="edge">edge classified as absence</param>
-        public AbsenceEdge(Edge edge)
-        {
-            this.edge = edge;
-        }
-
-        public override string ToString()
-        {
-            return "absence edge " + edge.ToString();
-        }
-    }
-
-    /// <summary>
     /// Implements the reflexion analysis, which compares an implementation against an expected
     /// architecture based on a mapping between the two.
     /// </summary>
@@ -194,13 +168,16 @@ namespace SEE.DataModel
         /// <param name="implementation">the implementation graph</param>
         /// <param name="architecture">the architecture model</param>
         /// <param name="mapping">the mapping of implementation nodes onto architecture nodes</param>
+        /// <param name="allow_dependencies_to_parents">whether descendants may access their ancestors</param>
         public Reflexion(Graph implementation,
                          Graph architecture,
-                         Graph mapping)
+                         Graph mapping,
+                         bool allow_dependencies_to_parents = true)
         {
             _implementation = implementation;
             _architecture = architecture;
             _mapping = mapping;
+            _allow_dependencies_to_parents = allow_dependencies_to_parents;
         }
 
         /// <summary>
@@ -693,6 +670,11 @@ namespace SEE.DataModel
         }
         */
 
+        /// <summary>
+        /// Whether descendants may implicitly access their ancestors.
+        /// </summary>
+        private bool _allow_dependencies_to_parents;
+
         // *****************************************
         // involved graphs
         // *****************************************
@@ -934,7 +916,7 @@ namespace SEE.DataModel
         // ***********************************************************************************
         // Traceability between dependencies propagated from dependency view into architecture
         // ***********************************************************************************
-        private multimap<Edge, Edge> _causing;
+        //private multimap<Edge, Edge> _causing;
         // map: propagated edge in architecture -> set of dependencies in dependency;
         // _causing[p] := { d | d in dependency and d was propagated onto p }
         // where p is a dependency edges in architecture not specified by the user;
@@ -948,10 +930,10 @@ namespace SEE.DataModel
         // The result list (see the Ada implementation) contains all pairs of divergences
         // along with the dependencies causing the divergence as well as all pairs of
         // absences with the specified architecture dependency classified as absent.
-        private List<Tuple<Edge, Edge>> _result_list;
+        //private List<Tuple<Edge, Edge>> _result_list;
         // This list explains the convergence edges: It contains all pairs of
         // convergence edges along with the dependencies implementing them.
-        private List<Tuple<Edge, Edge>> _convergence_list;
+        //private List<Tuple<Edge, Edge>> _convergence_list;
 
         // *****************************************
         // DG utilities
@@ -993,6 +975,7 @@ namespace SEE.DataModel
             set_counter(edge, new_value);
         }
 
+        // FIXME: Not used.
         // Helper struct storing an allowing edge and a propagated
         // architecture dependency
         private class Candidate_Edges
@@ -1013,6 +996,7 @@ namespace SEE.DataModel
             }
         }
 
+        // FIXME: Not used.
         // Choose from a map of candidate edge instances the (key) node n
         // with the smallest Linkage name, but prefer the node "preferred_node"
         // if possible. Set witness_node to n.
@@ -1243,19 +1227,19 @@ namespace SEE.DataModel
 #endif
                 return; 
             }
-            Edge architecture_dep = get_propagated_dependency(arch_source, arch_target, impl_type);
+            Edge propagated_architecture_dep = get_propagated_dependency(arch_source, arch_target, impl_type);
             // Assert: architecture_dep is in architecture graph or null.
-            System.Diagnostics.Debug.Assert(architecture_dep == null ||architecture_dep.ItsGraph == _architecture);
+            System.Diagnostics.Debug.Assert(propagated_architecture_dep == null ||propagated_architecture_dep.ItsGraph == _architecture);
             Edge allowing_edge = null;
-            if (architecture_dep == null)
+            if (propagated_architecture_dep == null)
             {   // a propagated dependency has not existed yet; we need to create one
-#if DEBUG
-                Debug.Log("new propagated dependency in architecture created\n");
-#endif
-                architecture_dep
+                propagated_architecture_dep
                   = new_impl_dep_in_architecture
                       (arch_source, arch_target, impl_type, ref allowing_edge);
                 // Assert: architecture_dep is in architecture graph (it is propagated; not specified)
+#if DEBUG
+                Debug.LogFormat("new propagated dependency in architecture created: {0}\n", propagated_architecture_dep);
+#endif
             }
             else
             {
@@ -1264,10 +1248,10 @@ namespace SEE.DataModel
                 Debug.Log("a propagated dependency exists already\n");
 #endif
                 int impl_counter = get_impl_counter(implementation_dep);
-                change_impl_ref(architecture_dep, impl_counter);
+                change_impl_ref(propagated_architecture_dep, impl_counter);
                 // Assert: architecture_dep.Source and architecture_dep.Target are in architecture.
-                lift(architecture_dep.Source,
-                     architecture_dep.Target,
+                lift(propagated_architecture_dep.Source,
+                     propagated_architecture_dep.Target,
                      impl_type,
                      impl_counter, 
                      ref allowing_edge);
@@ -1310,7 +1294,7 @@ namespace SEE.DataModel
         private Node maps_to(Node node)
         {
             System.Diagnostics.Debug.Assert(node.ItsGraph == _implementation);
-            if (_explicit_maps_to_table.TryGetValue(node, out Node target))
+            if (_implicit_maps_to_table.TryGetValue(node, out Node target))
             {
                 return target;
             }
@@ -1342,16 +1326,16 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// Returns true if 'child' is a descendant of 'ancestor' in the hierarchy.
+        /// Returns true if 'descendant' is a descendant of 'ancestor' in the hierarchy.
         /// 
-        /// Precondition: child and ancestor are in the same graph.
+        /// Precondition: descendant and ancestor are in the same graph.
         /// </summary>
-        /// <param name="child">source node</param>
+        /// <param name="descendant">source node</param>
         /// <param name="ancestor">target node</param>
-        /// <returns>true if 'source' is a descendant of 'target'</returns>
-        private bool is_descendant_of(Node child, Node ancestor)
+        /// <returns>true if 'descendant' is a descendant of 'ancestor'</returns>
+        private bool is_descendant_of(Node descendant, Node ancestor)
         {
-            Node cursor = get_parent(child);
+            Node cursor = get_parent(descendant);
             while (cursor != null && cursor != ancestor)
             {
                 cursor = get_parent(cursor);
@@ -1418,9 +1402,9 @@ namespace SEE.DataModel
                                                   ref Edge allowing_edge_out)
         {
             int counter = 1;
-            Edge architecture_dep = add(arch_source, arch_target, edge_type, _architecture);
+            Edge propagated_architecture_dep = add(arch_source, arch_target, edge_type, _architecture);
             // architecture_dep is a propagated dependency in the architecture graph
-            set_counter(architecture_dep, counter);
+            set_counter(propagated_architecture_dep, counter);
 
             // TODO: Mark architecture_dep as propagated. Or maybe that is not necessary at all
             // because we have the edge state from which we can derive whether an edge is specified
@@ -1429,26 +1413,36 @@ namespace SEE.DataModel
             // architecture_dep is a dependency propagated from the implementation onto the architecture;
             // it was just created and, hence, has no state yet (which means it is State.undefined);
             // because it has just come into existence, we need to let our observers know about it
-            Notify(new PropagatedEdge(architecture_dep));
+            Notify(new PropagatedEdge(propagated_architecture_dep));
 
             if (lift(arch_source, arch_target, edge_type, counter, ref allowing_edge_out))
             {
-                transition(architecture_dep, State.undefined, State.allowed);
+                // found a matching specified architecture dependency allowing propagated_architecture_dep
+                transition(propagated_architecture_dep, State.undefined, State.allowed);
             }
             else if (arch_source == arch_target)
             {
                 // by default, every entity may use itself
-                transition(architecture_dep, State.undefined, State.implicitly_allowed);
+                transition(propagated_architecture_dep, State.undefined, State.implicitly_allowed);
                 // Note: there is no specified architecture dependency that allows this implementation
                 // dependency. Self dependencies are implicitly allowed.
                 allowing_edge_out = null; 
             }
-            else
+            else if (_allow_dependencies_to_parents 
+                     && is_descendant_of(propagated_architecture_dep.Source, propagated_architecture_dep.Target))
             {
-                transition(architecture_dep, State.undefined, State.divergent);
+                transition(propagated_architecture_dep, State.undefined, State.implicitly_allowed);
+                // Note: there is no specified architecture dependency that allows this implementation
+                // dependency. Dependencies from descendants to ancestors are implicitly allowed if
+                // _allow_dependencies_to_parents is true.
                 allowing_edge_out = null;
             }
-            return architecture_dep;
+            else
+            {
+                transition(propagated_architecture_dep, State.undefined, State.divergent);
+                allowing_edge_out = null;
+            }
+            return propagated_architecture_dep;
         }
 
         /// <summary>
