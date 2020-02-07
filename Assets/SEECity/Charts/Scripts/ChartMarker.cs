@@ -216,7 +216,8 @@ namespace SEECity.Charts.Scripts
 		/// Highlights this marker and its <see cref="linkedObject" /> for a given amount of time.
 		/// </summary>
 		/// <param name="time">How long the highlight will last.</param>
-		public void TriggerTimedHighlight(float time, bool updateCall)
+		/// <param name="reenable"></param>
+		public void TriggerTimedHighlight(float time, bool reenable)
 		{
 			bool reactivate = false;
 
@@ -225,10 +226,14 @@ namespace SEECity.Charts.Scripts
 				StopCoroutine(TimedHighlight);
 				HighlightLinkedObjectToggle(false);
 				TimedHighlight = null;
-				if (_chartManager.selectionMode || updateCall) reactivate = true;
+				if (_chartManager.selectionMode || reenable) reactivate = true;
+			}
+			else
+			{
+				reactivate = true;
 			}
 
-			if (!reactivate) TimedHighlight = StartCoroutine(TimedHighlightRoutine(time));
+			if (reactivate) TimedHighlight = StartCoroutine(TimedHighlightRoutine(time));
 		}
 
 		/// <summary>

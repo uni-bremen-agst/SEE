@@ -28,7 +28,6 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// The currently selected option of <see cref="_dropdown" />.
 		/// </summary>
-		[HideInInspector]
 		public string Value { get; private set; }
 
 		/// <summary>

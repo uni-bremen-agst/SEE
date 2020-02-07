@@ -1,5 +1,4 @@
-﻿using SEE.Layout;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using Valve.VR;
 
@@ -54,7 +53,7 @@ namespace SEECity.Charts.Scripts.VR
 		}
 
 		/// <summary>
-		/// Initializes <see cref="EventData"/>.
+		/// Initializes <see cref="EventData" />.
 		/// </summary>
 		protected override void Start()
 		{
@@ -74,20 +73,16 @@ namespace SEECity.Charts.Scripts.VR
 			EventData.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
 			Ray ray = new Ray(_pointer.transform.position, _pointer.transform.forward);
 			Physics.Raycast(ray, out RaycastHit hitData, _chartManager.pointerLength);
-			float colliderDistance = hitData.distance == 0 ? _chartManager.pointerLength : hitData.distance;
-			float canvasDistance = EventData.pointerCurrentRaycast.distance == 0
+			float colliderDistance =
+				hitData.distance.Equals(0f) ? _chartManager.pointerLength : hitData.distance;
+			float canvasDistance = EventData.pointerCurrentRaycast.distance.Equals(0f)
 				? _chartManager.pointerLength
 				: EventData.pointerCurrentRaycast.distance;
 
 			if (colliderDistance.CompareTo(canvasDistance) < 0)
-			{
 				ExecutePhysical(hitData);
-			}
 			else
-			{
 				ExecuteCanvas();
-			}
-			
 		}
 
 		private void ExecutePhysical(RaycastHit hitData)
@@ -124,7 +119,8 @@ namespace SEECity.Charts.Scripts.VR
 		}
 
 		/// <summary>
-		/// Finds handlers on the object the user released on, that should react to a release and triggers them.
+		/// Finds handlers on the object the user released on, that should react to a release and triggers
+		/// them.
 		/// </summary>
 		private void Release(GameObject hitObject)
 		{

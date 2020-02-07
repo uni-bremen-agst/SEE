@@ -14,6 +14,11 @@ namespace SEECity.Charts.Scripts
 		private ChartManager _chartManager;
 
 		/// <summary>
+		/// The script attached to the chart.
+		/// </summary>
+		private ChartContent _chartContent;
+
+		/// <summary>
 		/// The minimum size a chart can have for width and height.
 		/// </summary>
 		protected int MinimumSize;
@@ -31,10 +36,9 @@ namespace SEECity.Charts.Scripts
 		[SerializeField] private Transform bottomRight;
 		[SerializeField] private Transform bottomLeft;
 
-		/// <summary>
-		/// The script attached to the chart.
-		/// </summary>
-		private ChartContent _chartContent;
+		[SerializeField] private RectTransform contentSelection;
+		[SerializeField] private RectTransform scrollView;
+		[SerializeField] private RectTransform contentSelectionHeader;
 
 		/// <summary>
 		/// Contains the size of the chart.
@@ -85,7 +89,7 @@ namespace SEECity.Charts.Scripts
 		protected virtual void ChangeSize(float width, float height)
 		{
 			RectTransform dataPanel = _chartContent.dataPanel;
-			dataPanel.sizeDelta = new Vector2(width - 100, height - 100);
+			dataPanel.sizeDelta = new Vector2(width - 80, height - 80);
 			dataPanel.anchoredPosition = new Vector2(width / 2, height / 2);
 			noDataWarning.sizeDelta = new Vector2(width - 150, height - 150);
 			RectTransform labelsPanel = _chartContent.labelsPanel;
@@ -102,9 +106,22 @@ namespace SEECity.Charts.Scripts
 			topLeft.localPosition = new Vector2(-width / 2, height / 2);
 			bottomRight.localPosition = new Vector2(width / 2, -height / 2);
 			bottomLeft.localPosition = new Vector2(-width / 2, -height / 2);
-			dragButton.localPosition = bottomRight.localPosition - new Vector3(25f, -25f);
+			dragButton.localPosition = bottomRight.localPosition - new Vector3(20f, -20f);
+			contentSelection.anchoredPosition =
+				new Vector2(width / 2 + contentSelection.sizeDelta.x / 2, 0);
+			contentSelection.sizeDelta = new Vector2(contentSelection.sizeDelta.x, height);
+			scrollView.sizeDelta = new Vector2(scrollView.sizeDelta.x, height - 50);
+			contentSelectionHeader.anchoredPosition = new Vector2(0, height / 2 - 20);
 
 			_chartContent.DrawData(false);
+		}
+
+		/// <summary>
+		/// Toggles the active state of <see cref="scrollContent" />. Called by Unity.
+		/// </summary>
+		public void ToggleContentSelection()
+		{
+			contentSelection.gameObject.SetActive(!contentSelection.gameObject.activeInHierarchy);
 		}
 	}
 }
