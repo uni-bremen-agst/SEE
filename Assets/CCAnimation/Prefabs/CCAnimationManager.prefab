@@ -60,7 +60,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gxlFolderName: animation-clones
-  render: {fileID: 4096480624022493778}
+  useBlockFactory: 1
+  maxRevisionsToLoad: 500
 --- !u!114 &2637723665296559955
 MonoBehaviour:
   m_ObjectHideFlags: 0

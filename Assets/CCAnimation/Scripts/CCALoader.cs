@@ -23,11 +23,11 @@ public class CCALoader
     /// !!! At the moment data for Metric.Clone_Rate is copied from Metric.LOC for better visualisation during test !!!
     /// </summary>
     /// <param name="graphSettings">The GraphSettings defining the location of gxl files.</param>
-    public void LoadGraphData(GraphSettings graphSettings)
+    public void LoadGraphData(GraphSettings graphSettings, int maxRevisionsToLoad)
     {
         graphSettings.AssertNotNull("graphSettings");
         graphs.Clear();
-        AddAllRevisions(graphSettings);
+        AddAllRevisions(graphSettings, maxRevisionsToLoad);
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class CCALoader
     /// and saves all loaded graph data.
     /// </summary>
     /// <param name="graphSettings">The GraphSettings defining the location of gxl files.</param>
-    private void AddAllRevisions(GraphSettings graphSettings)
+    private void AddAllRevisions(GraphSettings graphSettings, int maxRevisionsToLoad)
     {
         SEE.Performance p = SEE.Performance.Begin("loading animated graph data from " + graphSettings.GXLPath());
 
@@ -54,7 +54,6 @@ public class CCALoader
         {
             // load graph
             GraphReader graphCreator = new GraphReader(gxlPath, graphSettings.HierarchicalEdges, new SEELogger());
-            Debug.Log("Loading graph: " + gxlPath);
             graphCreator.Load();
             Graph graph = graphCreator.GetGraph();
 
@@ -69,6 +68,11 @@ public class CCALoader
             else
             {
                 graphs.Add(graph);
+            }
+            maxRevisionsToLoad--;
+            if (maxRevisionsToLoad <= 0)
+            {
+                break;
             }
         }
 

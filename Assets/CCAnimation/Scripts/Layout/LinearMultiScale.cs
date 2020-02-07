@@ -10,6 +10,7 @@ using UnityEngine;
 /// <summary>
 /// Provides x, y, z lengths of a node based on a linear interpolation
 /// of the node's metrics.
+/// TODO umbennenen in MultiScaler und mit unterschiedlichen Scales unterstützen
 /// </summary>
 public class LinearMultiScale : LinearScale
 {

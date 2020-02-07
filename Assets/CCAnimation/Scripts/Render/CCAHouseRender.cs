@@ -39,6 +39,7 @@ public class CCARender : AbstractCCARender
     {
         var isCircleNew = !ObjectManager.GetInnerNode(node, out GameObject circle);
         var nodeTransform = Layout.GetNodeTransform(node);
+
         var circlePosition = nodeTransform.position;
         circlePosition.y = 0.5F;
 
