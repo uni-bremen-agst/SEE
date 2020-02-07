@@ -1,9 +1,12 @@
-﻿using SEE;
+﻿using Assets.CCAnimation.Scripts.Render;
+using SEE;
 using SEE.DataModel;
 using SEE.Layout;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -12,6 +15,50 @@ using UnityEngine.Events;
 /// </summary>
 public class CCAStateManager : MonoBehaviour
 {
+    // TODO FPS
+    public int FPS { get; private set; }
+    public int LowestFPS { get; private set; }
+    public int HighestFPS { get; private set; }
+    public long CombinedFPS { get; private set; }
+    public long FPSCounter { get; private set; }
+
+    void Update()
+    {
+        FPS = (int)(1f / Time.unscaledDeltaTime);
+        CombinedFPS += FPS;
+        FPSCounter++;
+        if (LowestFPS > FPS)
+        {
+            LowestFPS = FPS;
+        }
+        if (HighestFPS < FPS)
+            HighestFPS = FPS;
+    }
+
+    void BeginFPS()
+    {
+        LowestFPS = FPS;
+        HighestFPS = FPS;
+        CombinedFPS = FPS;
+        FPSCounter = 1;
+    }
+
+    void EndFps()
+    {
+        var fpsStr = $"{OpenGraphIndex-1}; {LowestFPS}; {(int)(CombinedFPS / FPSCounter)}; {HighestFPS}";
+        //Debug.Log(fpsStr);
+        frameRateString.AppendLine(fpsStr);
+    }
+
+    StringBuilder frameRateString = new StringBuilder();
+    string gxlFolder = "";
+
+    void PrepareDatafolder()
+    {
+        gxlFolder = $"{Directory.GetCurrentDirectory()}\\Data\\GXL\\{gxlFolderName}";
+        frameRateString.Append("Graph Nr; Niedrigste FPS; Mittlere FPS; Hoechste FPS");
+    }
+
     /// <summary>
     /// Possible Animations:
     /// "animation-clones"
@@ -19,6 +66,14 @@ public class CCAStateManager : MonoBehaviour
     /// "animation-clones-log4j"
     /// </summary>
     public string gxlFolderName = "animation-clones";
+
+    /// <summary>
+    /// Set if the BlockFactory is use to create nodes or else
+    /// the BuildingFactory is used.
+    /// </summary>
+    public bool useBlockFactory = false;
+
+    public int maxRevisionsToLoad = 500;
 
     protected GraphSettings CreateGraphSetting()
     {
@@ -30,8 +85,26 @@ public class CCAStateManager : MonoBehaviour
 
     protected NodeFactory CreateNodeFactory()
     {
-        //return new CubeFactory();
-        return new BuildingFactory();
+        if (useBlockFactory)
+        {
+            return new CubeFactory();
+        }
+        else
+        {
+            return new BuildingFactory();
+        }
+    }
+
+    protected AbstractCCARender CreateRender()
+    {
+        if (useBlockFactory)
+        {
+            return gameObject.AddComponent(typeof(CCABlockRender)) as AbstractCCARender;
+        }
+        else
+        {
+            return gameObject.AddComponent(typeof(CCARender)) as AbstractCCARender;
+        }
     }
 
     protected AbstractCCAObjectManager createObjectManager()
@@ -66,6 +139,8 @@ public class CCAStateManager : MonoBehaviour
 
     private AbstractCCAObjectManager _objectManager;
 
+    private AbstractCCARender _Render;
+
     public GraphSettings Settings
     {
         get
@@ -96,8 +171,15 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
-    // Needs to be set via Ui
-    public AbstractCCARender render;
+    public AbstractCCARender Render
+    {
+        get
+        {
+            if (_Render == null)
+                _Render = CreateRender();
+            return _Render;
+        }
+    }
 
     [Obsolete]
     private IEdgeLayout EdgeLayout;
@@ -116,10 +198,10 @@ public class CCAStateManager : MonoBehaviour
 
     public float AnimationTime
     {
-        get => render.AnimationTime;
+        get => Render.AnimationTime;
         set
         {
-            render.AnimationTime = value;
+            Render.AnimationTime = value;
             ViewDataChangedEvent.Invoke();
         }
     }
@@ -187,10 +269,11 @@ public class CCAStateManager : MonoBehaviour
 
     void Start()
     {
-        render.AssertNotNull("render");
-        render.ObjectManager = ObjectManager;
+        PrepareDatafolder();
+        Render.AssertNotNull("render");
+        Render.ObjectManager = ObjectManager;
 
-        graphLoader.LoadGraphData(Settings);
+        graphLoader.LoadGraphData(Settings, maxRevisionsToLoad);
 
         ViewDataChangedEvent.Invoke();
 
@@ -198,14 +281,48 @@ public class CCAStateManager : MonoBehaviour
 
         scaler = CreateScaler(Graphs, Settings, nodeMetrics);
 
+        var csv = new StringBuilder();
+        
+        var csvFileName = "\\measure-house.csv";
+        if (useBlockFactory)
+        {
+            csvFileName = "\\measure-block.csv";
+        }
+        csv.AppendLine("Graph Nr; Load time");
+        int index = 1;
+        var stopwatch = new System.Diagnostics.Stopwatch();
+        var p = Performance.Begin("Layout all Graphs");
         Graphs.ForEach(key =>
         {
+            stopwatch.Reset();
+            stopwatch.Start();
             layouts[key] = new AbstractCCALayout();
             layouts[key].Calculate(ObjectManager, scaler, CreateLayout(NodeFactory), key, Settings);
+            stopwatch.Stop();
+            if (stopwatch.ElapsedMilliseconds == 0)
+            {
+                csv.AppendLine($"{index}; 1");
+            }
+            else
+                csv.AppendLine($"{index}; {stopwatch.ElapsedMilliseconds}");
+            index++;
         });
+        p.End();
+        try
+        {
+            Directory.CreateDirectory(gxlFolder);
+            File.Delete(gxlFolder + csvFileName);
+            File.WriteAllText(gxlFolder + csvFileName, csv.ToString());
+            Debug.Log($"Saved load time to {gxlFolder + csvFileName}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.ToString());
+        }
+
         if (HasLoadedGraph(out LoadedGraph loadedGraph))
         {
-            render.DisplayGraph(loadedGraph);
+            Render.DisplayGraph(loadedGraph);
         }
         else
         {
@@ -215,7 +332,7 @@ public class CCAStateManager : MonoBehaviour
 
     public bool TryShowSpecificGraph(int value)
     {
-        if (render.IsStillAnimating || IsAutoPlay)
+        if (Render.IsStillAnimating || IsAutoPlay)
         {
             Debug.Log("The render is already occupied with animating, wait till animations are finished.");
             return false;
@@ -230,7 +347,7 @@ public class CCAStateManager : MonoBehaviour
 
         if (HasLoadedGraph(out LoadedGraph loadedGraph))
         {
-            render.DisplayGraph(loadedGraph);
+            Render.DisplayGraph(loadedGraph);
             return true;
         }
         else
@@ -245,7 +362,7 @@ public class CCAStateManager : MonoBehaviour
     /// </summary>
     public void ShowNextGraph()
     {
-        if (render.IsStillAnimating || IsAutoPlay)
+        if (Render.IsStillAnimating || IsAutoPlay)
         {
             Debug.Log("The render is already occupied with animating, wait till animations are finished.");
             return;
@@ -263,7 +380,7 @@ public class CCAStateManager : MonoBehaviour
     /// </summary>
     public void ShowPreviousGraph()
     {
-        if (render.IsStillAnimating || IsAutoPlay)
+        if (Render.IsStillAnimating || IsAutoPlay)
         {
             Debug.Log("The render is already occupied with animating, wait till animations are finished.");
             return;
@@ -278,7 +395,7 @@ public class CCAStateManager : MonoBehaviour
         if (HasLoadedGraph(out LoadedGraph loadedGraph) &&
             HasLoadedGraph(OpenGraphIndex + 1, out LoadedGraph oldLoadedGraph))
         {
-            render.TransitionToPreviousGraph(oldLoadedGraph, loadedGraph);
+            Render.TransitionToPreviousGraph(oldLoadedGraph, loadedGraph);
         }
         else
         {
@@ -296,7 +413,7 @@ public class CCAStateManager : MonoBehaviour
         IsAutoPlay = enabled;
         if (IsAutoPlay)
         {
-            render.AnimationFinishedEvent.AddListener(OnAutoplayCanContinue);
+            Render.AnimationFinishedEvent.AddListener(OnAutoplayCanContinue);
             var canShowNext = ShowNextIfPossible();
             if (!canShowNext)
             {
@@ -305,7 +422,7 @@ public class CCAStateManager : MonoBehaviour
         }
         else
         {
-            render.AnimationFinishedEvent.RemoveListener(OnAutoplayCanContinue);
+            Render.AnimationFinishedEvent.RemoveListener(OnAutoplayCanContinue);
         }
         ViewDataChangedEvent.Invoke();
     }
@@ -321,7 +438,8 @@ public class CCAStateManager : MonoBehaviour
         if (HasLoadedGraph(out LoadedGraph loadedGraph) &&
             HasLoadedGraph(OpenGraphIndex - 1, out LoadedGraph oldLoadedGraph))
         {
-            render.TransitionToNextGraph(oldLoadedGraph, loadedGraph);
+            BeginFPS();
+            Render.TransitionToNextGraph(oldLoadedGraph, loadedGraph);
         }
         else
         {
@@ -332,9 +450,26 @@ public class CCAStateManager : MonoBehaviour
 
     internal void OnAutoplayCanContinue()
     {
+        EndFps();
         var canShowNext = ShowNextIfPossible();
         if (!canShowNext)
         {
+            try
+            {
+                Directory.CreateDirectory(gxlFolder);
+                var framerateFilename = "\\framerate-house.csv";
+                if (useBlockFactory)
+                {
+                    framerateFilename = "\\framerate-block.csv";
+                }
+                File.Delete(gxlFolder + framerateFilename);
+                File.WriteAllText(gxlFolder + framerateFilename, frameRateString.ToString());
+                Debug.Log($"Saved load time to {gxlFolder + framerateFilename}");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.ToString());
+            }
             ToggleAutoplay();
         }
     }
