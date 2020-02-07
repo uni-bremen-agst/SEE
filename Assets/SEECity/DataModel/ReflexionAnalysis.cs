@@ -11,16 +11,16 @@ the article:
 "Incremental Reflexion Analysis", Rainer Koschke, Journal on Software Maintenance
 and Evolution, 2011, DOI 10.1002/smr.542
 
-The reflexion analysis calculates the reflexion view describing the convergences,
+The reflexion analysis calculates the reflexion graph describing the convergences,
 absences, divergences between an architecture and its implementation. The following
-views are needed to calculate the reflexion view:
+graphs are needed to calculate the reflexion graph:
 
 - architecture defines the expected architectural entities and their dependencies
 (architectural entities may be hierarchical modeled by the part-of relation)
-- the implementation model is represented in two separated views:
-hierarchy view describes the nesting of implementation entities
-dependency view describes the dependencies among the implementation entities
-- mapping view describes the partial mapping of implementation entities onto
+- the implementation model is represented in two separated graphs:
+hierarchy graph describes the nesting of implementation entities
+dependency graph describes the dependencies among the implementation entities
+- mapping graph describes the partial mapping of implementation entities onto
 architectural entities.
 
 Open issues: implementation of incremental analysis is missing.
@@ -52,10 +52,10 @@ namespace SEE.DataModel
     public enum State
     {
         undefined = 0,          // initial undefined state
-        allowed = 1,            // propagated edge towards a convergence; only for implementation dependencies
-        divergent = 2,          // divergence; only for implementation dependencies
-        absent = 3,             // absence; only for architecture dependencies
-        convergent = 4,         // convergence; only for architecture dependencies
+        allowed = 1,            // allowed propagated dependency towards a convergence; only for implementation dependencies
+        divergent = 2,          // disallowed propagated dependency (divergence); only for implementation dependencies
+        absent = 3,             // specified architecture dependency without corresponding implementation dependency (absence); only for architecture dependencies
+        convergent = 4,         // specified architecture dependency without corresponding implementation dependency (convergence); only for architecture dependencies
         implicitly_allowed = 5, // self-usage is always implicitly allowed; only for implementation dependencies
         allowed_absent = 6,     // absence, but Architecture.Is_Optional attribute set
         specified = 7           // tags an architecture edge that was created by the architect, 
@@ -103,6 +103,11 @@ namespace SEE.DataModel
     /// <summary>
     /// A change event fired when an implementation dependency was propagated to
     /// the architecture.
+    /// 
+    /// Note: This event is fired only once for the very first time a corresponding
+    /// new propagated edge was created in the architecture. If there is already such
+    /// a propagated edge in the architecture, this existing edge is re-used and only 
+    /// its counter is updated.
     /// </summary>
     public class PropagatedEdge : ChangeEvent
     {
@@ -187,19 +192,9 @@ namespace SEE.DataModel
         public void Run()
         {
             RegisterNodes();
-            add_transitive_mapping();
-            from_scratch();
+            Add_Transitive_Mapping();
+            From_Scratch();
         }
-
-        // Cleans up architecture view by removing the reflexion-specific
-        // attributes Bauhaus::DG::Causing_Edge_Count_Attribute and
-        // Bauhaus::DG::Reflexion_Edge_State_Attribute in architecture
-        // view that are no longer needed after the analysis has finished.
-        // Precondition: underlying DG and architecture must still exist.
-        // Postcondition: reflexion is undefined afterwards; can no longer
-        //  be used.
-        public void clean_up()
-        { }
 
         // --------------------------------------------------------------------
         // State edge attribute
@@ -216,7 +211,7 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="edge">a dependency in the architecture</param>
         /// <returns>the state of 'edge' in the architecture</returns>
-        public State get_state(Edge edge)
+        public State Get_State(Edge edge)
         {
             if (edge.TryGetInt(state_attribute, out int value))
             {
@@ -234,7 +229,7 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="edge">edge whose initial state is to be set</param>
         /// <param name="initial_state">the initial state to be set</param>
-        private void set_initial(Edge edge, State initial_state)
+        private void Set_Initial(Edge edge, State initial_state)
         {
             edge.SetInt(state_attribute, (int)initial_state);
         }
@@ -245,7 +240,7 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="edge">edge whose state is to be set</param>
         /// <param name="new_state">the state to be set</param>
-        private void set_state(Edge edge, State new_state)
+        private void Set_State(Edge edge, State new_state)
         {
             edge.SetInt(state_attribute, (int)new_state);
         }
@@ -257,11 +252,11 @@ namespace SEE.DataModel
         /// <param name="edge">edge being changed</param>
         /// <param name="old_state">the old state of the edge</param>
         /// <param name="new_state">the new state of the edge after the change</param>
-        private void transition(Edge edge, State old_state, State new_state)
+        private void Transition(Edge edge, State old_state, State new_state)
         {
             if (old_state != new_state)
             {
-                set_state(edge, new_state);
+                Set_State(edge, new_state);
                 Notify(new EdgeChange(edge, old_state, new_state));
             }
         }
@@ -273,9 +268,9 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="edge">architecture dependency</param>
         /// <returns>true if edge is a specified architecture dependency</returns>
-        private bool is_specified(Edge edge)
+        private bool Is_Specified(Edge edge)
         {
-            State state = get_state(edge);
+            State state = Get_State(edge);
             return state == State.specified || state == State.convergent || state == State.absent;
         }
 
@@ -294,7 +289,7 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="edge">an architecture dependency whose counter is to be set</param>
         /// <param name="value">value to be set</param>
-        private void set_counter(Edge edge, int value)
+        private void Set_Counter(Edge edge, int value)
         {
             edge.SetInt(counter_attribute, value);
         }
@@ -305,7 +300,7 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="edge">an architecture dependency whose counter is to be changed</param>
         /// <param name="value">value to be added</param>
-        private void change_counter(Edge edge, int value)
+        private void Change_Counter(Edge edge, int value)
         {
             if (edge.TryGetInt(counter_attribute, out int oldValue))
             {
@@ -323,7 +318,7 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="edge">an architecture dependency whose counter is to be retrieved</param>
         /// <returns>the counter of 'edge'</returns>
-        public int get_counter(Edge edge)
+        public int Get_Counter(Edge edge)
         {
             if (edge.TryGetInt(counter_attribute, out int value))
             {
@@ -344,16 +339,16 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="edge">propagated dependency in architecture graph</param>
         /// <param name="value">value to be added</param>
-        private void change_impl_ref(Edge edge, int value)
+        private void Change_Impl_Ref(Edge edge, int value)
         {
-            int old_value = get_counter(edge);
+            int old_value = Get_Counter(edge);
             int new_value = old_value + value;
 
             if (new_value == 0)
             {
-                if (get_state(edge) == State.divergent)
+                if (Get_State(edge) == State.divergent)
                 {
-                    transition(edge, State.divergent, State.undefined);
+                    Transition(edge, State.divergent, State.undefined);
                 }
                 // we can drop this edge; it is no longer needed
                 Notify(new RemovedEdge(edge));
@@ -361,7 +356,7 @@ namespace SEE.DataModel
             }
             else
             {
-                set_counter(edge, new_value);
+                Set_Counter(edge, new_value);
             }
         }
 
@@ -372,7 +367,7 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="edge">an architecture dependency whose counter is to be retrieved</param>
         /// <returns>value of the counter attribute of given implementation dependency</returns>
-        private int get_impl_counter(Edge edge = null)
+        private int Get_Impl_Counter(Edge edge = null)
         {
             // returns the value of the counter attribute of edge
             // at present, dependencies extracted from the source
@@ -383,91 +378,44 @@ namespace SEE.DataModel
         // --------------------------------------------------------------------
         //                      context information
         // --------------------------------------------------------------------
-        //
-        // @return the RFG for which the reflexion view is calculated
-        //
-        public Graph get_graph()
+
+        /// <summary>
+        /// Returns the implementation graph for which the reflexion data are calculated.
+        /// </summary>
+        /// <returns>implementation graph</returns>
+        public Graph Get_Implementation()
         {
             return _implementation;
         }
-        //
-        // @return the architecture view
-        //
-        public Graph get_architecture()
+
+        /// <summary>
+        /// Returns the architecture graph for which the reflexion data are calculated.
+        /// </summary>
+        /// <returns>architecture graph</returns>
+        public Graph Get_Architecture()
         {
             return _architecture;
         }
-        
-        //
-        // @return the mapping view
-        //
-        public Graph get_mapping()
+
+        /// <summary>
+        /// Returns the mapping graph for which the reflexion data are calculated.
+        /// </summary>
+        /// <returns>mapping graph</returns>
+        public Graph Get_Mapping()
         {
             return _mapping;
         }
 
         // --------------------------------------------------------------------
-        // reflexion results
-        // --------------------------------------------------------------------
-
-        // adds a browsable mapping to 'result_view' by adding mapped elements in
-        // the hierarchy view as children to their mapping targets, replicating
-        // the remaining hierarchy for nodes that are not mapped; populates
-        // 'parents' with a mapping from inserted nodes to their parents
-        // precondition: none of the nodes in the hierarchy view are visible in
-        //               'result_view', all targets of mapping edges in the
-        //               mapping view are visible in 'result_view'
-        //public void add_browsable_mapping(View result_view,
-        //                                  SerializableDictionary<Node, Node> parents)
-        //{
-        //    // FIXME
-        //}
-
-        // adds a single node and its hierarchy to 'result_view', stops
-        // going up the hierarchy when it encounters an outgoing mapping edge
-        // and adds a hierarchical edge to 'result_view' in its place; updates
-        // 'parents' with any newly added hierarchy edges
-        // precondition: all targets of mapping edges in the mapping view are
-        //               visible in 'result_view'
-        /*
-        void add_causing_endpoint(Node endpoint,
-                          View result_view,
-                          Edge_Type* hierarchy_edge_type,
-                                  const Edge_Type* mapping_edge_type,
-                          std::map<Node, Node>& parents) const;
-                          */
-
-        // @return list of causes for architecture discrepancies consisting
-        // of edge pairs (R, D) as follows:
-        //   R in reflexion_view and
-        //   type-of(R) = divergence => D in get_dependencies() and D is not
-        //      allowed according to the architecture, that is, D causes R
-        //   type-of(R) = absence    => D in get_architecture() and D is a specified
-        //      architectural dependency for which no implementation dependency
-        //      was found; that is, D causes R
-
-        // Precondition: reflexion_view is the result of get_reflexion_view().
-        //public List<Tuple<Edge, Edge>> get_caused(View reflexion_view)
-        //{
-        //    return null; // FIXME
-        //}
-
-        // As get_caused, but returns justifications for the convergence edges.
-        // Precondition: reflexion_view is the result of get_reflexion_view().
-        //public List<Tuple<Edge, Edge>> get_conforming(View reflexion_view)
-        //{
-        //    return null; // FIXME
-        //}
-
-        // --------------------------------------------------------------------
         //                             modifiers
         // --------------------------------------------------------------------
-        // The following operations manipulate the relevant views of the
-        // context and trigger the incremental update of the reflexion view;
-        // if anything in the reflexion view changes, all listeners are informed
+        // The following operations manipulate the relevant graphs of the
+        // context and trigger the incremental update of the reflexion results;
+        // if anything in the reflexion results changes, all observers are informed
         // by the update message.
-        // Never modify the underlying views directly; always use the following
-        // methods. Otherwise the reflexion view may be in an inconsistent state.
+        // Never modify the underlying graphs directly; always use the following
+        // methods. Otherwise the reflexion result may be in an inconsistent state.
+        //
         // Implementation detail: in case of a state change, Notify(ChangeEvent arg)
         // will be called where arg describes the type of change; such change information
         // consists of the object changed (either a single edge or node) and the kind
@@ -477,179 +425,174 @@ namespace SEE.DataModel
         // Note also that a removal of a node implies that all its incoming and outgoing
         // edges (hierarchical as well as dependencies) will be removed, too.
         // Note also that an addition of an edge will imply an implicit addition of
-        // its source and target node if there are not yet contained in the target view.
+        // its source and target node if there are not yet contained in the target graph.
         // NODE section
-        //
-        // @param node  the node to be added to the mapping view
-        // precondition: node must not be contained in the mapping view
-        // postcondition: node is contained in the mapping view and the reflexion
-        //   view is updated; all listeners are informed of the change.
-        //
-        public void add_to_mapping(Node node)
+
+        /// <summary>
+        /// Adds given node to the mapping graph.
+        /// Precondition: node must not be contained in the mapping graph.
+        /// Postcondition: node is contained in the mapping graph and the architecture
+        //   graph is updated; all listeners are informed of the change.
+        /// </summary>
+        /// <param name="node">the node to be added to the mapping graph</param>
+        public void Add_To_Mapping(Node node)
         {
-            // FIXME
-        }
-        //
-        // @param node  the node to be removed from the mapping view
-        // precondition: node must be contained in the mapping view
-        // postcondition: node is no longer contained in the mapping view and the reflexion
-        //   view is updated; all listeners are informed of the change.
-        //
-        public void delete_from_mapping(Node node)
-        {
-            // FIXME
-        }
-        //
-        // @param node  the node to be added to the architecture view
-        // precondition: node must not be contained in the architecture view
-        // postcondition: node is contained in the architecture view and the reflexion
-        //   view is updated; all listeners are informed of the change.
-        //
-        public void add_to_architecture(Node node)
-        {
-            // FIXME
-        }
-        //
-        // @param node  the node to be removed from the architecture view
-        // precondition: node must be contained in the architecture view
-        // postcondition: node is no longer contained in the architecture view and the reflexion
-        //   view is updated; all listeners are informed of the change.
-        //
-        public void delete_from_architecture(Node node)
-        {
-            // FIXME
-        }
-        //
-        // @param node  the node to be added to the dependency view
-        // precondition: node must not be contained in the dependency view
-        // postcondition: node is contained in the dependency view and the reflexion
-        //   view is updated; all listeners are informed of the change.
-        //
-        public void add_to_dependencies(Node node)
-        {
-            // FIXME
-        }
-        //
-        // @param node  the node to be removed from the dependency view
-        // precondition: node must be contained in the dependency view
-        // postcondition: node is no longer contained in the dependency view and the reflexion
-        //   view is updated; all listeners are informed of the change.
-        //
-        public void delete_from_dependencies(Node node)
-        {
-            // FIXME
+            throw new NotImplementedException(); // FIXME
         }
 
-        //
-        // @param node  the node to be added to the hierarchy view
-        // precondition: node must not be contained in the hierarchy view
-        // postcondition: node is contained in the hierarchy view and the reflexion
-        //   view is updated; all listeners are informed of the change.
-        //
-        public void add_to_hierarchy(Node node)
+        /// <summary>
+        /// Removes given node from mapping graph.
+        /// Precondition: node must be contained in the mapping graph.
+        /// Postcondition: node is no longer contained in the mapping graph and the architecture
+        ///   graph is updated; all listeners are informed of the change.
+        /// </summary>
+        /// <param name="node">node to be removed from the mapping</param>
+        public void Delete_From_Mapping(Node node)
         {
-            // FIXME
+            throw new NotImplementedException(); // FIXME
         }
-        //
-        // @param node  the node to be removed from the hierarchy view
-        // precondition: node must be contained in the hierarchy view
-        // postcondition: node is no longer contained in the hierarchy view and the reflexion
-        //   view is updated; all listeners are informed of the change.
-        //
-        public void delete_from_hierarchy(Node node)
+
+        /// <summary>
+        /// Adds given node to architecture graph.
+        /// 
+        /// Precondition: node must not be contained in the architecture graph.
+        /// Postcondition: node is contained in the architecture graph and the reflexion
+        ///   data are updated; all listeners are informed of the change.
+        /// </summary>
+        /// <param name="node">the node to be added to the architecture graph</param>
+        public void Add_To_Architecture(Node node)
         {
-            // FIXME
+            throw new NotImplementedException(); // FIXME
+        }
+
+        /// <summary>
+        /// Removes given node from architecture graph.
+        /// Precondition: node must be contained in the architecture graph.
+        /// Postcondition: node is no longer contained in the architecture graph and the reflexion
+        ///   data are updated; all listeners are informed of the change.
+        /// </summary>
+        /// <param name="node">the node to be removed from the architecture graph</param>
+        public void Delete_From_Architecture(Node node)
+        {
+            throw new NotImplementedException(); // FIXME
+        }
+
+        /// <summary>
+        /// Adds given node to implementation graph.
+        /// Precondition: node must not be contained in the implementation graph.
+        /// Postcondition: node is contained in the implementation graph; all listeners are 
+        /// informed of the change.
+        /// </summary>
+        /// <param name="node">the node to be added to the implementation graph</param>
+        public void Add_To_Implementation(Node node)
+        {
+            throw new NotImplementedException(); // FIXME
+        }
+
+        /// <summary>
+        /// Removes the given node from the implementation graph (and all its incoming and
+        /// outgoing edges).
+        /// Precondition: node must be contained in the implementation graph.
+        /// Postcondition: node is no longer contained in the implementation graph and the reflexion
+        ///   data are updated; all listeners are informed of the change.
+        /// </summary>
+        /// <param name="node">the node to be removed from the implementation graph</param>
+        public void Delete_From_Implementation(Node node)
+        {
+            throw new NotImplementedException(); // FIXME
         }
 
         // EDGE section
 
-        //
-        // @param edge  the edge to be added to the mapping view
-        // precondition: edge must not be contained in the mapping view
-        //   and edge must be a maps_to edge
-        // postcondition: edge is contained in the mapping view and the reflexion
-        //   view is updated; all listeners are informed of the change.
-        //
-        public void add_to_mapping(Edge edge)
+        /// <summary>
+        /// Adds the given edge to the mapping graph.
+        /// Precondition: edge must not be contained in the mapping graph
+        ///   and edge must be a Maps_To edge.
+        /// Postcondition: edge is contained in the mapping graph and the reflexion
+        ///   graph is updated; all listeners are informed of the change.
+        /// </summary>
+        /// <param name="edge">the edge to be added to the mapping graph</param>
+        public void Add_To_Mapping(Edge edge)
         {
-            // FIXME
+            throw new NotImplementedException(); // FIXME
         }
+
         //
-        // @param edge  the edge to be removed from the mapping view
-        // precondition: edge must be contained in the mapping view
-        // postcondition: edge is no longer contained in the mapping view and the reflexion
-        //   view is updated; all listeners are informed of the change.
+        // @param edge  the edge to be removed from the mapping graph
+        // Precondition: edge must be contained in the mapping graph
+        // Postcondition: edge is no longer contained in the mapping graph and the reflexion
+        //   graph is updated; all listeners are informed of the change.
         //
         public void delete_from_mapping(Edge edge)
         {
-            // FIXME
+            throw new NotImplementedException(); // FIXME
         }
 
         //
-        // @param edge  the edge to be added to the architecture view
-        // precondition: edge must not be contained in the architecture view
-        // postcondition: edge is contained in the architecture view and the reflexion
-        //   view is updated; all listeners are informed of the change.
+        // @param edge  the edge to be added to the architecture graph
+        // Precondition: edge must not be contained in the architecture graph
+        // Postcondition: edge is contained in the architecture graph and the reflexion
+        //   graph is updated; all listeners are informed of the change.
         //
         public void add_to_architecture(Edge edge)
         {
-            // FIXME
+            throw new NotImplementedException(); // FIXME
         }
         //
-        // @param edge  the edge to be removed from the architecture view
-        // precondition: edge must be contained in the architecture view
+        // @param edge  the edge to be removed from the architecture graph
+        // Precondition: edge must be contained in the architecture graph
         //   and edge must be either a hierarchical or a dependency
-        // postcondition: edge is no longer contained in the architecture view and the reflexion
-        //   view is updated; all listeners are informed of the change.
+        // Postcondition: edge is no longer contained in the architecture graph and the reflexion
+        //   graph is updated; all listeners are informed of the change.
         //
         public void delete_from_architecture(Edge edge)
         {
-            // FIXME
+            throw new NotImplementedException(); // FIXME
         }
 
         //
-        // @param edge  the edge to be added to the dependency view
-        // precondition: edge must not be contained in the dependency view
-        // postcondition: edge is contained in the dependency view and the reflexion
-        //   view is updated; all listeners are informed of the change.
+        // @param edge  the edge to be added to the dependency graph
+        // Precondition: edge must not be contained in the dependency graph
+        // Postcondition: edge is contained in the dependency graph and the reflexion
+        //   graph is updated; all listeners are informed of the change.
         //
         public void add_to_dependencies(Edge edge)
         {
-            // FIXME
+            throw new NotImplementedException(); // FIXME
         }
 
         /*
         //
-        // @param edge  the edge to be removed from the dependency view
-        // precondition: edge must be contained in the dependency view
+        // @param edge  the edge to be removed from the dependency graph
+        // Precondition: edge must be contained in the dependency graph
         //   and edge must be a dependency
-        // postcondition: edge is no longer contained in the dependency view and the reflexion
-        //   view is updated; all listeners are informed of the change.
+        // Postcondition: edge is no longer contained in the dependency graph and the reflexion
+        //   graph is updated; all listeners are informed of the change.
         //
         void delete_from_dependencies(Edge edge);
         */
 
         //
-        // @param edge  the edge to be added to the hierarchy view
-        // precondition: edge must not be contained in the hierarchy view
+        // @param edge  the edge to be added to the hierarchy graph
+        // Precondition: edge must not be contained in the hierarchy graph
         //  and edge must be a hierarchical edge
-        // postcondition: edge is contained in the hierarchy view and the reflexion
-        //   view is updated; all listeners are informed of the change.
+        // Postcondition: edge is contained in the hierarchy graph and the reflexion
+        //   graph is updated; all listeners are informed of the change.
         //
         public void add_to_hierarchy(Edge edge)
         {
-            // FIXME
+            throw new NotImplementedException(); // FIXME
         }
         //
-        // @param edge  the edge to be removed from the hierarchy view
-        // precondition: edge must be contained in the hierarchy view
+        // @param edge  the edge to be removed from the hierarchy graph
+        // Precondition: edge must be contained in the hierarchy graph
         //    and edge must be hierarchical
-        // postcondition: edge is no longer contained in the hierarchy view and the reflexion
-        //   view is updated; all listeners are informed of the change.
+        // Postcondition: edge is no longer contained in the hierarchy graph and the reflexion
+        //   graph is updated; all listeners are informed of the change.
         //
         public void delete_from_hierarchy(Edge edge)
         {
-            // FIXME
+            throw new NotImplementedException(); // FIXME
         }
 
         // --------------------------------------------------------------------
@@ -823,7 +766,7 @@ namespace SEE.DataModel
         /// know immediately where an implementation entity is mapped to.
         /// The result is stored in _explicit_maps_to_table and _implicit_maps_to_table.
         /// </summary>
-        private void add_transitive_mapping()
+        private void Add_Transitive_Mapping()
         {
             // Because add_subtree_to_implicit_map() will check whether a node is a 
             // mapper, which is done by consulting _explicit_maps_to_table, we need
@@ -914,7 +857,7 @@ namespace SEE.DataModel
         private class multimap<T1, T2> { }
 
         // ***********************************************************************************
-        // Traceability between dependencies propagated from dependency view into architecture
+        // Traceability between dependencies propagated from dependency graph into architecture
         // ***********************************************************************************
         //private multimap<Edge, Edge> _causing;
         // map: propagated edge in architecture -> set of dependencies in dependency;
@@ -939,18 +882,6 @@ namespace SEE.DataModel
         // DG utilities
         // *****************************************
 
-        // creates and returns a new of type its_type from 'from' to 'to' in 'view'
-        //private Edge add(Node from, Node to, string its_type, View view)
-        //{
-        //    return null; // FIXME
-        //}
-
-        // removes edge from view and notifies all observers
-        //private void remove(Edge edge, View view)
-        //{
-        //    // FIXME
-        //}
-
         /// <summary>
         /// Adds value to counter of edge and transforms its state.
         /// Notifies if edge state changes.
@@ -960,53 +891,19 @@ namespace SEE.DataModel
         /// <param name="value">the value to be added to the edge's counter</param>
         private void change_architecture_dependency(Edge edge, int value)
         {
-            int old_value = get_counter(edge);
+            int old_value = Get_Counter(edge);
             int new_value = old_value + value;
-            State state = get_state(edge);
+            State state = Get_State(edge);
 
             if (old_value == 0)
             {
-                transition(edge, state, State.convergent);
+                Transition(edge, state, State.convergent);
             }
             else if (new_value == 0)
             {
-                transition(edge, state, State.absent);
+                Transition(edge, state, State.absent);
             }
-            set_counter(edge, new_value);
-        }
-
-        // FIXME: Not used.
-        // Helper struct storing an allowing edge and a propagated
-        // architecture dependency
-        private class Candidate_Edges
-        {
-            public Edge allowing_edge;
-            public Edge architecture_dep;
-
-            public Candidate_Edges()
-            {
-                allowing_edge = null;
-                architecture_dep = null;
-            }
-
-            public Candidate_Edges(Edge allowing_edge, Edge architecture_dep)
-            {
-                this.allowing_edge = allowing_edge;
-                this.architecture_dep = architecture_dep;
-            }
-        }
-
-        // FIXME: Not used.
-        // Choose from a map of candidate edge instances the (key) node n
-        // with the smallest Linkage name, but prefer the node "preferred_node"
-        // if possible. Set witness_node to n.
-        private void select_divergence_representative(SerializableDictionary<Node, Candidate_Edges> instances,
-                                                      Node first_preferred_node,
-                                                      Node second_preferred_node,
-                                                      Node witness_node,
-                                                      Candidate_Edges witness_edges)
-        {
-            // FIXME
+            Set_Counter(edge, new_value);
         }
 
         // *****************************************
@@ -1016,7 +913,7 @@ namespace SEE.DataModel
         /// <summary>
         /// Runs reflexion analysis from scratch, i.e., non-incrementally.
         /// </summary>
-        private void from_scratch()
+        private void From_Scratch()
         {
             Reset();
             RegisterNodes();
@@ -1025,12 +922,11 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// Resets architecture and implementation markings.
+        /// Resets architecture markings.
         /// </summary>
         private void Reset()
         {
             ResetArchitecture();
-            ResetImplementation();
         }
 
         /// <summary>
@@ -1044,19 +940,19 @@ namespace SEE.DataModel
 
             foreach (Edge edge in _architecture.Edges())
             {
-                State state = get_state(edge);
+                State state = Get_State(edge);
                 switch (state)
                 {
                     case State.undefined:
                     case State.specified:
-                        set_counter(edge, 0); // Note: architecture edges have a counter
-                        set_initial(edge, State.specified); // initial state must be State.specified
+                        Set_Counter(edge, 0); // Note: architecture edges have a counter
+                        Set_Initial(edge, State.specified); // initial state must be State.specified
                         break; 
                     case State.absent:
                     case State.convergent:
                         // The initial state of an architecture dependency that was not propagated is specified.
-                        transition(edge, state, State.specified);
-                        set_counter(edge, 0); // Note: architecture edges have a counter
+                        Transition(edge, state, State.specified);
+                        Set_Counter(edge, 0); // Note: architecture edges have a counter
                         break;
                     default:
                         // The edge is a left-over from a previous analysis and should be
@@ -1071,19 +967,6 @@ namespace SEE.DataModel
             foreach (Edge edge in toBeRemoved)
             {
                 _architecture.RemoveEdge(edge);
-            }
-        }
-
-        /// <summary>
-        /// The state of all implementation dependencies will be set to 'undefined'.
-        /// </summary>
-        private void ResetImplementation()
-        {
-            foreach (Edge edge in _implementation.Edges())
-            {
-                set_state(edge, State.undefined);
-                // FIXME: Do edges in _implementation actually have a state?
-                //set_counter(edge, 0); // FIXME: do implementation edges have counters at all?
             }
         }
 
@@ -1145,16 +1028,16 @@ namespace SEE.DataModel
             // are 'absent' (unless the architecture edge is marked 'optional'
             foreach (Edge edge in _architecture.Edges())
             {
-                State state = get_state(edge);
-                if (is_specified(edge) && state != State.convergent)
+                State state = Get_State(edge);
+                if (Is_Specified(edge) && state != State.convergent)
                 {
                     if (edge.HasToggle("Architecture.Is_Optional"))
                     {
-                        transition(edge, state, State.allowed_absent);
+                        Transition(edge, state, State.allowed_absent);
                     }
                     else
                     {
-                        transition(edge, state, State.absent);
+                        Transition(edge, state, State.absent);
                     }
                 }
             }
@@ -1188,7 +1071,7 @@ namespace SEE.DataModel
                 // the architecture graph does not have redundant specified dependencies).
                 // All others (more precisely, at most one) are dependencies that were propagated from the
                 // implementation graph to the architecture graph.
-                if (!is_specified(edge))
+                if (!Is_Specified(edge))
                 {
                     return edge;
                 }
@@ -1247,8 +1130,8 @@ namespace SEE.DataModel
 #if DEBUG
                 Debug.Log("a propagated dependency exists already\n");
 #endif
-                int impl_counter = get_impl_counter(implementation_dep);
-                change_impl_ref(propagated_architecture_dep, impl_counter);
+                int impl_counter = Get_Impl_Counter(implementation_dep);
+                Change_Impl_Ref(propagated_architecture_dep, impl_counter);
                 // Assert: architecture_dep.Source and architecture_dep.Target are in architecture.
                 lift(propagated_architecture_dep.Source,
                      propagated_architecture_dep.Target,
@@ -1404,7 +1287,7 @@ namespace SEE.DataModel
             int counter = 1;
             Edge propagated_architecture_dep = add(arch_source, arch_target, edge_type, _architecture);
             // architecture_dep is a propagated dependency in the architecture graph
-            set_counter(propagated_architecture_dep, counter);
+            Set_Counter(propagated_architecture_dep, counter);
 
             // TODO: Mark architecture_dep as propagated. Or maybe that is not necessary at all
             // because we have the edge state from which we can derive whether an edge is specified
@@ -1418,12 +1301,12 @@ namespace SEE.DataModel
             if (lift(arch_source, arch_target, edge_type, counter, ref allowing_edge_out))
             {
                 // found a matching specified architecture dependency allowing propagated_architecture_dep
-                transition(propagated_architecture_dep, State.undefined, State.allowed);
+                Transition(propagated_architecture_dep, State.undefined, State.allowed);
             }
             else if (arch_source == arch_target)
             {
                 // by default, every entity may use itself
-                transition(propagated_architecture_dep, State.undefined, State.implicitly_allowed);
+                Transition(propagated_architecture_dep, State.undefined, State.implicitly_allowed);
                 // Note: there is no specified architecture dependency that allows this implementation
                 // dependency. Self dependencies are implicitly allowed.
                 allowing_edge_out = null; 
@@ -1431,7 +1314,7 @@ namespace SEE.DataModel
             else if (_allow_dependencies_to_parents 
                      && is_descendant_of(propagated_architecture_dep.Source, propagated_architecture_dep.Target))
             {
-                transition(propagated_architecture_dep, State.undefined, State.implicitly_allowed);
+                Transition(propagated_architecture_dep, State.undefined, State.implicitly_allowed);
                 // Note: there is no specified architecture dependency that allows this implementation
                 // dependency. Dependencies from descendants to ancestors are implicitly allowed if
                 // _allow_dependencies_to_parents is true.
@@ -1439,7 +1322,7 @@ namespace SEE.DataModel
             }
             else
             {
-                transition(propagated_architecture_dep, State.undefined, State.divergent);
+                Transition(propagated_architecture_dep, State.undefined, State.divergent);
                 allowing_edge_out = null;
             }
             return propagated_architecture_dep;
@@ -1496,7 +1379,7 @@ namespace SEE.DataModel
                     // Assert: edge is in architecture; edge_type is the type of edge
                     // being propagated and lifted; it may be more concrete than the
                     // type of the specified architecture dependency.
-                    if (is_specified(edge)
+                    if (Is_Specified(edge)
                         && edge.Has_Supertype_Of(edge_type)
                         && parents.Contains(edge.Target))
                     {   // matching architecture dependency found
@@ -1513,20 +1396,6 @@ namespace SEE.DataModel
 #endif
             allowing_edge_out = null;
             return false;
-        }
-
-        // adds all children of 'mapped_node' to 'result_view' and adds the
-        // hierarchical edges to their parent and does the same recursively for
-        // each added child - completely ignores children that have outgoing
-        // mapping edges; populates 'parents' with the hierarchical edges
-        // precondition: 'mapped_node' is visible in 'result_view'
-        private void add_unmapped_descendants(Node mapped_node,
-                              string hierarchy_edge_type,
-                              string mapping_edge_type,
-                              //View result_view,
-                              SerializableDictionary<Node, Node> parents) 
-        {
-            // FIXME
         }
 
         //------------------------------------------------------------------
