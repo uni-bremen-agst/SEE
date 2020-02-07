@@ -83,8 +83,8 @@ namespace SEECity.Charts.Scripts.VR
 		{
 			PointerEventData data = _inputModule.EventData;
 			RaycastHit hit = CreateRaycast();
-			float colliderDistance = hit.distance == 0 ? _pointerLength : hit.distance;
-			float canvasDistance = data.pointerCurrentRaycast.distance == 0
+			float colliderDistance = hit.distance.Equals(0f) ? _pointerLength : hit.distance;
+			float canvasDistance = data.pointerCurrentRaycast.distance.Equals(0f)
 				? _pointerLength
 				: data.pointerCurrentRaycast.distance;
 			float targetLength = Mathf.Min(colliderDistance, canvasDistance);

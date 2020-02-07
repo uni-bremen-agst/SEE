@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel;
 using SEE.Layout;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SEECity.Charts.Scripts
 {
@@ -18,6 +18,16 @@ namespace SEECity.Charts.Scripts
 		/// Contains some settings used in this script.
 		/// </summary>
 		protected ChartManager ChartManager;
+
+		[SerializeField] private GameObject scrollContent;
+
+		[SerializeField] private GameObject scrollEntryPrefab;
+
+		[SerializeField] private Vector2 headerOffset;
+
+		[SerializeField] private Vector2 childOffset;
+
+		[HideInInspector] public Coroutine drawing;
 
 		/// <summary>
 		/// All objects to be listed in the chart.
@@ -34,13 +44,11 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// The <see cref="AxisContentDropdown" /> containing Values for the X-Axis.
 		/// </summary>
-		[FormerlySerializedAs("AxisDropdownX")]
 		public AxisContentDropdown axisDropdownX;
 
 		/// <summary>
 		/// The <see cref="AxisContentDropdown" /> containing Values for the Y-Axis.
 		/// </summary>
-		[FormerlySerializedAs("AxisDropdownY")]
 		public AxisContentDropdown axisDropdownY;
 
 		/// <summary>
@@ -53,20 +61,15 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		[SerializeField] private GameObject entries;
 
-		[FormerlySerializedAs("_noDataWarning"), SerializeField]
-		private GameObject noDataWarning;
+		[SerializeField] private GameObject noDataWarning;
 
-		[FormerlySerializedAs("minX"), SerializeField]
-		private TextMeshProUGUI minXText;
+		[SerializeField] private TextMeshProUGUI minXText;
 
-		[FormerlySerializedAs("maxX"), SerializeField]
-		private TextMeshProUGUI maxXText;
+		[SerializeField] private TextMeshProUGUI maxXText;
 
-		[FormerlySerializedAs("minY"), SerializeField]
-		private TextMeshProUGUI minYText;
+		[SerializeField] private TextMeshProUGUI minYText;
 
-		[FormerlySerializedAs("maxY"), SerializeField]
-		private TextMeshProUGUI maxYText;
+		[SerializeField] private TextMeshProUGUI maxYText;
 
 		/// <summary>
 		/// A parent of this object. Used in VR to destroy the whole construct of a moveable chart.
@@ -109,6 +112,44 @@ namespace SEECity.Charts.Scripts
 			Invoke(nameof(CallDrawData), 0.2f);
 		}
 
+		private void FillScrollView()
+		{
+			foreach (Transform child in scrollContent.transform) Destroy(child.gameObject);
+
+			GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+			ScrollViewToggle parentToggle = tempObject.GetComponent<ScrollViewToggle>();
+			parentToggle.SetLabel("Buildings");
+			tempObject.transform.localPosition = headerOffset;
+			parentToggle.Initialize(this);
+
+			int i = 0;
+			foreach (GameObject dataObject in _dataObjects)
+				if (dataObject.tag.Equals("Building"))
+					CreateChildToggle(dataObject, parentToggle, i++);
+
+			tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+			parentToggle = tempObject.GetComponent<ScrollViewToggle>();
+			parentToggle.SetLabel("Nodes");
+			tempObject.transform.localPosition = headerOffset + new Vector2(0, -20) * ++i;
+			parentToggle.Initialize(this);
+
+			foreach (GameObject dataObject in _dataObjects)
+				if (dataObject.tag.Equals("Node"))
+					CreateChildToggle(dataObject, parentToggle, i++);
+		}
+
+		private void CreateChildToggle(GameObject dataObject, ScrollViewToggle parentToggle, int i)
+		{
+			GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+			ScrollViewToggle toggle = tempObject.GetComponent<ScrollViewToggle>();
+			toggle.Parent = parentToggle;
+			toggle.LinkedObject = dataObject.GetComponent<NodeHighlights>();
+			toggle.SetLabel(dataObject.name);
+			tempObject.transform.localPosition = childOffset + new Vector2(0f, -20f) * i;
+			toggle.Initialize(this);
+			parentToggle.AddChild(toggle);
+		}
+
 		/// <summary>
 		/// Gets all keys for <see cref="float" /> values contained in the <see cref="NodeRef" /> of each
 		/// <see cref="GameObject" /> in <see cref="_dataObjects" />.
@@ -144,6 +185,12 @@ namespace SEECity.Charts.Scripts
 			Array.Copy(buildings, combined, buildings.Length);
 			Array.Copy(nodes, 0, combined, buildings.Length, nodes.Length);
 			_dataObjects = combined;
+
+			foreach (GameObject entry in combined)
+				if (!entry.GetComponent<NodeHighlights>().showInChart.Contains(this))
+					entry.GetComponent<NodeHighlights>().showInChart.Add(this, true);
+
+			FillScrollView();
 		}
 
 		/// <summary>
@@ -153,6 +200,13 @@ namespace SEECity.Charts.Scripts
 		private void CallDrawData()
 		{
 			DrawData(true);
+		}
+
+		public IEnumerator QueueDraw()
+		{
+			yield return new WaitForSeconds(0.5f);
+			DrawData(false);
+			drawing = null;
 		}
 
 		/// <summary>
@@ -220,27 +274,36 @@ namespace SEECity.Charts.Scripts
 					inY = true;
 				}
 
-				if (inX && inY) toDraw.Add(data);
+				if (inX && inY && (bool) data.GetComponent<NodeHighlights>().showInChart[this])
+					toDraw.Add(data);
 			}
 
-			bool xEqual = minX.Equals(maxX);
-			bool yEqual = minY.Equals(maxY);
-			if (xEqual || yEqual)
+			if (toDraw.Count > 0)
 			{
-				(float min, float max) = minX.Equals(maxX) ? (minY, maxY) : (minX, maxX);
-				AddMarkers(toDraw, min, max);
-				minXText.text = xEqual ? "0" : minX.ToString("0.00");
-				maxXText.text = xEqual ? toDraw.Count.ToString() : maxX.ToString("0.00");
-				minYText.text = yEqual ? "0" : minY.ToString("0.00");
-				maxYText.text = yEqual ? toDraw.Count.ToString() : maxY.ToString("0.00");
+				bool xEqual = minX.Equals(maxX);
+				bool yEqual = minY.Equals(maxY);
+				if (xEqual || yEqual)
+				{
+					(float min, float max) = minX.Equals(maxX) ? (minY, maxY) : (minX, maxX);
+					AddMarkers(toDraw, min, max);
+					minXText.text = xEqual ? "0" : minX.ToString("0.00");
+					maxXText.text = xEqual ? toDraw.Count.ToString() : maxX.ToString("0.00");
+					minYText.text = yEqual ? "0" : minY.ToString("0.00");
+					maxYText.text = yEqual ? toDraw.Count.ToString() : maxY.ToString("0.00");
+				}
+				else
+				{
+					AddMarkers(toDraw, minX, maxX, minY, maxY);
+					minXText.text = minX.ToString("0.00");
+					maxXText.text = maxX.ToString("0.00");
+					minYText.text = minY.ToString("0.00");
+					maxYText.text = maxY.ToString("0.00");
+				}
 			}
 			else
 			{
-				AddMarkers(toDraw, minX, maxX, minY, maxY);
-				minXText.text = minX.ToString("0.00");
-				maxXText.text = maxX.ToString("0.00");
-				minYText.text = minY.ToString("0.00");
-				maxYText.text = maxY.ToString("0.00");
+				foreach (GameObject activeMarker in ActiveMarkers) Destroy(activeMarker);
+				noDataWarning.SetActive(true);
 			}
 		}
 
@@ -255,25 +318,34 @@ namespace SEECity.Charts.Scripts
 			string metric = axisDropdownY.Value;
 
 			foreach (GameObject dataObject in _dataObjects)
-				if (dataObject.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float _))
+				if (dataObject.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float _) &&
+				    (bool) dataObject.GetComponent<NodeHighlights>().showInChart[this])
 					toDraw.Add(dataObject);
 
-			toDraw.Sort(delegate(GameObject go1, GameObject go2)
+			if (toDraw.Count > 0)
 			{
-				go1.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float value1);
-				go2.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float value2);
-				return value1.CompareTo(value2);
-			});
+				toDraw.Sort(delegate(GameObject go1, GameObject go2)
+				{
+					go1.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float value1);
+					go2.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float value2);
+					return value1.CompareTo(value2);
+				});
 
-			toDraw.First().GetComponent<NodeRef>().node.TryGetNumeric(metric, out float min);
-			toDraw.Last().GetComponent<NodeRef>().node.TryGetNumeric(metric, out float max);
+				toDraw.First().GetComponent<NodeRef>().node.TryGetNumeric(metric, out float min);
+				toDraw.Last().GetComponent<NodeRef>().node.TryGetNumeric(metric, out float max);
 
-			AddMarkers(toDraw, min, max);
+				AddMarkers(toDraw, min, max);
 
-			minXText.text = "0";
-			maxXText.text = toDraw.Count.ToString();
-			minYText.text = min.ToString("0.00");
-			maxYText.text = max.ToString("0.00");
+				minXText.text = "0";
+				maxXText.text = toDraw.Count.ToString();
+				minYText.text = min.ToString("0.00");
+				maxYText.text = max.ToString("0.00");
+			}
+			else
+			{
+				foreach (GameObject activeMarker in ActiveMarkers) Destroy(activeMarker);
+				noDataWarning.SetActive(true);
+			}
 		}
 
 		/// <summary>
@@ -330,9 +402,6 @@ namespace SEECity.Charts.Scripts
 				float width = dataRect.width / (toDraw.Count - 1);
 				float height = dataRect.height / (max - min);
 				string metric = axisDropdownY.Value;
-				//toDraw[0].GetComponent<NodeRef>().node
-				//	.TryGetNumeric(axisDropdownX.Value, out float dropdownValue);
-				//axisDropdownX.SetText(axisDropdownX.Value + " " + dropdownValue.ToString("0.00"));
 				int x = 0;
 
 				foreach (GameObject data in toDraw)
@@ -350,10 +419,13 @@ namespace SEECity.Charts.Scripts
 						new Vector2(x++ * width, (value - min) * height);
 					updatedMarkers.Add(marker);
 
-					float highlightTimeLeft = CheckOldMarkers(data);
-					if (highlightTimeLeft > 0f)
-						script.TriggerTimedHighlight(ChartManager.highlightDuration -
-						                             highlightTimeLeft, true);
+					if (ActiveMarkers.Count > 0)
+					{
+						float highlightTimeLeft = CheckOldMarkers(data);
+						if (highlightTimeLeft > 0f)
+							script.TriggerTimedHighlight(
+								ChartManager.highlightDuration - highlightTimeLeft, true);
+					}
 				}
 
 				foreach (GameObject marker in ActiveMarkers) Destroy(marker);
@@ -385,10 +457,13 @@ namespace SEECity.Charts.Scripts
 					new Vector2(x++ * width, y++ * height);
 				updatedMarkers.Add(marker);
 
-				float highlightTimeLeft = CheckOldMarkers(data);
-				if (highlightTimeLeft > 0f)
-					script.TriggerTimedHighlight(ChartManager.highlightDuration -
-					                             highlightTimeLeft, true);
+				if (ActiveMarkers.Count > 0)
+				{
+					float highlightTimeLeft = CheckOldMarkers(data);
+					if (highlightTimeLeft > 0f)
+						script.TriggerTimedHighlight(
+							ChartManager.highlightDuration - highlightTimeLeft, true);
+				}
 			}
 
 			foreach (GameObject marker in ActiveMarkers) Destroy(marker);
@@ -398,11 +473,10 @@ namespace SEECity.Charts.Scripts
 		private float CheckOldMarkers(GameObject marker)
 		{
 			foreach (GameObject oldMarker in ActiveMarkers)
-			{
-				ChartMarker oldScript = oldMarker.GetComponent<ChartMarker>();
-				if (oldScript.linkedObject.GetInstanceID() == marker.GetInstanceID() &&
-				    oldScript.TimedHighlight != null) return oldScript.HighlightTime;
-			}
+				if (oldMarker != null && oldMarker.TryGetComponent(out ChartMarker oldScript) &&
+				    oldScript.linkedObject.GetInstanceID() == marker.GetInstanceID() &&
+				    oldScript.TimedHighlight != null)
+					return oldScript.HighlightTime;
 
 			return 0f;
 		}
@@ -446,17 +520,22 @@ namespace SEECity.Charts.Scripts
 				                        axisDropdownY.Value);
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
+		/// <param name="highlight"></param>
 		public void HighlightCorrespondingMarker(GameObject highlight)
 		{
 			foreach (GameObject activeMarker in ActiveMarkers)
-			{
-				ChartMarker script = activeMarker.GetComponent<ChartMarker>();
-				if (script.linkedObject.Equals(highlight))
+				if (activeMarker != null)
 				{
-					script.TriggerTimedHighlight(ChartManager.highlightDuration, false);
-					break;
+					ChartMarker script = activeMarker.GetComponent<ChartMarker>();
+					if (script.linkedObject.Equals(highlight))
+					{
+						script.TriggerTimedHighlight(ChartManager.highlightDuration, false);
+						break;
+					}
 				}
-			}
 		}
 
 		public void AccentuateCorrespondingMarker(GameObject highlight)
@@ -478,6 +557,15 @@ namespace SEECity.Charts.Scripts
 		public void Destroy()
 		{
 			Destroy(parent);
+		}
+
+		/// <summary>
+		/// Removes this chart from all <see cref="NodeHighlights.showInChart" /> dictionaries.
+		/// </summary>
+		public void OnDestroy()
+		{
+			foreach (GameObject dataObject in _dataObjects)
+				dataObject.GetComponent<NodeHighlights>().showInChart.Remove(this);
 		}
 	}
 }
