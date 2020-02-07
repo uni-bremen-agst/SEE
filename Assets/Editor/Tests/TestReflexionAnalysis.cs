@@ -363,10 +363,6 @@ namespace SEE.DataModel
         ///   -- n2_c1
         ///  n3
         ///  
-        /// edges:
-        ///   import(n1, n2)
-        ///   import(n2, n3)
-        ///   import(n2, n3)
         /// </summary>
         /// <returns>new implementation graph with a hierarchy of nodes</returns>
         private Graph NewImplementationNodeHierarchy()
@@ -559,6 +555,20 @@ namespace SEE.DataModel
             return HasNewState(edgeChanges, source, target, edgeType, State.allowed_absent);
         }
 
+        /// <summary>
+        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.divergent).
+        /// </summary>
+        /// <param name="edgeChanges">list of edge-change events</param>
+        /// <param name="source">source of edge</param>
+        /// <param name="target">target of edge</param>
+        /// <param name="edgeType">type of edge</param>
+        /// <param name="state">new state</param>
+        /// <returns>true if such an edge exists</returns>
+        private bool IsDivergent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        {
+            return HasNewState(edgeChanges, source, target, edgeType, State.divergent);
+        }
+
         //-------------------
         // Implicitly allowed 
         //-------------------
@@ -631,9 +641,6 @@ namespace SEE.DataModel
             // 1 propagated edges
             Assert.AreEqual(1, propagatedEdges.Count);
 
-            // 1 implicitly allowed propagated dependencies
-            Assert.That(IsImplicitlyAllowed(edgeChanges, N1_C1, N1, call));
-
             // 4 absences 
             Assert.That(IsAbsent(edgeChanges, N2, N1, call));
             Assert.That(IsAbsent(edgeChanges, N1_C1, N2_C1, call));
@@ -653,6 +660,8 @@ namespace SEE.DataModel
             NewEdge(impl, n1_c1, n1, call);
             reflexion.Run();
 
+            // 1 implicitly allowed propagated dependencies
+            Assert.That(IsImplicitlyAllowed(edgeChanges, N1_C1, N1, call));
             CommonHierarchyAccess();
         }
 
@@ -664,6 +673,32 @@ namespace SEE.DataModel
             NewEdge(impl, n1_c1_c1, n1, call);
             reflexion.Run();
 
+            // 1 implicitly allowed propagated dependencies
+            Assert.That(IsImplicitlyAllowed(edgeChanges, N1_C1, N1, call));
+            CommonHierarchyAccess();
+        }
+
+        [Test]
+        public void TestAllowedChildAccess1()
+        {
+            // dependency from parent to child where both are mapped explicitly 
+            NewEdge(impl, n1_c1, n1_c1_c1, call);
+            reflexion.Run();
+
+            // 1 implicitly allowed propagated dependencies
+            Assert.That(IsImplicitlyAllowed(edgeChanges, N1_C1, N1_C1, call));
+            CommonHierarchyAccess();
+        }
+
+        [Test]
+        public void TestDisallowedChildAccess()
+        {
+            // dependency from parent to child where both are mapped explicitly 
+            NewEdge(impl, n1, n1_c1, call);
+            reflexion.Run();
+
+            // 1 disallowed propagated dependencies
+            Assert.That(IsDivergent(edgeChanges, N1, N1_C1, call));
             CommonHierarchyAccess();
         }
 
@@ -673,6 +708,40 @@ namespace SEE.DataModel
 
         [Test]
         public void TestConvergences1()
+        {
+            // Note: only one propagated edge for the following two implementation dependencies
+            // will be created that covers both.
+            NewEdge(impl, n1_c1_c1, n2_c1, call);
+            NewEdge(impl, n1_c1_c2, n2_c1, call);
+            NewEdge(impl, n2, n1_c2, call);
+            NewEdge(impl, n3, n2_c1, call);
+            NewEdge(impl, n3, n1_c2, call);
+            reflexion.Run();
+
+            // 4 propagated edges
+            Assert.AreEqual(4, propagatedEdges.Count);
+
+            // 4 convergences
+            Assert.That(IsConvergent(edgeChanges, N2, N1, call));
+            Assert.That(IsConvergent(edgeChanges, N1_C1, N2_C1, call));
+            Assert.That(IsConvergent(edgeChanges, N3, N1_C2, call));
+            Assert.That(IsConvergent(edgeChanges, N3, N2_C1, call));
+
+            // 4 allowed propagated dependencies
+            Assert.That(IsAllowed(edgeChanges, N1_C1, N2_C1, call));  // covers n1_c1_c1 -> n2_c1 and n1_c1_c2 -> n2_c1
+            Assert.That(IsAllowed(edgeChanges, N2, N1_C2, call));
+            Assert.That(IsAllowed(edgeChanges, N3, N2_C1, call));
+            Assert.That(IsAllowed(edgeChanges, N3, N1_C2, call));
+            // 0 absences
+
+            // 0 divergences
+            Assert.AreEqual(8, edgeChanges.Count);
+            // 0 removed edges
+            Assert.AreEqual(0, removedEdges.Count);
+        }
+
+        [Test]
+        public void TestConvergences2()
         {
             NewEdge(impl, n2, n1, call);
             reflexion.Run();
@@ -694,7 +763,7 @@ namespace SEE.DataModel
             Assert.AreEqual(0, removedEdges.Count);
         }
 
-        private void CommonTestConvergences234()
+        private void CommonTestConvergences345()
         {
             // 1 propagated edges
             Assert.AreEqual(1, propagatedEdges.Count);
@@ -712,7 +781,7 @@ namespace SEE.DataModel
         }
 
         [Test]
-        public void TestConvergences2()
+        public void TestConvergences3()
         {
             NewEdge(impl, n2_c1, n1_c2, call);
             reflexion.Run();
@@ -720,11 +789,11 @@ namespace SEE.DataModel
             // 1 allowed propagated dependencies
             Assert.That(IsAllowed(edgeChanges, N2_C1, N1_C2, call));
 
-            CommonTestConvergences234();
+            CommonTestConvergences345();
         }
 
         [Test]
-        public void TestConvergences3()
+        public void TestConvergences4()
         {
             NewEdge(impl, n2_c1, n1_c1_c2, call);
             reflexion.Run();
@@ -732,11 +801,11 @@ namespace SEE.DataModel
             // 1 allowed propagated dependencies
             Assert.That(IsAllowed(edgeChanges, N2_C1, N1_C1, call));
 
-            CommonTestConvergences234();
+            CommonTestConvergences345();
         }
 
         [Test]
-        public void TestConvergences4()
+        public void TestConvergences5()
         {
             NewEdge(impl, n2_c1, n1, call);
             reflexion.Run();
@@ -744,8 +813,104 @@ namespace SEE.DataModel
             // 1 allowed propagated dependencies
             Assert.That(IsAllowed(edgeChanges, N2_C1, N1, call));
 
-            CommonTestConvergences234();
+            CommonTestConvergences345();
         }
 
+        //-------------------
+        // Divergences 
+        //-------------------
+
+        private void CommonAbsences()
+        {
+            // 1 propagated edges
+            Assert.AreEqual(1, propagatedEdges.Count);
+
+            // 4 absences 
+            Assert.That(IsAbsent(edgeChanges, N2, N1, call));
+            Assert.That(IsAbsent(edgeChanges, N1_C1, N2_C1, call));
+            Assert.That(IsAbsent(edgeChanges, N3, N1_C2, call));
+            Assert.That(IsAllowedAbsent(edgeChanges, N3, N2_C1, call));
+            // 0 convergences
+            Assert.AreEqual(5, edgeChanges.Count);
+
+            // 0 removed edges
+            Assert.AreEqual(0, removedEdges.Count);
+        }
+
+        [Test]
+        public void TestDivergences1()
+        {
+            NewEdge(impl, n1, n2, call);
+            reflexion.Run();
+
+            // 1 divergent propagated dependency
+            Assert.That(IsDivergent(edgeChanges, N1, N2, call));
+
+            CommonAbsences();
+        }
+
+        [Test]
+        public void TestDivergences2()
+        {
+            NewEdge(impl, n1_c1, n2, call);
+            reflexion.Run();
+
+            // 1 divergent propagated dependency
+            Assert.That(IsDivergent(edgeChanges, N1_C1, N2, call));
+
+            CommonAbsences();
+        }
+
+        [Test]
+        public void TestDivergences3()
+        {
+            NewEdge(impl, n1_c1_c1, n2, call);
+            NewEdge(impl, n1_c1_c1, n2, call);
+            NewEdge(impl, n1_c1_c2, n2, call);
+            reflexion.Run();
+
+            // 1 divergent propagated dependency
+            Assert.That(IsDivergent(edgeChanges, N1_C1, N2, call));
+
+            CommonAbsences();
+        }
+
+        [Test]
+        public void TestDivergences4()
+        {
+            NewEdge(impl, n1, n2_c1, call);
+            reflexion.Run();
+
+            // 1 divergent propagated dependency
+            Assert.That(IsDivergent(edgeChanges, N1, N2_C1, call));
+
+            CommonAbsences();
+        }
+
+        [Test]
+        public void TestDivergences5()
+        {
+            NewEdge(impl, n1_c2, n2_c1, call);
+            reflexion.Run();
+
+            // 1 divergent propagated dependency
+            Assert.That(IsDivergent(edgeChanges, N1_C2, N2_C1, call));
+
+            CommonAbsences();
+        }
+
+        [Test]
+        public void TestDivergences6()
+        {
+            NewEdge(impl, n1_c1_c1, n1_c2, call);
+            NewEdge(impl, n1_c1_c1, n1_c2, call);
+            NewEdge(impl, n1_c1_c2, n1_c2, call);
+            reflexion.Run();
+
+            // 1 divergent propagated dependency
+            Assert.That(IsDivergent(edgeChanges, N1_C1, N1_C2, call));
+
+            CommonAbsences();
+        }
     }
 }
