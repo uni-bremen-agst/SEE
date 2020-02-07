@@ -185,44 +185,5 @@
         <edge id="E6" from="N2" to="N0">
             <type xlink:href="Enclosing"/>
         </edge>
-        <edge id="E7" from="N1" to="N4">
-            <type xlink:href="Clone"/>
-        </edge>
-        <edge id="E8" from="N1" to="N3">
-            <type xlink:href="Clone"/>
-        </edge>
-        <edge id="E9" from="N1" to="N5">
-            <type xlink:href="Clone"/>
-        </edge>
-        <edge id="E10" from="N3" to="N4">
-            <type xlink:href="Clone"/>
-        </edge>
-        <edge id="E11" from="N3" to="N5">
-            <type xlink:href="Clone"/>
-        </edge>
-        <edge id="E12" from="N3" to="N1">
-            <type xlink:href="Clone"/>
-        </edge>
-        <edge id="E13" from="N4" to="N3">
-            <type xlink:href="Clone"/>
-        </edge>
-        <edge id="E14" from="N4" to="N5">
-            <type xlink:href="Clone"/>
-        </edge>
-        <edge id="E15" from="N4" to="N1">
-            <type xlink:href="Clone"/>
-        </edge>
-        <edge id="E16" from="N5" to="N3">
-            <type xlink:href="Clone"/>
-        </edge>
-        <edge id="E17" from="N5" to="N1">
-            <type xlink:href="Clone"/>
-        </edge>
-        <edge id="E18" from="N5" to="N4">
-            <type xlink:href="Clone"/>
-        </edge>
-        <edge id="E19" from="N6" to="N5">
-            <type xlink:href="Clone"/>
-        </edge>
     </graph>
 </gxl>
