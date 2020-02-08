@@ -239,6 +239,11 @@ namespace SEEEditor
                     flightControl.SetDefaults();
                     flightControl.AdjustSettings(unit);
                 }
+                CameraController cameraController = camera.GetComponent<CameraController>();
+                if (cameraController != null)
+                {
+                    cameraController.AdjustSettings(unit);
+                }
                 // TODO: Adjust speed setting for Leap Rig camera
             }
         }
