@@ -137,6 +137,23 @@ namespace SEE.DataModel
             return parent == null;
         }
 
+        /// <summary>
+        /// Yields the set of all transitive parents of this node in the node hierarchy
+        /// including the node itself.
+        /// </summary>
+        /// <returns>ascendants of this node in the hierarchy including the node itself</returns>
+        public List<Node> Ascendants()
+        {
+            List<Node> result = new List<Node>();
+            Node cursor = this;
+            while (cursor != null)
+            {
+                result.Add(cursor);
+                cursor = cursor.Parent;
+            }
+            return result;
+        }
+
         public override string ToString()
         {
             string result = "{\n";
