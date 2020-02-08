@@ -1,0 +1,188 @@
+Set platform to 'v4', using directory 'C:\Windows\Microsoft.NET\Framework\v4.0.30319' for mscorlib.dll
+Running on Microsoft (R) .NET Framework v4.0.30319
+mscorlib.dll version = 4.0.0.0
+The list of input assemblies is:
+	NetworkCommsDotNet.dll
+	protobuf-net.dll
+	ProtobufSerializer.dll
+	ICSharpCode.SharpZipLib.dll
+	SharpZipLibCompressor.dll
+	QuickLZCompressor.dll
+	InTheHand.Net.Personal.dll
+	JSONSerializer.dll
+	Newtonsoft.Json.dll
+	DistributedFileSystem.dll
+	RemoteProcedureCalls.dll
+Trying to read assembly from the file 'C:\Users\Karnifexx\Documents\Visual Studio 2010\Projects\networkcomms.net\Platforms\Net40\MergedDllBuild\bin\Release\NetworkCommsDotNet.dll'.
+	Successfully read in assembly.
+	There were no errors reported in NetworkCommsDotNet's metadata.
+Trying to read assembly from the file 'C:\Users\Karnifexx\Documents\Visual Studio 2010\Projects\networkcomms.net\Platforms\Net40\MergedDllBuild\bin\Release\protobuf-net.dll'.
+	Successfully read in assembly.
+	There were no errors reported in protobuf-net's metadata.
+Trying to read assembly from the file 'C:\Users\Karnifexx\Documents\Visual Studio 2010\Projects\networkcomms.net\Platforms\Net40\MergedDllBuild\bin\Release\ProtobufSerializer.dll'.
+	Successfully read in assembly.
+	There were no errors reported in ProtobufSerializer's metadata.
+Trying to read assembly from the file 'C:\Users\Karnifexx\Documents\Visual Studio 2010\Projects\networkcomms.net\Platforms\Net40\MergedDllBuild\bin\Release\ICSharpCode.SharpZipLib.dll'.
+Can not find PDB file. Debug info will not be available for assembly 'ICSharpCode.SharpZipLib.dll'.
+	Successfully read in assembly.
+	There were no errors reported in ICSharpCode.SharpZipLib's metadata.
+Trying to read assembly from the file 'C:\Users\Karnifexx\Documents\Visual Studio 2010\Projects\networkcomms.net\Platforms\Net40\MergedDllBuild\bin\Release\SharpZipLibCompressor.dll'.
+	Successfully read in assembly.
+	There were no errors reported in SharpZipLibCompressor's metadata.
+Trying to read assembly from the file 'C:\Users\Karnifexx\Documents\Visual Studio 2010\Projects\networkcomms.net\Platforms\Net40\MergedDllBuild\bin\Release\QuickLZCompressor.dll'.
+	Successfully read in assembly.
+	There were no errors reported in QuickLZCompressor's metadata.
+Trying to read assembly from the file 'C:\Users\Karnifexx\Documents\Visual Studio 2010\Projects\networkcomms.net\Platforms\Net40\MergedDllBuild\bin\Release\InTheHand.Net.Personal.dll'.
+Can not find PDB file. Debug info will not be available for assembly 'InTheHand.Net.Personal.dll'.
+	Successfully read in assembly.
+	There were no errors reported in InTheHand.Net.Personal's metadata.
+Trying to read assembly from the file 'C:\Users\Karnifexx\Documents\Visual Studio 2010\Projects\networkcomms.net\Platforms\Net40\MergedDllBuild\bin\Release\JSONSerializer.dll'.
+	Successfully read in assembly.
+	There were no errors reported in JSONSerializer's metadata.
+Trying to read assembly from the file 'C:\Users\Karnifexx\Documents\Visual Studio 2010\Projects\networkcomms.net\Platforms\Net40\MergedDllBuild\bin\Release\Newtonsoft.Json.dll'.
+Can not find PDB file. Debug info will not be available for assembly 'Newtonsoft.Json.dll'.
+	Successfully read in assembly.
+	There were no errors reported in Newtonsoft.Json's metadata.
+Trying to read assembly from the file 'C:\Users\Karnifexx\Documents\Visual Studio 2010\Projects\networkcomms.net\Platforms\Net40\MergedDllBuild\bin\Release\DistributedFileSystem.dll'.
+	Successfully read in assembly.
+	There were no errors reported in DistributedFileSystem's metadata.
+Trying to read assembly from the file 'C:\Users\Karnifexx\Documents\Visual Studio 2010\Projects\networkcomms.net\Platforms\Net40\MergedDllBuild\bin\Release\RemoteProcedureCalls.dll'.
+	Successfully read in assembly.
+	There were no errors reported in RemoteProcedureCalls's metadata.
+Checking to see that all of the input assemblies have a compatible PeKind.
+	NetworkCommsDotNet.PeKind = ILonly
+	protobuf-net.PeKind = ILonly
+	ProtobufSerializer.PeKind = ILonly
+	ICSharpCode.SharpZipLib.PeKind = ILonly
+	SharpZipLibCompressor.PeKind = ILonly
+	QuickLZCompressor.PeKind = ILonly
+	InTheHand.Net.Personal.PeKind = ILonly
+	JSONSerializer.PeKind = ILonly
+	Newtonsoft.Json.PeKind = ILonly
+	DistributedFileSystem.PeKind = ILonly
+	RemoteProcedureCalls.PeKind = ILonly
+All input assemblies have a compatible PeKind value.
+AssemblyResolver: Assembly 'protobuf-net' is referencing assembly 'System.ServiceModel'.
+	AssemblyResolver: Attempting referencing assembly's directory.
+	AssemblyResolver: Did not find assembly in referencing assembly's directory.
+	AssemblyResolver: Attempting input directory.
+	AssemblyResolver: Did not find assembly in input directory.
+	AssemblyResolver: Attempting user-supplied directories.
+	AssemblyResolver: No user-supplied directories.
+	AssemblyResolver: Attempting framework directory.
+Can not find PDB file. Debug info will not be available for assembly 'System.ServiceModel'.
+Resolved assembly reference 'System.ServiceModel' to 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.ServiceModel.dll'. (Used framework directory.)
+AssemblyResolver: Assembly 'System.ServiceModel' is referencing assembly 'System.Configuration'.
+	AssemblyResolver: Attempting referencing assembly's directory.
+Can not find PDB file. Debug info will not be available for assembly 'System.Configuration'.
+Resolved assembly reference 'System.Configuration' to 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Configuration.dll'. (Used referencing Module's directory.)
+AssemblyResolver: Assembly 'protobuf-net' is referencing assembly 'System.Runtime.Serialization'.
+	AssemblyResolver: Attempting referencing assembly's directory.
+	AssemblyResolver: Did not find assembly in referencing assembly's directory.
+	AssemblyResolver: Attempting input directory.
+	AssemblyResolver: Did not find assembly in input directory.
+	AssemblyResolver: Attempting user-supplied directories.
+	AssemblyResolver: No user-supplied directories.
+	AssemblyResolver: Attempting framework directory.
+Can not find PDB file. Debug info will not be available for assembly 'System.Runtime.Serialization'.
+Resolved assembly reference 'System.Runtime.Serialization' to 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Runtime.Serialization.dll'. (Used framework directory.)
+AssemblyResolver: Assembly 'InTheHand.Net.Personal' is referencing assembly 'System.Configuration'.
+	AssemblyResolver: Attempting referencing assembly's directory.
+	AssemblyResolver: Did not find assembly in referencing assembly's directory.
+	AssemblyResolver: Attempting input directory.
+	AssemblyResolver: Did not find assembly in input directory.
+	AssemblyResolver: Attempting user-supplied directories.
+	AssemblyResolver: No user-supplied directories.
+	AssemblyResolver: Attempting framework directory.
+Can not find PDB file. Debug info will not be available for assembly 'System.Configuration'.
+Resolved assembly reference 'System.Configuration' to 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Configuration.dll'. (Used framework directory.)
+AssemblyResolver: Assembly 'InTheHand.Net.Personal' is referencing assembly 'System.Core'.
+	AssemblyResolver: Attempting referencing assembly's directory.
+	AssemblyResolver: Did not find assembly in referencing assembly's directory.
+	AssemblyResolver: Attempting input directory.
+	AssemblyResolver: Did not find assembly in input directory.
+	AssemblyResolver: Attempting user-supplied directories.
+	AssemblyResolver: No user-supplied directories.
+	AssemblyResolver: Attempting framework directory.
+Can not find PDB file. Debug info will not be available for assembly 'System.Core'.
+Resolved assembly reference 'System.Core' to 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Core.dll'. (Used framework directory.)
+AssemblyResolver: Assembly 'Newtonsoft.Json' is referencing assembly 'System.Numerics'.
+	AssemblyResolver: Attempting referencing assembly's directory.
+	AssemblyResolver: Did not find assembly in referencing assembly's directory.
+	AssemblyResolver: Attempting input directory.
+	AssemblyResolver: Did not find assembly in input directory.
+	AssemblyResolver: Attempting user-supplied directories.
+	AssemblyResolver: No user-supplied directories.
+	AssemblyResolver: Attempting framework directory.
+Can not find PDB file. Debug info will not be available for assembly 'System.Numerics'.
+Resolved assembly reference 'System.Numerics' to 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Numerics.dll'. (Used framework directory.)
+AssemblyResolver: Assembly 'Newtonsoft.Json' is referencing assembly 'System.Xml.Linq'.
+	AssemblyResolver: Attempting referencing assembly's directory.
+	AssemblyResolver: Did not find assembly in referencing assembly's directory.
+	AssemblyResolver: Attempting input directory.
+	AssemblyResolver: Did not find assembly in input directory.
+	AssemblyResolver: Attempting user-supplied directories.
+	AssemblyResolver: No user-supplied directories.
+	AssemblyResolver: Attempting framework directory.
+Can not find PDB file. Debug info will not be available for assembly 'System.Xml.Linq'.
+Resolved assembly reference 'System.Xml.Linq' to 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Xml.Linq.dll'. (Used framework directory.)
+Using assembly 'NetworkCommsDotNet' for assembly-level attributes for the target assembly.
+Merging assembly 'NetworkCommsDotNet' into target assembly.
+Merging assembly 'protobuf-net' into target assembly.
+AssemblyResolver: Assembly 'System.ServiceModel' is referencing assembly 'System.ServiceModel.Internals'.
+	AssemblyResolver: Attempting referencing assembly's directory.
+Can not find PDB file. Debug info will not be available for assembly 'System.ServiceModel.Internals'.
+Resolved assembly reference 'System.ServiceModel.Internals' to 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.ServiceModel.Internals.dll'. (Used referencing Module's directory.)
+Merging assembly 'ProtobufSerializer' into target assembly.
+Merging assembly 'ICSharpCode.SharpZipLib' into target assembly.
+Assembly level attribute 'System.Security.AllowPartiallyTrustedCallersAttribute' from assembly 'ICSharpCode.SharpZipLib' being deleted from target assembly
+Merging assembly 'SharpZipLibCompressor' into target assembly.
+Merging assembly 'QuickLZCompressor' into target assembly.
+Merging assembly 'InTheHand.Net.Personal' into target assembly.
+Merging assembly 'JSONSerializer' into target assembly.
+Merging assembly 'Newtonsoft.Json' into target assembly.
+Assembly level attribute 'System.Security.AllowPartiallyTrustedCallersAttribute' from assembly 'Newtonsoft.Json' being deleted from target assembly
+Merging assembly 'DistributedFileSystem' into target assembly.
+Duplicate type name: modifying name of the type '<>f__AnonymousType0`2' (from assembly 'DistributedFileSystem') to 'DistributedFileSystem.<>f__AnonymousType0`2'
+Merging assembly 'RemoteProcedureCalls' into target assembly.
+Copying 1 Win32 Resources from assembly 'NetworkCommsDotNet' into target assembly.
+ILMerge: Signing assembly with the key file 'networkcomms.net.snk'.
+	There were no errors reported in the target assembly's metadata.
+ILMerge: Writing target assembly 'MergedComplete\NetworkCommsDotNetComplete.dll'.
+Location for referenced module 'iphlpapi.dll' is ''
+Location for referenced module 'kernel32.dll' is ''
+Location for referenced module 'AdvApi32.dll' is ''
+Location for referenced module 'Crypt32.dll' is ''
+Location for referenced module 'User32.dll' is ''
+Location for referenced module '32feetWidcomm' is ''
+Location for referenced module 'ws2_32.dll' is ''
+Location for referenced module 'Irprops.cpl' is ''
+Location for referenced module 'bthprops.cpl' is ''
+Location for referenced module 'setupapi.dll' is ''
+Location for referenced module 'bluetooth' is ''
+Location for referenced module 'BsSDK' is ''
+Location for referenced assembly 'mscorlib' is 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\mscorlib.dll'
+	There were no errors reported in  mscorlib's metadata.
+Location for referenced assembly 'System' is 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\system.dll'
+	There were no errors reported in  System's metadata.
+Location for referenced assembly 'System.Core' is 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Core.dll'
+	There were no errors reported in  System.Core's metadata.
+Location for referenced assembly 'System.Xml' is 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Xml.dll'
+	There were no errors reported in  System.Xml's metadata.
+Location for referenced assembly 'System.ServiceModel' is 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.ServiceModel.dll'
+	There were no errors reported in  System.ServiceModel's metadata.
+Location for referenced assembly 'System.Runtime.Serialization' is 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Runtime.Serialization.dll'
+	There were no errors reported in  System.Runtime.Serialization's metadata.
+Location for referenced assembly 'System.Windows.Forms' is 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Windows.Forms.dll'
+	There were no errors reported in  System.Windows.Forms's metadata.
+Location for referenced assembly 'System.Drawing' is 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Drawing.dll'
+	There were no errors reported in  System.Drawing's metadata.
+Location for referenced assembly 'System.Configuration' is 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Configuration.dll'
+	There were no errors reported in  System.Configuration's metadata.
+Location for referenced assembly 'System.Numerics' is 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Numerics.dll'
+	There were no errors reported in  System.Numerics's metadata.
+Location for referenced assembly 'System.Data' is 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Data.dll'
+	There were no errors reported in  System.Data's metadata.
+Location for referenced assembly 'System.Xml.Linq' is 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\System.Xml.Linq.dll'
+	There were no errors reported in  System.Xml.Linq's metadata.
+ILMerge: Done.
