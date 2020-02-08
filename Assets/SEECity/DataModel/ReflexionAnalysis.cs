@@ -432,7 +432,7 @@ namespace SEE.DataModel
         /// Adds given node to the mapping graph.
         /// Precondition: node must not be contained in the mapping graph.
         /// Postcondition: node is contained in the mapping graph and the architecture
-        //   graph is updated; all listeners are informed of the change.
+        //   graph is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="node">the node to be added to the mapping graph</param>
         public void Add_To_Mapping(Node node)
@@ -444,7 +444,7 @@ namespace SEE.DataModel
         /// Removes given node from mapping graph.
         /// Precondition: node must be contained in the mapping graph.
         /// Postcondition: node is no longer contained in the mapping graph and the architecture
-        ///   graph is updated; all listeners are informed of the change.
+        ///   graph is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="node">node to be removed from the mapping</param>
         public void Delete_From_Mapping(Node node)
@@ -457,7 +457,7 @@ namespace SEE.DataModel
         /// 
         /// Precondition: node must not be contained in the architecture graph.
         /// Postcondition: node is contained in the architecture graph and the reflexion
-        ///   data are updated; all listeners are informed of the change.
+        ///   data are updated; all observers are informed of the change.
         /// </summary>
         /// <param name="node">the node to be added to the architecture graph</param>
         public void Add_To_Architecture(Node node)
@@ -469,7 +469,7 @@ namespace SEE.DataModel
         /// Removes given node from architecture graph.
         /// Precondition: node must be contained in the architecture graph.
         /// Postcondition: node is no longer contained in the architecture graph and the reflexion
-        ///   data are updated; all listeners are informed of the change.
+        ///   data are updated; all observers are informed of the change.
         /// </summary>
         /// <param name="node">the node to be removed from the architecture graph</param>
         public void Delete_From_Architecture(Node node)
@@ -480,7 +480,7 @@ namespace SEE.DataModel
         /// <summary>
         /// Adds given node to implementation graph.
         /// Precondition: node must not be contained in the implementation graph.
-        /// Postcondition: node is contained in the implementation graph; all listeners are 
+        /// Postcondition: node is contained in the implementation graph; all observers are 
         /// informed of the change.
         /// </summary>
         /// <param name="node">the node to be added to the implementation graph</param>
@@ -494,7 +494,7 @@ namespace SEE.DataModel
         /// outgoing edges).
         /// Precondition: node must be contained in the implementation graph.
         /// Postcondition: node is no longer contained in the implementation graph and the reflexion
-        ///   data are updated; all listeners are informed of the change.
+        ///   data are updated; all observers are informed of the change.
         /// </summary>
         /// <param name="node">the node to be removed from the implementation graph</param>
         public void Delete_From_Implementation(Node node)
@@ -509,88 +509,103 @@ namespace SEE.DataModel
         /// Precondition: edge must not be contained in the mapping graph
         ///   and edge must be a Maps_To edge.
         /// Postcondition: edge is contained in the mapping graph and the reflexion
-        ///   graph is updated; all listeners are informed of the change.
+        ///   graph is updated; all observers are informed of the change.
         /// </summary>
-        /// <param name="edge">the edge to be added to the mapping graph</param>
+        /// <param name="edge">the Maps_To edge to be added to the mapping graph</param>
         public void Add_To_Mapping(Edge edge)
         {
             throw new NotImplementedException(); // FIXME
         }
 
-        //
-        // @param edge  the edge to be removed from the mapping graph
-        // Precondition: edge must be contained in the mapping graph
-        // Postcondition: edge is no longer contained in the mapping graph and the reflexion
-        //   graph is updated; all listeners are informed of the change.
-        //
-        public void delete_from_mapping(Edge edge)
+        /// <summary>
+        /// Removes the given Maps_To edge from the mapping graph. 
+        /// Precondition: edge must be contained in the mapping graph and must have type Maps_To.
+        /// Postcondition: edge is no longer contained in the mapping graph and the reflexion
+        ///   data are updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="edge">the Maps_To edge to be removed from the mapping graph </param>
+        public void Delete_From_Mapping(Edge edge)
         {
             throw new NotImplementedException(); // FIXME
         }
 
-        //
-        // @param edge  the edge to be added to the architecture graph
-        // Precondition: edge must not be contained in the architecture graph
-        // Postcondition: edge is contained in the architecture graph and the reflexion
-        //   graph is updated; all listeners are informed of the change.
-        //
-        public void add_to_architecture(Edge edge)
-        {
-            throw new NotImplementedException(); // FIXME
-        }
-        //
-        // @param edge  the edge to be removed from the architecture graph
-        // Precondition: edge must be contained in the architecture graph
-        //   and edge must be either a hierarchical or a dependency
-        // Postcondition: edge is no longer contained in the architecture graph and the reflexion
-        //   graph is updated; all listeners are informed of the change.
-        //
-        public void delete_from_architecture(Edge edge)
+        /// <summary>
+        /// Adds the given dependency edge to the architecture graph. This edge will
+        /// be considered as a specified dependency.
+        /// Precondition: edge must not be contained in the architecture graph and must
+        /// represent a dependency.
+        /// Postcondition: edge is contained in the architecture graph and the reflexion
+        ///   data are updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="edge">the dependency edge to be added to the architecture graph</param>
+        public void Add_To_Architecture(Edge edge)
         {
             throw new NotImplementedException(); // FIXME
         }
 
-        //
-        // @param edge  the edge to be added to the dependency graph
-        // Precondition: edge must not be contained in the dependency graph
-        // Postcondition: edge is contained in the dependency graph and the reflexion
-        //   graph is updated; all listeners are informed of the change.
-        //
-        public void add_to_dependencies(Edge edge)
+        /// <summary>
+        /// Removes the given specified dependency edge from the architecture.
+        /// Precondition: edge must be contained in the architecture graph
+        ///   and edge must represent a specified dependency.
+        /// Postcondition: edge is no longer contained in the architecture graph and the reflexion
+        ///   data are updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="edge">the specified dependency edge to be removed from the architecture graph</param>
+        public void Delete_From_Architecture(Edge edge)
         {
             throw new NotImplementedException(); // FIXME
         }
 
-        /*
-        //
-        // @param edge  the edge to be removed from the dependency graph
-        // Precondition: edge must be contained in the dependency graph
-        //   and edge must be a dependency
-        // Postcondition: edge is no longer contained in the dependency graph and the reflexion
-        //   graph is updated; all listeners are informed of the change.
-        //
-        void delete_from_dependencies(Edge edge);
-        */
-
-        //
-        // @param edge  the edge to be added to the hierarchy graph
-        // Precondition: edge must not be contained in the hierarchy graph
-        //  and edge must be a hierarchical edge
-        // Postcondition: edge is contained in the hierarchy graph and the reflexion
-        //   graph is updated; all listeners are informed of the change.
-        //
-        public void add_to_hierarchy(Edge edge)
+        /// <summary>
+        /// Adds given dependency edge to the implementation graph.
+        /// Precondition: edge must not be contained in the implementation graph
+        /// Postcondition: edge is contained in the implementation graph and the reflexion
+        ///   data are updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="edge">the dependency edge to be added to the implementation graph</param>
+        public void Add_To_Dependencies(Edge edge)
         {
             throw new NotImplementedException(); // FIXME
         }
-        //
-        // @param edge  the edge to be removed from the hierarchy graph
-        // Precondition: edge must be contained in the hierarchy graph
-        //    and edge must be hierarchical
-        // Postcondition: edge is no longer contained in the hierarchy graph and the reflexion
-        //   graph is updated; all listeners are informed of the change.
-        //
-        public void delete_from_hierarchy(Edge edge)
+
+        /// <summary>
+        /// Removes the given dependency edge from the implementation graph.
+        /// Precondition: edge must be contained in the implementation graph
+        ///   and edge must be a dependency.
+        /// Postcondition: edge is no longer contained in the implementation graph and the reflexion
+        ///   data are updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="edge">the dependency edge to be removed from the implementation graph</param>
+        void Delete_From_Dependencies(Edge edge)
+        {
+            throw new NotImplementedException(); // FIXME
+        }
+
+        /// <summary>
+        /// Adds given child as a direct descendant of given parent in the node hierarchy of
+        /// the implementation graph.
+        /// Precondition: child and parent must be contained in the hierarchy graph;
+        ///    child has no current parent.
+        /// Postcondition: parent is a parent of child in the implementation graph and the reflexion
+        ///   data are updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="child">child node</param>
+        /// <param name="parent">parent node</param>
+        public void Add_Child_In_Implementation(Node child, Node parent)
+        {
+            throw new NotImplementedException(); // FIXME
+        }
+
+        /// <summary>
+        /// Removes given child from its parent in the node hierarchy of
+        /// the implementation graph.
+        /// Precondition: child and parent must be contained in the hierarchy graph;
+        ///    child has a parent.
+        /// Postcondition: child has no longer a parent in the implementation graph and the reflexion
+        ///   data are updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="child">child node</param>
+        public void Unparent_In_Implementation(Node child)
         {
             throw new NotImplementedException(); // FIXME
         }
@@ -654,40 +669,6 @@ namespace SEE.DataModel
         /// </summary>
         private SerializableDictionary<string, Node> InMapping;
 
-        // *****************************************
-        // Node hierarchy
-        // *****************************************
-
-        /// <summary>
-        /// Yields the parent of node in hierarchy or null if it has no parent.
-        /// Works for all nodes in all graphs. The parent returned is in the same
-        /// graph where the given node is contained.
-        /// </summary>
-        /// <param name="node">node whose parent is to be retrieved</param>
-        /// <returns>parent node or null</returns>
-        private Node get_parent(Node node)
-        {
-            return node.Parent;
-        }
-
-        /// <summary>
-        /// Yields the set of all transitive parents of node in hierarchy
-        /// including node itself
-        /// </summary>
-        /// <param name="node">node whose ascendants are to be retrieved</param>
-        /// <returns>ascendants of node in the hierarchy including node itself</returns>
-        private List<Node> ascendants(Node node)
-        {
-            List<Node> result = new List<Node>();
-            Node cursor = node;
-            while (cursor != null)
-            {
-                result.Add(cursor);
-                cursor = cursor.Parent;
-            }
-            return result;
-        }
-
         // ********************************************************************************
         // predicates for nodes and edges from implementation relevant for reflexion analysis
         // ********************************************************************************
@@ -696,11 +677,11 @@ namespace SEE.DataModel
         /// Returns false for given node if it should be ignored in the reflexion analysis.
         /// For instance, artificial nodes, template instances, and nodes with ambiguous definitions
         /// are to be ignored.
-        /// Precondition: source_node is node in implementation graph.
+        /// Precondition: node is a node in the implementation graph.
         /// </summary>
-        /// <param name="source_node">implementation node</param>
+        /// <param name="node">implementation node</param>
         /// <returns>true if node should be considered in the reflexion analysis</returns>
-        private bool is_relevant(Node source_node)
+        private bool Is_Relevant(Node node)
         {
             return true;
             // FIXME: For the time being, we consider every node to be relevant.
@@ -727,14 +708,14 @@ namespace SEE.DataModel
         /// <summary>
         /// Returns false for given edge if it should be ignored in the reflexion analysis.
         /// For instance, artificial edges and edges for which at least one end is an irrelevant node
-        // are to be ignored.
-        /// Precondition: source_edge is node in implementation graph.
+        /// are to be ignored.
+        /// Precondition: edge is an edge in the implementation graph.
         /// </summary>
-        /// <param name="source_edge">implementation dependency</param>
+        /// <param name="edge">implementation dependency</param>
         /// <returns>true if edge should be considered in the reflexion analysis</returns>
-        private bool is_relevant(Edge source_edge)
+        private bool Is_Relevant(Edge edge)
         {
-            return is_relevant(source_edge.Source) && is_relevant(source_edge.Target);
+            return Is_Relevant(edge.Source) && Is_Relevant(edge.Target);
             // FIXME: For the time being, we consider every edge to be relevant as long as their
             // source and target are relevant.
         }
@@ -791,7 +772,7 @@ namespace SEE.DataModel
             {
                 Node source = mapsto.Source;
                 Node target = mapsto.Target;
-                add_subtree_to_implicit_map(InImplementation[source.LinkName], InArchitecture[target.LinkName]);
+                Add_Subtree_To_Implicit_Map(InImplementation[source.LinkName], InArchitecture[target.LinkName]);
             }
 
 #if DEBUG
@@ -812,7 +793,7 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="node">implementation node</param>
         /// <returns>true if node is explicitly mapped</returns>
-        private bool is_mapper(Node node)
+        private bool Is_Mapper(Node node)
         {
             return _explicit_maps_to_table.ContainsKey(node);
         }
@@ -828,7 +809,7 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="root">implementation node that is the root of a subtree to be mapped implicitly</param>
         /// <param name="target">architecture node that is the target of the implicit mapping</param>
-        private void add_subtree_to_implicit_map(Node root, Node target)
+        private void Add_Subtree_To_Implicit_Map(Node root, Node target)
         {
             List<Node> children = root.Children();
 #if DEBUG
@@ -840,9 +821,9 @@ namespace SEE.DataModel
                 //Debug.LogFormat("mapping child {0} of {1}\n", child.LinkName, root.LinkName);
 #endif
                 // child is contained in implementation
-                if (!is_mapper(child))
+                if (!Is_Mapper(child))
                 {
-                    add_subtree_to_implicit_map(child, target);
+                    Add_Subtree_To_Implicit_Map(child, target);
                 }
                 else
                 {
@@ -853,30 +834,6 @@ namespace SEE.DataModel
             }
             _implicit_maps_to_table[root] = target;
         }
-
-        private class multimap<T1, T2> { }
-
-        // ***********************************************************************************
-        // Traceability between dependencies propagated from dependency graph into architecture
-        // ***********************************************************************************
-        //private multimap<Edge, Edge> _causing;
-        // map: propagated edge in architecture -> set of dependencies in dependency;
-        // _causing[p] := { d | d in dependency and d was propagated onto p }
-        // where p is a dependency edges in architecture not specified by the user;
-        // invariant: get_counter(p) == |_causing[p]|
-
-        // TODO: currently, we add only to this map; if we implement an incremental
-        // reflexion analysis, we need to update this map in case implementation
-        // dependencies are removed.
-
-        // This map helps us to create the result list explaining divergences and absences.
-        // The result list (see the Ada implementation) contains all pairs of divergences
-        // along with the dependencies causing the divergence as well as all pairs of
-        // absences with the specified architecture dependency classified as absent.
-        //private List<Tuple<Edge, Edge>> _result_list;
-        // This list explains the convergence edges: It contains all pairs of
-        // convergence edges along with the dependencies implementing them.
-        //private List<Tuple<Edge, Edge>> _convergence_list;
 
         // *****************************************
         // DG utilities
@@ -889,7 +846,7 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="edge">architecture dependency to be changed</param>
         /// <param name="value">the value to be added to the edge's counter</param>
-        private void change_architecture_dependency(Edge edge, int value)
+        private void Change_Architecture_Dependency(Edge edge, int value)
         {
             int old_value = Get_Counter(edge);
             int new_value = old_value + value;
@@ -917,8 +874,8 @@ namespace SEE.DataModel
         {
             Reset();
             RegisterNodes();
-            calculate_convergences_and_divergences();
-            calculate_absences();
+            Calculate_Convergences_And_Divergences();
+            Calculate_Absences();
         }
 
         /// <summary>
@@ -1000,7 +957,7 @@ namespace SEE.DataModel
         /// <summary>
         /// Calculates convergences and divergences non-incrementally.
         /// </summary>
-        private void calculate_convergences_and_divergences()
+        private void Calculate_Convergences_And_Divergences()
         {
             // Iterate on all nodes in the domain of implicit_maps_to_table
             // (N.B.: these are nodes that are in 'implementation'), and
@@ -1010,10 +967,10 @@ namespace SEE.DataModel
                 // source_node is in implementation
                 Node source_node = mapsto.Key;
                 System.Diagnostics.Debug.Assert(source_node.ItsGraph == _implementation);
-                if (is_relevant(source_node))
+                if (Is_Relevant(source_node))
                 {
                     // Node is contained in implementation graph and _implicit_maps_to_table
-                    propagate_and_lift_outgoing_dependencies(source_node);
+                    Propagate_And_Lift_Outgoing_Dependencies(source_node);
                 }
             }
         }
@@ -1021,7 +978,7 @@ namespace SEE.DataModel
         /// <summary>
         /// Calculates absences non-incrementally.
         /// </summary>
-        private void calculate_absences()
+        private void Calculate_Absences()
         {
             // after calculate_convergences_and_divergences() all
             // architectural dependencies not marked as 'convergent'
@@ -1057,7 +1014,7 @@ namespace SEE.DataModel
         /// <param name="its_type">the edge type of the propagated dependency</param>
         /// <returns>the propagated edge in the architecture graph between source and target
         /// with given type; null if there is no such edge</returns>
-        private Edge get_propagated_dependency(
+        private Edge Get_Propagated_Dependency(
             Node source, // source of edge; must be in architecture
             Node target, // target of edge; must be in architecture
             string its_type) // the edge type that must match exactly
@@ -1085,12 +1042,12 @@ namespace SEE.DataModel
         /// Precondition: implementation_dep is in implementation graph.
         /// </summary>
         /// <param name="implementation_dep">the implementation edge to be propagated</param>
-        private void propagate_and_lift_dependency(Edge implementation_dep)
+        private void Propagate_And_Lift_Dependency(Edge implementation_dep)
         {
 #if DEBUG
 
             Debug.LogFormat("propagate_and_lift_dependency: propagated implementation_dep = {0}\n",
-                            edge_name(implementation_dep, true));
+                            Edge_Name(implementation_dep, true));
 #endif
             System.Diagnostics.Debug.Assert(implementation_dep.ItsGraph == _implementation);
             Node impl_source = implementation_dep.Source;
@@ -1098,8 +1055,8 @@ namespace SEE.DataModel
             // Assert: impl_source and impl_target are in implementation
             string impl_type = implementation_dep.Type;
 
-            Node arch_source = maps_to(impl_source);
-            Node arch_target = maps_to(impl_target);
+            Node arch_source = Maps_To(impl_source);
+            Node arch_target = Maps_To(impl_target);
             // Assert: arch_source and arch_target are in architecture or null
 
             if (arch_source == null || arch_target == null)
@@ -1110,14 +1067,14 @@ namespace SEE.DataModel
 #endif
                 return; 
             }
-            Edge propagated_architecture_dep = get_propagated_dependency(arch_source, arch_target, impl_type);
+            Edge propagated_architecture_dep = Get_Propagated_Dependency(arch_source, arch_target, impl_type);
             // Assert: architecture_dep is in architecture graph or null.
             System.Diagnostics.Debug.Assert(propagated_architecture_dep == null ||propagated_architecture_dep.ItsGraph == _architecture);
             Edge allowing_edge = null;
             if (propagated_architecture_dep == null)
             {   // a propagated dependency has not existed yet; we need to create one
                 propagated_architecture_dep
-                  = new_impl_dep_in_architecture
+                  = New_Impl_Dep_In_Architecture
                       (arch_source, arch_target, impl_type, ref allowing_edge);
                 // Assert: architecture_dep is in architecture graph (it is propagated; not specified)
 #if DEBUG
@@ -1133,7 +1090,7 @@ namespace SEE.DataModel
                 int impl_counter = Get_Impl_Counter(implementation_dep);
                 Change_Impl_Ref(propagated_architecture_dep, impl_counter);
                 // Assert: architecture_dep.Source and architecture_dep.Target are in architecture.
-                lift(propagated_architecture_dep.Source,
+                Lift(propagated_architecture_dep.Source,
                      propagated_architecture_dep.Target,
                      impl_type,
                      impl_counter, 
@@ -1152,16 +1109,16 @@ namespace SEE.DataModel
         /// Precondition: node is in implementation graph.
         /// </summary>
         /// <param name="node">implementation node whose outgoings are to be propagated and lifted</param>
-        private void propagate_and_lift_outgoing_dependencies(Node node)
+        private void Propagate_And_Lift_Outgoing_Dependencies(Node node)
         {
             System.Diagnostics.Debug.Assert(node.ItsGraph == _implementation);
             foreach (Edge edge in node.Outgoings)
             {
                 // edge is in implementation
                 // only relevant dependencies may be propagated and lifted
-                if (is_relevant(edge))
+                if (Is_Relevant(edge))
                 {
-                    propagate_and_lift_dependency(edge);
+                    Propagate_And_Lift_Dependency(edge);
                 }
             }
         }
@@ -1174,7 +1131,7 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="node"></param>
         /// <returns>the architecture node upon which node is mapped or null</returns>
-        private Node maps_to(Node node)
+        private Node Maps_To(Node node)
         {
             System.Diagnostics.Debug.Assert(node.ItsGraph == _implementation);
             if (_implicit_maps_to_table.TryGetValue(node, out Node target))
@@ -1196,32 +1153,32 @@ namespace SEE.DataModel
         /// <param name="edge">dependency edge to be checked</param>
         /// <returns>true if this causing edge is a dependency from child to
         /// parent</returns>
-        private bool is_dependency_to_parent(Edge edge) 
+        private bool Is_Dependency_To_Parent(Edge edge) 
         {
-            Node mapped_source = maps_to(edge.Source);
-            Node mapped_target = maps_to(edge.Target);
+            Node mapped_source = Maps_To(edge.Source);
+            Node mapped_target = Maps_To(edge.Target);
             // Assert: mapped_source and mapped_target are in architecture
             if (mapped_source != null && mapped_target != null)
             {
-                return is_descendant_of(mapped_source, mapped_target);
+                return Is_Descendant_Of(mapped_source, mapped_target);
             }
             return false;
         }
 
         /// <summary>
-        /// Returns true if 'descendant' is a descendant of 'ancestor' in the hierarchy.
+        /// Returns true if 'descendant' is a descendant of 'ancestor' in the node hierarchy.
         /// 
         /// Precondition: descendant and ancestor are in the same graph.
         /// </summary>
         /// <param name="descendant">source node</param>
         /// <param name="ancestor">target node</param>
         /// <returns>true if 'descendant' is a descendant of 'ancestor'</returns>
-        private bool is_descendant_of(Node descendant, Node ancestor)
+        private bool Is_Descendant_Of(Node descendant, Node ancestor)
         {
-            Node cursor = get_parent(descendant);
+            Node cursor = descendant.Parent;
             while (cursor != null && cursor != ancestor)
             {
-                cursor = get_parent(cursor);
+                cursor = cursor.Parent;
             }
             return cursor == ancestor;
         }
@@ -1240,7 +1197,7 @@ namespace SEE.DataModel
         /// <param name="its_type">the type of the edge</param>
         /// <param name="graph">the graph the new edge should be added to</param>
         /// <returns>the new edge</returns>
-        private Edge add(Node from, Node to, string its_type, Graph graph)
+        private Edge Add(Node from, Node to, string its_type, Graph graph)
         {
             // Note: there may be a specified as well as a propagated edge between the
             // same two architectural entities; hence, we may have multiple edges
@@ -1279,13 +1236,13 @@ namespace SEE.DataModel
         /// dependency form a self-loop (arch_source == arch_target); self-dependencies are implicitly
         /// allowed, but do not necessarily have a specified architecture dependency</param>
         /// <returns>a new propagated dependency in the architecture graph</returns>
-        private Edge new_impl_dep_in_architecture(Node arch_source,
+        private Edge New_Impl_Dep_In_Architecture(Node arch_source,
                                                   Node arch_target,
                                                   string edge_type,
                                                   ref Edge allowing_edge_out)
         {
             int counter = 1;
-            Edge propagated_architecture_dep = add(arch_source, arch_target, edge_type, _architecture);
+            Edge propagated_architecture_dep = Add(arch_source, arch_target, edge_type, _architecture);
             // architecture_dep is a propagated dependency in the architecture graph
             Set_Counter(propagated_architecture_dep, counter);
 
@@ -1298,7 +1255,7 @@ namespace SEE.DataModel
             // because it has just come into existence, we need to let our observers know about it
             Notify(new PropagatedEdge(propagated_architecture_dep));
 
-            if (lift(arch_source, arch_target, edge_type, counter, ref allowing_edge_out))
+            if (Lift(arch_source, arch_target, edge_type, counter, ref allowing_edge_out))
             {
                 // found a matching specified architecture dependency allowing propagated_architecture_dep
                 Transition(propagated_architecture_dep, State.undefined, State.allowed);
@@ -1312,7 +1269,7 @@ namespace SEE.DataModel
                 allowing_edge_out = null; 
             }
             else if (_allow_dependencies_to_parents 
-                     && is_descendant_of(propagated_architecture_dep.Source, propagated_architecture_dep.Target))
+                     && Is_Descendant_Of(propagated_architecture_dep.Source, propagated_architecture_dep.Target))
             {
                 Transition(propagated_architecture_dep, State.undefined, State.implicitly_allowed);
                 // Note: there is no specified architecture dependency that allows this implementation
@@ -1343,22 +1300,22 @@ namespace SEE.DataModel
         /// <param name="allowing_edge_out">the specified architecture dependency allowing the implementation
         /// dependency if there is any; otherwise null</param>
         /// <returns></returns>
-        private bool lift(Node from,
+        private bool Lift(Node from,
                           Node to,
                           string edge_type,
                           int counter,
                           ref Edge allowing_edge_out)
 
         {
-            List<Node> parents = ascendants(to);
+            List<Node> parents = to.Ascendants();
             // Assert: all parents are in architecture
             Node cursor = from;
             // Assert: cursor is in architecture
 #if DEBUG
             Debug.Log("lift: lift an edge from "
-                + qualified_node_name(from, true)
+                + Qualified_Node_Name(from, true)
                 + " to "
-                + qualified_node_name(to, true)
+                + Qualified_Node_Name(to, true)
                 + " of type "
                 + edge_type
                 + " and counter value "
@@ -1383,12 +1340,12 @@ namespace SEE.DataModel
                         && edge.Has_Supertype_Of(edge_type)
                         && parents.Contains(edge.Target))
                     {   // matching architecture dependency found
-                        change_architecture_dependency(edge, counter);
+                        Change_Architecture_Dependency(edge, counter);
                         allowing_edge_out = edge;
                         return true;
                     }
                 }
-                cursor = get_parent(cursor);
+                cursor = cursor.Parent;
             }
             // no matching architecture dependency found
 #if DEBUG
@@ -1405,7 +1362,14 @@ namespace SEE.DataModel
         private const string File_Name_Attribute   = "Source.File";
         private const string Line_Number_Attribute = "Source.Line";
         private const string Object_Name_Attribute = "Source.Name";
-        
+
+        /// <summary>
+        /// Returns the attribute value of the given attribute of the given attributable.
+        /// If the attributable does not have this attribute, the empty string is returned.
+        /// </summary>
+        /// <param name="attributable">attributable element</param>
+        /// <param name="attribute">attribute name</param>
+        /// <returns>attribute value or empty string</returns>
         private static string GetStringAttribute(Attributable attributable, string attribute)
         {
             if (attributable.TryGetString(attribute, out string result))
@@ -1418,14 +1382,54 @@ namespace SEE.DataModel
             }
         }
 
-        // returns identifier for edge
-        private static string edge_name(Edge edge, bool be_verbose = false)
+        /// <summary>
+        /// Returns the Source.File attribute of the given attributable if it exists, otherwise
+        /// the empty string.
+        /// </summary>
+        /// <param name="attributable">attributable element</param>
+        /// <returns>Source.File attribute or empty string</returns>
+        private static string Get_Filename(Attributable attributable)
+        {
+            return GetStringAttribute(attributable, File_Name_Attribute);
+        }
+
+        /// <summary>
+        /// Returns the Source.Line attribute as a string if it exists; otherwise the empty string.
+        /// </summary>
+        /// <param name="attributable">attributable element</param>
+        /// <returns>Source.Line attribute or empty string</returns>
+        private static string Get_Source_Line(Attributable attributable)
+        {
+            if (attributable.TryGetInt(Line_Number_Attribute, out int result))
+            {
+                return result.ToString();
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// Returns a human-readable identifier for the given edge. 
+        /// Note: this identifier is not necessarily unique.
+        /// </summary>
+        /// <param name="edge">edge whose identifier is required</param>
+        /// <param name="be_verbose">currently ignored</param>
+        /// <returns>an identifier for the given edge</returns>
+        private static string Edge_Name(Edge edge, bool be_verbose = false)
         {
             return edge.ToString();
         }
 
-        // returns identifier for node
-        private static string node_name(Node node, bool be_verbose = false)
+        /// <summary>
+        /// Returns a human-readable identifier for the given node. 
+        /// Note: this identifier is not necessarily unique.
+        /// </summary>
+        /// <param name="node">node whose identifier is required</param>
+        /// <param name="be_verbose">currently ignored</param>
+        /// <returns>an identifier for the given node</returns>
+        private static string Node_Name(Node node, bool be_verbose = false)
         {
             string name = node.SourceName;
 
@@ -1441,75 +1445,84 @@ namespace SEE.DataModel
             }
         }
 
-        // returns Source.File attribute if it exists; otherwise ""
-        private static string get_filename(Attributable attributable)
+        /// <summary>
+        /// Returns a human-readable identifier for the given node further qualified with 
+        /// its source location if available.
+        /// Note: this identifier is not necessarily unique.
+        /// </summary>
+        /// <param name="node">node whose identifier is required</param>
+        /// <param name="be_verbose">currently ignored</param>
+        /// <returns>an identifier for the given node</returns>
+        // returns node name 
+        private static string Qualified_Node_Name(Node node, bool be_verbose = false)
         {
-            return GetStringAttribute(attributable, File_Name_Attribute);
+            string filename = Get_Filename(node);
+            string loc = Get_Source_Line(node);
+            return Node_Name(node, be_verbose) + "@" + filename + ":" + loc;
         }
 
-        // returns node name further qualified with source location if available
-        private static string qualified_node_name(Node node, bool be_verbose = false)
+        /// <summary>
+        /// Returns the edge as a clause "type(from, to)".
+        /// </summary>
+        /// <param name="edge">edge whose clause is expected</param>
+        /// <returns>the edge as a clause</returns>
+        private static string As_Clause(Edge edge)
         {
-            string filename = get_filename(node);
-            string loc = get_loc(node);
-            return node_name(node, be_verbose) + "@" + filename + ":" + loc;
+            return edge.GetType().Name + "(" + Node_Name(edge.Source, false) + ", "
+                                             + Node_Name(edge.Target, false) + ")";
         }
 
-        // returns the edge as a clause "type(from, to)"
-        private static string as_clause(Edge edge)
+        /// <summary>
+        /// Returns the edge as a qualified clause "type(from@loc, to@loc)@loc",
+        /// </summary>
+        /// <param name="edge">edge whose qualified clause is expected</param>
+        /// <returns>qualified clause</returns>
+        private static string As_Qualified_Clause(Edge edge)
         {
-            return edge.GetType().Name + "(" + node_name(edge.Source, false) + ", "
-                                             + node_name(edge.Target, false) + ")";
+            return edge.GetType().Name + "(" + Qualified_Node_Name(edge.Source, false) + ", "
+                                 + Qualified_Node_Name(edge.Target, false) + ")"
+                                 + "@" + Get_Filename(edge) + ":" + Get_Source_Line(edge);
         }
 
-        // returns Source.Line attribute as a string if it exists; otherwise ""
-        private static string get_loc(Attributable attributable)
-        {
-            if (attributable.TryGetInt(Line_Number_Attribute, out int result))
-            {
-                return result.ToString();
-            }
-            else
-            {
-                return "";
-            }
-        }
-
-        // returns the edge as a qualified clause "type(from@loc, to@loc)@loc"
-        private static string as_qualified_clause(Edge edge)
-        {
-            return edge.GetType().Name + "(" + qualified_node_name(edge.Source, false) + ", "
-                                 + qualified_node_name(edge.Target, false) + ")"
-                                 + "@" + get_filename(edge) + ":" + get_loc(edge);
-        }
-
-        // dumps node_set
-        static void dump_node_set(List<Node> node_set, string message)
+        /// <summary>
+        /// Dumps given node_set after given message was dumped.
+        /// </summary>
+        /// <param name="node_set">list of nodes whose qualified name is to be dumped</param>
+        /// <param name="message">message to be emitted before the nodes</param>
+        static void Dump_Node_Set(List<Node> node_set, string message)
         {
             Debug.Log(message + "\n");
             foreach (Node node in node_set)
             {
-                Debug.Log(qualified_node_name(node, true) + "\n");
+                Debug.Log(Qualified_Node_Name(node, true) + "\n");
             }
         }
 
-        // dumps edge_set
-        static void dump_edge_set(List<Edge> edge_set)
+        /// <summary>
+        /// Dumps given edge_set after given message was dumped.
+        /// </summary>
+        /// <param name="edge_set">list of edges whose qualified name is to be dumped</param>
+        /// <param name="message">message to be emitted before the edges</param>
+        static void Dump_Edge_Set(List<Edge> edge_set)
         {
             foreach (Edge edge in edge_set)
             {
-                Debug.Log(as_qualified_clause(edge) + "\n");
+                Debug.Log(As_Qualified_Clause(edge) + "\n");
             }
         }
 
-        // dumps table (mapping)
-        static void dump_table(SerializableDictionary<Node, Node> table)
+        /// <summary>
+        /// Dumps given mapping table as a list of source --maps_to--> target 
+        /// where the qualified node name is used for source and target.
+        /// </summary>
+        /// <param name="table">mapping table to be dumped</param>
+        static void Dump_Table(SerializableDictionary<Node, Node> table)
         {
             foreach(var entry in table)
             {
                 Debug.LogFormat("{0} --maps_to--> {1}\n",
-                                qualified_node_name(entry.Key, true),
-                                qualified_node_name(entry.Value, true));
+                                Qualified_Node_Name(entry.Key, true),
+                                Qualified_Node_Name(entry.Value, true));
             }
         }
     } // namespace SEE
