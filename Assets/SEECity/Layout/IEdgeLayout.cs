@@ -40,7 +40,7 @@ namespace SEE.Layout
         /// <summary>
         /// The material used for edges.
         /// </summary>
-        protected readonly static Material defaultLineMaterial = LineMaterial();
+        protected readonly Material defaultLineMaterial = LineMaterial();
 
         /// <summary>
         /// The width of every edge.

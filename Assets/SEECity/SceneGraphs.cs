@@ -22,10 +22,6 @@ namespace SEE
             }
             else 
             {
-                if (!graphs.ContainsKey(settings.GXLPath()))
-                {
-                    Debug.LogWarningFormat("graph {0} is already loaded and will be overridden.\n", settings.GXLPath());
-                }
                 graph = Load(settings);
                 if (graph == null)
                 {
@@ -33,7 +29,11 @@ namespace SEE
                 }
                 else
                 {
-                    graphs.Add(settings.GXLPath(), graph);
+                    if (graphs.ContainsKey(settings.GXLPath()))
+                    {
+                        Debug.LogWarningFormat("graph {0} is already loaded and will be overridden.\n", settings.GXLPath());
+                    }
+                    graphs[settings.GXLPath()] = graph;
                 }
             }
             return graph;

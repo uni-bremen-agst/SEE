@@ -8,8 +8,8 @@ filename = "net"
 has.clone.data = TRUE
 
 # the following files have no clone data
-# has.clone.data = FALSE
-# filename = "../OpenSSL/openssl-include"
+#has.clone.data = FALSE
+#filename = "../OpenSSL/openssl-include"
 
 
 gxlfile = paste(filename, ".gxl", sep="")
@@ -106,13 +106,14 @@ add.random.metrics = function(gxl)
   # all linkage names for the rows in gxl where all columns have values different from na
   Linkage.Name = gxl[complete.cases(gxl), ]$Linkname
   df = data.frame(Linkage.Name)
-  df$Metric.Architecture_Violations = abs(rnorm(nrow(df), mean=4, sd=4))
-  df$Metric.Clone = abs(rnorm(nrow(df), mean=20, sd=5))
-  df$Metric.Dead_Code = abs(rnorm(nrow(df), mean=8, sd=2))
-  df$Metric.Cycle = abs(rnorm(nrow(df), mean=0, sd=4))
-  df$Metric.Metric = abs(rnorm(nrow(df), mean=100, sd=40))
-  df$Metric.Style = abs(rnorm(nrow(df), mean=11100, sd=10000))
-  df$Metric.Universal = abs(rnorm(nrow(df), mean=0, sd=0.1))
+  df$Metric.Architecture_Violations = abs(rnorm(nrow(df), mean=4,     sd=4))
+  df$Metric.Clone                   = abs(rnorm(nrow(df), mean=20,    sd=5))
+  df$Metric.Dead_Code               = abs(rnorm(nrow(df), mean=8,     sd=2))
+  df$Metric.Cycle                   = abs(rnorm(nrow(df), mean=0,     sd=4))
+  df$Metric.Metric                  = abs(rnorm(nrow(df), mean=100,   sd=40))
+  df$Metric.Style                   = abs(rnorm(nrow(df), mean=11100, sd=10000))
+  df$Metric.Universal               = abs(rnorm(nrow(df), mean=0,     sd=0.1))
+  df$Metric.Complexity              = abs(rnorm(nrow(df), mean=500,   sd=400))
   df
 }
 
@@ -145,6 +146,7 @@ add.random.correlated.metrics = function(gxl)
   df$Metric.Metric                  = random.correlated(df$Number_Of_Tokens, 0.6, x)
   df$Metric.Style                   = random.correlated(df$Number_Of_Tokens, 0.4, x)
   df$Metric.Universal               = random.correlated(df$Number_Of_Tokens, 0.85, x)
+  df$Metric.Complexity              = random.correlated(df$Number_Of_Tokens, 0.3, x)
   df
 }
 
