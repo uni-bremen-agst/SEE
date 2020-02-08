@@ -23,10 +23,10 @@ namespace SEE.Layout
             switch (this.settings.LeafObjects)
             {
                 case GraphSettings.LeafNodeKinds.Blocks:
-                    leaveNodeFactory = new CubeFactory();
+                    leafNodeFactory = new CubeFactory();
                     break;
                 case GraphSettings.LeafNodeKinds.Buildings:
-                    leaveNodeFactory = new BuildingFactory();
+                    leafNodeFactory = new BuildingFactory();
                     break;
                 default:
                     throw new Exception("Unhandled GraphSettings.LeafNodeKinds");
@@ -38,13 +38,16 @@ namespace SEE.Layout
                     innerNodeFactory = new VanillaFactory();
                     break;
                 case GraphSettings.InnerNodeKinds.Circles:
-                    innerNodeFactory = new CircleFactory();
+                    innerNodeFactory = new CircleFactory(leafNodeFactory.Unit);
                     break;
                 case GraphSettings.InnerNodeKinds.Cylinders:
                     innerNodeFactory = new CylinderFactory();
                     break;
                 case GraphSettings.InnerNodeKinds.Rectangles:
-                    innerNodeFactory = new RectangleFactory();
+                    innerNodeFactory = new RectangleFactory(leafNodeFactory.Unit);
+                    break;
+                case GraphSettings.InnerNodeKinds.Blocks:
+                    innerNodeFactory = new CubeFactory();
                     break;
                 default:
                     throw new Exception("Unhandled GraphSettings.InnerNodeKinds");
@@ -59,7 +62,7 @@ namespace SEE.Layout
         /// <summary>
         /// The factory used to create blocks for leaves.
         /// </summary>
-        private readonly NodeFactory leaveNodeFactory;
+        private readonly NodeFactory leafNodeFactory;
 
         /// <summary>
         /// The factory used to create game nodes for inner graph nodes.
@@ -113,13 +116,13 @@ namespace SEE.Layout
             switch (settings.EdgeLayout)
             {
                 case GraphSettings.EdgeLayouts.Straight:
-                    layout = new StraightEdgeLayout(leaveNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
+                    layout = new StraightEdgeLayout(leafNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
                     break;
                 case GraphSettings.EdgeLayouts.Spline:
-                    layout = new SplineEdgeLayout(leaveNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
+                    layout = new SplineEdgeLayout(leafNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
                     break;
                 case GraphSettings.EdgeLayouts.Bundling:
-                    layout = new BundledEdgeLayout(leaveNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
+                    layout = new BundledEdgeLayout(leafNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
                     break;
                 case GraphSettings.EdgeLayouts.None:
                     // nothing to be done
@@ -144,42 +147,45 @@ namespace SEE.Layout
         /// <param name="graph">graph whose nodes and edges are to be laid out</param>
         protected void DrawCity(Graph graph)
         {
-            Dictionary<Node, GameObject> nodeMap;
-            Dictionary<GameObject, NodeTransform> layout;
             List<Node> nodes = graph.Nodes();
+
+            Dictionary<Node, GameObject> nodeMap = CreateBlocks(nodes);
+            Dictionary<GameObject, NodeTransform> layout;
+           
             switch (settings.NodeLayout)
             {
                 case GraphSettings.NodeLayouts.Manhattan:
-                    nodeMap = CreateBlocks(nodes); // only leaves
-                    layout = new ManhattanLayout(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
+                    // only leaves
+                    layout = new ManhattanLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.FlatRectanglePacking:
-                    nodeMap = CreateBlocks(nodes); // only leaves
-                    layout = new RectanglePacker(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
+                    // only leaves
+                    layout = new RectanglePacker(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
+                    break;
+                case GraphSettings.NodeLayouts.EvoStreets:
+                    AddContainers(nodeMap, nodes); // and inner nodes
+                    layout = new EvoStreetsNodeLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.Treemap:
-                    nodeMap = CreateBlocks(nodes); // leaves
                     AddContainers(nodeMap, nodes); // and inner nodes
-                    layout = new TreemapLayout(groundLevel, leaveNodeFactory, 100.0f * Unit(), 100.0f * Unit()).Layout(nodeMap.Values);
+                    layout = new TreemapLayout(groundLevel, leafNodeFactory, 1000.0f * Unit(), 1000.0f * Unit()).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.Balloon:
-                    nodeMap = CreateBlocks(nodes); // leaves
                     AddContainers(nodeMap, nodes); // and inner nodes
-                    layout = new BalloonNodeLayout(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
+                    layout = new BalloonNodeLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.CirclePacking:
-                    nodeMap = CreateBlocks(nodes); // leaves
                     AddContainers(nodeMap, nodes); // and inner nodes
-                    layout = new CirclePackingNodeLayout(groundLevel, leaveNodeFactory).Layout(nodeMap.Values);
+                    layout = new CirclePackingNodeLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }
 
-            Apply(layout);
-            ICollection<GameObject> gameNodes = nodeMap.Values;
+            Apply(layout, settings.origin);
+            ICollection<GameObject> gameNodes = layout.Keys;
             AddDecorations(gameNodes);
-            EdgeLayout(graph, gameNodes);           
+            EdgeLayout(graph, gameNodes);
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             // Place the plane somewhat under ground level.
             PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
@@ -195,11 +201,12 @@ namespace SEE.Layout
             // we also know their positions.
             if (settings.ShowErosions)
             {
-                ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leaveNodeFactory, scaler);
+                ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leafNodeFactory, scaler);
                 issueDecorator.Add(LeafNodes(gameNodes));
             }
 
-            if (settings.NodeLayout == GraphSettings.NodeLayouts.Balloon)
+            if (settings.NodeLayout == GraphSettings.NodeLayouts.Balloon 
+                || settings.NodeLayout == GraphSettings.NodeLayouts.EvoStreets)
             {
                 AddLabels(InnerNodes(gameNodes));
             }
@@ -222,6 +229,7 @@ namespace SEE.Layout
                     break;
                 case GraphSettings.InnerNodeKinds.Cylinders:
                 case GraphSettings.InnerNodeKinds.Rectangles:
+                case GraphSettings.InnerNodeKinds.Blocks:
                     // TODO
                     break;
                 default:
@@ -276,12 +284,13 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Applies the layout to all nodes.
+        /// Applies the layout to all nodes at given origin.
         /// </summary>
         /// <param name="layout">node layout to be applied</param>
-        public void Apply(Dictionary<GameObject, NodeTransform> layout)
-        {
-            foreach (var entry in layout)
+        /// <param name="origin">the center origin where the graph should be placed in the world scene</param>
+        public void Apply(Dictionary<GameObject, NodeTransform> layout, Vector3 origin)
+        {      
+            foreach (var entry in NodeLayout.Move(layout, origin))
             {
                 GameObject gameNode = entry.Key;
                 NodeTransform transform = entry.Value;
@@ -289,31 +298,54 @@ namespace SEE.Layout
 
                 if (node.IsLeaf())
                 {
-                    // Leaf nodes were created as blocks by leaveNodeFactory.
-                    // Leaf nodes have their size set before the layout is computed. We will
-                    // not change their size unless a layout requires that.
-                    leaveNodeFactory.SetGroundPosition(gameNode, transform.position);
+                    // We need to first scale the game node and only afterwards set its
+                    // position because transform.scale refers to the center position.
                     if (settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
                     {
-                        // Treemaps adjust the size of the object's ground area according to
+                        // The Treemap layout adjusts the size of the object's ground area according to
                         // the total space we allow it to use. The x length was initially
                         // mapped onto the area of the ground. The treemap layout yields
                         // an x and z co-ordinate that defines this area, which we use
                         // here to set the width and depth of the game node.
                         // The height (y axis) is not modified by the treemap layout and,
                         // hence, does not need any adustment.
-                        leaveNodeFactory.SetWidth(gameNode, transform.scale.x);
-                        leaveNodeFactory.SetDepth(gameNode, transform.scale.z);
+                        leafNodeFactory.SetWidth(gameNode, transform.scale.x);
+                        leafNodeFactory.SetDepth(gameNode, transform.scale.z);
                     }
+                    // Leaf nodes were created as blocks by leaveNodeFactory.
+                    // Leaf nodes have their size set before the layout is computed. We will
+                    // not change their size unless a layout requires that.
+                    leafNodeFactory.SetGroundPosition(gameNode, transform.position);
                 }
                 else
                 {
-                    // Inner nodes were not created by blockFactory.
+                    // Inner nodes were created by innerNodeFactory.
                     innerNodeFactory.SetSize(gameNode, transform.scale);
                     innerNodeFactory.SetGroundPosition(gameNode, transform.position);
                     // Inner nodes will be drawn later when we add decorations because
                     // they can be drawn as a single circle line or a Donut chart.
                 }
+                //Rotate(gameNode, transform.rotation);
+                // Rotate the game object.
+                Rotate(gameNode, transform.rotation);
+            }
+        }
+
+        /// <summary>
+        /// Rotates the given object by the given degree along the y axis (i.e., relative to the ground).
+        /// </summary>
+        /// <param name="gameNode">object to be rotated</param>
+        /// <param name="degree">degree of rotation</param>
+        private void Rotate(GameObject gameNode, float degree)
+        {
+            Node node = gameNode.GetComponent<NodeRef>().node;
+            if (node.IsLeaf())
+            {
+                leafNodeFactory.Rotate(gameNode, degree);
+            }
+            else
+            {
+                innerNodeFactory.Rotate(gameNode, degree);
             }
         }
 
@@ -324,7 +356,7 @@ namespace SEE.Layout
         /// <returns>unit of the world</returns>
         public float Unit()
         {
-            return leaveNodeFactory.Unit();
+            return leafNodeFactory.Unit;
         }
 
         /// <summary>
@@ -355,10 +387,10 @@ namespace SEE.Layout
                 if (node.IsLeaf())
                 {
                     int material = Mathf.RoundToInt(Mathf.Lerp(0.0f,
-                                                               (float)(leaveNodeFactory.NumberOfMaterials() - 1),
+                                                               (float)(leafNodeFactory.NumberOfMaterials() - 1),
                                                                scaler.GetNormalizedValue(settings.ColorMetric, node)
                                                                  / metricMaximum));
-                    GameObject block = leaveNodeFactory.NewBlock(material);
+                    GameObject block = leafNodeFactory.NewBlock(material);
                     block.name = node.LinkName;
 
                     AttachNode(block, node);
@@ -372,13 +404,13 @@ namespace SEE.Layout
                     {
                         // In case of treemaps, the width metric is mapped on the ground area.
                         float widthOfSquare = Mathf.Sqrt(scale.x);
-                        leaveNodeFactory.SetWidth(block, leaveNodeFactory.Unit() * widthOfSquare);
-                        leaveNodeFactory.SetDepth(block, leaveNodeFactory.Unit() * widthOfSquare);
-                        leaveNodeFactory.SetHeight(block, leaveNodeFactory.Unit() * scale.y);
+                        leafNodeFactory.SetWidth(block, leafNodeFactory.Unit * widthOfSquare);
+                        leafNodeFactory.SetDepth(block, leafNodeFactory.Unit * widthOfSquare);
+                        leafNodeFactory.SetHeight(block, leafNodeFactory.Unit * scale.y);
                     }
                     else
                     {
-                        leaveNodeFactory.SetSize(block, leaveNodeFactory.Unit() * scale);
+                        leafNodeFactory.SetSize(block, leafNodeFactory.Unit * scale);
                     }
 
                     result[node] = block;
@@ -444,8 +476,8 @@ namespace SEE.Layout
 
                     // Note: go.transform.position denotes the center of the object
 
-                    Vector3 extent = node.IsLeaf() ? leaveNodeFactory.GetSize(go) / 2.0f : innerNodeFactory.GetSize(go) / 2.0f;
-                    Vector3 position = node.IsLeaf() ? leaveNodeFactory.GetCenterPosition(go) : innerNodeFactory.GetCenterPosition(go);
+                    Vector3 extent = node.IsLeaf() ? leafNodeFactory.GetSize(go) / 2.0f : innerNodeFactory.GetSize(go) / 2.0f;
+                    Vector3 position = node.IsLeaf() ? leafNodeFactory.GetCenterPosition(go) : innerNodeFactory.GetCenterPosition(go);
                     {
                         // x co-ordinate of lower left corner
                         float x = position.x - extent.x;

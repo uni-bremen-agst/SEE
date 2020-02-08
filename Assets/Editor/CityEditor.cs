@@ -6,6 +6,7 @@ using SEE.Layout;
 using System.Collections.Generic;
 using UnityEngine.XR;
 using System.Linq;
+using System.IO;
 
 namespace SEEEditor
 {
@@ -45,18 +46,6 @@ namespace SEEEditor
         /// The user settings.
         /// </summary>
         private SEE.GraphSettings editorSettings = new SEE.GraphSettings();
-
-        /// <summary>
-        /// Returns the path to our Unity project folder.
-        /// </summary>
-        /// <returns>path to our Unity project folder</returns>
-        private static string ProjectPath()
-        {
-            string result = Application.dataPath;
-            // Unity uses Unix directory separator; we need Windows here
-            
-            return result.Replace('/', '\\') + '\\';
-        }
 
         /// <summary>
         /// Whether VR mode is to be activated for the game.
@@ -146,11 +135,12 @@ namespace SEEEditor
             {
                 // Application.dataPath (used within ProjectPath()) must not be called in a 
                 // constructor. That is why we need to set it here if it is not yet defined.
-                editorSettings.pathPrefix = ProjectPath();
+                editorSettings.pathPrefix = UnityProject.GetPath();
             }
             editorSettings.pathPrefix = EditorGUILayout.TextField("Project path prefix", editorSettings.pathPrefix);
             editorSettings.gxlPath = EditorGUILayout.TextField("GXL file", editorSettings.gxlPath);
             editorSettings.csvPath = EditorGUILayout.TextField("CSV file", editorSettings.csvPath);
+            editorSettings.origin = EditorGUILayout.Vector3Field("Origin", editorSettings.origin);
 
             GUILayout.Label("Attributes of leaf nodes", EditorStyles.boldLabel);
             editorSettings.WidthMetric = EditorGUILayout.TextField("Width", editorSettings.WidthMetric);

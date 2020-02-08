@@ -6,7 +6,7 @@ namespace SEE.Layout
     /// <summary>
     /// A factory for cubes as visual representations of graph nodes in the scene.
     /// </summary>
-    public class CubeFactory : NodeFactory
+    public class CubeFactory : InnerNodeFactory
     {
         public CubeFactory()
         {
