@@ -16,6 +16,12 @@ namespace SEE.Net.Internal
         {
         }
 
+        protected override bool HandleGXLPacketData(PacketHeader packetHeader, Connection connection, string data)
+        {
+            GXLPacketData packet = GXLPacketData.Deserialize(data);
+            // TODO: build city
+            return true;
+        }
         protected override bool HandleInstantiatePacketData(PacketHeader packetHeader, Connection connection, string data)
         {
             InstantiatePacketData packet = InstantiatePacketData.Deserialize(data);

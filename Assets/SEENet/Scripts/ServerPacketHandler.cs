@@ -1,6 +1,7 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace SEE.Net.Internal
@@ -27,6 +28,8 @@ namespace SEE.Net.Internal
                 );
                 Network.Send(connection, bufferedPackets[i].header.PacketType, bufferedPackets[i].data);
             }
+            string gxl = File.ReadAllText("C://Users//Torben//dev//SEE//Data//GXL//linux-clones//fs.gxl");
+            Network.Send(connection, Client.PACKET_PREFIX + GXLPacketData.PACKET_NAME, new GXLPacketData(gxl).Serialize());
         }
         public void OnConnectionClosed(Connection connection)
         {
@@ -45,6 +48,10 @@ namespace SEE.Net.Internal
             }
         }
 
+        protected override bool HandleGXLPacketData(PacketHeader packetHeader, Connection connection, string data)
+        {
+            throw new System.Exception("A server should never receive this type of packet!");
+        }
         protected override bool HandleInstantiatePacketData(PacketHeader packetHeader, Connection connection, string data)
         {
 #if UNITY_EDITOR

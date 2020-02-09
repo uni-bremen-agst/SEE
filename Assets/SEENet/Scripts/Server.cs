@@ -1,5 +1,6 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
@@ -18,17 +19,20 @@ namespace SEE.Net.Internal
             NetworkComms.AppendGlobalConnectionEstablishHandler(OnConnectionEstablished);
             NetworkComms.AppendGlobalConnectionCloseHandler(OnConnectionClosed);
 
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + InstantiatePacketData.PACKET_NAME, OnIncomingInstantiatePacket);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewPositionPacketData.PACKET_NAME, OnIncomingTransformViewPositionPacket);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, OnIncomingTransformViewRotationPacket);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, OnIncomingTransformViewScalePacket);
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + InstantiatePacketData.PACKET_NAME, OnIncomingPacket);
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewPositionPacketData.PACKET_NAME, OnIncomingPacket);
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, OnIncomingPacket);
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, OnIncomingPacket);
 
             try
             {
                 Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.ServerPort), false);
             }
-            catch (CommsSetupShutdownException e)
+            catch (Exception e)
             {
+#if !UNITY_EDITOR // TODO: this?
+                Application.Quit();
+#endif
                 Debug.LogException(e);
             }
         }
@@ -62,19 +66,7 @@ namespace SEE.Net.Internal
                 packetHandler.OnConnectionClosed(connection);
             }
         }
-        private static void OnIncomingInstantiatePacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            packetHandler.Push(packetHeader, connection, data);
-        }
-        private static void OnIncomingTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            packetHandler.Push(packetHeader, connection, data);
-        }
-        private static void OnIncomingTransformViewRotationPacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            packetHandler.Push(packetHeader, connection, data);
-        }
-        private static void OnIncomingTransformViewScalePacket(PacketHeader packetHeader, Connection connection, string data)
+        private static void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             packetHandler.Push(packetHeader, connection, data);
         }

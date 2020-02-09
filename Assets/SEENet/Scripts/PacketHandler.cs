@@ -54,7 +54,11 @@ namespace SEE.Net.Internal
                     Packet packet = pendingMessages.Pop();
                     string packetType = packet.header.PacketType;
 
-                    if (packetType.Equals(packetTypePrefix + InstantiatePacketData.PACKET_NAME))
+                    if (packetType.Equals(packetTypePrefix + GXLPacketData.PACKET_NAME))
+                    {
+                        HandleGXLPacketData(packet.header, packet.connection, packet.data);
+                    }
+                    else if (packetType.Equals(packetTypePrefix + InstantiatePacketData.PACKET_NAME))
                     {
                         HandleInstantiatePacketData(packet.header, packet.connection, packet.data);
                     }
@@ -77,6 +81,7 @@ namespace SEE.Net.Internal
                 }
             }
         }
+        protected abstract bool HandleGXLPacketData(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleInstantiatePacketData(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleTransformViewPositionPacketData(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleTransformViewRotationPacketData(PacketHeader packetHeader, Connection connection, string data);
