@@ -2,8 +2,9 @@
 using NetworkCommsDotNet.Connections;
 using SEE.Net.Internal;
 using System;
-using System.Net;
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
 using System.Threading;
 using UnityEngine;
 
@@ -87,6 +88,32 @@ namespace SEE.Net
                     Server.Shutdown();
                 }
                 Client.Shutdown();
+            }
+
+            // TODO: there must be a better way to stop the logging spam!
+            string currentDirectory = Directory.GetCurrentDirectory();
+            DirectoryInfo directoryInfo = new DirectoryInfo(currentDirectory);
+            FileInfo[] fileInfos = directoryInfo.GetFiles();
+            for (int i = 0; i < fileInfos.Length; i++)
+            {
+                FileInfo fileInfo = fileInfos[i];
+                string fileName = fileInfo.Name;
+                string[] prefixes = new string[] {
+                    "CompleteIncomingItemTaskError",
+                    "ConnectionKeepAlivePollError",
+                    "Error",
+                    "ManagedThreadPoolCallBackError",
+                    "PacketHandlerErrorGlobal"
+                };
+                for (int j = 0; j < prefixes.Length; j++)
+                {
+                    if (fileName.Contains(prefixes[j]))
+                    {
+                        Debug.Log("Deleting file: '" + fileInfo.FullName + "'!");
+                        fileInfo.Delete();
+                        break;
+                    }
+                }
             }
         }
         public static void Instantiate(string prefabName)
