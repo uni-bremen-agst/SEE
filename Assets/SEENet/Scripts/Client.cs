@@ -16,11 +16,11 @@ namespace SEE.Net.Internal
 
         public static void Initialize()
         {
-            // TODO: look up, if there's a general global packet handler, as handling the same for all packet types. server, too!
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + InstantiatePacketData.PACKET_NAME, OnIncomingInstantiatePacket);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewPositionPacketData.PACKET_NAME, OnIncomingTransformViewPositionPacket);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, OnIncomingTransformViewRotationPacket);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, OnIncomingTransformViewScalePacket);
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + GXLPacketData.PACKET_NAME, OnIncomingPacket);
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + InstantiatePacketData.PACKET_NAME, OnIncomingPacket);
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewPositionPacketData.PACKET_NAME, OnIncomingPacket);
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, OnIncomingPacket);
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, OnIncomingPacket);
 
             try
             {
@@ -33,6 +33,9 @@ namespace SEE.Net.Internal
             }
             catch (Exception e)
             {
+#if !UNITY_EDITOR // TODO: this?
+                Application.Quit();
+#endif
                 Debug.LogException(e);
             }
         }
@@ -56,19 +59,7 @@ namespace SEE.Net.Internal
                 return (IPEndPoint)Connection.ConnectionInfo.LocalEndPoint;
             }
         }
-        private static void OnIncomingInstantiatePacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            PacketHandler.Push(packetHeader, connection, data);
-        }
-        private static void OnIncomingTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            PacketHandler.Push(packetHeader, connection, data);
-        }
-        private static void OnIncomingTransformViewRotationPacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            PacketHandler.Push(packetHeader, connection, data);
-        }
-        private static void OnIncomingTransformViewScalePacket(PacketHeader packetHeader, Connection connection, string data)
+        private static void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             PacketHandler.Push(packetHeader, connection, data);
         }
