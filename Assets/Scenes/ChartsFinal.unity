@@ -2371,12 +2371,6 @@ RectTransform:
   m_AnchoredPosition: {x: 12.883628, y: 0.3650635}
   m_SizeDelta: {x: 0.6, y: 0.6}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &417235960 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8909484703925855460, guid: 4ccd5ea94039989458149588b86c9e40,
-    type: 3}
-  m_PrefabInstance: {fileID: 1334954064}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &445993377
 GameObject:
   m_ObjectHideFlags: 0
@@ -2604,17 +2598,12 @@ PrefabInstance:
         type: 3}
       propertyPath: nonVrObjects.Array.data[1]
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 290599652}
     - target: {fileID: 2342395875013397700, guid: 51821f11a04e1ab4d9151f06c2366bbc,
         type: 3}
       propertyPath: vrObjects.Array.data[0]
       value: 
       objectReference: {fileID: 1334954065}
-    - target: {fileID: 2342395875013397700, guid: 51821f11a04e1ab4d9151f06c2366bbc,
-        type: 3}
-      propertyPath: pointerLength
-      value: 80
-      objectReference: {fileID: 0}
     - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6042,29 +6031,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1334954064}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1334954068
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1334954065}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e2aa1509d12c0249873ef9f92ea2c53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Rig: {fileID: 1334954065}
-  Controler: {fileID: 417235960}
-  _OnLeftTrigger:
-    m_PersistentCalls:
-      m_Calls: []
-  _OnLeftTouchButtonPressed:
-    m_PersistentCalls:
-      m_Calls: []
-  _OnLeftTouchButtonReleased:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &1338129844
 GameObject:
   m_ObjectHideFlags: 0

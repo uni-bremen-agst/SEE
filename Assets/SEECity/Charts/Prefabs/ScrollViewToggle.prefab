@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6284450577250638507}
   - component: {fileID: 7234405433607168664}
   m_Layer: 5
-  m_Name: Toggle
+  m_Name: ScrollViewToggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27,7 +27,7 @@ RectTransform:
   m_GameObject: {fileID: 4132216685403434134}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_Children:
   - {fileID: 3561602446581024141}
   - {fileID: 9193821097247446700}

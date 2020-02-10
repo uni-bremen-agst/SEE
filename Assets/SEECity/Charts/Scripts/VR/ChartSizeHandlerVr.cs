@@ -9,6 +9,7 @@ namespace SEECity.Charts.Scripts.VR
 		private RectTransform _virtualRealityCanvas;
 		private GameObject _physicalOpen;
 		private GameObject _physicalClosed;
+		[SerializeField] private GameObject _contentSelectionBackground;
 		private float _dropdownThickness = 100f;
 		private float _physicalClosedPosition = 0.4575f * 600f;
 
@@ -44,6 +45,7 @@ namespace SEECity.Charts.Scripts.VR
 			_physicalOpen.transform.localScale = new Vector2(width / 600f, height / 600f);
 			_physicalClosed.transform.localPosition = new Vector2(width / _physicalClosedPosition,
 				-(height / _physicalClosedPosition));
+			_contentSelectionBackground.transform.localScale = new Vector2(_contentSelectionBackground.transform.localScale.x, height);
 		}
 	}
 }
