@@ -58,12 +58,12 @@ MonoBehaviour:
   accentuationColor: {r: 1, g: 0.23921567, b: 0.62098527, a: 1}
   highlightLineLength: 20
   highlightDuration: 5
-  pointerLength: 10
+  pointerLength: 20
   chartScrollSpeed: 10
   distanceThreshold: 0.5
   source: 2
   click:
-    actionPath: /actions/default/in/GrabGrip
+    actionPath: /actions/default/in/GrabPinch
     needsReinit: 0
   moveInOut:
     actionPath: /actions/default/in/MoveChartInOut

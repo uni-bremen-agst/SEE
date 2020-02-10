@@ -6,6 +6,7 @@ using SEE.DataModel;
 using SEE.Layout;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEECity.Charts.Scripts
 {
@@ -107,13 +108,17 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// Fills the chart for the first time.
 		/// </summary>
-		private void Start()
+		protected virtual void Start()
 		{
 			Invoke(nameof(CallDrawData), 0.2f);
 		}
 
+		/// <summary>
+		/// Fills the scroll view on the right of the chart with one entry for each node in the scene including two headers to toggle all buildings and all nodes.
+		/// </summary>
 		private void FillScrollView()
 		{
+			float gap = childOffset.y - headerOffset.y;
 			foreach (Transform child in scrollContent.transform) Destroy(child.gameObject);
 
 			GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
@@ -125,27 +130,35 @@ namespace SEECity.Charts.Scripts
 			int i = 0;
 			foreach (GameObject dataObject in _dataObjects)
 				if (dataObject.tag.Equals("Building"))
-					CreateChildToggle(dataObject, parentToggle, i++);
+					CreateChildToggle(dataObject, parentToggle, i++, gap);
 
 			tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
 			parentToggle = tempObject.GetComponent<ScrollViewToggle>();
 			parentToggle.SetLabel("Nodes");
-			tempObject.transform.localPosition = headerOffset + new Vector2(0, -20) * ++i;
+			tempObject.transform.localPosition = headerOffset + new Vector2(0, gap) * ++i;
 			parentToggle.Initialize(this);
 
 			foreach (GameObject dataObject in _dataObjects)
 				if (dataObject.tag.Equals("Node"))
-					CreateChildToggle(dataObject, parentToggle, i++);
+					CreateChildToggle(dataObject, parentToggle, i++, gap);
+			scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(scrollContent.GetComponent<RectTransform>().sizeDelta.x, i * Mathf.Abs(gap) + 40);
 		}
 
-		private void CreateChildToggle(GameObject dataObject, ScrollViewToggle parentToggle, int i)
+		/// <summary>
+		/// Creates a toggle for an object in the scene that is a node.
+		/// </summary>
+		/// <param name="dataObject">The object to be toggled.</param>
+		/// <param name="parentToggle">The toggle that will toggle this one when clicked.</param>
+		/// <param name="i">The position of the toggle in the scrollview.</param>
+		/// <param name="gap">The gap between two toggles in the scrollview.</param>
+		private void CreateChildToggle(GameObject dataObject, ScrollViewToggle parentToggle, int i, float gap)
 		{
 			GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
 			ScrollViewToggle toggle = tempObject.GetComponent<ScrollViewToggle>();
 			toggle.Parent = parentToggle;
 			toggle.LinkedObject = dataObject.GetComponent<NodeHighlights>();
 			toggle.SetLabel(dataObject.name);
-			tempObject.transform.localPosition = childOffset + new Vector2(0f, -20f) * i;
+			tempObject.transform.localPosition = childOffset + new Vector2(0f, gap) * i;
 			toggle.Initialize(this);
 			parentToggle.AddChild(toggle);
 		}
@@ -224,6 +237,7 @@ namespace SEECity.Charts.Scripts
 				DrawTwoAxes();
 
 			if (ActiveMarkers.Count == 0) noDataWarning.SetActive(true);
+			//TODO: Reduce values of g and b for every marker that is overlapping.
 		}
 
 		/// <summary>
@@ -464,6 +478,14 @@ namespace SEECity.Charts.Scripts
 						script.TriggerTimedHighlight(
 							ChartManager.highlightDuration - highlightTimeLeft, true);
 				}
+				//Rect rect = marker.GetComponent<Rect>();
+				//Image image = marker.GetComponent<Image>();
+				//foreach (GameObject updatedMarker in updatedMarkers)
+				//{
+				//	if (rect.Overlaps(updatedMarker.GetComponent<Rect>()) {
+				//		if (image.color.)
+				//	}
+				//}
 			}
 
 			foreach (GameObject marker in ActiveMarkers) Destroy(marker);

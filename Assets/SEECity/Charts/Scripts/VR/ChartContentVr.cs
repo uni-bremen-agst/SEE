@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEECity.Charts.Scripts.VR
 {
@@ -6,6 +7,13 @@ namespace SEECity.Charts.Scripts.VR
 	{
 		public GameObject physicalOpen;
 		public GameObject physicalClosed;
+		[SerializeField] private Toggle selectionToggle;
+
+		protected override void Start()
+		{
+			base.Start();
+			selectionToggle.gameObject.SetActive(true);
+		}
 
 		/// <summary>
 		/// </summary>
@@ -32,6 +40,14 @@ namespace SEECity.Charts.Scripts.VR
 						ChartManager.HighlightObject(
 							marker.GetComponent<ChartMarker>().linkedObject);
 				}
+		}
+
+		/// <summary>
+		/// Activates or deactivates the selection mode. TODO: Not synced across charts.
+		/// </summary>
+		public void SetSelectionMode()
+		{
+			ChartManager.selectionMode = selectionToggle.isOn;
 		}
 	}
 }

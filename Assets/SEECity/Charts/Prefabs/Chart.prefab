@@ -527,7 +527,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -20, y: 70}
+  m_AnchoredPosition: {x: -20, y: 80}
   m_SizeDelta: {x: 30, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7389868873064786122
@@ -1217,7 +1217,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00003241043}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 530}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &3455141902840063267
@@ -1795,8 +1795,8 @@ MonoBehaviour:
   scrollContent: {fileID: 3272069499047093058}
   scrollEntryPrefab: {fileID: 4132216685403434134, guid: 72b8684fd9a47094a909d569d504b1b2,
     type: 3}
-  headerOffset: {x: 120, y: -15}
-  childOffset: {x: 135, y: -35}
+  headerOffset: {x: 125, y: -15}
+  childOffset: {x: 140, y: -40}
   moveHandler: {fileID: 6148391239924467288}
   axisDropdownX: {fileID: 2097291809304348039}
   axisDropdownY: {fileID: 8374560118427697955}

@@ -61,8 +61,14 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		[SerializeField] private float highlightOutline = 0.005f;
 
+		/// <summary>
+		/// The color highlighted objects will have.
+		/// </summary>
 		public Color standardColor;
 
+		/// <summary>
+		/// The color acentuated highlighted objects will have.
+		/// </summary>
 		public Color accentuationColor;
 
 		/// <summary>
