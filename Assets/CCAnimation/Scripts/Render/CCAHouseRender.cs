@@ -7,11 +7,18 @@ using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// TODO flo doc
+/// A CCARender that is used to display houses as graph nodes.
 /// </summary>
 public class CCARender : AbstractCCARender
 {
+    /// <summary>
+    /// A SimpleAnimator used for animation.
+    /// </summary>
     private readonly AbstractCCAAnimator SimpleAnim = new SimpleCCAAnimator();
+
+    /// <summary>
+    /// A MoveAnimator used for move animations.
+    /// </summary>
     private readonly AbstractCCAAnimator MoveAnim = new MoveCCAAnimator();
 
     protected override void RegisterAllAnimators(List<AbstractCCAAnimator> animators)
@@ -26,11 +33,13 @@ public class CCARender : AbstractCCARender
         var nodeTransform = Layout.GetNodeTransform(node);
         if(isPlaneNew)
         {
+            // if the plane is new instantly apply the position and size
             root.transform.position = Vector3.zero;
             root.transform.localScale = nodeTransform.scale;
         }
         else
         {
+            // if the tranform of the plane changed animate it
             SimpleAnim.AnimateTo(node, root, Vector3.zero, nodeTransform.scale);
         }
     }
@@ -49,6 +58,7 @@ public class CCARender : AbstractCCARender
 
         if (isCircleNew)
         {
+            // if the inner node is new, animate it by moving it out of the ground
             circlePosition.y = -3;
             circle.transform.position = circlePosition;
             circle.transform.localScale = circleRadius;
@@ -88,7 +98,8 @@ public class CCARender : AbstractCCARender
 
         if (isLeafNew)
         {
-            actualSize.y += 5; // Für eine glattere Animation
+            // if the leaf node is new animate it, by moving it out of the ground
+            actualSize.y += 5; // for a smoother animation
             actualSize.x = 0;
             actualSize.z = 0;
             leaf.transform.position -= actualSize;
@@ -123,6 +134,7 @@ public class CCARender : AbstractCCARender
     {
         if (ObjectManager.RemoveNode(node, out GameObject gameObject))
         {
+            // if the node needs to be removed, let it sink into the ground
             var nextPosition = gameObject.transform.position;
             nextPosition.y = -2;
             MoveAnim.AnimateTo(node, gameObject, nextPosition, gameObject.transform.localScale, OnRemovedNodeFinishedAnimation);
@@ -133,6 +145,7 @@ public class CCARender : AbstractCCARender
     {
         if(ObjectManager.RemoveNode(node, out GameObject leaf))
         {
+            // if the node needs to be removed, let it sink into the ground
             var nodeTransform = Layout.GetNodeTransform(node);
             var actualSize = ObjectManager.NodeFactory.GetSize(leaf) * 1.5F;
             actualSize.x = 0;
@@ -148,7 +161,7 @@ public class CCARender : AbstractCCARender
     }
 
     /// <summary>
-    /// TODO flo doc
+    /// Event function, that destroys a given GameObject.
     /// </summary>
     /// <param name="gameObject"></param>
     void OnRemovedNodeFinishedAnimation(object gameObject)

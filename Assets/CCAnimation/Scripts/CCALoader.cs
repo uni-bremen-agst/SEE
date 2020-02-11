@@ -20,7 +20,6 @@ public class CCALoader
 
     /// <summary>
     /// Loads all gxl files from GraphSettings.AnimatedPath() sorted by numbers in the file names.
-    /// !!! At the moment data for Metric.Clone_Rate is copied from Metric.LOC for better visualisation during test !!!
     /// </summary>
     /// <param name="graphSettings">The GraphSettings defining the location of gxl files.</param>
     public void LoadGraphData(GraphSettings graphSettings, int maxRevisionsToLoad)
@@ -57,10 +56,10 @@ public class CCALoader
             graphCreator.Load();
             Graph graph = graphCreator.GetGraph();
 
-            // TODO flo: remove for real data
+            // TODO remove if Clone_Rate is properly represented in gxl-files
             graph.Traverse(leafNode => leafNode.SetFloat("Metric.Clone_Rate", leafNode.GetInt("Metric.LOC")));
 
-            // if graph was loaded put in graphs
+            // if graph was loaded put in graph list
             if (graph == null)
             {
                 Debug.LogError("graph " + gxlPath + " could not be loaded.");

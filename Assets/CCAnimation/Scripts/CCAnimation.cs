@@ -9,19 +9,43 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// : doc
+/// The CCAnimation manages user inputs and interfaces.
 /// </summary>
 public class CCAnimation : MonoBehaviour
 {
+    /// <summary>
+    /// The camera from the user.
+    /// </summary>
     public FlyCamera FlyCamera;
+
+    /// <summary>
+    /// The in game seen while viewing the animations.
+    /// </summary>
     public GameObject InGameCanvas;
+
+    /// <summary>
+    /// The menu for selecting the shown revision.
+    /// </summary>
     public GameObject MainMenuCanvas;
 
+    /// <summary>
+    /// The viewmodel for InGameCanvas.
+    /// </summary>
     private InGameMenuModel inGameMenu;
+
+    /// <summary>
+    /// The viewmodel for MainMenuCanvas
+    /// </summary>
     private MainMenuModel mainMenu;
 
+    /// <summary>
+    /// The StateManager containing all necessary components for controlling the animations.
+    /// </summary>
     public CCAStateManager stateManager;
 
+    /// <summary>
+    /// Returns true if MainMenuCanvas is shown.
+    /// </summary>
     public bool IsMainMenuOpen => !FlyCamera.IsEnabled;
 
     void Start()
@@ -73,11 +97,18 @@ public class CCAnimation : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Toggles the visibility from the MainMenuCanvas.
+    /// </summary>
     void ToogleMainMenu()
     {
         ToogleMainMenu(FlyCamera.IsEnabled);
     }
 
+    /// <summary>
+    /// Changes the visibility of the MainMenuCanvas to the given enabled.
+    /// </summary>
+    /// <param name="enabled"></param>
     void ToogleMainMenu(bool enabled)
     {
         FlyCamera.IsEnabled = !enabled;
@@ -96,6 +127,10 @@ public class CCAnimation : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Event function that updates all show data for the user.
+    /// E.g. the revision number shown in the InGameCanvas.
+    /// </summary>
     void OnViewDataChanged()
     {
         inGameMenu.RevisionNumberText.text = (stateManager.OpenGraphIndex + 1) + " / " + stateManager.GraphCount;
@@ -103,6 +138,11 @@ public class CCAnimation : MonoBehaviour
         inGameMenu.AnimationTimeText.text = "Revision animation time: " + stateManager.AnimationTime + "s";
     }
 
+    /// <summary>
+    /// Event function that changes the show revision to the
+    /// given value index.
+    /// </summary>
+    /// <param name="value"></param>
     void OnDropDownChanged(int value)
     {
         if (value != stateManager.OpenGraphIndex)

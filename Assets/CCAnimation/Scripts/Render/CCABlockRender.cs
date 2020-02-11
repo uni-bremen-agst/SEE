@@ -6,20 +6,45 @@ using System.Threading.Tasks;
 using SEE.DataModel;
 using UnityEngine;
 
-/// <summary>
-/// TODO DOc
-/// </summary>
+
 namespace Assets.CCAnimation.Scripts.Render
 {
+    /// <summary>
+    /// A CCARender that is used to display blocks as graph nodes.
+    /// </summary>
     class CCABlockRender : AbstractCCARender
     {
+        /// <summary>
+        /// A SimpleAnimator used for animation.
+        /// </summary>
         private readonly AbstractCCAAnimator SimpleAnim = new SimpleCCAAnimator();
+
+        /// <summary>
+        /// A MoveAnimator used for move animations.
+        /// </summary>
         private readonly AbstractCCAAnimator MoveAnim = new MoveCCAAnimator();
 
         protected override void RegisterAllAnimators(List<AbstractCCAAnimator> animators)
         {
             animators.Add(SimpleAnim);
             animators.Add(MoveAnim);
+        }
+
+        protected override void RenderRoot(Node node)
+        {
+            var isPlaneNew = !ObjectManager.GetRoot(out GameObject root);
+            var nodeTransform = Layout.GetNodeTransform(node);
+            if (isPlaneNew)
+            {
+                // if the plane is new instantly apply the position and size
+                root.transform.position = Vector3.zero;
+                root.transform.localScale = nodeTransform.scale;
+            }
+            else
+            {
+                // if the tranform of the plane changed animate it
+                SimpleAnim.AnimateTo(node, root, Vector3.zero, nodeTransform.scale);
+            }
         }
 
         protected override void RenderEdge(Edge edge)
@@ -40,6 +65,7 @@ namespace Assets.CCAnimation.Scripts.Render
 
             if (isCircleNew)
             {
+                // if the node is new instantly apply the position and size
                 circlePosition.y = -3;
                 circle.transform.position = circlePosition;
                 circle.transform.localScale = circleRadius;
@@ -68,11 +94,10 @@ namespace Assets.CCAnimation.Scripts.Render
 
             if (isLeafNew)
             {
-
+                // if the leaf node is new animate it, by moving it out of the ground
                 var newPosition = nodeTransform.position;
                 newPosition.y = -nodeTransform.scale.y;
                 leaf.transform.position = newPosition;
-                //leaf.transform.localScale = nodeTransform.scale;
 
                 SimpleAnim.AnimateTo(node, leaf, nodeTransform.position, nodeTransform.scale);
             }
@@ -99,6 +124,7 @@ namespace Assets.CCAnimation.Scripts.Render
         {
             if (ObjectManager.RemoveNode(node, out GameObject gameObject))
             {
+                // if the node needs to be removed, let it sink into the ground
                 var nextPosition = gameObject.transform.position;
                 nextPosition.y = -2;
                 MoveAnim.AnimateTo(node, gameObject, nextPosition, gameObject.transform.localScale, OnRemovedNodeFinishedAnimation);
@@ -109,6 +135,7 @@ namespace Assets.CCAnimation.Scripts.Render
         {
             if (ObjectManager.RemoveNode(node, out GameObject leaf))
             {
+                // if the node needs to be removed, let it sink into the ground
                 var newPosition = leaf.transform.position;
                 newPosition.y = -leaf.transform.localScale.y;
 
@@ -116,23 +143,8 @@ namespace Assets.CCAnimation.Scripts.Render
             }
         }
 
-        protected override void RenderRoot(Node node)
-        {
-            var isPlaneNew = !ObjectManager.GetRoot(out GameObject root);
-            var nodeTransform = Layout.GetNodeTransform(node);
-            if (isPlaneNew)
-            {
-                root.transform.position = Vector3.zero;
-                root.transform.localScale = nodeTransform.scale;
-            }
-            else
-            {
-                SimpleAnim.AnimateTo(node, root, Vector3.zero, nodeTransform.scale);
-            }
-        }
-
         /// <summary>
-        /// TODO flo doc
+        /// Event function, that destroys a given GameObject.
         /// </summary>
         /// <param name="gameObject"></param>
         void OnRemovedNodeFinishedAnimation(object gameObject)
