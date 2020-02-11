@@ -8,7 +8,15 @@ using UnityEngine.UI;
 /// </summary>
 public class MainMenuModel : MonoBehaviour
 {
+
+    /// <summary>
+    /// Dropdown that sets the actual shown revision.
+    /// </summary>
     public Dropdown OpenVersionDropdown;
+
+    /// <summary>
+    /// Button to close the MainMenu
+    /// </summary>
     public Button CloseViewButton;
 
     /// <summary>

@@ -7,32 +7,44 @@ using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// TODO flo doc
+/// Implements the <see cref="AbstractCCAObjectManager"/> by using a supplied
+/// NodeFactory to create its GameObjects.
 /// </summary>
 public class CCAObjectManager : AbstractCCAObjectManager
 {
     /// <summary>
-    /// TODO flo doc
+    /// The root GameObject of a graph.
     /// </summary>
     private GameObject _root;
 
     /// <summary>
-    /// TODO flo doc
+    /// A dictionary containing all created nodes that are in use.
     /// </summary>
     private readonly Dictionary<string, GameObject> nodes = new Dictionary<string, GameObject>();
 
+    /// <summary>
+    /// A circle factory for the inner nodes.
+    /// </summary>
     private readonly CircleFactory CircleFactory;
 
     /// <summary>
-    /// TODO flo doc
+    /// Constructor that sets the used node factory to create the GameObjects
     /// </summary>
     public CCAObjectManager(NodeFactory nodeFactory) : base(nodeFactory)
     {
         CircleFactory = new CircleFactory(nodeFactory.Unit);
     }
 
+    /// <summary>
+    /// Returns a list containing all created nodes that are in use.
+    /// </summary>
     public override List<GameObject> GameObjects => nodes.Values.ToList();
 
+    /// <summary>
+    /// Returns the root GameObject and creates it if necessary
+    /// </summary>
+    /// <param name="root"></param>
+    /// <returns></returns>
     public override bool GetRoot(out GameObject root)
     {
         var hasRoot = _root != null;
@@ -67,6 +79,12 @@ public class CCAObjectManager : AbstractCCAObjectManager
         return hasRoot;
     }
 
+    /// <summary>
+    /// Returns the GameObject for an inner node and creates it if necessary.
+    /// </summary>
+    /// <param name="node"></param>
+    /// <param name="innerNode"></param>
+    /// <returns></returns>
     public override bool GetInnerNode(Node node, out GameObject innerNode)
     {
         node.AssertNotNull("node");
@@ -93,20 +111,15 @@ public class CCAObjectManager : AbstractCCAObjectManager
         }
         noderef.node = node;
 
-        /*
-        private readonly Dictionary<string, GameObject> circleTexts = new Dictionary<string, GameObject>();
-        var isNewCircleText = !circleTexts.TryGetValue(node.LinkName, out circleText);
-        if (isNewCircleText)
-        {
-            circleText = ExtendedTextFactory.GetEmpty(node.LinkName);
-            circleTexts[node.LinkName] = circleText;
-        }
-
-        return isNewCircle || isNewCircleText;
-        */
         return hasInnerNode;
     }
 
+    /// <summary>
+    /// Returns the GameObject for a leaf node and creates it if necessary.
+    /// </summary>
+    /// <param name="node"></param>
+    /// <param name="leaf"></param>
+    /// <returns></returns>
     public override bool GetLeaf(Node node, out GameObject leaf)
     {
         node.AssertNotNull("node");
@@ -129,6 +142,13 @@ public class CCAObjectManager : AbstractCCAObjectManager
         return hasLeaf;
     }
 
+    /// <summary>
+    /// Removes a supplied node by using its Node.LinkName and returns
+    /// the removed node, if some was removed.
+    /// </summary>
+    /// <param name="node"></param>
+    /// <param name="gameObject"></param>
+    /// <returns></returns>
     public override bool RemoveNode(Node node, out GameObject gameObject)
     {
         node.AssertNotNull("node");
@@ -138,6 +158,10 @@ public class CCAObjectManager : AbstractCCAObjectManager
         return wasNodeRemoved;
     }
 
+    /// <summary>
+    /// Clears the internal lists containing the GameObjects,
+    /// without destroing them.
+    /// </summary>
     public override void Clear()
     {
         _root = null;

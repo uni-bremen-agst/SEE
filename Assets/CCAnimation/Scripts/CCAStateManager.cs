@@ -11,55 +11,12 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// TODO flo: make Abstract fpr CCAnimation to simpler Switch
+/// The CCAStateManager combines all necessary components for the animations
 /// </summary>
 public class CCAStateManager : MonoBehaviour
 {
-    // TODO FPS
-    public int FPS { get; private set; }
-    public int LowestFPS { get; private set; }
-    public int HighestFPS { get; private set; }
-    public long CombinedFPS { get; private set; }
-    public long FPSCounter { get; private set; }
-
-    void Update()
-    {
-        FPS = (int)(1f / Time.unscaledDeltaTime);
-        CombinedFPS += FPS;
-        FPSCounter++;
-        if (LowestFPS > FPS)
-        {
-            LowestFPS = FPS;
-        }
-        if (HighestFPS < FPS)
-            HighestFPS = FPS;
-    }
-
-    void BeginFPS()
-    {
-        LowestFPS = FPS;
-        HighestFPS = FPS;
-        CombinedFPS = FPS;
-        FPSCounter = 1;
-    }
-
-    void EndFps()
-    {
-        var fpsStr = $"{OpenGraphIndex-1}; {LowestFPS}; {(int)(CombinedFPS / FPSCounter)}; {HighestFPS}";
-        //Debug.Log(fpsStr);
-        frameRateString.AppendLine(fpsStr);
-    }
-
-    StringBuilder frameRateString = new StringBuilder();
-    string gxlFolder = "";
-
-    void PrepareDatafolder()
-    {
-        gxlFolder = $"{Directory.GetCurrentDirectory()}\\Data\\GXL\\{gxlFolderName}";
-        frameRateString.Append("Graph Nr; Niedrigste FPS; Mittlere FPS; Hoechste FPS");
-    }
-
     /// <summary>
+    /// Sets the used gxl folder to load graphs from.
     /// Possible Animations:
     /// "animation-clones"
     /// "animation-clones-tinylog"
@@ -73,8 +30,37 @@ public class CCAStateManager : MonoBehaviour
     /// </summary>
     public bool useBlockFactory = false;
 
+    /// <summary>
+    /// Sets the maximum number of revsions to load.
+    /// </summary>
     public int maxRevisionsToLoad = 500;
 
+    #region Internal private variables
+
+    private GraphSettings _settings;
+    private NodeFactory _nodeFactory;
+    private AbstractCCAObjectManager _objectManager;
+    private AbstractCCARender _Render;
+    private bool _isAutoplay = false;
+    private UnityEvent _viewDataChangedEvent = new UnityEvent();
+    private int _openGraphIndex = 0;
+    /// <summary>
+    /// The folder where the gxl files are located
+    /// </summary>
+    private readonly string gxlDataFolder = "";
+
+    /// <summary>
+    /// The FPS counter used to measure animatin perfomance.
+    /// </summary>
+    private CCAFPSCounter fpsCounter = new CCAFPSCounter();
+
+    #endregion
+
+    #region Factory methods
+    /// <summary>
+    /// Factory method to create the used GraphSettings.
+    /// </summary>
+    /// <returns></returns>
     protected GraphSettings CreateGraphSetting()
     {
         var _settings = GraphSettingsExtension.DefaultCCAnimationSettings(gxlFolderName);
@@ -83,6 +69,10 @@ public class CCAStateManager : MonoBehaviour
         return _settings;
     }
 
+    /// <summary>
+    /// Factory method to create the used NodeFactory.
+    /// </summary>
+    /// <returns></returns>
     protected NodeFactory CreateNodeFactory()
     {
         if (useBlockFactory)
@@ -95,6 +85,10 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Factory method to create the used AbstractCCARender.
+    /// </summary>
+    /// <returns></returns>
     protected AbstractCCARender CreateRender()
     {
         if (useBlockFactory)
@@ -107,11 +101,20 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
-    protected AbstractCCAObjectManager createObjectManager()
+    /// <summary>
+    /// Factory method to create the used AbstractCCAObjectManager.
+    /// </summary>
+    /// <returns></returns>
+    protected AbstractCCAObjectManager CreateObjectManager()
     {
         return new CCAObjectManager(NodeFactory);
     }
 
+    /// <summary>
+    /// Factory method to create the used NodeMetrics.
+    /// </summary>
+    /// <param name="graphSettings"></param>
+    /// <returns></returns>
     protected List<string> CreateNodeMetrics(GraphSettings graphSettings)
     {
         List<string> nodeMetrics = new List<string>() { graphSettings.WidthMetric, graphSettings.HeightMetric, graphSettings.DepthMetric, graphSettings.ColorMetric };
@@ -121,11 +124,23 @@ public class CCAStateManager : MonoBehaviour
         return nodeMetrics;
     }
 
+    /// <summary>
+    /// Factory method to create the used IScale implementation.
+    /// </summary>
+    /// <param name="graphs"></param>
+    /// <param name="graphSettings"></param>
+    /// <param name="nodeMetrics"></param>
+    /// <returns></returns>
     protected IScale CreateScaler(List<Graph> graphs, GraphSettings graphSettings, List<string> nodeMetrics)
     {
         return new LinearMultiScale(graphs, graphSettings.MinimalBlockLength, graphSettings.MaximalBlockLength, nodeMetrics);
     }
 
+    /// <summary>
+    /// Factory method to create the used NodeLaoyout.
+    /// </summary>
+    /// <param name="nodeFactory"></param>
+    /// <returns></returns>
     protected NodeLayout CreateLayout(NodeFactory nodeFactory)
     {
         //return new EvoStreetsNodeLayout(0, nodeFactory);
@@ -133,14 +148,13 @@ public class CCAStateManager : MonoBehaviour
         return new BalloonNodeLayout(0, nodeFactory);
     }
 
-    private GraphSettings _settings;
+    #endregion
 
-    private NodeFactory _nodeFactory;
+    #region Properties
 
-    private AbstractCCAObjectManager _objectManager;
-
-    private AbstractCCARender _Render;
-
+    /// <summary>
+    /// The GraphSettings used when calculating the layout.
+    /// </summary>
     public GraphSettings Settings
     {
         get
@@ -166,7 +180,7 @@ public class CCAStateManager : MonoBehaviour
         get
         {
             if (_objectManager == null)
-                _objectManager = createObjectManager();
+                _objectManager = CreateObjectManager();
             return _objectManager;
         }
     }
@@ -181,21 +195,19 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
-    [Obsolete]
-    private IEdgeLayout EdgeLayout;
+    private CCALoader GraphLoader{ get; } = new CCALoader();
 
-    private readonly CCALoader graphLoader = new CCALoader();
+    private Dictionary<Graph, CCALayout> Layouts { get; } = new Dictionary<Graph, CCALayout>();
 
-    private readonly Dictionary<Graph, AbstractCCALayout> layouts = new Dictionary<Graph, AbstractCCALayout>();
+    private IScale Scaler { get; set; }
 
-    private IScale scaler;
-
-    private bool _isAutoplay = false;
-
-    private List<Graph> Graphs => graphLoader.graphs;
+    private List<Graph> Graphs => GraphLoader.graphs;
 
     public int GraphCount => Graphs.Count;
 
+    /// <summary>
+    /// The used time for the animations.
+    /// </summary>
     public float AnimationTime
     {
         get => Render.AnimationTime;
@@ -206,7 +218,9 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
-    private int _openGraphIndex = 0;
+    /// <summary>
+    /// Returns the index of the shown graph.
+    /// </summary>
     public int OpenGraphIndex
     {
         get => _openGraphIndex;
@@ -217,7 +231,7 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
-    private UnityEvent _viewDataChangedEvent = new UnityEvent();
+ 
     public UnityEvent ViewDataChangedEvent
     {
         get
@@ -228,6 +242,9 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Returns true if automatic animations are active.
+    /// </summary>
     public bool IsAutoPlay
     {
         get => _isAutoplay;
@@ -238,51 +255,33 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
-    private bool HasLoadedGraph(out LoadedGraph loadedGraph)
+    #endregion
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    public CCAStateManager()
     {
-        return HasLoadedGraph(_openGraphIndex, out loadedGraph);
+        gxlDataFolder = $"{Directory.GetCurrentDirectory()}\\Data\\GXL\\{gxlFolderName}";
     }
 
-    private bool HasLoadedGraph(int index, out LoadedGraph loadedGraph)
-    {
-        loadedGraph = null;
-        var graph = Graphs[index];
-        if (graph == null)
-        {
-            Debug.LogError("There ist no Graph available at index " + index);
-            return false;
-        }
-        var hasLayout = layouts.TryGetValue(graph, out AbstractCCALayout layout);
-        if (layout == null || !hasLayout)
-        {
-            Debug.LogError("There ist no Layout available at index " + index);
-            return false;
-        }
-        if (Settings == null)
-        {
-            Debug.LogError("There ist no GraphSettings available");
-            return false;
-        }
-        loadedGraph = new LoadedGraph(graph, layout, Settings);
-        return true;
-    }
+    #region MonoBehavior basic methods
 
     void Start()
     {
-        PrepareDatafolder();
         Render.AssertNotNull("render");
         Render.ObjectManager = ObjectManager;
 
-        graphLoader.LoadGraphData(Settings, maxRevisionsToLoad);
+        GraphLoader.LoadGraphData(Settings, maxRevisionsToLoad);
 
         ViewDataChangedEvent.Invoke();
 
         var nodeMetrics = CreateNodeMetrics(Settings);
 
-        scaler = CreateScaler(Graphs, Settings, nodeMetrics);
+        Scaler = CreateScaler(Graphs, Settings, nodeMetrics);
 
         var csv = new StringBuilder();
-        
+
         var csvFileName = "\\measure-house.csv";
         if (useBlockFactory)
         {
@@ -296,8 +295,8 @@ public class CCAStateManager : MonoBehaviour
         {
             stopwatch.Reset();
             stopwatch.Start();
-            layouts[key] = new AbstractCCALayout();
-            layouts[key].Calculate(ObjectManager, scaler, CreateLayout(NodeFactory), key, Settings);
+            Layouts[key] = new CCALayout();
+            Layouts[key].Calculate(ObjectManager, Scaler, CreateLayout(NodeFactory), key, Settings);
             stopwatch.Stop();
             if (stopwatch.ElapsedMilliseconds == 0)
             {
@@ -310,10 +309,10 @@ public class CCAStateManager : MonoBehaviour
         p.End();
         try
         {
-            Directory.CreateDirectory(gxlFolder);
-            File.Delete(gxlFolder + csvFileName);
-            File.WriteAllText(gxlFolder + csvFileName, csv.ToString());
-            Debug.Log($"Saved load time to {gxlFolder + csvFileName}");
+            Directory.CreateDirectory(gxlDataFolder);
+            File.Delete(gxlDataFolder + csvFileName);
+            File.WriteAllText(gxlDataFolder + csvFileName, csv.ToString());
+            Debug.Log($"Saved load time to {gxlDataFolder + csvFileName}");
         }
         catch (Exception e)
         {
@@ -329,6 +328,15 @@ public class CCAStateManager : MonoBehaviour
             Debug.LogError("Could not create LoadedGraph to render.");
         }
     }
+
+    void Update()
+    {
+        fpsCounter.OnUpdate();
+    }
+
+    #endregion
+
+    #region public methods
 
     public bool TryShowSpecificGraph(int value)
     {
@@ -403,6 +411,50 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region internal methods
+
+    /// <summary>
+    /// Returns true and a LoadedGraph if there is a LoadedGraph for the active graph index.
+    /// </summary>
+    /// <param name="loadedGraph"></param>
+    /// <returns></returns>
+    private bool HasLoadedGraph(out LoadedGraph loadedGraph)
+    {
+        return HasLoadedGraph(_openGraphIndex, out loadedGraph);
+    }
+
+    /// <summary>
+    /// Returns true and a LoadedGraph if there is a LoadedGraph for the given graph index.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="loadedGraph"></param>
+    /// <returns></returns>
+    private bool HasLoadedGraph(int index, out LoadedGraph loadedGraph)
+    {
+        loadedGraph = null;
+        var graph = Graphs[index];
+        if (graph == null)
+        {
+            Debug.LogError("There ist no Graph available at index " + index);
+            return false;
+        }
+        var hasLayout = Layouts.TryGetValue(graph, out CCALayout layout);
+        if (layout == null || !hasLayout)
+        {
+            Debug.LogError("There ist no Layout available at index " + index);
+            return false;
+        }
+        if (Settings == null)
+        {
+            Debug.LogError("There ist no GraphSettings available");
+            return false;
+        }
+        loadedGraph = new LoadedGraph(graph, layout, Settings);
+        return true;
+    }
+
     internal void ToggleAutoplay()
     {
         ToggleAutoplay(!IsAutoPlay);
@@ -438,7 +490,7 @@ public class CCAStateManager : MonoBehaviour
         if (HasLoadedGraph(out LoadedGraph loadedGraph) &&
             HasLoadedGraph(OpenGraphIndex - 1, out LoadedGraph oldLoadedGraph))
         {
-            BeginFPS();
+            fpsCounter.BeginRound();
             Render.TransitionToNextGraph(oldLoadedGraph, loadedGraph);
         }
         else
@@ -450,21 +502,21 @@ public class CCAStateManager : MonoBehaviour
 
     internal void OnAutoplayCanContinue()
     {
-        EndFps();
+        fpsCounter.EndRound();
         var canShowNext = ShowNextIfPossible();
         if (!canShowNext)
         {
             try
             {
-                Directory.CreateDirectory(gxlFolder);
+                Directory.CreateDirectory(gxlDataFolder);
                 var framerateFilename = "\\framerate-house.csv";
                 if (useBlockFactory)
                 {
                     framerateFilename = "\\framerate-block.csv";
                 }
-                File.Delete(gxlFolder + framerateFilename);
-                File.WriteAllText(gxlFolder + framerateFilename, frameRateString.ToString());
-                Debug.Log($"Saved load time to {gxlFolder + framerateFilename}");
+                File.Delete(gxlDataFolder + framerateFilename);
+                File.WriteAllText(gxlDataFolder + framerateFilename, fpsCounter.AsCsvString);
+                Debug.Log($"Saved load time to {gxlDataFolder + framerateFilename}");
             }
             catch (Exception e)
             {
@@ -473,4 +525,6 @@ public class CCAStateManager : MonoBehaviour
             ToggleAutoplay();
         }
     }
+
+    #endregion
 }

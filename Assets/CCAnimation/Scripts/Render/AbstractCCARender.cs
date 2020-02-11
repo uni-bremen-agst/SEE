@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// TODO flo doc layout
+/// Abstract Render class that serves as an interface to optimally animate different display formats or layouts
 /// </summary>
 public abstract class AbstractCCARender : MonoBehaviour
 {
@@ -87,18 +87,17 @@ public abstract class AbstractCCARender : MonoBehaviour
     /// Gibt den aktuellen, bzw. 
     /// </summary>
     protected Graph Graph => _nextGraph?.Graph;
-    protected AbstractCCALayout Layout => _nextGraph?.Layout;
+    protected CCALayout Layout => _nextGraph?.Layout;
     protected GraphSettings Settings => _nextGraph?.Settings;
 
     protected Graph OldGraph => _loadedGraph?.Graph;
-    protected AbstractCCALayout OldLayout => _loadedGraph?.Layout;
+    protected CCALayout OldLayout => _loadedGraph?.Layout;
     protected GraphSettings OldSettings => _loadedGraph?.Settings;
 
     protected enum GraphDirection { First, Next, Previous };
 
     /// <summary>
     /// Can be null if not set
-    /// TODO needs to be set
     /// </summary>
     public AbstractCCAObjectManager ObjectManager
     {
@@ -110,11 +109,18 @@ public abstract class AbstractCCARender : MonoBehaviour
         get => _objectManager;
     }
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
     public AbstractCCARender()
     {
         RegisterAllAnimators(animators);
     }
 
+    /// <summary>
+    /// Displays the given LoadedGraph instantly if all animations are finished.
+    /// </summary>
+    /// <param name="loadedGraph"></param>
     public void DisplayGraph(LoadedGraph loadedGraph)
     {
         loadedGraph.AssertNotNull("loadedGraph");
@@ -130,6 +136,11 @@ public abstract class AbstractCCARender : MonoBehaviour
         RenderGraph();
     }
 
+    /// <summary>
+    /// Starts the animations to transition to the given next graph.
+    /// </summary>
+    /// <param name="actual"></param>
+    /// <param name="next"></param>
     public void TransitionToNextGraph(LoadedGraph actual, LoadedGraph next)
     {
         actual.AssertNotNull("actual");
@@ -146,6 +157,11 @@ public abstract class AbstractCCARender : MonoBehaviour
         RenderGraph();
     }
 
+    /// <summary>
+    /// Starts the animations to transition to the given previous graph.
+    /// </summary>
+    /// <param name="actual"></param>
+    /// <param name="previous"></param>
     public void TransitionToPreviousGraph(LoadedGraph actual, LoadedGraph previous)
     {
         actual.AssertNotNull("actual");
@@ -162,6 +178,9 @@ public abstract class AbstractCCARender : MonoBehaviour
         RenderGraph();
     }
 
+    /// <summary>
+    /// Renders the as active set graph.
+    /// </summary>
     private void RenderGraph()
     {
         IsStillAnimating = true;
@@ -190,6 +209,9 @@ public abstract class AbstractCCARender : MonoBehaviour
         Invoke("OnAnimationsFinished", Math.Max(AnimationTime, MinimalWaitTimeForNextRevision));
     }
 
+    /// <summary>
+    /// Event function triggered when alls animations are finished.
+    /// </summary>
     private void OnAnimationsFinished()
     {
         IsStillAnimating = false;
@@ -197,13 +219,34 @@ public abstract class AbstractCCARender : MonoBehaviour
     }
 
     /// <summary>
-    /// Is called on Constructor
+    /// Is called on Constructor the register all given animator,
+    /// so they can be updated accordingly.
     /// </summary>
     /// <param name="animators"></param>
     protected abstract void RegisterAllAnimators(List<AbstractCCAAnimator> animators);
+
+    /// <summary>
+    ///Determines how the main node of the active graph is displayed.
+    /// </summary>
+    /// <param name="node"></param>
     protected abstract void RenderRoot(Node node);
+
+    /// <summary>
+    /// Determines how an inner node that contains other nodes is displayed.
+    /// </summary>
+    /// <param name="node"></param>
     protected abstract void RenderInnerNode(Node node);
+
+    /// <summary>
+    /// Determines how a leaf node is displayed.
+    /// </summary>
+    /// <param name="node"></param>
     protected abstract void RenderLeaf(Node node);
+
+    /// <summary>
+    /// Determines how an edge is displayed.
+    /// </summary>
+    /// <param name="edge"></param>
     protected abstract void RenderEdge(Edge edge);
 
     /// <summary>
@@ -223,6 +266,9 @@ public abstract class AbstractCCARender : MonoBehaviour
     /// <param name="edge"></param>
     protected abstract void RenderRemovedOldEdge(Edge edge);
 
+    /// <summary>
+    /// Clears all GameObjects created by the used ObjectManager
+    /// </summary>
     private void ClearGraphObjects()
     {
         ObjectManager?.Clear();

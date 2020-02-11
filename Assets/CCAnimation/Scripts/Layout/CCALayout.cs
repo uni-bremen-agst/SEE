@@ -8,18 +8,18 @@ using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// TODO DOKU
-/// TODO umbenenen da nur noch eins von exisiteirt
+/// A CCALayout uses a given NodeLayout to calculate the Layout and save
+/// it for later use.
 /// </summary>
-public class AbstractCCALayout
+public class CCALayout
 {
     /// <summary>
-    /// TODO DOKU
+    /// The calculated NodeTransforms representing the layout.
     /// </summary>
     public readonly Dictionary<string, NodeTransform> nodeTransforms = new Dictionary<string, NodeTransform>();
 
     /// <summary>
-    /// TODO DOKU
+    /// Returns a NodeTransform for a given node, using the Node.LinkName attribut.
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
@@ -30,7 +30,7 @@ public class AbstractCCALayout
     }
 
     /// <summary>
-    /// TODO noderef muss gesetzt sein wegen check und in COnstructor auslagern
+    /// Calculates the layout data using the given NodeLayout, IScale and ObjectManager for the given graph.
     /// </summary>
     /// <param name="objectManager"></param>
     /// <param name="scaler"></param>

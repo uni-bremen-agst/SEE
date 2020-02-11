@@ -3,41 +3,40 @@ using SEE.DataModel;
 using SEE.Layout;
 
 /// <summary>
-/// TODO flo doc
+/// DataModel containig all data generated for a graph loaded from a gxl-file
+/// and the layout data
 /// </summary>
 public class LoadedGraph
 {
     private readonly Graph graph;
-    private readonly AbstractCCALayout layout;
+    private readonly CCALayout layout;
     private readonly GraphSettings graphSettings;
 
     /// <summary>
-    /// TODO flo doc
+    /// The loaded graph.
     /// </summary>
     public Graph Graph => graph;
 
     /// <summary>
-    /// TODO flo doc
+    /// The calculated layout of the loaded graph.
     /// </summary>
-    public AbstractCCALayout Layout => layout;
+    public CCALayout Layout => layout;
 
     /// <summary>
-    /// TODO flo doc
+    /// The settings used for the loaded graph.
     /// </summary>
     public GraphSettings Settings => graphSettings;
 
     /// <summary>
-    /// TODO flo doc
+    /// Creates a new LoadedGraph.
     /// </summary>
     /// <param name="graph"></param>
     /// <param name="layout"></param>
     /// <param name="graphSettings"></param>
-    public LoadedGraph(Graph graph, AbstractCCALayout layout, GraphSettings graphSettings)
+    public LoadedGraph(Graph graph, CCALayout layout, GraphSettings graphSettings)
     {
         this.graph = graph.AssertNotNull("graph");
         this.layout = layout.AssertNotNull("layout");
         this.graphSettings = graphSettings.AssertNotNull("graphSettings");
     }
-
-    
 }
