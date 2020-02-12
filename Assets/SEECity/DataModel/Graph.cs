@@ -90,7 +90,21 @@ namespace SEE.DataModel
             {
                 if (nodes.Remove(node.LinkName))
                 {
-                    // FIXME/TODO: If a node is removed, all the incoming and outgoing edges must be removed, too.
+                    // the edges of node are stored in the node's data structure as well as
+                    // in the node's neighbor's data structure
+                    foreach (Edge outgoing in node.Outgoings)
+                    {
+                        Node successor = outgoing.Target;
+                        successor.RemoveIncoming(outgoing);
+                        edges.Remove(outgoing);
+                    }
+                    foreach (Edge incoming in node.Incomings)
+                    {
+                        Node predecessor = incoming.Source;
+                        predecessor.RemoveOutgoing(incoming);
+                        edges.Remove(incoming);
+                    }
+                    node.RemoveAllEdges();
                 }
                 else
                 {
@@ -175,6 +189,7 @@ namespace SEE.DataModel
                     edge.ItsGraph = this;
                     edges.Add(edge);
                     edge.Source.AddOutgoing(edge);
+                    edge.Target.AddIncoming(edge);
                 }
             }
             else
@@ -213,6 +228,7 @@ namespace SEE.DataModel
                 else
                 {
                     edge.Source.RemoveOutgoing(edge);
+                    edge.Target.RemoveIncoming(edge);
                     edge.ItsGraph = null;
                 }
             }
