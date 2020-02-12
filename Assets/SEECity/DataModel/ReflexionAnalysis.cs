@@ -505,16 +505,224 @@ namespace SEE.DataModel
         // EDGE section
 
         /// <summary>
-        /// Adds the given edge to the mapping graph.
-        /// Precondition: edge must not be contained in the mapping graph
-        ///   and edge must be a Maps_To edge.
+        /// Adds a new Maps_To edge from 'from' to 'to' to the mapping graph and
+        /// re-runs the reflexion analysis incrementally.
+        /// Preconditions: from is contained in the implementation graph and not yet mapped explicitly
+        /// and to is contained in the architecture graph.
         /// Postcondition: edge is contained in the mapping graph and the reflexion
         ///   graph is updated; all observers are informed of the change.
         /// </summary>
-        /// <param name="edge">the Maps_To edge to be added to the mapping graph</param>
-        public void Add_To_Mapping(Edge edge)
+        /// <param name="from">the source of the maps_to edge to be added to the mapping graph</param>
+        /// <param name="to">the target of the maps_to edge to be added to the mapping graph</param>
+        public void Add_To_Mapping(Node from, Node to)
         {
-            throw new NotImplementedException(); // FIXME
+            if (Is_Mapper(from))
+            {
+                throw new Exception("node " + from.LinkName + " is already mapped explicitly.");
+            }
+            else
+            {
+                // all nodes that should be mapped onto 'to', too, as a consequence of
+                // mapping 'from'
+                List<Node> subtree = Mapped_Subtree(from);
+                // was 'to' mapped implicitly at all?
+                if (_implicit_maps_to_table.TryGetValue(from, out Node oldTarget))
+                {
+                    // from was actually mappéd implicitly onto oldTarget
+                    Unmap(subtree, oldTarget);
+                }
+                {
+                    // add maps_to edge to _mapping
+                    Edge mapsTo = new Edge();
+                    mapsTo.Type = "Maps_To";
+                    mapsTo.Source = from;
+                    mapsTo.Target = to;
+                    _mapping.AddEdge(mapsTo);
+                }
+                // adjust explicit mapping
+                _explicit_maps_to_table[from] = to;
+                // adjust implicit mapping
+                Change_Map(subtree, to);
+                Map(subtree, to);
+            }
+        }
+
+        /// <summary>
+        /// All nodes in given subtree are implicitly mapped onto given target architecture node.
+        /// Precondition: target is in the architecture graph and all nodes in subtree are in
+        /// the implementation graph.
+        /// </summary>
+        /// <param name="subtree">list of nodes to be mapped onto target</param>
+        /// <param name="target">architecture node onto which to map all nodes in subtree</param>
+        private void Change_Map(List<Node> subtree, Node target)
+        {
+            foreach (Node node in subtree)
+            {
+                _implicit_maps_to_table[node] = target;
+            }
+        }
+
+        /// <summary>
+        /// A function delegate that can be used to handle changes of the mapping by Handle_Mapped_Subtree.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        private delegate void Handle_Mapping_Change(Edge e, Node from, Node to);
+
+        /// <summary>
+        /// Handles every dependency edges (incoming as well as outgoing) of every node in given subtree
+        /// as follows:
+        /// 
+        /// Let e = (i1, i2) be a dependency edge where either i1 or i2 or both are contained in subtree.
+        /// Then e falls into one of the following categories:
+        ///  (1) inner dependency: it is in between two entities, i1 and i2, mapped onto the same entity:
+        ///      maps_to(i1) != null and maps_to(i2) != null and maps_to(i1) = maps_to(i2)
+        ///  (2) cross dependency: it is in between two entities, i1 and i2, mapped onto different entities:
+        ///      maps_to(i1) != null and maps_to(i2) != null and maps_to(i1) != maps_to(i2)
+        ///  (3) dangling dependency: it is in between two entities, i1 and i2, not yet both mapped:
+        ///      maps_to(i1) = null or maps_to(i2) = null
+        ///
+        /// Dangling dependencies will be ignored. For every inner or cross dependency, e, the given handler
+        /// will be applied with the following arguments:
+        /// 
+        ///   if e is an outgoing cross dependency, i.e., e.Source is contained in subtree
+        ///   but maps_to(e.Source) != maps_to(e.Target):
+        ///     handler(e, arch_node, maps_to(e.Target)) 
+        ///   if e is an inner or incoming cross dependency, i.e., e.Target is contained in subtree
+        ///   and maps_to(e.Source) may or may not be equal to maps_to(e.Target):
+        ///     handler(e, maps_to(e.Source), arch_node)
+        ///     
+        /// Precondition: given arch_node is in the architecture graph and all nodes in subtree are in the
+        /// implementation graph.
+        /// </summary>
+        /// <param name="subtree">implementation nodes whose mapping is to be adjusted</param>
+        /// <param name="arch_node">architecture node related to the nodes in subtree (to be mapped or unmapped)</param>
+        /// <param name="handler">delegate handling the necessary adjustment</param>
+        private void Handle_Mapped_Subtree(List<Node> subtree, Node arch_node, Handle_Mapping_Change handler)
+        {
+            foreach (Node impl_node in subtree)
+            {
+                // assert: impl_node is in implementation graph
+                foreach (Edge outgoing in impl_node.Outgoings)
+                {
+                    // assert: outgoing is in implementation graph
+                    if (_implicit_maps_to_table.TryGetValue(outgoing.Target, out Node oldTarget))
+                    {
+                        // outgoing is not dangling
+                        if (oldTarget != arch_node)
+                        {
+                            // outgoing is no inner dependency: it is an outgoing cross dependency;
+                            // inner dependencies will be handled only once in the loop below
+                            handler(outgoing, arch_node, oldTarget);
+                        }
+                    }
+                }
+                foreach (Edge incoming in impl_node.Incomings)
+                {
+                    if (_implicit_maps_to_table.TryGetValue(incoming.Source, out Node oldTarget))
+                    {
+                        // incoming cross or inner dependency
+                        handler(incoming, oldTarget, arch_node);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reverts the effect of the mapping of every node in the given subtree onto the
+        /// reflexion data. That is, every non-dangling incoming and outgoing dependency of every
+        /// node in the subtree will be "unpropagated" and "unlifted".
+        /// Precondition: given oldTarget is non-null and contained in the architecture graph and all nodes 
+        /// in subtree are in the implementation graph. All nodes in subtree were originally mapped onto oldTarget.
+        /// </summary>
+        /// <param name="subtree">implementation nodes whose mapping is to be reverted</param>
+        /// <param name="oldTarget">architecture node onto which the nodes in subtree were mapped originally</param>
+        private void Unmap(List<Node> subtree, Node oldTarget)
+        {
+            Handle_Mapped_Subtree(subtree, oldTarget, Decrease_And_Lift);
+        }
+
+        /// <summary>
+        /// Maps every node in the given subtree onto newTarget. That is, every non-dangling incoming 
+        /// and outgoing dependency of every node in the subtree will be propagated and lifted.
+        /// Precondition: given newTarget is non-null and contained in the architecture graph and all nodes 
+        /// in subtree are in the implementation graph. All nodes in subtree are to be mapped onto newTarget.
+        /// </summary>
+        /// <param name="subtree">implementation nodes whose mapping is to be put into effect</param>
+        /// <param name="newTarget">architecture node onto which the nodes in subtree are to be mapped</param>
+        private void Map(List<Node> subtree, Node newTarget)
+        {
+            Handle_Mapped_Subtree(subtree, newTarget, Increase_And_Lift);
+        }
+
+        /// <summary>
+        /// If both 'from' and 'to' are not null, the propagated architecture dependency corresponding
+        /// to given 'implementation_dependency' is lifted where the counter of the matching specified
+        /// architecture dependency and the counter of this propagated architecture dependency are decreased 
+        /// by the absolute value of implementation_dependency's counter.
+        /// Otherwise, nothing is done.
+        /// Precondition: 'implementation_dependency' is a dependency edge contained in implementation graph
+        /// and 'to' and 'from' are contained in the architecture graph.
+        /// </summary>
+        /// <param name="implementation_dependency">an implementation dependency whose corresponding propagated dependency
+        /// in the architecture graph is to be decreased and lifted</param>
+        /// <param name="from">architecture node = Maps_To(implementation_dependency.Source)</param>
+        /// <param name="to">architecture node = Maps_To(implementation_dependency.Target)</param>
+        private void Decrease_And_Lift(Edge implementation_dependency, Node from, Node to)
+        {
+            if (from != null && to != null)
+            {
+                Edge propagated_edge = Get_Propagated_Dependency(from, to, implementation_dependency.Type);
+                // FIXME: could propagated_edge be null?
+                int counter = -Get_Impl_Counter(implementation_dependency);
+                if (Lift(propagated_edge.Source, propagated_edge.Target, propagated_edge.Type, counter, out Edge allowing_edge))
+                {
+                    // matching specified architecture dependency found; no state change
+                }
+                Set_Counter(propagated_edge, counter);
+            }
+        }
+
+        /// <summary>
+        /// Propagates and lifts given implementation_dependency.
+        /// Precondition: 'implementation_dependency' is a dependency edge contained in implementation graph
+        /// and 'to' and 'from' are contained in the architecture graph.
+        /// 
+        /// Note: from and to are actually ignored (intentionally).
+        /// </summary>
+        /// <param name="implementation_dependency">an implementation dependency whose corresponding propagated dependency
+        /// in the architecture graph is to be decreased and lifted</param>
+        /// <param name="from">architecture node = Maps_To(implementation_dependency.Source)</param>
+        /// <param name="to">architecture node = Maps_To(implementation_dependency.Target)</param>
+        private void Increase_And_Lift(Edge implementation_dependency, Node from, Node to)
+        {
+            // safely ignore from and to
+            Propagate_And_Lift_Dependency(implementation_dependency);
+        }
+
+        /// <summary>
+        /// Returns the list of nodes in the subtree rooted by given node (including this
+        /// node itself) excluding those descendants in nested subtrees rooted by a mapper node, 
+        /// that is, are mapped elsewhere.
+        /// Precondition: node is contained in implementation graph and not Is_Mapper(node).
+        /// Postcondition: all nodes in the result are in the implementation graph and mapped 
+        /// onto the same architecture node as the given node; the given node is included 
+        /// in the result.
+        /// </summary>
+        /// <param name="node">root node of the subtree</param>
+        /// <returns></returns>
+        private List<Node> Mapped_Subtree(Node node)
+        {
+            List<Node> result = new List<Node> { node };
+            foreach (Node child in node.Children())
+            {
+                if (!Is_Mapper(child))
+                {
+                    result.AddRange(Mapped_Subtree(child));
+                }
+            }
+            return result;
         }
 
         /// <summary>
@@ -1094,7 +1302,7 @@ namespace SEE.DataModel
                      propagated_architecture_dep.Target,
                      impl_type,
                      impl_counter, 
-                     ref allowing_edge);
+                     out allowing_edge);
             }
             // keep a trace of dependency propagation
             //causing.insert(std::pair<Edge*, Edge*>
@@ -1255,7 +1463,7 @@ namespace SEE.DataModel
             // because it has just come into existence, we need to let our observers know about it
             Notify(new PropagatedEdge(propagated_architecture_dep));
 
-            if (Lift(arch_source, arch_target, edge_type, counter, ref allowing_edge_out))
+            if (Lift(arch_source, arch_target, edge_type, counter, out allowing_edge_out))
             {
                 // found a matching specified architecture dependency allowing propagated_architecture_dep
                 Transition(propagated_architecture_dep, State.undefined, State.allowed);
@@ -1304,7 +1512,7 @@ namespace SEE.DataModel
                           Node to,
                           string edge_type,
                           int counter,
-                          ref Edge allowing_edge_out)
+                          out Edge allowing_edge_out)
 
         {
             List<Node> parents = to.Ascendants();
