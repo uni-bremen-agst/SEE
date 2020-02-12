@@ -164,6 +164,74 @@ namespace SEE.DataModel
         }
 
         /// <summary>
+        /// The incoming edges of this node.
+        /// </summary>
+        [SerializeField]
+        private List<Edge> incomings = new List<Edge>();
+
+        /// <summary>
+        /// The incoming edges of this node.
+        /// </summary>
+        [SerializeField]
+        public List<Edge> Incomings
+        {
+            get => incomings;
+        }
+
+        /// <summary>
+        /// Adds given edge to the list of incoming edges of this node.
+        /// 
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        /// should use Graph.AddEdge() instead.
+        /// 
+        /// Precondition: edge != null and edge.Target == this
+        /// </summary>
+        /// <param name="edge">edge to be added as one of the node's incoming edges</param>
+        public void AddIncoming(Edge edge)
+        {
+            if (ReferenceEquals(edge, null))
+            {
+                throw new Exception("edge must not be null");
+            }
+            else if (edge.Target != this)
+            {
+                throw new Exception("edge " + edge.ToString() + " is no incoming edge of " + this.ToString());
+            }
+            else
+            {
+                incomings.Add(edge);
+            }
+        }
+
+        /// <summary>
+        /// Removes given edge from the list of incoming edges of this node.
+        /// 
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        /// should use Graph.RemoveEdge() instead.
+        /// 
+        /// Precondition: edge != null and edge.Target == this
+        /// </summary>
+        /// <param name="edge">edge to be removed from the node's incoming edges</param>
+        public void RemoveIncoming(Edge edge)
+        {
+            if (ReferenceEquals(edge, null))
+            {
+                throw new Exception("edge must not be null");
+            }
+            else if (edge.Target != this)
+            {
+                throw new Exception("edge " + edge.ToString() + " is no incoming edge of " + this.ToString());
+            }
+            else
+            {
+                if (!incomings.Remove(edge))
+                {
+                    throw new Exception("edge " + edge.ToString() + " is no incoming edge of " + this.ToString());
+                }
+            }
+        }
+
+        /// <summary>
         /// The outgoing edges of this node.
         /// </summary>
         [SerializeField]
@@ -176,6 +244,18 @@ namespace SEE.DataModel
         public List<Edge> Outgoings
         {
             get => outgoings;
+        }
+
+        /// <summary>
+        /// Removes all incoming and outgoing edges from this node.
+        /// 
+        /// IMPORTANT NOTE: This method is reserved for Graph and should not
+        /// be used by any other client.
+        /// </summary>
+        public void RemoveAllEdges()
+        {
+            outgoings.Clear();
+            incomings.Clear();
         }
 
         /// <summary>
@@ -224,7 +304,7 @@ namespace SEE.DataModel
             }
             else
             {
-                if (! outgoings.Remove(edge))
+                if (!outgoings.Remove(edge))
                 {
                     throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + this.ToString());
                 }
