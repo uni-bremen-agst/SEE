@@ -1254,8 +1254,8 @@ namespace SEE.DataModel
         {
 #if DEBUG
 
-            Debug.LogFormat("propagate_and_lift_dependency: propagated implementation_dep = {0}\n",
-                            Edge_Name(implementation_dep, true));
+            //Debug.LogFormat("propagate_and_lift_dependency: propagated implementation_dep = {0}\n",
+            //                Edge_Name(implementation_dep, true));
 #endif
             System.Diagnostics.Debug.Assert(implementation_dep.ItsGraph == _implementation);
             Node impl_source = implementation_dep.Source;
@@ -1271,7 +1271,7 @@ namespace SEE.DataModel
             {
                 // source or target are not mapped; so we cannot do anything
 #if DEBUG
-                Debug.Log("source or target are not mapped; bailing out\n");
+                //Debug.Log("source or target are not mapped; bailing out\n");
 #endif
                 return; 
             }
@@ -1286,14 +1286,14 @@ namespace SEE.DataModel
                       (arch_source, arch_target, impl_type, ref allowing_edge);
                 // Assert: architecture_dep is in architecture graph (it is propagated; not specified)
 #if DEBUG
-                Debug.LogFormat("new propagated dependency in architecture created: {0}\n", propagated_architecture_dep);
+                //Debug.LogFormat("new propagated dependency in architecture created: {0}\n", propagated_architecture_dep);
 #endif
             }
             else
             {
                 // a propagated dependency exists already
 #if DEBUG
-                Debug.Log("a propagated dependency exists already\n");
+                //Debug.Log("a propagated dependency exists already\n");
 #endif
                 int impl_counter = Get_Impl_Counter(implementation_dep);
                 Change_Impl_Ref(propagated_architecture_dep, impl_counter);
@@ -1520,15 +1520,15 @@ namespace SEE.DataModel
             Node cursor = from;
             // Assert: cursor is in architecture
 #if DEBUG
-            Debug.Log("lift: lift an edge from "
-                + Qualified_Node_Name(from, true)
-                + " to "
-                + Qualified_Node_Name(to, true)
-                + " of type "
-                + edge_type
-                + " and counter value "
-                + counter
-                + "\n");
+            //Debug.Log("lift: lift an edge from "
+            //    + Qualified_Node_Name(from, true)
+            //    + " to "
+            //    + Qualified_Node_Name(to, true)
+            //    + " of type "
+            //    + edge_type
+            //    + " and counter value "
+            //    + counter
+            //    + "\n");
             //dump_node_set(parents, "parents(to)");
 #endif
 
@@ -1557,7 +1557,7 @@ namespace SEE.DataModel
             }
             // no matching architecture dependency found
 #if DEBUG
-            Debug.Log("lift: no matching architecture dependency found" + "\n");
+            //Debug.Log("lift: no matching architecture dependency found" + "\n");
 #endif
             allowing_edge_out = null;
             return false;
