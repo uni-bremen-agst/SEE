@@ -4,7 +4,6 @@ using NetworkCommsDotNet.Connections.TCP;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using UnityEngine;
 
 namespace SEE.Net.Internal
 {
@@ -23,9 +22,29 @@ namespace SEE.Net.Internal
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, OnIncomingPacket);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, OnIncomingPacket);
 
-            List<IPAddress> ipAddresses = Network.LookupLocalIPAddresses();
-            try { ipAddresses.Insert(0, IPAddress.Parse(serverIPAddress)); }
-            catch (Exception) { }
+            List<IPAddress> ipAddresses = null;
+            if (serverIPAddress != null && serverIPAddress.Trim(new char[] { ' ' }).Length != 0)
+            {
+                try
+                {
+                    ipAddresses = new List<IPAddress>(1)
+                    {
+                        IPAddress.Parse(serverIPAddress)
+                    };
+                }
+                catch (Exception e)
+                {
+#if UNITY_EDITOR
+                    UnityEngine.Debug.LogException(e);
+                    UnityEditor.EditorApplication.isPlaying = false; // TODO: proper handling!
+                    throw e;
+#endif
+                }
+            }
+            else
+            {
+                ipAddresses = Network.LookupLocalIPAddresses();
+            }
 
             bool success = false;
             foreach (IPAddress ipAddress in ipAddresses)
