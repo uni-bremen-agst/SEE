@@ -435,10 +435,10 @@ namespace SEE.DataModel
         //   graph is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="node">the node to be added to the mapping graph</param>
-        public void Add_To_Mapping(Node node)
-        {
-            throw new NotImplementedException(); // FIXME
-        }
+        //public void Add_To_Mapping(Node node)
+        //{
+        //    throw new NotImplementedException(); // FIXME
+        //}
 
         /// <summary>
         /// Removes given node from mapping graph.
@@ -447,10 +447,10 @@ namespace SEE.DataModel
         ///   graph is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="node">node to be removed from the mapping</param>
-        public void Delete_From_Mapping(Node node)
-        {
-            throw new NotImplementedException(); // FIXME
-        }
+        //public void Delete_From_Mapping(Node node)
+        //{
+        //    throw new NotImplementedException(); // FIXME
+        //}
 
         /// <summary>
         /// Adds given node to architecture graph.
@@ -531,20 +531,55 @@ namespace SEE.DataModel
                     // from was actually mappéd implicitly onto oldTarget
                     Unmap(subtree, oldTarget);
                 }
-                {
-                    // add maps_to edge to _mapping
-                    Edge mapsTo = new Edge();
-                    mapsTo.Type = "Maps_To";
-                    mapsTo.Source = from;
-                    mapsTo.Target = to;
-                    _mapping.AddEdge(mapsTo);
-                }
+                Add_To_Mapping_Graph(from, to);
                 // adjust explicit mapping
                 _explicit_maps_to_table[from] = to;
                 // adjust implicit mapping
                 Change_Map(subtree, to);
                 Map(subtree, to);
             }
+        }
+
+        /// <summary>
+        /// Adds a clone of 'from' and a clone of 'to' to the mapping graph if
+        /// they do not have one already and adds a Maps_To edge in between.
+        /// 
+        /// Precondition: from is contained in the implementation graph and to is
+        /// contained in the architecture graph.
+        /// Postcondition: a clone F of from and a clone T of to exist in the
+        /// mapping graph and there is a maps_to edge from F to T in the mapping
+        /// graph.
+        /// </summary>
+        /// <param name="from">source of the maps-to edge</param>
+        /// <param name="to">target of the maps-to edge</param>
+        private void Add_To_Mapping_Graph(Node from, Node to)
+        {
+            Node from_clone = CloneInMapping(from);
+            Node to_clone = CloneInMapping(to);
+            // add maps_to edge to _mapping
+            Edge mapsTo = new Edge();
+            mapsTo.Type = "Maps_To";
+            mapsTo.Source = from_clone;
+            mapsTo.Target = to_clone;
+            _mapping.AddEdge(mapsTo);
+        }
+        
+        /// <summary>
+        /// Returns the node with the same Linkage.Name as given node contained
+        /// in _mapping. If no such node exists, a clone of the given node is
+        /// created, added to _mapping, and returned.
+        /// </summary>
+        /// <param name="node">node whose clone in _mapping is needed</param>
+        /// <returns>clone of node in _mapping</returns>
+        private Node CloneInMapping(Node node)
+        {
+            Node clone = _mapping.GetNode(node.LinkName);
+            if (clone == null)
+            {
+                clone = (Node)node.Clone();
+                _mapping.AddNode(clone);
+            }
+            return clone;
         }
 
         /// <summary>
