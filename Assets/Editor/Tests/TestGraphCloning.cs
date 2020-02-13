@@ -27,6 +27,8 @@ namespace SEE.DataModel
         public void TestCloneNode()
         {
             Node original = NewNode("node1");
+            Graph graph = new Graph();
+            graph.AddNode(original);
 
             Node clone = (Node)original.Clone();
             Assert.That(clone.Type == original.Type);
@@ -41,6 +43,8 @@ namespace SEE.DataModel
             Assert.That(clone.Level == 0);
             Assert.That(clone.Parent, Is.Null);
             Assert.That(clone.Children().Count == 0);
+            // cloned nodes do not yet belong to any graph
+            Assert.That(clone.ItsGraph, Is.Null);
         }
 
         private Edge NewEdge(Node source, Node target)
@@ -59,9 +63,13 @@ namespace SEE.DataModel
         [Test]
         public void TestCloneEdge()
         {
+            Graph graph = new Graph();
             Node source = NewNode("source");
+            graph.AddNode(source);
             Node target = NewNode("target");
+            graph.AddNode(target);
             Edge original = NewEdge(source, target);
+            graph.AddEdge(original);
 
             Edge clone = (Edge)original.Clone();
             Assert.That(clone.Type == original.Type);
@@ -72,6 +80,8 @@ namespace SEE.DataModel
             // Note: Source and target of an edge should be cloned (shallow copy), too.
             Assert.That(clone.Source == original.Source);
             Assert.That(clone.Target == original.Target);
+            // cloned edges do not yet belong to any graph
+            Assert.That(clone.ItsGraph, Is.Null);
         }
 
         [Test]
@@ -126,6 +136,19 @@ namespace SEE.DataModel
             Assert.That(clone.NodeCount == original.NodeCount);
             Assert.That(clone.EdgeCount == original.EdgeCount);
 
+            // all cloned nodes must be in the cloned graph
+            foreach (Node node in clone.Nodes())
+            {
+                Assert.AreEqual(clone, node.ItsGraph);
+            }
+            // all cloned edges must be in the cloned graph (and their
+            // source and target, too)
+            foreach (Edge edge in clone.Edges())
+            {
+                Assert.AreEqual(clone, edge.ItsGraph);
+                Assert.AreEqual(clone, edge.Source.ItsGraph);
+                Assert.AreEqual(clone, edge.Target.ItsGraph);
+            }
             CompareHierarchy(original, clone);
         }
 
