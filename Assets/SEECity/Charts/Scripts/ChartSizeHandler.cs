@@ -117,7 +117,7 @@ namespace SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Toggles the active state of <see cref="scrollContent" />. Called by Unity.
+		/// Toggles the active state of <see cref="contentSelection" />. Called by Unity.
 		/// </summary>
 		public void ToggleContentSelection()
 		{

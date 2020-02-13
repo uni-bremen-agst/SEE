@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 namespace SEECity.Charts.Scripts
 {
 	/// <summary>
-	/// Manages the highlighting and visibility of <see cref="SEE.DataModel.Node"/>s.
+	/// Manages the highlighting and visibility of <see cref="SEE.DataModel.Node" />s.
 	/// </summary>
 	public class NodeHighlights : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
 		IPointerClickHandler
