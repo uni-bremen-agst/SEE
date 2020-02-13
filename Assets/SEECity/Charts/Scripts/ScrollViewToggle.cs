@@ -170,7 +170,11 @@ namespace SEECity.Charts.Scripts
 		/// <param name="eventData"></param>
 		public void OnPointerExit(PointerEventData eventData)
 		{
-			if (_pointedOn) _chartManager.HighlightObject(LinkedObject.gameObject);
+			if (_pointedOn)
+			{
+				_chartManager.HighlightObject(LinkedObject.gameObject);
+				_pointedOn = false;
+			}
 		}
 
 		/// <summary>

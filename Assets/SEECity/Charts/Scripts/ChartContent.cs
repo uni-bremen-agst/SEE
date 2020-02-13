@@ -6,6 +6,7 @@ using SEE.DataModel;
 using SEE.Layout;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 namespace SEECity.Charts.Scripts
@@ -114,7 +115,8 @@ namespace SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Fills the scroll view on the right of the chart with one entry for each node in the scene including two headers to toggle all buildings and all nodes.
+		/// Fills the scroll view on the right of the chart with one entry for each node in the scene including
+		/// two headers to toggle all buildings and all nodes.
 		/// </summary>
 		private void FillScrollView()
 		{
@@ -141,7 +143,8 @@ namespace SEECity.Charts.Scripts
 			foreach (GameObject dataObject in _dataObjects)
 				if (dataObject.tag.Equals("Node"))
 					CreateChildToggle(dataObject, parentToggle, i++, gap);
-			scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(scrollContent.GetComponent<RectTransform>().sizeDelta.x, i * Mathf.Abs(gap) + 40);
+			scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(
+				scrollContent.GetComponent<RectTransform>().sizeDelta.x, i * Mathf.Abs(gap) + 40);
 		}
 
 		/// <summary>
@@ -151,7 +154,8 @@ namespace SEECity.Charts.Scripts
 		/// <param name="parentToggle">The toggle that will toggle this one when clicked.</param>
 		/// <param name="i">The position of the toggle in the scrollview.</param>
 		/// <param name="gap">The gap between two toggles in the scrollview.</param>
-		private void CreateChildToggle(GameObject dataObject, ScrollViewToggle parentToggle, int i, float gap)
+		private void CreateChildToggle(GameObject dataObject, ScrollViewToggle parentToggle, int i,
+			float gap)
 		{
 			GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
 			ScrollViewToggle toggle = tempObject.GetComponent<ScrollViewToggle>();
@@ -377,10 +381,12 @@ namespace SEECity.Charts.Scripts
 			Rect dataRect = dataPanel.rect;
 			float width = dataRect.width / (maxX - minX);
 			float height = dataRect.height / (maxY - minY);
+			int positionInLayer = 0;
 
 			foreach (GameObject data in toDraw)
 			{
 				GameObject marker = Instantiate(markerPrefab, entries.transform);
+				marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
 				ChartMarker script = marker.GetComponent<ChartMarker>();
 				script.linkedObject = data;
 				Node node = data.GetComponent<NodeRef>().node;
@@ -391,6 +397,7 @@ namespace SEECity.Charts.Scripts
 				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("0.00"));
 				marker.GetComponent<RectTransform>().anchoredPosition =
 					new Vector2((valueX - minX) * width, (valueY - minY) * height);
+				CheckOverlapping(marker, updatedMarkers.ToArray());
 				updatedMarkers.Add(marker);
 
 				float highlightTimeLeft = CheckOldMarkers(data);
@@ -403,6 +410,12 @@ namespace SEECity.Charts.Scripts
 			ActiveMarkers = updatedMarkers;
 		}
 
+		/// <summary>
+		/// Adds new markers to the chart if the same metric is displayed on both axes.
+		/// </summary>
+		/// <param name="toDraw">The markers to add to the chart.</param>
+		/// <param name="min">The minimum value of the metric.</param>
+		/// <param name="max">The maximum value of the metric.</param>
 		private void AddMarkers(List<GameObject> toDraw, float min, float max)
 		{
 			if (min.Equals(max))
@@ -417,10 +430,12 @@ namespace SEECity.Charts.Scripts
 				float height = dataRect.height / (max - min);
 				string metric = axisDropdownY.Value;
 				int x = 0;
+				int positionInLayer = 0;
 
 				foreach (GameObject data in toDraw)
 				{
 					GameObject marker = Instantiate(markerPrefab, entries.transform);
+					marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
 					ChartMarker script = marker.GetComponent<ChartMarker>();
 					script.linkedObject = data;
 					Node node = data.GetComponent<NodeRef>().node;
@@ -431,6 +446,7 @@ namespace SEECity.Charts.Scripts
 					                   ": " + value.ToString("0.00"));
 					marker.GetComponent<RectTransform>().anchoredPosition =
 						new Vector2(x++ * width, (value - min) * height);
+					CheckOverlapping(marker, updatedMarkers.ToArray());
 					updatedMarkers.Add(marker);
 
 					if (ActiveMarkers.Count > 0)
@@ -447,6 +463,10 @@ namespace SEECity.Charts.Scripts
 			}
 		}
 
+		/// <summary>
+		/// Adds markers to the chart where all markers have the same value.
+		/// </summary>
+		/// <param name="toDraw">The markers to add to the chart.</param>
 		private void AddMarkers(List<GameObject> toDraw)
 		{
 			List<GameObject> updatedMarkers = new List<GameObject>();
@@ -455,10 +475,12 @@ namespace SEECity.Charts.Scripts
 			float height = dataRect.height / toDraw.Count;
 			int x = 0;
 			int y = 0;
+			int positionInLayer = 0;
 
 			foreach (GameObject data in toDraw)
 			{
 				GameObject marker = Instantiate(markerPrefab, entries.transform);
+				marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
 				ChartMarker script = marker.GetComponent<ChartMarker>();
 				script.linkedObject = data;
 				Node node = data.GetComponent<NodeRef>().node;
@@ -469,6 +491,7 @@ namespace SEECity.Charts.Scripts
 				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("0.00"));
 				marker.GetComponent<RectTransform>().anchoredPosition =
 					new Vector2(x++ * width, y++ * height);
+				CheckOverlapping(marker, updatedMarkers.ToArray());
 				updatedMarkers.Add(marker);
 
 				if (ActiveMarkers.Count > 0)
@@ -478,20 +501,31 @@ namespace SEECity.Charts.Scripts
 						script.TriggerTimedHighlight(
 							ChartManager.highlightDuration - highlightTimeLeft, true);
 				}
-				//Rect rect = marker.GetComponent<Rect>();
-				//Image image = marker.GetComponent<Image>();
-				//foreach (GameObject updatedMarker in updatedMarkers)
-				//{
-				//	if (rect.Overlaps(updatedMarker.GetComponent<Rect>()) {
-				//		if (image.color.)
-				//	}
-				//}
 			}
 
 			foreach (GameObject marker in ActiveMarkers) Destroy(marker);
 			ActiveMarkers = updatedMarkers;
 		}
 
+		private void CheckOverlapping(GameObject marker, GameObject[] updatedMarkers)
+		{
+			Image image = marker.GetComponent<Image>();
+			foreach (GameObject updatedMarker in updatedMarkers)
+				if (Vector3.Distance(marker.transform.position, updatedMarker.transform.position) <
+				    3)
+					if (image.color.g - 0.1f >= 0)
+					{
+						Color oldColor = image.color;
+						image.color = new Color(oldColor.r, oldColor.g - 0.1f, oldColor.b - 0.1f);
+					}
+		}
+
+		/// <summary>
+		/// Checks if any of the old markers that will be removed were highlighted. If so, the highlight will
+		/// be carried over to the new marker.
+		/// </summary>
+		/// <param name="marker">The new marker.</param>
+		/// <returns></returns>
 		private float CheckOldMarkers(GameObject marker)
 		{
 			foreach (GameObject oldMarker in ActiveMarkers)
@@ -531,6 +565,9 @@ namespace SEECity.Charts.Scripts
 				}
 		}
 
+		/// <summary>
+		/// Sets the info text of the chart.
+		/// </summary>
 		public void SetInfoText()
 		{
 			string metricX = axisDropdownX.Value;
@@ -543,9 +580,10 @@ namespace SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// TODO
+		/// Finds all markers that refer to a given <see cref="GameObject" /> and toggles their highlight
+		/// across all charts.
 		/// </summary>
-		/// <param name="highlight"></param>
+		/// <param name="highlight">The object the marker will refer to.</param>
 		public void HighlightCorrespondingMarker(GameObject highlight)
 		{
 			foreach (GameObject activeMarker in ActiveMarkers)
@@ -560,6 +598,11 @@ namespace SEECity.Charts.Scripts
 				}
 		}
 
+		/// <summary>
+		/// Finds all markers that refer to a given <see cref="GameObject" /> and if they are highlighted,
+		/// their accentuation will be toggled.
+		/// </summary>
+		/// <param name="highlight">The object the marker will refer to.</param>
 		public void AccentuateCorrespondingMarker(GameObject highlight)
 		{
 			foreach (GameObject activeMarker in ActiveMarkers)
@@ -587,7 +630,8 @@ namespace SEECity.Charts.Scripts
 		public void OnDestroy()
 		{
 			foreach (GameObject dataObject in _dataObjects)
-				dataObject.GetComponent<NodeHighlights>().showInChart.Remove(this);
+				if (dataObject != null)
+					dataObject.GetComponent<NodeHighlights>().showInChart.Remove(this);
 		}
 	}
 }

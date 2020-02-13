@@ -34,8 +34,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 165, y: 0}
-  m_SizeDelta: {x: 300, y: 35}
+  m_AnchoredPosition: {x: 170, y: -25}
+  m_SizeDelta: {x: 300, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1120800419139858380
 CanvasRenderer:
@@ -93,14 +93,14 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 14
-  m_fontSizeBase: 14
+  m_fontSize: 18
+  m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_textAlignment: 513
+  m_textAlignment: 257
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0
@@ -263,6 +263,7 @@ GameObject:
   - component: {fileID: 7900548257253700397}
   - component: {fileID: 7900548257253700396}
   - component: {fileID: 7900548257253700399}
+  - component: {fileID: 1337706128253423066}
   m_Layer: 5
   m_Name: Marker
   m_TagString: Untagged
@@ -398,3 +399,14 @@ MonoBehaviour:
   highlightLine: {fileID: 5584465320866608993, guid: 1cf6c2eb644155f4c89e9332602e0a16,
     type: 3}
   infoText: {fileID: 2199698873300044687}
+--- !u!210 &1337706128253423066
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7900548257253700385}
+  m_Enabled: 1
+  m_SortingLayerID: -1745318755
+  m_SortingLayer: 1
+  m_SortingOrder: 0

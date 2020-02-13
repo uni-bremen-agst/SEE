@@ -196,7 +196,9 @@ namespace SEECity.Charts.Scripts
 				{
 					Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-					if (Physics.Raycast(ray, out RaycastHit hit, 100f) && hit.transform.gameObject.TryGetComponent(out NodeRef _)) HighlightObject(hit.transform.gameObject);
+					if (Physics.Raycast(ray, out RaycastHit hit, 100f) &&
+					    hit.transform.gameObject.TryGetComponent(out NodeRef _))
+						HighlightObject(hit.transform.gameObject);
 				}
 
 				if (Input.GetButtonDown("SelectionMode")) selectionMode = true;
@@ -245,7 +247,6 @@ namespace SEECity.Charts.Scripts
 			{
 				Transform child = highlightTransform.GetChild(i);
 				if (child.gameObject.name.Equals(highlight.name + "(Clone)"))
-				{
 					for (int x = 0; x < child.childCount; x++)
 					{
 						Transform secondChild = child.GetChild(x);
@@ -255,7 +256,6 @@ namespace SEECity.Charts.Scripts
 							return;
 						}
 					}
-				}
 			}
 		}
 
