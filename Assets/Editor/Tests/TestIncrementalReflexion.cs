@@ -1,7 +1,5 @@
 ﻿using NUnit.Framework;
-using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace SEE.DataModel 
 {
@@ -80,11 +78,8 @@ namespace SEE.DataModel
             for (int j = 1; j <= 4; j++)
             {
                 s[j] = new Edge();
+                s[j].Type = call;
             }
-            s[1].Type = "Source_Dependency";
-            s[2].Type = call;
-            s[3].Type = call;
-            s[4].Type = "Source_Dependency";
 
             AddToGraph(arch, s[1], a[3], a[7]);
             AddToGraph(arch, s[2], a[1], a[3]);
@@ -126,9 +121,6 @@ namespace SEE.DataModel
                 edge.Type = call;
                 e[j] = edge;
             }
-            e[1].Type = "import";
-            e[2].Type = "set";
-            e[3].Type = "use";
 
             AddToGraph(impl, e[1], i[ 3], i[15]);
             AddToGraph(impl, e[2], i[ 4], i[16]);
@@ -150,9 +142,23 @@ namespace SEE.DataModel
         [Test]
         public void TestIncrementalMapping()
         {
+            DumpEvents();
+
+            ResetEvents();
             reflexion.Add_To_Mapping(i[17], a[6]);
             DumpEvents();
-        }
 
+            ResetEvents();
+            reflexion.Add_To_Mapping(i[16], a[6]);
+            DumpEvents();
+
+            ResetEvents();
+            reflexion.Add_To_Mapping(i[3], a[3]);
+            DumpEvents();
+
+            ResetEvents();
+            reflexion.Add_To_Mapping(i[15], a[5]);
+            DumpEvents();
+        }
     }
 }
