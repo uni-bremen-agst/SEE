@@ -473,48 +473,47 @@ namespace SEE.DataModel
             Graph target = (Graph)clone;
             target.viewName = this.viewName;
             target.path = this.path;
-            target.nodes = CopyNodes(this.nodes);
-            target.edges = CopyEdges(this.edges);
+            CopyNodesTo(target);
+            CopyEdgesTo(target);
             CopyHierarchy(this, target);
         }
 
-        private StringNodeDictionary CopyNodes(StringNodeDictionary nodes)
+        private void CopyNodesTo(Graph target)
         {
-            StringNodeDictionary result = new StringNodeDictionary();
-            foreach (var entry in nodes)
+            target.nodes = new StringNodeDictionary();
+            foreach (var entry in this.nodes)
             {
-                result.Add(entry.Key, (Node)entry.Value.Clone());
+                Node node = (Node)entry.Value.Clone();
+                target.AddNode(node);
             }
-            return result;
         }
 
-        private List<Edge> CopyEdges(List<Edge> edges)
+        private void CopyEdgesTo(Graph target)
         {
-            List<Edge> result = new List<Edge>();
-            foreach (Edge edge in edges)
+            target.edges = new List<Edge>();
+            foreach (Edge edge in this.edges)
             {
                 Edge clone = (Edge)edge.Clone();
                 // set corresponding source
-                if (TryGetNode(edge.Source.LinkName, out Node source))
+                if (target.TryGetNode(edge.Source.LinkName, out Node from))
                 {
-                    clone.Source = source;
+                    clone.Source = from;
                 }
                 else
                 {
                     throw new Exception("target graph does not have a node with linkname " + edge.Source.LinkName);
                 }
                 // set corresponding target
-                if (TryGetNode(edge.Target.LinkName, out Node target))
+                if (target.TryGetNode(edge.Target.LinkName, out Node to))
                 {
-                    clone.Target = target;
+                    clone.Target = to;
                 }
                 else
                 {
                     throw new Exception("target graph does not have a node with linkname " + edge.Target.LinkName);
                 }
-                result.Add(clone);
+                target.AddEdge(clone);
             }
-            return result;
         }
 
         private static void CopyHierarchy(Graph fromGraph, Graph toGraph)
