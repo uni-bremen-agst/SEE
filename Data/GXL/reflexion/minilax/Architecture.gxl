@@ -7,10 +7,16 @@
       <attr name="Source.Name">
         <string>Memory Manager</string>
       </attr>
+	  <attr name="Linkage.Name">
+        <string>Memory Manager</string>
+      </attr>
     </node>
     <node id="N3361">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
+        <string>Print AST</string>
+      </attr>
+	  <attr name="Linkage.Name">
         <string>Print AST</string>
       </attr>
     </node>
@@ -19,150 +25,225 @@
       <attr name="Source.Name">
         <string>AST2IL</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>AST2IL</string>
+      </attr>	  
     </node>
     <node id="N3363">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Optimizer</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Optimizer</string>
+      </attr>	  
     </node>
     <node id="N3364">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Error Handler</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Error Handler</string>
+      </attr>	  
     </node>
     <node id="N3365">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Constants Table</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Constants Table</string>
+      </attr>	  
     </node>
     <node id="N3366">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Main</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Main</string>
+      </attr>	  
     </node>
     <node id="N3367">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Semantic Analysis</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Semantic Analysis</string>
+      </attr>	  
     </node>
     <node id="N3368">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Parser</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Parser</string>
+      </attr>	  
     </node>
     <node id="N3369">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Scanner</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Scanner</string>
+      </attr>	  
     </node>
     <node id="N3370">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Symbol Table</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Symbol Table</string>
+      </attr>	  
     </node>
     <node id="N3371">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>IL</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>IL</string>
+      </attr>	  
     </node>
     <node id="N3372">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>AST</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>AST</string>
+      </attr>	  
     </node>
     <node id="N3373">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Middleend</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Middleend</string>
+      </attr>	  
     </node>
     <node id="N3374">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Backend</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Backend</string>
+      </attr>	  
     </node>
     <node id="N3375">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Frontend</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Frontend</string>
+      </attr>	  
     </node>
     <node id="N3376">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Compiler</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Compiler</string>
+      </attr>	  
     </node>
     <node id="N3377">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Infrastructure</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Infrastructure</string>
+      </attr>	  
     </node>
     <node id="N3378">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Macros</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Macros</string>
+      </attr>	  
     </node>
     <node id="N3379">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Global Controls</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Global Controls</string>
+      </attr>	  
     </node>
     <node id="N3380">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>AST2Code</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>AST2Code</string>
+      </attr>	  
     </node>
     <node id="N3381">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>IL2Code</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>IL2Code</string>
+      </attr>	  
     </node>
     <node id="N3382">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Machine Description</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Machine Description</string>
+      </attr>	  
     </node>
     <node id="N3383">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Type Info</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Type Info</string>
+      </attr>	  
     </node>
     <node id="N3384">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Target Program</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Target Program</string>
+      </attr>	  
     </node>
     <node id="N3385">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>AST-Main</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>AST-Main</string>
+      </attr>	  
     </node>
     <node id="N3386">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Semantic Main</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>Semantic Main</string>
+      </attr>	  
     </node>
     <edge id="E13925" from="N3381" to="N3384">
       <type xlink:href="Source_Dependency"/>
