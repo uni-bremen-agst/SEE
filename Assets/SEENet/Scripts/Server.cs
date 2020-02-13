@@ -24,16 +24,17 @@ namespace SEE.Net.Internal
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, OnIncomingPacket);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, OnIncomingPacket);
 
-            try
+            while (true) // TODO: this is only to find an error, that only occurrs in the actual build.
             {
-                Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.ServerPort), false);
-            }
-            catch (Exception e)
-            {
-#if !UNITY_EDITOR // TODO: this?
-                Application.Quit();
-#endif
-                Debug.LogException(e);
+                try
+                {
+                    Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.ServerPort), false);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
             }
         }
         public static void Update()

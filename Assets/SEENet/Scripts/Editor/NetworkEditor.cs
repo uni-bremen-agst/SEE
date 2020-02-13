@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using UnityEngine;
 
 namespace SEE.Net.Internal
 {
@@ -12,6 +13,7 @@ namespace SEE.Net.Internal
 
         public override void OnInspectorGUI()
         {
+            SerializedProperty serverIPAddress = serializedObject.FindProperty("serverIPAddress");
             SerializedProperty serverPort = serializedObject.FindProperty("serverPort");
             SerializedProperty useInOfflineMode = serializedObject.FindProperty("useInOfflineMode");
             SerializedProperty hostServer = serializedObject.FindProperty("hostServer");
@@ -24,7 +26,11 @@ namespace SEE.Net.Internal
             {
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    EditorGUILayout.LabelField("Local IPV6-Address", Network.LookupLocalIPAddress().ToString());
+                    System.Collections.Generic.List<System.Net.IPAddress> ipAddresses = Network.LookupLocalIPAddresses();
+                    foreach (System.Net.IPAddress ipAddress in ipAddresses)
+                    {
+                        EditorGUILayout.LabelField("Local IPV6-Address", ipAddress.ToString());
+                    }
                 }
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
@@ -38,6 +44,7 @@ namespace SEE.Net.Internal
                     EditorGUILayout.PropertyField(useInOfflineMode);
                     EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
                     EditorGUILayout.PropertyField(hostServer);
+                    EditorGUILayout.PropertyField(serverIPAddress, new GUIContent("Server IPAddress", "Leave empty to connect to localhost."));
                     EditorGUILayout.PropertyField(serverPort);
                     EditorGUI.EndDisabledGroup();
                 }

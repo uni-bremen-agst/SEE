@@ -19,6 +19,7 @@ namespace SEE.Net
 
         [SerializeField] private bool useInOfflineMode = true;
         [SerializeField] private bool hostServer = false;
+        [SerializeField] private string serverIPAddress = string.Empty;
         [SerializeField] private int serverPort = 55555;
 #if UNITY_EDITOR
         [SerializeField] private bool loggingEnabled = false;
@@ -69,7 +70,7 @@ namespace SEE.Net
             {
                 Server.Initialize();
             }
-            Client.Initialize();
+            Client.Initialize(serverIPAddress, serverPort);
         }
         void Update()
         {
@@ -169,21 +170,22 @@ namespace SEE.Net
                 }
             })).Start();
         }
-        public static IPAddress LookupLocalIPAddress()
+        public static List<IPAddress> LookupLocalIPAddresses()
         {
             string hostName = Dns.GetHostName(); ;
             IPHostEntry hostEntry = Dns.GetHostEntry(hostName);
             IPAddress[] addresses = hostEntry.AddressList;
+            List<IPAddress> ipAddresses = new List<IPAddress>(addresses.Length);
             for (int i = 0; i < addresses.Length; i++)
             {
                 bool isLinkLocal = addresses[i].IsIPv6LinkLocal;
                 bool isSiteLocal = addresses[i].IsIPv6SiteLocal;
                 if (!isLinkLocal && !isSiteLocal)
                 {
-                    return addresses[i];
+                    ipAddresses.Add(addresses[i]);
                 }
             }
-            return null;
+            return ipAddresses;
         }
     }
 
