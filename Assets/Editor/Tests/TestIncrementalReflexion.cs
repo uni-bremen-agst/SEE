@@ -141,9 +141,16 @@ namespace SEE.DataModel
 
         private void AssertMapped(Node implNode, Node archNode)
         {
-            Assert.AreEqual(1, mapsToEdges.Count);
-            Assert.AreEqual(implNode.LinkName, mapsToEdges[0].mapsToEdge.Source.LinkName);
-            Assert.AreEqual(archNode.LinkName, mapsToEdges[0].mapsToEdge.Target.LinkName);
+            Assert.AreEqual(1, mapsToEdgesAdded.Count);
+            Assert.AreEqual(implNode.LinkName, mapsToEdgesAdded[0].mapsToEdge.Source.LinkName);
+            Assert.AreEqual(archNode.LinkName, mapsToEdgesAdded[0].mapsToEdge.Target.LinkName);
+        }
+
+        private void AssertUnmapped(Node implNode, Node archNode)
+        {
+            Assert.AreEqual(1, mapsToEdgesRemoved.Count);
+            Assert.AreEqual(implNode.LinkName, mapsToEdgesRemoved[0].mapsToEdge.Source.LinkName);
+            Assert.AreEqual(archNode.LinkName, mapsToEdgesRemoved[0].mapsToEdge.Target.LinkName);
         }
 
         private bool IsPropagated(Node from, Node to, string edgeType)
@@ -167,7 +174,7 @@ namespace SEE.DataModel
             Assert.That(IsAbsent(edgeChanges, a[1], a[3], call));
             Assert.That(IsAbsent(edgeChanges, a[8], a[8], call));
             Assert.That(IsAbsent(edgeChanges, a[2], a[4], call));
-            Assert.AreEqual(0, mapsToEdges.Count);
+            Assert.AreEqual(0, mapsToEdgesAdded.Count);
             Assert.AreEqual(0, propagatedEdges.Count);
             Assert.AreEqual(0, removedEdges.Count);
 

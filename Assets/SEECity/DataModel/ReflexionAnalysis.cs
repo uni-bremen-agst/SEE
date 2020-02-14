@@ -133,27 +133,60 @@ namespace SEE.DataModel
     }
 
     /// <summary>
-    /// A change event fired when a Maps_To edge was added to the mapping.
+    /// A change event fired when a Maps_To edge was added to the mapping or removed from it.
     /// </summary>
-    public class MapsToEdge : ChangeEvent
+    public abstract class MapsToEdge : ChangeEvent
     {
         /// <summary>
-        /// The Maps_To edge added to the mapping.
+        /// The Maps_To edge added to the mapping or removed from it.
         /// </summary>
         public Edge mapsToEdge;
 
         /// <summary>
-        /// Constructor preserving the Maps_To edge added to the mapping.
+        /// Constructor preserving the Maps_To edge added to the mapping or removed from it.
         /// </summary>
-        /// <param name="mapsToEdge">the Maps_To edge being added</param>
+        /// <param name="mapsToEdge">the Maps_To edge being added or removed</param>
         public MapsToEdge(Edge mapsToEdge)
         {
             this.mapsToEdge = mapsToEdge;
+        }
+    }
+
+    /// <summary>
+    /// A change event fired when a Maps_To edge was added to the mapping.
+    /// </summary>
+    public class MapsToEdgeAdded : MapsToEdge
+    {
+        /// <summary>
+        /// Constructor preserving the Maps_To edge added to the mapping.
+        /// </summary>
+        /// <param name="mapsToEdge">the Maps_To edge being added</param>
+        public MapsToEdgeAdded(Edge mapsToEdge) : base(mapsToEdge)
+        {
         }
 
         public override string ToString()
         {
             return "new Maps_To edge " + mapsToEdge.ToString();
+        }
+    }
+
+    /// <summary>
+    /// A change event fired when a Maps_To edge was removed from the mapping.
+    /// </summary>
+    public class MapsToEdgeRemoved : MapsToEdge
+    {
+        /// <summary>
+        /// Constructor preserving the Maps_To edge removed from the mapping.
+        /// </summary>
+        /// <param name="mapsToEdge">the Maps_To edge being removed</param>
+        public MapsToEdgeRemoved(Edge mapsToEdge) : base(mapsToEdge)
+        {
+        }
+
+        public override string ToString()
+        {
+            return "removed Maps_To edge " + mapsToEdge.ToString();
         }
     }
 
@@ -588,7 +621,7 @@ namespace SEE.DataModel
             mapsTo.Source = from_clone;
             mapsTo.Target = to_clone;
             _mapping.AddEdge(mapsTo);
-            Notify(new MapsToEdge(mapsTo));
+            Notify(new MapsToEdgeAdded(mapsTo));
         }
         
         /// <summary>
@@ -610,7 +643,10 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// All nodes in given subtree are implicitly mapped onto given target architecture node.
+        /// All nodes in given subtree are implicitly mapped onto given target architecture node
+        /// if target != null. If target == null, all nodes in given subtree are removed from
+        /// _implicit_maps_to_table.
+        /// 
         /// Precondition: target is in the architecture graph and all nodes in subtree are in
         /// the implementation graph.
         /// </summary>
@@ -618,9 +654,19 @@ namespace SEE.DataModel
         /// <param name="target">architecture node onto which to map all nodes in subtree</param>
         private void Change_Map(List<Node> subtree, Node target)
         {
-            foreach (Node node in subtree)
+            if (target == null)
             {
-                _implicit_maps_to_table[node] = target;
+                foreach (Node node in subtree)
+                {
+                    _implicit_maps_to_table.Remove(node);
+                }
+            }
+            else
+            {
+                foreach (Node node in subtree)
+                {
+                    _implicit_maps_to_table[node] = target;
+                }
             }
         }
 
@@ -797,7 +843,97 @@ namespace SEE.DataModel
         /// <param name="edge">the Maps_To edge to be removed from the mapping graph </param>
         public void Delete_From_Mapping(Edge edge)
         {
-            throw new NotImplementedException(); // FIXME
+            Node arch_target = _architecture.GetNode(edge.Target.LinkName);
+            if (arch_target == null)
+            {
+                throw new Exception("Mapping target node " + edge.Target + " is not in the architecture.");
+            }
+            else
+            {
+                Node impl_source = _implementation.GetNode(edge.Source.LinkName);
+                if (impl_source == null)
+                {
+                    throw new Exception("Mapping source node " + edge.Source + " is not in the implementation.");
+                }
+                else
+                {
+                    Delete_Maps_To(impl_source, arch_target, edge);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reverts the effect of mapping from impl_source onto arch_target.
+        /// Precondition: impl_source is in the implementation graph, arch_target is in the architecture
+        /// graph, and maps_to is in the mapping graph, where maps_to.Source.Linkname == impl_source.Linkname
+        /// and maps_to.Target.Linkname = arch_target.Linkname.
+        /// </summary>
+        /// <param name="impl_source">source of the mapping contained in _implementation</param>
+        /// <param name="arch_target">target of the mapping contained in _architecture</param>
+        /// <param name="maps_to">the mapping of impl_source onto arch_target as represented in _mapping</param>
+        private void Delete_Maps_To(Node impl_source, Node arch_target, Edge maps_to)
+        {
+            List<Node> subtree = Mapped_Subtree(impl_source);
+            Unmap(subtree, arch_target);
+            Node impl_source_parent = impl_source.Parent;
+            Node new_target = null;
+            if (impl_source_parent != null)
+            {
+                if (_implicit_maps_to_table.TryGetValue(impl_source_parent, out new_target))
+                {
+                    Change_Map(subtree, new_target);
+                }
+                if (new_target != null)
+                {
+                    Map(subtree, new_target);
+                }
+            }
+
+            Notify(new MapsToEdgeRemoved(maps_to));
+            _mapping.RemoveEdge(maps_to);
+        }
+
+        /// <summary>
+        /// Removes the Maps_To edge between 'from' and 'to' from the mapping graph. 
+        /// Precondition: a Maps_To edge between 'from' and 'to' must be contained in the mapping graph,
+        /// 'from' is contained in implementation graph and 'to' is contained in architecture graph.
+        /// Postcondition: the edge is no longer contained in the mapping graph and the reflexion
+        ///   data are updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="from">the source of the Maps_To edge to be removed from the mapping graph </param>
+        /// <param name="to">the target of the Maps_To edge to be removed from the mapping graph </param>
+        public void Delete_From_Mapping(Node from, Node to)
+        {
+            Node map_from = _mapping.GetNode(from.LinkName);
+            if (map_from == null)
+            {
+                throw new Exception("Node " + from + " is not mapped.");
+            }
+            else
+            {
+                Node map_to = _mapping.GetNode(to.LinkName);
+                if (map_to == null)
+                {
+                    throw new Exception("Node " + to + " is no mapping target.");
+                }
+                else
+                {
+                    List<Edge> maps_to_edges = map_from.From_To(map_to, "Maps_To");
+                    if (maps_to_edges.Count == 0)
+                    {
+                        throw new Exception("There is no mapping from " + from + " onto " + to + ".");
+                    }
+                    else if (maps_to_edges.Count > 1)
+                    {
+                        throw new Exception("There are multiple mappings in between " + from + " and " + to + ".");
+                    }
+                    else
+                    {
+                        Edge maps_to_edge = maps_to_edges[0];
+                        Delete_Maps_To(from, to, maps_to_edge);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -997,7 +1133,9 @@ namespace SEE.DataModel
 
         /// <summary>
         /// The implicit mapping as derived from _explicit_maps_to_table.
-        /// Note: the mapping key is a node in implementation and the mapping value a node in architecture
+        /// Note 1: the mapping key is a node in implementation and the mapping value a node in architecture
+        /// Note 2: not every node in implementation is a key in this dictionary; node in the implementation
+        /// neither mapped explicitly nor implicitly will not be contained.
         /// </summary>
         private SerializableDictionary<Node, Node> _implicit_maps_to_table;
 
