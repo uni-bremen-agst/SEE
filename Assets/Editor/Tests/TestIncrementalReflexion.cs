@@ -169,19 +169,22 @@ namespace SEE.DataModel
             Assert.That(IsAbsent(edgeChanges, a[2], a[4], call));
             Assert.AreEqual(0, mapsToEdges.Count);
             Assert.AreEqual(0, propagatedEdges.Count);
+            Assert.AreEqual(0, removedEdges.Count);
 
             ResetEvents();
             reflexion.Add_To_Mapping(i[17], a[6]);
             Assert.AreEqual(0, edgeChanges.Count);
             Assert.AreEqual(0, propagatedEdges.Count);
             AssertMapped(i[17], a[6]);
- 
+            Assert.AreEqual(0, removedEdges.Count);
+
             ResetEvents();
             reflexion.Add_To_Mapping(i[16], a[6]);
             Assert.AreEqual(0, edgeChanges.Count);
             Assert.AreEqual(0, propagatedEdges.Count);
             AssertMapped(i[16], a[6]);
-            
+            Assert.AreEqual(0, removedEdges.Count);
+
             ResetEvents();
             reflexion.Add_To_Mapping(i[3], a[3]);
             Assert.AreEqual(2, edgeChanges.Count);
@@ -190,6 +193,7 @@ namespace SEE.DataModel
             Assert.AreEqual(1, propagatedEdges.Count);
             Assert.That(IsPropagated(a[3], a[6], call));
             AssertMapped(i[3], a[3]);
+            Assert.AreEqual(0, removedEdges.Count);
 
             ResetEvents();
             reflexion.Add_To_Mapping(i[15], a[5]);
@@ -198,6 +202,7 @@ namespace SEE.DataModel
             Assert.AreEqual(1, propagatedEdges.Count);
             Assert.That(IsPropagated(a[3], a[5], call));
             AssertMapped(i[15], a[5]);
+            Assert.AreEqual(0, removedEdges.Count);
 
             ResetEvents();
             reflexion.Add_To_Mapping(i[1], a[1]);
@@ -210,6 +215,7 @@ namespace SEE.DataModel
             Assert.That(IsConvergent(edgeChanges, a[1], a[3], call));
             Assert.That(IsAllowed   (edgeChanges, a[1], a[1], call));
             Assert.That(IsConvergent(edgeChanges, a[8], a[8], call));
+            Assert.AreEqual(0, removedEdges.Count);
 
             ResetEvents();
             reflexion.Add_To_Mapping(i[14], a[4]);
@@ -218,10 +224,10 @@ namespace SEE.DataModel
             Assert.That(IsPropagated(a[4], a[1], call));
             Assert.AreEqual(1, edgeChanges.Count);
             Assert.That(IsDivergent(edgeChanges, a[4], a[1], call));
+            Assert.AreEqual(0, removedEdges.Count);
 
             ResetEvents();
             reflexion.Add_To_Mapping(i[2], a[9]);
-            DumpEvents();
             AssertMapped(i[2], a[9]);
             Assert.AreEqual(3, propagatedEdges.Count);
             Assert.That(IsPropagated(a[9], a[3], call));
@@ -235,6 +241,17 @@ namespace SEE.DataModel
             Assert.That(IsAbsent(edgeChanges, a[8], a[8], call));
             Assert.AreEqual(2, removedEdges.Count);
 
+            ResetEvents();
+            reflexion.Add_To_Mapping(i[10], a[2]);
+            AssertMapped(i[10], a[2]);
+            Assert.AreEqual(2, propagatedEdges.Count);
+            Assert.That(IsPropagated(a[1], a[2], call));
+            Assert.That(IsPropagated(a[9], a[2], call));
+            Assert.AreEqual(3, edgeChanges.Count);
+            Assert.That(IsAllowed(edgeChanges, a[1], a[2], call));
+            Assert.That(IsDivergent(edgeChanges, a[9], a[2], call));
+            Assert.That(IsConvergent(edgeChanges, a[8], a[8], call));
+            Assert.AreEqual(0, removedEdges.Count);
         }
     }
 }
