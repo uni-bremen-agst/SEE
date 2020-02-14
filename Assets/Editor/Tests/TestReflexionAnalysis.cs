@@ -46,6 +46,10 @@ namespace SEE.DataModel
         /// </summary>
         protected List<PropagatedEdge> propagatedEdges = new List<PropagatedEdge>();
         /// <summary>
+        /// List of Maps_To edges added to the mapping.
+        /// </summary>
+        protected List<MapsToEdge> mapsToEdges = new List<MapsToEdge>();
+        /// <summary>
         /// List of edges removed for a single reflexion-analysis run.
         /// </summary>
         protected List<RemovedEdge> removedEdges = new List<RemovedEdge>();
@@ -58,6 +62,7 @@ namespace SEE.DataModel
         {
             edgeChanges     = new List<EdgeChange>();
             propagatedEdges = new List<PropagatedEdge>();
+            mapsToEdges     = new List<MapsToEdge>();
             removedEdges    = new List<RemovedEdge>();
         }
 
@@ -168,11 +173,16 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// Dumps the results collected in edgeChanges, propagatedEdges, and removedEdges
+        /// Dumps the results collected in mapsToEdges, edgeChanges, propagatedEdges, and removedEdges
         /// to standard output.
         /// </summary>
         protected void DumpEvents()
         {
+            Debug.Log("MAPS_TO EDGES ADDED TO MAPPING\n");
+            foreach (MapsToEdge e in mapsToEdges)
+            {
+                Debug.LogFormat("maps_to {0}\n", e.mapsToEdge.ToString());
+            }
             Debug.Log("DEPENDENCIES PROPAGATED TO ARCHITECTURE\n");
             foreach (PropagatedEdge e in propagatedEdges)
             {
@@ -183,7 +193,7 @@ namespace SEE.DataModel
             {
                 Debug.LogFormat("changed {0} from {1} to {2}\n", e.edge.ToString(), e.oldState, e.newState);
             }
-            Debug.Log("DEPENDENCIES REMOVED FROM ARCHITECTURE\n");
+            Debug.Log("PROPAGATED DEPENDENCIES REMOVED FROM ARCHITECTURE\n");
             foreach (RemovedEdge e in removedEdges)
             {
                 Debug.LogFormat("removed {0}\n", e.edge.ToString());
@@ -206,15 +216,16 @@ namespace SEE.DataModel
         [TearDown]
         protected virtual void Teardown()
         {
-            impl = null;
-            arch = null;
-            mapping = null;
-            reflexion = null;
+            impl              = null;
+            arch              = null;
+            mapping           = null;
+            reflexion         = null;
             HierarchicalEdges = null;
-            logger = null;
-            edgeChanges = null;
-            propagatedEdges = null;
-            removedEdges = null;
+            logger            = null;
+            edgeChanges       = null;
+            propagatedEdges   = null;
+            mapsToEdges       = null;
+            removedEdges      = null;
         }
 
         protected static Node NewNode(Graph graph, string linkname, string type = "Routine")
@@ -256,6 +267,10 @@ namespace SEE.DataModel
             else if (changeEvent is RemovedEdge)
             {
                 removedEdges.Add(changeEvent as RemovedEdge);
+            }
+            else if (changeEvent is MapsToEdge)
+            {
+                mapsToEdges.Add(changeEvent as MapsToEdge);
             }
             else
             {
