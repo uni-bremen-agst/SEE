@@ -368,7 +368,7 @@ namespace SEE.DataModel
         {
             int old_value = Get_Counter(edge);
             int new_value = old_value + value;
-            Debug.LogFormat("Change_Impl_Ref: changed counter from {0} to {1} for edge {2}\n", old_value, new_value, edge);
+            //Debug.LogFormat("Change_Impl_Ref: changed counter from {0} to {1} for edge {2}\n", old_value, new_value, edge);
             if (new_value <= 0)
             {
                 if (Get_State(edge) == State.divergent)
@@ -742,7 +742,7 @@ namespace SEE.DataModel
                 {
                     // matching specified architecture dependency found; no state change
                 }
-                Debug.LogFormat("Decreasing counter of edge {0} by {1}\n", propagated_edge.ToString(), counter);
+                //Debug.LogFormat("Decreasing counter of edge {0} by {1}\n", propagated_edge.ToString(), counter);
                 Change_Impl_Ref(propagated_edge, counter);
             }
         }
