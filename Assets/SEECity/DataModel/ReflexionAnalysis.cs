@@ -133,6 +133,31 @@ namespace SEE.DataModel
     }
 
     /// <summary>
+    /// A change event fired when a Maps_To edge was added to the mapping.
+    /// </summary>
+    public class MapsToEdge : ChangeEvent
+    {
+        /// <summary>
+        /// The Maps_To edge added to the mapping.
+        /// </summary>
+        public Edge mapsToEdge;
+
+        /// <summary>
+        /// Constructor preserving the Maps_To edge added to the mapping.
+        /// </summary>
+        /// <param name="mapsToEdge">the Maps_To edge being added</param>
+        public MapsToEdge(Edge mapsToEdge)
+        {
+            this.mapsToEdge = mapsToEdge;
+        }
+
+        public override string ToString()
+        {
+            return "new Maps_To edge " + mapsToEdge.ToString();
+        }
+    }
+
+    /// <summary>
     /// A change event fired when an edge was removed by the analysis.
     /// </summary>
     public class RemovedEdge : ChangeEvent
@@ -343,14 +368,15 @@ namespace SEE.DataModel
         {
             int old_value = Get_Counter(edge);
             int new_value = old_value + value;
-
-            if (new_value == 0)
+            Debug.LogFormat("Change_Impl_Ref: changed counter from {0} to {1} for edge {2}\n", old_value, new_value, edge);
+            if (new_value <= 0)
             {
                 if (Get_State(edge) == State.divergent)
                 {
                     Transition(edge, State.divergent, State.undefined);
                 }
                 // we can drop this edge; it is no longer needed
+                Set_Counter(edge, 0);
                 Notify(new RemovedEdge(edge));
                 _architecture.RemoveEdge(edge);
             }
@@ -528,7 +554,7 @@ namespace SEE.DataModel
                 // was 'to' mapped implicitly at all?
                 if (_implicit_maps_to_table.TryGetValue(from, out Node oldTarget))
                 {
-                    // from was actually mappéd implicitly onto oldTarget
+                    // from was actually mapped implicitly onto oldTarget
                     Unmap(subtree, oldTarget);
                 }
                 Add_To_Mapping_Graph(from, to);
@@ -562,6 +588,7 @@ namespace SEE.DataModel
             mapsTo.Source = from_clone;
             mapsTo.Target = to_clone;
             _mapping.AddEdge(mapsTo);
+            Notify(new MapsToEdge(mapsTo));
         }
         
         /// <summary>
@@ -600,10 +627,10 @@ namespace SEE.DataModel
         /// <summary>
         /// A function delegate that can be used to handle changes of the mapping by Handle_Mapped_Subtree.
         /// </summary>
-        /// <param name="e"></param>
+        /// <param name="edge"></param>
         /// <param name="from"></param>
         /// <param name="to"></param>
-        private delegate void Handle_Mapping_Change(Edge e, Node from, Node to);
+        private delegate void Handle_Mapping_Change(Edge edge, Node from, Node to);
 
         /// <summary>
         /// Handles every dependency edges (incoming as well as outgoing) of every node in given subtree
@@ -715,7 +742,8 @@ namespace SEE.DataModel
                 {
                     // matching specified architecture dependency found; no state change
                 }
-                Set_Counter(propagated_edge, counter);
+                Debug.LogFormat("Decreasing counter of edge {0} by {1}\n", propagated_edge.ToString(), counter);
+                Change_Impl_Ref(propagated_edge, counter);
             }
         }
 
@@ -1331,13 +1359,13 @@ namespace SEE.DataModel
                 //Debug.Log("a propagated dependency exists already\n");
 #endif
                 int impl_counter = Get_Impl_Counter(implementation_dep);
-                Change_Impl_Ref(propagated_architecture_dep, impl_counter);
                 // Assert: architecture_dep.Source and architecture_dep.Target are in architecture.
                 Lift(propagated_architecture_dep.Source,
                      propagated_architecture_dep.Target,
                      impl_type,
                      impl_counter, 
                      out allowing_edge);
+                Change_Impl_Ref(propagated_architecture_dep, impl_counter);
             }
             // keep a trace of dependency propagation
             //causing.insert(std::pair<Edge*, Edge*>
