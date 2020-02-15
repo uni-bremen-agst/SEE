@@ -101,6 +101,28 @@ namespace SEE.DataModel
     }
 
     /// <summary>
+    /// A change event fired when an implementation dependency was either propagated to
+    /// the architecture or unpropagated from the architecture.
+    /// </summary>
+    public abstract class PropagatedEdge : ChangeEvent
+    {
+        /// <summary>
+        /// The implementation dependency propagated from the implementation to the architecture.
+        /// </summary>
+        public Edge propagatedEdge;
+
+        /// <summary>
+        /// Constructor preserving the implementation dependency that is or was
+        /// propagated to the architecture graph.
+        /// </summary>
+        /// <param name="propagatedEdge">the propagated edge</param>
+        public PropagatedEdge(Edge propagatedEdge)
+        {
+            this.propagatedEdge = propagatedEdge;
+        }
+    }
+
+    /// <summary>
     /// A change event fired when an implementation dependency was propagated to
     /// the architecture.
     /// 
@@ -109,26 +131,39 @@ namespace SEE.DataModel
     /// a propagated edge in the architecture, this existing edge is re-used and only 
     /// its counter is updated.
     /// </summary>
-    public class PropagatedEdge : ChangeEvent
+    public class PropagatedEdgeAdded : PropagatedEdge
     {
-        /// <summary>
-        /// The implementation dependency propagated from the implementation to the architecture.
-        /// </summary>
-        public Edge propagatedEdge;
-
         /// <summary>
         /// Constructor preserving the implementation dependency propagated from the 
         /// implementation to the architecture.
         /// </summary>
         /// <param name="propagatedEdge">the propagated edge</param>
-        public PropagatedEdge(Edge propagatedEdge)
+        public PropagatedEdgeAdded(Edge propagatedEdge) : base(propagatedEdge)
         {
-            this.propagatedEdge = propagatedEdge;
         }
 
         public override string ToString()
         {
             return "new propagated edge " + propagatedEdge.ToString();
+        }
+    }
+
+    /// <summary>
+    /// A change event fired when a propagated dependency edge was removed from the architecture.
+    /// </summary>
+    public class PropagatedEdgeRemoved : PropagatedEdge
+    {
+        /// <summary>
+        /// Constructor passing on the edge to be removed.
+        /// </summary>
+        /// <param name="propagatedEdge">edge to be removed</param>
+        public PropagatedEdgeRemoved(Edge propagatedEdge) : base(propagatedEdge)
+        {
+        }
+
+        public override string ToString()
+        {
+            return "unpropagated edge " + propagatedEdge.ToString();
         }
     }
 
@@ -187,33 +222,6 @@ namespace SEE.DataModel
         public override string ToString()
         {
             return "removed Maps_To edge " + mapsToEdge.ToString();
-        }
-    }
-
-    /// <summary>
-    /// A change event fired when an edge was removed by the analysis.
-    /// </summary>
-    public class RemovedEdge : ChangeEvent
-    {
-        /// <summary>
-        /// The edge being removed. It still exists in the graph until all observers 
-        /// have been notified. But then it will be removed from the graph it is 
-        /// contained in. An observer can fullfil his last wishes with it.
-        /// </summary>
-        public Edge edge;
-
-        /// <summary>
-        /// Constructor passing on the edge to be removed.
-        /// </summary>
-        /// <param name="edge">edge to be removed</param>
-        public RemovedEdge(Edge edge)
-        {
-            this.edge = edge;
-        }
-
-        public override string ToString()
-        {
-            return "removed edge " + edge.ToString();
         }
     }
 
@@ -404,13 +412,18 @@ namespace SEE.DataModel
             //Debug.LogFormat("Change_Impl_Ref: changed counter from {0} to {1} for edge {2}\n", old_value, new_value, edge);
             if (new_value <= 0)
             {
+                /*
                 if (Get_State(edge) == State.divergent)
                 {
                     Transition(edge, State.divergent, State.undefined);
                 }
-                // we can drop this edge; it is no longer needed
+                */
+                // We can drop this edge; it is no longer needed. Because the edge is 
+                // dropped and all observers are informed about the removal of this
+                // edge, we do not need to inform them about its state change from
+                // divergent/allowed/implicitly_allowed to undefined.
                 Set_Counter(edge, 0);
-                Notify(new RemovedEdge(edge));
+                Notify(new PropagatedEdgeRemoved(edge));
                 _architecture.RemoveEdge(edge);
             }
             else
@@ -782,14 +795,17 @@ namespace SEE.DataModel
             if (from != null && to != null)
             {
                 Edge propagated_edge = Get_Propagated_Dependency(from, to, implementation_dependency.Type);
-                // FIXME: could propagated_edge be null?
-                int counter = -Get_Impl_Counter(implementation_dependency);
-                if (Lift(propagated_edge.Source, propagated_edge.Target, propagated_edge.Type, counter, out Edge allowing_edge))
+                // It can happen that one of the edges end is not mapped, hence, no edge was propagated.
+                if (propagated_edge != null)
                 {
-                    // matching specified architecture dependency found; no state change
+                    int counter = -Get_Impl_Counter(implementation_dependency);
+                    if (Lift(propagated_edge.Source, propagated_edge.Target, propagated_edge.Type, counter, out Edge allowing_edge))
+                    {
+                        // matching specified architecture dependency found; no state change
+                    }
+                    //Debug.LogFormat("Decreasing counter of edge {0} by {1}\n", propagated_edge.ToString(), counter);
+                    Change_Impl_Ref(propagated_edge, counter);
                 }
-                //Debug.LogFormat("Decreasing counter of edge {0} by {1}\n", propagated_edge.ToString(), counter);
-                Change_Impl_Ref(propagated_edge, counter);
             }
         }
 
@@ -840,9 +856,10 @@ namespace SEE.DataModel
         /// Postcondition: edge is no longer contained in the mapping graph and the reflexion
         ///   data are updated; all observers are informed of the change.
         /// </summary>
-        /// <param name="edge">the Maps_To edge to be removed from the mapping graph </param>
+        /// <param name="edge">the Maps_To edge to be removed from the mapping graph</param>
         public void Delete_From_Mapping(Edge edge)
         {
+            // The mapping target in the architecture graph.
             Node arch_target = _architecture.GetNode(edge.Target.LinkName);
             if (arch_target == null)
             {
@@ -850,6 +867,7 @@ namespace SEE.DataModel
             }
             else
             {
+                // The mapping source in the implementation graph.
                 Node impl_source = _implementation.GetNode(edge.Source.LinkName);
                 if (impl_source == null)
                 {
@@ -864,46 +882,79 @@ namespace SEE.DataModel
 
         /// <summary>
         /// Reverts the effect of mapping from impl_source onto arch_target.
-        /// Precondition: impl_source is in the implementation graph, arch_target is in the architecture
+        /// Precondition: impl_source is in the implementation graph and is a mapper, arch_target is in the architecture
         /// graph, and maps_to is in the mapping graph, where maps_to.Source.Linkname == impl_source.Linkname
         /// and maps_to.Target.Linkname = arch_target.Linkname.
+        /// Postconditions: 
+        /// (1) <paramref name="maps_to"/> is removed from _mapping
+        /// (2) <paramref name="impl_source"/> is removed from _explicit_mapping
+        /// (3) all nodes in the mapped subtree rooted by <paramref name="impl_source"/> are first unmapped
+        /// and then -- if <paramref name="impl_source"/> has a mapped parent -- mapped onto the same target
+        /// as the mapped parent of <paramref name="impl_source"/>; _implicit_mapping is adjusted accordingly
+        /// (4) all other reflexion data are adjusted and all observers are notified
         /// </summary>
         /// <param name="impl_source">source of the mapping contained in _implementation</param>
         /// <param name="arch_target">target of the mapping contained in _architecture</param>
         /// <param name="maps_to">the mapping of impl_source onto arch_target as represented in _mapping</param>
         private void Delete_Maps_To(Node impl_source, Node arch_target, Edge maps_to)
         {
-            List<Node> subtree = Mapped_Subtree(impl_source);
-            Unmap(subtree, arch_target);
-            Node impl_source_parent = impl_source.Parent;
-            Node new_target = null;
-            if (impl_source_parent != null)
+            if (!Is_Mapper(impl_source))
             {
-                if (_implicit_maps_to_table.TryGetValue(impl_source_parent, out new_target))
-                {
-                    Change_Map(subtree, new_target);
-                }
-                if (new_target != null)
-                {
-                    Map(subtree, new_target);
-                }
+                throw new Exception("Implementation node " + impl_source + " is not mapped explicitly.");
             }
-
-            Notify(new MapsToEdgeRemoved(maps_to));
-            _mapping.RemoveEdge(maps_to);
+            else if (!_explicit_maps_to_table.Remove(impl_source))
+            {
+                throw new Exception("Implementation node " + impl_source + " is not mapped explicitly.");
+            }
+            else
+            {
+                // All nodes in the subtree rooted by impl_source and mapped onto the same target as impl_source.
+                List<Node> subtree = Mapped_Subtree(impl_source);
+                Unmap(subtree, arch_target);
+                Node impl_source_parent = impl_source.Parent;
+                if (impl_source_parent == null)
+                {
+                    // If impl_source has no parent, all nodes in subtree are not mapped at all any longer.
+                    Change_Map(subtree, null);
+                }
+                else
+                {
+                    // If impl_source has a parent, all nodes in subtree should be mapped onto
+                    // the architecture node onto which the parent is mapped -- if the parent
+                    // is mapped at all (implicitly or explicitly).
+                    if (_implicit_maps_to_table.TryGetValue(impl_source_parent, out Node new_target))
+                    {
+                        // new_target is the architecture node onto which the parent of impl_source is mapped.
+                        Change_Map(subtree, new_target);
+                    }
+                    if (new_target != null)
+                    {
+                        Map(subtree, new_target);
+                    }
+                }
+                // When an edge is removed from the graph, its source and target and graph containment are
+                // deleted.
+                Notify(new MapsToEdgeRemoved(maps_to));
+                _mapping.RemoveEdge(maps_to);
+            }
         }
 
         /// <summary>
-        /// Removes the Maps_To edge between 'from' and 'to' from the mapping graph. 
+        /// Removes the Maps_To edge between 'from' and 'to' from the mapping graph (more precisely,
+        /// the nodes corresponding to <paramref name="from"/> and <paramref name="to"/> in the
+        /// mapping graph; where two nodes correspond if they have the same Linkage.Name). 
         /// Precondition: a Maps_To edge between 'from' and 'to' must be contained in the mapping graph,
-        /// 'from' is contained in implementation graph and 'to' is contained in architecture graph.
+        /// 'from' is contained in implementation graph and 'to' is contained in the architecture graph.
         /// Postcondition: the edge is no longer contained in the mapping graph and the reflexion
         ///   data are updated; all observers are informed of the change.
         /// </summary>
-        /// <param name="from">the source of the Maps_To edge to be removed from the mapping graph </param>
-        /// <param name="to">the target of the Maps_To edge to be removed from the mapping graph </param>
+        /// <param name="from">the source (contained in implementation graph) of the Maps_To edge 
+        /// to be removed from the mapping graph </param>
+        /// <param name="to">the target (contained in the architecture graph) of the Maps_To edge 
+        /// to be removed from the mapping graph </param>
         public void Delete_From_Mapping(Node from, Node to)
         {
+            // The node corresponding to 'from' in the mapping.
             Node map_from = _mapping.GetNode(from.LinkName);
             if (map_from == null)
             {
@@ -911,6 +962,7 @@ namespace SEE.DataModel
             }
             else
             {
+                // The node corresponding to 'to' in the mapping.
                 Node map_to = _mapping.GetNode(to.LinkName);
                 if (map_to == null)
                 {
@@ -918,6 +970,8 @@ namespace SEE.DataModel
                 }
                 else
                 {
+                    // The maps_to edges in between from map_from to map_to. There should be
+                    // exactly one such edge.
                     List<Edge> maps_to_edges = map_from.From_To(map_to, "Maps_To");
                     if (maps_to_edges.Count == 0)
                     {
@@ -1323,7 +1377,7 @@ namespace SEE.DataModel
                     default:
                         // The edge is a left-over from a previous analysis and should be
                         // removed. Before we actually do that, we need to notify all observers.
-                        Notify(new RemovedEdge(edge));
+                        Notify(new PropagatedEdgeRemoved(edge));
                         toBeRemoved.Add(edge);
                         break;
                 }
@@ -1662,7 +1716,7 @@ namespace SEE.DataModel
             // architecture_dep is a dependency propagated from the implementation onto the architecture;
             // it was just created and, hence, has no state yet (which means it is State.undefined);
             // because it has just come into existence, we need to let our observers know about it
-            Notify(new PropagatedEdge(propagated_architecture_dep));
+            Notify(new PropagatedEdgeAdded(propagated_architecture_dep));
 
             if (Lift(arch_source, arch_target, edge_type, counter, out allowing_edge_out))
             {
