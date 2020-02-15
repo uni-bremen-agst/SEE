@@ -20,37 +20,218 @@ namespace SEE.DataModel
         [SerializeField]
         private List<Edge> edges = new List<Edge>();
 
+        // The (view) name of the graph.
+        [SerializeField]
+        private string viewName = "";
+
+        // The path of the file from which this graph was loaded. Could be the
+        /// empty string if the graph was not created by loading it from disk.
+        [SerializeField]
+        private string path = "";
+
         /// Adds a node to the graph. 
         /// Preconditions:
         ///   (1) node must not be null
         ///   (2) node.Linkname must be defined.
         ///   (3) a node with node.Linkname must not have been added before
+        ///   (4) node must not be contained in another graph
         /// </summary>
         /// <param name="node"></param>
         public void AddNode(Node node)
         {
-            if (node == null)
+            if (ReferenceEquals(node, null))
+            {
+                throw new Exception("node must not be null");
+            }
+            else if (String.IsNullOrEmpty(node.LinkName))
+            {
+                throw new Exception("linkname of a node must neither be null nor empty");
+            }
+            else if (nodes.ContainsKey(node.LinkName))
+            {
+                throw new Exception("linknames must be unique");
+            }
+            else if (!ReferenceEquals(node.ItsGraph, null))
+            {
+                throw new Exception("node " + node.ToString() + " is already in a graph " + node.ItsGraph.Name);
+            }
+            else
+            {
+                nodes[node.LinkName] = node;
+                node.ItsGraph = this;
+            }
+        }
+
+        /// <summary>
+        /// Removes the given node from the graph. Its incoming and outgoing edges are removed,
+        /// along with it.
+        /// 
+        /// Precondition: node must not be null and must be contained in this graph.
+        /// </summary>
+        /// <param name="node">node to be removed</param>
+        public void RemoveNode(Node node)
+        {
+            if (ReferenceEquals(node, null))
             {
                 throw new System.Exception("node must not be null");
             }
-            if (String.IsNullOrEmpty(node.LinkName))
+            else if (node.ItsGraph != this)
+            {
+                if (ReferenceEquals(node.ItsGraph, null))
+                {
+                    throw new Exception("node " + node.ToString() + " is not contained in any graph");
+                }
+                else
+                {
+                    throw new Exception("node " + node.ToString() + " is contained in a different graph " + node.ItsGraph.Name);
+                }
+            }
+            else
+            {
+                if (nodes.Remove(node.LinkName))
+                {
+                    // the edges of node are stored in the node's data structure as well as
+                    // in the node's neighbor's data structure
+                    foreach (Edge outgoing in node.Outgoings)
+                    {
+                        Node successor = outgoing.Target;
+                        successor.RemoveIncoming(outgoing);
+                        edges.Remove(outgoing);
+                    }
+                    foreach (Edge incoming in node.Incomings)
+                    {
+                        Node predecessor = incoming.Source;
+                        predecessor.RemoveOutgoing(incoming);
+                        edges.Remove(incoming);
+                    }
+                    node.RemoveAllEdges();
+                }
+                else
+                {
+                    throw new Exception("node " + node.ToString() + " is not contained in this graph " + Name);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns true if this graph contains a node with the same unique linkname
+        /// as the given node.
+        /// Throws an exception if node is null or node has no valid linkname.
+        /// </summary>
+        /// <param name="node">node to be checked for containment</param>
+        /// <returns>true iff there is a node contained in the graph with node.LinkName</returns>
+        public bool Contains(Node node)
+        {
+            if (ReferenceEquals(node, null))
+            {
+                throw new System.Exception("node must not be null");
+            }
+            else if (String.IsNullOrEmpty(node.LinkName))
             {
                 throw new System.Exception("linkname of a node must neither be null nor empty");
             }
-            if (nodes.ContainsKey(node.LinkName))
+            else
             {
-                throw new System.Exception("linknames must be unique");
+                return nodes.ContainsKey(node.LinkName);
             }
-            nodes[node.LinkName] = node;
+        }
+
+        /// <summary>
+        /// Returns the node with the given unique linkname if it exists; otherwise null.
+        /// </summary>
+        /// <param name="linkname">unique linkname</param>
+        /// <returns>node with the given unique linkname if it exists; otherwise null</returns>
+        public Node GetNode(string linkname)
+        {
+            if (String.IsNullOrEmpty(linkname))
+            {
+                throw new System.Exception("linkname must neither be null nor empty");
+            }
+            else if (nodes.TryGetValue(linkname, out Node node))
+            {
+                return node;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
         /// Adds a non-hierarchical edge to the graph.
-        /// Precondition: edge must not be null.
+        /// Preconditions: 
+        /// (1) edge must not be null.
+        /// (2) its source and target nodes must be in the graph already
+        /// (3) the edge must not be in any other graph
         /// </summary>
         public void AddEdge(Edge edge)
         {
-            edges.Add(edge);
+            if (ReferenceEquals(edge, null))
+            {
+                throw new Exception("edge must not be null");
+            }
+            else if (ReferenceEquals(edge.Source, null) || ReferenceEquals(edge.Target, null))
+            {
+                throw new Exception("source/target of this node is null");
+            }
+            else if (ReferenceEquals(edge.ItsGraph, null))
+            {
+                if (edge.Source.ItsGraph != this)
+                {
+                    throw new Exception("source node " + edge.Source.ToString() + " is not in the graph");
+                }
+                else if (edge.Target.ItsGraph != this)
+                {
+                    throw new Exception("target node " + edge.Target.ToString() + " is not in the graph");
+                }
+                else
+                {
+                    edge.ItsGraph = this;
+                    edges.Add(edge);
+                    edge.Source.AddOutgoing(edge);
+                    edge.Target.AddIncoming(edge);
+                }
+            }
+            else
+            {
+                throw new Exception("edge " + edge.ToString() + " is already in a graph " + edge.ItsGraph.Name);
+            }
+        }
+
+        /// <summary>
+        /// Removes the given edge from the graph.
+        /// </summary>
+        /// <param name="edge">edge to be removed</param>
+        public void RemoveEdge(Edge edge)
+        {
+            if (ReferenceEquals(edge, null))
+            {
+                throw new Exception("edge must not be null");
+            }
+            else if (edge.ItsGraph != this)
+            {
+                if (ReferenceEquals(edge.ItsGraph, null))
+                {
+                    throw new Exception("edge " + edge.ToString() + " is not contained in any graph");
+                }
+                else
+                {
+                    throw new Exception("edge " + edge.ToString() + " is contained in a different graph " + edge.ItsGraph.Name);
+                }
+            }
+            else
+            {
+                if (!edges.Remove(edge))
+                {
+                    throw new Exception("edge " + edge.ToString() + " is not contained in graph " + Name);
+                }
+                else
+                {
+                    edge.Source.RemoveOutgoing(edge);
+                    edge.Target.RemoveIncoming(edge);
+                    edge.ItsGraph = null;
+                }
+            }
         }
 
         /// <summary>
@@ -63,14 +244,6 @@ namespace SEE.DataModel
         /// </summary>
         public int EdgeCount => edges.Count;
 
-        //private void Awake()
-        //{
-        //    Debug.Log("Graph " + name + " with " + NodeCount + " nodes and " + EdgeCount + " edges.\n");
-        //}
-
-        [SerializeField]
-        private string viewName = "";
-
         /// <summary>
         /// Name of the graph (the view name of the underlying RFG).
         /// </summary>
@@ -80,12 +253,9 @@ namespace SEE.DataModel
             set => viewName = value;
         }
 
-        [SerializeField]
-        private string path = "";
-
         /// <summary>
         /// The path of the file from which this graph was loaded. Could be the
-        /// empty string if the graph was created by loading it from disk.
+        /// empty string if the graph was not created by loading it from disk.
         /// </summary>
         public string Path
         {
@@ -142,15 +312,6 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// Returns the game object representing the graph in the scene.
-        /// </summary>
-        /// <returns>game object representing the graph in the scene</returns>
-        //public GameObject GetGraph()
-        //{
-        //    return this.gameObject;
-        //}
-
-        /// <summary>
         /// Dumps the hierarchy for each root. Used for debugging.
         /// </summary>
         internal void DumpTree()
@@ -194,20 +355,8 @@ namespace SEE.DataModel
         /// </summary>
         public void Destroy()
         {
-            // FIXME
-            //foreach (Edge edge in edges)
-            //{
-            //    Destroyer.DestroyGameObject(edge.gameObject);
-            //}
             edges.Clear();
-            // FIXME
-            //foreach (Node node in nodes.Values)
-            //{
-            //    Destroyer.DestroyGameObject(node.gameObject);
-            //}
             nodes.Clear();
-            // FIXME
-            //Destroyer.DestroyGameObject(this.gameObject);
         }
 
         /// <summary>
@@ -306,6 +455,105 @@ namespace SEE.DataModel
             foreach (Node root in GetRoots())
             {
                 root.SetLevel(0);
+            }
+        }
+
+        /// <summary>
+        /// Creates deep copies of attributes where necessary. Is called by
+        /// Clone() once the copy is created. Must be extended by every 
+        /// subclass that adds fields that should be cloned, too.
+        /// 
+        /// IMPORTANT NOTE: Cloning a graph means to create deep copies of
+        /// its node and children, too. The hierarchy will be isomporph.
+        /// </summary>
+        /// <param name="clone">the clone receiving the copied attributes</param>
+        protected override void HandleCloned(object clone)
+        {
+            base.HandleCloned(clone);
+            Graph target = (Graph)clone;
+            target.viewName = this.viewName;
+            target.path = this.path;
+            CopyNodesTo(target);
+            CopyEdgesTo(target);
+            CopyHierarchy(this, target);
+        }
+
+        private void CopyNodesTo(Graph target)
+        {
+            target.nodes = new StringNodeDictionary();
+            foreach (var entry in this.nodes)
+            {
+                Node node = (Node)entry.Value.Clone();
+                target.AddNode(node);
+            }
+        }
+
+        private void CopyEdgesTo(Graph target)
+        {
+            target.edges = new List<Edge>();
+            foreach (Edge edge in this.edges)
+            {
+                Edge clone = (Edge)edge.Clone();
+                // set corresponding source
+                if (target.TryGetNode(edge.Source.LinkName, out Node from))
+                {
+                    clone.Source = from;
+                }
+                else
+                {
+                    throw new Exception("target graph does not have a node with linkname " + edge.Source.LinkName);
+                }
+                // set corresponding target
+                if (target.TryGetNode(edge.Target.LinkName, out Node to))
+                {
+                    clone.Target = to;
+                }
+                else
+                {
+                    throw new Exception("target graph does not have a node with linkname " + edge.Target.LinkName);
+                }
+                target.AddEdge(clone);
+            }
+        }
+
+        private static void CopyHierarchy(Graph fromGraph, Graph toGraph)
+        {
+            foreach (Node fromRoot in fromGraph.GetRoots())
+            {
+                if (toGraph.TryGetNode(fromRoot.LinkName, out Node toRoot))
+                {
+                    CopyHierarchy(fromRoot, toRoot, toGraph);
+                }
+                else
+                {
+                    throw new Exception("target graph does not have a node with linkname " + fromRoot.LinkName);
+                }
+            }
+            toGraph.CalculateLevels();
+        }
+
+        /// <summary>
+        /// Adds the children to toParent corresponding to the children of fromParent in toGraph.
+        /// </summary>
+        /// <param name="fromParent">a parent node in the original graph</param>
+        /// <param name="toParent">a parent node in copied graph (toGraph) whose children are to be added</param>
+        /// <param name="toGraph">the graph copy containing toParent and its children</param>
+        private static void CopyHierarchy(Node fromParent, Node toParent, Graph toGraph)
+        {
+            foreach (Node fromChild in fromParent.Children())
+            {
+                // Get the node in toGraph corresponding to fromChild.
+                if (toGraph.TryGetNode(fromChild.LinkName, out Node toChild))
+                {
+                    // fromChild is a parent of fromParent and
+                    // toChild must become a child of toParent
+                    toParent.AddChild(toChild);
+                    CopyHierarchy(fromChild, toChild, toGraph);
+                }
+                else
+                {
+                    throw new Exception("target graph does not have a node with linkname " + fromChild.LinkName);
+                }
             }
         }
     }

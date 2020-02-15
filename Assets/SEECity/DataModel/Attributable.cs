@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.DataModel
@@ -26,7 +28,7 @@ namespace SEE.DataModel
     /// Specifies and implements attributable objects with named toggle, int, float, and string attributes.
     /// </summary>
     [System.Serializable]
-    public abstract class Attributable //: MonoBehaviour
+    public abstract class Attributable : ICloneable
     {
         /// <summary>
         /// The set of toggle attributes. A toggle is set if it is contained in this
@@ -165,6 +167,41 @@ namespace SEE.DataModel
                 result += " \"" + attr.Key + "\": " + attr.Value + ",\n";
             }
             return result;
+        }
+
+        /// <summary>
+        /// Returns a deep clone of this attributable. Deep means that the list
+        /// of attributes of this attributable are copied, too.
+        /// </summary>
+        /// <returns>deep clone</returns>
+        public virtual object Clone()
+        {
+            var clone = (Attributable)this.MemberwiseClone();
+            HandleCloned(clone);
+            return clone;
+        }
+
+        /// <summary>
+        /// Creates deep copies of attributes where necessary. Is called by
+        /// Clone() once the copy is created. Must be extended by every 
+        /// subclass that adds fields that should be cloned, too.
+        /// </summary>
+        /// <param name="clone">the clone receiving the copied attributes</param>
+        protected virtual void HandleCloned(object clone)
+        {
+            Attributable target = (Attributable)clone;
+            // deep copies of the attributes
+            target.toggleAttributes = this.toggleAttributes.ToList();
+            // must be newly created and assigned because MemberwiseClone() creates a shallow
+            // copy in which those attributes will all refer to the dictionaries of the original 
+            // attributable
+            target.stringAttributes = new StringStringDictionary();
+            target.floatAttributes = new StringFloatDictionary();
+            target.intAttributes = new StringIntDictionary();
+            // now we can copy the correspondings attribute values in all lists
+            target.stringAttributes.CopyFrom(this.stringAttributes);
+            target.floatAttributes.CopyFrom(this.floatAttributes);
+            target.intAttributes.CopyFrom(this.intAttributes);
         }
     }
 }
