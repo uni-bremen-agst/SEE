@@ -136,7 +136,7 @@ namespace SEE.DataModel
             {
                 IXmlLineInfo xmlInfo = (IXmlLineInfo)reader;
                 int lineNumber = xmlInfo.LineNumber - 1;
-                logger.LogError(filename + ":" + lineNumber + ": " + message);
+                logger.LogError(filename + ":" + lineNumber + ": " + message + "\n");
             }
         }
 

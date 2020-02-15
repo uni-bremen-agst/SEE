@@ -246,8 +246,8 @@ namespace SEE.Layout
                 result.x += size.x + padding;
                 result.y += size.z + padding;
             }
-            Debug.LogFormat("x={0} y={1}\n", result.x, result.y);
-            Debug.Assert(result.x != result.y);
+            //Debug.LogFormat("x={0} y={1}\n", result.x, result.y);
+            //Debug.Assert(result.x != result.y);  // FIXME: Why this assertion?
             return result;
         }
     }
