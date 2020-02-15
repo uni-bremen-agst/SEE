@@ -40,11 +40,17 @@ namespace SEE.DataModel
         /// List of edges changed for a single reflexion-analysis run.
         /// </summary>
         protected List<EdgeChange> edgeChanges = new List<EdgeChange>();
+
         /// <summary>
         /// List of edges propagated from the implementation onto the architecture for 
         /// a single reflexion-analysis run.
         /// </summary>
-        protected List<PropagatedEdge> propagatedEdges = new List<PropagatedEdge>();
+        protected List<PropagatedEdge> propagatedEdgesAdded = new List<PropagatedEdge>();
+        /// <summary>
+        /// List of propagated dependency edges removed from the reflexion result.
+        /// </summary>
+        protected List<PropagatedEdge> propagatedEdgesRemoved = new List<PropagatedEdge>();
+
         /// <summary>
         /// List of Maps_To edges added to the mapping.
         /// </summary>
@@ -53,10 +59,6 @@ namespace SEE.DataModel
         /// List of Maps_To edges removed from the mapping.
         /// </summary>
         protected List<MapsToEdgeRemoved> mapsToEdgesRemoved = new List<MapsToEdgeRemoved>();
-        /// <summary>
-        /// List of propagated dependency edges removed from the reflexion result.
-        /// </summary>
-        protected List<RemovedEdge> removedEdges = new List<RemovedEdge>();
 
         /// <summary>
         /// Re-sets the event chaches edgeChanges, propagatedEdges, and removedEdges to
@@ -64,11 +66,11 @@ namespace SEE.DataModel
         /// </summary>
         protected void ResetEvents()
         {
-            edgeChanges        = new List<EdgeChange>();
-            propagatedEdges    = new List<PropagatedEdge>();
-            mapsToEdgesAdded   = new List<MapsToEdgeAdded>();
-            mapsToEdgesRemoved = new List<MapsToEdgeRemoved>(); 
-            removedEdges       = new List<RemovedEdge>();
+            edgeChanges            = new List<EdgeChange>();
+            propagatedEdgesAdded   = new List<PropagatedEdge>();
+            propagatedEdgesRemoved = new List<PropagatedEdge>();
+            mapsToEdgesAdded       = new List<MapsToEdgeAdded>();
+            mapsToEdgesRemoved     = new List<MapsToEdgeRemoved>(); 
         }
 
         /// <summary>
@@ -178,6 +180,54 @@ namespace SEE.DataModel
         }
 
         /// <summary>
+        /// Returns true if an edge from <paramref name="from"/> to <paramref name="to"/> with given <paramref name="edgeType"/>
+        /// has been propagated to the architecture graph.
+        /// </summary>
+        /// <param name="from">source of the propagated edge</param>
+        /// <param name="to">target of the propagated edge</param>
+        /// <param name="edgeType">type of the propagated edge</param>
+        /// <returns>true if such an edge is contained in propagatedEdgesAdded</returns>
+        protected bool IsPropagated(Node from, Node to, string edgeType)
+        {
+            return IsContained(from, to, edgeType, propagatedEdgesAdded);
+        }
+
+        /// <summary>
+        /// Returns true if an edge from <paramref name="from"/> to <paramref name="to"/> with given <paramref name="edgeType"/>
+        /// has been unpropagated from the architecture graph.
+        /// </summary>
+        /// <param name="from">source of the unpropagated edge</param>
+        /// <param name="to">target of the unpropagated edge</param>
+        /// <param name="edgeType">type of the unpropagated edge</param>
+        /// <returns>true if such an edge is contained in propagatedEdgesRemoved</returns>
+        protected bool IsUnpropagated(Node from, Node to, string edgeType)
+        {
+            return IsContained(from, to, edgeType, propagatedEdgesRemoved);
+        }
+
+        /// <summary>
+        /// Returns true if an edge from <paramref name="from"/> to <paramref name="to"/> with given <paramref name="edgeType"/>
+        /// is contained in <paramref name="propagatedEdges"/>.
+        /// </summary>
+        /// <param name="from">source of the propagated edge</param>
+        /// <param name="to">target of the propagated edge</param>
+        /// <param name="edgeType">type of the propagated edge</param>
+        /// <returns>true if such an edge is contained in <paramref name="propagatedEdges"/></returns>
+        protected bool IsContained(Node from, Node to, string edgeType, List<PropagatedEdge> propagatedEdges)
+        {
+            foreach (PropagatedEdge edge in propagatedEdges)
+            {
+                if (from.LinkName == edge.propagatedEdge.Source.LinkName
+                    && to.LinkName == edge.propagatedEdge.Target.LinkName
+                    && edgeType == edge.propagatedEdge.Type)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Dumps the results collected in mapsToEdges, edgeChanges, propagatedEdges, and removedEdges
         /// to standard output.
         /// </summary>
@@ -193,21 +243,24 @@ namespace SEE.DataModel
             {
                 Debug.LogFormat("maps_to {0}\n", e.mapsToEdge.ToString());
             }
+
             Debug.Log("DEPENDENCIES PROPAGATED TO ARCHITECTURE\n");
-            foreach (PropagatedEdge e in propagatedEdges)
+            foreach (PropagatedEdgeAdded e in propagatedEdgesAdded)
             {
                 Debug.LogFormat("propagated {0}\n", e.propagatedEdge.ToString());
             }
+            Debug.Log("PROPAGATED DEPENDENCIES REMOVED FROM ARCHITECTURE\n");
+            foreach (PropagatedEdgeRemoved e in propagatedEdgesRemoved)
+            {
+                Debug.LogFormat("removed {0}\n", e.propagatedEdge.ToString());
+            }
+
             Debug.Log("DEPENDENCIES CHANGED IN ARCHITECTURE\n");
             foreach (EdgeChange e in edgeChanges)
             {
                 Debug.LogFormat("changed {0} from {1} to {2}\n", e.edge.ToString(), e.oldState, e.newState);
             }
-            Debug.Log("PROPAGATED DEPENDENCIES REMOVED FROM ARCHITECTURE\n");
-            foreach (RemovedEdge e in removedEdges)
-            {
-                Debug.LogFormat("removed {0}\n", e.edge.ToString());
-            }
+
         }
 
         /// <summary>
@@ -226,17 +279,17 @@ namespace SEE.DataModel
         [TearDown]
         protected virtual void Teardown()
         {
-            impl               = null;
-            arch               = null;
-            mapping            = null;
-            reflexion          = null;
-            HierarchicalEdges  = null;
-            logger             = null;
-            edgeChanges        = null;
-            propagatedEdges    = null;
-            mapsToEdgesAdded   = null;
-            mapsToEdgesRemoved = null;
-            removedEdges       = null;
+            impl                   = null;
+            arch                   = null;
+            mapping                = null;
+            reflexion              = null;
+            HierarchicalEdges      = null;
+            logger                 = null;
+            edgeChanges            = null;
+            propagatedEdgesAdded   = null;
+            mapsToEdgesAdded       = null;
+            mapsToEdgesRemoved     = null;
+            propagatedEdgesRemoved = null;
         }
 
         protected static Node NewNode(Graph graph, string linkname, string type = "Routine")
@@ -271,13 +324,13 @@ namespace SEE.DataModel
             {
                 edgeChanges.Add(changeEvent as EdgeChange);
             }
-            else if (changeEvent is PropagatedEdge)
+            else if (changeEvent is PropagatedEdgeAdded)
             {
-                propagatedEdges.Add(changeEvent as PropagatedEdge);
+                propagatedEdgesAdded.Add(changeEvent as PropagatedEdgeAdded);
             }
-            else if (changeEvent is RemovedEdge)
+            else if (changeEvent is PropagatedEdgeRemoved)
             {
-                removedEdges.Add(changeEvent as RemovedEdge);
+                propagatedEdgesRemoved.Add(changeEvent as PropagatedEdgeRemoved);
             }
             else if (changeEvent is MapsToEdgeAdded)
             {
