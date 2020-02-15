@@ -307,7 +307,7 @@ namespace SEE.DataModel
         private void CommonImplicitlyAllowed()
         {
             // 1 propagated edges
-            Assert.AreEqual(1, propagatedEdges.Count);
+            Assert.AreEqual(1, propagatedEdgesAdded.Count);
 
             // 1 implicitly allowed propagated dependencies
             Assert.That(IsImplicitlyAllowed(edgeChanges, N1_C1, N1_C1, call));
@@ -320,7 +320,7 @@ namespace SEE.DataModel
             Assert.AreEqual(5, edgeChanges.Count);
 
             // 0 removed edges
-            Assert.AreEqual(0, removedEdges.Count);
+            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
         }
 
         [Test]
@@ -370,7 +370,7 @@ namespace SEE.DataModel
         private void CommonHierarchyAccess()
         {
             // 1 propagated edges
-            Assert.AreEqual(1, propagatedEdges.Count);
+            Assert.AreEqual(1, propagatedEdgesAdded.Count);
 
             // 4 absences 
             Assert.That(IsAbsent(edgeChanges, N2, N1, call));
@@ -381,7 +381,7 @@ namespace SEE.DataModel
             Assert.AreEqual(5, edgeChanges.Count);
 
             // 0 removed edges
-            Assert.AreEqual(0, removedEdges.Count);
+            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
         }
 
         [Test]
@@ -450,7 +450,7 @@ namespace SEE.DataModel
             reflexion.Run();
 
             // 4 propagated edges
-            Assert.AreEqual(4, propagatedEdges.Count);
+            Assert.AreEqual(4, propagatedEdgesAdded.Count);
 
             // 4 convergences
             Assert.That(IsConvergent(edgeChanges, N2, N1, call));
@@ -468,7 +468,7 @@ namespace SEE.DataModel
             // 0 divergences
             Assert.AreEqual(8, edgeChanges.Count);
             // 0 removed edges
-            Assert.AreEqual(0, removedEdges.Count);
+            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
         }
 
         [Test]
@@ -478,7 +478,7 @@ namespace SEE.DataModel
             reflexion.Run();
 
             // 1 propagated edges
-            Assert.AreEqual(1, propagatedEdges.Count);
+            Assert.AreEqual(1, propagatedEdgesAdded.Count);
 
             // 1 convergences
             Assert.That(IsConvergent(edgeChanges, N2, N1, call));
@@ -491,13 +491,13 @@ namespace SEE.DataModel
             // 0 divergences
             Assert.AreEqual(5, edgeChanges.Count);
             // 0 removed edges
-            Assert.AreEqual(0, removedEdges.Count);
+            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
         }
 
         private void CommonTestConvergences345()
         {
             // 1 propagated edges
-            Assert.AreEqual(1, propagatedEdges.Count);
+            Assert.AreEqual(1, propagatedEdgesAdded.Count);
 
             // 1 convergences
             Assert.That(IsConvergent(edgeChanges, N2, N1, call));
@@ -508,7 +508,7 @@ namespace SEE.DataModel
             // 0 divergences
             Assert.AreEqual(5, edgeChanges.Count);
             // 0 removed edges
-            Assert.AreEqual(0, removedEdges.Count);
+            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
         }
 
         [Test]
@@ -554,7 +554,7 @@ namespace SEE.DataModel
         private void CommonAbsences()
         {
             // 1 propagated edges
-            Assert.AreEqual(1, propagatedEdges.Count);
+            Assert.AreEqual(1, propagatedEdgesAdded.Count);
 
             // 4 absences 
             Assert.That(IsAbsent(edgeChanges, N2, N1, call));
@@ -565,7 +565,7 @@ namespace SEE.DataModel
             Assert.AreEqual(5, edgeChanges.Count);
 
             // 0 removed edges
-            Assert.AreEqual(0, removedEdges.Count);
+            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
         }
 
         [Test]
