@@ -23,7 +23,7 @@ namespace SEE
             else 
             {
                 graph = Load(settings);
-                if (graph == null)
+                if (ReferenceEquals(graph, null))
                 {
                     Debug.LogErrorFormat("graph {0} could not be loaded.\n", settings.GXLPath());
                 }
