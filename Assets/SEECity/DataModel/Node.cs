@@ -10,18 +10,37 @@ namespace SEE.DataModel
     [System.Serializable]
     public class Node : GraphElement
     {
-        // Important note: Nodes should be created only by calling Graph.newNode().
-        // Do not use 'new Node()'.
+        // IMPORTANT NOTES:
+        //
+        // If you use Clone() to create a copy of a node, be aware that the clone
+        // will have a deep copy of all attributes and the type of the node only.
+        // The hierarchy information (parent, children, level) is not copied at all.
+        // The clone will appear as a node without parent and children at level 0.
+        // Neither will its incoming and outgoing edges be copied.
 
+        /// <summary>
+        /// The attribute name for unique identifiers (within a graph).
+        /// </summary>
         public const string LinknameAttribute = "Linkage.Name";
 
         /// <summary>
-        /// The unique identifier of a node.
+        /// The unique identifier of a node. May be the empty string if the node has
+        /// no such identifier set.
         /// </summary>
         [SerializeField]
         public string LinkName
         {
-            get => GetString(LinknameAttribute);
+            get
+            {
+                if (TryGetString(LinknameAttribute, out string linkname))
+                {
+                    return linkname;
+                }
+                else
+                {
+                    return "";
+                }
+            }
             // This will only set the linkname attribute, but does not alter the
             // hashed linknames of the underlying graph. You will likely want to
             // use Graph.SetLinkname instead. Otherwise expect inconsistencies.
@@ -29,21 +48,31 @@ namespace SEE.DataModel
             set => SetString(LinknameAttribute, value);
         }
 
-        private const string sourcenameAttribute = "Source.Name";
+        /// <summary>
+        /// The attribute name for the name of nodes. They may or may not be unique.
+        /// </summary>
+        public const string SourceNameAttribute = "Source.Name";
 
         /// <summary>
         /// The name of the node (which is not necessarily unique).
         /// </summary>
         public string SourceName
         {
-            get => GetString(sourcenameAttribute);
-            set => SetString(sourcenameAttribute, value);
+            get => GetString(SourceNameAttribute);
+            set => SetString(SourceNameAttribute, value);
         }
 
+        /// <summary>
+        /// The parent of this node. Is null if it has none.
+        /// </summary>
         [SerializeField]
         private Node parent;
 
-        // level of a node in the hierarchy
+        /// <summary>
+        /// The level of the node in the hierarchy. The top-most level has level 
+        /// number 0. The number is the length of the path in the hierarchy from
+        /// the node to its ancestor that has no parent.
+        /// </summary>
         private int level = 0;
 
         /// <summary>
@@ -108,6 +137,23 @@ namespace SEE.DataModel
             return parent == null;
         }
 
+        /// <summary>
+        /// Yields the set of all transitive parents of this node in the node hierarchy
+        /// including the node itself.
+        /// </summary>
+        /// <returns>ascendants of this node in the hierarchy including the node itself</returns>
+        public List<Node> Ascendants()
+        {
+            List<Node> result = new List<Node>();
+            Node cursor = this;
+            while (cursor != null)
+            {
+                result.Add(cursor);
+                cursor = cursor.Parent;
+            }
+            return result;
+        }
+
         public override string ToString()
         {
             string result = "{\n";
@@ -117,13 +163,164 @@ namespace SEE.DataModel
             return result;
         }
 
+        /// <summary>
+        /// The incoming edges of this node.
+        /// </summary>
+        [SerializeField]
+        private List<Edge> incomings = new List<Edge>();
+
+        /// <summary>
+        /// The incoming edges of this node.
+        /// </summary>
+        [SerializeField]
+        public List<Edge> Incomings
+        {
+            get => incomings;
+        }
+
+        /// <summary>
+        /// Adds given edge to the list of incoming edges of this node.
+        /// 
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        /// should use Graph.AddEdge() instead.
+        /// 
+        /// Precondition: edge != null and edge.Target == this
+        /// </summary>
+        /// <param name="edge">edge to be added as one of the node's incoming edges</param>
+        public void AddIncoming(Edge edge)
+        {
+            if (ReferenceEquals(edge, null))
+            {
+                throw new Exception("edge must not be null");
+            }
+            else if (edge.Target != this)
+            {
+                throw new Exception("edge " + edge.ToString() + " is no incoming edge of " + this.ToString());
+            }
+            else
+            {
+                incomings.Add(edge);
+            }
+        }
+
+        /// <summary>
+        /// Removes given edge from the list of incoming edges of this node.
+        /// 
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        /// should use Graph.RemoveEdge() instead.
+        /// 
+        /// Precondition: edge != null and edge.Target == this
+        /// </summary>
+        /// <param name="edge">edge to be removed from the node's incoming edges</param>
+        public void RemoveIncoming(Edge edge)
+        {
+            if (ReferenceEquals(edge, null))
+            {
+                throw new Exception("edge must not be null");
+            }
+            else if (edge.Target != this)
+            {
+                throw new Exception("edge " + edge.ToString() + " is no incoming edge of " + this.ToString());
+            }
+            else
+            {
+                if (!incomings.Remove(edge))
+                {
+                    throw new Exception("edge " + edge.ToString() + " is no incoming edge of " + this.ToString());
+                }
+            }
+        }
+
+        /// <summary>
+        /// The outgoing edges of this node.
+        /// </summary>
+        [SerializeField]
+        private List<Edge> outgoings = new List<Edge>();
+
+        /// <summary>
+        /// The outgoing edges of this node.
+        /// </summary>
+        [SerializeField]
+        public List<Edge> Outgoings
+        {
+            get => outgoings;
+        }
+
+        /// <summary>
+        /// Removes all incoming and outgoing edges from this node.
+        /// 
+        /// IMPORTANT NOTE: This method is reserved for Graph and should not
+        /// be used by any other client.
+        /// </summary>
+        public void RemoveAllEdges()
+        {
+            outgoings.Clear();
+            incomings.Clear();
+        }
+
+        /// <summary>
+        /// Adds given edge to the list of outgoing edges of this node.
+        /// 
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        /// should use Graph.AddEdge() instead.
+        /// 
+        /// Precondition: edge != null and edge.Source == this
+        /// </summary>
+        /// <param name="edge">edge to be added as one of the node's outgoing edges</param>
+        public void AddOutgoing(Edge edge)
+        {
+            if (ReferenceEquals(edge, null))
+            {
+                throw new Exception("edge must not be null");
+            }
+            else if (edge.Source != this)
+            {
+                throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + this.ToString());
+            }
+            else
+            {
+                outgoings.Add(edge);
+            }
+        }
+
+        /// <summary>
+        /// Removes given edge from the list of outgoing edges of this node.
+        /// 
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        /// should use Graph.RemoveEdge() instead.
+        /// 
+        /// Precondition: edge != null and edge.Source == this
+        /// </summary>
+        /// <param name="edge">edge to be removed from the node's outgoing edges</param>
+        public void RemoveOutgoing(Edge edge)
+        {
+            if (ReferenceEquals(edge, null))
+            {
+                throw new Exception("edge must not be null");
+            }
+            else if (edge.Source != this)
+            {
+                throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + this.ToString());
+            }
+            else
+            {
+                if (!outgoings.Remove(edge))
+                {
+                    throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + this.ToString());
+                }
+            }
+        }
+
+        /// <summary>
+        /// The list of immediate children of this node in the hierarchy.
+        /// </summary>
         [SerializeField]
         private List<Node> children = new List<Node>();
 
         /// <summary>
-        /// The number of descendants of this node.
+        /// The number of immediate children of this node in the hierarchy.
         /// </summary>
-        /// <returns>number of descendants</returns>
+        /// <returns>number of immediate children</returns>
         public int NumberOfChildren()
         {
             return children.Count;
@@ -146,7 +343,7 @@ namespace SEE.DataModel
         /// <param name="child">descendant to be added to node</param>
         public void AddChild(Node child)
         {
-            if (child.Parent == null)
+            if (ReferenceEquals(child.Parent, null))
             {
                 children.Add(child);
                 child.Parent = this;
@@ -186,9 +383,9 @@ namespace SEE.DataModel
         /// <returns></returns>
         public static int CompareTo(Node first, Node second)
         {
-            if (first == null)
+            if (ReferenceEquals(first, null))
             {
-                if (second == null)
+                if (ReferenceEquals(second, null))
                 {
                     // If first is null and second is null, they're equal. 
                     return 0;
@@ -202,7 +399,7 @@ namespace SEE.DataModel
             else
             {
                 // If first is not null...
-                if (second == null)
+                if (ReferenceEquals(second, null))
                 // ...and second is null, first is greater.
                 {
                     return 1;
@@ -231,6 +428,57 @@ namespace SEE.DataModel
         public bool IsLeaf()
         {
             return children.Count == 0;
+        }
+
+        /// <summary>
+        /// Creates deep copies of attributes where necessary. Is called by
+        /// Clone() once the copy is created. Must be extended by every 
+        /// subclass that adds fields that should be cloned, too.
+        /// 
+        /// IMPORTANT NOTE: Cloning a node means only to create copy of its
+        /// type and attributes. The hierarchy information (parent, level,
+        /// and children) are not copied. Instead the copy will become a 
+        /// node without parent and children at level 0. If we copied the
+        /// hierarchy information, the hierarchy were no longer a forrest.
+        /// </summary>
+        /// <param name="clone">the clone receiving the copied attributes</param>
+        protected override void HandleCloned(object clone)
+        {
+            base.HandleCloned(clone);
+            Node target = (Node)clone;
+            target.parent = null;
+            target.level = 0;
+            target.children = new List<Node>();
+        }
+
+        /// <summary>
+        /// Returns the list of outgoing edges from this node to the given 
+        /// target node that have exactly the given edge type.
+        /// 
+        /// Precondition: target must not be null
+        /// </summary>
+        /// <param name="target">target node</param>
+        /// <param name="its_type">requested edge type</param>
+        /// <returns>all edges from this node to target node with exactly the given edge type</returns>
+        public List<Edge> From_To(Node target, string its_type)
+        {
+            if (ReferenceEquals(target, null))
+            {
+                throw new Exception("target node must not be null");
+            }
+            else
+            {
+                List<Edge> result = new List<Edge>();
+
+                foreach (Edge edge in outgoings)
+                {
+                    if (edge.Target == target && edge.Type == its_type)
+                    {
+                        result.Add(edge);
+                    }
+                }
+                return result;
+            }
         }
     }
 }
