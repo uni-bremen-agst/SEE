@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class FPSCounter : MonoBehaviour
 {
@@ -23,7 +22,7 @@ public class FPSCounter : MonoBehaviour
 
     void Start()
     {
-        if (!GetComponent<GUIText>())
+        if (!GetComponent<UnityEngine.UI.Text>())
         {
             Debug.Log("UtilityFramesPerSecond needs a GUIText component!");
             enabled = false;
@@ -44,15 +43,15 @@ public class FPSCounter : MonoBehaviour
             // display two fractional digits (f2 format)
             float fps = accum / frames;
             string format = System.String.Format("{0:F2} FPS", fps);
-            GetComponent<GUIText>().text = format;
+            GetComponent<UnityEngine.UI.Text>().text = format;
 
             if (fps < 30)
-                GetComponent<GUIText>().material.color = Color.yellow;
+                GetComponent<UnityEngine.UI.Text>().material.color = Color.yellow;
             else
                 if (fps < 10)
-                GetComponent<GUIText>().material.color = Color.red;
+                GetComponent<UnityEngine.UI.Text>().material.color = Color.red;
             else
-                GetComponent<GUIText>().material.color = Color.green;
+                GetComponent<UnityEngine.UI.Text>().material.color = Color.green;
             //	DebugConsole.Log(format,level);
             timeleft = updateInterval;
             accum = 0.0F;

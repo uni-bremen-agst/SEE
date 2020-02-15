@@ -58,7 +58,7 @@ namespace CScape
                 if (GUILayout.Button("OK! Switch!"))
                 {
                     PlayerSettings.colorSpace = ColorSpace.Linear;
-                    PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel18;
+                    PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel19;
                     EditorApplication.ExecuteMenuItem("Edit/Graphics Emulation/No Emulation");
                 }
                 GUILayout.EndVertical();
