@@ -170,22 +170,11 @@ namespace SEE.Net
                 }
             })).Start();
         }
-        public static List<IPAddress> LookupLocalIPAddresses()
+        public static IPAddress[] LookupLocalIPAddresses()
         {
             string hostName = Dns.GetHostName(); ;
             IPHostEntry hostEntry = Dns.GetHostEntry(hostName);
-            IPAddress[] addresses = hostEntry.AddressList;
-            List<IPAddress> ipAddresses = new List<IPAddress>(addresses.Length);
-            for (int i = 0; i < addresses.Length; i++)
-            {
-                bool isLinkLocal = addresses[i].IsIPv6LinkLocal;
-                bool isSiteLocal = addresses[i].IsIPv6SiteLocal;
-                if (!isLinkLocal && !isSiteLocal)
-                {
-                    ipAddresses.Add(addresses[i]);
-                }
-            }
-            return ipAddresses;
+            return hostEntry.AddressList;
         }
     }
 

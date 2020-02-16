@@ -2,6 +2,7 @@
 using NetworkCommsDotNet.Connections;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ namespace SEE.Net.Internal
     {
         public static readonly string PACKET_PREFIX = "Server.";
         public static List<Connection> Connections { get; private set; } = new List<Connection>();
+        private static List<ConnectionListenerBase> connectionListeners = null;
         private static ServerPacketHandler packetHandler = new ServerPacketHandler(PACKET_PREFIX);
 
         public static void Initialize()
@@ -23,18 +25,18 @@ namespace SEE.Net.Internal
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewPositionPacketData.PACKET_NAME, OnIncomingPacket);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, OnIncomingPacket);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, OnIncomingPacket);
-
-            while (true) // TODO: this is only to find an error, that only occurrs in the actual build.
+            
+            try
             {
-                try
+                connectionListeners = Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.ServerPort), false);
+                foreach (EndPoint localListenEndPoint in from connectionListenerBase in connectionListeners select connectionListenerBase.LocalListenEndPoint)
                 {
-                    Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.ServerPort), false);
-                    break;
+                    Debug.Log("Listening on: '" + localListenEndPoint.ToString() + "'.");
                 }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
             }
         }
         public static void Update()
@@ -43,11 +45,16 @@ namespace SEE.Net.Internal
         }
         public static void Shutdown()
         {
-            for (int i = 0; i < Connections.Count; i++)
+            lock (Connections)
             {
-                Connections[i].CloseConnection(false);
+                Connection.StopListening(connectionListeners);
+                connectionListeners = null;
+                for (int i = 0; i < Connections.Count; i++)
+                {
+                    Connections[i].CloseConnection(false);
+                }
+                Connections.Clear();
             }
-            Connections.Clear();
         }
         private static void OnConnectionEstablished(Connection connection)
         {
