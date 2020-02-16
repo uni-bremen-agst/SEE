@@ -2,6 +2,7 @@
 using NetworkCommsDotNet.Connections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Net.Internal
@@ -85,25 +86,28 @@ namespace SEE.Net.Internal
         }
         protected override bool HandleTransformViewPositionPacketData(PacketHeader packetHeader, Connection connection, string data)
         {
-            for (int i = 0; i < Server.Connections.Count; i++)
+            TransformViewPositionPacketData packetData = TransformViewPositionPacketData.Deserialize(data);
+            foreach (Connection co in from c in Server.Connections where !c.ConnectionInfo.RemoteEndPoint.Equals(packetData.transformView.viewContainer.owner) select c)
             {
-                Network.Send(Server.Connections[i], Client.PACKET_PREFIX + TransformViewPositionPacketData.PACKET_NAME, data);
+                Network.Send(co, Client.PACKET_PREFIX + TransformViewPositionPacketData.PACKET_NAME, data);
             }
             return true;
         }
         protected override bool HandleTransformViewRotationPacketData(PacketHeader packetHeader, Connection connection, string data)
         {
-            for (int i = 0; i < Server.Connections.Count; i++)
+            TransformViewRotationPacketData packetData = TransformViewRotationPacketData.Deserialize(data);
+            foreach (Connection co in from c in Server.Connections where !c.ConnectionInfo.RemoteEndPoint.Equals(packetData.transformView.viewContainer.owner) select c)
             {
-                Network.Send(Server.Connections[i], Client.PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, data);
+                Network.Send(co, Client.PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, data);
             }
             return true;
         }
         protected override bool HandleTransformViewScalePacketData(PacketHeader packetHeader, Connection connection, string data)
         {
-            for (int i = 0; i < Server.Connections.Count; i++)
+            TransformViewScalePacketData packetData = TransformViewScalePacketData.Deserialize(data);
+            foreach (Connection co in from c in Server.Connections where !c.ConnectionInfo.RemoteEndPoint.Equals(packetData.transformView.viewContainer.owner) select c)
             {
-                Network.Send(Server.Connections[i], Client.PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, data);
+                Network.Send(co, Client.PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, data);
             }
             return true;
         }
