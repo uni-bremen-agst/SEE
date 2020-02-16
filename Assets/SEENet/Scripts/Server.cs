@@ -21,22 +21,40 @@ namespace SEE.Net.Internal
             NetworkComms.AppendGlobalConnectionEstablishHandler(OnConnectionEstablished);
             NetworkComms.AppendGlobalConnectionCloseHandler(OnConnectionClosed);
 
+            void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => packetHandler.Push(packetHeader, connection, data);
+
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + InstantiatePacketData.PACKET_NAME, OnIncomingPacket);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewPositionPacketData.PACKET_NAME, OnIncomingPacket);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, OnIncomingPacket);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, OnIncomingPacket);
-            
-            try
+
+            foreach (IPAddress ipAddress in Network.LookupLocalIPAddresses())
             {
-                ConnectionListeners = Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, 0), false);
-                foreach (EndPoint localListenEndPoint in from connectionListenerBase in ConnectionListeners select connectionListenerBase.LocalListenEndPoint)
+                try
                 {
-                    Debug.Log("Listening on: '" + localListenEndPoint.ToString() + "'.");
+                    ConnectionListeners.AddRange(Connection.StartListening(ConnectionType.TCP, new IPEndPoint(ipAddress, 0), false));
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
                 }
             }
-            catch (Exception e)
+            foreach (EndPoint localListenEndPoint in from connectionListenerBase in ConnectionListeners select connectionListenerBase.LocalListenEndPoint)
             {
-                Debug.LogException(e);
+                Debug.Log("Listening on: '" + localListenEndPoint.ToString() + "'.");
+            }
+
+            var temp = GameObject.Find("NET"); // TODO: this is temporary
+            if (!temp)
+            {
+                Debug.LogError("GameObject was not found. Has a proper alternative been implemented yet?");
+                return;
+            }
+            var text = temp.GetComponentInChildren<UnityEngine.UI.Text>();
+            text.text = "";
+            foreach (ConnectionListenerBase connectionListener in ConnectionListeners)
+            {
+                text.text += connectionListener.LocalListenEndPoint.ToString();
             }
         }
         public static void Update()
@@ -60,9 +78,16 @@ namespace SEE.Net.Internal
         {
             if ((from connectionListener in ConnectionListeners select connectionListener.LocalListenEndPoint).Contains(connection.ConnectionInfo.LocalEndPoint))
             {
-                Debug.Log("Connection established: " + connection.ToString());
-                Connections.Add(connection);
-                packetHandler.OnConnectionEstablished(connection);
+                if (!Connections.Contains(connection))
+                {
+                    Debug.Log("Connection established: " + connection.ToString());
+                    Connections.Add(connection);
+                    packetHandler.OnConnectionEstablished(connection);
+                }
+                else
+                {
+                    connection.CloseConnection(true);
+                }
             }
         }
         private static void OnConnectionClosed(Connection connection)
@@ -73,10 +98,6 @@ namespace SEE.Net.Internal
                 Connections.Remove(connection);
                 packetHandler.OnConnectionClosed(connection);
             }
-        }
-        private static void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            packetHandler.Push(packetHeader, connection, data);
         }
     }
 
