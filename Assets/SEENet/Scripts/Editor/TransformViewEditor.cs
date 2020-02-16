@@ -16,6 +16,8 @@ namespace SEE.Net.Internal
             SerializedProperty synchronizePosition = serializedObject.FindProperty("synchronizePosition");
             SerializedProperty synchronizeRotation = serializedObject.FindProperty("synchronizeRotation");
             SerializedProperty synchronizeScale = serializedObject.FindProperty("synchronizeScale");
+            SerializedProperty teleportForGreatDistances = serializedObject.FindProperty("teleportForGreatDistances");
+            SerializedProperty teleportMinDistance = serializedObject.FindProperty("teleportMinDistance");
 
             // Infos
             showInfos = EditorGUILayout.BeginFoldoutHeaderGroup(showInfos, "Infos");
@@ -36,9 +38,17 @@ namespace SEE.Net.Internal
                 using (new EditorGUI.IndentLevelScope())
                 {
                     EditorGUILayout.PropertyField(transformToSynchronize);
+                    EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(synchronizePosition);
                     EditorGUILayout.PropertyField(synchronizeRotation);
                     EditorGUILayout.PropertyField(synchronizeScale);
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(teleportForGreatDistances);
+                    EditorGUI.BeginDisabledGroup(!teleportForGreatDistances.boolValue);
+                    {
+                        EditorGUILayout.PropertyField(teleportMinDistance);
+                    }
+                    EditorGUI.EndDisabledGroup();
                 }
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
