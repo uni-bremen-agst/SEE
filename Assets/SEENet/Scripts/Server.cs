@@ -13,7 +13,7 @@ namespace SEE.Net.Internal
     {
         public static readonly string PACKET_PREFIX = "Server.";
         public static List<Connection> Connections { get; private set; } = new List<Connection>();
-        private static List<ConnectionListenerBase> connectionListeners = null;
+        public static List<ConnectionListenerBase> ConnectionListeners { get; private set; } = new List<ConnectionListenerBase>();
         private static ServerPacketHandler packetHandler = new ServerPacketHandler(PACKET_PREFIX);
 
         public static void Initialize()
@@ -28,8 +28,8 @@ namespace SEE.Net.Internal
             
             try
             {
-                connectionListeners = Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.ServerPort), false);
-                foreach (EndPoint localListenEndPoint in from connectionListenerBase in connectionListeners select connectionListenerBase.LocalListenEndPoint)
+                ConnectionListeners = Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, 0), false);
+                foreach (EndPoint localListenEndPoint in from connectionListenerBase in ConnectionListeners select connectionListenerBase.LocalListenEndPoint)
                 {
                     Debug.Log("Listening on: '" + localListenEndPoint.ToString() + "'.");
                 }
@@ -47,8 +47,8 @@ namespace SEE.Net.Internal
         {
             lock (Connections)
             {
-                Connection.StopListening(connectionListeners);
-                connectionListeners = null;
+                Connection.StopListening(ConnectionListeners);
+                ConnectionListeners.Clear();
                 for (int i = 0; i < Connections.Count; i++)
                 {
                     Connections[i].CloseConnection(false);
@@ -58,7 +58,7 @@ namespace SEE.Net.Internal
         }
         private static void OnConnectionEstablished(Connection connection)
         {
-            if (((IPEndPoint)connection.ConnectionInfo.LocalEndPoint).Port == Network.ServerPort)
+            if ((from connectionListener in ConnectionListeners select connectionListener.LocalListenEndPoint).Contains(connection.ConnectionInfo.LocalEndPoint))
             {
                 Debug.Log("Connection established: " + connection.ToString());
                 Connections.Add(connection);
@@ -67,7 +67,7 @@ namespace SEE.Net.Internal
         }
         private static void OnConnectionClosed(Connection connection)
         {
-            if (((IPEndPoint)connection.ConnectionInfo.LocalEndPoint).Port == Network.ServerPort)
+            if ((from connectionListener in ConnectionListeners select connectionListener.LocalListenEndPoint).Contains(connection.ConnectionInfo.LocalEndPoint))
             {
                 Debug.Log("Connection closed: " + connection.ToString());
                 Connections.Remove(connection);
