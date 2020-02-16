@@ -22,12 +22,12 @@ namespace SEE.Net.Internal
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, OnIncomingPacket);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, OnIncomingPacket);
 
-            List<IPAddress> ipAddresses = null;
+            IPAddress[] ipAddresses = null;
             if (serverIPAddress != null && serverIPAddress.Trim(new char[] { ' ' }).Length != 0)
             {
                 try
                 {
-                    ipAddresses = new List<IPAddress>(1)
+                    ipAddresses = new IPAddress[]
                     {
                         IPAddress.Parse(serverIPAddress)
                     };
@@ -36,6 +36,7 @@ namespace SEE.Net.Internal
                 {
 #if UNITY_EDITOR
                     UnityEngine.Debug.LogException(e);
+                    UnityEngine.Debug.LogWarning("Until proper handling, the game will simply stop upon entering an invalid address and port");
                     UnityEditor.EditorApplication.isPlaying = false; // TODO: proper handling!
                     throw e;
 #endif
@@ -47,16 +48,13 @@ namespace SEE.Net.Internal
             }
 
             bool success = false;
+            ConnectionInfo connectionInfo = null;
             foreach (IPAddress ipAddress in ipAddresses)
             {
                 try
                 {
-                    IPEndPoint endPoint = new IPEndPoint(ipAddress, Network.ServerPort);
-                    ConnectionInfo info = new ConnectionInfo(endPoint);
-                    Connection = TCPConnection.GetConnection(info);
-                    int clientPort = ((IPEndPoint)Connection.ConnectionInfo.LocalEndPoint).Port;
-                    IPEndPoint listenerEndPoint = new IPEndPoint(IPAddress.Any, clientPort);
-                    Connection.StartListening(ConnectionType.TCP, listenerEndPoint, false);
+                    connectionInfo = new ConnectionInfo(new IPEndPoint(ipAddress, serverPort));
+                    Connection = TCPConnection.GetConnection(connectionInfo);
                     success = true;
                     break;
                 }

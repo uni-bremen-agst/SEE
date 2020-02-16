@@ -26,10 +26,10 @@ namespace SEE.Net.Internal
             {
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    System.Collections.Generic.List<System.Net.IPAddress> ipAddresses = Network.LookupLocalIPAddresses();
+                    System.Net.IPAddress[] ipAddresses = Network.LookupLocalIPAddresses();
                     foreach (System.Net.IPAddress ipAddress in ipAddresses)
                     {
-                        EditorGUILayout.LabelField("Local IPV6-Address", ipAddress.ToString());
+                        EditorGUILayout.LabelField(ipAddress.AddressFamily.ToString(), ipAddress.ToString());
                     }
                 }
             }
