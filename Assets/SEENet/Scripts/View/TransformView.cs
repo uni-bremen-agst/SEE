@@ -16,6 +16,10 @@ namespace SEE.Net
         [SerializeField] private bool synchronizeRotation = false;
         [SerializeField] private bool synchronizeScale = false;
 
+        [SerializeField] private bool teleportForGreatDistances = true;
+        [SerializeField] private float teleportMinDistance = 8.0f;
+        private float teleportMinDistanceSquared;
+
         public Transform TransformToSynchronize { get => transformToSynchronize; }
         public bool SynchronizingPosition { get => synchronizePosition; }
         public bool SynchronizingRotation { get => synchronizeRotation; }
@@ -50,6 +54,7 @@ namespace SEE.Net
                     InvokeRepeating("SynchronizeScale", UPDATE_TIME_START_OFFSET, UPDATE_TIME_VALUE);
                 }
             }
+            teleportMinDistanceSquared = teleportMinDistance * teleportMinDistance;
         }
         protected override void UpdateImpl()
         {
@@ -57,15 +62,22 @@ namespace SEE.Net
             {
                 if (synchronizePosition)
                 {
-                    transformToSynchronize.position = Vector3.LerpUnclamped(
-                        positionLast,
-                        positionNext,
-                        (float)(positionUpdateStopwatch.Elapsed.TotalSeconds / UPDATE_TIME_VALUE)
-                    );
+                    if (teleportForGreatDistances && Vector3.SqrMagnitude(positionNext - positionLast) >= teleportMinDistanceSquared)
+                    {
+                        transformToSynchronize.position = positionNext;
+                    }
+                    else
+                    {
+                        transformToSynchronize.position = Vector3.LerpUnclamped(
+                            positionLast,
+                            positionNext,
+                            (float)(positionUpdateStopwatch.Elapsed.TotalSeconds / UPDATE_TIME_VALUE)
+                        );
+                    }
                 }
                 if (synchronizeRotation)
                 {
-                    transformToSynchronize.rotation = Quaternion.SlerpUnclamped(
+                    transformToSynchronize.rotation = Quaternion.Slerp(
                         rotationLast,
                         rotationNext,
                         (float)(rotationUpdateStopwatch.Elapsed.TotalSeconds / UPDATE_TIME_VALUE)
@@ -73,7 +85,7 @@ namespace SEE.Net
                 }
                 if (synchronizeScale)
                 {
-                    transformToSynchronize.localScale = Vector3.LerpUnclamped(
+                    transformToSynchronize.localScale = Vector3.Lerp(
                         scaleLast,
                         scaleNext,
                         (float)(scaleUpdateStopwatch.Elapsed.TotalSeconds / UPDATE_TIME_VALUE)

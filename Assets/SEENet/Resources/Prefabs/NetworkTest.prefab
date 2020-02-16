@@ -127,6 +127,8 @@ MonoBehaviour:
   synchronizePosition: 1
   synchronizeRotation: 1
   synchronizeScale: 1
+  teleportForGreatDistances: 1
+  teleportMinDistance: 8
 --- !u!114 &-352220271283424049
 MonoBehaviour:
   m_ObjectHideFlags: 0
