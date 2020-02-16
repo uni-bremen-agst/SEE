@@ -22,7 +22,8 @@ namespace SEE.Net
         [SerializeField] private bool useInOfflineMode = true;
         [SerializeField] private bool hostServer = false;
         [SerializeField] private string serverIPAddress = string.Empty;
-        [SerializeField] private int serverPort = 0;
+        [SerializeField] private int localServerPort = 55555;
+        [SerializeField] private int remoteServerPort = 0;
 #if UNITY_EDITOR
         [SerializeField] private bool loggingEnabled = false;
         [SerializeField] private Internal.Logger.Severity minimalSeverity = DEFAULT_SEVERITY;
@@ -31,7 +32,8 @@ namespace SEE.Net
         public static bool UseInOfflineMode { get => instance ? instance.useInOfflineMode : true; }
         public static bool HostServer { get => instance ? instance.hostServer : false; }
         public static string ServerIPAddress { get => instance ? instance.serverIPAddress : ""; }
-        public static int ServerPort { get => instance ? instance.serverPort : -1; }
+        public static int LocalServerPort { get => instance ? instance.localServerPort : -1; }
+        public static int RemoteServerPort { get => instance ? instance.remoteServerPort : -1; }
 #if UNITY_EDITOR
         public static bool Logging { get => instance ? false : instance.loggingEnabled; }
         public static Internal.Logger.Severity MinimalSeverity { get => instance ? instance.minimalSeverity : DEFAULT_SEVERITY; }
@@ -177,8 +179,7 @@ namespace SEE.Net
         {
             string hostName = Dns.GetHostName(); ;
             IPHostEntry hostEntry = Dns.GetHostEntry(hostName);
-            IPAddress[] ipAddresses = hostEntry.AddressList;
-            return (from a in ipAddresses where a.AddressFamily == AddressFamily.InterNetwork select a).ToArray();
+            return hostEntry.AddressList;
         }
     }
 
