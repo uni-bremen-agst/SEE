@@ -3,6 +3,7 @@ using NetworkCommsDotNet.Connections;
 using NetworkCommsDotNet.Connections.TCP;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 
 namespace SEE.Net.Internal
@@ -14,7 +15,7 @@ namespace SEE.Net.Internal
         public static Connection Connection { get; private set; } = null;
         public static ClientPacketHandler PacketHandler { get; private set; } = new ClientPacketHandler(PACKET_PREFIX);
 
-        public static void Initialize(string serverIPAddress, int serverPort)
+        public static void Initialize()
         {
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + GXLPacketData.PACKET_NAME, OnIncomingPacket);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + InstantiatePacketData.PACKET_NAME, OnIncomingPacket);
@@ -22,38 +23,21 @@ namespace SEE.Net.Internal
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, OnIncomingPacket);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, OnIncomingPacket);
 
-            IPAddress[] ipAddresses = null;
-            if (serverIPAddress != null && serverIPAddress.Trim(new char[] { ' ' }).Length != 0)
+            List<IPEndPoint> endPoints = null;
+            if (Network.HostServer)
             {
-                try
-                {
-                    ipAddresses = new IPAddress[]
-                    {
-                        IPAddress.Parse(serverIPAddress)
-                    };
-                }
-                catch (Exception e)
-                {
-#if UNITY_EDITOR
-                    UnityEngine.Debug.LogException(e);
-                    UnityEngine.Debug.LogWarning("Until proper handling, the game will simply stop upon entering an invalid address and port");
-                    UnityEditor.EditorApplication.isPlaying = false; // TODO: proper handling!
-                    throw e;
-#endif
-                }
+                endPoints = (from connectionListener in Server.ConnectionListeners select connectionListener.LocalListenEndPoint as IPEndPoint).ToList();
             }
             else
             {
-                ipAddresses = Network.LookupLocalIPAddresses();
+                endPoints = new List<IPEndPoint>() { new IPEndPoint(IPAddress.Parse(Network.ServerIPAddress), Network.ServerPort) };
             }
-
             bool success = false;
-            ConnectionInfo connectionInfo = null;
-            foreach (IPAddress ipAddress in ipAddresses)
+            foreach (ConnectionListenerBase clb in Server.ConnectionListeners)
             {
                 try
                 {
-                    connectionInfo = new ConnectionInfo(new IPEndPoint(ipAddress, serverPort));
+                    ConnectionInfo connectionInfo = new ConnectionInfo(clb.LocalListenEndPoint);
                     Connection = TCPConnection.GetConnection(connectionInfo);
                     success = true;
                     break;

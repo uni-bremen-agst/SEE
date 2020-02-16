@@ -43,9 +43,15 @@ namespace SEE.Net.Internal
                 {
                     EditorGUILayout.PropertyField(useInOfflineMode);
                     EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
-                    EditorGUILayout.PropertyField(hostServer);
-                    EditorGUILayout.PropertyField(serverIPAddress, new GUIContent("Server IPAddress", "Leave empty to connect to localhost."));
-                    EditorGUILayout.PropertyField(serverPort);
+                    {
+                        EditorGUILayout.PropertyField(hostServer);
+                        EditorGUI.BeginDisabledGroup(hostServer.boolValue);
+                        {
+                            EditorGUILayout.PropertyField(serverIPAddress, new GUIContent("Remote IP-Address", "The IP-Address of the remote server."));
+                            EditorGUILayout.PropertyField(serverPort, new GUIContent("Remote Server Port", "The Port of the remote server."));
+                        }
+                        EditorGUI.EndDisabledGroup();
+                    }
                     EditorGUI.EndDisabledGroup();
                 }
             }
@@ -58,10 +64,14 @@ namespace SEE.Net.Internal
                 using (new EditorGUI.IndentLevelScope())
                 {
                     EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
-                    EditorGUILayout.PropertyField(loggingEnabled);
-                    EditorGUI.BeginDisabledGroup(!loggingEnabled.boolValue);
-                    EditorGUILayout.PropertyField(minimalSeverity);
-                    EditorGUI.EndDisabledGroup();
+                    {
+                        EditorGUILayout.PropertyField(loggingEnabled);
+                        EditorGUI.BeginDisabledGroup(!loggingEnabled.boolValue);
+                        {
+                            EditorGUILayout.PropertyField(minimalSeverity);
+                        }
+                        EditorGUI.EndDisabledGroup();
+                    }
                     EditorGUI.EndDisabledGroup();
                 }
             }

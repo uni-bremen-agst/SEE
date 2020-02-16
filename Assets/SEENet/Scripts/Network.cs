@@ -20,7 +20,7 @@ namespace SEE.Net
         [SerializeField] private bool useInOfflineMode = true;
         [SerializeField] private bool hostServer = false;
         [SerializeField] private string serverIPAddress = string.Empty;
-        [SerializeField] private int serverPort = 55555;
+        [SerializeField] private int serverPort = 0;
 #if UNITY_EDITOR
         [SerializeField] private bool loggingEnabled = false;
         [SerializeField] private Internal.Logger.Severity minimalSeverity = DEFAULT_SEVERITY;
@@ -28,6 +28,7 @@ namespace SEE.Net
 
         public static bool UseInOfflineMode { get => instance ? instance.useInOfflineMode : true; }
         public static bool HostServer { get => instance ? instance.hostServer : false; }
+        public static string ServerIPAddress { get => instance ? instance.serverIPAddress : ""; }
         public static int ServerPort { get => instance ? instance.serverPort : -1; }
 #if UNITY_EDITOR
         public static bool Logging { get => instance ? false : instance.loggingEnabled; }
@@ -70,7 +71,7 @@ namespace SEE.Net
             {
                 Server.Initialize();
             }
-            Client.Initialize(serverIPAddress, serverPort);
+            Client.Initialize();
         }
         void Update()
         {
