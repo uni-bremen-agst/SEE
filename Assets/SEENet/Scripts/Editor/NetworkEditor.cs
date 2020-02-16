@@ -14,7 +14,8 @@ namespace SEE.Net.Internal
         public override void OnInspectorGUI()
         {
             SerializedProperty serverIPAddress = serializedObject.FindProperty("serverIPAddress");
-            SerializedProperty serverPort = serializedObject.FindProperty("serverPort");
+            SerializedProperty localServerPort = serializedObject.FindProperty("localServerPort");
+            SerializedProperty remoteServerPort = serializedObject.FindProperty("remoteServerPort");
             SerializedProperty useInOfflineMode = serializedObject.FindProperty("useInOfflineMode");
             SerializedProperty hostServer = serializedObject.FindProperty("hostServer");
             SerializedProperty loggingEnabled = serializedObject.FindProperty("loggingEnabled");
@@ -45,10 +46,14 @@ namespace SEE.Net.Internal
                     EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
                     {
                         EditorGUILayout.PropertyField(hostServer);
-                        EditorGUI.BeginDisabledGroup(hostServer.boolValue);
+                        if (hostServer.boolValue)
+                        {
+                            EditorGUILayout.PropertyField(localServerPort, new GUIContent("Local Server Port", "The Port of the local server."));
+                        }
+                        else
                         {
                             EditorGUILayout.PropertyField(serverIPAddress, new GUIContent("Remote IP-Address", "The IP-Address of the remote server."));
-                            EditorGUILayout.PropertyField(serverPort, new GUIContent("Remote Server Port", "The Port of the remote server."));
+                            EditorGUILayout.PropertyField(remoteServerPort, new GUIContent("Remote Server Port", "The Port of the remote server."));
                         }
                         EditorGUI.EndDisabledGroup();
                     }

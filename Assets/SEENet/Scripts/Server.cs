@@ -27,34 +27,18 @@ namespace SEE.Net.Internal
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewPositionPacketData.PACKET_NAME, OnIncomingPacket);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, OnIncomingPacket);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, OnIncomingPacket);
-
-            foreach (IPAddress ipAddress in Network.LookupLocalIPAddresses())
+            
+            try
             {
-                try
+                ConnectionListeners.AddRange(Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.LocalServerPort), false));
+                foreach (EndPoint localListenEndPoint in from connectionListenerBase in ConnectionListeners select connectionListenerBase.LocalListenEndPoint)
                 {
-                    ConnectionListeners.AddRange(Connection.StartListening(ConnectionType.TCP, new IPEndPoint(ipAddress, 0), false));
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
+                    Debug.Log("Listening on: '" + localListenEndPoint.ToString() + "'.");
                 }
             }
-            foreach (EndPoint localListenEndPoint in from connectionListenerBase in ConnectionListeners select connectionListenerBase.LocalListenEndPoint)
+            catch (Exception e)
             {
-                Debug.Log("Listening on: '" + localListenEndPoint.ToString() + "'.");
-            }
-
-            var temp = GameObject.Find("NET"); // TODO: this is temporary
-            if (!temp)
-            {
-                Debug.LogError("GameObject was not found. Has a proper alternative been implemented yet?");
-                return;
-            }
-            var text = temp.GetComponentInChildren<UnityEngine.UI.Text>();
-            text.text = "";
-            foreach (ConnectionListenerBase connectionListener in ConnectionListeners)
-            {
-                text.text += connectionListener.LocalListenEndPoint.ToString();
+                Debug.LogException(e);
             }
         }
         public static void Update()

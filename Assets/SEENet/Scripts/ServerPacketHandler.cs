@@ -21,31 +21,38 @@ namespace SEE.Net.Internal
             for (int i = 0; i < bufferedPackets.Count; i++)
             {
                 Debug.Log(
-                    "Sending buffered packet!\n" +
+                    "Sending buffered packet!" +
                     "\nType: '" + bufferedPackets[i].header.PacketType + "'" +
                     "\nConnection: '" + connection.ToString() + "'" +
                     "\nPacket data: '" + bufferedPackets[i].data + "'"
                 );
                 Network.Send(connection, bufferedPackets[i].header.PacketType, bufferedPackets[i].data);
             }
+
+            // TODO: below is possibly temporary
             string gxl = File.ReadAllText("C://Users//Torben//dev//SEE//Data//GXL//linux-clones//fs.gxl");
             Network.Send(connection, Client.PACKET_PREFIX + GXLPacketData.PACKET_NAME, new GXLPacketData(gxl).Serialize());
         }
         public void OnConnectionClosed(Connection connection)
         {
+            // TODO: remote instantiated objects
             List<Packet> bps = new List<Packet>(bufferedPackets);
+#if UNITY_EDITOR
+            int removedCount = 0;
+#endif
             for (int i = 0; i < bps.Count; i++)
             {
                 if (bps[i].connection.Equals(connection))
                 {
 #if UNITY_EDITOR
-                    string oneMessage = "Removing buffered packet! There is " + (bufferedPackets.Count - 1) + " buffered packet left!";
-                    string twoOrMoreMessage = "Removing buffered packet! There are " + (bufferedPackets.Count - 1) + " buffered packets left!";
-                    Debug.Log(bufferedPackets.Count == 2 ? oneMessage : twoOrMoreMessage);
+                    removedCount++;
 #endif
                     bufferedPackets.Remove(bps[i]);
                 }
             }
+#if UNITY_EDITOR
+            Debug.Log("Removed '" + removedCount + "' buffered packet! Remaining buffered packet count: '" + (bufferedPackets.Count - 1) + "'");
+#endif
         }
 
         protected override bool HandleGXLPacketData(PacketHeader packetHeader, Connection connection, string data)
@@ -54,11 +61,13 @@ namespace SEE.Net.Internal
         }
         protected override bool HandleInstantiatePacketData(PacketHeader packetHeader, Connection connection, string data)
         {
-#if UNITY_EDITOR
-            string oneMessage = "Buffering packet of type '" + packetHeader.PacketType + "'! There is " + (bufferedPackets.Count + 1) + " buffered packet now!";
-            string twoOrMoreMessage = "Buffering packet of type '" + packetHeader.PacketType + "'! There are " + (bufferedPackets.Count + 1) + " buffered packets now!";
-            Debug.Log(bufferedPackets.Count == 0 ? oneMessage : twoOrMoreMessage);
-#endif
+            Debug.Log(
+                "Buffering packet!" + 
+                "\nType: '" + packetHeader.PacketType + "'" +
+                "\nConnection: '" + connection.ToString() + "'" +
+                "\nPacket data: '" + data + "'" + 
+                "\nTotal buffered packet count: '" + (bufferedPackets.Count + 1) + "'"
+            );
             InstantiatePacketData packetData = InstantiatePacketData.Deserialize(data);
             packetData.viewID = ++lastViewID; // TODO: this could potentially overflow. server should be able to run forever without having to restart!
             Packet packet = new Packet()

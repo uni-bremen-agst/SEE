@@ -30,7 +30,7 @@ namespace SEE.Net.Internal
 
             List<IPEndPoint> endPoints = Network.HostServer
                 ? (from connectionListener in Server.ConnectionListeners select connectionListener.LocalListenEndPoint as IPEndPoint).ToList()
-                : new List<IPEndPoint>() { new IPEndPoint(IPAddress.Parse(Network.ServerIPAddress), Network.ServerPort) };
+                : new List<IPEndPoint>() { new IPEndPoint(IPAddress.Parse(Network.ServerIPAddress), Network.RemoteServerPort) };
 
             bool success = false;
             foreach (ConnectionInfo connectionInfo in from endPoint in endPoints select new ConnectionInfo(endPoint))
