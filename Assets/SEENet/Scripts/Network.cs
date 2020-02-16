@@ -4,7 +4,9 @@ using SEE.Net.Internal;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
 
@@ -42,7 +44,7 @@ namespace SEE.Net
         {
             if (instance)
             {
-                Debug.LogError("There must not be more than one Network-script! Destroying this script");
+                Debug.LogError("There must not be more than one Network-script! This script will be destroyed!");
                 Destroy(this);
                 return;
             }
@@ -124,7 +126,7 @@ namespace SEE.Net
         }
         public static void Instantiate(string prefabName, Vector3 position, Quaternion rotation, Vector3 scale)
         {
-            InstantiatePacketData p = new InstantiatePacketData(prefabName, Client.GetLocalEndPoint(), position, rotation, scale);
+            InstantiatePacketData p = new InstantiatePacketData(prefabName, Client.LocalEndPoint, position, rotation, scale);
             if (instance.useInOfflineMode)
             {
                 Client.PacketHandler.Push(
@@ -175,7 +177,8 @@ namespace SEE.Net
         {
             string hostName = Dns.GetHostName(); ;
             IPHostEntry hostEntry = Dns.GetHostEntry(hostName);
-            return hostEntry.AddressList;
+            IPAddress[] ipAddresses = hostEntry.AddressList;
+            return (from a in ipAddresses where a.AddressFamily == AddressFamily.InterNetwork select a).ToArray();
         }
     }
 
