@@ -28,6 +28,8 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private Material _buildingHighlightMaterial;
 
+		private Material _buildingHighlightMaterialAccentuated;
+
 		/// <summary>
 		/// Copy of the <see cref="linkedObject" /> with different material to make it look highlighted.
 		/// </summary>
@@ -119,6 +121,8 @@ namespace SEECity.Charts.Scripts
 			_clickDelay = _chartManager.clickDelay;
 			_highlightDuration = _chartManager.highlightDuration;
 			_buildingHighlightMaterial = _chartManager.buildingHighlightMaterial;
+			_buildingHighlightMaterialAccentuated =
+				_chartManager.buildingHighlightMaterialAccentuated;
 			_highlightLineLength = _chartManager.highlightLineLength;
 		}
 
@@ -343,6 +347,9 @@ namespace SEECity.Charts.Scripts
 				? _chartManager.standardColor
 				: _chartManager.accentuationColor;
 			_accentuated = !_accentuated;
+			_highlightCopy.GetComponent<Renderer>().material = _accentuated
+				? _buildingHighlightMaterialAccentuated
+				: _buildingHighlightMaterial;
 		}
 
 		/// <summary>

@@ -56,6 +56,8 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		[Header("Highlights")] public Material buildingHighlightMaterial;
 
+		public Material buildingHighlightMaterialAccentuated;
+
 		/// <summary>
 		/// The thickness of the highlight outline of <see cref="buildingHighlightMaterial" />.
 		/// </summary>
@@ -213,6 +215,7 @@ namespace SEECity.Charts.Scripts
 		private void AnimateHighlight()
 		{
 			buildingHighlightMaterial.SetFloat("g_flOutlineWidth", highlightOutlineAnim);
+			buildingHighlightMaterialAccentuated.SetFloat("g_flOutlineWidth", highlightOutlineAnim);
 		}
 
 		private void ResetPosition()
@@ -265,6 +268,7 @@ namespace SEECity.Charts.Scripts
 		private void OnDestroy()
 		{
 			buildingHighlightMaterial.SetFloat("g_flOutlineWidth", highlightOutline);
+			buildingHighlightMaterialAccentuated.SetFloat("g_flOutlineWidth", highlightOutline);
 		}
 	}
 }

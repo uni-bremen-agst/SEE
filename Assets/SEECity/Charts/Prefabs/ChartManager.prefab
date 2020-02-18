@@ -53,6 +53,8 @@ MonoBehaviour:
   dragDelay: 0.2
   buildingHighlightMaterial: {fileID: 2100000, guid: 9d631e931375b5242b8903c497a12c74,
     type: 2}
+  buildingHighlightMaterialAccentuated: {fileID: 2100000, guid: 47a608dbb7b25de439f92bacb8350815,
+    type: 2}
   highlightOutline: 0.005
   standardColor: {r: 1, g: 0.9721673, b: 0.24056599, a: 1}
   accentuationColor: {r: 1, g: 0.23921567, b: 0.62098527, a: 1}
