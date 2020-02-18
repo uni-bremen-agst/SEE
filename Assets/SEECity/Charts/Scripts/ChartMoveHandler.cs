@@ -64,6 +64,8 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		[SerializeField] protected GameObject sizeButton;
 
+		[SerializeField] private GameObject contentSelection;
+
 		/// <summary>
 		/// Links the <see cref="Scripts.ChartManager" /> and initializes attributes.
 		/// </summary>
@@ -156,6 +158,7 @@ namespace SEECity.Charts.Scripts
 			chart.labelsPanel.gameObject.SetActive(Minimized);
 			chart.dataPanel.gameObject.SetActive(Minimized);
 			sizeButton.SetActive(Minimized);
+			contentSelection.SetActive(Minimized);
 			GetComponent<Image>().sprite = Minimized ? _maximizedSprite : _minimizedSprite;
 			Minimized = !Minimized;
 		}

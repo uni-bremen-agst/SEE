@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -199,6 +200,8 @@ MonoBehaviour:
       - Metric.Style
       m_values: 01010000650000000700000009000000010000002200000002000000000000000500000016000000
     type: File
+    incomings: []
+    outgoings: []
     children: []
 --- !u!65 &46112648
 BoxCollider:
@@ -227,6 +230,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -365,6 +369,8 @@ MonoBehaviour:
       m_keys: []
       m_values: 
     type: Directory
+    incomings: []
+    outgoings: []
     children:
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -390,6 +396,8 @@ MonoBehaviour:
         - Metric.Style
         m_values: 060000000400000002000000000000000200000022000000
       type: File
+      incomings: []
+      outgoings: []
       children: []
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -423,6 +431,8 @@ MonoBehaviour:
         - Metric.Style
         m_values: 10000000080000000100000000000000030000000200000001000000000000000c000000de140000
       type: File
+      incomings: []
+      outgoings: []
       children: []
 --- !u!65 &65872367
 BoxCollider:
@@ -451,6 +461,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -703,6 +714,8 @@ MonoBehaviour:
       m_keys: []
       m_values: 
     type: Directory
+    incomings: []
+    outgoings: []
     children:
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -736,6 +749,8 @@ MonoBehaviour:
         - Metric.Style
         m_values: ea010000d30000000400000007000000080000000500000001000000010000004a00000000000000
       type: File
+      incomings: []
+      outgoings: []
       children: []
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -769,6 +784,8 @@ MonoBehaviour:
         m_keys: []
         m_values: 
       type: Directory
+      incomings: []
+      outgoings: []
       children:
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -802,6 +819,8 @@ MonoBehaviour:
           - Metric.Style
           m_values: d4050000170100000100000004000000040000004c00000000000000000000000200000038000000
         type: File
+        incomings: []
+        outgoings: []
         children: []
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -835,6 +854,8 @@ MonoBehaviour:
           - Metric.Style
           m_values: b80b0000900100000400000008000000000000002d000000000000000000000059000000818f0300
         type: File
+        incomings: []
+        outgoings: []
         children: []
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -868,6 +889,8 @@ MonoBehaviour:
         m_keys: []
         m_values: 
       type: Directory
+      incomings: []
+      outgoings: []
       children:
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -901,6 +924,8 @@ MonoBehaviour:
           - Metric.Style
           m_values: 01010000650000000700000009000000010000002200000002000000000000000500000016000000
         type: File
+        incomings: []
+        outgoings: []
         children: []
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -934,6 +959,8 @@ MonoBehaviour:
           - Metric.Style
           m_values: 0c0300006f01000006000000020000000600000001000000010000000000000017000000c7010000
         type: File
+        incomings: []
+        outgoings: []
         children: []
 --- !u!65 &140428784
 BoxCollider:
@@ -962,6 +989,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1100,6 +1128,8 @@ MonoBehaviour:
       - Metric.Style
       m_values: ea010000d30000000400000007000000080000000500000001000000010000004a00000000000000
     type: File
+    incomings: []
+    outgoings: []
     children: []
 --- !u!65 &162503130
 BoxCollider:
@@ -1128,6 +1158,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1275,7 +1306,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286545791
+    rgba: 4286611584
   m_fontColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -1388,6 +1419,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1510,6 +1542,8 @@ MonoBehaviour:
       m_keys: []
       m_values: 
     type: Directory
+    incomings: []
+    outgoings: []
     children:
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -1543,6 +1577,8 @@ MonoBehaviour:
         - Metric.Style
         m_values: d80500001101000001000000050000000300000001000000000000000000000005000000535a0000
       type: File
+      incomings: []
+      outgoings: []
       children: []
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -1576,6 +1612,8 @@ MonoBehaviour:
         - Metric.Style
         m_values: 2003000037000000020000000a0000000300000003000000010000000000000008000000ba850000
       type: File
+      incomings: []
+      outgoings: []
       children: []
 --- !u!65 &233175551
 BoxCollider:
@@ -1604,6 +1642,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1808,6 +1847,8 @@ MonoBehaviour:
       - Metric.Style
       m_values: b0040000900100000200000001000000010000000600000003000000000000000200000022000000
     type: File
+    incomings: []
+    outgoings: []
     children: []
 --- !u!65 &294952090
 BoxCollider:
@@ -1836,6 +1877,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1974,6 +2016,8 @@ MonoBehaviour:
       m_keys: []
       m_values: 
     type: Directory
+    incomings: []
+    outgoings: []
     children:
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -2007,6 +2051,8 @@ MonoBehaviour:
         - Metric.Style
         m_values: d4050000170100000100000004000000040000004c00000000000000000000000200000038000000
       type: File
+      incomings: []
+      outgoings: []
       children: []
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -2040,6 +2086,8 @@ MonoBehaviour:
         - Metric.Style
         m_values: b80b0000900100000400000008000000000000002d000000000000000000000059000000818f0300
       type: File
+      incomings: []
+      outgoings: []
       children: []
 --- !u!65 &297095354
 BoxCollider:
@@ -2068,6 +2116,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2215,7 +2264,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286545791
+    rgba: 4286611584
   m_fontColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -2328,6 +2377,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2450,6 +2500,8 @@ MonoBehaviour:
       - Metric.Style
       m_values: 2003000037000000020000000a0000000300000003000000010000000000000008000000ba850000
     type: File
+    incomings: []
+    outgoings: []
     children: []
 --- !u!65 &445993380
 BoxCollider:
@@ -2478,6 +2530,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2745,6 +2798,8 @@ MonoBehaviour:
       - Metric.Style
       m_values: 0c0300006f01000006000000020000000600000001000000010000000000000017000000c7010000
     type: File
+    incomings: []
+    outgoings: []
     children: []
 --- !u!65 &580688672
 BoxCollider:
@@ -2773,6 +2828,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2894,7 +2950,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286545791
+    rgba: 4286611584
   m_fontColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -3007,6 +3063,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3233,6 +3290,8 @@ MonoBehaviour:
       m_keys: []
       m_values: 
     type: Directory
+    incomings: []
+    outgoings: []
     children:
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -3266,6 +3325,8 @@ MonoBehaviour:
         m_keys: []
         m_values: 
       type: Directory
+      incomings: []
+      outgoings: []
       children:
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -3291,6 +3352,8 @@ MonoBehaviour:
           - Metric.Style
           m_values: 060000000400000002000000000000000200000022000000
         type: File
+        incomings: []
+        outgoings: []
         children: []
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -3324,6 +3387,8 @@ MonoBehaviour:
           - Metric.Style
           m_values: 10000000080000000100000000000000030000000200000001000000000000000c000000de140000
         type: File
+        incomings: []
+        outgoings: []
         children: []
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -3357,6 +3422,8 @@ MonoBehaviour:
         m_keys: []
         m_values: 
       type: Directory
+      incomings: []
+      outgoings: []
       children:
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -3390,6 +3457,8 @@ MonoBehaviour:
           - Metric.Style
           m_values: 5604000004010000020000000f000000070000000900000000000000000000000500000020000000
         type: File
+        incomings: []
+        outgoings: []
         children: []
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -3423,6 +3492,8 @@ MonoBehaviour:
           - Metric.Style
           m_values: f40100006f0000000100000001000000010000000b0000000000000000000000070000000d000000
         type: File
+        incomings: []
+        outgoings: []
         children: []
 --- !u!65 &654514603
 BoxCollider:
@@ -3451,6 +3522,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3572,7 +3644,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286545791
+    rgba: 4286611584
   m_fontColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -3685,6 +3757,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3859,6 +3932,8 @@ MonoBehaviour:
       - Metric.Style
       m_values: b80b00002c0100000a0000000f000000090000000700000000000000000000000500000057080000
     type: File
+    incomings: []
+    outgoings: []
     children: []
 --- !u!65 &842305001
 BoxCollider:
@@ -3887,6 +3962,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4025,6 +4101,8 @@ MonoBehaviour:
       m_keys: []
       m_values: 
     type: Directory
+    incomings: []
+    outgoings: []
     children:
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -4058,6 +4136,8 @@ MonoBehaviour:
         - Metric.Style
         m_values: 5604000004010000020000000f000000070000000900000000000000000000000500000020000000
       type: File
+      incomings: []
+      outgoings: []
       children: []
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -4091,6 +4171,8 @@ MonoBehaviour:
         - Metric.Style
         m_values: f40100006f0000000100000001000000010000000b0000000000000000000000070000000d000000
       type: File
+      incomings: []
+      outgoings: []
       children: []
 --- !u!65 &861895627
 BoxCollider:
@@ -4119,6 +4201,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4240,7 +4323,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286545791
+    rgba: 4286611584
   m_fontColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -4353,6 +4436,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4467,6 +4551,8 @@ MonoBehaviour:
       - Metric.Style
       m_values: 060000000400000002000000000000000200000022000000
     type: File
+    incomings: []
+    outgoings: []
     children: []
 --- !u!65 &961384047
 BoxCollider:
@@ -4495,6 +4581,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4633,6 +4720,8 @@ MonoBehaviour:
       - Metric.Style
       m_values: ea010000d30000000400000007000000080000000500000001000000010000004a00000000000000
     type: File
+    incomings: []
+    outgoings: []
     children: []
 --- !u!65 &983424234
 BoxCollider:
@@ -4661,6 +4750,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4779,6 +4869,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4901,7 +4992,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286545791
+    rgba: 4286611584
   m_fontColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -5014,6 +5105,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5119,7 +5211,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286545791
+    rgba: 4286611584
   m_fontColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -5232,6 +5324,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5354,6 +5447,8 @@ MonoBehaviour:
       - Metric.Style
       m_values: b80b0000900100000400000008000000000000002d000000000000000000000059000000818f0300
     type: File
+    incomings: []
+    outgoings: []
     children: []
 --- !u!65 &1166754075
 BoxCollider:
@@ -5382,6 +5477,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5520,6 +5616,8 @@ MonoBehaviour:
       - Metric.Style
       m_values: d4050000170100000100000004000000040000004c00000000000000000000000200000038000000
     type: File
+    incomings: []
+    outgoings: []
     children: []
 --- !u!65 &1171606780
 BoxCollider:
@@ -5548,6 +5646,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5686,6 +5785,8 @@ MonoBehaviour:
       m_keys: []
       m_values: 
     type: Directory
+    incomings: []
+    outgoings: []
     children:
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -5719,6 +5820,8 @@ MonoBehaviour:
         - Metric.Style
         m_values: ea010000d30000000400000007000000080000000500000001000000010000004a00000000000000
       type: File
+      incomings: []
+      outgoings: []
       children: []
 --- !u!65 &1278328922
 BoxCollider:
@@ -5747,6 +5850,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6093,7 +6197,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286545791
+    rgba: 4286611584
   m_fontColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -6206,6 +6310,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6311,7 +6416,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286545791
+    rgba: 4286611584
   m_fontColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -6424,6 +6529,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6546,6 +6652,8 @@ MonoBehaviour:
       - Metric.Style
       m_values: 5604000004010000020000000f000000070000000900000000000000000000000500000020000000
     type: File
+    incomings: []
+    outgoings: []
     children: []
 --- !u!65 &1363966780
 BoxCollider:
@@ -6574,6 +6682,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6712,6 +6821,8 @@ MonoBehaviour:
       - Metric.Style
       m_values: f40100006f0000000100000001000000010000000b0000000000000000000000070000000d000000
     type: File
+    incomings: []
+    outgoings: []
     children: []
 --- !u!65 &1378372123
 BoxCollider:
@@ -6740,6 +6851,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6877,6 +6989,8 @@ MonoBehaviour:
       m_keys: []
       m_values: 
     type: Directory
+    incomings: []
+    outgoings: []
     children:
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -6910,6 +7024,8 @@ MonoBehaviour:
         m_keys: []
         m_values: 
       type: Directory
+      incomings: []
+      outgoings: []
       children:
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -6943,6 +7059,8 @@ MonoBehaviour:
           m_keys: []
           m_values: 
         type: Directory
+        incomings: []
+        outgoings: []
         children:
         - toggleAttributes:
           - Linkage.Is_Definition
@@ -6976,6 +7094,8 @@ MonoBehaviour:
             - Metric.Style
             m_values: d80500001101000001000000050000000300000001000000000000000000000005000000535a0000
           type: File
+          incomings: []
+          outgoings: []
           children: []
         - toggleAttributes:
           - Linkage.Is_Definition
@@ -7009,6 +7129,8 @@ MonoBehaviour:
             - Metric.Style
             m_values: 2003000037000000020000000a0000000300000003000000010000000000000008000000ba850000
           type: File
+          incomings: []
+          outgoings: []
           children: []
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -7042,6 +7164,8 @@ MonoBehaviour:
           m_keys: []
           m_values: 
         type: Directory
+        incomings: []
+        outgoings: []
         children:
         - toggleAttributes:
           - Linkage.Is_Definition
@@ -7075,6 +7199,8 @@ MonoBehaviour:
             - Metric.Style
             m_values: b0040000900100000200000001000000010000000600000003000000000000000200000022000000
           type: File
+          incomings: []
+          outgoings: []
           children: []
         - toggleAttributes:
           - Linkage.Is_Definition
@@ -7108,6 +7234,8 @@ MonoBehaviour:
             - Metric.Style
             m_values: b80b00002c0100000a0000000f000000090000000700000000000000000000000500000057080000
           type: File
+          incomings: []
+          outgoings: []
           children: []
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -7141,6 +7269,8 @@ MonoBehaviour:
         m_keys: []
         m_values: 
       type: Directory
+      incomings: []
+      outgoings: []
       children:
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -7174,6 +7304,8 @@ MonoBehaviour:
           m_keys: []
           m_values: 
         type: Directory
+        incomings: []
+        outgoings: []
         children:
         - toggleAttributes:
           - Linkage.Is_Definition
@@ -7199,6 +7331,8 @@ MonoBehaviour:
             - Metric.Style
             m_values: 060000000400000002000000000000000200000022000000
           type: File
+          incomings: []
+          outgoings: []
           children: []
         - toggleAttributes:
           - Linkage.Is_Definition
@@ -7232,6 +7366,8 @@ MonoBehaviour:
             - Metric.Style
             m_values: 10000000080000000100000000000000030000000200000001000000000000000c000000de140000
           type: File
+          incomings: []
+          outgoings: []
           children: []
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -7265,6 +7401,8 @@ MonoBehaviour:
           m_keys: []
           m_values: 
         type: Directory
+        incomings: []
+        outgoings: []
         children:
         - toggleAttributes:
           - Linkage.Is_Definition
@@ -7298,6 +7436,8 @@ MonoBehaviour:
             - Metric.Style
             m_values: 5604000004010000020000000f000000070000000900000000000000000000000500000020000000
           type: File
+          incomings: []
+          outgoings: []
           children: []
         - toggleAttributes:
           - Linkage.Is_Definition
@@ -7331,6 +7471,8 @@ MonoBehaviour:
             - Metric.Style
             m_values: f40100006f0000000100000001000000010000000b0000000000000000000000070000000d000000
           type: File
+          incomings: []
+          outgoings: []
           children: []
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -7364,6 +7506,8 @@ MonoBehaviour:
         m_keys: []
         m_values: 
       type: Directory
+      incomings: []
+      outgoings: []
       children:
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -7397,6 +7541,8 @@ MonoBehaviour:
           - Metric.Style
           m_values: ea010000d30000000400000007000000080000000500000001000000010000004a00000000000000
         type: File
+        incomings: []
+        outgoings: []
         children: []
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -7430,6 +7576,8 @@ MonoBehaviour:
           m_keys: []
           m_values: 
         type: Directory
+        incomings: []
+        outgoings: []
         children:
         - toggleAttributes:
           - Linkage.Is_Definition
@@ -7463,6 +7611,8 @@ MonoBehaviour:
             - Metric.Style
             m_values: d4050000170100000100000004000000040000004c00000000000000000000000200000038000000
           type: File
+          incomings: []
+          outgoings: []
           children: []
         - toggleAttributes:
           - Linkage.Is_Definition
@@ -7496,6 +7646,8 @@ MonoBehaviour:
             - Metric.Style
             m_values: b80b0000900100000400000008000000000000002d000000000000000000000059000000818f0300
           type: File
+          incomings: []
+          outgoings: []
           children: []
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -7529,6 +7681,8 @@ MonoBehaviour:
           m_keys: []
           m_values: 
         type: Directory
+        incomings: []
+        outgoings: []
         children:
         - toggleAttributes:
           - Linkage.Is_Definition
@@ -7562,6 +7716,8 @@ MonoBehaviour:
             - Metric.Style
             m_values: 01010000650000000700000009000000010000002200000002000000000000000500000016000000
           type: File
+          incomings: []
+          outgoings: []
           children: []
         - toggleAttributes:
           - Linkage.Is_Definition
@@ -7595,6 +7751,8 @@ MonoBehaviour:
             - Metric.Style
             m_values: 0c0300006f01000006000000020000000600000001000000010000000000000017000000c7010000
           type: File
+          incomings: []
+          outgoings: []
           children: []
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -7628,6 +7786,8 @@ MonoBehaviour:
         m_keys: []
         m_values: 
       type: Directory
+      incomings: []
+      outgoings: []
       children:
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -7661,6 +7821,8 @@ MonoBehaviour:
           - Metric.Style
           m_values: ea010000d30000000400000007000000080000000500000001000000010000004a00000000000000
         type: File
+        incomings: []
+        outgoings: []
         children: []
 --- !u!65 &1390860559
 BoxCollider:
@@ -7689,6 +7851,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -7827,6 +7990,8 @@ MonoBehaviour:
       - Metric.Style
       m_values: 10000000080000000100000000000000030000000200000001000000000000000c000000de140000
     type: File
+    incomings: []
+    outgoings: []
     children: []
 --- !u!65 &1403046775
 BoxCollider:
@@ -7855,6 +8020,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8002,7 +8168,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286545791
+    rgba: 4286611584
   m_fontColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -8115,6 +8281,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8237,6 +8404,8 @@ MonoBehaviour:
       m_keys: []
       m_values: 
     type: Directory
+    incomings: []
+    outgoings: []
     children:
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -8270,6 +8439,8 @@ MonoBehaviour:
         m_keys: []
         m_values: 
       type: Directory
+      incomings: []
+      outgoings: []
       children:
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -8303,6 +8474,8 @@ MonoBehaviour:
           - Metric.Style
           m_values: d80500001101000001000000050000000300000001000000000000000000000005000000535a0000
         type: File
+        incomings: []
+        outgoings: []
         children: []
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -8336,6 +8509,8 @@ MonoBehaviour:
           - Metric.Style
           m_values: 2003000037000000020000000a0000000300000003000000010000000000000008000000ba850000
         type: File
+        incomings: []
+        outgoings: []
         children: []
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -8369,6 +8544,8 @@ MonoBehaviour:
         m_keys: []
         m_values: 
       type: Directory
+      incomings: []
+      outgoings: []
       children:
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -8402,6 +8579,8 @@ MonoBehaviour:
           - Metric.Style
           m_values: b0040000900100000200000001000000010000000600000003000000000000000200000022000000
         type: File
+        incomings: []
+        outgoings: []
         children: []
       - toggleAttributes:
         - Linkage.Is_Definition
@@ -8435,6 +8614,8 @@ MonoBehaviour:
           - Metric.Style
           m_values: b80b00002c0100000a0000000f000000090000000700000000000000000000000500000057080000
         type: File
+        incomings: []
+        outgoings: []
         children: []
 --- !u!65 &1500272307
 BoxCollider:
@@ -8463,6 +8644,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8601,6 +8783,8 @@ MonoBehaviour:
       m_keys: []
       m_values: 
     type: Directory
+    incomings: []
+    outgoings: []
     children:
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -8634,6 +8818,8 @@ MonoBehaviour:
         - Metric.Style
         m_values: 01010000650000000700000009000000010000002200000002000000000000000500000016000000
       type: File
+      incomings: []
+      outgoings: []
       children: []
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -8667,6 +8853,8 @@ MonoBehaviour:
         - Metric.Style
         m_values: 0c0300006f01000006000000020000000600000001000000010000000000000017000000c7010000
       type: File
+      incomings: []
+      outgoings: []
       children: []
 --- !u!65 &1506106543
 BoxCollider:
@@ -8695,6 +8883,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8833,6 +9022,8 @@ MonoBehaviour:
       - Metric.Style
       m_values: d80500001101000001000000050000000300000001000000000000000000000005000000535a0000
     type: File
+    incomings: []
+    outgoings: []
     children: []
 --- !u!65 &1662277234
 BoxCollider:
@@ -8861,6 +9052,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8999,6 +9191,8 @@ MonoBehaviour:
       m_keys: []
       m_values: 
     type: Directory
+    incomings: []
+    outgoings: []
     children:
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -9032,6 +9226,8 @@ MonoBehaviour:
         - Metric.Style
         m_values: b0040000900100000200000001000000010000000600000003000000000000000200000022000000
       type: File
+      incomings: []
+      outgoings: []
       children: []
     - toggleAttributes:
       - Linkage.Is_Definition
@@ -9065,6 +9261,8 @@ MonoBehaviour:
         - Metric.Style
         m_values: b80b00002c0100000a0000000f000000090000000700000000000000000000000500000057080000
       type: File
+      incomings: []
+      outgoings: []
       children: []
 --- !u!65 &1752288926
 BoxCollider:
@@ -9093,6 +9291,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9214,7 +9413,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286545791
+    rgba: 4286611584
   m_fontColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -9327,6 +9526,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9395,8 +9595,9 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1972266461}
   m_Enabled: 1
-  serializedVersion: 9
+  serializedVersion: 10
   m_Type: 1
+  m_Shape: 0
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
   m_Intensity: 1
   m_Range: 10
