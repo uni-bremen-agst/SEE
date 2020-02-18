@@ -21,6 +21,8 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		protected ChartManager ChartManager;
 
+		private float _markerOverlapDistance = 22;
+
 		[SerializeField] private GameObject scrollContent;
 
 		[SerializeField] private GameObject scrollEntryPrefab;
@@ -241,7 +243,6 @@ namespace SEECity.Charts.Scripts
 				DrawTwoAxes();
 
 			if (ActiveMarkers.Count == 0) noDataWarning.SetActive(true);
-			//TODO: Reduce values of g and b for every marker that is overlapping.
 		}
 
 		/// <summary>
@@ -511,8 +512,7 @@ namespace SEECity.Charts.Scripts
 		{
 			Image image = marker.GetComponent<Image>();
 			foreach (GameObject updatedMarker in updatedMarkers)
-				if (Vector3.Distance(marker.transform.position, updatedMarker.transform.position) <
-				    3)
+				if (Vector3.Distance(marker.transform.position, updatedMarker.transform.position).CompareTo(_markerOverlapDistance * marker.transform.lossyScale.x) < 0)
 					if (image.color.g - 0.1f >= 0)
 					{
 						Color oldColor = image.color;

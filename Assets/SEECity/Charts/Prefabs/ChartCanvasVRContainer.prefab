@@ -202,6 +202,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -277,7 +278,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &7054491374032328785
 RectTransform:
   m_ObjectHideFlags: 0
@@ -355,7 +356,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!114 &7663019573522271225
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -570,6 +571,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -621,6 +623,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chartInfo: {fileID: 7026705762324680031}
   sizeButton: {fileID: 4687529802294026510}
+  contentSelection: {fileID: 0}
 --- !u!1 &8359109650499819823
 GameObject:
   m_ObjectHideFlags: 0
@@ -788,6 +791,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1085,7 +1089,7 @@ PrefabInstance:
     - target: {fileID: 4926765390931117993, guid: 7845d136e1a6173458ce440b23366580,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 0.00031500077
       objectReference: {fileID: 0}
     - target: {fileID: 5259919525468694474, guid: 7845d136e1a6173458ce440b23366580,
         type: 3}
