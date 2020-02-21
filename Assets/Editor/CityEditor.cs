@@ -47,18 +47,6 @@ namespace SEEEditor
         private SEE.GraphSettings editorSettings = new SEE.GraphSettings();
 
         /// <summary>
-        /// Returns the path to our Unity project folder.
-        /// </summary>
-        /// <returns>path to our Unity project folder</returns>
-        private static string ProjectPath()
-        {
-            string result = Application.dataPath;
-            // Unity uses Unix directory separator; we need Windows here
-            
-            return result.Replace('/', '\\') + '\\';
-        }
-
-        /// <summary>
         /// Whether VR mode is to be activated for the game.
         /// </summary>
         private bool VRenabled = false;
@@ -146,7 +134,7 @@ namespace SEEEditor
             {
                 // Application.dataPath (used within ProjectPath()) must not be called in a 
                 // constructor. That is why we need to set it here if it is not yet defined.
-                editorSettings.pathPrefix = ProjectPath();
+                editorSettings.pathPrefix = UnityProject.GetPath();
             }
             editorSettings.pathPrefix = EditorGUILayout.TextField("Project path prefix", editorSettings.pathPrefix);
             editorSettings.gxlPath = EditorGUILayout.TextField("GXL file", editorSettings.gxlPath);
@@ -195,7 +183,11 @@ namespace SEEEditor
                     EnableVR(VRenabled);
   
                     graph = SceneGraphs.Add(editorSettings);
-                    if (graph != null)
+                    if (ReferenceEquals(graph, null))
+                    {
+                        Debug.LogError("No graph loaded.\n");
+                    }
+                    else
                     {
                         int numberOfErrors = MetricImporter.Load(graph, editorSettings.CSVPath());
                         if (numberOfErrors > 0)
@@ -217,10 +209,6 @@ namespace SEEEditor
                         renderer.Draw(graph);
                         // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
                         AdjustCameraSpeed(renderer.Unit());
-                    }
-                    else
-                    {
-                        Debug.LogError("No graph loaded.\n");
                     }
                     break;
 

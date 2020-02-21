@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="Mapping" edgeids="true">
+    <node id="N1569">
+      <type xlink:href="Variable"/>
+      <attr name="Linkage.Name">
+        <string>O debug_flag</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>debug_flag</string>
+      </attr>
+    </node>
+    <node id="N1571">
+      <type xlink:href="Variable"/>
+      <attr name="Linkage.Name">
+        <string>O gencode_flag</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>gencode_flag</string>
+      </attr>
+    </node>
+    <node id="N1573">
+      <type xlink:href="Variable"/>
+      <attr name="Linkage.Name">
+        <string>O optimize_flag</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>optimize_flag</string>
+      </attr>
+    </node>
+    <node id="N1575">
+      <type xlink:href="Variable"/>
+      <attr name="Linkage.Name">
+        <string>O range_check_flag</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>range_check_flag</string>
+      </attr>
+    </node>
+    <node id="N1577">
+      <type xlink:href="Variable"/>
+      <attr name="Linkage.Name">
+        <string>O root</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>root</string>
+      </attr>
+    </node>
+    <node id="N1581">
+      <type xlink:href="Variable"/>
+      <attr name="Linkage.Name">
+        <string>O verbose_flag</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>verbose_flag</string>
+      </attr>
+    </node>
+    <node id="N1590">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M abstree</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>abstree</string>
+      </attr>
+    </node>
+    <node id="N1591">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M threeadr</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>threeadr</string>
+      </attr>
+    </node>
+    <node id="N1592">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M constab</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>constab</string>
+      </attr>
+    </node>
+    <node id="N1593">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M symtable</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>symtable</string>
+      </attr>
+    </node>
+    <node id="N1597">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M argument</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>argument</string>
+      </attr>
+    </node>
+    <node id="N1598">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M error</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>error</string>
+      </attr>
+    </node>
+    <node id="N1599">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M codelist</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>codelist</string>
+      </attr>
+    </node>
+    <node id="N1600">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M cbam</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>cbam</string>
+      </attr>
+    </node>
+    <node id="N1601">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M macros</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>macros</string>
+      </attr>
+    </node>
+    <node id="N1614">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M minilax</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>minilax</string>
+      </attr>
+    </node>
+    <node id="N1617">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M typechk</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>typechk</string>
+      </attr>
+    </node>
+    <node id="N1618">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M xmem</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>xmem</string>
+      </attr>
+    </node>
+    <node id="N1619">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M prntree</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>prntree</string>
+      </attr>
+    </node>
+    <node id="N1620">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M scanner</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>scanner</string>
+      </attr>
+    </node>
+    <node id="N1621">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M semantic</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>semantic</string>
+      </attr>
+    </node>
+    <node id="N1622">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M parser</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>parser</string>
+      </attr>
+    </node>
+    <node id="N1623">
+      <type xlink:href="Module"/>
+      <attr name="Linkage.Name">
+        <string>M codegen</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>codegen</string>
+      </attr>
+    </node>
+    <node id="N3360">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Memory Manager</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Memory Manager</string>
+      </attr>	  
+    </node>
+    <node id="N3361">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Print AST</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Print AST</string>
+      </attr>	  
+    </node>
+    <node id="N3364">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Error Handler</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Error Handler</string>
+      </attr>	  
+    </node>
+    <node id="N3365">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Constants Table</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Constants Table</string>
+      </attr>	  
+    </node>
+    <node id="N3366">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Main</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Main</string>
+      </attr>	  
+    </node>
+    <node id="N3368">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Parser</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Parser</string>
+      </attr>	  
+    </node>
+    <node id="N3369">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Scanner</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Scanner</string>
+      </attr>	  
+    </node>
+    <node id="N3370">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Symbol Table</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Symbol Table</string>
+      </attr>	  
+    </node>
+    <node id="N3371">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>IL</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>IL</string>
+      </attr>	  
+    </node>
+    <node id="N3372">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>AST</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>AST</string>
+      </attr>	  
+    </node>
+    <node id="N3378">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Macros</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Macros</string>
+      </attr>	  
+    </node>
+    <node id="N3379">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Global Controls</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Global Controls</string>
+      </attr>	  
+    </node>
+    <node id="N3381">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>IL2Code</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>IL2Code</string>
+      </attr>	  
+    </node>
+    <node id="N3382">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Machine Description</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Machine Description</string>
+      </attr>	  
+    </node>
+    <node id="N3383">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Type Info</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Type Info</string>
+      </attr>	  
+    </node>
+    <node id="N3384">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Target Program</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Target Program</string>
+      </attr>	  
+    </node>
+    <node id="N3385">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>AST-Main</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>AST-Main</string>
+      </attr>	  
+    </node>
+    <node id="N3386">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Semantic Main</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Semantic Main</string>
+      </attr>	  
+    </node>
+    <edge id="E13989" from="N1591" to="N3371">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E13990" from="N1598" to="N3364">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E13991" from="N1620" to="N3369">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E13992" from="N1593" to="N3370">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E13993" from="N1622" to="N3368">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E13994" from="N1619" to="N3361">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E13995" from="N1597" to="N3379">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E13996" from="N1614" to="N3366">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E13997" from="N1601" to="N3378">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E13998" from="N1592" to="N3365">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E13999" from="N1600" to="N3384">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E14000" from="N1599" to="N3384">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E14001" from="N1617" to="N3383">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E14002" from="N1623" to="N3381">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E14003" from="N1618" to="N3360">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E14004" from="N1581" to="N3379">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E14005" from="N1575" to="N3379">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E14006" from="N1577" to="N3379">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E14007" from="N1573" to="N3379">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E14008" from="N1569" to="N3379">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E14009" from="N1590" to="N3385">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E14010" from="N1621" to="N3386">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E14011" from="N1571" to="N3379">
+      <type xlink:href="Maps_To"/>
+    </edge>
+  </graph>
+</gxl>
