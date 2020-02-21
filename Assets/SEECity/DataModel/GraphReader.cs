@@ -93,7 +93,7 @@ namespace SEE.DataModel
         /// </summary>
         protected override void StartNode()
         {
-            if (current != null)
+            if (!ReferenceEquals(current, null))
             {
                 LogError("There is still a pending graph element when new node declaration has begun.");
             }
@@ -120,7 +120,11 @@ namespace SEE.DataModel
         /// </summary>
         protected override void EndNode()
         {
-            if (current != null)
+            if (ReferenceEquals(current, null))
+            {
+                LogError("There is no node to be ended here.");
+            }
+            else
             {
                 if (!(current is Node))
                 {
@@ -134,6 +138,16 @@ namespace SEE.DataModel
                     if (String.IsNullOrEmpty(node.LinkName))
                     {
                         LogError("Node has no attribute " + Node.LinknameAttribute);
+                        // let's try to use the Source.Name for the linkname instead, hoping it is unique
+                        if (String.IsNullOrEmpty(node.SourceName))
+                        {
+                            LogError("Node has not even an attribute " + Node.SourceNameAttribute);
+                        }
+                        else
+                        {
+                            node.LinkName = node.SourceName;
+                            graph.AddNode(node);
+                        }
                     }
                     else
                     {
@@ -141,10 +155,6 @@ namespace SEE.DataModel
                     }
                 }
                 current = null;
-            }
-            else
-            {
-                LogError("There is no node to be ended here.");
             }
         }
 
@@ -164,7 +174,7 @@ namespace SEE.DataModel
         /// </summary>
         protected override void StartEdge()
         {
-            if (current != null)
+            if (!ReferenceEquals(current, null))
             {
                 LogError("There is still a pending graph element when new edge declaration has begun.");
             }
@@ -252,7 +262,7 @@ namespace SEE.DataModel
         /// </summary>
         protected override void EndEdge()
         {
-            if (current != null)
+            if (!ReferenceEquals(current, null))
             {
                 if (!(current is Edge))
                 {
@@ -285,7 +295,7 @@ namespace SEE.DataModel
         /// </summary>
         protected override void StartType()
         {
-            if (current == null)
+            if (ReferenceEquals(current, null))
             {
                 LogError("Found type declaration outside of a node/edge declaration.");
             }
@@ -323,7 +333,7 @@ namespace SEE.DataModel
         /// </summary>
         protected override void StartAttr()
         {
-            if (current == null)
+            if (ReferenceEquals(current, null))
             {
                 LogError("Found attribute declaration outside of a node/edge declaration");
             }
@@ -353,7 +363,7 @@ namespace SEE.DataModel
         /// </summary>
         protected override void StartEnum()
         {
-            if (current == null)
+            if (ReferenceEquals(current, null))
             {
                 LogError("Found toggle attribute (enum) outside of a node/edge declaration.");
             }
@@ -373,7 +383,7 @@ namespace SEE.DataModel
         /// </summary>
         protected override void EndString(string value)
         {
-            if (current == null)
+            if (ReferenceEquals(current, null))
             {
                 LogError("Found string attribute outside of a node/edge declaration.");
             }
@@ -392,7 +402,7 @@ namespace SEE.DataModel
         /// </summary>
         protected override void EndFloat(float value)
         {
-            if (current == null)
+            if (ReferenceEquals(current, null))
             {
                 LogError("Found float attribute outside of a node/edge declaration.");
             }
@@ -411,7 +421,7 @@ namespace SEE.DataModel
         /// </summary>
         protected override void EndInt(int value)
         {
-            if (current == null)
+            if (ReferenceEquals(current, null))
             {
                 LogError("Found int attribute outside of a node/edge declaration.");
             }
