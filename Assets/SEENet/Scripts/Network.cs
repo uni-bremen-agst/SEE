@@ -82,6 +82,33 @@ namespace SEE.Net
         private void InitializeSEE()
         {
             Instantiate("Prefabs/Player");
+
+            GameObject rig = GameObject.Find("Player Rig");
+            if (rig)
+            {
+                ControlMode mode = rig.GetComponent<ControlMode>();
+#if UNITY_EDITOR
+                if (mode.ViveController && mode.LeapMotion)
+                {
+                    Debug.LogError("Only one mode should be enabled!");
+                }
+#endif
+                if (mode.ViveController)
+                {
+                    Instantiate("Prefabs/Network VR Vive-style Controller (Left)");
+                    Instantiate("Prefabs/Network VR Vive-style Controller (Right)");
+                }
+                else if (mode.LeapMotion)
+                {
+                    throw new NotImplementedException("Multiplayer does not support Leap Motion!");
+                }
+#if UNITY_EDITOR
+                else
+                {
+                    Debug.LogError("No mode selected!");
+                }
+#endif
+            }
         }
         private void Update()
         {
