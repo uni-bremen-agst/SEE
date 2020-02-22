@@ -58,7 +58,7 @@ namespace SEE.Net
         }
         protected override void UpdateImpl()
         {
-            if (!viewContainer.IsOwner())
+            if (viewContainer != null && !viewContainer.IsOwner())
             {
                 if (synchronizePosition)
                 {

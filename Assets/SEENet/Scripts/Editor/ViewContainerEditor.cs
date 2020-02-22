@@ -36,7 +36,7 @@ namespace SEE.Net.Internal
             {
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("views"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("views"), true);
                 }
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
