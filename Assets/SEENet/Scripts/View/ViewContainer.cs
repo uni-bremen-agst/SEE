@@ -71,7 +71,19 @@ namespace SEE.Net
         }
         public bool IsOwner()
         {
-            return Network.UseInOfflineMode || owner == null || Client.Connection == null || owner.Equals(Client.Connection.ConnectionInfo.LocalEndPoint);
+            bool isOwner = Network.UseInOfflineMode || owner == null || Client.Connection == null;
+
+            if (!isOwner && owner.Port == ((IPEndPoint)Client.Connection.ConnectionInfo.LocalEndPoint).Port)
+            {
+                foreach (IPAddress ipAddress in Network.LookupLocalIPAddresses())
+                {
+                    if (ipAddress.Equals(owner.Address))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return isOwner;
         }
     }
 

@@ -42,7 +42,7 @@ namespace SEE.Net
         public static Thread MainThread { get; private set; } = Thread.CurrentThread;
         private static List<Connection> deadConnections = new List<Connection>();
 
-        void Awake()
+        private void Awake()
         {
             if (instance)
             {
@@ -76,8 +76,14 @@ namespace SEE.Net
                 Server.Initialize();
             }
             Client.Initialize();
+
+            InitializeSEE();
         }
-        void Update()
+        private void InitializeSEE()
+        {
+            Instantiate("Prefabs/Player");
+        }
+        private void Update()
         {
             if (hostServer && !useInOfflineMode)
             {
@@ -85,7 +91,7 @@ namespace SEE.Net
             }
             Client.Update();
         }
-        void OnDestroy()
+        private void OnDestroy()
         {
             if (!useInOfflineMode)
             {
