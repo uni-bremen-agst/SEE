@@ -14,7 +14,7 @@ namespace SEE.Net
 
         [SerializeField] public int id = INVALID_ID;
         [SerializeField] public IPEndPoint owner;
-        [SerializeField] private View[] views;
+        [SerializeField] private View[] views = new View[1];
         
         private static Dictionary<int, ViewContainer> viewContainers = new Dictionary<int, ViewContainer>(); // TODO: could probably just be an array
 
@@ -71,7 +71,7 @@ namespace SEE.Net
         }
         public bool IsOwner()
         {
-            return Network.UseInOfflineMode || owner.Equals(Client.Connection.ConnectionInfo.LocalEndPoint);
+            return Network.UseInOfflineMode || owner == null || Client.Connection == null || owner.Equals(Client.Connection.ConnectionInfo.LocalEndPoint);
         }
     }
 
