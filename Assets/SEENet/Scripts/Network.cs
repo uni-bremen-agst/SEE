@@ -81,7 +81,7 @@ namespace SEE.Net
         }
         private void InitializeSEE()
         {
-            Instantiate("Prefabs/Player");
+            Instantiate("Prefabs/SEENetPlayer");
 
             GameObject rig = GameObject.Find("Player Rig");
             if (rig)
@@ -95,8 +95,9 @@ namespace SEE.Net
 #endif
                 if (mode.ViveController)
                 {
-                    Instantiate("Prefabs/Network VR Vive-style Controller (Left)");
-                    Instantiate("Prefabs/Network VR Vive-style Controller (Right)");
+                    Instantiate("Prefabs/SEENetViveControllerLeft");
+                    Instantiate("Prefabs/SEENetViveControllerRight");
+                    Instantiate("Prefabs/SEENetViveControllerRay");
                 }
                 else if (mode.LeapMotion)
                 {

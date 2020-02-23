@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Assertions;
 
-namespace SEE.Net
+namespace SEE.Net.Internal
 {
 
-    public class ViveController : MonoBehaviour
+    public class SEENetViveController : MonoBehaviour
     {
         public enum ViveControllerHand
         {
@@ -21,9 +20,10 @@ namespace SEE.Net
 
         private Transform controllerTransform;
 
-        void Start()
+        private void Start()
         {
-            if (!GetComponent<ViewContainer>().IsOwner())
+            ViewContainer viewContainer = GetComponent<ViewContainer>();
+            if (viewContainer == null || !viewContainer.IsOwner())
             {
                 Destroy(this);
                 return;
@@ -50,18 +50,12 @@ namespace SEE.Net
                 }
                 else
                 {
+                    Debug.LogError("Right controller could not be found! Is it enabled?");
                 }
             }
-#if UNITY_EDITOR
-            if (controllerTransform == null)
-            {
-                Debug.LogError((hand == ViveControllerHand.LeftHand ? "Left" : "Right") + " controller could not be found! Is it enabled?");
-                Destroy(this);
-            }
-#endif
+            Assert.IsNotNull(controllerTransform);
         }
-
-        void Update()
+        private void Update()
         {
             transform.position = controllerTransform.position;
             transform.rotation = controllerTransform.rotation;
