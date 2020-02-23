@@ -15,6 +15,7 @@ TagManager:
   - Block
   - Decoration
   - Path
+  - CCAnimation
   layers:
   - Default
   - TransparentFX
