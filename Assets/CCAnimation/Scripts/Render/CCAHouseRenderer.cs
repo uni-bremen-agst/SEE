@@ -22,9 +22,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// A CCARender that is used to display houses as graph nodes.
+/// A CCARenderer that is used to display houses as graph nodes.
 /// </summary>
-public class CCHouseRenderer : AbstractCCARender
+public class CCHouseRenderer : AbstractCCARenderer
 {
     /// <summary>
     /// A SimpleAnimator used for animation.

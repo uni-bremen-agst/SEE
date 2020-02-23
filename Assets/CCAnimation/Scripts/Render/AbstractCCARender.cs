@@ -25,42 +25,43 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// Abstract Render class that serves as an interface to optimally animate different display formats or layouts
+/// Abstract Render class that serves as an interface to optimally animate different 
+/// display formats or layouts.
 /// </summary>
-public abstract class AbstractCCARender : MonoBehaviour
+public abstract class AbstractCCARenderer : MonoBehaviour
 {
     /// <summary>
-    /// Die kürzeste Zeit, in der eine Animation ablaufen kann.
+    /// Shortest time period in which an animation can be run.
     /// </summary>
     private float MinimalWaitTimeForNextRevision = 0.1f;
 
     /// <summary>
-    /// Ein Event, der beim Start der Animationen ausgelöst wird.
+    /// An event fired upon the start of an animation.
     /// </summary>
     public readonly UnityEvent AnimationStartedEvent = new UnityEvent();
 
     /// <summary>
-    /// Ein Event, der nach dem abschließen der gestarteten Animation ausgelöst wird.
+    /// An event fired upon the end of an animation.
     /// </summary>
     public readonly UnityEvent AnimationFinishedEvent = new UnityEvent();
 
     private bool _isStillAnimating = false;
 
     /// <summary>
-    /// Gibt zurück, ob gerade Animationen im gange sind.
+    /// True if animation is still ongoing.
     /// </summary>
     public bool IsStillAnimating { get => _isStillAnimating; set => _isStillAnimating = value; }
 
     /// <summary>
-    /// Ein Sammlung der registrierten <see cref="AbstractCCAAnimator"/>, die bei 
-    /// Änderungen in der Animationszeit automatisch aktualisiert werden.
+    /// The collection of registered <see cref="AbstractCCAAnimator"/> to be updated
+    /// automatically for changes during the animation time period.
     /// </summary>
     private readonly List<AbstractCCAAnimator> animators = new List<AbstractCCAAnimator>();
 
     private float _animationTime = AbstractCCAAnimator.DefaultAnimationTime;
 
     /// <summary>
-    /// Die Zeit, die Animationen maximal nach ihrem Start andauern dürfen.
+    /// Maximal time of the lifetime of animation after they started.
     /// </summary>
     public float AnimationTime
     {
@@ -80,22 +81,22 @@ public abstract class AbstractCCARender : MonoBehaviour
     }
 
     /// <summary>
-    /// Der aktuell geladene Graph.
+    /// The currently loaded graph.
     /// </summary>
     private LoadedGraph _loadedGraph;
 
     /// <summary>
-    /// Der Graph, der als nächstes angezeigt werden soll.
+    /// The graph next to be shown.
     /// </summary>
     private LoadedGraph _nextGraph;
 
     /// <summary>
-    /// Eine Instanz zum Vergleichen zweier <see cref="Node"/>.
+    /// Allows the comparison of two instances of <see cref="Node"/>.
     /// </summary>
     private readonly NodeEqualityComparer nodeEqualityComparer = new NodeEqualityComparer();
 
     /// <summary>
-    /// Eine Instanz zum Vergleichen zweier <see cref="Edge"/>.
+    /// Allows the comparison of two instances of <see cref="Edge"/>.
     /// </summary>
     private readonly EdgeEqualityComparer edgeEqualityComparer = new EdgeEqualityComparer();
 
@@ -130,7 +131,7 @@ public abstract class AbstractCCARender : MonoBehaviour
     /// <summary>
     /// Constructor
     /// </summary>
-    public AbstractCCARender()
+    public AbstractCCARenderer()
     {
         RegisterAllAnimators(animators);
     }
