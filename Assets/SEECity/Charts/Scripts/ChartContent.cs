@@ -19,7 +19,7 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// Contains some settings used in this script.
 		/// </summary>
-		protected ChartManager ChartManager;
+		protected ChartManager chartManager;
 
 		private float _markerOverlapDistance = 22;
 
@@ -38,10 +38,12 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private GameObject[] _dataObjects;
 
+		[HideInInspector] public int citySize;
+
 		/// <summary>
 		/// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
 		/// </summary>
-		protected List<GameObject> ActiveMarkers = new List<GameObject>();
+		protected List<GameObject> activeMarkers = new List<GameObject>();
 
 		[SerializeField] private ChartMoveHandler moveHandler;
 
@@ -101,7 +103,7 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private void Awake()
 		{
-			ChartManager = GameObject.FindGameObjectWithTag("ChartManager")
+			chartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
 			FindDataObjects();
 			GetAllFloats();
@@ -113,7 +115,8 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		protected virtual void Start()
 		{
-			Invoke(nameof(CallDrawData), 0.2f);
+			float time = citySize > 50 ? 5f : 0.2f;
+			Invoke(nameof(CallDrawData), time);
 		}
 
 		/// <summary>
@@ -208,6 +211,7 @@ namespace SEECity.Charts.Scripts
 			foreach (GameObject entry in combined)
 				if (!entry.GetComponent<NodeHighlights>().showInChart.Contains(this))
 					entry.GetComponent<NodeHighlights>().showInChart.Add(this, true);
+			citySize = _dataObjects.Length;
 
 			FillScrollView();
 		}
@@ -221,9 +225,17 @@ namespace SEECity.Charts.Scripts
 			DrawData(true);
 		}
 
+		/// <summary>
+		/// Starts the Draw after a set time to handle calls in quick succession and improve performance.
+		/// </summary>
+		/// <returns></returns>
 		public IEnumerator QueueDraw()
 		{
-			yield return new WaitForSeconds(0.5f);
+			if (citySize > 50)
+				yield return new WaitForSeconds(2f);
+			else
+				yield return new WaitForSeconds(0.5f);
+
 			DrawData(false);
 			drawing = null;
 		}
@@ -242,7 +254,7 @@ namespace SEECity.Charts.Scripts
 			else
 				DrawTwoAxes();
 
-			if (ActiveMarkers.Count == 0) noDataWarning.SetActive(true);
+			if (activeMarkers.Count == 0) noDataWarning.SetActive(true);
 		}
 
 		/// <summary>
@@ -321,7 +333,7 @@ namespace SEECity.Charts.Scripts
 			}
 			else
 			{
-				foreach (GameObject activeMarker in ActiveMarkers) Destroy(activeMarker);
+				foreach (GameObject activeMarker in activeMarkers) Destroy(activeMarker);
 				noDataWarning.SetActive(true);
 			}
 		}
@@ -362,7 +374,7 @@ namespace SEECity.Charts.Scripts
 			}
 			else
 			{
-				foreach (GameObject activeMarker in ActiveMarkers) Destroy(activeMarker);
+				foreach (GameObject activeMarker in activeMarkers) Destroy(activeMarker);
 				noDataWarning.SetActive(true);
 			}
 		}
@@ -403,12 +415,12 @@ namespace SEECity.Charts.Scripts
 
 				float highlightTimeLeft = CheckOldMarkers(data);
 				if (highlightTimeLeft > 0f)
-					script.TriggerTimedHighlight(ChartManager.highlightDuration -
+					script.TriggerTimedHighlight(chartManager.highlightDuration -
 					                             highlightTimeLeft, true);
 			}
 
-			foreach (GameObject marker in ActiveMarkers) Destroy(marker);
-			ActiveMarkers = updatedMarkers;
+			foreach (GameObject marker in activeMarkers) Destroy(marker);
+			activeMarkers = updatedMarkers;
 		}
 
 		/// <summary>
@@ -450,17 +462,17 @@ namespace SEECity.Charts.Scripts
 					CheckOverlapping(marker, updatedMarkers.ToArray());
 					updatedMarkers.Add(marker);
 
-					if (ActiveMarkers.Count > 0)
+					if (activeMarkers.Count > 0)
 					{
 						float highlightTimeLeft = CheckOldMarkers(data);
 						if (highlightTimeLeft > 0f)
 							script.TriggerTimedHighlight(
-								ChartManager.highlightDuration - highlightTimeLeft, true);
+								chartManager.highlightDuration - highlightTimeLeft, true);
 					}
 				}
 
-				foreach (GameObject marker in ActiveMarkers) Destroy(marker);
-				ActiveMarkers = updatedMarkers;
+				foreach (GameObject marker in activeMarkers) Destroy(marker);
+				activeMarkers = updatedMarkers;
 			}
 		}
 
@@ -495,29 +507,53 @@ namespace SEECity.Charts.Scripts
 				CheckOverlapping(marker, updatedMarkers.ToArray());
 				updatedMarkers.Add(marker);
 
-				if (ActiveMarkers.Count > 0)
+				if (activeMarkers.Count > 0)
 				{
 					float highlightTimeLeft = CheckOldMarkers(data);
 					if (highlightTimeLeft > 0f)
 						script.TriggerTimedHighlight(
-							ChartManager.highlightDuration - highlightTimeLeft, true);
+							chartManager.highlightDuration - highlightTimeLeft, true);
 				}
 			}
 
-			foreach (GameObject marker in ActiveMarkers) Destroy(marker);
-			ActiveMarkers = updatedMarkers;
+			foreach (GameObject marker in activeMarkers) Destroy(marker);
+			activeMarkers = updatedMarkers;
 		}
 
+		/// <summary>
+		/// Checks if a marker is overlapping with any of the already existing new markers and changes its
+		/// color for each overlapping marker.
+		/// </summary>
+		/// <param name="marker">The marker to check.</param>
+		/// <param name="updatedMarkers">The already active new markers.</param>
 		private void CheckOverlapping(GameObject marker, GameObject[] updatedMarkers)
 		{
 			Image image = marker.GetComponent<Image>();
-			foreach (GameObject updatedMarker in updatedMarkers)
-				if (Vector3.Distance(marker.transform.position, updatedMarker.transform.position).CompareTo(_markerOverlapDistance * marker.transform.lossyScale.x) < 0)
-					if (image.color.g - 0.1f >= 0)
-					{
-						Color oldColor = image.color;
-						image.color = new Color(oldColor.r, oldColor.g - 0.1f, oldColor.b - 0.1f);
-					}
+			if (updatedMarkers.Length > 10)
+				for (int i = updatedMarkers.Length - 10; i < updatedMarkers.Length; i++)
+				{
+					GameObject updatedMarker = updatedMarkers[i];
+					if (Vector3.Distance(marker.transform.position,
+							updatedMarker.transform.position)
+						.CompareTo(_markerOverlapDistance * marker.transform.lossyScale.x) < 0)
+						if (image.color.g - 0.1f >= 0)
+						{
+							Color oldColor = image.color;
+							image.color = new Color(oldColor.r, oldColor.g - 0.1f,
+								oldColor.b - 0.1f);
+						}
+				}
+			else
+				foreach (GameObject updatedMarker in updatedMarkers)
+					if (Vector3.Distance(marker.transform.position,
+							updatedMarker.transform.position)
+						.CompareTo(_markerOverlapDistance * marker.transform.lossyScale.x) < 0)
+						if (image.color.g - 0.1f >= 0)
+						{
+							Color oldColor = image.color;
+							image.color = new Color(oldColor.r, oldColor.g - 0.1f,
+								oldColor.b - 0.1f);
+						}
 		}
 
 		/// <summary>
@@ -528,11 +564,20 @@ namespace SEECity.Charts.Scripts
 		/// <returns></returns>
 		private float CheckOldMarkers(GameObject marker)
 		{
-			foreach (GameObject oldMarker in ActiveMarkers)
-				if (oldMarker != null && oldMarker.TryGetComponent(out ChartMarker oldScript) &&
-				    oldScript.linkedObject.GetInstanceID() == marker.GetInstanceID() &&
-				    oldScript.TimedHighlight != null)
+			foreach (GameObject oldMarker in activeMarkers)
+				if (oldMarker.Equals(null))
+				{
+					Debug.Log("NullMarker");
+					activeMarkers.Remove(oldMarker);
+				}
+				else if (oldMarker.TryGetComponent(out ChartMarker oldScript) &&
+				         oldScript.linkedObject.GetInstanceID() == marker.GetInstanceID() &&
+				         oldScript.TimedHighlight != null)
+				{
+					activeMarkers.Remove(oldMarker);
+					Destroy(oldMarker);
 					return oldScript.HighlightTime;
+				}
 
 			return 0f;
 		}
@@ -546,21 +591,21 @@ namespace SEECity.Charts.Scripts
 		public virtual void AreaSelection(Vector2 min, Vector2 max, bool direction)
 		{
 			if (direction)
-				foreach (GameObject marker in ActiveMarkers)
+				foreach (GameObject marker in activeMarkers)
 				{
 					Vector2 markerPos = marker.transform.position;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y &&
 					    markerPos.y < max.y)
-						ChartManager.HighlightObject(
+						chartManager.HighlightObject(
 							marker.GetComponent<ChartMarker>().linkedObject);
 				}
 			else
-				foreach (GameObject marker in ActiveMarkers)
+				foreach (GameObject marker in activeMarkers)
 				{
 					Vector2 markerPos = marker.transform.position;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y &&
 					    markerPos.y > max.y)
-						ChartManager.HighlightObject(
+						chartManager.HighlightObject(
 							marker.GetComponent<ChartMarker>().linkedObject);
 				}
 		}
@@ -586,13 +631,13 @@ namespace SEECity.Charts.Scripts
 		/// <param name="highlight">The object the marker will refer to.</param>
 		public void HighlightCorrespondingMarker(GameObject highlight)
 		{
-			foreach (GameObject activeMarker in ActiveMarkers)
-				if (activeMarker != null)
+			foreach (GameObject activeMarker in activeMarkers)
+				if (!activeMarker.Equals(null))
 				{
 					ChartMarker script = activeMarker.GetComponent<ChartMarker>();
 					if (script.linkedObject.Equals(highlight))
 					{
-						script.TriggerTimedHighlight(ChartManager.highlightDuration, false);
+						script.TriggerTimedHighlight(chartManager.highlightDuration, false);
 						break;
 					}
 				}
@@ -605,7 +650,7 @@ namespace SEECity.Charts.Scripts
 		/// <param name="highlight">The object the marker will refer to.</param>
 		public void AccentuateCorrespondingMarker(GameObject highlight)
 		{
-			foreach (GameObject activeMarker in ActiveMarkers)
+			foreach (GameObject activeMarker in activeMarkers)
 			{
 				ChartMarker script = activeMarker.GetComponent<ChartMarker>();
 				if (script.linkedObject.Equals(highlight))

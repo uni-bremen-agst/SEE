@@ -194,7 +194,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 25, y: 25}
+  m_SizeDelta: {x: 27, y: 27}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5142605227835778228
 CanvasRenderer:
@@ -276,6 +276,7 @@ GameObject:
   - component: {fileID: 7900548257253700396}
   - component: {fileID: 7900548257253700399}
   - component: {fileID: 6095600582505346959}
+  - component: {fileID: 2991698331623378089}
   m_Layer: 5
   m_Name: Marker
   m_TagString: Untagged
@@ -422,3 +423,18 @@ SortingGroup:
   m_SortingLayerID: -1745318755
   m_SortingLayer: 1
   m_SortingOrder: 0
+--- !u!114 &2991698331623378089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7900548257253700385}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 0.5, y: -0.5}
+  m_UseGraphicAlpha: 1

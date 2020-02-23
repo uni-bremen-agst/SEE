@@ -21,7 +21,7 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// The minimum size a chart can have for width and height.
 		/// </summary>
-		protected int MinimumSize;
+		protected int minimumSize;
 
 		/// <summary>
 		/// The objects that have to be moved individually when resizing the chart.
@@ -43,7 +43,7 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// Contains the size of the chart.
 		/// </summary>
-		protected RectTransform Chart;
+		protected RectTransform chart;
 
 		/// <summary>
 		/// Initializes some attributes.
@@ -53,7 +53,7 @@ namespace SEECity.Charts.Scripts
 			GetSettingData();
 			Transform parent = transform.parent;
 			_chartContent = parent.GetComponent<ChartContent>();
-			Chart = parent.GetComponent<RectTransform>();
+			chart = parent.GetComponent<RectTransform>();
 		}
 
 		/// <summary>
@@ -63,7 +63,7 @@ namespace SEECity.Charts.Scripts
 		{
 			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
-			MinimumSize = _chartManager.minimumSize;
+			minimumSize = _chartManager.minimumSize;
 		}
 
 		/// <summary>
@@ -76,9 +76,10 @@ namespace SEECity.Charts.Scripts
 			RectTransform pos = GetComponent<RectTransform>();
 			Vector2 oldPos = pos.position;
 			pos.position = eventData.position;
-			if (pos.anchoredPosition.x / pos.lossyScale.x < MinimumSize ||
-			    pos.anchoredPosition.y / pos.lossyScale.y < MinimumSize) pos.position = oldPos;
-			ChangeSize(pos.anchoredPosition.x, pos.anchoredPosition.y);
+			Vector2 anchoredPos = pos.anchoredPosition;
+			if (anchoredPos.x / pos.lossyScale.x < minimumSize ||
+			    anchoredPos.y / pos.lossyScale.y < minimumSize) pos.position = oldPos;
+			ChangeSize(anchoredPos.x, anchoredPos.y);
 		}
 
 		/// <summary>
@@ -101,7 +102,7 @@ namespace SEECity.Charts.Scripts
 			RectTransform yDropdown = _chartContent.axisDropdownY.GetComponent<RectTransform>();
 			yDropdown.anchoredPosition = new Vector2(yDropdown.anchoredPosition.x, height / 2);
 			yDropdown.sizeDelta = new Vector2(height / 2, yDropdown.sizeDelta.y);
-			Chart.sizeDelta = new Vector2(width, height);
+			chart.sizeDelta = new Vector2(width, height);
 			topRight.localPosition = new Vector2(width / 2, height / 2);
 			topLeft.localPosition = new Vector2(-width / 2, height / 2);
 			bottomRight.localPosition = new Vector2(width / 2, -height / 2);
@@ -113,7 +114,15 @@ namespace SEECity.Charts.Scripts
 			scrollView.sizeDelta = new Vector2(scrollView.sizeDelta.x, height - 50);
 			contentSelectionHeader.anchoredPosition = new Vector2(0, height / 2 - 20);
 
-			_chartContent.DrawData(false);
+			if (_chartContent.citySize > 50)
+			{
+				if (_chartContent.drawing == null)
+					_chartContent.drawing = StartCoroutine(_chartContent.QueueDraw());
+			}
+			else
+			{
+				_chartContent.DrawData(false);
+			}
 		}
 
 		/// <summary>
