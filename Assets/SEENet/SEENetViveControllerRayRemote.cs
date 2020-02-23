@@ -22,11 +22,12 @@ namespace SEE.Net.Internal
             Assert.IsNotNull(startTransform);
             Assert.IsNotNull(endTransform);
             Assert.IsNotNull(lineRenderer);
+            lineRenderer.material.color = Color.green;
         }
         private void Update()
         {
             lineRenderer.SetPosition(0, startTransform.position);
-            lineRenderer.SetPosition(0, endTransform.position);
+            lineRenderer.SetPosition(1, endTransform.position);
         }
     }
 
