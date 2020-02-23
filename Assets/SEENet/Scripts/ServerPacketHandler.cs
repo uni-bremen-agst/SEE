@@ -36,7 +36,7 @@ namespace SEE.Net.Internal
         }
         public void OnConnectionClosed(Connection connection)
         {
-            // TODO: remote instantiated objects
+            // TODO: remove instantiated objects
             List<Packet> bps = new List<Packet>(bufferedPackets);
 #if UNITY_EDITOR
             int removedCount = 0;

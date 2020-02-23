@@ -45,19 +45,19 @@ namespace SEE.Net.Internal
         protected override bool HandleTransformViewPositionPacketData(PacketHeader packetHeader, Connection connection, string data)
         {
             TransformViewPositionPacketData packet = TransformViewPositionPacketData.Deserialize(data);
-            packet.transformView.SetNextPosition(packet.updateTime, packet.position);
+            packet?.transformView?.SetNextPosition(packet.updateTime, packet.position);
             return true;
         }
         protected override bool HandleTransformViewRotationPacketData(PacketHeader packetHeader, Connection connection, string data)
         {
             TransformViewRotationPacketData packet = TransformViewRotationPacketData.Deserialize(data);
-            packet.transformView.SetNextRotation(packet.updateTime, packet.rotation);
+            packet?.transformView?.SetNextRotation(packet.updateTime, packet.rotation);
             return true;
         }
         protected override bool HandleTransformViewScalePacketData(PacketHeader packetHeader, Connection connection, string data)
         {
             TransformViewScalePacketData packet = TransformViewScalePacketData.Deserialize(data);
-            packet.transformView.SetNextScale(packet.updateTime, packet.scale);
+            packet?.transformView?.SetNextScale(packet.updateTime, packet.scale);
             return true;
         }
     }
