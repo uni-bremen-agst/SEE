@@ -16,6 +16,7 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 using SEE;
 using SEE.DataModel;
 using System;
@@ -297,6 +298,18 @@ public abstract class AbstractCCARenderer : MonoBehaviour
             {
                 DestroyImmediate(o);
             }
+        }
+    }
+
+    /// <summary>
+    /// Event function that destroys a given GameObject.
+    /// </summary>
+    /// <param name="gameObject"></param>
+    public void OnRemovedNodeFinishedAnimation(object gameObject)
+    {
+        if (gameObject != null && gameObject is GameObject)
+        {
+            Destroy((GameObject)gameObject);
         }
     }
 }

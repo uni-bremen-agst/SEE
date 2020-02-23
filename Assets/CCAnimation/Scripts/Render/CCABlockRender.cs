@@ -16,11 +16,8 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
-using System;
+
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SEE.DataModel;
 using UnityEngine;
 
@@ -28,9 +25,9 @@ using UnityEngine;
 namespace Assets.CCAnimation.Scripts.Render
 {
     /// <summary>
-    /// A CCARender that is used to display blocks as graph nodes.
+    /// A CCARenderer that is used to display blocks as graph nodes.
     /// </summary>
-    class CCABlockRender : AbstractCCARenderer
+    class CCABlockRenderer : AbstractCCARenderer
     {
         /// <summary>
         /// A SimpleAnimator used for animation.
@@ -158,18 +155,6 @@ namespace Assets.CCAnimation.Scripts.Render
                 newPosition.y = -leaf.transform.localScale.y;
 
                 SimpleAnim.AnimateTo(node, leaf, newPosition, leaf.transform.localScale, OnRemovedNodeFinishedAnimation);
-            }
-        }
-
-        /// <summary>
-        /// Event function, that destroys a given GameObject.
-        /// </summary>
-        /// <param name="gameObject"></param>
-        void OnRemovedNodeFinishedAnimation(object gameObject)
-        {
-            if (gameObject != null && gameObject.GetType() == typeof(GameObject))
-            {
-                Destroy((GameObject)gameObject);
             }
         }
     }

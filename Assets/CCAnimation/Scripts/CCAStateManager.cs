@@ -110,7 +110,7 @@ public class CCAStateManager : MonoBehaviour
     {
         if (useBlockFactory)
         {
-            return gameObject.AddComponent(typeof(CCABlockRender)) as AbstractCCARenderer;
+            return gameObject.AddComponent(typeof(CCABlockRenderer)) as AbstractCCARenderer;
         }
         else
         {
