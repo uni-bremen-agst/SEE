@@ -23,21 +23,21 @@ namespace SEECity.Charts.Scripts.VR
 		public override void AreaSelection(Vector2 min, Vector2 max, bool direction)
 		{
 			if (direction)
-				foreach (GameObject marker in ActiveMarkers)
+				foreach (GameObject marker in activeMarkers)
 				{
 					Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y &&
 					    markerPos.y < max.y)
-						ChartManager.HighlightObject(
+						chartManager.HighlightObject(
 							marker.GetComponent<ChartMarker>().linkedObject);
 				}
 			else
-				foreach (GameObject marker in ActiveMarkers)
+				foreach (GameObject marker in activeMarkers)
 				{
 					Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y &&
 					    markerPos.y > max.y)
-						ChartManager.HighlightObject(
+						chartManager.HighlightObject(
 							marker.GetComponent<ChartMarker>().linkedObject);
 				}
 		}
@@ -47,7 +47,7 @@ namespace SEECity.Charts.Scripts.VR
 		/// </summary>
 		public void SetSelectionMode()
 		{
-			ChartManager.selectionMode = selectionToggle.isOn;
+			chartManager.selectionMode = selectionToggle.isOn;
 		}
 	}
 }
