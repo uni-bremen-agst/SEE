@@ -23,7 +23,6 @@ using SEE.Layout;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Events;
@@ -115,7 +114,7 @@ public class CCAStateManager : MonoBehaviour
         }
         else
         {
-            return gameObject.AddComponent(typeof(CCARender)) as AbstractCCARender;
+            return gameObject.AddComponent(typeof(CCHouseRenderer)) as AbstractCCARender;
         }
     }
 
