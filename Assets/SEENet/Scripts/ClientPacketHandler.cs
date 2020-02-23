@@ -1,6 +1,5 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
-using System;
 using UnityEngine;
 
 namespace SEE.Net.Internal
@@ -8,10 +7,6 @@ namespace SEE.Net.Internal
 
     public class ClientPacketHandler : PacketHandler
     {
-        private static DateTime lastTransformViewPositionPacketDateTime = DateTime.MinValue;
-        private static DateTime lastTransformViewRotationPacketDateTime = DateTime.MinValue;
-        private static DateTime lastTransformViewScalePacketDateTime = DateTime.MinValue;
-
         public ClientPacketHandler(string packetTypePrefix) : base(packetTypePrefix)
         {
         }
@@ -50,34 +45,19 @@ namespace SEE.Net.Internal
         protected override bool HandleTransformViewPositionPacketData(PacketHeader packetHeader, Connection connection, string data)
         {
             TransformViewPositionPacketData packet = TransformViewPositionPacketData.Deserialize(data);
-            if (packet == null || packet.updateTime < lastTransformViewPositionPacketDateTime)
-            {
-                return false;
-            }
-            lastTransformViewPositionPacketDateTime = packet.updateTime;
-            packet.transformView.SetNextPosition(packet.position);
+            packet.transformView.SetNextPosition(packet.updateTime, packet.position);
             return true;
         }
         protected override bool HandleTransformViewRotationPacketData(PacketHeader packetHeader, Connection connection, string data)
         {
             TransformViewRotationPacketData packet = TransformViewRotationPacketData.Deserialize(data);
-            if (packet == null || packet.updateTime < lastTransformViewRotationPacketDateTime)
-            {
-                return false;
-            }
-            lastTransformViewRotationPacketDateTime = packet.updateTime;
-            packet.transformView.SetNextRotation(packet.rotation);
+            packet.transformView.SetNextRotation(packet.updateTime, packet.rotation);
             return true;
         }
         protected override bool HandleTransformViewScalePacketData(PacketHeader packetHeader, Connection connection, string data)
         {
             TransformViewScalePacketData packet = TransformViewScalePacketData.Deserialize(data);
-            if (packet == null || packet.updateTime < lastTransformViewScalePacketDateTime)
-            {
-                return false;
-            }
-            lastTransformViewScalePacketDateTime = packet.updateTime;
-            packet.transformView.SetNextScale(packet.scale);
+            packet.transformView.SetNextScale(packet.updateTime, packet.scale);
             return true;
         }
     }
