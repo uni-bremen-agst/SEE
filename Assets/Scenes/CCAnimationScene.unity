@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1414016351}
-  m_IndirectSpecularColor: {r: 0.18028334, g: 0.2257134, b: 0.30692226, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -1513,8 +1514,9 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1414016350}
   m_Enabled: 1
-  serializedVersion: 9
+  serializedVersion: 10
   m_Type: 1
+  m_Shape: 0
   m_Color: {r: 1, g: 0.9719945, b: 0.9216956, a: 1}
   m_Intensity: 1
   m_Range: 10
@@ -1879,6 +1881,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: CCAnimationManager
       objectReference: {fileID: 0}
+    - target: {fileID: 2637723665296559954, guid: 39c6f07ca63915048a64d1ab7a27203c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2637723665296559955, guid: 39c6f07ca63915048a64d1ab7a27203c,
         type: 3}
       propertyPath: flyCamera
@@ -1918,6 +1925,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7167062139765021778, guid: 39c6f07ca63915048a64d1ab7a27203c,
+        type: 3}
+      propertyPath: gxlFolderName
+      value: animation-clones-log4j
       objectReference: {fileID: 0}
     - target: {fileID: 8157221115155232187, guid: 39c6f07ca63915048a64d1ab7a27203c,
         type: 3}
@@ -2613,10 +2625,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 777166b103fd6964f95e4c82cbdd85f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  relativeBaseSpeed: 30
-  relativeMaximalSpeed: 300
+  relativeBaseSpeed: 10
+  relativeMaximalSpeed: 100
   absoluteMinimumSpeed: 0.5
-  absoluteMaximumSpeed: 900
+  absoluteMaximumSpeed: 300
   acceleration: 10
   rotationFactor: 50
   groundDistanceFactor: 0.1
