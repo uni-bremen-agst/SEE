@@ -172,18 +172,6 @@ public class CCHouseRenderer : AbstractCCARenderer
 
     protected override void RenderRemovedOldEdge(Edge edge)
     {
-
     }
 
-    /// <summary>
-    /// Event function that destroys a given GameObject.
-    /// </summary>
-    /// <param name="gameObject"></param>
-    void OnRemovedNodeFinishedAnimation(object gameObject)
-    {
-        if (gameObject != null && gameObject.GetType() == typeof(GameObject) )
-        {
-            Destroy((GameObject)gameObject);
-        }
-    }
 }
