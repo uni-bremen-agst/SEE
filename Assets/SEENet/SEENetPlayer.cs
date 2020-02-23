@@ -1,11 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace SEE.Net
+namespace SEE.Net.Internal
 {
 
-    public class Player : MonoBehaviour
+    public class SEENetPlayer : MonoBehaviour
     {
         Transform cameraTransform;
 
