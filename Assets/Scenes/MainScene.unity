@@ -1718,9 +1718,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useInOfflineMode: 0
   hostServer: 1
-  serverIPAddress: 
+  serverIPAddress: 134.102.30.49
   localServerPort: 55555
-  remoteServerPort: 0
+  remoteServerPort: 55555
   loggingEnabled: 0
   minimalSeverity: 2
 --- !u!4 &1245491017
@@ -1731,7 +1731,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1245491015}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.3184761, y: 0.97893363, z: -1.7393463}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1930,7 +1930,7 @@ Transform:
   - {fileID: 373244399}
   - {fileID: 2080445757}
   m_Father: {fileID: 774140792}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1893184897
 MonoBehaviour:

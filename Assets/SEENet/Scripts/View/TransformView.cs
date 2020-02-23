@@ -37,6 +37,10 @@ namespace SEE.Net
         private Vector3 scaleLast;
         private Vector3 scaleNext;
 
+        private DateTime lastUpdateTimePosition = DateTime.MinValue;
+        private DateTime lastUpdateTimeRotation = DateTime.MinValue;
+        private DateTime lastUpdateTimeScale = DateTime.MinValue;
+
         protected override void InitializeImpl()
         {
             if (viewContainer.IsOwner() && !Network.UseInOfflineMode)
@@ -94,20 +98,35 @@ namespace SEE.Net
             }
         }
 
-        public void SetNextPosition(Vector3 nextPosition)
+        public void SetNextPosition(DateTime updateTime, Vector3 nextPosition)
         {
+            if (updateTime < lastUpdateTimePosition)
+            {
+                return;
+            }
+            lastUpdateTimePosition = updateTime;
             positionUpdateStopwatch.Restart();
             positionLast = transformToSynchronize.position;
             positionNext = nextPosition;
         }
-        public void SetNextRotation(Quaternion nextRotation)
+        public void SetNextRotation(DateTime updateTime, Quaternion nextRotation)
         {
+            if (updateTime < lastUpdateTimeRotation)
+            {
+                return;
+            }
+            lastUpdateTimeRotation = updateTime;
             rotationUpdateStopwatch.Restart();
             rotationLast = transformToSynchronize.rotation;
             rotationNext = nextRotation;
         }
-        public void SetNextScale(Vector3 nextScale)
+        public void SetNextScale(DateTime updateTime, Vector3 nextScale)
         {
+            if (updateTime < lastUpdateTimeScale)
+            {
+                return;
+            }
+            lastUpdateTimeScale = updateTime;
             scaleUpdateStopwatch.Restart();
             scaleLast = transformToSynchronize.localScale;
             scaleNext = nextScale;

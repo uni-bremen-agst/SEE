@@ -6,7 +6,6 @@ namespace SEE.Net
 
     public abstract class View : MonoBehaviour
     {
-        [Header("Internal")]
         public ViewContainer viewContainer;
 
         public void Initialize(ViewContainer viewContainer)
