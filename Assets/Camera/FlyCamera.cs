@@ -31,9 +31,25 @@ namespace SEE
         // These variables are exposed to the editor and can be changed by the user.
         // These parameters determine the principal speed of movement but their
         // actual value is also function of the distance to the ground. The lower we 
-        // are to the ground, the slower we move, and vice versa.
+        // are to the ground, the slower we move, and vice versa
 
         public const float relativeBaseSpeedDefault = 10.0f;
+
+        /// <summary>
+        /// Enables or disables the camera tracking for the mouse movement.
+        /// If isEnabled = true, the camera will track the mouse.
+        /// </summary>
+        private bool _isEnabled = true;
+
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set
+            {
+                lastMouse = Input.mousePosition;
+                _isEnabled = value;
+            }
+        }
 
         [Tooltip("Relative base speed without acceleration and independent of the distance to the ground."
                  + " The actual speed is a function of this parameter and the distance to the ground."
@@ -77,7 +93,7 @@ namespace SEE
         /// <param name="unit"></param>
         public void AdjustSettings(float unit)
         {
-            relativeBaseSpeed     = Mathf.Max(relativeBaseSpeedDefault * unit,   relativeBaseSpeed);
+            relativeBaseSpeed = Mathf.Max(relativeBaseSpeedDefault * unit, relativeBaseSpeed);
             relativeMaximalSpeed = Mathf.Max(relativeMaximalSpeedDefault * unit, relativeMaximalSpeed);
             absoluteMaximumSpeed = Mathf.Max(absoluteMaximumSpeedDefault * unit, absoluteMaximumSpeed);
         }
@@ -159,10 +175,10 @@ namespace SEE
         {
             return Mathf.Clamp(SpeedFunction(relativeMaximalSpeed), absoluteMinimumSpeed, absoluteMaximumSpeed);
         }
-        
+
         [Tooltip("The sensitivity to the mouse movement.")]
         public float camSens = 0.15f;   // Mouse sensitivity
-        
+
         // the position of the mouse cursor of the last tick
         private Vector3 lastMouse = false ? new Vector3(0, 0, 0)
                                          : new Vector3(255, 255, 255);  // kind of in the middle of the screen, rather than at the top (play)
@@ -220,7 +236,7 @@ namespace SEE
             }
             else
             {
-                Debug.LogWarningFormat("No UI textfield named {0} found. Please add one to the scene within the Unity editor.\n", 
+                Debug.LogWarningFormat("No UI textfield named {0} found. Please add one to the scene within the Unity editor.\n",
                                        TextFieldObjectName);
             }
 
@@ -242,6 +258,10 @@ namespace SEE
         /// </summary>
         void Update()
         {
+            if (!IsEnabled)
+            {
+                return;
+            }
             if (Input.GetKeyDown(KeyCode.C))
             {
                 CenterCursor();
@@ -361,7 +381,7 @@ namespace SEE
                     //{
                     //    text.text = node.LinkName;
                     //}
-                    
+
                     else
                     {
                         text.text = nodeRef.node.Type;
