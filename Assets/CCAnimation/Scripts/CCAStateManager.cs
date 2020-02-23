@@ -57,7 +57,7 @@ public class CCAStateManager : MonoBehaviour
     private GraphSettings _settings;
     private NodeFactory _nodeFactory;
     private AbstractCCAObjectManager _objectManager;
-    private AbstractCCARender _Render;
+    private AbstractCCARenderer _Render;
     private bool _isAutoplay = false;
     private UnityEvent _viewDataChangedEvent = new UnityEvent();
     private int _openGraphIndex = 0;
@@ -106,15 +106,15 @@ public class CCAStateManager : MonoBehaviour
     /// Factory method to create the used AbstractCCARender.
     /// </summary>
     /// <returns></returns>
-    protected AbstractCCARender CreateRender()
+    protected AbstractCCARenderer CreateRender()
     {
         if (useBlockFactory)
         {
-            return gameObject.AddComponent(typeof(CCABlockRender)) as AbstractCCARender;
+            return gameObject.AddComponent(typeof(CCABlockRender)) as AbstractCCARenderer;
         }
         else
         {
-            return gameObject.AddComponent(typeof(CCHouseRenderer)) as AbstractCCARender;
+            return gameObject.AddComponent(typeof(CCHouseRenderer)) as AbstractCCARenderer;
         }
     }
 
@@ -202,7 +202,7 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
-    public AbstractCCARender Render
+    public AbstractCCARenderer Render
     {
         get
         {

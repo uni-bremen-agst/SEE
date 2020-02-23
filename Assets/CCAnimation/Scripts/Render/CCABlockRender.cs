@@ -30,7 +30,7 @@ namespace Assets.CCAnimation.Scripts.Render
     /// <summary>
     /// A CCARender that is used to display blocks as graph nodes.
     /// </summary>
-    class CCABlockRender : AbstractCCARender
+    class CCABlockRender : AbstractCCARenderer
     {
         /// <summary>
         /// A SimpleAnimator used for animation.
