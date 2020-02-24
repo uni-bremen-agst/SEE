@@ -71,6 +71,7 @@ public class TouchControlsSEE : MonoBehaviour
         //for tiny spline implementation
         time += Time.deltaTime;
 
+        //choose object as target
         if (!Lock && Input.touchCount > 0)
         {
             if (Input.touchCount == 1 && !UiIsTouched())
@@ -88,6 +89,7 @@ public class TouchControlsSEE : MonoBehaviour
                     SetTarget(target = hitInfo.transform);
                 }
             }
+            //zooming into target
             else if (Input.touchCount == 2)
             {
                 if (Input.GetTouch(1).phase == TouchPhase.Began)
@@ -107,6 +109,7 @@ public class TouchControlsSEE : MonoBehaviour
                         Rig.transform.position = newPosition;
                 }
             }
+            //spherical movements around the target
             else if (Input.touchCount == 3)
             {
                 if (Input.GetTouch(2).phase == TouchPhase.Began)
