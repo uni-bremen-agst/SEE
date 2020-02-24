@@ -101,7 +101,7 @@ public class RigMovement : MonoBehaviour
     /// </summary>
     /// <param name="direction">the direction the object is supposed to face in</param>
     /// <param name="speed"></param>
-    public void TurnToRotation(Vector3 direction, float speed)
+    public void LookInDirection(Vector3 direction, float speed)
     {
 
     }
@@ -129,6 +129,7 @@ public class RigMovement : MonoBehaviour
 
     /// <summary>
     /// Moves the attached GameObject to the new location along a smooth curve above the map.
+    /// Is a macro/movement and takes longer than one tick.
     /// </summary>
     /// <param name="position">the target position</param>
     /// <param name="direction">the direction the object is supposed to face at the end</param>
@@ -159,6 +160,7 @@ public class RigMovement : MonoBehaviour
     /// <param name="direction">x is the factor for moving right, y the factor foe moving up and z the factor for the forward component of the movement</param>
     public void CircleAround(Vector3 target, Vector3 direction)
     {
+        Debug.Log("Circle function got called");
         float DistanceFactor = Vector3.Distance(transform.position, target);  //needs to be tuned
 
         Vector3 nextPos = transform.position;
