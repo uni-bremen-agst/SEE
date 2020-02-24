@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class ControlMode : MonoBehaviour
 {
-    public bool LeapMotion;
-    public bool ViveControler;
+    public bool LeapMotion = false;
+    public bool ViveControler = false;
 
     void Start()
     {
@@ -23,15 +23,17 @@ public class ControlMode : MonoBehaviour
         }
         else if (ViveControler)
         {
+            LeapMotion = false;
             LeapModels.SetActive(false);
             MovementControl.GetComponent<LeapMovementSEE>().enabled = false;
             HandAttachments.SetActive(false);
         }
         else if(LeapMotion)
         {
+            ViveControler = false;
             //VRControlerLeft.SetActive(false);
             //VRControlerRight.SetActive(false);
-            MovementControl.GetComponent<VRControlerMovement>().enabled = false;
+            //MovementControl.GetComponent<VRControlerMovement>().enabled = false;
         }
     }
 
