@@ -110,6 +110,10 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		public SteamVR_Input_Sources source = SteamVR_Input_Sources.RightHand;
 
+		public SteamVR_Input_Sources movementSource = SteamVR_Input_Sources.LeftHand;
+
+		public SteamVR_Action_Single movement;
+
 		/// <summary>
 		/// The action boolean assigned to interacting with canvases in VR.
 		/// </summary>

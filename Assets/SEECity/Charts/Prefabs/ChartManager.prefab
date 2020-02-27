@@ -64,6 +64,10 @@ MonoBehaviour:
   chartScrollSpeed: 10
   distanceThreshold: 0.5
   source: 2
+  movementSource: 1
+  movement:
+    actionPath: /actions/default/in/Squeeze
+    needsReinit: 0
   click:
     actionPath: /actions/default/in/GrabPinch
     needsReinit: 0
