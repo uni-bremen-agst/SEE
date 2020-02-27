@@ -564,11 +564,13 @@ namespace SEECity.Charts.Scripts
 		/// <returns></returns>
 		private float CheckOldMarkers(GameObject marker)
 		{
+			loop:
 			foreach (GameObject oldMarker in activeMarkers)
 				if (oldMarker.Equals(null))
 				{
-					Debug.Log("NullMarker");
+					Destroy(oldMarker);
 					activeMarkers.Remove(oldMarker);
+					goto loop;
 				}
 				else if (oldMarker.TryGetComponent(out ChartMarker oldScript) &&
 				         oldScript.linkedObject.GetInstanceID() == marker.GetInstanceID() &&
