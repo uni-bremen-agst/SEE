@@ -61,6 +61,10 @@ namespace SEE.Net.Internal
 #endif
         }
 
+        protected override bool HandleBuildingPacketData(PacketHeader packetHeader, Connection connection, string data)
+        {
+            throw new Exception("A server should never receive this type of packet!");
+        }
         protected override bool HandleBuildingsPacketData(PacketHeader packetHeader, Connection connection, string data)
         {
             throw new Exception("A server should never receive this type of packet!");

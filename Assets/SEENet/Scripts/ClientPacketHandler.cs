@@ -11,13 +11,27 @@ namespace SEE.Net.Internal
         {
         }
 
+        protected override bool HandleBuildingPacketData(PacketHeader packetHeader, Connection connection, string data)
+        {
+            BuildingPacketData buildingPacketData = BuildingPacketData.Deserialize(data);
+            BuildingData buildingData = buildingPacketData.buildingData;
+
+            GameObject building = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            building.AddComponent<BuildingIdentifier>().id = buildingData.id;
+            building.transform.position = buildingData.position;
+            building.transform.rotation = buildingData.rotation;
+            building.transform.localScale = buildingData.scale;
+            building.GetComponent<MeshRenderer>().material.color = buildingData.color;
+
+            return true;
+        }
         protected override bool HandleBuildingsPacketData(PacketHeader packetHeader, Connection connection, string data)
         {
             BuildingsPacketData buildingsPacketData = BuildingsPacketData.Deserialize(data);
             foreach (BuildingData buildingData in buildingsPacketData.buildingData)
             {
                 GameObject building = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Building b = building.AddComponent<Building>();
+                BuildingIdentifier b = building.AddComponent<BuildingIdentifier>();
                 b.id = buildingData.id;
                 building.transform.position = buildingData.position;
                 building.transform.rotation = buildingData.rotation;
