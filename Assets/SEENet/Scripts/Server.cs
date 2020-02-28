@@ -15,11 +15,13 @@ namespace SEE.Net.Internal
         public static List<Connection> Connections { get; private set; } = new List<Connection>();
         public static List<ConnectionListenerBase> ConnectionListeners { get; private set; } = new List<ConnectionListenerBase>();
         private static ServerPacketHandler packetHandler = new ServerPacketHandler(PACKET_PREFIX);
+        private static Stack<Connection> pendingEstablishedConnections = new Stack<Connection>();
+        private static Stack<Connection> pendingClosedConnections = new Stack<Connection>();
 
         public static void Initialize()
         {
-            NetworkComms.AppendGlobalConnectionEstablishHandler(OnConnectionEstablished);
-            NetworkComms.AppendGlobalConnectionCloseHandler(OnConnectionClosed);
+            NetworkComms.AppendGlobalConnectionEstablishHandler((Connection c) => pendingEstablishedConnections.Push(c));
+            NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => pendingClosedConnections.Push(c));
 
             void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => packetHandler.Push(packetHeader, connection, data);
 
@@ -44,6 +46,14 @@ namespace SEE.Net.Internal
         public static void Update()
         {
             packetHandler.HandlePendingPackets();
+            while (pendingEstablishedConnections.Count != 0)
+            {
+                OnConnectionEstablished(pendingEstablishedConnections.Pop());
+            }
+            while (pendingClosedConnections.Count != 0)
+            {
+                OnConnectionClosed(pendingClosedConnections.Pop());
+            }
         }
         public static void Shutdown()
         {

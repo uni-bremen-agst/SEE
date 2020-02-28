@@ -11,6 +11,18 @@ namespace SEE.Net.Internal
         {
         }
 
+        protected override bool HandleBuildingsPacketData(PacketHeader packetHeader, Connection connection, string data)
+        {
+            BuildingsPacketData buildingsPacketData = BuildingsPacketData.Deserialize(data);
+            foreach (BuildingData buildingData in buildingsPacketData.buildingData)
+            {
+                GameObject building = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                building.transform.position = buildingData.position;
+                building.transform.rotation = buildingData.rotation;
+                building.transform.localScale = buildingData.scale;
+            }
+            return true;
+        }
         protected override bool HandleGXLPacketData(PacketHeader packetHeader, Connection connection, string data)
         {
             GXLPacketData packet = GXLPacketData.Deserialize(data);

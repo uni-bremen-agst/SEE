@@ -1,8 +1,10 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
+using SEE.DataModel;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Net;
 using UnityEngine;
 
 namespace SEE.Net.Internal
@@ -30,9 +32,12 @@ namespace SEE.Net.Internal
                 Network.Send(connection, bufferedPackets[i].header.PacketType, bufferedPackets[i].data);
             }
 
-            // TODO: below is possibly temporary
-            string gxl = File.ReadAllText("C://Users//Torben//dev//SEE//Data//GXL//linux-clones//fs.gxl");
-            Network.Send(connection, Client.PACKET_PREFIX + GXLPacketData.PACKET_NAME, new GXLPacketData(gxl).Serialize());
+            if (!Client.LocalEndPoint.Equals(connection.ConnectionInfo.RemoteEndPoint))
+            {
+                GameObject[] buildings = GameObject.FindGameObjectsWithTag(Tags.Building);
+                BuildingsPacketData buildingsPacketData = new BuildingsPacketData(buildings);
+                Network.Send(connection, Client.PACKET_PREFIX + BuildingsPacketData.PACKET_NAME, buildingsPacketData.Serialize());
+            }
         }
         public void OnConnectionClosed(Connection connection)
         {
@@ -56,9 +61,13 @@ namespace SEE.Net.Internal
 #endif
         }
 
+        protected override bool HandleBuildingsPacketData(PacketHeader packetHeader, Connection connection, string data)
+        {
+            throw new Exception("A server should never receive this type of packet!");
+        }
         protected override bool HandleGXLPacketData(PacketHeader packetHeader, Connection connection, string data)
         {
-            throw new System.Exception("A server should never receive this type of packet!");
+            throw new Exception("A server should never receive this type of packet!");
         }
         protected override bool HandleInstantiatePacketData(PacketHeader packetHeader, Connection connection, string data)
         {
