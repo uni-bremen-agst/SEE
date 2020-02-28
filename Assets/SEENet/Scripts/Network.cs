@@ -209,6 +209,16 @@ namespace SEE.Net
                 }
             })).Start();
         }
+        public static bool IsLocalIPAddress(IPAddress ipAddress)
+        {
+            if (ipAddress == null)
+            {
+                return false;
+            }
+
+            IPAddress[] localIPAddresses = LookupLocalIPAddresses();
+            return localIPAddresses.Contains(ipAddress);
+        }
         public static IPAddress[] LookupLocalIPAddresses()
         {
             string hostName = Dns.GetHostName(); ;

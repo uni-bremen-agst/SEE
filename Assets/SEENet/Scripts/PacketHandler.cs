@@ -54,33 +54,40 @@ namespace SEE.Net.Internal
                     Packet packet = pendingMessages.Pop();
                     string packetType = packet.header.PacketType;
 
-                    if (packetType.Equals(packetTypePrefix + GXLPacketData.PACKET_NAME))
+                    Func<PacketHeader, Connection, string, bool> handlePacketFunc;
+                    if (packetType.Equals(packetTypePrefix + BuildingsPacketData.PACKET_NAME))
                     {
-                        HandleGXLPacketData(packet.header, packet.connection, packet.data);
+                        handlePacketFunc = HandleBuildingsPacketData;
+                    }
+                    else if (packetType.Equals(packetTypePrefix + GXLPacketData.PACKET_NAME))
+                    {
+                        handlePacketFunc = HandleGXLPacketData;
                     }
                     else if (packetType.Equals(packetTypePrefix + InstantiatePacketData.PACKET_NAME))
                     {
-                        HandleInstantiatePacketData(packet.header, packet.connection, packet.data);
+                        handlePacketFunc = HandleInstantiatePacketData;
                     }
                     else if (packetType.Equals(packetTypePrefix + TransformViewPositionPacketData.PACKET_NAME))
                     {
-                        HandleTransformViewPositionPacketData(packet.header, packet.connection, packet.data);
+                        handlePacketFunc = HandleTransformViewPositionPacketData;
                     }
                     else if (packetType.Equals(packetTypePrefix + TransformViewRotationPacketData.PACKET_NAME))
                     {
-                        HandleTransformViewRotationPacketData(packet.header, packet.connection, packet.data);
+                        handlePacketFunc = HandleTransformViewRotationPacketData;
                     }
                     else if (packetType.Equals(packetTypePrefix + TransformViewScalePacketData.PACKET_NAME))
                     {
-                        HandleTransformViewScalePacketData(packet.header, packet.connection, packet.data);
+                        handlePacketFunc = HandleTransformViewScalePacketData;
                     }
                     else
                     {
                         throw new FormatException("Type of packet it unknown!");
                     }
+                    handlePacketFunc(packet.header, packet.connection, packet.data);
                 }
             }
         }
+        protected abstract bool HandleBuildingsPacketData(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleGXLPacketData(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleInstantiatePacketData(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleTransformViewPositionPacketData(PacketHeader packetHeader, Connection connection, string data);

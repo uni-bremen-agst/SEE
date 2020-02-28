@@ -1,11 +1,9 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using NetworkCommsDotNet.Connections.TCP;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading;
 
 namespace SEE.Net.Internal
 {
@@ -22,6 +20,7 @@ namespace SEE.Net.Internal
         {
             void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => PacketHandler.Push(packetHeader, connection, data);
 
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + BuildingsPacketData.PACKET_NAME, OnIncomingPacket);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + GXLPacketData.PACKET_NAME, OnIncomingPacket);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + InstantiatePacketData.PACKET_NAME, OnIncomingPacket);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewPositionPacketData.PACKET_NAME, OnIncomingPacket);
