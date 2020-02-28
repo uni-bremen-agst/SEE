@@ -20,12 +20,10 @@ namespace SEE.Net.Internal
         {
             void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => PacketHandler.Push(packetHeader, connection, data);
 
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + BuildingsPacketData.PACKET_NAME, OnIncomingPacket);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + GXLPacketData.PACKET_NAME, OnIncomingPacket);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + InstantiatePacketData.PACKET_NAME, OnIncomingPacket);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewPositionPacketData.PACKET_NAME, OnIncomingPacket);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, OnIncomingPacket);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, OnIncomingPacket);
+            foreach (string packetType in from handlerFuncDictEntry in PacketHandler.handlerFuncDict select handlerFuncDictEntry.Key)
+            {
+                NetworkComms.AppendGlobalIncomingPacketHandler<string>(packetType, OnIncomingPacket);
+            }
 
             List<IPEndPoint> endPoints = Network.HostServer
                 ? (from connectionListener in Server.ConnectionListeners select connectionListener.LocalListenEndPoint as IPEndPoint).ToList()

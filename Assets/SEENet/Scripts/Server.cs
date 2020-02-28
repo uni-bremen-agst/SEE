@@ -25,10 +25,10 @@ namespace SEE.Net.Internal
 
             void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => packetHandler.Push(packetHeader, connection, data);
 
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + InstantiatePacketData.PACKET_NAME, OnIncomingPacket);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewPositionPacketData.PACKET_NAME, OnIncomingPacket);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, OnIncomingPacket);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, OnIncomingPacket);
+            foreach (string packetType in from handlerFuncDictEntry in packetHandler.handlerFuncDict select handlerFuncDictEntry.Key)
+            {
+                NetworkComms.AppendGlobalIncomingPacketHandler<string>(packetType, OnIncomingPacket);
+            }
             
             try
             {

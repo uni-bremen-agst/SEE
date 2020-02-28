@@ -33,7 +33,7 @@ namespace SEE.Net.Internal
         }
         protected static string Serialize(object o)
         {
-            var switchDict = new Dictionary<Type, Func<string>>
+            Dictionary<Type, Func<string>> switchDict = new Dictionary<Type, Func<string>>
             {
                 { typeof(Color), () => Serialize((Color)o) },
                 { typeof(DateTime), () => Serialize((DateTime)o) },
@@ -45,16 +45,7 @@ namespace SEE.Net.Internal
                 { typeof(Quaternion), () => Serialize((Quaternion)o) },
                 { typeof(string), () => (string)o }
             };
-            Func<string> func = null;
-            bool result = false;
-            try
-            {
-                result = switchDict.TryGetValue(o.GetType(), out func);
-            }
-            catch (NullReferenceException)
-            {
-                Debug.Log("HI");
-            }
+            bool result = result = switchDict.TryGetValue(o.GetType(), out Func<string> func);
             return result ? func() : throw new ArgumentException("Object '" + o + "' of type '" + o.GetType() + "' can not be serialized!");
         }
         protected static string Serialize(Color c)
