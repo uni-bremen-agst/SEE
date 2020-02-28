@@ -35,6 +35,7 @@ namespace SEE.Net.Internal
         {
             var switchDict = new Dictionary<Type, Func<string>>
             {
+                { typeof(Color), () => Serialize((Color)o) },
                 { typeof(DateTime), () => Serialize((DateTime)o) },
                 { typeof(float), () => Serialize((float)o) },
                 { typeof(int), () => Serialize((int)o) },
@@ -44,8 +45,21 @@ namespace SEE.Net.Internal
                 { typeof(Quaternion), () => Serialize((Quaternion)o) },
                 { typeof(string), () => (string)o }
             };
-            bool result = switchDict.TryGetValue(o.GetType(), out var func);
+            Func<string> func = null;
+            bool result = false;
+            try
+            {
+                result = switchDict.TryGetValue(o.GetType(), out func);
+            }
+            catch (NullReferenceException)
+            {
+                Debug.Log("HI");
+            }
             return result ? func() : throw new ArgumentException("Object '" + o + "' of type '" + o.GetType() + "' can not be serialized!");
+        }
+        protected static string Serialize(Color c)
+        {
+            return Serialize(new object[] { c.r, c.g, c.b, c.a });
         }
         protected static string Serialize(DateTime dt)
         {
@@ -74,6 +88,15 @@ namespace SEE.Net.Internal
         #endregion
 
         #region Deserialization
+        protected static Color DeserializeColor(string data, out string croppedData)
+        {
+            return new Color(
+                DeserializeFloat(data, out croppedData),
+                DeserializeFloat(croppedData, out croppedData),
+                DeserializeFloat(croppedData, out croppedData),
+                DeserializeFloat(croppedData, out croppedData)
+            );
+        }
         protected static DateTime DeserializeDateTime(string data, out string croppedData)
         {
             return DateTime.Parse(DeserializeString(data, out croppedData));

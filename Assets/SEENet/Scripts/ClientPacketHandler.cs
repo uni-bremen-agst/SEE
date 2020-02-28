@@ -17,9 +17,12 @@ namespace SEE.Net.Internal
             foreach (BuildingData buildingData in buildingsPacketData.buildingData)
             {
                 GameObject building = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Building b = building.AddComponent<Building>();
+                b.id = buildingData.id;
                 building.transform.position = buildingData.position;
                 building.transform.rotation = buildingData.rotation;
                 building.transform.localScale = buildingData.scale;
+                building.GetComponent<MeshRenderer>().material.color = buildingData.color;
             }
             return true;
         }

@@ -6,9 +6,11 @@ namespace SEE.Net.Internal
 
     public struct BuildingData
     {
+        public int id;
         public Vector3 position;
         public Quaternion rotation;
         public Vector3 scale;
+        public Color color;
     }
 
     public class BuildingsPacketData : PacketData
@@ -23,9 +25,11 @@ namespace SEE.Net.Internal
             buildingData = new BuildingData[buildings.Length];
             for (int i = 0; i < buildings.Length; i++)
             {
+                buildingData[i].id = buildings[i].GetInstanceID();
                 buildingData[i].position = buildings[i].transform.position;
                 buildingData[i].rotation = buildings[i].transform.rotation;
                 buildingData[i].scale = buildings[i].transform.lossyScale;
+                buildingData[i].color = buildings[i].GetComponent<MeshRenderer>().material.color;
             }
         }
         private BuildingsPacketData(BuildingData[] buildingData)
@@ -36,17 +40,20 @@ namespace SEE.Net.Internal
 
         public override string Serialize()
         {
-            int buildingCount = 3 * buildingData.Length;
-            int objectCount = 1 + buildingCount;
+            int buildingDataFieldCount = typeof(BuildingData).GetFields().Length;
+            int objectCount = 1 + buildingDataFieldCount * buildingData.Length;
             object[] data = new object[objectCount];
 
             data[0] = buildingData.Length;
 
             for (int i = 0; i < buildingData.Length; i++)
             {
-                data[1 + 3 * i + 0] = buildingData[i].position;
-                data[1 + 3 * i + 1] = buildingData[i].rotation;
-                data[1 + 3 * i + 2] = buildingData[i].scale;
+                int offset = 0;
+                data[1 + buildingDataFieldCount * i + offset++] = buildingData[i].id;
+                data[1 + buildingDataFieldCount * i + offset++] = buildingData[i].position;
+                data[1 + buildingDataFieldCount * i + offset++] = buildingData[i].rotation;
+                data[1 + buildingDataFieldCount * i + offset++] = buildingData[i].scale;
+                data[1 + buildingDataFieldCount * i + offset++] = buildingData[i].color;
             }
 
             return Serialize(data);
@@ -57,9 +64,11 @@ namespace SEE.Net.Internal
             BuildingData[] buildingData = new BuildingData[buildingCount];
             for (int i = 0; i < buildingCount; i++)
             {
+                buildingData[i].id = DeserializeInt(d, out d);
                 buildingData[i].position = DeserializeVector3(d, out d);
                 buildingData[i].rotation = DeserializeQuaternion(d, out d);
                 buildingData[i].scale = DeserializeVector3(d, out d);
+                buildingData[i].color = DeserializeColor(d, out d);
             }
             return new BuildingsPacketData(buildingData);
         }
