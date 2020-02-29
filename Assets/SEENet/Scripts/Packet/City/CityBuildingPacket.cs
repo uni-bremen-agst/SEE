@@ -17,6 +17,8 @@ namespace SEE.Net.Internal
         public CityBuildingPacket(GameObject building) : base(PACKET_TYPE)
         {
             Assert.IsNotNull(building);
+            Assert.IsNotNull(building.GetComponent<MeshRenderer>());
+
             id = building.GetInstanceID();
             position = building.transform.position;
             rotation = building.transform.rotation;

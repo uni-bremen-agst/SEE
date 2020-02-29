@@ -16,12 +16,29 @@ namespace SEE.Net.Internal
             CityBuildingPacket packet = CityBuildingPacket.Deserialize(data);
 
             GameObject building = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            building.name = "Building";
             building.AddComponent<GameObjectIdentifier>().id = packet.id;
             building.transform.position = packet.position;
             building.transform.rotation = packet.rotation;
             building.transform.localScale = packet.scale;
             building.GetComponent<MeshRenderer>().material.color = packet.color;
 
+            return true;
+        }
+        protected override bool HandleCityEdgePacket(PacketHeader packetHeader, Connection connection, string data)
+        {
+            CityEdgePacket packet = CityEdgePacket.Deserialize(data);
+
+            GameObject edge = new GameObject("Edge");
+            edge.AddComponent<GameObjectIdentifier>().id = packet.id;
+            LineRenderer lineRenderer = edge.AddComponent<LineRenderer>();
+            lineRenderer.positionCount = packet.positions.Length;
+            lineRenderer.SetPositions(packet.positions);
+            lineRenderer.startWidth = packet.startWidth;
+            lineRenderer.endWidth = packet.endWidth;
+            lineRenderer.startColor = packet.startColor;
+            lineRenderer.endColor = packet.endColor;
+            lineRenderer.material = new Material(Shader.Find("Legacy Shaders/Particles/Additive")); // TODO: is there a more general way?
             return true;
         }
         protected override bool HandleCityNodePacket(PacketHeader packetHeader, Connection connection, string data)

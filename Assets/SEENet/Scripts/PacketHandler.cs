@@ -28,6 +28,7 @@ namespace SEE.Net.Internal
             handlerFuncDict = new Dictionary<string, HandlerFunc>
             {
                 { packetTypePrefix + CityBuildingPacket.PACKET_TYPE, HandleCityBuildingPacket },
+                { packetTypePrefix + CityEdgePacket.PACKET_TYPE, HandleCityEdgePacket },
                 { packetTypePrefix + CityNodePacket.PACKET_TYPE, HandleCityNodePacket },
                 { packetTypePrefix + InstantiatePacket.PACKET_TYPE, HandleInstantiatePacket },
                 { packetTypePrefix + TransformViewPositionPacket.PACKET_TYPE, HandleTransformViewPositionPacket },
@@ -64,6 +65,7 @@ namespace SEE.Net.Internal
         }
 
         protected abstract bool HandleCityBuildingPacket(PacketHeader packetHeader, Connection connection, string data);
+        protected abstract bool HandleCityEdgePacket(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleCityNodePacket(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleInstantiatePacket(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data);

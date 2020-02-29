@@ -26,16 +26,16 @@ namespace SEE.Net.Internal
         public abstract string Serialize();
         protected static string Serialize(object[] tokens)
         {
-            if (tokens == null || tokens.Length == 0)
-            {
-                Debug.LogWarning("Count of tokens is 0!");
-                return "";
-            }
+            Assert.IsNotNull(tokens);
+            Assert.IsTrue(tokens.Length > 0);
+            const string tokenNullMessage = "Token for serialization is null! Was the array filled correctly?";
 
             StringBuilder sb = new StringBuilder();
+            Assert.IsNotNull(tokens[0], tokenNullMessage);
             sb.Append(Serialize(tokens[0]));
             for (int i = 1; i < tokens.Length; i++)
             {
+                Assert.IsNotNull(tokens[i], tokenNullMessage);
                 sb.Append(DELIM + Serialize(tokens[i]));
             }
             return sb.ToString();
