@@ -16,21 +16,24 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
-using SEE.DataModel;
+
 using System.Collections.Generic;
 
-/// <summary>
-/// Compares two nodes by Node.LinkName for equality.
-/// </summary>
-public class NodeEqualityComparer : IEqualityComparer<Node>
+namespace SEE.DataModel
 {
-    public bool Equals(Node x, Node y)
+    /// <summary>
+    /// Compares two nodes by Node.LinkName for equality.
+    /// </summary>
+    public class NodeEqualityComparer : IEqualityComparer<Node>
     {
-        return x.LinkName.Equals(y?.LinkName);
-    }
+        public bool Equals(Node x, Node y)
+        {
+            return x.LinkName.Equals(y?.LinkName);
+        }
 
-    public int GetHashCode(Node obj)
-    {
-        return obj.LinkName.GetHashCode();
+        public int GetHashCode(Node obj)
+        {
+            return obj.LinkName.GetHashCode();
+        }
     }
 }

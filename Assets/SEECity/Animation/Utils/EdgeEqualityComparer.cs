@@ -17,21 +17,23 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel;
 using System.Collections.Generic;
 
-/// <summary>
-/// Compares two edges by Edge.LinkName() for equality.
-/// </summary>
-public class EdgeEqualityComparer : IEqualityComparer<Edge>
+namespace SEE.DataModel
 {
-    public bool Equals(Edge x, Edge y)
+    /// <summary>
+    /// Compares two edges by Edge.LinkName() for equality.
+    /// </summary>
+    public class EdgeEqualityComparer : IEqualityComparer<Edge>
     {
-        return x.LinkName().Equals(y.LinkName());
-    }
+        public bool Equals(Edge x, Edge y)
+        {
+            return x.LinkName().Equals(y.LinkName());
+        }
 
-    public int GetHashCode(Edge obj)
-    {
-        return obj.LinkName().GetHashCode();
+        public int GetHashCode(Edge obj)
+        {
+            return obj.LinkName().GetHashCode();
+        }
     }
 }
