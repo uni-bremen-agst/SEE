@@ -18,7 +18,6 @@
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 using SEE;
 using SEE.DataModel;
-using SEE.Layout;
 
 /// <summary>
 /// DataModel containig all data generated for a graph loaded from a gxl-file
@@ -27,7 +26,7 @@ using SEE.Layout;
 public class LoadedGraph
 {
     private readonly Graph graph;
-    private readonly CCALayout layout;
+    private readonly Layout layout;
     private readonly GraphSettings graphSettings;
 
     /// <summary>
@@ -38,7 +37,7 @@ public class LoadedGraph
     /// <summary>
     /// The calculated layout of the loaded graph.
     /// </summary>
-    public CCALayout Layout => layout;
+    public Layout Layout => layout;
 
     /// <summary>
     /// The settings used for the loaded graph.
@@ -51,7 +50,7 @@ public class LoadedGraph
     /// <param name="graph"></param>
     /// <param name="layout"></param>
     /// <param name="graphSettings"></param>
-    public LoadedGraph(Graph graph, CCALayout layout, GraphSettings graphSettings)
+    public LoadedGraph(Graph graph, Layout layout, GraphSettings graphSettings)
     {
         this.graph = graph.AssertNotNull("graph");
         this.layout = layout.AssertNotNull("layout");

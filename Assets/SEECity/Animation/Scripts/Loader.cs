@@ -29,7 +29,7 @@ using UnityEngine;
 /// Allows loading of multiple gxl files from a directory and stores them.
 /// !!! At the moment data for Metric.Clone_Rate is copied from Metric.LOC for better visualisation during test !!!
 /// </summary>
-public class CCALoader
+public class Loader
 {
     /// <summary>
     /// Contains all loaded graphs after calling LoadGraphData().

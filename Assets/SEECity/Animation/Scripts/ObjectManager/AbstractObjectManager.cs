@@ -16,9 +16,9 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 using SEE.DataModel;
 using SEE.Layout;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,7 +28,7 @@ using UnityEngine;
 /// depending on the implementation. Each GameObject is assigned to the
 /// LinkName of a node and can be retrieved via any node with the same LinkName.
 /// </summary>
-public abstract class AbstractCCAObjectManager
+public abstract class AbstractObjectManager
 {
     /// <summary>
     /// The BlockFactory used internally for creating missing
@@ -45,7 +45,7 @@ public abstract class AbstractCCAObjectManager
     /// Creates a new ObjectManager with the given BlackFactory.
     /// </summary>
     /// <param name="nodeFactory">The given BlockFactory.</param>
-    public AbstractCCAObjectManager(NodeFactory nodeFactory)
+    public AbstractObjectManager(NodeFactory nodeFactory)
     {
         nodeFactory.AssertNotNull("nodeFactory");
 

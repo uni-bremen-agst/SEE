@@ -16,20 +16,16 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 using SEE;
-using SEE.DataModel;
-using SEE.Layout;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// The CCAnimation manages user inputs and interfaces.
+/// The Animation manages user inputs and interfaces.
 /// </summary>
-public class CCAnimation : MonoBehaviour
+public class Animation : MonoBehaviour
 {
     /// <summary>
     /// The camera from the user.
@@ -59,7 +55,7 @@ public class CCAnimation : MonoBehaviour
     /// <summary>
     /// The StateManager containing all necessary components for controlling the animations.
     /// </summary>
-    public CCAStateManager stateManager;
+    public StateManager stateManager;
 
     /// <summary>
     /// Returns true if MainMenuCanvas is shown.

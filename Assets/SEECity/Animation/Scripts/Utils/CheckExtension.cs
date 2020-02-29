@@ -24,7 +24,7 @@ using UnityEngine;
 /// Enables fast and simple checks for all types.
 /// If a check fails an exception is thrown.
 /// </summary>
-public static class CCACheckExtension
+public static class CheckExtension
 {
 
     /// <summary>

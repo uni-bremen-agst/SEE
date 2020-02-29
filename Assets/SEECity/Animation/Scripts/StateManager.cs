@@ -16,7 +16,8 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
-using Assets.CCAnimation.Scripts.Render;
+
+using Assets.Animation.Scripts.Renderer;
 using SEE;
 using SEE.DataModel;
 using SEE.Layout;
@@ -28,9 +29,9 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// The CCAStateManager combines all necessary components for the animations
+/// The StateManager combines all necessary components for the animations.
 /// </summary>
-public class CCAStateManager : MonoBehaviour
+public class StateManager : MonoBehaviour
 {
     /// <summary>
     /// Sets the used gxl folder to load graphs from.
@@ -56,8 +57,8 @@ public class CCAStateManager : MonoBehaviour
 
     private GraphSettings _settings;
     private NodeFactory _nodeFactory;
-    private AbstractCCAObjectManager _objectManager;
-    private AbstractCCARenderer _Render;
+    private AbstractObjectManager _objectManager;
+    private AbstractRenderer _Render;
     private bool _isAutoplay = false;
     private UnityEvent _viewDataChangedEvent = new UnityEvent();
     private int _openGraphIndex = 0;
@@ -69,7 +70,7 @@ public class CCAStateManager : MonoBehaviour
     /// <summary>
     /// The FPS counter used to measure animatin perfomance.
     /// </summary>
-    private CCAFPSCounter fpsCounter = new CCAFPSCounter();
+    private SEE.Animation.Utils.FPSCounter fpsCounter = new SEE.Animation.Utils.FPSCounter();
 
     #endregion
 
@@ -80,7 +81,7 @@ public class CCAStateManager : MonoBehaviour
     /// <returns></returns>
     protected GraphSettings CreateGraphSetting()
     {
-        var _settings = GraphSettingsExtension.DefaultCCAnimationSettings(gxlFolderName);
+        var _settings = GraphSettingsExtension.DefaultAnimationSettings(gxlFolderName);
         _settings.MinimalBlockLength = 1;
         _settings.MaximalBlockLength = 100;
         return _settings;
@@ -103,28 +104,28 @@ public class CCAStateManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Factory method to create the used AbstractCCARender.
+    /// Factory method to create the used AbstractRenderer.
     /// </summary>
     /// <returns></returns>
-    protected AbstractCCARenderer CreateRender()
+    protected AbstractRenderer CreateRender()
     {
         if (useBlockFactory)
         {
-            return gameObject.AddComponent(typeof(CCABlockRenderer)) as AbstractCCARenderer;
+            return gameObject.AddComponent(typeof(BlockRenderer)) as AbstractRenderer;
         }
         else
         {
-            return gameObject.AddComponent(typeof(CCHouseRenderer)) as AbstractCCARenderer;
+            return gameObject.AddComponent(typeof(HouseRenderer)) as AbstractRenderer;
         }
     }
 
     /// <summary>
-    /// Factory method to create the used AbstractCCAObjectManager.
+    /// Factory method to create the used AbstractObjectManager.
     /// </summary>
     /// <returns></returns>
-    protected AbstractCCAObjectManager CreateObjectManager()
+    protected AbstractObjectManager CreateObjectManager()
     {
-        return new CCAObjectManager(NodeFactory);
+        return new ObjectManager(NodeFactory);
     }
 
     /// <summary>
@@ -192,7 +193,7 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
-    public AbstractCCAObjectManager ObjectManager
+    public AbstractObjectManager ObjectManager
     {
         get
         {
@@ -202,7 +203,7 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
-    public AbstractCCARenderer Render
+    public AbstractRenderer Render
     {
         get
         {
@@ -212,9 +213,9 @@ public class CCAStateManager : MonoBehaviour
         }
     }
 
-    private CCALoader GraphLoader{ get; } = new CCALoader();
+    private Loader GraphLoader{ get; } = new Loader();
 
-    private Dictionary<Graph, CCALayout> Layouts { get; } = new Dictionary<Graph, CCALayout>();
+    private Dictionary<Graph, Layout> Layouts { get; } = new Dictionary<Graph, Layout>();
 
     private IScale Scaler { get; set; }
 
@@ -277,7 +278,7 @@ public class CCAStateManager : MonoBehaviour
     /// <summary>
     /// Constructor
     /// </summary>
-    public CCAStateManager()
+    public StateManager()
     {
         gxlDataFolder = $"{Directory.GetCurrentDirectory()}\\Data\\GXL\\{gxlFolderName}";
     }
@@ -312,7 +313,7 @@ public class CCAStateManager : MonoBehaviour
         {
             stopwatch.Reset();
             stopwatch.Start();
-            Layouts[key] = new CCALayout();
+            Layouts[key] = new Layout();
             Layouts[key].Calculate(ObjectManager, Scaler, CreateLayout(NodeFactory), key, Settings);
             stopwatch.Stop();
             if (stopwatch.ElapsedMilliseconds == 0)
@@ -457,7 +458,7 @@ public class CCAStateManager : MonoBehaviour
             Debug.LogError("There ist no Graph available at index " + index);
             return false;
         }
-        var hasLayout = Layouts.TryGetValue(graph, out CCALayout layout);
+        var hasLayout = Layouts.TryGetValue(graph, out Layout layout);
         if (layout == null || !hasLayout)
         {
             Debug.LogError("There ist no Layout available at index " + index);

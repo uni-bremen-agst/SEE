@@ -16,19 +16,17 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
-using System.Collections;
-using System.Collections.Generic;
 using SEE.DataModel;
 using UnityEngine;
 
 /// <summary>
-/// Animates the position of a given GameObject over the full <see cref="AbstractCCAAnimator.MaxAnimationTime"/>.
+/// Animates the position of a given GameObject over the full <see cref="AbstractAnimator.MaxAnimationTime"/>.
 /// The scale is instantly applied.
 /// </summary>
-public class MoveCCAAnimator : AbstractCCAAnimator
+public class MoveAnimator : AbstractAnimator
 {
     /// <summary>
-    /// See <see cref="AbstractCCAAnimator.AnimateToInternal(Node, GameObject, Vector3, Vector3)"/>
+    /// See <see cref="AbstractAnimator.AnimateToInternal(Node, GameObject, Vector3, Vector3)"/>
     /// </summary>
     /// <param name="node"></param>
     /// <param name="gameObject"></param>
@@ -44,7 +42,7 @@ public class MoveCCAAnimator : AbstractCCAAnimator
     }
 
     /// <summary>
-    /// See <see cref="AbstractCCAAnimator.AnimateToAndInternal(Node, GameObject, Vector3, Vector3, GameObject, string)"/>
+    /// See <see cref="AbstractAnimator.AnimateToAndInternal(Node, GameObject, Vector3, Vector3, GameObject, string)"/>
     /// </summary>
     /// <param name="node"></param>
     /// <param name="gameObject"></param>
