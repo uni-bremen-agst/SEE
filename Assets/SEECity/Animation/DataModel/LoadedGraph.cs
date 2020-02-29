@@ -16,44 +16,47 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
-using SEE;
+
 using SEE.DataModel;
 
-/// <summary>
-/// DataModel containig all data generated for a graph loaded from a gxl-file
-/// and the layout data
-/// </summary>
-public class LoadedGraph
+namespace SEE.Animation.Internal
 {
-    private readonly Graph graph;
-    private readonly Layout layout;
-    private readonly GraphSettings graphSettings;
-
     /// <summary>
-    /// The loaded graph.
+    /// DataModel containig all data generated for a graph loaded from a gxl-file
+    /// and the layout data
     /// </summary>
-    public Graph Graph => graph;
-
-    /// <summary>
-    /// The calculated layout of the loaded graph.
-    /// </summary>
-    public Layout Layout => layout;
-
-    /// <summary>
-    /// The settings used for the loaded graph.
-    /// </summary>
-    public GraphSettings Settings => graphSettings;
-
-    /// <summary>
-    /// Creates a new LoadedGraph.
-    /// </summary>
-    /// <param name="graph"></param>
-    /// <param name="layout"></param>
-    /// <param name="graphSettings"></param>
-    public LoadedGraph(Graph graph, Layout layout, GraphSettings graphSettings)
+    public class LoadedGraph
     {
-        this.graph = graph.AssertNotNull("graph");
-        this.layout = layout.AssertNotNull("layout");
-        this.graphSettings = graphSettings.AssertNotNull("graphSettings");
+        private readonly Graph graph;
+        private readonly Layout layout;
+        private readonly GraphSettings graphSettings;
+
+        /// <summary>
+        /// The loaded graph.
+        /// </summary>
+        public Graph Graph => graph;
+
+        /// <summary>
+        /// The calculated layout of the loaded graph.
+        /// </summary>
+        public Layout Layout => layout;
+
+        /// <summary>
+        /// The settings used for the loaded graph.
+        /// </summary>
+        public GraphSettings Settings => graphSettings;
+
+        /// <summary>
+        /// Creates a new LoadedGraph.
+        /// </summary>
+        /// <param name="graph"></param>
+        /// <param name="layout"></param>
+        /// <param name="graphSettings"></param>
+        public LoadedGraph(Graph graph, Layout layout, GraphSettings graphSettings)
+        {
+            this.graph = graph.AssertNotNull("graph");
+            this.layout = layout.AssertNotNull("layout");
+            this.graphSettings = graphSettings.AssertNotNull("graphSettings");
+        }
     }
 }

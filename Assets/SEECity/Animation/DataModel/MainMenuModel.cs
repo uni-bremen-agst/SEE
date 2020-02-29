@@ -16,33 +16,36 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
+using SEE.Animation.Internal;
 
-/// <summary>
-/// Datamodel for mainmenuview.
-/// </summary>
-public class MainMenuModel : MonoBehaviour
+namespace SEE.Animation
 {
-
     /// <summary>
-    /// Dropdown that sets the actual shown revision.
+    /// Datamodel for mainmenuview.
     /// </summary>
-    public Dropdown OpenVersionDropdown;
-
-    /// <summary>
-    /// Button to close the MainMenu
-    /// </summary>
-    public Button CloseViewButton;
-
-    /// <summary>
-    /// Checks if all fields are initialized.
-    /// </summary>
-    void Start()
+    public class MainMenuModel : MonoBehaviour
     {
-        OpenVersionDropdown.AssertNotNull("OpenVersionDropdown");
-        CloseViewButton.AssertNotNull("CloseViewButton");
+
+        /// <summary>
+        /// Dropdown that sets the actual shown revision.
+        /// </summary>
+        public Dropdown OpenVersionDropdown;
+
+        /// <summary>
+        /// Button to close the MainMenu
+        /// </summary>
+        public Button CloseViewButton;
+
+        /// <summary>
+        /// Checks if all fields are initialized.
+        /// </summary>
+        void Start()
+        {
+            OpenVersionDropdown.AssertNotNull("OpenVersionDropdown");
+            CloseViewButton.AssertNotNull("CloseViewButton");
+        }
     }
 }

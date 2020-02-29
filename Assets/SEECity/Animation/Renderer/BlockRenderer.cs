@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using SEE.DataModel;
 using UnityEngine;
 
-namespace Assets.Animation.Scripts.Renderer
+namespace SEE.Animation.Internal
 {
     /// <summary>
     /// An Animation Renderer that is used to display blocks as graph nodes.

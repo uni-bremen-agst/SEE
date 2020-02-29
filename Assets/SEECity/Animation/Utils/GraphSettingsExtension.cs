@@ -17,26 +17,28 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE;
 using UnityEngine;
 
-/// <summary>
-/// Extension for GraphSettings to simplify the use in Animation.
-/// </summary>
-public static class GraphSettingsExtension
+namespace SEE.Animation.Internal
 {
     /// <summary>
-    /// Returns a GraphSettings instance with the default settings for usage in Animation.
+    /// Extension for GraphSettings to simplify the use in Animation.
     /// </summary>
-    /// <returns>An initialized GraphSettings instance.</returns>
-    public static GraphSettings DefaultAnimationSettings(string gxlFolderName)
+    public static class GraphSettingsExtension
     {
-        var graphSettings = new GraphSettings();
+        /// <summary>
+        /// Returns a GraphSettings instance with the default settings for usage in Animation.
+        /// </summary>
+        /// <returns>An initialized GraphSettings instance.</returns>
+        public static GraphSettings DefaultAnimationSettings(string gxlFolderName)
+        {
+            var graphSettings = new GraphSettings();
 
-        graphSettings.pathPrefix = Application.dataPath.Replace('/', '\\') + '\\';
+            graphSettings.pathPrefix = Application.dataPath.Replace('/', '\\') + '\\';
 
-        graphSettings.gxlPath = $"..\\Data\\GXL\\{gxlFolderName}\\";
+            graphSettings.gxlPath = $"..\\Data\\GXL\\{gxlFolderName}\\";
 
-        return graphSettings;
+            return graphSettings;
+        }
     }
 }
