@@ -12,28 +12,27 @@ namespace SEE.Net.Internal
 
     public abstract class PacketHandler
     {
-        protected struct Packet
+        private struct PendingPacket
         {
             public PacketHeader header;
             public Connection connection;
-            public string data;
+            public string packet;
         }
 
         public readonly Dictionary<string, HandlerFunc> handlerFuncDict;
-        private Stack<Packet> pendingMessages = new Stack<Packet>();
+        private Stack<PendingPacket> pendingMessages = new Stack<PendingPacket>();
 
         public PacketHandler(string packetTypePrefix)
         {
             Assert.IsNotNull(packetTypePrefix);
             handlerFuncDict = new Dictionary<string, HandlerFunc>
             {
-                { packetTypePrefix + BuildingPacketData.PACKET_NAME, HandleBuildingPacketData },
-                { packetTypePrefix + BuildingsPacketData.PACKET_NAME, HandleBuildingsPacketData },
-                { packetTypePrefix + GXLPacketData.PACKET_NAME, HandleGXLPacketData },
-                { packetTypePrefix + InstantiatePacketData.PACKET_NAME, HandleInstantiatePacketData },
-                { packetTypePrefix + TransformViewPositionPacketData.PACKET_NAME, HandleTransformViewPositionPacketData },
-                { packetTypePrefix + TransformViewRotationPacketData.PACKET_NAME, HandleTransformViewRotationPacketData },
-                { packetTypePrefix + TransformViewScalePacketData.PACKET_NAME, HandleTransformViewScalePacketData }
+                { packetTypePrefix + CityBuildingPacket.PACKET_TYPE, HandleBuildingPacket },
+                { packetTypePrefix + GXLPacket.PACKET_TYPE, HandleGXLPacket },
+                { packetTypePrefix + InstantiatePacket.PACKET_TYPE, HandleInstantiatePacket },
+                { packetTypePrefix + TransformViewPositionPacket.PACKET_TYPE, HandleTransformViewPositionPacket },
+                { packetTypePrefix + TransformViewRotationPacket.PACKET_TYPE, HandleTransformViewRotationPacket },
+                { packetTypePrefix + TransformViewScalePacket.PACKET_TYPE, HandleTransformViewScalePacket }
             };
         }
 
@@ -41,11 +40,11 @@ namespace SEE.Net.Internal
         {
             lock (pendingMessages)
             {
-                pendingMessages.Push(new Packet
+                pendingMessages.Push(new PendingPacket
                 {
                     header = packetHeader,
                     connection = connection,
-                    data = incomingObject
+                    packet = incomingObject
                 });
             }
         }
@@ -56,20 +55,19 @@ namespace SEE.Net.Internal
                 Assert.AreEqual(Thread.CurrentThread, Network.MainThread);
                 while (pendingMessages.Count != 0)
                 {
-                    Packet packet = pendingMessages.Pop();
+                    PendingPacket packet = pendingMessages.Pop();
                     bool result = handlerFuncDict.TryGetValue(packet.header.PacketType, out HandlerFunc func);
                     Assert.IsTrue(result);
-                    func(packet.header, packet.connection, packet.data);
+                    func(packet.header, packet.connection, packet.packet);
                 }
             }
         }
-        protected abstract bool HandleBuildingPacketData(PacketHeader packetHeader, Connection connection, string data);
-        protected abstract bool HandleBuildingsPacketData(PacketHeader packetHeader, Connection connection, string data);
-        protected abstract bool HandleGXLPacketData(PacketHeader packetHeader, Connection connection, string data);
-        protected abstract bool HandleInstantiatePacketData(PacketHeader packetHeader, Connection connection, string data);
-        protected abstract bool HandleTransformViewPositionPacketData(PacketHeader packetHeader, Connection connection, string data);
-        protected abstract bool HandleTransformViewRotationPacketData(PacketHeader packetHeader, Connection connection, string data);
-        protected abstract bool HandleTransformViewScalePacketData(PacketHeader packetHeader, Connection connection, string data);
+        protected abstract bool HandleBuildingPacket(PacketHeader packetHeader, Connection connection, string data);
+        protected abstract bool HandleGXLPacket(PacketHeader packetHeader, Connection connection, string data);
+        protected abstract bool HandleInstantiatePacket(PacketHeader packetHeader, Connection connection, string data);
+        protected abstract bool HandleTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data);
+        protected abstract bool HandleTransformViewRotationPacket(PacketHeader packetHeader, Connection connection, string data);
+        protected abstract bool HandleTransformViewScalePacket(PacketHeader packetHeader, Connection connection, string data);
     }
 
 }

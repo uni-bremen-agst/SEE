@@ -4,18 +4,18 @@ using UnityEngine;
 namespace SEE.Net.Internal
 {
 
-    public class TransformViewRotationPacketData : PacketData
+    public class TransformViewPositionPacket : Packet
     {
-        public static readonly string PACKET_NAME = "TransformViewRotation";
+        public static readonly string PACKET_TYPE = "TransformViewPosition";
 
         public TransformView transformView;
-        public Quaternion rotation;
+        public Vector3 position;
         public DateTime updateTime;
 
-        public TransformViewRotationPacketData(TransformView transformView, Quaternion rotation, DateTime updateTime)
+        public TransformViewPositionPacket(TransformView transformView, Vector3 position, DateTime updateTime) : base(PACKET_TYPE)
         {
             this.transformView = transformView;
-            this.rotation = rotation;
+            this.position = position;
             this.updateTime = updateTime;
         }
 
@@ -25,11 +25,11 @@ namespace SEE.Net.Internal
             {
                 transformView.viewContainer.id,
                 transformView.viewContainer.GetIndexOf(transformView),
-                rotation,
+                position,
                 updateTime
             });
         }
-        public static TransformViewRotationPacketData Deserialize(string data)
+        public static TransformViewPositionPacket Deserialize(string data)
         {
             ViewContainer viewContainer = ViewContainer.GetViewContainerByID(DeserializeInt(data, out string d));
             if (viewContainer == null)
@@ -41,9 +41,9 @@ namespace SEE.Net.Internal
             {
                 return null;
             }
-            return new TransformViewRotationPacketData(
+            return new TransformViewPositionPacket(
                 transformView,
-                DeserializeQuaternion(d, out d),
+                DeserializeVector3(d, out d),
                 DeserializeDateTime(d, out d)
             );
         }

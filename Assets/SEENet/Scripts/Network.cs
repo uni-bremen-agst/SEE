@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Net
 {
@@ -162,22 +162,32 @@ namespace SEE.Net
         }
         public static void Instantiate(string prefabName, Vector3 position, Quaternion rotation, Vector3 scale)
         {
-            InstantiatePacketData p = new InstantiatePacketData(prefabName, Client.LocalEndPoint, position, rotation, scale);
+            InstantiatePacket p = new InstantiatePacket(prefabName, Client.LocalEndPoint, position, rotation, scale);
             if (instance.useInOfflineMode)
             {
                 Client.PacketHandler.Push(
-                    new PacketHeader(Client.PACKET_PREFIX + InstantiatePacketData.PACKET_NAME, 0),
+                    new PacketHeader(Client.PACKET_PREFIX + InstantiatePacket.PACKET_TYPE, 0),
                     null,
                     p.Serialize()
                 );
             }
             else
             {
-                Send(Client.Connection, Server.PACKET_PREFIX + InstantiatePacketData.PACKET_NAME, p.Serialize());
+                Send(Client.Connection, p);
             }
         }
-        public static void Send(Connection connection, string packetType, string data, SendReceiveOptions options = null) // TODO: the prefix of the packet type could be auto detected via connection
+        public static void Send(Connection connection, Internal.Packet packet, SendReceiveOptions options = null)
         {
+            Assert.IsNotNull(connection);
+            Assert.IsNotNull(packet);
+            Assert.IsNotNull(Client.Connection);
+
+            string packetTargetPrefix = Client.Connection.Equals(connection) ? Server.PACKET_PREFIX : Client.PACKET_PREFIX;
+            string packetType = packetTargetPrefix + packet.packetType;
+            string data = packet.Serialize();
+
+            Assert.IsNotNull(data);
+
             if (instance.useInOfflineMode)
             {
                 Debug.LogWarning("Packets can not be sent in offline mode!");

@@ -3,15 +3,24 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Net.Internal
 {
 
-    public abstract class PacketData
+    public abstract class Packet
     {
         public static readonly string DATE_TIME_FORMAT = "yyyy.MM.dd HH:mm:ss.fffffff";
         private const char DELIM = ';';
         private static readonly char[] DELIMS = new char[] { DELIM };
+
+        public readonly string packetType = null;
+
+        protected Packet(string packetType)
+        {
+            Assert.IsNotNull(packetType);
+            this.packetType = packetType;
+        }
 
         #region Serialization
         public abstract string Serialize();

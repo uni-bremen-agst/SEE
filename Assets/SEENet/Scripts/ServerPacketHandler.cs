@@ -4,7 +4,6 @@ using SEE.DataModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using UnityEngine;
 
 namespace SEE.Net.Internal
@@ -12,7 +11,14 @@ namespace SEE.Net.Internal
 
     public class ServerPacketHandler : PacketHandler
     {
-        private List<Packet> bufferedPackets = new List<Packet>();
+        private struct BufferedPacket
+        {
+            public PacketHeader header;
+            public Connection connection;
+            public Packet packet;
+        }
+
+        private List<BufferedPacket> bufferedPackets = new List<BufferedPacket>();
         private int lastViewID = -1;
 
         public ServerPacketHandler(string packetTypePrefix) : base(packetTypePrefix)
@@ -23,26 +29,23 @@ namespace SEE.Net.Internal
         {
             for (int i = 0; i < bufferedPackets.Count; i++)
             {
-                Debug.Log(
-                    "Sending buffered packet!" +
-                    "\nType: '" + bufferedPackets[i].header.PacketType + "'" +
-                    "\nConnection: '" + connection.ToString() + "'" +
-                    "\nPacket data: '" + bufferedPackets[i].data + "'"
-                );
-                Network.Send(connection, bufferedPackets[i].header.PacketType, bufferedPackets[i].data);
+                Network.Send(connection, bufferedPackets[i].packet);
             }
 
             if (!Client.LocalEndPoint.Equals(connection.ConnectionInfo.RemoteEndPoint))
             {
                 GameObject[] buildings = GameObject.FindGameObjectsWithTag(Tags.Building);
-                BuildingsPacketData buildingsPacketData = new BuildingsPacketData(buildings);
-                Network.Send(connection, Client.PACKET_PREFIX + BuildingsPacketData.PACKET_NAME, buildingsPacketData.Serialize());
+                foreach (GameObject building in buildings)
+                {
+                    CityBuildingPacket packet = new CityBuildingPacket(building);
+                    Network.Send(connection, packet);
+                }
             }
         }
         public void OnConnectionClosed(Connection connection)
         {
             // TODO: remove instantiated objects
-            List<Packet> bps = new List<Packet>(bufferedPackets);
+            List<BufferedPacket> bps = new List<BufferedPacket>(bufferedPackets);
 #if UNITY_EDITOR
             int removedCount = 0;
 #endif
@@ -61,19 +64,15 @@ namespace SEE.Net.Internal
 #endif
         }
 
-        protected override bool HandleBuildingPacketData(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleBuildingPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             throw new Exception("A server should never receive this type of packet!");
         }
-        protected override bool HandleBuildingsPacketData(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleGXLPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             throw new Exception("A server should never receive this type of packet!");
         }
-        protected override bool HandleGXLPacketData(PacketHeader packetHeader, Connection connection, string data)
-        {
-            throw new Exception("A server should never receive this type of packet!");
-        }
-        protected override bool HandleInstantiatePacketData(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleInstantiatePacket(PacketHeader packetHeader, Connection connection, string data)
         {
             Debug.Log(
                 "Buffering packet!" + 
@@ -82,45 +81,45 @@ namespace SEE.Net.Internal
                 "\nPacket data: '" + data + "'" + 
                 "\nTotal buffered packet count: '" + (bufferedPackets.Count + 1) + "'"
             );
-            InstantiatePacketData packetData = InstantiatePacketData.Deserialize(data);
-            packetData.viewID = ++lastViewID; // TODO: this could potentially overflow. server should be able to run forever without having to restart!
-            Packet packet = new Packet()
+            InstantiatePacket packet = InstantiatePacket.Deserialize(data);
+            packet.viewID = ++lastViewID; // TODO: this could potentially overflow. server should be able to run forever without having to restart!
+            BufferedPacket bufferedPacket = new BufferedPacket()
             {
-                header = new PacketHeader(Client.PACKET_PREFIX + InstantiatePacketData.PACKET_NAME, packetHeader.TotalPayloadSize),
+                header = new PacketHeader(Client.PACKET_PREFIX + InstantiatePacket.PACKET_TYPE, packetHeader.TotalPayloadSize),
                 connection = connection,
-                data = packetData.Serialize()
+                packet = packet
             };
-            bufferedPackets.Add(packet);
+            bufferedPackets.Add(bufferedPacket);
             for (int i = 0; i < Server.Connections.Count; i++)
             {
-                Network.Send(Server.Connections[i], Client.PACKET_PREFIX + InstantiatePacketData.PACKET_NAME, packet.data);
+                Network.Send(Server.Connections[i], packet);
             }
             return true;
         }
-        protected override bool HandleTransformViewPositionPacketData(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data)
         {
-            TransformViewPositionPacketData packetData = TransformViewPositionPacketData.Deserialize(data);
-            foreach (Connection co in from c in Server.Connections where !c.ConnectionInfo.RemoteEndPoint.Equals(packetData.transformView.viewContainer.owner) select c)
+            TransformViewPositionPacket packet = TransformViewPositionPacket.Deserialize(data);
+            foreach (Connection co in from c in Server.Connections where !c.ConnectionInfo.RemoteEndPoint.Equals(packet.transformView.viewContainer.owner) select c)
             {
-                Network.Send(co, Client.PACKET_PREFIX + TransformViewPositionPacketData.PACKET_NAME, data);
+                Network.Send(co, packet);
             }
             return true;
         }
-        protected override bool HandleTransformViewRotationPacketData(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleTransformViewRotationPacket(PacketHeader packetHeader, Connection connection, string data)
         {
-            TransformViewRotationPacketData packetData = TransformViewRotationPacketData.Deserialize(data);
-            foreach (Connection co in from c in Server.Connections where !c.ConnectionInfo.RemoteEndPoint.Equals(packetData.transformView.viewContainer.owner) select c)
+            TransformViewRotationPacket packet = TransformViewRotationPacket.Deserialize(data);
+            foreach (Connection co in from c in Server.Connections where !c.ConnectionInfo.RemoteEndPoint.Equals(packet.transformView.viewContainer.owner) select c)
             {
-                Network.Send(co, Client.PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME, data);
+                Network.Send(co, packet);
             }
             return true;
         }
-        protected override bool HandleTransformViewScalePacketData(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleTransformViewScalePacket(PacketHeader packetHeader, Connection connection, string data)
         {
-            TransformViewScalePacketData packetData = TransformViewScalePacketData.Deserialize(data);
-            foreach (Connection co in from c in Server.Connections where !c.ConnectionInfo.RemoteEndPoint.Equals(packetData.transformView.viewContainer.owner) select c)
+            TransformViewScalePacket packet = TransformViewScalePacket.Deserialize(data);
+            foreach (Connection co in from c in Server.Connections where !c.ConnectionInfo.RemoteEndPoint.Equals(packet.transformView.viewContainer.owner) select c)
             {
-                Network.Send(co, Client.PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME, data);
+                Network.Send(co, packet);
             }
             return true;
         }

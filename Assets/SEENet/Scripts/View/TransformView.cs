@@ -135,24 +135,21 @@ namespace SEE.Net
         {
             Network.Send(
                 Client.Connection,
-                Server.PACKET_PREFIX + TransformViewPositionPacketData.PACKET_NAME,
-                new TransformViewPositionPacketData(this, transformToSynchronize.position, DateTime.Now).Serialize()
+                new TransformViewPositionPacket(this, transformToSynchronize.position, DateTime.Now)
             );
         }
         private void SynchronizeRotation()
         {
             Network.Send(
                 Client.Connection,
-                Server.PACKET_PREFIX + TransformViewRotationPacketData.PACKET_NAME,
-                new TransformViewRotationPacketData(this, transformToSynchronize.rotation, DateTime.Now).Serialize()
+                new TransformViewRotationPacket(this, transformToSynchronize.rotation, DateTime.Now)
             );
         }
         private void SynchronizeScale()
         {
             Network.Send(
                 Client.Connection,
-                Server.PACKET_PREFIX + TransformViewScalePacketData.PACKET_NAME,
-                new TransformViewScalePacketData(this, transformToSynchronize.localScale, DateTime.Now).Serialize()
+                new TransformViewScalePacket(this, transformToSynchronize.localScale, DateTime.Now)
             );
         }
     }

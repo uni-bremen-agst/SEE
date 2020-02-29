@@ -4,18 +4,18 @@ using UnityEngine;
 namespace SEE.Net.Internal
 {
 
-    public class TransformViewPositionPacketData : PacketData
+    public class TransformViewRotationPacket : Packet
     {
-        public static readonly string PACKET_NAME = "TransformViewPosition";
+        public static readonly string PACKET_TYPE = "TransformViewRotation";
 
         public TransformView transformView;
-        public Vector3 position;
-        public DateTime updateTime; // TODO: will this be needed ever? also in TransformViewRotationPacketData and TransformViewScalePacketData
+        public Quaternion rotation;
+        public DateTime updateTime;
 
-        public TransformViewPositionPacketData(TransformView transformView, Vector3 position, DateTime updateTime)
+        public TransformViewRotationPacket(TransformView transformView, Quaternion rotation, DateTime updateTime) : base(PACKET_TYPE)
         {
             this.transformView = transformView;
-            this.position = position;
+            this.rotation = rotation;
             this.updateTime = updateTime;
         }
 
@@ -25,11 +25,11 @@ namespace SEE.Net.Internal
             {
                 transformView.viewContainer.id,
                 transformView.viewContainer.GetIndexOf(transformView),
-                position,
+                rotation,
                 updateTime
             });
         }
-        public static TransformViewPositionPacketData Deserialize(string data)
+        public static TransformViewRotationPacket Deserialize(string data)
         {
             ViewContainer viewContainer = ViewContainer.GetViewContainerByID(DeserializeInt(data, out string d));
             if (viewContainer == null)
@@ -41,9 +41,9 @@ namespace SEE.Net.Internal
             {
                 return null;
             }
-            return new TransformViewPositionPacketData(
+            return new TransformViewRotationPacket(
                 transformView,
-                DeserializeVector3(d, out d),
+                DeserializeQuaternion(d, out d),
                 DeserializeDateTime(d, out d)
             );
         }

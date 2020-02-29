@@ -4,15 +4,15 @@ using UnityEngine;
 namespace SEE.Net.Internal
 {
 
-    public class TransformViewScalePacketData : PacketData
+    public class TransformViewScalePacket : Packet
     {
-        public static readonly string PACKET_NAME = "TransformViewScale";
+        public static readonly string PACKET_TYPE = "TransformViewScale";
 
         public TransformView transformView;
         public Vector3 scale;
         public DateTime updateTime;
 
-        public TransformViewScalePacketData(TransformView transformView, Vector3 scale, DateTime updateTime)
+        public TransformViewScalePacket(TransformView transformView, Vector3 scale, DateTime updateTime) : base(PACKET_TYPE)
         {
             this.transformView = transformView;
             this.scale = scale;
@@ -29,7 +29,7 @@ namespace SEE.Net.Internal
                 updateTime
             });
         }
-        public static TransformViewScalePacketData Deserialize(string data)
+        public static TransformViewScalePacket Deserialize(string data)
         {
             ViewContainer viewContainer = ViewContainer.GetViewContainerByID(DeserializeInt(data, out string d));
             if (viewContainer == null)
@@ -41,7 +41,7 @@ namespace SEE.Net.Internal
             {
                 return null;
             }
-            return new TransformViewScalePacketData(
+            return new TransformViewScalePacket(
                 transformView,
                 DeserializeVector3(d, out d),
                 DeserializeDateTime(d, out d)
