@@ -11,44 +11,28 @@ namespace SEE.Net.Internal
         {
         }
 
-        protected override bool HandleBuildingPacketData(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleBuildingPacket(PacketHeader packetHeader, Connection connection, string data)
         {
-            BuildingPacketData buildingPacketData = BuildingPacketData.Deserialize(data);
-            BuildingData buildingData = buildingPacketData.buildingData;
+            CityBuildingPacket buildingPacket = CityBuildingPacket.Deserialize(data);
 
             GameObject building = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            building.AddComponent<BuildingIdentifier>().id = buildingData.id;
-            building.transform.position = buildingData.position;
-            building.transform.rotation = buildingData.rotation;
-            building.transform.localScale = buildingData.scale;
-            building.GetComponent<MeshRenderer>().material.color = buildingData.color;
+            building.AddComponent<BuildingIdentifier>().id = buildingPacket.id;
+            building.transform.position = buildingPacket.position;
+            building.transform.rotation = buildingPacket.rotation;
+            building.transform.localScale = buildingPacket.scale;
+            building.GetComponent<MeshRenderer>().material.color = buildingPacket.color;
 
             return true;
         }
-        protected override bool HandleBuildingsPacketData(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleGXLPacket(PacketHeader packetHeader, Connection connection, string data)
         {
-            BuildingsPacketData buildingsPacketData = BuildingsPacketData.Deserialize(data);
-            foreach (BuildingData buildingData in buildingsPacketData.buildingData)
-            {
-                GameObject building = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                BuildingIdentifier b = building.AddComponent<BuildingIdentifier>();
-                b.id = buildingData.id;
-                building.transform.position = buildingData.position;
-                building.transform.rotation = buildingData.rotation;
-                building.transform.localScale = buildingData.scale;
-                building.GetComponent<MeshRenderer>().material.color = buildingData.color;
-            }
-            return true;
-        }
-        protected override bool HandleGXLPacketData(PacketHeader packetHeader, Connection connection, string data)
-        {
-            GXLPacketData packet = GXLPacketData.Deserialize(data);
+            GXLPacket packet = GXLPacket.Deserialize(data);
             // TODO: build city
             return true;
         }
-        protected override bool HandleInstantiatePacketData(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleInstantiatePacket(PacketHeader packetHeader, Connection connection, string data)
         {
-            InstantiatePacketData packet = InstantiatePacketData.Deserialize(data);
+            InstantiatePacket packet = InstantiatePacket.Deserialize(data);
             if (packet == null)
             {
                 return false;
@@ -71,21 +55,21 @@ namespace SEE.Net.Internal
             obj.transform.localScale = packet.scale;
             return true;
         }
-        protected override bool HandleTransformViewPositionPacketData(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data)
         {
-            TransformViewPositionPacketData packet = TransformViewPositionPacketData.Deserialize(data);
+            TransformViewPositionPacket packet = TransformViewPositionPacket.Deserialize(data);
             packet?.transformView?.SetNextPosition(packet.updateTime, packet.position);
             return true;
         }
-        protected override bool HandleTransformViewRotationPacketData(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleTransformViewRotationPacket(PacketHeader packetHeader, Connection connection, string data)
         {
-            TransformViewRotationPacketData packet = TransformViewRotationPacketData.Deserialize(data);
+            TransformViewRotationPacket packet = TransformViewRotationPacket.Deserialize(data);
             packet?.transformView?.SetNextRotation(packet.updateTime, packet.rotation);
             return true;
         }
-        protected override bool HandleTransformViewScalePacketData(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleTransformViewScalePacket(PacketHeader packetHeader, Connection connection, string data)
         {
-            TransformViewScalePacketData packet = TransformViewScalePacketData.Deserialize(data);
+            TransformViewScalePacket packet = TransformViewScalePacket.Deserialize(data);
             packet?.transformView?.SetNextScale(packet.updateTime, packet.scale);
             return true;
         }

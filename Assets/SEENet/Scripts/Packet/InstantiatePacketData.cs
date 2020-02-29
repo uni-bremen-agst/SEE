@@ -5,9 +5,9 @@ using UnityEngine;
 namespace SEE.Net.Internal
 {
 
-    public class InstantiatePacketData : PacketData
+    public class InstantiatePacket : Packet
     {
-        public static readonly string PACKET_NAME = "Instantiate";
+        public static readonly string PACKET_TYPE = "Instantiate";
 
         public string prefabName;
         public IPEndPoint owner;
@@ -16,11 +16,11 @@ namespace SEE.Net.Internal
         public Vector3 scale;
         public int viewID;
 
-        public InstantiatePacketData(string prefabName, IPEndPoint owner, int viewID = -1)
+        public InstantiatePacket(string prefabName, IPEndPoint owner, int viewID = -1) : base(PACKET_TYPE)
         {
             Initialize(prefabName, owner, Vector3.zero, Quaternion.identity, Vector3.one, viewID);
         }
-        public InstantiatePacketData(string prefabName, IPEndPoint owner, Vector3 position, Quaternion rotation, Vector3 scale, int viewID = -1)
+        public InstantiatePacket(string prefabName, IPEndPoint owner, Vector3 position, Quaternion rotation, Vector3 scale, int viewID = -1) : base(PACKET_TYPE)
         {
             Initialize(prefabName, owner, position, rotation, scale, viewID);
         }
@@ -67,9 +67,9 @@ namespace SEE.Net.Internal
                 viewID
             });
         }
-        public static InstantiatePacketData Deserialize(string data)
+        public static InstantiatePacket Deserialize(string data)
         {
-            return new InstantiatePacketData(
+            return new InstantiatePacket(
                 DeserializeString(data, out string d),
                 new IPEndPoint(IPAddress.Parse(DeserializeString(d, out d)), DeserializeInt(d, out d)),
                 DeserializeVector3(d, out d),
