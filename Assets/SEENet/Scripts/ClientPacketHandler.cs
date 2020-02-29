@@ -11,23 +11,30 @@ namespace SEE.Net.Internal
         {
         }
 
-        protected override bool HandleBuildingPacket(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleCityBuildingPacket(PacketHeader packetHeader, Connection connection, string data)
         {
-            CityBuildingPacket buildingPacket = CityBuildingPacket.Deserialize(data);
+            CityBuildingPacket packet = CityBuildingPacket.Deserialize(data);
 
             GameObject building = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            building.AddComponent<BuildingIdentifier>().id = buildingPacket.id;
-            building.transform.position = buildingPacket.position;
-            building.transform.rotation = buildingPacket.rotation;
-            building.transform.localScale = buildingPacket.scale;
-            building.GetComponent<MeshRenderer>().material.color = buildingPacket.color;
+            building.AddComponent<GameObjectIdentifier>().id = packet.id;
+            building.transform.position = packet.position;
+            building.transform.rotation = packet.rotation;
+            building.transform.localScale = packet.scale;
+            building.GetComponent<MeshRenderer>().material.color = packet.color;
 
             return true;
         }
-        protected override bool HandleGXLPacket(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleCityNodePacket(PacketHeader packetHeader, Connection connection, string data)
         {
-            GXLPacket packet = GXLPacket.Deserialize(data);
-            // TODO: build city
+            CityNodePacket packet = CityNodePacket.Deserialize(data);
+
+            GameObject node = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            node.AddComponent<GameObjectIdentifier>().id = packet.id;
+            node.transform.position = packet.position;
+            node.transform.rotation = packet.rotation;
+            node.transform.localScale = packet.scale;
+            node.GetComponent<MeshRenderer>().material.color = packet.color;
+
             return true;
         }
         protected override bool HandleInstantiatePacket(PacketHeader packetHeader, Connection connection, string data)

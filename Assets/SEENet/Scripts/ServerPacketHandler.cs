@@ -40,6 +40,13 @@ namespace SEE.Net.Internal
                     CityBuildingPacket packet = new CityBuildingPacket(building);
                     Network.Send(connection, packet);
                 }
+
+                GameObject[] nodes = GameObject.FindGameObjectsWithTag(Tags.Node);
+                foreach (GameObject node in nodes)
+                {
+                    CityNodePacket packet = new CityNodePacket(node);
+                    Network.Send(connection, packet);
+                }
             }
         }
         public void OnConnectionClosed(Connection connection)
@@ -64,23 +71,16 @@ namespace SEE.Net.Internal
 #endif
         }
 
-        protected override bool HandleBuildingPacket(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleCityBuildingPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             throw new Exception("A server should never receive this type of packet!");
         }
-        protected override bool HandleGXLPacket(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleCityNodePacket(PacketHeader packetHeader, Connection connection, string data)
         {
             throw new Exception("A server should never receive this type of packet!");
         }
         protected override bool HandleInstantiatePacket(PacketHeader packetHeader, Connection connection, string data)
         {
-            Debug.Log(
-                "Buffering packet!" + 
-                "\nType: '" + packetHeader.PacketType + "'" +
-                "\nConnection: '" + connection.ToString() + "'" +
-                "\nPacket data: '" + data + "'" + 
-                "\nTotal buffered packet count: '" + (bufferedPackets.Count + 1) + "'"
-            );
             InstantiatePacket packet = InstantiatePacket.Deserialize(data);
             packet.viewID = ++lastViewID; // TODO: this could potentially overflow. server should be able to run forever without having to restart!
             BufferedPacket bufferedPacket = new BufferedPacket()

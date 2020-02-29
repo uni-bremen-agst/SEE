@@ -3,7 +3,7 @@
 namespace SEE.Net.Internal
 {
 
-    public class BuildingIdentifier : MonoBehaviour
+    public class GameObjectIdentifier : MonoBehaviour
     {
         /// <summary>
         /// This represents the instance id of the server-side
