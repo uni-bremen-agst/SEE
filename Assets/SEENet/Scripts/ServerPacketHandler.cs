@@ -34,25 +34,17 @@ namespace SEE.Net.Internal
 
             if (!Client.LocalEndPoint.Equals(connection.ConnectionInfo.RemoteEndPoint))
             {
-                GameObject[] buildings = GameObject.FindGameObjectsWithTag(Tags.Building);
-                foreach (GameObject building in buildings)
+                foreach (GameObject building in GameObject.FindGameObjectsWithTag(Tags.Building))
                 {
-                    CityBuildingPacket packet = new CityBuildingPacket(building);
-                    Network.Send(connection, packet);
+                    Network.Send(connection, new CityBuildingPacket(building));
                 }
-
-                GameObject[] nodes = GameObject.FindGameObjectsWithTag(Tags.Node);
-                foreach (GameObject node in nodes)
+                foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
                 {
-                    CityNodePacket packet = new CityNodePacket(node);
-                    Network.Send(connection, packet);
+                    Network.Send(connection, new CityNodePacket(node));
                 }
-
-                GameObject[] edges = GameObject.FindGameObjectsWithTag(Tags.Edge);
-                foreach (GameObject edge in edges)
+                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                 {
-                    CityEdgePacket packet = new CityEdgePacket(edge);
-                    Network.Send(connection, packet);
+                    Network.Send(connection, new CityEdgePacket(edge));
                 }
             }
         }
