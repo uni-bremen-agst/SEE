@@ -14,9 +14,6 @@ namespace SEE.Net.Internal
         public Vector3 scale;
         public Color color;
 
-        private CityBuildingPacket() : base(PACKET_TYPE)
-        {
-        }
         public CityBuildingPacket(GameObject building) : base(PACKET_TYPE)
         {
             Assert.IsNotNull(building);
@@ -25,6 +22,9 @@ namespace SEE.Net.Internal
             rotation = building.transform.rotation;
             scale = building.transform.lossyScale;
             color = building.GetComponent<MeshRenderer>().material.color;
+        }
+        private CityBuildingPacket() : base(PACKET_TYPE)
+        {
         }
 
         public override string Serialize()

@@ -27,8 +27,8 @@ namespace SEE.Net.Internal
             Assert.IsNotNull(packetTypePrefix);
             handlerFuncDict = new Dictionary<string, HandlerFunc>
             {
-                { packetTypePrefix + CityBuildingPacket.PACKET_TYPE, HandleBuildingPacket },
-                { packetTypePrefix + GXLPacket.PACKET_TYPE, HandleGXLPacket },
+                { packetTypePrefix + CityBuildingPacket.PACKET_TYPE, HandleCityBuildingPacket },
+                { packetTypePrefix + CityNodePacket.PACKET_TYPE, HandleCityNodePacket },
                 { packetTypePrefix + InstantiatePacket.PACKET_TYPE, HandleInstantiatePacket },
                 { packetTypePrefix + TransformViewPositionPacket.PACKET_TYPE, HandleTransformViewPositionPacket },
                 { packetTypePrefix + TransformViewRotationPacket.PACKET_TYPE, HandleTransformViewRotationPacket },
@@ -62,8 +62,9 @@ namespace SEE.Net.Internal
                 }
             }
         }
-        protected abstract bool HandleBuildingPacket(PacketHeader packetHeader, Connection connection, string data);
-        protected abstract bool HandleGXLPacket(PacketHeader packetHeader, Connection connection, string data);
+
+        protected abstract bool HandleCityBuildingPacket(PacketHeader packetHeader, Connection connection, string data);
+        protected abstract bool HandleCityNodePacket(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleInstantiatePacket(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleTransformViewRotationPacket(PacketHeader packetHeader, Connection connection, string data);
