@@ -20,7 +20,7 @@
 using System.Text;
 using UnityEngine;
 
-namespace SEE.Animation.Utils
+namespace SEE.Animation.Internal
 {
     /// <summary>
     /// An FPSCounter allows the measurement of frames per

@@ -16,38 +16,41 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
+using SEE.Animation.Internal;
 
-/// <summary>
-/// Datamodel for ingameview.
-/// </summary>
-public class InGameMenuModel : MonoBehaviour
+namespace SEE.Animation
 {
     /// <summary>
-    /// TextField for the used AnimationTime in seconds.
+    /// Datamodel for ingameview.
     /// </summary>
-    public Text AnimationTimeText;
-
-    /// <summary>
-    /// TextField for the show revision in game.
-    /// </summary>
-    public Text RevisionNumberText;
-
-    /// <summary>
-    /// Toggle that shows if autoplaing the animations is active.
-    /// </summary>
-    public Toggle AutoplayToggle;
-
-    /// <summary>
-    /// Checks if all fields are initialized.
-    /// </summary>
-    void Start()
+    public class InGameMenuModel : MonoBehaviour
     {
-        AnimationTimeText.AssertNotNull("AnimationTimeText");
-        RevisionNumberText.AssertNotNull("RevisionNumberText");
-        AutoplayToggle.AssertNotNull("AutoplayToggle");
+        /// <summary>
+        /// TextField for the used AnimationTime in seconds.
+        /// </summary>
+        public Text AnimationTimeText;
+
+        /// <summary>
+        /// TextField for the show revision in game.
+        /// </summary>
+        public Text RevisionNumberText;
+
+        /// <summary>
+        /// Toggle that shows if autoplaing the animations is active.
+        /// </summary>
+        public Toggle AutoplayToggle;
+
+        /// <summary>
+        /// Checks if all fields are initialized.
+        /// </summary>
+        void Start()
+        {
+            AnimationTimeText.AssertNotNull("AnimationTimeText");
+            RevisionNumberText.AssertNotNull("RevisionNumberText");
+            AutoplayToggle.AssertNotNull("AutoplayToggle");
+        }
     }
 }

@@ -16,49 +16,53 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 using SEE.DataModel;
 using UnityEngine;
 
-/// <summary>
-/// Animates the position of a given GameObject over the full <see cref="AbstractAnimator.MaxAnimationTime"/>.
-/// The scale is instantly applied.
-/// </summary>
-public class MoveAnimator : AbstractAnimator
+namespace SEE.Animation
 {
     /// <summary>
-    /// See <see cref="AbstractAnimator.AnimateToInternal(Node, GameObject, Vector3, Vector3)"/>
+    /// Animates the position of a given GameObject over the full <see cref="AbstractAnimator.MaxAnimationTime"/>.
+    /// The scale is instantly applied.
     /// </summary>
-    /// <param name="node"></param>
-    /// <param name="gameObject"></param>
-    /// <param name="position"></param>
-    /// <param name="scale"></param>
-    protected override void AnimateToInternal(Node node, GameObject gameObject, Vector3 position, Vector3 scale)
+    public class MoveAnimator : AbstractAnimator
     {
-        gameObject.transform.localScale = scale;
-        iTween.MoveTo(gameObject, iTween.Hash(
-            "position", position,
-            "time", MaxAnimationTime
-        ));
-    }
+        /// <summary>
+        /// See <see cref="AbstractAnimator.AnimateToInternal(Node, GameObject, Vector3, Vector3)"/>
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="gameObject"></param>
+        /// <param name="position"></param>
+        /// <param name="scale"></param>
+        protected override void AnimateToInternal(Node node, GameObject gameObject, Vector3 position, Vector3 scale)
+        {
+            gameObject.transform.localScale = scale;
+            iTween.MoveTo(gameObject, iTween.Hash(
+                "position", position,
+                "time", MaxAnimationTime
+            ));
+        }
 
-    /// <summary>
-    /// See <see cref="AbstractAnimator.AnimateToAndInternal(Node, GameObject, Vector3, Vector3, GameObject, string)"/>
-    /// </summary>
-    /// <param name="node"></param>
-    /// <param name="gameObject"></param>
-    /// <param name="position"></param>
-    /// <param name="scale"></param>
-    /// <param name="callBackTarget"></param>
-    /// <param name="callbackName"></param>
-    protected override void AnimateToAndInternal(Node node, GameObject gameObject, Vector3 position, Vector3 scale, GameObject callBackTarget, string callbackName)
-    {
-        gameObject.transform.localScale = scale;
-        iTween.MoveTo(gameObject, iTween.Hash(
-            "position", position,
-            "time", MaxAnimationTime,
-            "oncompletetarget", callBackTarget,
-            "oncomplete", callbackName,
-            "oncompleteparams", gameObject
-        ));
+        /// <summary>
+        /// See <see cref="AbstractAnimator.AnimateToAndInternal(Node, GameObject, Vector3, Vector3, GameObject, string)"/>
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="gameObject"></param>
+        /// <param name="position"></param>
+        /// <param name="scale"></param>
+        /// <param name="callBackTarget"></param>
+        /// <param name="callbackName"></param>
+        protected override void AnimateToAndInternal(Node node, GameObject gameObject, Vector3 position, Vector3 scale, GameObject callBackTarget, string callbackName)
+        {
+            gameObject.transform.localScale = scale;
+            iTween.MoveTo(gameObject, iTween.Hash(
+                "position", position,
+                "time", MaxAnimationTime,
+                "oncompletetarget", callBackTarget,
+                "oncomplete", callbackName,
+                "oncompleteparams", gameObject
+            ));
+        }
     }
 }
