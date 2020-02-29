@@ -21,25 +21,24 @@ using System.Collections.Generic;
 using SEE.DataModel;
 using UnityEngine;
 
-
-namespace Assets.CCAnimation.Scripts.Render
+namespace Assets.Animation.Scripts.Renderer
 {
     /// <summary>
-    /// A CCARenderer that is used to display blocks as graph nodes.
+    /// An Animation Renderer that is used to display blocks as graph nodes.
     /// </summary>
-    class CCABlockRenderer : AbstractCCARenderer
+    class BlockRenderer : AbstractRenderer
     {
         /// <summary>
         /// A SimpleAnimator used for animation.
         /// </summary>
-        private readonly AbstractCCAAnimator SimpleAnim = new SimpleCCAAnimator();
+        private readonly AbstractAnimator SimpleAnim = new SimpleAnimator();
 
         /// <summary>
         /// A MoveAnimator used for move animations.
         /// </summary>
-        private readonly AbstractCCAAnimator MoveAnim = new MoveCCAAnimator();
+        private readonly AbstractAnimator MoveAnim = new MoveAnimator();
 
-        protected override void RegisterAllAnimators(List<AbstractCCAAnimator> animators)
+        protected override void RegisterAllAnimators(List<AbstractAnimator> animators)
         {
             animators.Add(SimpleAnim);
             animators.Add(MoveAnim);

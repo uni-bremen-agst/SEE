@@ -16,19 +16,18 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
-using SEE;
+
 using SEE.DataModel;
 using SEE.Layout;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// Implements the <see cref="AbstractCCAObjectManager"/> by using a supplied
+/// Implements the <see cref="AbstractObjectManager"/> by using a supplied
 /// NodeFactory to create its GameObjects.
 /// </summary>
-public class CCAObjectManager : AbstractCCAObjectManager
+public class ObjectManager : AbstractObjectManager
 {
     /// <summary>
     /// The root GameObject of a graph.
@@ -48,7 +47,7 @@ public class CCAObjectManager : AbstractCCAObjectManager
     /// <summary>
     /// Constructor that sets the used node factory to create the GameObjects
     /// </summary>
-    public CCAObjectManager(NodeFactory nodeFactory) : base(nodeFactory)
+    public ObjectManager(NodeFactory nodeFactory) : base(nodeFactory)
     {
         CircleFactory = new CircleFactory(nodeFactory.Unit);
     }

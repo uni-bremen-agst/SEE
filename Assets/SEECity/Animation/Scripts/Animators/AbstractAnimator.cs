@@ -19,8 +19,6 @@
 
 using SEE.DataModel;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -28,7 +26,7 @@ using UnityEngine;
 /// For example there could be a RotationAnimator and BounceAnimator for different
 /// kind of states.
 /// </summary>
-public abstract class AbstractCCAAnimator
+public abstract class AbstractAnimator
 {
     /// <summary>
     /// Defines the default time an animation takes in seconds.
@@ -52,7 +50,7 @@ public abstract class AbstractCCAAnimator
     /// Creates a new animator with a given maximal animation time.
     /// </summary>
     /// <param name="maxAnimationTime">The maximum time the animation is allowed to run.</param>
-    public AbstractCCAAnimator(float maxAnimationTime = DefaultAnimationTime)
+    public AbstractAnimator(float maxAnimationTime = DefaultAnimationTime)
     {
         this.MaxAnimationTime = maxAnimationTime;
     }

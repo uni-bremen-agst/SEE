@@ -16,20 +16,19 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 using SEE;
 using SEE.DataModel;
 using SEE.Layout;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// A CCALayout uses a given NodeLayout to calculate the Layout and save
+/// A Layout uses a given NodeLayout to calculate the layout and save
 /// it for later use.
 /// </summary>
-public class CCALayout
+public class Layout
 {
     /// <summary>
     /// The calculated NodeTransforms representing the layout.
@@ -55,7 +54,7 @@ public class CCALayout
     /// <param name="nodeLayout"></param>
     /// <param name="graph"></param>
     /// <param name="graphSettings"></param>
-    public void Calculate(AbstractCCAObjectManager objectManager, IScale scaler, NodeLayout nodeLayout, Graph graph, GraphSettings graphSettings)
+    public void Calculate(AbstractObjectManager objectManager, IScale scaler, NodeLayout nodeLayout, Graph graph, GraphSettings graphSettings)
     {
         var gameObjects = new List<GameObject>();
         graph.Traverse(

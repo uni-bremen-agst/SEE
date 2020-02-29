@@ -29,7 +29,7 @@ using UnityEngine.Events;
 /// Abstract Render class that serves as an interface to optimally animate different 
 /// display formats or layouts.
 /// </summary>
-public abstract class AbstractCCARenderer : MonoBehaviour
+public abstract class AbstractRenderer : MonoBehaviour
 {
     /// <summary>
     /// Shortest time period in which an animation can be run.
@@ -54,12 +54,12 @@ public abstract class AbstractCCARenderer : MonoBehaviour
     public bool IsStillAnimating { get => _isStillAnimating; set => _isStillAnimating = value; }
 
     /// <summary>
-    /// The collection of registered <see cref="AbstractCCAAnimator"/> to be updated
+    /// The collection of registered <see cref="AbstractAnimator"/> to be updated
     /// automatically for changes during the animation time period.
     /// </summary>
-    private readonly List<AbstractCCAAnimator> animators = new List<AbstractCCAAnimator>();
+    private readonly List<AbstractAnimator> animators = new List<AbstractAnimator>();
 
-    private float _animationTime = AbstractCCAAnimator.DefaultAnimationTime;
+    private float _animationTime = AbstractAnimator.DefaultAnimationTime;
 
     /// <summary>
     /// Maximal time of the lifetime of animation after they started.
@@ -101,17 +101,17 @@ public abstract class AbstractCCARenderer : MonoBehaviour
     /// </summary>
     private readonly EdgeEqualityComparer edgeEqualityComparer = new EdgeEqualityComparer();
 
-    private AbstractCCAObjectManager _objectManager;
+    private AbstractObjectManager _objectManager;
 
     /// <summary>
     /// Gibt den aktuellen, bzw. 
     /// </summary>
     protected Graph Graph => _nextGraph?.Graph;
-    protected CCALayout Layout => _nextGraph?.Layout;
+    protected Layout Layout => _nextGraph?.Layout;
     protected GraphSettings Settings => _nextGraph?.Settings;
 
     protected Graph OldGraph => _loadedGraph?.Graph;
-    protected CCALayout OldLayout => _loadedGraph?.Layout;
+    protected Layout OldLayout => _loadedGraph?.Layout;
     protected GraphSettings OldSettings => _loadedGraph?.Settings;
 
     protected enum GraphDirection { First, Next, Previous };
@@ -119,7 +119,7 @@ public abstract class AbstractCCARenderer : MonoBehaviour
     /// <summary>
     /// Can be null if not set
     /// </summary>
-    public AbstractCCAObjectManager ObjectManager
+    public AbstractObjectManager ObjectManager
     {
         set
         {
@@ -132,7 +132,7 @@ public abstract class AbstractCCARenderer : MonoBehaviour
     /// <summary>
     /// Constructor
     /// </summary>
-    public AbstractCCARenderer()
+    public AbstractRenderer()
     {
         RegisterAllAnimators(animators);
     }
@@ -243,7 +243,7 @@ public abstract class AbstractCCARenderer : MonoBehaviour
     /// so they can be updated accordingly.
     /// </summary>
     /// <param name="animators"></param>
-    protected abstract void RegisterAllAnimators(List<AbstractCCAAnimator> animators);
+    protected abstract void RegisterAllAnimators(List<AbstractAnimator> animators);
 
     /// <summary>
     ///Determines how the main node of the active graph is displayed.

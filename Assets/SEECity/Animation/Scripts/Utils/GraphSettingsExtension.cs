@@ -16,21 +16,20 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 using SEE;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Extension for GraphSettings to simplify the use in CCAnimation.
+/// Extension for GraphSettings to simplify the use in Animation.
 /// </summary>
 public static class GraphSettingsExtension
 {
     /// <summary>
-    /// Returns a GraphSettings instance with the default settings for usage in CCAnimation
+    /// Returns a GraphSettings instance with the default settings for usage in Animation.
     /// </summary>
     /// <returns>An initialized GraphSettings instance.</returns>
-    public static GraphSettings DefaultCCAnimationSettings(string gxlFolderName)
+    public static GraphSettings DefaultAnimationSettings(string gxlFolderName)
     {
         var graphSettings = new GraphSettings();
 
