@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7167062139765021778}
   - component: {fileID: 2637723665296559955}
   m_Layer: 0
-  m_Name: CCAnimationManager
+  m_Name: AnimationManager
   m_TagString: CCAnimation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,7 +44,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2637723665296559954}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f89ea367c785c44ebd9f3c6ce2824c3, type: 3}
+  m_Script: {fileID: 11500000, guid: 2b67be9713ab3ac48afc229cc0b0527a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &7167062139765021778
@@ -56,7 +56,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2637723665296559954}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ad7a99706a6bd040a79bfeeb92e73a7, type: 3}
+  m_Script: {fileID: 11500000, guid: df55a01401a3f0c409a28477c4a418c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   gxlFolderName: animation-clones
@@ -71,7 +71,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2637723665296559954}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5dd2938650329b34ba9a997725d94bd3, type: 3}
+  m_Script: {fileID: 11500000, guid: c0b94ac26c08644428d063065119b125, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   FlyCamera: {fileID: 0}
