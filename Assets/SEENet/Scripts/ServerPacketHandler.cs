@@ -47,6 +47,13 @@ namespace SEE.Net.Internal
                     CityNodePacket packet = new CityNodePacket(node);
                     Network.Send(connection, packet);
                 }
+
+                GameObject[] edges = GameObject.FindGameObjectsWithTag(Tags.Edge);
+                foreach (GameObject edge in edges)
+                {
+                    CityEdgePacket packet = new CityEdgePacket(edge);
+                    Network.Send(connection, packet);
+                }
             }
         }
         public void OnConnectionClosed(Connection connection)
@@ -72,6 +79,10 @@ namespace SEE.Net.Internal
         }
 
         protected override bool HandleCityBuildingPacket(PacketHeader packetHeader, Connection connection, string data)
+        {
+            throw new Exception("A server should never receive this type of packet!");
+        }
+        protected override bool HandleCityEdgePacket(PacketHeader packetHeader, Connection connection, string data)
         {
             throw new Exception("A server should never receive this type of packet!");
         }

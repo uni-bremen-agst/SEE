@@ -17,6 +17,8 @@ namespace SEE.Net.Internal
         public CityNodePacket(GameObject node) : base(PACKET_TYPE)
         {
             Assert.IsNotNull(node);
+            Assert.IsNotNull(node.GetComponent<MeshRenderer>());
+
             id = node.GetInstanceID();
             position = node.transform.position;
             rotation = node.transform.rotation;
