@@ -13,7 +13,7 @@ namespace SEE
     {
         private static Dictionary<string, Graph> graphs = new Dictionary<string, Graph>();
 
-        public static Graph Add(GraphSettings settings)
+        public static Graph Add(SEECity settings)
         {
             Graph graph = null;
             if (string.IsNullOrEmpty(settings.GXLPath()))
@@ -39,7 +39,7 @@ namespace SEE
             return graph;
         }
 
-        private static Graph Load(GraphSettings settings)
+        private static Graph Load(SEECity settings)
         {
             // GraphCreator graphCreator = new GraphCreator(settings.GXLPath(), settings.HierarchicalEdges, new SEELogger());
             GraphReader graphCreator = new GraphReader(settings.GXLPath(), settings.HierarchicalEdges, new SEELogger());

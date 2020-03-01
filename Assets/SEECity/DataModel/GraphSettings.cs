@@ -7,7 +7,7 @@ namespace SEE
     /// <summary>
     /// Settings of the graph data needed at runtime.
     /// </summary>
-    public class GraphSettings
+    public class SEECity
     {
         /// <summary>
         /// The prefix of the absolute paths for the GXL and CSV data.

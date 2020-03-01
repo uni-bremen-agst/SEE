@@ -17,15 +17,15 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="graph">the graph to be drawn</param>
         /// <param name="settings">the settings for the visualization</param>
-        public GraphRenderer(GraphSettings settings)
+        public GraphRenderer(SEECity settings)
         {
             this.settings = settings;
             switch (this.settings.LeafObjects)
             {
-                case GraphSettings.LeafNodeKinds.Blocks:
+                case SEECity.LeafNodeKinds.Blocks:
                     leafNodeFactory = new CubeFactory();
                     break;
-                case GraphSettings.LeafNodeKinds.Buildings:
+                case SEECity.LeafNodeKinds.Buildings:
                     leafNodeFactory = new BuildingFactory();
                     break;
                 default:
@@ -33,20 +33,20 @@ namespace SEE.Layout
             }
             switch (this.settings.InnerNodeObjects)
             {
-                case GraphSettings.InnerNodeKinds.Empty:
-                case GraphSettings.InnerNodeKinds.Donuts:
+                case SEECity.InnerNodeKinds.Empty:
+                case SEECity.InnerNodeKinds.Donuts:
                     innerNodeFactory = new VanillaFactory();
                     break;
-                case GraphSettings.InnerNodeKinds.Circles:
+                case SEECity.InnerNodeKinds.Circles:
                     innerNodeFactory = new CircleFactory(leafNodeFactory.Unit);
                     break;
-                case GraphSettings.InnerNodeKinds.Cylinders:
+                case SEECity.InnerNodeKinds.Cylinders:
                     innerNodeFactory = new CylinderFactory();
                     break;
-                case GraphSettings.InnerNodeKinds.Rectangles:
+                case SEECity.InnerNodeKinds.Rectangles:
                     innerNodeFactory = new RectangleFactory(leafNodeFactory.Unit);
                     break;
-                case GraphSettings.InnerNodeKinds.Blocks:
+                case SEECity.InnerNodeKinds.Blocks:
                     innerNodeFactory = new CubeFactory();
                     break;
                 default:
@@ -57,7 +57,7 @@ namespace SEE.Layout
         /// <summary>
         /// Settings for the visualization.
         /// </summary>
-        private readonly GraphSettings settings;
+        private readonly SEECity settings;
 
         /// <summary>
         /// The factory used to create blocks for leaves.
@@ -115,16 +115,16 @@ namespace SEE.Layout
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
             {
-                case GraphSettings.EdgeLayouts.Straight:
+                case SEECity.EdgeLayouts.Straight:
                     layout = new StraightEdgeLayout(leafNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
                     break;
-                case GraphSettings.EdgeLayouts.Spline:
+                case SEECity.EdgeLayouts.Spline:
                     layout = new SplineEdgeLayout(leafNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
                     break;
-                case GraphSettings.EdgeLayouts.Bundling:
+                case SEECity.EdgeLayouts.Bundling:
                     layout = new BundledEdgeLayout(leafNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
                     break;
-                case GraphSettings.EdgeLayouts.None:
+                case SEECity.EdgeLayouts.None:
                     // nothing to be done
                     return;
                 default:
@@ -154,27 +154,27 @@ namespace SEE.Layout
            
             switch (settings.NodeLayout)
             {
-                case GraphSettings.NodeLayouts.Manhattan:
+                case SEECity.NodeLayouts.Manhattan:
                     // only leaves
                     layout = new ManhattanLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
-                case GraphSettings.NodeLayouts.FlatRectanglePacking:
+                case SEECity.NodeLayouts.FlatRectanglePacking:
                     // only leaves
                     layout = new RectanglePacker(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
-                case GraphSettings.NodeLayouts.EvoStreets:
+                case SEECity.NodeLayouts.EvoStreets:
                     AddContainers(nodeMap, nodes); // and inner nodes
                     layout = new EvoStreetsNodeLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
-                case GraphSettings.NodeLayouts.Treemap:
+                case SEECity.NodeLayouts.Treemap:
                     AddContainers(nodeMap, nodes); // and inner nodes
                     layout = new TreemapLayout(groundLevel, leafNodeFactory, 1000.0f * Unit(), 1000.0f * Unit()).Layout(nodeMap.Values);
                     break;
-                case GraphSettings.NodeLayouts.Balloon:
+                case SEECity.NodeLayouts.Balloon:
                     AddContainers(nodeMap, nodes); // and inner nodes
                     layout = new BalloonNodeLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
-                case GraphSettings.NodeLayouts.CirclePacking:
+                case SEECity.NodeLayouts.CirclePacking:
                     AddContainers(nodeMap, nodes); // and inner nodes
                     layout = new CirclePackingNodeLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
@@ -205,31 +205,31 @@ namespace SEE.Layout
                 issueDecorator.Add(LeafNodes(gameNodes));
             }
 
-            if (settings.NodeLayout == GraphSettings.NodeLayouts.Balloon 
-                || settings.NodeLayout == GraphSettings.NodeLayouts.EvoStreets)
+            if (settings.NodeLayout == SEECity.NodeLayouts.Balloon 
+                || settings.NodeLayout == SEECity.NodeLayouts.EvoStreets)
             {
                 AddLabels(InnerNodes(gameNodes));
             }
             switch (settings.InnerNodeObjects)
             {
-                case GraphSettings.InnerNodeKinds.Empty:
+                case SEECity.InnerNodeKinds.Empty:
                     // do nothing
                     break;
-                case GraphSettings.InnerNodeKinds.Circles:
+                case SEECity.InnerNodeKinds.Circles:
                     {
                         CircleDecorator decorator = new CircleDecorator(innerNodeFactory, Color.white);
                         decorator.Add(InnerNodes(gameNodes));
                     }
                     break;
-                case GraphSettings.InnerNodeKinds.Donuts:
+                case SEECity.InnerNodeKinds.Donuts:
                     {
                         DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric, settings.AllInnerNodeIssues().ToArray<string>());
                         decorator.Add(InnerNodes(gameNodes));
                     }
                     break;
-                case GraphSettings.InnerNodeKinds.Cylinders:
-                case GraphSettings.InnerNodeKinds.Rectangles:
-                case GraphSettings.InnerNodeKinds.Blocks:
+                case SEECity.InnerNodeKinds.Cylinders:
+                case SEECity.InnerNodeKinds.Rectangles:
+                case SEECity.InnerNodeKinds.Blocks:
                     // TODO
                     break;
                 default:
@@ -300,7 +300,7 @@ namespace SEE.Layout
                 {
                     // We need to first scale the game node and only afterwards set its
                     // position because transform.scale refers to the center position.
-                    if (settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
+                    if (settings.NodeLayout == SEECity.NodeLayouts.Treemap)
                     {
                         // The Treemap layout adjusts the size of the object's ground area according to
                         // the total space we allow it to use. The x length was initially
@@ -400,7 +400,7 @@ namespace SEE.Layout
                                                 scaler.GetNormalizedValue(settings.DepthMetric, node));
 
                     // Scale according to the metrics.
-                    if (settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
+                    if (settings.NodeLayout == SEECity.NodeLayouts.Treemap)
                     {
                         // In case of treemaps, the width metric is mapped on the ground area.
                         float widthOfSquare = Mathf.Sqrt(scale.x);

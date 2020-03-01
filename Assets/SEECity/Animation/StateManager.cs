@@ -56,7 +56,7 @@ namespace SEE.Animation
 
         #region Internal private variables
 
-        private GraphSettings _settings;
+        private SEECity _settings;
         private NodeFactory _nodeFactory;
         private AbstractObjectManager _objectManager;
         private AbstractRenderer _Render;
@@ -80,12 +80,12 @@ namespace SEE.Animation
         /// Factory method to create the used GraphSettings.
         /// </summary>
         /// <returns></returns>
-        protected GraphSettings CreateGraphSetting()
+        protected SEECity CreateGraphSetting()
         {
             // FIXME/TODO: We need a GameObject representing the graph settings at runtime,
             // which can be modified by a custom editor for GraphSettings and which replaces
             // the current CityEditor.
-            var _settings = new GraphSettings();  
+            var _settings = new SEECity();  
             _settings.SetDefaultAnimationSettings(gxlFolderName);
             _settings.MinimalBlockLength = 1;
             _settings.MaximalBlockLength = 100;
@@ -138,7 +138,7 @@ namespace SEE.Animation
         /// </summary>
         /// <param name="graphSettings"></param>
         /// <returns></returns>
-        protected List<string> CreateNodeMetrics(GraphSettings graphSettings)
+        protected List<string> CreateNodeMetrics(SEECity graphSettings)
         {
             List<string> nodeMetrics = new List<string>() { graphSettings.WidthMetric, graphSettings.HeightMetric, graphSettings.DepthMetric, graphSettings.ColorMetric };
             nodeMetrics.AddRange(graphSettings.AllLeafIssues());
@@ -154,7 +154,7 @@ namespace SEE.Animation
         /// <param name="graphSettings"></param>
         /// <param name="nodeMetrics"></param>
         /// <returns></returns>
-        protected IScale CreateScaler(List<Graph> graphs, GraphSettings graphSettings, List<string> nodeMetrics)
+        protected IScale CreateScaler(List<Graph> graphs, SEECity graphSettings, List<string> nodeMetrics)
         {
             return new LinearMultiScale(graphs, graphSettings.MinimalBlockLength, graphSettings.MaximalBlockLength, nodeMetrics);
         }
@@ -178,7 +178,7 @@ namespace SEE.Animation
         /// <summary>
         /// The GraphSettings used when calculating the layout.
         /// </summary>
-        public GraphSettings Settings
+        public SEECity Settings
         {
             get
             {
