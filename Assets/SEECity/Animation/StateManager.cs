@@ -82,7 +82,11 @@ namespace SEE.Animation
         /// <returns></returns>
         protected GraphSettings CreateGraphSetting()
         {
-            var _settings = GraphSettingsExtension.DefaultAnimationSettings(gxlFolderName);
+            // FIXME/TODO: We need a GameObject representing the graph settings at runtime,
+            // which can be modified by a custom editor for GraphSettings and which replaces
+            // the current CityEditor.
+            var _settings = new GraphSettings();  
+            _settings.SetDefaultAnimationSettings(gxlFolderName);
             _settings.MinimalBlockLength = 1;
             _settings.MaximalBlockLength = 100;
             return _settings;
