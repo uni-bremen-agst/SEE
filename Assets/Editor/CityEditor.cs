@@ -44,7 +44,7 @@ namespace SEEEditor
         /// <summary>
         /// The user settings.
         /// </summary>
-        private SEE.GraphSettings editorSettings = new SEE.GraphSettings();
+        private SEE.SEECity editorSettings = new SEE.SEECity();
 
         /// <summary>
         /// Whether VR mode is to be activated for the game.
@@ -151,15 +151,15 @@ namespace SEEEditor
             VRenabled = EditorGUILayout.Toggle("Enable VR", VRenabled);
 
             GUILayout.Label("Visual node attributes", EditorStyles.boldLabel);
-            editorSettings.LeafObjects = (GraphSettings.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", editorSettings.LeafObjects);
-            editorSettings.InnerNodeObjects = (GraphSettings.InnerNodeKinds)EditorGUILayout.EnumPopup("Inner nodes", editorSettings.InnerNodeObjects);
-            editorSettings.NodeLayout = (GraphSettings.NodeLayouts)EditorGUILayout.EnumPopup("Layout", editorSettings.NodeLayout);
+            editorSettings.LeafObjects = (SEECity.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", editorSettings.LeafObjects);
+            editorSettings.InnerNodeObjects = (SEECity.InnerNodeKinds)EditorGUILayout.EnumPopup("Inner nodes", editorSettings.InnerNodeObjects);
+            editorSettings.NodeLayout = (SEECity.NodeLayouts)EditorGUILayout.EnumPopup("Layout", editorSettings.NodeLayout);
             
             editorSettings.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", editorSettings.ZScoreScale);
             editorSettings.ShowErosions = EditorGUILayout.Toggle("Show erosions", editorSettings.ShowErosions);
 
             GUILayout.Label("Visual edge attributes", EditorStyles.boldLabel);
-            editorSettings.EdgeLayout = (GraphSettings.EdgeLayouts)EditorGUILayout.EnumPopup("Layout", editorSettings.EdgeLayout);
+            editorSettings.EdgeLayout = (SEECity.EdgeLayouts)EditorGUILayout.EnumPopup("Layout", editorSettings.EdgeLayout);
             editorSettings.EdgeWidth = EditorGUILayout.FloatField("Edge width", editorSettings.EdgeWidth);
             editorSettings.EdgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", editorSettings.EdgesAboveBlocks);
             

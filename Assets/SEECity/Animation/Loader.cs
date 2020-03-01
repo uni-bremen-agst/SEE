@@ -40,7 +40,7 @@ namespace SEE.Animation.Internal
         /// Loads all gxl files from GraphSettings.AnimatedPath() sorted by numbers in the file names.
         /// </summary>
         /// <param name="graphSettings">The GraphSettings defining the location of gxl files.</param>
-        public void LoadGraphData(GraphSettings graphSettings, int maxRevisionsToLoad)
+        public void LoadGraphData(SEECity graphSettings, int maxRevisionsToLoad)
         {
             graphSettings.AssertNotNull("graphSettings");
             graphs.Clear();
@@ -52,7 +52,7 @@ namespace SEE.Animation.Internal
         /// and saves all loaded graph data.
         /// </summary>
         /// <param name="graphSettings">The GraphSettings defining the location of gxl files.</param>
-        private void AddAllRevisions(GraphSettings graphSettings, int maxRevisionsToLoad)
+        private void AddAllRevisions(SEECity graphSettings, int maxRevisionsToLoad)
         {
             SEE.Performance p = SEE.Performance.Begin("loading animated graph data from " + graphSettings.GXLPath());
 

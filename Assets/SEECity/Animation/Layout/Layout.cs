@@ -55,7 +55,7 @@ namespace SEE.Animation.Internal
         /// <param name="nodeLayout"></param>
         /// <param name="graph"></param>
         /// <param name="graphSettings"></param>
-        public void Calculate(AbstractObjectManager objectManager, IScale scaler, NodeLayout nodeLayout, Graph graph, GraphSettings graphSettings)
+        public void Calculate(AbstractObjectManager objectManager, IScale scaler, NodeLayout nodeLayout, Graph graph, SEECity graphSettings)
         {
             var gameObjects = new List<GameObject>();
             graph.Traverse(
