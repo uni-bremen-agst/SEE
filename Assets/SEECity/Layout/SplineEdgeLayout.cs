@@ -14,8 +14,10 @@ namespace SEE.Layout
         {
         }
 
-        public override void DrawEdges(Graph graph, ICollection<GameObject> nodes)
+        public override ICollection<GameObject> DrawEdges(Graph graph, ICollection<GameObject> nodes)
         {
+            List<GameObject> result = new List<GameObject>();
+
             SetGameNodes(nodes);
             float maxBlockHeight = GetMaxBlockHeight(nodes);
 
@@ -23,7 +25,7 @@ namespace SEE.Layout
             if (edgeMaterial == null)
             {
                 Debug.LogError("Could not find material " + materialPath + "\n");
-                return;
+                return result;
             }
 
             Vector3 levelUnit = Vector3.zero;
@@ -35,7 +37,6 @@ namespace SEE.Layout
                 Node targetObject = edge.Target;
 
                 GameObject gameEdge = NewGameEdge(edge);
-
 
                 Vector3 sourcePosition = edgesAboveBlocks ? blockFactory.Roof(gameNodes[sourceObject])
                                                           : blockFactory.Ground(gameNodes[sourceObject]);
@@ -51,7 +52,9 @@ namespace SEE.Layout
                     targetPosition
                 };
                 BSplineFactory.Draw(gameEdge, controlPoints, edgeWidth * blockFactory.Unit, edgeMaterial);
+                result.Add(gameEdge);
             }
+            return result;
         }
     }
 }

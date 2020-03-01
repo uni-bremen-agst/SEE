@@ -7,7 +7,10 @@ using UnityEngine;
 namespace SEE
 {
     /// <summary>
-    /// Settings of the graph data needed at runtime.
+    /// Settings of the graph data needed at runtime. A SEECity is intended to
+    /// be added to a game object in the scene as a component. That game object
+    /// is the representation of a graph including the settings that have lead
+    /// to its visualization.
     /// </summary>
     public class SEECity : MonoBehaviour
     {
@@ -399,6 +402,30 @@ namespace SEE
                 Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
                 Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
                 LoadMetrics();
+                DrawGraph();
+            }
+        }
+
+        /// <summary>
+        /// Draws the graph.
+        /// Precondition: The graph and its metrics have been loaded.
+        /// </summary>
+        private void DrawGraph()
+        {
+            if (ReferenceEquals(ItsGraph, null))
+            {
+                Debug.LogError("No graph loaded.\n");
+            }
+            else
+            {
+                GraphRenderer renderer = new GraphRenderer(this);
+                // We assume here that this SEECity instance was added to a game object as
+                // a component. The inherited attribute gameObject identifies this game object.
+                renderer.Draw(ItsGraph, gameObject);
+                // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
+                // We may have cities with blocks and cities with CScape buildings in the same scene.
+                // We cannot simply alternate the speed each time when a graph is loaded.
+                // Cameras.AdjustCameraSpeed(renderer.Unit());
             }
         }
 
@@ -427,15 +454,37 @@ namespace SEE
         }
 
         /// <summary>
-        /// Destroys the underlying graph.
+        /// Destroys the underlying graph and all game objects visualizing information about it.
         /// </summary>
         public void DeleteGraph()
         {
+            // Delete all children.
+            // Note: foreach (GameObject child in transform)... would not work;
+            // we really need to collect all children first and only then can destroy each.
+            foreach (GameObject child in AllChildren())
+            {
+                Destroyer.DestroyGameObject(child);
+            }
+            // Delete the underlying graph.
             if (graph != null)
             {
                 graph.Destroy();
             }
             graph = null;
+        }
+
+        /// <summary>
+        /// Returns all immediate children of the game object this SEECity is attached to.
+        /// </summary>
+        /// <returns>immediate children of the game object this SEECity is attached to</returns>
+        private List<GameObject> AllChildren()
+        {
+            List<GameObject> result = new List<GameObject>();
+            foreach (Transform child in transform)
+            {
+                result.Add(child.gameObject);
+            }
+            return result;
         }
 
         /// <summary>

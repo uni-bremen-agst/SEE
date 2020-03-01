@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -242,8 +243,6 @@ namespace SEE.Layout
         /// <param name="innerValue">the value to be put onto the inner circle</param>
         /// <param name="values">the values to be put onto the outer donut circle sectors</param>
         /// <param name="fractionOfInnerCircle">defines the fraction of the radius of the inner circle w.r.t. radius</param>
-        /// <returns>composite game object containing the inner circle and the outer
-        /// circle sectors as children</returns>
         public void AttachDonutChart(GameObject donutChart,
                                      float innerValue,
                                      float[] values,
@@ -269,8 +268,16 @@ namespace SEE.Layout
             CreateInnerCircle(donutChart, innerValue, fractionOfInnerCircle);
         }
 
+        /// <summary>
+        /// Creates the circle segments for the given <paramref name="donutChart"/> based on
+        /// the given <paramref name="values"/>. The circle segments are created as game objects
+        /// added to the <paramref name="donutChart"/> as a child.
+        /// </summary>
+        /// <param name="donutChart">the game object representing the whole donut</param>
+        /// <param name="values">the metric values determining the size of the circle sectors</param>
         private void CreateCircleSegments(GameObject donutChart, float[] values)
         {
+            List<GameObject> result = new List<GameObject>();
             if (metrics.Length > 0)
             {
                 // total sum of values; required to select the circle segments proportionally
