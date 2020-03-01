@@ -13,27 +13,27 @@ namespace SEE
     {
         private static Dictionary<string, Graph> graphs = new Dictionary<string, Graph>();
 
-        public static Graph Add(SEECity settings)
+        public static Graph Add(SEECity city)
         {
             Graph graph = null;
-            if (string.IsNullOrEmpty(settings.GXLPath()))
+            if (string.IsNullOrEmpty(city.GXLPath()))
             {
                 Debug.LogError("No graph path given.\n");
             }
             else 
             {
-                graph = Load(settings);
+                graph = Load(city);
                 if (ReferenceEquals(graph, null))
                 {
-                    Debug.LogErrorFormat("graph {0} could not be loaded.\n", settings.GXLPath());
+                    Debug.LogErrorFormat("graph {0} could not be loaded.\n", city.GXLPath());
                 }
                 else
                 {
-                    if (graphs.ContainsKey(settings.GXLPath()))
+                    if (graphs.ContainsKey(city.GXLPath()))
                     {
-                        Debug.LogWarningFormat("graph {0} is already loaded and will be overridden.\n", settings.GXLPath());
+                        Debug.LogWarningFormat("graph {0} is already loaded and will be overridden.\n", city.GXLPath());
                     }
-                    graphs[settings.GXLPath()] = graph;
+                    graphs[city.GXLPath()] = graph;
                 }
             }
             return graph;
