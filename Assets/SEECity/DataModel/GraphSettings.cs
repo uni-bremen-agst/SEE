@@ -40,7 +40,14 @@ namespace SEE
         //public string csvPath = "..\\Data\\GXL\\linux-clones\\fs.csv";
 
         // Smaller clone graph with single root (Linux directory "net").
+
+        /// <summary>
+        /// The relative path for the GXL file containing the graph data.
+        /// </summary>
         public string gxlPath = "..\\Data\\GXL\\linux-clones\\net.gxl";
+        /// <summary>
+        /// The relative path for the CSV file containing the node metrics.
+        /// </summary>
         public string csvPath = "..\\Data\\GXL\\linux-clones\\net.csv";
 
         // Larger clone graph with single root (Linux directory "drivers"): 16.920 nodes, 10583 edges.
@@ -100,21 +107,34 @@ namespace SEE
         // Visual attributes of a leaf node
         //---------------------------------
         //
-        // Width of a building (x co-ordinate)
+
+        /// <summary>
+        /// The attribute name of the metric to be used for the width of a building (x co-ordinate).
+        /// </summary>
         public string WidthMetric = "Metric.Number_of_Tokens";
-        // Height of a building (y co-ordinate)
+        /// <summary>
+        /// The attribute name of the metric to be used for the height of a building (y co-ordinate).
+        /// </summary>
         public string HeightMetric = "Metric.Clone_Rate";
-        // Breadth of a building (y co-ordinate)
+        /// <summary>
+        /// The attribute name of the metric to be used for the breadth of a building (y co-ordinate).
+        /// </summary>
         public string DepthMetric = "Metric.LOC";
-        // Metric determining the color gradient of leaf nodes.
+        /// <summary>
+        /// The attribute name of the metric to be used for determining the color gradient of leaf nodes.
+        /// </summary>
         public string ColorMetric = "Metric.Complexity";
 
-        // This parameter determines the minimal width, breadth, and height of each block
-        // representing a graph node visually. Must not be greater than MaximalBlockLength.
+        /// <summary>
+        /// This parameter determines the minimal width, breadth, and height of each block
+        /// representing a graph node visually. Must not be greater than MaximalBlockLength.
+        /// </summary>
         public float MinimalBlockLength = 0.1f;
 
-        // This parameter determines the maximal width, breadth, and height of each block
-        // representing a graph node visually. Must not be smaller than MinimalBlockLength.
+        /// <summary>
+        /// This parameter determines the maximal width, breadth, and height of each block
+        /// representing a graph node visually. Must not be smaller than MinimalBlockLength.
+        /// </summary>
         public float MaximalBlockLength = 100.0f;
 
         /// <summary>
@@ -173,17 +193,25 @@ namespace SEE
             Bundling = 3
         }
 
-        // The layout that should be used for nodes.
+        /// <summary>
+        /// The layout that should be used for nodes.
+        /// </summary>
         public NodeLayouts NodeLayout;
 
-        // The layout that should be used for edges.
+        /// <summary>
+        /// The layout that should be used for edges.
+        /// </summary>
         public EdgeLayouts EdgeLayout;
 
-        // Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
-        // for range [0, max-value] is used, where max-value is the maximum value of a metric.
+        /// <summary>
+        /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
+        /// for range [0, max-value] is used, where max-value is the maximum value of a metric.
+        /// </summary>
         public bool ZScoreScale = true;
 
-        // The width of edges.
+        /// <summary>
+        /// The width of the line representing edges.
+        /// </summary>
         public float EdgeWidth = 0.3f;
 
         /// <summary>
@@ -201,15 +229,40 @@ namespace SEE
         //--------------------------------------------------------
         // Software erosion issues shown as icons above leaf nodes
         //--------------------------------------------------------
-        //
+
+        /// <summary>
+        /// The attribute name of the metric representing architecture violations.
+        /// </summary>
         public string ArchitectureIssue = "Metric.Architecture_Violations";
+        /// <summary>
+        /// The attribute name of the metric representing duplicated code.
+        /// </summary>
         public string CloneIssue = "Metric.Clone";
+        /// <summary>
+        /// The attribute name of the metric representing cylces.
+        /// </summary>
         public string CycleIssue = "Metric.Cycle";
+        /// <summary>
+        /// The attribute name of the metric representing dead code.
+        /// </summary>
         public string Dead_CodeIssue = "Metric.Dead_Code";
+        /// <summary>
+        /// The attribute name of the metric representing metric violations.
+        /// </summary>
         public string MetricIssue = "Metric.Metric";
+        /// <summary>
+        /// The attribute name of the metric representing code-style violations.
+        /// </summary>
         public string StyleIssue = "Metric.Style";
+        /// <summary>
+        /// The attribute name of the metric representing other kinds of violations.
+        /// </summary>
         public string UniversalIssue = "Metric.Universal";
 
+        /// <summary>
+        /// Returns all attribute names of the different kinds of software erosions.
+        /// </summary>
+        /// <returns>all attribute names of the different kinds of software erosions</returns>
         public IList<string> AllLeafIssues()
         {
             List<string> result = new List<string>()
@@ -228,15 +281,47 @@ namespace SEE
         //-----------------------------------------------------------------------
         // Software erosion issues shown as icons on Donut charts for inner nodes
         //-----------------------------------------------------------------------
-        //
+        /// <summary>
+        /// The attribute name of the metric representing the sum of all architecture violations
+        /// for an inner node.
+        /// </summary>
         public string ArchitectureIssue_SUM = "Metric.Architecture_Violations_SUM";
+        /// <summary>
+        /// The attribute name of the metric representing the sum of all clones
+        /// for an inner node.
+        /// </summary>
         public string CloneIssue_SUM = "Metric.Clone_SUM";
+        /// <summary>
+        /// The attribute name of the metric representing the sum of all cycles
+        /// for an inner node.
+        /// </summary>
         public string CycleIssue_SUM = "Metric.Cycle_SUM";
+        /// <summary>
+        /// The attribute name of the metric representing the sum of all dead entities
+        /// for an inner node.
+        /// </summary>
         public string Dead_CodeIssue_SUM = "Metric.Dead_Code_SUM";
+        /// <summary>
+        /// The attribute name of the metric representing the sum of all metric violations
+        /// for an inner node.
+        /// </summary>
         public string MetricIssue_SUM = "Metric.Metric_SUM";
+        /// <summary>
+        /// The attribute name of the metric representing the sum of all style violations
+        /// for an inner node.
+        /// </summary>
         public string StyleIssue_SUM = "Metric.Style_SUM";
+        /// <summary>
+        /// The attribute name of the metric representing the sum of all other kinds of
+        /// software erosions for an inner node.
+        /// </summary>
         public string UniversalIssue_SUM = "Metric.Universal_SUM";
 
+        /// <summary>
+        /// Returns all attribute names of the different kinds of software erosions for inner
+        /// nodes (the sums of their descendants).
+        /// </summary>
+        /// <returns>all attribute names of the different kinds of software erosions for inner nodes</returns>
         public IList<string> AllInnerNodeIssues()
         {
             List<string> result = new List<string>()
