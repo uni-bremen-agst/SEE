@@ -77,11 +77,13 @@ namespace SEE.Layout
         /// <summary>
         /// Draws the graph (nodes and edges and all decorations).
         /// </summary>
-        public void Draw(Graph graph)
+        /// <param name="graph">the graph to be drawn</param>
+        /// <param name="parent">every game object drawn for this graph will be added to this parent</param>
+        public void Draw(Graph graph, GameObject parent)
         {
             SetScaler(graph);
             graph.SortHierarchyByName();
-            DrawCity(graph);
+            DrawCity(graph, parent);
         }
 
         /// <summary>
@@ -110,7 +112,8 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
-        private void EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
+        /// <returns>all game objects created to represent the edges; may be empty</returns>
+        private ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
         {
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
@@ -126,13 +129,14 @@ namespace SEE.Layout
                     break;
                 case SEECity.EdgeLayouts.None:
                     // nothing to be done
-                    return;
+                    return new List<GameObject>();
                 default:
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
             }
             Performance p = Performance.Begin(layout.Name + " layout of edges");
-            layout.DrawEdges(graph, gameNodes);
+            ICollection<GameObject> result = layout.DrawEdges(graph, gameNodes);
             p.End();
+            return result;
         }
 
         /// <summary>
@@ -145,7 +149,8 @@ namespace SEE.Layout
         /// choice in the settings.
         /// </summary>
         /// <param name="graph">graph whose nodes and edges are to be laid out</param>
-        protected void DrawCity(Graph graph)
+        /// <param name="parent">every game object drawn for this graph will be added to this parent</param>
+        protected void DrawCity(Graph graph, GameObject parent)
         {
             List<Node> nodes = graph.Nodes();
 
@@ -184,32 +189,66 @@ namespace SEE.Layout
 
             Apply(layout, settings.origin);
             ICollection<GameObject> gameNodes = layout.Keys;
-            AddDecorations(gameNodes);
-            EdgeLayout(graph, gameNodes);
+            AddToParent(gameNodes, parent);
+            AddToParent(AddDecorations(gameNodes), parent);
+            AddToParent(EdgeLayout(graph, gameNodes), parent);
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             // Place the plane somewhat under ground level.
-            PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
+            GameObject plane = PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
+            AddToParent(plane, parent);
+        }
+
+        /// <summary>
+        /// Adds <paramref name="child"/> as a child to <paramref name="parent"/>.
+        /// </summary>
+        /// <param name="child">child to be added</param>
+        /// <param name="parent">new parent of child</param>
+        private static void AddToParent(GameObject child, GameObject parent)
+        {
+            child.transform.SetParent(parent.transform, true);
+            //child.transform.parent = parent.transform;
+        }
+
+        /// <summary>
+        /// Adds all <paramref name="children"/> as a child to <paramref name="parent"/>.
+        /// </summary>
+        /// <param name="children">children to be added</param>
+        /// <param name="parent">new parent of children</param>
+        private static void AddToParent(ICollection<GameObject> children, GameObject parent)
+        {
+            foreach (GameObject child in children)
+            {
+                AddToParent(child, parent);
+            }
         }
 
         /// <summary>
         /// Draws the decorations of the given game nodes.
         /// </summary>
         /// <param name="gameNodes">game nodes to be decorated</param>
-        private void AddDecorations(ICollection<GameObject> gameNodes)
+        /// <returns>the game objects added for the decorations; may be an empty collection</returns>
+        private ICollection<GameObject> AddDecorations(ICollection<GameObject> gameNodes)
         {
             // Decorations must be applied after the blocks have been placed, so that
             // we also know their positions.
+            List<GameObject> decorations = new List<GameObject>();
+
+            // Add software erosion decorators for all leaf nodes if requested.
             if (settings.ShowErosions)
             {
                 ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leafNodeFactory, scaler);
-                issueDecorator.Add(LeafNodes(gameNodes));
+                decorations.AddRange(issueDecorator.Add(LeafNodes(gameNodes)));
             }
 
+            // Add text labels for all inner nodes
             if (settings.NodeLayout == SEECity.NodeLayouts.Balloon 
                 || settings.NodeLayout == SEECity.NodeLayouts.EvoStreets)
             {
-                AddLabels(InnerNodes(gameNodes));
+                decorations.AddRange(AddLabels(InnerNodes(gameNodes)));
             }
+
+            // Add decorators specific to the shape of inner nodes (circle decorators for circles
+            // and donut decorators for donuts.
             switch (settings.InnerNodeObjects)
             {
                 case SEECity.InnerNodeKinds.Empty:
@@ -218,12 +257,17 @@ namespace SEE.Layout
                 case SEECity.InnerNodeKinds.Circles:
                     {
                         CircleDecorator decorator = new CircleDecorator(innerNodeFactory, Color.white);
+                        // the circle decorator does not create new game objects; it justs adds a line
+                        // renderer to the list of nodes; that is why we do not add the result to decorations.
                         decorator.Add(InnerNodes(gameNodes));
                     }
                     break;
                 case SEECity.InnerNodeKinds.Donuts:
                     {
-                        DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric, settings.AllInnerNodeIssues().ToArray<string>());
+                        DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric, 
+                                                                      settings.AllInnerNodeIssues().ToArray<string>());
+                        // the circle segments and the inner circle for the donut are added as children by Add();
+                        // that is why we do not add the result to decorations.
                         decorator.Add(InnerNodes(gameNodes));
                     }
                     break;
@@ -235,14 +279,18 @@ namespace SEE.Layout
                 default:
                     throw new Exception("Unhandled GraphSettings.InnerNodeKinds " + settings.InnerNodeObjects);
             }
+            return decorations;
         }
 
         /// <summary>
         /// Adds the source name as a label to the center of the given game nodes.
         /// </summary>
         /// <param name="gameNodes">game nodes whose source name is to be added</param>
-        private void AddLabels(ICollection<GameObject> gameNodes)
+        /// <returns>the game objects created for the text labels</returns>
+        private ICollection<GameObject> AddLabels(ICollection<GameObject> gameNodes)
         {
+            IList<GameObject> result = new List<GameObject>();
+
             foreach (GameObject node in gameNodes)
             {
                 Vector3 size = innerNodeFactory.GetSize(node);
@@ -250,7 +298,9 @@ namespace SEE.Layout
                 // The text may occupy up to 30% of the length.
                 GameObject text = TextFactory.GetText(node.GetComponent<NodeRef>().node.SourceName, 
                                                       node.transform.position, length * 0.3f);
+                result.Add(text);
             }
+            return result;
         }
 
         /// <summary>

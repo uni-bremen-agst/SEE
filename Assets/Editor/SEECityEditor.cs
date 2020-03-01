@@ -71,24 +71,12 @@ namespace SEEEditor
 
         /// <summary>
         /// Loads the graph data and metric data from disk, aggregates the metrics to
-        /// inner nodes, renders the graph in the scene and adjusts the speed of all
-        /// main cameras if necessary.
+        /// inner nodes and renders the graph in the scene.
         /// </summary>
         /// <param name="city">the city to be set up</param>
         private void SetUp(SEECity city)
         {
             city.LoadGraph();
-            if (ReferenceEquals(city.ItsGraph, null))
-            {
-                Debug.LogError("No graph loaded.\n");
-            }
-            else
-            {
-                GraphRenderer renderer = new GraphRenderer(city);
-                renderer.Draw(city.ItsGraph);
-                // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
-                Cameras.AdjustCameraSpeed(renderer.Unit());
-            }
         }
 
         /// <summary>
