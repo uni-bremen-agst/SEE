@@ -1,5 +1,7 @@
-﻿using SEE.Layout;
+﻿using SEE.DataModel;
+using SEE.Layout;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE
@@ -7,8 +9,24 @@ namespace SEE
     /// <summary>
     /// Settings of the graph data needed at runtime.
     /// </summary>
-    public class SEECity
+    public class SEECity : MonoBehaviour
     {
+        /// <summary>
+        /// The graph that is visualized in the scene and whose settings are 
+        /// managed here.
+        /// </summary>
+        private Graph graph = null;
+
+        /// <summary>
+        /// The graph underlying this SEE city. May be null.
+        /// the element is currently not in a graph.
+        /// </summary>
+        public Graph ItsGraph
+        {
+            get => graph;
+            set => graph = value;
+        }
+
         /// <summary>
         /// The prefix of the absolute paths for the GXL and CSV data.
         /// </summary>        
@@ -106,8 +124,6 @@ namespace SEE
         //---------------------------------
         // Visual attributes of a leaf node
         //---------------------------------
-        //
-
         /// <summary>
         /// The attribute name of the metric to be used for the width of a building (x co-ordinate).
         /// </summary>
@@ -360,6 +376,66 @@ namespace SEE
                 { UniversalIssue, IconFactory.Erosion.Universal }
             };
             return result;
+        }
+
+        /// <summary>
+        /// Loads the graph data from the GXL file with GXLPath() and the metrics
+        /// from the CSV file with CSVPath().
+        /// </summary>
+        public void LoadGraph()
+        {
+            if (string.IsNullOrEmpty(GXLPath()))
+            {
+                Debug.LogError("Empty graph path.\n");
+            }
+            else
+            {
+                SEE.Performance p = SEE.Performance.Begin("loading graph data from " + GXLPath());
+                GraphReader graphCreator = new GraphReader(GXLPath(), HierarchicalEdges, new SEELogger());
+                graphCreator.Load();
+                graph = graphCreator.GetGraph();
+                graph.CalculateLevels();
+                p.End();
+                Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
+                Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
+                LoadMetrics();
+            }
+        }
+
+        /// <summary>
+        /// Loads the metrics from CSVPath() and aggregates and adds them to the graph.
+        /// Precondition: graph must have been loaded before.
+        /// </summary>
+        private void LoadMetrics()
+        {
+            int numberOfErrors = MetricImporter.Load(ItsGraph, CSVPath());
+            if (numberOfErrors > 0)
+            {
+                Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", CSVPath(), numberOfErrors);
+            }
+            {
+                MetricAggregator.AggregateSum(ItsGraph, AllLeafIssues().ToArray<string>());
+                // Note: We do not want to compute the derived metric editorSettings.InnerDonutMetric
+                // when we have a single root node in the graph. This metric will be used to define the color
+                // of inner circles of Donut charts. Because the color is a linear interpolation of the whole
+                // metric value range, the inner circle would always have the maximal value (it is the total
+                // sum over all) and hence the maximal color gradient. The color of the other nodes would be
+                // hardly distinguishable. 
+                // FIXME: We need a better solution. This is a kind of hack.
+                MetricAggregator.DeriveSum(ItsGraph, AllInnerNodeIssues().ToArray<string>(), InnerDonutMetric, true);
+            }
+        }
+
+        /// <summary>
+        /// Destroys the underlying graph.
+        /// </summary>
+        public void DeleteGraph()
+        {
+            if (graph != null)
+            {
+                graph.Destroy();
+            }
+            graph = null;
         }
 
         /// <summary>
