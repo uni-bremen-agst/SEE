@@ -22,8 +22,6 @@ using SEE.Layout;
 using SEE.Animation.Internal;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -52,11 +50,6 @@ namespace SEE.Animation
         private bool _isAutoplay = false;
         private UnityEvent _viewDataChangedEvent = new UnityEvent();
         private int _openGraphIndex = 0;
-
-        /// <summary>
-        /// The FPS counter used to measure animation perfomance.
-        /// </summary>
-        private SEE.Animation.Internal.FPSCounter fpsCounter = new SEE.Animation.Internal.FPSCounter();
 
         /// <summary>
         /// Factory method to create the used NodeFactory.
@@ -243,44 +236,13 @@ namespace SEE.Animation
 
             Scaler = CreateScaler(Graphs, nodeMetrics);
 
-            var csv = new StringBuilder();
-
-            var csvFileName = "\\measure-house.csv";
-            if (useBlockFactory)
-            {
-                csvFileName = "\\measure-block.csv";
-            }
-            csv.AppendLine("Graph Nr; Load time");
-            int index = 1;
-            var stopwatch = new System.Diagnostics.Stopwatch();
-            var p = Performance.Begin("Layout all graphs");
+            var p = Performance.Begin("Layouting all graphs");
             Graphs.ForEach(key =>
             {
-                stopwatch.Reset();
-                stopwatch.Start();
                 Layouts[key] = new SEE.Animation.Internal.Layout();
                 Layouts[key].Calculate(ObjectManager, Scaler, CreateLayout(NodeFactory), key, this);
-                stopwatch.Stop();
-                if (stopwatch.ElapsedMilliseconds == 0)
-                {
-                    csv.AppendLine($"{index}; 1");
-                }
-                else
-                    csv.AppendLine($"{index}; {stopwatch.ElapsedMilliseconds}");
-                index++;
             });
             p.End();
-            try
-            {
-                Directory.CreateDirectory(PathPrefix);
-                File.Delete(PathPrefix + csvFileName);
-                File.WriteAllText(PathPrefix + csvFileName, csv.ToString());
-                Debug.Log($"Saved load time to {PathPrefix + csvFileName}");
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e.ToString());
-            }
 
             if (HasLoadedGraph(out LoadedGraph loadedGraph))
             {
@@ -288,13 +250,8 @@ namespace SEE.Animation
             }
             else
             {
-                Debug.LogError("Could not create LoadedGraph to render.");
+                Debug.LogError("Could not create LoadedGraph to renderer.");
             }
-        }
-
-        void Update()
-        {
-            fpsCounter.OnUpdate();
         }
 
         public bool TryShowSpecificGraph(int value)
@@ -331,7 +288,7 @@ namespace SEE.Animation
         {
             if (Renderer.IsStillAnimating || IsAutoPlay)
             {
-                Debug.Log("The render is already occupied with animating, wait till animations are finished.");
+                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.");
                 return;
             }
             var canShowNext = ShowNextIfPossible();
@@ -416,8 +373,7 @@ namespace SEE.Animation
             if (IsAutoPlay)
             {
                 Renderer.AnimationFinishedEvent.AddListener(OnAutoplayCanContinue);
-                var canShowNext = ShowNextIfPossible();
-                if (!canShowNext)
+                if (!ShowNextIfPossible())
                 {
                     Debug.Log("This is already the last graph revision.");
                 }
@@ -440,7 +396,6 @@ namespace SEE.Animation
             if (HasLoadedGraph(out LoadedGraph loadedGraph) &&
                 HasLoadedGraph(OpenGraphIndex - 1, out LoadedGraph oldLoadedGraph))
             {
-                fpsCounter.BeginRound();
                 Renderer.TransitionToNextGraph(oldLoadedGraph, loadedGraph);
             }
             else
@@ -452,26 +407,8 @@ namespace SEE.Animation
 
         internal void OnAutoplayCanContinue()
         {
-            fpsCounter.EndRound();
-            var canShowNext = ShowNextIfPossible();
-            if (!canShowNext)
+            if (!ShowNextIfPossible())
             {
-                try
-                {
-                    Directory.CreateDirectory(PathPrefix);
-                    var framerateFilename = "\\framerate-house.csv";
-                    if (useBlockFactory)
-                    {
-                        framerateFilename = "\\framerate-block.csv";
-                    }
-                    File.Delete(PathPrefix + framerateFilename);
-                    File.WriteAllText(PathPrefix + framerateFilename, fpsCounter.AsCsvString);
-                    Debug.Log($"Saved load time to {PathPrefix + framerateFilename}");
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError(e.ToString());
-                }
                 ToggleAutoplay();
             }
         }
