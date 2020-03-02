@@ -57,7 +57,7 @@ namespace SEE.Animation
         /// <summary>
         /// The StateManager containing all necessary components for controlling the animations.
         /// </summary>
-        public StateManager stateManager;
+        public SEECityEvolution stateManager;
 
         /// <summary>
         /// Returns true if MainMenuCanvas is shown.

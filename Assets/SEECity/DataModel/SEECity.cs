@@ -486,18 +486,5 @@ namespace SEE
             }
             return result;
         }
-
-        /// <summary>
-        /// Sets the default settings for usage in code-evolution animation.
-        /// The path prefix is set to the application data path. The gxlPath
-        /// becomes "..\Data\GXL\gxlFolderName\".
-        /// </summary>
-        /// <param name="gxlFolderName">name of the folder where the GXL data for 
-        /// the evolution of one program are located</param>
-        public void SetDefaultAnimationSettings(string gxlFolderName)
-        {
-            pathPrefix = Application.dataPath.Replace('/', '\\') + '\\';
-            gxlPath = $"..\\Data\\GXL\\{gxlFolderName}\\";
-        }
     }
 }
