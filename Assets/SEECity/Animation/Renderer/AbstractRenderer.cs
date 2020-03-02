@@ -109,11 +109,11 @@ namespace SEE.Animation.Internal
         /// </summary>
         protected Graph Graph => _nextGraph?.Graph;
         protected Layout Layout => _nextGraph?.Layout;
-        protected SEECity Settings => _nextGraph?.Settings;
+        protected SEECityEvolution Settings => _nextGraph?.Settings;
 
         protected Graph OldGraph => _loadedGraph?.Graph;
         protected Layout OldLayout => _loadedGraph?.Layout;
-        protected SEECity OldSettings => _loadedGraph?.Settings;
+        protected SEECityEvolution OldSettings => _loadedGraph?.Settings;
 
         protected enum GraphDirection { First, Next, Previous };
 

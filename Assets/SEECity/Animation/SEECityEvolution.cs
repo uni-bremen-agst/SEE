@@ -33,17 +33,8 @@ namespace SEE.Animation
     /// A SEECityEvolution combines all necessary components for the animations
     /// of an evolving SEECity.
     /// </summary>
-    public class SEECityEvolution : SEECity
+    public class SEECityEvolution : AbstractSEECity
     {
-        /// <summary>
-        /// Sets the used GXL folder to load graphs from.
-        /// Possible Animations:
-        /// "animation-clones"
-        /// "animation-clones-tinylog"
-        /// "animation-clones-log4j"
-        /// </summary>
-        public string gxlFolderName = "animation-clones";
-
         /// <summary>
         /// Set if the BlockFactory is use to create nodes or else
         /// the BuildingFactory is used.
@@ -61,11 +52,6 @@ namespace SEE.Animation
         private bool _isAutoplay = false;
         private UnityEvent _viewDataChangedEvent = new UnityEvent();
         private int _openGraphIndex = 0;
-
-        /// <summary>
-        /// The folder where the gxl files are located
-        /// </summary>
-        private readonly string gxlDataFolder = "";
 
         /// <summary>
         /// The FPS counter used to measure animation perfomance.
@@ -216,7 +202,6 @@ namespace SEE.Animation
             }
         }
 
-
         public UnityEvent ViewDataChangedEvent
         {
             get
@@ -240,20 +225,16 @@ namespace SEE.Animation
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public SEECityEvolution()
-        {
-            gxlDataFolder = $"{Directory.GetCurrentDirectory()}\\Data\\GXL\\{gxlFolderName}";
-        }
-
         void Start()
         {
             Renderer.AssertNotNull("renderer");
             Renderer.ObjectManager = ObjectManager;
 
-            SetDefaultAnimationSettings(gxlDataFolder);
+            if (String.IsNullOrEmpty(PathPrefix))
+            {
+                PathPrefix = UnityProject.GetPath() + "..\\Data\\GXL\\animation-clones\\";
+                Debug.LogErrorFormat("Path prefix not set. Using default: {0}.\n", PathPrefix);
+            }
             GraphLoader.LoadGraphData(this, maxRevisionsToLoad);
 
             ViewDataChangedEvent.Invoke();
@@ -291,10 +272,10 @@ namespace SEE.Animation
             p.End();
             try
             {
-                Directory.CreateDirectory(gxlDataFolder);
-                File.Delete(gxlDataFolder + csvFileName);
-                File.WriteAllText(gxlDataFolder + csvFileName, csv.ToString());
-                Debug.Log($"Saved load time to {gxlDataFolder + csvFileName}");
+                Directory.CreateDirectory(PathPrefix);
+                File.Delete(PathPrefix + csvFileName);
+                File.WriteAllText(PathPrefix + csvFileName, csv.ToString());
+                Debug.Log($"Saved load time to {PathPrefix + csvFileName}");
             }
             catch (Exception e)
             {
@@ -390,19 +371,6 @@ namespace SEE.Animation
         }
 
         /// <summary>
-        /// Sets the default settings for usage in code-evolution animation.
-        /// The path prefix is set to the application data path. The gxlPath
-        /// becomes "..\Data\GXL\gxlFolderName\".
-        /// </summary>
-        /// <param name="gxlFolderName">name of the folder where the GXL data for 
-        /// the evolution of one program are located</param>
-        public void SetDefaultAnimationSettings(string gxlFolderName)
-        {
-            pathPrefix = Application.dataPath.Replace('/', '\\') + '\\';
-            gxlPath = $"..\\Data\\GXL\\{gxlFolderName}\\";
-        }
-
-        /// <summary>
         /// Returns true and a LoadedGraph if there is a LoadedGraph for the active graph index.
         /// </summary>
         /// <param name="loadedGraph"></param>
@@ -490,15 +458,15 @@ namespace SEE.Animation
             {
                 try
                 {
-                    Directory.CreateDirectory(gxlDataFolder);
+                    Directory.CreateDirectory(PathPrefix);
                     var framerateFilename = "\\framerate-house.csv";
                     if (useBlockFactory)
                     {
                         framerateFilename = "\\framerate-block.csv";
                     }
-                    File.Delete(gxlDataFolder + framerateFilename);
-                    File.WriteAllText(gxlDataFolder + framerateFilename, fpsCounter.AsCsvString);
-                    Debug.Log($"Saved load time to {gxlDataFolder + framerateFilename}");
+                    File.Delete(PathPrefix + framerateFilename);
+                    File.WriteAllText(PathPrefix + framerateFilename, fpsCounter.AsCsvString);
+                    Debug.Log($"Saved load time to {PathPrefix + framerateFilename}");
                 }
                 catch (Exception e)
                 {
