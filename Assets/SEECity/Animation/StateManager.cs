@@ -30,12 +30,13 @@ using UnityEngine.Events;
 namespace SEE.Animation
 {
     /// <summary>
-    /// The StateManager combines all necessary components for the animations.
+    /// A SEECityEvolution combines all necessary components for the animations
+    /// of an evolving SEECity.
     /// </summary>
-    public class StateManager : MonoBehaviour
+    public class SEECityEvolution : SEECity
     {
         /// <summary>
-        /// Sets the used gxl folder to load graphs from.
+        /// Sets the used GXL folder to load graphs from.
         /// Possible Animations:
         /// "animation-clones"
         /// "animation-clones-tinylog"
@@ -54,43 +55,22 @@ namespace SEE.Animation
         /// </summary>
         public int maxRevisionsToLoad = 500;
 
-        #region Internal private variables
-
-        private SEECity _settings;
         private NodeFactory _nodeFactory;
         private AbstractObjectManager _objectManager;
         private AbstractRenderer _Render;
         private bool _isAutoplay = false;
         private UnityEvent _viewDataChangedEvent = new UnityEvent();
         private int _openGraphIndex = 0;
+
         /// <summary>
         /// The folder where the gxl files are located
         /// </summary>
         private readonly string gxlDataFolder = "";
 
         /// <summary>
-        /// The FPS counter used to measure animatin perfomance.
+        /// The FPS counter used to measure animation perfomance.
         /// </summary>
         private SEE.Animation.Internal.FPSCounter fpsCounter = new SEE.Animation.Internal.FPSCounter();
-
-        #endregion
-
-        #region Factory methods
-        /// <summary>
-        /// Factory method to create the used GraphSettings.
-        /// </summary>
-        /// <returns></returns>
-        protected SEECity CreateGraphSetting()
-        {
-            // FIXME/TODO: We need a GameObject representing the graph settings at runtime,
-            // which can be modified by a custom editor for GraphSettings and which replaces
-            // the current CityEditor.
-            var _settings = new SEECity();  
-            _settings.SetDefaultAnimationSettings(gxlFolderName);
-            _settings.MinimalBlockLength = 1;
-            _settings.MaximalBlockLength = 100;
-            return _settings;
-        }
 
         /// <summary>
         /// Factory method to create the used NodeFactory.
@@ -112,7 +92,7 @@ namespace SEE.Animation
         /// Factory method to create the used AbstractRenderer.
         /// </summary>
         /// <returns></returns>
-        protected AbstractRenderer CreateRender()
+        protected AbstractRenderer CreateRenderer()
         {
             if (useBlockFactory)
             {
@@ -136,14 +116,13 @@ namespace SEE.Animation
         /// <summary>
         /// Factory method to create the used NodeMetrics.
         /// </summary>
-        /// <param name="graphSettings"></param>
         /// <returns></returns>
-        protected List<string> CreateNodeMetrics(SEECity graphSettings)
+        protected List<string> CreateNodeMetrics()
         {
-            List<string> nodeMetrics = new List<string>() { graphSettings.WidthMetric, graphSettings.HeightMetric, graphSettings.DepthMetric, graphSettings.ColorMetric };
-            nodeMetrics.AddRange(graphSettings.AllLeafIssues());
-            nodeMetrics.AddRange(graphSettings.AllInnerNodeIssues());
-            nodeMetrics.Add(graphSettings.InnerDonutMetric);
+            List<string> nodeMetrics = new List<string>() { this.WidthMetric, this.HeightMetric, this.DepthMetric, this.ColorMetric };
+            nodeMetrics.AddRange(this.AllLeafIssues());
+            nodeMetrics.AddRange(this.AllInnerNodeIssues());
+            nodeMetrics.Add(this.InnerDonutMetric);
             return nodeMetrics;
         }
 
@@ -151,12 +130,11 @@ namespace SEE.Animation
         /// Factory method to create the used IScale implementation.
         /// </summary>
         /// <param name="graphs"></param>
-        /// <param name="graphSettings"></param>
         /// <param name="nodeMetrics"></param>
         /// <returns></returns>
-        protected IScale CreateScaler(List<Graph> graphs, SEECity graphSettings, List<string> nodeMetrics)
+        protected IScale CreateScaler(List<Graph> graphs, List<string> nodeMetrics)
         {
-            return new LinearMultiScale(graphs, graphSettings.MinimalBlockLength, graphSettings.MaximalBlockLength, nodeMetrics);
+            return new LinearMultiScale(graphs, this.MinimalBlockLength, this.MaximalBlockLength, nodeMetrics);
         }
 
         /// <summary>
@@ -169,23 +147,6 @@ namespace SEE.Animation
             //return new EvoStreetsNodeLayout(0, nodeFactory);
             //return new TreemapLayout(0, nodeFactory, 1000, 1000);
             return new BalloonNodeLayout(0, nodeFactory);
-        }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// The GraphSettings used when calculating the layout.
-        /// </summary>
-        public SEECity Settings
-        {
-            get
-            {
-                if (_settings == null)
-                    _settings = CreateGraphSetting();
-                return _settings;
-            }
         }
 
         public NodeFactory NodeFactory
@@ -208,19 +169,20 @@ namespace SEE.Animation
             }
         }
 
-        public AbstractRenderer Render
+        public AbstractRenderer Renderer
         {
             get
             {
                 if (_Render == null)
-                    _Render = CreateRender();
+                    _Render = CreateRenderer();
                 return _Render;
             }
         }
 
         private Loader GraphLoader { get; } = new Loader();
 
-        private Dictionary<Graph, SEE.Animation.Internal.Layout> Layouts { get; } = new Dictionary<Graph, SEE.Animation.Internal.Layout>();
+        private Dictionary<Graph, SEE.Animation.Internal.Layout> Layouts { get; } 
+            = new Dictionary<Graph, SEE.Animation.Internal.Layout>();
 
         private IScale Scaler { get; set; }
 
@@ -233,10 +195,10 @@ namespace SEE.Animation
         /// </summary>
         public float AnimationTime
         {
-            get => Render.AnimationTime;
+            get => Renderer.AnimationTime;
             set
             {
-                Render.AnimationTime = value;
+                Renderer.AnimationTime = value;
                 ViewDataChangedEvent.Invoke();
             }
         }
@@ -278,30 +240,27 @@ namespace SEE.Animation
             }
         }
 
-        #endregion
-
         /// <summary>
         /// Constructor
         /// </summary>
-        public StateManager()
+        public SEECityEvolution()
         {
             gxlDataFolder = $"{Directory.GetCurrentDirectory()}\\Data\\GXL\\{gxlFolderName}";
         }
 
-        #region MonoBehavior basic methods
-
         void Start()
         {
-            Render.AssertNotNull("render");
-            Render.ObjectManager = ObjectManager;
+            Renderer.AssertNotNull("renderer");
+            Renderer.ObjectManager = ObjectManager;
 
-            GraphLoader.LoadGraphData(Settings, maxRevisionsToLoad);
+            SetDefaultAnimationSettings(gxlDataFolder);
+            GraphLoader.LoadGraphData(this, maxRevisionsToLoad);
 
             ViewDataChangedEvent.Invoke();
 
-            var nodeMetrics = CreateNodeMetrics(Settings);
+            var nodeMetrics = CreateNodeMetrics();
 
-            Scaler = CreateScaler(Graphs, Settings, nodeMetrics);
+            Scaler = CreateScaler(Graphs, nodeMetrics);
 
             var csv = new StringBuilder();
 
@@ -313,13 +272,13 @@ namespace SEE.Animation
             csv.AppendLine("Graph Nr; Load time");
             int index = 1;
             var stopwatch = new System.Diagnostics.Stopwatch();
-            var p = Performance.Begin("Layout all Graphs");
+            var p = Performance.Begin("Layout all graphs");
             Graphs.ForEach(key =>
             {
                 stopwatch.Reset();
                 stopwatch.Start();
                 Layouts[key] = new SEE.Animation.Internal.Layout();
-                Layouts[key].Calculate(ObjectManager, Scaler, CreateLayout(NodeFactory), key, Settings);
+                Layouts[key].Calculate(ObjectManager, Scaler, CreateLayout(NodeFactory), key, this);
                 stopwatch.Stop();
                 if (stopwatch.ElapsedMilliseconds == 0)
                 {
@@ -344,7 +303,7 @@ namespace SEE.Animation
 
             if (HasLoadedGraph(out LoadedGraph loadedGraph))
             {
-                Render.DisplayGraph(loadedGraph);
+                Renderer.DisplayGraph(loadedGraph);
             }
             else
             {
@@ -357,15 +316,11 @@ namespace SEE.Animation
             fpsCounter.OnUpdate();
         }
 
-        #endregion
-
-        #region public methods
-
         public bool TryShowSpecificGraph(int value)
         {
-            if (Render.IsStillAnimating || IsAutoPlay)
+            if (Renderer.IsStillAnimating || IsAutoPlay)
             {
-                Debug.Log("The render is already occupied with animating, wait till animations are finished.");
+                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.");
                 return false;
             }
 
@@ -378,7 +333,7 @@ namespace SEE.Animation
 
             if (HasLoadedGraph(out LoadedGraph loadedGraph))
             {
-                Render.DisplayGraph(loadedGraph);
+                Renderer.DisplayGraph(loadedGraph);
                 return true;
             }
             else
@@ -393,7 +348,7 @@ namespace SEE.Animation
         /// </summary>
         public void ShowNextGraph()
         {
-            if (Render.IsStillAnimating || IsAutoPlay)
+            if (Renderer.IsStillAnimating || IsAutoPlay)
             {
                 Debug.Log("The render is already occupied with animating, wait till animations are finished.");
                 return;
@@ -411,7 +366,7 @@ namespace SEE.Animation
         /// </summary>
         public void ShowPreviousGraph()
         {
-            if (Render.IsStillAnimating || IsAutoPlay)
+            if (Renderer.IsStillAnimating || IsAutoPlay)
             {
                 Debug.Log("The render is already occupied with animating, wait till animations are finished.");
                 return;
@@ -426,7 +381,7 @@ namespace SEE.Animation
             if (HasLoadedGraph(out LoadedGraph loadedGraph) &&
                 HasLoadedGraph(OpenGraphIndex + 1, out LoadedGraph oldLoadedGraph))
             {
-                Render.TransitionToPreviousGraph(oldLoadedGraph, loadedGraph);
+                Renderer.TransitionToPreviousGraph(oldLoadedGraph, loadedGraph);
             }
             else
             {
@@ -434,9 +389,18 @@ namespace SEE.Animation
             }
         }
 
-        #endregion
-
-        #region internal methods
+        /// <summary>
+        /// Sets the default settings for usage in code-evolution animation.
+        /// The path prefix is set to the application data path. The gxlPath
+        /// becomes "..\Data\GXL\gxlFolderName\".
+        /// </summary>
+        /// <param name="gxlFolderName">name of the folder where the GXL data for 
+        /// the evolution of one program are located</param>
+        public void SetDefaultAnimationSettings(string gxlFolderName)
+        {
+            pathPrefix = Application.dataPath.Replace('/', '\\') + '\\';
+            gxlPath = $"..\\Data\\GXL\\{gxlFolderName}\\";
+        }
 
         /// <summary>
         /// Returns true and a LoadedGraph if there is a LoadedGraph for the active graph index.
@@ -460,21 +424,16 @@ namespace SEE.Animation
             var graph = Graphs[index];
             if (graph == null)
             {
-                Debug.LogError("There ist no Graph available at index " + index);
+                Debug.LogError("There ist no graph available at index " + index);
                 return false;
             }
             var hasLayout = Layouts.TryGetValue(graph, out SEE.Animation.Internal.Layout layout);
             if (layout == null || !hasLayout)
             {
-                Debug.LogError("There ist no Layout available at index " + index);
+                Debug.LogError("There ist no layout available at index " + index);
                 return false;
             }
-            if (Settings == null)
-            {
-                Debug.LogError("There ist no GraphSettings available");
-                return false;
-            }
-            loadedGraph = new LoadedGraph(graph, layout, Settings);
+            loadedGraph = new LoadedGraph(graph, layout, this);
             return true;
         }
 
@@ -488,7 +447,7 @@ namespace SEE.Animation
             IsAutoPlay = enabled;
             if (IsAutoPlay)
             {
-                Render.AnimationFinishedEvent.AddListener(OnAutoplayCanContinue);
+                Renderer.AnimationFinishedEvent.AddListener(OnAutoplayCanContinue);
                 var canShowNext = ShowNextIfPossible();
                 if (!canShowNext)
                 {
@@ -497,7 +456,7 @@ namespace SEE.Animation
             }
             else
             {
-                Render.AnimationFinishedEvent.RemoveListener(OnAutoplayCanContinue);
+                Renderer.AnimationFinishedEvent.RemoveListener(OnAutoplayCanContinue);
             }
             ViewDataChangedEvent.Invoke();
         }
@@ -514,7 +473,7 @@ namespace SEE.Animation
                 HasLoadedGraph(OpenGraphIndex - 1, out LoadedGraph oldLoadedGraph))
             {
                 fpsCounter.BeginRound();
-                Render.TransitionToNextGraph(oldLoadedGraph, loadedGraph);
+                Renderer.TransitionToNextGraph(oldLoadedGraph, loadedGraph);
             }
             else
             {
@@ -548,7 +507,5 @@ namespace SEE.Animation
                 ToggleAutoplay();
             }
         }
-
-        #endregion
     }
 }
