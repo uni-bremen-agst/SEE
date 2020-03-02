@@ -29,7 +29,7 @@ namespace SEE.Animation.Internal
     {
         private readonly Graph graph;
         private readonly Layout layout;
-        private readonly SEECity graphSettings;
+        private readonly SEECityEvolution graphSettings;
 
         /// <summary>
         /// The loaded graph.
@@ -44,7 +44,7 @@ namespace SEE.Animation.Internal
         /// <summary>
         /// The settings used for the loaded graph.
         /// </summary>
-        public SEECity Settings => graphSettings;
+        public SEECityEvolution Settings => graphSettings;
 
         /// <summary>
         /// Creates a new LoadedGraph.
@@ -52,7 +52,7 @@ namespace SEE.Animation.Internal
         /// <param name="graph"></param>
         /// <param name="layout"></param>
         /// <param name="graphSettings"></param>
-        public LoadedGraph(Graph graph, Layout layout, SEECity graphSettings)
+        public LoadedGraph(Graph graph, Layout layout, SEECityEvolution graphSettings)
         {
             this.graph = graph.AssertNotNull("graph");
             this.layout = layout.AssertNotNull("layout");

@@ -18,6 +18,7 @@
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.DataModel;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace SEE.Animation.Internal
         /// Loads all gxl files from GraphSettings.AnimatedPath() sorted by numbers in the file names.
         /// </summary>
         /// <param name="graphSettings">The GraphSettings defining the location of gxl files.</param>
-        public void LoadGraphData(SEECity graphSettings, int maxRevisionsToLoad)
+        public void LoadGraphData(SEECityEvolution graphSettings, int maxRevisionsToLoad)
         {
             graphSettings.AssertNotNull("graphSettings");
             graphs.Clear();
@@ -52,16 +53,20 @@ namespace SEE.Animation.Internal
         /// and saves all loaded graph data.
         /// </summary>
         /// <param name="graphSettings">The GraphSettings defining the location of gxl files.</param>
-        private void AddAllRevisions(SEECity graphSettings, int maxRevisionsToLoad)
+        private void AddAllRevisions(SEECityEvolution graphSettings, int maxRevisionsToLoad)
         {
-            SEE.Performance p = SEE.Performance.Begin("loading animated graph data from " + graphSettings.GXLPath());
+            if (String.IsNullOrEmpty(graphSettings.PathPrefix))
+            {
+                throw new Exception("Path prefix not set.");
+            }
+            SEE.Performance p = SEE.Performance.Begin("loading animated graph data from " + graphSettings.PathPrefix);
 
             // clear possible old data
             graphs.Clear();
 
             // get all gxl files sorted by numbers in their name
             var sortedGraphNames = Directory
-                .GetFiles(graphSettings.GXLPath(), "*.gxl", SearchOption.TopDirectoryOnly)
+                .GetFiles(graphSettings.PathPrefix, "*.gxl", SearchOption.TopDirectoryOnly)
                 .Where(e => !string.IsNullOrEmpty(e))
                 .Distinct()
                 .NumericalSort();
