@@ -1,7 +1,6 @@
 ﻿using SEE.DataModel;
 using SEE.Layout;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE
@@ -13,6 +12,7 @@ namespace SEE
     /// is the representation of a graph including the settings that have lead
     /// to its visualization.
     /// </summary>
+    [System.Serializable]
     public abstract class AbstractSEECity : MonoBehaviour
     {
         /// <summary>
@@ -39,16 +39,19 @@ namespace SEE
         /// constructor. That is why we need to defer its definition to the 
         /// SEECityEditor.
         /// </summary>        
+        [SerializeField]
         public string PathPrefix = null;
 
         /// <summary>
         /// The center origin where the graph should be placed in the world scene.
         /// </summary>
+        [SerializeField]
         public Vector3 origin = Vector3.zero;
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
+        [SerializeField]
         public HashSet<string> HierarchicalEdges = Hierarchical_Edge_Types();
 
         /// <summary>
