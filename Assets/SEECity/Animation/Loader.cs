@@ -27,8 +27,7 @@ using UnityEngine;
 namespace SEE.Animation.Internal
 {
     /// <summary>
-    /// Allows loading of multiple gxl files from a directory and stores them.
-    /// FIXME: !!! At the moment data for Metric.Clone_Rate is copied from Metric.LOC for better visualisation during test !!!
+    /// Loads and stores multiple GXL files from a directory.
     /// </summary>
     public class Loader
     {
@@ -38,41 +37,41 @@ namespace SEE.Animation.Internal
         public readonly List<Graph> graphs = new List<Graph>();
 
         /// <summary>
-        /// Loads all gxl files from GraphSettings.AnimatedPath() sorted by numbers in the file names.
+        /// Loads all GXL files from cityEvolution.PathPrefix sorted by numbers in the file names.
         /// </summary>
-        /// <param name="graphSettings">The GraphSettings defining the location of gxl files.</param>
-        public void LoadGraphData(SEECityEvolution graphSettings, int maxRevisionsToLoad)
+        /// <param name="cityEvolution">The city evolution defining the location of gxl files.</param>
+        public void LoadGraphData(SEECityEvolution cityEvolution, int maxRevisionsToLoad)
         {
-            graphSettings.AssertNotNull("graphSettings");
+            cityEvolution.AssertNotNull("graphSettings");
             graphs.Clear();
-            AddAllRevisions(graphSettings, maxRevisionsToLoad);
+            AddAllRevisions(cityEvolution, maxRevisionsToLoad);
         }
 
         /// <summary>
         /// Internal function that loads all gxl files from the path set in GraphSettings and
         /// and saves all loaded graph data.
         /// </summary>
-        /// <param name="graphSettings">The GraphSettings defining the location of gxl files.</param>
-        private void AddAllRevisions(SEECityEvolution graphSettings, int maxRevisionsToLoad)
+        /// <param name="cityEvolution">The GraphSettings defining the location of gxl files.</param>
+        private void AddAllRevisions(SEECityEvolution cityEvolution, int maxRevisionsToLoad)
         {
-            if (String.IsNullOrEmpty(graphSettings.PathPrefix))
+            if (String.IsNullOrEmpty(cityEvolution.PathPrefix))
             {
                 throw new Exception("Path prefix not set.");
             }
-            Debug.LogFormat("Loading animated graph data from {0}.\n", graphSettings.PathPrefix);
-            SEE.Performance p = SEE.Performance.Begin("Loading animated graph data from " + graphSettings.PathPrefix);
+            Debug.LogFormat("Loading animated graph data from {0}.\n", cityEvolution.PathPrefix);
+            SEE.Performance p = SEE.Performance.Begin("Loading animated graph data from " + cityEvolution.PathPrefix);
 
             // clear possible old data
             graphs.Clear();
 
             // get all gxl files sorted by numbers in their name
             IEnumerable<string> sortedGraphNames = Directory
-                .GetFiles(graphSettings.PathPrefix, "*.gxl", SearchOption.TopDirectoryOnly)
+                .GetFiles(cityEvolution.PathPrefix, "*.gxl", SearchOption.TopDirectoryOnly)
                 .Where(e => !string.IsNullOrEmpty(e));
 
             if (sortedGraphNames.Count<string>() == 0)
             {
-                throw new Exception("Directory '" + graphSettings.PathPrefix + "' has no GXL files.");
+                throw new Exception("Directory '" + cityEvolution.PathPrefix + "' has no GXL files.");
             }
             sortedGraphNames = sortedGraphNames.Distinct().NumericalSort();
 
@@ -80,17 +79,14 @@ namespace SEE.Animation.Internal
             foreach (string gxlPath in sortedGraphNames)
             {
                 // load graph
-                GraphReader graphCreator = new GraphReader(gxlPath, graphSettings.HierarchicalEdges, "ROOT", new SEELogger());
+                GraphReader graphCreator = new GraphReader(gxlPath, cityEvolution.HierarchicalEdges, "ROOT", new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
-
-                // TODO remove if Clone_Rate is properly represented in gxl-files
-                graph.Traverse(leafNode => leafNode.SetFloat("Metric.Clone_Rate", leafNode.GetInt("Metric.LOC")));
 
                 // if graph was loaded put in graph list
                 if (graph == null)
                 {
-                    Debug.LogError("graph " + gxlPath + " could not be loaded.");
+                    Debug.LogError("graph " + gxlPath + " could not be loaded.\n");
                 }
                 else
                 {
