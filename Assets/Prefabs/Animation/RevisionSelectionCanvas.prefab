@@ -86,7 +86,7 @@ GameObject:
   - component: {fileID: 7419595554349286225}
   - component: {fileID: 2519789042018128699}
   m_Layer: 0
-  m_Name: OpenVersionDropdown
+  m_Name: RevisionSelectionDropdown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -408,7 +408,7 @@ GameObject:
   - component: {fileID: 3378868594509276438}
   - component: {fileID: 9177160583193807262}
   m_Layer: 0
-  m_Name: GameMenuCanvas
+  m_Name: RevisionSelectionCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -506,7 +506,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3abf2970e2b81b840a0182f50c117729, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OpenVersionDropdown: {fileID: 2519789042018128699}
+  RevisionDropdown: {fileID: 2519789042018128699}
   CloseViewButton: {fileID: 1656043701592340992}
 --- !u!1 &3392776730731066942
 GameObject:
