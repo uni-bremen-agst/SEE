@@ -113,7 +113,7 @@ namespace SEE
             else
             {
                 SEE.Performance p = SEE.Performance.Begin("loading graph data from " + GXLPath());
-                GraphReader graphCreator = new GraphReader(GXLPath(), HierarchicalEdges, new SEELogger());
+                GraphReader graphCreator = new GraphReader(GXLPath(), HierarchicalEdges, "ROOT", new SEELogger());
                 graphCreator.Load();
                 graph = graphCreator.GetGraph();
                 graph.CalculateLevels();

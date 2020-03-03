@@ -80,7 +80,7 @@ namespace SEE.Animation.Internal
             foreach (string gxlPath in sortedGraphNames)
             {
                 // load graph
-                GraphReader graphCreator = new GraphReader(gxlPath, graphSettings.HierarchicalEdges, new SEELogger());
+                GraphReader graphCreator = new GraphReader(gxlPath, graphSettings.HierarchicalEdges, "ROOT", new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
 

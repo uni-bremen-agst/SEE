@@ -152,7 +152,7 @@ namespace SEE.DataModel
             }
         }
 
-        public void Load()
+        public virtual void Load()
         {
             // Preserves the last text content of an XML node seen, 
             // e.g., "mystring" in <string>mystring</string>.
