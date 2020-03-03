@@ -238,7 +238,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'Use L and K-key to view the next and previous graph revision.
 
-    Esc for menu and Tab-Key to toggle endless-mode.'
+    Esc
+    for menu and Tab-Key to toggle endless-mode.'
 --- !u!1 &4461994104216227615
 GameObject:
   m_ObjectHideFlags: 0
@@ -253,7 +254,7 @@ GameObject:
   - component: {fileID: 4461994104216227612}
   - component: {fileID: 6721087702604884392}
   m_Layer: 5
-  m_Name: InGameMenuCanvas
+  m_Name: AnimationCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -352,7 +353,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9e1a6e567f81c441bcb1b8fd53f950e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AnimationTimeText: {fileID: 4775238824520643617}
+  AnimationLagText: {fileID: 4775238824520643617}
   RevisionNumberText: {fileID: 3372066274193659943}
   AutoplayToggle: {fileID: 1992955808648693269}
 --- !u!1 &4698523398524419078
@@ -518,7 +519,7 @@ GameObject:
   - component: {fileID: 830825711465371328}
   - component: {fileID: 4775238824520643617}
   m_Layer: 5
-  m_Name: TextAnimationSpeed
+  m_Name: TextAnimationLag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
