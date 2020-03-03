@@ -47,9 +47,9 @@ namespace SEEEditor
             }
             EditorGUILayout.BeginHorizontal();
             {
-                //city.PathPrefix = EditorGUILayout.TextField("Data path prefix", Filenames.OnCurrentPlatform(city.PathPrefix));
-                EditorGUILayout.LabelField("Data path prefix", GUILayout.Width(EditorGUIUtility.labelWidth));
-                EditorGUILayout.SelectableLabel(city.PathPrefix, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
+                city.PathPrefix = EditorGUILayout.TextField("Data path prefix", Filenames.OnCurrentPlatform(city.PathPrefix));
+                //EditorGUILayout.LabelField("Data path prefix", GUILayout.Width(EditorGUIUtility.labelWidth));
+                //EditorGUILayout.SelectableLabel(city.PathPrefix, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
                 if (GUILayout.Button("Select"))
                 {
                     city.PathPrefix = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select GXL graph data directory", city.PathPrefix, ""));
@@ -59,7 +59,6 @@ namespace SEEEditor
                 {
                     city.PathPrefix = city.PathPrefix + Path.DirectorySeparatorChar;
                 }
-                Debug.LogFormat("city.PathPrefix: {0}\n", city.PathPrefix);
             }
             EditorGUILayout.EndHorizontal();
 
