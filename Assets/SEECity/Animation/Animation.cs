@@ -25,9 +25,9 @@ using SEE.Animation.Internal;
 namespace SEE.Animation
 {
     /// <summary>
-    /// The Animation manages user inputs and interfaces.
+    /// The AnimationInteraction manages user inputs and interfaces.
     /// </summary>
-    public class Animation : MonoBehaviour
+    public class AnimationInteraction : MonoBehaviour
     {
         /// <summary>
         /// The camera from the user.
@@ -35,66 +35,81 @@ namespace SEE.Animation
         public FlyCamera FlyCamera;
 
         /// <summary>
-        /// The in game seen while viewing the animations.
+        /// The in-game animation canvas shown while viewing the animations. It contains
+        /// the panel for the instructions shown to the user (explaining the
+        /// keys) and a panel for the currently shown revision, the total number
+        /// of revisions and the auto-play toggle. If the ESC key is hit, the
+        /// RevisionSelectionCanvas is shown again.
         /// </summary>
-        public GameObject InGameCanvas;
+        public GameObject AnimationCanvas;
 
         /// <summary>
-        /// The menu for selecting the shown revision.
+        /// The viewmodel for AnimationCanvas.
         /// </summary>
-        public GameObject MainMenuCanvas;
+        private AnimationDataModel animationDataModel;
 
         /// <summary>
-        /// The viewmodel for InGameCanvas.
+        /// The in-game canvas containing the menu for selecting the shown graph revision. 
+        /// It is shown when the user enters the ESC key. Beside the revision selection
+        /// menu, it also contains a close button. If this button is pressed, the
+        /// AnimationCanvas is shown again.
         /// </summary>
-        private InGameMenuModel inGameMenu;
+        public GameObject RevisionSelectionCanvas;
 
         /// <summary>
-        /// The viewmodel for MainMenuCanvas
+        /// The viewmodel for RevisionSelectionCanvas.
         /// </summary>
-        private MainMenuModel mainMenu;
+        private RevisionSelectionDataModel mainMenu;
 
         /// <summary>
-        /// The StateManager containing all necessary components for controlling the animations.
+        /// The SEECityEvolution containing all necessary components for controlling the animations.
         /// </summary>
-        public SEECityEvolution stateManager;
+        public SEECityEvolution CityEvolution;
 
         /// <summary>
-        /// Returns true if MainMenuCanvas is shown.
+        /// Returns true if RevisionSelectionCanvas is currently shown.
         /// </summary>
-        public bool IsMainMenuOpen => !FlyCamera.IsEnabled;
+        public bool IsRevisionSelectionOpen => !FlyCamera.IsEnabled;
 
         void Start()
         {
-            mainMenu = MainMenuCanvas.GetComponent<MainMenuModel>();
-            inGameMenu = InGameCanvas.GetComponent<InGameMenuModel>();
+            mainMenu = RevisionSelectionCanvas.GetComponent<RevisionSelectionDataModel>();
+            animationDataModel = AnimationCanvas.GetComponent<AnimationDataModel>();
 
             mainMenu.AssertNotNull("mainMenu");
-            inGameMenu.AssertNotNull("inGameMenu");
+            animationDataModel.AssertNotNull("inGameMenu");
 
             mainMenu.CloseViewButton.onClick.AddListener(ToogleMainMenu);
-            mainMenu.OpenVersionDropdown.onValueChanged.AddListener(OnDropDownChanged);
+            mainMenu.RevisionDropdown.onValueChanged.AddListener(OnDropDownChanged);
 
             ToogleMainMenu(true);
             OnViewDataChanged();
-            stateManager.ViewDataChangedEvent.AddListener(OnViewDataChanged);
+            CityEvolution.ViewDataChangedEvent.AddListener(OnViewDataChanged);
         }
 
+        /// <summary>
+        /// Handles the user input as follows:
+        ///   k   => previous graph revision is shown
+        ///   l   => next graph revision is shown
+        ///   tab => auto-play mode is toggled
+        ///   0-9 => the time in between two revisions in auto-play mode is adjusted
+        ///   ESC => toggle between the two canvases AnimationCanvas and RevisionSelectionCanvas
+        /// </summary>
         void Update()
         {
-            if (!IsMainMenuOpen)
+            if (!IsRevisionSelectionOpen)
             {
                 if (Input.GetKeyDown("k"))
                 {
-                    stateManager.ShowPreviousGraph();
+                    CityEvolution.ShowPreviousGraph();
                 }
                 else if (Input.GetKeyDown("l"))
                 {
-                    stateManager.ShowNextGraph();
+                    CityEvolution.ShowNextGraph();
                 }
                 else if (Input.GetKeyDown(KeyCode.Tab))
                 {
-                    stateManager.ToggleAutoplay();
+                    CityEvolution.ToggleAutoplay();
                 }
 
                 string[] animationTimeKeys = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
@@ -103,7 +118,7 @@ namespace SEE.Animation
                 {
                     if (Input.GetKeyDown(animationTimeKeys[i]))
                     {
-                        stateManager.AnimationTime = animationTimeValues[i];
+                        CityEvolution.AnimationLag = animationTimeValues[i];
                     }
                 }
             }
@@ -128,18 +143,18 @@ namespace SEE.Animation
         void ToogleMainMenu(bool enabled)
         {
             FlyCamera.IsEnabled = !enabled;
-            InGameCanvas.SetActive(!enabled);
-            MainMenuCanvas.SetActive(enabled);
-            stateManager.ToggleAutoplay(false);
+            AnimationCanvas.SetActive(!enabled);
+            RevisionSelectionCanvas.SetActive(enabled);
+            CityEvolution.ToggleAutoplay(false);
             if (enabled)
             {
-                mainMenu.OpenVersionDropdown.ClearOptions();
+                mainMenu.RevisionDropdown.ClearOptions();
                 var options = Enumerable
-                    .Range(1, stateManager.GraphCount)
+                    .Range(1, CityEvolution.GraphCount)
                     .Select(i => new Dropdown.OptionData(i.ToString()))
                     .ToList();
-                mainMenu.OpenVersionDropdown.AddOptions(options);
-                mainMenu.OpenVersionDropdown.value = stateManager.OpenGraphIndex;
+                mainMenu.RevisionDropdown.AddOptions(options);
+                mainMenu.RevisionDropdown.value = CityEvolution.OpenGraphIndex;
             }
         }
 
@@ -149,9 +164,9 @@ namespace SEE.Animation
         /// </summary>
         void OnViewDataChanged()
         {
-            inGameMenu.RevisionNumberText.text = (stateManager.OpenGraphIndex + 1) + " / " + stateManager.GraphCount;
-            inGameMenu.AutoplayToggle.isOn = stateManager.IsAutoPlay;
-            inGameMenu.AnimationTimeText.text = "Revision animation time: " + stateManager.AnimationTime + "s";
+            animationDataModel.RevisionNumberText.text = (CityEvolution.OpenGraphIndex + 1) + " / " + CityEvolution.GraphCount;
+            animationDataModel.AutoplayToggle.isOn = CityEvolution.IsAutoPlay;
+            animationDataModel.AnimationLagText.text = "Revision animation time: " + CityEvolution.AnimationLag + "s";
         }
 
         /// <summary>
@@ -161,9 +176,9 @@ namespace SEE.Animation
         /// <param name="value"></param>
         void OnDropDownChanged(int value)
         {
-            if (value != stateManager.OpenGraphIndex)
+            if (value != CityEvolution.OpenGraphIndex)
             {
-                stateManager.TryShowSpecificGraph(value);
+                CityEvolution.TryShowSpecificGraph(value);
             }
         }
     }
