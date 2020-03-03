@@ -24,27 +24,29 @@ using SEE.Animation.Internal;
 namespace SEE.Animation
 {
     /// <summary>
-    /// Datamodel for mainmenuview.
+    /// Data model for the selection of a revision consisting of a drop-down
+    /// menu listing all available revisions and a close button. These data are
+    /// shown to the user as part of the revision-selection canvas.
     /// </summary>
-    public class MainMenuModel : MonoBehaviour
+    public class RevisionSelectionDataModel : MonoBehaviour
     {
-
         /// <summary>
-        /// Dropdown that sets the actual shown revision.
+        /// Drop-down menu that allows a user to select the revision to be shown.
+        /// It contains all available revisions.
         /// </summary>
-        public Dropdown OpenVersionDropdown;
+        public Dropdown RevisionDropdown;
 
         /// <summary>
-        /// Button to close the MainMenu
+        /// Button to close this dialog.
         /// </summary>
         public Button CloseViewButton;
 
         /// <summary>
-        /// Checks if all fields are initialized.
+        /// Checks whether all fields are initialized.
         /// </summary>
         void Start()
         {
-            OpenVersionDropdown.AssertNotNull("OpenVersionDropdown");
+            RevisionDropdown.AssertNotNull("RevisionDropdown");
             CloseViewButton.AssertNotNull("CloseViewButton");
         }
     }

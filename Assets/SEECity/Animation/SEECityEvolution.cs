@@ -46,9 +46,18 @@ namespace SEE.Animation
 
         private NodeFactory _nodeFactory;
         private AbstractObjectManager _objectManager;
-        private AbstractRenderer _Render;
+        private AbstractRenderer _Renderer;
+
+        /// <summary>
+        /// Whether the user has selected auto-play mode.
+        /// </summary>
         private bool _isAutoplay = false;
+
         private UnityEvent _viewDataChangedEvent = new UnityEvent();
+
+        /// <summary>
+        /// The index of the currently visualized graph.
+        /// </summary>
         private int _openGraphIndex = 0;
 
         /// <summary>
@@ -152,9 +161,9 @@ namespace SEE.Animation
         {
             get
             {
-                if (_Render == null)
-                    _Render = CreateRenderer();
-                return _Render;
+                if (_Renderer == null)
+                    _Renderer = CreateRenderer();
+                return _Renderer;
             }
         }
 
@@ -170,9 +179,9 @@ namespace SEE.Animation
         public int GraphCount => Graphs.Count;
 
         /// <summary>
-        /// The used time for the animations.
+        /// The time in seconds for showing a single graph revision during auto-play animation.
         /// </summary>
-        public float AnimationTime
+        public float AnimationLag
         {
             get => Renderer.AnimationTime;
             set
@@ -228,14 +237,15 @@ namespace SEE.Animation
                 PathPrefix = UnityProject.GetPath() + "..\\Data\\GXL\\animation-clones\\";
                 Debug.LogErrorFormat("Path prefix not set. Using default: {0}.\n", PathPrefix);
             }
+            // Load all GXL graphs in directory PathPrefix but not more than maxRevisionsToLoad many.
             GraphLoader.LoadGraphData(this, maxRevisionsToLoad);
 
             ViewDataChangedEvent.Invoke();
 
-            var nodeMetrics = CreateNodeMetrics();
+            // Create the scaling of all visualized metrics.
+            Scaler = CreateScaler(Graphs, CreateNodeMetrics());
 
-            Scaler = CreateScaler(Graphs, nodeMetrics);
-
+            // Determine the layouts of all loaded graphs upfront.
             var p = Performance.Begin("Layouting all graphs");
             Graphs.ForEach(key =>
             {
@@ -244,6 +254,7 @@ namespace SEE.Animation
             });
             p.End();
 
+            // 
             if (HasLoadedGraph(out LoadedGraph loadedGraph))
             {
                 Renderer.DisplayGraph(loadedGraph);
@@ -331,7 +342,7 @@ namespace SEE.Animation
         /// Returns true and a LoadedGraph if there is a LoadedGraph for the active graph index.
         /// </summary>
         /// <param name="loadedGraph"></param>
-        /// <returns></returns>
+        /// <returns>true if there is graph to be visualized (index _openGraphIndex)</returns>
         private bool HasLoadedGraph(out LoadedGraph loadedGraph)
         {
             return HasLoadedGraph(_openGraphIndex, out loadedGraph);
@@ -340,9 +351,9 @@ namespace SEE.Animation
         /// <summary>
         /// Returns true and a LoadedGraph if there is a LoadedGraph for the given graph index.
         /// </summary>
-        /// <param name="index"></param>
-        /// <param name="loadedGraph"></param>
-        /// <returns></returns>
+        /// <param name="index">index of the requested graph</param>
+        /// <param name="loadedGraph">the resulting graph with given index; defined only if this method returns true</param>
+        /// <returns>true iff there is a graph at the given index</returns>
         private bool HasLoadedGraph(int index, out LoadedGraph loadedGraph)
         {
             loadedGraph = null;

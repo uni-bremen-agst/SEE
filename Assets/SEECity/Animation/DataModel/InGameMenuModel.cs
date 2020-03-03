@@ -24,22 +24,26 @@ using SEE.Animation.Internal;
 namespace SEE.Animation
 {
     /// <summary>
-    /// Datamodel for ingameview.
+    /// Data model for the animation-related user interactions consisting
+    /// of a text field for the animation lag, a text field for the currently
+    /// shown revision, and a toggle for the auto-play mode. These data are
+    /// shown to the user as part of the animation canvas.
     /// </summary>
-    public class InGameMenuModel : MonoBehaviour
+    public class AnimationDataModel : MonoBehaviour
     {
         /// <summary>
-        /// TextField for the used AnimationTime in seconds.
+        /// TextField for the animation time in seconds, that is, the time in 
+        /// seconds for showing a single graph revision during auto-play animation.
         /// </summary>
-        public Text AnimationTimeText;
+        public Text AnimationLagText;
 
         /// <summary>
-        /// TextField for the show revision in game.
+        /// TextField for the shown revision in game.
         /// </summary>
         public Text RevisionNumberText;
 
         /// <summary>
-        /// Toggle that shows if autoplaing the animations is active.
+        /// Toggle that shows whether auto-play mode is active.
         /// </summary>
         public Toggle AutoplayToggle;
 
@@ -48,7 +52,7 @@ namespace SEE.Animation
         /// </summary>
         void Start()
         {
-            AnimationTimeText.AssertNotNull("AnimationTimeText");
+            AnimationLagText.AssertNotNull("AnimationLagText");
             RevisionNumberText.AssertNotNull("RevisionNumberText");
             AutoplayToggle.AssertNotNull("AutoplayToggle");
         }
