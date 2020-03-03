@@ -45,17 +45,21 @@ namespace SEEEditor
                 // constructor. That is why we need to set it here if it is not yet defined.
                 city.PathPrefix = UnityProject.GetPath();
             }
-
-            //city.pathPrefix = EditorGUILayout.TextField("Project path prefix", city.pathPrefix);
             EditorGUILayout.BeginHorizontal();
             {
+                //city.PathPrefix = EditorGUILayout.TextField("Data path prefix", Filenames.OnCurrentPlatform(city.PathPrefix));
                 EditorGUILayout.LabelField("Data path prefix", GUILayout.Width(EditorGUIUtility.labelWidth));
                 EditorGUILayout.SelectableLabel(city.PathPrefix, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
                 if (GUILayout.Button("Select"))
                 {
-                    city.PathPrefix = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select data directory", city.PathPrefix, ""))
-                        + Path.DirectorySeparatorChar;
+                    city.PathPrefix = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select GXL graph data directory", city.PathPrefix, ""));
                 }
+                // city.PathPrefix must end with a directory separator
+                if (city.PathPrefix.Length > 0 && city.PathPrefix[city.PathPrefix.Length - 1] != Path.DirectorySeparatorChar)
+                {
+                    city.PathPrefix = city.PathPrefix + Path.DirectorySeparatorChar;
+                }
+                Debug.LogFormat("city.PathPrefix: {0}\n", city.PathPrefix);
             }
             EditorGUILayout.EndHorizontal();
 

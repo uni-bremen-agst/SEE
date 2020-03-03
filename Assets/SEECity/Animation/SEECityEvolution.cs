@@ -58,7 +58,7 @@ namespace SEE.Animation
         /// <summary>
         /// The index of the currently visualized graph.
         /// </summary>
-        private int _openGraphIndex = 0;
+        private int currentGraphIndex = 0;
 
         /// <summary>
         /// Factory method to create the used NodeFactory.
@@ -192,14 +192,14 @@ namespace SEE.Animation
         }
 
         /// <summary>
-        /// Returns the index of the shown graph.
+        /// Returns the index of the currently shown graph.
         /// </summary>
-        public int OpenGraphIndex
+        public int CurrentGraphIndex
         {
-            get => _openGraphIndex;
+            get => currentGraphIndex;
             private set
             {
-                _openGraphIndex = value;
+                currentGraphIndex = value;
                 ViewDataChangedEvent.Invoke();
             }
         }
@@ -278,7 +278,7 @@ namespace SEE.Animation
                 Debug.Log("value is no valid index.");
                 return false;
             }
-            OpenGraphIndex = value;
+            CurrentGraphIndex = value;
 
             if (HasLoadedGraph(out LoadedGraph loadedGraph))
             {
@@ -320,15 +320,15 @@ namespace SEE.Animation
                 Debug.Log("The render is already occupied with animating, wait till animations are finished.");
                 return;
             }
-            if (OpenGraphIndex == 0)
+            if (CurrentGraphIndex == 0)
             {
                 Debug.Log("This is already the first graph revision.");
                 return;
             }
-            OpenGraphIndex--;
+            CurrentGraphIndex--;
 
             if (HasLoadedGraph(out LoadedGraph loadedGraph) &&
-                HasLoadedGraph(OpenGraphIndex + 1, out LoadedGraph oldLoadedGraph))
+                HasLoadedGraph(CurrentGraphIndex + 1, out LoadedGraph oldLoadedGraph))
             {
                 Renderer.TransitionToPreviousGraph(oldLoadedGraph, loadedGraph);
             }
@@ -345,7 +345,7 @@ namespace SEE.Animation
         /// <returns>true if there is graph to be visualized (index _openGraphIndex)</returns>
         private bool HasLoadedGraph(out LoadedGraph loadedGraph)
         {
-            return HasLoadedGraph(_openGraphIndex, out loadedGraph);
+            return HasLoadedGraph(currentGraphIndex, out loadedGraph);
         }
 
         /// <summary>
@@ -398,14 +398,14 @@ namespace SEE.Animation
 
         private bool ShowNextIfPossible()
         {
-            if (_openGraphIndex == Graphs.Count - 1)
+            if (currentGraphIndex == Graphs.Count - 1)
             {
                 return false;
             }
-            OpenGraphIndex++;
+            CurrentGraphIndex++;
 
             if (HasLoadedGraph(out LoadedGraph loadedGraph) &&
-                HasLoadedGraph(OpenGraphIndex - 1, out LoadedGraph oldLoadedGraph))
+                HasLoadedGraph(CurrentGraphIndex - 1, out LoadedGraph oldLoadedGraph))
             {
                 Renderer.TransitionToNextGraph(oldLoadedGraph, loadedGraph);
             }

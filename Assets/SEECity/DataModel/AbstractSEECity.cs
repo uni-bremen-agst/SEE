@@ -12,7 +12,6 @@ namespace SEE
     /// is the representation of a graph including the settings that have lead
     /// to its visualization.
     /// </summary>
-    [System.Serializable]
     public abstract class AbstractSEECity : MonoBehaviour
     {
         /// <summary>
