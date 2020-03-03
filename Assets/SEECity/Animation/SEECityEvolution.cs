@@ -106,10 +106,10 @@ namespace SEE.Animation
         }
 
         /// <summary>
-        /// Factory method to create the used NodeMetrics.
+        /// Returns the list of visualized node metrics to be scaled.
         /// </summary>
-        /// <returns></returns>
-        protected List<string> CreateNodeMetrics()
+        /// <returns>list of visualized node metrics to be scaled</returns>
+        protected List<string> MetricsToBeScaled()
         {
             List<string> nodeMetrics = new List<string>() { this.WidthMetric, this.HeightMetric, this.DepthMetric, this.ColorMetric };
             nodeMetrics.AddRange(this.AllLeafIssues());
@@ -247,7 +247,7 @@ namespace SEE.Animation
             ViewDataChangedEvent.Invoke();
 
             // Create the scaling of all visualized metrics.
-            Scaler = CreateScaler(Graphs, CreateNodeMetrics());
+            Scaler = CreateScaler(Graphs, MetricsToBeScaled());
 
             // Determine the layouts of all loaded graphs upfront.
             var p = Performance.Begin("Layouting all graphs");
