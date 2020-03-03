@@ -111,11 +111,13 @@ namespace SEE.Animation
         /// <returns>list of visualized node metrics to be scaled</returns>
         protected List<string> MetricsToBeScaled()
         {
-            List<string> nodeMetrics = new List<string>() { this.WidthMetric, this.HeightMetric, this.DepthMetric, this.ColorMetric };
-            nodeMetrics.AddRange(this.AllLeafIssues());
-            nodeMetrics.AddRange(this.AllInnerNodeIssues());
+            // We are first using a set because the user could have decided to use
+            // the same node attribute more than once for one of these visual attributes.
+            HashSet<string> nodeMetrics = new HashSet<string>() { this.WidthMetric, this.HeightMetric, this.DepthMetric, this.ColorMetric };
+            nodeMetrics.UnionWith(this.AllLeafIssues());
+            nodeMetrics.UnionWith(this.AllInnerNodeIssues());
             nodeMetrics.Add(this.InnerDonutMetric);
-            return nodeMetrics;
+            return new List<string>(nodeMetrics);
         }
 
         /// <summary>
