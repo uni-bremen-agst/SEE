@@ -44,7 +44,7 @@ namespace SEE.Animation
         public GameObject AnimationCanvas;
 
         /// <summary>
-        /// The viewmodel for AnimationCanvas.
+        /// The user-data model for AnimationCanvas.
         /// </summary>
         private AnimationDataModel animationDataModel;
 
@@ -57,9 +57,9 @@ namespace SEE.Animation
         public GameObject RevisionSelectionCanvas;
 
         /// <summary>
-        /// The viewmodel for RevisionSelectionCanvas.
+        /// The user-data model for RevisionSelectionCanvas.
         /// </summary>
-        private RevisionSelectionDataModel mainMenu;
+        private RevisionSelectionDataModel revisionSelectionDataModel;
 
         /// <summary>
         /// The SEECityEvolution containing all necessary components for controlling the animations.
@@ -73,16 +73,16 @@ namespace SEE.Animation
 
         void Start()
         {
-            mainMenu = RevisionSelectionCanvas.GetComponent<RevisionSelectionDataModel>();
+            revisionSelectionDataModel = RevisionSelectionCanvas.GetComponent<RevisionSelectionDataModel>();
             animationDataModel = AnimationCanvas.GetComponent<AnimationDataModel>();
 
-            mainMenu.AssertNotNull("mainMenu");
-            animationDataModel.AssertNotNull("inGameMenu");
+            revisionSelectionDataModel.AssertNotNull("revisionSelectionDataModel");
+            animationDataModel.AssertNotNull("animationDataModel");
 
-            mainMenu.CloseViewButton.onClick.AddListener(ToogleMainMenu);
-            mainMenu.RevisionDropdown.onValueChanged.AddListener(OnDropDownChanged);
+            revisionSelectionDataModel.CloseViewButton.onClick.AddListener(ToogleMode);
+            revisionSelectionDataModel.RevisionDropdown.onValueChanged.AddListener(OnDropDownChanged);
 
-            ToogleMainMenu(true);
+            SetMode(true);
             OnViewDataChanged();
             CityEvolution.ViewDataChangedEvent.AddListener(OnViewDataChanged);
         }
@@ -124,23 +124,43 @@ namespace SEE.Animation
             }
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                ToogleMainMenu(FlyCamera.IsEnabled);
+                SetMode(FlyCamera.IsEnabled);
             }
         }
 
         /// <summary>
-        /// Toggles the visibility from the MainMenuCanvas.
+        /// Toggles between the animation-interaction mode and the revision-selection
+        /// mode. 
+        /// In the animation-interaction mode, the user can see and control
+        /// the animations of the graph revisions through the AnimationCanvas
+        /// and freely move in the city. 
+        /// In the revision-selection mode, the user can select the revision to be shown
+        /// through the RevisionSelectionCanvas. No movement is possible in that mode.
         /// </summary>
-        void ToogleMainMenu()
+        private void ToogleMode()
         {
-            ToogleMainMenu(FlyCamera.IsEnabled);
+            SetMode(FlyCamera.IsEnabled);
         }
 
         /// <summary>
-        /// Changes the visibility of the MainMenuCanvas to the given enabled.
+        /// Toggles between the animation-interaction mode and the revision-selection
+        /// mode. If <paramref name="enabled"/> is true, the revision-selection mode
+        /// is activated; otherwise the animation-interaction mode is turned on.
+        /// 
+        /// In the revision-selection mode, the user can select the revision to be shown
+        /// through the RevisionSelectionCanvas. No movement is possible in that mode.
+        /// 
+        /// In the animation-interaction mode, the user can see and control
+        /// the animations of the graph revisions through the AnimationCanvas
+        /// and freely move in the city. 
+        /// 
+        /// Both modes are mutually exclusive.
+        /// 
+        /// Auto-play animation is always turned off independent of <paramref name="enabled"/>.
         /// </summary>
-        /// <param name="enabled"></param>
-        void ToogleMainMenu(bool enabled)
+        /// <param name="enabled">if true, revision-selection mode is turned on; otherwise
+        /// animation-interaction mode is turned on</param>
+        private void SetMode(bool enabled)
         {
             FlyCamera.IsEnabled = !enabled;
             AnimationCanvas.SetActive(!enabled);
@@ -148,35 +168,40 @@ namespace SEE.Animation
             CityEvolution.ToggleAutoplay(false);
             if (enabled)
             {
-                mainMenu.RevisionDropdown.ClearOptions();
+                // if revision-selection mode is enabled, we re-fill the drop-down
+                // selection menu with all available graph indices.
+                revisionSelectionDataModel.RevisionDropdown.ClearOptions();
                 var options = Enumerable
                     .Range(1, CityEvolution.GraphCount)
                     .Select(i => new Dropdown.OptionData(i.ToString()))
                     .ToList();
-                mainMenu.RevisionDropdown.AddOptions(options);
-                mainMenu.RevisionDropdown.value = CityEvolution.OpenGraphIndex;
+                revisionSelectionDataModel.RevisionDropdown.AddOptions(options);
+                revisionSelectionDataModel.RevisionDropdown.value = CityEvolution.CurrentGraphIndex;
             }
         }
 
         /// <summary>
-        /// Event function that updates all show data for the user.
-        /// E.g. the revision number shown in the InGameCanvas.
+        /// Event function that updates all shown data for the user;
+        /// e.g. the revision number shown in the animation canvas.
+        /// This method is called as a callback when any of the graph
+        /// data have changed.
         /// </summary>
-        void OnViewDataChanged()
+        private void OnViewDataChanged()
         {
-            animationDataModel.RevisionNumberText.text = (CityEvolution.OpenGraphIndex + 1) + " / " + CityEvolution.GraphCount;
+            animationDataModel.RevisionNumberText.text = (CityEvolution.CurrentGraphIndex + 1) + " / " + CityEvolution.GraphCount;
             animationDataModel.AutoplayToggle.isOn = CityEvolution.IsAutoPlay;
-            animationDataModel.AnimationLagText.text = "Revision animation time: " + CityEvolution.AnimationLag + "s";
+            animationDataModel.AnimationLagText.text = "Revision animation lag: " + CityEvolution.AnimationLag + "s";
         }
 
         /// <summary>
-        /// Event function that changes the show revision to the
-        /// given value index.
+        /// Event function that changes the shown revision to the given value index.
+        /// This method is called as a callback when the user selects an entry in
+        /// the RevisionDropdown box.
         /// </summary>
-        /// <param name="value"></param>
-        void OnDropDownChanged(int value)
+        /// <param name="value">the revision index selected from the drop-down box</param>
+        private void OnDropDownChanged(int value)
         {
-            if (value != CityEvolution.OpenGraphIndex)
+            if (value != CityEvolution.CurrentGraphIndex)
             {
                 CityEvolution.TryShowSpecificGraph(value);
             }

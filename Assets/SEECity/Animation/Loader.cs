@@ -28,7 +28,7 @@ namespace SEE.Animation.Internal
 {
     /// <summary>
     /// Allows loading of multiple gxl files from a directory and stores them.
-    /// !!! At the moment data for Metric.Clone_Rate is copied from Metric.LOC for better visualisation during test !!!
+    /// FIXME: !!! At the moment data for Metric.Clone_Rate is copied from Metric.LOC for better visualisation during test !!!
     /// </summary>
     public class Loader
     {
@@ -59,17 +59,22 @@ namespace SEE.Animation.Internal
             {
                 throw new Exception("Path prefix not set.");
             }
-            SEE.Performance p = SEE.Performance.Begin("loading animated graph data from " + graphSettings.PathPrefix);
+            Debug.LogFormat("Loading animated graph data from {0}.\n", graphSettings.PathPrefix);
+            SEE.Performance p = SEE.Performance.Begin("Loading animated graph data from " + graphSettings.PathPrefix);
 
             // clear possible old data
             graphs.Clear();
 
             // get all gxl files sorted by numbers in their name
-            var sortedGraphNames = Directory
+            IEnumerable<string> sortedGraphNames = Directory
                 .GetFiles(graphSettings.PathPrefix, "*.gxl", SearchOption.TopDirectoryOnly)
-                .Where(e => !string.IsNullOrEmpty(e))
-                .Distinct()
-                .NumericalSort();
+                .Where(e => !string.IsNullOrEmpty(e));
+
+            if (sortedGraphNames.Count<string>() == 0)
+            {
+                throw new Exception("Directory '" + graphSettings.PathPrefix + "' has no GXL files.");
+            }
+            sortedGraphNames = sortedGraphNames.Distinct().NumericalSort();
 
             // for all found gxl files load and save the graph data
             foreach (string gxlPath in sortedGraphNames)
