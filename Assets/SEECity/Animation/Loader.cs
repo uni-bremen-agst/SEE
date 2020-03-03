@@ -37,7 +37,8 @@ namespace SEE.Animation.Internal
         public readonly List<Graph> graphs = new List<Graph>();
 
         /// <summary>
-        /// Loads all GXL files from cityEvolution.PathPrefix sorted by numbers in the file names.
+        /// Loads all GXL files from cityEvolution.PathPrefix sorted by the
+        /// numbers in the file names.
         /// </summary>
         /// <param name="cityEvolution">The city evolution defining the location of gxl files.</param>
         public void LoadGraphData(SEECityEvolution cityEvolution, int maxRevisionsToLoad)
