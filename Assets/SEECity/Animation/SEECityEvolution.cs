@@ -34,10 +34,14 @@ namespace SEE.Animation
     public class SEECityEvolution : AbstractSEECity
     {
         /// <summary>
-        /// Set if the BlockFactory is use to create nodes or else
-        /// the BuildingFactory is used.
+        /// True if BlockFactory should be used for leaf nodes; otherwise
+        /// BuildingFactory will be used instead.
         /// </summary>
-        public bool useBlockFactory = false;
+        /// <returns>true if BlockFactory should be used for leaf nodes</returns>
+        private bool UseBlockFactory()
+        {
+            return LeafObjects == LeafNodeKinds.Blocks;
+        }
 
         /// <summary>
         /// Sets the maximum number of revsions to load.
@@ -66,7 +70,7 @@ namespace SEE.Animation
         /// <returns></returns>
         protected NodeFactory CreateNodeFactory()
         {
-            if (useBlockFactory)
+            if (UseBlockFactory())
             {
                 return new CubeFactory();
             }
@@ -82,7 +86,7 @@ namespace SEE.Animation
         /// <returns></returns>
         protected AbstractRenderer CreateRenderer()
         {
-            if (useBlockFactory)
+            if (UseBlockFactory())
             {
                 return gameObject.AddComponent(typeof(BlockRenderer)) as AbstractRenderer;
             }
@@ -132,9 +136,9 @@ namespace SEE.Animation
         /// <returns></returns>
         protected NodeLayout CreateLayout(NodeFactory nodeFactory)
         {
-            //return new EvoStreetsNodeLayout(0, nodeFactory);
+            return new EvoStreetsNodeLayout(0, nodeFactory);
             //return new TreemapLayout(0, nodeFactory, 1000, 1000);
-            return new BalloonNodeLayout(0, nodeFactory);
+            //return new BalloonNodeLayout(0, nodeFactory);
         }
 
         public NodeFactory NodeFactory
