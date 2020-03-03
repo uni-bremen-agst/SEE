@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2637723665296559952}
   - component: {fileID: 4096480624022493778}
-  - component: {fileID: 7167062139765021778}
   - component: {fileID: 2637723665296559955}
   m_Layer: 0
   m_Name: SEECityEvolutionAnimation
@@ -47,51 +46,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b67be9713ab3ac48afc229cc0b0527a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &7167062139765021778
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2637723665296559954}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df55a01401a3f0c409a28477c4a418c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PathPrefix: C:\Users\raine\develop\SEECity\Assets\
-  origin: {x: 0, y: 0, z: 0}
-  WidthMetric: Metric.Number_of_Tokens
-  HeightMetric: Metric.Clone_Rate
-  DepthMetric: Metric.LOC
-  ColorMetric: Metric.Complexity
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 0
-  NodeLayout: 0
-  EdgeLayout: 0
-  ZScoreScale: 1
-  EdgeWidth: 0.3
-  ShowErosions: 0
-  EdgesAboveBlocks: 1
-  ArchitectureIssue: Metric.Architecture_Violations
-  CloneIssue: Metric.Clone
-  CycleIssue: Metric.Cycle
-  Dead_CodeIssue: Metric.Dead_Code
-  MetricIssue: Metric.Metric
-  StyleIssue: Metric.Style
-  UniversalIssue: Metric.Universal
-  ArchitectureIssue_SUM: Metric.Architecture_Violations_SUM
-  CloneIssue_SUM: Metric.Clone_SUM
-  CycleIssue_SUM: Metric.Cycle_SUM
-  Dead_CodeIssue_SUM: Metric.Dead_Code_SUM
-  MetricIssue_SUM: Metric.Metric_SUM
-  StyleIssue_SUM: Metric.Style_SUM
-  UniversalIssue_SUM: Metric.Universal_SUM
-  InnerDonutMetric: Metric.IssuesTotal
-  useBlockFactory: 1
-  maxRevisionsToLoad: 500
 --- !u!114 &2637723665296559955
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -107,7 +61,7 @@ MonoBehaviour:
   FlyCamera: {fileID: 0}
   AnimationCanvas: {fileID: 2245381400701509102}
   RevisionSelectionCanvas: {fileID: 5740635153240536284}
-  CityEvolution: {fileID: 7167062139765021778}
+  CityEvolution: {fileID: 0}
 --- !u!1001 &2505441218421789425
 PrefabInstance:
   m_ObjectHideFlags: 0
