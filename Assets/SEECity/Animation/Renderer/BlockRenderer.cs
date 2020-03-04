@@ -68,6 +68,7 @@ namespace SEE.Animation.Internal
 
         protected override void RenderInnerNode(Node node)
         {
+            // TODO/FIXME: This code is specific to a circle layout.
             var isCircleNew = !ObjectManager.GetInnerNode(node, out GameObject circle);
             var nodeTransform = Layout.GetNodeTransform(node);
             var circlePosition = nodeTransform.position;
