@@ -48,6 +48,16 @@ namespace SEE.Animation.Internal
         public readonly UnityEvent AnimationFinishedEvent = new UnityEvent();
 
         /// <summary>
+        /// A SimpleAnimator used for animation.
+        /// </summary>
+        protected readonly AbstractAnimator SimpleAnim = new SimpleAnimator();
+
+        /// <summary>
+        /// A MoveAnimator used for move animations.
+        /// </summary>
+        protected readonly AbstractAnimator MoveAnim = new MoveAnimator();
+
+        /// <summary>
         /// Whether the animation is still ongoing.
         /// </summary>
         private bool _isStillAnimating = false;
@@ -192,14 +202,15 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Renders the as active set graph.
+        /// Renders the animation from CurrentGraphShown to NextGraphToBeShown.
         /// </summary>
         private void RenderGraph()
         {
             IsStillAnimating = true;
             AnimationStartedEvent.Invoke();
 
-            // For all nodes 
+            // For all nodes of the current graph not in the next graph; that is, all
+            // nodes removed:
             CurrentGraphShown?
                 .Nodes().Except(NextGraphToBeShown.Nodes(), nodeEqualityComparer).ToList()
                 .ForEach(node =>
@@ -214,11 +225,15 @@ namespace SEE.Animation.Internal
                     }
                 });
 
+            // For all edges of the current graph not in the next graph; that is, all
+            // edges removed:
             CurrentGraphShown?
                 .Edges().Except(NextGraphToBeShown.Edges(), edgeEqualityComparer).ToList()
                 .ForEach(RenderRemovedOldEdge);
 
+            // Draw all nodes of NextGraphToBeShown.
             NextGraphToBeShown.Traverse(RenderRoot, RenderInnerNode, RenderLeaf);
+            // Draw all edges of NextGraphToBeShown.
             NextGraphToBeShown.Edges().ForEach(RenderEdge);
             Invoke("OnAnimationsFinished", Math.Max(AnimationTime, MinimalWaitTimeForNextRevision));
         }
@@ -237,48 +252,115 @@ namespace SEE.Animation.Internal
         /// so they can be updated accordingly.
         /// </summary>
         /// <param name="animators"></param>
-        protected abstract void RegisterAllAnimators(List<AbstractAnimator> animators);
+        protected virtual void RegisterAllAnimators(List<AbstractAnimator> animators)
+        {
+            animators.Add(SimpleAnim);
+            animators.Add(MoveAnim);
+        }
 
         /// <summary>
-        ///Determines how the main node of the active graph is displayed.
+        /// Determines how the main node of the active graph is displayed.
         /// </summary>
-        /// <param name="node"></param>
-        protected abstract void RenderRoot(Node node);
+        /// <param name="node">the node to be displayed</param>
+        protected virtual void RenderRoot(Node node)
+        {
+            var isPlaneNew = !ObjectManager.GetRoot(out GameObject root);
+            var nodeTransform = NextLayoutToBeShown.GetNodeTransform(node);
+            if (isPlaneNew)
+            {
+                // if the plane is new instantly apply the position and size
+                root.transform.position = Vector3.zero;
+                root.transform.localScale = nodeTransform.scale;
+            }
+            else
+            {
+                // if the tranform of the plane changed animate it
+                SimpleAnim.AnimateTo(node, root, Vector3.zero, nodeTransform.scale);
+            }
+        }
 
         /// <summary>
         /// Determines how an inner node that contains other nodes is displayed.
         /// </summary>
-        /// <param name="node"></param>
-        protected abstract void RenderInnerNode(Node node);
+        /// <param name="node">node to be displayed</param>
+        protected virtual void RenderInnerNode(Node node)
+        {
+            var isCircleNew = !ObjectManager.GetInnerNode(node, out GameObject circle);
+            var nodeTransform = NextLayoutToBeShown.GetNodeTransform(node);
+
+            var circlePosition = nodeTransform.position;
+            circlePosition.y = 0.5F;
+
+            var circleRadius = nodeTransform.scale;
+            circleRadius.x += 2;
+            circleRadius.z += 2;
+
+            if (isCircleNew)
+            {
+                // if the node is new, animate it by moving it out of the ground
+                circlePosition.y = -3;
+                circle.transform.position = circlePosition;
+                circle.transform.localScale = circleRadius;
+
+                circlePosition.y = 0.5F;
+                SimpleAnim.AnimateTo(node, circle, circlePosition, circleRadius);
+            }
+            else if (node.WasModified())
+            {
+                SimpleAnim.AnimateTo(node, circle, circlePosition, circleRadius);
+            }
+            else if (node.WasRelocated(out string oldLinkageName))
+            {
+                SimpleAnim.AnimateTo(node, circle, circlePosition, circleRadius);
+            }
+            else
+            {
+                SimpleAnim.AnimateTo(node, circle, circlePosition, circleRadius);
+            }
+        }
 
         /// <summary>
-        /// Determines how a leaf node is displayed.
+        /// Renders a leaf node.
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">leaf node to be rendered</param>
         protected abstract void RenderLeaf(Node node);
 
         /// <summary>
         /// Determines how an edge is displayed.
         /// </summary>
         /// <param name="edge"></param>
-        protected abstract void RenderEdge(Edge edge);
+        protected virtual void RenderEdge(Edge edge)
+        {
+        }
 
         /// <summary>
-        /// Object is not auto destroyed
+        /// Removes the given inner node. The node is not auto destroyed.
         /// </summary>
-        /// <param name="node"></param>
-        protected abstract void RenderRemovedOldInnerNode(Node node);
+        /// <param name="node">inner node to be removed</param>
+        protected virtual void RenderRemovedOldInnerNode(Node node)
+        {
+            if (ObjectManager.RemoveNode(node, out GameObject gameObject))
+            {
+                // if the node needs to be removed, let it sink into the ground
+                var nextPosition = gameObject.transform.position;
+                nextPosition.y = -2;
+                MoveAnim.AnimateTo(node, gameObject, nextPosition, gameObject.transform.localScale,
+                                   OnRemovedNodeFinishedAnimation);
+            }
+        }
         /// <summary>
-        /// Object is not auto destroyed
+        /// Removes the given leaf node. The node is not auto destroyed.
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">leaf node to be removed</param>
         protected abstract void RenderRemovedOldLeaf(Node node);
 
         /// <summary>
-        /// Object is not auto destroyed
+        /// Removes the given edge. The edge is not auto destroyed, however.
         /// </summary>
         /// <param name="edge"></param>
-        protected abstract void RenderRemovedOldEdge(Edge edge);
+        protected virtual void RenderRemovedOldEdge(Edge edge)
+        {
+        }
 
         /// <summary>
         /// Clears all GameObjects created by the used ObjectManager
