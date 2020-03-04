@@ -22,41 +22,50 @@ using SEE.DataModel;
 namespace SEE.Animation.Internal
 {
     /// <summary>
-    /// DataModel containig all data generated for a graph loaded from a gxl-file
-    /// and the layout data
+    /// Data model containing all data generated for a graph loaded from a GXL file
+    /// and its layout data.
     /// </summary>
-    public class LoadedGraph
+    public class LaidOutGraph
     {
+        /// <summary>
+        /// The graph.
+        /// </summary>
         private readonly Graph graph;
+        /// <summary>
+        /// The layout for the graph.
+        /// </summary>
         private readonly Layout layout;
-        private readonly SEECityEvolution graphSettings;
+        /// <summary>
+        /// The city evolution this graph belongs to.
+        /// </summary>
+        private readonly SEECityEvolution cityEvolution;
 
         /// <summary>
-        /// The loaded graph.
+        /// The graph.
         /// </summary>
         public Graph Graph => graph;
 
         /// <summary>
-        /// The calculated layout of the loaded graph.
+        /// The layout of the graph.
         /// </summary>
         public Layout Layout => layout;
 
         /// <summary>
-        /// The settings used for the loaded graph.
+        /// The city evolution this graph belongs to.
         /// </summary>
-        public SEECityEvolution Settings => graphSettings;
+        public SEECityEvolution Settings => cityEvolution;
 
         /// <summary>
-        /// Creates a new LoadedGraph.
+        /// Constructor.
         /// </summary>
-        /// <param name="graph"></param>
-        /// <param name="layout"></param>
-        /// <param name="graphSettings"></param>
-        public LoadedGraph(Graph graph, Layout layout, SEECityEvolution graphSettings)
+        /// <param name="graph">the graph</param>
+        /// <param name="layout">its layout out</param>
+        /// <param name="cityEvolution">the city evolution this graph belongs to</param>
+        public LaidOutGraph(Graph graph, Layout layout, SEECityEvolution cityEvolution)
         {
             this.graph = graph.AssertNotNull("graph");
             this.layout = layout.AssertNotNull("layout");
-            this.graphSettings = graphSettings.AssertNotNull("graphSettings");
+            this.cityEvolution = cityEvolution.AssertNotNull("graphSettings");
         }
     }
 }
