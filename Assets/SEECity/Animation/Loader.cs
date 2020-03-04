@@ -17,64 +17,50 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel;
+//using SEE.Animation.Internal;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace SEE.Animation.Internal
+namespace SEE.DataModel
 {
-    // TODO: Move this code to GraphLoader.
-
     /// <summary>
     /// Loads and stores multiple GXL files from a directory.
     /// </summary>
-    public class Loader
+    public class GraphsReader
     {
         /// <summary>
-        /// Contains all loaded graphs after calling LoadGraphData().
+        /// Contains all loaded graphs after calling Load().
         /// </summary>
         public readonly List<Graph> graphs = new List<Graph>();
 
         /// <summary>
-        /// Loads all GXL files from cityEvolution.PathPrefix sorted by the
-        /// numbers in the file names.
+        /// Loads all GXL files (limited to <paramref name="maxRevisionsToLoad"/> many 
+        /// files) from <paramref name="directory"/> and and saves all loaded graph data.
         /// </summary>
-        /// <param name="cityEvolution">The city evolution defining the location of gxl files.</param>
-        public void LoadGraphData(SEECityEvolution cityEvolution, int maxRevisionsToLoad)
+        /// <param name="directory">the directory path where the GXL file are located in</param>
+        /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
+        /// <param name="maxRevisionsToLoad">the upper limit of files to be loaded</param>
+        public void Load(string directory, HashSet<string> hierarchicalEdgeTypes, int maxRevisionsToLoad)
         {
-            cityEvolution.AssertNotNull("graphSettings");
             graphs.Clear();
-            AddAllRevisions(cityEvolution, maxRevisionsToLoad);
-        }
-
-        /// <summary>
-        /// Internal function that loads all gxl files from the path set in GraphSettings and
-        /// and saves all loaded graph data.
-        /// </summary>
-        /// <param name="cityEvolution">The GraphSettings defining the location of gxl files.</param>
-        private void AddAllRevisions(SEECityEvolution cityEvolution, int maxRevisionsToLoad)
-        {
-            if (String.IsNullOrEmpty(cityEvolution.PathPrefix))
+            if (String.IsNullOrEmpty(directory))
             {
-                throw new Exception("Path prefix not set.");
+                throw new Exception("Directory not set.");
             }
-            Debug.LogFormat("Loading animated graph data from {0}.\n", cityEvolution.PathPrefix);
-            SEE.Performance p = SEE.Performance.Begin("Loading animated graph data from " + cityEvolution.PathPrefix);
-
-            // clear possible old data
-            graphs.Clear();
+            SEE.Performance p = SEE.Performance.Begin("Loading GXL files from " + directory);
 
             // get all gxl files sorted by numbers in their name
             IEnumerable<string> sortedGraphNames = Directory
-                .GetFiles(cityEvolution.PathPrefix, "*.gxl", SearchOption.TopDirectoryOnly)
+                .GetFiles(directory, "*.gxl", SearchOption.TopDirectoryOnly)
                 .Where(e => !string.IsNullOrEmpty(e));
 
             if (sortedGraphNames.Count<string>() == 0)
             {
-                throw new Exception("Directory '" + cityEvolution.PathPrefix + "' has no GXL files.");
+                throw new Exception("Directory '" + directory + "' has no GXL files.");
             }
             sortedGraphNames = sortedGraphNames.Distinct().NumericalSort();
 
@@ -82,7 +68,7 @@ namespace SEE.Animation.Internal
             foreach (string gxlPath in sortedGraphNames)
             {
                 // load graph
-                GraphReader graphCreator = new GraphReader(gxlPath, cityEvolution.HierarchicalEdges, "ROOT", new SEELogger());
+                GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes, "ROOT", new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
 
@@ -101,9 +87,34 @@ namespace SEE.Animation.Internal
                     break;
                 }
             }
-
             p.End();
             Debug.Log("Number of graphs loaded: " + graphs.Count + "\n");
+        }
+    }
+
+    /// <summary>
+    /// Extension for IEnumerable<string>, that sorts by numbers in the string.
+    /// For example {a-1, a-11, a-2} becomes {a-1, a-2, a-11}.
+    /// </summary>
+    internal static class NumericalSortExtension
+    {
+        /// <summary>
+        /// Sorts the given IEnumerable<string> by numbers contained in the string.
+        /// For example {a-1, a-11, a-2} becomes {a-1, a-2, a-11}.
+        /// </summary>
+        /// <param name="list">An IEnumerable<string> to be sorted</param>
+        /// <returns>The passed list sorted by numbers</returns>
+        public static IEnumerable<string> NumericalSort(this IEnumerable<string> list)
+        {
+            int maxLen = list.Select(s => s.Length).Max();
+
+            return list.Select(s => new
+            {
+                OrgStr = s,
+                SortStr = Regex.Replace(s, @"(\d+)|(\D+)", m => m.Value.PadLeft(maxLen, char.IsDigit(m.Value[0]) ? ' ' : '\xffff'))
+            })
+            .OrderBy(x => x.SortStr)
+            .Select(x => x.OrgStr);
         }
     }
 }

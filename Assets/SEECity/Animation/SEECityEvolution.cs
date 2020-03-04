@@ -178,7 +178,7 @@ namespace SEE.Animation
             }
         }
 
-        private Loader GraphLoader { get; } = new Loader();
+        private GraphsReader GraphLoader { get; } = new GraphsReader();
 
         private Dictionary<Graph, SEE.Animation.Internal.Layout> Layouts { get; } 
             = new Dictionary<Graph, SEE.Animation.Internal.Layout>();
@@ -249,7 +249,7 @@ namespace SEE.Animation
                 Debug.LogErrorFormat("Path prefix not set. Using default: {0}.\n", PathPrefix);
             }
             // Load all GXL graphs in directory PathPrefix but not more than maxRevisionsToLoad many.
-            GraphLoader.LoadGraphData(this, maxRevisionsToLoad);
+            GraphLoader.Load(this.PathPrefix, this.HierarchicalEdges, maxRevisionsToLoad);
 
             ViewDataChangedEvent.Invoke();
 
