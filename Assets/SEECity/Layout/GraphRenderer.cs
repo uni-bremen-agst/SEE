@@ -343,40 +343,55 @@ namespace SEE.Layout
             {
                 GameObject gameNode = entry.Key;
                 NodeTransform transform = entry.Value;
-                Node node = gameNode.GetComponent<NodeRef>().node;
-
-                if (node.IsLeaf())
-                {
-                    // We need to first scale the game node and only afterwards set its
-                    // position because transform.scale refers to the center position.
-                    if (settings.NodeLayout == SEECity.NodeLayouts.Treemap)
-                    {
-                        // The Treemap layout adjusts the size of the object's ground area according to
-                        // the total space we allow it to use. The x length was initially
-                        // mapped onto the area of the ground. The treemap layout yields
-                        // an x and z co-ordinate that defines this area, which we use
-                        // here to set the width and depth of the game node.
-                        // The height (y axis) is not modified by the treemap layout and,
-                        // hence, does not need any adustment.
-                        leafNodeFactory.SetWidth(gameNode, transform.scale.x);
-                        leafNodeFactory.SetDepth(gameNode, transform.scale.z);
-                    }
-                    // Leaf nodes were created as blocks by leaveNodeFactory.
-                    // Leaf nodes have their size set before the layout is computed. We will
-                    // not change their size unless a layout requires that.
-                    leafNodeFactory.SetGroundPosition(gameNode, transform.position);
-                }
-                else
-                {
-                    // Inner nodes were created by innerNodeFactory.
-                    innerNodeFactory.SetSize(gameNode, transform.scale);
-                    innerNodeFactory.SetGroundPosition(gameNode, transform.position);
-                    // Inner nodes will be drawn later when we add decorations because
-                    // they can be drawn as a single circle line or a Donut chart.
-                }
-                // Rotate the game object.
-                Rotate(gameNode, transform.rotation);
+                Apply(gameNode, transform);
             }
+        }
+
+        /// <summary>
+        /// Applies the given <paramref name="transform"/> to the given <paramref name="gameNode"/>,
+        /// i.e., sets its size and position according to the <paramref name="transform"/>. The
+        /// game node can represent a leaf or inner node of the node hierarchy.
+        /// 
+        /// Precondition: <paramref name="gameNode"/> must have NodeRef component referencing a
+        /// graph node.
+        /// </summary>
+        /// <param name="gameNode">the game node the transform should be applied to</param>
+        /// <param name="transform">transform to be applied to the game node</param>
+        public void Apply(GameObject gameNode, NodeTransform transform)
+        {
+            Node node = gameNode.GetComponent<NodeRef>().node;
+
+            if (node.IsLeaf())
+            {
+                // We need to first scale the game node and only afterwards set its
+                // position because transform.scale refers to the center position.
+                if (settings.NodeLayout == SEECity.NodeLayouts.Treemap)
+                {
+                    // The Treemap layout adjusts the size of the object's ground area according to
+                    // the total space we allow it to use. The x length was initially
+                    // mapped onto the area of the ground. The treemap layout yields
+                    // an x and z co-ordinate that defines this area, which we use
+                    // here to set the width and depth of the game node.
+                    // The height (y axis) is not modified by the treemap layout and,
+                    // hence, does not need any adustment.
+                    leafNodeFactory.SetWidth(gameNode, transform.scale.x);
+                    leafNodeFactory.SetDepth(gameNode, transform.scale.z);
+                }
+                // Leaf nodes were created as blocks by leaveNodeFactory.
+                // Leaf nodes have their size set before the layout is computed. We will
+                // not change their size unless a layout requires that.
+                leafNodeFactory.SetGroundPosition(gameNode, transform.position);
+            }
+            else
+            {
+                // Inner nodes were created by innerNodeFactory.
+                innerNodeFactory.SetSize(gameNode, transform.scale);
+                innerNodeFactory.SetGroundPosition(gameNode, transform.position);
+                // Inner nodes will be drawn later when we add decorations because
+                // they can be drawn as a single circle line or a Donut chart.
+            }
+            // Rotate the game object.
+            Rotate(gameNode, transform.rotation);
         }
 
         /// <summary>
@@ -434,37 +449,87 @@ namespace SEE.Layout
                 // We add only leaves.
                 if (node.IsLeaf())
                 {
-                    int material = Mathf.RoundToInt(Mathf.Lerp(0.0f,
-                                                               (float)(leafNodeFactory.NumberOfMaterials() - 1),
-                                                               scaler.GetNormalizedValue(settings.ColorMetric, node)
-                                                                 / metricMaximum));
-                    GameObject block = leafNodeFactory.NewBlock(material);
-                    block.name = node.LinkName;
-
-                    AttachNode(block, node);
-                    // Scaled metric values for the dimensions.
-                    Vector3 scale = new Vector3(scaler.GetNormalizedValue(settings.WidthMetric, node),
-                                                scaler.GetNormalizedValue(settings.HeightMetric, node),
-                                                scaler.GetNormalizedValue(settings.DepthMetric, node));
-
-                    // Scale according to the metrics.
-                    if (settings.NodeLayout == SEECity.NodeLayouts.Treemap)
-                    {
-                        // In case of treemaps, the width metric is mapped on the ground area.
-                        float widthOfSquare = Mathf.Sqrt(scale.x);
-                        leafNodeFactory.SetWidth(block, leafNodeFactory.Unit * widthOfSquare);
-                        leafNodeFactory.SetDepth(block, leafNodeFactory.Unit * widthOfSquare);
-                        leafNodeFactory.SetHeight(block, leafNodeFactory.Unit * scale.y);
-                    }
-                    else
-                    {
-                        leafNodeFactory.SetSize(block, leafNodeFactory.Unit * scale);
-                    }
+                    GameObject block = NewLeafNode(node, metricMaximum);
 
                     result[node] = block;
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// Create and returns a new game object for representing the given <paramref name="node"/>.
+        /// The exact kind of representation depends upon the leaf-node factory. The node is 
+        /// scaled according to the WidthMetric, HeightMetric, and DepthMetric of the current settings. 
+        /// Its color is determined by ColorMetric (linerar interpolation of a color gradient).
+        /// 
+        /// Precondition: <paramref name="node"/> must be a leaf node in the node hierarchy.
+        /// </summary>
+        /// <param name="node">leaf node</param>
+        /// <returns>game object representing given <paramref name="node"/></returns>
+        public GameObject NewLeafNode(Node node)
+        {
+            return NewLeafNode(node, scaler.GetNormalizedMaximum(settings.ColorMetric));
+        }
+
+        /// <summary>
+        /// Create and returns a new game object for representing the given <paramref name="node"/>.
+        /// The exact kind of representation depends upon the leaf-node factory. The node is 
+        /// scaled according to the WidthMetric, HeightMetric, and DepthMetric of the current settings. 
+        /// Its color is determined by ColorMetric devided by <paramref name="metricMaximum"/>.
+        /// 
+        /// Precondition: <paramref name="node"/> must be a leaf node in the node hierarchy.
+        /// </summary>
+        /// <param name="node">leaf node</param>
+        /// <param name="metricMaximum">the maximal value the color metric can have;
+        /// used to devide the color metric's value so that it stays in the range [0,1]</param>
+        /// <returns>game object representing given <paramref name="node"/></returns>
+        private GameObject NewLeafNode(Node node, float metricMaximum)
+        {
+            int material = Mathf.RoundToInt(Mathf.Lerp(0.0f,
+                                                       (float)(leafNodeFactory.NumberOfMaterials() - 1),
+                                                       scaler.GetNormalizedValue(settings.ColorMetric, node)
+                                                         / metricMaximum));
+            GameObject block = leafNodeFactory.NewBlock(material);
+            block.name = node.LinkName;
+
+            AttachNode(block, node);
+            // Scaled metric values for the dimensions.
+            Vector3 scale = new Vector3(scaler.GetNormalizedValue(settings.WidthMetric, node),
+                                        scaler.GetNormalizedValue(settings.HeightMetric, node),
+                                        scaler.GetNormalizedValue(settings.DepthMetric, node));
+
+            // Scale according to the metrics.
+            if (settings.NodeLayout == SEECity.NodeLayouts.Treemap)
+            {
+                // In case of treemaps, the width metric is mapped on the ground area.
+                float widthOfSquare = Mathf.Sqrt(scale.x);
+                leafNodeFactory.SetWidth(block, leafNodeFactory.Unit * widthOfSquare);
+                leafNodeFactory.SetDepth(block, leafNodeFactory.Unit * widthOfSquare);
+                leafNodeFactory.SetHeight(block, leafNodeFactory.Unit * scale.y);
+            }
+            else
+            {
+                leafNodeFactory.SetSize(block, leafNodeFactory.Unit * scale);
+            }
+            return block;
+        }
+
+        /// <summary>
+        /// Creates a new game object for an inner node using innerNodeFactory.
+        /// 
+        /// Precondition: <paramref name="node"/> must be an inner node of the node
+        /// hierarchy.
+        /// </summary>
+        /// <param name="node">graph node for which to create the game node</param>
+        /// <returns>new game object for the inner node</returns>
+        public GameObject NewInnerNode(Node node)
+        {
+            GameObject innerGameObject = innerNodeFactory.NewBlock();
+            innerGameObject.name = node.LinkName;
+            innerGameObject.tag = Tags.Node;
+            AttachNode(innerGameObject, node);
+            return innerGameObject;
         }
 
         /// <summary>
@@ -484,20 +549,6 @@ namespace SEE.Layout
                     nodeMap[node] = innerGameObject;
                 }
             }
-        }
-
-        /// <summary>
-        /// Creates a new game object for an inner node using innerNodeFactory.
-        /// </summary>
-        /// <param name="node">graph node for which to create the game node</param>
-        /// <returns>new game object for the inner node</returns>
-        private GameObject NewInnerNode(Node node)
-        {
-            GameObject innerGameObject = innerNodeFactory.NewBlock();
-            innerGameObject.name = node.LinkName;
-            innerGameObject.tag = Tags.Node;
-            AttachNode(innerGameObject, node);
-            return innerGameObject;
         }
 
         /// <summary>
