@@ -47,7 +47,7 @@ namespace SEE.Animation.Internal
         protected override void RenderRoot(Node node)
         {
             var isPlaneNew = !ObjectManager.GetRoot(out GameObject root);
-            var nodeTransform = Layout.GetNodeTransform(node);
+            var nodeTransform = NextLayoutToBeShown.GetNodeTransform(node);
             if (isPlaneNew)
             {
                 // if the plane is new instantly apply the position and size
@@ -64,7 +64,7 @@ namespace SEE.Animation.Internal
         protected override void RenderInnerNode(Node node)
         {
             var isCircleNew = !ObjectManager.GetInnerNode(node, out GameObject circle);
-            var nodeTransform = Layout.GetNodeTransform(node);
+            var nodeTransform = NextLayoutToBeShown.GetNodeTransform(node);
 
             var circlePosition = nodeTransform.position;
             circlePosition.y = 0.5F;
@@ -100,7 +100,7 @@ namespace SEE.Animation.Internal
         protected override void RenderLeaf(Node node)
         {
             var isLeafNew = !ObjectManager.GetLeaf(node, out GameObject leaf);
-            var nodeTransform = Layout.GetNodeTransform(node);
+            var nodeTransform = NextLayoutToBeShown.GetNodeTransform(node);
             var nextPosition = nodeTransform.position;
             var nextScale = nodeTransform.scale;
 
@@ -163,7 +163,7 @@ namespace SEE.Animation.Internal
             if (ObjectManager.RemoveNode(node, out GameObject leaf))
             {
                 // if the node needs to be removed, let it sink into the ground
-                var nodeTransform = Layout.GetNodeTransform(node);
+                var nodeTransform = NextLayoutToBeShown.GetNodeTransform(node);
                 var actualSize = ObjectManager.NodeFactory.GetSize(leaf) * 1.5F;
                 actualSize.x = 0;
                 actualSize.z = 0;

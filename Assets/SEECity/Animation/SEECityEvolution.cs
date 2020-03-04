@@ -267,7 +267,7 @@ namespace SEE.Animation
             p.End();
 
             // 
-            if (HasLoadedGraph(out LaidOutGraph loadedGraph))
+            if (HasLaidOutGraph(out LaidOutGraph loadedGraph))
             {
                 Renderer.DisplayGraph(loadedGraph);
             }
@@ -292,7 +292,7 @@ namespace SEE.Animation
             }
             CurrentGraphIndex = value;
 
-            if (HasLoadedGraph(out LaidOutGraph loadedGraph))
+            if (HasLaidOutGraph(out LaidOutGraph loadedGraph))
             {
                 Renderer.DisplayGraph(loadedGraph);
                 return true;
@@ -314,8 +314,7 @@ namespace SEE.Animation
                 Debug.Log("The renderer is already occupied with animating, wait till animations are finished.");
                 return;
             }
-            var canShowNext = ShowNextIfPossible();
-            if (!canShowNext)
+            if (!ShowNextIfPossible())
             {
                 Debug.Log("This is already the last graph revision.");
                 return;
@@ -329,7 +328,7 @@ namespace SEE.Animation
         {
             if (Renderer.IsStillAnimating || IsAutoPlay)
             {
-                Debug.Log("The render is already occupied with animating, wait till animations are finished.");
+                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.");
                 return;
             }
             if (CurrentGraphIndex == 0)
@@ -339,36 +338,38 @@ namespace SEE.Animation
             }
             CurrentGraphIndex--;
 
-            if (HasLoadedGraph(out LaidOutGraph loadedGraph) &&
-                HasLoadedGraph(CurrentGraphIndex + 1, out LaidOutGraph oldLoadedGraph))
+            if (HasLaidOutGraph(out LaidOutGraph newShownGraph) &&
+                HasLaidOutGraph(CurrentGraphIndex + 1, out LaidOutGraph currentlyShownGraph))
             {
-                Renderer.TransitionToPreviousGraph(oldLoadedGraph, loadedGraph);
+                // Note: newShownGraph is the most recent past of currentlyShownGraph
+                Renderer.TransitionToNextGraph(currentlyShownGraph, newShownGraph);
             }
             else
             {
-                Debug.LogError("Could not create LoadedGraph to render.");
+                Debug.LogError("Could not create LaidOutGraph to render.");
             }
         }
 
         /// <summary>
-        /// Returns true and a LoadedGraph if there is a LoadedGraph for the active graph index.
+        /// Returns true and a LoadedGraph if there is a LoadedGraph for the active graph index
+        /// CurrentGraphIndex.
         /// </summary>
         /// <param name="loadedGraph"></param>
         /// <returns>true if there is graph to be visualized (index _openGraphIndex)</returns>
-        private bool HasLoadedGraph(out LaidOutGraph loadedGraph)
+        private bool HasLaidOutGraph(out LaidOutGraph loadedGraph)
         {
-            return HasLoadedGraph(currentGraphIndex, out loadedGraph);
+            return HasLaidOutGraph(CurrentGraphIndex, out loadedGraph);
         }
 
         /// <summary>
-        /// Returns true and a LoadedGraph if there is a LoadedGraph for the given graph index.
+        /// Returns true and a LaidOutGraph if there is a LaidOutGraph for the given graph index.
         /// </summary>
         /// <param name="index">index of the requested graph</param>
-        /// <param name="loadedGraph">the resulting graph with given index; defined only if this method returns true</param>
+        /// <param name="laidOutGraph">the resulting graph with given index; defined only if this method returns true</param>
         /// <returns>true iff there is a graph at the given index</returns>
-        private bool HasLoadedGraph(int index, out LaidOutGraph loadedGraph)
+        private bool HasLaidOutGraph(int index, out LaidOutGraph laidOutGraph)
         {
-            loadedGraph = null;
+            laidOutGraph = null;
             var graph = Graphs[index];
             if (graph == null)
             {
@@ -381,7 +382,7 @@ namespace SEE.Animation
                 Debug.LogError("There ist no layout available at index " + index);
                 return false;
             }
-            loadedGraph = new LaidOutGraph(graph, layout, this);
+            laidOutGraph = new LaidOutGraph(graph, layout);
             return true;
         }
 
@@ -416,10 +417,12 @@ namespace SEE.Animation
             }
             CurrentGraphIndex++;
 
-            if (HasLoadedGraph(out LaidOutGraph loadedGraph) &&
-                HasLoadedGraph(CurrentGraphIndex - 1, out LaidOutGraph oldLoadedGraph))
+            if (HasLaidOutGraph(out LaidOutGraph newShownGraph) &&
+                HasLaidOutGraph(CurrentGraphIndex - 1, out LaidOutGraph currentlyShownGraph))
             {
-                Renderer.TransitionToNextGraph(oldLoadedGraph, loadedGraph);
+
+                // Note: newShownGraph is the very next future of currentlyShownGraph
+                Renderer.TransitionToNextGraph(currentlyShownGraph, newShownGraph);
             }
             else
             {

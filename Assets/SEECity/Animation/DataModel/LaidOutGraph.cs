@@ -35,10 +35,6 @@ namespace SEE.Animation.Internal
         /// The layout for the graph.
         /// </summary>
         private readonly Layout layout;
-        /// <summary>
-        /// The city evolution this graph belongs to.
-        /// </summary>
-        private readonly SEECityEvolution cityEvolution;
 
         /// <summary>
         /// The graph.
@@ -51,21 +47,14 @@ namespace SEE.Animation.Internal
         public Layout Layout => layout;
 
         /// <summary>
-        /// The city evolution this graph belongs to.
-        /// </summary>
-        public SEECityEvolution Settings => cityEvolution;
-
-        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="graph">the graph</param>
         /// <param name="layout">its layout out</param>
-        /// <param name="cityEvolution">the city evolution this graph belongs to</param>
-        public LaidOutGraph(Graph graph, Layout layout, SEECityEvolution cityEvolution)
+        public LaidOutGraph(Graph graph, Layout layout)
         {
             this.graph = graph.AssertNotNull("graph");
             this.layout = layout.AssertNotNull("layout");
-            this.cityEvolution = cityEvolution.AssertNotNull("graphSettings");
         }
     }
 }

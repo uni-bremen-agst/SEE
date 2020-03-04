@@ -47,6 +47,9 @@ namespace SEE.Animation.Internal
         /// </summary>
         public readonly UnityEvent AnimationFinishedEvent = new UnityEvent();
 
+        /// <summary>
+        /// Whether the animation is still ongoing.
+        /// </summary>
         private bool _isStillAnimating = false;
 
         /// <summary>
@@ -83,14 +86,35 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// The currently loaded graph.
+        /// The city (graph + layout) currently shown.
         /// </summary>
-        private LaidOutGraph _loadedGraph;
+        private LaidOutGraph _currentCity;
+        /// <summary>
+        /// The underlying graph of the city currently shown.
+        /// </summary>
+        protected Graph CurrentGraphShown => _currentCity?.Graph;
+        /// <summary>
+        /// The layout of the city currently shown.
+        /// </summary>
+        protected Layout CurrentLayoutShown => _currentCity?.Layout;
 
         /// <summary>
-        /// The graph next to be shown.
+        /// The city (graph + layout) to be shown next.
         /// </summary>
-        private LaidOutGraph _nextGraph;
+        private LaidOutGraph _nextCity;
+
+        /// <summary>
+        /// The next city (graph + layout) to be shown. 
+        /// Note: 'next' does not necessarily mean that it is a graph coming later in the
+        /// series of the graph evolution. It just means that this is the next graph to
+        /// be shown. If the user goes backward in time, _nextCity is actually an older
+        /// graph.
+        /// </summary>
+        protected Graph NextGraphToBeShown => _nextCity?.Graph;
+        /// <summary>
+        /// The layout of _nextGraph.
+        /// </summary>
+        protected Layout NextLayoutToBeShown => _nextCity?.Layout;
 
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Node"/>.
@@ -103,17 +127,6 @@ namespace SEE.Animation.Internal
         private readonly EdgeEqualityComparer edgeEqualityComparer = new EdgeEqualityComparer();
 
         private AbstractObjectManager _objectManager;
-
-        /// <summary>
-        /// Gibt den aktuellen, bzw. 
-        /// </summary>
-        protected Graph Graph => _nextGraph?.Graph;
-        protected Layout Layout => _nextGraph?.Layout;
-        protected SEECityEvolution Settings => _nextGraph?.Settings;
-
-        protected Graph OldGraph => _loadedGraph?.Graph;
-        protected Layout OldLayout => _loadedGraph?.Layout;
-        protected SEECityEvolution OldSettings => _loadedGraph?.Settings;
 
         protected enum GraphDirection { First, Next, Previous };
 
@@ -139,12 +152,12 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Displays the given LoadedGraph instantly if all animations are finished.
+        /// Displays the given graph instantly if all animations are finished.
         /// </summary>
-        /// <param name="loadedGraph"></param>
-        public void DisplayGraph(LaidOutGraph loadedGraph)
+        /// <param name="graph"></param>
+        public void DisplayGraph(LaidOutGraph graph)
         {
-            loadedGraph.AssertNotNull("loadedGraph");
+            graph.AssertNotNull("loadedGraph");
 
             if (IsStillAnimating)
             {
@@ -153,18 +166,18 @@ namespace SEE.Animation.Internal
             }
 
             ClearGraphObjects();
-            _nextGraph = loadedGraph;
+            _nextCity = graph;
             RenderGraph();
         }
 
         /// <summary>
-        /// Starts the animations to transition to the given next graph.
+        /// Starts the animations to transition from the current to the next graph.
         /// </summary>
-        /// <param name="actual"></param>
-        /// <param name="next"></param>
-        public void TransitionToNextGraph(LaidOutGraph actual, LaidOutGraph next)
+        /// <param name="current">the currently shown graph</param>
+        /// <param name="next">the next graph to be shown</param>
+        public void TransitionToNextGraph(LaidOutGraph current, LaidOutGraph next)
         {
-            actual.AssertNotNull("actual");
+            current.AssertNotNull("current");
             next.AssertNotNull("next");
 
             if (IsStillAnimating)
@@ -173,29 +186,8 @@ namespace SEE.Animation.Internal
                 return;
             }
 
-            _loadedGraph = actual;
-            _nextGraph = next;
-            RenderGraph();
-        }
-
-        /// <summary>
-        /// Starts the animations to transition to the given previous graph.
-        /// </summary>
-        /// <param name="actual"></param>
-        /// <param name="previous"></param>
-        public void TransitionToPreviousGraph(LaidOutGraph actual, LaidOutGraph previous)
-        {
-            actual.AssertNotNull("actual");
-            previous.AssertNotNull("previous");
-
-            if (IsStillAnimating)
-            {
-                Debug.LogError("Graph changes are not allowed while animations are running.");
-                return;
-            }
-
-            _loadedGraph = actual;
-            _nextGraph = previous;
+            _currentCity = current;
+            _nextCity = next;
             RenderGraph();
         }
 
@@ -207,8 +199,9 @@ namespace SEE.Animation.Internal
             IsStillAnimating = true;
             AnimationStartedEvent.Invoke();
 
-            OldGraph?
-                .Nodes().Except(Graph.Nodes(), nodeEqualityComparer).ToList()
+            // For all nodes 
+            CurrentGraphShown?
+                .Nodes().Except(NextGraphToBeShown.Nodes(), nodeEqualityComparer).ToList()
                 .ForEach(node =>
                 {
                     if (node.IsLeaf())
@@ -221,12 +214,12 @@ namespace SEE.Animation.Internal
                     }
                 });
 
-            OldGraph?
-                .Edges().Except(Graph.Edges(), edgeEqualityComparer).ToList()
+            CurrentGraphShown?
+                .Edges().Except(NextGraphToBeShown.Edges(), edgeEqualityComparer).ToList()
                 .ForEach(RenderRemovedOldEdge);
 
-            Graph.Traverse(RenderRoot, RenderInnerNode, RenderLeaf);
-            Graph.Edges().ForEach(RenderEdge);
+            NextGraphToBeShown.Traverse(RenderRoot, RenderInnerNode, RenderLeaf);
+            NextGraphToBeShown.Edges().ForEach(RenderEdge);
             Invoke("OnAnimationsFinished", Math.Max(AnimationTime, MinimalWaitTimeForNextRevision));
         }
 
