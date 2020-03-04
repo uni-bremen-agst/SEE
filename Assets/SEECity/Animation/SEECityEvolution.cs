@@ -267,7 +267,7 @@ namespace SEE.Animation
             p.End();
 
             // 
-            if (HasLoadedGraph(out LoadedGraph loadedGraph))
+            if (HasLoadedGraph(out LaidOutGraph loadedGraph))
             {
                 Renderer.DisplayGraph(loadedGraph);
             }
@@ -292,7 +292,7 @@ namespace SEE.Animation
             }
             CurrentGraphIndex = value;
 
-            if (HasLoadedGraph(out LoadedGraph loadedGraph))
+            if (HasLoadedGraph(out LaidOutGraph loadedGraph))
             {
                 Renderer.DisplayGraph(loadedGraph);
                 return true;
@@ -339,8 +339,8 @@ namespace SEE.Animation
             }
             CurrentGraphIndex--;
 
-            if (HasLoadedGraph(out LoadedGraph loadedGraph) &&
-                HasLoadedGraph(CurrentGraphIndex + 1, out LoadedGraph oldLoadedGraph))
+            if (HasLoadedGraph(out LaidOutGraph loadedGraph) &&
+                HasLoadedGraph(CurrentGraphIndex + 1, out LaidOutGraph oldLoadedGraph))
             {
                 Renderer.TransitionToPreviousGraph(oldLoadedGraph, loadedGraph);
             }
@@ -355,7 +355,7 @@ namespace SEE.Animation
         /// </summary>
         /// <param name="loadedGraph"></param>
         /// <returns>true if there is graph to be visualized (index _openGraphIndex)</returns>
-        private bool HasLoadedGraph(out LoadedGraph loadedGraph)
+        private bool HasLoadedGraph(out LaidOutGraph loadedGraph)
         {
             return HasLoadedGraph(currentGraphIndex, out loadedGraph);
         }
@@ -366,7 +366,7 @@ namespace SEE.Animation
         /// <param name="index">index of the requested graph</param>
         /// <param name="loadedGraph">the resulting graph with given index; defined only if this method returns true</param>
         /// <returns>true iff there is a graph at the given index</returns>
-        private bool HasLoadedGraph(int index, out LoadedGraph loadedGraph)
+        private bool HasLoadedGraph(int index, out LaidOutGraph loadedGraph)
         {
             loadedGraph = null;
             var graph = Graphs[index];
@@ -381,7 +381,7 @@ namespace SEE.Animation
                 Debug.LogError("There ist no layout available at index " + index);
                 return false;
             }
-            loadedGraph = new LoadedGraph(graph, layout, this);
+            loadedGraph = new LaidOutGraph(graph, layout, this);
             return true;
         }
 
@@ -416,8 +416,8 @@ namespace SEE.Animation
             }
             CurrentGraphIndex++;
 
-            if (HasLoadedGraph(out LoadedGraph loadedGraph) &&
-                HasLoadedGraph(CurrentGraphIndex - 1, out LoadedGraph oldLoadedGraph))
+            if (HasLoadedGraph(out LaidOutGraph loadedGraph) &&
+                HasLoadedGraph(CurrentGraphIndex - 1, out LaidOutGraph oldLoadedGraph))
             {
                 Renderer.TransitionToNextGraph(oldLoadedGraph, loadedGraph);
             }

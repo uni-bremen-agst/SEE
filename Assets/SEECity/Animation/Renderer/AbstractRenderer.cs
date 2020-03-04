@@ -85,12 +85,12 @@ namespace SEE.Animation.Internal
         /// <summary>
         /// The currently loaded graph.
         /// </summary>
-        private LoadedGraph _loadedGraph;
+        private LaidOutGraph _loadedGraph;
 
         /// <summary>
         /// The graph next to be shown.
         /// </summary>
-        private LoadedGraph _nextGraph;
+        private LaidOutGraph _nextGraph;
 
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Node"/>.
@@ -142,7 +142,7 @@ namespace SEE.Animation.Internal
         /// Displays the given LoadedGraph instantly if all animations are finished.
         /// </summary>
         /// <param name="loadedGraph"></param>
-        public void DisplayGraph(LoadedGraph loadedGraph)
+        public void DisplayGraph(LaidOutGraph loadedGraph)
         {
             loadedGraph.AssertNotNull("loadedGraph");
 
@@ -162,7 +162,7 @@ namespace SEE.Animation.Internal
         /// </summary>
         /// <param name="actual"></param>
         /// <param name="next"></param>
-        public void TransitionToNextGraph(LoadedGraph actual, LoadedGraph next)
+        public void TransitionToNextGraph(LaidOutGraph actual, LaidOutGraph next)
         {
             actual.AssertNotNull("actual");
             next.AssertNotNull("next");
@@ -183,7 +183,7 @@ namespace SEE.Animation.Internal
         /// </summary>
         /// <param name="actual"></param>
         /// <param name="previous"></param>
-        public void TransitionToPreviousGraph(LoadedGraph actual, LoadedGraph previous)
+        public void TransitionToPreviousGraph(LaidOutGraph actual, LaidOutGraph previous)
         {
             actual.AssertNotNull("actual");
             previous.AssertNotNull("previous");
