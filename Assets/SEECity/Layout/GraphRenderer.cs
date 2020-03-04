@@ -15,7 +15,6 @@ namespace SEE.Layout
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="graph">the graph to be drawn</param>
         /// <param name="settings">the settings for the visualization</param>
         public GraphRenderer(SEECity settings)
         {
@@ -375,7 +374,6 @@ namespace SEE.Layout
                     // Inner nodes will be drawn later when we add decorations because
                     // they can be drawn as a single circle line or a Donut chart.
                 }
-                //Rotate(gameNode, transform.rotation);
                 // Rotate the game object.
                 Rotate(gameNode, transform.rotation);
             }
