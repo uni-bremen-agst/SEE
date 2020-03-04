@@ -37,13 +37,14 @@ namespace SEE.Animation.Internal
         public readonly Dictionary<string, NodeTransform> nodeTransforms = new Dictionary<string, NodeTransform>();
 
         /// <summary>
-        /// Returns a NodeTransform for a given node, using the Node.LinkName attribut.
+        /// Returns a NodeTransform for a given node, using the Node.LinkName attribute
+        /// according to the layout.
         /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
+        /// <param name="node">node for which the NodeTransform is rquested</param>
+        /// <returns>NodeTransform of given node</returns>
         public NodeTransform GetNodeTransform(Node node)
         {
-            nodeTransforms.TryGetValue(node.LinkName, out var nodeTransform);
+            nodeTransforms.TryGetValue(node.LinkName, out NodeTransform nodeTransform);
             return nodeTransform;
         }
 
