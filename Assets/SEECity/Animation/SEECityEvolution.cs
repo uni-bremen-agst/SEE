@@ -84,7 +84,7 @@ namespace SEE.Animation
         /// Factory method to create the used AbstractRenderer.
         /// </summary>
         /// <returns></returns>
-        protected AbstractRenderer CreateRenderer()
+        protected AbstractRenderer CreateLeafNodeRenderer()
         {
             if (UseBlockFactory())
             {
@@ -128,6 +128,7 @@ namespace SEE.Animation
         /// <returns></returns>
         protected IScale CreateScaler(List<Graph> graphs, List<string> nodeMetrics)
         {
+            // TODO: Use the setting of attribute ZScoreScale.
             return new LinearMultiScale(graphs, this.MinimalBlockLength, this.MaximalBlockLength, nodeMetrics);
         }
 
@@ -138,6 +139,10 @@ namespace SEE.Animation
         /// <returns></returns>
         protected NodeLayout CreateLayout(NodeFactory nodeFactory)
         {
+            // TODO: Use the setting of attribute NodeLayout
+            // TODO: Make the layouts incremental, so that we can add and
+            // remove single nodes and modify their dimensions.
+
             return new EvoStreetsNodeLayout(0, nodeFactory);
             //return new TreemapLayout(0, nodeFactory, 1000, 1000);
             //return new BalloonNodeLayout(0, nodeFactory);
@@ -168,7 +173,7 @@ namespace SEE.Animation
             get
             {
                 if (_Renderer == null)
-                    _Renderer = CreateRenderer();
+                    _Renderer = CreateLeafNodeRenderer();
                 return _Renderer;
             }
         }
@@ -248,6 +253,7 @@ namespace SEE.Animation
 
             ViewDataChangedEvent.Invoke();
 
+            // TODO: Extend IScale so that it can handle a list of graphs instead of just one.
             // Create the scaling of all visualized metrics.
             Scaler = CreateScaler(Graphs, MetricsToBeScaled());
 

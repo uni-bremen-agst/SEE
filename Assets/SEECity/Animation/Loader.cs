@@ -26,6 +26,8 @@ using UnityEngine;
 
 namespace SEE.Animation.Internal
 {
+    // TODO: Move this code to GraphLoader.
+
     /// <summary>
     /// Loads and stores multiple GXL files from a directory.
     /// </summary>
