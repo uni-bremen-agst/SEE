@@ -20,7 +20,6 @@
 using SEE.DataModel;
 using System;
 using UnityEngine;
-using SEE.Animation.Internal;
 
 namespace SEE.Animation
 {
@@ -36,16 +35,22 @@ namespace SEE.Animation
         /// </summary>
         public const int DefaultAnimationTime = 2;
 
+        /// <summary>
+        /// Defines the maximum time an animation is allowed to take in seconds.
+        /// </summary>
         private float _maxAnimationTime;
+        /// <summary>
+        /// If true animations are skipped and the new values are applied instantly.
+        /// </summary>
         private bool _animationsDisabled = false;
 
         /// <summary>
-        /// Defines the maximum time an animation is allowed to Take, in seconds, the animation is allowed to take.
+        /// Defines the maximum time an animation is allowed to take in seconds.
         /// </summary>
         public float MaxAnimationTime { get => _maxAnimationTime; set => _maxAnimationTime = value; }
 
         /// <summary>
-        /// If set to true animations are skipped and the new values are instantly applied.
+        /// If set to true animations are skipped and the new values are applied instantly.
         /// </summary>
         public bool AnimationsDisabled { get => _animationsDisabled; set => _animationsDisabled = value; }
 
@@ -59,7 +64,7 @@ namespace SEE.Animation
         }
 
         /// <summary>
-        /// Animates a give GameObject to a new position an scale. If needed a callback that is called
+        /// Animates the change of a given GameObject to a new position and scale. If needed, a callback that is called
         /// after the animation is finished, can be defined. The animation is implemented by
         /// <see cref="AnimateToInternal(Node, GameObject, Vector3, Vector3)"/>
         /// </summary>
@@ -83,22 +88,13 @@ namespace SEE.Animation
             }
             else if (callback == null)
             {
-                AnimateToInternal(node, gameObject, position, scale);
+                AnimateToInternalWithCallback(node, gameObject, position, scale, null, "");
             }
             else
             {
-                AnimateToAndInternal(node, gameObject, position, scale, ((MonoBehaviour)callback.Target).gameObject, callback.Method.Name);
+                AnimateToInternalWithCallback(node, gameObject, position, scale, ((MonoBehaviour)callback.Target).gameObject, callback.Method.Name);
             }
         }
-
-        /// <summary>
-        /// Abstract method, called by <see cref="AnimateTo"/> for an animation without a callback.
-        /// </summary>
-        /// <param name="node">Node of the given GameObject</param>
-        /// <param name="gameObject">GameObject to animate</param>
-        /// <param name="position">The new position</param>
-        /// <param name="scale">The new scale</param>
-        protected abstract void AnimateToInternal(Node node, GameObject gameObject, Vector3 position, Vector3 scale);
 
         /// <summary>
         /// Abstract method, called by <see cref="AnimateTo"/> for an animation with a callback.
@@ -108,6 +104,12 @@ namespace SEE.Animation
         /// <param name="position">The new position</param>
         /// <param name="scale">The new scale</param>
         /// <param name="callback">An optional callback</param>
-        protected abstract void AnimateToAndInternal(Node node, GameObject gameObject, Vector3 position, Vector3 scale, GameObject callBackTarget, string callbackName);
+        protected abstract void AnimateToInternalWithCallback
+            (Node node, 
+            GameObject gameObject, 
+            Vector3 position, 
+            Vector3 scale, 
+            GameObject callBackTarget, 
+            string callbackName);
     }
 }
