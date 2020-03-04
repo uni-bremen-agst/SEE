@@ -259,11 +259,14 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Determines how the main node of the active graph is displayed.
+        /// Determines how the root node of the active graph is displayed.
         /// </summary>
         /// <param name="node">the node to be displayed</param>
         protected virtual void RenderRoot(Node node)
         {
+            // FIXME: The root node is either a leaf or inner node.
+            // So just dispatch to either RenderInnerNode or RenderLeaf-
+
             var isPlaneNew = !ObjectManager.GetRoot(out GameObject root);
             var nodeTransform = NextLayoutToBeShown.GetNodeTransform(node);
             if (isPlaneNew)
@@ -285,6 +288,12 @@ namespace SEE.Animation.Internal
         /// <param name="node">node to be displayed</param>
         protected virtual void RenderInnerNode(Node node)
         {
+            // FIXME: The form of inner nodes depends upon the user's choice
+            // and possibly the kind of layout.
+
+            // Currently, we have the following kinds of InnerNodeKinds:
+            // Blocks, Rectangles, Donuts, Circles, Empty, Cylinders.
+
             var isCircleNew = !ObjectManager.GetInnerNode(node, out GameObject circle);
             var nodeTransform = NextLayoutToBeShown.GetNodeTransform(node);
 
