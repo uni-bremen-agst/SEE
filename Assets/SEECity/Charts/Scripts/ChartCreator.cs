@@ -22,8 +22,7 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		public void CreateChart()
 		{
-			ChartContent content =
-				Instantiate(chartPrefab, chartsCanvas).GetComponent<ChartContent>();
+			Instantiate(chartPrefab, chartsCanvas).GetComponent<ChartContent>();
 		}
 	}
 }

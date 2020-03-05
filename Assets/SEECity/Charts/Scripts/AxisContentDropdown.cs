@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -23,7 +23,7 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// A list containing all options for the <see cref="_dropdown" />
 		/// </summary>
-		private List<string> _options;
+		private string[] _options;
 
 		/// <summary>
 		/// The currently selected option of <see cref="_dropdown" />.
@@ -38,7 +38,7 @@ namespace SEECity.Charts.Scripts
 			_chartContent = transform.parent.parent.GetComponent<ChartContent>();
 			_dropdown = GetComponent<TMP_Dropdown>();
 			GetKeys();
-			Value = _dropdown.options[0].text;
+			Value = "Metric." + _dropdown.options[0].text;
 			_chartContent.SetInfoText();
 		}
 
@@ -48,8 +48,9 @@ namespace SEECity.Charts.Scripts
 		private void GetKeys()
 		{
 			_dropdown.ClearOptions();
-			_options = _chartContent.AllKeys;
-			_dropdown.AddOptions(_options);
+			_options = _chartContent.AllKeys.ToArray();
+			for (var i = 0; i < _options.Length; i++) _options[i] = _options[i].Remove(0, 7);
+			_dropdown.AddOptions(_options.ToList());
 		}
 
 		/// <summary>
@@ -57,11 +58,15 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		public void ChangeValue()
 		{
-			Value = _dropdown.options[_dropdown.value].text;
+			Value = "Metric." + _dropdown.options[_dropdown.value].text;
 			_chartContent.DrawData(true);
 			_chartContent.SetInfoText();
 		}
 
+		/// <summary>
+		/// Changes the text of the dropdown.
+		/// </summary>
+		/// <param name="text"></param>
 		public void SetText(string text)
 		{
 			_dropdown.captionText.text = text;

@@ -115,7 +115,7 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		protected virtual void Start()
 		{
-			float time = citySize > 50 ? 5f : 0.2f;
+			var time = citySize > 50 ? 5f : 0.2f;
 			Invoke(nameof(CallDrawData), time);
 		}
 
@@ -125,7 +125,7 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private void FillScrollView()
 		{
-			float gap = childOffset.y - headerOffset.y;
+			var gap = childOffset.y - headerOffset.y;
 			foreach (Transform child in scrollContent.transform) Destroy(child.gameObject);
 
 			GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
@@ -134,7 +134,7 @@ namespace SEECity.Charts.Scripts
 			tempObject.transform.localPosition = headerOffset;
 			parentToggle.Initialize(this);
 
-			int i = 0;
+			var i = 0;
 			foreach (GameObject dataObject in _dataObjects)
 				if (dataObject.tag.Equals("Building"))
 					CreateChildToggle(dataObject, parentToggle, i++, gap);
@@ -165,7 +165,9 @@ namespace SEECity.Charts.Scripts
 			GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
 			ScrollViewToggle toggle = tempObject.GetComponent<ScrollViewToggle>();
 			toggle.Parent = parentToggle;
-			toggle.LinkedObject = dataObject.GetComponent<NodeHighlights>();
+			NodeHighlights highlights = dataObject.GetComponent<NodeHighlights>();
+			toggle.LinkedObject = highlights;
+			highlights.scrollViewToggle = toggle;
 			toggle.SetLabel(dataObject.name);
 			tempObject.transform.localPosition = childOffset + new Vector2(0f, gap) * i;
 			toggle.Initialize(this);
@@ -179,7 +181,7 @@ namespace SEECity.Charts.Scripts
 		private void GetAllFloats()
 		{
 			foreach (GameObject data in _dataObjects)
-			foreach (string key in data.GetComponent<NodeRef>().node.FloatAttributes.Keys)
+			foreach (var key in data.GetComponent<NodeRef>().node.FloatAttributes.Keys)
 				if (!AllKeys.Contains(key))
 					AllKeys.Add(key);
 		}
@@ -191,7 +193,7 @@ namespace SEECity.Charts.Scripts
 		private void GetAllIntegers()
 		{
 			foreach (GameObject data in _dataObjects)
-			foreach (string key in data.GetComponent<NodeRef>().node.IntAttributes.Keys)
+			foreach (var key in data.GetComponent<NodeRef>().node.IntAttributes.Keys)
 				if (!AllKeys.Contains(key))
 					AllKeys.Add(key);
 		}
@@ -263,9 +265,9 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private void DrawTwoAxes()
 		{
-			int i = 0;
+			var i = 0;
 			Node node = _dataObjects[i].GetComponent<NodeRef>().node;
-			bool contained = node.TryGetNumeric(axisDropdownX.Value, out float minX);
+			var contained = node.TryGetNumeric(axisDropdownX.Value, out var minX);
 			while (!contained)
 			{
 				i++;
@@ -273,10 +275,10 @@ namespace SEECity.Charts.Scripts
 				contained = node.TryGetNumeric(axisDropdownX.Value, out minX);
 			}
 
-			float maxX = minX;
+			var maxX = minX;
 			i = 0;
 			node = _dataObjects[i].GetComponent<NodeRef>().node;
-			contained = node.TryGetNumeric(axisDropdownY.Value, out float minY);
+			contained = node.TryGetNumeric(axisDropdownY.Value, out var minY);
 			while (!contained)
 			{
 				i++;
@@ -291,14 +293,14 @@ namespace SEECity.Charts.Scripts
 				node = data.GetComponent<NodeRef>().node;
 				bool inX = false;
 				bool inY = false;
-				if (node.TryGetNumeric(axisDropdownX.Value, out float tempX))
+				if (node.TryGetNumeric(axisDropdownX.Value, out var tempX))
 				{
 					if (tempX < minX) minX = tempX;
 					if (tempX > maxX) maxX = tempX;
 					inX = true;
 				}
 
-				if (node.TryGetNumeric(axisDropdownY.Value, out float tempY))
+				if (node.TryGetNumeric(axisDropdownY.Value, out var tempY))
 				{
 					if (tempY > maxY) maxY = tempY;
 					if (tempY < minY) minY = tempY;
@@ -402,6 +404,7 @@ namespace SEECity.Charts.Scripts
 				marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
 				ChartMarker script = marker.GetComponent<ChartMarker>();
 				script.linkedObject = data;
+				script.scrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
 				Node node = data.GetComponent<NodeRef>().node;
 				node.TryGetNumeric(axisDropdownX.Value, out float valueX);
 				node.TryGetNumeric(axisDropdownY.Value, out float valueY);
@@ -451,6 +454,7 @@ namespace SEECity.Charts.Scripts
 					marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
 					ChartMarker script = marker.GetComponent<ChartMarker>();
 					script.linkedObject = data;
+					script.scrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
 					Node node = data.GetComponent<NodeRef>().node;
 					node.TryGetNumeric(metric, out float value);
 					string type = node.IsLeaf() ? "Building" : "Node";
@@ -496,6 +500,7 @@ namespace SEECity.Charts.Scripts
 				marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
 				ChartMarker script = marker.GetComponent<ChartMarker>();
 				script.linkedObject = data;
+				script.scrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
 				Node node = data.GetComponent<NodeRef>().node;
 				node.TryGetNumeric(axisDropdownX.Value, out float valueX);
 				node.TryGetNumeric(axisDropdownY.Value, out float valueY);

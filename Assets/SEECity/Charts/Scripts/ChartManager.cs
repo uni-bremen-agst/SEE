@@ -69,7 +69,7 @@ namespace SEECity.Charts.Scripts
 		public Color standardColor;
 
 		/// <summary>
-		/// The color acentuated highlighted objects will have.
+		/// The color accentuated highlighted objects will have.
 		/// </summary>
 		public Color accentuationColor;
 
@@ -253,16 +253,14 @@ namespace SEECity.Charts.Scripts
 			for (int i = 0; i < highlightTransform.childCount; i++)
 			{
 				Transform child = highlightTransform.GetChild(i);
-				if (child.gameObject.name.Equals(highlight.name + "(Clone)"))
-					for (int x = 0; x < child.childCount; x++)
-					{
-						Transform secondChild = child.GetChild(x);
-						if (secondChild.gameObject.name.Equals("HighlightLine(Clone)"))
-						{
-							secondChild.GetComponent<HighlightLine>().ToggleAccentuation();
-							return;
-						}
-					}
+				if (!child.gameObject.name.Equals(highlight.name + "(Clone)")) continue;
+				for (int x = 0; x < child.childCount; x++)
+				{
+					Transform secondChild = child.GetChild(x);
+					if (!secondChild.gameObject.name.Equals("HighlightLine(Clone)")) continue;
+					secondChild.GetComponent<HighlightLine>().ToggleAccentuation();
+					return;
+				}
 			}
 		}
 

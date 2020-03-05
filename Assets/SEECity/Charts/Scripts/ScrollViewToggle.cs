@@ -87,11 +87,9 @@ namespace SEECity.Charts.Scripts
 		{
 			if (Parent == null)
 			{
-				if (StatusUpdate == null)
-				{
-					bool active = toggle.isOn;
-					foreach (ScrollViewToggle child in _children) child.Toggle(active);
-				}
+				if (StatusUpdate != null) return;
+				var active = toggle.isOn;
+				foreach (ScrollViewToggle child in _children) child.Toggle(active);
 			}
 			else
 			{
@@ -116,7 +114,7 @@ namespace SEECity.Charts.Scripts
 		/// Updates the status on parent markers depending on the values of it's children.
 		/// </summary>
 		/// <returns></returns>
-		public IEnumerator UpdateStatus()
+		private IEnumerator UpdateStatus()
 		{
 			yield return new WaitForSeconds(0.2f);
 			bool active = true;
@@ -137,7 +135,7 @@ namespace SEECity.Charts.Scripts
 		/// Used to check if a marker for the <see cref="LinkedObject" /> will be added to the linked chart.
 		/// </summary>
 		/// <returns>The status of the <see cref="LinkedObject" />.</returns>
-		public bool GetStatus()
+		private bool GetStatus()
 		{
 			return (bool) LinkedObject.showInChart[_chartContent];
 		}
@@ -151,17 +149,23 @@ namespace SEECity.Charts.Scripts
 			_children.Add(child);
 		}
 
+		public void SetHighlighted(bool highlighted)
+		{
+			var highlightToggle = GetComponent<Toggle>();
+			var colors = highlightToggle.colors;
+			colors.normalColor = highlighted ? Color.yellow : Color.white;
+			highlightToggle.colors = colors;
+		}
+
 		/// <summary>
 		/// Highlights the <see cref="LinkedObject" /> when the user points on this <see cref="GameObject" />.
 		/// </summary>
 		/// <param name="eventData"></param>
 		public void OnPointerEnter(PointerEventData eventData)
 		{
-			if (_chartManager != null && LinkedObject != null)
-			{
-				_pointedOn = true;
-				_chartManager.HighlightObject(LinkedObject.gameObject);
-			}
+			if (_chartManager == null || LinkedObject == null) return;
+			_pointedOn = true;
+			_chartManager.HighlightObject(LinkedObject.gameObject);
 		}
 
 		/// <summary>
@@ -170,11 +174,9 @@ namespace SEECity.Charts.Scripts
 		/// <param name="eventData"></param>
 		public void OnPointerExit(PointerEventData eventData)
 		{
-			if (_pointedOn)
-			{
-				_chartManager.HighlightObject(LinkedObject.gameObject);
-				_pointedOn = false;
-			}
+			if (!_pointedOn) return;
+			_chartManager.HighlightObject(LinkedObject.gameObject);
+			_pointedOn = false;
 		}
 
 		/// <summary>

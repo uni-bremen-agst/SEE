@@ -40,6 +40,8 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		[HideInInspector] public GameObject linkedObject;
 
+		public ScrollViewToggle scrollViewToggle { private get; set; }
+
 		/// <summary>
 		/// The active <see cref="Camera" /> in the scene.
 		/// </summary>
@@ -214,6 +216,7 @@ namespace SEECity.Charts.Scripts
 			}
 
 			markerHighlight.SetActive(highlight);
+			scrollViewToggle.SetHighlighted(highlight);
 		}
 
 		/// <summary>
@@ -223,7 +226,7 @@ namespace SEECity.Charts.Scripts
 		/// <param name="reenable"></param>
 		public void TriggerTimedHighlight(float time, bool reenable)
 		{
-			bool reactivate = false;
+			var reactivate = false;
 
 			if (TimedHighlight != null)
 			{
@@ -266,7 +269,7 @@ namespace SEECity.Charts.Scripts
 		{
 			_activeCamera = Camera.main.GetComponent<Camera>();
 			//TODO: Change to active camera and not just main camera.
-			Vector3 cameraPos = _activeCamera.transform.position;
+			var cameraPos = _activeCamera.transform.position;
 
 			if (_moveWithRotation)
 			{
@@ -276,10 +279,11 @@ namespace SEECity.Charts.Scripts
 					_cameraMoving = null;
 				}
 
-				Vector3 lookPos = linkedObject.transform.position - cameraPos;
+				var linkedPos = linkedObject.transform.position;
+				var lookPos = linkedPos - cameraPos;
 				_cameraMoving = StartCoroutine(MoveCameraTo(
-					Vector3.MoveTowards(cameraPos, linkedObject.transform.position,
-						lookPos.magnitude - _cameraDistance), Quaternion.LookRotation(lookPos)));
+					Vector3.MoveTowards(cameraPos, linkedPos, lookPos.magnitude - _cameraDistance),
+					Quaternion.LookRotation(lookPos)));
 			}
 			else
 			{
@@ -289,7 +293,7 @@ namespace SEECity.Charts.Scripts
 					_cameraMoving = null;
 				}
 
-				Vector3 pos = linkedObject.transform.position;
+				var pos = linkedObject.transform.position;
 				_cameraMoving =
 					StartCoroutine(MoveCameraTo(new Vector3(pos.x, cameraPos.y,
 						pos.z - _cameraDistance)));
@@ -305,22 +309,21 @@ namespace SEECity.Charts.Scripts
 		/// <returns></returns>
 		private IEnumerator MoveCameraTo(Vector3 newPos, Quaternion lookAt)
 		{
-			Vector3 oldPos = _activeCamera.transform.position;
-			if (newPos != linkedObject.transform.position)
+			var oldPos = _activeCamera.transform.position;
+			if (newPos == linkedObject.transform.position) yield break;
+			var oldRot = _activeCamera.transform.rotation;
+			for (var time = 0f; time <= _cameraFlightTime; time += Time.deltaTime)
 			{
-				Quaternion oldRot = _activeCamera.transform.rotation;
-				for (float time = 0f; time <= _cameraFlightTime; time += Time.deltaTime)
-				{
-					_activeCamera.transform.position =
-						Vector3.Lerp(oldPos, newPos, time * (1 / _cameraFlightTime));
-					_activeCamera.transform.rotation =
-						Quaternion.Slerp(oldRot, lookAt, time * (1 / _cameraFlightTime));
-					yield return new WaitForEndOfFrame();
-				}
-
-				_activeCamera.transform.rotation = lookAt;
-				_activeCamera.transform.position = newPos;
+				_activeCamera.transform.position =
+					Vector3.Lerp(oldPos, newPos, time * (1 / _cameraFlightTime));
+				_activeCamera.transform.rotation =
+					Quaternion.Slerp(oldRot, lookAt, time * (1 / _cameraFlightTime));
+				yield return new WaitForEndOfFrame();
 			}
+
+			var cameraPos = _activeCamera.transform;
+			cameraPos.rotation = lookAt;
+			cameraPos.transform.position = newPos;
 		}
 
 		/// <summary>
@@ -330,7 +333,7 @@ namespace SEECity.Charts.Scripts
 		/// <returns></returns>
 		private IEnumerator MoveCameraTo(Vector3 newPos)
 		{
-			Vector3 oldPos = _activeCamera.transform.position;
+			var oldPos = _activeCamera.transform.position;
 			for (float time = 0; time <= _cameraFlightTime; time += Time.deltaTime)
 			{
 				_activeCamera.transform.position =
@@ -341,12 +344,16 @@ namespace SEECity.Charts.Scripts
 			_activeCamera.transform.position = newPos;
 		}
 
+		/// <summary>
+		/// Changes the color of the marker and the <see cref="linkedObject" /> to the accentuation color.
+		/// </summary>
 		public void Accentuate()
 		{
 			markerHighlight.GetComponent<Image>().color = _accentuated
 				? _chartManager.standardColor
 				: _chartManager.accentuationColor;
 			_accentuated = !_accentuated;
+			if (_highlightCopy == null) return;
 			_highlightCopy.GetComponent<Renderer>().material = _accentuated
 				? _buildingHighlightMaterialAccentuated
 				: _buildingHighlightMaterial;
@@ -395,11 +402,9 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private void OnEnable()
 		{
-			if (_reactivateHighlight)
-			{
-				TriggerTimedHighlight(_highlightDuration - HighlightTime, true);
-				_reactivateHighlight = false;
-			}
+			if (!_reactivateHighlight) return;
+			TriggerTimedHighlight(_highlightDuration - HighlightTime, true);
+			_reactivateHighlight = false;
 		}
 
 		/// <summary>

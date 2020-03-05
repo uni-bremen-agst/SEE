@@ -13,6 +13,7 @@ namespace SEECity.Charts.Scripts
 	{
 		private ChartManager _chartManager;
 		public IDictionary showInChart = new Dictionary<ChartContent, bool>();
+		public ScrollViewToggle scrollViewToggle;
 
 		private void Awake()
 		{
@@ -22,7 +23,7 @@ namespace SEECity.Charts.Scripts
 
 		public void OnPointerEnter(PointerEventData eventData)
 		{
-			for (int i = 0; i < transform.childCount; i++)
+			for (var i = 0; i < transform.childCount; i++)
 				if (transform.GetChild(i).gameObject.name.Equals(gameObject.name + "(Clone)"))
 				{
 					_chartManager.Accentuate(gameObject);
@@ -32,7 +33,7 @@ namespace SEECity.Charts.Scripts
 
 		public void OnPointerExit(PointerEventData eventData)
 		{
-			for (int i = 0; i < transform.childCount; i++)
+			for (var i = 0; i < transform.childCount; i++)
 				if (transform.GetChild(i).gameObject.name.Equals(gameObject.name + "(Clone)"))
 				{
 					_chartManager.Accentuate(gameObject);
