@@ -18,7 +18,7 @@ namespace SEE.Layout
         /// The number of building types offered.
         /// </summary>
         /// <returns>number of building types offered</returns>
-        public override int NumberOfMaterials()
+        public override int NumberOfStyles()
         {
             return prefabFiles.Length;
         }
@@ -153,29 +153,36 @@ namespace SEE.Layout
         /// </summary>
         private const bool createDifferentBuildingTypes = true;
 
-        public override GameObject NewBlock(int index = 0)
+        public override GameObject NewBlock(int style = 0)
         {
             if (createDifferentBuildingTypes)
             {
-                index = Mathf.Clamp(index, 0, prefabs.Length - 1);
-                return NewBuilding(index);
+                style = Mathf.Clamp(style, 0, prefabs.Length - 1);
+                GameObject building = NewBuilding(style);
+                SetStyle(building, style);
+                return building;
             }
             else
             {
                 // The most suitable CScape building is CSTemplate30 because that kind of
                 // building can be scaled down to (1 floors, 1 depth, 1 width).
-                return NewBuilding(0);
+                GameObject building = NewBuilding(0);
+                // Even though we are using the same type of building for all styles,
+                // we can still vary its facade.
+                SetStyle(building, style);
+                return building;
             }
         }
 
         /// <summary>
         /// Returns the CScape building with given index relative to prefabs.
         /// </summary>
-        /// <param name="index">index of the building to be returned</param>
+        /// <param name="style">style index of the building to be returned</param>
         /// <returns>CScape building with given index</returns>
-        private static GameObject NewBuilding(int index)
+        private static GameObject NewBuilding(int style)
         {
-            return NewBuilding(prefabs[index]);
+            GameObject building = NewBuilding(prefabs[style]);
+            return building;
         }
 
         /// <summary>
@@ -439,6 +446,44 @@ namespace SEE.Layout
             // Unlike normal Unity objects, CScape buildings are rotated relative to the left front corner
             // at ground level. That is why we need to select the ground center as the anchor of rotation.
             block.transform.RotateAround(Ground(block), Vector3.up, degree);
+        }
+
+        public override void SetStyle(GameObject block, int style)
+        {
+            // What would be a good option to change the style? Selecting a 
+            // different type of building would be an obvious chose, in 
+            // particular because the style parameter in NewBlock is
+            // in fact used to determine the type of building.
+            // The problem with that is that we would need to instantiate a 
+            // different building prefab. As a consequence, we would create a new
+            // game object that is different from 'block'. Other objects
+            // may still reference the 'block', however. We need a way in which
+            // the block remains the same game object, but only one of its
+            // visual attributes changes. We could use the material of the
+            // facade, for instance, or the facade shape. This could be achieved
+            // through the BuildingModifier attached to the block.
+            // The facade shape is one of the most prominent visual features
+            // of a building. For this reason, we will select that for the style.
+            // There are two different facade shapes: one for the front and one
+            // lateral. We will change both and keep them in sync, which makes
+            // sense because a building should be alike from all different
+            // perspectives; this is also the case for the color style for
+            // cubes we offer as an alternative to CScape buildings.
+
+            
+            BuildingModifier modifier = block.GetComponent<BuildingModifier>();
+            if (modifier == null)
+            {
+                Debug.LogErrorFormat("CScape building {0} does not have a BuildingModifier");
+            }
+            else
+            {
+                // The facade shape has a value range [0,19].
+                int index = Mathf.Clamp(style, 0, Mathf.Min(19, prefabFiles.Length));
+                // front facade shape
+                modifier.materialId2 = index;
+                modifier.materialId3 = index;
+            }
         }
     }
 }
