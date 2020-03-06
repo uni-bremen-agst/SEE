@@ -2,6 +2,8 @@
 using UnityEngine;
 
 using SEE.DataModel;
+using static SEE.GraphSettings;
+using System.Linq;
 
 namespace SEE
 {
@@ -57,6 +59,36 @@ namespace SEE
                 p.End();
                 Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
                 Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
+
+                // die "veralteten" dirs, vor dem neuen laden
+                Dictionary<string, bool> dirs = settings.CoseGraphSettings.ListDirToggle;
+                // die neuen dirs 
+                Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
+                List<Node> dirsNodes = graph.GetRoots();
+
+                Dictionary<string, NodeLayouts> dirsLayout = new Dictionary<string, NodeLayouts>();
+
+                foreach (Node node in graph.Nodes())
+                {
+                    if (!node.IsLeaf())
+                    {
+                        dirsLocal.Add(node.LinkName, false);
+                        dirsLayout.Add(node.LinkName, settings.NodeLayout);
+                    }
+                }
+
+                // falls der key nicht in den alten dictonary ist
+                dirsLocal = dirsLocal.Where(i => !dirs.ContainsKey(i.Key)).ToDictionary(i => i.Key, i => i.Value);
+
+                settings.CoseGraphSettings.show = new Dictionary<Node, bool>();
+                if (dirsLocal.Count != 0)
+                {
+                    settings.CoseGraphSettings.DirNodeLayout = dirsLayout;
+                    settings.CoseGraphSettings.ListDirToggle = dirsLocal;
+                    // get roots
+                    settings.CoseGraphSettings.dirs = dirsNodes;
+                }
+
                 return graph;
             }
         }

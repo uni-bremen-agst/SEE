@@ -1,6 +1,9 @@
 ﻿using SEE.Layout;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using System;
+using SEE.DataModel;
 
 namespace SEE
 {
@@ -160,7 +163,18 @@ namespace SEE
             Treemap,
             CirclePacking,
             Manhattan,
+            CompoundSpringEmbedder
         }
+
+        /// <summary>
+        /// Dictionary with all Nodelayouts for leaf and inner nodes
+        /// </summary>
+        public Dictionary<GraphSettings.NodeLayouts, string> SubLayoutsInnerNodes = Enum.GetValues(typeof(GraphSettings.NodeLayouts)).Cast<GraphSettings.NodeLayouts>().Where(i => i != GraphSettings.NodeLayouts.Manhattan && i != GraphSettings.NodeLayouts.FlatRectanglePacking).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
+
+        /// <summary>
+        ///  Dictionary with all Nodelayouts only for leaf nodes
+        /// </summary>
+        public Dictionary<GraphSettings.NodeLayouts, string> SubLayoutsLeafNodes = Enum.GetValues(typeof(GraphSettings.NodeLayouts)).Cast<GraphSettings.NodeLayouts>().OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
 
         /// <summary>
         /// The kinds of edge layouts available.
@@ -276,5 +290,15 @@ namespace SEE
             };
             return result;
         }
+
+        /// <summary>
+        /// Cosegraph settings
+        /// </summary>
+        public CoseGraphSettings CoseGraphSettings = new CoseGraphSettings();
+ 
+        /// <summary>
+        /// measurements of the layout
+        /// </summary>
+        public SortedDictionary<string, string> Measurements = new SortedDictionary<string, string>();
     }
 }
