@@ -108,6 +108,7 @@ namespace SEECity.Charts.Scripts
 		public void Toggle(bool active)
 		{
 			toggle.isOn = active;
+			//SetHighlighted(active);
 		}
 
 		/// <summary>
@@ -117,7 +118,7 @@ namespace SEECity.Charts.Scripts
 		private IEnumerator UpdateStatus()
 		{
 			yield return new WaitForSeconds(0.2f);
-			bool active = true;
+			var active = true;
 			foreach (ScrollViewToggle child in _children)
 				if (!child.GetStatus())
 				{
@@ -176,6 +177,7 @@ namespace SEECity.Charts.Scripts
 		{
 			if (!_pointedOn) return;
 			_chartManager.HighlightObject(LinkedObject.gameObject);
+			SetHighlighted(false);
 			_pointedOn = false;
 		}
 
