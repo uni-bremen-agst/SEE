@@ -25,8 +25,7 @@ using UnityEngine;
 namespace SEE.Animation.Internal
 {
     /// <summary>
-    /// Data model containing all data generated for a graph loaded from a GXL file
-    /// and its layout data.
+    /// Data model containing a graph loaded from a GXL file and its node layout.
     /// </summary>
     public class LaidOutGraph
     {
