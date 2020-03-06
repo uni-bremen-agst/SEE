@@ -139,6 +139,8 @@ namespace SEE.Animation
 
         /// <summary>
         /// The time in seconds for showing a single graph revision during auto-play animation.
+        /// 
+        /// FIXME: Should this be moved to EvolutionRenderer?
         /// </summary>
         public float AnimationLag
         {
@@ -215,7 +217,7 @@ namespace SEE.Animation
 
             ViewDataChangedEvent.Invoke();
 
-            Renderer.CalculateGraphLayouts(Graphs);
+            Renderer.CalculateAllGraphLayouts(Graphs);
 
             // 
             if (HasLaidOutGraph(out LaidOutGraph loadedGraph))
