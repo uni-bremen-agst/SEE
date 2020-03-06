@@ -36,6 +36,11 @@ namespace SEE.DataModel
         private Node target;
 
         /// <summary>
+        /// the length of the edge
+        /// </summary>
+        public float dist;
+
+        /// <summary>
         /// The target of the edge.
         /// </summary>
         public Node Target

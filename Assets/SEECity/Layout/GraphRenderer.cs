@@ -31,24 +31,29 @@ namespace SEE.Layout
                 default:
                     throw new Exception("Unhandled GraphSettings.LeafNodeKinds");
             }
-            switch (this.settings.InnerNodeObjects)
+            innerNodeFactory = GetInnerNodeFactory(this.settings.InnerNodeObjects);
+        }
+
+        /// <summary>
+        /// Returns the Factory for the inner nodes
+        /// </summary>
+        /// <param name="innerNodeKinds">the kind of the inner nodes</param>
+        /// <returns>inner node factory</returns>
+        private InnerNodeFactory GetInnerNodeFactory(GraphSettings.InnerNodeKinds innerNodeKinds)
+        {
+            switch (innerNodeKinds)
             {
                 case GraphSettings.InnerNodeKinds.Empty:
                 case GraphSettings.InnerNodeKinds.Donuts:
-                    innerNodeFactory = new VanillaFactory();
-                    break;
+                    return new VanillaFactory();
                 case GraphSettings.InnerNodeKinds.Circles:
-                    innerNodeFactory = new CircleFactory(leafNodeFactory.Unit);
-                    break;
+                    return new CircleFactory(leafNodeFactory.Unit);
                 case GraphSettings.InnerNodeKinds.Cylinders:
-                    innerNodeFactory = new CylinderFactory();
-                    break;
+                    return new CylinderFactory();
                 case GraphSettings.InnerNodeKinds.Rectangles:
-                    innerNodeFactory = new RectangleFactory(leafNodeFactory.Unit);
-                    break;
+                    return new RectangleFactory(leafNodeFactory.Unit);
                 case GraphSettings.InnerNodeKinds.Blocks:
-                    innerNodeFactory = new CubeFactory();
-                    break;
+                    return new CubeFactory();
                 default:
                     throw new Exception("Unhandled GraphSettings.InnerNodeKinds");
             }
@@ -151,7 +156,11 @@ namespace SEE.Layout
 
             Dictionary<Node, GameObject> nodeMap = CreateBlocks(nodes);
             Dictionary<GameObject, NodeTransform> layout;
-           
+
+            Dictionary<string, List<Node>> sublayoutRootsWithNodes = new Dictionary<string, List<Node>>();
+
+            Performance p = Performance.Begin("layout name" + settings.NodeLayout + ", layout of nodes");
+
             switch (settings.NodeLayout)
             {
                 case GraphSettings.NodeLayouts.Manhattan:
@@ -178,17 +187,149 @@ namespace SEE.Layout
                     AddContainers(nodeMap, nodes); // and inner nodes
                     layout = new CirclePackingNodeLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
+                case GraphSettings.NodeLayouts.CompoundSpringEmbedder:
+                    sublayoutRootsWithNodes = SetContainersCompoundSpringEmbedder(nodeMap, nodes); 
+
+                    bool isCircle = false;
+                    if (settings.InnerNodeObjects == GraphSettings.InnerNodeKinds.Circles || settings.InnerNodeObjects == GraphSettings.InnerNodeKinds.Circles || settings.InnerNodeObjects == GraphSettings.InnerNodeKinds.Circles)
+                    {
+                        isCircle = true;
+                    }
+                    layout = new CoseLayout(groundLevel, leafNodeFactory, isCircle, graph.Edges(), settings).Layout(nodeMap.Values);
+                    break;
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }
+            p.End();
 
-            Apply(layout, settings.origin);
             ICollection<GameObject> gameNodes = layout.Keys;
-            AddDecorations(gameNodes);
+
+            if (settings.NodeLayout != GraphSettings.NodeLayouts.CompoundSpringEmbedder) 
+            {
+                Apply(layout, settings.origin);
+                AddDecorations(gameNodes);
+            } else
+            {
+                if (sublayoutRootsWithNodes.Count > 0)
+                {
+                    Dictionary<GameObject, NodeTransform> remainingLayoutNodes = layout;
+
+                    foreach (KeyValuePair<string, List<Node>> kvp in sublayoutRootsWithNodes)
+                    {
+                        // nodeMap nach knoten gefiltert, die in dem sublayout sind 
+                        Dictionary<Node, GameObject> filteredNodeMap = nodeMap.Where(i => kvp.Value.Contains(i.Key)).ToDictionary(i => i.Key, i => i.Value);
+                        // layout nach gameobjects gefiltert, die im sublayout sind
+                        Dictionary<GameObject, NodeTransform> subLayout = layout.Where(pair => filteredNodeMap.ContainsValue(pair.Key)).ToDictionary(i => i.Key, i => i.Value);
+                        remainingLayoutNodes.Where(pair => !subLayout.ContainsKey(pair.Key)).ToDictionary(i => i.Key, i => i.Value);
+                        InnerNodeFactory innerNodeFactory = GetInnerNodeFactory(settings.CoseGraphSettings.DirShape[kvp.Key]);
+                        Apply(subLayout, settings.origin, innerNodeFactory);
+                        AddDecorations(subLayout.Keys.ToList(), settings.CoseGraphSettings.DirShape[kvp.Key], settings.CoseGraphSettings.DirNodeLayout[kvp.Key]);
+                    }
+
+                    Apply(remainingLayoutNodes, settings.origin);
+                    AddDecorations(remainingLayoutNodes.Keys.ToList());
+                }
+                else
+                {
+                    // keine sublayouts 
+                    Apply(layout, settings.origin);
+                    AddDecorations(gameNodes);
+                }
+            }
+            
             EdgeLayout(graph, gameNodes);
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             // Place the plane somewhat under ground level.
             PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
+
+            Measurements measurements = new Measurements(nodeMap, graph, settings, leftFrontCorner, rightBackCorner);
+            measurements.NodesPerformance(p);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nodeMap"></param>
+        /// <param name="nodes"></param>
+        /// <returns></returns>
+        private Dictionary<string, List<Node>> SetContainersCompoundSpringEmbedder(Dictionary<Node, GameObject> nodeMap, List<Node> nodes)
+        {
+            Dictionary<string, List<Node>> subLayoutRootsWithNodes = new Dictionary<string, List<Node>>();
+
+            Dictionary<string, GraphSettings.NodeLayouts> sublayouts = FilterSubLayouts();
+            if (sublayouts.Count != 0)
+            {
+                List<Node> remainingNodes = nodes;
+
+                foreach (KeyValuePair<string, GraphSettings.NodeLayouts> sublayoutKvp in sublayouts)
+                {
+                    List<Node> filteredNodes = FilterNodes(nodes, sublayoutKvp.Key);
+                    remainingNodes = remainingNodes.Where(i => !filteredNodes.Contains(i)).ToList();
+                    AddContainers(nodeMap, filteredNodes, GetInnerNodeFactory(settings.CoseGraphSettings.DirShape[sublayoutKvp.Key]));
+                    subLayoutRootsWithNodes.Add(sublayoutKvp.Key, filteredNodes);
+                }
+
+                AddContainers(nodeMap, remainingNodes);
+            }
+            else
+            {
+                AddContainers(nodeMap, nodes);
+            }
+
+            return subLayoutRootsWithNodes;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private Dictionary<string, GraphSettings.NodeLayouts> FilterSubLayouts()
+        {
+            Dictionary<string, GraphSettings.NodeLayouts> sublayouts = new Dictionary<string, GraphSettings.NodeLayouts>();
+            foreach (KeyValuePair<string, GraphSettings.NodeLayouts> dir in settings.CoseGraphSettings.DirNodeLayout)
+            {
+                if (settings.CoseGraphSettings.ListDirToggle[dir.Key])
+                {
+                    sublayouts.Add(dir.Key, dir.Value);
+                }
+            }
+            return sublayouts;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nodes"></param>
+        /// <param name="sublayoutRoot"></param>
+        /// <returns></returns>
+        private List<Node> FilterNodes(List<Node> nodes, string sublayoutRoot)
+        {
+            IEnumerable<Node> matches = nodes.Where(i => i.SourceName.Equals(sublayoutRoot));
+            List<Node> sublayoutNodes = new List<Node>();
+
+            if (matches.Count() > 0)
+            {
+                // alle Kind Knoten von Root 
+                sublayoutNodes = WithAllChildren(matches.First());
+            }
+            return sublayoutNodes;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="root"></param>
+        /// <returns></returns>
+        private List<Node> WithAllChildren(Node root)
+        {
+            List<Node> allNodes = new List<Node>();
+            allNodes.Add(root);
+            foreach (Node node in root.Children())
+            {
+                allNodes.AddRange(WithAllChildren(node));
+            }
+
+            return allNodes;
         }
 
         /// <summary>
@@ -196,6 +337,15 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="gameNodes">game nodes to be decorated</param>
         private void AddDecorations(ICollection<GameObject> gameNodes)
+        {
+            AddDecorations(gameNodes, settings.InnerNodeObjects, settings.NodeLayout);
+        }
+
+        /// <summary>
+        /// Draws the decorations of the given game nodes.
+        /// </summary>
+        /// <param name="gameNodes">game nodes to be decorated</param>
+        private void AddDecorations(ICollection<GameObject> gameNodes, GraphSettings.InnerNodeKinds innerNodeKinds, GraphSettings.NodeLayouts nodeLayout)
         {
             // Decorations must be applied after the blocks have been placed, so that
             // we also know their positions.
@@ -205,12 +355,12 @@ namespace SEE.Layout
                 issueDecorator.Add(LeafNodes(gameNodes));
             }
 
-            if (settings.NodeLayout == GraphSettings.NodeLayouts.Balloon 
-                || settings.NodeLayout == GraphSettings.NodeLayouts.EvoStreets)
+            if (nodeLayout == GraphSettings.NodeLayouts.Balloon 
+                || nodeLayout == GraphSettings.NodeLayouts.EvoStreets)
             {
                 AddLabels(InnerNodes(gameNodes));
             }
-            switch (settings.InnerNodeObjects)
+            switch (innerNodeKinds)
             {
                 case GraphSettings.InnerNodeKinds.Empty:
                     // do nothing
@@ -288,8 +438,13 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="layout">node layout to be applied</param>
         /// <param name="origin">the center origin where the graph should be placed in the world scene</param>
-        public void Apply(Dictionary<GameObject, NodeTransform> layout, Vector3 origin)
-        {      
+        public void Apply(Dictionary<GameObject, NodeTransform> layout, Vector3 origin, InnerNodeFactory innerNodeFactory = null)
+        {
+            if (innerNodeFactory == null)
+            {
+                innerNodeFactory = this.innerNodeFactory;
+            }
+
             foreach (var entry in NodeLayout.Move(layout, origin))
             {
                 GameObject gameNode = entry.Key;
@@ -425,14 +580,19 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="nodeMap">nodeMap to which the game objects are to be added</param>
         /// <param name="nodes">list of nodes for which to create blocks</param>
-        private void AddContainers(Dictionary<Node, GameObject> nodeMap, IList<Node> nodes)
+        private void AddContainers(Dictionary<Node, GameObject> nodeMap, IList<Node> nodes, InnerNodeFactory innerNodeFactory = null)
         {
+            if (innerNodeFactory == null)
+            {
+                innerNodeFactory = this.innerNodeFactory;
+            }
+
             foreach (Node node in nodes)
             {
                 // We add only inner nodes.
                 if (! node.IsLeaf())
                 {
-                    GameObject innerGameObject = NewInnerNode(node);
+                    GameObject innerGameObject = NewInnerNode(node, innerNodeFactory);
                     nodeMap[node] = innerGameObject;
                 }
             }
@@ -443,7 +603,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">graph node for which to create the game node</param>
         /// <returns>new game object for the inner node</returns>
-        private GameObject NewInnerNode(Node node)
+        private GameObject NewInnerNode(Node node, InnerNodeFactory innerNodeFactory)
         {
             GameObject innerGameObject = innerNodeFactory.NewBlock();
             innerGameObject.name = node.LinkName;

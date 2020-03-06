@@ -7,6 +7,13 @@ namespace SEE.Layout
 {
     public static class CoseGeometry
     {
+        /// <summary>
+        /// Calculates the amout of intersection between two rectangles
+        /// </summary>
+        /// <param name="rectA">the first rectangle</param>
+        /// <param name="rectB">the second rectangle</param>
+        /// <param name="result">the result values</param>
+        /// <returns>a tuple(intersect, result), intersect indictates if they intersect and result contains the resulting values</returns>
         public static Tuple<bool, double[]> GetIntersection(Rect rectA,
         Rect rectB,
         double[] result)
@@ -280,6 +287,13 @@ namespace SEE.Layout
             return new Tuple<bool, double[]>(false, result);
         }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="slope"></param>
+        /// <param name="slopePrime"></param>
+        /// <param name="line"></param>
+        /// <returns></returns>
         private static int GetCardinalDirection(double slope, double slopePrime, int line)
         {
             if (slope > slopePrime)
@@ -292,6 +306,12 @@ namespace SEE.Layout
             }
         }
 
+        /// <summary>
+        /// Calculates in which direction two rectangles overlap
+        /// </summary>
+        /// <param name="rectA">the first rectangle</param>
+        /// <param name="rectB">the second rectangle</param>
+        /// <param name="directions">the directions, -1 = left/ top, 1= right/bottom</param>
         private static void DecideDirectionsForOverlappingNodes(Rect rectA, Rect rectB, double[] directions)
         {
             if (rectA.center.x < rectB.center.x)
@@ -313,6 +333,13 @@ namespace SEE.Layout
             }
         }
 
+        /// <summary>
+        /// calcualtes the separatoin amount between two given rectangles
+        /// </summary>
+        /// <param name="_rectA">the first rectangle</param>
+        /// <param name="rectB">the second rectangle</param>
+        /// <param name="overlapAmount">the amount of overlapping</param>
+        /// <param name="separationBuffer">the separation buffer</param>
         public static void CalcSeparationAmount(Rect _rectA, Rect rectB, double[] overlapAmount, double separationBuffer)
         {
             Rect rectA = _rectA;

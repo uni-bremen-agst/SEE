@@ -28,6 +28,8 @@ namespace SEE
 
         private readonly string action;
 
+        private string elapsedTime = "00:00:00:00";
+
         /// <summary>
         /// Returns a new performance time stamp and emits given action.
         /// </summary>
@@ -52,7 +54,13 @@ namespace SEE
             TimeSpan ts = stopWatch.Elapsed;
             string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
                 ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+            this.elapsedTime = elapsedTime;
             Debug.Log("End of " + action + " (" + elapsedTime + ").\n");
+        }
+
+        public string GetElapsedTime()
+        {
+            return elapsedTime;
         }
     }
 }

@@ -37,6 +37,43 @@ namespace SEE.Layout
         public int Weight { get => weight; set => weight = value; }
         public CoseCoarsenNode Node1 { get => node1; set => node1 = value; }
         public CoseCoarsenNode Node2 { get => node2; set => node2 = value; }
+
+        /// <summary>
+        /// constructor, inital weight of a coarsenNode is 1
+        /// </summary>
+        /// <param name="node">the original node</param>
+        /// <param name="graphManager">the current graphmanager</param>
+        public CoseCoarsenNode(Node node, CoseGraphManager graphManager) : base(node, graphManager)
+        {
+            Weight = 1;
+        }
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        public CoseCoarsenNode() : base(null, null)
+        {
+        }
+
+        /// <summary>
+        /// Calculates the best node for a matching
+        /// </summary>
+        /// <returns> neighbour node with the smallest weight </returns>
+        public CoseCoarsenNode GetMatching()
+        {
+            CoseCoarsenNode minWeighted = null;
+            int minWeight = int.MaxValue;
+
+            foreach (CoseCoarsenNode node in GetNeighborsList())
+            {
+                if (!node.Matched && node != this && (node.Weight < minWeight))
+                {
+                    minWeighted = node;
+                    minWeight = node.Weight;
+                }
+            }
+            return minWeighted;
+        }
     }
 }
 

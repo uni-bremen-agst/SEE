@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
-    public class CoseEdge : MonoBehaviour
+    public class CoseEdge
     {
         /// <summary>
         /// Indicates whether the edge is an intergraph edge
