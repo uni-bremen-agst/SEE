@@ -155,6 +155,13 @@ namespace SEE.Layout
         }
 
         /// <summary>
+        /// If true, the layout can handle both inner nodes and leaves; otherwise
+        /// only leaves.
+        /// </summary>
+        /// <returns>whether the layout can handle hierarchical graphs</returns>
+        public abstract bool IsHierarchical();
+
+        /// <summary>
         /// Creates the relevant tree consisting of the nodes to be laid out
         /// (a subtree of the node hierarchy of the original graph).
         /// 

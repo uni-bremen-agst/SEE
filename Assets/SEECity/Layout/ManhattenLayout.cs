@@ -8,7 +8,7 @@ namespace SEE.Layout
     /// Calculates a simple grid layout for leaf nodes (only). The order is
     /// random. 
     /// </summary>
-    public class ManhattanLayout : NodeLayout
+    public class ManhattanLayout : FlatNodeLayout
     {
         public ManhattanLayout(float groundLevel,
                                NodeFactory blockFactory)
