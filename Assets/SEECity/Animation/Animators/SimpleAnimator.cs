@@ -25,21 +25,17 @@ namespace SEE.Animation
 {
     /// <summary>
     /// Animates the position and scale of a given GameObject over the full <see cref="AbstractAnimator.MaxAnimationTime"/>.
-    /// If <see cref="Node.WasModified()"/> is true, the GameObject will shake to indicate a file modification.
+    /// If <see cref="Node.WasModified()"/> is true, the GameObject will be shaken to indicate its modification.
     /// </summary>
-    public class SimpleAnimator : AbstractAnimator
+    public class MoveScaleShakeAnimator : AbstractAnimator
     {
         /// <summary>
-        /// See <see cref="AbstractAnimator.AnimateToInternalWithCallback(Node, GameObject, Vector3, Vector3, GameObject, string)"/>
+        /// See <see cref="AbstractAnimator.AnimateToInternalWithCallback(Node, GameObject, Vector3, Vector3, GameObject, string)"/>.
+        /// Moves, scales, and shakes the animated game object.
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="gameObject"></param>
-        /// <param name="position"></param>
-        /// <param name="scale"></param>
-        /// <param name="callBackTarget"></param>
-        /// <param name="callbackName"></param>
         protected override void AnimateToInternalWithCallback(Node node, GameObject gameObject, Vector3 position, Vector3 scale, GameObject callBackTarget, string callbackName)
         {
+            // Move the object.
             if (callBackTarget != null)
             {
                 iTween.MoveTo(gameObject, iTween.Hash(
@@ -54,11 +50,12 @@ namespace SEE.Animation
             {
                 iTween.MoveTo(gameObject, iTween.Hash("position", position, "time", MaxAnimationTime));
             }
+            // Scale the object.
             iTween.ScaleTo(gameObject, iTween.Hash(
                 "scale", scale,
                 "time", MaxAnimationTime
             ));
-
+            // Shake the object.
             if (node.WasModified())
             {
                 iTween.ShakeRotation(gameObject, iTween.Hash(

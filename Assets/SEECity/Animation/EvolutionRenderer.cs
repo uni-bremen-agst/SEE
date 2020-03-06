@@ -39,7 +39,7 @@ namespace SEE.Animation.Internal
         /// <summary>
         /// The city evolution to be drawn by this renderer.
         /// </summary>
-        private SEECityEvolution city;
+        private SEECityEvolution cityEvolution;
 
         /// <summary>
         /// The graph renderer used to draw a single graph and the later added nodes and edges.
@@ -61,16 +61,16 @@ namespace SEE.Animation.Internal
         /// </summary>
         public SEECityEvolution CityEvolution
         {
-            get => city;
+            get => cityEvolution;
             set {
-                city = value;
-                // A constructor is meaningless for a class that derives from MonoBehaviour.
+                cityEvolution = value;
+                // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
                 // So we cannot make the following assignment in the constructor. Neither
                 // can we assign this value at the declaration of graphRenderer because
                 // we need the city argument, which comes only later. Anyhow, whenever we
                 // assign a new city, we also need a new graph renderer for that city.
                 // So in fact this is the perfect place to assign graphRenderer.
-                graphRenderer = new GraphRenderer(city);
+                graphRenderer = new GraphRenderer(cityEvolution);
                 objectManager = new ObjectManager(graphRenderer);
             }
         }
@@ -93,7 +93,7 @@ namespace SEE.Animation.Internal
         /// <summary>
         /// A SimpleAnimator used for animation.
         /// </summary>
-        protected readonly AbstractAnimator SimpleAnim = new SimpleAnimator();
+        protected readonly AbstractAnimator SimpleAnim = new MoveScaleShakeAnimator();
 
         /// <summary>
         /// A MoveAnimator used for move animations.
@@ -183,7 +183,7 @@ namespace SEE.Animation.Internal
 
         protected enum GraphDirection { First, Next, Previous };
 
-        protected SEECityEvolution City => city;
+        protected SEECityEvolution City => cityEvolution;
 
         /// <summary>
         /// Constructor
@@ -329,7 +329,7 @@ namespace SEE.Animation.Internal
                 // We assume that the city is a component nested in a game object. 
                 // This game object becomes the parent under which all game objects
                 // created for the underlying graph are to be nested.
-                GameObject root = city.gameObject;
+                GameObject root = cityEvolution.gameObject;
                 if (root == null)
                 {
                     root = new GameObject();
