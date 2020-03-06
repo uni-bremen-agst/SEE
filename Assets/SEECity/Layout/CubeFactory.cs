@@ -5,15 +5,14 @@ namespace SEE.Layout
 {
     /// <summary>
     /// A factory for cubes as visual representations of graph nodes in the scene.
+    /// Cubes are used for both leaves (as an alternative to CScape buildings) and
+    /// inner nodes (e.g., for the streets in EvoStreets), but because they are
+    /// used for inner nodes, too, they must provide SetLineWidth() even though
+    /// it does not do anything.
     /// </summary>
     public class CubeFactory : InnerNodeFactory
     {
-        public CubeFactory()
-        {
-            materials = new Materials(10, Color.white, Color.red);
-        }
-
-        public override GameObject NewBlock(int index)
+        public override GameObject NewBlock(int style)
         {
             GameObject result = GameObject.CreatePrimitive(PrimitiveType.Cube);
             result.tag = Tags.Building;
@@ -23,7 +22,7 @@ namespace SEE.Layout
             renderer.receiveShadows = false;
 
             // Assigns a material to the object.
-            renderer.sharedMaterial = materials.DefaultMaterial(index);
+            renderer.sharedMaterial = materials.DefaultMaterial(Mathf.Clamp(style, 0, NumberOfStyles()-1));
 
             // Add collider so that we can interact with the object.
             result.AddComponent<BoxCollider>();

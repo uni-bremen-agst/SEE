@@ -1,36 +1,47 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Layout
 {
     /// <summary>
     /// A factory for visual representations of graph nodes in the scene.
+    /// 
+    /// A game object created by this factory has -- as every other game
+    /// object -- a scale (width X, height Y, depth Z), which can be 
+    /// set and manipulated by this factory. Clients of a node factory
+    /// should not retrieve or set these attributes themselves using Unity's own
+    /// API, thus, should not use transform.localScale or renderer.bounds.size
+    /// and the like. The reason for that is that the intent of NodeFactory
+    /// to abstract from the differences of the kinds of game objects we use
+    /// for leaf nodes, namely, Cubes and CScape buildings. The latter have
+    /// their own idea of scaling and size, which differs from the normal
+    /// Unity way.
+    /// 
+    /// In addition to scale, a node can have another kind of visual attribute
+    /// that is offered by a node factory. Concretely, Cubes offer a color
+    /// and CScape buildings different styles of buildings. As a shared
+    /// term that abstracts from those concrete styles, we call this attribute
+    /// Style.
     /// </summary>
     public abstract class NodeFactory
     {
         /// <summary>
         /// Creates and returns a new block representation of a graph node.
-        /// The interpretation of the given index depends upon the subclasses.
-        /// It can be used to specify a visual property of the objects such
-        /// as the color. The allowed range of it depends upon the subclasses, too.
+        /// The interpretation of the given <paramref name="style"/> depends upon 
+        /// the subclasses. It can be used to specify a visual property of the 
+        /// objects such as the color. The allowed range of a style index depends 
+        /// upon the  subclasses, too, but must be in [0, NumberOfStyles()-1].
         /// </summary>
-        /// <param name="index">specifies an additional visual parameter of the object</param>
+        /// <param name="style">specifies an additional visual style parameter of 
+        /// the object</param>
         /// <returns>new block representation</returns>
-        public abstract GameObject NewBlock(int index = 0);
+        public abstract GameObject NewBlock(int style = 0);
 
         /// <summary>
-        /// The collection of materials to be used by this node factory.
-        /// </summary>
-        protected Materials materials;
-
-        /// <summary>
-        /// The number of materials offered.
+        /// The number of styles offered. A style index must be in the range
+        /// [0, NumberOfStyles()-1].
         /// </summary>
         /// <returns>number of materials offered</returns>
-        public virtual int NumberOfMaterials()
-        {
-            return materials.NumberOfMaterials();
-        }
+        public abstract int NumberOfStyles();
 
         /// <summary>
         /// The length unit of a block representation in Unity measures.
@@ -181,5 +192,13 @@ namespace SEE.Layout
             Quaternion rotation = Quaternion.Euler(0, degree, 0);
             block.transform.rotation = rotation;
         }
+
+        /// <summary>
+        /// Sets the style as the given <paramref name="style"/> 
+        /// for <paramref name="block"/>. The value used will be clamped
+        /// in [0, NumberOfStyles()-1].
+        /// </summary>
+        /// <param name="style">the index of the requested material</param>
+        public abstract void SetStyle(GameObject block, int style);
     }
 }
