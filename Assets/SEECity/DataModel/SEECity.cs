@@ -104,7 +104,7 @@ namespace SEE
         /// Loads the graph data from the GXL file with GXLPath() and the metrics
         /// from the CSV file with CSVPath().
         /// </summary>
-        public void LoadGraph()
+        public void LoadData()
         {
             if (string.IsNullOrEmpty(GXLPath()))
             {
