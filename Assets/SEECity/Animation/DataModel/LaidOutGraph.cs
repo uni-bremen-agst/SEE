@@ -18,6 +18,9 @@
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.DataModel;
+using SEE.Layout;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Animation.Internal
 {
@@ -34,7 +37,7 @@ namespace SEE.Animation.Internal
         /// <summary>
         /// The layout for the graph.
         /// </summary>
-        private readonly Layout layout;
+        private readonly Dictionary<GameObject, NodeTransform> layout;
 
         /// <summary>
         /// The graph.
@@ -44,14 +47,14 @@ namespace SEE.Animation.Internal
         /// <summary>
         /// The layout of the graph.
         /// </summary>
-        public Layout Layout => layout;
+        public Dictionary<GameObject, NodeTransform> Layout => layout;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="graph">the graph</param>
         /// <param name="layout">its layout out</param>
-        public LaidOutGraph(Graph graph, Layout layout)
+        public LaidOutGraph(Graph graph, Dictionary<GameObject, NodeTransform> layout)
         {
             this.graph = graph.AssertNotNull("graph");
             this.layout = layout.AssertNotNull("layout");

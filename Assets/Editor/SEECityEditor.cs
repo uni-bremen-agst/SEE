@@ -39,7 +39,7 @@ namespace SEEEditor
         /// <param name="city">the city to be set up</param>
         private void SetUp(SEECity city)
         {
-            city.LoadGraph();
+            city.LoadData();
         }
 
         /// <summary>

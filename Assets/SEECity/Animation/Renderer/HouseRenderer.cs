@@ -22,55 +22,57 @@ using UnityEngine;
 
 namespace SEE.Animation.Internal
 {
-    /// <summary>
-    /// An Animation Renderer that is used to display buildings as graph leaf nodes.
-    /// </summary>
-    public class HouseRenderer : AbstractRenderer
+    /*
+/// <summary>
+/// An Animation Renderer that is used to display buildings as graph leaf nodes.
+/// </summary>
+public class HouseRenderer : AbstractRenderer
+{
+protected override void RenderLeaf(Node node)
+{
+    var isLeafNew = !ObjectManager.GetLeaf(node, out GameObject leaf);
+    var nodeTransform = NextLayoutToBeShown.GetNodeTransform(node);
+    var nextPosition = nodeTransform.position;
+    var nextScale = nodeTransform.scale;
+
+    var oldPosition = leaf.transform.position;
+    var oldSize = ObjectManager.GraphRenderer.GetSize(leaf);
+    ObjectManager.GraphRenderer.SetSize(leaf, nextScale);
+    ObjectManager.GraphRenderer.SetGroundPosition(leaf, nextPosition);
+    var realNewPosition = leaf.transform.position;
+
+    var actualSize = ObjectManager.GraphRenderer.GetSize(leaf);
+    var sizeDifference = new Vector3(oldSize.x / actualSize.x, oldSize.y / actualSize.y, oldSize.z / actualSize.z);
+
+    if (isLeafNew)
     {
-        protected override void RenderLeaf(Node node)
+        // if the leaf node is new, animate it by moving it out of the ground
+        actualSize.y += 5; // for a smoother animation
+        actualSize.x = 0;
+        actualSize.z = 0;
+        leaf.transform.position -= actualSize;
+    }
+    else
+    {
+        leaf.transform.position = oldPosition;
+        leaf.transform.localScale = sizeDifference;
+    }
+    SimpleAnim.AnimateTo(node, leaf, realNewPosition, Vector3.one);
+}
+    protected override void RenderRemovedOldLeaf(Node node)
+    {
+        if (ObjectManager.RemoveNode(node, out GameObject leaf))
         {
-            var isLeafNew = !ObjectManager.GetLeaf(node, out GameObject leaf);
+            // if the node needs to be removed, let it sink into the ground
             var nodeTransform = NextLayoutToBeShown.GetNodeTransform(node);
-            var nextPosition = nodeTransform.position;
-            var nextScale = nodeTransform.scale;
-
-            var oldPosition = leaf.transform.position;
-            var oldSize = ObjectManager.NodeFactory.GetSize(leaf);
-            ObjectManager.NodeFactory.SetSize(leaf, nextScale);
-            ObjectManager.NodeFactory.SetGroundPosition(leaf, nextPosition);
-            var realNewPosition = leaf.transform.position;
-
-            var actualSize = ObjectManager.NodeFactory.GetSize(leaf);
-            var sizeDifference = new Vector3(oldSize.x / actualSize.x, oldSize.y / actualSize.y, oldSize.z / actualSize.z);
-
-            if (isLeafNew)
-            {
-                // if the leaf node is new, animate it by moving it out of the ground
-                actualSize.y += 5; // for a smoother animation
-                actualSize.x = 0;
-                actualSize.z = 0;
-                leaf.transform.position -= actualSize;
-            }
-            else
-            {
-                leaf.transform.position = oldPosition;
-                leaf.transform.localScale = sizeDifference;
-            }
-            SimpleAnim.AnimateTo(node, leaf, realNewPosition, Vector3.one);
-        }
-
-        protected override void RenderRemovedOldLeaf(Node node)
-        {
-            if (ObjectManager.RemoveNode(node, out GameObject leaf))
-            {
-                // if the node needs to be removed, let it sink into the ground
-                var nodeTransform = NextLayoutToBeShown.GetNodeTransform(node);
-                var actualSize = ObjectManager.NodeFactory.GetSize(leaf) * 1.5F;
-                actualSize.x = 0;
-                actualSize.z = 0;
-                var nextPosition = leaf.transform.position - actualSize;
-                MoveAnim.AnimateTo(node, leaf, nextPosition, Vector3.one, OnRemovedNodeFinishedAnimation);
-            }
+            var actualSize = ObjectManager.GraphRenderer.GetSize(leaf) * 1.5F;
+            actualSize.x = 0;
+            actualSize.z = 0;
+            var nextPosition = leaf.transform.position - actualSize;
+            MoveAnim.AnimateTo(node, leaf, nextPosition, Vector3.one, OnRemovedNodeFinishedAnimation);
         }
     }
+
+}
+    */
 }

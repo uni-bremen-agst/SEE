@@ -33,25 +33,24 @@ namespace SEE.Animation.Internal
     public abstract class AbstractObjectManager
     {
         /// <summary>
-        /// The BlockFactory used internally for creating missing
-        /// GameObjects.
+        /// The graph renderer used to create the game objects. It is used for creating missing
+        /// game objects.
         /// </summary>
-        private readonly NodeFactory _nodeFactory;
+        private readonly GraphRenderer _graphRenderer;
 
         /// <summary>
-        /// Returns the internally used BlockFactory.
+        /// Returns the graph renderer used to create the game objects.
         /// </summary>
-        public NodeFactory NodeFactory => _nodeFactory;
+        protected GraphRenderer GraphRenderer => _graphRenderer;
 
         /// <summary>
-        /// Creates a new ObjectManager with the given BlackFactory.
+        /// Constructor.
         /// </summary>
-        /// <param name="nodeFactory">The given BlockFactory.</param>
-        public AbstractObjectManager(NodeFactory nodeFactory)
+        /// <param name="renderer">the graph renderer used to create the game objects</param>
+        public AbstractObjectManager(GraphRenderer renderer)
         {
-            nodeFactory.AssertNotNull("nodeFactory");
-
-            _nodeFactory = nodeFactory;
+            renderer.AssertNotNull("city");
+            _graphRenderer = renderer;
         }
 
         /// <summary>
@@ -63,30 +62,63 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Returns a saved GameObject for the root or generates a new one if it does not already exist.
+        /// Returns a saved plane or generates a new one if it does not already exist. The resulting
+        /// plane encloses all game objects of the city.
         /// </summary>
-        /// <param name="root">The root GameObject or null if no GameObject could be found or generated.</param>
-        /// <returns>True if the GameObject already existed and false if it was generated.</returns>
-        public abstract bool GetRoot(out GameObject root);
+        /// <param name="plane">the plane (new or existing)</param>
+        /// <returns>true if the plane already existed (thus, can be re-used) and false if it was newly 
+        /// created.</returns>
+        public abstract bool GetPlane(out GameObject plane);
 
         /// <summary>
-        /// Returns a saved GameObject for an inner node or generates a new one if it does not already exist.
+        /// Returns a saved GameObject for an inner node or creates a new one if it does not already exist.
+        /// The resulting game object will have a random scale and position. Those will be determined later
+        /// when the layout was calculated.
         /// </summary>
         /// <param name="node">The inner node under which a GameObject may be stored.</param>
-        /// <param name="innerNode">The GameObject associated to node or null if no GameObject could be found or generated.</param>
-        /// <returns>True if the GameObject already existed and false if it was generated.</returns>
+        /// <param name="innerNode">The resulting GameObject associated to node or null if no GameObject 
+        /// could be found or created.</param>
+        /// <returns>true if the GameObject already existed and false if it was newly created.</returns>
         public abstract bool GetInnerNode(Node node, out GameObject innerNode);
 
         /// <summary>
-        /// Returns a saved GameObject for a leaf node or generates a new one if it does not already exist.
+        /// Returns a saved GameObject for a leaf node or creates a new one if it does not already exist.
+        /// The resulting game object will have the dimensions according to attributes of the given 
+        /// <paramref name="node"/> even if the game node existed already. The position of the resulting
+        /// game object is random. The reason for that is the fact that layouts do not change the scale
+        /// (well, some of them, for instance the TreeMap, may shrink or extend the scale by a factor). 
+        /// Instead the node layouters need to know the scale of the nodes they are to layout upfront. 
+        /// On the other hand, the layouts determine the positions.
         /// </summary>
         /// <param name="node">The leaf node under which a GameObject may be stored.</param>
-        /// <param name="leaf">The GameObject associated to node or null if no GameObject could be found or generated.</param>
-        /// <returns>True if the GameObject already existed and false if it was generated.</returns>
+        /// <param name="leaf">The resulting GameObject associated to node or null if no GameObject 
+        /// could be found or created.</param>
+        /// <returns>True if the GameObject already existed and false if it was newly created.</returns>
         public abstract bool GetLeaf(Node node, out GameObject leaf);
 
         /// <summary>
-        /// Removes the GameObject from a given node in the internal memory structure
+        /// Returns a saved GameObject for a leaf or inner node or creates a new one if it does not already exist.
+        /// If the node is a leaf, GetLeaf() will be used to create an leaf node; otherwise GetInnerNode()
+        /// will be used instead to create an inner node.
+        /// </summary>
+        /// <param name="node">The node under which a GameObject may be stored.</param>
+        /// <param name="leaf">The resulting GameObject associated to node or null if no GameObject could 
+        /// be found or created.</param>
+        /// <returns>True if the GameObject already existed and false if it was newly created.</returns>
+        public virtual bool GetNode(Node node, out GameObject gameNode)
+        {
+            if (node.IsLeaf())
+            {
+                return GetLeaf(node, out gameNode);
+            }
+            else
+            {
+                return GetInnerNode(node, out gameNode);
+            }
+        }
+
+        /// <summary>
+        /// Removes the GameObject from a given node in the internal node cache
         /// and returns it for further use.
         /// </summary>
         /// <param name="node">The node under which a GameObject may be stored.</param>
@@ -95,7 +127,7 @@ namespace SEE.Animation.Internal
         public abstract bool RemoveNode(Node node, out GameObject gameObject);
 
         /// <summary>
-        /// Removes all generated GameObjects from internally used memory structures.
+        /// Removes all generated GameObjects from the internally used node cache.
         /// This does not delete or destroy GameObjects.
         /// </summary>
         public abstract void Clear();

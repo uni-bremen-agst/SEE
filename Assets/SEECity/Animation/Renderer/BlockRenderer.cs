@@ -22,11 +22,13 @@ using UnityEngine;
 
 namespace SEE.Animation.Internal
 {
+    /*
     /// <summary>
     /// An Animation Renderer that is used to display blocks as graph leaf nodes.
     /// </summary>
     class BlockRenderer : AbstractRenderer
     {
+        /*
         protected override void RenderLeaf(Node node)
         {
             var isLeafNew = !ObjectManager.GetLeaf(node, out GameObject leaf);
@@ -42,6 +44,7 @@ namespace SEE.Animation.Internal
             SimpleAnim.AnimateTo(node, leaf, nodeTransform.position, nodeTransform.scale);
         }
 
+
         protected override void RenderRemovedOldLeaf(Node node)
         {
             if (ObjectManager.RemoveNode(node, out GameObject leaf))
@@ -54,4 +57,5 @@ namespace SEE.Animation.Internal
             }
         }
     }
-}
+            */
+    }

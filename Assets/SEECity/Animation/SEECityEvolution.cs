@@ -48,9 +48,10 @@ namespace SEE.Animation
         /// </summary>
         public int maxRevisionsToLoad = 500;
 
-        private NodeFactory _nodeFactory;
-        private AbstractObjectManager _objectManager;
-        private AbstractRenderer _Renderer;
+        /// <summary>
+        /// The renderer for the rendering the evolution of the graph series.
+        /// </summary>
+        private EvolutionRenderer _Renderer;
 
         /// <summary>
         /// Whether the user has selected auto-play mode.
@@ -65,44 +66,14 @@ namespace SEE.Animation
         private int currentGraphIndex = 0;
 
         /// <summary>
-        /// Factory method to create the used NodeFactory.
+        /// Factory method to create the used EvolutionRenderer.
         /// </summary>
         /// <returns></returns>
-        protected NodeFactory CreateNodeFactory()
+        protected EvolutionRenderer CreateEvolutionRenderer()
         {
-            if (UseBlockFactory())
-            {
-                return new CubeFactory();
-            }
-            else
-            {
-                return new BuildingFactory();
-            }
-        }
-
-        /// <summary>
-        /// Factory method to create the used AbstractRenderer.
-        /// </summary>
-        /// <returns></returns>
-        protected AbstractRenderer CreateLeafNodeRenderer()
-        {
-            if (UseBlockFactory())
-            {
-                return gameObject.AddComponent(typeof(BlockRenderer)) as AbstractRenderer;
-            }
-            else
-            {
-                return gameObject.AddComponent(typeof(HouseRenderer)) as AbstractRenderer;
-            }
-        }
-
-        /// <summary>
-        /// Factory method to create the used AbstractObjectManager.
-        /// </summary>
-        /// <returns></returns>
-        protected AbstractObjectManager CreateObjectManager()
-        {
-            return new ObjectManager(NodeFactory);
+            EvolutionRenderer result = gameObject.AddComponent<EvolutionRenderer>();
+            result.CityEvolution = this;
+            return result;
         }
 
         /// <summary>
@@ -148,40 +119,17 @@ namespace SEE.Animation
             //return new BalloonNodeLayout(0, nodeFactory);
         }
 
-        public NodeFactory NodeFactory
-        {
-            get
-            {
-                if (_nodeFactory == null)
-                    _nodeFactory = CreateNodeFactory();
-                return _nodeFactory;
-            }
-        }
-
-        public AbstractObjectManager ObjectManager
-        {
-            get
-            {
-                if (_objectManager == null)
-                    _objectManager = CreateObjectManager();
-                return _objectManager;
-            }
-        }
-
-        public AbstractRenderer Renderer
+        public EvolutionRenderer Renderer
         {
             get
             {
                 if (_Renderer == null)
-                    _Renderer = CreateLeafNodeRenderer();
+                    _Renderer = CreateEvolutionRenderer();
                 return _Renderer;
             }
         }
 
         private GraphsReader GraphLoader { get; } = new GraphsReader();
-
-        private Dictionary<Graph, SEE.Animation.Internal.Layout> Layouts { get; } 
-            = new Dictionary<Graph, SEE.Animation.Internal.Layout>();
 
         private IScale Scaler { get; set; }
 
@@ -238,11 +186,12 @@ namespace SEE.Animation
             }
         }
 
-        void Start()
+        /// <summary>
+        /// Loads the graph data from the GXL files and the metrics from the CSV files contained 
+        /// in the directory with path PathPrefix and the metrics.
+        /// </summary>
+        public void LoadData()
         {
-            Renderer.AssertNotNull("renderer");
-            Renderer.ObjectManager = ObjectManager;
-
             if (String.IsNullOrEmpty(PathPrefix))
             {
                 PathPrefix = UnityProject.GetPath() + "..\\Data\\GXL\\animation-clones\\";
@@ -251,25 +200,27 @@ namespace SEE.Animation
             // Load all GXL graphs in directory PathPrefix but not more than maxRevisionsToLoad many.
             GraphLoader.Load(this.PathPrefix, this.HierarchicalEdges, maxRevisionsToLoad);
 
-            ViewDataChangedEvent.Invoke();
+            // TODO: The CSV metric files should be loaded, too.
 
             // TODO: Extend IScale so that it can handle a list of graphs instead of just one.
             // Create the scaling of all visualized metrics.
             Scaler = CreateScaler(Graphs, MetricsToBeScaled());
+        }
 
-            // Determine the layouts of all loaded graphs upfront.
-            var p = Performance.Begin("Layouting all graphs");
-            Graphs.ForEach(key =>
-            {
-                Layouts[key] = new SEE.Animation.Internal.Layout();
-                Layouts[key].Calculate(ObjectManager, Scaler, CreateLayout(NodeFactory), key, this);
-            });
-            p.End();
+        void Start()
+        {
+            Renderer.AssertNotNull("renderer");
+
+            LoadData();
+
+            ViewDataChangedEvent.Invoke();
+
+            Renderer.CalculateGraphLayouts(Graphs);
 
             // 
             if (HasLaidOutGraph(out LaidOutGraph loadedGraph))
             {
-                Renderer.DisplayGraph(loadedGraph);
+                Renderer.DisplayInitialGraph(loadedGraph);
             }
             else
             {
@@ -294,7 +245,7 @@ namespace SEE.Animation
 
             if (HasLaidOutGraph(out LaidOutGraph loadedGraph))
             {
-                Renderer.DisplayGraph(loadedGraph);
+                Renderer.DisplayInitialGraph(loadedGraph);
                 return true;
             }
             else
@@ -376,7 +327,7 @@ namespace SEE.Animation
                 Debug.LogError("There ist no graph available at index " + index);
                 return false;
             }
-            var hasLayout = Layouts.TryGetValue(graph, out SEE.Animation.Internal.Layout layout);
+            var hasLayout = _Renderer.TryGetLayout(graph, out Dictionary<GameObject, NodeTransform> layout);
             if (layout == null || !hasLayout)
             {
                 Debug.LogError("There ist no layout available at index " + index);

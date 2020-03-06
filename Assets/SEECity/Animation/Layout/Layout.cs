@@ -34,7 +34,7 @@ namespace SEE.Animation.Internal
         /// <summary>
         /// The calculated NodeTransforms representing the layout.
         /// </summary>
-        public readonly Dictionary<string, NodeTransform> nodeTransforms = new Dictionary<string, NodeTransform>();
+        private readonly Dictionary<string, NodeTransform> nodeTransforms = new Dictionary<string, NodeTransform>();
 
         /// <summary>
         /// Returns a NodeTransform for a given node, using the Node.LinkName attribute
@@ -58,10 +58,19 @@ namespace SEE.Animation.Internal
         /// <param name="graphSettings"></param>
         public void Calculate(AbstractObjectManager objectManager, IScale scaler, NodeLayout nodeLayout, Graph graph, SEECityEvolution graphSettings)
         {
+            // The following code assumes that a leaf node remains a leaf across all
+            // graphs of the graph series and an inner node remains an inner node.
+            // This may not necessarily be true. For instance, a directory could 
+            // get subdirectories in the course of the evolution.
+
+            // Collecting all game objects corresponding to nodes of the given graph.
+            // If node existed in a previous graph, we will re-use its corresponding
+            // game object created earlier.
             var gameObjects = new List<GameObject>();
             graph.Traverse(
                 rootNode =>
                 {
+                    // FIXME: In rare cases the root could be a leaf node.
                     objectManager.GetInnerNode(rootNode, out var inner);
                     gameObjects.Add(inner);
                 },
@@ -73,17 +82,22 @@ namespace SEE.Animation.Internal
                 leafNode =>
                 {
                     objectManager.GetLeaf(leafNode, out var leaf);
+                    /*
                     var size = new Vector3(
                         scaler.GetNormalizedValue(graphSettings.WidthMetric, leafNode),
                         scaler.GetNormalizedValue(graphSettings.HeightMetric, leafNode),
                         scaler.GetNormalizedValue(graphSettings.DepthMetric, leafNode)
                     );
-                    objectManager.NodeFactory.SetSize(leaf, size);
+                    objectManager.graphRenderer.SetSize(leaf, size);
+                    */
                     gameObjects.Add(leaf);
                 }
             );
 
+            // Calculate the layout for the game objects.
             var layoutData = nodeLayout.Layout(gameObjects);
+
+            // Apply the layout to the game objects.
             layoutData.Keys.ToList().ForEach(key =>
             {
                 var node = key.GetComponent<NodeRef>().node;
