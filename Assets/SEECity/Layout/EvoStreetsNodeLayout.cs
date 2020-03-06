@@ -4,7 +4,7 @@ using SEE.Layout.EvoStreets;
 
 namespace SEE.Layout
 {
-    public class EvoStreetsNodeLayout : NodeLayout
+    public class EvoStreetsNodeLayout : HierarchicalNodeLayout
     {
         /// <summary>
         /// Constructor.

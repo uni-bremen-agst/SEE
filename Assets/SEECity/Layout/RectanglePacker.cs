@@ -16,7 +16,7 @@ namespace SEE.Layout
     /// The algorithm proposed by Richard Wettel in his dissertation 
     /// "Software Systems as Cities" described on page 36 is used.
     /// </summary>
-    public class RectanglePacker : NodeLayout
+    public class RectanglePacker : FlatNodeLayout
     {
         /// <summary>
         /// Constructor.
