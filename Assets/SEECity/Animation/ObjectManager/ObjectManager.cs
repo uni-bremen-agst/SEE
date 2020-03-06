@@ -27,10 +27,16 @@ namespace SEE.Animation.Internal
 {
     /// <summary>
     /// Implements the <see cref="AbstractObjectManager"/> by using a supplied
-    /// AbstractSEECity to create its GameObjects.
+    /// GraphRenderer to create game objects for graph nodes. Those game objects
+    /// will be cached.
     /// </summary>
     public class ObjectManager : AbstractObjectManager
     {
+        // TODO: Merge AbstractObjectManager and ObjectManager: I do not see a
+        // reason why we would ever want to add an alternative to ObjectManager.
+        // The ObjectManager just manages the cache. What kind of game objects are 
+        // created, is decided by the GraphRenderer.
+
         /// <summary>
         /// The plane enclosing all game objects of the city.
         /// </summary>
@@ -91,6 +97,7 @@ namespace SEE.Animation.Internal
 
             if (nodes.TryGetValue(node.LinkName, out innerNode))
             {
+                // A game object for this inner code could be retrieved.
                 // The game object has already a node attached to it, but that
                 // node is part of a different graph (i.e,, different revision).
                 // That is why we replace the attached node by this node here.
@@ -116,9 +123,10 @@ namespace SEE.Animation.Internal
         /// The resulting game object will have the dimensions and style according to the attributes of 
         /// the given <paramref name="node"/> even if the game node existed already. The position of the
         /// resulting game object is random. The reason for that is the fact that layouts do not change 
-        /// the scale (well, some of them, for instance the TreeMap, may shrink or extend the scale by  
+        /// the scale (well, some of them -- for instance, TreeMap -- may shrink or extend the scale by  
         /// a factor). Instead the node layouters need to know the scale of the nodes they are to layout 
-        /// upfront. On the other hand, the layouts determine the positions.
+        /// upfront. On the other hand, the layouts determine the positions. That is why we adjust the 
+        /// scale (and the style) but not the position here. 
         /// The given <paramref name="node"/> will be attached to <paramref name="leaf"/> and replaces
         /// its currently attached graph node.
         /// </summary>
@@ -133,8 +141,8 @@ namespace SEE.Animation.Internal
             if (nodes.TryGetValue(node.LinkName, out leaf))
             {
                 // We are re-using an existing node, but that node's attributes
-                // might have changed. That is why we need to adjust its scale
-                // and color.
+                // determining its scale or style might have changed. That is why we 
+                // need to adjust its scale and style, too.
 
                 // The game object has already a node attached to it, but that
                 // node is part of a different graph (i.e,, different revision).
@@ -143,14 +151,16 @@ namespace SEE.Animation.Internal
 
                 // Now after having attached the new node to the game object,
                 // we must adjust the visual attributes of it according to the
-                // newly attached node.
+                // newly attached node. Actually, only the scale would need to
+                // be adjusted because that is the information later needed by the
+                // layouter.
                 GraphRenderer.AdjustVisualsOfBlock(leaf);
                 return true;
             }
             else
             {
-                // NewLeafNode() will set the scale and color of the leaf
-                // and will also attach node to it.
+                // NewLeafNode() will set the scale and style of the leaf
+                // and will also attach the node to it.
                 leaf = GraphRenderer.NewLeafNode(node);
                 return false;
             }
@@ -177,12 +187,13 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Removes a supplied node by using its Node.LinkName and returns
-        /// the removed node, if some was removed.
+        /// Removes a the game object representing the given <paramref name="node"/> by using the LinkName 
+        /// of the <paramref name="node"/> and returns the removed node in <paramref name="gameObject"/>, if 
+        /// it existed. Returns true if such a game object existed in the cache.
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="gameObject"></param>
-        /// <returns></returns>
+        /// <param name="node">node determining the game object to be removed from the cache</param>
+        /// <param name="gameObject">the corresponding game object that was removed from the cache or null</param>
+        /// <returns>true if a corresponding game object existed and was removed from the cache</returns>
         public override bool RemoveNode(Node node, out GameObject gameObject)
         {
             node.AssertNotNull("node");
@@ -193,8 +204,8 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Clears the internal lists containing the GameObjects,
-        /// without destroing them.
+        /// Clears the internal cache containing all game objects created by GetInnerNode(),
+        /// GetLeaf(), GetNode(), or GetPlane() without actually destroing those game objects.
         /// </summary>
         public override void Clear()
         {
