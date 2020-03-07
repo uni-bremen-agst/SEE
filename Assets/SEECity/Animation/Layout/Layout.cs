@@ -56,7 +56,7 @@ namespace SEE.Animation.Internal
         /// <param name="nodeLayout"></param>
         /// <param name="graph"></param>
         /// <param name="graphSettings"></param>
-        public void Calculate(AbstractObjectManager objectManager, IScale scaler, NodeLayout nodeLayout, Graph graph, SEECityEvolution graphSettings)
+        public void Calculate(ObjectManager objectManager, IScale scaler, NodeLayout nodeLayout, Graph graph, SEECityEvolution graphSettings)
         {
             // The following code assumes that a leaf node remains a leaf across all
             // graphs of the graph series and an inner node remains an inner node.
