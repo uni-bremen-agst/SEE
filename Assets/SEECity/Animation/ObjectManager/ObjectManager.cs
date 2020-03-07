@@ -32,7 +32,7 @@ namespace SEE.Animation.Internal
     /// for reuse during query. Each GameObject is identified by the LinkName of 
     /// a node and can be retrieved via any node with the same LinkName.
     /// </summary>
-    public class ObjectManager : AbstractObjectManager
+    public class ObjectManager
     {
         /// <summary>
         /// The graph renderer used to create the game objects. It is used for creating missing
