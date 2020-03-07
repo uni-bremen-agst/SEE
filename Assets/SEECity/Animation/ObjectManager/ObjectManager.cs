@@ -26,16 +26,24 @@ using UnityEngine;
 namespace SEE.Animation.Internal
 {
     /// <summary>
-    /// Implements the <see cref="AbstractObjectManager"/> by using a supplied
+    /// An ObjectManager creates and manages GameObjects by using a supplied
     /// GraphRenderer to create game objects for graph nodes. Those game objects
-    /// will be cached.
+    /// will be cached, that is, non-existing GameObjects are created and stored 
+    /// for reuse during query. Each GameObject is identified by the LinkName of 
+    /// a node and can be retrieved via any node with the same LinkName.
     /// </summary>
     public class ObjectManager : AbstractObjectManager
     {
-        // TODO: Merge AbstractObjectManager and ObjectManager: I do not see a
-        // reason why we would ever want to add an alternative to ObjectManager.
-        // The ObjectManager just manages the cache. What kind of game objects are 
-        // created, is decided by the GraphRenderer.
+        /// <summary>
+        /// The graph renderer used to create the game objects. It is used for creating missing
+        /// game objects.
+        /// </summary>
+        private readonly GraphRenderer _graphRenderer;
+
+        /// <summary>
+        /// Returns the graph renderer used to create the game objects.
+        /// </summary>
+        protected GraphRenderer GraphRenderer => _graphRenderer;
 
         /// <summary>
         /// The plane enclosing all game objects of the city.
@@ -54,14 +62,24 @@ namespace SEE.Animation.Internal
         /// Constructor.
         /// </summary>
         /// <param name="renderer">the graph renderer used to create the game objects</param>
-        public ObjectManager(GraphRenderer renderer) : base(renderer)
+        public ObjectManager(GraphRenderer renderer)
         {
+            renderer.AssertNotNull("renderer");
+            _graphRenderer = renderer;
         }
 
         /// <summary>
-        /// Returns a list containing all created nodes that are in use.
+        /// Returns all created GameObjects till now.
         /// </summary>
-        public override List<GameObject> GameObjects => nodes.Values.ToList();
+        public List<GameObject> GameObjects
+        {
+            get => gameObjects;
+        }
+
+        /// <summary>
+        /// List of all created nodes that are in use.
+        /// </summary>
+        private List<GameObject> gameObjects => nodes.Values.ToList();
 
         /// <summary>
         /// Returns a saved plane or generates a new one if it does not already exist. The resulting
@@ -70,15 +88,36 @@ namespace SEE.Animation.Internal
         /// </summary>
         /// <param name="plane">the plane intended to enclose all game objects of the city</param>
         /// <returns>true if the plane already existed (thus, can be re-used) and false if it was newly created</returns>
-        public override bool GetPlane(out GameObject plane)
+        public bool GetPlane(out GameObject plane)
         {
             bool hasPlane = currentPlane != null;
             if (!hasPlane)
             {
-                currentPlane = GraphRenderer.NewPlane(GameObjects);
+                currentPlane = GraphRenderer.NewPlane(gameObjects);
             }
             plane = currentPlane;
             return hasPlane;
+        }
+
+        /// <summary>
+        /// Returns a saved GameObject for a leaf or inner node or creates a new one if it does not already exist.
+        /// If the node is a leaf, GetLeaf() will be used to create an leaf node; otherwise GetInnerNode()
+        /// will be used instead to create an inner node.
+        /// </summary>
+        /// <param name="node">The node under which a GameObject may be stored.</param>
+        /// <param name="leaf">The resulting GameObject associated to node or null if no GameObject could 
+        /// be found or created.</param>
+        /// <returns>True if the GameObject already existed and false if it was newly created.</returns>
+        public bool GetNode(Node node, out GameObject gameNode)
+        {
+            if (node.IsLeaf())
+            {
+                return GetLeaf(node, out gameNode);
+            }
+            else
+            {
+                return GetInnerNode(node, out gameNode);
+            }
         }
 
         /// <summary>
@@ -91,7 +130,7 @@ namespace SEE.Animation.Internal
         /// <param name="innerNode">the resulting GameObject associated to node or null if no GameObject 
         /// could be found or created</param>
         /// <returns>true if the GameObject already existed and false if it was newly created</returns>
-        public override bool GetInnerNode(Node node, out GameObject innerNode)
+        public bool GetInnerNode(Node node, out GameObject innerNode)
         {
             node.AssertNotNull("node");
 
@@ -134,7 +173,7 @@ namespace SEE.Animation.Internal
         /// <param name="leaf">the resulting GameObject associated to node or null if no GameObject 
         /// could be found or created</param>
         /// <returns>true if the GameObject already existed and false if it was newly created</returns>
-        public override bool GetLeaf(Node node, out GameObject leaf)
+        public bool GetLeaf(Node node, out GameObject leaf)
         {
             node.AssertNotNull("node");
 
@@ -194,7 +233,7 @@ namespace SEE.Animation.Internal
         /// <param name="node">node determining the game object to be removed from the cache</param>
         /// <param name="gameObject">the corresponding game object that was removed from the cache or null</param>
         /// <returns>true if a corresponding game object existed and was removed from the cache</returns>
-        public override bool RemoveNode(Node node, out GameObject gameObject)
+        public bool RemoveNode(Node node, out GameObject gameObject)
         {
             node.AssertNotNull("node");
 
@@ -207,7 +246,7 @@ namespace SEE.Animation.Internal
         /// Clears the internal cache containing all game objects created by GetInnerNode(),
         /// GetLeaf(), GetNode(), or GetPlane() without actually destroing those game objects.
         /// </summary>
-        public override void Clear()
+        public void Clear()
         {
             currentPlane = null;
             nodes.Clear();
