@@ -124,10 +124,21 @@ namespace SEE.Layout
 
             foreach (CoseGraph graph in GraphManager.Graphs)
             {
-                float width = graph.BoudingRect.width;
-                float height = graph.BoudingRect.height;
+                float width;
+                float height;
 
-                Vector3 position = new Vector3(graph.BoudingRect.x + (width / 2), groundLevel, graph.BoudingRect.y + (height / 2));
+                if (graph.Parent != null && graph.Parent.CNodeSublayoutValues.IsSubLayoutRoot && graph.Parent.CNodeSublayoutValues.NodeLayout == NodeLayouts.EvoStreets)
+                {
+                    width = graph.Parent.CNodeSublayoutValues.Sublayout.LayoutScale.x;
+                    height = graph.Parent.CNodeSublayoutValues.Sublayout.LayoutScale.z;
+                }
+                else
+                {
+                    width = graph.BoudingRect.width;
+                    height = graph.BoudingRect.height;
+                }
+
+                Vector3 position = new Vector3(graph.BoudingRect.center.x, groundLevel, graph.BoudingRect.center.y);
 
                 if (graph != GraphManager.RootGraph)
                 {

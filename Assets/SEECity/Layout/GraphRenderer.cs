@@ -224,7 +224,16 @@ namespace SEE.Layout
                         InnerNodeFactory innerNodeFactory = GetInnerNodeFactory(settings.CoseGraphSettings.DirShape[kvp.Key]);
                         Apply(subLayout, settings.origin, innerNodeFactory);
                         AddDecorations(subLayout.Keys.ToList(), settings.CoseGraphSettings.DirShape[kvp.Key], settings.CoseGraphSettings.DirNodeLayout[kvp.Key]);
+
+
+                        BoundingBox(filteredNodeMap.Values, out Vector2 leftFrontC, out Vector2 rightBackC);
+                        PlaneFactory.NewPlane(leftFrontC, rightBackC, groundLevel - 0.005f, Color.blue);
+
+
+
                     }
+
+                    
 
                     Apply(remainingLayoutNodes, settings.origin);
                     AddDecorations(remainingLayoutNodes.Keys.ToList());

@@ -39,11 +39,19 @@ namespace SEE.Layout
         /// </summary>
         private NodeLayouts nodeLayout;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private CoseSublayout sublayout;
+
         public List<CoseNode> SublayoutNodes { get => sublayoutNodes; set => sublayoutNodes = value; }
         public bool IsSubLayoutRoot { get => isSubLayoutRoot; set => isSubLayoutRoot = value; }
         public bool IsSubLayoutNode { get => isSubLayoutNode; set => isSubLayoutNode = value; }
         public CoseNode SubLayoutRoot { get => subLayoutRoot; set => subLayoutRoot = value; }
         public NodeLayouts NodeLayout { get => nodeLayout; set => nodeLayout = value; }
+        public CoseSublayout Sublayout { get => sublayout; set => sublayout = value; }
+
+
 
         /// <summary>
         /// updates the relative bounding rect

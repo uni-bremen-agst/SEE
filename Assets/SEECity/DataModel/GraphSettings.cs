@@ -43,8 +43,8 @@ namespace SEE
         //public string csvPath = "..\\Data\\GXL\\linux-clones\\fs.csv";
 
         // Smaller clone graph with single root (Linux directory "net").
-        public string gxlPath = "..\\Data\\GXL\\linux-clones\\net.gxl";
-        public string csvPath = "..\\Data\\GXL\\linux-clones\\net.csv";
+        public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
+        public string csvPath = "..\\Data\\GXL\\minimal_clones.csv";
 
         // Larger clone graph with single root (Linux directory "drivers"): 16.920 nodes, 10583 edges.
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\drivers.gxl";
@@ -150,7 +150,7 @@ namespace SEE
         /// <summary>
         /// What kinds of game objects are to be created for inner graph nodes.
         /// </summary>
-        public InnerNodeKinds InnerNodeObjects;
+        public InnerNodeKinds InnerNodeObjects = InnerNodeKinds.Rectangles;
 
         /// <summary>
         /// The kinds of node layouts available.
@@ -188,17 +188,17 @@ namespace SEE
         }
 
         // The layout that should be used for nodes.
-        public NodeLayouts NodeLayout;
+        public NodeLayouts NodeLayout = NodeLayouts.CompoundSpringEmbedder;
 
         // The layout that should be used for edges.
-        public EdgeLayouts EdgeLayout;
+        public EdgeLayouts EdgeLayout = EdgeLayouts.Spline;
 
         // Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
         // for range [0, max-value] is used, where max-value is the maximum value of a metric.
         public bool ZScoreScale = true;
 
         // The width of edges.
-        public float EdgeWidth = 0.3f;
+        public float EdgeWidth = 1.0f;
 
         /// <summary>
         /// Whether erosions should be visible above blocks.
