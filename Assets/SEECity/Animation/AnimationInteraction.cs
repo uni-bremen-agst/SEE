@@ -109,7 +109,7 @@ namespace SEE.Animation
                 }
                 else if (Input.GetKeyDown(KeyCode.Tab))
                 {
-                    CityEvolution.ToggleAutoplay();
+                    CityEvolution.ToggleAutoPlay();
                 }
 
                 string[] animationTimeKeys = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
@@ -165,7 +165,7 @@ namespace SEE.Animation
             FlyCamera.IsEnabled = !enabled;
             AnimationCanvas.SetActive(!enabled);
             RevisionSelectionCanvas.SetActive(enabled);
-            CityEvolution.ToggleAutoplay(false);
+            CityEvolution.SetAutoPlay(false);
             if (enabled)
             {
                 // if revision-selection mode is enabled, we re-fill the drop-down
