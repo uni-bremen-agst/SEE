@@ -46,14 +46,13 @@ namespace SEE.DataModel
         /// <param name="maxRevisionsToLoad">the upper limit of files to be loaded</param>
         public void Load(string directory, HashSet<string> hierarchicalEdgeTypes, int maxRevisionsToLoad)
         {
-            graphs.Clear();
             if (String.IsNullOrEmpty(directory))
             {
                 throw new Exception("Directory not set.");
             }
             SEE.Performance p = SEE.Performance.Begin("Loading GXL files from " + directory);
 
-            // get all gxl files sorted by numbers in their name
+            // get all GXL files sorted by numbers in their name
             IEnumerable<string> sortedGraphNames = Directory
                 .GetFiles(directory, "*.gxl", SearchOption.TopDirectoryOnly)
                 .Where(e => !string.IsNullOrEmpty(e));
@@ -64,11 +63,12 @@ namespace SEE.DataModel
             }
             sortedGraphNames = sortedGraphNames.Distinct().NumericalSort();
 
-            // for all found gxl files load and save the graph data
+            graphs.Clear();
+            // for all found GXL files load and save the graph data
             foreach (string gxlPath in sortedGraphNames)
             {
                 // load graph
-                GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes, "ROOT", new SEELogger());
+                GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes, gxlPath, new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
 
@@ -79,9 +79,9 @@ namespace SEE.DataModel
                 }
                 else
                 {
+                    maxRevisionsToLoad--;
                     graphs.Add(graph);
                 }
-                maxRevisionsToLoad--;
                 if (maxRevisionsToLoad <= 0)
                 {
                     break;
