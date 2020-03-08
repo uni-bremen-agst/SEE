@@ -19,14 +19,14 @@ namespace SEE.Layout
         /// <summary>
         /// Constructor for z-score based scaling of node metrics. 
         /// </summary>
-        /// <param name="graph">the graph whose node metrics are to be scaled</param>
+        /// <param name="graphs">the set of graphs whose node metrics are to be scaled</param>
         /// <param name="minimalLength">the mininmal value a node length can have</param>
         /// <param name="maximalLength">the maximal value a node length can have</param>
         /// <param name="metrics">node metrics for scaling</param>
-        public ZScoreScale(Graph graph, float minimalLength, float maximalLength, IList<string> metrics)
-        : base(graph, metrics, minimalLength, maximalLength)
+        public ZScoreScale(ICollection<Graph> graphs, float minimalLength, float maximalLength, IList<string> metrics)
+        : base(graphs, metrics, minimalLength, maximalLength)
         {
-            Determine_Statistics(graph);
+            Determine_Statistics(graphs);
         }
 
         // The statistics gathered for the node metrics.
@@ -50,21 +50,24 @@ namespace SEE.Layout
         /// <summary>
         /// Determines mean and standard deviation for each metric.
         /// </summary>
-        /// <param name="graph">graph whose nodes are to be considered</param>
-        private void Determine_Statistics(Graph graph)
+        /// <param name="graphs">set of graphs whose nodes are to be considered</param>
+        private void Determine_Statistics(ICollection<Graph> graphs)
         {
             Dictionary<string, float> sum = Initial(metrics);
             Dictionary<string, float> count = Initial(metrics);
 
             // Count the number of metric values and sum them up for each metric.
-            foreach (Node node in graph.Nodes())
+            foreach (Graph graph in graphs)
             {
-                foreach (string metric in metrics)
+                foreach (Node node in graph.Nodes())
                 {
-                    if (node.TryGetNumeric(metric, out float value))
+                    foreach (string metric in metrics)
                     {
-                        count[metric]++;
-                        sum[metric] += value;
+                        if (node.TryGetNumeric(metric, out float value))
+                        {
+                            count[metric]++;
+                            sum[metric] += value;
+                        }
                     }
                 }
             }
@@ -83,14 +86,17 @@ namespace SEE.Layout
             }
 
             // Calculate sum((x_i - mean)^2) over all i in [1..n]
-            foreach (Node node in graph.Nodes())
+            foreach (Graph graph in graphs)
             {
-                foreach (string metric in metrics)
+                foreach (Node node in graph.Nodes())
                 {
-                    if (node.TryGetNumeric(metric, out float value))
+                    foreach (string metric in metrics)
                     {
-                        float diff = value - statistics[metric].mean;
-                        statistics[metric].standard_deviation += diff * diff;
+                        if (node.TryGetNumeric(metric, out float value))
+                        {
+                            float diff = value - statistics[metric].mean;
+                            statistics[metric].standard_deviation += diff * diff;
+                        }
                     }
                 }
             }
