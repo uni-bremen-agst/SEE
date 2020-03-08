@@ -1,5 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.Layout;
+﻿using SEE.Layout;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,22 +13,6 @@ namespace SEE
     /// </summary>
     public abstract class AbstractSEECity : MonoBehaviour
     {
-        /// <summary>
-        /// The graph that is visualized in the scene and whose settings are 
-        /// managed here.
-        /// </summary>
-        protected Graph graph = null;
-
-        /// <summary>
-        /// The graph underlying this SEE city. May be null.
-        /// the element is currently not in a graph.
-        /// </summary>
-        public Graph ItsGraph
-        {
-            get => graph;
-            set => graph = value;
-        }
-
         /// <summary>
         /// The prefix of the absolute paths for the GXL and CSV data; that is,
         /// the directory where these data are located in.
