@@ -12,16 +12,16 @@ namespace SEE.Layout
         /// <summary>
         /// Constructor defining the node metrics to be normalized.
         /// </summary>
-        /// <param name="graph">the graph whose node metrics are to be scaled</param>
+        /// <param name="graphs">the set of graphs whose node metrics are to be scaled</param>
         /// <param name="metrics">node metrics for scaling</param>
         /// <param name="minimalLength">the minimal value that can be returned by this scaling</param>
         /// <param name="minimalLength">the maximal value that can be returned by this scaling</param>
-        public IScale(Graph graph, IList<string> metrics, float minimalLength, float maximalLength)
+        public IScale(ICollection<Graph> graphs, IList<string> metrics, float minimalLength, float maximalLength)
         {
             this.metrics = metrics;
             this.minimalLength = minimalLength;
             this.maximalLength = maximalLength;
-            metricMaxima = DetermineMetricMaxima(graph, metrics);
+            metricMaxima = DetermineMetricMaxima(graphs, metrics);
         }
 
         /// <summary>
@@ -74,9 +74,10 @@ namespace SEE.Layout
         /// <summary>
         /// Returns the maximal values of the given node metrics.
         /// </summary>
+        /// <param name="graphs">the set of graphs for which to determine the node metric maxima</param>
         /// <param name="metrics">the metrics for which the maxima are to be gathered</param>
         /// <returns>metric maxima</returns>
-        protected Dictionary<string, float> DetermineMetricMaxima(Graph graph, IList<string> metrics)
+        protected Dictionary<string, float> DetermineMetricMaxima(ICollection<Graph> graphs, IList<string> metrics)
         {
             Dictionary<string, float> result = new Dictionary<string, float>();
             foreach (string metric in metrics)
@@ -84,15 +85,18 @@ namespace SEE.Layout
                 result[metric] = 0.0f;
             }
 
-            foreach (Node node in graph.Nodes())
+            foreach (Graph graph in graphs)
             {
-                foreach (string metric in metrics)
+                foreach (Node node in graph.Nodes())
                 {
-                    if (node.TryGetNumeric(metric, out float value))
+                    foreach (string metric in metrics)
                     {
-                        if (value > result[metric])
+                        if (node.TryGetNumeric(metric, out float value))
                         {
-                            result[metric] = value;
+                            if (value > result[metric])
+                            {
+                                result[metric] = value;
+                            }
                         }
                     }
                 }
