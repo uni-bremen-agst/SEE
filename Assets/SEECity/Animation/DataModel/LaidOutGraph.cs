@@ -25,7 +25,7 @@ using UnityEngine;
 namespace SEE.Animation.Internal
 {
     /// <summary>
-    /// Data model containing a graph loaded from a GXL file and its node layout.
+    /// Data model containing a graph and its node layout.
     /// </summary>
     public class LaidOutGraph
     {
@@ -34,9 +34,9 @@ namespace SEE.Animation.Internal
         /// </summary>
         private readonly Graph graph;
         /// <summary>
-        /// The layout for the graph.
+        /// The layout for the graph as a mapping of the nodes' LinkNames onto their NodeTransform.
         /// </summary>
-        private readonly Dictionary<GameObject, NodeTransform> layout;
+        private readonly Dictionary<string, NodeTransform> layout;
 
         /// <summary>
         /// The graph.
@@ -44,19 +44,36 @@ namespace SEE.Animation.Internal
         public Graph Graph => graph;
 
         /// <summary>
-        /// The layout of the graph.
+        /// The layout of the graph as a mapping of the nodes' LinkNames onto their NodeTransform.
         /// </summary>
-        public Dictionary<GameObject, NodeTransform> Layout => layout;
+        public Dictionary<string, NodeTransform> Layout => layout;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="graph">the graph</param>
-        /// <param name="layout">its layout out</param>
-        public LaidOutGraph(Graph graph, Dictionary<GameObject, NodeTransform> layout)
+        /// <param name="layout">its layout as a mapping of the nodes' LinkNames onto their NodeTransform</param>
+        public LaidOutGraph(Graph graph, Dictionary<string, NodeTransform> layout)
         {
             this.graph = graph.AssertNotNull("graph");
             this.layout = layout.AssertNotNull("layout");
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="graph">the graph</param>
+        /// <param name="layout">its layout as a mapping of game objects onto their NodeTransform</param>
+        public LaidOutGraph(Graph graph, Dictionary<GameObject, NodeTransform> layout)
+        {
+            this.graph = graph.AssertNotNull("graph");
+            layout.AssertNotNull("layout");
+            this.layout = new Dictionary<string, NodeTransform>();
+            foreach (var entry in layout)
+            {
+                NodeRef nodeRef = entry.Key.GetComponent<NodeRef>();
+                this.layout[nodeRef.node.LinkName] = entry.Value;
+            }
         }
     }
 }
