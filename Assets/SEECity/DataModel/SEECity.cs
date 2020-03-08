@@ -12,6 +12,22 @@ namespace SEE
     /// </summary>
     public class SEECity : AbstractSEECity
     {
+        /// <summary>
+        /// The graph that is visualized in the scene and whose visualization settings are 
+        /// managed here.
+        /// </summary>
+        protected Graph graph = null;
+
+        /// <summary>
+        /// The graph underlying this SEE city. May be null.
+        /// the element is currently not in a graph.
+        /// </summary>
+        public Graph ItsGraph
+        {
+            get => graph;
+            set => graph = value;
+        }
+
         /// Clone graph with one directory and two files contained therein.
         //public string gxlPath = "..\\Data\\GXL\\two_files.gxl";
         //public string csvPath = "..\\Data\\GXL\\two_files.csv";
