@@ -78,11 +78,11 @@ namespace SEE.DataModel
         /// IMPORTANT NOTE: This linkname is unique only if there is only a single edge
         /// between those nodes with the edge's type.
         /// </summary>
-        /// <param name="edge">edge for which linkname is requested</param>
-        /// <returns>A string from both node LinkName (Type + "#" + Source.LinkName + '#' + Target.LinkName)</returns>
-        public string LinkName()
+        /// <returns>a string from both nodes' LinkNames as follows: Type + "#" + Source.LinkName + '#' + Target.LinkName</returns>
+        public string LinkName
         {
-            return Type + "#" + Source.LinkName + "#" + Target.LinkName;
+            get => Type + "#" + Source.LinkName + "#" + Target.LinkName;
         }
+
     }
 }
