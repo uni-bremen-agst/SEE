@@ -18,6 +18,7 @@
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.DataModel;
+using SEE.Layout;
 using UnityEngine;
 
 namespace SEE.Animation
@@ -29,21 +30,20 @@ namespace SEE.Animation
     public class MoveAnimator : AbstractAnimator
     {
         /// <summary>
-        /// See <see cref="AbstractAnimator.AnimateToInternalWithCallback(Node, GameObject, Vector3, Vector3, GameObject, string)"/>
+        /// See <see cref="AbstractAnimator.AnimateToInternalWithCallback(Node, GameObject, NodeTransform, GameObject, string)"/>
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="gameObject"></param>
-        /// <param name="position"></param>
-        /// <param name="scale"></param>
-        /// <param name="callBackTarget"></param>
-        /// <param name="callbackName"></param>
-        protected override void AnimateToInternalWithCallback(Node node, GameObject gameObject, Vector3 position, Vector3 scale, GameObject callBackTarget, string callbackName)
+        /// <param name="node">Node of the given GameObject</param>
+        /// <param name="gameObject">GameObject to animate</param>
+        /// <param name="nodeTransform">the node transformation to be applied</param>
+        /// <param name="callback">An optional callback</param>
+        /// <param name="callbackName">name of the callback</param>
+        protected override void AnimateToInternalWithCallback(Node node, GameObject gameObject, NodeTransform nodeTransform, GameObject callBackTarget, string callbackName)
         {
-            gameObject.transform.localScale = scale;
+            gameObject.transform.localScale = nodeTransform.scale;
             if (callBackTarget != null)
             {
                 iTween.MoveTo(gameObject, iTween.Hash(
-                    "position", position,
+                    "position", nodeTransform.position,
                     "time", MaxAnimationTime,
                     "oncompletetarget", callBackTarget,
                     "oncomplete", callbackName,
@@ -53,7 +53,7 @@ namespace SEE.Animation
             else
             {
                 iTween.MoveTo(gameObject, iTween.Hash(
-                                          "position", position,
+                                          "position", nodeTransform.position,
                                           "time", MaxAnimationTime
                 ));
             }

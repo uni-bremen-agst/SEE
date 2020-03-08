@@ -18,6 +18,7 @@
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.DataModel;
+using SEE.Layout;
 using System;
 using UnityEngine;
 
@@ -64,35 +65,37 @@ namespace SEE.Animation
         }
 
         /// <summary>
-        /// Animates the change of a given GameObject to a new position and scale. If needed, a callback that is called
-        /// after the animation is finished, can be defined. The animation is implemented by
-        /// <see cref="AnimateToInternal(Node, GameObject, Vector3, Vector3)"/>
+        /// Animates the node transformation of a given GameObject. If needed, a callback that is called
+        /// after the animation is finished can be defined. The animation is implemented by
+        /// <see cref="AnimateToInternal(Node, GameObject, NodeTransform)"/>
         /// </summary>
         /// <param name="node">Node of the given GameObject</param>
         /// <param name="gameObject">GameObject to animate</param>
-        /// <param name="position">The new position</param>
-        /// <param name="scale">The new scale</param>
+        /// <param name="nodeTransform">the node transformation to be applied</param>
         /// <param name="callback">An optional callback</param>
-        public void AnimateTo(Node node, GameObject gameObject, Vector3 position, Vector3 scale, Action<object> callback = null)
+        public void AnimateTo(Node node, GameObject gameObject, NodeTransform nodeTransform, Action<object> callback = null)
         {
+            Debug.LogFormat("AnimateTo {0}: from (position={1}, scale={2}) to (position={3}, scale={4})\n",
+                             node.LinkName,
+                             gameObject.transform.position, gameObject.transform.localScale,
+                             nodeTransform.position, nodeTransform.scale);
             node.AssertNotNull("node");
             gameObject.AssertNotNull("gameObject");
-            position.AssertNotNull("position");
-            scale.AssertNotNull("scale");
+            nodeTransform.AssertNotNull("nodeTransform");
 
             if (AnimationsDisabled)
             {
-                gameObject.transform.position = position;
-                gameObject.transform.localScale = scale;
+                gameObject.transform.position = nodeTransform.position;
+                gameObject.transform.localScale = nodeTransform.scale;
                 callback?.Invoke(gameObject);
             }
             else if (callback == null)
             {
-                AnimateToInternalWithCallback(node, gameObject, position, scale, null, "");
+                AnimateToInternalWithCallback(node, gameObject, nodeTransform, null, "");
             }
             else
             {
-                AnimateToInternalWithCallback(node, gameObject, position, scale, ((MonoBehaviour)callback.Target).gameObject, callback.Method.Name);
+                AnimateToInternalWithCallback(node, gameObject, nodeTransform, ((MonoBehaviour)callback.Target).gameObject, callback.Method.Name);
             }
         }
 
@@ -101,14 +104,13 @@ namespace SEE.Animation
         /// </summary>
         /// <param name="node">Node of the given GameObject</param>
         /// <param name="gameObject">GameObject to animate</param>
-        /// <param name="position">The new position</param>
-        /// <param name="scale">The new scale</param>
+        /// <param name="nodeTransform">the node transformation to be applied</param>
         /// <param name="callback">An optional callback</param>
+        /// <param name="callbackName">name of the callback</param>
         protected abstract void AnimateToInternalWithCallback
             (Node node, 
             GameObject gameObject, 
-            Vector3 position, 
-            Vector3 scale, 
+            NodeTransform nodeTransform,  
             GameObject callBackTarget, 
             string callbackName);
     }

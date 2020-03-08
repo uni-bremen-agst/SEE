@@ -85,7 +85,6 @@ namespace SEE.Animation.Internal
                 // assign a new city, we also need a new graph renderer for that city.
                 // So in fact this is the perfect place to assign graphRenderer.
                 graphRenderer = new GraphRenderer(cityEvolution);
-                graphRenderer.SetScaler(cityEvolution.Graphs);
                 objectManager = new ObjectManager(graphRenderer);
             }
         }
@@ -161,6 +160,7 @@ namespace SEE.Animation.Internal
         /// The city (graph + layout) currently shown.
         /// </summary>
         private LaidOutGraph _currentCity;
+
         /// <summary>
         /// The underlying graph of the city currently shown.
         /// </summary>
@@ -202,8 +202,8 @@ namespace SEE.Animation.Internal
         /// <summary>
         /// All pre-computed layouts for the whole graph series.
         /// </summary>
-        private Dictionary<Graph, Dictionary<GameObject, NodeTransform>> Layouts { get; }
-             =  new Dictionary<Graph, Dictionary<GameObject, NodeTransform>>();
+        private Dictionary<Graph, Dictionary<string, NodeTransform>> Layouts { get; }
+             =  new Dictionary<Graph, Dictionary<string, NodeTransform>>();
 
         /// <summary>
         /// Creates and saves the layouts for all given <paramref name="graphs"/>. This will 
@@ -229,7 +229,7 @@ namespace SEE.Animation.Internal
         /// </summary>
         /// <param name="graph">graph for which the layout is to be calculated</param>
         /// <returns>the node layout for all nodes in <paramref name="graph"/></returns>
-        private Dictionary<GameObject, NodeTransform> CalculateLayout(Graph graph)
+        private Dictionary<string, NodeTransform> CalculateLayout(Graph graph)
         {
             // The following code assumes that a leaf node remains a leaf across all
             // graphs of the graph series and an inner node remains an inner node.
@@ -260,7 +260,7 @@ namespace SEE.Animation.Internal
             }
 
             // Calculate and return the layout for the collected game objects.
-            return nodeLayout.Layout(gameObjects);
+            return ToLinkNameLayout(nodeLayout.Layout(gameObjects));
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to 
             // objectManager.GetNode() above. Yet, inner nodes are generally not scaled by
@@ -272,6 +272,24 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
+        /// Transform the given <paramref name="layout"/> such that instead of the game objects, 
+        /// the LinkName of the graph node attached to a game object is used as a key for
+        /// the dictionary.
+        /// </summary>
+        /// <param name="layout">layout indexed by game objects</param>
+        /// <returns>layout indexed by the LinkName of the node attached to the game objects</returns>
+        private static Dictionary<string, NodeTransform> ToLinkNameLayout(Dictionary<GameObject, NodeTransform> layout)
+        {
+            Dictionary<string, NodeTransform> result = new Dictionary<string, NodeTransform>();
+            foreach (var entry in layout)
+            {
+                NodeRef nodeRef = entry.Key.GetComponent<NodeRef>();
+                result[nodeRef.node.LinkName] = entry.Value;
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Retrieves the pre-computed stored layout for given <paramref name="graph"/>
         /// in output parameter <paramref name="layout"/> if one can be found. If a
         /// layout was actually found, true is returned; otherwise false.
@@ -279,7 +297,7 @@ namespace SEE.Animation.Internal
         /// <param name="graph">the graph for which to determine the layout</param>
         /// <param name="layout">the retrieved layout or null</param>
         /// <returns>true if a layout could be found</returns>
-        public bool TryGetLayout(Graph graph, out Dictionary<GameObject, NodeTransform> layout)
+        public bool TryGetLayout(Graph graph, out Dictionary<string, NodeTransform> layout)
         {
             return Layouts.TryGetValue(graph, out layout);
         }
@@ -298,10 +316,10 @@ namespace SEE.Animation.Internal
 
             if (IsStillAnimating)
             {
-                Debug.LogWarning("Graph changes are blocked while animations are running.");
+                Debug.LogWarning("Graph changes are blocked while animations are running.\n");
                 return;
             }
-            if (_currentCity != null)
+            //if (_currentCity != null)
             {
                 ClearGraphObjects(); // FIXME: Why do we need to clear the objects anyhow?
             }
@@ -320,7 +338,7 @@ namespace SEE.Animation.Internal
 
             if (IsStillAnimating)
             {
-                Debug.LogError("Graph changes are blocked while animations are running.");
+                Debug.LogError("Graph changes are blocked while animations are running.\n");
                 return;
             }
             RenderGraph(current, next);
@@ -339,7 +357,9 @@ namespace SEE.Animation.Internal
             if (current != null)
             {
                 // For all nodes of the current graph not in the next graph; that is, all
-                // nodes removed: remove those.
+                // nodes removed: remove those. Note: The comparison is based on the
+                // Linknames of the nodes because nodes between two graphs must be different
+                // even if they denote the "logically same" node.
                 current.Graph?
                     .Nodes().Except(next.Graph.Nodes(), nodeEqualityComparer).ToList()
                     .ForEach(node =>
@@ -355,7 +375,8 @@ namespace SEE.Animation.Internal
                     });
 
                 // For all edges of the current graph not in the next graph; that is, all
-                // edges removed: remove those.
+                // edges removed: remove those. As above, edges are compared by their
+                // linknames.
                 current.Graph?
                     .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
                     .ForEach(RenderRemovedOldEdge);
@@ -424,6 +445,7 @@ namespace SEE.Animation.Internal
         /// <param name="node">node to be displayed</param>
         protected virtual void RenderInnerNode(Node node)
         {
+            Debug.LogFormat("RenderInnerNode for node {0}\n", node.LinkName);
             // FIXME: The form of inner nodes depends upon the user's choice
             // and possibly the kind of layout.
 
@@ -472,35 +494,37 @@ namespace SEE.Animation.Internal
         /// <param name="node">leaf node to be rendered</param>
         protected virtual void RenderLeaf(Node node)
         {
+            Debug.LogFormat("RenderLeaf for node {0}\n", node.LinkName);
+            // FIXME isNewLeaf will always be true because we do not remove nodes from the objectManager
+            // cache anymore.
             bool isNewLeaf = !objectManager.GetLeaf(node, out GameObject leaf);
             if (leaf == null)
             {
                 Debug.LogErrorFormat("Leaf node {0} does not have an associated game object in the object manager.\n", node.LinkName);
                 return;
             }
-            NodeTransform nodeTransform;
-
+            
             try
             {
-                nodeTransform = NextLayoutToBeShown[node.LinkName];
+                NodeTransform nodeTransform = NextLayoutToBeShown[node.LinkName];
+                if (isNewLeaf)
+                {
+                    // if the leaf node is new, animate it by moving it out of the ground
+                    Debug.LogFormat("RenderLeaf: node {0} is a new leaf\n", node.LinkName);
+
+                    // FIXME: CScape buildings have a different notion of position than cubes.
+                    // We need to use graphRenderer.Apply().
+                    var newPosition = nodeTransform.position;
+                    newPosition.y = -nodeTransform.scale.y;
+                    leaf.transform.position = newPosition;
+                }
+                moveScaleShakeAnimator.AnimateTo(node, leaf, nodeTransform);
             } catch (Exception e)
             {
-                Debug.LogErrorFormat("Leaf node named {0} does not have a layout.\n", node.LinkName);
+                Debug.LogErrorFormat("Leaf node named {0} does not have a layout: {1}\n", node.LinkName, e);
                 DumpLayout(NextLayoutToBeShown);
                 return;
             }
-
-            if (isNewLeaf)
-            {
-                // if the leaf node is new, animate it by moving it out of the ground
-
-                // FIXME: CScape buildings have a different notion of position than cubes.
-                // We need to use graphRenderer.Apply().
-                var newPosition = nodeTransform.position;
-                newPosition.y = -nodeTransform.scale.y;
-                leaf.transform.position = newPosition;
-            }
-            moveScaleShakeAnimator.AnimateTo(node, leaf, nodeTransform.position, nodeTransform.scale);
         }
 
         private void DumpLayout(Dictionary<string, NodeTransform> layout)
@@ -512,11 +536,12 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Determines how an edge is displayed.
+        /// Rendes given <paramref name="edge"/>.
         /// </summary>
-        /// <param name="edge"></param>
+        /// <param name="edge">edge to be rendered</param>
         protected virtual void RenderEdge(Edge edge)
         {
+            Debug.LogFormat("RenderEdge for edge {0}\n", edge.LinkName);
         }
 
         /// <summary>
@@ -525,46 +550,56 @@ namespace SEE.Animation.Internal
         /// <param name="node">inner node to be removed</param>
         protected virtual void RenderRemovedOldInnerNode(Node node)
         {
+            Debug.LogFormat("RenderRemovedOldInnerNode for node {0}\n", node.LinkName);
             if (objectManager.TryGetNode(node, out GameObject gameObject))
             {
+                Debug.LogFormat("RenderRemovedOldInnerNode for node {0}: SINK ANIMATION\n", node.LinkName);
                 // if the node needs to be removed, let it sink into the ground
                 var nextPosition = gameObject.transform.position;
                 nextPosition.y = -2;
-                moveAnimator.AnimateTo(node, gameObject, nextPosition, gameObject.transform.localScale,
-                                   OnRemovedNodeFinishedAnimation);
+                NodeTransform nodeTransform = new NodeTransform(nextPosition, gameObject.transform.localScale);
+                moveAnimator.AnimateTo(node, gameObject, nodeTransform, OnRemovedNodeFinishedAnimation);
             }
         }
+
         /// <summary>
-        /// Removes the given leaf node. The removal is animating by sinking the
-        /// node. The node is not auto destroyed.
+        /// Removes the given leaf node. The removal is animated by sinking the
+        /// node. The node is not destroyed.
         /// </summary>
         /// <param name="node">leaf node to be removed</param>
         protected virtual void RenderRemovedOldLeaf(Node node)
         {
+            Debug.LogFormat("RenderRemovedOldLeaf for node {0}\n", node.LinkName);
             if (objectManager.TryGetNode(node, out GameObject leaf))
             {
+                Debug.LogFormat("RenderRemovedOldLeaf for node {0}: SINK ANIMATION\n", node.LinkName);
                 // if the node needs to be removed, let it sink into the ground
                 var newPosition = leaf.transform.position;
                 newPosition.y = -leaf.transform.localScale.y;
-
-                moveScaleShakeAnimator.AnimateTo(node, leaf, newPosition, leaf.transform.localScale, OnRemovedNodeFinishedAnimation);
+                NodeTransform nodeTransform = new NodeTransform(newPosition, leaf.transform.localScale);
+                moveScaleShakeAnimator.AnimateTo(node, leaf, nodeTransform, OnRemovedNodeFinishedAnimation);
             }
         }
 
         /// <summary>
-        /// Removes the given edge. The edge is not auto destroyed, however.
+        /// Removes the given edge. The edge is not destroyed, however.
         /// </summary>
         /// <param name="edge"></param>
         protected virtual void RenderRemovedOldEdge(Edge edge)
         {
+            Debug.LogFormat("RenderRemovedOldEdge for edge {0}\n", edge.LinkName);
         }
 
         /// <summary>
-        /// Clears all GameObjects created by the used ObjectManager
+        /// Clears all GameObjects created by the used ObjectManager.
         /// </summary>
         private void ClearGraphObjects()
         {
+            Debug.Log("ClearGraphObjects()");
             objectManager?.Clear();
+            // We do not want to remove all objects from the scene. There may be
+            // other objects not managed by this cityEvolution.
+            
             foreach (string tag in SEE.DataModel.Tags.All)
             {
                 foreach (GameObject o in GameObject.FindGameObjectsWithTag(tag))
@@ -572,17 +607,326 @@ namespace SEE.Animation.Internal
                     DestroyImmediate(o);
                 }
             }
+            
         }
 
         /// <summary>
-        /// Event function that destroys a given GameObject.
+        /// Event function that destroys the given <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject"></param>
+        /// <param name="gameObject">game object to be destroyed</param>
         public void OnRemovedNodeFinishedAnimation(object gameObject)
         {
             if (gameObject != null && gameObject is GameObject)
             {
                 Destroy((GameObject)gameObject);
+            }
+        }
+
+        // **********************************************************************
+
+        /// <summary>
+        /// The series of underlying graphs to be rendered.
+        /// </summary>
+        private List<Graph> graphs;
+
+        /// <summary>
+        /// The number of graphs of the graph series to be rendered.
+        /// </summary>
+        public int GraphCount => graphs.Count;
+
+        /// <summary>
+        /// The time in seconds for showing a single graph revision during auto-play animation.
+        /// </summary>
+        public float AnimationLag
+        {
+            get => AnimationDuration;
+            set
+            {
+                AnimationDuration = value;
+                ViewDataChangedEvent.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// The index of the currently visualized graph.
+        /// </summary>
+        private int currentGraphIndex = 0;
+
+        /// <summary>
+        /// Returns the index of the currently shown graph.
+        /// </summary>
+        public int CurrentGraphIndex
+        {
+            get => currentGraphIndex;
+            private set
+            {
+                currentGraphIndex = value;
+                ViewDataChangedEvent.Invoke();
+            }
+        }
+
+        private UnityEvent _viewDataChangedEvent = new UnityEvent();
+
+        /// <summary>
+        /// An event fired when the viewn data have changed. Returns
+        /// always the same UnityEvent instance.
+        /// </summary>
+        public UnityEvent ViewDataChangedEvent
+        {
+            get
+            {
+                if (_viewDataChangedEvent == null)
+                    _viewDataChangedEvent = new UnityEvent();
+                return _viewDataChangedEvent;
+            }
+        }
+
+        /// <summary>
+        /// Whether the user has selected auto-play mode.
+        /// </summary>
+        private bool _isAutoplay = false;
+
+        /// <summary>
+        /// Returns true if automatic animations are active.
+        /// </summary>
+        public bool IsAutoPlay
+        {
+            get => _isAutoplay;
+            private set
+            {
+                ViewDataChangedEvent.Invoke();
+                _isAutoplay = value;
+            }
+        }
+
+        internal void ShowGraphEvolution(List<Graph> graphs)
+        {
+            this.graphs = graphs;
+            graphRenderer.SetScaler(graphs);
+            CalculateAllGraphLayouts(graphs);
+
+            ViewDataChangedEvent.Invoke();
+
+            if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph))
+            {
+                DisplayGraphAsNew(loadedGraph);
+            }
+            else
+            {
+                Debug.LogError("Evolution renderer could not show the inital graph.\n");
+            }
+        }
+
+        /// <summary>
+        /// If animations are still ongoing, auto-play mode is turned on, or <paramref name="index"/> 
+        /// does not denote a valid index in the graph series, false is returned and nothing else
+        /// happens. Otherwise the graph with the given index in the graph series becomes the new
+        /// currently shown graph.
+        /// </summary>
+        /// <param name="index">index of the graph to be shown in the graph series</param>
+        /// <returns>true if that graph could be shown successfully</returns>
+        public bool TryShowSpecificGraph(int index)
+        {
+            if (IsStillAnimating)
+            {
+                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.\n");
+                return false;
+            }
+            if (IsAutoPlay)
+            {
+                Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.\n");
+                return false;
+            }
+            if (index < 0 || index >= GraphCount)
+            {
+                Debug.Log("value is no valid index.");
+                return false;
+            }
+            CurrentGraphIndex = index;
+
+            if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph))
+            {
+                DisplayGraphAsNew(loadedGraph);
+                return true;
+            }
+            else
+            {
+                Debug.LogError("Could not create LoadedGraph to render.\n");
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns true and a LoadedGraph if there is a LoadedGraph for the active graph index
+        /// CurrentGraphIndex.
+        /// </summary>
+        /// <param name="loadedGraph"></param>
+        /// <returns>true if there is graph to be visualized (index _openGraphIndex)</returns>
+        private bool HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph)
+        {
+            return HasLaidOutGraph(CurrentGraphIndex, out loadedGraph);
+        }
+
+        /// <summary>
+        /// Returns true and a LaidOutGraph if there is a LaidOutGraph for the given graph index.
+        /// </summary>
+        /// <param name="index">index of the requested graph</param>
+        /// <param name="laidOutGraph">the resulting graph with given index; defined only if this method returns true</param>
+        /// <returns>true iff there is a graph at the given index</returns>
+        private bool HasLaidOutGraph(int index, out LaidOutGraph laidOutGraph)
+        {
+            laidOutGraph = null;
+            var graph = graphs[index];
+            if (graph == null)
+            {
+                Debug.LogError("There ist no graph available at index " + index);
+                return false;
+            }
+            var hasLayout = TryGetLayout(graph, out Dictionary<string, NodeTransform> layout);
+            if (layout == null || !hasLayout)
+            {
+                Debug.LogError("There ist no layout available at index " + index);
+                return false;
+            }
+            laidOutGraph = new LaidOutGraph(graph, layout);
+            return true;
+        }
+
+        /// <summary>
+        /// If animation is still ongoing, auto-play mode is turned on, or we are at 
+        /// the end of the graph series, nothing happens.
+        /// Otherwise we make the transition from the currently shown graph to its 
+        /// direct successor graph in the graph series.
+        /// </summary>
+        public void ShowNextGraph()
+        {
+            if (IsStillAnimating)
+            {
+                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.\n");
+                return;
+            }
+            if (IsAutoPlay)
+            {
+                Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.\n");
+                return;
+            }
+            if (!ShowNextIfPossible())
+            {
+                Debug.Log("This is already the last graph revision.\n");
+                return;
+            }
+        }
+
+        /// <summary>
+        /// If we are at the end of the graph series, false is returned and nothing else happens.
+        /// Otherwise we make the transition from the currently shown graph to its 
+        /// direct successor graph in the graph series. CurrentGraphIndex is increased
+        /// by one accordingly.
+        /// </summary>
+        /// <returns>true iff we are not at the end of the graph series</returns>
+        private bool ShowNextIfPossible()
+        {
+            if (currentGraphIndex == graphs.Count - 1)
+            {
+                return false;
+            }
+            CurrentGraphIndex++;
+
+            Debug.LogFormat("ShowNextIfPossible: CurrentGraphIndex={0}\n", CurrentGraphIndex);
+
+            if (HasCurrentLaidOutGraph(out LaidOutGraph newlyShownGraph) &&
+                HasLaidOutGraph(CurrentGraphIndex - 1, out LaidOutGraph currentlyShownGraph))
+            {
+                // Note: newlyShownGraph is the very next future of currentlyShownGraph
+                TransitionToNextGraph(currentlyShownGraph, newlyShownGraph);
+            }
+            else
+            {
+                Debug.LogError("Could not create LoadedGraph to render.\n");
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// If we are at the begin of the graph series, nothing happens.
+        /// Otherwise we make the transition from the currently shown graph to its 
+        /// direct predecessor graph in the graph series. CurrentGraphIndex is decreased
+        /// by one accordingly.
+        /// </summary>
+        public void ShowPreviousGraph()
+        {
+            if (IsStillAnimating || IsAutoPlay)
+            {
+                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.\n");
+                return;
+            }
+            if (CurrentGraphIndex == 0)
+            {
+                Debug.Log("This is already the first graph revision.\n");
+                return;
+            }
+            CurrentGraphIndex--;
+
+            Debug.LogFormat("ShowPreviousGraph: CurrentGraphIndex={0}\n", CurrentGraphIndex);
+
+            if (HasCurrentLaidOutGraph(out LaidOutGraph newlyShownGraph) &&
+                HasLaidOutGraph(CurrentGraphIndex + 1, out LaidOutGraph currentlyShownGraph))
+            {
+                // Note: newlyShownGraph is the most recent past of currentlyShownGraph
+                TransitionToNextGraph(currentlyShownGraph, newlyShownGraph);
+            }
+            else
+            {
+                Debug.LogError("Could not create LaidOutGraph to render.\n");
+            }
+        }
+
+        /// <summary>
+        /// Toggles the auto-play mode. Equivalent to: SetAutoPlay(!IsAutoPlay)
+        /// where IsAutoPlay denotes the current state of the auto-play mode.
+        /// </summary>
+        internal void ToggleAutoPlay()
+        {
+            SetAutoPlay(!IsAutoPlay);
+        }
+
+        /// <summary>
+        /// Sets auto-play mode to <paramref name="enabled"/>. If <paramref name="enabled"/>
+        /// is true, the next graph in the series is shown and from there all other 
+        /// following graphs until we reach the end of the graph series or auto-play
+        /// mode is turned off again. If <paramref name="enabled"/> is false instead,
+        /// the currently shown graph remains visible.
+        /// </summary>
+        /// <param name="enabled"></param>
+        internal void SetAutoPlay(bool enabled)
+        {
+            IsAutoPlay = enabled;
+            if (IsAutoPlay)
+            {
+                AnimationFinishedEvent.AddListener(OnAutoPlayCanContinue);
+                if (!ShowNextIfPossible())
+                {
+                    Debug.Log("This is already the last graph revision.\n");
+                }
+            }
+            else
+            {
+                AnimationFinishedEvent.RemoveListener(OnAutoPlayCanContinue);
+            }
+            ViewDataChangedEvent.Invoke();
+        }
+
+        /// <summary>
+        /// If we at the end of the graph series, nothing happens.
+        /// Otherwise we make the transition from the currently shown graph to its next
+        /// direct successor graph in the graph series. CurrentGraphIndex is increased
+        /// by one accordingly and auto-play mode is toggled (switched off actually).
+        /// </summary>
+        private void OnAutoPlayCanContinue()
+        {
+            if (!ShowNextIfPossible())
+            {
+                ToggleAutoPlay();
             }
         }
     }

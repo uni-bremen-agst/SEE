@@ -17,10 +17,10 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.Animation.Internal;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using SEE.Animation.Internal;
 
 namespace SEE.Animation
 {
@@ -62,16 +62,28 @@ namespace SEE.Animation
         private RevisionSelectionDataModel revisionSelectionDataModel;
 
         /// <summary>
-        /// The SEECityEvolution containing all necessary components for controlling the animations.
+        /// The evolution renderer doing the rendering and animations of the graphs.
         /// </summary>
-        public SEECityEvolution CityEvolution;
+        private EvolutionRenderer evolutionRenderer;
+
+        /// <summary>
+        /// The evolution renderer doing the rendering and animations of the graphs.
+        /// </summary>
+        public EvolutionRenderer EvolutionRenderer
+        {
+            set
+            {
+                evolutionRenderer = value;
+                Init();
+            }
+        }
 
         /// <summary>
         /// Returns true if RevisionSelectionCanvas is currently shown.
         /// </summary>
         public bool IsRevisionSelectionOpen => !FlyCamera.IsEnabled;
 
-        void Start()
+        private void Init()
         {
             revisionSelectionDataModel = RevisionSelectionCanvas.GetComponent<RevisionSelectionDataModel>();
             animationDataModel = AnimationCanvas.GetComponent<AnimationDataModel>();
@@ -84,7 +96,7 @@ namespace SEE.Animation
 
             SetMode(true);
             OnViewDataChanged();
-            CityEvolution.ViewDataChangedEvent.AddListener(OnViewDataChanged);
+            evolutionRenderer.ViewDataChangedEvent.AddListener(OnViewDataChanged);
         }
 
         /// <summary>
@@ -101,15 +113,15 @@ namespace SEE.Animation
             {
                 if (Input.GetKeyDown("k"))
                 {
-                    CityEvolution.ShowPreviousGraph();
+                    evolutionRenderer.ShowPreviousGraph();
                 }
                 else if (Input.GetKeyDown("l"))
                 {
-                    CityEvolution.ShowNextGraph();
+                    evolutionRenderer.ShowNextGraph();
                 }
                 else if (Input.GetKeyDown(KeyCode.Tab))
                 {
-                    CityEvolution.ToggleAutoPlay();
+                    evolutionRenderer.ToggleAutoPlay();
                 }
 
                 string[] animationTimeKeys = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
@@ -118,7 +130,7 @@ namespace SEE.Animation
                 {
                     if (Input.GetKeyDown(animationTimeKeys[i]))
                     {
-                        CityEvolution.AnimationLag = animationTimeValues[i];
+                        evolutionRenderer.AnimationLag = animationTimeValues[i];
                     }
                 }
             }
@@ -165,18 +177,18 @@ namespace SEE.Animation
             FlyCamera.IsEnabled = !enabled;
             AnimationCanvas.SetActive(!enabled);
             RevisionSelectionCanvas.SetActive(enabled);
-            CityEvolution.SetAutoPlay(false);
+            evolutionRenderer.SetAutoPlay(false);
             if (enabled)
             {
                 // if revision-selection mode is enabled, we re-fill the drop-down
                 // selection menu with all available graph indices.
                 revisionSelectionDataModel.RevisionDropdown.ClearOptions();
                 var options = Enumerable
-                    .Range(1, CityEvolution.GraphCount)
+                    .Range(1, evolutionRenderer.GraphCount)
                     .Select(i => new Dropdown.OptionData(i.ToString()))
                     .ToList();
                 revisionSelectionDataModel.RevisionDropdown.AddOptions(options);
-                revisionSelectionDataModel.RevisionDropdown.value = CityEvolution.CurrentGraphIndex;
+                revisionSelectionDataModel.RevisionDropdown.value = evolutionRenderer.CurrentGraphIndex;
             }
         }
 
@@ -188,9 +200,9 @@ namespace SEE.Animation
         /// </summary>
         private void OnViewDataChanged()
         {
-            animationDataModel.RevisionNumberText.text = (CityEvolution.CurrentGraphIndex + 1) + " / " + CityEvolution.GraphCount;
-            animationDataModel.AutoplayToggle.isOn = CityEvolution.IsAutoPlay;
-            animationDataModel.AnimationLagText.text = "Revision animation lag: " + CityEvolution.AnimationLag + "s";
+            animationDataModel.RevisionNumberText.text = (evolutionRenderer.CurrentGraphIndex + 1) + " / " + evolutionRenderer.GraphCount;
+            animationDataModel.AutoplayToggle.isOn = evolutionRenderer.IsAutoPlay;
+            animationDataModel.AnimationLagText.text = "Revision animation lag: " + evolutionRenderer.AnimationLag + "s";
         }
 
         /// <summary>
@@ -201,9 +213,9 @@ namespace SEE.Animation
         /// <param name="value">the revision index selected from the drop-down box</param>
         private void OnDropDownChanged(int value)
         {
-            if (value != CityEvolution.CurrentGraphIndex)
+            if (value != evolutionRenderer.CurrentGraphIndex)
             {
-                CityEvolution.TryShowSpecificGraph(value);
+                evolutionRenderer.TryShowSpecificGraph(value);
             }
         }
     }
