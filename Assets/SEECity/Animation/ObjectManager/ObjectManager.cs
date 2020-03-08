@@ -226,7 +226,7 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Removes a the game object representing the given <paramref name="node"/> by using the LinkName 
+        /// Removes the game object representing the given <paramref name="node"/> by using the LinkName 
         /// of the <paramref name="node"/> and returns the removed node in <paramref name="gameObject"/>, if 
         /// it existed. Returns true if such a game object existed in the cache.
         /// </summary>
@@ -240,6 +240,20 @@ namespace SEE.Animation.Internal
             var wasNodeRemoved = nodes.TryGetValue(node.LinkName, out gameObject);
             nodes.Remove(node.LinkName);
             return wasNodeRemoved;
+        }
+
+        /// <summary>
+        /// Retrieves the game object representing the given <paramref name="node"/> by using the LinkName 
+        /// of the <paramref name="node"/> if it exists. Returns true if such a game object exists in the cache;
+        /// otherwise false is returned and <paramref name="gameObject"/> is null.
+        /// </summary>
+        /// <param name="node">node determining the game object to be retrieved from the cache</param>
+        /// <param name="gameObject">the corresponding game object or null</param>
+        /// <returns>true if a corresponding game object exists</returns>
+        public bool TryGetNode(Node node, out GameObject gameObject)
+        {
+            node.AssertNotNull("node");
+            return nodes.TryGetValue(node.LinkName, out gameObject);
         }
 
         /// <summary>
