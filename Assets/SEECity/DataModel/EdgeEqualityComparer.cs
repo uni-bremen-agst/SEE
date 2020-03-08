@@ -28,12 +28,12 @@ namespace SEE.DataModel
     {
         public bool Equals(Edge x, Edge y)
         {
-            return x.LinkName().Equals(y.LinkName());
+            return x.LinkName.Equals(y.LinkName);
         }
 
         public int GetHashCode(Edge obj)
         {
-            return obj.LinkName().GetHashCode();
+            return obj.LinkName.GetHashCode();
         }
     }
 }
