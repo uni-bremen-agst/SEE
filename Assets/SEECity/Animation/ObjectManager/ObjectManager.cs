@@ -252,8 +252,11 @@ namespace SEE.Animation.Internal
         /// <returns>true if a corresponding game object exists</returns>
         public bool TryGetNode(Node node, out GameObject gameObject)
         {
+            return RemoveNode(node, out gameObject); // FIXME: Temporarily we remove the node.
+            /*
             node.AssertNotNull("node");
             return nodes.TryGetValue(node.LinkName, out gameObject);
+            */
         }
 
         /// <summary>
