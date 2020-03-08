@@ -20,6 +20,7 @@
 using SEE.DataModel;
 using UnityEngine;
 using SEE.Animation.Internal;
+using SEE.Layout;
 
 namespace SEE.Animation
 {
@@ -33,13 +34,18 @@ namespace SEE.Animation
         /// See <see cref="AbstractAnimator.AnimateToInternalWithCallback(Node, GameObject, Vector3, Vector3, GameObject, string)"/>.
         /// Moves, scales, and shakes the animated game object.
         /// </summary>
-        protected override void AnimateToInternalWithCallback(Node node, GameObject gameObject, Vector3 position, Vector3 scale, GameObject callBackTarget, string callbackName)
+        /// <param name="node">Node of the given GameObject</param>
+        /// <param name="gameObject">GameObject to animate</param>
+        /// <param name="nodeTransform">the node transformation to be applied</param>
+        /// <param name="callback">An optional callback</param>
+        /// <param name="callbackName">name of the callback</param>
+        protected override void AnimateToInternalWithCallback(Node node, GameObject gameObject, NodeTransform nodeTransform, GameObject callBackTarget, string callbackName)
         {
             // Move the object.
             if (callBackTarget != null)
             {
                 iTween.MoveTo(gameObject, iTween.Hash(
-                    "position", position,
+                    "position", nodeTransform.position,
                     "time", MaxAnimationTime,
                     "oncompletetarget", callBackTarget,
                     "oncomplete", callbackName,
@@ -48,11 +54,11 @@ namespace SEE.Animation
             }
             else
             {
-                iTween.MoveTo(gameObject, iTween.Hash("position", position, "time", MaxAnimationTime));
+                iTween.MoveTo(gameObject, iTween.Hash("position", nodeTransform.position, "time", MaxAnimationTime));
             }
             // Scale the object.
             iTween.ScaleTo(gameObject, iTween.Hash(
-                "scale", scale,
+                "scale", nodeTransform.scale,
                 "time", MaxAnimationTime
             ));
             // Shake the object.
