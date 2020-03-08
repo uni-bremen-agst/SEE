@@ -17,6 +17,7 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System.Runtime.CompilerServices;
 using SEE.DataModel;
 using SEE.Layout;
 using System;
@@ -67,7 +68,7 @@ namespace SEE.Animation.Internal
         /// depends upon the graphRenderer, which in turn depends upon the city, which is set by 
         /// this setter.
         /// </summary>
-        private AbstractObjectManager objectManager;
+        private ObjectManager objectManager;
 
         /// <summary>
         /// The city evolution to be drawn by this renderer.
@@ -84,14 +85,15 @@ namespace SEE.Animation.Internal
                 // assign a new city, we also need a new graph renderer for that city.
                 // So in fact this is the perfect place to assign graphRenderer.
                 graphRenderer = new GraphRenderer(cityEvolution);
+                graphRenderer.SetScaler(cityEvolution.Graphs);
                 objectManager = new ObjectManager(graphRenderer);
             }
         }
 
         /// <summary>
-        /// Shortest time period in which an animation can be run.
+        /// Shortest time period in which an animation can be run in seconds.
         /// </summary>
-        private float MinimalWaitTimeForNextRevision = 0.1f;
+        private readonly float MinimalWaitTimeForNextRevision = 0.1f;
 
         /// <summary>
         /// An event fired upon the start of an animation.
@@ -133,19 +135,19 @@ namespace SEE.Animation.Internal
         /// <summary>
         /// The duration of an animation. This value can be controlled by the user.
         /// </summary>
-        private float _animationTime = AbstractAnimator.DefaultAnimationTime;
+        private float _animationDuration = AbstractAnimator.DefaultAnimationTime;
 
         /// <summary>
         /// The duration of an animation.
         /// </summary>
-        public float AnimationTime
+        public float AnimationDuration
         {
-            get => _animationTime;
+            get => _animationDuration;
             set
             {
                 if (value >= 0)
                 {
-                    _animationTime = value;
+                    _animationDuration = value;
                     animators.ForEach(animator =>
                     {
                         animator.MaxAnimationTime = value;
@@ -164,9 +166,10 @@ namespace SEE.Animation.Internal
         /// </summary>
         protected Graph CurrentGraphShown => _currentCity?.Graph;
         /// <summary>
-        /// The layout of the city currently shown.
+        /// The layout of the city currently shown. The layout is a mapping of the graph
+        /// nodes' LinkName onto their NodeTransforms.
         /// </summary>
-        protected Dictionary<GameObject, NodeTransform> CurrentLayoutShown => _currentCity?.Layout;
+        protected Dictionary<string, NodeTransform> CurrentLayoutShown => _currentCity?.Layout;
 
         /// <summary>
         /// The city (graph + layout) to be shown next.
@@ -181,17 +184,18 @@ namespace SEE.Animation.Internal
         /// </summary>
         protected Graph NextGraphToBeShown => _nextCity?.Graph;
         /// <summary>
-        /// The layout of _nextGraph.
+        /// The layout of _nextGraph. The layout is a mapping of the graph
+        /// nodes' LinkName onto their NodeTransforms.
         /// </summary>
-        protected Dictionary<GameObject, NodeTransform> NextLayoutToBeShown => _nextCity?.Layout;
+        protected Dictionary<string, NodeTransform> NextLayoutToBeShown => _nextCity?.Layout;
 
         /// <summary>
-        /// Allows the comparison of two instances of <see cref="Node"/>.
+        /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
         /// </summary>
         private readonly NodeEqualityComparer nodeEqualityComparer = new NodeEqualityComparer();
 
         /// <summary>
-        /// Allows the comparison of two instances of <see cref="Edge"/>.
+        /// Allows the comparison of two instances of <see cref="Edge"/> from different graphs.
         /// </summary>
         private readonly EdgeEqualityComparer edgeEqualityComparer = new EdgeEqualityComparer();
 
@@ -209,7 +213,7 @@ namespace SEE.Animation.Internal
         public void CalculateAllGraphLayouts(List<Graph> graphs)
         {
             // Determine the layouts of all loaded graphs upfront.
-            var p = Performance.Begin("Layouting all graphs");
+            var p = Performance.Begin("Layouting all " + graphs.Count + " graphs");
             graphs.ForEach(graph =>
             {
                 Layouts[graph] = CalculateLayout(graph);
@@ -268,35 +272,40 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Displays the given graph instantly if all animations are finished; that is,
-        /// no animation are run. The graph is drawn from scratch.
-        /// </summary>
-        /// <param name="graph">graph to be drawn initially</param>
-        public void DisplayInitialGraph(LaidOutGraph graph)
-        {
-            graph.AssertNotNull("loadedGraph");
-
-            if (IsStillAnimating)
-            {
-                Debug.LogWarning("Graph changes are blocked while animations are running.");
-                return;
-            }
-            _currentCity = graph;
-            _nextCity = graph; // FIXME: Not needed?
-            RenderGraph(true);
-        }
-
-        /// <summary>
         /// Retrieves the pre-computed stored layout for given <paramref name="graph"/>
         /// in output parameter <paramref name="layout"/> if one can be found. If a
         /// layout was actually found, true is returned; otherwise false.
         /// </summary>
         /// <param name="graph">the graph for which to determine the layout</param>
         /// <param name="layout">the retrieved layout or null</param>
-        /// <returns></returns>
+        /// <returns>true if a layout could be found</returns>
         public bool TryGetLayout(Graph graph, out Dictionary<GameObject, NodeTransform> layout)
         {
             return Layouts.TryGetValue(graph, out layout);
+        }
+
+        /// <summary>
+        /// Displays the given graph instantly if all animations are finished. This is
+        /// called when we jump directly to a specific graph in the graph series: when
+        /// we start the visualization of the graph evolution initially and when the user
+        /// selects a specific graph revision.
+        /// The graph is drawn from scratch.
+        /// </summary>
+        /// <param name="graph">graph to be drawn initially</param>
+        public void DisplayGraphAsNew(LaidOutGraph graph)
+        {
+            graph.AssertNotNull("graph");
+
+            if (IsStillAnimating)
+            {
+                Debug.LogWarning("Graph changes are blocked while animations are running.");
+                return;
+            }
+            if (_currentCity != null)
+            {
+                ClearGraphObjects(); // FIXME: Why do we need to clear the objects anyhow?
+            }
+            RenderGraph(_currentCity, graph);
         }
 
         /// <summary>
@@ -311,36 +320,28 @@ namespace SEE.Animation.Internal
 
             if (IsStillAnimating)
             {
-                Debug.LogError("Graph changes are not allowed while animations are running.");
+                Debug.LogError("Graph changes are blocked while animations are running.");
                 return;
             }
-
-            _currentCity = current;
-            _nextCity = next;
-            RenderGraph(false);
+            RenderGraph(current, next);
         }
 
         /// <summary>
-        /// Renders the animation from CurrentGraphShown to NextGraphToBeShown if <paramref name="asNew"/>
-        /// is false; otherwise the graph is drawn from scratch.
+        /// Renders the animation from CurrentGraphShown to NextGraphToBeShown.
         /// </summary>
-        /// <param name="asNew">if true, graph is drawn from scratch; otherwise the differences
-        /// from CurrentGraphShown to NextGraphToBeShown are animated</param>
-        private void RenderGraph(bool asNew)
+        /// <param name="current">the graph currently shown that is to be migrated into the next graph; may be null</param>
+        /// <param name="next">the new graph to be shown, in which to migrate the current graph; must not be null</param>
+        private void RenderGraph(LaidOutGraph current, LaidOutGraph next)
         {
-            if (asNew)
+            next.AssertNotNull("next");
+            IsStillAnimating = true;
+            AnimationStartedEvent.Invoke();
+            if (current != null)
             {
-                ClearGraphObjects();
-                graphRenderer.Apply(Layouts[CurrentGraphShown], cityEvolution.origin);
-            }
-            else
-            {
-                IsStillAnimating = true;
-                AnimationStartedEvent.Invoke();
                 // For all nodes of the current graph not in the next graph; that is, all
                 // nodes removed: remove those.
-                CurrentGraphShown?
-                    .Nodes().Except(NextGraphToBeShown.Nodes(), nodeEqualityComparer).ToList()
+                current.Graph?
+                    .Nodes().Except(next.Graph.Nodes(), nodeEqualityComparer).ToList()
                     .ForEach(node =>
                     {
                         if (node.IsLeaf())
@@ -355,16 +356,20 @@ namespace SEE.Animation.Internal
 
                 // For all edges of the current graph not in the next graph; that is, all
                 // edges removed: remove those.
-                CurrentGraphShown?
-                    .Edges().Except(NextGraphToBeShown.Edges(), edgeEqualityComparer).ToList()
+                current.Graph?
+                    .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
                     .ForEach(RenderRemovedOldEdge);
-
-                // Draw all nodes of NextGraphToBeShown.
-                NextGraphToBeShown.Traverse(RenderPlane, RenderInnerNode, RenderLeaf);
-                // Draw all edges of NextGraphToBeShown.
-                NextGraphToBeShown.Edges().ForEach(RenderEdge);
-                Invoke("OnAnimationsFinished", Math.Max(AnimationTime, MinimalWaitTimeForNextRevision));
             }
+            // We need to assign _nextCity because the callback RenderPlane, RenderInnerNode, RenderLeaf, and 
+            // RenderEdge will access it.
+            _nextCity = next;
+            // Draw all nodes of next graph.
+            next.Graph.Traverse(RenderPlane, RenderInnerNode, RenderLeaf);
+            // Draw all edges of next graph.
+            next.Graph.Edges().ForEach(RenderEdge);
+            // We have made the transition to the next graph.
+            _currentCity = next;
+            Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
 
         /// <summary>
@@ -394,9 +399,7 @@ namespace SEE.Animation.Internal
         /// <param name="node">the node to be displayed</param>
         protected virtual void RenderPlane(Node node)
         {
-            // FIXME: The root node is either a leaf or inner node.
-            // GraphRenderer.NewPlane(),
-
+            Debug.LogWarning("EvolutionRenderer.RenderPlane(Node) not implemented yet.\n");
             // FIXME. Code must be adjusted. Planes are not part of the layout.
             /*
             var isPlaneNew = !objectManager.GetPlane(out GameObject plane);
@@ -427,6 +430,7 @@ namespace SEE.Animation.Internal
             // Currently, we have the following kinds of InnerNodeKinds:
             // Blocks, Rectangles, Donuts, Circles, Empty, Cylinders.
 
+            /*
             var isCircleNew = !objectManager.GetInnerNode(node, out GameObject circle);
             var nodeTransform = NextLayoutToBeShown[circle];
 
@@ -459,6 +463,7 @@ namespace SEE.Animation.Internal
             {
                 moveScaleShakeAnimator.AnimateTo(node, circle, circlePosition, circleRadius);
             }
+            */
         }
 
         /// <summary>
@@ -467,19 +472,43 @@ namespace SEE.Animation.Internal
         /// <param name="node">leaf node to be rendered</param>
         protected virtual void RenderLeaf(Node node)
         {
-            var isLeafNew = !objectManager.GetLeaf(node, out GameObject leaf);
-            var nodeTransform = NextLayoutToBeShown[leaf];
+            bool isNewLeaf = !objectManager.GetLeaf(node, out GameObject leaf);
+            if (leaf == null)
+            {
+                Debug.LogErrorFormat("Leaf node {0} does not have an associated game object in the object manager.\n", node.LinkName);
+                return;
+            }
+            NodeTransform nodeTransform;
 
-            if (isLeafNew)
+            try
+            {
+                nodeTransform = NextLayoutToBeShown[node.LinkName];
+            } catch (Exception e)
+            {
+                Debug.LogErrorFormat("Leaf node named {0} does not have a layout.\n", node.LinkName);
+                DumpLayout(NextLayoutToBeShown);
+                return;
+            }
+
+            if (isNewLeaf)
             {
                 // if the leaf node is new, animate it by moving it out of the ground
 
                 // FIXME: CScape buildings have a different notion of position than cubes.
+                // We need to use graphRenderer.Apply().
                 var newPosition = nodeTransform.position;
                 newPosition.y = -nodeTransform.scale.y;
                 leaf.transform.position = newPosition;
             }
             moveScaleShakeAnimator.AnimateTo(node, leaf, nodeTransform.position, nodeTransform.scale);
+        }
+
+        private void DumpLayout(Dictionary<string, NodeTransform> layout)
+        {
+            foreach (var entry in layout)
+            {
+                Debug.LogFormat("layout of node named {0}: {1}.\n", entry.Key, entry.Value);
+            }
         }
 
         /// <summary>
@@ -496,7 +525,7 @@ namespace SEE.Animation.Internal
         /// <param name="node">inner node to be removed</param>
         protected virtual void RenderRemovedOldInnerNode(Node node)
         {
-            if (objectManager.RemoveNode(node, out GameObject gameObject))
+            if (objectManager.TryGetNode(node, out GameObject gameObject))
             {
                 // if the node needs to be removed, let it sink into the ground
                 var nextPosition = gameObject.transform.position;
@@ -512,7 +541,7 @@ namespace SEE.Animation.Internal
         /// <param name="node">leaf node to be removed</param>
         protected virtual void RenderRemovedOldLeaf(Node node)
         {
-            if (objectManager.RemoveNode(node, out GameObject leaf))
+            if (objectManager.TryGetNode(node, out GameObject leaf))
             {
                 // if the node needs to be removed, let it sink into the ground
                 var newPosition = leaf.transform.position;
