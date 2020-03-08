@@ -71,52 +71,12 @@ namespace SEE.Animation
         /// <returns></returns>
         protected EvolutionRenderer CreateEvolutionRenderer()
         {
+            // FIXME: Do we really need to attach the evolution renderer as a component to
+            // the game object? That was likely done because EvolutionRenderer derives from
+            // MonoBehaviour and MonoBehaviours cannot be created by the new operator.
             EvolutionRenderer result = gameObject.AddComponent<EvolutionRenderer>();
             result.CityEvolution = this;
             return result;
-        }
-
-        /// <summary>
-        /// Returns the list of visualized node metrics to be scaled.
-        /// </summary>
-        /// <returns>list of visualized node metrics to be scaled</returns>
-        protected List<string> MetricsToBeScaled()
-        {
-            // We are first using a set because the user could have decided to use
-            // the same node attribute more than once for one of these visual attributes.
-            HashSet<string> nodeMetrics = new HashSet<string>() { this.WidthMetric, this.HeightMetric, this.DepthMetric, this.ColorMetric };
-            nodeMetrics.UnionWith(this.AllLeafIssues());
-            nodeMetrics.UnionWith(this.AllInnerNodeIssues());
-            nodeMetrics.Add(this.InnerDonutMetric);
-            return new List<string>(nodeMetrics);
-        }
-
-        /// <summary>
-        /// Factory method to create the used IScale implementation.
-        /// </summary>
-        /// <param name="graphs"></param>
-        /// <param name="nodeMetrics"></param>
-        /// <returns></returns>
-        protected IScale CreateScaler(List<Graph> graphs, List<string> nodeMetrics)
-        {
-            // TODO: Use the setting of attribute ZScoreScale.
-            return new LinearMultiScale(graphs, this.MinimalBlockLength, this.MaximalBlockLength, nodeMetrics);
-        }
-
-        /// <summary>
-        /// Factory method to create the used NodeLaoyout.
-        /// </summary>
-        /// <param name="nodeFactory"></param>
-        /// <returns></returns>
-        protected NodeLayout CreateLayout(NodeFactory nodeFactory)
-        {
-            // TODO: Use the setting of attribute NodeLayout
-            // TODO: Make the layouts incremental, so that we can add and
-            // remove single nodes and modify their dimensions.
-
-            return new EvoStreetsNodeLayout(0, nodeFactory);
-            //return new TreemapLayout(0, nodeFactory, 1000, 1000);
-            //return new BalloonNodeLayout(0, nodeFactory);
         }
 
         public EvolutionRenderer Renderer
@@ -129,12 +89,21 @@ namespace SEE.Animation
             }
         }
 
+        /// <summary>
+        /// The graph loader used to load all graphs of this graph series. It is
+        /// kept because it holds all graphs that we need to retrieve during the
+        /// visualization.
+        /// </summary>
         private GraphsReader GraphLoader { get; } = new GraphsReader();
 
-        private IScale Scaler { get; set; }
+        /// <summary>
+        /// The series of underlying graphs of this evolving city.
+        /// </summary>
+        public List<Graph> Graphs => GraphLoader.graphs;
 
-        private List<Graph> Graphs => GraphLoader.graphs;
-
+        /// <summary>
+        /// The number of loaded graphs of the graph series.
+        /// </summary>
         public int GraphCount => Graphs.Count;
 
         /// <summary>
@@ -144,10 +113,10 @@ namespace SEE.Animation
         /// </summary>
         public float AnimationLag
         {
-            get => Renderer.AnimationTime;
+            get => Renderer.AnimationDuration;
             set
             {
-                Renderer.AnimationTime = value;
+                Renderer.AnimationDuration = value;
                 ViewDataChangedEvent.Invoke();
             }
         }
@@ -165,6 +134,10 @@ namespace SEE.Animation
             }
         }
 
+        /// <summary>
+        /// An event fired when the viewn data have changed. Returns
+        /// always the same UnityEvent instance.
+        /// </summary>
         public UnityEvent ViewDataChangedEvent
         {
             get
@@ -203,12 +176,13 @@ namespace SEE.Animation
             GraphLoader.Load(this.PathPrefix, this.HierarchicalEdges, maxRevisionsToLoad);
 
             // TODO: The CSV metric files should be loaded, too.
-
-            // TODO: Extend IScale so that it can handle a list of graphs instead of just one.
-            // Create the scaling of all visualized metrics.
-            Scaler = CreateScaler(Graphs, MetricsToBeScaled());
         }
 
+        /// <summary>
+        /// Called by Unity when this SEECityEvolution instances comes into existence 
+        /// and can enter the game for the first time. Loads all graphs, calculates their
+        /// layouts, and displays the first graph in the graph series.
+        /// </summary>
         void Start()
         {
             Renderer.AssertNotNull("renderer");
@@ -219,10 +193,9 @@ namespace SEE.Animation
 
             Renderer.CalculateAllGraphLayouts(Graphs);
 
-            // 
             if (HasLaidOutGraph(out LaidOutGraph loadedGraph))
             {
-                Renderer.DisplayInitialGraph(loadedGraph);
+                Renderer.DisplayGraphAsNew(loadedGraph);
             }
             else
             {
@@ -230,24 +203,36 @@ namespace SEE.Animation
             }
         }
 
-        public bool TryShowSpecificGraph(int value)
+        /// <summary>
+        /// If animations are still ongoing, auto-play mode is turned on, or <paramref name="index"/> 
+        /// does not denote a valid index in the graph series, false is returned and nothing else
+        /// happens. Otherwise the graph with the given index in the graph series becomes the new
+        /// currently shown graph.
+        /// </summary>
+        /// <param name="index">index of the graph to be shown in the graph series</param>
+        /// <returns>true if that graph could be shown successfully</returns>
+        public bool TryShowSpecificGraph(int index)
         {
-            if (Renderer.IsStillAnimating || IsAutoPlay)
+            if (Renderer.IsStillAnimating)
             {
                 Debug.Log("The renderer is already occupied with animating, wait till animations are finished.");
                 return false;
             }
-
-            if (value < 0 || value >= GraphCount)
+            if (IsAutoPlay)
+            {
+                Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.");
+                return false;
+            }
+            if (index < 0 || index >= GraphCount)
             {
                 Debug.Log("value is no valid index.");
                 return false;
             }
-            CurrentGraphIndex = value;
+            CurrentGraphIndex = index;
 
             if (HasLaidOutGraph(out LaidOutGraph loadedGraph))
             {
-                Renderer.DisplayInitialGraph(loadedGraph);
+                Renderer.DisplayGraphAsNew(loadedGraph);
                 return true;
             }
             else
@@ -255,52 +240,6 @@ namespace SEE.Animation
                 Debug.LogError("Could not create LoadedGraph to render.");
             }
             return false;
-        }
-
-        /// <summary>
-        /// TODO: doc
-        /// </summary>
-        public void ShowNextGraph()
-        {
-            if (Renderer.IsStillAnimating || IsAutoPlay)
-            {
-                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.");
-                return;
-            }
-            if (!ShowNextIfPossible())
-            {
-                Debug.Log("This is already the last graph revision.");
-                return;
-            }
-        }
-
-        /// <summary>
-        /// TODO: doc
-        /// </summary>
-        public void ShowPreviousGraph()
-        {
-            if (Renderer.IsStillAnimating || IsAutoPlay)
-            {
-                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.");
-                return;
-            }
-            if (CurrentGraphIndex == 0)
-            {
-                Debug.Log("This is already the first graph revision.");
-                return;
-            }
-            CurrentGraphIndex--;
-
-            if (HasLaidOutGraph(out LaidOutGraph newShownGraph) &&
-                HasLaidOutGraph(CurrentGraphIndex + 1, out LaidOutGraph currentlyShownGraph))
-            {
-                // Note: newShownGraph is the most recent past of currentlyShownGraph
-                Renderer.TransitionToNextGraph(currentlyShownGraph, newShownGraph);
-            }
-            else
-            {
-                Debug.LogError("Could not create LaidOutGraph to render.");
-            }
         }
 
         /// <summary>
@@ -339,29 +278,38 @@ namespace SEE.Animation
             return true;
         }
 
-        internal void ToggleAutoplay()
+        /// <summary>
+        /// If animation is still ongoing, auto-play mode is turned on, or we are at 
+        /// the end of the graph series, nothing happens.
+        /// Otherwise we make the transition from the currently shown graph to its 
+        /// direct successor graph in the graph series.
+        /// </summary>
+        public void ShowNextGraph()
         {
-            ToggleAutoplay(!IsAutoPlay);
-        }
-
-        internal void ToggleAutoplay(bool enabled)
-        {
-            IsAutoPlay = enabled;
+            if (Renderer.IsStillAnimating)
+            {
+                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.");
+                return;
+            }
             if (IsAutoPlay)
             {
-                Renderer.AnimationFinishedEvent.AddListener(OnAutoplayCanContinue);
-                if (!ShowNextIfPossible())
-                {
-                    Debug.Log("This is already the last graph revision.");
-                }
+                Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.");
+                return;
             }
-            else
+            if (!ShowNextIfPossible())
             {
-                Renderer.AnimationFinishedEvent.RemoveListener(OnAutoplayCanContinue);
+                Debug.Log("This is already the last graph revision.");
+                return;
             }
-            ViewDataChangedEvent.Invoke();
         }
 
+        /// <summary>
+        /// If we are at the end of the graph series, false is returned and nothing else happens.
+        /// Otherwise we make the transition from the currently shown graph to its 
+        /// direct successor graph in the graph series. CurrentGraphIndex is increased
+        /// by one accordingly.
+        /// </summary>
+        /// <returns>true iff we are not at the end of the graph series</returns>
         private bool ShowNextIfPossible()
         {
             if (currentGraphIndex == Graphs.Count - 1)
@@ -384,11 +332,84 @@ namespace SEE.Animation
             return true;
         }
 
-        internal void OnAutoplayCanContinue()
+        /// <summary>
+        /// If we are at the begin of the graph series, nothing happens.
+        /// Otherwise we make the transition from the currently shown graph to its 
+        /// direct predecessor graph in the graph series. CurrentGraphIndex is decreased
+        /// by one accordingly.
+        /// </summary>
+        public void ShowPreviousGraph()
+        {
+            if (Renderer.IsStillAnimating || IsAutoPlay)
+            {
+                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.");
+                return;
+            }
+            if (CurrentGraphIndex == 0)
+            {
+                Debug.Log("This is already the first graph revision.");
+                return;
+            }
+            CurrentGraphIndex--;
+
+            if (HasLaidOutGraph(out LaidOutGraph newShownGraph) &&
+                HasLaidOutGraph(CurrentGraphIndex + 1, out LaidOutGraph currentlyShownGraph))
+            {
+                // Note: newShownGraph is the most recent past of currentlyShownGraph
+                Renderer.TransitionToNextGraph(currentlyShownGraph, newShownGraph);
+            }
+            else
+            {
+                Debug.LogError("Could not create LaidOutGraph to render.");
+            }
+        }
+
+        /// <summary>
+        /// Toggles the auto-play mode. Equivalent to: SetAutoPlay(!IsAutoPlay)
+        /// where IsAutoPlay denotes the current state of the auto-play mode.
+        /// </summary>
+        internal void ToggleAutoPlay()
+        {
+            SetAutoPlay(!IsAutoPlay);
+        }
+
+        /// <summary>
+        /// Sets auto-play mode to <paramref name="enabled"/>. If <paramref name="enabled"/>
+        /// is true, the next graph in the series is shown and from there all other 
+        /// following graphs until we reach the end of the graph series or auto-play
+        /// mode is turned off again. If <paramref name="enabled"/> is false instead,
+        /// the currently shown graph remains visible.
+        /// </summary>
+        /// <param name="enabled"></param>
+        internal void SetAutoPlay(bool enabled)
+        {
+            IsAutoPlay = enabled;
+            if (IsAutoPlay)
+            {
+                Renderer.AnimationFinishedEvent.AddListener(OnAutoPlayCanContinue);
+                if (!ShowNextIfPossible())
+                {
+                    Debug.Log("This is already the last graph revision.");
+                }
+            }
+            else
+            {
+                Renderer.AnimationFinishedEvent.RemoveListener(OnAutoPlayCanContinue);
+            }
+            ViewDataChangedEvent.Invoke();
+        }
+
+        /// <summary>
+        /// If we at the end of the graph series, nothing happens.
+        /// Otherwise we make the transition from the currently shown graph to its next
+        /// direct successor graph in the graph series. CurrentGraphIndex is increased
+        /// by one accordingly and auto-play mode is toggled (switched off actually).
+        /// </summary>
+        private void OnAutoPlayCanContinue()
         {
             if (!ShowNextIfPossible())
             {
-                ToggleAutoplay();
+                ToggleAutoPlay();
             }
         }
     }
