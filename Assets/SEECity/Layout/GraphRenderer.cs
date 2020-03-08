@@ -90,18 +90,8 @@ namespace SEE.Layout
         /// (e.g., width, height, depth, color) across all given <paramref name="graphs"/>
         /// based on the user's choice (settings).
         /// </summary>
-        /// <param name="graphs"></param>
+        /// <param name="graphs">set of graphs whose node metrics are to be scaled</param>
         public void SetScaler(ICollection<Graph> graphs)
-        {
-            // FIXME: Implement this.
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Sets scaler according to the user's choice (settings).
-        /// </summary>
-        /// <param name="graph">graph whose node metrics are to be scaled</param>
-        private void SetScaler(Graph graph)
         {
             List<string> nodeMetrics = new List<string>() { settings.WidthMetric, settings.HeightMetric, settings.DepthMetric, settings.ColorMetric };
             nodeMetrics.AddRange(settings.AllLeafIssues());
@@ -110,12 +100,23 @@ namespace SEE.Layout
 
             if (settings.ZScoreScale)
             {
-                scaler = new ZScoreScale(graph, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
+                scaler = new ZScoreScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
             }
             else
             {
-                scaler = new LinearScale(graph, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
+                scaler = new LinearScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
             }
+        }
+
+        /// <summary>
+        /// Sets the scaler to be used to map metric values onto graphical attributes
+        /// (e.g., width, height, depth, color) for given <paramref name="graph"/>
+        /// based on the user's choice (settings).
+        /// </summary>
+        /// <param name="graph">graph whose node metrics are to be scaled</param>
+        public void SetScaler(Graph graph)
+        {
+            SetScaler(new List<Graph>() { graph });
         }
 
         /// <summary>
