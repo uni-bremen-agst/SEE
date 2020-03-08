@@ -4,6 +4,7 @@ using UnityEngine;
 using SEE.DataModel;
 using System.Linq;
 using System;
+using static SEE.GraphSettings;
 
 namespace SEE.Layout
 {
@@ -49,14 +50,18 @@ namespace SEE.Layout
         /// </summary>
         private readonly float innerNodeHeight;
 
-        public GraphSettings.NodeLayouts NodeLayout => nodeLayout;
-        public CoseNode Root => root;
-        public bool OnlyLeaves => onlyLeaves;
-        public Dictionary<Node, GameObject> NodeMap { get => nodeMap; set => nodeMap = value; }
-        public Dictionary<CoseNode, GameObject> NodeMapSublayout { get => nodeMapSublayout; set => nodeMapSublayout = value; }
-        public float GroundLevel => groundLevel;
-        public NodeFactory LeafNodeFactory => leafNodeFactory;
-        public float InnerNodeHeight => innerNodeHeight;
+        /// <summary>
+        /// TODO
+        /// </summary>
+        private Vector3 layoutScale;
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        private Vector3 layoutPosition;
+
+        public Vector3 LayoutScale { get => layoutScale; set => layoutScale = value; }
+        public Vector3 LayoutPosition { get => layoutPosition; set => layoutPosition = value; }
 
         /// <summary>
         /// constructor 
@@ -81,6 +86,8 @@ namespace SEE.Layout
             {
                 this.nodeMapSublayout = CalculateGameobjectsForSublayout();
             }
+
+            root.CNodeSublayoutValues.Sublayout = this;
         }
 
         /// <summary>
@@ -94,9 +101,16 @@ namespace SEE.Layout
             {
                 CoseNode coseNode = nodeMapSublayout.FirstOrDefault(i => i.Value == gameObject).Key;
                 coseNode.SetPositionScale(layout[gameObject].position, layout[gameObject].scale);
+
+                if (coseNode == root)
+                {
+                    LayoutScale = layout[gameObject].scale;
+                    LayoutPosition = layout[gameObject].position;
+                    //coseNode.CNodeSublayoutValues.relativeRect = new Rect(new Vector2(layout[gameObject].position.x, layout[gameObject].position.z), new Vector2(layout[gameObject].scale.x, layout[gameObject].scale.z));
+                }
             }
 
-            if (onlyLeaves)
+            if (onlyLeaves ||  nodeLayout == NodeLayouts.EvoStreets)
             {
                 float left = Int32.MaxValue;
                 float right = -Int32.MaxValue;
@@ -142,7 +156,9 @@ namespace SEE.Layout
                 bottom += defaultMargin;
 
                 Rect boundingRect = new Rect(left, top, right - left, bottom - top);
-                root.SetPositionScale(new Vector3(boundingRect.center.x, groundLevel, boundingRect.center.y), new Vector3(boundingRect.width, innerNodeHeight, boundingRect.height));
+                Vector3 position = new Vector3(boundingRect.center.x, groundLevel, boundingRect.center.y);
+                Vector3 scale = new Vector3(boundingRect.width, innerNodeHeight, boundingRect.height);
+                root.SetPositionScale(position, scale);
             }
 
             SetCoseNodeToLayoutPosition(root, root);
@@ -211,7 +227,7 @@ namespace SEE.Layout
                 case GraphSettings.NodeLayouts.FlatRectanglePacking:
                     return new RectanglePacker(groundLevel, leafNodeFactory).Layout(gameObjects);
                 case GraphSettings.NodeLayouts.EvoStreets:
-                //layout = new EvoStreetsNodeLayout(groundLevel, leafNodeFactory, innerNodeFactory).Layout(nodeMap.Values);
+                    return new EvoStreetsNodeLayout(groundLevel, leafNodeFactory).Layout(gameObjects);
                 case GraphSettings.NodeLayouts.Treemap:
                 //return new TreemapLayout(groundLevel, leafNodeFactory, 1000.0f * Unit(), 1000.0f * Unit()).Layout(nodeMap.Values);
                 case GraphSettings.NodeLayouts.Balloon:
