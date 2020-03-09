@@ -17,7 +17,6 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Runtime.CompilerServices;
 using SEE.DataModel;
 using SEE.Layout;
 using System;
@@ -46,16 +45,6 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// The city evolution to be drawn by this renderer.
-        /// </summary>
-        private SEECityEvolution cityEvolution;
-
-        /// <summary>
-        /// The city evolution to be drawn by this renderer.
-        /// </summary>
-        protected SEECityEvolution City => cityEvolution;
-
-        /// <summary>
         /// The graph renderer used to draw a single graph and the later added nodes and edges.
         /// This attribute will be set in the setter of the attribute CityEvolution because it
         /// depends upon the city, which is set by this setter.
@@ -69,6 +58,11 @@ namespace SEE.Animation.Internal
         /// this setter.
         /// </summary>
         private ObjectManager objectManager;
+
+        /// <summary>
+        /// The city evolution to be drawn by this renderer.
+        /// </summary>
+        private SEECityEvolution cityEvolution;
 
         /// <summary>
         /// The city evolution to be drawn by this renderer.
@@ -699,7 +693,7 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Initiates the visualization of the evolving series of <paramref name="graphs"/>. 
+        /// Initiates the visualization of the evolving series of <paramref name="graphs"/>.
         /// </summary>
         /// <param name="graphs">series of graphs to be visualized</param>
         public void ShowGraphEvolution(List<Graph> graphs)
