@@ -62,23 +62,16 @@ namespace SEE.Animation.Internal
         /// <summary>
         /// The city evolution to be drawn by this renderer.
         /// </summary>
-        private SEECityEvolution cityEvolution;
-
-        /// <summary>
-        /// The city evolution to be drawn by this renderer.
-        /// </summary>
         public SEECityEvolution CityEvolution
         {
-            get => cityEvolution;
             set {
-                cityEvolution = value;
                 // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
                 // So we cannot make the following assignment in the constructor. Neither
                 // can we assign this value at the declaration of graphRenderer because
                 // we need the city argument, which comes only later. Anyhow, whenever we
                 // assign a new city, we also need a new graph renderer for that city.
                 // So in fact this is the perfect place to assign graphRenderer.
-                graphRenderer = new GraphRenderer(cityEvolution);
+                graphRenderer = new GraphRenderer(value);
                 objectManager = new ObjectManager(graphRenderer);
             }
         }
