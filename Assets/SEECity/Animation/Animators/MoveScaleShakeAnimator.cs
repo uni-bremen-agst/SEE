@@ -31,15 +31,15 @@ namespace SEE.Animation
     public class MoveScaleShakeAnimator : AbstractAnimator
     {
         /// <summary>
-        /// See <see cref="AbstractAnimator.AnimateToInternalWithCallback(Node, GameObject, Vector3, Vector3, GameObject, string)"/>.
+        /// See <see cref="AbstractAnimator.AnimateToInternalWithCallback(GameObject, NodeTransform, bool, GameObject, string)"/>.
         /// Moves, scales, and shakes the animated game object.
         /// </summary>
-        /// <param name="node">Node of the given GameObject</param>
         /// <param name="gameObject">GameObject to animate</param>
         /// <param name="nodeTransform">the node transformation to be applied</param>
+        /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
         /// <param name="callback">An optional callback</param>
         /// <param name="callbackName">name of the callback</param>
-        protected override void AnimateToInternalWithCallback(Node node, GameObject gameObject, NodeTransform nodeTransform, GameObject callBackTarget, string callbackName)
+        protected override void AnimateToInternalWithCallback(GameObject gameObject, NodeTransform nodeTransform, bool wasModified, GameObject callBackTarget, string callbackName)
         {
             // Move the object.
             if (callBackTarget != null)
@@ -62,7 +62,7 @@ namespace SEE.Animation
                 "time", MaxAnimationTime
             ));
             // Shake the object.
-            if (node.WasModified())
+            if (wasModified)
             {
                 iTween.ShakeRotation(gameObject, iTween.Hash(
                     "amount", new Vector3(0, 10, 0),

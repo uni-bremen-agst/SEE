@@ -30,14 +30,14 @@ namespace SEE.Animation
     public class MoveAnimator : AbstractAnimator
     {
         /// <summary>
-        /// See <see cref="AbstractAnimator.AnimateToInternalWithCallback(Node, GameObject, NodeTransform, GameObject, string)"/>
+        /// See <see cref="AbstractAnimator.AnimateToInternalWithCallback(GameObject, NodeTransform, bool, GameObject, string)"/>
         /// </summary>
-        /// <param name="node">Node of the given GameObject</param>
         /// <param name="gameObject">GameObject to animate</param>
         /// <param name="nodeTransform">the node transformation to be applied</param>
+        /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
         /// <param name="callback">An optional callback</param>
         /// <param name="callbackName">name of the callback</param>
-        protected override void AnimateToInternalWithCallback(Node node, GameObject gameObject, NodeTransform nodeTransform, GameObject callBackTarget, string callbackName)
+        protected override void AnimateToInternalWithCallback(GameObject gameObject, NodeTransform nodeTransform, bool wasModified, GameObject callBackTarget, string callbackName)
         {
             gameObject.transform.localScale = nodeTransform.scale;
             if (callBackTarget != null)
