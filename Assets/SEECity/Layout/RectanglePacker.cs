@@ -77,13 +77,6 @@ namespace SEE.Layout
             elements.Sort(delegate (GameObject left, GameObject right) 
                           { return AreaSize(right, leafNodeFactory).CompareTo(AreaSize(left, leafNodeFactory)); });
 
-            //{
-            //    for (int j = 0; j < elements.Count - 1; j++)
-            //    {
-            //        Debug.Assert(AreaSize(elements[j], leafNodeFactory) >= AreaSize(elements[j+1], leafNodeFactory));
-            //    }
-            //}
-
             // Since we initially do not know how much space we need, we assign a space of the 
             // worst case to the root. Note that we want to add padding in between the nodes,
             // so we need to increase the required size accordingly.
