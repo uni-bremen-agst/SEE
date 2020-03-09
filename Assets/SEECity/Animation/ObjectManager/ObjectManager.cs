@@ -41,11 +41,6 @@ namespace SEE.Animation.Internal
         private readonly GraphRenderer _graphRenderer;
 
         /// <summary>
-        /// Returns the graph renderer used to create the game objects.
-        /// </summary>
-        protected GraphRenderer GraphRenderer => _graphRenderer;
-
-        /// <summary>
         /// The plane enclosing all game objects of the city.
         /// </summary>
         private GameObject currentPlane;
@@ -93,7 +88,7 @@ namespace SEE.Animation.Internal
             bool hasPlane = currentPlane != null;
             if (!hasPlane)
             {
-                currentPlane = GraphRenderer.NewPlane(gameObjects);
+                currentPlane = _graphRenderer.NewPlane(gameObjects);
             }
             plane = currentPlane;
             return hasPlane;
@@ -146,7 +141,7 @@ namespace SEE.Animation.Internal
             else
             {
                 // NewInnerNode() will attach node to innerNode
-                innerNode = GraphRenderer.NewInnerNode(node);
+                innerNode = _graphRenderer.NewInnerNode(node);
                 // Note: The scale of innerNode will be adjusted later when we have the
                 // layout. 
                 // TODO: Inner nodes have a style, too, as much as leaves. We may need to
@@ -193,14 +188,14 @@ namespace SEE.Animation.Internal
                 // newly attached node. Actually, only the scale would need to
                 // be adjusted because that is the information later needed by the
                 // layouter.
-                GraphRenderer.AdjustVisualsOfBlock(leaf);
+                _graphRenderer.AdjustVisualsOfBlock(leaf);
                 return true;
             }
             else
             {
                 // NewLeafNode() will set the scale and style of the leaf
                 // and will also attach the node to it.
-                leaf = GraphRenderer.NewLeafNode(node);
+                leaf = _graphRenderer.NewLeafNode(node);
                 return false;
             }
         }
