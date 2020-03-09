@@ -14,7 +14,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
-        /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
+        /// <param name="leafNodeFactory">the factory used to create leaf nodes</param>
         public NodeLayout(float groundLevel,
                           NodeFactory leafNodeFactory)
         {
@@ -164,12 +164,10 @@ namespace SEE.Layout
         /// <summary>
         /// Creates the relevant tree consisting of the nodes to be laid out
         /// (a subtree of the node hierarchy of the original graph).
-        /// 
         /// </summary>
         /// <param name="nodes">the nodes whose hierarchy is to be determined</param>
         /// <param name="roots">the root nodes of the hierarchy</param>
         /// <param name="children">mapping of nodes onto their immediate children</param>
-        /// 
         protected static void CreateTree(ICollection<Node> nodes,
                                          out List<Node> roots,
                                          out Dictionary<Node, List<Node>> children)
