@@ -142,6 +142,7 @@ namespace SEE.Animation.Internal
             {
                 // NewInnerNode() will attach node to innerNode
                 innerNode = _graphRenderer.NewInnerNode(node);
+                nodes[node.LinkName] = innerNode;
                 // Note: The scale of innerNode will be adjusted later when we have the
                 // layout. 
                 // TODO: Inner nodes have a style, too, as much as leaves. We may need to
@@ -196,6 +197,7 @@ namespace SEE.Animation.Internal
                 // NewLeafNode() will set the scale and style of the leaf
                 // and will also attach the node to it.
                 leaf = _graphRenderer.NewLeafNode(node);
+                nodes[node.LinkName] = leaf;
                 return false;
             }
         }
