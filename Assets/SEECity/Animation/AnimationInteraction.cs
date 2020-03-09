@@ -95,8 +95,8 @@ namespace SEE.Animation
             revisionSelectionDataModel.RevisionDropdown.onValueChanged.AddListener(OnDropDownChanged);
 
             SetMode(true);
-            OnViewDataChanged();
-            evolutionRenderer.ViewDataChangedEvent.AddListener(OnViewDataChanged);
+            OnShownGraphHasChanged();
+            evolutionRenderer.Register(OnShownGraphHasChanged);
         }
 
         /// <summary>
@@ -195,10 +195,10 @@ namespace SEE.Animation
         /// <summary>
         /// Event function that updates all shown data for the user;
         /// e.g. the revision number shown in the animation canvas.
-        /// This method is called as a callback when any of the graph
-        /// data have changed.
+        /// This method is called as a callback of the evolution renderer
+        /// when any of the graph data have changed.
         /// </summary>
-        private void OnViewDataChanged()
+        private void OnShownGraphHasChanged()
         {
             animationDataModel.RevisionNumberText.text = (evolutionRenderer.CurrentGraphIndex + 1) + " / " + evolutionRenderer.GraphCount;
             animationDataModel.AutoplayToggle.isOn = evolutionRenderer.IsAutoPlay;

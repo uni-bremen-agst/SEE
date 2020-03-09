@@ -95,6 +95,16 @@ namespace SEE.Animation.Internal
         private readonly float MinimalWaitTimeForNextRevision = 0.1f;
 
         /// <summary>
+        /// Registers <paramref name="action"/> to be called back when the shown
+        /// graph has changed.
+        /// </summary>
+        /// <param name="action">action to be called back</param>
+        internal void Register(UnityAction action)
+        {
+            shownGraphHasChangedEvent.AddListener(action);
+        }
+
+        /// <summary>
         /// An event fired upon the start of an animation.
         /// </summary>
         public readonly UnityEvent AnimationStartedEvent = new UnityEvent();
@@ -643,7 +653,7 @@ namespace SEE.Animation.Internal
             set
             {
                 AnimationDuration = value;
-                ViewDataChangedEvent.Invoke();
+                shownGraphHasChangedEvent.Invoke();
             }
         }
 
@@ -661,25 +671,14 @@ namespace SEE.Animation.Internal
             private set
             {
                 currentGraphIndex = value;
-                ViewDataChangedEvent.Invoke();
+                shownGraphHasChangedEvent.Invoke();
             }
         }
-
-        private UnityEvent _viewDataChangedEvent = new UnityEvent();
 
         /// <summary>
-        /// An event fired when the viewn data have changed. Returns
-        /// always the same UnityEvent instance.
+        /// An event fired when the viewn graph has changed.
         /// </summary>
-        public UnityEvent ViewDataChangedEvent
-        {
-            get
-            {
-                if (_viewDataChangedEvent == null)
-                    _viewDataChangedEvent = new UnityEvent();
-                return _viewDataChangedEvent;
-            }
-        }
+        private UnityEvent shownGraphHasChangedEvent = new UnityEvent();
 
         /// <summary>
         /// Whether the user has selected auto-play mode.
@@ -694,18 +693,22 @@ namespace SEE.Animation.Internal
             get => _isAutoplay;
             private set
             {
-                ViewDataChangedEvent.Invoke();
+                shownGraphHasChangedEvent.Invoke();
                 _isAutoplay = value;
             }
         }
 
-        internal void ShowGraphEvolution(List<Graph> graphs)
+        /// <summary>
+        /// Initiates the visualization of the evolving series of <paramref name="graphs"/>. 
+        /// </summary>
+        /// <param name="graphs">series of graphs to be visualized</param>
+        public void ShowGraphEvolution(List<Graph> graphs)
         {
             this.graphs = graphs;
             graphRenderer.SetScaler(graphs);
             CalculateAllGraphLayouts(graphs);
 
-            ViewDataChangedEvent.Invoke();
+            shownGraphHasChangedEvent.Invoke();
 
             if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph))
             {
@@ -913,7 +916,7 @@ namespace SEE.Animation.Internal
             {
                 AnimationFinishedEvent.RemoveListener(OnAutoPlayCanContinue);
             }
-            ViewDataChangedEvent.Invoke();
+            shownGraphHasChangedEvent.Invoke();
         }
 
         /// <summary>
