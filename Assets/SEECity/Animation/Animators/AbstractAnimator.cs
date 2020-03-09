@@ -17,8 +17,8 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel;
 using SEE.Layout;
+using static SEE.Layout.GameObjectExtensions;
 using System;
 using UnityEngine;
 
@@ -65,21 +65,20 @@ namespace SEE.Animation
         }
 
         /// <summary>
-        /// Animates the node transformation of a given GameObject. If needed, a callback that is called
-        /// after the animation is finished can be defined. The animation is implemented by
+        /// Animates the node transformation of a given GameObject. If needed, a <paramref name="gameObject"/> 
+        /// that is called after the animation is finished can be passed. The animation is implemented by
         /// <see cref="AnimateToInternal(Node, GameObject, NodeTransform)"/>
         /// </summary>
-        /// <param name="node">Node of the given GameObject</param>
         /// <param name="gameObject">GameObject to animate</param>
         /// <param name="nodeTransform">the node transformation to be applied</param>
+        /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
         /// <param name="callback">An optional callback</param>
-        public void AnimateTo(Node node, GameObject gameObject, NodeTransform nodeTransform, Action<object> callback = null)
+        public void AnimateTo(GameObject gameObject, NodeTransform nodeTransform, bool wasModified, Action<object> callback = null)
         {
             Debug.LogFormat("AnimateTo {0}: from (position={1}, scale={2}) to (position={3}, scale={4})\n",
-                             node.LinkName,
+                             gameObject.LinkName(),
                              gameObject.transform.position, gameObject.transform.localScale,
                              nodeTransform.position, nodeTransform.scale);
-            node.AssertNotNull("node");
             gameObject.AssertNotNull("gameObject");
             nodeTransform.AssertNotNull("nodeTransform");
 
@@ -91,27 +90,27 @@ namespace SEE.Animation
             }
             else if (callback == null)
             {
-                AnimateToInternalWithCallback(node, gameObject, nodeTransform, null, "");
+                AnimateToInternalWithCallback(gameObject, nodeTransform, wasModified, null, "");
             }
             else
             {
-                AnimateToInternalWithCallback(node, gameObject, nodeTransform, ((MonoBehaviour)callback.Target).gameObject, callback.Method.Name);
+                AnimateToInternalWithCallback(gameObject, nodeTransform, wasModified, ((MonoBehaviour)callback.Target).gameObject, callback.Method.Name);
             }
         }
 
         /// <summary>
         /// Abstract method, called by <see cref="AnimateTo"/> for an animation with a callback.
         /// </summary>
-        /// <param name="node">Node of the given GameObject</param>
         /// <param name="gameObject">GameObject to animate</param>
         /// <param name="nodeTransform">the node transformation to be applied</param>
+        /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
         /// <param name="callback">An optional callback</param>
         /// <param name="callbackName">name of the callback</param>
         protected abstract void AnimateToInternalWithCallback
-            (Node node, 
-            GameObject gameObject, 
-            NodeTransform nodeTransform,  
-            GameObject callBackTarget, 
-            string callbackName);
+            (GameObject gameObject, 
+             NodeTransform nodeTransform,
+             bool wasModified,
+             GameObject callBackTarget, 
+             string callbackName);
     }
 }

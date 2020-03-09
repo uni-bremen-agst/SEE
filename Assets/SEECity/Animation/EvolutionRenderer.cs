@@ -207,7 +207,7 @@ namespace SEE.Animation.Internal
         /// also create all necessary game objects -- even those game objects that are not 
         /// present in the first graph in this list.
         /// </summary>
-        public void CalculateAllGraphLayouts(List<Graph> graphs)
+        private void CalculateAllGraphLayouts(List<Graph> graphs)
         {
             // Determine the layouts of all loaded graphs upfront.
             var p = Performance.Begin("Layouting all " + graphs.Count + " graphs");
@@ -215,6 +215,7 @@ namespace SEE.Animation.Internal
             {
                 Layouts[graph] = CalculateLayout(graph);
             });
+            objectManager.Clear();
             p.End();
         }
 
@@ -507,7 +508,7 @@ namespace SEE.Animation.Internal
                 if (isNewLeaf)
                 {
                     // if the leaf node is new, animate it by moving it out of the ground
-                    Debug.LogFormat("RenderLeaf: node {0} is a new leaf\n", node.LinkName);
+                    Debug.LogFormat("RenderLeaf: node {0} is a new leaf: RISE ANIMATION\n", node.LinkName);
 
                     // FIXME: CScape buildings have a different notion of position than cubes.
                     // We need to use graphRenderer.Apply().
@@ -515,7 +516,11 @@ namespace SEE.Animation.Internal
                     newPosition.y = -nodeTransform.scale.y;
                     leaf.transform.position = newPosition;
                 }
-                moveScaleShakeAnimator.AnimateTo(node, leaf, nodeTransform);
+                else
+                {
+                    Debug.LogFormat("RenderLeaf: node {0} is an existing leaf: MOVE ANIMATION\n", node.LinkName);
+                }
+                moveScaleShakeAnimator.AnimateTo(leaf, nodeTransform, node.WasModified());
             } catch (Exception e)
             {
                 Debug.LogErrorFormat("Leaf node named {0} does not have a layout: {1}\n", node.LinkName, e);
@@ -555,7 +560,7 @@ namespace SEE.Animation.Internal
                 var nextPosition = gameObject.transform.position;
                 nextPosition.y = -2;
                 NodeTransform nodeTransform = new NodeTransform(nextPosition, gameObject.transform.localScale);
-                moveAnimator.AnimateTo(node, gameObject, nodeTransform, OnRemovedNodeFinishedAnimation);
+                moveAnimator.AnimateTo(gameObject, nodeTransform, false, OnRemovedNodeFinishedAnimation);
             }
         }
 
@@ -574,7 +579,7 @@ namespace SEE.Animation.Internal
                 var newPosition = leaf.transform.position;
                 newPosition.y = -leaf.transform.localScale.y;
                 NodeTransform nodeTransform = new NodeTransform(newPosition, leaf.transform.localScale);
-                moveScaleShakeAnimator.AnimateTo(node, leaf, nodeTransform, OnRemovedNodeFinishedAnimation);
+                moveScaleShakeAnimator.AnimateTo(leaf, nodeTransform, false, OnRemovedNodeFinishedAnimation);
             }
         }
 
@@ -692,6 +697,10 @@ namespace SEE.Animation.Internal
         public void ShowGraphEvolution(List<Graph> graphs)
         {
             this.graphs = graphs;
+            CurrentGraphIndex = 0;
+            _currentCity = null;
+            _nextCity = null;
+
             graphRenderer.SetScaler(graphs);
             CalculateAllGraphLayouts(graphs);
 
@@ -766,13 +775,13 @@ namespace SEE.Animation.Internal
         private bool HasLaidOutGraph(int index, out LaidOutGraph laidOutGraph)
         {
             laidOutGraph = null;
-            var graph = graphs[index];
+            Graph graph = graphs[index];
             if (graph == null)
             {
                 Debug.LogError("There ist no graph available at index " + index);
                 return false;
             }
-            var hasLayout = TryGetLayout(graph, out Dictionary<string, NodeTransform> layout);
+            bool hasLayout = TryGetLayout(graph, out Dictionary<string, NodeTransform> layout);
             if (layout == null || !hasLayout)
             {
                 Debug.LogError("There ist no layout available at index " + index);
