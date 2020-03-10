@@ -443,47 +443,8 @@ namespace SEE.Animation.Internal
         /// <param name="node">node to be displayed</param>
         protected virtual void RenderInnerNode(Node node)
         {
-            Debug.LogFormat("RenderInnerNode for node {0}\n", node.LinkName);
-            // FIXME: The form of inner nodes depends upon the user's choice
-            // and possibly the kind of layout.
-
-            // Currently, we have the following kinds of InnerNodeKinds:
-            // Blocks, Rectangles, Donuts, Circles, Empty, Cylinders.
-
-            /*
-            var isCircleNew = !objectManager.GetInnerNode(node, out GameObject circle);
-            var nodeTransform = NextLayoutToBeShown[circle];
-
-            var circlePosition = nodeTransform.position;
-            circlePosition.y = 0.5F;
-
-            var circleRadius = nodeTransform.scale;
-            circleRadius.x += 2;
-            circleRadius.z += 2;
-
-            if (isCircleNew)
-            {
-                // if the node is new, animate it by moving it out of the ground
-                circlePosition.y = -3;
-                circle.transform.position = circlePosition;
-                circle.transform.localScale = circleRadius;
-
-                circlePosition.y = 0.5F;
-                moveScaleShakeAnimator.AnimateTo(node, circle, circlePosition, circleRadius);
-            }
-            else if (node.WasModified())
-            {
-                moveScaleShakeAnimator.AnimateTo(node, circle, circlePosition, circleRadius);
-            }
-            else if (node.WasRelocated(out string oldLinkageName))
-            {
-                moveScaleShakeAnimator.AnimateTo(node, circle, circlePosition, circleRadius);
-            }
-            else
-            {
-                moveScaleShakeAnimator.AnimateTo(node, circle, circlePosition, circleRadius);
-            }
-            */
+            bool isNew = !objectManager.GetInnerNode(node, out GameObject gameObject);
+            RenderNode(node, isNew, gameObject);
         }
 
         /// <summary>
@@ -492,41 +453,24 @@ namespace SEE.Animation.Internal
         /// <param name="node">leaf node to be rendered</param>
         protected virtual void RenderLeaf(Node node)
         {
-            Debug.LogFormat("RenderLeaf for node {0}\n", node.LinkName);
-            // FIXME isNewLeaf will always be true because we do not remove nodes from the objectManager
-            // cache anymore.
-            bool isNewLeaf = !objectManager.GetLeaf(node, out GameObject leaf);
-            if (leaf == null)
-            {
-                Debug.LogErrorFormat("Leaf node {0} does not have an associated game object in the object manager.\n", node.LinkName);
-                return;
-            }
-            
-            try
-            {
-                NodeTransform nodeTransform = NextLayoutToBeShown[node.LinkName];
-                if (isNewLeaf)
-                {
-                    // if the leaf node is new, animate it by moving it out of the ground
-                    Debug.LogFormat("RenderLeaf: node {0} is a new leaf: RISE ANIMATION\n", node.LinkName);
+            bool isNew = !objectManager.GetLeaf(node, out GameObject gameObject);
+            RenderNode(node, isNew, gameObject);
+        }
 
-                    // FIXME: CScape buildings have a different notion of position than cubes.
-                    // We need to use graphRenderer.Apply().
-                    var newPosition = nodeTransform.position;
-                    newPosition.y = -nodeTransform.scale.y;
-                    leaf.transform.position = newPosition;
-                }
-                else
-                {
-                    Debug.LogFormat("RenderLeaf: node {0} is an existing leaf: MOVE ANIMATION\n", node.LinkName);
-                }
-                moveScaleShakeAnimator.AnimateTo(leaf, nodeTransform, node.WasModified());
-            } catch (Exception e)
+        private void RenderNode(Node node, bool isNew, GameObject gameObject)
+        {
+            NodeTransform nodeTransform = NextLayoutToBeShown[node.LinkName];
+            if (isNew)
             {
-                Debug.LogErrorFormat("Leaf node named {0} does not have a layout: {1}\n", node.LinkName, e);
-                DumpLayout(NextLayoutToBeShown);
-                return;
+                // if the leaf node is new, animate it by moving it out of the ground
+
+                // FIXME: CScape buildings have a different notion of position than cubes.
+                // We need to use graphRenderer.Apply().
+                var newPosition = nodeTransform.position;
+                newPosition.y = -nodeTransform.scale.y;
+                gameObject.transform.position = newPosition;
             }
+            moveScaleShakeAnimator.AnimateTo(gameObject, nodeTransform, node.WasModified());
         }
 
         private void DumpLayout(Dictionary<string, NodeTransform> layout)
