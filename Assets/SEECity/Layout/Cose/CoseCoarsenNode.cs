@@ -45,7 +45,7 @@ namespace SEE.Layout
         /// <param name="graphManager">the current graphmanager</param>
         public CoseCoarsenNode(Node node, CoseGraphManager graphManager) : base(node, graphManager)
         {
-            Weight = 1;
+            weight = 1;
         }
 
         /// <summary>
@@ -66,10 +66,10 @@ namespace SEE.Layout
 
             foreach (CoseCoarsenNode node in GetNeighborsList())
             {
-                if (!node.Matched && node != this && (node.Weight < minWeight))
+                if (!node.matched && node != this && (node.weight < minWeight))
                 {
                     minWeighted = node;
-                    minWeight = node.Weight;
+                    minWeight = node.weight;
                 }
             }
             return minWeighted;

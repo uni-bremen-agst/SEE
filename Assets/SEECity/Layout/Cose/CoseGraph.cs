@@ -99,8 +99,8 @@ namespace SEE.Layout
         /// <param name="graphManager">the graphmanager for this graph</param>
         public CoseGraph(CoseNode parent, CoseGraphManager graphManager)
         {
-            this.Parent = parent;
-            this.GraphManager = graphManager;
+            this.parent = parent;
+            this.graphManager = graphManager;
         }
 
         /// <summary>
@@ -109,12 +109,12 @@ namespace SEE.Layout
         /// <param name="recursive">Indicates if the bounds should be calculated recursively</param>
         public void UpdateBounds(bool recursive)
         {
-            if (Parent.CNodeSublayoutValues.IsSubLayoutNode) 
+            if (parent.SublayoutValues.IsSubLayoutNode) 
             {
-                this.left = (float)Parent.GetLeft();
-                this.right = (float)Parent.GetRight();
-                this.top = (float)Parent.GetTop();
-                this.bottom = (float)Parent.GetBottom();
+                this.left = (float)parent.GetLeft();
+                this.right = (float)parent.GetRight();
+                this.top = (float)parent.GetTop();
+                this.bottom = (float)parent.GetBottom();
                 UpdateBoundingRect();
 
                 foreach (CoseNode cNode in nodes)
@@ -131,10 +131,10 @@ namespace SEE.Layout
                 return;
             }
 
-            float left = Int32.MaxValue;
-            float right = -Int32.MaxValue;
-            float top = Int32.MaxValue;
-            float bottom = -Int32.MaxValue;
+            float left = Mathf.Infinity;
+            float right = Mathf.NegativeInfinity;
+            float top = Mathf.Infinity;
+            float bottom = Mathf.NegativeInfinity;
             float nodeLeft;
             float nodeRight;
             float nodeTop;
@@ -176,18 +176,18 @@ namespace SEE.Layout
 
             Rect boundingRect = new Rect(left, top, right - left, bottom - top);
 
-            if (left == Int32.MaxValue)
+            if (left == Mathf.Infinity)
             {
-                this.left = (float)Parent.GetLeft();
-                this.right = (float)Parent.GetRight();
-                this.top = (float)Parent.GetTop();
-                this.bottom = (float)Parent.GetBottom();
+                this.left = (float)parent.GetLeft();
+                this.right = (float)parent.GetRight();
+                this.top = (float)parent.GetTop();
+                this.bottom = (float)parent.GetBottom();
             }
 
-            if (GraphManager.Layout.InnerNodesAreCircles)
+            if (graphManager.Layout.InnerNodesAreCircles)
             {
-                var width = Math.Abs(this.Right - this.Left);
-                var height = Math.Abs(this.Bottom - this.Top);
+                var width = Math.Abs(this.right - this.left);
+                var height = Math.Abs(this.bottom - this.top);
 
                 var boundsWidth = (float)((width / Math.Sqrt(2)) - (width / 2));
                 var boundsHeight = (float)((height / Math.Sqrt(2)) - (height / 2));
@@ -220,7 +220,7 @@ namespace SEE.Layout
         /// </summary>
         public void UpdateBoundingRect()
         {
-            this.BoudingRect = new Rect(this.left, this.top, this.right - this.left, this.bottom - this.top);
+            this.boudingRect = new Rect(left, top, right - left, bottom - top);
         }
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace SEE.Layout
         {
             if (nodes.Count == 0)
             {
-                IsConnected = true;
+                isConnected = true;
                 return;
             }
 
@@ -265,7 +265,7 @@ namespace SEE.Layout
                 }
             }
 
-            IsConnected = false;
+            isConnected = false;
 
             if (visited.Count >= nodes.Count)
             {
@@ -279,9 +279,9 @@ namespace SEE.Layout
                     }
                 }
 
-                if (noOfVisitedInThisGraph == Nodes.Count)
+                if (noOfVisitedInThisGraph == nodes.Count)
                 {
-                    IsConnected = true;
+                    isConnected = true;
                 }
             }
         }
@@ -308,7 +308,7 @@ namespace SEE.Layout
             newEdge.Source = sourceNode;
             newEdge.Target = targetNode;
             newEdge.IsInterGraph = false;
-            Edges.Add(newEdge);
+            edges.Add(newEdge);
             sourceNode.Edges.Add(newEdge);
 
             if (targetNode != sourceNode)
@@ -324,11 +324,11 @@ namespace SEE.Layout
         /// <param name="node">the new node</param>
         public void AddNode(CoseNode node)
         {
-            if (GraphManager == null)
+            if (graphManager == null)
             {
                 throw new System.Exception("Graph has no graph manager");
             }
-            if (Nodes.Contains(node))
+            if (nodes.Contains(node))
             {
                 throw new System.Exception("Node is already in graph");
             }
@@ -352,14 +352,14 @@ namespace SEE.Layout
 
             if (size == 0)
             {
-                EstimatedSize = CoseLayoutSettings.Empty_Compound_Size;
+                estimatedSize = CoseLayoutSettings.Empty_Compound_Size;
             }
             else
             {
-                EstimatedSize = size / Mathf.Sqrt(nodes.Count);
+                estimatedSize = size / Mathf.Sqrt(nodes.Count);
             }
 
-            return EstimatedSize;
+            return estimatedSize;
         }
 
         /// <summary>
@@ -392,7 +392,7 @@ namespace SEE.Layout
             {
                 throw new System.Exception("owner graph is invalid");
             }
-            if (GraphManager == null)
+            if (graphManager == null)
             {
                 throw new System.Exception("Owner graph manager is invalid");
             }
@@ -404,7 +404,7 @@ namespace SEE.Layout
             {
                 if (edge.IsInterGraph)
                 {
-                    GraphManager.Remove(edge);
+                    graphManager.Remove(edge);
                 }
                 else
                 {
@@ -412,11 +412,11 @@ namespace SEE.Layout
                 }
             }
 
-            if (!Nodes.Contains(node))
+            if (!nodes.Contains(node))
             {
                 throw new System.Exception("node is not in owner node list");
             }
-            Nodes.Remove(node);
+            nodes.Remove(node);
         }
 
         /// <summary>
@@ -465,20 +465,20 @@ namespace SEE.Layout
         public List<CoseNode> CalculateNodesForSublayout(bool onlyLeaves)
         {
             List<CoseNode> nodesForLayout = new List<CoseNode>();
-            foreach (CoseNode node in Nodes)
+            foreach (CoseNode node in nodes)
             {
                 if (onlyLeaves)
                 {
                     if (node.IsLeaf())
                     {
                         nodesForLayout.Add(node);
-                        node.CNodeSublayoutValues.IsSubLayoutNode = true;
+                        node.SublayoutValues.IsSubLayoutNode = true;
                     }
                 }
                 else
                 {
                     nodesForLayout.Add(node);
-                    node.CNodeSublayoutValues.IsSubLayoutNode = true;
+                    node.SublayoutValues.IsSubLayoutNode = true;
                 }
 
                 if (node.Child != null)
