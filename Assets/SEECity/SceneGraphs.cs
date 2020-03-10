@@ -67,11 +67,13 @@ namespace SEE
                 List<Node> dirsNodes = graph.GetRoots();
 
                 Dictionary<string, NodeLayouts> dirsLayout = new Dictionary<string, NodeLayouts>();
+                Dictionary<string, InnerNodeKinds> dirsShape = new Dictionary<string, InnerNodeKinds>();
 
                 foreach (Node node in graph.Nodes())
                 {
                     if (!node.IsLeaf())
                     {
+                        dirsShape.Add(node.LinkName, settings.InnerNodeObjects);
                         dirsLocal.Add(node.LinkName, false);
                         dirsLayout.Add(node.LinkName, settings.NodeLayout);
                     }
@@ -83,6 +85,7 @@ namespace SEE
                 settings.CoseGraphSettings.show = new Dictionary<Node, bool>();
                 if (dirsLocal.Count != 0)
                 {
+                    settings.CoseGraphSettings.DirShape = dirsShape;
                     settings.CoseGraphSettings.DirNodeLayout = dirsLayout;
                     settings.CoseGraphSettings.ListDirToggle = dirsLocal;
                     // get roots

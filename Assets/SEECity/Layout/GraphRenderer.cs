@@ -236,7 +236,7 @@ namespace SEE.Layout
             {
                 if (sublayoutRootsWithNodes.Count > 0)
                 {
-                    Dictionary<GameObject, NodeTransform> remainingLayoutNodes = layout;
+                    Dictionary<GameObject, NodeTransform> remainingLayoutNodes = new Dictionary<GameObject, NodeTransform>(layout);
 
                     foreach (KeyValuePair<string, List<Node>> kvp in sublayoutRootsWithNodes)
                     {
@@ -245,21 +245,21 @@ namespace SEE.Layout
                         Dictionary<Node, GameObject> filteredNodeMap = nodeMap.Where(i => kvp.Value.Contains(i.Key)).ToDictionary(i => i.Key, i => i.Value);
                         // layout nach gameobjects gefiltert, die im sublayout sind
                         Dictionary<GameObject, NodeTransform> subLayout = layout.Where(pair => filteredNodeMap.ContainsValue(pair.Key)).ToDictionary(i => i.Key, i => i.Value);
-                        remainingLayoutNodes.Where(pair => !subLayout.ContainsKey(pair.Key)).ToDictionary(i => i.Key, i => i.Value);
+
+                        foreach(KeyValuePair<GameObject, NodeTransform> sub in subLayout)
+                        {
+                            remainingLayoutNodes.Remove(sub.Key);
+                        }
+
+
+                        //remainingLayoutNodes.Where(pair => !subLayout.ContainsKey(pair.Key)).ToDictionary(i => i.Key, i => i.Value);
                         InnerNodeFactory innerNodeFactory = GetInnerNodeFactory(settings.CoseGraphSettings.DirShape[kvp.Key]);
                         Apply(subLayout, settings.origin, innerNodeFactory);
                         AddDecorations(subLayout.Keys.ToList(), settings.CoseGraphSettings.DirShape[kvp.Key], settings.CoseGraphSettings.DirNodeLayout[kvp.Key]);
 
-
-                        BoundingBox(filteredNodeMap.Values, out Vector2 leftFrontC, out Vector2 rightBackC);
-                        PlaneFactory.NewPlane(leftFrontC, rightBackC, groundLevel - 0.005f, Color.blue);
-
-
-
+                        //BoundingBox(filteredNodeMap.Values, out Vector2 leftFrontC, out Vector2 rightBackC);
+                        //PlaneFactory.NewPlane(leftFrontC, rightBackC, groundLevel - 0.005f, Color.blue);
                     }
-
-                    
-
                     Apply(remainingLayoutNodes, settings.origin);
                     AddDecorations(remainingLayoutNodes.Keys.ToList());
                 }

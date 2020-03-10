@@ -44,7 +44,11 @@ namespace SEE.Layout
         {
             foreach (GameObject gameNode in gameNodes)
             {
-                float lineWidth = 0.7f;
+                Vector3 size = nodeFactory.GetSize(gameNode);
+                
+                float avg = (size.x + size.z) / 2;
+                float lineWidth = avg / 100.0f;
+
                 AttachRectangleLine(gameNode, lineWidth);
             }
         }
@@ -65,7 +69,7 @@ namespace SEE.Layout
 
             LineFactory.SetDefaults(line);
             LineFactory.SetColor(line, color);
-            LineFactory.SetWidth(line, 0.7f);
+            LineFactory.SetWidth(line, lineWidth);
 
             line.useWorldSpace = false;
 
