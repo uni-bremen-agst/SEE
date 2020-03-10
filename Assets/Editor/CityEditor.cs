@@ -422,7 +422,7 @@ namespace SEEEditor
             else
             {
                 EditorGUI.BeginDisabledGroup(true);
-                ShowShapeEnum(GraphSettings.InnerNodeKinds.Rectangles, root);
+                ShowShapeEnum(editorSettings.CoseGraphSettings.DirShape[root.LinkName], root);
                 EditorGUI.EndDisabledGroup();
             }
         }

@@ -89,7 +89,7 @@ namespace SEE.Layout
         /// <summary>
         /// the repulsion strength 
         /// </summary>
-        public static double Repulsion_Strength = 300;
+        public static double Repulsion_Strength = 50;
 
         /// <summary>
         /// the gravity range factor
