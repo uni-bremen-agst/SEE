@@ -198,18 +198,18 @@ namespace SEE.Layout
 
         public CoseLayoutSettings()
         {
-            CoolingFactor = 1.0;
-            InitialCoolingFactor = 1.0;
-            Coolingcycle = 0;
-            FinalTemperature = 0;
-            MaxIterations = 2500;
-            FinalTemperature = Convergence_Check_Periode / MaxIterations;
-            MaxCoolingCycle = MaxIterations / Convergence_Check_Periode;
-            DisplacementThresholdPerNode = (3.0 * Edge_Length) / 100;
-            TotalIterations = 0;
-            TotalDisplacement = 0.0;
-            OldTotalDisplacement = 0.0;
-            Level = 0;
+            coolingFactor = 1.0;
+            initialCoolingFactor = 1.0;
+            coolingcycle = 0;
+            finalTemperature = 0;
+            maxIterations = 2500;
+            finalTemperature = Convergence_Check_Periode / maxIterations;
+            maxCoolingCycle = maxIterations / Convergence_Check_Periode;
+            displacementThresholdPerNode = (3.0 * Edge_Length) / 100;
+            totalIterations = 0;
+            totalDisplacement = 0.0;
+            oldTotalDisplacement = 0.0;
+            level = 0;
         }
 
         public double InitialCoolingFactor { get => initialCoolingFactor; set => initialCoolingFactor = value; }

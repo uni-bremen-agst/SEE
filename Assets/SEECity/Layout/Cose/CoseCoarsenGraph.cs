@@ -54,13 +54,13 @@ namespace SEE.Layout
                 foreach (CoseCoarsenNode node in Nodes)
                 {
                     CoseNode newNode = layout.NewNode();
-                    newNode.CNodeLayoutValues.Pred1 = node.Node1.Reference;
-                    node.Node1.Reference.CNodeLayoutValues.Next = newNode;
+                    newNode.LayoutValues.Pred1 = node.Node1.Reference;
+                    node.Node1.Reference.LayoutValues.Next = newNode;
 
                     if (node.Node2 != null)
                     {
-                        newNode.CNodeLayoutValues.Pred2 = node.Node2.Reference;
-                        node.Node2.Reference.CNodeLayoutValues.Next = newNode;
+                        newNode.LayoutValues.Pred2 = node.Node2.Reference;
+                        node.Node2.Reference.LayoutValues.Next = newNode;
                     }
 
                     node.Reference = newNode;

@@ -74,7 +74,7 @@ namespace SEE.Layout
         /// <param name="innerNodeHeight">The height of objects (y co-ordinate) drawn for inner nodes.</param>
         public CoseSublayout(CoseNode root, Dictionary<Node, GameObject> nodeMap, float groundLevel, NodeFactory leafNodeFactory, float innerNodeHeight)
         {
-            this.nodeLayout = root.CNodeSublayoutValues.NodeLayout;
+            this.nodeLayout = root.SublayoutValues.NodeLayout;
             this.root = root;
             this.nodeMap = nodeMap;
             this.groundLevel = groundLevel;
@@ -87,7 +87,7 @@ namespace SEE.Layout
                 this.nodeMapSublayout = CalculateGameobjectsForSublayout();
             }
 
-            root.CNodeSublayoutValues.Sublayout = this;
+            root.SublayoutValues.Sublayout = this;
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace SEE.Layout
             if (!onlyLeaves)
             {
                 nodesForLayout.Add(graph.Parent);
-                graph.Parent.CNodeSublayoutValues.IsSubLayoutNode = true;
+                graph.Parent.SublayoutValues.IsSubLayoutNode = true;
             }
 
             nodesForLayout.AddRange(graph.CalculateNodesForSublayout(onlyLeaves));
