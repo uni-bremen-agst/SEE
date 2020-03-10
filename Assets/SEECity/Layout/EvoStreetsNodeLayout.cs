@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using SEE.Layout.EvoStreets;
+using System.Linq;
 
 namespace SEE.Layout
 {
@@ -66,7 +67,7 @@ namespace SEE.Layout
             }
             else if (gameNodes.Count == 1)
             {
-                GameObject gameNode = gameNodes.GetEnumerator().Current;
+                GameObject gameNode = gameNodes.Single();
                 Dictionary<GameObject, NodeTransform> layout_result = new Dictionary<GameObject, NodeTransform>
                 {
                     [gameNode] = new NodeTransform(Vector3.zero, gameNode.transform.localScale)
