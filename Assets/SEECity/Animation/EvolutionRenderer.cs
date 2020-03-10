@@ -383,7 +383,7 @@ namespace SEE.Animation.Internal
             // RenderEdge will access it.
             _nextCity = next;
             // Draw all nodes of next graph.
-            next.Graph.Traverse(RenderPlane, RenderInnerNode, RenderLeaf);
+            next.Graph.Traverse(RenderInnerNode, RenderLeaf);
             // Draw all edges of next graph.
             next.Graph.Edges().ForEach(RenderEdge);
             // We have made the transition to the next graph.
@@ -487,7 +487,6 @@ namespace SEE.Animation.Internal
         /// <param name="edge">edge to be rendered</param>
         protected virtual void RenderEdge(Edge edge)
         {
-            Debug.LogFormat("RenderEdge for edge {0}\n", edge.LinkName);
         }
 
         /// <summary>
@@ -496,10 +495,8 @@ namespace SEE.Animation.Internal
         /// <param name="node">inner node to be removed</param>
         protected virtual void RenderRemovedOldInnerNode(Node node)
         {
-            Debug.LogFormat("RenderRemovedOldInnerNode for node {0}\n", node.LinkName);
             if (objectManager.TryGetNode(node, out GameObject gameObject))
             {
-                Debug.LogFormat("RenderRemovedOldInnerNode for node {0}: SINK ANIMATION\n", node.LinkName);
                 // if the node needs to be removed, let it sink into the ground
                 var nextPosition = gameObject.transform.position;
                 nextPosition.y = -2;
@@ -515,10 +512,8 @@ namespace SEE.Animation.Internal
         /// <param name="node">leaf node to be removed</param>
         protected virtual void RenderRemovedOldLeaf(Node node)
         {
-            Debug.LogFormat("RenderRemovedOldLeaf for node {0}\n", node.LinkName);
             if (objectManager.TryGetNode(node, out GameObject leaf))
             {
-                Debug.LogFormat("RenderRemovedOldLeaf for node {0}: SINK ANIMATION\n", node.LinkName);
                 // if the node needs to be removed, let it sink into the ground
                 var newPosition = leaf.transform.position;
                 newPosition.y = -leaf.transform.localScale.y;
@@ -533,7 +528,6 @@ namespace SEE.Animation.Internal
         /// <param name="edge"></param>
         protected virtual void RenderRemovedOldEdge(Edge edge)
         {
-            Debug.LogFormat("RenderRemovedOldEdge for edge {0}\n", edge.LinkName);
         }
 
         /// <summary>
@@ -541,11 +535,9 @@ namespace SEE.Animation.Internal
         /// </summary>
         private void ClearGraphObjects()
         {
-            Debug.Log("ClearGraphObjects()");
             objectManager?.Clear();
-            // We do not want to remove all objects from the scene. There may be
+            // FIXME: We do not want to remove all objects from the scene. There may be
             // other objects not managed by this cityEvolution.
-            
             foreach (string tag in SEE.DataModel.Tags.All)
             {
                 foreach (GameObject o in GameObject.FindGameObjectsWithTag(tag))
@@ -553,7 +545,6 @@ namespace SEE.Animation.Internal
                     DestroyImmediate(o);
                 }
             }
-            
         }
 
         /// <summary>
@@ -682,7 +673,7 @@ namespace SEE.Animation.Internal
             }
             if (index < 0 || index >= GraphCount)
             {
-                Debug.Log("value is no valid index.");
+                Debug.LogErrorFormat("The value {0} is no valid index.\n", index);
                 return false;
             }
             CurrentGraphIndex = index;
@@ -694,9 +685,9 @@ namespace SEE.Animation.Internal
             }
             else
             {
-                Debug.LogError("Could not create LoadedGraph to render.\n");
+                Debug.LogErrorFormat("Could not retrieve a layout for graph with index {0}.\n", index);
+                return false;
             }
-            return false;
         }
 
         /// <summary>
@@ -722,13 +713,13 @@ namespace SEE.Animation.Internal
             Graph graph = graphs[index];
             if (graph == null)
             {
-                Debug.LogError("There ist no graph available at index " + index);
+                Debug.LogErrorFormat("There ist no graph available for graph with index {0}\n", index);
                 return false;
             }
             bool hasLayout = TryGetLayout(graph, out Dictionary<string, NodeTransform> layout);
             if (layout == null || !hasLayout)
             {
-                Debug.LogError("There ist no layout available at index " + index);
+                Debug.LogErrorFormat("There ist no layout available for graph with index {0}", index);
                 return false;
             }
             laidOutGraph = new LaidOutGraph(graph, layout);
@@ -775,8 +766,6 @@ namespace SEE.Animation.Internal
             }
             CurrentGraphIndex++;
 
-            Debug.LogFormat("ShowNextIfPossible: CurrentGraphIndex={0}\n", CurrentGraphIndex);
-
             if (HasCurrentLaidOutGraph(out LaidOutGraph newlyShownGraph) &&
                 HasLaidOutGraph(CurrentGraphIndex - 1, out LaidOutGraph currentlyShownGraph))
             {
@@ -785,7 +774,7 @@ namespace SEE.Animation.Internal
             }
             else
             {
-                Debug.LogError("Could not create LoadedGraph to render.\n");
+                Debug.LogError("Could not retrieve a layout for the graph.\n");
             }
             return true;
         }
@@ -810,8 +799,6 @@ namespace SEE.Animation.Internal
             }
             CurrentGraphIndex--;
 
-            Debug.LogFormat("ShowPreviousGraph: CurrentGraphIndex={0}\n", CurrentGraphIndex);
-
             if (HasCurrentLaidOutGraph(out LaidOutGraph newlyShownGraph) &&
                 HasLaidOutGraph(CurrentGraphIndex + 1, out LaidOutGraph currentlyShownGraph))
             {
@@ -820,7 +807,7 @@ namespace SEE.Animation.Internal
             }
             else
             {
-                Debug.LogError("Could not create LaidOutGraph to render.\n");
+                Debug.LogError("Could not retrieve a graph layout.\n");
             }
         }
 
