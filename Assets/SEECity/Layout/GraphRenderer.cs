@@ -117,6 +117,30 @@ namespace SEE.Layout
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
         private void EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
         {
+            Dictionary<Node, GameObject> nodeMap = new Dictionary<Node, GameObject>();
+
+            foreach (GameObject gameNode in gameNodes)
+            {
+                NodeRef nodeRef = gameNode.GetComponent<NodeRef>();
+                if (nodeRef != null)
+                {
+                    nodeMap[nodeRef.node] = gameNode;
+                }
+                else
+                {
+                    throw new System.Exception("game node without graph node component");
+                }
+            }
+
+            foreach (Edge edge in graph.ConnectingEdges(nodeMap.Keys))
+            {
+                Vector3 sourcePosition = leafNodeFactory.Ground(nodeMap[edge.Source]);
+                                                         
+                Vector3 targetPosition = leafNodeFactory.Ground(nodeMap[edge.Target]);
+
+                edge.dist = Vector3.Distance(sourcePosition, targetPosition);
+            }
+
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
             {
@@ -216,6 +240,7 @@ namespace SEE.Layout
 
                     foreach (KeyValuePair<string, List<Node>> kvp in sublayoutRootsWithNodes)
                     {
+                        // BUG!
                         // nodeMap nach knoten gefiltert, die in dem sublayout sind 
                         Dictionary<Node, GameObject> filteredNodeMap = nodeMap.Where(i => kvp.Value.Contains(i.Key)).ToDictionary(i => i.Key, i => i.Value);
                         // layout nach gameobjects gefiltert, die im sublayout sind
@@ -249,7 +274,7 @@ namespace SEE.Layout
             EdgeLayout(graph, gameNodes);
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             // Place the plane somewhat under ground level.
-            PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
+            PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 2.0f, new Color(94f / 255f, 93f / 255f, 92f / 255f));
 
             Measurements measurements = new Measurements(nodeMap, graph, settings, leftFrontCorner, rightBackCorner);
             measurements.NodesPerformance(p);
@@ -388,6 +413,12 @@ namespace SEE.Layout
                     break;
                 case GraphSettings.InnerNodeKinds.Cylinders:
                 case GraphSettings.InnerNodeKinds.Rectangles:
+                    {
+                        RectangleDecorator decorator = new RectangleDecorator(innerNodeFactory, Color.white);
+                        decorator.Add(InnerNodes(gameNodes));
+                    }
+                    break;
+                    
                 case GraphSettings.InnerNodeKinds.Blocks:
                     // TODO
                     break;

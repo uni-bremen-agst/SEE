@@ -181,7 +181,7 @@ namespace SEE.Layout
                     sublayouts.Add(dir.Key, dir.Value);
                 }
             }
-            sublayouts = sublayouts;
+            this.sublayouts = sublayouts;
         }
 
         /// <summary>
@@ -194,7 +194,7 @@ namespace SEE.Layout
 
             foreach (GameObject gameObject in gameNodes)
             {
-                var scale = gameObject.transform.localScale;
+                var size = leafNodeFactory.GetSize(gameObject);
                 Node node = gameObject.GetComponent<NodeRef>().node;
                 if (roots.Contains(node))
                 {
@@ -204,8 +204,8 @@ namespace SEE.Layout
 
                 if (node.IsLeaf())
                 {
-                    coseNode.SetWidth(scale.x);
-                    coseNode.SetHeight(scale.z);
+                    coseNode.SetWidth(size.x);
+                    coseNode.SetHeight(size.z);
                 }
             }
         }

@@ -66,10 +66,10 @@ namespace SEE.Layout
 
             foreach (CoseCoarsenNode node in GetNeighborsList())
             {
-                if (!node.matched && node != this && (node.weight < minWeight))
+                if (!node.Matched && node != this && (node.Weight < minWeight))
                 {
                     minWeighted = node;
-                    minWeight = node.weight;
+                    minWeight = node.Weight;
                 }
             }
             return minWeighted;
