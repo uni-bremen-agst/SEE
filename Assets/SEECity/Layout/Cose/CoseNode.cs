@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.DataModel;
 using System;
+using System.Linq;
 
 namespace SEE.Layout
 {
@@ -215,7 +216,7 @@ namespace SEE.Layout
             allIntergraphEdges.AddRange(graphManager.Edges);
 
             // here nur sublayout nodes für das jeweilige root 
-            List<CoseNode> nodes = cNSubLValues.SublayoutNodes;
+            List<CoseNode> nodes = new List<CoseNode>();//cNSubLValues.Sublayout.NodeMapSublayout.Keys.ToList();
 
             foreach (CoseNode node in nodes)
             {

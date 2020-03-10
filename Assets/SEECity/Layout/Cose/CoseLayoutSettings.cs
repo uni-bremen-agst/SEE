@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
-    public class CoseLayoutSettings : MonoBehaviour
+    public class CoseLayoutSettings 
     {
         /// <summary>
         /// the margin of a graph

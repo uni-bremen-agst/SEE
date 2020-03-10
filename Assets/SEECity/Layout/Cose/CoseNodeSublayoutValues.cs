@@ -7,7 +7,7 @@ using static SEE.GraphSettings;
 
 namespace SEE.Layout
 {
-    public class CoseNodeSublayoutValues : MonoBehaviour
+    public class CoseNodeSublayoutValues
     {
         /// <summary>
         /// the bounds of the node relative to its sublayout root 
@@ -43,6 +43,8 @@ namespace SEE.Layout
         /// 
         /// </summary>
         private CoseSublayout sublayout;
+
+        public List<Node> removedChildren = new List<Node>();
 
         public List<CoseNode> SublayoutNodes { get => sublayoutNodes; set => sublayoutNodes = value; }
         public bool IsSubLayoutRoot { get => isSubLayoutRoot; set => isSubLayoutRoot = value; }
