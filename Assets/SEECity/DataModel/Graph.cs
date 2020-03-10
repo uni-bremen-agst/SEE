@@ -579,7 +579,7 @@ namespace SEE.DataModel
         /// <summary>
         /// Traverses the given graph. On every node that is a leaf,
         /// leafAction is called, otherwise innerNodeAction is called.
-        /// If an action ist null, it just won't be called.
+        /// If an action is null, it just won't be called.
         /// </summary>
         /// <param name="innerNodeAction">Function that is called when node is not a leaf.</param>
         /// <param name="leafAction">Function that is called when node is a leaf.</param>
