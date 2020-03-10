@@ -56,7 +56,7 @@ namespace SEE.Layout
         /// <param name="layout">the layout</param>
         public CoseGraphManager(CoseLayout layout)
         {
-            this.Layout = layout;
+            this.layout = layout;
             Init();
         }
 
@@ -70,7 +70,7 @@ namespace SEE.Layout
             allNodes = null;
             allEdges = null;
             nodesToApplyGravitation = null;
-            RootGraph = null;
+            rootGraph = null;
         }
 
         /// <summary>
@@ -79,8 +79,8 @@ namespace SEE.Layout
         /// <returns></returns>
         public CoseGraph AddRootGraph()
         {
-            RootGraph = Add(new CoseGraph(null, this), new CoseNode(null, this));
-            return RootGraph;
+            rootGraph = Add(new CoseGraph(null, this), new CoseNode(null, this));
+            return rootGraph;
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace SEE.Layout
 
             if (graph.Parent == null)
             {
-                graph.Parent = Layout.NewNode();
+                graph.Parent = layout.NewNode();
             }
         }
 
@@ -192,7 +192,7 @@ namespace SEE.Layout
         /// </summary>
         public void UpdateBounds()
         {
-            RootGraph.UpdateBounds(true);
+            rootGraph.UpdateBounds(true);
         }
 
         /// <summary>
@@ -324,7 +324,7 @@ namespace SEE.Layout
 
             CoseCoarsenGraph g = new CoseCoarsenGraph(layout);
 
-            ConvertToCoarseningGraph(RootGraph, g);
+            ConvertToCoarseningGraph(rootGraph, g);
 
             currNodeCount = g.Nodes.Count;
 
@@ -344,7 +344,7 @@ namespace SEE.Layout
 
             } while ((prevNodeCount != currNodeCount) && currNodeCount > 1);
 
-            Layout.GraphManager = this;
+            layout.GraphManager = this;
 
             gmList.RemoveAt(gmList.Count - 1);
 
@@ -383,25 +383,25 @@ namespace SEE.Layout
             {
                 if (node.Child != null)
                 {
-                    node.CNodeLayoutValues.Next = coarserGraph.GraphManager.Layout.NewNode();
-                    coarserGraph.GraphManager.Add(coarserGraph.GraphManager.Layout.NewGraph(), node.CNodeLayoutValues.Next);
-                    node.CNodeLayoutValues.Next.CNodeLayoutValues.Pred1 = node;
-                    coarserGraph.AddNode(node.CNodeLayoutValues.Next);
+                    node.LayoutValues.Next = coarserGraph.GraphManager.Layout.NewNode();
+                    coarserGraph.GraphManager.Add(coarserGraph.GraphManager.Layout.NewGraph(), node.LayoutValues.Next);
+                    node.LayoutValues.Next.LayoutValues.Pred1 = node;
+                    coarserGraph.AddNode(node.LayoutValues.Next);
 
-                    CoarsenNodes(node.Child, node.CNodeLayoutValues.Next.Child);
+                    CoarsenNodes(node.Child, node.LayoutValues.Next.Child);
                 }
                 else
                 {
-                    if (!node.CNodeLayoutValues.Next.CNodeLayoutValues.IsProcessed)
+                    if (!node.LayoutValues.Next.LayoutValues.IsProcessed)
                     {
-                        coarserGraph.AddNode(node.CNodeLayoutValues.Next);
-                        node.CNodeLayoutValues.Next.CNodeLayoutValues.IsProcessed = true;
+                        coarserGraph.AddNode(node.LayoutValues.Next);
+                        node.LayoutValues.Next.LayoutValues.IsProcessed = true;
                     }
                 }
 
-                node.CNodeLayoutValues.Next.SetLocation(node.rect.x, node.rect.y);
-                node.CNodeLayoutValues.Next.SetHeight(node.rect.height);
-                node.CNodeLayoutValues.Next.SetWidth(node.rect.width);
+                node.LayoutValues.Next.SetLocation(node.rect.x, node.rect.y);
+                node.LayoutValues.Next.SetHeight(node.rect.height);
+                node.LayoutValues.Next.SetWidth(node.rect.width);
             }
         }
 

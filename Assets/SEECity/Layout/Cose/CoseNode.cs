@@ -47,8 +47,8 @@ namespace SEE.Layout
         /// <summary>
         /// TODO
         /// </summary>
-        private CoseNodeSublayoutValues cNSubLValues = new CoseNodeSublayoutValues();
-
+        private CoseNodeSublayoutValues sublayoutValues = new CoseNodeSublayoutValues();
+   
         /// <summary>
         /// The estimated size of the node
         /// </summary>
@@ -57,7 +57,7 @@ namespace SEE.Layout
         /// <summary>
         /// TODO
         /// </summary>
-        private CoseNodeLayoutValues cNLValues = new CoseNodeLayoutValues();
+        private CoseNodeLayoutValues layoutValues = new CoseNodeLayoutValues();
 
         /// <summary>
         /// A list of nodes that surround the node
@@ -71,9 +71,9 @@ namespace SEE.Layout
 
         public int NoOfChildren { get => noOfChildren; set => noOfChildren = value; }
         public List<CoseNode> Surrounding { get => surrounding; set => surrounding = value; }
-        public CoseNodeLayoutValues CNodeLayoutValues { get => cNLValues; set => cNLValues = value; }
+        public CoseNodeLayoutValues LayoutValues { get => layoutValues; set => layoutValues = value; }
         public float EstimatedSize { get => estimatedSize; set => estimatedSize = value; }
-        public CoseNodeSublayoutValues CNodeSublayoutValues { get => cNSubLValues; set => cNSubLValues = value; }
+        public CoseNodeSublayoutValues SublayoutValues { get => sublayoutValues; set => sublayoutValues = value; }
         public List<CoseEdge> Edges { get => edges; set => edges = value; }
         public CoseGraph Owner { get => owner; set => owner = value; }
         public CoseGraph Child { get => child; set => child = value; }
@@ -88,13 +88,13 @@ namespace SEE.Layout
         /// <param name="graphManager">the graphmanager</param>
         public CoseNode(Node node, CoseGraphManager graphManager)
         {
-            this.NodeObject = node;
+            nodeObject = node;
             this.graphManager = graphManager;
 
             if (graphManager != null && graphManager.Layout.Sublayouts.Count != 0 && node != null && graphManager.Layout.Sublayouts.ContainsKey(node.LinkName))
             {
-                CNodeSublayoutValues.IsSubLayoutRoot = true;
-                CNodeSublayoutValues.NodeLayout = graphManager.Layout.Sublayouts[node.LinkName];
+                sublayoutValues.IsSubLayoutRoot = true;
+                sublayoutValues.NodeLayout = graphManager.Layout.Sublayouts[node.LinkName];
             }
         }
 
@@ -146,9 +146,9 @@ namespace SEE.Layout
                 withNeighbors.Add(this);
             }
 
-            if (Child != null)
+            if (child != null)
             {
-                foreach (CoseNode childN in Child.Nodes)
+                foreach (CoseNode childN in child.Nodes)
                 {
                     withNeighbors.AddRange(childN.WithChildren());
                 }
@@ -165,45 +165,45 @@ namespace SEE.Layout
             CoseLayout layout = graphManager.Layout;
             double maxNodeDisplacement = layout.CoseLayoutSettings.CoolingFactor * layout.CoseLayoutSettings.MaxNodeDisplacement;
 
-            cNLValues.DisplacementX = layout.CoseLayoutSettings.CoolingFactor * (cNLValues.SpringForceX + cNLValues.RepulsionForceX + cNLValues.GravitationForceX) / NumberOfChildren();
-            cNLValues.DisplacementY = layout.CoseLayoutSettings.CoolingFactor * (cNLValues.SpringForceY + cNLValues.RepulsionForceY + cNLValues.GravitationForceY) / NumberOfChildren();
+            layoutValues.DisplacementX = layout.CoseLayoutSettings.CoolingFactor * (layoutValues.SpringForceX + layoutValues.RepulsionForceX + layoutValues.GravitationForceX) / NumberOfChildren();
+            layoutValues.DisplacementY = layout.CoseLayoutSettings.CoolingFactor * (layoutValues.SpringForceY + layoutValues.RepulsionForceY + layoutValues.GravitationForceY) / NumberOfChildren();
 
 
-            if (Math.Abs(cNLValues.DisplacementX) > maxNodeDisplacement)
+            if (Math.Abs(layoutValues.DisplacementX) > maxNodeDisplacement)
             {
-                cNLValues.DisplacementX = maxNodeDisplacement * Math.Sign(cNLValues.DisplacementX);
+                layoutValues.DisplacementX = maxNodeDisplacement * Math.Sign(layoutValues.DisplacementX);
             }
 
-            if (Math.Abs(cNLValues.DisplacementY) > maxNodeDisplacement)
+            if (Math.Abs(layoutValues.DisplacementY) > maxNodeDisplacement)
             {
-                cNLValues.DisplacementY = maxNodeDisplacement * Math.Sign(cNLValues.DisplacementY);
+                layoutValues.DisplacementY = maxNodeDisplacement * Math.Sign(layoutValues.DisplacementY);
             }
 
-            if (Child == null && !cNSubLValues.IsSubLayoutNode) // TODO here maybe
+            if (child == null && !sublayoutValues.IsSubLayoutNode) // TODO here maybe
             {
-                MoveBy(cNLValues.DisplacementX, cNLValues.DisplacementY);
+                MoveBy(layoutValues.DisplacementX, layoutValues.DisplacementY);
             }
-            else if (Child.Nodes.Count == 0 && !cNSubLValues.IsSubLayoutNode) // todo here maybe 
+            else if (child.Nodes.Count == 0 && !sublayoutValues.IsSubLayoutNode) // todo here maybe 
             {
-                MoveBy(cNLValues.DisplacementX, cNLValues.DisplacementY);
+                MoveBy(layoutValues.DisplacementX, layoutValues.DisplacementY);
             }
             else
             {
-                if (!cNSubLValues.IsSubLayoutNode && !cNSubLValues.IsSubLayoutRoot)
+                if (!sublayoutValues.IsSubLayoutNode && !sublayoutValues.IsSubLayoutRoot)
                 {
-                    PropogateDisplacementToChildren(cNLValues.DisplacementX, cNLValues.DisplacementY);
+                    PropogateDisplacementToChildren(layoutValues.DisplacementX, layoutValues.DisplacementY);
                 }
                 else
                 {
-                    if (cNSubLValues.IsSubLayoutRoot)
+                    if (sublayoutValues.IsSubLayoutRoot)
                     {
-                        MoveBy(cNLValues.DisplacementX, cNLValues.DisplacementY);
+                        MoveBy(layoutValues.DisplacementX, layoutValues.DisplacementY);
                     }
                 }
 
             }
 
-            layout.CoseLayoutSettings.TotalDisplacement += Math.Abs(cNLValues.DisplacementX) + Math.Abs(cNLValues.DisplacementY);
+            layout.CoseLayoutSettings.TotalDisplacement += Math.Abs(layoutValues.DisplacementX) + Math.Abs(layoutValues.DisplacementY);
         }
 
         /// <summary>
@@ -216,6 +216,7 @@ namespace SEE.Layout
             allIntergraphEdges.AddRange(graphManager.Edges);
 
             // here nur sublayout nodes für das jeweilige root 
+
             List<CoseNode> nodes = new List<CoseNode>();//cNSubLValues.Sublayout.NodeMapSublayout.Keys.ToList();
 
             foreach (CoseNode node in nodes)
@@ -233,7 +234,7 @@ namespace SEE.Layout
                                 {
                                     edge.Source.Edges.Remove(edge);
                                     edge.Source = this;
-                                    this.Edges.Add(edge);
+                                    this.edges.Add(edge);
                                 }
                                 else
                                 {
@@ -247,7 +248,7 @@ namespace SEE.Layout
                                 {
                                     edge.Target.Edges.Remove(edge);
                                     edge.Target = this;
-                                    this.Edges.Add(edge);
+                                    this.edges.Add(edge);
                                 }
                                 else
                                 {
@@ -271,11 +272,11 @@ namespace SEE.Layout
         {
             MoveBy(dx, dy);
 
-            if (Child != null)
+            if (child != null)
             {
-                Child.SetXYDisplacementBoundingRect(dx, dy);
+                child.SetXYDisplacementBoundingRect(dx, dy);
 
-                foreach (CoseNode node in Child.Nodes)
+                foreach (CoseNode node in child.Nodes)
                 {
                     node.PropogateDisplacementToSublayoutChildren(dx, dy);
                 }
@@ -289,13 +290,13 @@ namespace SEE.Layout
         /// <param name="dy">the displacement of the y direction</param>
         public void PropogateDisplacementToChildren(double dx, double dy)
         {
-            foreach (CoseNode node in Child.Nodes)
+            foreach (CoseNode node in child.Nodes)
             {
                 if (node.Child == null)
                 {
                     node.MoveBy(dx, dy);
-                    node.cNLValues.DisplacementX += dx;
-                    node.cNLValues.DisplacementY += dy;
+                    node.LayoutValues.DisplacementX += dx;
+                    node.LayoutValues.DisplacementY += dy;
                 }
                 else
                 {
@@ -320,14 +321,14 @@ namespace SEE.Layout
         /// </summary>
         public void Reset()
         {
-            cNLValues.SpringForceX = 0;
-            cNLValues.SpringForceY = 0;
-            cNLValues.RepulsionForceX = 0;
-            cNLValues.RepulsionForceY = 0;
-            cNLValues.GravitationForceX = 0;
-            cNLValues.GravitationForceY = 0;
-            cNLValues.DisplacementX = 0;
-            cNLValues.DisplacementY = 0;
+            layoutValues.SpringForceX = 0;
+            layoutValues.SpringForceY = 0;
+            layoutValues.RepulsionForceX = 0;
+            layoutValues.RepulsionForceY = 0;
+            layoutValues.GravitationForceX = 0;
+            layoutValues.GravitationForceY = 0;
+            layoutValues.DisplacementX = 0;
+            layoutValues.DisplacementY = 0;
         }
 
         /// <summary>
@@ -336,9 +337,9 @@ namespace SEE.Layout
         /// <param name="origin">the node</param>
         public void SetPositionRelativ(CoseNode origin)
         {
-            cNSubLValues.relativeRect.x -= origin.rect.x;
-            cNSubLValues.relativeRect.y -= origin.rect.y;
-            cNSubLValues.SubLayoutRoot = origin;
+            sublayoutValues.relativeRect.x -= origin.rect.x;
+            sublayoutValues.relativeRect.y -= origin.rect.y;
+            sublayoutValues.SubLayoutRoot = origin;
         }
 
         /// <summary>
@@ -346,10 +347,10 @@ namespace SEE.Layout
         /// </summary>
         public void SetOrigin()
         {
-            rect.x = cNSubLValues.relativeRect.x + cNSubLValues.SubLayoutRoot.rect.x;
-            rect.y = cNSubLValues.relativeRect.y + cNSubLValues.SubLayoutRoot.rect.y;
-            SetWidth(cNSubLValues.relativeRect.width);
-            SetHeight(cNSubLValues.relativeRect.height);
+            rect.x = sublayoutValues.relativeRect.x + sublayoutValues.SubLayoutRoot.rect.x;
+            rect.y = sublayoutValues.relativeRect.y + sublayoutValues.SubLayoutRoot.rect.y;
+            SetWidth(sublayoutValues.relativeRect.width);
+            SetHeight(sublayoutValues.relativeRect.height);
         }
 
         /// <summary>
@@ -367,16 +368,16 @@ namespace SEE.Layout
             float top = position.z - (scale.z / 2);
             float bottom = position.z + (scale.z / 2);
 
-            cNSubLValues.UpdateRelativeRect(left, right, top, bottom);
+            sublayoutValues.UpdateRelativeRect(left, right, top, bottom);
             UpdateRect(left, right, top, bottom);
 
-            if (Child != null)
+            if (child != null)
             {
-                Child.Left = left;
-                Child.Top = top;
-                Child.Right = right;
-                Child.Bottom = bottom;
-                Child.UpdateBoundingRect();
+                child.Left = left;
+                child.Top = top;
+                child.Right = right;
+                child.Bottom = bottom;
+                child.UpdateBoundingRect();
             }
         }
 
@@ -386,7 +387,7 @@ namespace SEE.Layout
         /// <returns></returns>
         public bool IsLeaf()
         {
-            return Child == null || Child.Nodes.Count == 0;
+            return child == null || child.Nodes.Count == 0;
         }
 
         /// <summary>
@@ -397,13 +398,13 @@ namespace SEE.Layout
         {
             int noOfChildren = 0;
 
-            if (Child == null)
+            if (child == null)
             {
                 noOfChildren = 1;
             }
             else
             {
-                foreach (CoseNode child in Child.Nodes)
+                foreach (CoseNode child in child.Nodes)
                 {
                     noOfChildren += child.NumberOfChildren();
                 }
@@ -434,40 +435,40 @@ namespace SEE.Layout
         /// </summary>
         public void UpdateBounds()
         {
-            if (Child == null)
+            if (child == null)
             {
                 throw new System.Exception("Child Graph is null");
             }
 
-            if (cNSubLValues.IsSubLayoutRoot)
+            if (sublayoutValues.IsSubLayoutRoot)
             {
-                SetWidth(cNSubLValues.relativeRect.width);
-                SetHeight(cNSubLValues.relativeRect.height);
-                Child.UpdateBounds(true);
+                SetWidth(sublayoutValues.relativeRect.width);
+                SetHeight(sublayoutValues.relativeRect.height);
+                child.UpdateBounds(true);
                 // rect.x/ rect.y müssen nicht gesetzt werden, da der Knoten seine Größe kennt und nicht abhängig von Child knoten ist
                 return;
             }
 
-            if (cNSubLValues.IsSubLayoutNode) // durch das vorherige return werden die root knoten ausgeschlossen
+            if (sublayoutValues.IsSubLayoutNode) // durch das vorherige return werden die root knoten ausgeschlossen
             {
                 // diese knoten haben relativ positionen zu subLayoutRoot, d.h. diese müssen wieder auf origin gesetzt werden, 
                 // damit das von anderen richtig berechnet werden kann
 
                 // set position to origin by using the relativ values 
 
-                rect.x = cNSubLValues.relativeRect.x + cNSubLValues.SubLayoutRoot.rect.x;
-                rect.y = cNSubLValues.relativeRect.y + cNSubLValues.SubLayoutRoot.rect.y;
-                SetWidth(cNSubLValues.relativeRect.width);
-                SetHeight(cNSubLValues.relativeRect.height);
-                Child.UpdateBounds(true);
+                rect.x = sublayoutValues.relativeRect.x + sublayoutValues.SubLayoutRoot.rect.x;
+                rect.y = sublayoutValues.relativeRect.y + sublayoutValues.SubLayoutRoot.rect.y;
+                SetWidth(sublayoutValues.relativeRect.width);
+                SetHeight(sublayoutValues.relativeRect.height);
+                child.UpdateBounds(true);
                 return;
             }
 
-            if (Child.Nodes.Count != 0)
+            if (child.Nodes.Count != 0)
             {
-                Child.UpdateBounds(true);
-                rect.x = Child.Left - CoseLayoutSettings.Compound_Node_Margin;
-                rect.y = Child.Top - CoseLayoutSettings.Compound_Node_Margin;
+                child.UpdateBounds(true);
+                rect.x = child.Left - CoseLayoutSettings.Compound_Node_Margin;
+                rect.y = child.Top - CoseLayoutSettings.Compound_Node_Margin;
 
                 // float width = childGraph.Right - childGraph.Left / Mathf.Sqrt(2);
                 // float height = childGraph.Bottom - childGraph.Top / Mathf.Sqrt(2);
@@ -476,21 +477,21 @@ namespace SEE.Layout
                 // float diffHeight = Mathf.Abs(height - rect.height);
 
                 // Here add Labelheight etc. 
-                if (GraphManager.Layout.InnerNodesAreCircles)
+                if (graphManager.Layout.InnerNodesAreCircles)
                 {
-                    var width = Math.Abs(Child.Right - Child.Left);
-                    var height = Math.Abs(Child.Bottom - Child.Top);
+                    var width = Math.Abs(child.Right - child.Left);
+                    var height = Math.Abs(child.Bottom - child.Top);
 
                     var boundsWidth = (float)((width / Math.Sqrt(2)) - (width / 2));
                     var boundsHeight = (float)((height / Math.Sqrt(2)) - (height / 2));
 
-                    SetWidth(Child.Right - Child.Left + boundsWidth + boundsWidth);
-                    SetHeight(Child.Bottom - Child.Top + boundsHeight + boundsHeight);
+                    SetWidth(child.Right - child.Left + boundsWidth + boundsWidth);
+                    SetHeight(child.Bottom - child.Top + boundsHeight + boundsHeight);
                 }
                 else
                 {
-                    SetWidth(Child.Right - Child.Left + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);//+ (2 * CoseDefaultValues.COMPOUND_NODE_MARGIN)); //+ diffWidth);
-                    SetHeight(Child.Bottom - Child.Top + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);// + (2 * CoseDefaultValues.COMPOUND_NODE_MARGIN)); // + diffHeight);
+                    SetWidth(child.Right - child.Left + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);//+ (2 * CoseDefaultValues.COMPOUND_NODE_MARGIN)); //+ diffWidth);
+                    SetHeight(child.Bottom - child.Top + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);// + (2 * CoseDefaultValues.COMPOUND_NODE_MARGIN)); // + diffHeight);
                 }
             }
         }
@@ -502,12 +503,12 @@ namespace SEE.Layout
         /// <param name="_finishX"></param>
         /// <param name="_startY"></param>
         /// <param name="_finishY"></param>
-        public void SetGridCoordinates(int _startX, int _finishX, int _startY, int _finishY)
+        public void SetGridCoordinates(int startX, int finishX, int startY, int finishY)
         {
-            cNLValues.StartX = _startX;
-            cNLValues.FinishX = _finishX;
-            cNLValues.StartY = _startY;
-            cNLValues.FinishY = _finishY;
+            layoutValues.StartX = startX;
+            layoutValues.FinishX = finishX;
+            layoutValues.StartY = startY;
+            layoutValues.FinishY = finishY;
         }
 
         /// <summary>
@@ -516,14 +517,14 @@ namespace SEE.Layout
         /// <returns></returns>
         public float CalcEstimatedSize()
         {
-            if (Child == null)
+            if (child == null)
             {
                 estimatedSize = (rect.width + rect.height) / 2;
                 return estimatedSize;
             }
             else
             {
-                estimatedSize = Child.CalcEstimatedSize();
+                estimatedSize = child.CalcEstimatedSize();
                 rect.width = estimatedSize;
                 rect.height = estimatedSize;
                 return estimatedSize;

@@ -45,7 +45,7 @@ namespace SEE.Layout
         /// <param name="graphManager">the current graphmanager</param>
         public CoseCoarsenNode(Node node, CoseGraphManager graphManager) : base(node, graphManager)
         {
-            Weight = 1;
+            weight = 1;
         }
 
         /// <summary>

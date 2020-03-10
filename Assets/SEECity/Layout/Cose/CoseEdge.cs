@@ -139,8 +139,8 @@ namespace SEE.Layout
         /// </summary>
         public void UpdateLengthSimple()
         {
-            lengthX = Target.GetCenterX() - Source.GetCenterX();
-            lengthY = Target.GetCenterY() - Source.GetCenterY();
+            lengthX = target.GetCenterX() - source.GetCenterX();
+            lengthY = target.GetCenterY() - source.GetCenterY();
 
             if (Math.Abs(lengthX) < 1.0)
             {
@@ -152,7 +152,7 @@ namespace SEE.Layout
                 lengthY = Math.Sign(lengthY);
             }
 
-            Length = Math.Sqrt(lengthX * lengthX + lengthY * lengthY);
+            length = Math.Sqrt(lengthX * lengthX + lengthY * lengthY);
         }
 
         /// <summary>
@@ -161,26 +161,26 @@ namespace SEE.Layout
         public void UpdateLenght()
         {
             double[] clipPointCoordinates = new double[4];
-            Tuple<bool, double[]> result = CoseGeometry.GetIntersection(Target.rect, Source.rect, clipPointCoordinates);
-            IsOverlappingSourceAndTarget = result.Item1;
+            Tuple<bool, double[]> result = CoseGeometry.GetIntersection(target.rect, source.rect, clipPointCoordinates);
+            isOverlappingSourceAndTarget = result.Item1;
             clipPointCoordinates = result.Item2;
 
-            if (!IsOverlappingSourceAndTarget)
+            if (!isOverlappingSourceAndTarget)
             {
                 lengthX = clipPointCoordinates[0] - clipPointCoordinates[2];
                 lengthY = clipPointCoordinates[1] - clipPointCoordinates[3];
 
                 if (Math.Abs(lengthX) < 1.0)
                 {
-                    LengthX = Math.Sign(LengthX);
+                    lengthX = Math.Sign(lengthX);
                 }
 
                 if (Math.Abs(lengthY) < 1.0)
                 {
-                    LengthY = Math.Sign(LengthY);
+                    lengthY = Math.Sign(lengthY);
                 }
 
-                Length = Math.Sqrt(lengthX * lengthX + lengthY * lengthY);
+                length = Math.Sqrt(lengthX * lengthX + lengthY * lengthY);
             }
         }
     }
