@@ -75,10 +75,6 @@ namespace SEE.Animation
         /// <param name="callback">An optional callback</param>
         public void AnimateTo(GameObject gameObject, NodeTransform nodeTransform, bool wasModified, Action<object> callback = null)
         {
-            Debug.LogFormat("AnimateTo {0}: from (position={1}, scale={2}) to (position={3}, scale={4})\n",
-                             gameObject.LinkName(),
-                             gameObject.transform.position, gameObject.transform.localScale,
-                             nodeTransform.position, nodeTransform.scale);
             gameObject.AssertNotNull("gameObject");
             nodeTransform.AssertNotNull("nodeTransform");
 
