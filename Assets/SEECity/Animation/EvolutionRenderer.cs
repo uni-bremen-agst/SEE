@@ -383,7 +383,7 @@ namespace SEE.Animation.Internal
             // RenderEdge will access it.
             _nextCity = next;
             // Draw all nodes of next graph.
-            next.Graph.Traverse(RenderInnerNode, RenderLeaf);
+            next.Graph.Traverse(RenderNode, RenderNode);
             // Draw all edges of next graph.
             next.Graph.Edges().ForEach(RenderEdge);
             // We have made the transition to the next graph.
@@ -438,31 +438,17 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Determines how an inner node that contains other nodes is displayed.
+        /// Renders the game object corresponding to the given <paramref name="node"/>.
         /// </summary>
         /// <param name="node">node to be displayed</param>
-        protected virtual void RenderInnerNode(Node node)
-        {
-            bool isNew = !objectManager.GetInnerNode(node, out GameObject gameObject);
-            RenderNode(node, isNew, gameObject);
-        }
-
-        /// <summary>
-        /// Renders a leaf node.
-        /// </summary>
-        /// <param name="node">leaf node to be rendered</param>
-        protected virtual void RenderLeaf(Node node)
-        {
-            bool isNew = !objectManager.GetLeaf(node, out GameObject gameObject);
-            RenderNode(node, isNew, gameObject);
-        }
-
-        private void RenderNode(Node node, bool isNew, GameObject gameObject)
+        protected virtual void RenderNode(Node node)
         {
             NodeTransform nodeTransform = NextLayoutToBeShown[node.LinkName];
-            if (isNew)
+            Node formerNode = objectManager.GetNode(node, out GameObject gameObject);
+
+            if (formerNode == null)
             {
-                // if the leaf node is new, animate it by moving it out of the ground
+                // If the node is new, we animate it by moving it out of the ground.
 
                 // FIXME: CScape buildings have a different notion of position than cubes.
                 // We need to use graphRenderer.Apply().
