@@ -93,10 +93,7 @@ namespace SEE.Layout
         /// <param name="graphs">set of graphs whose node metrics are to be scaled</param>
         public void SetScaler(ICollection<Graph> graphs)
         {
-            List<string> nodeMetrics = new List<string>() { settings.WidthMetric, settings.HeightMetric, settings.DepthMetric, settings.ColorMetric };
-            nodeMetrics.AddRange(settings.AllLeafIssues());
-            nodeMetrics.AddRange(settings.AllInnerNodeIssues());
-            nodeMetrics.Add(settings.InnerDonutMetric);
+            List<string> nodeMetrics = settings.AllMetricAttributes();
 
             if (settings.ZScoreScale)
             {
