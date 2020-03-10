@@ -26,7 +26,7 @@ namespace SEE.Animation
 {
     /// <summary>
     /// Animates the position and scale of a given GameObject over the full <see cref="AbstractAnimator.MaxAnimationTime"/>.
-    /// If <see cref="Node.WasModified()"/> is true, the GameObject will be shaken to indicate its modification.
+    /// If a node was modified, the GameObject will be shaken to indicate its modification.
     /// </summary>
     public class MoveScaleShakeAnimator : AbstractAnimator
     {
