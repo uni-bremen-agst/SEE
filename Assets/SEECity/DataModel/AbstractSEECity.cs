@@ -289,6 +289,22 @@ namespace SEE
         public string InnerDonutMetric = "Metric.IssuesTotal";
 
         /// <summary>
+        /// Returns the names of all node metric attributes that are visualized somehow.
+        /// More precisely, the resulting list consists of the following metrics:
+        /// WidthMetric, HeightMetric, DepthMetric, ColorMetric, AllLeafIssues(),
+        /// AllInnerNodeIssues(), and InnerDonutMetric.
+        /// </summary>
+        /// <returns>all node metric attributes</returns>
+        public List<string> AllMetricAttributes()
+        {
+            List<string> nodeMetrics = new List<string>() { WidthMetric, HeightMetric, DepthMetric, ColorMetric };
+            nodeMetrics.AddRange(AllLeafIssues());
+            nodeMetrics.AddRange(AllInnerNodeIssues());
+            nodeMetrics.Add(InnerDonutMetric);
+            return nodeMetrics;
+        }
+
+        /// <summary>
         /// Yields a mapping of all node attribute names that define erosion issues 
         /// for leaf nodes in the GXL file onto the icons to be used for visualizing them.
         /// </summary>

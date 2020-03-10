@@ -72,9 +72,17 @@ namespace SEE.Animation.Internal
                 // assign a new city, we also need a new graph renderer for that city.
                 // So in fact this is the perfect place to assign graphRenderer.
                 graphRenderer = new GraphRenderer(value);
+                diff = new NumericAttributeDiff(value.AllMetricAttributes());
                 objectManager = new ObjectManager(graphRenderer);
             }
         }
+
+        /// <summary>
+        /// The kind of comparison to determine whether there any differences between
+        /// two corresponding graph elements (corresponding by their linknames) in
+        /// two different graphs of the graph series.
+        /// </summary>
+        private GraphElementDiff diff;
 
         /// <summary>
         /// Shortest time period in which an animation can be run in seconds.
@@ -446,6 +454,7 @@ namespace SEE.Animation.Internal
             NodeTransform nodeTransform = NextLayoutToBeShown[node.LinkName];
             Node formerNode = objectManager.GetNode(node, out GameObject gameObject);
 
+            bool wasModified;
             if (formerNode == null)
             {
                 // If the node is new, we animate it by moving it out of the ground.
@@ -455,8 +464,13 @@ namespace SEE.Animation.Internal
                 var newPosition = nodeTransform.position;
                 newPosition.y = -nodeTransform.scale.y;
                 gameObject.transform.position = newPosition;
+                wasModified = false;
             }
-            moveScaleShakeAnimator.AnimateTo(gameObject, nodeTransform, node.WasModified());
+            else
+            {
+                wasModified = diff.AreDifferent(formerNode, node);
+            }
+            moveScaleShakeAnimator.AnimateTo(gameObject, nodeTransform, wasModified);
         }
 
         private void DumpLayout(Dictionary<string, NodeTransform> layout)
@@ -473,6 +487,7 @@ namespace SEE.Animation.Internal
         /// <param name="edge">edge to be rendered</param>
         protected virtual void RenderEdge(Edge edge)
         {
+            // FIXME.
         }
 
         /// <summary>
@@ -514,6 +529,7 @@ namespace SEE.Animation.Internal
         /// <param name="edge"></param>
         protected virtual void RenderRemovedOldEdge(Edge edge)
         {
+            // FIXME.
         }
 
         /// <summary>
