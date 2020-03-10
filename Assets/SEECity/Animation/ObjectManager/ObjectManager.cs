@@ -95,85 +95,22 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Returns a saved GameObject for a leaf or inner node or creates a new one if it does not already exist.
-        /// If the node is a leaf, GetLeaf() will be used to create an leaf node; otherwise GetInnerNode()
-        /// will be used instead to create an inner node.
+        /// Sets <paramref name="gameNode"/> to a cached GameObject for a leaf or inner node 
+        /// or creates a new one if none has existed. The game object is identified
+        /// by the attribute Linkname of <paramref name="node"/>.
+        /// If a game object existed already, the given <paramref name="node"/> will be
+        /// attached to <paramref name="gameNode"/> replacing its previously attached graph
+        /// node and that previously attached graph node will be returned. If no such game object
+        /// existed before, <paramref name="node"/> will be attached to the new game object
+        /// and null will be returned.
         /// </summary>
-        /// <param name="node">The node under which a GameObject may be stored.</param>
-        /// <param name="leaf">The resulting GameObject associated to node or null if no GameObject could 
-        /// be found or created.</param>
-        /// <returns>True if the GameObject already existed and false if it was newly created.</returns>
-        public bool GetNode(Node node, out GameObject gameNode)
+        /// <param name="node">the node to be represented by <paramref name="gameNode"/></param>
+        /// <param name="gameNode">the resulting GameObject representing <paramref name="node"/></param>
+        /// <returns>the formerly attached graph node of <paramref name="gameNode"/> if 
+        /// such a game object existed or null if the game node was newly created</returns>
+        public Node GetNode(Node node, out GameObject gameNode)
         {
-            if (node.IsLeaf())
-            {
-                return GetLeaf(node, out gameNode);
-            }
-            else
-            {
-                return GetInnerNode(node, out gameNode);
-            }
-        }
-
-        /// <summary>
-        /// Returns a saved GameObject for an inner node or creates and caches a new one if it does not 
-        /// already exist. Scale and style of <paramref name="innerNode"/> remain unchanged.
-        /// The given <paramref name="node"/> will be attached to <paramref name="leaf"/> and replaces
-        /// its currently attached graph node.
-        /// </summary>
-        /// <param name="node">the inner node under which a GameObject may be stored</param>
-        /// <param name="innerNode">the resulting GameObject associated to node or null if no GameObject 
-        /// could be found or created</param>
-        /// <returns>true if the GameObject already existed and false if it was newly created</returns>
-        public bool GetInnerNode(Node node, out GameObject innerNode)
-        {
-            node.AssertNotNull("node");
-
-            if (nodes.TryGetValue(node.LinkName, out innerNode))
-            {
-                // A game object for this inner code could be retrieved.
-                // The game object has already a node attached to it, but that
-                // node is part of a different graph (i.e,, different revision).
-                // That is why we replace the attached node by this node here.
-                ReattachNode(innerNode, node);
-                return true;
-            }
-            else
-            {
-                // NewInnerNode() will attach node to innerNode
-                innerNode = _graphRenderer.NewInnerNode(node);
-                nodes[node.LinkName] = innerNode;
-                // Note: The scale of innerNode will be adjusted later when we have the
-                // layout. 
-                // TODO: Inner nodes have a style, too, as much as leaves. We may need to
-                // adjust that style, too, either here or (likely better) later when we 
-                // apply the layout to inner nodes.
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Returns a saved GameObject for a leaf node or creates and caches a new one if it does not 
-        /// already exist.
-        /// The resulting game object will have the dimensions and style according to the attributes of 
-        /// the given <paramref name="node"/> even if the game node existed already. The position of the
-        /// resulting game object is random. The reason for that is the fact that layouts do not change 
-        /// the scale (well, some of them -- for instance, TreeMap -- may shrink or extend the scale by  
-        /// a factor). Instead the node layouters need to know the scale of the nodes they are to layout 
-        /// upfront. On the other hand, the layouts determine the positions. That is why we adjust the 
-        /// scale (and the style) but not the position here. 
-        /// The given <paramref name="node"/> will be attached to <paramref name="leaf"/> and replaces
-        /// its currently attached graph node.
-        /// </summary>
-        /// <param name="node">the leaf node under which a GameObject may be stored</param>
-        /// <param name="leaf">the resulting GameObject associated to node or null if no GameObject 
-        /// could be found or created</param>
-        /// <returns>true if the GameObject already existed and false if it was newly created</returns>
-        public bool GetLeaf(Node node, out GameObject leaf)
-        {
-            node.AssertNotNull("node");
-
-            if (nodes.TryGetValue(node.LinkName, out leaf))
+            if (nodes.TryGetValue(node.LinkName, out gameNode))
             {
                 // We are re-using an existing node, but that node's attributes
                 // determining its scale or style might have changed. That is why we 
@@ -182,35 +119,48 @@ namespace SEE.Animation.Internal
                 // The game object has already a node attached to it, but that
                 // node is part of a different graph (i.e,, different revision).
                 // That is why we replace the attached node by this node here.
-                ReattachNode(leaf, node);
+                Node result = ReattachNode(gameNode, node);
 
                 // Now after having attached the new node to the game object,
                 // we must adjust the visual attributes of it according to the
-                // newly attached node. Actually, only the scale would need to
-                // be adjusted because that is the information later needed by the
-                // layouter.
-                _graphRenderer.AdjustVisualsOfBlock(leaf);
-                return true;
+                // newly attached node.
+                _graphRenderer.AdjustVisuals(gameNode);
+                return result;
             }
             else
             {
-                // NewLeafNode() will set the scale and style of the leaf
-                // and will also attach the node to it.
-                leaf = _graphRenderer.NewLeafNode(node);
-                nodes[node.LinkName] = leaf;
-                return false;
+                if (node.IsLeaf())
+                {
+                    // NewLeafNode() will attach node to gameNode and will 
+                    // also set the scale and style of gameNode.
+                    gameNode = _graphRenderer.NewLeafNode(node);
+                }
+                else
+                {
+                    // NewInnerNode() will attach node to gameNode.
+                    gameNode = _graphRenderer.NewInnerNode(node);
+                    // Note: The scale of inner nodes will be adjusted later when
+                    // we have the layout. 
+                }
+                // Add the newly created gameNode to the cache.
+                nodes[node.LinkName] = gameNode;
+                return null;
             }
         }
 
         /// <summary>
         /// Re-attaches the given <paramref name="node"/> to the given <paramref name="gameObject"/>,
         /// that is, the NodeRef component of <paramref name="gameObject"/> will refer to 
-        /// <paramref name="node"/> afterwards.
+        /// <paramref name="node"/> afterwards. Returns the node formerly attached to 
+        /// <paramref name="gameObject"/> if there was one or null if there was none.
         /// </summary>
         /// <param name="gameObject">the game object where the node is to be attached to</param>
         /// <param name="node">the node to be attached</param>
-        private static void ReattachNode(GameObject gameObject, Node node)
+        /// <returns>the node formerly attached to <paramref name="gameObject"/> or null</returns>
+        private static Node ReattachNode(GameObject gameObject, Node node)
         {
+            Node formerNode = null;
+
             NodeRef noderef = gameObject.GetComponent<NodeRef>();
             if (noderef == null)
             {
@@ -219,7 +169,12 @@ namespace SEE.Animation.Internal
                                      node.LinkName);
                 noderef = gameObject.AddComponent<NodeRef>();
             }
+            else
+            {
+                formerNode = noderef.node;
+            }
             noderef.node = node;
+            return formerNode;
         }
 
         /// <summary>
