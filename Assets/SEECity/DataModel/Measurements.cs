@@ -78,7 +78,7 @@ namespace SEE
                 }
             }
 
-            settings.Measurements.Add("Überlappungen", OverlappingGameNodes(nodes).ToString());
+            settings.Measurements.Add("Nodes overlapping", OverlappingGameNodes(nodes).ToString());
         }
 
         /// <summary>
@@ -227,17 +227,17 @@ namespace SEE
 
             standardDeviation = Mathf.Sqrt(varianceDistEdge);
 
-            settings.Measurements.Add("Edge length max", Math.Round(maxDistEdge, 2).ToString());
-            settings.Measurements.Add("Edge length min", Math.Round(minDistEdge, 2).ToString());
-            settings.Measurements.Add("Edge length total", Math.Round(totalDist, 2).ToString());
+            settings.Measurements.Add("Straight Edge length max", Math.Round(maxDistEdge, 2).ToString());
+            settings.Measurements.Add("Straight Edge length min", Math.Round(minDistEdge, 2).ToString());
+            settings.Measurements.Add("Straight Edge length total", Math.Round(totalDist, 2).ToString());
 
-            settings.Measurements.Add("Edge length max (area)", Math.Round(relationMaxDistEdge, 2).ToString());
-            settings.Measurements.Add("Edge length min (area)", Math.Round(relationMinDistEdge, 2).ToString());
-            settings.Measurements.Add("Edge length total (area)", Math.Round(relationTotalDist, 2).ToString());
+            settings.Measurements.Add("Straight Edge length max (area)", Math.Round(relationMaxDistEdge, 2).ToString());
+            settings.Measurements.Add("Straight Edge length min (area)", Math.Round(relationMinDistEdge, 2).ToString());
+            settings.Measurements.Add("Straight Edge length total (area)", Math.Round(relationTotalDist, 2).ToString());
 
-            settings.Measurements.Add("Edge length average", Math.Round(averageDistEdge, 2).ToString());
-            settings.Measurements.Add("Edge length variance", Math.Round(varianceDistEdge, 2).ToString());
-            settings.Measurements.Add("Edge length standard deviation", Math.Round(standardDeviation, 2).ToString());
+            settings.Measurements.Add("Straight Edge length average", Math.Round(averageDistEdge, 2).ToString());
+            settings.Measurements.Add("Straight Edge length variance", Math.Round(varianceDistEdge, 2).ToString());
+            settings.Measurements.Add("Straight Edge length standard deviation", Math.Round(standardDeviation, 2).ToString());
         }
 
         /// <summary>

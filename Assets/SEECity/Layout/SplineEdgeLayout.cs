@@ -44,8 +44,6 @@ namespace SEE.Layout
 
                 float factor = edgesAboveBlocks ? 1.0f : -1.0f;
 
-                edge.dist = Vector3.Distance(sourcePosition, targetPosition);
-
                 Vector3[] controlPoints = new Vector3[] {
                     sourcePosition,
                     factor * (Vector3.Lerp(sourcePosition, targetPosition, 0.3f) + levelUnit),
