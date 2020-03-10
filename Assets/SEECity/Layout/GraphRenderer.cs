@@ -273,6 +273,10 @@ namespace SEE.Layout
                 foreach (KeyValuePair<string, GraphSettings.NodeLayouts> sublayoutKvp in sublayouts)
                 {
                     List<Node> filteredNodes = FilterNodes(nodes, sublayoutKvp.Key);
+
+                    // TODO here, sublayout in sublayout 
+
+
                     remainingNodes = remainingNodes.Where(i => !filteredNodes.Contains(i)).ToList();
                     AddContainers(nodeMap, filteredNodes, GetInnerNodeFactory(settings.CoseGraphSettings.DirShape[sublayoutKvp.Key]));
                     subLayoutRootsWithNodes.Add(sublayoutKvp.Key, filteredNodes);

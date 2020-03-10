@@ -318,29 +318,48 @@ namespace SEE.Layout
             }
         }
 
+
+        private List<CoseNode> CalculateNodesWithSublayout(CoseGraph graph)
+        {
+            List<CoseNode> nodesWithSublayout = new List<CoseNode>();
+
+            foreach (CoseNode child in graph.Nodes)
+            {
+                if (child.CNodeSublayoutValues.IsSubLayoutRoot)
+                {
+                    nodesWithSublayout.Add(child);
+                }
+
+                if (child.Child != null)
+                {
+                    nodesWithSublayout.AddRange(CalculateNodesWithSublayout(child.Child));  
+                }
+            }
+
+            return nodesWithSublayout;
+        }
+
+
         /// <summary>
         /// calculates the sublayouts
         /// </summary>
         /// <param name="graph">the graph for which the sublayout is calculated</param>
         private void CalculateSubLayouts(CoseGraph graph)
         {
-            foreach (CoseNode child in graph.Nodes)
+            List<CoseNode> nodesWithSublayout = CalculateNodesWithSublayout(graph);
+            nodesWithSublayout.Sort((n1, n2) => n2.NodeObject.Level.CompareTo(n1.NodeObject.Level));
+
+
+            foreach (CoseNode child in nodesWithSublayout)
             {
-                if (child.CNodeSublayoutValues.IsSubLayoutRoot)
-                {
+             
                     CoseSublayout sublayout = new CoseSublayout(child, to_game_node, groundLevel, leafNodeFactory, innerNodeHeight);
                     sublayout.Layout();
-                }
-                else
-                {
-                    if (child.Child != null)
-                    {
-                        CalculateSubLayouts(child.Child);
-                    }
-                }
+                
             }
         }
 
+    
         /// <summary>
         /// Runs the spring embedder 
         /// </summary>

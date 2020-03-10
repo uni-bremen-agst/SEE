@@ -315,7 +315,7 @@ namespace SEE.DataModel
         /// The list of immediate children of this node in the hierarchy.
         /// </summary>
         [SerializeField]
-        private List<Node> children = new List<Node>();
+        public List<Node> children = new List<Node>();
 
         /// <summary>
         /// The number of immediate children of this node in the hierarchy.

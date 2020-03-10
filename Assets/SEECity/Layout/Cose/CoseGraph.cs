@@ -457,37 +457,9 @@ namespace SEE.Layout
             edge.Source.Owner.Edges.Remove(edge);
         }
 
-        /// <summary>
-        /// Calculates all nodes needed for a sublayout with this graphs parent node as the sublayouts root node
-        /// </summary>
-        /// <param name="onlyLeaves"></param>
-        /// <returns></returns>
-        public List<CoseNode> CalculateNodesForSublayout(bool onlyLeaves)
-        {
-            List<CoseNode> nodesForLayout = new List<CoseNode>();
-            foreach (CoseNode node in Nodes)
-            {
-                if (onlyLeaves)
-                {
-                    if (node.IsLeaf())
-                    {
-                        nodesForLayout.Add(node);
-                        node.CNodeSublayoutValues.IsSubLayoutNode = true;
-                    }
-                }
-                else
-                {
-                    nodesForLayout.Add(node);
-                    node.CNodeSublayoutValues.IsSubLayoutNode = true;
-                }
+       
 
-                if (node.Child != null)
-                {
-                    nodesForLayout.AddRange(node.Child.CalculateNodesForSublayout(onlyLeaves));
-                }
-            }
-            return nodesForLayout;
-        }
+   
     }
 }
 
