@@ -470,11 +470,10 @@ namespace SEE.Layout
             // perspectives; this is also the case for the color style for
             // cubes we offer as an alternative to CScape buildings.
 
-            
             BuildingModifier modifier = block.GetComponent<BuildingModifier>();
             if (modifier == null)
             {
-                Debug.LogErrorFormat("CScape building {0} does not have a BuildingModifier");
+                Debug.LogWarningFormat("CScape building {0} does not have a BuildingModifier.\n", block.name);
             }
             else
             {
