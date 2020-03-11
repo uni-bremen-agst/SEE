@@ -378,8 +378,9 @@ namespace SEE.Layout
 
         /// <summary>
         /// Applies the given <paramref name="transform"/> to the given <paramref name="gameNode"/>,
-        /// i.e., sets its size and position according to the <paramref name="transform"/>. The
-        /// game node can represent a leaf or inner node of the node hierarchy.
+        /// i.e., sets its size and position according to the <paramref name="transform"/> and
+        /// possibly rotates it. The game node can represent a leaf or inner node of the node 
+        /// hierarchy.
         /// 
         /// Precondition: <paramref name="gameNode"/> must have NodeRef component referencing a
         /// graph node.
