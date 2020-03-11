@@ -43,11 +43,16 @@ namespace SEE.Animation
         /// <param name="callbackName">the method name of the callback</param>
         protected override void AnimateToInternalWithCallback(GameObject gameObject, NodeTransform nodeTransform, bool wasModified, GameObject callBackTarget, string callbackName)
         {
+            // Note: nodeTransform.position.y denotes the ground of the game object, not
+            // the center as normally in Unity. The following position is the one in
+            // Unity's term where the y co-ordinate denotes the center.
+            Vector3 position = nodeTransform.position;
+            position.y += nodeTransform.scale.y / 2;
             gameObject.transform.localScale = nodeTransform.scale;
             if (callBackTarget != null)
             {
                 iTween.MoveTo(gameObject, iTween.Hash(
-                    "position", nodeTransform.position,
+                    "position", position,
                     "time", MaxAnimationTime,
                     "oncompletetarget", callBackTarget,
                     "oncomplete", callbackName,
@@ -57,7 +62,7 @@ namespace SEE.Animation
             else
             {
                 iTween.MoveTo(gameObject, iTween.Hash(
-                                          "position", nodeTransform.position,
+                                          "position", position,
                                           "time", MaxAnimationTime
                 ));
             }
