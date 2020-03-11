@@ -446,6 +446,21 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
+        /// Event function that adjusts the given <paramref name="gameNode"/>
+        /// according to is attached node's metrics (concerning scale and style).
+        /// It will be called as a callback after the animation of a node to be 
+        /// rendered has been finished (see RenderNode()).
+        /// </summary>
+        /// <param name="gameNode">game node object to be rendered at the </param>
+        public void OnRenderNodeFinishedAnimation(object gameNode)
+        {
+            if (gameNode != null && gameNode is GameObject)
+            {
+                graphRenderer.AdjustVisuals(gameNode as GameObject);
+            }
+        }
+
+        /// <summary>
         /// Renders the game object corresponding to the given <paramref name="node"/>.
         /// </summary>
         /// <param name="node">node to be displayed</param>
@@ -470,7 +485,7 @@ namespace SEE.Animation.Internal
             {
                 wasModified = diff.AreDifferent(formerNode, node);
             }
-            moveScaleShakeAnimator.AnimateTo(gameObject, nodeTransform, wasModified);
+            moveScaleShakeAnimator.AnimateTo(gameObject, nodeTransform, wasModified, OnRenderNodeFinishedAnimation);
         }
 
         private void DumpLayout(Dictionary<string, NodeTransform> layout)
@@ -488,6 +503,20 @@ namespace SEE.Animation.Internal
         protected virtual void RenderEdge(Edge edge)
         {
             // FIXME.
+        }
+
+        /// <summary>
+        /// Event function that destroys the given <paramref name="gameObject"/>.
+        /// It will be called as a callback after the animation of a node to be 
+        /// removed has been finished.
+        /// </summary>
+        /// <param name="gameObject">game object to be destroyed</param>
+        public void OnRemovedNodeFinishedAnimation(object gameObject)
+        {
+            if (gameObject != null && gameObject is GameObject)
+            {
+                Destroy((GameObject)gameObject);
+            }
         }
 
         /// <summary>
@@ -546,18 +575,6 @@ namespace SEE.Animation.Internal
                 {
                     DestroyImmediate(o);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Event function that destroys the given <paramref name="gameObject"/>.
-        /// </summary>
-        /// <param name="gameObject">game object to be destroyed</param>
-        public void OnRemovedNodeFinishedAnimation(object gameObject)
-        {
-            if (gameObject != null && gameObject is GameObject)
-            {
-                Destroy((GameObject)gameObject);
             }
         }
 
