@@ -325,10 +325,12 @@ namespace SEE.Animation.Internal
                 Debug.LogWarning("Graph changes are blocked while animations are running.\n");
                 return;
             }
-            //if (_currentCity != null)
-            {
-                ClearGraphObjects(); // FIXME: Why do we need to clear the objects anyhow?
-            }
+            // The upfront calculation of the node layout for all graphs has filled
+            // objectManager with game objects for those nodes. Likewise, when we jump
+            // to a graph directly in the version history, the nodes of its predecessors
+            // may still be contained in the scene and objectManager. We need to clean up 
+            // first.
+            objectManager?.Clear();
             RenderGraph(_currentCity, graph);
         }
 
@@ -473,12 +475,12 @@ namespace SEE.Animation.Internal
             if (formerNode == null)
             {
                 // If the node is new, we animate it by moving it out of the ground.
-
-                // FIXME: CScape buildings have a different notion of position than cubes.
-                // We need to use graphRenderer.Apply().
-                var newPosition = nodeTransform.position;
-                newPosition.y = -nodeTransform.scale.y;
-                gameObject.transform.position = newPosition;
+                // Note nodeTransform.position.y denotes the ground position of
+                // a game object, not its center.
+                nodeTransform.position.y -= nodeTransform.scale.y;
+                graphRenderer.Apply(gameObject, nodeTransform);
+                // Revert the change to the y co-ordindate.
+                nodeTransform.position.y += nodeTransform.scale.y;
                 wasModified = false;
             }
             else
@@ -525,7 +527,7 @@ namespace SEE.Animation.Internal
         /// <param name="node">inner node to be removed</param>
         protected virtual void RenderRemovedOldInnerNode(Node node)
         {
-            if (objectManager.TryGetNode(node, out GameObject gameObject))
+            if (objectManager.RemoveNode(node, out GameObject gameObject))
             {
                 // if the node needs to be removed, let it sink into the ground
                 var nextPosition = gameObject.transform.position;
@@ -542,13 +544,13 @@ namespace SEE.Animation.Internal
         /// <param name="node">leaf node to be removed</param>
         protected virtual void RenderRemovedOldLeaf(Node node)
         {
-            if (objectManager.TryGetNode(node, out GameObject leaf))
+            if (objectManager.RemoveNode(node, out GameObject gameObject))
             {
                 // if the node needs to be removed, let it sink into the ground
-                var newPosition = leaf.transform.position;
-                newPosition.y = -leaf.transform.localScale.y;
-                NodeTransform nodeTransform = new NodeTransform(newPosition, leaf.transform.localScale);
-                moveScaleShakeAnimator.AnimateTo(leaf, nodeTransform, false, OnRemovedNodeFinishedAnimation);
+                var newPosition = gameObject.transform.position;
+                newPosition.y = -gameObject.transform.localScale.y;
+                NodeTransform nodeTransform = new NodeTransform(newPosition, gameObject.transform.localScale);
+                moveScaleShakeAnimator.AnimateTo(gameObject, nodeTransform, false, OnRemovedNodeFinishedAnimation);
             }
         }
 
@@ -559,23 +561,6 @@ namespace SEE.Animation.Internal
         protected virtual void RenderRemovedOldEdge(Edge edge)
         {
             // FIXME.
-        }
-
-        /// <summary>
-        /// Clears all GameObjects created by the used ObjectManager.
-        /// </summary>
-        private void ClearGraphObjects()
-        {
-            objectManager?.Clear();
-            // FIXME: We do not want to remove all objects from the scene. There may be
-            // other objects not managed by this cityEvolution.
-            foreach (string tag in SEE.DataModel.Tags.All)
-            {
-                foreach (GameObject o in GameObject.FindGameObjectsWithTag(tag))
-                {
-                    DestroyImmediate(o);
-                }
-            }
         }
 
         // **********************************************************************
