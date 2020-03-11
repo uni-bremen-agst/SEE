@@ -195,29 +195,20 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Retrieves the game object representing the given <paramref name="node"/> by using the LinkName 
-        /// of the <paramref name="node"/> if it exists. Returns true if such a game object exists in the cache;
-        /// otherwise false is returned and <paramref name="gameObject"/> is null.
-        /// </summary>
-        /// <param name="node">node determining the game object to be retrieved from the cache</param>
-        /// <param name="gameObject">the corresponding game object or null</param>
-        /// <returns>true if a corresponding game object exists</returns>
-        public bool TryGetNode(Node node, out GameObject gameObject)
-        {
-            return RemoveNode(node, out gameObject); // FIXME: Temporarily we remove the node.
-            /*
-            node.AssertNotNull("node");
-            return nodes.TryGetValue(node.LinkName, out gameObject);
-            */
-        }
-
-        /// <summary>
         /// Clears the internal cache containing all game objects created by GetInnerNode(),
-        /// GetLeaf(), GetNode(), or GetPlane() without actually destroing those game objects.
+        /// GetLeaf(), GetNode(), or GetPlane() and also destroys those game objects.
         /// </summary>
         public void Clear()
         {
-            currentPlane = null;
+            if (currentPlane??true)
+            {
+                Object.Destroy(currentPlane);
+                currentPlane = null;
+            }
+            foreach (GameObject gameObject in nodes.Values)
+            {
+                Object.Destroy(gameObject);
+            }
             nodes.Clear();
         }
     }
