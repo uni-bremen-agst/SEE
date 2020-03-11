@@ -17,9 +17,7 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel;
 using UnityEngine;
-using SEE.Animation.Internal;
 using SEE.Layout;
 
 namespace SEE.Animation
@@ -31,16 +29,29 @@ namespace SEE.Animation
     public class MoveScaleShakeAnimator : AbstractAnimator
     {
         /// <summary>
-        /// See <see cref="AbstractAnimator.AnimateToInternalWithCallback(GameObject, NodeTransform, bool, GameObject, string)"/>.
-        /// Moves, scales, and shakes the animated game object.
+        /// Shakes (if <paramref name="wasModified"/>), scales, and then moves the animated game object.
+        /// At the end of the animation, the method <paramref name="callbackName"/> will be called for the
+        /// game object <paramref name="callBackTarget"/> with <paramref name="gameObject"/> as 
+        /// parameter if <paramref name="callBackTarget"/> is not null. If <paramref name="callBackTarget"/>
+        /// equals null, no callback happens.
         /// </summary>
-        /// <param name="gameObject">GameObject to animate</param>
+        /// <param name="gameObject">game object to be animated</param>
         /// <param name="nodeTransform">the node transformation to be applied</param>
         /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
-        /// <param name="callback">An optional callback</param>
-        /// <param name="callbackName">name of the callback</param>
-        protected override void AnimateToInternalWithCallback(GameObject gameObject, NodeTransform nodeTransform, bool wasModified, GameObject callBackTarget, string callbackName)
+        /// <param name="callBackTarget">an optional game object that should receive the callback</param>
+        /// <param name="callbackName">the method name of the callback</param>
+        protected override void AnimateToInternalWithCallback(GameObject gameObject, NodeTransform nodeTransform, 
+                                                              bool wasModified, GameObject callBackTarget, string callbackName)
         {
+            // First shake the object.
+            if (wasModified)
+            {
+                iTween.ShakeRotation(gameObject, iTween.Hash(
+                    "amount", new Vector3(0, 10, 0),
+                    "time", MaxAnimationTime / 2,
+                    "delay", MaxAnimationTime / 2
+                ));
+            }
             // Move the object.
             if (callBackTarget != null)
             {
@@ -61,15 +72,7 @@ namespace SEE.Animation
                 "scale", nodeTransform.scale,
                 "time", MaxAnimationTime
             ));
-            // Shake the object.
-            if (wasModified)
-            {
-                iTween.ShakeRotation(gameObject, iTween.Hash(
-                    "amount", new Vector3(0, 10, 0),
-                    "time", MaxAnimationTime / 2,
-                    "delay", MaxAnimationTime / 2
-                ));
-            }
+
         }
     }
 }
