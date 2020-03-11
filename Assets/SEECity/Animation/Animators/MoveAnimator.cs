@@ -24,19 +24,23 @@ using UnityEngine;
 namespace SEE.Animation
 {
     /// <summary>
-    /// Animates the position of a given GameObject over the full <see cref="AbstractAnimator.MaxAnimationTime"/>.
-    /// The scale is instantly applied.
+    /// Animates the move of a given GameObject over the full <see cref="AbstractAnimator.MaxAnimationTime"/>.
+    /// The scale and style are instantly applied.
     /// </summary>
     public class MoveAnimator : AbstractAnimator
     {
         /// <summary>
-        /// See <see cref="AbstractAnimator.AnimateToInternalWithCallback(GameObject, NodeTransform, bool, GameObject, string)"/>
+        /// Moves the game object to its target location through animation. The scale and style are instantly applied.
+        /// At the end of the animation, the method <paramref name="callbackName"/> will be called for the
+        /// game object <paramref name="callBackTarget"/> with <paramref name="gameObject"/> as 
+        /// parameter if <paramref name="callBackTarget"/> is not null. If <paramref name="callBackTarget"/>
+        /// equals null, no callback happens.
         /// </summary>
-        /// <param name="gameObject">GameObject to animate</param>
+        /// <param name="gameObject">game object to be animated</param>
         /// <param name="nodeTransform">the node transformation to be applied</param>
-        /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
-        /// <param name="callback">An optional callback</param>
-        /// <param name="callbackName">name of the callback</param>
+        /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph (ignored here)</param>
+        /// <param name="callBackTarget">an optional game object that should receive the callback</param>
+        /// <param name="callbackName">the method name of the callback</param>
         protected override void AnimateToInternalWithCallback(GameObject gameObject, NodeTransform nodeTransform, bool wasModified, GameObject callBackTarget, string callbackName)
         {
             gameObject.transform.localScale = nodeTransform.scale;

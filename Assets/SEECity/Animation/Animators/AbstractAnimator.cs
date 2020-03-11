@@ -18,7 +18,6 @@
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Layout;
-using static SEE.Layout.GameObjectExtensions;
 using System;
 using UnityEngine;
 
@@ -65,14 +64,19 @@ namespace SEE.Animation
         }
 
         /// <summary>
-        /// Animates the node transformation of a given GameObject. If needed, a <paramref name="gameObject"/> 
-        /// that is called after the animation is finished can be passed. The animation is implemented by
-        /// <see cref="AnimateToInternal(Node, GameObject, NodeTransform)"/>
+        /// Animates the node transformation of given <paramref name="gameObject"/>. If needed, a <paramref name="callback"/> 
+        /// that is invoked with <paramref name="gameObject"/> as a parameter when the animation is finished can be passed.
+        /// 
+        /// Precondition: the caller of this method AnimateTo() is a Monobehaviour instance attached to a game object.
+        /// 
+        /// Let C be the caller (a Monobehaviour) of AnimateTo(). Then the actual callback will be as follows: 
+        ///   O.<paramref name="callback"/>(<paramref name="gameObject"/>) where O is the game object caller C 
+        ///   is attached to (its gameObject).
         /// </summary>
-        /// <param name="gameObject">GameObject to animate</param>
+        /// <param name="gameObject">game object to be animated</param>
         /// <param name="nodeTransform">the node transformation to be applied</param>
         /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
-        /// <param name="callback">An optional callback</param>
+        /// <param name="callback">an optional callback</param>
         public void AnimateTo(GameObject gameObject, NodeTransform nodeTransform, bool wasModified, Action<object> callback = null)
         {
             gameObject.AssertNotNull("gameObject");
@@ -95,13 +99,17 @@ namespace SEE.Animation
         }
 
         /// <summary>
-        /// Abstract method, called by <see cref="AnimateTo"/> for an animation with a callback.
+        /// Abstract method called by <see cref="AnimateTo"/> for an animation with a callback. At the
+        /// end of the animation, the method <paramref name="callbackName"/> will be called for the
+        /// game object <paramref name="callBackTarget"/> with <paramref name="gameObject"/> as 
+        /// parameter if <paramref name="callBackTarget"/> is not null. If <paramref name="callBackTarget"/>
+        /// equals null, no callback happens.
         /// </summary>
-        /// <param name="gameObject">GameObject to animate</param>
+        /// <param name="gameObject">game object to be animated</param>
         /// <param name="nodeTransform">the node transformation to be applied</param>
         /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
-        /// <param name="callback">An optional callback</param>
-        /// <param name="callbackName">name of the callback</param>
+        /// <param name="callBackTarget">an optional game object that should receive the callback</param>
+        /// <param name="callbackName">the method name of the callback</param>
         protected abstract void AnimateToInternalWithCallback
             (GameObject gameObject, 
              NodeTransform nodeTransform,
