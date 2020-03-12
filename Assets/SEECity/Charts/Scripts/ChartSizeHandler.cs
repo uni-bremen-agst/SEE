@@ -51,7 +51,7 @@ namespace SEECity.Charts.Scripts
 		protected virtual void Awake()
 		{
 			GetSettingData();
-			Transform parent = transform.parent;
+			var parent = transform.parent;
 			_chartContent = parent.GetComponent<ChartContent>();
 			chart = parent.GetComponent<RectTransform>();
 		}
@@ -73,12 +73,13 @@ namespace SEECity.Charts.Scripts
 		/// <param name="eventData">Contains the position data.</param>
 		public virtual void OnDrag(PointerEventData eventData)
 		{
-			RectTransform pos = GetComponent<RectTransform>();
+			var pos = GetComponent<RectTransform>();
 			Vector2 oldPos = pos.position;
 			pos.position = eventData.position;
-			Vector2 anchoredPos = pos.anchoredPosition;
+			var anchoredPos = pos.anchoredPosition;
 			if (anchoredPos.x / pos.lossyScale.x < minimumSize ||
 			    anchoredPos.y / pos.lossyScale.y < minimumSize) pos.position = oldPos;
+			anchoredPos = pos.anchoredPosition;
 			ChangeSize(anchoredPos.x, anchoredPos.y);
 		}
 
