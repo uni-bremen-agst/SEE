@@ -19,6 +19,7 @@
 
 using UnityEngine;
 using SEE.Layout;
+using System;
 
 namespace SEE.Animation
 {
@@ -29,7 +30,7 @@ namespace SEE.Animation
     public class MoveScaleShakeAnimator : AbstractAnimator
     {
         /// <summary>
-        /// Shakes (if <paramref name="wasModified"/>), scales, and then moves the animated game object.
+        /// Moves, scales, and then finally shakes (if <paramref name="wasModified"/>) the animated game object.
         /// At the end of the animation, the method <paramref name="callbackName"/> will be called for the
         /// game object <paramref name="callBackTarget"/> with <paramref name="gameObject"/> as 
         /// parameter if <paramref name="callBackTarget"/> is not null. If <paramref name="callBackTarget"/>
@@ -40,45 +41,108 @@ namespace SEE.Animation
         /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
         /// <param name="callBackTarget">an optional game object that should receive the callback</param>
         /// <param name="callbackName">the method name of the callback</param>
-        protected override void AnimateToInternalWithCallback(GameObject gameObject, NodeTransform nodeTransform, 
-                                                              bool wasModified, GameObject callBackTarget, string callbackName)
+        protected override void AnimateToInternalWithCallback
+                  (GameObject gameObject, 
+                   NodeTransform nodeTransform, 
+                   bool wasModified, 
+                   GameObject callBackTarget, 
+                   string callbackName,
+                   Action<object> callback)
         {
+            bool mustCallBack = callBackTarget != null;
+
             // Note: nodeTransform.position.y denotes the ground of the game object, not
             // the center as normally in Unity. The following position is the one in
-            // Unity's term where the y co-ordinate denotes the center.
+            // Unity's terms where the y co-ordinate denotes the center.
             Vector3 position = nodeTransform.position;
             position.y += nodeTransform.scale.y / 2;
 
-            // First shake the object.
+            // nodeTransform.scale is in world space, while the animation by itween
+            // is in local space. Our game objects may be nested in other game objects,
+            // hence, the two spaces may be different.
+            // We may need to transform nodeTransform.scale from world space to local space.
+            Vector3 localScale = gameObject.transform.parent == null ?
+                                   nodeTransform.scale
+                                   : gameObject.transform.parent.InverseTransformVector(nodeTransform.scale);
+
+            Debug.LogFormat("animating {0} from pos={1} scale={2} to pos={3} scale={4}\n", 
+                gameObject.name,
+                gameObject.transform.position, gameObject.transform.localScale,
+                position, localScale);
+
+            /*
+            if (gameObject.transform.localScale != localScale)
+            {
+                // Scale the object.
+                if (mustCallBack)
+                {
+                    iTween.ScaleTo(gameObject, iTween.Hash(
+                        "scale", localScale,
+                        "time", MaxAnimationTime,
+                        "oncompletetarget", callBackTarget,
+                        "oncomplete", callbackName,
+                        "oncompleteparams", gameObject
+                    ));
+                    mustCallBack = false;
+                }
+                else
+                {
+                    iTween.ScaleTo(gameObject, iTween.Hash(
+                         "scale", localScale,
+                         "time", MaxAnimationTime
+                    ));
+                }
+            }
+            */
+
+            if (gameObject.transform.position != position)
+            {
+                // Move the object.
+                if (mustCallBack)
+                {
+                    iTween.MoveTo(gameObject, iTween.Hash(
+                        "position", position,
+                        "time", MaxAnimationTime,
+                        "oncompletetarget", callBackTarget,
+                        "oncomplete", callbackName,
+                        "oncompleteparams", gameObject
+                    ));
+                    mustCallBack = false;
+                }
+                else
+                {
+                    iTween.MoveTo(gameObject, iTween.Hash("position", position, "time", MaxAnimationTime));
+                }
+            }
+
+            // Shake the object if it was modified.
             if (wasModified)
             {
-                iTween.ShakeRotation(gameObject, iTween.Hash(
-                    "amount", new Vector3(0, 10, 0),
-                    "time", MaxAnimationTime / 2,
-                    "delay", MaxAnimationTime / 2
-                ));
+                if (mustCallBack)
+                {
+                    iTween.ShakeRotation(gameObject, iTween.Hash(
+                         "amount", new Vector3(0, 10, 0),
+                         "time", MaxAnimationTime / 2,
+                         "delay", MaxAnimationTime / 2,
+                         "oncompletetarget", callBackTarget,
+                         "oncomplete", callbackName,
+                         "oncompleteparams", gameObject
+                    ));
+                    mustCallBack = false;
+                }
+                else
+                {
+                    iTween.ShakeRotation(gameObject, iTween.Hash(
+                         "amount", new Vector3(0, 10, 0),
+                         "time", MaxAnimationTime / 2,
+                         "delay", MaxAnimationTime / 2
+                    ));
+                }
             }
-            // Move the object.
-            if (callBackTarget != null)
+            if (mustCallBack)
             {
-                iTween.MoveTo(gameObject, iTween.Hash(
-                    "position", position,
-                    "time", MaxAnimationTime,
-                    "oncompletetarget", callBackTarget,
-                    "oncomplete", callbackName,
-                    "oncompleteparams", gameObject
-                ));
+                callback?.Invoke(gameObject);
             }
-            else
-            {
-                iTween.MoveTo(gameObject, iTween.Hash("position", position, "time", MaxAnimationTime));
-            }
-            // Scale the object.
-            iTween.ScaleTo(gameObject, iTween.Hash(
-                "scale", nodeTransform.scale,
-                "time", MaxAnimationTime
-            ));
-
         }
     }
 }
