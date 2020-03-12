@@ -346,7 +346,7 @@ namespace SEE.Animation.Internal
 
             if (IsStillAnimating)
             {
-                Debug.LogError("Graph changes are blocked while animations are running.\n");
+                Debug.Log("Graph changes are blocked while animations are running.\n");
                 return;
             }
             RenderGraph(current, next);
@@ -393,7 +393,7 @@ namespace SEE.Animation.Internal
             // RenderEdge will access it.
             _nextCity = next;
             // Draw all nodes of next graph.
-            next.Graph.Traverse(RenderNode, RenderNode);
+            next.Graph.Traverse(RenderNode, RenderNode, RenderNode);
             // Draw all edges of next graph.
             next.Graph.Edges().ForEach(RenderEdge);
             // We have made the transition to the next graph.
@@ -458,7 +458,7 @@ namespace SEE.Animation.Internal
         {
             if (gameNode != null && gameNode is GameObject)
             {
-                graphRenderer.AdjustVisuals(gameNode as GameObject);
+                //graphRenderer.AdjustVisuals(gameNode as GameObject);
             }
         }
 
