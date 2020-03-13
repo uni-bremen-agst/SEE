@@ -84,17 +84,22 @@ namespace SEE.Animation
 
             if (AnimationsDisabled)
             {
-                gameObject.transform.position = nodeTransform.position;
+                // Note: nodeTransform.position.y denotes the ground of the game object, not
+                // the center as normally in Unity. The following position is the one in
+                // Unity's terms where the y co-ordinate denotes the center.
+                Vector3 position = nodeTransform.position;
+                position.y += nodeTransform.scale.y / 2;
+                gameObject.transform.position = position;
                 gameObject.transform.localScale = nodeTransform.scale;
                 callback?.Invoke(gameObject);
             }
             else if (callback == null)
             {
-                AnimateToInternalWithCallback(gameObject, nodeTransform, wasModified, null, "");
+                AnimateToInternalWithCallback(gameObject, nodeTransform, wasModified, null, "", null);
             }
             else
             {
-                AnimateToInternalWithCallback(gameObject, nodeTransform, wasModified, ((MonoBehaviour)callback.Target).gameObject, callback.Method.Name);
+                AnimateToInternalWithCallback(gameObject, nodeTransform, wasModified, ((MonoBehaviour)callback.Target).gameObject, callback.Method.Name, callback);
             }
         }
 
@@ -115,6 +120,7 @@ namespace SEE.Animation
              NodeTransform nodeTransform,
              bool wasModified,
              GameObject callBackTarget, 
-             string callbackName);
+             string callbackName,
+             Action<object> callback);
     }
 }

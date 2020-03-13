@@ -19,6 +19,7 @@
 
 using SEE.DataModel;
 using SEE.Layout;
+using System;
 using UnityEngine;
 
 namespace SEE.Animation
@@ -41,7 +42,13 @@ namespace SEE.Animation
         /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph (ignored here)</param>
         /// <param name="callBackTarget">an optional game object that should receive the callback</param>
         /// <param name="callbackName">the method name of the callback</param>
-        protected override void AnimateToInternalWithCallback(GameObject gameObject, NodeTransform nodeTransform, bool wasModified, GameObject callBackTarget, string callbackName)
+        protected override void AnimateToInternalWithCallback
+                  (GameObject gameObject,
+                   NodeTransform nodeTransform,
+                   bool wasModified,
+                   GameObject callBackTarget,
+                   string callbackName,
+                   Action<object> callback)
         {
             // Note: nodeTransform.position.y denotes the ground of the game object, not
             // the center as normally in Unity. The following position is the one in
