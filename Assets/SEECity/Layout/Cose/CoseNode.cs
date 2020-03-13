@@ -91,10 +91,15 @@ namespace SEE.Layout
             nodeObject = node;
             this.graphManager = graphManager;
 
-            if (graphManager != null && graphManager.Layout.Sublayouts.Count != 0 && node != null && graphManager.Layout.Sublayouts.ContainsKey(node.LinkName))
+            if (graphManager != null && graphManager.Layout.SublayoutNodes.Count != 0 && node != null)
             {
-                sublayoutValues.IsSubLayoutRoot = true;
-                sublayoutValues.NodeLayout = graphManager.Layout.Sublayouts[node.LinkName];
+                SublayoutNode sublayoutNode = CoseHelperFunctions.CheckIfNodeIsSublayouRoot(graphManager.Layout.SublayoutNodes, node);
+
+                if (sublayoutNode != null)
+                {
+                    sublayoutValues.IsSubLayoutRoot = true;
+                }
+                
             }
         }
 

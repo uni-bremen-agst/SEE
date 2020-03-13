@@ -359,10 +359,6 @@ namespace SEE
         /// <returns></returns>
         private bool CheckOverlapping(Node node1, Node node2)
         {
-            if (node1.SourceName == "dir_B" || node1.SourceName == "dir_A" || node1.SourceName == "dir_B_1" || node1.SourceName == "dir_A_1")
-            {
-                Debug.Log("HI");
-            }
             Bounds bounds1 = GetBounds(nodeMap[node1]);
             Bounds bounds2 = GetBounds(nodeMap[node2]);
 

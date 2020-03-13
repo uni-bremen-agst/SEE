@@ -354,10 +354,8 @@ namespace SEEEditor
                         editorSettings.CoseGraphSettings.show[root] = showPosition;
                         if (showPosition)
                         {
-                            if (!root.IsRoot())
-                            {
-                                ShowCheckBox(root, false);
-                            }
+
+                            ShowCheckBox(root, false);
 
                             GUILayout.EndHorizontal();
 

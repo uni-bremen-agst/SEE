@@ -33,11 +33,6 @@ namespace SEE.Layout
         /// The root node of the sublayout the node is part of 
         /// </summary>
         private CoseNode subLayoutRoot = null;
-        
-        /// <summary>
-        /// The layout if the sublayout 
-        /// </summary>
-        private NodeLayouts nodeLayout;
 
         /// <summary>
         /// 
@@ -50,7 +45,6 @@ namespace SEE.Layout
         public bool IsSubLayoutRoot { get => isSubLayoutRoot; set => isSubLayoutRoot = value; }
         public bool IsSubLayoutNode { get => isSubLayoutNode; set => isSubLayoutNode = value; }
         public CoseNode SubLayoutRoot { get => subLayoutRoot; set => subLayoutRoot = value; }
-        public NodeLayouts NodeLayout { get => nodeLayout; set => nodeLayout = value; }
         public CoseSublayout Sublayout { get => sublayout; set => sublayout = value; }
 
 

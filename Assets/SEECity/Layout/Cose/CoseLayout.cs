@@ -46,6 +46,11 @@ namespace SEE.Layout
         private Dictionary<string, NodeLayouts> sublayouts = new Dictionary<string, NodeLayouts>();
 
         /// <summary>
+        /// TODO
+        /// </summary>
+        private List<SublayoutNode> sublayoutNodes = new List<SublayoutNode>();
+
+        /// <summary>
         /// Collection with all gamenodes
         /// </summary>
         private ICollection<GameObject> gameNodes;
@@ -73,7 +78,8 @@ namespace SEE.Layout
         public CoseGraphManager GraphManager { get => graphManager; set => graphManager = value; }
         public CoseLayoutSettings CoseLayoutSettings { get => coseLayoutSettings; set => coseLayoutSettings = value; }
         public Dictionary<string, NodeLayouts> Sublayouts { get => sublayouts; set => sublayouts = value; }
-        public bool InnerNodesAreCircles { get => innerNodesAreCircles; set => innerNodesAreCircles = value; } 
+        public bool InnerNodesAreCircles { get => innerNodesAreCircles; set => innerNodesAreCircles = value; }
+        public List<SublayoutNode> SublayoutNodes { get => sublayoutNodes; set => sublayoutNodes = value; }
 
         /// <summary>
         /// Constructor
@@ -83,7 +89,7 @@ namespace SEE.Layout
         /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
         /// <param name="edges">List of Edges</param>
         /// <param name="coseGraphSettings">Graph Settings, choosed by user</param>
-        public CoseLayout(float groundLevel, NodeFactory leafNodeFactory, bool isCircle, List<Edge> edges, GraphSettings settings) : base(groundLevel, leafNodeFactory)
+        public CoseLayout(float groundLevel, NodeFactory leafNodeFactory, bool isCircle, List<Edge> edges, GraphSettings settings, List<SublayoutNode> coseSublayoutNodes) : base(groundLevel, leafNodeFactory)
         {
             name = "Compound Spring Embedder Layout";
             this.edges = edges;
@@ -91,6 +97,7 @@ namespace SEE.Layout
             this.coseNodeToNode = new Dictionary<CoseNode, Node>();
             this.innerNodesAreCircles = isCircle;
             this.settings = settings;
+            this.SublayoutNodes = coseSublayoutNodes;
             SetupGraphSettings(settings.CoseGraphSettings);
         }
 
@@ -116,18 +123,18 @@ namespace SEE.Layout
 
             foreach (CoseGraph graph in graphManager.Graphs)
             {
-                float width;
-                float height;
+                float width = graph.BoudingRect.width;
+                float height = graph.BoudingRect.height;
 
-                if (graph.Parent != null && graph.Parent.SublayoutValues.IsSubLayoutRoot && graph.Parent.SublayoutValues.NodeLayout == NodeLayouts.EvoStreets)
+                if (graph.Parent != null && graph.Parent.NodeObject != null && SublayoutNodes.Count() > 0)
                 {
-                    width = graph.Parent.SublayoutValues.Sublayout.LayoutScale.x;
-                    height = graph.Parent.SublayoutValues.Sublayout.LayoutScale.z;
-                }
-                else
-                {
-                    width = graph.BoudingRect.width;
-                    height = graph.BoudingRect.height;
+                    SublayoutNode sublayoutNode = CoseHelperFunctions.CheckIfNodeIsSublayouRoot(SublayoutNodes, graph.Parent.NodeObject);
+
+                    if (sublayoutNode != null && sublayoutNode.NodeLayout == NodeLayouts.EvoStreets)
+                    {
+                        width = graph.Parent.SublayoutValues.Sublayout.LayoutScale.x;
+                        height = graph.Parent.SublayoutValues.Sublayout.LayoutScale.z;
+                    } 
                 }
 
                 Vector3 position = new Vector3(graph.BoudingRect.center.x, groundLevel, graph.BoudingRect.center.y);
@@ -142,6 +149,7 @@ namespace SEE.Layout
             to_game_node = null;
             return layoutResult;
         }
+
 
         /// <summary>
         /// Setup function for the CoseGraphSettings
@@ -162,26 +170,15 @@ namespace SEE.Layout
 
             coseLayoutSettings = new CoseLayoutSettings();
 
-            FilterSubLayouts(settings);
+            FilterSubLayouts();
         }
 
         /// <summary>
         /// Filter for the Sublayouts (choosed by the user) 
         /// </summary>
-        /// <param name="settings">Graph Settings, choosed by user</param>
-        private void FilterSubLayouts(CoseGraphSettings settings)
+        private void FilterSubLayouts()
         {
-            Dictionary<string, NodeLayouts> sublayouts = new Dictionary<string, NodeLayouts>();
-            Dictionary<string, bool> ListDirToggle = settings.ListDirToggle;
-
-            foreach (KeyValuePair<string, NodeLayouts> dir in settings.DirNodeLayout)
-            {
-                if (dir.Value != NodeLayouts.CompoundSpringEmbedder && ListDirToggle[dir.Key])
-                {
-                    sublayouts.Add(dir.Key, dir.Value);
-                }
-            }
-            this.sublayouts = sublayouts;
+            SublayoutNodes.RemoveAll(node => node.NodeLayout == NodeLayouts.CompoundSpringEmbedder);
         }
 
         /// <summary>
@@ -222,7 +219,8 @@ namespace SEE.Layout
                 if (node.IsLeaf())
                 {
                     Node nNode = coseNodeToNode[node];
-                    layoutResult[to_game_node[nNode]] = new NodeTransform(new Vector3((float)node.GetCenterX(), groundLevel, (float)node.GetCenterY()), Vector3.one);
+                    NodeTransform transform = new NodeTransform(new Vector3((float)node.GetCenterX(), groundLevel, (float)node.GetCenterY()), new Vector3(node.rect.width, groundLevel, node.rect.height));
+                    layoutResult[to_game_node[nNode]] = transform;
                 }
 
                 if (node.Child != null)
@@ -239,19 +237,24 @@ namespace SEE.Layout
         private void PlaceNodes(Node root)
         {
             CreateTopology(root);
-            CalculateSubLayouts(graphManager.RootGraph);
+            CalculateSubLayouts(graphManager.RootGraph.Parent);
 
-
-            if (CoseLayoutSettings.Multilevel_Scaling)
+            if (SublayoutNodes.Count > 0 && CoseHelperFunctions.CheckIfNodeIsSublayouRoot(SublayoutNodes, graphManager.RootGraph.Parent.NodeObject) != null)
             {
-                // TODO sollte das auch in der Gui dann abgehakt werden?
-                CoseLayoutSettings.Incremental = false;
-                MultiLevelScaling();
-            }
-            else
+                // nothing to do
+            } else
             {
-                ClassicLayout();
-            }
+                if (CoseLayoutSettings.Multilevel_Scaling)
+                {
+                    // TODO sollte das auch in der Gui dann abgehakt werden?
+                    CoseLayoutSettings.Incremental = false;
+                    MultiLevelScaling();
+                }
+                else
+                {
+                    ClassicLayout();
+                }
+            } 
         }
 
         /// <summary>
@@ -313,42 +316,19 @@ namespace SEE.Layout
         }
 
 
-        private List<CoseNode> CalculateNodesWithSublayout(CoseGraph graph)
-        {
-            List<CoseNode> nodesWithSublayout = new List<CoseNode>();
-
-            foreach (CoseNode child in graph.Nodes)
-            {
-                if (child.SublayoutValues.IsSubLayoutRoot)
-                {
-                    nodesWithSublayout.Add(child);
-                }
-
-                if (child.Child != null)
-                {
-                    nodesWithSublayout.AddRange(CalculateNodesWithSublayout(child.Child));  
-                }
-            }
-
-            return nodesWithSublayout;
-        }
-
-
         /// <summary>
         /// calculates the sublayouts
         /// </summary>
         /// <param name="graph">the graph for which the sublayout is calculated</param>
-        private void CalculateSubLayouts(CoseGraph graph)
+        private void CalculateSubLayouts(CoseNode root)
         {
-            List<CoseNode> nodesWithSublayout = CalculateNodesWithSublayout(graph);
-            nodesWithSublayout.Sort((n1, n2) => n2.NodeObject.Level.CompareTo(n1.NodeObject.Level));
-
-
-            foreach (CoseNode child in nodesWithSublayout)
+            // sind immernoch nach Leveln sortiert
+            foreach (SublayoutNode sublayoutNode in sublayoutNodes)
             {
-                CoseSublayout sublayout = new CoseSublayout(child, to_game_node, groundLevel, leafNodeFactory, innerNodeHeight);
+                List<CoseNode> allNodes = sublayoutNode.Nodes.Select(node => nodeToCoseNode[node]).ToList();
+                List<CoseNode> removedNodes = sublayoutNode.RemovedChildren.Select(node => nodeToCoseNode[node]).ToList();
+                CoseSublayout sublayout = new CoseSublayout(nodeToCoseNode[sublayoutNode.Node], to_game_node, groundLevel, leafNodeFactory, innerNodeHeight, settings, sublayoutNode.NodeLayout, allNodes, removedNodes);
                 sublayout.Layout();
-                
             }
         }
 
@@ -941,8 +921,16 @@ namespace SEE.Layout
         private void CreateTopology(Node root)
         {
             graphManager = new CoseGraphManager(this);
+
+            //CreateNode(root, null);
+            CoseNode rootNode = NewNode(root);
             CoseGraph rootGraph = graphManager.AddRootGraph();
             rootGraph.GraphObject = root;
+            rootGraph.Parent = rootNode;
+            rootNode.Child = rootGraph;
+            this.nodeToCoseNode.Add(root, rootNode);
+            this.coseNodeToNode.Add(rootNode, root);
+
 
             foreach (Node child in root.Children())
             {
