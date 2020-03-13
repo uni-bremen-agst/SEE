@@ -20,6 +20,8 @@ namespace SEE.Layout
         public GraphRenderer(GraphSettings settings)
         {
             this.settings = settings;
+            this.coseGraphSettings = settings.CoseGraphSettings;
+
             switch (this.settings.LeafObjects)
             {
                 case GraphSettings.LeafNodeKinds.Blocks:
@@ -63,6 +65,11 @@ namespace SEE.Layout
         /// Settings for the visualization.
         /// </summary>
         private readonly GraphSettings settings;
+
+        /// <summary>
+        /// Settings for the visualization.
+        /// </summary>
+        private readonly CoseGraphSettings coseGraphSettings;
 
         /// <summary>
         /// The factory used to create blocks for leaves.
@@ -181,7 +188,7 @@ namespace SEE.Layout
             Dictionary<Node, GameObject> nodeMap = CreateBlocks(nodes);
             Dictionary<GameObject, NodeTransform> layout;
 
-            Dictionary<string, List<Node>> sublayoutRootsWithNodes = new Dictionary<string, List<Node>>();
+            List<SublayoutNode> sublayoutNodes = new List<SublayoutNode>();
 
             Performance p = Performance.Begin("layout name" + settings.NodeLayout + ", layout of nodes");
 
@@ -212,14 +219,14 @@ namespace SEE.Layout
                     layout = new CirclePackingNodeLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.CompoundSpringEmbedder:
-                    sublayoutRootsWithNodes = SetContainersCompoundSpringEmbedder(nodeMap, nodes); 
+                    sublayoutNodes = SetContainersCompoundSpringEmbedder(nodeMap, nodes); 
 
                     bool isCircle = false;
                     if (settings.InnerNodeObjects == GraphSettings.InnerNodeKinds.Circles || settings.InnerNodeObjects == GraphSettings.InnerNodeKinds.Circles || settings.InnerNodeObjects == GraphSettings.InnerNodeKinds.Circles)
                     {
                         isCircle = true;
                     }
-                    layout = new CoseLayout(groundLevel, leafNodeFactory, isCircle, graph.Edges(), settings).Layout(nodeMap.Values);
+                    layout = new CoseLayout(groundLevel, leafNodeFactory, isCircle, graph.Edges(), settings, sublayoutNodes).Layout(nodeMap.Values);
                     break;
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
@@ -234,15 +241,14 @@ namespace SEE.Layout
                 AddDecorations(gameNodes);
             } else
             {
-                if (sublayoutRootsWithNodes.Count > 0)
+                if (sublayoutNodes.Count > 0)
                 {
                     Dictionary<GameObject, NodeTransform> remainingLayoutNodes = new Dictionary<GameObject, NodeTransform>(layout);
 
-                    foreach (KeyValuePair<string, List<Node>> kvp in sublayoutRootsWithNodes)
+                    foreach (SublayoutNode sublayoutNode in sublayoutNodes)
                     {
-                        // BUG!
                         // nodeMap nach knoten gefiltert, die in dem sublayout sind 
-                        Dictionary<Node, GameObject> filteredNodeMap = nodeMap.Where(i => kvp.Value.Contains(i.Key)).ToDictionary(i => i.Key, i => i.Value);
+                        Dictionary<Node, GameObject> filteredNodeMap = nodeMap.Where(i => sublayoutNode.Nodes.Contains(i.Key)).ToDictionary(i => i.Key, i => i.Value);
                         // layout nach gameobjects gefiltert, die im sublayout sind
                         Dictionary<GameObject, NodeTransform> subLayout = layout.Where(pair => filteredNodeMap.ContainsValue(pair.Key)).ToDictionary(i => i.Key, i => i.Value);
 
@@ -253,9 +259,9 @@ namespace SEE.Layout
 
 
                         //remainingLayoutNodes.Where(pair => !subLayout.ContainsKey(pair.Key)).ToDictionary(i => i.Key, i => i.Value);
-                        InnerNodeFactory innerNodeFactory = GetInnerNodeFactory(settings.CoseGraphSettings.DirShape[kvp.Key]);
-                        Apply(subLayout, settings.origin, innerNodeFactory);
-                        AddDecorations(subLayout.Keys.ToList(), settings.CoseGraphSettings.DirShape[kvp.Key], settings.CoseGraphSettings.DirNodeLayout[kvp.Key]);
+                        InnerNodeFactory innerNodeFactory = GetInnerNodeFactory(sublayoutNode.InnerNodeKind);
+                        Apply(subLayout, settings.origin, innerNodeFactory, sublayoutNode.NodeLayout == GraphSettings.NodeLayouts.Treemap);
+                        AddDecorations(subLayout.Keys.ToList(), sublayoutNode.InnerNodeKind, sublayoutNode.NodeLayout);
 
                         //BoundingBox(filteredNodeMap.Values, out Vector2 leftFrontC, out Vector2 rightBackC);
                         //PlaneFactory.NewPlane(leftFrontC, rightBackC, groundLevel - 0.005f, Color.blue);
@@ -271,7 +277,7 @@ namespace SEE.Layout
                 }
             }
             
-            EdgeLayout(graph, gameNodes);
+                                           EdgeLayout(graph, gameNodes);
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             // Place the plane somewhat under ground level.
             PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 2.0f, new Color(94f / 255f, 93f / 255f, 92f / 255f));
@@ -281,32 +287,76 @@ namespace SEE.Layout
         }
 
         /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="nodes"></param>
+        /// <returns></returns>
+        private List<SublayoutNode> CreateCoseSublayoutNodes(List<Node> nodes)
+        {
+            List<SublayoutNode> coseSublayoutNodes = new List<SublayoutNode>();
+            foreach (KeyValuePair<string, bool> dir in settings.CoseGraphSettings.ListDirToggle)
+            {
+                if (dir.Value)
+                {
+                    var name = dir.Key;
+                    if (coseGraphSettings.DirNodeLayout.ContainsKey(name) && coseGraphSettings.DirShape.ContainsKey(name))
+                    {
+                        IEnumerable<Node> matches = nodes.Where(i => i.LinkName.Equals(name));
+                        if (matches.Count() > 0)
+                        {
+                            coseSublayoutNodes.Add(new SublayoutNode(name, matches.First(), coseGraphSettings.DirShape[name], coseGraphSettings.DirNodeLayout[name]));
+                        }
+                    }
+                }
+            }
+            return coseSublayoutNodes;
+        }
+
+        private void CalculateNodesSublayout(List<SublayoutNode> coseSublayoutNodes)
+        {
+            foreach (SublayoutNode sublayoutNode in coseSublayoutNodes)
+            {
+                List<Node> children = WithAllChildren(sublayoutNode.Node);
+                List<Node> childrenToRemove = new List<Node>();
+
+                foreach (Node child in children)
+                {
+                    SublayoutNode sublayout = CoseHelperFunctions.CheckIfNodeIsSublayouRoot(coseSublayoutNodes, child);
+
+                    if (sublayout != null)
+                    {
+                        childrenToRemove.AddRange(sublayout.Nodes);
+                    }
+                }
+
+                sublayoutNode.RemovedChildren = childrenToRemove;
+                children.RemoveAll(child => childrenToRemove.Contains(child));
+                sublayoutNode.Nodes = children;
+            }
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="nodeMap"></param>
         /// <param name="nodes"></param>
         /// <returns></returns>
-        private Dictionary<string, List<Node>> SetContainersCompoundSpringEmbedder(Dictionary<Node, GameObject> nodeMap, List<Node> nodes)
+        private List<SublayoutNode> SetContainersCompoundSpringEmbedder(Dictionary<Node, GameObject> nodeMap, List<Node> nodes)
         {
-            Dictionary<string, List<Node>> subLayoutRootsWithNodes = new Dictionary<string, List<Node>>();
+            List<SublayoutNode> coseSublayoutNodes = CreateCoseSublayoutNodes(nodes);
 
-            Dictionary<string, GraphSettings.NodeLayouts> sublayouts = FilterSubLayouts();
-            if (sublayouts.Count != 0)
+            if (coseSublayoutNodes.Count > 0)
             {
-                List<Node> remainingNodes = nodes;
+                coseSublayoutNodes.Sort((n1, n2) => n2.Node.Level.CompareTo(n1.Node.Level));
 
-                foreach (KeyValuePair<string, GraphSettings.NodeLayouts> sublayoutKvp in sublayouts)
+                CalculateNodesSublayout(coseSublayoutNodes);
+
+                List<Node> remainingNodes = new List<Node>(nodes);
+                foreach (SublayoutNode sublayoutNode in coseSublayoutNodes)
                 {
-                    List<Node> filteredNodes = FilterNodes(nodes, sublayoutKvp.Key);
-
-                    // TODO here, sublayout in sublayout 
-
-
-                    remainingNodes = remainingNodes.Where(i => !filteredNodes.Contains(i)).ToList();
-                    AddContainers(nodeMap, filteredNodes, GetInnerNodeFactory(settings.CoseGraphSettings.DirShape[sublayoutKvp.Key]));
-                    subLayoutRootsWithNodes.Add(sublayoutKvp.Key, filteredNodes);
+                    AddContainers(nodeMap, sublayoutNode.Nodes, GetInnerNodeFactory(sublayoutNode.InnerNodeKind));
+                    remainingNodes.RemoveAll(node => sublayoutNode.Nodes.Contains(node));
                 }
-
                 AddContainers(nodeMap, remainingNodes);
             }
             else
@@ -314,43 +364,7 @@ namespace SEE.Layout
                 AddContainers(nodeMap, nodes);
             }
 
-            return subLayoutRootsWithNodes;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        private Dictionary<string, GraphSettings.NodeLayouts> FilterSubLayouts()
-        {
-            Dictionary<string, GraphSettings.NodeLayouts> sublayouts = new Dictionary<string, GraphSettings.NodeLayouts>();
-            foreach (KeyValuePair<string, GraphSettings.NodeLayouts> dir in settings.CoseGraphSettings.DirNodeLayout)
-            {
-                if (settings.CoseGraphSettings.ListDirToggle[dir.Key])
-                {
-                    sublayouts.Add(dir.Key, dir.Value);
-                }
-            }
-            return sublayouts;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="nodes"></param>
-        /// <param name="sublayoutRoot"></param>
-        /// <returns></returns>
-        private List<Node> FilterNodes(List<Node> nodes, string sublayoutRoot)
-        {
-            IEnumerable<Node> matches = nodes.Where(i => i.SourceName.Equals(sublayoutRoot));
-            List<Node> sublayoutNodes = new List<Node>();
-
-            if (matches.Count() > 0)
-            {
-                // alle Kind Knoten von Root 
-                sublayoutNodes = WithAllChildren(matches.First());
-            }
-            return sublayoutNodes;
+            return coseSublayoutNodes;
         }
 
         /// <summary>
@@ -360,8 +374,7 @@ namespace SEE.Layout
         /// <returns></returns>
         private List<Node> WithAllChildren(Node root)
         {
-            List<Node> allNodes = new List<Node>();
-            allNodes.Add(root);
+            List<Node> allNodes = new List<Node>{ root};
             foreach (Node node in root.Children())
             {
                 allNodes.AddRange(WithAllChildren(node));
@@ -482,7 +495,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="layout">node layout to be applied</param>
         /// <param name="origin">the center origin where the graph should be placed in the world scene</param>
-        public void Apply(Dictionary<GameObject, NodeTransform> layout, Vector3 origin, InnerNodeFactory innerNodeFactory = null)
+        public void Apply(Dictionary<GameObject, NodeTransform> layout, Vector3 origin, InnerNodeFactory innerNodeFactory = null, bool isTreemap = false)
         {
             if (innerNodeFactory == null)
             {
@@ -499,7 +512,7 @@ namespace SEE.Layout
                 {
                     // We need to first scale the game node and only afterwards set its
                     // position because transform.scale refers to the center position.
-                    if (settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
+                    if (isTreemap || settings.NodeLayout == GraphSettings.NodeLayouts.Treemap)
                     {
                         // The Treemap layout adjusts the size of the object's ground area according to
                         // the total space we allow it to use. The x length was initially
