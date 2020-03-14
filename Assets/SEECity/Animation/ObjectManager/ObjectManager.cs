@@ -112,19 +112,10 @@ namespace SEE.Animation.Internal
         {
             if (nodes.TryGetValue(node.LinkName, out gameNode))
             {
-                // We are re-using an existing node, but that node's attributes
-                // determining its scale or style might have changed. That is why we 
-                // need to adjust its scale and style, too.
-
                 // The game object has already a node attached to it, but that
                 // node is part of a different graph (i.e,, different revision).
                 // That is why we replace the attached node by this node here.
                 Node result = ReattachNode(gameNode, node);
-
-                // Now after having attached the new node to the game object,
-                // we must adjust the visual attributes of it according to the
-                // newly attached node.
-                _graphRenderer.AdjustVisuals(gameNode);
                 return result;
             }
             else

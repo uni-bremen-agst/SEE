@@ -261,6 +261,12 @@ namespace SEE.Animation.Internal
                     // need to add the game objects for inner nodes, too. To put it differently,
                     // inner nodes are added only if we apply a hierarchical layout.
                     objectManager.GetNode(node, out var gameNode);
+                    // Now after having attached the new node to the game object,
+                    // we must adjust the visual attributes of it according to the
+                    // newly attached node. That is necessary because we need adjust the dimensions
+                    // of the gameNode according to the newly attached graph node so that the 
+                    // layouter has these.
+                    graphRenderer.AdjustVisuals(gameNode);
                     gameObjects.Add(gameNode);
                 }
             }
