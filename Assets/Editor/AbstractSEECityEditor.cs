@@ -23,18 +23,21 @@ namespace SEEEditor
             city.WidthMetric = EditorGUILayout.TextField("Width", city.WidthMetric);
             city.HeightMetric = EditorGUILayout.TextField("Height", city.HeightMetric);
             city.DepthMetric = EditorGUILayout.TextField("Depth", city.DepthMetric);
-            city.ColorMetric = EditorGUILayout.TextField("Color", city.ColorMetric);
+            city.LeafStyleMetric = EditorGUILayout.TextField("Style", city.LeafStyleMetric);
 
-            GUILayout.Label("Visual node attributes", EditorStyles.boldLabel);
+            GUILayout.Label("Attributes of inner nodes", EditorStyles.boldLabel);
+            city.InnerNodeStyleMetric = EditorGUILayout.TextField("Style", city.InnerNodeStyleMetric);
+
+            GUILayout.Label("Nodes and Node Layout", EditorStyles.boldLabel);
             city.LeafObjects = (SEECity.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
             city.InnerNodeObjects = (SEECity.InnerNodeKinds)EditorGUILayout.EnumPopup("Inner nodes", city.InnerNodeObjects);
-            city.NodeLayout = (SEECity.NodeLayouts)EditorGUILayout.EnumPopup("Layout", city.NodeLayout);
+            city.NodeLayout = (SEECity.NodeLayouts)EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
 
             city.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", city.ZScoreScale);
             city.ShowErosions = EditorGUILayout.Toggle("Show erosions", city.ShowErosions);
 
-            GUILayout.Label("Visual edge attributes", EditorStyles.boldLabel);
-            city.EdgeLayout = (SEECity.EdgeLayouts)EditorGUILayout.EnumPopup("Layout", city.EdgeLayout);
+            GUILayout.Label("Edges and Edge Layout", EditorStyles.boldLabel);
+            city.EdgeLayout = (SEECity.EdgeLayouts)EditorGUILayout.EnumPopup("Edge layout", city.EdgeLayout);
             city.EdgeWidth = EditorGUILayout.FloatField("Edge width", city.EdgeWidth);
             city.EdgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", city.EdgesAboveBlocks);
 

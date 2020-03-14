@@ -17,7 +17,7 @@ namespace SEE.Layout
     /// Unity way.
     /// 
     /// In addition to scale, a node can have another kind of visual attribute
-    /// that is offered by a node factory. Concretely, Cubes offer a color
+    /// that is offered by a node factory. Concretely, Cubes offer a color gradient
     /// and CScape buildings different styles of buildings. As a shared
     /// term that abstracts from those concrete styles, we call this attribute
     /// Style.

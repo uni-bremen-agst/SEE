@@ -51,6 +51,14 @@ namespace SEE
             return result;
         }
 
+        //-----------------------------------
+        // Visual attributes of an inner node
+        //-----------------------------------
+        /// <summary>
+        /// The attribute name of the metric to be used for determining the style of inner nodes.
+        /// </summary>
+        public string InnerNodeStyleMetric = "Metric.IssuesTotal";
+
         //---------------------------------
         // Visual attributes of a leaf node
         //---------------------------------
@@ -67,9 +75,9 @@ namespace SEE
         /// </summary>
         public string DepthMetric = "Metric.LOC";
         /// <summary>
-        /// The attribute name of the metric to be used for determining the color gradient of leaf nodes.
+        /// The attribute name of the metric to be used for determining the style of leaf nodes.
         /// </summary>
-        public string ColorMetric = "Metric.Complexity";
+        public string LeafStyleMetric = "Metric.Complexity";
 
         /// <summary>
         /// This parameter determines the minimal width, breadth, and height of each block
@@ -297,7 +305,7 @@ namespace SEE
         /// <returns>all node metric attributes</returns>
         public List<string> AllMetricAttributes()
         {
-            List<string> nodeMetrics = new List<string>() { WidthMetric, HeightMetric, DepthMetric, ColorMetric };
+            List<string> nodeMetrics = new List<string>() { WidthMetric, HeightMetric, DepthMetric, LeafStyleMetric };
             nodeMetrics.AddRange(AllLeafIssues());
             nodeMetrics.AddRange(AllInnerNodeIssues());
             nodeMetrics.Add(InnerDonutMetric);
