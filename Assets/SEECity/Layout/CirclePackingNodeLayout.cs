@@ -140,7 +140,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">game node whose size is to be determined</param>
         /// <param name="radius">the radius for the game node if it is an inner node</param>
-        /// <returns></returns>
+        /// <returns>the scale of <paramref name="node"/></returns>
         private Vector3 GetScale(GameObject node, float radius)
         {
             Node n = node.GetComponent<NodeRef>().node;
