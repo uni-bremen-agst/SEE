@@ -247,14 +247,14 @@ namespace SEE.Layout
             if (children.Count == 0)
             {
                 // leaf
-                // leaves will only be positions, but not scaled; hence, we can use any value
-                // for the scale, e.g., Vector3.one.
-                layout_result[to_game_node[node]] = new NodeTransform(position, Vector3.one);
+                // leaves will only be positioned; we maintain their original scale
+                GameObject gameObject = to_game_node[node];
+                layout_result[gameObject] = new NodeTransform(position, leafNodeFactory.GetSize(gameObject));
             }
             else
             {
                 // inner node
-                // inner nodes will be positoned and scaled, primarily in x and z axes; 
+                // inner nodes will be positioned and scaled, primarily in x and z axes; 
                 // the inner nodes will be slightly lifted along the y axis according to their
                 // tree depth so that they can be stacked visually (level 0 is at the bottom)
                 position.y += LevelLift(node);
