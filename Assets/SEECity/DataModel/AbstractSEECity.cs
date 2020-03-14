@@ -299,7 +299,7 @@ namespace SEE
         /// <summary>
         /// Returns the names of all node metric attributes that are visualized somehow.
         /// More precisely, the resulting list consists of the following metrics:
-        /// WidthMetric, HeightMetric, DepthMetric, ColorMetric, AllLeafIssues(),
+        /// WidthMetric, HeightMetric, DepthMetric, LeafStyleMetric, AllLeafIssues(),
         /// AllInnerNodeIssues(), and InnerDonutMetric.
         /// </summary>
         /// <returns>all node metric attributes</returns>

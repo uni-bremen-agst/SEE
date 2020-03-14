@@ -467,7 +467,7 @@ namespace SEE.Layout
             // There are two different facade shapes: one for the front and one
             // lateral. We will change both and keep them in sync, which makes
             // sense because a building should be alike from all different
-            // perspectives; this is also the case for the color style for
+            // perspectives; this is also the case for the style for
             // cubes we offer as an alternative to CScape buildings.
 
             BuildingModifier modifier = block.GetComponent<BuildingModifier>();
