@@ -48,11 +48,11 @@ namespace SEE.Layout
         /// TODO
         /// </summary>
         private CoseNodeSublayoutValues sublayoutValues = new CoseNodeSublayoutValues();
-   
+
         /// <summary>
         /// The estimated size of the node
         /// </summary>
-        private float estimatedSize = Int32.MinValue;
+        private double estimatedSize = Mathf.NegativeInfinity;
 
         /// <summary>
         /// TODO
@@ -72,7 +72,7 @@ namespace SEE.Layout
         public int NoOfChildren { get => noOfChildren; set => noOfChildren = value; }
         public List<CoseNode> Surrounding { get => surrounding; set => surrounding = value; }
         public CoseNodeLayoutValues LayoutValues { get => layoutValues; set => layoutValues = value; }
-        public float EstimatedSize { get => estimatedSize; set => estimatedSize = value; }
+        public double EstimatedSize { get => estimatedSize; set => estimatedSize = value; }
         public CoseNodeSublayoutValues SublayoutValues { get => sublayoutValues; set => sublayoutValues = value; }
         public List<CoseEdge> Edges { get => edges; set => edges = value; }
         public CoseGraph Owner { get => owner; set => owner = value; }
@@ -472,8 +472,8 @@ namespace SEE.Layout
             if (child.Nodes.Count != 0)
             {
                 child.UpdateBounds(true);
-                rect.x = child.Left - CoseLayoutSettings.Compound_Node_Margin;
-                rect.y = child.Top - CoseLayoutSettings.Compound_Node_Margin;
+                rect.x = (float) (child.Left - CoseLayoutSettings.Compound_Node_Margin);
+                rect.y = (float)(child.Top - CoseLayoutSettings.Compound_Node_Margin);
 
                 // float width = childGraph.Right - childGraph.Left / Mathf.Sqrt(2);
                 // float height = childGraph.Bottom - childGraph.Top / Mathf.Sqrt(2);
@@ -520,7 +520,7 @@ namespace SEE.Layout
         /// Calculates the estimated size of this node
         /// </summary>
         /// <returns></returns>
-        public float CalcEstimatedSize()
+        public double CalcEstimatedSize()
         {
             if (child == null)
             {
@@ -530,8 +530,8 @@ namespace SEE.Layout
             else
             {
                 estimatedSize = child.CalcEstimatedSize();
-                rect.width = estimatedSize;
-                rect.height = estimatedSize;
+                rect.width = (float) estimatedSize;
+                rect.height = (float) estimatedSize;
                 return estimatedSize;
             }
         }
@@ -597,25 +597,25 @@ namespace SEE.Layout
         /// Sets the height of the bouding rect
         /// </summary>
         /// <param name="height">the height</param>
-        public void SetHeight(float height)
+        public void SetHeight(double height)
         {
-            rect.height = height;
+            rect.height = (float) height;
         }
 
         /// <summary>
         /// Sets the width of the bouding rect
         /// </summary>
         /// <param name="height">the width</param>
-        public void SetWidth(float width)
+        public void SetWidth(double width)
         {
-            rect.width = width;
+            rect.width =(float) width;
         }
 
         /// <summary>
         /// Returns the left postion of the bounding rect
         /// </summary>
         /// <returns>the left position</returns>
-        public Double GetLeft()
+        public float GetLeft()
         {
             return rect.x;
         }
@@ -624,7 +624,7 @@ namespace SEE.Layout
         /// Returns the right postion of the bounding rect
         /// </summary>
         /// <returns>the right position</returns>
-        public Double GetRight()
+        public float GetRight()
         {
             return rect.x + rect.width;
         }
@@ -633,7 +633,7 @@ namespace SEE.Layout
         /// Returns the top postion of the bounding rect
         /// </summary>
         /// <returns>the top position</returns>
-        public Double GetTop()
+        public float GetTop()
         {
             return rect.y;
         }
@@ -642,7 +642,7 @@ namespace SEE.Layout
         /// Returns the bottom postion of the bounding rect
         /// </summary>
         /// <returns>the bottom position</returns>
-        public Double GetBottom()
+        public float GetBottom()
         {
             return rect.y + rect.height;
         }

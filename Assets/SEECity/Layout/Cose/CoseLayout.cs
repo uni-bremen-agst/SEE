@@ -580,7 +580,7 @@ namespace SEE.Layout
                 {
                     distanceX = ((rectB.x + rectB.width) / 2) - ((rectA.x + rectA.width) / 2);
                     distanceY = ((rectB.y + rectB.height) / 2) - ((rectA.y + rectA.height) / 2);
-                }
+                } else
                 {
                     clipPoints = nodeA.CalcIntersection(nodeB, clipPoints);
                     distanceX = clipPoints[2] - clipPoints[0];

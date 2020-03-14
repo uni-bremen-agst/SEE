@@ -31,22 +31,22 @@ namespace SEE.Layout
         /// <summary>
         /// top position of the graph
         /// </summary>
-        private float top;
+        private double top;
 
         /// <summary>
         /// left position of the graph
         /// </summary>
-        private float left;
+        private double left;
 
         /// <summary>
         /// bottom position of the graph
         /// </summary>
-        private float bottom;
+        private double bottom;
 
         /// <summary>
         /// right position of the graph
         /// </summary>
-        private float right;
+        private double right;
 
         /// <summary>
         /// the bounding rect of this graph
@@ -56,12 +56,12 @@ namespace SEE.Layout
         /// <summary>
         /// the esitmated size of this graph
         /// </summary>
-        private float estimatedSize = Int32.MinValue;
+        private double estimatedSize = Mathf.NegativeInfinity;
 
         /// <summary>
         /// the margin around this graph
         /// </summary>
-        private float defaultMargin = CoseLayoutSettings.Graph_Margin;
+        private double defaultMargin = CoseLayoutSettings.Graph_Margin;
 
         /// <summary>
         /// Indicates if the graph is connected
@@ -79,17 +79,17 @@ namespace SEE.Layout
         private bool isSubLayout = false;
 
         public Node GraphObject { get => graphObject; set => graphObject = value; }
-        public float Left { get => left; set => left = value; }
-        public float Top { get => top; set => top = value; }
-        public float Bottom { get => bottom; set => bottom = value; }
-        public float Right { get => right; set => right = value; }
+        public double Left { get => left; set => left = value; }
+        public double Top { get => top; set => top = value; }
+        public double Bottom { get => bottom; set => bottom = value; }
+        public double Right { get => right; set => right = value; }
         public CoseGraphManager GraphManager { get => graphManager; set => graphManager = value; }
         public CoseNode Parent { get => parent; set => parent = value; }
         public List<CoseNode> Nodes { get => nodes; set => nodes = value; }
         public Rect BoudingRect { get => boudingRect; set => boudingRect = value; }
         public bool IsConnected { get => isConnected; set => isConnected = value; }
         public List<CoseEdge> Edges { get => edges; set => edges = value; }
-        public float EstimatedSize { get => estimatedSize; set => estimatedSize = value; }
+        public double EstimatedSize { get => estimatedSize; set => estimatedSize = value; }
         public bool IsSubLayout { get => isSubLayout; set => isSubLayout = value; }
 
         /// <summary>
@@ -111,10 +111,10 @@ namespace SEE.Layout
         {
             if (parent.SublayoutValues.IsSubLayoutNode) 
             {
-                this.left = (float)parent.GetLeft();
-                this.right = (float)parent.GetRight();
-                this.top = (float)parent.GetTop();
-                this.bottom = (float)parent.GetBottom();
+                this.left = parent.GetLeft();
+                this.right = parent.GetRight();
+                this.top = parent.GetTop();
+                this.bottom = parent.GetBottom();
                 UpdateBoundingRect();
 
                 foreach (CoseNode cNode in nodes)
@@ -131,14 +131,14 @@ namespace SEE.Layout
                 return;
             }
 
-            float left = Mathf.Infinity;
-            float right = Mathf.NegativeInfinity;
-            float top = Mathf.Infinity;
-            float bottom = Mathf.NegativeInfinity;
-            float nodeLeft;
-            float nodeRight;
-            float nodeTop;
-            float nodeBottom;
+            double left = Mathf.Infinity;
+            double right = Mathf.NegativeInfinity;
+            double top = Mathf.Infinity;
+            double bottom = Mathf.NegativeInfinity;
+            double nodeLeft;
+            double nodeRight;
+            double nodeTop;
+            double nodeBottom;
 
             foreach (CoseNode cNode in nodes)
             {
@@ -148,10 +148,10 @@ namespace SEE.Layout
                     cNode.UpdateBounds();
                 }
 
-                nodeLeft = (int)cNode.GetLeft();
-                nodeRight = (int)cNode.GetRight();
-                nodeTop = (int)cNode.GetTop();
-                nodeBottom = (int)cNode.GetBottom();
+                nodeLeft = cNode.GetLeft();
+                nodeRight = cNode.GetRight();
+                nodeTop = cNode.GetTop();
+                nodeBottom = cNode.GetBottom();
 
                 if (left > nodeLeft)
                 {
@@ -174,14 +174,14 @@ namespace SEE.Layout
                 }
             }
 
-            Rect boundingRect = new Rect(left, top, right - left, bottom - top);
+            Rect boundingRect = new Rect((float)left, (float)top, (float)(right - left), (float)(bottom - top));
 
             if (left == Mathf.Infinity)
             {
-                this.left = (float)parent.GetLeft();
-                this.right = (float)parent.GetRight();
-                this.top = (float)parent.GetTop();
-                this.bottom = (float)parent.GetBottom();
+                this.left = parent.GetLeft();
+                this.right = parent.GetRight();
+                this.top = parent.GetTop();
+                this.bottom = parent.GetBottom();
             }
 
             if (graphManager.Layout.InnerNodesAreCircles)
@@ -189,8 +189,8 @@ namespace SEE.Layout
                 var width = Math.Abs(this.right - this.left);
                 var height = Math.Abs(this.bottom - this.top);
 
-                var boundsWidth = (float)((width / Math.Sqrt(2)) - (width / 2));
-                var boundsHeight = (float)((height / Math.Sqrt(2)) - (height / 2));
+                var boundsWidth = (width / Math.Sqrt(2)) - (width / 2);
+                var boundsHeight = (height / Math.Sqrt(2)) - (height / 2);
 
                 defaultMargin = Math.Max(boundsWidth, defaultMargin);
                 defaultMargin = Math.Max(boundsHeight, defaultMargin);
@@ -220,7 +220,7 @@ namespace SEE.Layout
         /// </summary>
         public void UpdateBoundingRect()
         {
-            this.boudingRect = new Rect(left, top, right - left, bottom - top);
+            this.boudingRect = new Rect((float)left, (float)top, (float)right - (float)left, (float)bottom - (float)top);
         }
 
         /// <summary>
@@ -341,9 +341,9 @@ namespace SEE.Layout
         /// calculates the estimated size of this graph
         /// </summary>
         /// <returns></returns>
-        public float CalcEstimatedSize()
+        public double CalcEstimatedSize()
         {
-            float size = 0;
+            double size = 0;
 
             foreach (CoseNode node in nodes)
             {
@@ -356,7 +356,7 @@ namespace SEE.Layout
             }
             else
             {
-                estimatedSize = size / Mathf.Sqrt(nodes.Count);
+                estimatedSize = size / Math.Sqrt(nodes.Count);
             }
 
             return estimatedSize;
