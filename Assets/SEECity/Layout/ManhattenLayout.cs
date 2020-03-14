@@ -58,8 +58,10 @@ namespace SEE.Layout
                     // center position of the block to be placed
                     positionX += size.x / 2.0f;
                     // The position is the center of a GameObject. We want all GameObjects
-                    // be placed at the same ground level 0.
-                    result[gameNode] = new NodeTransform(new Vector3(positionX, groundLevel, positionZ), Vector3.one);
+                    // be placed at the same ground level 0. We maintain the original scale
+                    // of the gameNode.
+                    result[gameNode] = new NodeTransform(new Vector3(positionX, groundLevel, positionZ), 
+                                                         leafNodeFactory.GetSize(gameNode));
                     // right border position of the block to be placed + space in between buildings
                     positionX += size.x / 2.0f + distanceBetweenBuildings;
                 }
