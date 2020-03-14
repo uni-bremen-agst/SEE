@@ -228,6 +228,12 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
+        /// If true, inner nodes should not be rendered. This will be true if a non-hierarchical
+        /// layout is applied.
+        /// </summary>
+        private bool ignoreInnerNodes = true;
+
+        /// <summary>
         /// Calculates the layout data for <paramref name="graph"/> using the graphRenderer.
         /// All the game objects created for the nodes of <paramref name="graph"/> will
         /// be created by the objectManager, thus, be available for later use. The layout
@@ -251,10 +257,10 @@ namespace SEE.Animation.Internal
             NodeLayout nodeLayout = graphRenderer.GetLayout();
 
             // Gather all nodes for the layout.
-            bool isHierarchicalLayout = nodeLayout.IsHierarchical();
+            ignoreInnerNodes = ! nodeLayout.IsHierarchical();
             foreach (Node node in graph.Nodes())
             {
-                if (isHierarchicalLayout || node.IsLeaf())
+                if (! ignoreInnerNodes || node.IsLeaf())
                 {
                     // All layouts (flat and hierarchical ones) must be able to handle leaves; 
                     // hence, leaves can be added at any rate. For a hierarchical layout, we 
@@ -262,11 +268,13 @@ namespace SEE.Animation.Internal
                     // inner nodes are added only if we apply a hierarchical layout.
                     objectManager.GetNode(node, out var gameNode);
                     // Now after having attached the new node to the game object,
-                    // we must adjust the visual attributes of it according to the
-                    // newly attached node. That is necessary because we need adjust the dimensions
-                    // of the gameNode according to the newly attached graph node so that the 
-                    // layouter has these.
-                    graphRenderer.AdjustVisuals(gameNode);
+                    // we must adjust the scale of it according to the newly attached node so 
+                    // that the layouter has these. We need to adjust the scale only for leaves, 
+                    // however, because the layouter will select the scale for inner nodes.
+                    if (node.IsLeaf())
+                    {
+                        graphRenderer.AdjustScaleOfLeaf(gameNode);
+                    }
                     gameObjects.Add(gameNode);
                 }
             }
@@ -399,7 +407,15 @@ namespace SEE.Animation.Internal
             // RenderEdge will access it.
             _nextCity = next;
             // Draw all nodes of next graph.
-            next.Graph.Traverse(RenderNode, RenderNode, RenderNode);
+            if (ignoreInnerNodes)
+            {
+                // FIXME: The root could be a leaf.
+                next.Graph.Traverse(IgnoreNode, IgnoreNode, RenderNode);
+            }
+            else
+            {
+                next.Graph.Traverse(RenderNode, RenderNode, RenderNode);
+            }
             // Draw all edges of next graph.
             next.Graph.Edges().ForEach(RenderEdge);
             // We have made the transition to the next graph.
@@ -455,17 +471,30 @@ namespace SEE.Animation.Internal
 
         /// <summary>
         /// Event function that adjusts the given <paramref name="gameNode"/>
-        /// according to is attached node's metrics (concerning scale and style).
+        /// according to is attached node's color (style) metric.
         /// It will be called as a callback after the animation of a node to be 
-        /// rendered has been finished (see RenderNode()).
+        /// rendered has been finished (see RenderNode()). The animation will
+        /// adjust the game object's scale and position, but not its style.
+        /// Here we adjust the style.
         /// </summary>
-        /// <param name="gameNode">game node object to be rendered at the </param>
+        /// <param name="gameNode">game node object that was just modified by the animation</param>
         public void OnRenderNodeFinishedAnimation(object gameNode)
         {
             if (gameNode != null && gameNode is GameObject)
             {
-                //graphRenderer.AdjustVisuals(gameNode as GameObject);
+                graphRenderer.AdjustStyle(gameNode as GameObject);
             }
+        }
+
+        /// <summary>
+        /// Ignroes the given <paramref name="node"/> in rendering. This method can
+        /// be used if inner or leaf nodes are to be ignored (e.g., for non-hierarchical
+        /// layouts).
+        /// </summary>
+        /// <param name="node">node to be displayed</param>
+        protected void IgnoreNode(Node node)
+        {
+            // intentionally left blank
         }
 
         /// <summary>
