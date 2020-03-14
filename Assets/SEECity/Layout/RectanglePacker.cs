@@ -81,7 +81,6 @@ namespace SEE.Layout
             // worst case to the root. Note that we want to add padding in between the nodes,
             // so we need to increase the required size accordingly.
             PTree tree = new PTree(Vector2.zero, Sum(elements, leafNodeFactory, padding));
-            //Debug.LogFormat("Initial ptree {0}\n", tree.Root.ToString());
 
             // Keeps track of the area currently covered by elements. It is the bounding
             // box containing all rectangles placed so far.
@@ -98,30 +97,16 @@ namespace SEE.Layout
             // place el.
             Dictionary<PNode, float> expanders = new Dictionary<PNode, float>();
 
-            //Debug.LogFormat("Processing {0} elements.\n", elements.Count);
-
-            int i = 1;
             foreach (GameObject el in elements)
             {
-                if (i % 10 == 0)
-                {
-                    Debug.LogFormat("Processing {0}/{1}.\n", i, elements.Count);
-                    Debug.Break();
-                }
-                i++;
-
                 // The size we need to place el plus the padding between nodes.
                 Vector2 requiredSize = GetRectangleSize(el, leafNodeFactory, padding);
 
                 preservers.Clear();
                 expanders.Clear();
 
-                //Debug.LogFormat("Required size of {0} is {1}\n", el.name, requiredSize);
-
                 foreach (PNode pnode in tree.GetSufficientlyLargeLeaves(requiredSize))
                 {
-                    //Debug.LogFormat("Sufficiently large rectangle {0}\n", pnode.ToString());
-
                     // Right lower corner of new rectangle 
                     Vector2 corner = pnode.rectangle.position + requiredSize;
                     // Expanded covrec.
@@ -133,14 +118,12 @@ namespace SEE.Layout
                         // The remaining area of pnode if el were placed into it.
                         float waste = pnode.rectangle.size.x * pnode.rectangle.size.y - requiredSize.x * requiredSize.y;
                         preservers[pnode] = waste;
-                        //Debug.LogFormat("Preserver {0} with waste {1}\n", pnode, waste);
                     }
                     else
                     {
                         // The aspect ratio of coverec if pnode were used to place el.
                         float ratio = expandedCoveRec.x / expandedCoveRec.y;
                         expanders[pnode] = ratio;
-                        //Debug.LogFormat("Expander {0} with ratio {1}\n", pnode, ratio);
                     }
                 }
 
@@ -176,8 +159,6 @@ namespace SEE.Layout
                         }
                     }
                 }
-
-                //Debug.LogFormat("Target node is {0}\n", targetNode.ToString());
 
                 // Place el into targetNode.
                 // The free leaf node that has the requested size allocated within targetNode. 
@@ -239,8 +220,6 @@ namespace SEE.Layout
                 result.x += size.x + padding;
                 result.y += size.z + padding;
             }
-            //Debug.LogFormat("x={0} y={1}\n", result.x, result.y);
-            //Debug.Assert(result.x != result.y);  // FIXME: Why this assertion?
             return result;
         }
     }
