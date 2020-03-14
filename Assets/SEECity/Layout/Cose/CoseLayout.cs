@@ -26,11 +26,6 @@ namespace SEE.Layout
         private Dictionary<Node, CoseNode> nodeToCoseNode;
 
         /// <summary>
-        /// Mapping from CoseNode to Node
-        /// </summary>
-        private Dictionary<CoseNode, Node> coseNodeToNode;
-
-        /// <summary>
         /// Layout Settings (idealEdgeLength etc.)
         /// </summary>
         private CoseLayoutSettings coseLayoutSettings;
@@ -94,7 +89,6 @@ namespace SEE.Layout
             name = "Compound Spring Embedder Layout";
             this.edges = edges;
             this.nodeToCoseNode = new Dictionary<Node, CoseNode>();
-            this.coseNodeToNode = new Dictionary<CoseNode, Node>();
             this.innerNodesAreCircles = isCircle;
             this.settings = settings;
             this.SublayoutNodes = coseSublayoutNodes;
@@ -141,7 +135,7 @@ namespace SEE.Layout
 
                 if (graph != graphManager.RootGraph)
                 {
-                    position.y += LevelLift(coseNodeToNode[graph.Parent]);
+                    position.y += LevelLift(graph.Parent.NodeObject);
                 }
 
                 layoutResult[to_game_node[graph.GraphObject]] = new NodeTransform(position, new Vector3(width, innerNodeHeight, height));
@@ -218,7 +212,7 @@ namespace SEE.Layout
             {
                 if (node.IsLeaf())
                 {
-                    Node nNode = coseNodeToNode[node];
+                    Node nNode = node.NodeObject;
                     NodeTransform transform = new NodeTransform(new Vector3((float)node.GetCenterX(), groundLevel, (float)node.GetCenterY()), new Vector3(node.rect.width, groundLevel, node.rect.height));
                     layoutResult[to_game_node[nNode]] = transform;
                 }
@@ -327,7 +321,7 @@ namespace SEE.Layout
             {
                 List<CoseNode> allNodes = sublayoutNode.Nodes.Select(node => nodeToCoseNode[node]).ToList();
                 List<CoseNode> removedNodes = sublayoutNode.RemovedChildren.Select(node => nodeToCoseNode[node]).ToList();
-                CoseSublayout sublayout = new CoseSublayout(nodeToCoseNode[sublayoutNode.Node], to_game_node, groundLevel, leafNodeFactory, innerNodeHeight, settings, sublayoutNode.NodeLayout, allNodes, removedNodes);
+                CoseSublayout sublayout = new CoseSublayout(nodeToCoseNode[sublayoutNode.Node], to_game_node, groundLevel, leafNodeFactory, innerNodeHeight, sublayoutNode.NodeLayout, allNodes, removedNodes);
                 sublayout.Layout();
             }
         }
@@ -929,8 +923,6 @@ namespace SEE.Layout
             rootGraph.Parent = rootNode;
             rootNode.Child = rootGraph;
             this.nodeToCoseNode.Add(root, rootNode);
-            this.coseNodeToNode.Add(rootNode, root);
-
 
             foreach (Node child in root.Children())
             {
@@ -965,7 +957,6 @@ namespace SEE.Layout
             CoseGraph rootGraph = graphManager.RootGraph;
 
             this.nodeToCoseNode.Add(node, cNode);
-            this.coseNodeToNode.Add(cNode, node);
 
             if (parent != null)
             {

@@ -174,7 +174,7 @@ namespace SEE.Layout
             if (children[node].Count == 0)
             {
                 // a leaf      
-                Vector3 size = leafNodeFactory.GetSize(gameNode);
+                Vector3 size = gameNode.transform.localScale;//leafNodeFactory.GetSize(gameNode);
                 // x and z lenghts may differ; we need to consider the larger value
                 float result = Mathf.Max(size.x, size.z);
                 sizes[node] = new RectangleTiling.NodeSize(gameNode, result);

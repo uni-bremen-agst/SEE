@@ -319,7 +319,8 @@ namespace SEE.Layout
         private void SetHouseScale(ENode node)
         {
             // Scaled metric values for the dimensions.
-            Vector3 size = leafNodeFactory.GetSize(to_game_node[node.GraphNode]);
+            GameObject gameNode = to_game_node[node.GraphNode];
+            Vector3 size = gameNode.transform.localScale;//leafNodeFactory.GetSize(to_game_node[node.GraphNode]);
             node.Scale = new Vector3(size.x, size.y, size.z);
         }
 

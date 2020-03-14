@@ -175,7 +175,7 @@ namespace SEE.Layout
                 GameObject block = to_game_node[node];
 
                 // Necessary size of the block independent of the parent
-                Vector3 size = leafNodeFactory.GetSize(block);
+                Vector3 size = block.transform.localScale;// leafNodeFactory.GetSize(block);
 
                 // The outer radius of an inner-most node is determined by the ground
                 // rectangle of the block to be drawn for the node.

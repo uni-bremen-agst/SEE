@@ -49,7 +49,7 @@ namespace SEE.Layout
                     }
 
                     // size is independent of the sceneNode
-                    Vector3 size = leafNodeFactory.GetSize(gameNode);
+                    Vector3 size = gameNode.transform.localScale;//leafNodeFactory.GetSize(gameNode);
                     if (size.z > maxZ)
                     {
                         maxZ = size.z;

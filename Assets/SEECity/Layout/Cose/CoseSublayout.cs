@@ -28,7 +28,7 @@ namespace SEE.Layout
         /// <summary>
         /// a map from every node to the corresponding gameobject
         /// </summary>
-        private Dictionary<Node, GameObject> nodeMap;
+        private readonly Dictionary<Node, GameObject> nodeMap;
 
         /// <summary>
         /// a map from every sublayout node to the corresponding gameobject
@@ -60,13 +60,20 @@ namespace SEE.Layout
         /// </summary>
         private Vector3 layoutPosition;
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         private Node parentNodeObject;
 
-        private GraphSettings settings;
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly List<CoseNode> allNodes = new List<CoseNode>();
 
-        private List<CoseNode> allNodes = new List<CoseNode>();
-
-        private List<CoseNode> removedChildren = new List<CoseNode>();
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly List<CoseNode> removedChildren = new List<CoseNode>();
 
         public Vector3 LayoutScale { get => layoutScale; set => layoutScale = value; }
         public Vector3 LayoutPosition { get => layoutPosition; set => layoutPosition = value; }
@@ -81,8 +88,10 @@ namespace SEE.Layout
         /// placed on this level</param>
         /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
         /// <param name="innerNodeHeight">The height of objects (y co-ordinate) drawn for inner nodes.</param>
-        /// <param name="settings"> TODO</param>
-        public CoseSublayout(CoseNode root, Dictionary<Node, GameObject> nodeMap, float groundLevel, NodeFactory leafNodeFactory, float innerNodeHeight, GraphSettings settings, NodeLayouts nodeLayout, List<CoseNode> allNodes, List<CoseNode> removedChildren)
+        /// <param name="allNodes">TODO</param>
+        /// <param name="nodeLayout">TODO</param>
+        /// <param name="removedChildren">TODO</param>
+        public CoseSublayout(CoseNode root, Dictionary<Node, GameObject> nodeMap, float groundLevel, NodeFactory leafNodeFactory, float innerNodeHeight, NodeLayouts nodeLayout, List<CoseNode> allNodes, List<CoseNode> removedChildren)
         {
             this.nodeLayout = nodeLayout;
             this.root = root;
@@ -91,7 +100,6 @@ namespace SEE.Layout
             this.leafNodeFactory = leafNodeFactory;
             this.innerNodeHeight = innerNodeHeight;
             this.onlyLeaves = OnlyLeaveNodes();
-            this.settings = settings;
             this.allNodes = allNodes;
             this.removedChildren = removedChildren;
 
