@@ -87,7 +87,7 @@ namespace SEE.Layout
 
         /// <summary>
         /// Sets the scaler to be used to map metric values onto graphical attributes
-        /// (e.g., width, height, depth, color) across all given <paramref name="graphs"/>
+        /// (e.g., width, height, depth, style) across all given <paramref name="graphs"/>
         /// based on the user's choice (settings).
         /// </summary>
         /// <param name="graphs">set of graphs whose node metrics are to be scaled</param>
@@ -107,7 +107,7 @@ namespace SEE.Layout
 
         /// <summary>
         /// Sets the scaler to be used to map metric values onto graphical attributes
-        /// (e.g., width, height, depth, color) for given <paramref name="graph"/>
+        /// (e.g., width, height, depth, style) for given <paramref name="graph"/>
         /// based on the user's choice (settings).
         /// </summary>
         /// <param name="graph">graph whose node metrics are to be scaled</param>
@@ -488,7 +488,7 @@ namespace SEE.Layout
         /// Create and returns a new game object for representing the given <paramref name="node"/>.
         /// The exact kind of representation depends upon the leaf-node factory. The node is 
         /// scaled according to the WidthMetric, HeightMetric, and DepthMetric of the current settings. 
-        /// Its style is determined by LeafNodeColorMetric (linerar interpolation of a color gradient).
+        /// Its style is determined by LeafNodeStyleMetric (linerar interpolation of a color gradient).
         /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
         /// 
         /// Precondition: <paramref name="node"/> must be a leaf node in the node hierarchy.
@@ -510,7 +510,7 @@ namespace SEE.Layout
         /// where M is the number of available styles of the leafNodeFactory (if
         /// the node is a leaf) or innerNodeFactory (if it is an inner node)
         /// and X = C / metricMaximum and C is the normalized metric value of 
-        /// <paramref name="node"/> for the attribute chosen for the color
+        /// <paramref name="node"/> for the attribute chosen for the style
         /// and metricMaximum is the maximal value of the style metric.
         /// </summary>
         /// <param name="node">node for which to determine the style index</param>
@@ -519,7 +519,7 @@ namespace SEE.Layout
         {
             bool isLeaf = node.IsLeaf();
             int style = isLeaf ? leafNodeFactory.NumberOfStyles() : innerNodeFactory.NumberOfStyles();
-            string styleMetric = isLeaf ? settings.LeafColorMetric : settings.InnerNodeColorMetric;
+            string styleMetric = isLeaf ? settings.LeafStyleMetric : settings.InnerNodeStyleMetric;
             float metricMaximum = scaler.GetNormalizedMaximum(styleMetric);
             return Mathf.RoundToInt(Mathf.Lerp(0.0f,
                                                (float)(style - 1),
