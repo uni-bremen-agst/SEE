@@ -487,8 +487,8 @@ namespace SEE.Layout
                     var width = Math.Abs(child.Right - child.Left);
                     var height = Math.Abs(child.Bottom - child.Top);
 
-                    var boundsWidth = (float)((width / Math.Sqrt(2)) - (width / 2));
-                    var boundsHeight = (float)((height / Math.Sqrt(2)) - (height / 2));
+                    double boundsWidth = (width / Math.Sqrt(2)) - (width / 2);
+                    double boundsHeight = (height / Math.Sqrt(2)) - (height / 2);
 
                     SetWidth(child.Right - child.Left + boundsWidth + boundsWidth);
                     SetHeight(child.Bottom - child.Top + boundsHeight + boundsHeight);

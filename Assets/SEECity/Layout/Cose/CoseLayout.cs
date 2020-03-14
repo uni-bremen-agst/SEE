@@ -301,10 +301,10 @@ namespace SEE.Layout
         {
             foreach (CoseNode node in graphManager.GetAllNodes())
             {
-                node.LayoutValues.Pred1.SetLocation((float)node.GetLeft(), (float)node.GetTop());
+                node.LayoutValues.Pred1.SetLocation(node.GetLeft(), node.GetTop());
                 if (node.LayoutValues.Pred2 != null)
                 {
-                    node.LayoutValues.Pred2.SetLocation((float)(node.GetLeft() + CoseLayoutSettings.Edge_Length), (float)(node.GetTop() + CoseLayoutSettings.Edge_Length));
+                    node.LayoutValues.Pred2.SetLocation(node.GetLeft() + CoseLayoutSettings.Edge_Length, node.GetTop() + CoseLayoutSettings.Edge_Length);
                 }
             }
         }
@@ -346,7 +346,9 @@ namespace SEE.Layout
                     //CoolingFactor = initialCoolingFactor * ((maxIterations - totalIterations) / maxIterations);
                     // TODO
                     // based on www.btluke.com/simanf1.html, schedule 3
-                    coseLayoutSettings.CoolingFactor = Mathf.Max((float)(coseLayoutSettings.InitialCoolingFactor - Mathf.Pow((float)coseLayoutSettings.Coolingcycle, Mathf.Log((float)(100 * (coseLayoutSettings.InitialCoolingFactor - coseLayoutSettings.FinalTemperature))) / Mathf.Log(coseLayoutSettings.MaxCoolingCycle)) / 100 * CoseLayoutSettings.Cooling_Adjuster), (float)coseLayoutSettings.FinalTemperature);
+                    
+                    coseLayoutSettings.CoolingFactor = Math.Max(coseLayoutSettings.InitialCoolingFactor - Math.Pow(coseLayoutSettings.Coolingcycle, Math.Log(100 * (coseLayoutSettings.InitialCoolingFactor - coseLayoutSettings.FinalTemperature)) / Math.Log(coseLayoutSettings.MaxCoolingCycle)) / 100 * CoseLayoutSettings.Cooling_Adjuster, coseLayoutSettings.FinalTemperature);
+                    Debug.Log("cooling: " + coseLayoutSettings.CoolingFactor);
                 }
 
                 coseLayoutSettings.TotalDisplacement = 0;
@@ -763,7 +765,7 @@ namespace SEE.Layout
 
             if (coseLayoutSettings.TotalIterations > coseLayoutSettings.MaxIterations / 3)
             {
-                oscilating = Mathf.Abs((float)(coseLayoutSettings.TotalDisplacement - coseLayoutSettings.OldTotalDisplacement)) < 2;
+                oscilating = Math.Abs(coseLayoutSettings.TotalDisplacement - coseLayoutSettings.OldTotalDisplacement) < 2;
             }
             converged = coseLayoutSettings.TotalDisplacement < coseLayoutSettings.TotalDisplacementThreshold;
             coseLayoutSettings.OldTotalDisplacement = coseLayoutSettings.TotalDisplacement;
