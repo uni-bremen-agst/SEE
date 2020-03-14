@@ -472,14 +472,12 @@ namespace SEE.Layout
         {
             Dictionary<Node, GameObject> result = new Dictionary<Node, GameObject>();
 
-            float metricMaximum = scaler.GetNormalizedMaximum(settings.ColorMetric);
-
             foreach (Node node in nodes)
             {
                 // We add only leaves.
                 if (node.IsLeaf())
                 {
-                    GameObject block = NewLeafNode(node, metricMaximum);
+                    GameObject block = NewLeafNode(node);
                     result[node] = block;
                 }
             }
@@ -490,7 +488,7 @@ namespace SEE.Layout
         /// Create and returns a new game object for representing the given <paramref name="node"/>.
         /// The exact kind of representation depends upon the leaf-node factory. The node is 
         /// scaled according to the WidthMetric, HeightMetric, and DepthMetric of the current settings. 
-        /// Its color is determined by ColorMetric (linerar interpolation of a color gradient).
+        /// Its style is determined by LeafNodeColorMetric (linerar interpolation of a color gradient).
         /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
         /// 
         /// Precondition: <paramref name="node"/> must be a leaf node in the node hierarchy.
@@ -499,56 +497,43 @@ namespace SEE.Layout
         /// <returns>game object representing given <paramref name="node"/></returns>
         public GameObject NewLeafNode(Node node)
         {
-            return NewLeafNode(node, scaler.GetNormalizedMaximum(settings.ColorMetric));
-        }
-
-        /// <summary>
-        /// Create and returns a new game object for representing the given <paramref name="node"/>.
-        /// The exact kind of representation depends upon the leaf-node factory. The node is 
-        /// scaled according to the WidthMetric, HeightMetric, and DepthMetric of the current settings. 
-        /// Its color is determined by ColorMetric devided by <paramref name="metricMaximum"/>.
-        /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
-        /// 
-        /// Precondition: <paramref name="node"/> must be a leaf node in the node hierarchy.
-        /// </summary>
-        /// <param name="node">leaf node</param>
-        /// <param name="metricMaximum">the maximal value the color metric can have;
-        /// used to devide the color metric's value so that it stays in the range [0,1]</param>
-        /// <returns>game object representing given <paramref name="node"/></returns>
-        private GameObject NewLeafNode(Node node, float metricMaximum)
-        {
-            int material = SelectStyle(node, metricMaximum);
-            GameObject block = leafNodeFactory.NewBlock(material);
+            int style = SelectStyle(node);
+            GameObject block = leafNodeFactory.NewBlock(style);
             block.name = node.LinkName;
             AttachNode(block, node);
-            AdjustVisuals(node, block);
+            AdjustScaleOfLeaf(block);
             return block;
         }
 
         /// <summary>
         /// Returns a style index as a linear interpolation of X for range [0..M-1]
-        /// where M is the number of available styles of the leafNodeFactory
+        /// where M is the number of available styles of the leafNodeFactory (if
+        /// the node is a leaf) or innerNodeFactory (if it is an inner node)
         /// and X = C / metricMaximum and C is the normalized metric value of 
-        /// <paramref name="node"/> for the attribute chosen for the color.
+        /// <paramref name="node"/> for the attribute chosen for the color
+        /// and metricMaximum is the maximal value of the style metric.
         /// </summary>
         /// <param name="node">node for which to determine the style index</param>
-        /// <param name="metricMaximum">the maximal value of the metric chosen for color</param>
         /// <returns>style index</returns>
-        private int SelectStyle(Node node, float metricMaximum)
+        private int SelectStyle(Node node)
         {
+            bool isLeaf = node.IsLeaf();
+            int style = isLeaf ? leafNodeFactory.NumberOfStyles() : innerNodeFactory.NumberOfStyles();
+            string styleMetric = isLeaf ? settings.LeafColorMetric : settings.InnerNodeColorMetric;
+            float metricMaximum = scaler.GetNormalizedMaximum(styleMetric);
             return Mathf.RoundToInt(Mathf.Lerp(0.0f,
-                                               (float)(leafNodeFactory.NumberOfStyles() - 1),
-                                                scaler.GetNormalizedValue(settings.ColorMetric, node)
+                                               (float)(style - 1),
+                                                scaler.GetNormalizedValue(styleMetric, node)
                                                          / metricMaximum));
         }
 
         /// <summary>
-        /// Adjusts the scale and style of the given <paramref name="gameNode"/> according
-        /// to the metric values of the graph node attached to <paramref name="gameNode"/>
-        /// chosen to determine scale and color.
+        /// Adjusts the style of the given <paramref name="gameNode"/> according
+        /// to the metric value of the graph node attached to <paramref name="gameNode"/>
+        /// chosen to determine style.
         /// </summary>
         /// <param name="gameNode">a game node representing a leaf or inner graph node</param>
-        public void AdjustVisuals(GameObject gameNode)
+        public void AdjustStyle(GameObject gameNode)
         {
             NodeRef noderef = gameNode.GetComponent<NodeRef>();
             if (noderef == null)
@@ -558,57 +543,64 @@ namespace SEE.Layout
             else
             {
                 Node node = noderef.node;
-                float metricMaximum = scaler.GetNormalizedMaximum(settings.ColorMetric);
-                int material = SelectStyle(node, metricMaximum);
-                // The scale of inner nodes will not be adjusted.
-                AdjustVisuals(node.IsLeaf() ? node : null, gameNode, material);
+                int style = SelectStyle(node);
+                if (node.IsLeaf())
+                {
+                    leafNodeFactory.SetStyle(gameNode, style);
+                }
+                else
+                {
+                    innerNodeFactory.SetStyle(gameNode, style);
+                }
             }
         }
 
         /// <summary>
-        /// Adjusts the scale and style of the given <paramref name="gameNode"/> according
+        /// Adjusts the scale of the given leaf <paramref name="gameNode"/> according
         /// to the metric values of the <paramref name="node"/> attached to 
-        /// <paramref name="gameNode"/>. The scale is determined by the node's
-        /// width, height, and depth metrics (which are determined by the settings)
-        /// if <paramref name="node"/> is not null. If <paramref name="node"/> is
-        /// null, the scale of <paramref name="gameNode"/> will not be adjusted.
-        /// The style of <paramref name="gameNode"/> will be determined by the given 
-        /// parameter <paramref name="style"/> if (and only if) <paramref name="style"/>
-        /// is equal to or greater than 0. If <paramref name="style"/> is negative,
-        /// the style of <paramref name="gameNode"/> will not be changed.
-        /// 
-        /// Assumption: <paramref name="node"/> is either null or is attached to <paramref name="gameNode"/>
-        /// and has the width, height, and depth metrics set.
+        /// <paramref name="gameNode"/>. 
+        /// The scale of a leaf is determined by the node's width, height, and depth 
+        /// metrics (which are determined by the settings).
+        /// Precondition: A graph node is attached to <paramref name="gameNode"/>
+        /// and has the width, height, and depth metrics set and is a leaf.
         /// </summary>
-        /// <param name="node">the node determining the scale; if null, the scale of <paramref name="gameNode"/>
-        /// is not adjusted</param>
         /// <param name="gameNode">the game object whose visual attributes are to be adjusted</param>
-        /// <param name="style">they style index to be applied; if less than zero, the style is not changed</param>
-        private void AdjustVisuals(Node node, GameObject gameNode, int style = -1)
+        public void AdjustScaleOfLeaf(GameObject gameNode)
         {
-            if (style >= 0)
+            NodeRef noderef = gameNode.GetComponent<NodeRef>();
+            if (noderef == null)
             {
-                leafNodeFactory.SetStyle(gameNode, style);
+                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
             }
-            if (node != null)
+            else
             {
-                // Scaled metric values for the three dimensions.
-                Vector3 scale = new Vector3(scaler.GetNormalizedValue(settings.WidthMetric, node),
-                                            scaler.GetNormalizedValue(settings.HeightMetric, node),
-                                            scaler.GetNormalizedValue(settings.DepthMetric, node));
-
-                // Scale according to the metrics.
-                if (settings.NodeLayout == SEECity.NodeLayouts.Treemap)
+                Node node = noderef.node;
+                if (node.IsLeaf())
                 {
-                    // In case of treemaps, the width metric is mapped on the ground area.
-                    float widthOfSquare = Mathf.Sqrt(scale.x);
-                    leafNodeFactory.SetWidth(gameNode, leafNodeFactory.Unit * widthOfSquare);
-                    leafNodeFactory.SetDepth(gameNode, leafNodeFactory.Unit * widthOfSquare);
-                    leafNodeFactory.SetHeight(gameNode, leafNodeFactory.Unit * scale.y);
+                    // Scaled metric values for the three dimensions.
+                    Vector3 scale = new Vector3(scaler.GetNormalizedValue(settings.WidthMetric, node),
+                                                scaler.GetNormalizedValue(settings.HeightMetric, node),
+                                                scaler.GetNormalizedValue(settings.DepthMetric, node));
+
+                    // Scale according to the metrics.
+                    if (settings.NodeLayout == SEECity.NodeLayouts.Treemap)
+                    {
+                        // FIXME: This is ugly. The graph renderer should not need to care what
+                        // kind of layout was applied.
+                        // In case of treemaps, the width metric is mapped on the ground area.
+                        float widthOfSquare = Mathf.Sqrt(scale.x);
+                        leafNodeFactory.SetWidth(gameNode, leafNodeFactory.Unit * widthOfSquare);
+                        leafNodeFactory.SetDepth(gameNode, leafNodeFactory.Unit * widthOfSquare);
+                        leafNodeFactory.SetHeight(gameNode, leafNodeFactory.Unit * scale.y);
+                    }
+                    else
+                    {
+                        leafNodeFactory.SetSize(gameNode, leafNodeFactory.Unit * scale);
+                    }
                 }
                 else
                 {
-                    leafNodeFactory.SetSize(gameNode, leafNodeFactory.Unit * scale);
+                    throw new Exception("Game object " + gameNode.name + " is not a leaf.");
                 }
             }
         }
@@ -616,7 +608,8 @@ namespace SEE.Layout
         /// <summary>
         /// Creates a new game object for an inner node using innerNodeFactory.
         /// The inner <paramref name="node"/> is attached to that new game object
-        /// via a NodeRef component.
+        /// via a NodeRef component. The style of resulting game object is adjusted
+        /// according to the selected InnerNodeStyleMetric but not its scale.
         /// 
         /// Precondition: <paramref name="node"/> must be an inner node of the node
         /// hierarchy.
@@ -629,6 +622,7 @@ namespace SEE.Layout
             innerGameObject.name = node.LinkName;
             innerGameObject.tag = Tags.Node;
             AttachNode(innerGameObject, node);
+            AdjustStyle(innerGameObject);
             return innerGameObject;
         }
 
