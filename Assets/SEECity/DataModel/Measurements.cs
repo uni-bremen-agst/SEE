@@ -297,7 +297,6 @@ namespace SEE
                     bool inSameHierarchie = CheckIfInHierarchie(node, node2);
                     if (CheckOverlapping(node, node2) && !CheckIfInHierarchie(node, node2))
                     {
-                        Debug.Log("node: " + node.SourceName + " node2: " + node2.SourceName);
                         overlapAmount++;
                     }
                 }

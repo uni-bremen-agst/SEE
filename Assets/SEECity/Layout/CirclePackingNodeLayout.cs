@@ -144,7 +144,7 @@ namespace SEE.Layout
         private Vector3 GetScale(GameObject node, float radius)
         {
             Node n = node.GetComponent<NodeRef>().node;
-            return n.IsLeaf() ? leafNodeFactory.GetSize(node) 
+            return n.IsLeaf() ? node.transform.localScale//leafNodeFactory.GetSize(node) 
                               : new Vector3(2 * radius, innerNodeHeight, 2 * radius);
         }
 
@@ -157,7 +157,7 @@ namespace SEE.Layout
         /// <returns>radius of the minimal circle containing the given block</returns>
         private float LeafRadius(GameObject block)
         {
-            Vector3 extent = leafNodeFactory.GetSize(block) / 2.0f;
+            Vector3 extent = block.transform.localScale / 2.0f; //leafNodeFactory.GetSize(block) / 2.0f;
             return Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);
         }
     }
