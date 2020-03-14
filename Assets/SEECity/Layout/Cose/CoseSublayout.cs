@@ -179,21 +179,21 @@ namespace SEE.Layout
 
             if (onlyLeaves ||  nodeLayout == NodeLayouts.EvoStreets)
             {
-                float left = Mathf.Infinity;
-                float right = Mathf.NegativeInfinity;
-                float top = Mathf.Infinity;
-                float bottom = Mathf.NegativeInfinity;
-                float nodeLeft;
-                float nodeRight;
-                float nodeTop;
-                float nodeBottom;
+                double left = Mathf.Infinity;
+                double right = Mathf.NegativeInfinity;
+                double top = Mathf.Infinity;
+                double bottom = Mathf.NegativeInfinity;
+                double nodeLeft;
+                double nodeRight;
+                double nodeTop;
+                double nodeBottom;
 
                 foreach (CoseNode cNode in NodeMapSublayout.Keys)
                 {
-                    nodeLeft = (float)cNode.GetLeft();
-                    nodeRight = (float)cNode.GetRight();
-                    nodeTop = (float)cNode.GetTop();
-                    nodeBottom = (float)cNode.GetBottom();
+                    nodeLeft = cNode.GetLeft();
+                    nodeRight = cNode.GetRight();
+                    nodeTop = cNode.GetTop();
+                    nodeBottom = cNode.GetBottom();
 
                     if (left > nodeLeft)
                     {
@@ -222,7 +222,7 @@ namespace SEE.Layout
                 top -= defaultMargin;
                 bottom += defaultMargin;
 
-                Rect boundingRect = new Rect(left, top, right - left, bottom - top);
+                Rect boundingRect = new Rect((float)left, (float)top, (float)(right - left), (float)(bottom - top));
                 Vector3 position = new Vector3(boundingRect.center.x, groundLevel, boundingRect.center.y);
                 Vector3 scale = new Vector3(boundingRect.width, innerNodeHeight, boundingRect.height);
                 LayoutScale = new Vector3(root.rect.width, innerNodeHeight, root.rect.height);

@@ -348,7 +348,7 @@ namespace SEE.Layout
                     // based on www.btluke.com/simanf1.html, schedule 3
                     
                     coseLayoutSettings.CoolingFactor = Math.Max(coseLayoutSettings.InitialCoolingFactor - Math.Pow(coseLayoutSettings.Coolingcycle, Math.Log(100 * (coseLayoutSettings.InitialCoolingFactor - coseLayoutSettings.FinalTemperature)) / Math.Log(coseLayoutSettings.MaxCoolingCycle)) / 100 * CoseLayoutSettings.Cooling_Adjuster, coseLayoutSettings.FinalTemperature);
-                    Debug.Log("cooling: " + coseLayoutSettings.CoolingFactor);
+                    //Debug.Log("cooling: " + coseLayoutSettings.CoolingFactor);
                 }
 
                 coseLayoutSettings.TotalDisplacement = 0;
@@ -555,8 +555,8 @@ namespace SEE.Layout
             var rectB = nodeB.rect;
             double[] overlapAmount = new double[2];
             double[] clipPoints = new double[4];
-            double distanceX = 0;
-            double distanceY = 0;
+            double distanceX;
+            double distanceY;
             double distanceSquared;
             double distance;
             double repulsionForce;
@@ -589,18 +589,18 @@ namespace SEE.Layout
                     distanceY = clipPoints[3] - clipPoints[1];
                 }
 
-                if (Mathf.Abs((float)distanceX) < CoseLayoutSettings.Min_Repulsion_Dist)
+                if (Math.Abs(distanceX) < CoseLayoutSettings.Min_Repulsion_Dist)
                 {
                     distanceX = Math.Sign(distanceX) * CoseLayoutSettings.Min_Repulsion_Dist;
                 }
 
-                if (Mathf.Abs((float)distanceY) < CoseLayoutSettings.Min_Repulsion_Dist)
+                if (Math.Abs(distanceY) < CoseLayoutSettings.Min_Repulsion_Dist)
                 {
-                    distanceY = Mathf.Sign((float)distanceY) * CoseLayoutSettings.Min_Repulsion_Dist;
+                    distanceY = Math.Sign(distanceY) * CoseLayoutSettings.Min_Repulsion_Dist;
                 }
 
                 distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
-                distance = Mathf.Sqrt((float)distanceSquared);
+                distance = Math.Sqrt(distanceSquared);
 
                 repulsionForce = CoseLayoutSettings.Repulsion_Strength * nodeA.NumberOfChildren() * nodeB.NumberOfChildren() / distanceSquared;
 
