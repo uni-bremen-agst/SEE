@@ -65,12 +65,11 @@ namespace SEE.Animation
                                    nodeTransform.scale
                                    : gameObject.transform.parent.InverseTransformVector(nodeTransform.scale);
 
-            Debug.LogFormat("animating {0} from pos={1} scale={2} to pos={3} scale={4}\n", 
-                gameObject.name,
-                gameObject.transform.position, gameObject.transform.localScale,
-                position, localScale);
+            //Debug.LogFormat("animating {0} from pos={1} scale={2} to pos={3} scale={4}\n",
+            //    gameObject.name,
+            //    gameObject.transform.position, gameObject.transform.localScale,
+            //    position, localScale);
 
-            /*
             if (gameObject.transform.localScale != localScale)
             {
                 // Scale the object.
@@ -93,7 +92,6 @@ namespace SEE.Animation
                     ));
                 }
             }
-            */
 
             if (gameObject.transform.position != position)
             {
