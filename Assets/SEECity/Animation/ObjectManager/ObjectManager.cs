@@ -79,7 +79,7 @@ namespace SEE.Animation.Internal
         /// <summary>
         /// Returns a saved plane or generates a new one if it does not already exist. The resulting
         /// plane encloses all currently cached game objects of the city only if it was newly 
-        /// generated. It may need to be adjusted if it was not newly generated. TODO.
+        /// generated. It may need to be adjusted if it was not newly generated. 
         /// </summary>
         /// <param name="plane">the plane intended to enclose all game objects of the city</param>
         /// <returns>true if the plane already existed (thus, can be re-used) and false if it was newly created</returns>
@@ -92,6 +92,16 @@ namespace SEE.Animation.Internal
             }
             plane = currentPlane;
             return hasPlane;
+        }
+
+        /// <summary>
+        /// Adjusts the current plane so that all current game objects managed here 
+        /// fit onto it. Height and y co-ordinate will be maintained. Only its 
+        /// x and z co-ordinates will be adjusted.
+        /// </summary>
+        public void AdjustPlane()
+        {
+            _graphRenderer.AdjustPlane(currentPlane, gameObjects);
         }
 
         /// <summary>

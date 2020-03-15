@@ -427,6 +427,7 @@ namespace SEE.Animation.Internal
             next.Graph.Edges().ForEach(RenderEdge);
             // We have made the transition to the next graph.
             _currentCity = next;
+            RenderPlane();
             Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
 
@@ -440,40 +441,33 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Is called on Constructor the register all given animator,
+        /// Is called by Constructor the register all given <paramref name="animators"/>,
         /// so they can be updated accordingly.
         /// </summary>
-        /// <param name="animators"></param>
-        protected virtual void RegisterAllAnimators(List<AbstractAnimator> animators)
+        /// <param name="animators">list of animators to be informed</param>
+        protected virtual void RegisterAllAnimators(IList<AbstractAnimator> animators)
         {
             animators.Add(moveScaleShakeAnimator);
             animators.Add(moveAnimator);
         }
 
         /// <summary>
-        /// Renders a plane enclosing all (transitive) descendant game objects of given
-        /// <paramref name="node"/>.
+        /// Renders a plane enclosing all game objects of the currently shown graph.
         /// </summary>
-        /// <param name="node">the node to be displayed</param>
-        protected virtual void RenderPlane(Node node)
+        protected virtual void RenderPlane()
         {
-            Debug.LogWarning("EvolutionRenderer.RenderPlane(Node) not implemented yet.\n");
-            // FIXME. Code must be adjusted. Planes are not part of the layout.
-            /*
-            var isPlaneNew = !objectManager.GetPlane(out GameObject plane);
-            var nodeTransform = NextLayoutToBeShown[node];
+            bool isPlaneNew = !objectManager.GetPlane(out GameObject plane);
             if (isPlaneNew)
             {
-                // if the plane is new instantly apply the position and size
-                plane.transform.position = Vector3.zero;
-                plane.transform.localScale = nodeTransform.scale;
+
             }
             else
             {
                 // if the tranform of the plane changed animate it
-                SimpleAnim.AnimateTo(node, plane, Vector3.zero, nodeTransform.scale);
+                //SimpleAnim.AnimateTo(node, plane, Vector3.zero, nodeTransform.scale);
+                objectManager.AdjustPlane();
             }
-            */
+
         }
 
         /// <summary>
