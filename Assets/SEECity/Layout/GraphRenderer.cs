@@ -149,11 +149,6 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// The y co-ordinate of the ground where blocks are placed.
-        /// </summary>
-        protected const float groundLevel = 0.0f;
-
-        /// <summary>
         /// Draws the nodes and edges of the graph by applying the layouts according to the user's
         /// choice in the settings.
         /// </summary>
@@ -189,14 +184,16 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Returns the node layouter according to the settings.
+        /// Returns the node layouter according to the settings. The node layouter will
+        /// place the nodes at ground level 0.
         /// </summary>
         /// <returns>node layout selected</returns>
         public NodeLayout GetLayout()
         {
+            float groundLevel = 0.0f;
             switch (settings.NodeLayout)
             {
-                case SEECity.NodeLayouts.Manhattan:
+                case SEECity.NodeLayouts.Manhattan:                    
                     return new ManhattanLayout(groundLevel, leafNodeFactory);
                 case SEECity.NodeLayouts.FlatRectanglePacking:
                     return new RectanglePacker(groundLevel, leafNodeFactory);
@@ -222,19 +219,18 @@ namespace SEE.Layout
         {
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             // Place the plane somewhat under ground level.
-            GameObject plane = PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 0.01f, Color.gray);
-            return plane;
+            return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, settings.origin.y - 0.01f, Color.gray);
         }
 
         /// <summary>
-        /// Adds <paramref name="child"/> as a child to <paramref name="parent"/>.
+        /// Adds <paramref name="child"/> as a child to <paramref name="parent"/>,
+        /// maintaining the world position of <paramref name="child"/>.
         /// </summary>
         /// <param name="child">child to be added</param>
         /// <param name="parent">new parent of child</param>
         private static void AddToParent(GameObject child, GameObject parent)
         {
             child.transform.SetParent(parent.transform, true);
-            //child.transform.parent = parent.transform;
         }
 
         /// <summary>
@@ -648,7 +644,7 @@ namespace SEE.Layout
         /// <summary>
         /// Returns the bounding box (2D rectangle) enclosing all given game nodes.
         /// </summary>
-        /// <param name="gameNodes"></param>
+        /// <param name="gameNodes">the list of game nodes that are enclosed in the resulting bounding box</param>
         /// <param name="leftLowerCorner">the left lower front corner (x axis in 3D space) of the bounding box</param>
         /// <param name="rightUpperCorner">the right lower back corner (z axis in 3D space) of the bounding box</param>
         private void BoundingBox(ICollection<GameObject> gameNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
@@ -667,9 +663,8 @@ namespace SEE.Layout
                 {
                     Node node = go.GetComponent<NodeRef>().node;
 
-                    // Note: go.transform.position denotes the center of the object
-
                     Vector3 extent = node.IsLeaf() ? leafNodeFactory.GetSize(go) / 2.0f : innerNodeFactory.GetSize(go) / 2.0f;
+                    // Note: position denotes the center of the object
                     Vector3 position = node.IsLeaf() ? leafNodeFactory.GetCenterPosition(go) : innerNodeFactory.GetCenterPosition(go);
                     {
                         // x co-ordinate of lower left corner
