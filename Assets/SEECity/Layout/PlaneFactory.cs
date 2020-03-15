@@ -56,19 +56,19 @@ namespace SEE.Layout
         /// with given color, width, depth, and height.
         /// Draws a plane in rectangle with  at ground level.
         /// 
-        /// Preconditions: x1 > x1 and z1 > z0 (Exception is thrown otherwise)
+        /// Preconditions: x0 < x1 and z0 < z1 (Exception is thrown otherwise)
         /// </summary>
         /// <param name="leftFrontCorner">2D co-ordinate of the left front corner</param>
         /// <param name="rightBackCorner">2D co-ordinate of the right back corner</param>
-        /// <param name="y">y co-ordinate fo the plane</param>
+        /// <param name="groundLevel">y co-ordinate for the plane</param>
         /// <param name="color">color of the plane</param>
         /// <param name="height">height (thickness) of the plane</param>
-        public static GameObject NewPlane(Vector2 leftFrontCorner, Vector2 rightBackCorner, float y, Color color, float height = 0.1f)
+        public static GameObject NewPlane(Vector2 leftFrontCorner, Vector2 rightBackCorner, float groundLevel, Color color, float height = 0.1f)
         {
             float width = Distance(leftFrontCorner.x, rightBackCorner.x);
             float depth = Distance(leftFrontCorner.y, rightBackCorner.y);
 
-            Vector3 centerPosition = new Vector3(leftFrontCorner.x + width / 2.0f, y, leftFrontCorner.y + depth / 2.0f);
+            Vector3 centerPosition = new Vector3(leftFrontCorner.x + width / 2.0f, groundLevel, leftFrontCorner.y + depth / 2.0f);
             return NewPlane(centerPosition, color, width, depth, height);
         }
 
