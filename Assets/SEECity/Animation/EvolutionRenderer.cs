@@ -60,6 +60,12 @@ namespace SEE.Animation.Internal
         private ObjectManager objectManager;
 
         /// <summary>
+        /// The origin of the city. The resulting layout of each graph will be moved to 
+        /// this origin.
+        /// </summary>
+        private Vector3 cityOrigin;
+
+        /// <summary>
         /// The city evolution to be drawn by this renderer.
         /// </summary>
         public SEECityEvolution CityEvolution
@@ -72,6 +78,7 @@ namespace SEE.Animation.Internal
                 // assign a new city, we also need a new graph renderer for that city.
                 // So in fact this is the perfect place to assign graphRenderer.
                 graphRenderer = new GraphRenderer(value);
+                cityOrigin = value.origin;
                 diff = new NumericAttributeDiff(value.AllMetricAttributes());
                 objectManager = new ObjectManager(graphRenderer);
             }
@@ -280,7 +287,7 @@ namespace SEE.Animation.Internal
             }
 
             // Calculate and return the layout for the collected game objects.
-            return ToLinkNameLayout(nodeLayout.Layout(gameObjects));
+            return ToLinkNameLayout(NodeLayout.Move(nodeLayout.Layout(gameObjects), cityOrigin));
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to 
             // objectManager.GetNode() above. Yet, inner nodes are generally not scaled by
