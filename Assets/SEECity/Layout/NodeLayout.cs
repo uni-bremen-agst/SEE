@@ -97,7 +97,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="layout">node layout to be adjusted</param>
         /// <param name="offset">offset to be added</param>
-        /// <returns></returns>
+        /// <returns><paramref name="layout"/> where <paramref name="offset"/> has been added to each position</returns>
         public static Dictionary<GameObject, NodeTransform> Move(Dictionary<GameObject, NodeTransform> layout, Vector3 offset)
         {
             Dictionary<GameObject, NodeTransform> result = new Dictionary<GameObject, NodeTransform>();
