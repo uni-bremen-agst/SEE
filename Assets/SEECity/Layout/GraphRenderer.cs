@@ -223,6 +223,18 @@ namespace SEE.Layout
         }
 
         /// <summary>
+        /// Adjusts the x and z co-ordinates of the given <paramref name="plane"/> so that all
+        /// <paramref name="gameNodes"/> fit onto it.
+        /// </summary>
+        /// <param name="plane">the plane to be adjusted</param>
+        /// <param name="gameNodes">the game nodes that should be fitted onto <paramref name="plane"/></param>
+        public void AdjustPlane(GameObject plane, ICollection<GameObject> gameNodes)
+        {
+            BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+            PlaneFactory.AdjustXZ(plane, leftFrontCorner, rightBackCorner);
+        }
+
+        /// <summary>
         /// Adds <paramref name="child"/> as a child to <paramref name="parent"/>,
         /// maintaining the world position of <paramref name="child"/>.
         /// </summary>
