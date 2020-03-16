@@ -105,6 +105,19 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
+        /// Determines the new <paramref name="centerPosition"/> and <paramref name="scale"/> for the 
+        /// plane so that it would enclose all cached game objects of the city where
+        /// the y co-ordinate and the height of the plane would remain the same. The plane itself
+        /// is not actually changed.
+        /// </summary>
+        /// <param name="centerPosition">the new center of the plane</param>
+        /// <param name="scale">the new scale of the plane</param>
+        public void GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale)
+        {
+            _graphRenderer.GetPlaneTransform(currentPlane, gameObjects, out centerPosition, out scale);
+        }
+
+        /// <summary>
         /// Sets <paramref name="gameNode"/> to a cached GameObject for a leaf or inner node 
         /// or creates a new one if none has existed. The game object is identified
         /// by the attribute Linkname of <paramref name="node"/>.
