@@ -112,21 +112,41 @@ namespace SEE.Layout
         /// <param name="rightBackCorner">new right back corner of the plane</param>
         internal static void AdjustXZ(GameObject plane, Vector2 leftFrontCorner, Vector2 rightBackCorner)
         {
+            Vector3 centerPosition, planeScale;
+            GetTransform(plane, leftFrontCorner, rightBackCorner, out centerPosition, out planeScale);
+
+            plane.transform.position = centerPosition;
+            plane.transform.localScale = planeScale;
+        }
+
+        /// <summary>
+        /// Determines the new <paramref name="centerPosition"/> and <paramref name="scale"/> for the given 
+        /// <paramref name="plane"/> so that <paramref name="leftFrontCorner"/> would be the left front 
+        /// corner and <paramref name="rightBackCorner"/> would be the right back corner in the X-Z plane 
+        /// and the y co-ordinate and the height of <paramref name="plane"/> would remain the same.
+        /// 
+        /// Precondition: <paramref name="plane"/> is a plane game object.
+        /// </summary>
+        /// <param name="plane">a plane game object to be adjusted</param>
+        /// <param name="leftFrontCorner">new left front corner of the plane</param>
+        /// <param name="rightBackCorner">new right back corner of the plane</param>
+        /// <param name="centerPosition">the new center of the plane</param>
+        /// <param name="scale">the new scale of the plane</param>
+        internal static void GetTransform(GameObject plane, Vector2 leftFrontCorner, Vector2 rightBackCorner, out Vector3 centerPosition, out Vector3 scale)
+        {
             float width = Distance(leftFrontCorner.x, rightBackCorner.x);
             float depth = Distance(leftFrontCorner.y, rightBackCorner.y);
             // We will maintain the height and ground level of the plane.
             float height = plane.transform.localScale.y;
             float groundLevel = plane.transform.position.y;
 
-            Vector3 centerPosition = new Vector3(leftFrontCorner.x + width / 2.0f, groundLevel, leftFrontCorner.y + depth / 2.0f);
-            plane.transform.position = centerPosition;
+            centerPosition = new Vector3(leftFrontCorner.x + width / 2.0f, groundLevel, leftFrontCorner.y + depth / 2.0f);
 
             // A plane is a flat square with edges ten units long oriented in the XZ plane of the local 
             // coordinate space. Thus, the mesh of a plane is 10 times larger than its scale factors for X and Y. 
             // When we want a plane to have width 12 units, we need to devide the scale for the width 
             // by 1.2.
-            Vector3 planeScale = new Vector3(width, height * planeMeshFactor, depth) / planeMeshFactor;
-            plane.transform.localScale = planeScale;
+            scale = new Vector3(width, height * planeMeshFactor, depth) / planeMeshFactor;
         }
     }
 }

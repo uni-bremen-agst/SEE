@@ -233,6 +233,23 @@ namespace SEE.Layout
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             PlaneFactory.AdjustXZ(plane, leftFrontCorner, rightBackCorner);
         }
+ 
+        /// <summary>
+        /// Determines the new <paramref name="centerPosition"/> and <paramref name="scale"/> for the given 
+        /// <paramref name="plane"/> so that it would enclose all given <paramref name="gameNodes"/>
+        /// and the y co-ordinate and the height of <paramref name="plane"/> would remain the same.
+        /// 
+        /// Precondition: <paramref name="plane"/> is a plane game object.
+        /// </summary>
+        /// <param name="plane">a plane game object to be adjusted</param>
+        /// <param name="gameNodes">the game nodes that should be fitted onto <paramref name="plane"/></param>
+        /// <param name="centerPosition">the new center of the plane</param>
+        /// <param name="scale">the new scale of the plane</param>
+        public void GetPlaneTransform(GameObject plane, ICollection<GameObject> gameNodes, out Vector3 centerPosition, out Vector3 scale)
+        {
+            BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+            PlaneFactory.GetTransform(plane, leftFrontCorner, rightBackCorner, out centerPosition, out scale);
+        }
 
         /// <summary>
         /// Adds <paramref name="child"/> as a child to <paramref name="parent"/>,
