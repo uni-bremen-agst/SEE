@@ -457,15 +457,16 @@ namespace SEE.Animation.Internal
         protected virtual void RenderPlane()
         {
             bool isPlaneNew = !objectManager.GetPlane(out GameObject plane);
-            if (isPlaneNew)
+            if (!isPlaneNew)
             {
-
-            }
-            else
-            {
-                // if the tranform of the plane changed animate it
-                //SimpleAnim.AnimateTo(node, plane, Vector3.zero, nodeTransform.scale);
-                objectManager.AdjustPlane();
+                // We are re-using the existing plane, hence, we animate its change
+                // (new position and new scale).
+                objectManager.GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale);
+                iTween.ScaleTo(plane, iTween.Hash(
+                         "scale", scale,
+                         "time", moveAnimator.MaxAnimationTime
+                    ));
+                iTween.MoveTo(plane, iTween.Hash("position", centerPosition, "time", moveAnimator.MaxAnimationTime));
             }
 
         }
