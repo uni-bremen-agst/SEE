@@ -468,7 +468,6 @@ namespace SEE.Animation.Internal
                     ));
                 iTween.MoveTo(plane, iTween.Hash("position", centerPosition, "time", moveAnimator.MaxAnimationTime));
             }
-
         }
 
         /// <summary>
