@@ -119,6 +119,7 @@ namespace SEE.Layout
             float groundLevel = plane.transform.position.y;
 
             Vector3 centerPosition = new Vector3(leftFrontCorner.x + width / 2.0f, groundLevel, leftFrontCorner.y + depth / 2.0f);
+            plane.transform.position = centerPosition;
 
             // A plane is a flat square with edges ten units long oriented in the XZ plane of the local 
             // coordinate space. Thus, the mesh of a plane is 10 times larger than its scale factors for X and Y. 
