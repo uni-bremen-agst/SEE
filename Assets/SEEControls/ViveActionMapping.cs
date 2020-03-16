@@ -17,17 +17,17 @@ namespace SEE.Controls
             Mapping = new Event[NumberOfInputs];
         }
 
-        public void SetAction(Inputs input, Event action)
+        public override void SetAction(Inputs input, Event action)
         {
             Mapping[(int)input] = action;
         }
 
-        public Event GetEvent(Inputs input)
+        public override Event GetEvent(Inputs input)
         {
             return Mapping[(int)input];
         }
 
-        public Event[] GetSet()
+        public override Event[] GetSet()
         {
             return Mapping;
         }
