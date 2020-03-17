@@ -350,7 +350,6 @@ namespace SEE
                 GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "ROOT", new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
-                graph.CalculateLevels();
                 p.End();
                 Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
                 Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
