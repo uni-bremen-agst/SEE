@@ -128,14 +128,7 @@ namespace SEE
             }
             else
             {
-                SEE.Performance p = SEE.Performance.Begin("loading graph data from " + GXLPath());
-                GraphReader graphCreator = new GraphReader(GXLPath(), HierarchicalEdges, "ROOT", new SEELogger());
-                graphCreator.Load();
-                graph = graphCreator.GetGraph();
-                graph.CalculateLevels();
-                p.End();
-                Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
-                Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
+                graph = LoadGraph(GXLPath());
                 LoadMetrics();
                 DrawGraph();
             }
