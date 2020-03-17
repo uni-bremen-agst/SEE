@@ -37,9 +37,10 @@ namespace SEE.Animation.Internal
     public class EvolutionRenderer : MonoBehaviour
     {
         /// <summary>
-        /// Constructor.
+        /// Constructors for MonoBehaviours are meaningless. We need to initialize everything
+        /// at Start() time.
         /// </summary>
-        public EvolutionRenderer()
+        public void Start()
         {
             RegisterAllAnimators(animators);
         }
@@ -66,6 +67,11 @@ namespace SEE.Animation.Internal
         private Vector3 cityOrigin;
 
         /// <summary>
+        /// The marker used to mark the new and removed game objects.
+        /// </summary>
+        private Marker marker;
+
+        /// <summary>
         /// The city evolution to be drawn by this renderer.
         /// </summary>
         public SEECityEvolution CityEvolution
@@ -81,6 +87,7 @@ namespace SEE.Animation.Internal
                 cityOrigin = value.origin;
                 diff = new NumericAttributeDiff(value.AllMetricAttributes());
                 objectManager = new ObjectManager(graphRenderer);
+                marker = new Marker(graphRenderer);
             }
         }
 
@@ -382,6 +389,8 @@ namespace SEE.Animation.Internal
         {
             next.AssertNotNull("next");
             IsStillAnimating = true;
+            // First remove all markings of the previous animation cycle.
+            marker.Clear();
             AnimationStartedEvent.Invoke();
             if (current != null)
             {
@@ -487,7 +496,7 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Ignroes the given <paramref name="node"/> in rendering. This method can
+        /// Ignores the given <paramref name="node"/> in rendering. This method can
         /// be used if inner or leaf nodes are to be ignored (e.g., for non-hierarchical
         /// layouts).
         /// </summary>
@@ -516,6 +525,7 @@ namespace SEE.Animation.Internal
                 graphRenderer.Apply(gameObject, nodeTransform);
                 // Revert the change to the y co-ordindate.
                 nodeTransform.position.y += nodeTransform.scale.y;
+                marker.MarkBorn(gameObject);
                 wasModified = false;
             }
             else
@@ -524,15 +534,6 @@ namespace SEE.Animation.Internal
             }
             moveScaleShakeAnimator.AnimateTo(gameObject, nodeTransform, wasModified, OnRenderNodeFinishedAnimation);
         }
-
-        /// <summary>
-        /// Rendes given <paramref name="edge"/>.
-        /// </summary>
-        /// <param name="edge">edge to be rendered</param>
-        /// FOR ANIMATION: protected virtual void RenderEdge(Edge edge)
-        /// FOR ANIMATION: {
-        /// FOR ANIMATION: // FIXME.
-        /// FOR ANIMATION: }
 
         /// <summary>
         /// Event function that destroys the given <paramref name="gameObject"/>.
@@ -555,15 +556,25 @@ namespace SEE.Animation.Internal
         /// <param name="node">leaf node to be removed</param>
         protected virtual void RenderRemovedNode(Node node)
         {
-            if (objectManager.RemoveNode(node, out GameObject gameObject))
+            if (objectManager.RemoveNode(node, out GameObject block))
             {
-                // if the node needs to be removed, let it sink into the ground
-                var newPosition = gameObject.transform.position;
-                newPosition.y = -gameObject.transform.localScale.y;
-                NodeTransform nodeTransform = new NodeTransform(newPosition, gameObject.transform.localScale);
-                moveScaleShakeAnimator.AnimateTo(gameObject, nodeTransform, false, OnRemovedNodeFinishedAnimation);
+                // if the node needs to be removed, mark it dead and let it sink into the ground
+                marker.MarkDead(block);
+                var newPosition = block.transform.position;
+                newPosition.y = -block.transform.localScale.y;
+                NodeTransform nodeTransform = new NodeTransform(newPosition, block.transform.localScale);
+                moveScaleShakeAnimator.AnimateTo(block, nodeTransform, false, OnRemovedNodeFinishedAnimation);
             }
         }
+
+        /// <summary>
+        /// Rendes given <paramref name="edge"/>.
+        /// </summary>
+        /// <param name="edge">edge to be rendered</param>
+        /// FOR ANIMATION: protected virtual void RenderEdge(Edge edge)
+        /// FOR ANIMATION: {
+        /// FOR ANIMATION: // FIXME.
+        /// FOR ANIMATION: }
 
         /// <summary>
         /// Removes the given edge. The edge is not destroyed, however.
