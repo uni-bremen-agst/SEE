@@ -69,6 +69,11 @@ namespace SEE.Layout
         /// </summary>
         private int noOfChildren;
 
+        /// <summary>
+        /// TODO
+        /// </summary>
+        private int inclusionTreeDepth = int.MaxValue;
+
         public int NoOfChildren { get => noOfChildren; set => noOfChildren = value; }
         public List<CoseNode> Surrounding { get => surrounding; set => surrounding = value; }
         public CoseNodeLayoutValues LayoutValues { get => layoutValues; set => layoutValues = value; }
@@ -80,6 +85,7 @@ namespace SEE.Layout
         public bool IsConnected { get => isConnected; set => isConnected = value; }
         public Node NodeObject { get => nodeObject; set => nodeObject = value; }
         public CoseGraphManager GraphManager { get => graphManager; set => graphManager = value; }
+        public int InclusionTreeDepth { get => inclusionTreeDepth; set => inclusionTreeDepth = value; }
 
         /// <summary>
         /// Constructor
@@ -170,8 +176,8 @@ namespace SEE.Layout
             CoseLayout layout = graphManager.Layout;
             double maxNodeDisplacement = layout.CoseLayoutSettings.CoolingFactor * layout.CoseLayoutSettings.MaxNodeDisplacement;
 
-            layoutValues.DisplacementX = layout.CoseLayoutSettings.CoolingFactor * (layoutValues.SpringForceX + layoutValues.RepulsionForceX + layoutValues.GravitationForceX) / NumberOfChildren();
-            layoutValues.DisplacementY = layout.CoseLayoutSettings.CoolingFactor * (layoutValues.SpringForceY + layoutValues.RepulsionForceY + layoutValues.GravitationForceY) / NumberOfChildren();
+            layoutValues.DisplacementX = layout.CoseLayoutSettings.CoolingFactor * (layoutValues.SpringForceX + layoutValues.RepulsionForceX + layoutValues.GravitationForceX) / noOfChildren;
+            layoutValues.DisplacementY = layout.CoseLayoutSettings.CoolingFactor * (layoutValues.SpringForceY + layoutValues.RepulsionForceY + layoutValues.GravitationForceY) / noOfChildren;
 
 
             if (Math.Abs(layoutValues.DisplacementX) > maxNodeDisplacement)
@@ -211,7 +217,7 @@ namespace SEE.Layout
             layout.CoseLayoutSettings.TotalDisplacement += Math.Abs(layoutValues.DisplacementX) + Math.Abs(layoutValues.DisplacementY);
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Changes to Source/ Target node of the intergraph edges from all child nodes of the sublayout root to sublayout root
         /// </summary>
         public void SetIntergraphEdgesToSublayoutRoot()
@@ -266,7 +272,7 @@ namespace SEE.Layout
                 }
             }
             graphManager.AllEdges = null;
-        }
+        }*/
 
         /// <summary>
         /// Propogates the displacement of the sublayout root to the sublayout children
@@ -399,7 +405,7 @@ namespace SEE.Layout
         /// Calculates the number of children
         /// </summary>
         /// <returns></returns>
-        public int NumberOfChildren()
+        public int CalcNumberOfChildren()
         {
             int noOfChildren = 0;
 
@@ -411,7 +417,7 @@ namespace SEE.Layout
             {
                 foreach (CoseNode child in child.Nodes)
                 {
-                    noOfChildren += child.NumberOfChildren();
+                    noOfChildren += child.CalcNumberOfChildren();
                 }
             }
 

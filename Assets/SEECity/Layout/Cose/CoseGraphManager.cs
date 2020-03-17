@@ -215,6 +215,28 @@ namespace SEE.Layout
             return allNodes;
         }
 
+        public void CalcInclusionTreeDepths()
+        {
+            CalcInclusionTreeDepth(RootGraph, 1);
+        }
+
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        private void CalcInclusionTreeDepth(CoseGraph graph, int depth)
+        {
+            graph.Nodes.ForEach(node =>
+            {
+                node.InclusionTreeDepth = depth;
+
+                if (node.Child != null)
+                {
+                    CalcInclusionTreeDepth(node.Child, depth +1);
+                }
+            });
+        }
+
 
         /// <summary>
         /// calculates all lowest common anchestors for all edges

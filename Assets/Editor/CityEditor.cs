@@ -181,6 +181,8 @@ namespace SEEEditor
                 editorSettings.CoseGraphSettings.RepulsionStrength = EditorGUILayout.DoubleField("Repulsion Strength", editorSettings.CoseGraphSettings.RepulsionStrength);
                 editorSettings.CoseGraphSettings.GravityStrength = EditorGUILayout.DoubleField("Gravity", editorSettings.CoseGraphSettings.GravityStrength);
                 editorSettings.CoseGraphSettings.CompoundGravityStrength = EditorGUILayout.DoubleField("Compound gravity", editorSettings.CoseGraphSettings.CompoundGravityStrength);
+                editorSettings.CoseGraphSettings.useOptAlgorithm = EditorGUILayout.Toggle("Use Opt-Algorithm", editorSettings.CoseGraphSettings.useOptAlgorithm);
+
 
                 if (editorSettings.CoseGraphSettings.dirs.Count > 0)
                 {

@@ -75,6 +75,9 @@ namespace SEE.DataModel
         /// </summary>
         private int level = 0;
 
+
+        public int depth;
+
         /// <summary>
         /// The level of a node in the hierarchy. The level of a root node is 0.
         /// For all other nodes, the level is the level of its parent + 1.
@@ -114,6 +117,7 @@ namespace SEE.DataModel
                     maxDepth = depth;
                 }
             }
+            depth = maxDepth + 1;
             return maxDepth + 1;
         }
 

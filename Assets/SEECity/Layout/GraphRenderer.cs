@@ -122,7 +122,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
-        private void EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
+        protected void EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
         {
             Dictionary<Node, GameObject> nodeMap = new Dictionary<Node, GameObject>();
 
@@ -191,6 +191,11 @@ namespace SEE.Layout
             List<SublayoutNode> sublayoutNodes = new List<SublayoutNode>();
 
             Performance p = Performance.Begin("layout name" + settings.NodeLayout + ", layout of nodes");
+
+            if (settings.NodeLayout == GraphSettings.NodeLayouts.CompoundSpringEmbedder && coseGraphSettings.useOptAlgorithm)
+            {
+                FindOptimalSolution(graph, nodes, nodeMap);
+            }
 
             switch (settings.NodeLayout)
             {
@@ -277,13 +282,20 @@ namespace SEE.Layout
                 }
             }
             
-                                           EdgeLayout(graph, gameNodes);
-            BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+            EdgeLayout(graph, gameNodes);
+            BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner, leafNodeFactory, innerNodeFactory);
             // Place the plane somewhat under ground level.
             PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 2.0f, new Color(94f / 255f, 93f / 255f, 92f / 255f));
 
             Measurements measurements = new Measurements(nodeMap, graph, settings, leftFrontCorner, rightBackCorner);
             measurements.NodesPerformance(p);
+        }
+
+        private void FindOptimalSolution(Graph graph, List<Node> nodes, Dictionary<Node, GameObject> nodeMap)
+        {
+            List<SublayoutNode> sublayoutNodes = SetContainersCompoundSpringEmbedder(nodeMap, nodes);
+            var optAlgo = new OptAlgorithm(settings, groundLevel, leafNodeFactory, innerNodeFactory, graph, sublayoutNodes, nodeMap);
+            optAlgo.StartOptAlgorithm();
         }
 
         /// <summary>
@@ -675,7 +687,7 @@ namespace SEE.Layout
         /// <param name="gameNodes"></param>
         /// <param name="leftLowerCorner">the left lower front corner (x axis in 3D space) of the bounding box</param>
         /// <param name="rightUpperCorner">the right lower back corner (z axis in 3D space) of the bounding box</param>
-        private void BoundingBox(ICollection<GameObject> gameNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
+        public static void BoundingBox(ICollection<GameObject> gameNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner, NodeFactory leafNodeFactory, InnerNodeFactory innerNodeFactory)
         {
             if (gameNodes.Count == 0)
             {
