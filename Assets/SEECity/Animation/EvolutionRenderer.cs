@@ -406,9 +406,9 @@ namespace SEE.Animation.Internal
                 // For all edges of the current graph not in the next graph; that is, all
                 // edges removed: remove those. As above, edges are compared by their
                 // linknames.
-                current.Graph?
-                    .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
-                    .ForEach(RenderRemovedOldEdge);
+                // FOR ANIMATION: current.Graph?
+                // FOR ANIMATION:     .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
+                // FOR ANIMATION:     .ForEach(RenderRemovedOldEdge);
             }
             // We need to assign _nextCity because the callback RenderPlane, RenderInnerNode, RenderLeaf, and 
             // RenderEdge will access it.
@@ -423,19 +423,25 @@ namespace SEE.Animation.Internal
             {
                 next.Graph.Traverse(RenderNode, RenderNode, RenderNode);
             }
-            // Draw all edges of next graph.
-            next.Graph.Edges().ForEach(RenderEdge);
+            // FOR ANIMATION: next.Graph.Edges().ForEach(RenderEdge);
+
             // We have made the transition to the next graph.
-            _currentCity = next;
+            _currentCity = next;            
             RenderPlane();
             Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
 
         /// <summary>
-        /// Event function triggered when alls animations are finished.
+        /// Event function triggered when alls animations are finished. Renders all edges
+        /// as new and notifies everyone that the animation is finished.
         /// </summary>
         private void OnAnimationsFinished()
         {
+            // Destroy all previous edges and draw all edges of next graph. This can only
+            // be done when nodes have reached their final position, that is, at the end
+            // of the animation cycle.
+            objectManager.RenderEdges(_currentCity.Graph);
+
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();
         }
@@ -526,22 +532,14 @@ namespace SEE.Animation.Internal
             moveScaleShakeAnimator.AnimateTo(gameObject, nodeTransform, wasModified, OnRenderNodeFinishedAnimation);
         }
 
-        private void DumpLayout(Dictionary<string, NodeTransform> layout)
-        {
-            foreach (var entry in layout)
-            {
-                Debug.LogFormat("layout of node named {0}: {1}.\n", entry.Key, entry.Value);
-            }
-        }
-
         /// <summary>
         /// Rendes given <paramref name="edge"/>.
         /// </summary>
         /// <param name="edge">edge to be rendered</param>
-        protected virtual void RenderEdge(Edge edge)
-        {
-            // FIXME.
-        }
+        /// FOR ANIMATION: protected virtual void RenderEdge(Edge edge)
+        /// FOR ANIMATION: {
+        /// FOR ANIMATION: // FIXME.
+        /// FOR ANIMATION: }
 
         /// <summary>
         /// Event function that destroys the given <paramref name="gameObject"/>.
@@ -594,10 +592,10 @@ namespace SEE.Animation.Internal
         /// Removes the given edge. The edge is not destroyed, however.
         /// </summary>
         /// <param name="edge"></param>
-        protected virtual void RenderRemovedOldEdge(Edge edge)
-        {
-            // FIXME.
-        }
+        /// FOR ANIMATION: protected virtual void RenderRemovedOldEdge(Edge edge)
+        /// FOR ANIMATION: {
+        /// FOR ANIMATION: // FIXME.
+        /// FOR ANIMATION: }
 
         // **********************************************************************
 

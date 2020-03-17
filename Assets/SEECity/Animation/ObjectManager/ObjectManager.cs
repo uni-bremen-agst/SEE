@@ -209,21 +209,73 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
+        /// The list of edges rendered for this graph.
+        /// </summary>
+        private ICollection<GameObject> edges;
+
+        /// <summary>
+        /// Renders all edges for the nodes in the node cache according to the settings.
+        /// If edges for these nodes existed already, their game objects are destroyed first.
+        /// </summary>
+        /// <param name="graph">the graph from which to retrieve the edges among the nodes in the node cache</param>
+        public void RenderEdges(Graph graph)
+        {
+            ClearEdges();
+            edges = _graphRenderer.EdgeLayout(graph, nodes.Values);
+        }
+
+        /// <summary>
         /// Clears the internal cache containing all game objects created by GetInnerNode(),
         /// GetLeaf(), GetNode(), or GetPlane() and also destroys those game objects.
         /// </summary>
         public void Clear()
         {
-            if (currentPlane??true)
+            ClearPlane();
+            ClearNodes();
+            ClearEdges();
+        }
+
+        /// <summary>
+        /// Destroys the game object created for the plane (if one exists). 
+        /// Postcondition: currentPlane = null.
+        /// </summary>
+        private void ClearPlane()
+        {
+            if (currentPlane ?? true)
             {
                 Object.Destroy(currentPlane);
                 currentPlane = null;
             }
+        }
+
+        /// <summary>
+        /// Destroys all game objects created for nodes. Clears the node cache.
+        /// </summary>
+        private void ClearNodes()
+        {
             foreach (GameObject gameObject in nodes.Values)
             {
                 Object.Destroy(gameObject);
             }
             nodes.Clear();
+        }
+
+        /// <summary>
+        /// Destroys all game objects created for edges.
+        /// Postcondition: 
+        /// </summary>
+        private void ClearEdges()
+        {
+            if (edges != null)
+            {
+                foreach (GameObject gameObject in edges)
+                {
+                    Object.Destroy(gameObject);
+                }
+                // edges will be overridden in RenderEdges() each time, that is why we
+                // do not Clear() it but reset it to null
+                edges = null;
+            }
         }
     }
 }
