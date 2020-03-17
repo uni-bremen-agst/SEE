@@ -553,6 +553,34 @@ namespace SEE.Layout
         }
 
         /// <summary>
+        /// Returns the center of the roof of the given <paramref name="gameNode"/>.
+        /// 
+        /// Precondition: <paramref name="gameNode"/> must have been created by this graph renderer.
+        /// </summary>
+        /// <param name="gameNode">game node for which to determine the roof position</param>
+        /// <returns>roof position</returns>
+        internal Vector3 GetRoof(GameObject gameNode)
+        {
+            NodeRef noderef = gameNode.GetComponent<NodeRef>();
+            if (noderef == null)
+            {
+                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
+            }
+            else
+            {
+                Node node = noderef.node;
+                if (node.IsLeaf())
+                {
+                    return leafNodeFactory.Roof(gameNode);
+                }
+                else
+                {
+                    return innerNodeFactory.Roof(gameNode);
+                }
+            }
+        }
+
+        /// <summary>
         /// Adjusts the style of the given <paramref name="gameNode"/> according
         /// to the metric value of the graph node attached to <paramref name="gameNode"/>
         /// chosen to determine style.
