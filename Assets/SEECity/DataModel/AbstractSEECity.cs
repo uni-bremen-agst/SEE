@@ -1,4 +1,5 @@
-﻿using SEE.Layout;
+﻿using SEE.DataModel;
+using SEE.Layout;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -330,6 +331,31 @@ namespace SEE
                 { UniversalIssue, IconFactory.Erosion.Universal }
             };
             return result;
+        }
+
+        /// <summary>
+        /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.
+        /// </summary>
+        /// <returns>the loaded graph (may be empty if a graph could not be loaded)</returns>
+        public Graph LoadGraph(string filename)
+        {
+            if (string.IsNullOrEmpty(filename))
+            {
+                Debug.LogError("Empty graph path.\n");
+                return new Graph();
+            }
+            else
+            {
+                SEE.Performance p = SEE.Performance.Begin("loading graph data from " + filename);
+                GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "ROOT", new SEELogger());
+                graphCreator.Load();
+                Graph graph = graphCreator.GetGraph();
+                graph.CalculateLevels();
+                p.End();
+                Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
+                Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
+                return graph;
+            }
         }
     }
 }
