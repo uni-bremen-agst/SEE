@@ -43,7 +43,10 @@ namespace SEE.Layout
         public override void SetStyle(GameObject block, int style)
         {
             Renderer renderer = block.GetComponent<Renderer>();
-            renderer.sharedMaterial = materials.DefaultMaterial(Mathf.Clamp(style, 0, NumberOfStyles() - 1));
+            if (renderer != null)
+            {
+                renderer.sharedMaterial = materials.DefaultMaterial(Mathf.Clamp(style, 0, NumberOfStyles() - 1));
+            }
         }
     }
 }
