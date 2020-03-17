@@ -257,11 +257,21 @@ namespace SEE.Layout
         private void ClassicLayout()
         {
             CalculateNodesToApplyGravityTo();
+            CalcNoOfChildrenForAllNodes();
             graphManager.CalcLowestCommonAncestors();
+            graphManager.CalcInclusionTreeDepths();
             graphManager.RootGraph.CalcEstimatedSize();
             CalcIdealEdgeLength();
             InitSpringEmbedder();
             RunSpringEmbedder();
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        private void CalcNoOfChildrenForAllNodes()
+        {
+            graphManager.GetAllNodes().ForEach(node => node.NoOfChildren = node.CalcNumberOfChildren());
         }
 
         /// <summary>
@@ -568,7 +578,7 @@ namespace SEE.Layout
                 repulsionForceX = 2 * overlapAmount[0];
                 repulsionForceY = 2 * overlapAmount[1];
 
-                double childrenConstant = nodeA.NumberOfChildren() * nodeB.NumberOfChildren() / (double)(nodeA.NumberOfChildren() + nodeB.NumberOfChildren());
+                double childrenConstant = nodeA.NoOfChildren * nodeB.NoOfChildren / (double)(nodeA.NoOfChildren + nodeB.NoOfChildren);
 
                 nodeA.LayoutValues.RepulsionForceX -= childrenConstant * repulsionForceX;
                 nodeA.LayoutValues.RepulsionForceY -= childrenConstant * repulsionForceY;
@@ -602,7 +612,7 @@ namespace SEE.Layout
                 distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
                 distance = Math.Sqrt(distanceSquared);
 
-                repulsionForce = CoseLayoutSettings.Repulsion_Strength * nodeA.NumberOfChildren() * nodeB.NumberOfChildren() / distanceSquared;
+                repulsionForce = CoseLayoutSettings.Repulsion_Strength * nodeA.NoOfChildren * nodeB.NoOfChildren / distanceSquared;
 
                 repulsionForceX = repulsionForce * distanceX / distance;
                 repulsionForceY = repulsionForce * distanceY / distance;
@@ -840,7 +850,7 @@ namespace SEE.Layout
                 }
                 else
                 {
-                    // TODO
+                    /*// TODO
                     // density mit einbeziehen, aber nur in dem Graphen an sich
 
                     CoseGraph owner = edge.Source.Owner;
@@ -857,7 +867,7 @@ namespace SEE.Layout
                     if (edgeSum > 200)
                     {
                         edge.IdealEdgeLength = 300;
-                    }
+                    }*/
                 }
             }
         }
