@@ -122,7 +122,7 @@ namespace SEE.Layout
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
+        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
         {
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
