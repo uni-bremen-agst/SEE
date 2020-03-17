@@ -393,14 +393,7 @@ namespace SEE.Animation.Internal
                     .Nodes().Except(next.Graph.Nodes(), nodeEqualityComparer).ToList()
                     .ForEach(node =>
                     {
-                        if (node.IsLeaf())
-                        {
-                            RenderRemovedOldLeaf(node);
-                        }
-                        else
-                        {
-                            RenderRemovedOldInnerNode(node);
-                        }
+                        RenderRemovedNode(node);
                     });
 
                 // For all edges of the current graph not in the next graph; that is, all
@@ -556,27 +549,11 @@ namespace SEE.Animation.Internal
         }
 
         /// <summary>
-        /// Removes the given inner node. The node is not auto destroyed.
-        /// </summary>
-        /// <param name="node">inner node to be removed</param>
-        protected virtual void RenderRemovedOldInnerNode(Node node)
-        {
-            if (objectManager.RemoveNode(node, out GameObject gameObject))
-            {
-                // if the node needs to be removed, let it sink into the ground
-                var nextPosition = gameObject.transform.position;
-                nextPosition.y = -2;
-                NodeTransform nodeTransform = new NodeTransform(nextPosition, gameObject.transform.localScale);
-                moveAnimator.AnimateTo(gameObject, nodeTransform, false, OnRemovedNodeFinishedAnimation);
-            }
-        }
-
-        /// <summary>
-        /// Removes the given leaf node. The removal is animated by sinking the
+        /// Removes the given node. The removal is animated by sinking the
         /// node. The node is not destroyed.
         /// </summary>
         /// <param name="node">leaf node to be removed</param>
-        protected virtual void RenderRemovedOldLeaf(Node node)
+        protected virtual void RenderRemovedNode(Node node)
         {
             if (objectManager.RemoveNode(node, out GameObject gameObject))
             {
