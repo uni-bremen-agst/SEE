@@ -17,6 +17,8 @@ namespace SEE.DataModel
         /// <paramref name="rootName"/> is null or the empty string or has a single root, the graph
         /// will be loaded as stored in the GXL file. 
         /// 
+        /// When the graph is loaded, the node levels are calculated.
+        /// 
         /// Precondition: <paramref name="rootName"/> must be unique.
         /// </summary>
         /// <param name="filename">the name of the GXL file</param>
@@ -38,7 +40,7 @@ namespace SEE.DataModel
 
         /// <summary>
         /// Loads the graph from the GXL file and adds an artifical root node if requested
-        /// (see constructor).
+        /// (see constructor). The node levels will be calculated, too.
         /// </summary>
         public override void Load()
         {
@@ -66,6 +68,8 @@ namespace SEE.DataModel
                     }
                 }
             }
+            // After having the complete hierarchy, we can calculate the node levels.
+            graph.CalculateLevels();
         }
 
         /// <summary>
