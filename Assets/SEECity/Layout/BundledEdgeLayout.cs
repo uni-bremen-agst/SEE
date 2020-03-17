@@ -224,15 +224,16 @@ namespace SEE.Layout
 
             // if ancestorLevel = childLevel, then path.Count = 1
             Node[] path = new Node[childLevel - ancestorLevel + 1];
+            Node cursor = child;
             int i = 0;
             while (true)
             {
-                path[i] = child;
-                if (child == ancestor)
+                path[i] = cursor;
+                if (cursor == ancestor)
                 {
                     break;
                 }
-                child = child.Parent;
+                cursor = cursor.Parent;
                 i++;
             }
             return path;
