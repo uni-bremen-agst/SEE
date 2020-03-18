@@ -71,5 +71,18 @@ namespace SEE.DataModel
             result += "}";
             return result;
         }
+
+        /// <summary>
+        /// Creates a unique string representing the edge as the concatentation of its edge
+        /// type and the two linknames of the edge's source and target node.
+        /// IMPORTANT NOTE: This linkname is unique only if there is only a single edge
+        /// between those nodes with the edge's type.
+        /// </summary>
+        /// <returns>a string from both nodes' LinkNames as follows: Type + "#" + Source.LinkName + '#' + Target.LinkName</returns>
+        public string LinkName
+        {
+            get => Type + "#" + Source.LinkName + "#" + Target.LinkName;
+        }
+
     }
 }

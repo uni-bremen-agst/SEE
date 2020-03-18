@@ -21,7 +21,7 @@ namespace SEE.DataModel
         {
             string platformPath = Filenames.OnCurrentPlatform(path);
             Debug.LogFormat("Loading graph from {0}...\n", platformPath);
-            GraphReader graphCreator = new GraphReader(platformPath, HierarchicalEdges, logger);
+            GraphReader graphCreator = new GraphReader(platformPath, HierarchicalEdges, "", logger);
             graphCreator.Load();
             Graph result = graphCreator.GetGraph();
             Assert.That(result, !Is.Null);

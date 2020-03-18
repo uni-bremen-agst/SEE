@@ -88,7 +88,8 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="nodes">the list of nodes whose edges are to be drawn</param>
-        public abstract void DrawEdges(Graph graph, ICollection<GameObject> nodes);
+        /// <returns>all game objects created to represent the edges</returns>
+        public abstract ICollection<GameObject> DrawEdges(Graph graph, ICollection<GameObject> nodes);
 
         /// <summary>
         /// Returns the default material for edges using the materialPath.

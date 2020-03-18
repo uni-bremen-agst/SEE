@@ -12,15 +12,14 @@ namespace SEE.Layout
     {
         /// <summary>
         /// Constructor for linear-interpolation based scaling of node metrics.
-        /// The values are guaranteed to be in the range of [minimalLength,
-        /// maximalLength].
+        /// The values are guaranteed to be in the range of [minimalLength, maximalLength].
         /// </summary>
-        /// <param name="graph">the graph whose node metrics are to be scaled</param>
+        /// <param name="graphs">the set of graph whose node metrics are to be scaled</param>
         /// <param name="minimalLength">the mininmal value a node length can have</param>
         /// <param name="maximalLength">the maximal value a node length can have</param>
         /// <param name="metrics">node metrics for scaling</param>
-        public LinearScale(Graph graph, float minimalLength, float maximalLength, IList<string> metrics)
-            : base(graph, metrics, minimalLength, maximalLength)
+        public LinearScale(ICollection<Graph> graphs, float minimalLength, float maximalLength, IList<string> metrics)
+            : base(graphs, metrics, minimalLength, maximalLength)
         {
         }
 

@@ -10,7 +10,7 @@ namespace SEE.Layout
     /// described by Bruls, Huizing, van Wijk, "Squarified Treemaps".
     /// pp. 33-42, Eurographics / IEEE VGTC Symposium on Visualization, 2000.
     /// </summary>
-    public class TreemapLayout : NodeLayout
+    public class TreemapLayout : HierarchicalNodeLayout
     {
         /// <summary>
         /// Constructor. The width and depth are assumed to be in Unity units.

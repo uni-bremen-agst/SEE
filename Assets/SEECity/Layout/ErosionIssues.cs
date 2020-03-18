@@ -41,12 +41,15 @@ namespace SEE.Layout
         /// Creates sprites for software-erosion indicators for all given game nodes.
         /// </summary>
         /// <param name="gameNodes">list of game nodes for which to create erosion visualizations</param>
-        public void Add(ICollection<GameObject> gameNodes)
+        /// <returns>the list of sprites created</returns>
+        public ICollection<GameObject> Add(ICollection<GameObject> gameNodes)
         {
+            List<GameObject> result = new List<GameObject>();
             foreach (GameObject block in gameNodes)
             {
-                AddErosionIssues(block);
+                result.AddRange(AddErosionIssues(block));
             }
+            return result;
         }
 
         /// <summary>
@@ -54,8 +57,9 @@ namespace SEE.Layout
         /// in ascending order in terms of the sprite width. The sprite width is proportional
         /// to the normalized metric value for the erosion issue.
         /// </summary>
-        /// <param name="node"></param>
-        protected void AddErosionIssues(GameObject gameNode)
+        /// <param name="gameNode">the game node which the sprites are to be created for</param>
+        /// <returns>the list of sprites created</returns>
+        protected ICollection<GameObject> AddErosionIssues(GameObject gameNode)
         {
             Node node = gameNode.GetComponent<NodeRef>().node;
 
@@ -103,6 +107,7 @@ namespace SEE.Layout
                     currentRoof = sprite.transform.position + halfHeight;
                 }
             }
+            return sprites;
         }
 
         /// <summary>

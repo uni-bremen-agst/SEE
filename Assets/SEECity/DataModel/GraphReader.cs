@@ -10,15 +10,66 @@ namespace SEE.DataModel
     public class GraphReader : GXLParser
     {
         /// <summary>
-        /// Constructor.
+        /// Constructor. If <paramref name="rootName"/> is neither null nor the empty string and if 
+        /// the loaded graph has multiple roots, a single artificial root with that name will be added
+        /// that becomes the parent of all other original roots. The <paramref name="rootName"/> 
+        /// determines both Source.Name, Linkage.Name, and Type of that artificial root. If 
+        /// <paramref name="rootName"/> is null or the empty string or has a single root, the graph
+        /// will be loaded as stored in the GXL file. 
+        /// 
+        /// When the graph is loaded, the node levels are calculated.
+        /// 
+        /// Precondition: <paramref name="rootName"/> must be unique.
         /// </summary>
         /// <param name="filename">the name of the GXL file</param>
         /// <param name="graph">the graph to which the entities found in the GXL are to be added</param>
         /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
+        /// <param name="rootName">name of the artifical root node if required</param>
         /// <param name="logger">the logger used for messages; if null, no messages are emitted</param>
-        public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, ILogger logger = null) : base(filename, logger)
+        public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string rootName = "", ILogger logger = null) : base(filename, logger)
         {
             this.hierarchicalEdgeTypes = hierarchicalEdgeTypes;
+            this.rootName = string.IsNullOrEmpty(rootName) ? "" : rootName;
+        }
+
+        /// <summary>
+        /// The value for the Source.Name, Linkage.Name, and Type of the artificial root if
+        /// one is to be created at all.
+        /// </summary>
+        private readonly string rootName;
+
+        /// <summary>
+        /// Loads the graph from the GXL file and adds an artifical root node if requested
+        /// (see constructor). The node levels will be calculated, too.
+        /// </summary>
+        public override void Load()
+        {
+            base.Load();
+            if (rootName.Length > 0)
+            {
+                List<Node> roots = graph.GetRoots();
+                if (roots.Count == 0)
+                {
+                    Debug.LogWarningFormat("Graph stored in {0} is empty.\n", filename);
+                }
+                else if (roots.Count > 1)
+                {
+                    Debug.LogWarningFormat("Graph stored in {0} has multiple roots. Adding an artificial single root {1}.\n", filename, rootName);
+                    Node singleRoot = new Node
+                    {
+                        Type = rootName,
+                        LinkName = rootName,
+                        SourceName = rootName
+                    };
+                    graph.AddNode(singleRoot);
+                    foreach (Node root in roots)
+                    {
+                        singleRoot.AddChild(root);
+                    }
+                }
+            }
+            // After having the complete hierarchy, we can calculate the node levels.
+            graph.CalculateLevels();
         }
 
         /// <summary>

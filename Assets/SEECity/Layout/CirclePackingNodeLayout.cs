@@ -9,7 +9,7 @@ namespace SEE.Layout
     /// This layout packs circles closely together as a set of nested circles to decrease 
     /// the total area of city.
     /// </summary>
-    public class CirclePackingNodeLayout : NodeLayout
+    public class CirclePackingNodeLayout : HierarchicalNodeLayout
     {
         /// <summary>
         /// Constructor.
@@ -140,7 +140,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">game node whose size is to be determined</param>
         /// <param name="radius">the radius for the game node if it is an inner node</param>
-        /// <returns></returns>
+        /// <returns>the scale of <paramref name="node"/></returns>
         private Vector3 GetScale(GameObject node, float radius)
         {
             Node n = node.GetComponent<NodeRef>().node;
