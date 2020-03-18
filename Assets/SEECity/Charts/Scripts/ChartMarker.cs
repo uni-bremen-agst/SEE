@@ -201,7 +201,10 @@ namespace SEECity.Charts.Scripts
 				{
 					_highlightCopy = Instantiate(linkedObject, linkedObject.transform);
 					_highlightCopy.tag = "Untagged";
-					_highlightCopy.GetComponent<Renderer>().material = _buildingHighlightMaterial;
+					if (_highlightCopy.TryGetComponent<Renderer>(out Renderer renderer))
+					{
+						renderer.material = _buildingHighlightMaterial;
+					}
 					LineRenderer line = Instantiate(highlightLine, _highlightCopy.transform)
 						.GetComponent<LineRenderer>();
 					Vector3 linePos = _highlightCopy.transform.localPosition;
