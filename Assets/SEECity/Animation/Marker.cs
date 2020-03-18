@@ -75,6 +75,7 @@ namespace SEE.Animation.Internal
         public GameObject MarkDead(GameObject block)
         {
             GameObject post = MarkByPost(block, black);
+            post.name = "dead " + block.name;
             // Makes post a child of block so that it moves along with it during the animation.
             // In addition, it will also be destroyed along with its parent block.
             post.transform.SetParent(block.transform, true);
@@ -90,6 +91,7 @@ namespace SEE.Animation.Internal
         public GameObject MarkBorn(GameObject block)
         {
             GameObject post = MarkByPost(block, green);
+            post.name = "new " + block.name;
             // We need to add post to posts so that it can be destroyed at the beginning of the
             // next animation cycle.
             posts.Add(post);
