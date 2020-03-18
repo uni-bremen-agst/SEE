@@ -37,6 +37,7 @@ namespace SEECity.Charts.Scripts.VR
                     StopCoroutine(_chartsDeactivated);
                 }
                 _chartsDeactivated = StartCoroutine(DeactivateCharts());
+                Debug.Log(axis);
                 transform.Translate(_hand.forward * axis * movementSpeed);
             }
         }
