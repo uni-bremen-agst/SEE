@@ -17,12 +17,11 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel;
 using SEE.Layout;
 using System;
 using UnityEngine;
 
-namespace SEE.Animation
+namespace SEE.Game.Animation
 {
     /// <summary>
     /// Animates the move of a given GameObject over the full <see cref="AbstractAnimator.MaxAnimationTime"/>.

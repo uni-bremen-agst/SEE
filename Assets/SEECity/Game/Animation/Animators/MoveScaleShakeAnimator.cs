@@ -21,7 +21,7 @@ using UnityEngine;
 using SEE.Layout;
 using System;
 
-namespace SEE.Animation
+namespace SEE.Game.Animation
 {
     /// <summary>
     /// Animates the position and scale of a given GameObject over the full <see cref="AbstractAnimator.MaxAnimationTime"/>.

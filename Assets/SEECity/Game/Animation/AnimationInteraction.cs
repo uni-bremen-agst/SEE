@@ -17,12 +17,11 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.Animation.Internal;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEE.Animation
+namespace SEE.Game.Animation
 {
     /// <summary>
     /// The AnimationInteraction manages user inputs and interfaces.

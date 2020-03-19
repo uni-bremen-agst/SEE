@@ -18,12 +18,12 @@
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.DataModel;
-using SEE.Animation.Internal;
+using SEE.Game.Animation;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Animation
+namespace SEE.Game
 {
     /// <summary>
     /// A SEECityEvolution combines all necessary components for the animations

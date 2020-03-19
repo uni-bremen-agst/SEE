@@ -23,7 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Animation.Internal
+namespace SEE.Game.Animation
 {
     /// <summary>
     /// An ObjectManager creates and manages GameObjects by using a supplied

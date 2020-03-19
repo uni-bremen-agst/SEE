@@ -19,9 +19,8 @@
 
 using UnityEngine;
 using UnityEngine.UI;
-using SEE.Animation.Internal;
 
-namespace SEE.Animation
+namespace SEE.Game.Animation
 {
     /// <summary>
     /// Data model for the animation-related user interactions consisting

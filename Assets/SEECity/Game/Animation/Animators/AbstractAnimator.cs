@@ -21,7 +21,7 @@ using SEE.Layout;
 using System;
 using UnityEngine;
 
-namespace SEE.Animation
+namespace SEE.Game.Animation
 {
     /// <summary>
     /// An abstract animator that makes it simple to swap an existing type of animation.
