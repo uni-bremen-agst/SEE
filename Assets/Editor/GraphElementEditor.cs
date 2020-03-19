@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using SEE.DataModel;
-using SEE.Layout;
+using SEE.GO;
 
 namespace SEEEditor
 {

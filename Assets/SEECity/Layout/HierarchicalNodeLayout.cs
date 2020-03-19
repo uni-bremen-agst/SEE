@@ -1,4 +1,6 @@
-﻿namespace SEE.Layout
+﻿using SEE.GO;
+
+namespace SEE.Layout
 {
     /// <summary>
     /// The abstract super class of all hierarchical node layouts.

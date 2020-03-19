@@ -2,7 +2,7 @@
 using SEE.DataModel;
 using System.Collections.Generic;
 
-namespace SEE.Layout
+namespace SEE.GO
 {
     /// <summary>
     /// Scaling based on z-score. The z-score of a value v that is an element of 

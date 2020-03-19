@@ -19,6 +19,7 @@
 
 using SEE.DataModel;
 using SEE.Layout;
+using SEE.GO;
 using System;
 using System.Collections.Generic;
 using System.Linq;

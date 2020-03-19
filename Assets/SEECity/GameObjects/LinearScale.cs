@@ -2,7 +2,7 @@
 using SEE.DataModel;
 using System.Collections.Generic;
 
-namespace SEE.Layout
+namespace SEE.GO
 {
     /// <summary>
     /// Provides x, y, z lengths of a node based on a linear interpolation

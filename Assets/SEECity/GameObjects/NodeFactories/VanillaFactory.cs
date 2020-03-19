@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.GO
 {
     /// <summary>
     /// A factory for empty plain (vanilla) game objects.

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel;
+using SEE.Layout;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.GO
 {
     /// <summary>
     /// A renderer for graphs. Encapsulates handling of block types, node and edge layouts,

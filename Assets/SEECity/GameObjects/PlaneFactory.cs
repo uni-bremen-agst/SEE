@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.GO
 {
     /// <summary>
     /// A factory for planes where blocks can be put on.

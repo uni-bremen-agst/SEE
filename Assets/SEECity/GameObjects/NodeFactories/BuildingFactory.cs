@@ -2,7 +2,7 @@
 using CScape;
 using SEE.DataModel;
 
-namespace SEE.Layout
+namespace SEE.GO
 {
     /// <summary>
     /// A factory for game objects represented by CScape buildings.

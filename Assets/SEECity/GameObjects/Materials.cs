@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.GO
 {
     /// <summary>
     /// Provides default material that can be shared among game objects to

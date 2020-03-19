@@ -2,7 +2,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.GO
 {
     /// <summary>
     /// A factory for text objects that rotate towards the camera.
