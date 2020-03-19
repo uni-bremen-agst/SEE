@@ -238,5 +238,48 @@ namespace SEE.Layout
             }
             return result + 1;
         }
+
+        /// <summary>
+        /// Transforms the given <paramref name="gameNodes"/> to a collection of LayoutNodes.
+        /// </summary>
+        /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
+        /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
+        protected ICollection<LayoutNode> ToLayoutNodes(ICollection<GameObject> gameNodes)
+        {
+            List<LayoutNode> result = new List<LayoutNode>();
+            foreach (GameObject gameObject in gameNodes)
+            {
+                Node node = gameObject.GetComponent<NodeRef>().node;
+                if (node.IsLeaf())
+                {
+                    result.Add(new GameNode(gameObject, leafNodeFactory));
+                }
+                else
+                {
+                    result.Add(new GameNode(gameObject));
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Transforms the given <paramref name="layout"/> into the layout representation 
+        /// currently used by the NodeLayout clients. The key of the resulting dictionary are
+        /// the game objects represented by the keys of <paramref name="layout"/>. The value
+        /// of the resulting dictionary is its corresponding NodeTransform.
+        /// </summary>
+        /// <param name="layout">layout to be transformed</param>
+        /// <returns></returns>
+        protected Dictionary<GameObject, NodeTransform> ToNodeTransformLayout(Dictionary<LayoutNode, NodeTransform> layout)
+        {
+            Dictionary<GameObject, NodeTransform> result = new Dictionary<GameObject, NodeTransform>();
+
+            foreach (var entry in layout)
+            {
+                GameNode gameNode = entry.Key as GameNode;
+                result[gameNode.GetGameObject()] = entry.Value;
+            }
+            return result;
+        }
     }
 }
