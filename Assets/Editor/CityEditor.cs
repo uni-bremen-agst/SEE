@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEngine.XR;
 using SEE;
+using SEE.Game;
 
 namespace SEEEditor
 {

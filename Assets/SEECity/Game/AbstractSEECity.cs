@@ -3,7 +3,7 @@ using SEE.GO;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE
+namespace SEE.Game
 {
     /// <summary>
     /// Common abstract superclass of SEECity and SEECityEvolution.
