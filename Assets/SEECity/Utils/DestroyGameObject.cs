@@ -9,7 +9,7 @@ namespace SEE
     {
         /// <summary>
         /// Destroys given game object using UnityEngine.Object when in
-        /// game mode UnityEngine.Object.DestroyImmediate when in editor mode.
+        /// game mode or UnityEngine.Object.DestroyImmediate when in editor mode.
         /// </summary>
         /// <param name="gameObject"></param>
         public static void DestroyGameObject(GameObject gameObject)

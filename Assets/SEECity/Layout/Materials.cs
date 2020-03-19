@@ -58,22 +58,45 @@ namespace SEE.Layout
         /// <returns>materials</returns>
         private static Material[] Init(int numberOfColors, Color lower, Color higher)
         {
+            if (numberOfColors < 1)
+            {
+                throw new Exception("Number of colors must be greater than 0.");
+            }
             // Shader to retrieve the default material.
             Shader shader = Shader.Find(shaderName);
 
             Material[] result = new Material[numberOfColors];
 
-            for (int i = 0; i < result.Length; i++)
+            if (numberOfColors == 1)
             {
-                Material material = new Material(shader);
-                // Turn off reflection
-                material.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
-                material.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
-                material.SetFloat("_SpecularHighlights", 0.0f);
-                material.color = Color.Lerp(lower, higher, (float)i / (float)(numberOfColors - 1));
-                result[i] = material;
+                result[0] = NewMaterial(shader, lower);
+            }
+            else
+            {
+                for (int i = 0; i < result.Length; i++)
+                {
+                    result[i] = NewMaterial(shader, Color.Lerp(lower, higher, (float)i / (float)(numberOfColors - 1)));
+                }
             }
             return result;
+        }
+
+        /// <summary>
+        /// Creates and returns a new material with the given <paramref name="color"/>.
+        /// Reflections are turned off for this material.
+        /// </summary>
+        /// <param name="shader">shader to be used to create the material</param>
+        /// <param name="color">requested color of the new material</param>
+        /// <returns>new material</returns>
+        private static Material NewMaterial(Shader shader, Color color)
+        {
+            Material material = new Material(shader);
+            // Turn off reflection
+            material.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
+            material.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
+            material.SetFloat("_SpecularHighlights", 0.0f);
+            material.color = color;
+            return material;
         }
 
         /// <summary>

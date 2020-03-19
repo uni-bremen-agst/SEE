@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using SEE.Layout.EvoStreets;
+using System.Linq;
 
 namespace SEE.Layout
 {
-    public class EvoStreetsNodeLayout : NodeLayout
+    public class EvoStreetsNodeLayout : HierarchicalNodeLayout
     {
         /// <summary>
         /// Constructor.
@@ -66,10 +67,10 @@ namespace SEE.Layout
             }
             else if (gameNodes.Count == 1)
             {
-                GameObject gameNode = gameNodes.GetEnumerator().Current;
+                GameObject singleNode = gameNodes.Single();
                 Dictionary<GameObject, NodeTransform> layout_result = new Dictionary<GameObject, NodeTransform>
                 {
-                    [gameNode] = new NodeTransform(Vector3.zero, gameNode.transform.localScale)
+                    [singleNode] = new NodeTransform(Vector3.zero, singleNode.transform.localScale)
                 };
                 return layout_result;
             }
@@ -139,7 +140,8 @@ namespace SEE.Layout
         {
             layout_result[to_game_node[node.GraphNode]] 
                 = new NodeTransform(node.Location, 
-                                    new Vector3(node.Scale.x, StreetHeight, node.Scale.z), node.Rotation);
+                                    new Vector3(node.Scale.x, StreetHeight, node.Scale.z), 
+                                    node.Rotation);
         }
 
         /// <summary>
