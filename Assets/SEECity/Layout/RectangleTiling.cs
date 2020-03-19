@@ -30,12 +30,12 @@ namespace SEE.Layout
         /// </summary>
         public class NodeSize
         {
-            public NodeSize(GameObject gameNode, float size)
+            public NodeSize(LayoutNode gameNode, float size)
             {
                 this.gameNode = gameNode;
                 this.size = size;
             }
-            public GameObject gameNode;
+            public LayoutNode gameNode;
             public float size;
         }
 

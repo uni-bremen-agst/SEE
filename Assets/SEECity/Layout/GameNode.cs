@@ -1,4 +1,5 @@
-﻿using SEE.DataModel;
+﻿using System.Collections.Generic;
+using SEE.DataModel;
 using SEE.GO;
 using UnityEngine;
 
@@ -13,6 +14,12 @@ namespace SEE.Layout
         private readonly GameObject gameObject;
         private readonly NodeFactory leafNodeFactory;
         private readonly Node node;
+        private readonly Dictionary<Node, GameNode> to_layout_node = new Dictionary<Node, GameNode>();
+
+        public LayoutNode Parent
+        {
+            get => node.Parent != null ? to_layout_node[node.Parent] : null;
+        }
 
         public GameObject GetGameObject()
         {
@@ -24,18 +31,18 @@ namespace SEE.Layout
             return node;
         }
 
-        public GameNode(GameObject gameObject, NodeFactory nodeFactory)
+        public GameNode(Dictionary<Node, GameNode> to_layout_node, GameObject gameObject, NodeFactory nodeFactory)
         {
             this.gameObject = gameObject;
             this.leafNodeFactory = nodeFactory;
             this.node = this.gameObject.GetComponent<NodeRef>().node;
+            this.to_layout_node = to_layout_node;
+            to_layout_node[node] = this;
         }
 
-        public GameNode(GameObject gameObject)
+        public GameNode(Dictionary<Node, GameNode> to_layout_node, GameObject gameObject)
+            : this(to_layout_node, gameObject, null)
         {
-            this.gameObject = gameObject;
-            this.leafNodeFactory = null;
-            this.node = this.gameObject.GetComponent<NodeRef>().node;
         }
 
         public Vector3 GetSize()
@@ -57,7 +64,17 @@ namespace SEE.Layout
 
         public string LinkName()
         {
-            return gameObject.LinkName();
+            return node.LinkName;
+        }
+
+        public IList<LayoutNode> Children()
+        {
+            IList<LayoutNode> children = new List<LayoutNode>();
+            foreach (Node node in node.Children())
+            {
+                children.Add(to_layout_node[node]);
+            }
+            return children;
         }
     }
 }

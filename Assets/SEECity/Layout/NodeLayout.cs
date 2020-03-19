@@ -247,16 +247,18 @@ namespace SEE.Layout
         protected ICollection<LayoutNode> ToLayoutNodes(ICollection<GameObject> gameNodes)
         {
             List<LayoutNode> result = new List<LayoutNode>();
+            Dictionary<Node, GameNode> to_layout_node = new Dictionary<Node, GameNode>();
+
             foreach (GameObject gameObject in gameNodes)
             {
                 Node node = gameObject.GetComponent<NodeRef>().node;
                 if (node.IsLeaf())
                 {
-                    result.Add(new GameNode(gameObject, leafNodeFactory));
+                    result.Add(new GameNode(to_layout_node, gameObject, leafNodeFactory));
                 }
                 else
                 {
-                    result.Add(new GameNode(gameObject));
+                    result.Add(new GameNode(to_layout_node, gameObject));
                 }
             }
             return result;
@@ -280,6 +282,25 @@ namespace SEE.Layout
                 result[gameNode.GetGameObject()] = entry.Value;
             }
             return result;
+        }
+
+        /// <summary>
+        /// Returns all root nodes in <paramref name="layoutNodes"/>. A node is a root node
+        /// if its Parent is null.
+        /// </summary>
+        /// <param name="layoutNodes">layout nodes for which to collect all roots</param>
+        /// <returns></returns>
+        protected IList<LayoutNode> GetRoots(ICollection<LayoutNode> layoutNodes)
+        {
+            List<LayoutNode> roots = new List<LayoutNode>();
+            foreach (LayoutNode layoutNode in layoutNodes)
+            {
+                if (layoutNode.Parent == null)
+                {
+                    roots.Add(layoutNode);
+                }
+            }
+            return roots;
         }
     }
 }
