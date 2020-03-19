@@ -45,39 +45,39 @@ namespace SEE.Layout
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
-        private Dictionary<GameObject, NodeTransform> layout_result;
-
-        /// <summary>
-        /// The set of children of each node. This is a subset of the node's children
-        /// in the graph, limited to the children for which a layout is requested.
-        /// </summary>
-        private Dictionary<Node, List<Node>> children;
+        private Dictionary<LayoutNode, NodeTransform> layout_result;
 
         /// <summary>
         /// The roots of the subtrees of the original graph that are to be laid out.
         /// A node is considered a root if it has either no parent in the original
         /// graph or its parent is not contained in the set of nodes to be laid out.
         /// </summary>
-        private List<Node> roots;
+        private IList<LayoutNode> roots;
 
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
         {
-            layout_result = new Dictionary<GameObject, NodeTransform>();
+            to_game_node = NodeMapping(gameNodes);
+            return ToNodeTransformLayout(Layout(ToLayoutNodes(gameNodes)));
+        }
 
-            if (gameNodes.Count == 0)
+        private Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> layoutNodes)
+        {
+            layout_result = new Dictionary<LayoutNode, NodeTransform>();
+
+            if (layoutNodes.Count == 0)
             {
                 throw new Exception("No nodes to be laid out.");
             }
-            else if (gameNodes.Count == 1)
+            else if (layoutNodes.Count == 1)
             {
-                GameObject gameNode = gameNodes.GetEnumerator().Current;
+                LayoutNode gameNode = layoutNodes.GetEnumerator().Current;
                 layout_result[gameNode] = new NodeTransform(Vector3.zero, 
-                                                            new Vector3(width, gameNode.transform.localScale.y, depth));
+                                                            new Vector3(width, gameNode.GetSize().y, depth));
             }
             else
             {
-                to_game_node = NodeMapping(gameNodes);
-                CreateTree(to_game_node.Keys, out roots, out children);
+                //CreateTree(to_game_node.Keys, out roots, out children);
+                roots = GetRoots(layoutNodes);
                 CalculateSize();
                 CalculateLayout();
             }
@@ -94,10 +94,10 @@ namespace SEE.Layout
         {
             if (roots.Count == 1)
             {
-                GameObject root = to_game_node[roots[0]];
+                LayoutNode root = roots[0];
                 layout_result[root] = new NodeTransform(Vector3.zero, 
-                                                        new Vector3(width, root.transform.localScale.y, depth));
-                CalculateLayout(children[roots[0]], -width / 2.0f, -depth / 2.0f, width, depth);
+                                                        new Vector3(width, root.GetSize().y, depth));
+                CalculateLayout(root.Children(), -width / 2.0f, -depth / 2.0f, width, depth);
             }
             else
             {
@@ -116,21 +116,21 @@ namespace SEE.Layout
         /// <param name="z">z co-ordinate of the left front corner of the rectangle</param>
         /// <param name="width">width of the rectangle</param>
         /// <param name="depth">depth of the rectangle</param>
-        private void CalculateLayout(List<Node> siblings, float x, float z, float width, float depth)
+        private void CalculateLayout(ICollection<LayoutNode> siblings, float x, float z, float width, float depth)
         {
             List<RectangleTiling.NodeSize> sizes = GetSizes(siblings);
             float padding = Mathf.Min(width, depth) * 0.01f;
             List<RectangleTiling.Rectangle> rects = RectangleTiling.Squarified_Layout_With_Padding(sizes, x, z, width, depth, padding);
             Add_To_Layout(sizes, rects);
 
-            foreach (Node node in siblings)
+            foreach (LayoutNode node in siblings)
             {
-                List<Node> kids = children[node];
+                ICollection<LayoutNode> kids = node.Children();
                 if (kids.Count > 0)
                 {
                     // Note: nodeTransform.position is the center position, while 
                     // CalculateLayout assumes co-ordinates x and z as the left front corner
-                    NodeTransform nodeTransform = layout_result[to_game_node[node]];
+                    NodeTransform nodeTransform = layout_result[node];
                     CalculateLayout(kids, 
                                     nodeTransform.position.x - nodeTransform.scale.x / 2.0f, 
                                     nodeTransform.position.z - nodeTransform.scale.z / 2.0f,
@@ -149,7 +149,7 @@ namespace SEE.Layout
         private float CalculateSize()
         {
             float total_size = 0.0f;
-            foreach(Node root in roots)
+            foreach(LayoutNode root in roots)
             {
                 total_size += CalculateSize(root);
             }
@@ -159,7 +159,7 @@ namespace SEE.Layout
         /// <summary>
         /// The size metric of each node. The area of the rectangle is proportional to a node's size.
         /// </summary>
-        private Dictionary<Node, RectangleTiling.NodeSize> sizes = new Dictionary<Node, RectangleTiling.NodeSize>();
+        private Dictionary<LayoutNode, RectangleTiling.NodeSize> sizes = new Dictionary<LayoutNode, RectangleTiling.NodeSize>();
 
         /// <summary>
         /// Calculates the size of node and all its descendants. The size of a leaf
@@ -168,27 +168,25 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">node whose size it to be determined</param>
         /// <returns>size of node</returns>
-        private float CalculateSize(Node node)
+        private float CalculateSize(LayoutNode node)
         {
-            GameObject gameNode = to_game_node[node];
-
-            if (children[node].Count == 0)
+            if (node.IsLeaf())
             {
                 // a leaf      
-                Vector3 size = leafNodeFactory.GetSize(gameNode);
+                Vector3 size = node.GetSize();
                 // x and z lenghts may differ; we need to consider the larger value
                 float result = Mathf.Max(size.x, size.z);
-                sizes[node] = new RectangleTiling.NodeSize(gameNode, result);
+                sizes[node] = new RectangleTiling.NodeSize(node, result);
                 return result;
             }
             else
             {
                 float total_size = 0.0f;
-                foreach (Node child in children[node])
+                foreach (LayoutNode child in node.Children())
                 {
                     total_size += CalculateSize(child);
                 }
-                sizes[node] = new RectangleTiling.NodeSize(gameNode, total_size);
+                sizes[node] = new RectangleTiling.NodeSize(node, total_size);
                 return total_size;
             }
         }
@@ -199,10 +197,10 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="nodes">list of nodes whose sizes are to be determined</param>
         /// <returns>list of node area sizes</returns>
-        private List<RectangleTiling.NodeSize> GetSizes(ICollection<Node> nodes)
+        private List<RectangleTiling.NodeSize> GetSizes(ICollection<LayoutNode> nodes)
         {
             List<RectangleTiling.NodeSize> result = new List<RectangleTiling.NodeSize>();
-            foreach (Node node in nodes)
+            foreach (LayoutNode node in nodes)
             {
                 result.Add(sizes[node]);
             }
@@ -225,9 +223,9 @@ namespace SEE.Layout
             int i = 0;
             foreach (RectangleTiling.Rectangle rect in rects)
             {
-                GameObject o = nodes[i].gameNode;
+                LayoutNode o = nodes[i].gameNode;
                 Vector3 position = new Vector3(rect.x + rect.width / 2.0f, groundLevel, rect.z + rect.depth / 2.0f);
-                Vector3 scale = new Vector3(rect.width, o.transform.localScale.y, rect.depth);
+                Vector3 scale = new Vector3(rect.width, o.GetSize().y, rect.depth);
                 layout_result[o] = new NodeTransform(position, scale);
                 i++;
             }

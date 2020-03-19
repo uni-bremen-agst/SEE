@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Layout
 {
@@ -7,6 +8,8 @@ namespace SEE.Layout
     /// </summary>
     public interface LayoutNode
     {
+        LayoutNode Parent { get; }
+
         /// <summary>
         /// Yields true if the given node is to be interpreted as a leaf by the layouter.
         /// 
@@ -27,6 +30,7 @@ namespace SEE.Layout
         /// </summary>
         /// <returns>scale of node</returns>
         Vector3 GetSize();
+        IList<LayoutNode> Children();
 
         //Vector3 Position();
         //ICollection<LayoutNode> Children();
