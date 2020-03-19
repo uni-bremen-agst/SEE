@@ -28,6 +28,9 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private Material _buildingHighlightMaterial;
 
+		/// <summary>
+		/// The <see cref="Material" /> making the object look accentuated.
+		/// </summary>
 		private Material _buildingHighlightMaterialAccentuated;
 
 		/// <summary>
@@ -40,7 +43,10 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		[HideInInspector] public GameObject linkedObject;
 
-		public ScrollViewToggle scrollViewToggle { private get; set; }
+		/// <summary>
+		/// The toggle linked to this marker.
+		/// </summary>
+		public ScrollViewToggle ScrollViewToggle { private get; set; }
 
 		/// <summary>
 		/// The active <see cref="Camera" /> in the scene.
@@ -95,6 +101,9 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private float _highlightLineLength;
 
+		/// <summary>
+		/// Stores if the marker is accentuated.
+		/// </summary>
 		private bool _accentuated;
 
 		/// <summary>
@@ -128,16 +137,18 @@ namespace SEECity.Charts.Scripts
 			_highlightLineLength = _chartManager.highlightLineLength;
 		}
 
+		/// <summary>
+		/// Reactivates the highlight if a previous marker linked to the same <see cref="linkedObject" />
+		/// highlighted it.
+		/// </summary>
 		private void Start()
 		{
-			for (int i = 0; i < linkedObject.transform.childCount; i++)
+			for (var i = 0; i < linkedObject.transform.childCount; i++)
 			{
-				Transform child = linkedObject.transform.GetChild(i);
-				if (child.name.Equals(linkedObject.name + "(Clone)"))
-				{
-					TriggerTimedHighlight(_chartManager.highlightDuration, false);
-					break;
-				}
+				var child = linkedObject.transform.GetChild(i);
+				if (!child.name.Equals(linkedObject.name + "(Clone)")) continue;
+				TriggerTimedHighlight(_chartManager.highlightDuration, false);
+				break;
 			}
 		}
 
@@ -184,15 +195,15 @@ namespace SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Highlights the <see cref="linkedObject" />.
+		/// Toggles the highlight of the <see cref="linkedObject" /> and this marker.
 		/// </summary>
 		private void HighlightLinkedObjectToggle(bool highlight)
 		{
 			if (highlight)
 			{
-				bool highlighted = false;
+				var highlighted = false;
 
-				for (int i = 0; i < linkedObject.transform.childCount; i++)
+				for (var i = 0; i < linkedObject.transform.childCount; i++)
 					if (linkedObject.transform.GetChild(i).gameObject.name
 						.Equals(linkedObject.name + "(Clone)"))
 						highlighted = true;
@@ -207,7 +218,7 @@ namespace SEECity.Charts.Scripts
 					}
 					LineRenderer line = Instantiate(highlightLine, _highlightCopy.transform)
 						.GetComponent<LineRenderer>();
-					Vector3 linePos = _highlightCopy.transform.localPosition;
+					var linePos = _highlightCopy.transform.localPosition;
 					line.SetPositions(new[]
 						{linePos, linePos + new Vector3(0f, _highlightLineLength)});
 				}
@@ -219,14 +230,18 @@ namespace SEECity.Charts.Scripts
 			}
 
 			markerHighlight.SetActive(highlight);
-			scrollViewToggle.SetHighlighted(highlight);
+			ScrollViewToggle.SetHighlighted(highlight);
 		}
 
 		/// <summary>
-		/// Highlights this marker and its <see cref="linkedObject" /> for a given amount of time.
+		/// Toggles the highlights this marker and its <see cref="linkedObject" /> for a given amount of time.
+		/// Reactivates it after deactivation if <see cref="ChartManager.selectionMode" /> is toggled on
 		/// </summary>
 		/// <param name="time">How long the highlight will last.</param>
-		/// <param name="reenable"></param>
+		/// <param name="reenable">
+		/// Overwrites the selection mode to reactivate the highlight after
+		/// deactivation.
+		/// </param>
 		public void TriggerTimedHighlight(float time, bool reenable)
 		{
 			var reactivate = false;
@@ -270,8 +285,7 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private void ShowLinkedObject()
 		{
-			_activeCamera = Camera.main.GetComponent<Camera>();
-			//TODO: Change to active camera and not just main camera.
+			_activeCamera = Camera.main;
 			var cameraPos = _activeCamera.transform.position;
 
 			if (_moveWithRotation)

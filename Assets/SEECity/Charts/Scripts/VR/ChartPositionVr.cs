@@ -53,15 +53,15 @@ namespace SEECity.Charts.Scripts.VR
 		/// </summary>
 		private void Update()
 		{
-			if (Vector3.Distance(transform.position, cameraTransform.position) > _distanceThreshold)
+			if (Vector3.Distance(transform.position, cameraTransform.position) <=
+			    _distanceThreshold) return;
+			if (_movingChart != null)
 			{
-				if (_movingChart != null)
-				{
-					StopCoroutine(_movingChart);
-					gameObject.SetActive(true);
-				}
-				_movingChart = StartCoroutine(MoveChart());
+				StopCoroutine(_movingChart);
+				gameObject.SetActive(true);
 			}
+
+			_movingChart = StartCoroutine(MoveChart());
 		}
 
 		/// <summary>
@@ -70,9 +70,8 @@ namespace SEECity.Charts.Scripts.VR
 		/// <returns></returns>
 		private IEnumerator MoveChart()
 		{
-			//gameObject.SetActive(false);
-			Vector3 startPosition = transform.position;
-			for (float time = 0f; time < 1f; time += Time.deltaTime)
+			var startPosition = transform.position;
+			for (var time = 0f; time < 1f; time += Time.deltaTime)
 			{
 				transform.position = Vector3.Lerp(startPosition, cameraTransform.position, time);
 				yield return new WaitForEndOfFrame();

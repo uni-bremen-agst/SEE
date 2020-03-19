@@ -21,16 +21,34 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		protected ChartManager chartManager;
 
-		private float _markerOverlapDistance = 22;
+		/// <summary>
+		/// The distance to another marker to recognize it as overlapping.
+		/// </summary>
+		private const float MarkerOverlapDistance = 22;
 
+		/// <summary>
+		/// Contains one <see cref="scrollEntryPrefab" /> for each <see cref="Node" /> in the scene.
+		/// </summary>
 		[SerializeField] private GameObject scrollContent;
 
+		/// <summary>
+		/// A checkbox associated to a <see cref="Node" /> in the scene to activate it in the chart.
+		/// </summary>
 		[SerializeField] private GameObject scrollEntryPrefab;
 
+		/// <summary>
+		/// The starting coordinates of the headers in the <see cref="scrollContent" />.
+		/// </summary>
 		[SerializeField] private Vector2 headerOffset;
 
+		/// <summary>
+		/// The starting coordinates of the children in the <see cref="scrollContent" />.
+		/// </summary>
 		[SerializeField] private Vector2 childOffset;
 
+		/// <summary>
+		/// If a draw is queued, this wont be null.
+		/// </summary>
 		[HideInInspector] public Coroutine drawing;
 
 		/// <summary>
@@ -38,6 +56,9 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private GameObject[] _dataObjects;
 
+		/// <summary>
+		/// The number of nodes in a scene to determine the performance of graphs.
+		/// </summary>
 		[HideInInspector] public int citySize;
 
 		/// <summary>
@@ -45,6 +66,9 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		protected List<GameObject> activeMarkers = new List<GameObject>();
 
+		/// <summary>
+		/// Handles the movement of charts.
+		/// </summary>
 		[SerializeField] private ChartMoveHandler moveHandler;
 
 		/// <summary>
@@ -63,18 +87,33 @@ namespace SEECity.Charts.Scripts
 		[SerializeField] private GameObject markerPrefab;
 
 		/// <summary>
-		/// Game Object to group all content entries of a chart.
+		/// Used to group all content entries of a chart as children of this <see cref="GameObject" />.
 		/// </summary>
 		[SerializeField] private GameObject entries;
 
+		/// <summary>
+		/// Will be shown if no data is to be displayed.
+		/// </summary>
 		[SerializeField] private GameObject noDataWarning;
 
+		/// <summary>
+		/// The minimum value on the x-axis.
+		/// </summary>
 		[SerializeField] private TextMeshProUGUI minXText;
 
+		/// <summary>
+		/// The maximum value on the x-axis.
+		/// </summary>
 		[SerializeField] private TextMeshProUGUI maxXText;
 
+		/// <summary>
+		/// The minimum value on the y-axis.
+		/// </summary>
 		[SerializeField] private TextMeshProUGUI minYText;
 
+		/// <summary>
+		/// The maximum value on the y-axis.
+		/// </summary>
 		[SerializeField] private TextMeshProUGUI maxYText;
 
 		/// <summary>
@@ -111,7 +150,8 @@ namespace SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Fills the chart for the first time.
+		/// Fills the chart for the first time and invokes <see cref="CallDrawData" /> to keep the chart up to
+		/// date.
 		/// </summary>
 		protected virtual void Start()
 		{
@@ -128,15 +168,15 @@ namespace SEECity.Charts.Scripts
 			var gap = childOffset.y - headerOffset.y;
 			foreach (Transform child in scrollContent.transform) Destroy(child.gameObject);
 
-			GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-			ScrollViewToggle parentToggle = tempObject.GetComponent<ScrollViewToggle>();
+			var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+			var parentToggle = tempObject.GetComponent<ScrollViewToggle>();
 			parentToggle.SetLabel("Buildings");
 			tempObject.transform.localPosition = headerOffset;
 			parentToggle.Initialize(this);
 
 			var i = 0;
-			foreach (GameObject dataObject in _dataObjects)
-				if (dataObject.tag.Equals("Building"))
+			foreach (var dataObject in _dataObjects)
+				if (dataObject.CompareTag("Building"))
 					CreateChildToggle(dataObject, parentToggle, i++, gap);
 
 			tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
@@ -145,8 +185,8 @@ namespace SEECity.Charts.Scripts
 			tempObject.transform.localPosition = headerOffset + new Vector2(0, gap) * ++i;
 			parentToggle.Initialize(this);
 
-			foreach (GameObject dataObject in _dataObjects)
-				if (dataObject.tag.Equals("Node"))
+			foreach (var dataObject in _dataObjects)
+				if (dataObject.CompareTag("Node"))
 					CreateChildToggle(dataObject, parentToggle, i++, gap);
 			scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(
 				scrollContent.GetComponent<RectTransform>().sizeDelta.x, i * Mathf.Abs(gap) + 40);
@@ -162,10 +202,10 @@ namespace SEECity.Charts.Scripts
 		private void CreateChildToggle(GameObject dataObject, ScrollViewToggle parentToggle, int i,
 			float gap)
 		{
-			GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-			ScrollViewToggle toggle = tempObject.GetComponent<ScrollViewToggle>();
+			var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+			var toggle = tempObject.GetComponent<ScrollViewToggle>();
 			toggle.Parent = parentToggle;
-			NodeHighlights highlights = dataObject.GetComponent<NodeHighlights>();
+			var highlights = dataObject.GetComponent<NodeHighlights>();
 			toggle.LinkedObject = highlights;
 			highlights.scrollViewToggle = toggle;
 			toggle.SetLabel(dataObject.name);
@@ -180,7 +220,7 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private void GetAllFloats()
 		{
-			foreach (GameObject data in _dataObjects)
+			foreach (var data in _dataObjects)
 			foreach (var key in data.GetComponent<NodeRef>().node.FloatAttributes.Keys)
 				if (!AllKeys.Contains(key))
 					AllKeys.Add(key);
@@ -192,14 +232,14 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private void GetAllIntegers()
 		{
-			foreach (GameObject data in _dataObjects)
+			foreach (var data in _dataObjects)
 			foreach (var key in data.GetComponent<NodeRef>().node.IntAttributes.Keys)
 				if (!AllKeys.Contains(key))
 					AllKeys.Add(key);
 		}
 
 		/// <summary>
-		/// Fills a List with all objects that will be in the chart.
+		/// Fills a List with all <see cref="Node" />s that will be in the chart.
 		/// </summary>
 		private void FindDataObjects()
 		{
@@ -210,7 +250,7 @@ namespace SEECity.Charts.Scripts
 			Array.Copy(nodes, 0, combined, buildings.Length, nodes.Length);
 			_dataObjects = combined;
 
-			foreach (GameObject entry in combined)
+			foreach (var entry in combined)
 				if (!entry.GetComponent<NodeHighlights>().showInChart.Contains(this))
 					entry.GetComponent<NodeHighlights>().showInChart.Add(this, true);
 			citySize = _dataObjects.Length;
@@ -266,7 +306,7 @@ namespace SEECity.Charts.Scripts
 		private void DrawTwoAxes()
 		{
 			var i = 0;
-			Node node = _dataObjects[i].GetComponent<NodeRef>().node;
+			var node = _dataObjects[i].GetComponent<NodeRef>().node;
 			var contained = node.TryGetNumeric(axisDropdownX.Value, out var minX);
 			while (!contained)
 			{
@@ -286,13 +326,13 @@ namespace SEECity.Charts.Scripts
 				contained = node.TryGetNumeric(axisDropdownY.Value, out minY);
 			}
 
-			float maxY = minY;
+			var maxY = minY;
 			List<GameObject> toDraw = new List<GameObject>();
-			foreach (GameObject data in _dataObjects)
+			foreach (var data in _dataObjects)
 			{
 				node = data.GetComponent<NodeRef>().node;
-				bool inX = false;
-				bool inY = false;
+				var inX = false;
+				var inY = false;
 				if (node.TryGetNumeric(axisDropdownX.Value, out var tempX))
 				{
 					if (tempX < minX) minX = tempX;
@@ -313,8 +353,8 @@ namespace SEECity.Charts.Scripts
 
 			if (toDraw.Count > 0)
 			{
-				bool xEqual = minX.Equals(maxX);
-				bool yEqual = minY.Equals(maxY);
+				var xEqual = minX.Equals(maxX);
+				var yEqual = minY.Equals(maxY);
 				if (xEqual || yEqual)
 				{
 					(float min, float max) = minX.Equals(maxX) ? (minY, maxY) : (minX, maxX);
@@ -335,7 +375,7 @@ namespace SEECity.Charts.Scripts
 			}
 			else
 			{
-				foreach (GameObject activeMarker in activeMarkers) Destroy(activeMarker);
+				foreach (var activeMarker in activeMarkers) Destroy(activeMarker);
 				noDataWarning.SetActive(true);
 			}
 		}
@@ -348,10 +388,10 @@ namespace SEECity.Charts.Scripts
 		private void DrawOneAxis()
 		{
 			List<GameObject> toDraw = new List<GameObject>();
-			string metric = axisDropdownY.Value;
+			var metric = axisDropdownY.Value;
 
-			foreach (GameObject dataObject in _dataObjects)
-				if (dataObject.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float _) &&
+			foreach (var dataObject in _dataObjects)
+				if (dataObject.GetComponent<NodeRef>().node.TryGetNumeric(metric, out var _) &&
 				    (bool) dataObject.GetComponent<NodeHighlights>().showInChart[this])
 					toDraw.Add(dataObject);
 
@@ -359,13 +399,13 @@ namespace SEECity.Charts.Scripts
 			{
 				toDraw.Sort(delegate(GameObject go1, GameObject go2)
 				{
-					go1.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float value1);
-					go2.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float value2);
+					go1.GetComponent<NodeRef>().node.TryGetNumeric(metric, out var value1);
+					go2.GetComponent<NodeRef>().node.TryGetNumeric(metric, out var value2);
 					return value1.CompareTo(value2);
 				});
 
-				toDraw.First().GetComponent<NodeRef>().node.TryGetNumeric(metric, out float min);
-				toDraw.Last().GetComponent<NodeRef>().node.TryGetNumeric(metric, out float max);
+				toDraw.First().GetComponent<NodeRef>().node.TryGetNumeric(metric, out var min);
+				toDraw.Last().GetComponent<NodeRef>().node.TryGetNumeric(metric, out var max);
 
 				AddMarkers(toDraw, min, max);
 
@@ -376,7 +416,7 @@ namespace SEECity.Charts.Scripts
 			}
 			else
 			{
-				foreach (GameObject activeMarker in activeMarkers) Destroy(activeMarker);
+				foreach (var activeMarker in activeMarkers) Destroy(activeMarker);
 				noDataWarning.SetActive(true);
 			}
 		}
@@ -393,22 +433,22 @@ namespace SEECity.Charts.Scripts
 			float maxY)
 		{
 			List<GameObject> updatedMarkers = new List<GameObject>();
-			Rect dataRect = dataPanel.rect;
-			float width = dataRect.width / (maxX - minX);
-			float height = dataRect.height / (maxY - minY);
-			int positionInLayer = 0;
+			var dataRect = dataPanel.rect;
+			var width = dataRect.width / (maxX - minX);
+			var height = dataRect.height / (maxY - minY);
+			var positionInLayer = 0;
 
-			foreach (GameObject data in toDraw)
+			foreach (var data in toDraw)
 			{
-				GameObject marker = Instantiate(markerPrefab, entries.transform);
+				var marker = Instantiate(markerPrefab, entries.transform);
 				marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
-				ChartMarker script = marker.GetComponent<ChartMarker>();
+				var script = marker.GetComponent<ChartMarker>();
 				script.linkedObject = data;
-				script.scrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
-				Node node = data.GetComponent<NodeRef>().node;
-				node.TryGetNumeric(axisDropdownX.Value, out float valueX);
-				node.TryGetNumeric(axisDropdownY.Value, out float valueY);
-				string type = node.IsLeaf() ? "Building" : "Node";
+				script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
+				var node = data.GetComponent<NodeRef>().node;
+				node.TryGetNumeric(axisDropdownX.Value, out var valueX);
+				node.TryGetNumeric(axisDropdownY.Value, out var valueY);
+				var type = node.IsLeaf() ? "Building" : "Node";
 				script.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
 				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("0.00"));
 				marker.GetComponent<RectTransform>().anchoredPosition =
@@ -416,13 +456,13 @@ namespace SEECity.Charts.Scripts
 				CheckOverlapping(marker, updatedMarkers.ToArray());
 				updatedMarkers.Add(marker);
 
-				float highlightTimeLeft = CheckOldMarkers(data);
+				var highlightTimeLeft = CheckOldMarkers(data);
 				if (highlightTimeLeft > 0f)
 					script.TriggerTimedHighlight(chartManager.highlightDuration -
 					                             highlightTimeLeft, true);
 			}
 
-			foreach (GameObject marker in activeMarkers) Destroy(marker);
+			foreach (var marker in activeMarkers) Destroy(marker);
 			activeMarkers = updatedMarkers;
 		}
 
@@ -441,23 +481,23 @@ namespace SEECity.Charts.Scripts
 			else
 			{
 				List<GameObject> updatedMarkers = new List<GameObject>();
-				Rect dataRect = dataPanel.rect;
-				float width = dataRect.width / (toDraw.Count - 1);
-				float height = dataRect.height / (max - min);
-				string metric = axisDropdownY.Value;
-				int x = 0;
-				int positionInLayer = 0;
+				var dataRect = dataPanel.rect;
+				var width = dataRect.width / (toDraw.Count - 1);
+				var height = dataRect.height / (max - min);
+				var metric = axisDropdownY.Value;
+				var x = 0;
+				var positionInLayer = 0;
 
-				foreach (GameObject data in toDraw)
+				foreach (var data in toDraw)
 				{
-					GameObject marker = Instantiate(markerPrefab, entries.transform);
+					var marker = Instantiate(markerPrefab, entries.transform);
 					marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
-					ChartMarker script = marker.GetComponent<ChartMarker>();
+					var script = marker.GetComponent<ChartMarker>();
 					script.linkedObject = data;
-					script.scrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
-					Node node = data.GetComponent<NodeRef>().node;
-					node.TryGetNumeric(metric, out float value);
-					string type = node.IsLeaf() ? "Building" : "Node";
+					script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
+					var node = data.GetComponent<NodeRef>().node;
+					node.TryGetNumeric(metric, out var value);
+					var type = node.IsLeaf() ? "Building" : "Node";
 					script.SetInfoText("Linked to: " + data.name + " of type " + type + "\n" +
 					                   metric +
 					                   ": " + value.ToString("0.00"));
@@ -468,14 +508,14 @@ namespace SEECity.Charts.Scripts
 
 					if (activeMarkers.Count > 0)
 					{
-						float highlightTimeLeft = CheckOldMarkers(data);
+						var highlightTimeLeft = CheckOldMarkers(data);
 						if (highlightTimeLeft > 0f)
 							script.TriggerTimedHighlight(
 								chartManager.highlightDuration - highlightTimeLeft, true);
 					}
 				}
 
-				foreach (GameObject marker in activeMarkers) Destroy(marker);
+				foreach (var marker in activeMarkers) Destroy(marker);
 				activeMarkers = updatedMarkers;
 			}
 		}
@@ -487,24 +527,24 @@ namespace SEECity.Charts.Scripts
 		private void AddMarkers(List<GameObject> toDraw)
 		{
 			List<GameObject> updatedMarkers = new List<GameObject>();
-			Rect dataRect = dataPanel.rect;
-			float width = dataRect.width / toDraw.Count;
-			float height = dataRect.height / toDraw.Count;
-			int x = 0;
-			int y = 0;
-			int positionInLayer = 0;
+			var dataRect = dataPanel.rect;
+			var width = dataRect.width / toDraw.Count;
+			var height = dataRect.height / toDraw.Count;
+			var x = 0;
+			var y = 0;
+			var positionInLayer = 0;
 
-			foreach (GameObject data in toDraw)
+			foreach (var data in toDraw)
 			{
-				GameObject marker = Instantiate(markerPrefab, entries.transform);
+				var marker = Instantiate(markerPrefab, entries.transform);
 				marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
-				ChartMarker script = marker.GetComponent<ChartMarker>();
+				var script = marker.GetComponent<ChartMarker>();
 				script.linkedObject = data;
-				script.scrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
-				Node node = data.GetComponent<NodeRef>().node;
-				node.TryGetNumeric(axisDropdownX.Value, out float valueX);
-				node.TryGetNumeric(axisDropdownY.Value, out float valueY);
-				string type = node.IsLeaf() ? "Building" : "Node";
+				script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
+				var node = data.GetComponent<NodeRef>().node;
+				node.TryGetNumeric(axisDropdownX.Value, out var valueX);
+				node.TryGetNumeric(axisDropdownY.Value, out var valueY);
+				var type = node.IsLeaf() ? "Building" : "Node";
 				script.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
 				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("0.00"));
 				marker.GetComponent<RectTransform>().anchoredPosition =
@@ -514,14 +554,14 @@ namespace SEECity.Charts.Scripts
 
 				if (activeMarkers.Count > 0)
 				{
-					float highlightTimeLeft = CheckOldMarkers(data);
+					var highlightTimeLeft = CheckOldMarkers(data);
 					if (highlightTimeLeft > 0f)
 						script.TriggerTimedHighlight(
 							chartManager.highlightDuration - highlightTimeLeft, true);
 				}
 			}
 
-			foreach (GameObject marker in activeMarkers) Destroy(marker);
+			foreach (var marker in activeMarkers) Destroy(marker);
 			activeMarkers = updatedMarkers;
 		}
 
@@ -533,29 +573,29 @@ namespace SEECity.Charts.Scripts
 		/// <param name="updatedMarkers">The already active new markers.</param>
 		private void CheckOverlapping(GameObject marker, GameObject[] updatedMarkers)
 		{
-			Image image = marker.GetComponent<Image>();
+			var image = marker.GetComponent<Image>();
 			if (updatedMarkers.Length > 10)
-				for (int i = updatedMarkers.Length - 10; i < updatedMarkers.Length; i++)
+				for (var i = updatedMarkers.Length - 10; i < updatedMarkers.Length; i++)
 				{
-					GameObject updatedMarker = updatedMarkers[i];
+					var updatedMarker = updatedMarkers[i];
 					if (Vector3.Distance(marker.transform.position,
 							updatedMarker.transform.position)
-						.CompareTo(_markerOverlapDistance * marker.transform.lossyScale.x) < 0)
+						.CompareTo(MarkerOverlapDistance * marker.transform.lossyScale.x) < 0)
 						if (image.color.g - 0.1f >= 0)
 						{
-							Color oldColor = image.color;
+							var oldColor = image.color;
 							image.color = new Color(oldColor.r, oldColor.g - 0.1f,
 								oldColor.b - 0.1f);
 						}
 				}
 			else
-				foreach (GameObject updatedMarker in updatedMarkers)
+				foreach (var updatedMarker in updatedMarkers)
 					if (Vector3.Distance(marker.transform.position,
 							updatedMarker.transform.position)
-						.CompareTo(_markerOverlapDistance * marker.transform.lossyScale.x) < 0)
+						.CompareTo(MarkerOverlapDistance * marker.transform.lossyScale.x) < 0)
 						if (image.color.g - 0.1f >= 0)
 						{
-							Color oldColor = image.color;
+							var oldColor = image.color;
 							image.color = new Color(oldColor.r, oldColor.g - 0.1f,
 								oldColor.b - 0.1f);
 						}
@@ -570,7 +610,7 @@ namespace SEECity.Charts.Scripts
 		private float CheckOldMarkers(GameObject marker)
 		{
 			loop:
-			foreach (GameObject oldMarker in activeMarkers)
+			foreach (var oldMarker in activeMarkers)
 				if (oldMarker.Equals(null))
 				{
 					Destroy(oldMarker);
@@ -598,7 +638,7 @@ namespace SEECity.Charts.Scripts
 		public virtual void AreaSelection(Vector2 min, Vector2 max, bool direction)
 		{
 			if (direction)
-				foreach (GameObject marker in activeMarkers)
+				foreach (var marker in activeMarkers)
 				{
 					Vector2 markerPos = marker.transform.position;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y &&
@@ -607,7 +647,7 @@ namespace SEECity.Charts.Scripts
 							marker.GetComponent<ChartMarker>().linkedObject);
 				}
 			else
-				foreach (GameObject marker in activeMarkers)
+				foreach (var marker in activeMarkers)
 				{
 					Vector2 markerPos = marker.transform.position;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y &&
@@ -622,8 +662,8 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		public void SetInfoText()
 		{
-			string metricX = axisDropdownX.Value;
-			string metricY = axisDropdownY.Value;
+			var metricX = axisDropdownX.Value;
+			var metricY = axisDropdownY.Value;
 			if (metricX.Equals(metricY))
 				moveHandler.SetInfoText(metricX);
 			else
@@ -638,10 +678,10 @@ namespace SEECity.Charts.Scripts
 		/// <param name="highlight">The object the marker will refer to.</param>
 		public void HighlightCorrespondingMarker(GameObject highlight)
 		{
-			foreach (GameObject activeMarker in activeMarkers)
+			foreach (var activeMarker in activeMarkers)
 				if (!activeMarker.Equals(null))
 				{
-					ChartMarker script = activeMarker.GetComponent<ChartMarker>();
+					var script = activeMarker.GetComponent<ChartMarker>();
 					if (script.linkedObject.Equals(highlight))
 					{
 						script.TriggerTimedHighlight(chartManager.highlightDuration, false);
@@ -657,14 +697,12 @@ namespace SEECity.Charts.Scripts
 		/// <param name="highlight">The object the marker will refer to.</param>
 		public void AccentuateCorrespondingMarker(GameObject highlight)
 		{
-			foreach (GameObject activeMarker in activeMarkers)
+			foreach (var activeMarker in activeMarkers)
 			{
-				ChartMarker script = activeMarker.GetComponent<ChartMarker>();
-				if (script.linkedObject.Equals(highlight))
-				{
-					script.Accentuate();
-					break;
-				}
+				var script = activeMarker.GetComponent<ChartMarker>();
+				if (!script.linkedObject.Equals(highlight)) continue;
+				script.Accentuate();
+				break;
 			}
 		}
 
@@ -681,7 +719,7 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		public void OnDestroy()
 		{
-			foreach (GameObject dataObject in _dataObjects)
+			foreach (var dataObject in _dataObjects)
 				if (dataObject != null)
 					dataObject.GetComponent<NodeHighlights>().showInChart.Remove(this);
 		}

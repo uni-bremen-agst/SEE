@@ -26,7 +26,7 @@ namespace SEECity.Charts.Scripts
 		private string[] _options;
 
 		/// <summary>
-		/// The currently selected option of <see cref="_dropdown" />.
+		/// The currently selected option of the <see cref="_dropdown" />.
 		/// </summary>
 		public string Value { get; private set; }
 

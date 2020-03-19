@@ -61,7 +61,7 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// Called by <see cref="ChartContent" /> after creation to pass some values and initialize attributes.
 		/// </summary>
-		/// <param name="script"></param>
+		/// <param name="script">The script to link.</param>
 		public void Initialize(ChartContent script)
 		{
 			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
@@ -73,7 +73,7 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// Changes the UI label of this entry.
 		/// </summary>
-		/// <param name="text"></param>
+		/// <param name="text">The new label.</param>
 		public void SetLabel(string text)
 		{
 			label.text = text;
@@ -89,7 +89,7 @@ namespace SEECity.Charts.Scripts
 			{
 				if (StatusUpdate != null) return;
 				var active = toggle.isOn;
-				foreach (ScrollViewToggle child in _children) child.Toggle(active);
+				foreach (var child in _children) child.Toggle(active);
 			}
 			else
 			{
@@ -108,7 +108,6 @@ namespace SEECity.Charts.Scripts
 		public void Toggle(bool active)
 		{
 			toggle.isOn = active;
-			//SetHighlighted(active);
 		}
 
 		/// <summary>
@@ -119,7 +118,7 @@ namespace SEECity.Charts.Scripts
 		{
 			yield return new WaitForSeconds(0.2f);
 			var active = true;
-			foreach (ScrollViewToggle child in _children)
+			foreach (var child in _children)
 				if (!child.GetStatus())
 				{
 					Toggle(false);
@@ -150,6 +149,10 @@ namespace SEECity.Charts.Scripts
 			_children.Add(child);
 		}
 
+		/// <summary>
+		/// Sets the highlight state of this toggle.
+		/// </summary>
+		/// <param name="highlighted">Highlight on or off.</param>
 		public void SetHighlighted(bool highlighted)
 		{
 			var highlightToggle = GetComponent<Toggle>();

@@ -29,15 +29,44 @@ namespace SEECity.Charts.Scripts
 		[Header("For resizing"), SerializeField]
 		private Transform dragButton;
 
+		/// <summary>
+		/// The warning displayed when no data is displayed in the chart.
+		/// </summary>
 		[SerializeField] private RectTransform noDataWarning;
 
+		/// <summary>
+		/// Top right area of the chart.
+		/// </summary>
 		[SerializeField] private Transform topRight;
+
+		/// <summary>
+		/// Top left area of the chart.
+		/// </summary>
 		[SerializeField] private Transform topLeft;
+
+		/// <summary>
+		/// Bottom right area of the chart.
+		/// </summary>
 		[SerializeField] private Transform bottomRight;
+
+		/// <summary>
+		/// Bottom left area of the chart.
+		/// </summary>
 		[SerializeField] private Transform bottomLeft;
 
+		/// <summary>
+		/// Area on the right of the chart to select the nodes to be displayed in the chart.
+		/// </summary>
 		[SerializeField] private RectTransform contentSelection;
+
+		/// <summary>
+		/// The content of the <see cref="contentSelection" />.
+		/// </summary>
 		[SerializeField] private RectTransform scrollView;
+
+		/// <summary>
+		/// The text above the <see cref="scrollView" />.
+		/// </summary>
 		[SerializeField] private RectTransform contentSelectionHeader;
 
 		/// <summary>
@@ -90,17 +119,17 @@ namespace SEECity.Charts.Scripts
 		/// <param name="height">The new height of the chart.</param>
 		protected virtual void ChangeSize(float width, float height)
 		{
-			RectTransform dataPanel = _chartContent.dataPanel;
+			var dataPanel = _chartContent.dataPanel;
 			dataPanel.sizeDelta = new Vector2(width - 80, height - 80);
 			dataPanel.anchoredPosition = new Vector2(width / 2, height / 2);
 			noDataWarning.sizeDelta = new Vector2(width - 150, height - 150);
-			RectTransform labelsPanel = _chartContent.labelsPanel;
+			var labelsPanel = _chartContent.labelsPanel;
 			labelsPanel.sizeDelta = new Vector2(width, height);
 			labelsPanel.anchoredPosition = new Vector2(width / 2, height / 2);
-			RectTransform xDropdown = _chartContent.axisDropdownX.GetComponent<RectTransform>();
+			var xDropdown = _chartContent.axisDropdownX.GetComponent<RectTransform>();
 			xDropdown.anchoredPosition = new Vector2(width / 2, xDropdown.anchoredPosition.y);
 			xDropdown.sizeDelta = new Vector2(width / 2, xDropdown.sizeDelta.y);
-			RectTransform yDropdown = _chartContent.axisDropdownY.GetComponent<RectTransform>();
+			var yDropdown = _chartContent.axisDropdownY.GetComponent<RectTransform>();
 			yDropdown.anchoredPosition = new Vector2(yDropdown.anchoredPosition.x, height / 2);
 			yDropdown.sizeDelta = new Vector2(height / 2, yDropdown.sizeDelta.y);
 			chart.sizeDelta = new Vector2(width, height);
