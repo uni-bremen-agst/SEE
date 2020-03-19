@@ -27,7 +27,7 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Attaches Donut charts to all game nodes as children.
+        /// Attaches Donut charts to all <paramref name="gameNodes"/> as children.
         /// </summary>
         /// <param name="gameNodes">list of game nodes for which to create Donut chart visualizations</param>
         public void Add(ICollection<GameObject> gameNodes)
@@ -69,7 +69,8 @@ namespace SEE.Layout
         private readonly IScale scaler;
 
         /// <summary>
-        /// Creates and attaches circle segments and inner circle to the given game node.
+        /// Creates and attaches circle segments and inner circle to the given game node
+        /// as children.
         /// </summary>
         /// <param name="gameNode">parent of the circle segments and inner circle</param>
         private void Add(GameObject gameNode)

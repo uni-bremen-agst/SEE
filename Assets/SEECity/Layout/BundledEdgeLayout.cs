@@ -20,8 +20,10 @@ namespace SEE.Layout
         /// </summary>
         private int maxDepth = 0;
 
-        public override void DrawEdges(Graph graph, ICollection<GameObject> nodes)
+        public override ICollection<GameObject> DrawEdges(Graph graph, ICollection<GameObject> nodes)
         {
+            List<GameObject> result = new List<GameObject>();
+
             SetGameNodes(nodes);
             maxDepth = graph.GetMaxDepth();
             // The distance between of the control points at the subsequent levels of the hierarchy.
@@ -31,15 +33,16 @@ namespace SEE.Layout
             if (newMat == null)
             {
                 Debug.LogError("Could not find material " + materialPath + "\n");
-                return;
+                return result;
             }
 
             List<Node> roots = graph.GetRoots();
             if (roots.Count != 1)
             {
                 Debug.LogError("Graph must have a single root node.\n");
-                return;
+                return result;
             }
+            
             LCAFinder lca = new LCAFinder(graph, roots);
             foreach (Edge edge in graph.ConnectingEdges(gameNodes.Keys))
             {
@@ -62,7 +65,9 @@ namespace SEE.Layout
                                          target != null ? target.LinkName : "null",
                                          edge.Type);
                 }
+                result.Add(go);
             }
+            return result;
         }
 
         /// <summary>
@@ -219,15 +224,16 @@ namespace SEE.Layout
 
             // if ancestorLevel = childLevel, then path.Count = 1
             Node[] path = new Node[childLevel - ancestorLevel + 1];
+            Node cursor = child;
             int i = 0;
             while (true)
             {
-                path[i] = child;
-                if (child == ancestor)
+                path[i] = cursor;
+                if (cursor == ancestor)
                 {
                     break;
                 }
-                child = child.Parent;
+                cursor = cursor.Parent;
                 i++;
             }
             return path;

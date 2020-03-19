@@ -15,8 +15,10 @@ namespace SEE.Layout
         {
         }
 
-        public override void DrawEdges(Graph graph, ICollection<GameObject> nodes)
+        public override ICollection<GameObject> DrawEdges(Graph graph, ICollection<GameObject> nodes)
         {
+            List<GameObject> result = new List<GameObject>();
+
             SetGameNodes(nodes);
             float maxBlockHeight = GetMaxBlockHeight(nodes);
 
@@ -34,7 +36,7 @@ namespace SEE.Layout
             if (newMat == null)
             {
                 Debug.LogError("Could not find material " + materialPath + "\n");
-                return;
+                return result;
             }
 
             foreach (Edge edge in graph.ConnectingEdges(gameNodes.Keys))
@@ -44,6 +46,7 @@ namespace SEE.Layout
                 if (source != null && target != null)
                 {
                     GameObject gameEdge = NewGameEdge(edge);
+                    result.Add(gameEdge);
 
                     // gameEdge does not yet have a renderer; we add a new one
                     LineRenderer line = gameEdge.AddComponent<LineRenderer>();
@@ -112,6 +115,7 @@ namespace SEE.Layout
                     Debug.LogErrorFormat("Edge of type {0} has a missing source or target.\n", edge.Type);
                 }
             }
+            return result;
         }
     }
 }
