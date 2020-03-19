@@ -2,7 +2,7 @@
 using SEE.DataModel;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.GO
 {
     /// <summary>
     /// Allows to add erosion issues as sprites atop of game objects.

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using SEE.GO;
 
 namespace SEE.Layout.RectanglePacking
 {
@@ -10,18 +11,6 @@ namespace SEE.Layout.RectanglePacking
     /// </summary>
     internal class TestRectanglePacker
     {
-        //[SetUp]
-        //public virtual void Setup()
-        //{
-        //    Debug.Log("Setup\n");
-        //}
-
-        //[TearDown]
-        //public virtual void Teardown()
-        //{
-        //    Debug.Log("Teardown\n");
-        //}
-
         /// <summary>
         /// True if left and right are the same list (order is ignored).
         /// </summary>

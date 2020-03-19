@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.GO
 {
     /// <summary>
     /// Abstract super class of all inner nodes that use a line renderer 

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.GO
 {
     /// <summary>
     /// Common abstract super class of every NodeFactory for game objects that

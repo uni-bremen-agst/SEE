@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.GO
 {
     /// <summary>
     /// Allows one to decorate game objects with Donut charts. The inner circle and the outer circle

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using SEE.DataModel;
+using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Layout

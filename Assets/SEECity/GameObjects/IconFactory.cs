@@ -2,7 +2,7 @@
 using System;
 using SEE.DataModel;
 
-namespace SEE.Layout
+namespace SEE.GO
 {
     /// <summary>
     /// A factory to generate sprites from sprite prefab files for all types of 
