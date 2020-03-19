@@ -16,6 +16,9 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private static ChartManager _instance;
 
+		/// <summary>
+		/// If true, highlighted objects will stay highlighted until this is deactivated.
+		/// </summary>
 		[HideInInspector] public bool selectionMode;
 
 		/// <summary>
@@ -56,6 +59,9 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		[Header("Highlights")] public Material buildingHighlightMaterial;
 
+		/// <summary>
+		/// The <see cref="Material" /> making the object look accentuated.
+		/// </summary>
 		public Material buildingHighlightMaterialAccentuated;
 
 		/// <summary>
@@ -106,12 +112,18 @@ namespace SEECity.Charts.Scripts
 		public float distanceThreshold = 0.5f;
 
 		/// <summary>
-		/// The input source for controlling charts in VR.
+		/// The left controller input source.
 		/// </summary>
 		public SteamVR_Input_Sources source = SteamVR_Input_Sources.RightHand;
 
+		/// <summary>
+		/// The right controller input source.
+		/// </summary>
 		public SteamVR_Input_Sources movementSource = SteamVR_Input_Sources.LeftHand;
 
+		/// <summary>
+		/// The controller axis for movement.
+		/// </summary>
 		public SteamVR_Action_Single movement;
 
 		/// <summary>
@@ -124,6 +136,9 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		public SteamVR_Action_Vector2 moveInOut;
 
+		/// <summary>
+		/// Controller button to reset the charts positions.
+		/// </summary>
 		[SerializeField] private SteamVR_Action_Boolean resetPosition;
 
 		/// <summary>
@@ -177,12 +192,12 @@ namespace SEECity.Charts.Scripts
 			_isVirtualReality = XRDevice.isPresent;
 			if (!_isVirtualReality)
 			{
-				foreach (GameObject vrObject in vrObjects) Destroy(vrObject);
+				foreach (var vrObject in vrObjects) Destroy(vrObject);
 				Instantiate(chartsPrefab);
 			}
 			else
 			{
-				foreach (GameObject nonVrObject in nonVrObjects) Destroy(nonVrObject);
+				foreach (var nonVrObject in nonVrObjects) Destroy(nonVrObject);
 			}
 		}
 
@@ -200,9 +215,9 @@ namespace SEECity.Charts.Scripts
 			{
 				if (Input.GetMouseButtonDown(0))
 				{
-					Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+					var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-					if (Physics.Raycast(ray, out RaycastHit hit, 100f) &&
+					if (Physics.Raycast(ray, out var hit, 100f) &&
 					    hit.transform.gameObject.TryGetComponent(out NodeRef _))
 						HighlightObject(hit.transform.gameObject);
 				}
@@ -222,12 +237,15 @@ namespace SEECity.Charts.Scripts
 			buildingHighlightMaterialAccentuated.SetFloat("g_flOutlineWidth", highlightOutlineAnim);
 		}
 
+		/// <summary>
+		/// Sets the positions of all charts to be in front of the player in VR.
+		/// </summary>
 		private void ResetPosition()
 		{
-			Transform cameraPosition = Camera.main.transform;
+			var cameraPosition = Camera.main.transform;
 			GameObject[] charts = GameObject.FindGameObjectsWithTag("ChartContainer");
-			float offset = 0f;
-			foreach (GameObject chart in charts)
+			var offset = 0f;
+			foreach (var chart in charts)
 			{
 				chart.transform.position =
 					cameraPosition.position + (2 + offset) * cameraPosition.forward;
@@ -235,28 +253,36 @@ namespace SEECity.Charts.Scripts
 			}
 		}
 
+		/// <summary>
+		/// Highlights an object and all markers associated with it.
+		/// </summary>
+		/// <param name="highlight"></param>
 		public void HighlightObject(GameObject highlight)
 		{
 			GameObject[] charts = GameObject.FindGameObjectsWithTag("Chart");
-			foreach (GameObject chart in charts)
+			foreach (var chart in charts)
 				chart.GetComponent<ChartContent>().HighlightCorrespondingMarker(highlight);
 		}
 
+		/// <summary>
+		/// Accentuates an object and all markers associated with it.
+		/// </summary>
+		/// <param name="highlight"></param>
 		public void Accentuate(GameObject highlight)
 		{
 			GameObject[] charts = GameObject.FindGameObjectsWithTag("Chart");
-			foreach (GameObject chart in charts)
+			foreach (var chart in charts)
 				chart.GetComponent<ChartContent>().AccentuateCorrespondingMarker(highlight);
 
-			Transform highlightTransform = highlight.transform;
+			var highlightTransform = highlight.transform;
 
-			for (int i = 0; i < highlightTransform.childCount; i++)
+			for (var i = 0; i < highlightTransform.childCount; i++)
 			{
-				Transform child = highlightTransform.GetChild(i);
+				var child = highlightTransform.GetChild(i);
 				if (!child.gameObject.name.Equals(highlight.name + "(Clone)")) continue;
-				for (int x = 0; x < child.childCount; x++)
+				for (var x = 0; x < child.childCount; x++)
 				{
-					Transform secondChild = child.GetChild(x);
+					var secondChild = child.GetChild(x);
 					if (!secondChild.gameObject.name.Equals("HighlightLine(Clone)")) continue;
 					secondChild.GetComponent<HighlightLine>().ToggleAccentuation();
 					return;

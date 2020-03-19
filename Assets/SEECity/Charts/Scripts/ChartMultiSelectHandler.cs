@@ -17,19 +17,19 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// Needed for access to <see cref="Scripts.ChartContent.AreaSelection" />.
 		/// </summary>
-		protected ChartContent ChartContent;
+		protected ChartContent chartContent;
 
 		/// <summary>
 		/// The position the user started the drag at.
 		/// </summary>
-		protected Vector3 StartingPos;
+		protected Vector3 startingPos;
 
 		/// <summary>
-		/// Assigns <see cref="ChartContent" />.
+		/// Assigns <see cref="chartContent" />.
 		/// </summary>
 		private void Awake()
 		{
-			ChartContent = transform.parent.GetComponent<ChartContent>();
+			chartContent = transform.parent.GetComponent<ChartContent>();
 		}
 
 		/// <summary>
@@ -40,64 +40,64 @@ namespace SEECity.Charts.Scripts
 		{
 			selectionRect.gameObject.SetActive(true);
 			selectionRect.position = eventData.pressPosition;
-			StartingPos = selectionRect.position;
+			startingPos = selectionRect.position;
 			selectionRect.sizeDelta = new Vector2(0f, 0f);
 		}
 
 		/// <summary>
-		/// Resizes the <see cref="selectionRect" /> to make it span from <see cref="StartingPos" /> to
+		/// Resizes the <see cref="selectionRect" /> to make it span from <see cref="startingPos" /> to
 		/// <see cref="PointerEventData.position" />.
 		/// </summary>
 		/// <param name="eventData">Contains the position data.</param>
 		public virtual void OnDrag(PointerEventData eventData)
 		{
-			bool negative = false;
-			Vector3 lossyScale = selectionRect.lossyScale;
+			var negative = false;
+			var lossyScale = selectionRect.lossyScale;
+			var sizeDelta = Vector2.zero;
 
-			if (eventData.position.x - StartingPos.x < 0)
+			if (eventData.position.x - startingPos.x < 0)
 			{
 				selectionRect.sizeDelta =
 					new Vector2(
-						Mathf.Abs(eventData.position.x - StartingPos.x) /
+						Mathf.Abs(eventData.position.x - startingPos.x) /
 						selectionRect.lossyScale.x,
-						(eventData.position.y - StartingPos.y) / lossyScale.y);
-				selectionRect.position =
-					new Vector3(StartingPos.x - selectionRect.sizeDelta.x / 2 * lossyScale.x,
-						StartingPos.y + selectionRect.sizeDelta.y / 2 * lossyScale.y, 0);
+						(eventData.position.y - startingPos.y) / lossyScale.y);
+				sizeDelta = selectionRect.sizeDelta;
+				selectionRect.position = new Vector3(startingPos.x - sizeDelta.x / 2 * lossyScale.x,
+					startingPos.y + sizeDelta.y / 2 * lossyScale.y, 0);
 				negative = true;
 			}
 
-			if (eventData.position.y - StartingPos.y < 0)
+			if (eventData.position.y - startingPos.y < 0)
 			{
 				if (negative)
 				{
 					selectionRect.sizeDelta = new Vector2(selectionRect.sizeDelta.x,
-						Mathf.Abs(eventData.position.y - StartingPos.y) /
+						Mathf.Abs(eventData.position.y - startingPos.y) /
 						selectionRect.lossyScale.y);
 					selectionRect.position = new Vector3(selectionRect.position.x,
-						StartingPos.y - selectionRect.sizeDelta.y / 2 * lossyScale.y, 0);
+						startingPos.y - selectionRect.sizeDelta.y / 2 * lossyScale.y, 0);
 				}
 				else
 				{
 					selectionRect.sizeDelta =
-						new Vector2((eventData.position.x - StartingPos.x) / lossyScale.x,
-							Mathf.Abs(eventData.position.y - StartingPos.y) / lossyScale.y);
+						new Vector2((eventData.position.x - startingPos.x) / lossyScale.x,
+							Mathf.Abs(eventData.position.y - startingPos.y) / lossyScale.y);
+					sizeDelta = selectionRect.sizeDelta;
 					selectionRect.position =
-						new Vector3(StartingPos.x + selectionRect.sizeDelta.x / 2 * lossyScale.x,
-							StartingPos.y - selectionRect.sizeDelta.y / 2 * lossyScale.y, 0);
+						new Vector3(startingPos.x + sizeDelta.x / 2 * lossyScale.x,
+							startingPos.y - sizeDelta.y / 2 * lossyScale.y, 0);
 					negative = true;
 				}
 			}
 
-			if (!negative)
-			{
-				selectionRect.sizeDelta =
-					new Vector2((eventData.position.x - StartingPos.x) / lossyScale.x,
-						(eventData.position.y - StartingPos.y) / lossyScale.y);
-				selectionRect.position =
-					new Vector3(StartingPos.x + selectionRect.sizeDelta.x / 2 * lossyScale.x,
-						StartingPos.y + selectionRect.sizeDelta.y / 2 * lossyScale.y, 0);
-			}
+			if (negative) return;
+			selectionRect.sizeDelta =
+				new Vector2((eventData.position.x - startingPos.x) / lossyScale.x,
+					(eventData.position.y - startingPos.y) / lossyScale.y);
+			sizeDelta = selectionRect.sizeDelta;
+			selectionRect.position = new Vector3(startingPos.x + sizeDelta.x / 2 * lossyScale.x,
+				startingPos.y + sizeDelta.y / 2 * lossyScale.y, 0);
 		}
 
 		/// <summary>
@@ -106,12 +106,12 @@ namespace SEECity.Charts.Scripts
 		/// <param name="eventData">Contains the position data.</param>
 		public virtual void OnPointerUp(PointerEventData eventData)
 		{
-			if (StartingPos.x < eventData.position.x)
-				ChartContent.AreaSelection(StartingPos, eventData.position,
-					StartingPos.y < eventData.position.y);
+			if (startingPos.x < eventData.position.x)
+				chartContent.AreaSelection(startingPos, eventData.position,
+					startingPos.y < eventData.position.y);
 			else
-				ChartContent.AreaSelection(eventData.position, StartingPos,
-					StartingPos.y > eventData.position.y);
+				chartContent.AreaSelection(eventData.position, startingPos,
+					startingPos.y > eventData.position.y);
 
 			selectionRect.gameObject.SetActive(false);
 		}

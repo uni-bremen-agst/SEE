@@ -9,6 +9,9 @@ namespace SEECity.Charts.Scripts.VR
 	/// </summary>
 	public class ChartMoveHandlerVr : ChartMoveHandler
 	{
+		/// <summary>
+		/// Contains settings used in this script.
+		/// </summary>
 		private ChartContentVr _chartContent;
 
 		/// <summary>
@@ -32,8 +35,14 @@ namespace SEECity.Charts.Scripts.VR
 		/// </summary>
 		private SteamVR_Action_Vector2 _moveInOut;
 
-		private float _minimumDistance = 1f;
+		/// <summary>
+		/// The minimum distance from the controller to the chart.
+		/// </summary>
+		private const float MinimumDistance = 1f;
 
+		/// <summary>
+		/// The maximum distance from the controller to the chart.
+		/// </summary>
 		private float _maximumDistance;
 
 		/// <summary>
@@ -61,13 +70,17 @@ namespace SEECity.Charts.Scripts.VR
 		/// </summary>
 		private readonly Vector3 _chartOffset = new Vector3(0, 0, -0.03f);
 
+		/// <summary>
+		/// Initializes some attributes.
+		/// </summary>
 		protected override void Awake()
 		{
 			base.Awake();
-			_parent = transform.parent.GetComponent<ChartContent>().parent.transform;
+			var parent = transform.parent;
+			_parent = parent.GetComponent<ChartContent>().parent.transform;
 			_mainCamera = Camera.main;
 			_pointerCamera = GameObject.FindGameObjectWithTag("Pointer").GetComponent<Camera>();
-			_chartContent = transform.parent.GetComponent<ChartContentVr>();
+			_chartContent = parent.GetComponent<ChartContentVr>();
 			_physicalOpen = _chartContent.physicalOpen;
 			_physicalClosed = _chartContent.physicalClosed;
 		}
@@ -78,18 +91,21 @@ namespace SEECity.Charts.Scripts.VR
 		protected override void GetSettingData()
 		{
 			base.GetSettingData();
-			_chartScrollSpeed = ChartManager.chartScrollSpeed;
-			_source = ChartManager.source;
-			_moveInOut = ChartManager.moveInOut;
+			_chartScrollSpeed = chartManager.chartScrollSpeed;
+			_source = chartManager.source;
+			_moveInOut = chartManager.moveInOut;
 			//TODO: minDist
-			_maximumDistance = ChartManager.pointerLength;
+			_maximumDistance = chartManager.pointerLength;
 		}
 
-
+		/// <summary>
+		/// Turns the chart to always face the player.
+		/// </summary>
 		protected override void Update()
 		{
 			base.Update();
-			_parent.LookAt(_parent.position - (_mainCamera.transform.position - _parent.position));
+			var parentPosition = _parent.position;
+			_parent.LookAt(parentPosition - (_mainCamera.transform.position - parentPosition));
 			ScrollInOut();
 		}
 
@@ -99,21 +115,21 @@ namespace SEECity.Charts.Scripts.VR
 		/// </summary>
 		private void ScrollInOut()
 		{
-			if (PointerDown)
-				if (_moveInOut.GetChanged(_source))
-				{
-					Vector3 direction = _pointerCamera.transform.position -
-					                    GetComponent<RectTransform>().position;
-					float moveBy = _moveInOut.GetAxis(_source).y * _chartScrollSpeed *
-					               Time.deltaTime;
-					if (!(_moveInOut.GetAxis(_source).y < 0 &&
-					      direction.magnitude < _minimumDistance + moveBy ||
-					      _moveInOut.GetAxis(_source).y > 0 &&
-					      direction.magnitude > _maximumDistance - moveBy))
-						_parent.position -= direction * moveBy;
-				}
+			if (!pointerDown || !_moveInOut.GetChanged(_source)) return;
+			var direction = _pointerCamera.transform.position -
+			                GetComponent<RectTransform>().position;
+			var moveBy = _moveInOut.GetAxis(_source).y * _chartScrollSpeed * Time.deltaTime;
+			if (!(_moveInOut.GetAxis(_source).y < 0 &&
+			      direction.magnitude < MinimumDistance + moveBy ||
+			      _moveInOut.GetAxis(_source).y > 0 &&
+			      direction.magnitude > _maximumDistance - moveBy))
+				_parent.position -= direction * moveBy;
 		}
 
+		/// <summary>
+		/// Moves the chart to the new position.
+		/// </summary>
+		/// <param name="eventData">Contains position data of the pointer.</param>
 		public override void OnDrag(PointerEventData eventData)
 		{
 			if (eventData.pointerCurrentRaycast.worldPosition != Vector3.zero)
@@ -122,10 +138,13 @@ namespace SEECity.Charts.Scripts.VR
 				                   _chartOffset;
 		}
 
+		/// <summary>
+		/// Toggles minimization of the chart.
+		/// </summary>
 		protected override void ToggleMinimize()
 		{
-			_physicalOpen.SetActive(Minimized);
-			_physicalClosed.SetActive(!Minimized);
+			_physicalOpen.SetActive(minimized);
+			_physicalClosed.SetActive(!minimized);
 			base.ToggleMinimize();
 		}
 	}

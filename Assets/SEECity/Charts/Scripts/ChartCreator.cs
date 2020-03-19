@@ -3,7 +3,7 @@
 namespace SEECity.Charts.Scripts
 {
 	/// <summary>
-	/// Contains all the information needed to create the next chart.
+	/// Used to create new charts.
 	/// </summary>
 	public class ChartCreator : MonoBehaviour
 	{

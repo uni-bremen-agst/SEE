@@ -14,7 +14,7 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// Contains some settings used in this script.
 		/// </summary>
-		protected ChartManager ChartManager;
+		protected ChartManager chartManager;
 
 		/// <summary>
 		/// Contains the position of the chart on the <see cref="Canvas" />.
@@ -40,12 +40,12 @@ namespace SEECity.Charts.Scripts
 		/// <summary>
 		/// If the pointer is currently down or not.
 		/// </summary>
-		protected bool PointerDown;
+		protected bool pointerDown;
 
 		/// <summary>
 		/// If the chart is currently minimized or not.
 		/// </summary>
-		protected bool Minimized;
+		protected bool minimized;
 
 		/// <summary>
 		/// The sprite for the drag button when the chart is maximized.
@@ -57,6 +57,9 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		private Sprite _minimizedSprite;
 
+		/// <summary>
+		/// Contains information about what is displayed on the chart.
+		/// </summary>
 		[SerializeField] private GameObject chartInfo;
 
 		/// <summary>
@@ -64,10 +67,13 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		[SerializeField] protected GameObject sizeButton;
 
+		/// <summary>
+		/// The sidebar in which the user can select what nodes will be displayed in the chart.
+		/// </summary>
 		[SerializeField] private GameObject contentSelection;
 
 		/// <summary>
-		/// Links the <see cref="Scripts.ChartManager" /> and initializes attributes.
+		/// Links the <see cref="ChartManager" /> and initializes attributes.
 		/// </summary>
 		protected virtual void Awake()
 		{
@@ -77,15 +83,15 @@ namespace SEECity.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Links the <see cref="Scripts.ChartManager" /> and gets its setting data.
+		/// Links the <see cref="ChartManager" /> and gets its setting data.
 		/// </summary>
 		protected virtual void GetSettingData()
 		{
-			ChartManager = GameObject.FindGameObjectWithTag("ChartManager")
+			chartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
-			_dragDelay = ChartManager.dragDelay;
-			_maximizedSprite = ChartManager.maximizedSprite;
-			_minimizedSprite = ChartManager.minimizedSprite;
+			_dragDelay = chartManager.dragDelay;
+			_maximizedSprite = chartManager.maximizedSprite;
+			_minimizedSprite = chartManager.minimizedSprite;
 		}
 
 		/// <summary>
@@ -93,7 +99,7 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		protected virtual void Update()
 		{
-			if (PointerDown) _timer += Time.deltaTime;
+			if (pointerDown) _timer += Time.deltaTime;
 		}
 
 		/// <summary>
@@ -102,7 +108,7 @@ namespace SEECity.Charts.Scripts
 		/// <param name="eventData">Contains the position data.</param>
 		public virtual void OnDrag(PointerEventData eventData)
 		{
-			RectTransform pos = GetComponent<RectTransform>();
+			var pos = GetComponent<RectTransform>();
 			if (eventData.position.x > 0 &&
 			    eventData.position.x < _screenSize.sizeDelta.x * _screenSize.lossyScale.x &&
 			    eventData.position.y > 0 &&
@@ -119,7 +125,7 @@ namespace SEECity.Charts.Scripts
 		public void OnPointerDown(PointerEventData eventData)
 		{
 			_timer = 0f;
-			PointerDown = true;
+			pointerDown = true;
 			chartInfo.SetActive(false);
 		}
 
@@ -129,21 +135,33 @@ namespace SEECity.Charts.Scripts
 		/// <param name="eventData">Event payload associated with pointer (mouse / touch) events.</param>
 		public void OnPointerUp(PointerEventData eventData)
 		{
-			PointerDown = false;
+			pointerDown = false;
 			if (_timer < _dragDelay) ToggleMinimize();
-			if (Minimized) chartInfo.SetActive(true);
+			if (minimized) chartInfo.SetActive(true);
 		}
 
+		/// <summary>
+		/// Activates the <see cref="chartInfo" /> when hovering over the minimized chart.
+		/// </summary>
+		/// <param name="eventData"></param>
 		public void OnPointerEnter(PointerEventData eventData)
 		{
-			if (Minimized && !PointerDown) chartInfo.SetActive(true);
+			if (minimized && !pointerDown) chartInfo.SetActive(true);
 		}
 
+		/// <summary>
+		/// Deactivated the <see cref="chartInfo" /> when no longer hovering over the minimized chart.
+		/// </summary>
+		/// <param name="eventData"></param>
 		public void OnPointerExit(PointerEventData eventData)
 		{
 			chartInfo.SetActive(false);
 		}
 
+		/// <summary>
+		/// Changes the text displayed by <see cref="chartInfo" />.
+		/// </summary>
+		/// <param name="text"></param>
 		public void SetInfoText(string text)
 		{
 			chartInfo.GetComponent<TextMeshProUGUI>().text = text;
@@ -154,13 +172,13 @@ namespace SEECity.Charts.Scripts
 		/// </summary>
 		protected virtual void ToggleMinimize()
 		{
-			ChartContent chart = _chart.GetComponent<ChartContent>();
-			chart.labelsPanel.gameObject.SetActive(Minimized);
-			chart.dataPanel.gameObject.SetActive(Minimized);
-			sizeButton.SetActive(Minimized);
-			contentSelection.SetActive(Minimized);
-			GetComponent<Image>().sprite = Minimized ? _maximizedSprite : _minimizedSprite;
-			Minimized = !Minimized;
+			var chart = _chart.GetComponent<ChartContent>();
+			chart.labelsPanel.gameObject.SetActive(minimized);
+			chart.dataPanel.gameObject.SetActive(minimized);
+			sizeButton.SetActive(minimized);
+			contentSelection.SetActive(minimized);
+			GetComponent<Image>().sprite = minimized ? _maximizedSprite : _minimizedSprite;
+			minimized = !minimized;
 		}
 	}
 }
