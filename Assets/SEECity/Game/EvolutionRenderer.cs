@@ -25,8 +25,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using SEE.Game.Animation;
 
-namespace SEE.Animation.Internal
+namespace SEE.Game
 {
     /// <summary>
     /// Renders the evolution of the graph series through animations. Incrementally updates

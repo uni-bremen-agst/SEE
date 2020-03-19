@@ -20,9 +20,8 @@
 using SEE.DataModel;
 using SEE.Layout;
 using System.Collections.Generic;
-using UnityEngine;
 
-namespace SEE.Animation.Internal
+namespace SEE.Game.Animation
 {
     /// <summary>
     /// Data model containing a graph and its node layout. The node layout is indexed by the

@@ -3,7 +3,7 @@ using SEE.GO;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Animation.Internal
+namespace SEE.Game.Animation
 {
     public class Marker
     {

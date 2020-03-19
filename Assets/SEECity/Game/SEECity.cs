@@ -1,10 +1,9 @@
 ﻿using SEE.DataModel;
-using SEE.GO;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE
+namespace SEE.Game
 {
     /// <summary>
     /// Manages settings of the graph data showing a single version of a software
