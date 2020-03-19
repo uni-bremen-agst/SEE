@@ -37,15 +37,14 @@ namespace SEE.Layout
         private readonly float padding;
 
         /// <summary>
-        /// Returns the area size of given game object, i.e., its width (x co-ordinate)
+        /// Returns the area size of given layout node, i.e., its width (x co-ordinate)
         /// multiplied by its depth (z co-ordinate).
         /// </summary>
-        /// <param name="gameObject">object whose size is to be returned</param>
-        /// <param name="nodeFactory">the factory that created the object</param>
-        /// <returns>area size of given game object</returns>
-        private static float AreaSize(GameObject gameObject, NodeFactory nodeFactory)
+        /// <param name="layoutNode">node whose size is to be returned</param>
+        /// <returns>area size of given layout node</returns>
+        private static float AreaSize(LayoutNode layoutNode)
         {
-            Vector3 size = nodeFactory.GetSize(gameObject);
+            Vector3 size = layoutNode.GetSize();
             return size.x * size.z;
         }
 
@@ -67,21 +66,26 @@ namespace SEE.Layout
         /// <param name="elements">the game objects to be laid out</param>
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
         {
-            /// The node layout we compute as a result.
-            Dictionary<GameObject, NodeTransform> layout_result = new Dictionary<GameObject, NodeTransform>();
+            return ToNodeTransformLayout(Layout(ToLayoutNodes(gameNodes)));
+        }
 
-            List<GameObject> elements = new List<GameObject>();
+        private Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
+        {
+            /// The node layout we compute as a result.
+            Dictionary<LayoutNode, NodeTransform> layout_result = new Dictionary<LayoutNode, NodeTransform>();
+
+            List<LayoutNode> elements = new List<LayoutNode>();
             elements.AddRange(gameNodes);
 
             // To increase the efficiency of the space usage, we order the elements by one of the sizes.
             // Elements must be sorted by size, descending
-            elements.Sort(delegate (GameObject left, GameObject right) 
-                          { return AreaSize(right, leafNodeFactory).CompareTo(AreaSize(left, leafNodeFactory)); });
+            elements.Sort(delegate (LayoutNode left, LayoutNode right) 
+                          { return AreaSize(right).CompareTo(AreaSize(left)); });
 
             // Since we initially do not know how much space we need, we assign a space of the 
             // worst case to the root. Note that we want to add padding in between the nodes,
             // so we need to increase the required size accordingly.
-            PTree tree = new PTree(Vector2.zero, Sum(elements, leafNodeFactory, padding));
+            PTree tree = new PTree(Vector2.zero, Sum(elements, padding));
 
             // Keeps track of the area currently covered by elements. It is the bounding
             // box containing all rectangles placed so far.
@@ -98,10 +102,10 @@ namespace SEE.Layout
             // place el.
             Dictionary<PNode, float> expanders = new Dictionary<PNode, float>();
 
-            foreach (GameObject el in elements)
+            foreach (LayoutNode el in elements)
             {
                 // The size we need to place el plus the padding between nodes.
-                Vector2 requiredSize = GetRectangleSize(el, leafNodeFactory, padding);
+                Vector2 requiredSize = GetRectangleSize(el, padding);
 
                 preservers.Clear();
                 expanders.Clear();
@@ -168,10 +172,11 @@ namespace SEE.Layout
                 // The size of the node remains unchanged. We set only the position.
                 // The x and y co-ordinates of the rectangle denote the corner. The layout
                 // position returned must be the center plus the padding.
-                layout_result[el] = new NodeTransform(new Vector3(fitNode.rectangle.position.x + (el.transform.localScale.x + padding) / 2.0f, 
+                Vector3 scale = el.GetSize();
+                layout_result[el] = new NodeTransform(new Vector3(fitNode.rectangle.position.x + (scale.x + padding) / 2.0f, 
                                                                   groundLevel, 
-                                                                  fitNode.rectangle.position.y + (el.transform.localScale.z  + padding) / 2.0f),
-                                                      el.transform.localScale);
+                                                                  fitNode.rectangle.position.y + (scale.z  + padding) / 2.0f),
+                                                      scale);
 
                 // If fitNode is a boundary expander, then we need to expand coverc to the
                 // newly covered area.
@@ -192,14 +197,13 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Returns the ground area size of the given game object (x -> width, z -> depth).
+        /// Returns the ground area size of the given layout node (x -> width, z -> depth).
         /// </summary>
-        /// <param name="gameObject">game object whose ground area size is requested</param>
-        /// <param name="nodeFactory">node factory that created this node</param>
+        /// <param name="layoutNode">layout node whose ground area size is requested</param>
         /// <returns>ground area size of the given game object</returns>
-        private static Vector2 GetRectangleSize(GameObject gameObject, NodeFactory nodeFactory, float padding)
+        private static Vector2 GetRectangleSize(LayoutNode layoutNode, float padding)
         {
-            Vector3 size = nodeFactory.GetSize(gameObject);
+            Vector3 size = layoutNode.GetSize();
             return new Vector2(size.x + padding, size.z + padding);
         }
 
@@ -212,12 +216,12 @@ namespace SEE.Layout
         /// <param name="nodeFactory">the factory that created each node</param>
         /// <param name="padding">the padding to be added to an object's ground area size</param>
         /// <returns>sum of the required ground area over all given elements</returns>
-        private Vector2 Sum(List<GameObject> elements, NodeFactory nodeFactory, float padding)
+        private Vector2 Sum(List<LayoutNode> elements, float padding)
         {
             Vector2 result = Vector2.zero;
-            foreach (GameObject element in elements)
+            foreach (LayoutNode element in elements)
             {
-                Vector3 size = nodeFactory.GetSize(element);
+                Vector3 size = element.GetSize();
                 result.x += size.x + padding;
                 result.y += size.z + padding;
             }
