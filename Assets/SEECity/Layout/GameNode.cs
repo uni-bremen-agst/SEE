@@ -11,7 +11,7 @@ namespace SEE.Layout
     public class GameNode : LayoutNode
     {
         private readonly GameObject gameObject;
-        private readonly LeafNodeFactory leafNodeFactory;
+        private readonly NodeFactory leafNodeFactory;
         private readonly Node node;
 
         public GameObject GetGameObject()
@@ -24,7 +24,7 @@ namespace SEE.Layout
             return node;
         }
 
-        public GameNode(GameObject gameObject, LeafNodeFactory nodeFactory)
+        public GameNode(GameObject gameObject, NodeFactory nodeFactory)
         {
             this.gameObject = gameObject;
             this.leafNodeFactory = nodeFactory;
