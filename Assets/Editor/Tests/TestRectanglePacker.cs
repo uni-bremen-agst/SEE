@@ -223,11 +223,7 @@ namespace SEE.Layout.RectanglePacking
 
         private class MyGameNode : LayoutNode
         {
-            private Vector3 scale;
-
             private readonly int index;
-
-            private int level = 0;
 
             public MyGameNode(Vector3 initialSize, int index)
             {
@@ -236,6 +232,8 @@ namespace SEE.Layout.RectanglePacking
             }
 
             public LayoutNode Parent => null;
+
+            private int level = 0;
 
             public int Level
             {
@@ -248,13 +246,21 @@ namespace SEE.Layout.RectanglePacking
                 return new List<LayoutNode>();
             }
 
+            private Vector3 scale;
+
             public Vector3 Scale
             {
                 get => scale;
-
                 set => scale = value;
             }
 
+            private Vector3 position;
+
+            public Vector3 CenterPosition
+            {
+                get => position;
+                set => position = value;
+            }
 
             public bool IsLeaf => false;
 

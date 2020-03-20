@@ -143,6 +143,38 @@ namespace SEE.Layout
         }
 
         /// <summary>
+        /// The center position of this node in world space.
+        /// </summary>
+        public Vector3 CenterPosition
+        {
+            get
+            {
+                if (node.IsLeaf())
+                {
+                    return leafNodeFactory.GetCenterPosition(gameObject);
+                }
+                else
+                {
+                    return gameObject.transform.position;
+                }
+            }
+            set
+            {
+                if (node.IsLeaf())
+                {
+                    Vector3 groundPosition = value;
+                    Vector3 extent = leafNodeFactory.GetSize(gameObject) / 2.0f;
+                    groundPosition.y -= extent.y;
+                    leafNodeFactory.SetGroundPosition(gameObject, groundPosition);
+                }
+                else
+                {
+                    gameObject.transform.position = value;
+                }
+            }
+        }
+
+        /// <summary>
         /// Whether this node represents a leaf.
         /// </summary>
         /// <returns>true if this node represents a leaf</returns>

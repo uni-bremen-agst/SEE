@@ -395,6 +395,11 @@ namespace SEE.GO
             //block.transform.localPosition = position - extent;
         }
 
+        /// <summary>
+        /// The center position of the block in world space.
+        /// </summary>
+        /// <param name="block">block for which to retrieve the center position</param>
+        /// <returns>center position of the block in world space</returns>
         public override Vector3 GetCenterPosition(GameObject block)
         {
             // transform.position denotes the left front corner of a building in CScape

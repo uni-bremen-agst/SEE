@@ -171,10 +171,10 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// The center position of the block.
+        /// The center position of the block in world space.
         /// </summary>
         /// <param name="block">block for which to retrieve the center position</param>
-        /// <returns>center position of the block</returns>
+        /// <returns>center position of the block in world space</returns>
         public virtual Vector3 GetCenterPosition(GameObject block)
         {
             // The center position in Unity is normally its transform.position
