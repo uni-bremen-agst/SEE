@@ -296,7 +296,7 @@ namespace SEE.Game
             }
 
             // Calculate and return the layout for the collected game objects.
-            return ToLinkNameLayout(NodeLayout.Move(nodeLayout.Layout(gameObjects), cityOrigin));
+            return ToLinkNameLayout(NodeLayout.Move(nodeLayout.Layout(graphRenderer.ToLayoutNodes(gameObjects)), cityOrigin));
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to 
             // objectManager.GetNode() above. Yet, inner nodes are generally not scaled by
@@ -308,19 +308,18 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Transform the given <paramref name="layout"/> such that instead of the game objects, 
-        /// the LinkName of the graph node attached to a game object is used as a key for
+        /// Transforms the given <paramref name="layout"/> such that instead of the layout nodes, 
+        /// the LinkName of the graph node corresponding to the layout node is used as a key for
         /// the dictionary.
         /// </summary>
-        /// <param name="layout">layout indexed by game objects</param>
-        /// <returns>layout indexed by the LinkName of the node attached to the game objects</returns>
-        private static Dictionary<string, NodeTransform> ToLinkNameLayout(Dictionary<GameObject, NodeTransform> layout)
+        /// <param name="layout">layout indexed by layout nodes</param>
+        /// <returns>layout indexed by the LinkName of the node corresponding to the layout node</returns>
+        private static Dictionary<string, NodeTransform> ToLinkNameLayout(Dictionary<LayoutNode, NodeTransform> layout)
         {
             Dictionary<string, NodeTransform> result = new Dictionary<string, NodeTransform>();
             foreach (var entry in layout)
             {
-                NodeRef nodeRef = entry.Key.GetComponent<NodeRef>();
-                result[nodeRef.node.LinkName] = entry.Value;
+                result[entry.Key.LinkName()] = entry.Value;
             }
             return result;
         }

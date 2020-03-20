@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using SEE.Layout.EvoStreets;
-using SEE.GO;
 using System.Linq;
+
+using SEE.Layout.EvoStreets;
 
 namespace SEE.Layout
 {
@@ -13,15 +13,13 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
-        /// <param name="leafNodeFactory">the factory used to create leaf nodes</param>
-        public EvoStreetsNodeLayout(float groundLevel,
-                                    NodeFactory leafNodeFactory)
-        : base(groundLevel, leafNodeFactory)
+        public EvoStreetsNodeLayout(float groundLevel, float Unit)
+        : base(groundLevel)
         {
             name = "EvoStreets";
-            OffsetBetweenBuildings *= leafNodeFactory.Unit;
-            StreetWidth *= leafNodeFactory.Unit;
-            StreetHeight *= leafNodeFactory.Unit;
+            OffsetBetweenBuildings *= Unit;
+            StreetWidth *= Unit;
+            StreetHeight *= Unit;
         }
 
         /// <summary>
@@ -47,12 +45,7 @@ namespace SEE.Layout
         /// </summary>
         private int maximalDepth;
 
-        public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
-        {
-            return ToNodeTransformLayout(Layout(ToLayoutNodes(gameNodes)));
-        }
-
-        private Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
+        public override Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
         {
             if (gameNodes.Count == 0)
             {
@@ -69,7 +62,7 @@ namespace SEE.Layout
             }
             else
             {
-                roots = GetRoots(gameNodes);
+                roots = LayoutNodes.GetRoots(gameNodes);
                 if (roots.Count == 0)
                 {
                     throw new System.Exception("Graph has no root node.");

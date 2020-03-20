@@ -1,7 +1,7 @@
-﻿using SEE.GO;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+
 using SEE.Layout.TreeMap;
 
 namespace SEE.Layout
@@ -18,14 +18,12 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
-        /// <param name="leafNodeFactory">the factory used to create leaf nodes</param>
         /// <param name="width">width of the rectangle in which to place all nodes in Unity units</param>
         /// <param name="depth">width of the rectangle in which to place all nodes in Unity units</param>
         public TreemapLayout(float groundLevel,
-                             NodeFactory leafNodeFactory,
                              float width,
                              float depth)
-        : base(groundLevel, leafNodeFactory)
+        : base(groundLevel)
         {
             name = "Treemap";
             this.width = width;
@@ -47,12 +45,7 @@ namespace SEE.Layout
         /// </summary>
         private Dictionary<LayoutNode, NodeTransform> layout_result;
 
-        public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
-        {
-            return ToNodeTransformLayout(Layout(ToLayoutNodes(gameNodes)));
-        }
-
-        private Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> layoutNodes)
+        public override Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> layoutNodes)
         {
             layout_result = new Dictionary<LayoutNode, NodeTransform>();
 
@@ -68,8 +61,7 @@ namespace SEE.Layout
             }
             else
             {
-                //CreateTree(to_game_node.Keys, out roots, out children);
-                roots = GetRoots(layoutNodes);
+                roots = LayoutNodes.GetRoots(layoutNodes);
                 CalculateSize();
                 CalculateLayout();
             }

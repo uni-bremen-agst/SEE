@@ -1,5 +1,4 @@
-﻿using SEE.GO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -11,14 +10,16 @@ namespace SEE.Layout
     /// </summary>
     public class ManhattanLayout : FlatNodeLayout
     {
-        public ManhattanLayout(float groundLevel,
-                               NodeFactory blockFactory)
-            : base(groundLevel, blockFactory)
+        public ManhattanLayout(float groundLevel, float Unit)
+            : base(groundLevel)
         {
             name = "Manhattan";
+            this.Unit = Unit;
         }
 
-        private Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
+        private readonly float Unit;
+
+        public override Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
         {
             Dictionary<LayoutNode, NodeTransform> result = new Dictionary<LayoutNode, NodeTransform>();
 
@@ -26,7 +27,7 @@ namespace SEE.Layout
             int numberOfBuildingsPerRow = (int)Mathf.Sqrt(gameNodes.Count);
             int column = 0;
             int row = 1;
-            float distanceBetweenBuildings = leafNodeFactory.Unit * 3.0f;
+            float distanceBetweenBuildings = Unit * 3.0f;
             float maxZ = 0.0f;         // maximal depth of a building in a row
             float positionX = 0.0f;    // co-ordinate in a column of the grid
             float positionZ = 0.0f;    // co-ordinate in a row of the grid
@@ -62,11 +63,6 @@ namespace SEE.Layout
                 positionX += size.x / 2.0f + distanceBetweenBuildings;
             }
             return result;
-        }
-
-        public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
-        {
-            return ToNodeTransformLayout(Layout(ToLayoutNodes(gameNodes)));
         }
     }
 }
