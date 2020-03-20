@@ -36,5 +36,46 @@ namespace SEE.Layout
         /// graph or its parent is not contained in the set of nodes to be laid out.
         /// </summary>
         protected IList<LayoutNode> roots;
+
+        /// <summary>
+        /// Returns the maximal depth of the forest with the given root nodes.
+        /// If roots.Count == 0, 0 is the maximal depth. If there is at least
+        /// one root, the minimum value of the maximal depth is 1.
+        /// </summary>
+        /// <param name="roots">set of root tree nodes of the forest</param>
+        /// <returns>maximal depth of the forest</returns>
+        protected static int MaxDepth(List<LayoutNode> roots)
+        {
+            int result = 0;
+            foreach (LayoutNode root in roots)
+            {
+                int depth = MaxDepth(root);
+                if (depth > result)
+                {
+                    result = depth;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the maximal depth of the tree rooted by given node. The depth of
+        /// a tree with only one node is 1.
+        /// </summary>
+        /// <param name="node">root node of the tree</param>
+        /// <returns>maximal depth of the tree</returns>
+        protected static int MaxDepth(LayoutNode node)
+        {
+            int result = 0;
+            foreach (LayoutNode child in node.Children())
+            {
+                int depth = MaxDepth(child);
+                if (depth > result)
+                {
+                    result = depth;
+                }
+            }
+            return result + 1;
+        }
     }
 }

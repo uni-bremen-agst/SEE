@@ -113,30 +113,6 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// A mapping of graph nodes onto their game nodes.
-        /// </summary>
-        protected Dictionary<Node, GameObject> to_game_node;
-
-        /// <summary>
-        /// Returns a mapping of graph nodes onto their game nodes.
-        /// 
-        /// Precondition: Every game object must contain a NodeRef component referencing 
-        /// a graph node.
-        /// </summary>
-        /// <param name="gameNodes">the game nodes to be mapped (target objects of the mapping)</param>
-        /// <returns>mapping of graph nodes onto their game nodes</returns>
-        protected static Dictionary<Node, GameObject> NodeMapping(ICollection<GameObject> gameNodes)
-        {
-            Dictionary<Node, GameObject> map = new Dictionary<Node, GameObject>();
-            foreach (GameObject gameNode in gameNodes)
-            {
-                Node node = gameNode.GetComponent<NodeRef>().node;
-                map[node] = gameNode;
-            }
-            return map;
-        }
-
-        /// <summary>
         /// Returns all root graph nodes within gameNodes.
         /// </summary>
         /// <param name="gameNodes">game nodes for which to determine root nodes</param>
@@ -170,6 +146,7 @@ namespace SEE.Layout
         /// <param name="nodes">the nodes whose hierarchy is to be determined</param>
         /// <param name="roots">the root nodes of the hierarchy</param>
         /// <param name="children">mapping of nodes onto their immediate children</param>
+        /*
         protected static void CreateTree(ICollection<Node> nodes,
                                          out List<Node> roots,
                                          out Dictionary<Node, List<Node>> children)
@@ -196,68 +173,7 @@ namespace SEE.Layout
                 }
             }
         }
-
-        /// <summary>
-        /// Returns the maximal depth of the forest with the given root nodes.
-        /// If roots.Count == 0, 0 is the maximal depth. If there is at least
-        /// one root, the minimum value of the maximal depth is 1.
-        /// </summary>
-        /// <param name="roots">set of root tree nodes of the forest</param>
-        /// <param name="children">mapping of nodes onto their children</param>
-        /// <returns>maximal depth of the forest</returns>
-        protected static int MaxDepth(List<Node> roots, Dictionary<Node, List<Node>> children)
-        {
-            int result = 0;
-            foreach (Node root in roots)
-            {
-                int depth = MaxDepth(root, children);
-                if (depth > result)
-                {
-                    result = depth;
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Returns the maximal depth of the tree rooted by given node. The depth of
-        /// a node with only one node is 1.
-        /// </summary>
-        /// <param name="node">root node of the tree</param>
-        /// <param name="children">mapping of nodes onto their children</param>
-        /// <returns>maximal depth of the tree</returns>
-        protected static int MaxDepth(Node node, Dictionary<Node, List<Node>> children)
-        {
-            int result = 0;
-            foreach (Node child in children[node])
-            {
-                int depth = MaxDepth(child, children);
-                if (depth > result)
-                {
-                    result = depth;
-                }
-            }
-            return result + 1;
-        }
-
-        /// <summary>
-        /// Returns all root nodes in <paramref name="layoutNodes"/>. A node is a root node
-        /// if its Parent is null.
-        /// </summary>
-        /// <param name="layoutNodes">layout nodes for which to collect all roots</param>
-        /// <returns></returns>
-        protected IList<LayoutNode> GetRoots(ICollection<LayoutNode> layoutNodes)
-        {
-            List<LayoutNode> roots = new List<LayoutNode>();
-            foreach (LayoutNode layoutNode in layoutNodes)
-            {
-                if (layoutNode.Parent == null)
-                {
-                    roots.Add(layoutNode);
-                }
-            }
-            return roots;
-        }
+        */
 
         /// <summary>
         /// Transforms the given <paramref name="gameNodes"/> to a collection of LayoutNodes.
@@ -286,9 +202,14 @@ namespace SEE.Layout
             return result;
         }
 
-        private void SetLevels(List<LayoutNode> result)
+        /// <summary>
+        /// Sets the level of each node (node.Level) in <paramref name="layoutNodes"/>. A root has level 1,
+        /// for every other node the level is its distance to its root.
+        /// </summary>
+        /// <param name="layoutNodes">nodes whose level is to be set</param>
+        private void SetLevels(ICollection<LayoutNode> layoutNodes)
         {
-            foreach (LayoutNode root in GetRoots(result))
+            foreach (LayoutNode root in GetRoots(layoutNodes))
             {
                 root.Level = 0;
                 foreach(LayoutNode child in root.Children())
@@ -298,6 +219,31 @@ namespace SEE.Layout
             }
         }
 
+        /// <summary>
+        /// Returns all root nodes in <paramref name="layoutNodes"/>. A node is a root node
+        /// if its Parent is null.
+        /// </summary>
+        /// <param name="layoutNodes">layout nodes for which to collect all roots</param>
+        /// <returns></returns>
+        protected IList<LayoutNode> GetRoots(ICollection<LayoutNode> layoutNodes)
+        {
+            List<LayoutNode> roots = new List<LayoutNode>();
+            foreach (LayoutNode layoutNode in layoutNodes)
+            {
+                if (layoutNode.Parent == null)
+                {
+                    roots.Add(layoutNode);
+                }
+            }
+            return roots;
+        }
+
+        /// <summary>
+        /// Sets the level of the given <paramref name="node"/> to the given <paramref name="level"/>
+        /// and recurses to its children with the <paramref name="level"/> increased by one.
+        /// </summary>
+        /// <param name="node">node whose level is to be set (node.Level)</param>
+        /// <param name="level">level to set</param>
         private void SetLevels(LayoutNode node, int level)
         {
             node.Level = level;

@@ -56,7 +56,6 @@ namespace SEE.Layout
                 layout_result[root] = new NodeTransform(position,
                                                         GetScale(root, out_radius));
                 MakeGlobal(position, root.Children());
-                to_game_node = null;
                 return layout_result;
             }
         }

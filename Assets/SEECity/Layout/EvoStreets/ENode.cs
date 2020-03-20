@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using SEE.DataModel;
 using UnityEngine;
 
 namespace SEE.Layout.EvoStreets
@@ -12,7 +11,7 @@ namespace SEE.Layout.EvoStreets
     {
         public ENode() { }
 
-        public ENode(Node node)
+        public ENode(LayoutNode node)
         {
             this.GraphNode = node;
         }
@@ -30,7 +29,7 @@ namespace SEE.Layout.EvoStreets
         /// <summary>
         /// The node in the original graph this ENode is representing.
         /// </summary>
-        public Node GraphNode;
+        public LayoutNode GraphNode;
 
         /// <summary>
         /// The pivot world co-ordinate along the x axis.
@@ -110,8 +109,7 @@ namespace SEE.Layout.EvoStreets
 
         public override string ToString()
         {
-            var nodeType = GraphNode != null ? GraphNode.Type : "NoType";
-            return $"Node[Linkname={GraphNode.LinkName},Type={nodeType}]";
+            return $"Node[Linkname={GraphNode.LinkName()}]";
         }
     }
 }
