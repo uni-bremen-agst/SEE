@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.CirclePacking
 {
     /// <summary>
     /// Represents a circle by its center and radius for a given game object to be laid out.
     /// </summary>
-    internal class MyCircle
+    internal class Circle
     {
         /// <summary>
         /// Center of the circle.
@@ -28,7 +28,7 @@ namespace SEE.Layout
         /// <param name="gameObject">the game object for which to determine position and radius</param>
         /// <param name="center">center position of the circle</param>
         /// <param name="radius">radius of the circle</param>
-        public MyCircle(LayoutNode gameObject, Vector2 center, float radius)
+        public Circle(LayoutNode gameObject, Vector2 center, float radius)
         {
             this.gameObject = gameObject;
             this.center = center;
@@ -45,11 +45,11 @@ namespace SEE.Layout
     }
 
     /// <summary>
-    /// This class holds a list of <see cref="MyCircle"/> objects and packs them closely.
+    /// This class holds a list of <see cref="Circle"/> objects and packs them closely.
     /// The original source can be found 
     /// <see href="https://www.codeproject.com/Articles/42067/D-Circle-Packing-Algorithm-Ported-to-Csharp">HERE</see>.
     /// </summary>
-    public static class MyCirclePacker
+    public static class CirclePacker
     {
         /// <summary>
         /// The default minimal separation between two circles to be placed next to each other.
@@ -68,7 +68,7 @@ namespace SEE.Layout
         /// <param name="c1">First circle.</param>
         /// <param name="c2">Second circle.</param>
         /// <returns></returns>
-        private static int DescendingRadiusComparator(MyCircle c1, MyCircle c2)
+        private static int DescendingRadiusComparator(Circle c1, Circle c2)
         {
             float r1 = c1.radius;
             float r2 = c2.radius;
@@ -86,7 +86,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="circles">The circles to be packed.</param>
         /// <param name="out_outer_radius">The radius of the appoximated minimal enclosing circle.</param>
-        internal static void Pack(List<MyCircle> circles, out float out_outer_radius)
+        internal static void Pack(List<Circle> circles, out float out_outer_radius)
         {
             out_outer_radius = 0.0f;
             // Sort circles descendingly based on radius
@@ -173,16 +173,16 @@ namespace SEE.Layout
         /// 
         /// <param name="out_radius">The radius of <paramref name="circles"/> enclosing
         /// circle.</param>
-        private static void SmallestEnclosingCircle(List<MyCircle> circles, out Vector2 out_center, out float out_radius)
+        private static void SmallestEnclosingCircle(List<Circle> circles, out Vector2 out_center, out float out_radius)
         {
-            SmallestEnclosingCircleImpl(new List<MyCircle>(circles), new List<MyCircle>(), out Vector2 center, out float radius);
+            SmallestEnclosingCircleImpl(new List<Circle>(circles), new List<Circle>(), out Vector2 center, out float radius);
             out_center = center;
             out_radius = radius;
         }
 
         /// <summary>
         /// Implementation of
-        /// <see cref="SmallestEnclosingCircle(List{MyCircle}, out Vector2, out float)"/>
+        /// <see cref="SmallestEnclosingCircle(List{Circle}, out Vector2, out float)"/>
         /// .
         /// </summary>
         /// 
@@ -196,7 +196,7 @@ namespace SEE.Layout
         /// 
         /// <param name="out_radius">The radius of <paramref name="borderCircles"/> enclosing
         /// circle.</param>
-        private static void SmallestEnclosingCircleImpl(List<MyCircle> circles, List<MyCircle> borderCircles, out Vector2 out_center, out float out_radius)
+        private static void SmallestEnclosingCircleImpl(List<Circle> circles, List<Circle> borderCircles, out Vector2 out_center, out float out_radius)
         {
             out_center = Vector2.zero;
             out_radius = 0.0f;
@@ -234,16 +234,16 @@ namespace SEE.Layout
 
             // This is the smallest circle, if circles are sorted by descending radius
             int smallestCircleIndex = circles.Count - 1;
-            MyCircle smallestCircle = circles[smallestCircleIndex];
+            Circle smallestCircle = circles[smallestCircleIndex];
 
-            List<MyCircle> cmc = new List<MyCircle>(circles);
+            List<Circle> cmc = new List<Circle>(circles);
             cmc.RemoveAt(smallestCircleIndex);
 
             SmallestEnclosingCircleImpl(cmc, borderCircles, out Vector2 out_center_cmc, out float out_radius_cmc);
 
             if (!CircleContainsCircle(out_center_cmc, out_radius_cmc, smallestCircle))
             {
-                List<MyCircle> bcpc = new List<MyCircle>(borderCircles);
+                List<Circle> bcpc = new List<Circle>(borderCircles);
                 bcpc.Add(smallestCircle);
 
                 SmallestEnclosingCircleImpl(cmc, bcpc, out Vector2 out_center_cmc_bcpc, out float out_radius_cmc_bcpc);
@@ -267,7 +267,7 @@ namespace SEE.Layout
         /// <param name="radius">Radius of containing circle.</param>
         /// <param name="circle">Contained circle.</param>
         /// <returns></returns>
-        private static bool CircleContainsCircle(Vector2 position, float radius, MyCircle circle)
+        private static bool CircleContainsCircle(Vector2 position, float radius, Circle circle)
         {
             var xc0 = position.x - circle.center.x;
             var yc0 = position.y - circle.center.y;
@@ -283,7 +283,7 @@ namespace SEE.Layout
         /// <param name="c2">Second circle.</param>
         /// <param name="out_center">Center of smallest enclosing circle.</param>
         /// <param name="out_radius">Radius of smallest enclosing circle.</param>
-        private static void CircleIntersectingTwoCircles(MyCircle c1, MyCircle c2, out Vector2 out_center, out float out_radius)
+        private static void CircleIntersectingTwoCircles(Circle c1, Circle c2, out Vector2 out_center, out float out_radius)
         {
             Vector2 c12 = c2.center - c1.center;
             float r12 = c2.radius - c1.radius;
@@ -302,7 +302,7 @@ namespace SEE.Layout
         /// <param name="c3">Third circle.</param>
         /// <param name="out_center">Center of smallest enclosing circle.</param>
         /// <param name="out_radius">Radius of smallest enclosing circle.</param>
-        private static void CircleIntersectingThreeCircles(MyCircle c1, MyCircle c2, MyCircle c3, out Vector2 out_center, out float out_radius)
+        private static void CircleIntersectingThreeCircles(Circle c1, Circle c2, Circle c3, out Vector2 out_center, out float out_radius)
         {
             Vector2 p0 = new Vector2(c1.center.x, c1.center.y);  // FIXME: Can be simplified to p0 = c1.center
             Vector2 p1 = new Vector2(c2.center.x, c2.center.y);
