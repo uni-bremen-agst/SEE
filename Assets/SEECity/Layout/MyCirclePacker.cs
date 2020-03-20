@@ -20,7 +20,7 @@ namespace SEE.Layout
         /// <summary>
         /// The game object represented by this circle.
         /// </summary>
-        public GameObject gameObject;
+        public LayoutNode gameObject;
 
         /// <summary>
         /// Creates a new circle for the game object at given center position with given radius.
@@ -28,7 +28,7 @@ namespace SEE.Layout
         /// <param name="gameObject">the game object for which to determine position and radius</param>
         /// <param name="center">center position of the circle</param>
         /// <param name="radius">radius of the circle</param>
-        public MyCircle(GameObject gameObject, Vector2 center, float radius)
+        public MyCircle(LayoutNode gameObject, Vector2 center, float radius)
         {
             this.gameObject = gameObject;
             this.center = center;

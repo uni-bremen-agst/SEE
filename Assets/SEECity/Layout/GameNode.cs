@@ -15,10 +15,34 @@ namespace SEE.Layout
         private readonly NodeFactory leafNodeFactory;
         private readonly Node node;
         private readonly Dictionary<Node, GameNode> to_layout_node = new Dictionary<Node, GameNode>();
+        private int level;
 
         public LayoutNode Parent
         {
-            get => node.Parent != null ? to_layout_node[node.Parent] : null;
+            get
+            {
+                if (node.Parent == null)
+                {
+                    // The node does not have a parent in the original graph.
+                    return null;
+                }
+                else if (to_layout_node.TryGetValue(node.Parent, out GameNode result))
+                {
+                    // The node has a parent in the original graph and that parent was passed to the layout.
+                    return result;
+                }
+                else
+                {
+                    // The node has a parent in the original graph, but it was not passed to the layout.
+                    return null;
+                }
+            }
+        }
+
+        public int Level
+        {
+            get => level;
+            set => level = value;
         }
 
         public GameObject GetGameObject()

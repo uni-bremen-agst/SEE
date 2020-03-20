@@ -8,7 +8,17 @@ namespace SEE.Layout
     /// </summary>
     public interface LayoutNode
     {
+        /// <summary>
+        /// The parent of the node. Is null if the node is a root.
+        /// </summary>
         LayoutNode Parent { get; }
+
+        /// <summary>
+        /// The level of the node in the node hierarchy. A root node has
+        /// level 0. For all other nodes, the level is the distance from
+        /// the node to its root.
+        /// </summary>
+        int Level { get; set; }
 
         /// <summary>
         /// Yields true if the given node is to be interpreted as a leaf by the layouter.

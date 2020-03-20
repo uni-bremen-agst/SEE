@@ -1,5 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.GO;
+﻿using SEE.GO;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -46,13 +45,6 @@ namespace SEE.Layout
         /// The node layout we compute as a result.
         /// </summary>
         private Dictionary<LayoutNode, NodeTransform> layout_result;
-
-        /// <summary>
-        /// The roots of the subtrees of the original graph that are to be laid out.
-        /// A node is considered a root if it has either no parent in the original
-        /// graph or its parent is not contained in the set of nodes to be laid out.
-        /// </summary>
-        private IList<LayoutNode> roots;
 
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
         {

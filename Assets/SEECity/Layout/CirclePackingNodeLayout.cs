@@ -1,6 +1,7 @@
 ﻿using SEE.DataModel;
 using SEE.GO;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -26,13 +27,18 @@ namespace SEE.Layout
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
-        Dictionary<GameObject, NodeTransform> layout_result;
+        Dictionary<LayoutNode, NodeTransform> layout_result;
 
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
         {
-            layout_result = new Dictionary<GameObject, NodeTransform>();
+            return ToNodeTransformLayout(Layout(ToLayoutNodes(gameNodes)));
+        }
 
-            List<Node> roots = GetRoots(gameNodes);
+        private Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
+        {
+            layout_result = new Dictionary<LayoutNode, NodeTransform>();
+
+            ICollection<LayoutNode> roots = GetRoots(gameNodes);
             if (roots.Count == 0)
             {
                 throw new System.Exception("Graph has no root node.");
@@ -41,15 +47,18 @@ namespace SEE.Layout
             {
                 throw new System.Exception("Graph has more than one root node.");
             }
-            to_game_node = NodeMapping(gameNodes);
-            Node root = roots[0];
-            float out_radius = PlaceNodes(root);
-            Vector3 position = new Vector3(0.0f, groundLevel, 0.0f);
-            layout_result[to_game_node[root]] = new NodeTransform(position,
-                                                                  GetScale(to_game_node[root], out_radius));
-            MakeGlobal(position, root.Children());
-            to_game_node = null;
-            return layout_result;
+            else
+            {
+                // exactly one root
+                LayoutNode root = roots.FirstOrDefault();
+                float out_radius = PlaceNodes(root);
+                Vector3 position = new Vector3(0.0f, groundLevel, 0.0f);
+                layout_result[root] = new NodeTransform(position,
+                                                        GetScale(root, out_radius));
+                MakeGlobal(position, root.Children());
+                to_game_node = null;
+                return layout_result;
+            }
         }
 
         /// <summary>
@@ -60,12 +69,11 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="position">the position of the parent of all children</param>
         /// <param name="children">the children to be laid out</param>
-        private void MakeGlobal(Vector3 position, List<Node> children)
+        private void MakeGlobal(Vector3 position, ICollection<LayoutNode> children)
         {
-            foreach (Node child in children)
+            foreach (LayoutNode child in children)
             {
-                GameObject childObject = to_game_node[child];
-                NodeTransform childTransform = layout_result[childObject];
+                NodeTransform childTransform = layout_result[child];
                 if (! child.IsLeaf())
                 {
                     // The inner nodes will be slightly lifted along the y axis according to their
@@ -73,7 +81,7 @@ namespace SEE.Layout
                     position.y += LevelLift(child);
                 }
                 childTransform.position += position;
-                layout_result[childObject] = childTransform;
+                layout_result[child] = childTransform;
                 MakeGlobal(childTransform.position, child.Children());
             }
         }
@@ -84,9 +92,9 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="parent">node whose descendants are to be placed</param>
         /// <returns>the radius required for a circle represent parent</returns>
-        private float PlaceNodes(Node parent)
+        private float PlaceNodes(LayoutNode parent)
         {
-            List<Node> children = parent.Children();
+            IList<LayoutNode> children = parent.Children();
 
             if (children.Count == 0)
             {
@@ -94,21 +102,19 @@ namespace SEE.Layout
                 // Position Vector3.zero because they are located relative to their parent.
                 // This position may be overridden later in the context of parent's parent.
                 //layout[to_game_node[parent]] = new NodeTransform(Vector3.zero, Vector3.one);
-                return LeafRadius(to_game_node[parent]);
+                return LeafRadius(parent);
             }
             else
             { 
                 List<MyCircle> circles = new List<MyCircle>(children.Count);
 
                 int i = 0;
-                foreach (Node child in children)
+                foreach (LayoutNode child in children)
                 {
-                    GameObject childObject = to_game_node[child];
-
-                    float radius = child.IsLeaf() ? LeafRadius(childObject) : PlaceNodes(child);
+                    float radius = child.IsLeaf() ? LeafRadius(child) : PlaceNodes(child);
                     // Position the children on a circle as required by CirclePacker.Pack.
                     float radians = ((float)i / (float)children.Count) * (2.0f * Mathf.PI);
-                    circles.Add(new MyCircle(childObject, new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * radius, radius));
+                    circles.Add(new MyCircle(child, new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * radius, radius));
                     i++;
                 }
 
@@ -141,11 +147,10 @@ namespace SEE.Layout
         /// <param name="node">game node whose size is to be determined</param>
         /// <param name="radius">the radius for the game node if it is an inner node</param>
         /// <returns>the scale of <paramref name="node"/></returns>
-        private Vector3 GetScale(GameObject node, float radius)
+        private Vector3 GetScale(LayoutNode node, float radius)
         {
-            Node n = node.GetComponent<NodeRef>().node;
-            return n.IsLeaf() ? leafNodeFactory.GetSize(node) 
-                              : new Vector3(2 * radius, innerNodeHeight, 2 * radius);
+            return node.IsLeaf() ? node.GetSize() 
+                                 : new Vector3(2 * radius, innerNodeHeight, 2 * radius);
         }
 
         /// <summary>
@@ -155,9 +160,9 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="block">block whose radius is required</param>
         /// <returns>radius of the minimal circle containing the given block</returns>
-        private float LeafRadius(GameObject block)
+        private float LeafRadius(LayoutNode block)
         {
-            Vector3 extent = leafNodeFactory.GetSize(block) / 2.0f;
+            Vector3 extent = block.GetSize() / 2.0f;
             return Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);
         }
     }
