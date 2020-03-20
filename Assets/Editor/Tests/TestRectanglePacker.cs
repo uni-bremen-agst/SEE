@@ -208,19 +208,59 @@ namespace SEE.Layout.RectanglePacking
             Vector3 initialSize = Vector3.one;
 
             CubeFactory factory = new CubeFactory();
-            IList<GameObject> gameObjects = new List<GameObject>();
+            ICollection<LayoutNode> gameObjects = new List<LayoutNode>();
 
             for (int i = 1; i <= howManyNodes; i++)
             {
-                GameObject gameObject = factory.NewBlock(0);
-                factory.SetSize(gameObject, initialSize);
                 initialSize *= 1.01f;
-                gameObjects.Add(gameObject);
+                gameObjects.Add(new MyGameNode(initialSize, i));
             }
 
-            RectanglePacker packer = new RectanglePacker(0.0f, factory);
+            RectanglePacker packer = new RectanglePacker(0.0f, 1.0f);
 
-            Dictionary<GameObject, NodeTransform> layout = packer.Layout(gameObjects);
+            Dictionary<LayoutNode, NodeTransform> layout = packer.Layout(gameObjects);
+        }
+
+        private class MyGameNode : LayoutNode
+        {
+            private readonly Vector3 scale;
+
+            private readonly int index;
+
+            private int level = 0;
+
+            public MyGameNode(Vector3 initialSize, int i)
+            {
+                this.scale = initialSize;
+            }
+
+            public LayoutNode Parent => null;
+
+            public int Level
+            {
+                get => level;
+                set => level = value;
+            }
+
+            public IList<LayoutNode> Children()
+            {
+                return new List<LayoutNode>();
+            }
+
+            public Vector3 GetSize()
+            {
+                return scale;
+            }
+
+            public bool IsLeaf()
+            {
+                return false;
+            }
+
+            public string LinkName()
+            {
+                return index.ToString();
+            }
         }
     }
 }
