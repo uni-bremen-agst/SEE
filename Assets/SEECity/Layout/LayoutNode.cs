@@ -34,10 +34,10 @@ namespace SEE.Layout
         string LinkName { get; }
 
         /// <summary>
-        /// Yields the scale of a node.
+        /// Scale of a node.
         /// </summary>
         /// <returns>scale of node</returns>
-        Vector3 GetSize();
+        Vector3 Scale { get; set; }
 
         /// <summary>
         /// The set of children of this node. Note: Even nodes for which IsLeaf

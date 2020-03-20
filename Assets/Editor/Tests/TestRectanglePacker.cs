@@ -223,7 +223,7 @@ namespace SEE.Layout.RectanglePacking
 
         private class MyGameNode : LayoutNode
         {
-            private readonly Vector3 scale;
+            private Vector3 scale;
 
             private readonly int index;
 
@@ -248,10 +248,13 @@ namespace SEE.Layout.RectanglePacking
                 return new List<LayoutNode>();
             }
 
-            public Vector3 GetSize()
+            public Vector3 Scale
             {
-                return scale;
+                get => scale;
+
+                set => scale = value;
             }
+
 
             public bool IsLeaf => false;
 

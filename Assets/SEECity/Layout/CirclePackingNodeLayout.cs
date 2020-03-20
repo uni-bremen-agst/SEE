@@ -67,7 +67,7 @@ namespace SEE.Layout
             foreach (LayoutNode child in children)
             {
                 NodeTransform childTransform = layout_result[child];
-                if (! child.IsLeaf())
+                if (! child.IsLeaf)
                 {
                     // The inner nodes will be slightly lifted along the y axis according to their
                     // tree depth so that they can be stacked visually (level 0 is at the bottom).
@@ -142,7 +142,7 @@ namespace SEE.Layout
         /// <returns>the scale of <paramref name="node"/></returns>
         private Vector3 GetScale(LayoutNode node, float radius)
         {
-            return node.IsLeaf ? node.GetSize() 
+            return node.IsLeaf ? node.Scale 
                                : new Vector3(2 * radius, innerNodeHeight, 2 * radius);
         }
 
@@ -155,7 +155,7 @@ namespace SEE.Layout
         /// <returns>radius of the minimal circle containing the given block</returns>
         private float LeafRadius(LayoutNode block)
         {
-            Vector3 extent = block.GetSize() / 2.0f;
+            Vector3 extent = block.Scale / 2.0f;
             return Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);
         }
     }

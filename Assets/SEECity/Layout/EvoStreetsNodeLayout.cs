@@ -56,7 +56,7 @@ namespace SEE.Layout
                 LayoutNode singleNode = gameNodes.FirstOrDefault();
                 Dictionary<LayoutNode, NodeTransform> layout_result = new Dictionary<LayoutNode, NodeTransform>
                 {
-                    [singleNode] = new NodeTransform(Vector3.zero, singleNode.GetSize())
+                    [singleNode] = new NodeTransform(Vector3.zero, singleNode.Scale)
                 };
                 return layout_result;
             }
@@ -247,7 +247,7 @@ namespace SEE.Layout
                     {
                         // left
                         newChildNode.Left = true; // is default value
-                        if (newChildNode.GraphNode.IsLeaf())
+                        if (newChildNode.GraphNode.IsLeaf)
                         {
                             // house
                             leftPivotX += newChildNode.Scale.x;
@@ -307,7 +307,7 @@ namespace SEE.Layout
         private void SetHouseScale(ENode node)
         {
             // Scaled metric values for the dimensions.
-            Vector3 size = node.GraphNode.GetSize();
+            Vector3 size = node.GraphNode.Scale;
             node.Scale = new Vector3(size.x, size.y, size.z);
         }
 
