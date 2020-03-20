@@ -55,7 +55,6 @@ namespace SEE.Layout
 
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
         {
-            to_game_node = NodeMapping(gameNodes);
             return ToNodeTransformLayout(Layout(ToLayoutNodes(gameNodes)));
         }
 
@@ -108,7 +107,6 @@ namespace SEE.Layout
             }
 
             // FIXME: define layout_result for roots?
-            to_game_node = null;
             return layout_result;
         }
 

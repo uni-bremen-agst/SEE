@@ -43,24 +43,16 @@ namespace SEE.Layout
         private readonly float StreetHeight = 0.05f;
 
         /// <summary>
-        /// The set of children of each node. This is a subset of the node's children
-        /// in the graph, limited to the children for which a layout is requested.
-        /// </summary>
-        private Dictionary<DataModel.Node, List<DataModel.Node>> children;
-
-        /// <summary>
         /// The maximal depth of the ENode tree hierarchy. Set by Layout and used by RelativeStreetWidth.
         /// </summary>
         private int maximalDepth;
 
-        /// <summary>
-        /// The roots of the subtrees of the original graph that are to be laid out.
-        /// A node is considered a root if it has either no parent in the original
-        /// graph or its parent is not contained in the set of nodes to be laid out.
-        /// </summary>
-        private List<DataModel.Node> roots;
-
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
+        {
+            return ToNodeTransformLayout(Layout(ToLayoutNodes(gameNodes)));
+        }
+
+        private Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
         {
             if (gameNodes.Count == 0)
             {
@@ -68,17 +60,16 @@ namespace SEE.Layout
             }
             else if (gameNodes.Count == 1)
             {
-                GameObject singleNode = gameNodes.Single();
-                Dictionary<GameObject, NodeTransform> layout_result = new Dictionary<GameObject, NodeTransform>
+                LayoutNode singleNode = gameNodes.FirstOrDefault();
+                Dictionary<LayoutNode, NodeTransform> layout_result = new Dictionary<LayoutNode, NodeTransform>
                 {
-                    [singleNode] = new NodeTransform(Vector3.zero, singleNode.transform.localScale)
+                    [singleNode] = new NodeTransform(Vector3.zero, singleNode.GetSize())
                 };
                 return layout_result;
             }
             else
             {
-                to_game_node = NodeMapping(gameNodes);
-                CreateTree(to_game_node.Keys, out roots, out children);
+                roots = GetRoots(gameNodes);
                 if (roots.Count == 0)
                 {
                     throw new System.Exception("Graph has no root node.");
@@ -89,11 +80,12 @@ namespace SEE.Layout
                 }
                 else
                 {
-                    ENode rootNode = GenerateHierarchy(roots[0]);
-                    maximalDepth = MaxDepth(roots[0], children);
+                    LayoutNode root = roots.FirstOrDefault();
+                    ENode rootNode = GenerateHierarchy(root);
+                    maximalDepth = MaxDepth(root);
                     SetScalePivotsRotation(rootNode);
                     CalculationNodeLocation(rootNode, Vector3.zero);
-                    Dictionary<GameObject, NodeTransform> layout_result = new Dictionary<GameObject, NodeTransform>();
+                    Dictionary<LayoutNode, NodeTransform> layout_result = new Dictionary<LayoutNode, NodeTransform>();
                     To_Layout(rootNode, ref layout_result);
                     return layout_result;
                 }
@@ -105,7 +97,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">root of a subtree to be added to the layout result</param>
         /// <param name="layout_result">layout result</param>
-        private void To_Layout(ENode node, ref Dictionary<GameObject, NodeTransform> layout_result)
+        private void To_Layout(ENode node, ref Dictionary<LayoutNode, NodeTransform> layout_result)
         {
             if (node.IsHouse())
             {
@@ -127,9 +119,9 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">leaf node</param>
         /// <param name="layout_result">layout result</param>
-        private void Place_House(ENode node, ref Dictionary<GameObject, NodeTransform> layout_result)
+        private void Place_House(ENode node, ref Dictionary<LayoutNode, NodeTransform> layout_result)
         {
-            layout_result[to_game_node[node.GraphNode]] = new NodeTransform(node.Location, node.Scale, node.Rotation);
+            layout_result[node.GraphNode] = new NodeTransform(node.Location, node.Scale, node.Rotation);
         }
 
         /// <summary>
@@ -137,9 +129,9 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">inner node</param>
         /// <param name="layout_result">layout result</param>
-        private void Place_Street(ENode node, ref Dictionary<GameObject, NodeTransform> layout_result)
+        private void Place_Street(ENode node, ref Dictionary<LayoutNode, NodeTransform> layout_result)
         {
-            layout_result[to_game_node[node.GraphNode]] 
+            layout_result[node.GraphNode] 
                 = new NodeTransform(node.Location, 
                                     new Vector3(node.Scale.x, StreetHeight, node.Scale.z), 
                                     node.Rotation);
@@ -151,13 +143,13 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="root">root of the hierarchy</param>
         /// <returns>root ENode</returns>
-        private ENode GenerateHierarchy(DataModel.Node root)
+        private ENode GenerateHierarchy(LayoutNode root)
         {
             ENode result = new ENode(root)
             {
                 Depth = 0
             };
-            foreach (DataModel.Node child in children[root])
+            foreach (LayoutNode child in root.Children())
             {
                 ENode kid = GenerateHierarchy(result, child);
                 result.Children.Add(kid);
@@ -171,14 +163,14 @@ namespace SEE.Layout
         /// <param name="parent">parent of node in the ENode tree hierarchy</param>
         /// <param name="node">root of a subtree in the original graph</param>
         /// <returns>ENode representing node</returns>
-        private ENode GenerateHierarchy(ENode parent, DataModel.Node node)
+        private ENode GenerateHierarchy(ENode parent, LayoutNode node)
         {
             ENode result = new ENode(node)
             {
                 Depth = parent.Depth + 1,
                 ParentNode = parent
             };
-            foreach (DataModel.Node child in children[node])
+            foreach (LayoutNode child in node.Children())
             {
                 ENode kid = GenerateHierarchy(result, child);
                 result.Children.Add(kid);
@@ -322,7 +314,7 @@ namespace SEE.Layout
         private void SetHouseScale(ENode node)
         {
             // Scaled metric values for the dimensions.
-            Vector3 size = leafNodeFactory.GetSize(to_game_node[node.GraphNode]);
+            Vector3 size = node.GraphNode.GetSize();
             node.Scale = new Vector3(size.x, size.y, size.z);
         }
 

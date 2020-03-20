@@ -48,7 +48,6 @@ namespace SEE.Layout
 
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
         {
-            to_game_node = NodeMapping(gameNodes);
             return ToNodeTransformLayout(Layout(ToLayoutNodes(gameNodes)));
         }
 
