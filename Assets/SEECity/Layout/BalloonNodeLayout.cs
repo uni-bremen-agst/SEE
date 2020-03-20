@@ -167,7 +167,7 @@ namespace SEE.Layout
             float rad = 0.0f;
             float rl_child = 0.0f;
 
-            if (node.IsLeaf())
+            if (node.IsLeaf)
             {
                 // Necessary size of the block independent of the parent
                 Vector3 size = node.GetSize();

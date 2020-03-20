@@ -21,19 +21,17 @@ namespace SEE.Layout
         int Level { get; set; }
 
         /// <summary>
-        /// Yields true if the given node is to be interpreted as a leaf by the layouter.
+        /// True if the given node is to be interpreted as a leaf by the layouter.
         /// 
         /// Note: Even leaves may have children. What to do with those is the decision of the
         /// layouter. It may or may not lay them out.
         /// </summary>
-        /// <returns>true if the given node is to be interpreted as a leaf by the layouter</returns>
-        bool IsLeaf();
+        bool IsLeaf { get; }
 
         /// <summary>
         /// A unique ID for a node.
         /// </summary>
-        /// <returns>unique ID for a node</returns>
-        string LinkName();
+        string LinkName { get; }
 
         /// <summary>
         /// Yields the scale of a node.

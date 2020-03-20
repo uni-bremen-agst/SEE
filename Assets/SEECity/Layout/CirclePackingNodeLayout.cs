@@ -104,7 +104,7 @@ namespace SEE.Layout
                 int i = 0;
                 foreach (LayoutNode child in children)
                 {
-                    float radius = child.IsLeaf() ? LeafRadius(child) : PlaceNodes(child);
+                    float radius = child.IsLeaf ? LeafRadius(child) : PlaceNodes(child);
                     // Position the children on a circle as required by CirclePacker.Pack.
                     float radians = ((float)i / (float)children.Count) * (2.0f * Mathf.PI);
                     circles.Add(new Circle(child, new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * radius, radius));
@@ -142,8 +142,8 @@ namespace SEE.Layout
         /// <returns>the scale of <paramref name="node"/></returns>
         private Vector3 GetScale(LayoutNode node, float radius)
         {
-            return node.IsLeaf() ? node.GetSize() 
-                                 : new Vector3(2 * radius, innerNodeHeight, 2 * radius);
+            return node.IsLeaf ? node.GetSize() 
+                               : new Vector3(2 * radius, innerNodeHeight, 2 * radius);
         }
 
         /// <summary>

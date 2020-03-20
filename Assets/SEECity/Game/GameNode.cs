@@ -132,20 +132,14 @@ namespace SEE.Layout
         /// <summary>
         /// Whether this node represents a leaf.
         /// </summary>
-        /// <returns></returns>
-        public bool IsLeaf()
-        {
-            return node.IsLeaf();
-        }
+        /// <returns>true if this node represents a leaf</returns>
+        public bool IsLeaf => node.IsLeaf();
 
         /// <summary>
         /// A unique ID for a node: the LinkName of the graph node underlying this layout node.
         /// </summary>
         /// <returns>unique ID for this node</returns>
-        public string LinkName()
-        {
-            return node.LinkName;
-        }
+        public string LinkName { get => node.LinkName; }
 
         /// <summary>
         /// The set of children of this node. Note: For nodes for which IsLeaf
@@ -155,7 +149,7 @@ namespace SEE.Layout
         public IList<LayoutNode> Children()
         {
             IList<LayoutNode> children = new List<LayoutNode>();
-            if (!IsLeaf())
+            if (!IsLeaf)
             {
                 foreach (Node node in node.Children())
                 {
