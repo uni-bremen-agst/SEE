@@ -154,7 +154,7 @@ namespace SEE.Layout
         /// <returns>size of node</returns>
         private float CalculateSize(LayoutNode node)
         {
-            if (node.IsLeaf())
+            if (node.IsLeaf)
             {
                 // a leaf      
                 Vector3 size = node.GetSize();

@@ -34,7 +34,7 @@ namespace SEE.Layout
             // Note: (position.X, position.Y) is the left lower corner of the game object in the X,Z plane
 
             // Draw all nodes in a grid in ascending alphabetic order of their linkname.
-            foreach (LayoutNode gameNode in gameNodes.OrderBy<LayoutNode, string>(gameObject => gameObject.LinkName()))
+            foreach (LayoutNode gameNode in gameNodes.OrderBy<LayoutNode, string>(gameObject => gameObject.LinkName))
             {
                 column++;
                 if (column > numberOfBuildingsPerRow)

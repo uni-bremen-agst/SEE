@@ -229,9 +229,10 @@ namespace SEE.Layout.RectanglePacking
 
             private int level = 0;
 
-            public MyGameNode(Vector3 initialSize, int i)
+            public MyGameNode(Vector3 initialSize, int index)
             {
                 this.scale = initialSize;
+                this.index = index;
             }
 
             public LayoutNode Parent => null;
@@ -252,15 +253,10 @@ namespace SEE.Layout.RectanglePacking
                 return scale;
             }
 
-            public bool IsLeaf()
-            {
-                return false;
-            }
+            public bool IsLeaf => false;
 
-            public string LinkName()
-            {
-                return index.ToString();
-            }
+            public string LinkName { get => index.ToString(); }
+
         }
     }
 }

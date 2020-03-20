@@ -226,7 +226,7 @@ namespace SEE.Layout
         /// <param name="node">node whose scale, pivots, and rotation are to be set</param>
         private void SetScalePivotsRotation(ENode node)
         {
-            if (node.GraphNode.IsLeaf())
+            if (node.GraphNode.IsLeaf)
             {
                 SetHouseScale(node);
             }
@@ -265,7 +265,7 @@ namespace SEE.Layout
                     {
                         // right
                         newChildNode.Left = false;
-                        if (newChildNode.GraphNode.IsLeaf())
+                        if (newChildNode.GraphNode.IsLeaf)
                         {
                             // house
                             newChildNode.XPivot = RightPivotX;
@@ -281,7 +281,7 @@ namespace SEE.Layout
                         }
                     }
 
-                    if (newChildNode.GraphNode.IsLeaf())
+                    if (newChildNode.GraphNode.IsLeaf)
                     {   // house
                         newChildNode.Rotation =
                             (newChildNode.Left) ? node.Rotation - 180.0f : node.Rotation; //is not a street

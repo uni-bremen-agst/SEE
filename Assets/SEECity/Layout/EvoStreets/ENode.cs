@@ -75,7 +75,7 @@ namespace SEE.Layout.EvoStreets
         /// <returns>Children.Count == 0</returns>
         public bool IsHouse()
         {
-            return GraphNode.IsLeaf();
+            return GraphNode.IsLeaf;
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace SEE.Layout.EvoStreets
         /// <returns>Children.Count > 0</returns>
         public bool IsStreet()
         {
-            return ! GraphNode.IsLeaf();
+            return ! GraphNode.IsLeaf;
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace SEE.Layout.EvoStreets
 
         public override string ToString()
         {
-            return $"Node[Linkname={GraphNode.LinkName()}]";
+            return $"Node[Linkname={GraphNode.LinkName}]";
         }
     }
 }
