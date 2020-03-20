@@ -170,9 +170,11 @@ namespace SEE.Game
                 AddInnerNodes(nodeMap, nodes); // and inner nodes
             }
             // calculate the layout
-            Dictionary<GameObject, NodeTransform> layout = nodeLayout.Layout(nodeMap.Values);
+            Dictionary<GameObject, NodeTransform> layout 
+                = ToNodeTransformLayout(NodeLayout.Move(nodeLayout.Layout(ToLayoutNodes(nodeMap.Values)), 
+                                                        settings.origin));
             // apply the layout
-            Apply(layout, settings.origin);
+            Apply(layout);
             // add all game nodes as children to parent
             ICollection<GameObject> gameNodes = layout.Keys;
             AddToParent(gameNodes, parent);
@@ -196,17 +198,17 @@ namespace SEE.Game
             switch (settings.NodeLayout)
             {
                 case SEECity.NodeLayouts.Manhattan:                    
-                    return new ManhattanLayout(groundLevel, leafNodeFactory);
+                    return new ManhattanLayout(groundLevel, leafNodeFactory.Unit);
                 case SEECity.NodeLayouts.FlatRectanglePacking:
-                    return new RectanglePacker(groundLevel, leafNodeFactory);
+                    return new RectanglePacker(groundLevel, leafNodeFactory.Unit);
                 case SEECity.NodeLayouts.EvoStreets:
-                    return new EvoStreetsNodeLayout(groundLevel, leafNodeFactory);
+                    return new EvoStreetsNodeLayout(groundLevel, leafNodeFactory.Unit);
                 case SEECity.NodeLayouts.Treemap:
-                    return new TreemapLayout(groundLevel, leafNodeFactory, 1000.0f * Unit(), 1000.0f * Unit());
+                    return new TreemapLayout(groundLevel, 1000.0f * Unit(), 1000.0f * Unit());
                 case SEECity.NodeLayouts.Balloon:
-                    return new BalloonNodeLayout(groundLevel, leafNodeFactory);
+                    return new BalloonNodeLayout(groundLevel);
                 case SEECity.NodeLayouts.CirclePacking:
-                    return new CirclePackingNodeLayout(groundLevel, leafNodeFactory);
+                    return new CirclePackingNodeLayout(groundLevel);
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }
@@ -337,6 +339,72 @@ namespace SEE.Game
             return decorations;
         }
 
+        /*
+        public Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes, NodeFactory leafNodeFactory)
+        {
+            return ToNodeTransformLayout(Layout(ToLayoutNodes(gameNodes, leafNodeFactory)));
+        }
+        */
+
+        /// <summary>
+        /// Transforms the given <paramref name="gameNodes"/> to a collection of LayoutNodes.
+        /// Sets the node levels of all <paramref name="gameNodes"/>.
+        /// </summary>
+        /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
+        /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
+        public ICollection<LayoutNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
+        {
+            return ToLayoutNodes(gameObjects, leafNodeFactory);
+        }
+
+        /// <summary>
+        /// Transforms the given <paramref name="gameNodes"/> to a collection of LayoutNodes.
+        /// Sets the node levels of all <paramref name="gameNodes"/>.
+        /// </summary>
+        /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
+        /// <param name="leafNodeFactory">the leaf node factory that created the leaf nodes in <paramref name="gameNodes"/></param>
+        /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
+        private ICollection<LayoutNode> ToLayoutNodes(ICollection<GameObject> gameNodes, NodeFactory leafNodeFactory)
+        {
+            IList<LayoutNode> result = new List<LayoutNode>();
+            Dictionary<Node, GameNode> to_layout_node = new Dictionary<Node, GameNode>();
+
+            foreach (GameObject gameObject in gameNodes)
+            {
+                Node node = gameObject.GetComponent<NodeRef>().node;
+                if (node.IsLeaf())
+                {
+                    result.Add(new GameNode(to_layout_node, gameObject, leafNodeFactory));
+                }
+                else
+                {
+                    result.Add(new GameNode(to_layout_node, gameObject));
+                }
+            }
+            LayoutNodes.SetLevels(result);
+            return result;
+        }
+
+        /// <summary>
+        /// Transforms the given <paramref name="layout"/> into the layout representation 
+        /// currently used by the NodeLayout clients. The key of the resulting dictionary are
+        /// the game objects represented by the keys of <paramref name="layout"/>. The value
+        /// of the resulting dictionary is its corresponding NodeTransform.
+        /// </summary>
+        /// <param name="layout">layout to be transformed</param>
+        /// <returns>the node layout indexed by game nodes instead of layout nodes</returns>
+        protected Dictionary<GameObject, NodeTransform> ToNodeTransformLayout(Dictionary<LayoutNode, NodeTransform> layout)
+        {
+            Dictionary<GameObject, NodeTransform> result = new Dictionary<GameObject, NodeTransform>();
+
+            foreach (var entry in layout)
+            {
+                GameNode gameNode = entry.Key as GameNode;
+                result[gameNode.GetGameObject()] = entry.Value;
+            }
+            return result;
+        }
+
         /// <summary>
         /// Adds the source name as a label to the center of the given game nodes.
         /// </summary>
@@ -393,9 +461,9 @@ namespace SEE.Game
         /// </summary>
         /// <param name="layout">node layout to be applied</param>
         /// <param name="origin">the center origin where the graph should be placed in the world scene</param>
-        public void Apply(Dictionary<GameObject, NodeTransform> layout, Vector3 origin)
+        private void Apply(Dictionary<GameObject, NodeTransform> layout)
         {      
-            foreach (var entry in NodeLayout.Move(layout, origin))
+            foreach (var entry in layout)
             {
                 GameObject gameNode = entry.Key;
                 NodeTransform transform = entry.Value;

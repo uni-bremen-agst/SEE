@@ -1,7 +1,7 @@
-﻿using SEE.Layout.RectanglePacking;
-using SEE.GO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+
+using SEE.Layout.RectanglePacking;
 
 namespace SEE.Layout
 {
@@ -27,11 +27,11 @@ namespace SEE.Layout
         /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
         /// <param name="padding">the padding to be added between neighboring nodes;
         /// the actual value used is padding * leafNodeFactory.Unit()</param>
-        public RectanglePacker(float groundLevel, NodeFactory leafNodeFactory, float padding = 0.1f)
-            : base(groundLevel, leafNodeFactory)
+        public RectanglePacker(float groundLevel, float Unit, float padding = 0.1f)
+            : base(groundLevel)
         {
             name = "Rectangle Packing";
-            this.padding = padding * leafNodeFactory.Unit;
+            this.padding = padding * Unit;
         }
 
         private readonly float padding;
@@ -63,13 +63,8 @@ namespace SEE.Layout
         /// Precondition: every node in <paramref name="gameNodes"/> must have been
         /// created by the node factory passed to the constructor.
         /// </summary>
-        /// <param name="elements">the game objects to be laid out</param>
-        public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
-        {
-            return ToNodeTransformLayout(Layout(ToLayoutNodes(gameNodes)));
-        }
-
-        private Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
+        /// <param name="gameNodes">the game objects to be laid out</param>
+        public override Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
         {
             /// The node layout we compute as a result.
             Dictionary<LayoutNode, NodeTransform> layout_result = new Dictionary<LayoutNode, NodeTransform>();

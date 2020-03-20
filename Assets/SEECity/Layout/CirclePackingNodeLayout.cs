@@ -2,7 +2,6 @@
 using System.Linq;
 using UnityEngine;
 
-using SEE.GO;
 using SEE.Layout.CirclePacking;
 
 namespace SEE.Layout
@@ -18,9 +17,8 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
-        /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
-        public CirclePackingNodeLayout(float groundLevel, NodeFactory leafNodeFactory) 
-            : base(groundLevel, leafNodeFactory)
+        public CirclePackingNodeLayout(float groundLevel) 
+            : base(groundLevel)
         {
             name = "Circle Packing";
         }
@@ -30,16 +28,11 @@ namespace SEE.Layout
         /// </summary>
         Dictionary<LayoutNode, NodeTransform> layout_result;
 
-        public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
-        {
-            return ToNodeTransformLayout(Layout(ToLayoutNodes(gameNodes)));
-        }
-
-        private Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
+        public override Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
         {
             layout_result = new Dictionary<LayoutNode, NodeTransform>();
 
-            ICollection<LayoutNode> roots = GetRoots(gameNodes);
+            ICollection<LayoutNode> roots = LayoutNodes.GetRoots(gameNodes);
             if (roots.Count == 0)
             {
                 throw new System.Exception("Graph has no root node.");

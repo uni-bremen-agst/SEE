@@ -1,6 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.GO;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,9 +17,8 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
-        /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
-        public BalloonNodeLayout(float groundLevel, NodeFactory leafNodeFactory) 
-            : base(groundLevel, leafNodeFactory)
+        public BalloonNodeLayout(float groundLevel) 
+            : base(groundLevel)
         {
             name = "Balloon";
         }
@@ -53,12 +50,7 @@ namespace SEE.Layout
         /// </summary>
         private Dictionary<LayoutNode, NodeTransform> layout_result;
 
-        public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
-        {
-            return ToNodeTransformLayout(Layout(ToLayoutNodes(gameNodes)));
-        }
-
-        private Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
+        public override Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
         {
             // puts the outermost circles of the roots next to each other;
             // later we might use a circle-packing algorithm instead,
@@ -68,7 +60,7 @@ namespace SEE.Layout
             //to_game_node = NodeMapping(gameNodes);
 
             const float offset = 1.0f;
-            roots = GetRoots(gameNodes);
+            roots = LayoutNodes.GetRoots(gameNodes);
             if (roots.Count == 0)
             {
                 throw new System.Exception("Graph has no root nodes.");

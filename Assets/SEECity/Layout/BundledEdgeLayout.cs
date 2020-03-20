@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
+
 using SEE.DataModel;
 using SEE.GO;
-using UnityEngine;
 
 namespace SEE.Layout
 {

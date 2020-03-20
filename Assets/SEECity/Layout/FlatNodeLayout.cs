@@ -1,6 +1,4 @@
-﻿using SEE.GO;
-
-namespace SEE.Layout
+﻿namespace SEE.Layout
 {
     /// <summary>
     /// The abstract super class of all non-hierarchical (flat) node layouts.
@@ -12,11 +10,8 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
-        /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
-        public FlatNodeLayout
-            (float groundLevel,
-             NodeFactory leafNodeFactory)
-            : base(groundLevel, leafNodeFactory)
+        public FlatNodeLayout(float groundLevel)
+            : base(groundLevel)
         {
         }
 
