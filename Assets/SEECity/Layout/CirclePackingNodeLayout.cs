@@ -1,8 +1,9 @@
-﻿using SEE.DataModel;
-using SEE.GO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+
+using SEE.GO;
+using SEE.Layout.CirclePacking;
 
 namespace SEE.Layout
 {
@@ -105,7 +106,7 @@ namespace SEE.Layout
             }
             else
             { 
-                List<MyCircle> circles = new List<MyCircle>(children.Count);
+                List<Circle> circles = new List<Circle>(children.Count);
 
                 int i = 0;
                 foreach (LayoutNode child in children)
@@ -113,7 +114,7 @@ namespace SEE.Layout
                     float radius = child.IsLeaf() ? LeafRadius(child) : PlaceNodes(child);
                     // Position the children on a circle as required by CirclePacker.Pack.
                     float radians = ((float)i / (float)children.Count) * (2.0f * Mathf.PI);
-                    circles.Add(new MyCircle(child, new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * radius, radius));
+                    circles.Add(new Circle(child, new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * radius, radius));
                     i++;
                 }
 
@@ -122,9 +123,9 @@ namespace SEE.Layout
                 // the children we just packed. By necessity, the objects whose children we are
                 // currently processing is a composed object represented by a circle, otherwise
                 // we would not have any children here.
-                MyCirclePacker.Pack(circles, out float out_outer_radius);
+                CirclePacker.Pack(circles, out float out_outer_radius);
 
-                foreach (MyCircle circle in circles)
+                foreach (Circle circle in circles)
                 {
                     // Note: The position of the transform is currently only local, relative to the zero center
                     // within the parent node. The co-ordinates will later be adjusted to the world scope.
