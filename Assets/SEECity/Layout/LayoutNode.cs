@@ -40,9 +40,13 @@ namespace SEE.Layout
         /// </summary>
         /// <returns>scale of node</returns>
         Vector3 GetSize();
-        IList<LayoutNode> Children();
 
-        //Vector3 Position();
-        //ICollection<LayoutNode> Children();
+        /// <summary>
+        /// The set of children of this node. Note: Even nodes for which IsLeaf
+        /// returns true, may still have children. Layouts may refuse to layout
+        /// the children of a node for which IsLeaf() returns true.
+        /// </summary>
+        /// <returns>children of this node</returns>
+        IList<LayoutNode> Children();
     }
 }
