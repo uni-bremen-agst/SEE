@@ -116,16 +116,29 @@ namespace SEE.Layout
         /// <summary>
         /// The scale of this node.
         /// </summary>
-        /// <returns>scale of this node</returns>
-        public Vector3 GetSize()
+        public Vector3 Scale
         {
-            if (node.IsLeaf())
+            get
             {
-                return leafNodeFactory.GetSize(gameObject);
+                if (node.IsLeaf())
+                {
+                    return leafNodeFactory.GetSize(gameObject);
+                }
+                else
+                {
+                    return gameObject.transform.localScale;
+                }
             }
-            else
+            set
             {
-                return gameObject.transform.localScale;
+                if (node.IsLeaf())
+                {
+                    leafNodeFactory.SetSize(gameObject, value);
+                }
+                else
+                {
+                    gameObject.transform.localScale = value;
+                }
             }
         }
 

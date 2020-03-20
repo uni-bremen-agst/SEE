@@ -44,7 +44,7 @@ namespace SEE.Layout
         /// <returns>area size of given layout node</returns>
         private static float AreaSize(LayoutNode layoutNode)
         {
-            Vector3 size = layoutNode.GetSize();
+            Vector3 size = layoutNode.Scale;
             return size.x * size.z;
         }
 
@@ -167,7 +167,7 @@ namespace SEE.Layout
                 // The size of the node remains unchanged. We set only the position.
                 // The x and y co-ordinates of the rectangle denote the corner. The layout
                 // position returned must be the center plus the padding.
-                Vector3 scale = el.GetSize();
+                Vector3 scale = el.Scale;
                 layout_result[el] = new NodeTransform(new Vector3(fitNode.rectangle.position.x + (scale.x + padding) / 2.0f, 
                                                                   groundLevel, 
                                                                   fitNode.rectangle.position.y + (scale.z  + padding) / 2.0f),
@@ -198,7 +198,7 @@ namespace SEE.Layout
         /// <returns>ground area size of the given game object</returns>
         private static Vector2 GetRectangleSize(LayoutNode layoutNode, float padding)
         {
-            Vector3 size = layoutNode.GetSize();
+            Vector3 size = layoutNode.Scale;
             return new Vector2(size.x + padding, size.z + padding);
         }
 
@@ -216,7 +216,7 @@ namespace SEE.Layout
             Vector2 result = Vector2.zero;
             foreach (LayoutNode element in elements)
             {
-                Vector3 size = element.GetSize();
+                Vector3 size = element.Scale;
                 result.x += size.x + padding;
                 result.y += size.z + padding;
             }

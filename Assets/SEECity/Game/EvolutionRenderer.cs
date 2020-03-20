@@ -319,7 +319,7 @@ namespace SEE.Game
             Dictionary<string, NodeTransform> result = new Dictionary<string, NodeTransform>();
             foreach (var entry in layout)
             {
-                result[entry.Key.LinkName()] = entry.Value;
+                result[entry.Key.LinkName] = entry.Value;
             }
             return result;
         }
