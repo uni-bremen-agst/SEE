@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel;
 using SEE.GO;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -73,7 +74,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">an inner node to be lifted</param>
         /// <returns>lift for an innner node</returns>
-        protected float LevelLift(Node node)
+        protected float LevelLift(LayoutNode node)
         {
             return node.Level * levelIncreaseForInnerNodes;
         }
@@ -240,7 +241,27 @@ namespace SEE.Layout
         }
 
         /// <summary>
+        /// Returns all root nodes in <paramref name="layoutNodes"/>. A node is a root node
+        /// if its Parent is null.
+        /// </summary>
+        /// <param name="layoutNodes">layout nodes for which to collect all roots</param>
+        /// <returns></returns>
+        protected IList<LayoutNode> GetRoots(ICollection<LayoutNode> layoutNodes)
+        {
+            List<LayoutNode> roots = new List<LayoutNode>();
+            foreach (LayoutNode layoutNode in layoutNodes)
+            {
+                if (layoutNode.Parent == null)
+                {
+                    roots.Add(layoutNode);
+                }
+            }
+            return roots;
+        }
+
+        /// <summary>
         /// Transforms the given <paramref name="gameNodes"/> to a collection of LayoutNodes.
+        /// Sets the node levels of all <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
@@ -261,7 +282,29 @@ namespace SEE.Layout
                     result.Add(new GameNode(to_layout_node, gameObject));
                 }
             }
+            SetLevels(result);
             return result;
+        }
+
+        private void SetLevels(List<LayoutNode> result)
+        {
+            foreach (LayoutNode root in GetRoots(result))
+            {
+                root.Level = 0;
+                foreach(LayoutNode child in root.Children())
+                {
+                    SetLevels(child, 1);
+                }
+            }
+        }
+
+        private void SetLevels(LayoutNode node, int level)
+        {
+            node.Level = level;
+            foreach (LayoutNode child in node.Children())
+            {
+                SetLevels(child, level + 1);
+            }
         }
 
         /// <summary>
@@ -271,7 +314,7 @@ namespace SEE.Layout
         /// of the resulting dictionary is its corresponding NodeTransform.
         /// </summary>
         /// <param name="layout">layout to be transformed</param>
-        /// <returns></returns>
+        /// <returns>the node layout indexed by game nodes instead of layout nodes</returns>
         protected Dictionary<GameObject, NodeTransform> ToNodeTransformLayout(Dictionary<LayoutNode, NodeTransform> layout)
         {
             Dictionary<GameObject, NodeTransform> result = new Dictionary<GameObject, NodeTransform>();
@@ -282,25 +325,6 @@ namespace SEE.Layout
                 result[gameNode.GetGameObject()] = entry.Value;
             }
             return result;
-        }
-
-        /// <summary>
-        /// Returns all root nodes in <paramref name="layoutNodes"/>. A node is a root node
-        /// if its Parent is null.
-        /// </summary>
-        /// <param name="layoutNodes">layout nodes for which to collect all roots</param>
-        /// <returns></returns>
-        protected IList<LayoutNode> GetRoots(ICollection<LayoutNode> layoutNodes)
-        {
-            List<LayoutNode> roots = new List<LayoutNode>();
-            foreach (LayoutNode layoutNode in layoutNodes)
-            {
-                if (layoutNode.Parent == null)
-                {
-                    roots.Add(layoutNode);
-                }
-            }
-            return roots;
         }
     }
 }

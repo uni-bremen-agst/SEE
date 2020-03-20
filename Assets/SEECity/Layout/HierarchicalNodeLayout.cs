@@ -1,4 +1,5 @@
 ﻿using SEE.GO;
+using System.Collections.Generic;
 
 namespace SEE.Layout
 {
@@ -28,5 +29,12 @@ namespace SEE.Layout
         {
             return true;
         }
+
+        /// <summary>
+        /// The roots of the subtrees of the original graph that are to be laid out.
+        /// A node is considered a root if it has either no parent in the original
+        /// graph or its parent is not contained in the set of nodes to be laid out.
+        /// </summary>
+        protected IList<LayoutNode> roots;
     }
 }

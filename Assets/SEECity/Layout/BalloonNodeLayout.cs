@@ -46,24 +46,30 @@ namespace SEE.Layout
         /// <summary>
         /// A mapping of nodes onto their circle data.
         /// </summary>
-        private Dictionary<Node, NodeInfo> nodeInfos = new Dictionary<Node, NodeInfo>();
+        private Dictionary<LayoutNode, NodeInfo> nodeInfos = new Dictionary<LayoutNode, NodeInfo>();
 
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
-        private Dictionary<GameObject, NodeTransform> layout_result;
+        private Dictionary<LayoutNode, NodeTransform> layout_result;
 
         public override Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes)
+        {
+            to_game_node = NodeMapping(gameNodes);
+            return ToNodeTransformLayout(Layout(ToLayoutNodes(gameNodes)));
+        }
+
+        private Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
         {
             // puts the outermost circles of the roots next to each other;
             // later we might use a circle-packing algorithm instead,
             // e.g., https://www.codeproject.com/Articles/42067/D-Circle-Packing-Algorithm-Ported-to-Csharp
 
-            layout_result = new Dictionary<GameObject, NodeTransform>();
-            to_game_node = NodeMapping(gameNodes);
+            layout_result = new Dictionary<LayoutNode, NodeTransform>();
+            //to_game_node = NodeMapping(gameNodes);
 
             const float offset = 1.0f;
-            List<Node> roots = GetRoots(gameNodes);
+            roots = GetRoots(gameNodes);
             if (roots.Count == 0)
             {
                 throw new System.Exception("Graph has no root nodes.");
@@ -75,7 +81,7 @@ namespace SEE.Layout
             // First calculate all radii including those for the roots as well as max_radius.
             {
                 int i = 0;
-                foreach (Node root in roots)
+                foreach (LayoutNode root in roots)
                 {
                     CalculateRadius2D(root, out float out_rad);
                     i++;
@@ -91,7 +97,7 @@ namespace SEE.Layout
             {
                 Vector3 position = Vector3.zero;
                 int i = 0;
-                foreach (Node root in roots)
+                foreach (LayoutNode root in roots)
                 {
                     // for two neighboring circles the distance must be the sum of the their two radii;
                     // in case we draw the very first circle, no distance must be kept
@@ -164,7 +170,7 @@ namespace SEE.Layout
         /// <param name="node">the node for which the ballon layout is to be computed</param>
         /// <param name="out_rad">radius of the minimal circle around node that includes every circle 
         ///                       of its descendants</param>
-        private void CalculateRadius2D(Node node, out float out_rad)
+        private void CalculateRadius2D(LayoutNode node, out float out_rad)
         {
             // radius of the circle around node at which the center of every circle
             // of its direct children is located
@@ -173,10 +179,8 @@ namespace SEE.Layout
 
             if (node.IsLeaf())
             {
-                GameObject block = to_game_node[node];
-
                 // Necessary size of the block independent of the parent
-                Vector3 size = leafNodeFactory.GetSize(block);
+                Vector3 size = node.GetSize();
 
                 // The outer radius of an inner-most node is determined by the ground
                 // rectangle of the block to be drawn for the node.
@@ -195,7 +199,7 @@ namespace SEE.Layout
                 // maximal out_rad_k over all children k of i
                 float max_children_rad = 0.0f;
 
-                foreach (Node child in node.Children())
+                foreach (LayoutNode child in node.Children())
                 {
 
                     // Find the radius rad_k and outer-radius out_rad_k for each child k of node i.
@@ -241,16 +245,15 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">node to be drawn</param>
         /// <param name="position">position at which to place the node</param>
-        private void DrawCircles(Node node, Vector3 position)
+        private void DrawCircles(LayoutNode node, Vector3 position)
         {
-            List<Node> children = node.Children();
+            ICollection<LayoutNode> children = node.Children();
 
             if (children.Count == 0)
             {
                 // leaf
                 // leaves will only be positioned; we maintain their original scale
-                GameObject gameObject = to_game_node[node];
-                layout_result[gameObject] = new NodeTransform(position, leafNodeFactory.GetSize(gameObject));
+                layout_result[node] = new NodeTransform(position, node.GetSize());
             }
             else
             {
@@ -259,7 +262,7 @@ namespace SEE.Layout
                 // the inner nodes will be slightly lifted along the y axis according to their
                 // tree depth so that they can be stacked visually (level 0 is at the bottom)
                 position.y += LevelLift(node);
-                layout_result[to_game_node[node]]
+                layout_result[node]
                     = new NodeTransform(position,
                                         new Vector3(2 * nodeInfos[node].outer_radius, 
                                                     innerNodeHeight, 2 * nodeInfos[node].outer_radius));
@@ -286,7 +289,7 @@ namespace SEE.Layout
                     // The accumulated angles in radians.
                     double accummulated_alpha = 0.0;
 
-                    foreach (Node child in children)
+                    foreach (LayoutNode child in children)
                     {
                         double child_outer_radius = nodeInfos[child].outer_radius;
                         // As in polar coordinates, the angle of the child circle w.r.t. to the 
@@ -330,7 +333,7 @@ namespace SEE.Layout
                     // The accumulated angles in radians.
                     double accummulated_alpha = 0.0;
 
-                    foreach (Node child in children)
+                    foreach (LayoutNode child in children)
                     {
                         // As in polar coordinates, the angle of the child circle w.r.t. to the 
                         // circle point of the node's circle. The distance from the node's center point
