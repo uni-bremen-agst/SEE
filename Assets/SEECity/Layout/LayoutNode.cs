@@ -36,13 +36,17 @@ namespace SEE.Layout
         /// <summary>
         /// Scale of a node.
         /// </summary>
-        /// <returns>scale of node</returns>
         Vector3 Scale { get; set; }
+
+        /// <summary>
+        /// Center position of a node in world space.
+        /// </summary>
+        Vector3 CenterPosition { get; set; }
 
         /// <summary>
         /// The set of children of this node. Note: Even nodes for which IsLeaf
         /// returns true, may still have children. Layouts may refuse to layout
-        /// the children of a node for which IsLeaf() returns true.
+        /// the children of a node for which IsLeaf returns true.
         /// </summary>
         /// <returns>children of this node</returns>
         IList<LayoutNode> Children();
