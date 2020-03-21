@@ -98,12 +98,12 @@ namespace SEE.Runtime
         /// </summary>
         void Update()
         {
-            bool leftTrackpadPressed = Input.GetButtonDown("LeftVRTrackpadPress");
-            float leftTrackpadHorizontalMovement = Input.GetAxis("LeftVRTrackpadHorizontalMovement");
-            
-            float leftTriggerValue = Input.GetAxis("LeftVRTrigger");
-            bool leftTriggerPressed = leftTriggerValue > 0.5f && !isLeftTriggerDown;
-            isLeftTriggerDown = leftTriggerValue > 0.5f;
+            bool leftTrackpadPressed = false;//Input.GetButtonDown("LeftVRTrackpadPress");
+            float leftTrackpadHorizontalMovement = 0.0f;//Input.GetAxis("LeftVRTrackpadHorizontalMovement");
+
+            //float leftTriggerValue = Input.GetAxis("LeftVRTrigger");
+            bool leftTriggerPressed = false;//leftTriggerValue > 0.5f && !isLeftTriggerDown;
+            isLeftTriggerDown = false;//leftTriggerValue > 0.5f;
 
             if (Input.GetKeyDown(KeyCode.Return) || leftTriggerPressed)
             {

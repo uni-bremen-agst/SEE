@@ -349,6 +349,11 @@ namespace SEE.Game
         public bool EdgesAboveBlocks = true; // serialized by Unity
 
         /// <summary>
+        /// Whether a dynamic call graph should be loaded.
+        /// </summary>
+        public bool DynamicCallGraph = false;  // serialized by Unity
+
+        /// <summary>
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.
         /// </summary>
         /// <returns>the loaded graph (may be empty if a graph could not be loaded)</returns>

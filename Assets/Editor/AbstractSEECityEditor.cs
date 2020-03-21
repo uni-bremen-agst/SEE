@@ -40,6 +40,9 @@ namespace SEEEditor
             city.EdgeWidth = EditorGUILayout.FloatField("Edge width", city.EdgeWidth);
             city.EdgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", city.EdgesAboveBlocks);
 
+            GUILayout.Label("Dynamic", EditorStyles.boldLabel);
+            city.DynamicCallGraph = EditorGUILayout.Toggle("Load dynamic call graph", city.DynamicCallGraph);
+
             GUILayout.Label("Data", EditorStyles.boldLabel);
             if (city.PathPrefix == null)
             {
