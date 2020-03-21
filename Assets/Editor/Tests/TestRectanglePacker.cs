@@ -254,12 +254,22 @@ namespace SEE.Layout.RectanglePacking
                 set => scale = value;
             }
 
-            private Vector3 position;
+            private Vector3 centerPosition;
 
             public Vector3 CenterPosition
             {
-                get => position;
-                set => position = value;
+                get => centerPosition;
+                set => centerPosition = value;
+            }
+
+            public Vector3 Roof
+            {
+                get => centerPosition + Vector3.up * 0.5f * scale.y;
+            }
+
+            public Vector3 Ground
+            {
+                get => centerPosition - Vector3.up * 0.5f * scale.y;
             }
 
             public bool IsLeaf => false;

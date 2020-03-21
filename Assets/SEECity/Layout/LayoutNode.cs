@@ -44,6 +44,16 @@ namespace SEE.Layout
         Vector3 CenterPosition { get; set; }
 
         /// <summary>
+        /// X-Z center position of the roof of the node in world space.
+        /// </summary>
+        Vector3 Roof { get; }
+
+        /// <summary>
+        /// X-Z center position of the ground of the node in world space.
+        /// </summary>
+        Vector3 Ground { get; }
+
+        /// <summary>
         /// The set of children of this node. Note: Even nodes for which IsLeaf
         /// returns true, may still have children. Layouts may refuse to layout
         /// the children of a node for which IsLeaf returns true.

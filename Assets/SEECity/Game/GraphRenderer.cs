@@ -354,7 +354,7 @@ namespace SEE.Game
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         public ICollection<LayoutNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
         {
-            return ToLayoutNodes(gameObjects, leafNodeFactory);
+            return ToLayoutNodes(gameObjects, leafNodeFactory, innerNodeFactory);
         }
 
         /// <summary>
@@ -363,8 +363,12 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
         /// <param name="leafNodeFactory">the leaf node factory that created the leaf nodes in <paramref name="gameNodes"/></param>
+        /// <param name="innerNodeFactory">the inner node factory that created the inner nodes in <paramref name="gameNodes"/></param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        private ICollection<LayoutNode> ToLayoutNodes(ICollection<GameObject> gameNodes, NodeFactory leafNodeFactory)
+        private ICollection<LayoutNode> ToLayoutNodes
+            (ICollection<GameObject> gameNodes, 
+            NodeFactory leafNodeFactory,
+            NodeFactory innerNodeFactory)
         {
             IList<LayoutNode> result = new List<LayoutNode>();
             Dictionary<Node, GameNode> to_layout_node = new Dictionary<Node, GameNode>();
@@ -378,7 +382,7 @@ namespace SEE.Game
                 }
                 else
                 {
-                    result.Add(new GameNode(to_layout_node, gameObject));
+                    result.Add(new GameNode(to_layout_node, gameObject, innerNodeFactory));
                 }
             }
             LayoutNodes.SetLevels(result);
