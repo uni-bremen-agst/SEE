@@ -40,30 +40,10 @@ namespace SEE.Layout
                 Vector3 end = edgesAboveBlocks ? blockFactory.Roof(gameNodes[targetObject])
                                                : blockFactory.Ground(gameNodes[targetObject]);
 
-                // The offset of the edges above or below the ground chosen relative 
-                // to the distance between the two blocks.
-                // We are using a value relative to the distance so that edges 
-                // connecting close blocks do not shoot into the sky. Otherwise they
-                // would be difficult to read. Likewise, edges connecting blocks farther
-                // away should go higher so that we avoid edge and node crossings.
-                // This heuristic may help to better read the edges.
-
-                // This offset is used to draw the line somewhat below
-                // or above the house (depending on the orientation).
-                float offset = 1.5f * Vector3.Distance(start, end); // must be positive
-                // The level at which edges are drawn.
-                float edgeLevel = edgesAboveBlocks ? Mathf.Max(start.y, end.y) + offset
-                                             : Mathf.Min(start.y, end.y) - offset;
-
-                Vector3[] controlPoints = new Vector3[4];
-                controlPoints[0] = start;
-                controlPoints[1] = Vector3.Lerp(start, end, 0.333333f);
-                controlPoints[1].y = edgeLevel;
-                controlPoints[2]   = Vector3.Lerp(start, end, 0.666666f);
-                controlPoints[3].y = edgeLevel;
-                controlPoints[3]= end;
-
-                BSplineFactory.Draw(gameEdge, controlPoints, edgeWidth * blockFactory.Unit, edgeMaterial);
+                LineFactory.Draw(gameEdge, 
+                                 LinePoints.SplineLinePoints(start, end, edgesAboveBlocks), 
+                                 edgeWidth * blockFactory.Unit, 
+                                 edgeMaterial);
                 result.Add(gameEdge);
             }
             return result;

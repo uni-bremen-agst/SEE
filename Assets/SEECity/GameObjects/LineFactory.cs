@@ -70,5 +70,27 @@ namespace SEE.GO
             line.endWidth = width;
         }
 
+        public static void Draw(GameObject edge, Vector3[] linePoints, float width, Material material = null)
+        {
+            LineRenderer line = edge.GetComponent<LineRenderer>();
+            if (line == null)
+            {
+                // edge does not yet have a renderer; we add a new one
+                line = edge.AddComponent<LineRenderer>();
+            }
+            line.useWorldSpace = true;
+            if (material != null)
+            {
+                // use sharedMaterial if changes to the original material should affect all
+                // objects using this material; renderer.material instead will create a copy
+                // of the material and will not be affected by changes of the original material
+                line.sharedMaterial = material;
+            }
+            line.positionCount = linePoints.Length; // number of vertices       
+            line.SetPositions(linePoints);
+            SetDefaults(line);
+            SetWidth(line, width);
+            SetColors(line);
+        }
     }
 }
