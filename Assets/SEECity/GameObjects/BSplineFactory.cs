@@ -8,6 +8,31 @@ namespace SEE.GO
     /// </summary>
     class BSplineFactory
     {
+        public static void Draw(GameObject edge, Vector3[] controlPoints, float width, Material material = null)
+        {
+            Vector3[] splinePoints = LinePoints(controlPoints);
+
+            LineRenderer line = edge.GetComponent<LineRenderer>();
+            if (line == null)
+            {
+                // edge does not yet have a renderer; we add a new one
+                line = edge.AddComponent<LineRenderer>();
+            }
+            line.useWorldSpace = true;
+            if (material != null)
+            {
+                // use sharedMaterial if changes to the original material should affect all
+                // objects using this material; renderer.material instead will create a copy
+                // of the material and will not be affected by changes of the original material
+                line.sharedMaterial = material;
+            }
+            line.positionCount = splinePoints.Length; // number of vertices       
+            line.SetPositions(splinePoints);
+            LineFactory.SetDefaults(line);
+            LineFactory.SetWidth(line, width);
+            LineFactory.SetColors(line);
+        }
+
         /// <summary>
         /// Serializes the co-ordinates of all given vectors as a list.
         /// E.g., The list {(1.0, 2.0, 3.0), (4.0, 5.0, 6.0)} is serialized 
@@ -26,46 +51,6 @@ namespace SEE.GO
             }
             return result;
         }
-
-        /// <summary>
-        /// Deserializes the given co-oordindates back into 3D vectors.
-        /// E.g., The list {1.0, 2.0, 3.0, 4.0, 5.0, 6.0} is deserialized 
-        /// into {(1.0, 2.0, 3.0), (4.0, 5.0, 6.0)}.
-        /// </summary>
-        /// <param name="values">co-ordinates to be deserialized</param>
-        /// <returns>Deserialized vectors having the given co-ordinates</returns>
-        /*
-        private static IList<Vector3> ListToVectors(IList<double> values)
-        {
-            List<Vector3> result = new List<Vector3>();
-
-            int i = 0;
-            // Random value; this value will not never be added based on the
-            // logic of the loop, but the compiler forces us to initialize v.
-            Vector3 v = Vector3.zero; 
-            foreach (double value in values)
-            {
-                switch(i)
-                    {
-                    case 0:
-                        v = new Vector3();
-                        v.x = (float)value;
-                        i++;
-                        break;
-                    case 1:
-                        v.y = (float)value;
-                        i++;
-                        break;
-                    case 2:
-                        v.z = (float)value;
-                        result.Add(v);
-                        i = 0;
-                        break;
-                }
-            }
-            return result;
-        }
-        */
 
         /// <summary>
         /// Deserializes the given co-oordindates back into 3D vectors.
@@ -105,8 +90,16 @@ namespace SEE.GO
             return result;
         }
 
+        /// <summary>
+        /// Number of dimensions. Here: 3D.
+        /// </summary>
         private const int dimensions = 3;
 
+        /// <summary>
+        /// Returns the B-spline for the given <paramref name="controlPoints"/>.
+        /// </summary>
+        /// <param name="controlPoints">control points of the B-spline</param>
+        /// <returns>B-spline constrained by the given <paramref name="controlPoints"/></returns>
         private static TinySpline.BSpline Spline(IList<Vector3> controlPoints)
         {
             // Create a cubic spline with 7 control points in 3D using
@@ -114,7 +107,9 @@ namespace SEE.GO
             // BSpline spline = new BSpline(7, 2, 3, BSplineType.CLAMPED);
             TinySpline.BSpline spline = new TinySpline.BSpline(7, dimensions);
 
-            // Setup control points.
+            // Setup control points. Note: This looks like a superflous assignment,
+            // but in fact is a call to the setter of the property with a side effect
+            // on spline.
             IList<double> ctrlp = spline.controlPoints;
             return spline;
         }
@@ -125,7 +120,12 @@ namespace SEE.GO
         /// </summary>
         public static float tension = 0.85f; // 0.85 is the value recommended by Holten
 
-        public static void Draw(GameObject edge, Vector3[] controlPoints, float width, Material material = null)
+        /// <summary>
+        /// Returns the points of the line along the B-spline constrained by the given <paramref name="controlPoints"/>.
+        /// </summary>
+        /// <param name="controlPoints">control points of the B-spline</param>
+        /// <returns>points of the line along the B-spline</returns>
+        private static Vector3[] LinePoints(Vector3[] controlPoints)
         {
             // Create a cubic spline with control points in 3D using a clamped knot vector.
             TinySpline.BSpline spline = new TinySpline.BSpline((uint)controlPoints.Length, dimensions)
@@ -135,28 +135,7 @@ namespace SEE.GO
             };
 
             IList<double> list = spline.buckle(tension).sample();
-
-            Vector3[] splinePoints = ListToVectors(list);
-
-            LineRenderer line = edge.GetComponent<LineRenderer>();
-            if (line == null)
-            {
-                // edge does not yet have a renderer; we add a new one
-                line = edge.AddComponent<LineRenderer>();
-            }
-            line.useWorldSpace = true;
-            if (material != null)
-            {
-                // use sharedMaterial if changes to the original material should affect all
-                // objects using this material; renderer.material instead will create a copy
-                // of the material and will not be affected by changes of the original material
-                line.sharedMaterial = material;
-            }
-            line.positionCount = splinePoints.Length; // number of vertices       
-            line.SetPositions(splinePoints);
-            LineFactory.SetDefaults(line);
-            LineFactory.SetWidth(line, width);
-            LineFactory.SetColors(line);
+            return ListToVectors(list);
         }
     }
 }
