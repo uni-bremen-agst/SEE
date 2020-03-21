@@ -19,9 +19,6 @@ namespace SEE.Layout
         {
             List<GameObject> result = new List<GameObject>();
 
-            SetGameNodes(nodes);
-            float maxBlockHeight = GetMaxBlockHeight(nodes);
-
             Material edgeMaterial = new Material(defaultLineMaterial);
             if (edgeMaterial == null)
             {
@@ -29,8 +26,7 @@ namespace SEE.Layout
                 return result;
             }
 
-            Vector3 levelUnit = Vector3.zero;
-            levelUnit.y = maxBlockHeight;
+            SetGameNodes(nodes);
 
             foreach (Edge edge in graph.ConnectingEdges(gameNodes.Keys))
             {
@@ -39,19 +35,34 @@ namespace SEE.Layout
 
                 GameObject gameEdge = NewGameEdge(edge);
 
-                Vector3 sourcePosition = edgesAboveBlocks ? blockFactory.Roof(gameNodes[sourceObject])
-                                                          : blockFactory.Ground(gameNodes[sourceObject]);
-                Vector3 targetPosition = edgesAboveBlocks ? blockFactory.Roof(gameNodes[targetObject])
-                                                          : blockFactory.Ground(gameNodes[targetObject]);
+                Vector3 start = edgesAboveBlocks ? blockFactory.Roof(gameNodes[sourceObject])
+                                                 : blockFactory.Ground(gameNodes[sourceObject]);
+                Vector3 end = edgesAboveBlocks ? blockFactory.Roof(gameNodes[targetObject])
+                                               : blockFactory.Ground(gameNodes[targetObject]);
 
-                float factor = edgesAboveBlocks ? 1.0f : -1.0f;
+                // The offset of the edges above or below the ground chosen relative 
+                // to the distance between the two blocks.
+                // We are using a value relative to the distance so that edges 
+                // connecting close blocks do not shoot into the sky. Otherwise they
+                // would be difficult to read. Likewise, edges connecting blocks farther
+                // away should go higher so that we avoid edge and node crossings.
+                // This heuristic may help to better read the edges.
 
-                Vector3[] controlPoints = new Vector3[] {
-                    sourcePosition,
-                    factor * (Vector3.Lerp(sourcePosition, targetPosition, 0.3f) + levelUnit),
-                    factor * (Vector3.Lerp(sourcePosition, targetPosition, 0.7f) + levelUnit),
-                    targetPosition
-                };
+                // This offset is used to draw the line somewhat below
+                // or above the house (depending on the orientation).
+                float offset = 1.5f * Vector3.Distance(start, end); // must be positive
+                // The level at which edges are drawn.
+                float edgeLevel = edgesAboveBlocks ? Mathf.Max(start.y, end.y) + offset
+                                             : Mathf.Min(start.y, end.y) - offset;
+
+                Vector3[] controlPoints = new Vector3[4];
+                controlPoints[0] = start;
+                controlPoints[1] = Vector3.Lerp(start, end, 0.333333f);
+                controlPoints[1].y = edgeLevel;
+                controlPoints[2]   = Vector3.Lerp(start, end, 0.666666f);
+                controlPoints[3].y = edgeLevel;
+                controlPoints[3]= end;
+
                 BSplineFactory.Draw(gameEdge, controlPoints, edgeWidth * blockFactory.Unit, edgeMaterial);
                 result.Add(gameEdge);
             }
