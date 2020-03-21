@@ -18,7 +18,7 @@ namespace SEE.Layout
         /// <summary>
         /// The node factory that created the game object. Required to obtain scaling information.
         /// </summary>
-        private readonly NodeFactory leafNodeFactory;
+        private readonly NodeFactory nodeFactory;
         /// <summary>
         /// The graph node attached to gameObject.
         /// </summary>
@@ -37,7 +37,7 @@ namespace SEE.Layout
 
         /// <summary>
         /// Constructor in cases where <paramref name="gameObject"/> is not a leaf and was created by 
-        /// a <paramref name="nodeFactory"/>..
+        /// a <paramref name="nodeFactory"/>.
         /// </summary>
         /// <param name="to_layout_node">the mapping of graph nodes onto GameNodes this node should be added to</param>
         /// <param name="gameObject">the game object this layout node represents</param>
@@ -46,21 +46,10 @@ namespace SEE.Layout
         public GameNode(Dictionary<Node, GameNode> to_layout_node, GameObject gameObject, NodeFactory nodeFactory)
         {
             this.gameObject = gameObject;
-            this.leafNodeFactory = nodeFactory;
+            this.nodeFactory = nodeFactory;
             this.node = this.gameObject.GetComponent<NodeRef>().node;
             this.to_layout_node = to_layout_node;
             to_layout_node[node] = this;
-        }
-
-        /// <summary>
-        /// Constructor in cases where <paramref name="gameObject"/> is an inner not created by a 
-        /// <paramref name="nodeFactory"/> for leaf nodes.
-        /// </summary>
-        /// <param name="to_layout_node">the mapping of graph nodes onto GameNodes this node should be added to</param>
-        /// <param name="gameObject">the game object this layout node represents</param>
-        public GameNode(Dictionary<Node, GameNode> to_layout_node, GameObject gameObject)
-            : this(to_layout_node, gameObject, null)
-        {
         }
 
         /// <summary>
@@ -120,25 +109,11 @@ namespace SEE.Layout
         {
             get
             {
-                if (node.IsLeaf())
-                {
-                    return leafNodeFactory.GetSize(gameObject);
-                }
-                else
-                {
-                    return gameObject.transform.localScale;
-                }
+                return nodeFactory.GetSize(gameObject);
             }
             set
             {
-                if (node.IsLeaf())
-                {
-                    leafNodeFactory.SetSize(gameObject, value);
-                }
-                else
-                {
-                    gameObject.transform.localScale = value;
-                }
+                nodeFactory.SetSize(gameObject, value);
             }
         }
 
@@ -149,28 +124,36 @@ namespace SEE.Layout
         {
             get
             {
-                if (node.IsLeaf())
-                {
-                    return leafNodeFactory.GetCenterPosition(gameObject);
-                }
-                else
-                {
-                    return gameObject.transform.position;
-                }
+                return nodeFactory.GetCenterPosition(gameObject);
             }
             set
             {
-                if (node.IsLeaf())
-                {
-                    Vector3 groundPosition = value;
-                    Vector3 extent = leafNodeFactory.GetSize(gameObject) / 2.0f;
-                    groundPosition.y -= extent.y;
-                    leafNodeFactory.SetGroundPosition(gameObject, groundPosition);
-                }
-                else
-                {
-                    gameObject.transform.position = value;
-                }
+                Vector3 groundPosition = value;
+                Vector3 extent = nodeFactory.GetSize(gameObject) / 2.0f;
+                groundPosition.y -= extent.y;
+                nodeFactory.SetGroundPosition(gameObject, groundPosition);
+            }
+        }
+
+        /// <summary>
+        /// X-Z center position of the roof of the node in world space.
+        /// </summary>
+        public Vector3 Roof
+        {
+            get
+            {
+                return nodeFactory.Roof(gameObject);
+            }
+        }
+
+        /// <summary>
+        /// X-Z center position of the ground of the node in world space.
+        /// </summary>
+        public Vector3 Ground
+        {
+            get
+            {
+                return nodeFactory.Ground(gameObject);
             }
         }
 
