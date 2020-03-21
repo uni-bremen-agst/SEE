@@ -107,22 +107,36 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Yields the greatest y co-ordinate of all nodes given.
+        /// Yields the greatest and smallest y co-ordinate and the maximal height of all <paramref name="nodes"/> given.
+        /// 
+        /// Precondition: <paramref name="nodes"/> is not empty.
         /// </summary>
-        /// <param name="nodes">list of nodes whose greatest y co-ordinate is required</param>
-        /// <returns>greatest y co-ordinate of all nodes given</returns>
-        protected float GetMaxBlockHeight(ICollection<GameObject> nodes)
+        /// <param name="nodes">list of nodes whose greatest and smallest y co-ordinate is required</param>
+        /// <param name="minY">smallest y co-ordinate</param>
+        /// <param name="maxY">highest x co-ordinate</param>
+        /// <param name="maxHeight">maximal height of nodes</param>
+        protected void MinMaxBlockY(ICollection<GameObject> nodes, out float minY, out float maxY, out float maxHeight)
         {
-            float result = Mathf.NegativeInfinity;
+            maxY = Mathf.NegativeInfinity;
+            minY = Mathf.Infinity;
+            maxHeight = 0.0f;
             foreach (GameObject node in nodes)
             {
                 float y = blockFactory.Roof(node).y;
-                if (y > result)
+                if (y > maxY)
                 {
-                    result = y;
+                    maxY = y;
+                }
+                else if (y < minY)
+                {
+                    minY = y;
+                }
+                float h = blockFactory.GetSize(node).y;
+                if (h > maxHeight)
+                {
+                    maxHeight = h;
                 }
             }
-            return result;
         }
 
         /// <summary>

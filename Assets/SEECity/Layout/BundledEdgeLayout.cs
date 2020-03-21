@@ -58,7 +58,10 @@ namespace SEE.Layout
                 if (source != null && target != null)
                 {
                     go.name = edge.Type + "(" + source.LinkName + ", " + target.LinkName + ")";
-                    BSplineFactory.Draw(go, GetControlPoints(source, target, lca, maxDepth), edgeWidth * blockFactory.Unit, newMat);
+                    LineFactory.Draw(go,
+                                     LinePoints.BSplineLinePoints(GetControlPoints(source, target, lca, maxDepth)), 
+                                     edgeWidth * blockFactory.Unit, 
+                                     newMat);
                 }
                 else
                 {
