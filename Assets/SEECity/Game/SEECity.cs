@@ -64,6 +64,10 @@ namespace SEE.Game
         /// The relative path for the CSV file containing the node metrics.
         /// </summary>
         public string csvPath = "..\\Data\\GXL\\linux-clones\\net.csv";
+        /// <summary>
+        /// The relative path for the DYN file containing the dynamic call graph.
+        /// </summary>
+        public string dynPath = "..\\Data\\DYN\\example_02.dyn";
 
         // Larger clone graph with single root (Linux directory "drivers"): 16.920 nodes, 10583 edges.
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\drivers.gxl";
@@ -72,6 +76,11 @@ namespace SEE.Game
         // Medium size include graph with single root (OpenSSL).
         //public string gxlPath = "..\\Data\\GXL\\OpenSSL\\openssl-include.gxl";
         //public string csvPath = "..\\Data\\GXL\\OpenSSL\\openssl-include.csv";
+        
+        // Examples for dynamic call graphs
+        //public string gxlPath = "..\\Data\\GXL\\dynamic-tests\\example_02.gxl";
+        //public string csvPath = "..\\Data\\GXL\\dynamic-tests\\empty.csv";
+        //public string dynPath = "..\\Data\\DYN\\example_02.dyn";
 
         /// <summary>
         /// Returns the concatenation of pathPrefix and gxlPath. That is the complete
@@ -91,6 +100,32 @@ namespace SEE.Game
         public string CSVPath()
         {
             return PathPrefix + csvPath;
+        }
+
+        /// <summary>
+        /// Returns the concatenation of pathPrefix and dynPath. That is the complete
+        /// absolute path to the DYN file containing the additional metric values.
+        /// </summary>
+        /// <returns>concatenation of pathPrefix and dynPath</returns>
+        public string DYNPath()
+        {
+            return PathPrefix + dynPath;
+        }
+
+        /// <summary>
+        /// Loads the dynamic data from the DYN file with DYNPath() and adds them to the graph.
+        /// Precondition: graph must have been loaded before.
+        /// </summary>
+        private void LoadDYN()
+        {
+            CallTreeReader callTreeReader = new CallTreeReader(DYNPath(), new SEELogger());
+            callTreeReader.Load();
+
+            GameObject runtimeGO = new GameObject();
+            runtimeGO.transform.parent = transform;
+            runtimeGO.name = Tags.Runtime;
+            runtimeGO.tag = Tags.Runtime;
+            runtimeGO.AddComponent<Runtime.Runtime>().callTree = callTreeReader.CallTree;
         }
 
         /// <summary>
@@ -131,6 +166,10 @@ namespace SEE.Game
             {
                 graph = LoadGraph(GXLPath());
                 LoadMetrics();
+                if (DynamicCallGraph)
+                {
+                    LoadDYN();
+                }
                 DrawGraph();
             }
         }

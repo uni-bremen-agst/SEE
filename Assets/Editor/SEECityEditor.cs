@@ -17,8 +17,22 @@ namespace SEEEditor
 
             SEECity city = target as SEECity;
 
+
             city.gxlPath = EditorGUILayout.TextField("GXL file", city.gxlPath);
             city.csvPath = EditorGUILayout.TextField("CSV file", city.csvPath);
+            EditorGUI.BeginDisabledGroup(!city.DynamicCallGraph);
+            {
+                const string dynFileLabel = "DYN file";
+                if (city.DynamicCallGraph)
+                {
+                    city.dynPath = EditorGUILayout.TextField(dynFileLabel, city.dynPath);
+                }
+                else
+                {
+                    city.dynPath = EditorGUILayout.TextField(new GUIContent(dynFileLabel, "Enable 'Load dynamic call graph' to edit!"), city.dynPath);
+                }
+            }
+            EditorGUI.EndDisabledGroup();
 
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Load City"))
