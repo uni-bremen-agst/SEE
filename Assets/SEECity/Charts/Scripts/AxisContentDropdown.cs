@@ -2,7 +2,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace SEECity.Charts.Scripts
+namespace SEE.Charts.Scripts
 {
 	/// <summary>
 	/// Manages results and options of <see cref="TMP_Dropdown" />s used to select what metric to display

@@ -1,7 +1,7 @@
 ﻿using SEE;
 using UnityEngine;
 
-namespace SEECity.Charts.Scripts
+namespace SEE.Charts.Scripts
 {
 	/// <summary>
 	/// Sets the active states of different layers of the chart UI.

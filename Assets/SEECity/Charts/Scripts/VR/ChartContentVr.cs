@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEECity.Charts.Scripts.VR
+namespace SEE.Charts.Scripts.VR
 {
 	/// <summary>
 	/// The virtual reality version of <see cref="ChartContent" />.

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEECity.Charts.Scripts.VR
+namespace SEE.Charts.Scripts.VR
 {
 	/// <summary>
 	/// Handles setup of new charts entering the scene.
@@ -13,7 +13,7 @@ namespace SEECity.Charts.Scripts.VR
 		/// </summary>
 		private void Awake()
 		{
-			Camera eventCamera = GetComponent<Canvas>().worldCamera =
+			var eventCamera = GetComponent<Canvas>().worldCamera =
 				GameObject.FindGameObjectWithTag("Pointer").GetComponent<Camera>();
 			eventCamera.enabled = false;
 		}

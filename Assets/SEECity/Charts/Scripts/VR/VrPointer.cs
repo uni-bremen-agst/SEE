@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.EventSystems;
 
-namespace SEECity.Charts.Scripts.VR
+namespace SEE.Charts.Scripts.VR
 {
 	/// <summary>
 	/// Manages the pointer used to interact with canvases in VR.
@@ -81,14 +80,14 @@ namespace SEECity.Charts.Scripts.VR
 		/// </summary>
 		private void UpdateLine()
 		{
-			PointerEventData data = _inputModule.EventData;
-			RaycastHit hit = CreateRaycast();
-			float colliderDistance = hit.distance.Equals(0f) ? _pointerLength : hit.distance;
-			float canvasDistance = data.pointerCurrentRaycast.distance.Equals(0f)
+			var data = _inputModule.EventData;
+			var hit = CreateRaycast();
+			var colliderDistance = hit.distance.Equals(0f) ? _pointerLength : hit.distance;
+			var canvasDistance = data.pointerCurrentRaycast.distance.Equals(0f)
 				? _pointerLength
 				: data.pointerCurrentRaycast.distance;
-			float targetLength = Mathf.Min(colliderDistance, canvasDistance);
-			Vector3 hitPosition = transform.position + transform.forward * targetLength;
+			var targetLength = Mathf.Min(colliderDistance, canvasDistance);
+			var hitPosition = transform.position + transform.forward * targetLength;
 			hitDot.transform.position = hitPosition;
 			_lineRenderer.SetPosition(0, transform.position);
 			_lineRenderer.SetPosition(1, hitPosition);
@@ -100,8 +99,8 @@ namespace SEECity.Charts.Scripts.VR
 		/// <returns>Information about the hit.</returns>
 		private RaycastHit CreateRaycast()
 		{
-			Ray ray = new Ray(transform.position, transform.forward);
-			Physics.Raycast(ray, out RaycastHit hitData, _pointerLength);
+			var ray = new Ray(transform.position, transform.forward);
+			Physics.Raycast(ray, out var hitData, _pointerLength);
 
 			return hitData;
 		}

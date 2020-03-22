@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEECity.Charts.Scripts.VR
+namespace SEE.Charts.Scripts.VR
 {
 	/// <summary>
 	/// The VR version of <see cref="ChartCreator" />.

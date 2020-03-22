@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 
-namespace SEECity.Charts.Scripts
+namespace SEE.Charts.Scripts
 {
 	/// <summary>
 	/// Fills Charts with data and manages that data.
@@ -682,11 +682,9 @@ namespace SEECity.Charts.Scripts
 				if (!activeMarker.Equals(null))
 				{
 					var script = activeMarker.GetComponent<ChartMarker>();
-					if (script.linkedObject.Equals(highlight))
-					{
-						script.TriggerTimedHighlight(chartManager.highlightDuration, false);
-						break;
-					}
+					if (!script.linkedObject.Equals(highlight)) continue;
+					script.TriggerTimedHighlight(chartManager.highlightDuration, false);
+					break;
 				}
 		}
 

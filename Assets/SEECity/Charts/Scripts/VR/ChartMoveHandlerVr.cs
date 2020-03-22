@@ -2,7 +2,7 @@
 using UnityEngine.EventSystems;
 using Valve.VR;
 
-namespace SEECity.Charts.Scripts.VR
+namespace SEE.Charts.Scripts.VR
 {
 	/// <summary>
 	/// Handles the dragging and minimization of charts in VR.

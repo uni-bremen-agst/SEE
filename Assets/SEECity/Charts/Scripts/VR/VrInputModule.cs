@@ -2,7 +2,7 @@
 using UnityEngine.EventSystems;
 using Valve.VR;
 
-namespace SEECity.Charts.Scripts.VR
+namespace SEE.Charts.Scripts.VR
 {
 	/// <summary>
 	/// Extends the standard <see cref="BaseInputModule" /> for usage in VR.
@@ -71,11 +71,12 @@ namespace SEECity.Charts.Scripts.VR
 		{
 			eventSystem.RaycastAll(EventData, m_RaycastResultCache);
 			EventData.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
-			Ray ray = new Ray(_pointer.transform.position, _pointer.transform.forward);
-			Physics.Raycast(ray, out RaycastHit hitData, _chartManager.pointerLength);
-			float colliderDistance =
-				hitData.distance.Equals(0f) ? _chartManager.pointerLength : hitData.distance;
-			float canvasDistance = EventData.pointerCurrentRaycast.distance.Equals(0f)
+			var ray = new Ray(_pointer.transform.position, _pointer.transform.forward);
+			Physics.Raycast(ray, out var hitData, _chartManager.pointerLength);
+			var colliderDistance = hitData.distance.Equals(0f)
+				? _chartManager.pointerLength
+				: hitData.distance;
+			var canvasDistance = EventData.pointerCurrentRaycast.distance.Equals(0f)
 				? _chartManager.pointerLength
 				: EventData.pointerCurrentRaycast.distance;
 
@@ -124,8 +125,7 @@ namespace SEECity.Charts.Scripts.VR
 		/// </summary>
 		private void Release(GameObject hitObject)
 		{
-			GameObject pointerRelease =
-				ExecuteEvents.GetEventHandler<IPointerClickHandler>(hitObject);
+			var pointerRelease = ExecuteEvents.GetEventHandler<IPointerClickHandler>(hitObject);
 
 			if (EventData.pointerPress == pointerRelease)
 				ExecuteEvents.Execute(EventData.pointerPress, EventData,

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace SEECity.Charts.Scripts
+namespace SEE.Charts.Scripts
 {
 	/// <summary>
-	/// Manages the highlighting and visibility of <see cref="SEE.DataModel.Node" />s.
+	/// Manages the highlighting and visibility of <see cref="DataModel.Node" />s.
 	/// </summary>
 	public class NodeHighlights : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
 		IPointerClickHandler
