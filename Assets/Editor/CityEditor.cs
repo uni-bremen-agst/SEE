@@ -175,7 +175,6 @@ namespace SEEEditor
                 editorSettings.CoseGraphSettings.EdgeLength = EditorGUILayout.IntField("Edge length", editorSettings.CoseGraphSettings.EdgeLength);
                 editorSettings.CoseGraphSettings.UseSmartIdealEdgeCalculation = EditorGUILayout.Toggle("Smart ideal edge length", editorSettings.CoseGraphSettings.UseSmartIdealEdgeCalculation);
                 editorSettings.CoseGraphSettings.PerLevelIdealEdgeLengthFactor = EditorGUILayout.DoubleField("Level edge length factor", editorSettings.CoseGraphSettings.PerLevelIdealEdgeLengthFactor);
-                editorSettings.CoseGraphSettings.Incremental = EditorGUILayout.Toggle("Incremental", editorSettings.CoseGraphSettings.Incremental);
                 editorSettings.CoseGraphSettings.multiLevelScaling = EditorGUILayout.Toggle("MultiLevelscaling", editorSettings.CoseGraphSettings.multiLevelScaling);
                 editorSettings.CoseGraphSettings.UseSmartRepulsionRangeCalculation = EditorGUILayout.Toggle("Smart repulsion range", editorSettings.CoseGraphSettings.UseSmartRepulsionRangeCalculation);
                 editorSettings.CoseGraphSettings.RepulsionStrength = EditorGUILayout.DoubleField("Repulsion Strength", editorSettings.CoseGraphSettings.RepulsionStrength);

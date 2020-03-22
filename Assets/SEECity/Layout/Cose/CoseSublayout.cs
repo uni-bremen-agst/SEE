@@ -232,7 +232,6 @@ namespace SEE.Layout
             }
 
             SetCoseNodeToLayoutPosition();
-            //root.SetIntergraphEdgesToSublayoutRoot();
         }
 
         /// <summary>

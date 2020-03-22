@@ -100,7 +100,7 @@ namespace SEE.Layout
         /// Sets scaler according to the user's choice (settings).
         /// </summary>
         /// <param name="graph">graph whose node metrics are to be scaled</param>
-        private void SetScaler(Graph graph)
+        protected void SetScaler(Graph graph)
         {
             List<string> nodeMetrics = new List<string>() { settings.WidthMetric, settings.HeightMetric, settings.DepthMetric, settings.ColorMetric };
             nodeMetrics.AddRange(settings.AllLeafIssues());
@@ -124,30 +124,6 @@ namespace SEE.Layout
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
         protected void EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
         {
-            Dictionary<Node, GameObject> nodeMap = new Dictionary<Node, GameObject>();
-
-            foreach (GameObject gameNode in gameNodes)
-            {
-                NodeRef nodeRef = gameNode.GetComponent<NodeRef>();
-                if (nodeRef != null)
-                {
-                    nodeMap[nodeRef.node] = gameNode;
-                }
-                else
-                {
-                    throw new System.Exception("game node without graph node component");
-                }
-            }
-
-            foreach (Edge edge in graph.ConnectingEdges(nodeMap.Keys))
-            {
-                Vector3 sourcePosition = leafNodeFactory.Ground(nodeMap[edge.Source]);
-                                                         
-                Vector3 targetPosition = leafNodeFactory.Ground(nodeMap[edge.Target]);
-
-                edge.dist = Vector3.Distance(sourcePosition, targetPosition);
-            }
-
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
             {
@@ -169,6 +145,37 @@ namespace SEE.Layout
             Performance p = Performance.Begin(layout.Name + " layout of edges");
             layout.DrawEdges(graph, gameNodes);
             p.End();
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="gameNodes"></param>
+        protected void EdgeDistCalculation(Graph graph, ICollection<GameObject> gameNodes)
+        {
+            Dictionary<Node, GameObject> nodeMap = new Dictionary<Node, GameObject>();
+
+            foreach (GameObject gameNode in gameNodes)
+            {
+                NodeRef nodeRef = gameNode.GetComponent<NodeRef>();
+                if (nodeRef != null)
+                {
+                    nodeMap[nodeRef.node] = gameNode;
+                }
+                else
+                {
+                    throw new System.Exception("game node without graph node component");
+                }
+            }
+
+            foreach (Edge edge in graph.ConnectingEdges(nodeMap.Keys))
+            {
+                Vector3 sourcePosition = leafNodeFactory.Ground(nodeMap[edge.Source]);
+
+                Vector3 targetPosition = leafNodeFactory.Ground(nodeMap[edge.Target]);
+
+                edge.dist = Vector3.Distance(sourcePosition, targetPosition);
+            }
         }
 
         /// <summary>
@@ -194,6 +201,7 @@ namespace SEE.Layout
 
             if (settings.NodeLayout == GraphSettings.NodeLayouts.CompoundSpringEmbedder && coseGraphSettings.useOptAlgorithm)
             {
+                AddContainers(nodeMap, nodes);
                 FindOptimalSolution(graph, nodes, nodeMap);
             }
 
@@ -224,9 +232,16 @@ namespace SEE.Layout
                     layout = new CirclePackingNodeLayout(groundLevel, leafNodeFactory).Layout(nodeMap.Values);
                     break;
                 case GraphSettings.NodeLayouts.CompoundSpringEmbedder:
-                    sublayoutNodes = SetContainersCompoundSpringEmbedder(nodeMap, nodes); 
-
+                    if (!settings.CoseGraphSettings.useOptAlgorithm)
+                    {
+                        //AddContainers(nodeMap, nodes); // and inner nodes
+                        sublayoutNodes = SetContainersCompoundSpringEmbedder(nodeMap, nodes);
+                    }
+                   
                     bool isCircle = false;
+                    
+
+                   
                     if (settings.InnerNodeObjects == GraphSettings.InnerNodeKinds.Circles || settings.InnerNodeObjects == GraphSettings.InnerNodeKinds.Circles || settings.InnerNodeObjects == GraphSettings.InnerNodeKinds.Circles)
                     {
                         isCircle = true;
@@ -281,20 +296,22 @@ namespace SEE.Layout
                     AddDecorations(gameNodes);
                 }
             }
-            
+
+            EdgeDistCalculation(graph, gameNodes);
             EdgeLayout(graph, gameNodes);
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner, leafNodeFactory, innerNodeFactory);
             // Place the plane somewhat under ground level.
             PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, groundLevel - 2.0f, new Color(94f / 255f, 93f / 255f, 92f / 255f));
 
+            // TODO
             Measurements measurements = new Measurements(nodeMap, graph, settings, leftFrontCorner, rightBackCorner);
             measurements.NodesPerformance(p);
         }
 
         private void FindOptimalSolution(Graph graph, List<Node> nodes, Dictionary<Node, GameObject> nodeMap)
         {
-            List<SublayoutNode> sublayoutNodes = SetContainersCompoundSpringEmbedder(nodeMap, nodes);
-            var optAlgo = new OptAlgorithm(settings, groundLevel, leafNodeFactory, innerNodeFactory, graph, sublayoutNodes, nodeMap);
+            List<SublayoutNode> sublayoutNodes = new List<SublayoutNode>();
+            var optAlgo = new OptAlgorithm2(settings, groundLevel, graph, sublayoutNodes, nodeMap, innerNodeFactory, leafNodeFactory);
             optAlgo.StartOptAlgorithm();
         }
 
