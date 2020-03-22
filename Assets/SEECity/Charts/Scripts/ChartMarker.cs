@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace SEECity.Charts.Scripts
+namespace SEE.Charts.Scripts
 {
 	/// <summary>
 	/// Contains the logic for the markers representing entries linked to objects in the chart.
@@ -187,7 +187,7 @@ namespace SEECity.Charts.Scripts
 			else
 			{
 				ShowLinkedObject();
-				HighlightLinkedObjectToggle(true); //TODO: Deactivate when user switches target.
+				HighlightLinkedObjectToggle(true);
 			}
 
 			_waiting = false;
@@ -212,11 +212,9 @@ namespace SEECity.Charts.Scripts
 				{
 					_highlightCopy = Instantiate(linkedObject, linkedObject.transform);
 					_highlightCopy.tag = "Untagged";
-					if (_highlightCopy.TryGetComponent<Renderer>(out Renderer renderer))
-					{
-						renderer.material = _buildingHighlightMaterial;
-					}
-					LineRenderer line = Instantiate(highlightLine, _highlightCopy.transform)
+					if (_highlightCopy.TryGetComponent<Renderer>(out var render))
+						render.material = _buildingHighlightMaterial;
+					var line = Instantiate(highlightLine, _highlightCopy.transform)
 						.GetComponent<LineRenderer>();
 					var linePos = _highlightCopy.transform.localPosition;
 					line.SetPositions(new[]

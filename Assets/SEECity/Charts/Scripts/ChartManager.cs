@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 using UnityEngine.XR;
 using Valve.VR;
 
-namespace SEECity.Charts.Scripts
+namespace SEE.Charts.Scripts
 {
 	/// <summary>
 	/// Contains most settings and some methods needed across all charts.

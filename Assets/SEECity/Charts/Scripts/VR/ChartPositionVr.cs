@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace SEECity.Charts.Scripts.VR
+namespace SEE.Charts.Scripts.VR
 {
 	/// <summary>
 	/// Manages the position of the <see cref="GameObject" /> containing the charts in VR.

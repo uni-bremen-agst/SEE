@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEECity.Charts.Scripts
+namespace SEE.Charts.Scripts
 {
 	/// <summary>
 	/// A line placed above a node in the scene that is highlighted.

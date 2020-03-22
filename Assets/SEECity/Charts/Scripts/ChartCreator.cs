@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEECity.Charts.Scripts
+namespace SEE.Charts.Scripts
 {
 	/// <summary>
 	/// Used to create new charts.

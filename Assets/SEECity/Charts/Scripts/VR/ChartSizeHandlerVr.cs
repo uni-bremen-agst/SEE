@@ -1,16 +1,31 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace SEECity.Charts.Scripts.VR
+namespace SEE.Charts.Scripts.VR
 {
 	/// <summary>
 	/// The VR version of <see cref="ChartSizeHandler" />.
 	/// </summary>
 	public class ChartSizeHandlerVr : ChartSizeHandler
 	{
+		/// <summary>
+		/// The VR version of <see cref="ChartContent" />.
+		/// </summary>
 		private ChartContentVr _chartContentVr;
+
+		/// <summary>
+		/// A world space canvas to use the charts in VR.
+		/// </summary>
 		private RectTransform _virtualRealityCanvas;
+
+		/// <summary>
+		/// A 3D cube serving as background of the chart to not look flat in 3D space.
+		/// </summary>
 		private GameObject _physicalOpen;
+
+		/// <summary>
+		/// The 3D cube representing the chart when minimized.
+		/// </summary>
 		private GameObject _physicalClosed;
 
 		/// <summary>

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace SEECity.Charts.Scripts
+namespace SEE.Charts.Scripts
 {
 	/// <summary>
 	/// Handles the dragging of charts.
