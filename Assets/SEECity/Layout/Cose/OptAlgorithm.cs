@@ -24,6 +24,7 @@ namespace SEE.Layout
         List<SublayoutNode> sublayoutNodes;
         Dictionary<string, double> values = new Dictionary<string, double>();
         Dictionary<string, double> oldValues = new Dictionary<string, double>();
+        Dictionary<List<Double>, Measurements> results = new Dictionary<List<double>, Measurements>();
 
 
         public OptAlgorithm(GraphSettings settings, float groundLevel, NodeFactory leafNodeFactory, InnerNodeFactory innerNodeFactory, Graph graph, List<SublayoutNode> sublayoutNodes, Dictionary<Node, GameObject> nodeMap): base (settings)

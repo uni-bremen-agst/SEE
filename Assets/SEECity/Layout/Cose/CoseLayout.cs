@@ -610,7 +610,7 @@ namespace SEE.Layout
                 }
 
                 distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
-                distance = Math.Sqrt(distanceSquared);
+                distance = Mathf.Sqrt((float)distanceSquared);
 
                 repulsionForce = CoseLayoutSettings.Repulsion_Strength * nodeA.NoOfChildren * nodeB.NoOfChildren / distanceSquared;
 
