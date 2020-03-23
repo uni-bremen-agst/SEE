@@ -123,14 +123,15 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
+        /// <param name="layoutNodes">the subset of layout nodes for which to draw the edges</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
+        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes, ICollection<LayoutNode> layoutNodes)
         {
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
             {
                 case SEECity.EdgeLayouts.Straight:
-                    layout = new StraightEdgeLayout(leafNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
+                    layout = new StraightEdgeLayout(leafNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks, layoutNodes);
                     break;
                 case SEECity.EdgeLayouts.Spline:
                     layout = new SplineEdgeLayout(leafNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
@@ -169,19 +170,18 @@ namespace SEE.Game
             {
                 AddInnerNodes(nodeMap, nodes); // and inner nodes
             }
-            // calculate the layout
-            Dictionary<GameObject, NodeTransform> layout 
-                = ToNodeTransformLayout(NodeLayout.Move(nodeLayout.Layout(ToLayoutNodes(nodeMap.Values)), 
-                                                        settings.origin));
-            // apply the layout
-            Apply(layout);
-            // add all game nodes as children to parent
-            ICollection<GameObject> gameNodes = layout.Keys;
+
+            // calculate and apply the node layout
+            Dictionary<Node, GameObject>.ValueCollection gameNodes = nodeMap.Values;
+            ICollection<LayoutNode> layoutNodes = ToLayoutNodes(gameNodes);
+            nodeLayout.Apply(layoutNodes);
+            NodeLayout.Move(layoutNodes, settings.origin);
+
             AddToParent(gameNodes, parent);
             // add the decorations, too
             AddToParent(AddDecorations(gameNodes), parent);
             // create the laid out edges
-            AddToParent(EdgeLayout(graph, gameNodes), parent);
+            AddToParent(EdgeLayout(graph, gameNodes, layoutNodes), parent);
             // add the plane surrounding all game objects for nodes
             GameObject plane = NewPlane(gameNodes);
             AddToParent(plane, parent);
@@ -339,13 +339,6 @@ namespace SEE.Game
             return decorations;
         }
 
-        /*
-        public Dictionary<GameObject, NodeTransform> Layout(ICollection<GameObject> gameNodes, NodeFactory leafNodeFactory)
-        {
-            return ToNodeTransformLayout(Layout(ToLayoutNodes(gameNodes, leafNodeFactory)));
-        }
-        */
-
         /// <summary>
         /// Transforms the given <paramref name="gameNodes"/> to a collection of LayoutNodes.
         /// Sets the node levels of all <paramref name="gameNodes"/>.
@@ -458,21 +451,6 @@ namespace SEE.Game
         private static bool IsLeaf(GameObject gameNode)
         {
             return gameNode.GetComponent<NodeRef>().node.IsLeaf();
-        }
-
-        /// <summary>
-        /// Applies the layout to all nodes at given origin.
-        /// </summary>
-        /// <param name="layout">node layout to be applied</param>
-        /// <param name="origin">the center origin where the graph should be placed in the world scene</param>
-        private void Apply(Dictionary<GameObject, NodeTransform> layout)
-        {      
-            foreach (var entry in layout)
-            {
-                GameObject gameNode = entry.Key;
-                NodeTransform transform = entry.Value;
-                Apply(gameNode, transform);
-            }
         }
 
         /// <summary>
