@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -100,10 +101,43 @@ namespace SEE.Layout
         }
 
         /// <summary>
+        /// Adds the given <paramref name="offset"/> to every node in <paramref name="layoutNodes"/>.
+        /// </summary>
+        /// <param name="layoutNodes">layout nodes to be adjusted</param>
+        /// <param name="offset">offset to be added</param>
+        public static void Move(ICollection<LayoutNode> layoutNodes, Vector3 offset)
+        {
+            foreach (LayoutNode layoutNode in layoutNodes)
+            {
+                layoutNode.CenterPosition += offset;
+            }
+        }
+
+        /// <summary>
         /// If true, the layout can handle both inner nodes and leaves; otherwise
         /// only leaves.
         /// </summary>
         /// <returns>whether the layout can handle hierarchical graphs</returns>
         public abstract bool IsHierarchical();
+
+        /// <summary>
+        /// Calculates and applies the layout to the given <paramref name="layoutNodes"/>.
+        /// </summary>
+        /// <param name="layoutNodes">nodes for which to apply the layout</param>
+        public void Apply(ICollection<LayoutNode> layoutNodes)
+        {
+            Dictionary<LayoutNode, NodeTransform> layout = Layout(layoutNodes);
+            foreach (var entry in layout)
+            {
+                LayoutNode node = entry.Key;
+                NodeTransform transform = entry.Value;
+                // y co-ordinate of transform.position refers to the ground
+                Vector3 position = transform.position;
+                position.y += transform.scale.y / 2.0f;
+                node.CenterPosition = position;
+                node.Scale = transform.scale;
+                node.Rotation = transform.rotation;
+            }
+        }
     }
 }
