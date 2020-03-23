@@ -29,7 +29,7 @@ namespace SEE.Layout
             SetGameNodes(nodes);
             maxDepth = graph.GetMaxDepth();
             // The distance between of the control points at the subsequent levels of the hierarchy.
-            levelUnit = MaximalNodeHeight();
+            minY = MaximalNodeHeight();
 
             Material newMat = new Material(defaultLineMaterial);
             if (newMat == null)
@@ -139,29 +139,22 @@ namespace SEE.Layout
                         Node lcaNode = lcaNodeRef.node;
 
                         Node[] sourceToLCA = Ancestors(source, lcaNode);
-                        Debug.Assert(sourceToLCA.Length > 1);
-                        Debug.Assert(sourceToLCA[0] == source);
-                        Debug.Assert(sourceToLCA[sourceToLCA.Length - 1] == lcaNode);
+                        //Debug.Assert(sourceToLCA.Length > 1);
+                        //Debug.Assert(sourceToLCA[0] == source);
+                        //Debug.Assert(sourceToLCA[sourceToLCA.Length - 1] == lcaNode);
 
                         Node[] targetToLCA = Ancestors(target, lcaNode);
-                        Debug.Assert(targetToLCA.Length > 1);
-                        Debug.Assert(targetToLCA[0] == target);
-                        Debug.Assert(targetToLCA[targetToLCA.Length - 1] == lcaNode);
+                        //Debug.Assert(targetToLCA.Length > 1);
+                        //Debug.Assert(targetToLCA[0] == target);
+                        //Debug.Assert(targetToLCA[targetToLCA.Length - 1] == lcaNode);
 
                         Array.Reverse(targetToLCA, 0, targetToLCA.Length);
-                        // Note: lcaNode is included in both paths
 
+                        // Note: lcaNode is included in both paths
                         if (sourceToLCA.Length == 2 && targetToLCA.Length == 2)
                         {
-                            // source and target are siblings in the same subtree at the same level
-                            // the total path has length 4 and and we do need at least four control points 
-                            // for Bsplines (it is fine to include LCA twice).
-                            // Edges between leaves will be on the ground.
-                            controlPoints = new Vector3[4];
-                            controlPoints[0] = blockFactory.Ground(sourceObject);
-                            controlPoints[1] = gameNodes[lcaNode].transform.position;
-                            controlPoints[2] = controlPoints[1];
-                            controlPoints[3] = blockFactory.Ground(targetObject);
+                            // source and target are siblings in the same subtree at the same level.
+                            controlPoints = BetweenSiblings(sourceObject, targetObject, GetLevelHeight(1));
                         }
                         else
                         {
@@ -185,7 +178,8 @@ namespace SEE.Layout
                                 // Note that a root has level 0 and the level is increases along 
                                 // the childrens' depth. That is why we need to choose the height
                                 // as a measure relative to maxDepth.
-                                controlPoints[i] = gameNodes[fullPath[i]].transform.position + (maxDepth - fullPath[i].Level) * levelUnit;
+                                controlPoints[i] = gameNodes[fullPath[i]].transform.position
+                                                   + GetLevelHeight(fullPath[i].Level) * Vector3.up;
                             }
                             controlPoints[controlPoints.Length - 1] = blockFactory.Roof(targetObject);
                             //Dump(controlPoints);
@@ -193,6 +187,54 @@ namespace SEE.Layout
                     }
                 }
             }
+            return controlPoints;
+        }
+
+        /// <summary>
+        /// Returns four control points for an edge from <paramref name="sourceObject"/> to <paramref name="targetObject"/>.
+        /// The first control point is the center of the roof of <paramref name="sourceObject"/> and the last
+        /// control point the center of the roof of <paramref name="targetObject"/>. The second and third control point
+        /// is the position in between <paramref name="sourceObject"/> and <paramref name="targetObject"/> where
+        /// the y co-ordinate is specified by <paramref name="yLevel"/>. That means an edge between siblings is drawn
+        /// as a direct spline on the shortest path between the two nodes from roof to roof. Thus, no hierarchical
+        /// bundling is applied. We assume that siblings are close to each other for all hierarchical layouts,
+        /// which is true for EvoStreets, Balloon, TreeMap, and CirclePacking. If all edges between siblings were led 
+        /// over one single control point, they would often take a detour even though the nodes are close by. The
+        /// detour makes it difficult to follow the edges visually.
+        /// </summary>
+        /// <param name="sourceObject">the object where to start the edge</param>
+        /// <param name="targetObject">the object where to end the edge</param>
+        /// <param name="yLevel">the y co-ordinate of the two middle control points</param>
+        /// <returns>control points for an edge between siblings</returns>
+        private Vector3[] BetweenSiblings(GameObject sourceObject, GameObject targetObject, float yLevel)
+        {
+            // We do need at least four control points for Bsplines (it is fine to include 
+            // the middle control point twice).
+            Vector3 start = blockFactory.Roof(sourceObject);
+            Vector3 end = blockFactory.Roof(targetObject);
+            // position in between start and end
+            Vector3 middle = Vector3.Lerp(start, end, 0.5f);
+            middle.y += yLevel;
+            return SplineLinePoints(start, middle, end);
+        }
+
+        /// <summary>
+        /// Returns control points of for a B-spline for the following path:
+        ///  from <paramref name="start"/> to <paramref name="middle"/>
+        ///  and then from <paramref name="middle"/> to <paramref name="middle"/> 
+        ///  and finally from <paramref name="middle"/> to <paramref name="end"/>.
+        /// </summary>
+        /// <param name="start">first control point</param>
+        /// <param name="middle">second and third control point</param>
+        /// <param name="end">last control point</param>
+        /// <returns>control points</returns>
+        private static Vector3[] SplineLinePoints(Vector3 start, Vector3 middle, Vector3 end)
+        {
+            Vector3[] controlPoints = new Vector3[4];
+            controlPoints[0] = start;
+            controlPoints[1] = middle;
+            controlPoints[2] = middle;
+            controlPoints[3] = end;
             return controlPoints;
         }
 
@@ -246,37 +288,59 @@ namespace SEE.Layout
 
         /// <summary>
         /// The number of Unity units per level of the hierarchy for the height of control points.
-        /// This factor must be relative to the height of the buildings. The initial value is
-        /// just a default.
         /// </summary>
-        private static Vector3 levelUnit = 2.0f * Vector3.up;
+        private const float levelDistance = 2.0f;
 
         /// <summary>
-        /// The number of Unity units by which the second and third control point of 
-        /// a self loop is located towards left and right (x axis).
+        /// The minimal y co-ordinate for all hierarchical control points at level 2 and above.
+        /// Control points at level 0 (self loop) will be handled separately: self loops will be
+        /// drawn on top of the roof or below the ground of a node. Likewise, edges for nodes
+        /// that are siblings in the hierarchy will be drawn as simple splines from roof to
+        /// roof or ground to ground, respectively. The y co-ordinate of inner control points 
+        /// of all other edges will be at minY or above. See GetLevelHeight() for more details.
         /// </summary>
-        private static readonly float selfLoopExtent = 3.0f;
+        private float minY;
 
         /// <summary>
-        /// Yields control points for a self loop at a node. The control points
-        /// start and end at the center of roof of the node (first and last
-        /// control points). The second control point is selfLoopExtent units
-        /// to the left and levelUnit units above of the roof center. The 
-        /// third control point is opposite of the second control point, that
-        /// is, selfLoopExtent units to the right and levelUnit units above of 
-        /// the roof center.
+        /// Returns the y co-ordinate for control points of nodes at the given <paramref name="level"/>
+        /// of the node hierarchy. Root nodes are assumed to have level 0. There may be node hierarchies
+        /// that are actually forrests rather than simple trees. In such cases, the given <paramref name="level"/>
+        /// can be -1, which is perfectly acceptable. In such cases, the returned value will be just one 
+        /// levelDistance above those for normal root nodes. If level == maxDepth, minY will be returned;
+        /// in all other cases the returned value is guaranteed to be greater than minY.
+        /// </summary>
+        /// <param name="level">node hierarchy level</param>
+        /// <returns>y co-ordinate for control points</returns>
+        private float GetLevelHeight(int level)
+        {
+            return minY + (maxDepth - level) * levelDistance;
+        }
+
+        /// <summary>
+        /// Yields four control points for a self loop at a node. The first control 
+        /// point is the front left corner of the roof of <paramref name="node"/>
+        /// and the last control point is its opposite back right roof corner.
+        /// Thus, the edge is diagonal across the roof. The second and third control
+        /// points are the same position: the position directly in between the first
+        /// and last control point but with a y co-ordinate that is the roof's 
+        /// y co-ordinate plus the distance between the first and last control point.
+        /// As a consequence, self loops are wider and higher for larger roof areas.
         /// </summary>
         /// <param name="node">node whose self loop control points are required</param>
         /// <returns>control points forming a self loop above the node</returns>
         private Vector3[] SelfLoop(GameObject node)
         {
-            // we need at least four control points; tinySplines wants that
+            Vector3 roofCenter = blockFactory.Roof(node);
+            Vector3 extent = blockFactory.GetSize(node) / 2.0f;
+
+            Vector3 start = new Vector3(roofCenter.x - extent.x, roofCenter.y, roofCenter.z - extent.z);
+            Vector3 end   = new Vector3(roofCenter.x + extent.x, roofCenter.y, roofCenter.z + extent.z);
+            Vector3 middle = roofCenter + Vector3.Distance(start, end) * Vector3.up;
             Vector3[] controlPoints = new Vector3[4];
-            // self-loop
-            controlPoints[0] = blockFactory.Roof(node);
-            controlPoints[1] = controlPoints[0] + levelUnit + selfLoopExtent * Vector3.left;
-            controlPoints[2] = controlPoints[1] + 2.0f * selfLoopExtent * Vector3.right;
-            controlPoints[3] = blockFactory.Roof(node);
+            controlPoints[0] = start;
+            controlPoints[1] = middle;
+            controlPoints[2] = middle;
+            controlPoints[3] = end;
             return controlPoints;
         }
 
@@ -297,34 +361,52 @@ namespace SEE.Layout
         /// <returns>control points for two nodes without common ancestor</returns>
         private Vector3[] ThroughCenter(GameObject sourceObject, GameObject targetObject, int maxDepth)
         {
-            Vector3[] controlPoints = new Vector3[4];
-            controlPoints[0] = blockFactory.Roof(sourceObject);
-            controlPoints[3] = blockFactory.Roof(targetObject);
-            // the point in between the two roofs
-            Vector3 center = controlPoints[0] + 0.5f * (controlPoints[3] - controlPoints[0]);
+            Vector3 start = blockFactory.Roof(sourceObject);
+            Vector3 end = blockFactory.Roof(targetObject);
             // note: height is independent of the roofs; it is the distance to the ground
-            center.y = levelUnit.y * (maxDepth + 1);
+            return ThroughCenter(start, end, GetLevelHeight(-1));
+        }
+
+        /// <summary>
+        /// Yields control points for a B-spline from <paramref name="start"/> to <paramref name="end"/>.
+        /// The first and last control points are <paramref name="start"/> and <paramref name="end"/>,
+        /// respectively. The second and third control points are the same position that lies in between 
+        /// <paramref name="start"/> and <paramref name="end"/> with respect to the x and z axis; its height
+        /// (y axis) is <paramref name="yLevel"/>.
+        /// </summary>
+        /// <param name="sourceObject"></param>
+        /// <param name="targetObject"></param>
+        /// <param name="yLevel">y co-ordinate of the second and third control points returned</param>
+        /// <returns>control points for two nodes without common ancestor</returns>
+        private static Vector3[] ThroughCenter(Vector3 start, Vector3 end, float yLevel)
+        {
+            Vector3[] controlPoints = new Vector3[4];
+            controlPoints[0] = start;
+            controlPoints[3] = end;
+            // the point in between the start and end
+            Vector3 center = controlPoints[0] + 0.5f * (controlPoints[3] - controlPoints[0]);
+            center.y = yLevel;
             controlPoints[1] = center;
             controlPoints[2] = center;
             return controlPoints;
         }
 
         /// <summary>
-        /// Yields the maximal height over all nodes (stored in gameObjects).
+        /// Yields the maximal height over all nodes (stored in gameNodes).
         /// </summary>
-        /// <returns>maximal height of nodes in y coordinate (x and z are zero)</returns>
-        private Vector3 MaximalNodeHeight()
+        /// <returns>maximal height of gameNodes in y axis</returns>
+        private float MaximalNodeHeight()
         {
-            Vector3 result = Vector3.zero;
+            float result = 0.0f;
             foreach (KeyValuePair<Node, GameObject> node in gameNodes)
             {
                 Node n = node.Key;
                 if (n != null && n.IsLeaf())
                 {
                     Vector3 size = blockFactory.GetSize(node.Value);
-                    if (size.y > result.y)
+                    if (size.y > result)
                     {
-                        result.y = size.y;
+                        result = size.y;
                     }
                 }
             }
