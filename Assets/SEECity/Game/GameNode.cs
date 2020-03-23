@@ -25,9 +25,11 @@ namespace SEE.Layout
         private readonly Node node;
         /// <summary>
         /// The mapping from graph nodes onto game nodes. Every game node created by any of the
-        /// constructors of this class will be added to it. 
+        /// constructors of this class will be added to it. All game nodes given to the layout
+        /// will refer to the same mapping, i.e., to_layout_node is the same for all. The 
+        /// mapping will be given by the constructor.
         /// </summary>
-        private readonly Dictionary<Node, GameNode> to_layout_node = new Dictionary<Node, GameNode>();
+        private readonly Dictionary<Node, GameNode> to_layout_node;
 
         /// <summary>
         /// The tree level of the node. Roots have level 0, for all other nodes the level is the 
