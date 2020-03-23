@@ -44,6 +44,11 @@ namespace SEE.Layout
         Vector3 CenterPosition { get; set; }
 
         /// <summary>
+        /// Rotation around the y axis in degrees.
+        /// </summary>
+        float Rotation { get; set; }
+
+        /// <summary>
         /// X-Z center position of the roof of the node in world space.
         /// </summary>
         Vector3 Roof { get; }
