@@ -276,6 +276,13 @@ namespace SEE.Layout.RectanglePacking
 
             public string LinkName { get => index.ToString(); }
 
+            private float rotation;
+
+            public float Rotation
+            {
+                get => rotation;
+                set => rotation = value;
+            }
         }
     }
 }

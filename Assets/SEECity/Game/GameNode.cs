@@ -135,6 +135,13 @@ namespace SEE.Layout
             }
         }
 
+        public float Rotation
+        {
+            get => gameObject.transform.eulerAngles.y;
+            set => gameObject.transform.Rotate(new Vector3(0, value, 0));
+        }
+
+
         /// <summary>
         /// X-Z center position of the roof of the node in world space.
         /// </summary>
