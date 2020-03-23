@@ -470,23 +470,10 @@ namespace SEE.Game
 
             if (node.IsLeaf())
             {
+                // Leaf nodes were created as blocks by leaveNodeFactory.
                 // We need to first scale the game node and only afterwards set its
                 // position because transform.scale refers to the center position.
-                if (settings.NodeLayout == SEECity.NodeLayouts.Treemap)
-                {
-                    // The Treemap layout adjusts the size of the object's ground area according to
-                    // the total space we allow it to use. The x length was initially
-                    // mapped onto the area of the ground. The treemap layout yields
-                    // an x and z co-ordinate that defines this area, which we use
-                    // here to set the width and depth of the game node.
-                    // The height (y axis) is not modified by the treemap layout and,
-                    // hence, does not need any adustment.
-                    leafNodeFactory.SetWidth(gameNode, transform.scale.x);
-                    leafNodeFactory.SetDepth(gameNode, transform.scale.z);
-                }
-                // Leaf nodes were created as blocks by leaveNodeFactory.
-                // Leaf nodes have their size set before the layout is computed. We will
-                // not change their size unless a layout requires that.
+                leafNodeFactory.SetSize(gameNode, transform.scale);
                 leafNodeFactory.SetGroundPosition(gameNode, transform.position);
             }
             else
@@ -494,8 +481,6 @@ namespace SEE.Game
                 // Inner nodes were created by innerNodeFactory.
                 innerNodeFactory.SetSize(gameNode, transform.scale);
                 innerNodeFactory.SetGroundPosition(gameNode, transform.position);
-                // Inner nodes will be drawn later when we add decorations because
-                // they can be drawn as a single circle line or a Donut chart.
             }
             // Rotate the game object.
             Rotate(gameNode, transform.rotation);
