@@ -26,11 +26,12 @@ namespace SEE.Layout
         {
             List<GameObject> result = new List<GameObject>();
 
-            SetGameNodes(nodes);
-            maxDepth = graph.GetMaxDepth();
-            // The distance between of the control points at the subsequent levels of the hierarchy.
-            minY = MaximalNodeHeight();
-
+            List<Node> roots = graph.GetRoots();
+            if (roots.Count != 1)
+            {
+                Debug.LogError("Graph must have a single root node.\n");
+                return result;
+            }
             Material newMat = new Material(defaultLineMaterial);
             if (newMat == null)
             {
@@ -38,13 +39,18 @@ namespace SEE.Layout
                 return result;
             }
 
-            List<Node> roots = graph.GetRoots();
-            if (roots.Count != 1)
-            {
-                Debug.LogError("Graph must have a single root node.\n");
-                return result;
-            }
-            
+            maxDepth = graph.GetMaxDepth();
+
+            SetGameNodes(nodes);
+
+            // The distance between of the control points at the subsequent levels of the hierarchy.
+            minY = MaximalNodeHeight();
+
+            // TODO: We want the level distances be chosen relative to the maximal height of all
+            // game objects within the same subtree. At the very least, we want that for siblings
+            // whose edges are drawn as direct splines. They should be led across all other siblings.
+            // CalculateMaxHeights(gameNodes);
+
             LCAFinder lca = new LCAFinder(graph, roots);
             foreach (Edge edge in graph.ConnectingEdges(gameNodes.Keys))
             {
