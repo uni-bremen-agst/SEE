@@ -75,17 +75,17 @@ namespace SEE.GO
         /// <summary>
         /// Returns the distance from v0 to v1.
         /// 
-        /// Precondition: v1 > v0 (otherwise an Exception is thrown)
+        /// Precondition: v1 >= v0 (otherwise an Exception is thrown)
         /// </summary>
         /// <param name="v0">start position</param>
         /// <param name="v1">end position</param>
-        /// <returns></returns>
+        /// <returns>distance from v0 to v1</returns>
         private static float Distance(float v0, float v1)
         {
-            if (v1 <= v0)
+            if (v1 < v0)
             {
-                Debug.AssertFormat(v1 > v0, "v1 > v0 expected. Actual v0 = {0}, v1 = {1}.\n", v0, v1);
-                throw new Exception("v1 > v0 expected");
+                Debug.AssertFormat(v1 >= v0, "v1 >= v0 expected. Actual v0 = {0}, v1 = {1}.\n", v0, v1);
+                throw new Exception("v1 >= v0 expected");
             }
             else
             {

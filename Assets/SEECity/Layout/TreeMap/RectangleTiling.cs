@@ -30,12 +30,12 @@ namespace SEE.Layout.TreeMap
         /// </summary>
         public class NodeSize
         {
-            public NodeSize(LayoutNode gameNode, float size)
+            public NodeSize(ILayoutNode gameNode, float size)
             {
                 this.gameNode = gameNode;
                 this.size = size;
             }
-            public LayoutNode gameNode;
+            public ILayoutNode gameNode;
             public float size;
         }
 

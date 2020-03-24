@@ -34,9 +34,9 @@ namespace SEE.Game.Animation
         /// </summary>
         private readonly Graph graph;
         /// <summary>
-        /// The layout for the graph as a mapping of the nodes' LinkNames onto their NodeTransform.
+        /// The layout for the graph as a mapping of the nodes' LinkNames onto their ILayoutNode.
         /// </summary>
-        private readonly Dictionary<string, NodeTransform> layout;
+        private readonly Dictionary<string, ILayoutNode> layout;
 
         /// <summary>
         /// The graph.
@@ -44,16 +44,16 @@ namespace SEE.Game.Animation
         public Graph Graph => graph;
 
         /// <summary>
-        /// The layout of the graph as a mapping of the nodes' LinkNames onto their NodeTransform.
+        /// The layout of the graph as a mapping of the nodes' LinkNames onto their ILayoutNode.
         /// </summary>
-        public Dictionary<string, NodeTransform> Layout => layout;
+        public Dictionary<string, ILayoutNode> Layout => layout;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="graph">the graph</param>
-        /// <param name="layout">its layout as a mapping of the nodes' LinkNames onto their NodeTransform</param>
-        public LaidOutGraph(Graph graph, Dictionary<string, NodeTransform> layout)
+        /// <param name="layout">its layout as a mapping of the nodes' LinkNames onto their ILayoutNode</param>
+        public LaidOutGraph(Graph graph, Dictionary<string, ILayoutNode> layout)
         {
             this.graph = graph.AssertNotNull("graph");
             this.layout = layout.AssertNotNull("layout");

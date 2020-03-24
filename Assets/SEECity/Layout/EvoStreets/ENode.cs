@@ -11,7 +11,7 @@ namespace SEE.Layout.EvoStreets
     {
         public ENode() { }
 
-        public ENode(LayoutNode node)
+        public ENode(ILayoutNode node)
         {
             this.GraphNode = node;
         }
@@ -29,7 +29,7 @@ namespace SEE.Layout.EvoStreets
         /// <summary>
         /// The node in the original graph this ENode is representing.
         /// </summary>
-        public LayoutNode GraphNode;
+        public ILayoutNode GraphNode;
 
         /// <summary>
         /// The pivot world co-ordinate along the x axis.

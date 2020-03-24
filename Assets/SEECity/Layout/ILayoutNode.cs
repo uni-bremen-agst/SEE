@@ -6,12 +6,12 @@ namespace SEE.Layout
     /// <summary>
     ///  Defines the methods for all nodes to be laid out.
     /// </summary>
-    public interface LayoutNode
+    public interface ILayoutNode
     {
         /// <summary>
         /// The parent of the node. Is null if the node is a root.
         /// </summary>
-        LayoutNode Parent { get; }
+        ILayoutNode Parent { get; }
 
         /// <summary>
         /// The level of the node in the node hierarchy. A root node has
@@ -64,6 +64,6 @@ namespace SEE.Layout
         /// the children of a node for which IsLeaf returns true.
         /// </summary>
         /// <returns>children of this node</returns>
-        IList<LayoutNode> Children();
+        IList<ILayoutNode> Children();
     }
 }

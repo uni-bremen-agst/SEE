@@ -37,28 +37,23 @@ namespace SEE.Game.Animation
         /// equals null, no callback happens.
         /// </summary>
         /// <param name="gameObject">game object to be animated</param>
-        /// <param name="nodeTransform">the node transformation to be applied</param>
+        /// <param name="layout">the node transform to be applied</param>
         /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph (ignored here)</param>
         /// <param name="callBackTarget">an optional game object that should receive the callback</param>
         /// <param name="callbackName">the method name of the callback</param>
         protected override void AnimateToInternalWithCallback
                   (GameObject gameObject,
-                   NodeTransform nodeTransform,
+                   ILayoutNode layout,
                    bool wasModified,
                    GameObject callBackTarget,
                    string callbackName,
                    Action<object> callback)
         {
-            // Note: nodeTransform.position.y denotes the ground of the game object, not
-            // the center as normally in Unity. The following position is the one in
-            // Unity's term where the y co-ordinate denotes the center.
-            Vector3 position = nodeTransform.position;
-            position.y += nodeTransform.scale.y / 2;
-            gameObject.transform.localScale = nodeTransform.scale;
+            gameObject.transform.localScale = layout.Scale;
             if (callBackTarget != null)
             {
                 iTween.MoveTo(gameObject, iTween.Hash(
-                    "position", position,
+                    "position", layout.CenterPosition,
                     "time", MaxAnimationTime,
                     "oncompletetarget", callBackTarget,
                     "oncomplete", callbackName,
@@ -68,7 +63,7 @@ namespace SEE.Game.Animation
             else
             {
                 iTween.MoveTo(gameObject, iTween.Hash(
-                                          "position", position,
+                                          "position", layout.CenterPosition,
                                           "time", MaxAnimationTime
                 ));
             }

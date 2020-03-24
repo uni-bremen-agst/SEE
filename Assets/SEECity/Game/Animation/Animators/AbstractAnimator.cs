@@ -77,7 +77,7 @@ namespace SEE.Game.Animation
         /// <param name="nodeTransform">the node transformation to be applied</param>
         /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
         /// <param name="callback">an optional callback</param>
-        public void AnimateTo(GameObject gameObject, NodeTransform nodeTransform, bool wasModified, Action<object> callback = null)
+        public void AnimateTo(GameObject gameObject, ILayoutNode nodeTransform, bool wasModified, Action<object> callback = null)
         {
             gameObject.AssertNotNull("gameObject");
             nodeTransform.AssertNotNull("nodeTransform");
@@ -87,10 +87,10 @@ namespace SEE.Game.Animation
                 // Note: nodeTransform.position.y denotes the ground of the game object, not
                 // the center as normally in Unity. The following position is the one in
                 // Unity's terms where the y co-ordinate denotes the center.
-                Vector3 position = nodeTransform.position;
-                position.y += nodeTransform.scale.y / 2;
+                Vector3 position = nodeTransform.CenterPosition;
+                position.y += nodeTransform.Scale.y / 2;
                 gameObject.transform.position = position;
-                gameObject.transform.localScale = nodeTransform.scale;
+                gameObject.transform.localScale = nodeTransform.Scale;
                 callback?.Invoke(gameObject);
             }
             else if (callback == null)
@@ -116,8 +116,8 @@ namespace SEE.Game.Animation
         /// <param name="callBackTarget">an optional game object that should receive the callback</param>
         /// <param name="callbackName">the method name of the callback</param>
         protected abstract void AnimateToInternalWithCallback
-            (GameObject gameObject, 
-             NodeTransform nodeTransform,
+            (GameObject gameObject,
+             ILayoutNode nodeTransform,
              bool wasModified,
              GameObject callBackTarget, 
              string callbackName,

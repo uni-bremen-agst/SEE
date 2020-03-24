@@ -221,7 +221,7 @@ namespace SEE.Game.Animation
         public void RenderEdges(Graph graph)
         {
             ClearEdges();
-            edges = _graphRenderer.EdgeLayout(graph, nodes.Values);
+            edges = _graphRenderer.EdgeLayout(graph, nodes.Values, null);  // FIXME: Meaningful last parameter.
         }
 
         /// <summary>

@@ -31,7 +31,7 @@ namespace SEE.Layout
         /// A node is considered a root if it has either no parent in the original
         /// graph or its parent is not contained in the set of nodes to be laid out.
         /// </summary>
-        protected IList<LayoutNode> roots;
+        protected IList<ILayoutNode> roots;
 
         /// <summary>
         /// Returns the maximal depth of the forest with the given root nodes.
@@ -40,10 +40,10 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="roots">set of root tree nodes of the forest</param>
         /// <returns>maximal depth of the forest</returns>
-        protected static int MaxDepth(List<LayoutNode> roots)
+        protected static int MaxDepth(List<ILayoutNode> roots)
         {
             int result = 0;
-            foreach (LayoutNode root in roots)
+            foreach (ILayoutNode root in roots)
             {
                 int depth = MaxDepth(root);
                 if (depth > result)
@@ -60,10 +60,10 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">root node of the tree</param>
         /// <returns>maximal depth of the tree</returns>
-        protected static int MaxDepth(LayoutNode node)
+        protected static int MaxDepth(ILayoutNode node)
         {
             int result = 0;
-            foreach (LayoutNode child in node.Children())
+            foreach (ILayoutNode child in node.Children())
             {
                 int depth = MaxDepth(child);
                 if (depth > result)

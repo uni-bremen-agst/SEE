@@ -19,13 +19,13 @@
 
 using SEE.DataModel;
 using SEE.Layout;
-using SEE.GO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using SEE.Game.Animation;
+using SEE.GO;
 
 namespace SEE.Game
 {
@@ -188,9 +188,9 @@ namespace SEE.Game
         protected Graph CurrentGraphShown => _currentCity?.Graph;
         /// <summary>
         /// The layout of the city currently shown. The layout is a mapping of the graph
-        /// nodes' LinkName onto their NodeTransforms.
+        /// nodes' LinkName onto their layout nodes.
         /// </summary>
-        protected Dictionary<string, NodeTransform> CurrentLayoutShown => _currentCity?.Layout;
+        protected Dictionary<string, ILayoutNode> CurrentLayoutShown => _currentCity?.Layout;
 
         /// <summary>
         /// The city (graph + layout) to be shown next.
@@ -206,9 +206,9 @@ namespace SEE.Game
         protected Graph NextGraphToBeShown => _nextCity?.Graph;
         /// <summary>
         /// The layout of _nextGraph. The layout is a mapping of the graph
-        /// nodes' LinkName onto their NodeTransforms.
+        /// nodes' LinkName onto their ILayoutNodes.
         /// </summary>
-        protected Dictionary<string, NodeTransform> NextLayoutToBeShown => _nextCity?.Layout;
+        protected Dictionary<string, ILayoutNode> NextLayoutToBeShown => _nextCity?.Layout;
 
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
@@ -223,8 +223,8 @@ namespace SEE.Game
         /// <summary>
         /// All pre-computed layouts for the whole graph series.
         /// </summary>
-        private Dictionary<Graph, Dictionary<string, NodeTransform>> Layouts { get; }
-             =  new Dictionary<Graph, Dictionary<string, NodeTransform>>();
+        private Dictionary<Graph, Dictionary<string, ILayoutNode>> Layouts { get; }
+             =  new Dictionary<Graph, Dictionary<string, ILayoutNode>>();
 
         /// <summary>
         /// Creates and saves the layouts for all given <paramref name="graphs"/>. This will 
@@ -257,7 +257,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph for which the layout is to be calculated</param>
         /// <returns>the node layout for all nodes in <paramref name="graph"/></returns>
-        private Dictionary<string, NodeTransform> CalculateLayout(Graph graph)
+        private Dictionary<string, ILayoutNode> CalculateLayout(Graph graph)
         {
             // The following code assumes that a leaf node remains a leaf across all
             // graphs of the graph series and an inner node remains an inner node.
@@ -295,8 +295,14 @@ namespace SEE.Game
                 }
             }
 
-            // Calculate and return the layout for the collected game objects.
-            return ToLinkNameLayout(NodeLayout.Move(nodeLayout.Layout(graphRenderer.ToLayoutNodes(gameObjects)), cityOrigin));
+            // Calculate and apply the node layout
+            ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(gameObjects);
+            // Note: Apply applies its results only on the layoutNodes but not on the game objects
+            // these layoutNodes represent. Here, we leave the game objects untouched. The layout
+            // must be later applied when render a city. Here, we only store the layout for later use.
+            nodeLayout.Apply(layoutNodes);
+            NodeLayout.Move(layoutNodes, cityOrigin);
+            return ToLinkNameLayout(layoutNodes);
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to 
             // objectManager.GetNode() above. Yet, inner nodes are generally not scaled by
@@ -308,18 +314,44 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Transforms the given <paramref name="layout"/> such that instead of the layout nodes, 
-        /// the LinkName of the graph node corresponding to the layout node is used as a key for
-        /// the dictionary.
+        /// Yields the collection of LayoutNodes corresponding to the given <paramref name="gameNodes"/>.
+        /// Each LayoutNode has the position, scale, and rotation of the game node. The graph node 
+        /// attached to the game node is passed on to the LayoutNode so that the graph node data is
+        /// available to the node layout (e.g., Parent or Children).
+        /// Sets also the node levels of all resulting LayoutNodes.
         /// </summary>
-        /// <param name="layout">layout indexed by layout nodes</param>
-        /// <returns>layout indexed by the LinkName of the node corresponding to the layout node</returns>
-        private static Dictionary<string, NodeTransform> ToLinkNameLayout(Dictionary<LayoutNode, NodeTransform> layout)
+        /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
+        /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
+        private ICollection<ILayoutNode> ToLayoutNodes(List<GameObject> gameNodes)
         {
-            Dictionary<string, NodeTransform> result = new Dictionary<string, NodeTransform>();
-            foreach (var entry in layout)
+            IList<ILayoutNode> result = new List<ILayoutNode>();
+            Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+
+            foreach (GameObject gameObject in gameNodes)
             {
-                result[entry.Key.LinkName] = entry.Value;
+                Node node = gameObject.GetComponent<NodeRef>().node;
+                LayoutNode layoutNode = new LayoutNode(node, to_layout_node);
+                // We must transfer the scale from gameObject to layoutNode.
+                // Rotation and CenterPosition are all zero. They will be computed by the layout,
+                // but the layout needs the game object's scale.
+                layoutNode.Scale = graphRenderer.GetSize(gameObject);
+                result.Add(layoutNode);
+            }
+            LayoutNodes.SetLevels(result);
+            return result;
+        }
+
+        /// <summary>
+        /// Returns a mapping of graph-node linknames onto their corresponding <paramref name="layoutNodes"/>.
+        /// </summary>
+        /// <param name="layoutNodes">collection of layout nodes to be mapped</param>
+        /// <returns>mapping indexed by the LinkName of the nodes corresponding to the layout nodes</returns>
+        private static Dictionary<string, ILayoutNode> ToLinkNameLayout(ICollection<ILayoutNode> layoutNodes)
+        {
+            Dictionary<string, ILayoutNode> result = new Dictionary<string, ILayoutNode>();
+            foreach (ILayoutNode layoutNode in layoutNodes)
+            {
+                result[layoutNode.LinkName] = layoutNode;
             }
             return result;
         }
@@ -332,7 +364,7 @@ namespace SEE.Game
         /// <param name="graph">the graph for which to determine the layout</param>
         /// <param name="layout">the retrieved layout or null</param>
         /// <returns>true if a layout could be found</returns>
-        public bool TryGetLayout(Graph graph, out Dictionary<string, NodeTransform> layout)
+        public bool TryGetLayout(Graph graph, out Dictionary<string, ILayoutNode> layout)
         {
             return Layouts.TryGetValue(graph, out layout);
         }
@@ -508,32 +540,36 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Renders the game object corresponding to the given <paramref name="node"/>.
+        /// Renders the game object corresponding to the given <paramref name="graphNode"/>.
         /// </summary>
-        /// <param name="node">node to be displayed</param>
-        protected virtual void RenderNode(Node node)
+        /// <param name="graphNode">graph node to be displayed</param>
+        protected virtual void RenderNode(Node graphNode)
         {
-            NodeTransform nodeTransform = NextLayoutToBeShown[node.LinkName];
-            Node formerNode = objectManager.GetNode(node, out GameObject gameObject);
+            ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.LinkName];
+            Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
 
             bool wasModified;
-            if (formerNode == null)
+            if (formerGraphNode == null)
             {
+                // The node is new. It has no layout applied to it yet.
                 // If the node is new, we animate it by moving it out of the ground.
-                // Note nodeTransform.position.y denotes the ground position of
+                // Note layoutNode.position.y denotes the ground position of
                 // a game object, not its center.
-                nodeTransform.position.y -= nodeTransform.scale.y;
-                graphRenderer.Apply(gameObject, nodeTransform);
+                Vector3 position = layoutNode.CenterPosition;
+                position.y -= layoutNode.Scale.y;
+                layoutNode.CenterPosition = position;
+                graphRenderer.Apply(currentGameNode, layoutNode);
                 // Revert the change to the y co-ordindate.
-                nodeTransform.position.y += nodeTransform.scale.y;
-                marker.MarkBorn(gameObject);
+                position.y += layoutNode.Scale.y;
+                layoutNode.CenterPosition = position;
+                marker.MarkBorn(currentGameNode);
                 wasModified = false;
             }
             else
             {
-                wasModified = diff.AreDifferent(formerNode, node);
+                wasModified = diff.AreDifferent(formerGraphNode, graphNode);
             }
-            moveScaleShakeAnimator.AnimateTo(gameObject, nodeTransform, wasModified, OnRenderNodeFinishedAnimation);
+            moveScaleShakeAnimator.AnimateTo(currentGameNode, layoutNode, wasModified, OnRenderNodeFinishedAnimation);
         }
 
         /// <summary>
@@ -563,7 +599,7 @@ namespace SEE.Game
                 marker.MarkDead(block);
                 var newPosition = block.transform.position;
                 newPosition.y = -block.transform.localScale.y;
-                NodeTransform nodeTransform = new NodeTransform(newPosition, block.transform.localScale);
+                ILayoutNode nodeTransform = new AnimationNode(newPosition, block.transform.localScale);
                 moveScaleShakeAnimator.AnimateTo(block, nodeTransform, false, OnRemovedNodeFinishedAnimation);
             }
         }
@@ -743,7 +779,7 @@ namespace SEE.Game
                 Debug.LogErrorFormat("There ist no graph available for graph with index {0}\n", index);
                 return false;
             }
-            bool hasLayout = TryGetLayout(graph, out Dictionary<string, NodeTransform> layout);
+            bool hasLayout = TryGetLayout(graph, out Dictionary<string, ILayoutNode> layout);
             if (layout == null || !hasLayout)
             {
                 Debug.LogErrorFormat("There ist no layout available for graph with index {0}", index);
@@ -884,6 +920,54 @@ namespace SEE.Game
             if (!ShowNextIfPossible())
             {
                 ToggleAutoPlay();
+            }
+        }
+
+        /// <summary>
+        /// An implementation of ILayoutNode that is used for animation purposes only.
+        /// The only features it supports are the position and scale of node.
+        /// That is what is currenly needed by the animators.
+        /// </summary>
+        private class AnimationNode : ILayoutNode
+        {
+            private Vector3 centerPosition;
+            private Vector3 scale;
+
+            public AnimationNode(Vector3 centerPosition, Vector3 scale)
+            {
+                this.centerPosition = centerPosition;
+                this.scale = scale;
+            }
+
+            public Vector3 Scale
+            {
+                get => scale;
+                set => scale = value;
+            }
+
+            public Vector3 CenterPosition
+            {
+                get => centerPosition;
+                set => centerPosition = value;
+            }
+
+            public ILayoutNode Parent => throw new NotImplementedException();
+
+            public int Level { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public bool IsLeaf => throw new NotImplementedException();
+
+            public string LinkName => throw new NotImplementedException();
+
+            public float Rotation { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public Vector3 Roof => throw new NotImplementedException();
+
+            public Vector3 Ground => throw new NotImplementedException();
+
+            public IList<ILayoutNode> Children()
+            {
+                throw new NotImplementedException();
             }
         }
     }

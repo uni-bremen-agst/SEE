@@ -11,9 +11,84 @@ namespace SEE.Layout
     /// </summary>
     public class StraightEdgeLayout : IEdgeLayout
     {
-        public StraightEdgeLayout(NodeFactory blockFactory, float edgeWidth, bool edgesAboveBlocks) 
+        public StraightEdgeLayout(NodeFactory blockFactory, float edgeWidth, bool edgesAboveBlocks, ICollection<ILayoutNode> layoutNodes) 
             : base(blockFactory, edgeWidth, edgesAboveBlocks)
         {
+            this.layoutNodes = layoutNodes;
+        }
+
+        public class LayoutEdge
+        {
+            public ILayoutNode Source;
+            public ILayoutNode Target;
+            // public Vector3[] points;
+        }
+
+        private ICollection<ILayoutNode> layoutNodes;
+
+        /*
+        public Dictionary<LayoutEdge, Vector3[]> DrawEdges()
+        {
+            ICollection<LayoutEdge> layoutEdges = new List<LayoutEdge>();
+            foreach (LayoutNode node in LayoutNodes)
+            {
+            }
+
+            Dictionary<LayoutEdge, Vector3[]> layoutEdges = DrawEdges(ToLayoutEdges(graph.ConnectingEdges(nodes)));
+
+        }
+        */
+
+        public Dictionary<LayoutEdge, Vector3[]> DrawEdges(ICollection<LayoutEdge> layoutEdges)
+        {
+            Dictionary<LayoutEdge, Vector3[]> layout = new Dictionary<LayoutEdge, Vector3[]>();
+            layoutNodes = GetNodes(layoutEdges);
+            MinMaxBlockY(layoutNodes, out float minBlockY, out float maxBlockY, out float maxHeight);
+
+            // The offset of the edges above or below the ground chosen relative 
+            // to the height of the largest block.
+            // We are using a value relative to the highest node so that edges 
+            // are farther away from the blocks for cities with large blocks and
+            // closer to blocks for cities with small blocks. This may help to 
+            // better read the edges.
+            // This offset is used to draw the line somewhat below
+            // or above the house (depending on the orientation).
+            float offset = 0.2f * maxHeight; // must be positive
+            // The level at which edges are drawn.
+            float edgeLevel = edgesAboveBlocks ? maxBlockY + offset : minBlockY - offset;
+
+            foreach (LayoutEdge edge in layoutEdges)
+            {
+                ILayoutNode source = edge.Source;
+                ILayoutNode target = edge.Target;
+                // define the points along the line
+                Vector3 start;
+                Vector3 end;
+                if (edgesAboveBlocks)
+                {
+                    start = source.Roof;
+                    end = target.Roof;
+                }
+                else
+                {
+                    start = source.Ground;
+                    end = target.Ground;
+                }
+                layout[edge] = LinePoints.StraightLinePoints(start, end, edgeLevel);
+
+            }
+            return layout;
+        }
+
+        private ISet<ILayoutNode> GetNodes(ICollection<LayoutEdge> layoutEdges)
+        {
+            ISet<ILayoutNode> result = new HashSet<ILayoutNode>();
+            foreach (LayoutEdge edge in layoutEdges)
+            {
+                result.Add(edge.Source);
+                result.Add(edge.Target);
+            }
+            return result;
         }
 
         public override ICollection<GameObject> DrawEdges(Graph graph, ICollection<GameObject> nodes)
