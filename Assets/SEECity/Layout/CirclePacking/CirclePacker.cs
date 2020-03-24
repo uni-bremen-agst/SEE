@@ -20,7 +20,7 @@ namespace SEE.Layout.CirclePacking
         /// <summary>
         /// The game object represented by this circle.
         /// </summary>
-        public LayoutNode gameObject;
+        public ILayoutNode gameObject;
 
         /// <summary>
         /// Creates a new circle for the game object at given center position with given radius.
@@ -28,7 +28,7 @@ namespace SEE.Layout.CirclePacking
         /// <param name="gameObject">the game object for which to determine position and radius</param>
         /// <param name="center">center position of the circle</param>
         /// <param name="radius">radius of the circle</param>
-        public Circle(LayoutNode gameObject, Vector2 center, float radius)
+        public Circle(ILayoutNode gameObject, Vector2 center, float radius)
         {
             this.gameObject = gameObject;
             this.center = center;

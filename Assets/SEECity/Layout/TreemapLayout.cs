@@ -43,11 +43,11 @@ namespace SEE.Layout
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
-        private Dictionary<LayoutNode, NodeTransform> layout_result;
+        private Dictionary<ILayoutNode, NodeTransform> layout_result;
 
-        public override Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> layoutNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes)
         {
-            layout_result = new Dictionary<LayoutNode, NodeTransform>();
+            layout_result = new Dictionary<ILayoutNode, NodeTransform>();
 
             if (layoutNodes.Count == 0)
             {
@@ -55,7 +55,7 @@ namespace SEE.Layout
             }
             else if (layoutNodes.Count == 1)
             {
-                LayoutNode gameNode = layoutNodes.GetEnumerator().Current;
+                ILayoutNode gameNode = layoutNodes.GetEnumerator().Current;
                 layout_result[gameNode] = new NodeTransform(Vector3.zero, 
                                                             new Vector3(width, gameNode.Scale.y, depth));
             }
@@ -78,7 +78,7 @@ namespace SEE.Layout
         {
             if (roots.Count == 1)
             {
-                LayoutNode root = roots[0];
+                ILayoutNode root = roots[0];
                 layout_result[root] = new NodeTransform(Vector3.zero, 
                                                         new Vector3(width, root.Scale.y, depth));
                 CalculateLayout(root.Children(), -width / 2.0f, -depth / 2.0f, width, depth);
@@ -100,16 +100,16 @@ namespace SEE.Layout
         /// <param name="z">z co-ordinate of the left front corner of the rectangle</param>
         /// <param name="width">width of the rectangle</param>
         /// <param name="depth">depth of the rectangle</param>
-        private void CalculateLayout(ICollection<LayoutNode> siblings, float x, float z, float width, float depth)
+        private void CalculateLayout(ICollection<ILayoutNode> siblings, float x, float z, float width, float depth)
         {
             List<RectangleTiling.NodeSize> sizes = GetSizes(siblings);
             float padding = Mathf.Min(width, depth) * 0.01f;
             List<RectangleTiling.Rectangle> rects = RectangleTiling.Squarified_Layout_With_Padding(sizes, x, z, width, depth, padding);
             Add_To_Layout(sizes, rects);
 
-            foreach (LayoutNode node in siblings)
+            foreach (ILayoutNode node in siblings)
             {
-                ICollection<LayoutNode> kids = node.Children();
+                ICollection<ILayoutNode> kids = node.Children();
                 if (kids.Count > 0)
                 {
                     // Note: nodeTransform.position is the center position, while 
@@ -133,7 +133,7 @@ namespace SEE.Layout
         private float CalculateSize()
         {
             float total_size = 0.0f;
-            foreach(LayoutNode root in roots)
+            foreach(ILayoutNode root in roots)
             {
                 total_size += CalculateSize(root);
             }
@@ -143,7 +143,7 @@ namespace SEE.Layout
         /// <summary>
         /// The size metric of each node. The area of the rectangle is proportional to a node's size.
         /// </summary>
-        private Dictionary<LayoutNode, RectangleTiling.NodeSize> sizes = new Dictionary<LayoutNode, RectangleTiling.NodeSize>();
+        private Dictionary<ILayoutNode, RectangleTiling.NodeSize> sizes = new Dictionary<ILayoutNode, RectangleTiling.NodeSize>();
 
         /// <summary>
         /// Calculates the size of node and all its descendants. The size of a leaf
@@ -152,7 +152,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">node whose size it to be determined</param>
         /// <returns>size of node</returns>
-        private float CalculateSize(LayoutNode node)
+        private float CalculateSize(ILayoutNode node)
         {
             if (node.IsLeaf)
             {
@@ -166,7 +166,7 @@ namespace SEE.Layout
             else
             {
                 float total_size = 0.0f;
-                foreach (LayoutNode child in node.Children())
+                foreach (ILayoutNode child in node.Children())
                 {
                     total_size += CalculateSize(child);
                 }
@@ -181,10 +181,10 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="nodes">list of nodes whose sizes are to be determined</param>
         /// <returns>list of node area sizes</returns>
-        private List<RectangleTiling.NodeSize> GetSizes(ICollection<LayoutNode> nodes)
+        private List<RectangleTiling.NodeSize> GetSizes(ICollection<ILayoutNode> nodes)
         {
             List<RectangleTiling.NodeSize> result = new List<RectangleTiling.NodeSize>();
-            foreach (LayoutNode node in nodes)
+            foreach (ILayoutNode node in nodes)
             {
                 result.Add(sizes[node]);
             }
@@ -207,7 +207,7 @@ namespace SEE.Layout
             int i = 0;
             foreach (RectangleTiling.Rectangle rect in rects)
             {
-                LayoutNode o = nodes[i].gameNode;
+                ILayoutNode o = nodes[i].gameNode;
                 Vector3 position = new Vector3(rect.x + rect.width / 2.0f, groundLevel, rect.z + rect.depth / 2.0f);
                 Vector3 scale = new Vector3(rect.width, o.Scale.y, rect.depth);
                 layout_result[o] = new NodeTransform(position, scale);

@@ -42,7 +42,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="layoutNode">node whose size is to be returned</param>
         /// <returns>area size of given layout node</returns>
-        private static float AreaSize(LayoutNode layoutNode)
+        private static float AreaSize(ILayoutNode layoutNode)
         {
             Vector3 size = layoutNode.Scale;
             return size.x * size.z;
@@ -64,17 +64,17 @@ namespace SEE.Layout
         /// created by the node factory passed to the constructor.
         /// </summary>
         /// <param name="gameNodes">the game objects to be laid out</param>
-        public override Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes)
         {
             /// The node layout we compute as a result.
-            Dictionary<LayoutNode, NodeTransform> layout_result = new Dictionary<LayoutNode, NodeTransform>();
+            Dictionary<ILayoutNode, NodeTransform> layout_result = new Dictionary<ILayoutNode, NodeTransform>();
 
-            List<LayoutNode> elements = new List<LayoutNode>();
+            List<ILayoutNode> elements = new List<ILayoutNode>();
             elements.AddRange(gameNodes);
 
             // To increase the efficiency of the space usage, we order the elements by one of the sizes.
             // Elements must be sorted by size, descending
-            elements.Sort(delegate (LayoutNode left, LayoutNode right) 
+            elements.Sort(delegate (ILayoutNode left, ILayoutNode right) 
                           { return AreaSize(right).CompareTo(AreaSize(left)); });
 
             // Since we initially do not know how much space we need, we assign a space of the 
@@ -97,7 +97,7 @@ namespace SEE.Layout
             // place el.
             Dictionary<PNode, float> expanders = new Dictionary<PNode, float>();
 
-            foreach (LayoutNode el in elements)
+            foreach (ILayoutNode el in elements)
             {
                 // The size we need to place el plus the padding between nodes.
                 Vector2 requiredSize = GetRectangleSize(el, padding);
@@ -196,7 +196,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="layoutNode">layout node whose ground area size is requested</param>
         /// <returns>ground area size of the given game object</returns>
-        private static Vector2 GetRectangleSize(LayoutNode layoutNode, float padding)
+        private static Vector2 GetRectangleSize(ILayoutNode layoutNode, float padding)
         {
             Vector3 size = layoutNode.Scale;
             return new Vector2(size.x + padding, size.z + padding);
@@ -211,10 +211,10 @@ namespace SEE.Layout
         /// <param name="nodeFactory">the factory that created each node</param>
         /// <param name="padding">the padding to be added to an object's ground area size</param>
         /// <returns>sum of the required ground area over all given elements</returns>
-        private Vector2 Sum(List<LayoutNode> elements, float padding)
+        private Vector2 Sum(List<ILayoutNode> elements, float padding)
         {
             Vector2 result = Vector2.zero;
-            foreach (LayoutNode element in elements)
+            foreach (ILayoutNode element in elements)
             {
                 Vector3 size = element.Scale;
                 result.x += size.x + padding;

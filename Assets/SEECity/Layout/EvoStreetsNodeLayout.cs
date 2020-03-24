@@ -45,7 +45,7 @@ namespace SEE.Layout
         /// </summary>
         private int maximalDepth;
 
-        public override Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes)
         {
             if (gameNodes.Count == 0)
             {
@@ -53,8 +53,8 @@ namespace SEE.Layout
             }
             else if (gameNodes.Count == 1)
             {
-                LayoutNode singleNode = gameNodes.FirstOrDefault();
-                Dictionary<LayoutNode, NodeTransform> layout_result = new Dictionary<LayoutNode, NodeTransform>
+                ILayoutNode singleNode = gameNodes.FirstOrDefault();
+                Dictionary<ILayoutNode, NodeTransform> layout_result = new Dictionary<ILayoutNode, NodeTransform>
                 {
                     [singleNode] = new NodeTransform(Vector3.zero, singleNode.Scale)
                 };
@@ -73,12 +73,12 @@ namespace SEE.Layout
                 }
                 else
                 {
-                    LayoutNode root = roots.FirstOrDefault();
+                    ILayoutNode root = roots.FirstOrDefault();
                     ENode rootNode = GenerateHierarchy(root);
                     maximalDepth = MaxDepth(root);
                     SetScalePivotsRotation(rootNode);
                     CalculationNodeLocation(rootNode, Vector3.zero);
-                    Dictionary<LayoutNode, NodeTransform> layout_result = new Dictionary<LayoutNode, NodeTransform>();
+                    Dictionary<ILayoutNode, NodeTransform> layout_result = new Dictionary<ILayoutNode, NodeTransform>();
                     To_Layout(rootNode, ref layout_result);
                     return layout_result;
                 }
@@ -90,7 +90,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">root of a subtree to be added to the layout result</param>
         /// <param name="layout_result">layout result</param>
-        private void To_Layout(ENode node, ref Dictionary<LayoutNode, NodeTransform> layout_result)
+        private void To_Layout(ENode node, ref Dictionary<ILayoutNode, NodeTransform> layout_result)
         {
             if (node.IsHouse())
             {
@@ -112,7 +112,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">leaf node</param>
         /// <param name="layout_result">layout result</param>
-        private void Place_House(ENode node, ref Dictionary<LayoutNode, NodeTransform> layout_result)
+        private void Place_House(ENode node, ref Dictionary<ILayoutNode, NodeTransform> layout_result)
         {
             layout_result[node.GraphNode] = new NodeTransform(node.Location, node.Scale, node.Rotation);
         }
@@ -122,7 +122,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">inner node</param>
         /// <param name="layout_result">layout result</param>
-        private void Place_Street(ENode node, ref Dictionary<LayoutNode, NodeTransform> layout_result)
+        private void Place_Street(ENode node, ref Dictionary<ILayoutNode, NodeTransform> layout_result)
         {
             layout_result[node.GraphNode] 
                 = new NodeTransform(node.Location, 
@@ -136,13 +136,13 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="root">root of the hierarchy</param>
         /// <returns>root ENode</returns>
-        private ENode GenerateHierarchy(LayoutNode root)
+        private ENode GenerateHierarchy(ILayoutNode root)
         {
             ENode result = new ENode(root)
             {
                 Depth = 0
             };
-            foreach (LayoutNode child in root.Children())
+            foreach (ILayoutNode child in root.Children())
             {
                 ENode kid = GenerateHierarchy(result, child);
                 result.Children.Add(kid);
@@ -156,14 +156,14 @@ namespace SEE.Layout
         /// <param name="parent">parent of node in the ENode tree hierarchy</param>
         /// <param name="node">root of a subtree in the original graph</param>
         /// <returns>ENode representing node</returns>
-        private ENode GenerateHierarchy(ENode parent, LayoutNode node)
+        private ENode GenerateHierarchy(ENode parent, ILayoutNode node)
         {
             ENode result = new ENode(node)
             {
                 Depth = parent.Depth + 1,
                 ParentNode = parent
             };
-            foreach (LayoutNode child in node.Children())
+            foreach (ILayoutNode child in node.Children())
             {
                 ENode kid = GenerateHierarchy(result, child);
                 result.Children.Add(kid);

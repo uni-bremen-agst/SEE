@@ -37,13 +37,13 @@ namespace SEE.Game.Animation
         /// equals null, no callback happens.
         /// </summary>
         /// <param name="gameObject">game object to be animated</param>
-        /// <param name="nodeTransform">the node transformation to be applied</param>
+        /// <param name="layout">the node transformation to be applied</param>
         /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
         /// <param name="callBackTarget">an optional game object that should receive the callback</param>
         /// <param name="callbackName">the method name of the callback</param>
         protected override void AnimateToInternalWithCallback
-                  (GameObject gameObject, 
-                   NodeTransform nodeTransform, 
+                  (GameObject gameObject,
+                   ILayoutNode layout, 
                    bool wasModified, 
                    GameObject callBackTarget, 
                    string callbackName,
@@ -51,19 +51,15 @@ namespace SEE.Game.Animation
         {
             bool mustCallBack = callBackTarget != null;
 
-            // Note: nodeTransform.position.y denotes the ground of the game object, not
-            // the center as normally in Unity. The following position is the one in
-            // Unity's terms where the y co-ordinate denotes the center.
-            Vector3 position = nodeTransform.position;
-            position.y += nodeTransform.scale.y / 2;
+            Vector3 position = layout.CenterPosition;
 
-            // nodeTransform.scale is in world space, while the animation by itween
+            // layout.scale is in world space, while the animation by iTween
             // is in local space. Our game objects may be nested in other game objects,
             // hence, the two spaces may be different.
             // We may need to transform nodeTransform.scale from world space to local space.
             Vector3 localScale = gameObject.transform.parent == null ?
-                                   nodeTransform.scale
-                                   : gameObject.transform.parent.InverseTransformVector(nodeTransform.scale);
+                                     layout.Scale
+                                   : gameObject.transform.parent.InverseTransformVector(layout.Scale);
 
             //Debug.LogFormat("animating {0} from pos={1} scale={2} to pos={3} scale={4}\n",
             //    gameObject.name,

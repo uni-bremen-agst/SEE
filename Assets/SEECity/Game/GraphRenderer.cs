@@ -125,7 +125,7 @@ namespace SEE.Game
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
         /// <param name="layoutNodes">the subset of layout nodes for which to draw the edges</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes, ICollection<LayoutNode> layoutNodes)
+        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes, ICollection<ILayoutNode> layoutNodes)
         {
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
@@ -173,7 +173,7 @@ namespace SEE.Game
 
             // calculate and apply the node layout
             Dictionary<Node, GameObject>.ValueCollection gameNodes = nodeMap.Values;
-            ICollection<LayoutNode> layoutNodes = ToLayoutNodes(gameNodes);
+            ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(gameNodes);
             nodeLayout.Apply(layoutNodes);
             NodeLayout.Move(layoutNodes, settings.origin);
 
@@ -345,7 +345,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        public ICollection<LayoutNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
+        private ICollection<ILayoutNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
         {
             return ToLayoutNodes(gameObjects, leafNodeFactory, innerNodeFactory);
         }
@@ -358,13 +358,13 @@ namespace SEE.Game
         /// <param name="leafNodeFactory">the leaf node factory that created the leaf nodes in <paramref name="gameNodes"/></param>
         /// <param name="innerNodeFactory">the inner node factory that created the inner nodes in <paramref name="gameNodes"/></param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        private ICollection<LayoutNode> ToLayoutNodes
+        private ICollection<ILayoutNode> ToLayoutNodes
             (ICollection<GameObject> gameNodes, 
             NodeFactory leafNodeFactory,
             NodeFactory innerNodeFactory)
         {
-            IList<LayoutNode> result = new List<LayoutNode>();
-            Dictionary<Node, GameNode> to_layout_node = new Dictionary<Node, GameNode>();
+            IList<ILayoutNode> result = new List<ILayoutNode>();
+            Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
 
             foreach (GameObject gameObject in gameNodes)
             {
@@ -379,26 +379,6 @@ namespace SEE.Game
                 }
             }
             LayoutNodes.SetLevels(result);
-            return result;
-        }
-
-        /// <summary>
-        /// Transforms the given <paramref name="layout"/> into the layout representation 
-        /// currently used by the NodeLayout clients. The key of the resulting dictionary are
-        /// the game objects represented by the keys of <paramref name="layout"/>. The value
-        /// of the resulting dictionary is its corresponding NodeTransform.
-        /// </summary>
-        /// <param name="layout">layout to be transformed</param>
-        /// <returns>the node layout indexed by game nodes instead of layout nodes</returns>
-        protected Dictionary<GameObject, NodeTransform> ToNodeTransformLayout(Dictionary<LayoutNode, NodeTransform> layout)
-        {
-            Dictionary<GameObject, NodeTransform> result = new Dictionary<GameObject, NodeTransform>();
-
-            foreach (var entry in layout)
-            {
-                GameNode gameNode = entry.Key as GameNode;
-                result[gameNode.GetGameObject()] = entry.Value;
-            }
             return result;
         }
 
@@ -454,17 +434,17 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Applies the given <paramref name="transform"/> to the given <paramref name="gameNode"/>,
-        /// i.e., sets its size and position according to the <paramref name="transform"/> and
+        /// Applies the given <paramref name="layout"/> to the given <paramref name="gameNode"/>,
+        /// i.e., sets its size and position according to the <paramref name="layout"/> and
         /// possibly rotates it. The game node can represent a leaf or inner node of the node 
         /// hierarchy.
         /// 
         /// Precondition: <paramref name="gameNode"/> must have NodeRef component referencing a
         /// graph node.
         /// </summary>
-        /// <param name="gameNode">the game node the transform should be applied to</param>
-        /// <param name="transform">transform to be applied to the game node</param>
-        public void Apply(GameObject gameNode, NodeTransform transform)
+        /// <param name="gameNode">the game node the layout should be applied to</param>
+        /// <param name="layout">layout to be applied to the game node</param>
+        public void Apply(GameObject gameNode, ILayoutNode layout)
         {
             Node node = gameNode.GetComponent<NodeRef>().node;
 
@@ -473,17 +453,19 @@ namespace SEE.Game
                 // Leaf nodes were created as blocks by leaveNodeFactory.
                 // We need to first scale the game node and only afterwards set its
                 // position because transform.scale refers to the center position.
-                leafNodeFactory.SetSize(gameNode, transform.scale);
-                leafNodeFactory.SetGroundPosition(gameNode, transform.position);
+                leafNodeFactory.SetSize(gameNode, layout.Scale);
+                // FIXME: Must adjust layout.CenterPosition.y
+                leafNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
             }
             else
             {
                 // Inner nodes were created by innerNodeFactory.
-                innerNodeFactory.SetSize(gameNode, transform.scale);
-                innerNodeFactory.SetGroundPosition(gameNode, transform.position);
+                innerNodeFactory.SetSize(gameNode, layout.Scale);
+                // FIXME: Must adjust layout.CenterPosition.y
+                innerNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
             }
             // Rotate the game object.
-            Rotate(gameNode, transform.rotation);
+            Rotate(gameNode, layout.Rotation);
         }
 
         /// <summary>
@@ -613,6 +595,34 @@ namespace SEE.Game
                 else
                 {
                     return innerNodeFactory.Roof(gameNode);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the scale of the given <paramref name="gameNode"/>.
+        /// 
+        /// Precondition: <paramref name="gameNode"/> must have been created by this graph renderer.
+        /// </summary>
+        /// <param name="gameNode"></param>
+        /// <returns>scale of <paramref name="gameNode"/></returns>
+        internal Vector3 GetSize(GameObject gameNode)
+        {
+            NodeRef noderef = gameNode.GetComponent<NodeRef>();
+            if (noderef == null)
+            {
+                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
+            }
+            else
+            {
+                Node node = noderef.node;
+                if (node.IsLeaf())
+                {
+                    return leafNodeFactory.GetSize(gameNode);
+                }
+                else
+                {
+                    return innerNodeFactory.GetSize(gameNode);
                 }
             }
         }

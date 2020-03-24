@@ -19,9 +19,9 @@ namespace SEE.Layout
 
         private readonly float Unit;
 
-        public override Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> gameNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes)
         {
-            Dictionary<LayoutNode, NodeTransform> result = new Dictionary<LayoutNode, NodeTransform>();
+            Dictionary<ILayoutNode, NodeTransform> result = new Dictionary<ILayoutNode, NodeTransform>();
 
             // Simple grid layout with the same number of blocks in each row (roughly).
             int numberOfBuildingsPerRow = (int)Mathf.Sqrt(gameNodes.Count);
@@ -34,7 +34,7 @@ namespace SEE.Layout
             // Note: (position.X, position.Y) is the left lower corner of the game object in the X,Z plane
 
             // Draw all nodes in a grid in ascending alphabetic order of their linkname.
-            foreach (LayoutNode gameNode in gameNodes.OrderBy<LayoutNode, string>(gameObject => gameObject.LinkName))
+            foreach (ILayoutNode gameNode in gameNodes.OrderBy<ILayoutNode, string>(gameObject => gameObject.LinkName))
             {
                 column++;
                 if (column > numberOfBuildingsPerRow)

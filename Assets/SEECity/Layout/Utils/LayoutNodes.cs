@@ -9,12 +9,12 @@ namespace SEE.Layout
         /// for every other node the level is its distance to its root.
         /// </summary>
         /// <param name="layoutNodes">nodes whose level is to be set</param>
-        public static void SetLevels(ICollection<LayoutNode> layoutNodes)
+        public static void SetLevels(ICollection<ILayoutNode> layoutNodes)
         {
-            foreach (LayoutNode root in GetRoots(layoutNodes))
+            foreach (ILayoutNode root in GetRoots(layoutNodes))
             {
                 root.Level = 0;
-                foreach (LayoutNode child in root.Children())
+                foreach (ILayoutNode child in root.Children())
                 {
                     SetLevels(child, 1);
                 }
@@ -27,10 +27,10 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">node whose level is to be set (node.Level)</param>
         /// <param name="level">level to set</param>
-        public static void SetLevels(LayoutNode node, int level)
+        public static void SetLevels(ILayoutNode node, int level)
         {
             node.Level = level;
-            foreach (LayoutNode child in node.Children())
+            foreach (ILayoutNode child in node.Children())
             {
                 SetLevels(child, level + 1);
             }
@@ -42,10 +42,10 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="layoutNodes">layout nodes for which to collect all roots</param>
         /// <returns>list of root nodes</returns>
-        public static IList<LayoutNode> GetRoots(ICollection<LayoutNode> layoutNodes)
+        public static IList<ILayoutNode> GetRoots(ICollection<ILayoutNode> layoutNodes)
         {
-            IList<LayoutNode> roots = new List<LayoutNode>();
-            foreach (LayoutNode layoutNode in layoutNodes)
+            IList<ILayoutNode> roots = new List<ILayoutNode>();
+            foreach (ILayoutNode layoutNode in layoutNodes)
             {
                 if (layoutNode.Parent == null)
                 {

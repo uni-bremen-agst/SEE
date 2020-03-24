@@ -140,6 +140,39 @@ namespace SEE.Layout
         }
 
         /// <summary>
+        /// Yields the greatest and smallest y co-ordinate and the maximal height of all <paramref name="nodes"/> given.
+        /// 
+        /// Precondition: <paramref name="nodes"/> is not empty.
+        /// </summary>
+        /// <param name="nodes">list of nodes whose greatest and smallest y co-ordinate is required</param>
+        /// <param name="minY">smallest y co-ordinate</param>
+        /// <param name="maxY">highest x co-ordinate</param>
+        /// <param name="maxHeight">maximal height of nodes</param>
+        protected void MinMaxBlockY(ICollection<ILayoutNode> nodes, out float minY, out float maxY, out float maxHeight)
+        {
+            maxY = Mathf.NegativeInfinity;
+            minY = Mathf.Infinity;
+            maxHeight = 0.0f;
+            foreach (ILayoutNode node in nodes)
+            {
+                float y = node.Roof.y;
+                if (y > maxY)
+                {
+                    maxY = y;
+                }
+                else if (y < minY)
+                {
+                    minY = y;
+                }
+                float h = node.Scale.y;
+                if (h > maxHeight)
+                {
+                    maxHeight = h;
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns a new game edge.
         /// </summary>
         /// <param name="edge">graph edge for which to create the game edge</param>

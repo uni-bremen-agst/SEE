@@ -63,7 +63,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">an inner node to be lifted</param>
         /// <returns>lift for an innner node</returns>
-        protected float LevelLift(LayoutNode node)
+        protected float LevelLift(ILayoutNode node)
         {
             return node.Level * levelIncreaseForInnerNodes;
         }
@@ -80,7 +80,7 @@ namespace SEE.Layout
         /// <param name="layoutNodes">set of layout nodes for which to compute the layout</param>
         /// <returns>node layout</returns>
         /// 
-        public abstract Dictionary<LayoutNode, NodeTransform> Layout(ICollection<LayoutNode> layoutNodes);
+        public abstract Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes);
 
         /// <summary>
         /// Adds the given <paramref name="offset"/> to every node position in the given <paramref name="layout"/>.
@@ -88,9 +88,9 @@ namespace SEE.Layout
         /// <param name="layout">node layout to be adjusted</param>
         /// <param name="offset">offset to be added</param>
         /// <returns><paramref name="layout"/> where <paramref name="offset"/> has been added to each position</returns>
-        public static Dictionary<LayoutNode, NodeTransform> Move(Dictionary<LayoutNode, NodeTransform> layout, Vector3 offset)
+        public static Dictionary<ILayoutNode, NodeTransform> Move(Dictionary<ILayoutNode, NodeTransform> layout, Vector3 offset)
         {
-            Dictionary<LayoutNode, NodeTransform> result = new Dictionary<LayoutNode, NodeTransform>();
+            Dictionary<ILayoutNode, NodeTransform> result = new Dictionary<ILayoutNode, NodeTransform>();
             foreach(var entry in layout)
             {
                 NodeTransform transform = entry.Value;
@@ -105,9 +105,9 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="layoutNodes">layout nodes to be adjusted</param>
         /// <param name="offset">offset to be added</param>
-        public static void Move(ICollection<LayoutNode> layoutNodes, Vector3 offset)
+        public static void Move(ICollection<ILayoutNode> layoutNodes, Vector3 offset)
         {
-            foreach (LayoutNode layoutNode in layoutNodes)
+            foreach (ILayoutNode layoutNode in layoutNodes)
             {
                 layoutNode.CenterPosition += offset;
             }
@@ -124,12 +124,12 @@ namespace SEE.Layout
         /// Calculates and applies the layout to the given <paramref name="layoutNodes"/>.
         /// </summary>
         /// <param name="layoutNodes">nodes for which to apply the layout</param>
-        public void Apply(ICollection<LayoutNode> layoutNodes)
+        public void Apply(ICollection<ILayoutNode> layoutNodes)
         {
-            Dictionary<LayoutNode, NodeTransform> layout = Layout(layoutNodes);
+            Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes);
             foreach (var entry in layout)
             {
-                LayoutNode node = entry.Key;
+                ILayoutNode node = entry.Key;
                 NodeTransform transform = entry.Value;
                 // y co-ordinate of transform.position refers to the ground
                 Vector3 position = transform.position;

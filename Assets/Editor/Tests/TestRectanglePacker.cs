@@ -208,7 +208,7 @@ namespace SEE.Layout.RectanglePacking
             Vector3 initialSize = Vector3.one;
 
             CubeFactory factory = new CubeFactory();
-            ICollection<LayoutNode> gameObjects = new List<LayoutNode>();
+            ICollection<ILayoutNode> gameObjects = new List<ILayoutNode>();
 
             for (int i = 1; i <= howManyNodes; i++)
             {
@@ -218,10 +218,10 @@ namespace SEE.Layout.RectanglePacking
 
             RectanglePacker packer = new RectanglePacker(0.0f, 1.0f);
 
-            Dictionary<LayoutNode, NodeTransform> layout = packer.Layout(gameObjects);
+            Dictionary<ILayoutNode, NodeTransform> layout = packer.Layout(gameObjects);
         }
 
-        private class MyGameNode : LayoutNode
+        private class MyGameNode : ILayoutNode
         {
             private readonly int index;
 
@@ -231,7 +231,7 @@ namespace SEE.Layout.RectanglePacking
                 this.index = index;
             }
 
-            public LayoutNode Parent => null;
+            public ILayoutNode Parent => null;
 
             private int level = 0;
 
@@ -241,9 +241,9 @@ namespace SEE.Layout.RectanglePacking
                 set => level = value;
             }
 
-            public IList<LayoutNode> Children()
+            public IList<ILayoutNode> Children()
             {
-                return new List<LayoutNode>();
+                return new List<ILayoutNode>();
             }
 
             private Vector3 scale;
