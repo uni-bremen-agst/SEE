@@ -8,7 +8,7 @@ namespace SEE.Layout
     /// the game object (unlike in Unity where it is the center height).
     /// </summary>
     /// Note: Structs are value types and are copied on assignment. 
-    internal struct NodeTransform
+    public struct NodeTransform
     {
         /// <summary>
         /// Constructor setting the position and scale. The rotation will be 0 degrees.
