@@ -116,6 +116,19 @@ namespace SEE.Game
             return children;
         }
 
+        public ICollection<ILayoutNode> Successors
+        {
+            get
+            {
+                ICollection<ILayoutNode> successors = new List<ILayoutNode>();
+                foreach (Edge edge in node.Outgoings)
+                {
+                    successors.Add(to_layout_node[edge.Target]);
+                }
+                return successors;
+            }
+        }
+
         // Features defined by LayoutNode that must be implemented by subclasses of 
         public abstract Vector3 Scale { get; set; }
         public abstract Vector3 CenterPosition { get; set; }
