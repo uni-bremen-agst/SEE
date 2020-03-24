@@ -283,6 +283,8 @@ namespace SEE.Layout.RectanglePacking
                 get => rotation;
                 set => rotation = value;
             }
+
+            public ICollection<ILayoutNode> Successors => new List<ILayoutNode>();
         }
     }
 }

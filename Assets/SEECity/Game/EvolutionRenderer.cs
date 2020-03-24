@@ -965,6 +965,8 @@ namespace SEE.Game
 
             public Vector3 Ground => throw new NotImplementedException();
 
+            public ICollection<ILayoutNode> Successors => throw new NotImplementedException();
+
             public IList<ILayoutNode> Children()
             {
                 throw new NotImplementedException();

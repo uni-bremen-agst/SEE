@@ -59,6 +59,11 @@ namespace SEE.Layout
         Vector3 Ground { get; }
 
         /// <summary>
+        /// The set of immediate successors of this node.
+        /// </summary>
+        ICollection<ILayoutNode> Successors { get; }
+
+        /// <summary>
         /// The set of children of this node. Note: Even nodes for which IsLeaf
         /// returns true, may still have children. Layouts may refuse to layout
         /// the children of a node for which IsLeaf returns true.
