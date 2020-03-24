@@ -131,7 +131,7 @@ namespace SEE.Game
             switch (settings.EdgeLayout)
             {
                 case SEECity.EdgeLayouts.Straight:
-                    layout = new StraightEdgeLayout(leafNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks, layoutNodes);
+                    layout = new StraightEdgeLayout(leafNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
                     break;
                 case SEECity.EdgeLayouts.Spline:
                     layout = new SplineEdgeLayout(leafNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
@@ -146,7 +146,17 @@ namespace SEE.Game
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
             }
             Performance p = Performance.Begin(layout.Name + " layout of edges");
-            ICollection<GameObject> result = layout.DrawEdges(graph, gameNodes);
+            ICollection<GameObject> result;
+            // FIXME
+            if (settings.EdgeLayout == SEECity.EdgeLayouts.Straight || settings.EdgeLayout == SEECity.EdgeLayouts.Spline)
+            {
+                EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
+                result = edgeFactory.DrawEdges(layoutNodes);
+            }
+            else
+            {
+                result = layout.DrawEdges(graph, gameNodes);
+            }
             p.End();
             return result;
         }

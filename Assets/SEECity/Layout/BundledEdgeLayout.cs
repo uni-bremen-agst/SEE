@@ -418,5 +418,10 @@ namespace SEE.Layout
             }
             return result;
         }
+
+        internal override ICollection<LayoutEdge> GetLines(ICollection<ILayoutNode> layoutNodes)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
