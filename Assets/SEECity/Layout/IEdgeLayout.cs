@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel;
 using SEE.GO;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -50,6 +51,8 @@ namespace SEE.Layout
 
         // A mapping of graph nodes onto the game objects representing them visually in the scene
         protected Dictionary<Node, GameObject> gameNodes = new Dictionary<Node, GameObject>();
+
+        internal abstract ICollection<LayoutEdge> GetLines(ICollection<ILayoutNode> layoutNodes);
 
         /// <summary>
         /// Adds all graph nodes contained in any of the game nodes given to gameNodes mapping.
