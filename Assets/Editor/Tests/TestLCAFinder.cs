@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using SEE.DataModel;
-using System;
 
 namespace SEE.Layout
 {
