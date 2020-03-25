@@ -131,13 +131,13 @@ namespace SEE.Game
             switch (settings.EdgeLayout)
             {
                 case SEECity.EdgeLayouts.Straight:
-                    layout = new StraightEdgeLayout(leafNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
+                    layout = new StraightEdgeLayout(settings.EdgesAboveBlocks);
                     break;
                 case SEECity.EdgeLayouts.Spline:
-                    layout = new SplineEdgeLayout(leafNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
+                    layout = new SplineEdgeLayout(settings.EdgesAboveBlocks);
                     break;
                 case SEECity.EdgeLayouts.Bundling:
-                    layout = new BundledEdgeLayout(leafNodeFactory, settings.EdgeWidth, settings.EdgesAboveBlocks);
+                    layout = new BundledEdgeLayout(settings.EdgesAboveBlocks);
                     break;
                 case SEECity.EdgeLayouts.None:
                     // nothing to be done
@@ -145,18 +145,9 @@ namespace SEE.Game
                 default:
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
             }
-            Performance p = Performance.Begin(layout.Name + " layout of edges");
-            ICollection<GameObject> result;
-            // FIXME
-            if (settings.EdgeLayout == SEECity.EdgeLayouts.Straight || settings.EdgeLayout == SEECity.EdgeLayouts.Spline)
-            {
-                EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
-                result = edgeFactory.DrawEdges(layoutNodes);
-            }
-            else
-            {
-                result = layout.DrawEdges(graph, gameNodes);
-            }
+            Performance p = Performance.Begin("edge layout " + layout.Name);
+            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
+            ICollection<GameObject> result = edgeFactory.DrawEdges(layoutNodes);
             p.End();
             return result;
         }

@@ -65,7 +65,7 @@ namespace SEE.GO
         {
             List<GameObject> result = new List<GameObject>();
 
-            foreach (LayoutEdge layoutEdge in layout.GetLines(layoutNodes))
+            foreach (LayoutEdge layoutEdge in layout.Create(layoutNodes))
             {
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);

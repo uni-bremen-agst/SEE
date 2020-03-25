@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-
-using SEE.DataModel;
-using SEE.GO;
+using System;
 
 namespace SEE.Layout
 {
@@ -12,40 +9,29 @@ namespace SEE.Layout
     /// </summary>
     public class BundledEdgeLayout : IEdgeLayout
     {
-        public BundledEdgeLayout(NodeFactory blockFactory, float edgeWidth, bool edgesAboveBlocks)
-            : base(blockFactory, edgeWidth, edgesAboveBlocks)
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
+        public BundledEdgeLayout(bool edgesAboveBlocks)
+            : base(edgesAboveBlocks)
         {
+            name = "Hierarchically Bundled";
         }
 
         /// <summary>
-        /// The maximal depth of node hierarchy of the graph.
+        /// The maximal depth of the node hierarchy of the graph.
         /// </summary>
         private int maxDepth = 0;
 
-        public override ICollection<GameObject> DrawEdges(Graph graph, ICollection<GameObject> nodes)
+        public override ICollection<LayoutEdge> Create(ICollection<ILayoutNode> layoutNodes)
         {
-            List<GameObject> result = new List<GameObject>();
+            ICollection<LayoutEdge> layout = new List<LayoutEdge>();
 
-            /*
-            List<Node> roots = graph.GetRoots();
-            if (roots.Count != 1)
-            {
-                Debug.LogError("Graph must have a single root node.\n");
-                return result;
-            }
-            Material newMat = new Material(defaultLineMaterial);
-            if (newMat == null)
-            {
-                Debug.LogError("Could not find material " + materialPath + "\n");
-                return result;
-            }
+            ICollection<ILayoutNode> roots = GetRoots(layoutNodes);
+            maxDepth = GetMaxDepth(roots, -1);
 
-            maxDepth = graph.GetMaxDepth();
-
-            SetGameNodes(nodes);
-
-            // The distance between of the control points at the subsequent levels of the hierarchy.
-            minY = MaximalNodeHeight();
+            minY = HighestRoofYLevel(layoutNodes);
 
             // TODO: We want the level distances be chosen relative to the maximal height of all
             // game objects within the same subtree. At the very least, we want that for siblings
@@ -53,33 +39,45 @@ namespace SEE.Layout
             // CalculateMaxHeights(gameNodes);
 
             LCAFinder<ILayoutNode> lca = new LCAFinder<ILayoutNode>(roots);
-            foreach (Edge edge in graph.ConnectingEdges(gameNodes.Keys))
-            {
-                GameObject go = new GameObject
-                {
-                    tag = Tags.Edge
-                };
 
-                Node source = edge.Source;
-                Node target = edge.Target;
-                if (source != null && target != null)
+            foreach (ILayoutNode source in layoutNodes)
+            {
+                foreach (ILayoutNode target in source.Successors)
                 {
-                    go.name = edge.Type + "(" + source.LinkName + ", " + target.LinkName + ")";
-                    LineFactory.Draw(go,
-                                     LinePoints.BSplineLinePoints(GetControlPoints(source, target, lca, maxDepth)), 
-                                     edgeWidth * blockFactory.Unit, 
-                                     newMat);
+                    layout.Add(new LayoutEdge(source, target,
+                                              LinePoints.BSplineLinePoints(GetControlPoints(source, target, lca, maxDepth))));
                 }
-                else
-                {
-                    Debug.LogErrorFormat("Scene edge from {0} to {1} of type {2} has a missing source or target.\n",
-                                         source != null ? source.LinkName : "null",
-                                         target != null ? target.LinkName : "null",
-                                         edge.Type);
-                }
-                result.Add(go);
             }
-            */
+            return layout;
+        }
+
+        private int GetMaxDepth(ICollection<ILayoutNode> nodes, int currentDepth)
+        {
+            int max = currentDepth + 1;
+            foreach (ILayoutNode node in nodes)
+            {
+                max = Math.Max(max, GetMaxDepth(node.Children(), currentDepth + 1));
+            }
+            return max;
+        }
+
+
+        /// <summary>
+        /// Yields all nodes in <paramref name="layoutNodes"/> that do not have a parent,
+        /// i.e., are root nodes.
+        /// </summary>
+        /// <param name="layoutNodes">list of nodes</param>
+        /// <returns>all root nodes in <paramref name="layoutNodes"/></returns>
+        private ICollection<ILayoutNode> GetRoots(ICollection<ILayoutNode> layoutNodes)
+        {
+            ICollection<ILayoutNode> result = new List<ILayoutNode>();
+            foreach (ILayoutNode layoutNode in layoutNodes)
+            {
+                if (layoutNode.Parent == null)
+                {
+                    result.Add(layoutNode);
+                }
+            }
             return result;
         }
 
@@ -103,22 +101,18 @@ namespace SEE.Layout
         /// <param name="lcaFinder">to retrieve the lowest common ancestor of source and target</param>
         /// <param name="maxDepth">the maximal depth of the node hierarchy</param>
         /// <returns>control points to draw a bspline between source and target</returns>
-        private Vector3[] GetControlPoints(Node source, Node target, LCAFinder<ILayoutNode> lcaFinder, int maxDepth)
+        private Vector3[] GetControlPoints(ILayoutNode source, ILayoutNode target, LCAFinder<ILayoutNode> lcaFinder, int maxDepth)
         {
             Vector3[] controlPoints = null;
 
-            /*
-            GameObject sourceObject = gameNodes[source];
-            GameObject targetObject = gameNodes[target];
-
             if (source == target)
             {
-                controlPoints = SelfLoop(sourceObject);
+                controlPoints = SelfLoop(source);
             }
             else
             {
                 // Lowest common ancestor
-                Node lca = lcaFinder.LCA<ILayoutNode>(source, target);
+                ILayoutNode lca = lcaFinder.LCA(source, target);
                 if (lca == null)
                 {
                     // This should never occur if we have a single root node, but may happen if
@@ -126,85 +120,74 @@ namespace SEE.Layout
                     // forrest do not have a common ancestor.
                     Debug.LogError("Undefined lowest common ancestor for "
                         + source.LinkName + " and " + target.LinkName + "\n");
-                    controlPoints = ThroughCenter(sourceObject, targetObject, maxDepth);
+                    controlPoints = ThroughCenter(source, target, maxDepth);
                 }
                 else
                 {
-                    GameObject lcaObject = gameNodes[lca];
-                    if (lcaObject == null)
+
+                    // assert: sourceObject != targetObject
+                    // assert: lcaObject != null
+                    // because the edges are only between leaves:
+                    // assert: sourceObject != lcaObject
+                    // assert: targetObject != lcaObject
+
+                    ILayoutNode[] sourceToLCA = Ancestors(source, lca);
+                    //Debug.Assert(sourceToLCA.Length > 1);
+                    //Debug.Assert(sourceToLCA[0] == source);
+                    //Debug.Assert(sourceToLCA[sourceToLCA.Length - 1] == lcaNode);
+
+                    ILayoutNode[] targetToLCA = Ancestors(target, lca);
+                    //Debug.Assert(targetToLCA.Length > 1);
+                    //Debug.Assert(targetToLCA[0] == target);
+                    //Debug.Assert(targetToLCA[targetToLCA.Length - 1] == lcaNode);
+
+                    Array.Reverse(targetToLCA, 0, targetToLCA.Length);
+
+                    // Note: lcaNode is included in both paths
+                    if (sourceToLCA.Length == 2 && targetToLCA.Length == 2)
                     {
-                        Debug.LogError("Undefined game object for lowest common ancestor of "
-                                       + source.LinkName + " and " + target.LinkName + "\n");
-                        controlPoints = ThroughCenter(sourceObject, targetObject, maxDepth);
+                        // source and target are siblings in the same subtree at the same level.
+                        controlPoints = BetweenSiblings(source, target, GetLevelHeight(1));
                     }
                     else
                     {
-                        // assert: sourceObject != targetObject
-                        // assert: lcaObject != null
-                        // because the edges are only between leaves:
-                        // assert: sourceObject != lcaObject
-                        // assert: targetObject != lcaObject
-                        NodeRef lcaNodeRef = lcaObject.GetComponent<NodeRef>();
-                        Node lcaNode = lcaNodeRef.node;
-
-                        Node[] sourceToLCA = Ancestors(source, lcaNode);
-                        //Debug.Assert(sourceToLCA.Length > 1);
-                        //Debug.Assert(sourceToLCA[0] == source);
-                        //Debug.Assert(sourceToLCA[sourceToLCA.Length - 1] == lcaNode);
-
-                        Node[] targetToLCA = Ancestors(target, lcaNode);
-                        //Debug.Assert(targetToLCA.Length > 1);
-                        //Debug.Assert(targetToLCA[0] == target);
-                        //Debug.Assert(targetToLCA[targetToLCA.Length - 1] == lcaNode);
-
-                        Array.Reverse(targetToLCA, 0, targetToLCA.Length);
-
-                        // Note: lcaNode is included in both paths
-                        if (sourceToLCA.Length == 2 && targetToLCA.Length == 2)
+                        //Debug.LogFormat("maxDepth = {0}\n", maxDepth);
+                        // Concatenate both paths.
+                        // We have sufficient many control points without the duplicated LCA,
+                        // hence, we can remove the duplicate
+                        ILayoutNode[] fullPath = new ILayoutNode[sourceToLCA.Length + targetToLCA.Length - 1];
+                        sourceToLCA.CopyTo(fullPath, 0);
+                        // copy without the first element
+                        for (int i = 1; i < targetToLCA.Length; i++)
                         {
-                            // source and target are siblings in the same subtree at the same level.
-                            controlPoints = BetweenSiblings(sourceObject, targetObject, GetLevelHeight(1));
+                            fullPath[sourceToLCA.Length + i - 1] = targetToLCA[i];
                         }
-                        else
+                        // Calculate control points along the node hierarchy 
+                        controlPoints = new Vector3[fullPath.Length];
+                        controlPoints[0] = source.Roof;
+                        for (int i = 1; i < fullPath.Length - 1; i++)
                         {
-                            //Debug.LogFormat("maxDepth = {0}\n", maxDepth);
-                            // Concatenate both paths.
-                            // We have sufficient many control points without the duplicated LCA,
-                            // hence, we can remove the duplicate
-                            Node[] fullPath = new Node[sourceToLCA.Length + targetToLCA.Length - 1];
-                            sourceToLCA.CopyTo(fullPath, 0);
-                            // copy without the first element
-                            for (int i = 1; i < targetToLCA.Length; i++)
-                            {
-                                fullPath[sourceToLCA.Length + i - 1] = targetToLCA[i];
-                            }
-                            // Calculate control points along the node hierarchy 
-                            controlPoints = new Vector3[fullPath.Length];
-                            controlPoints[0] = blockFactory.Roof(sourceObject);
-                            for (int i = 1; i < fullPath.Length - 1; i++)
-                            {
-                                // We consider the height of intermediate nodes.
-                                // Note that a root has level 0 and the level is increases along 
-                                // the childrens' depth. That is why we need to choose the height
-                                // as a measure relative to maxDepth.
-                                controlPoints[i] = gameNodes[fullPath[i]].transform.position
-                                                   + GetLevelHeight(fullPath[i].Level) * Vector3.up;
-                            }
-                            controlPoints[controlPoints.Length - 1] = blockFactory.Roof(targetObject);
-                            //Dump(controlPoints);
+                            // We consider the height of intermediate nodes.
+                            // Note that a root has level 0 and the level is increased along 
+                            // the childrens' depth. That is why we need to choose the height
+                            // as a measure relative to maxDepth.
+                            // TODO: Do we really want the center position here?
+                            controlPoints[i] = fullPath[i].CenterPosition
+                                               + GetLevelHeight(fullPath[i].Level) * Vector3.up;
                         }
+                        controlPoints[controlPoints.Length - 1] = target.Roof;
+                        //Dump(controlPoints);
                     }
                 }
             }
-            */
             return controlPoints;
         }
 
         /// <summary>
-        /// Returns four control points for an edge from <paramref name="sourceObject"/> to <paramref name="targetObject"/>.
-        /// The first control point is the center of the roof of <paramref name="sourceObject"/> and the last
-        /// control point the center of the roof of <paramref name="targetObject"/>. The second and third control point
-        /// is the position in between <paramref name="sourceObject"/> and <paramref name="targetObject"/> where
+        /// Returns four control points for an edge from <paramref name="source"/> to <paramref name="target"/>.
+        /// The first control point is the center of the roof of <paramref name="source"/> and the last
+        /// control point the center of the roof of <paramref name="target"/>. The second and third control point
+        /// is the position in between <paramref name="source"/> and <paramref name="target"/> where
         /// the y co-ordinate is specified by <paramref name="yLevel"/>. That means an edge between siblings is drawn
         /// as a direct spline on the shortest path between the two nodes from roof to roof. Thus, no hierarchical
         /// bundling is applied. We assume that siblings are close to each other for all hierarchical layouts,
@@ -212,16 +195,16 @@ namespace SEE.Layout
         /// over one single control point, they would often take a detour even though the nodes are close by. The
         /// detour makes it difficult to follow the edges visually.
         /// </summary>
-        /// <param name="sourceObject">the object where to start the edge</param>
-        /// <param name="targetObject">the object where to end the edge</param>
+        /// <param name="source">the object where to start the edge</param>
+        /// <param name="target">the object where to end the edge</param>
         /// <param name="yLevel">the y co-ordinate of the two middle control points</param>
         /// <returns>control points for an edge between siblings</returns>
-        private Vector3[] BetweenSiblings(GameObject sourceObject, GameObject targetObject, float yLevel)
+        private Vector3[] BetweenSiblings(ILayoutNode source, ILayoutNode target, float yLevel)
         {
             // We do need at least four control points for Bsplines (it is fine to include 
             // the middle control point twice).
-            Vector3 start = blockFactory.Roof(sourceObject);
-            Vector3 end = blockFactory.Roof(targetObject);
+            Vector3 start = source.Roof;
+            Vector3 end = target.Roof;
             // position in between start and end
             Vector3 middle = Vector3.Lerp(start, end, 0.5f);
             middle.y += yLevel;
@@ -272,7 +255,7 @@ namespace SEE.Layout
         /// <param name="child">from where to start</param>
         /// <param name="ancestor">where to stop</param>
         /// <returns>path from child to ancestor in the tree</returns>
-        private Node[] Ancestors(Node child, Node ancestor)
+        private ILayoutNode[] Ancestors(ILayoutNode child, ILayoutNode ancestor)
         {
             int childLevel = child.Level;
             int ancestorLevel = ancestor.Level;
@@ -280,8 +263,8 @@ namespace SEE.Layout
             // thus, childLevel >= ancestorLevel
 
             // if ancestorLevel = childLevel, then path.Count = 1
-            Node[] path = new Node[childLevel - ancestorLevel + 1];
-            Node cursor = child;
+            ILayoutNode[] path = new ILayoutNode[childLevel - ancestorLevel + 1];
+            ILayoutNode cursor = child;
             int i = 0;
             while (true)
             {
@@ -338,13 +321,13 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">node whose self loop control points are required</param>
         /// <returns>control points forming a self loop above the node</returns>
-        private Vector3[] SelfLoop(GameObject node)
+        private Vector3[] SelfLoop(ILayoutNode node)
         {
-            Vector3 roofCenter = blockFactory.Roof(node);
-            Vector3 extent = blockFactory.GetSize(node) / 2.0f;
+            Vector3 roofCenter = node.Roof;
+            Vector3 extent = node.Scale / 2.0f;
 
             Vector3 start = new Vector3(roofCenter.x - extent.x, roofCenter.y, roofCenter.z - extent.z);
-            Vector3 end   = new Vector3(roofCenter.x + extent.x, roofCenter.y, roofCenter.z + extent.z);
+            Vector3 end = new Vector3(roofCenter.x + extent.x, roofCenter.y, roofCenter.z + extent.z);
             Vector3 middle = roofCenter + Vector3.Distance(start, end) * Vector3.up;
             Vector3[] controlPoints = new Vector3[4];
             controlPoints[0] = start;
@@ -365,14 +348,14 @@ namespace SEE.Layout
         /// the two nodes with respect to the x and z axis; its height (y axis) is the
         /// highest hierarchical level, that is, one levelUnit above the level at maxDepth.
         /// </summary>
-        /// <param name="sourceObject"></param>
-        /// <param name="targetObject"></param>
+        /// <param name="source"></param>
+        /// <param name="target"></param>
         /// <param name="maxDepth">maximal depth of the node hierarchy</param>
         /// <returns>control points for two nodes without common ancestor</returns>
-        private Vector3[] ThroughCenter(GameObject sourceObject, GameObject targetObject, int maxDepth)
+        private Vector3[] ThroughCenter(ILayoutNode source, ILayoutNode target, int maxDepth)
         {
-            Vector3 start = blockFactory.Roof(sourceObject);
-            Vector3 end = blockFactory.Roof(targetObject);
+            Vector3 start = source.Roof;
+            Vector3 end = target.Roof;
             // note: height is independent of the roofs; it is the distance to the ground
             return ThroughCenter(start, end, GetLevelHeight(-1));
         }
@@ -402,30 +385,21 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Yields the maximal height over all nodes (stored in gameNodes).
+        /// Yields the largest roof co-ordinate over all given <paramref name="layoutNodes"/>.
         /// </summary>
-        /// <returns>maximal height of gameNodes in y axis</returns>
-        private float MaximalNodeHeight()
+        /// <returns>largest roof co-ordinate</returns>
+        private float HighestRoofYLevel(ICollection<ILayoutNode> layoutNodes)
         {
             float result = 0.0f;
-            foreach (KeyValuePair<Node, GameObject> node in gameNodes)
+            foreach (ILayoutNode node in layoutNodes)
             {
-                Node n = node.Key;
-                if (n != null && n.IsLeaf())
+                float y = node.CenterPosition.y + node.Scale.y / 2.0f;
+                if (y > result)
                 {
-                    Vector3 size = blockFactory.GetSize(node.Value);
-                    if (size.y > result)
-                    {
-                        result = size.y;
-                    }
+                    result = y;
                 }
             }
             return result;
-        }
-
-        internal override ICollection<LayoutEdge> GetLines(ICollection<ILayoutNode> layoutNodes)
-        {
-            throw new NotImplementedException();
         }
     }
 }
