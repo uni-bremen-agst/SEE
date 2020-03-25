@@ -1,5 +1,5 @@
 ﻿using UnityEditor;
-using SEE.Animation;
+using SEE.Game;
 
 namespace SEEEditor
 {
