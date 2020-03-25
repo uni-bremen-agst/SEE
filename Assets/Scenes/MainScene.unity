@@ -365,7 +365,7 @@ MonoBehaviour:
   NodeLayout: 1
   EdgeLayout: 3
   ZScoreScale: 0
-  EdgeWidth: 0.3
+  EdgeWidth: 2
   ShowErosions: 0
   EdgesAboveBlocks: 1
   ArchitectureIssue: Metric.Architecture_Violations
@@ -1837,7 +1837,7 @@ MonoBehaviour:
   NodeLayout: 3
   EdgeLayout: 3
   ZScoreScale: 0
-  EdgeWidth: 0.3
+  EdgeWidth: 1
   ShowErosions: 0
   EdgesAboveBlocks: 1
   ArchitectureIssue: Metric.Architecture_Violations
@@ -1912,11 +1912,11 @@ MonoBehaviour:
   LeafObjects: 0
   InnerNodeObjects: 4
   NodeLayout: 5
-  EdgeLayout: 1
-  ZScoreScale: 1
-  EdgeWidth: 0.3
+  EdgeLayout: 2
+  ZScoreScale: 0
+  EdgeWidth: 1
   ShowErosions: 0
-  EdgesAboveBlocks: 1
+  EdgesAboveBlocks: 0
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -1989,9 +1989,9 @@ MonoBehaviour:
   LeafObjects: 0
   InnerNodeObjects: 3
   NodeLayout: 4
-  EdgeLayout: 2
-  ZScoreScale: 1
-  EdgeWidth: 0.3
+  EdgeLayout: 3
+  ZScoreScale: 0
+  EdgeWidth: 1
   ShowErosions: 0
   EdgesAboveBlocks: 0
   ArchitectureIssue: Metric.Architecture_Violations
@@ -2066,9 +2066,9 @@ MonoBehaviour:
   LeafObjects: 0
   InnerNodeObjects: 4
   NodeLayout: 2
-  EdgeLayout: 0
+  EdgeLayout: 1
   ZScoreScale: 0
-  EdgeWidth: 0.3
+  EdgeWidth: 1
   ShowErosions: 1
   EdgesAboveBlocks: 1
   ArchitectureIssue: Metric.Architecture_Violations
@@ -2289,7 +2289,7 @@ MonoBehaviour:
   NodeLayout: 0
   EdgeLayout: 3
   ZScoreScale: 0
-  EdgeWidth: 0.3
+  EdgeWidth: 1
   ShowErosions: 0
   EdgesAboveBlocks: 1
   ArchitectureIssue: Metric.Architecture_Violations
