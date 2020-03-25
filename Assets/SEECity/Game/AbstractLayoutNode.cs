@@ -103,7 +103,7 @@ namespace SEE.Game
         /// returns true, the empty list will be returned. 
         /// </summary>
         /// <returns>children of this node</returns>
-        public IList<ILayoutNode> Children()
+        public ICollection<ILayoutNode> Children()
         {
             IList<ILayoutNode> children = new List<ILayoutNode>();
             if (!IsLeaf)

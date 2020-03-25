@@ -1,19 +1,18 @@
-﻿using NUnit.Framework;
-using SEE.DataModel;
+﻿using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace SEE.Layout
 {
     /// <summary>
-    /// Unit tests for Graph.
+    /// Unit tests for LCAFinder.
     /// </summary>
     class TestLCAFinder
     {
-        Graph graph;
         private int nodeID = 0;
 
-        private Node NewVertex(string name = "")
+        private LNode NewVertex(string name = "")
         {
-            Node node = new Node();
+            LNode node = new LNode();
             if (string.IsNullOrEmpty(name))
             {
                 node.LinkName = nodeID.ToString();
@@ -23,28 +22,64 @@ namespace SEE.Layout
             {
                 node.LinkName = name;
             }
-            graph.AddNode(node);
             return node;
+        }
+
+        private class LNode : IHierarchyNode<LNode>
+        {
+            private LNode parent;
+
+            public LNode Parent => parent;
+
+            private int level;
+
+            public int Level
+            {
+                get => level;
+                set => level = value;
+            }
+
+            public bool IsLeaf => children.Count == 0;
+
+            private string linkname;
+
+            public string LinkName
+            {
+                get => linkname;
+                set => linkname = value;
+            }
+
+            private ICollection<LNode> children = new List<LNode>();
+
+            public ICollection<LNode> Children()
+            {
+                return children;
+            }
+
+            public void AddChild(LNode child)
+            {
+                child.parent = this;
+                children.Add(child);
+            }
         }
 
         [SetUp]
         protected void Setup()
         {
-            graph = new Graph();
             nodeID = 0;
         }
 
         [Test]
         public void TestEmpty()
         {
-            Assert.That(() => new LCAFinder(graph, (Node)null), Throws.ArgumentNullException);
+            Assert.That(() => new LCAFinder<LNode>((LNode)null), Throws.ArgumentNullException);
         }
 
         [Test]
         public void TestSingle()
         {
-            Node root = NewVertex();
-            LCAFinder lca = new LCAFinder(graph, root);
+            LNode root = NewVertex();
+            LCAFinder<LNode> lca = new LCAFinder<LNode>(root);
 
             Assert.AreEqual(root, lca.LCA(root, root));
         }
@@ -52,13 +87,13 @@ namespace SEE.Layout
         [Test]
         public void TestSimple()
         {
-            Node root = NewVertex();
-            Node a = NewVertex();
-            Node b = NewVertex();
+            LNode root = NewVertex();
+            LNode a = NewVertex();
+            LNode b = NewVertex();
             root.AddChild(a);
             root.AddChild(b);
 
-            LCAFinder lca = new LCAFinder(graph, root);
+            LCAFinder<LNode> lca = new LCAFinder<LNode>(root);
 
             Assert.AreEqual(root, lca.LCA(a, b));
             Assert.AreEqual(root, lca.LCA(root, b));
@@ -78,17 +113,17 @@ namespace SEE.Layout
             //            /\ 
             //          c11 c12
 
-            Node root = NewVertex("root");
-            Node a = NewVertex("a");
-            Node b = NewVertex("b");
-            Node c = NewVertex("c");
-            Node a1 = NewVertex("a1");
-            Node a2 = NewVertex("a2");
-            Node b1 = NewVertex("b1");
-            Node c1 = NewVertex("c1");
-            Node c2 = NewVertex("c2");
-            Node c11 = NewVertex("c11");
-            Node c12 = NewVertex("c12");
+            LNode root = NewVertex("root");
+            LNode a = NewVertex("a");
+            LNode b = NewVertex("b");
+            LNode c = NewVertex("c");
+            LNode a1 = NewVertex("a1");
+            LNode a2 = NewVertex("a2");
+            LNode b1 = NewVertex("b1");
+            LNode c1 = NewVertex("c1");
+            LNode c2 = NewVertex("c2");
+            LNode c11 = NewVertex("c11");
+            LNode c12 = NewVertex("c12");
 
             root.AddChild(a);
             root.AddChild(b);
@@ -104,7 +139,7 @@ namespace SEE.Layout
             c1.AddChild(c11);
             c1.AddChild(c12);
 
-            LCAFinder lca = new LCAFinder(graph, root);
+            LCAFinder<LNode> lca = new LCAFinder<LNode>(root);
 
             Assert.AreEqual(a, lca.LCA(a1, a2));
             Assert.AreEqual(root, lca.LCA(a2, b1));
@@ -112,6 +147,60 @@ namespace SEE.Layout
             Assert.AreEqual(c1, lca.LCA(c11, c12));
             Assert.AreEqual(c, lca.LCA(c2, c12));
             Assert.AreEqual(c, lca.LCA(c1, c));
+        }
+
+        [Test]
+        public void TestForrest()
+        {
+            //        r2  r2
+            //       / |   \
+            //      a  b    c
+            //     /\  |    /\
+            //   a1 a2 b1 c1 c2
+            //            /\ 
+            //          c11 c12
+
+            LNode r1 = NewVertex("r1");
+            LNode a = NewVertex("a");
+            LNode b = NewVertex("b");            
+            LNode a1 = NewVertex("a1");
+            LNode a2 = NewVertex("a2");
+            LNode b1 = NewVertex("b1");
+            r1.AddChild(a);
+            r1.AddChild(b);
+            a.AddChild(a1);
+            a.AddChild(a2);
+            b.AddChild(b1);
+
+            LNode r2 = NewVertex("r2");
+            LNode c = NewVertex("c");
+            LNode c1 = NewVertex("c1");
+            LNode c2 = NewVertex("c2");
+            LNode c11 = NewVertex("c11");
+            LNode c12 = NewVertex("c12");
+
+            r2.AddChild(c);
+            c.AddChild(c1);
+            c.AddChild(c2);
+            c1.AddChild(c11);
+            c1.AddChild(c12);
+
+            ICollection<LNode> roots = new List<LNode>();
+            roots.Add(r1);
+            roots.Add(r2);
+
+            LCAFinder<LNode> lca = new LCAFinder<LNode>(roots);
+
+            Assert.AreEqual(a, lca.LCA(a1, a2));
+            Assert.AreEqual(r1, lca.LCA(a2, b1));
+            
+            Assert.AreEqual(c1, lca.LCA(c11, c12));
+            Assert.AreEqual(c, lca.LCA(c2, c12));
+            Assert.AreEqual(c, lca.LCA(c1, c));
+            Assert.AreEqual(r2, lca.LCA(r2, c12));
+
+            Assert.AreEqual(null, lca.LCA(b1, c12));
+            Assert.AreEqual(null, lca.LCA(r1, r2));
         }
     }
 }

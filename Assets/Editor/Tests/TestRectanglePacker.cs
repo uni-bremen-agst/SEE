@@ -241,7 +241,7 @@ namespace SEE.Layout.RectanglePacking
                 set => level = value;
             }
 
-            public IList<ILayoutNode> Children()
+            public ICollection<ILayoutNode> Children()
             {
                 return new List<ILayoutNode>();
             }

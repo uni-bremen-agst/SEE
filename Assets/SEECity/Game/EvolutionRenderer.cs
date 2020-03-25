@@ -967,7 +967,7 @@ namespace SEE.Game
 
             public ICollection<ILayoutNode> Successors => throw new NotImplementedException();
 
-            public IList<ILayoutNode> Children()
+            public ICollection<ILayoutNode> Children()
             {
                 throw new NotImplementedException();
             }

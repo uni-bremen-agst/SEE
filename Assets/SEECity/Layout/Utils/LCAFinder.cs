@@ -1,24 +1,20 @@
-﻿using SEE.DataModel;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using UnityEngine;
 
 namespace SEE.Layout
 {
-
     /// <summary>
     /// Computes the lowest common ancestors (LCA) in a rooted tree or a forest based on
     /// the algorithm by Berkman, Omer and Vishkin, Uzi(1993), "Recursive Star-Tree 
     /// Parallel Data Structure", SIAM Journal on Computing, 22 (2): 221–242.
     /// </summary>
-    public class LCAFinder
+    public class LCAFinder<HNode> where HNode : IHierarchyNode<HNode>
     {
-        private Graph graph;
-        private IList<Node> roots;
         private uint maxLevel;
 
-        private Dictionary<Node, int> nodeMap;
-        private Node[] indexList;
+        private Dictionary<HNode, int> nodeMap;
+        private HNode[] indexList;
 
         private int[] eulerTour;
         private int tourLength;
@@ -34,19 +30,33 @@ namespace SEE.Layout
 
         /// <summary>
         /// Runs the preprocessing step to find the LCA in O(|V| log(|V|)) time and space.
-        /// Precondition: The graph forms a tree and root is not null.
+        /// Precondition: The descendants of <paramref name="root"/> form a tree.
         /// </summary>
-        /// <param name="graph">input graph (tree, really)</param>
         /// <param name="root">root of the tree</param>
-        public LCAFinder(Graph graph, Node root)
+        public LCAFinder(HNode root)
         {
             if (root == null)
             {
                 throw new System.ArgumentNullException("Root must not be null.");
             }
-            IList<Node> roots = new List<Node>();
+            ICollection<HNode> roots = new List<HNode>();
             roots.Add(root);
-            Run(graph, roots);
+            Run(roots);
+        }
+
+        /// <summary>
+        /// Runs the preprocessing step to find the LCA in O(|V| log(|V|)) time and space.
+        /// Precondition: The roots and their descendants form a forest (non-cyclic; every nodes
+        /// has at most one parent).
+        /// </summary>
+        /// <param name="root">roots of the forest</param>
+        public LCAFinder(ICollection<HNode> roots)
+        {
+            if (roots.Count == 0)
+            {
+                throw new System.Exception("Empty set of roots given.");
+            }
+            Run(roots);
         }
 
         /// <summary>
@@ -78,46 +88,47 @@ namespace SEE.Layout
 
         /// <summary>
         /// Runs the preprocessing step to find the LCA in O(|V| log(|V|)) time and space.
-        /// Precondition: The graph forms a forest.
         /// </summary>
-        /// <param name="graph">input graph (forest, really)</param>
         /// <param name="root">roots of the forest</param>
-        public LCAFinder(Graph graph, IList<Node> roots)
+        private void Run(ICollection<HNode> roots)
         {
-            Run(graph, roots);
-        }
-
-        /// <summary>
-        /// Runs the preprocessing step to find the LCA in O(|V| log(|V|)) time and space.
-        /// Precondition: The graph forms a forest.
-        /// </summary>
-        /// <param name="graph">input graph (forest, really)</param>
-        /// <param name="root">roots of the forest</param>
-        private void Run(Graph graph, IList<Node> roots)
-        {
-            this.graph = graph;
-            this.maxLevel = 1 + Log2((uint)graph.Nodes().Count);
-            this.roots = roots;
-
-            if (this.roots.Count == 0)
-            {
-                Debug.LogError("LCAFinder: empty set of roots.\n");
-            }
-            else
-            {
-                DetermineEulerTours();
-            }
+            int numberOfNodes = MapAllNodes(roots);
+            this.maxLevel = 1 + Log2((uint)numberOfNodes);
+            DetermineEulerTours(roots, numberOfNodes);
         }
 
         /// <summary>
         /// Creates the mapping of nodes onto integers and the index list.
         /// </summary>
-        private void MapAllNodes()
+        private int MapAllNodes(ICollection<HNode> roots)
         {
-            NodeToIntegerMap nodeToIntegerMapping = new NodeToIntegerMap(graph.Nodes());
+            ICollection<HNode> allNodes = AllNodes(roots);
+            NodeToIntegerMap nodeToIntegerMapping = new NodeToIntegerMap(allNodes);
             nodeMap = nodeToIntegerMapping.NodeMap();
             indexList = nodeToIntegerMapping.IndexList();
-            //nodeToIntegerMapping.Dump();
+            return allNodes.Count;
+        }
+
+        /// <summary>
+        /// Gathers all nodes: <paramref name="roots"/> and their transitive descendants.
+        /// </summary>
+        /// <param name="roots">list of root nodes</param>
+        /// <returns><paramref name="roots"/> and their transitive descendants</returns>
+        private ICollection<HNode> AllNodes(ICollection<HNode> roots)
+        {
+            List<HNode> result = new List<HNode>(roots);
+            Queue<HNode> todos = new Queue<HNode>(roots);
+            while (todos.Count > 0)
+            {
+                HNode node = todos.Dequeue();
+                ICollection<HNode> children = node.Children();
+                result.AddRange(children);
+                foreach (HNode child in children)
+                {
+                    todos.Enqueue(child);
+                }
+            }
+            return result;
         }
 
         /// <summary>
@@ -148,8 +159,8 @@ namespace SEE.Layout
                     this.level[tourLength] = lvl;
                     tourLength++;
 
-                    Node node = indexList[n];
-                    foreach (Node edge in node.Children())
+                    HNode node = indexList[n];
+                    foreach (HNode edge in node.Children())
                     {
                         nodeMap.TryGetValue(edge, out int child);
 
@@ -209,11 +220,8 @@ namespace SEE.Layout
         /// Determines the Euler tours for all subtrees rooted by any of the given roots.
         /// Computes eulerTour, level, and representative.
         /// </summary>
-        private void DetermineEulerTours()
+        private void DetermineEulerTours(ICollection<HNode> roots, int numberOfNodes)
         {
-            MapAllNodes();
-
-            int numberOfNodes = graph.Nodes().Count;
             eulerTour = new int[2 * numberOfNodes];
             level = new int[2 * numberOfNodes];
             representative = new int[numberOfNodes];
@@ -221,7 +229,7 @@ namespace SEE.Layout
             numberComponent = 0;
             tree = new int[numberOfNodes];
 
-            foreach (Node root in roots)
+            foreach (HNode root in roots)
             {
                 nodeMap.TryGetValue(root, out int u);
 
@@ -262,7 +270,7 @@ namespace SEE.Layout
         /// <param name="nodeA">first node</param>
         /// <param name="nodeB">second</param>
         /// <returns></returns>
-        public Node LCA(Node nodeA, Node nodeB)
+        public HNode LCA(HNode nodeA, HNode nodeB)
         {
             if (!nodeMap.TryGetValue(nodeA, out int indexOfA))
             {
@@ -281,7 +289,7 @@ namespace SEE.Layout
             // If a and b are in different components, they do not have an LCA
             if (tree[indexOfA] != tree[indexOfB] || tree[indexOfA] == 0)
             {
-                return null;
+                return default(HNode);
             }
             indexOfA = representative[indexOfA];
             indexOfB = representative[indexOfB];
@@ -304,5 +312,57 @@ namespace SEE.Layout
             return indexList[eulerTour[sol]];
         }
 
+        /// <summary>
+        /// Provides a one-to-one mapping for a collection of nodes to the integer range
+        /// [0, n), where n is the number of nodes in the collection.
+        /// </summary>
+        private class NodeToIntegerMap
+        {
+            /// <summary>
+            /// The mapping from nodes onto integers, i.e., the inverse of indexList.
+            /// </summary>
+            private readonly Dictionary<HNode, int> nodeMap;
+
+            /// <summary>
+            /// The mapping from integers onto nodes, i.e., the inverse of nodeMap.
+            /// </summary>
+            private readonly HNode[] indexList;
+
+            /// <summary>
+            /// Create a new mapping from a set of nodes.
+            /// Precondition: nodes is not null.
+            /// </summary>
+            /// <param name="nodes">the input list of nodes</param>
+            public NodeToIntegerMap(ICollection<HNode> nodes)
+            {
+                nodeMap = new Dictionary<HNode, int>(nodes.Count);
+                indexList = new HNode[nodes.Count];
+                int i = 0;
+                foreach (HNode v in nodes)
+                {
+                    nodeMap.Add(v, nodeMap.Count);
+                    indexList[i] = v;
+                    i++;
+                }
+            }
+
+            /// <summary>
+            /// Yields the mapping from nodes onto integers, i.e., the inverse of indexList.
+            /// </summary>
+            /// <returns>a mapping from nodes onto integers</returns>
+            public Dictionary<HNode, int> NodeMap()
+            {
+                return nodeMap;
+            }
+
+            /// <summary>
+            /// Yields the mapping from integers onto nodes, i.e., the inverse of nodeMap.
+            /// </summary>
+            /// <returns>mapping from integers onto nodes</returns>
+            public HNode[] IndexList()
+            {
+                return indexList;
+            }
+        }
     }
 }
