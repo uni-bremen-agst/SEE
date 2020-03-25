@@ -87,7 +87,7 @@ namespace SEE.Layout
         /// <returns>the radius required for a circle represent parent</returns>
         private float PlaceNodes(ILayoutNode parent)
         {
-            IList<ILayoutNode> children = parent.Children();
+            ICollection<ILayoutNode> children = parent.Children();
 
             if (children.Count == 0)
             {

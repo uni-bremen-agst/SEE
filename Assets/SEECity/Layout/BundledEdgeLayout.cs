@@ -26,6 +26,7 @@ namespace SEE.Layout
         {
             List<GameObject> result = new List<GameObject>();
 
+            /*
             List<Node> roots = graph.GetRoots();
             if (roots.Count != 1)
             {
@@ -51,7 +52,7 @@ namespace SEE.Layout
             // whose edges are drawn as direct splines. They should be led across all other siblings.
             // CalculateMaxHeights(gameNodes);
 
-            LCAFinder lca = new LCAFinder(graph, roots);
+            LCAFinder<ILayoutNode> lca = new LCAFinder<ILayoutNode>(roots);
             foreach (Edge edge in graph.ConnectingEdges(gameNodes.Keys))
             {
                 GameObject go = new GameObject
@@ -78,6 +79,7 @@ namespace SEE.Layout
                 }
                 result.Add(go);
             }
+            */
             return result;
         }
 
@@ -101,10 +103,11 @@ namespace SEE.Layout
         /// <param name="lcaFinder">to retrieve the lowest common ancestor of source and target</param>
         /// <param name="maxDepth">the maximal depth of the node hierarchy</param>
         /// <returns>control points to draw a bspline between source and target</returns>
-        private Vector3[] GetControlPoints(Node source, Node target, LCAFinder lcaFinder, int maxDepth)
+        private Vector3[] GetControlPoints(Node source, Node target, LCAFinder<ILayoutNode> lcaFinder, int maxDepth)
         {
-            Vector3[] controlPoints;
+            Vector3[] controlPoints = null;
 
+            /*
             GameObject sourceObject = gameNodes[source];
             GameObject targetObject = gameNodes[target];
 
@@ -115,7 +118,7 @@ namespace SEE.Layout
             else
             {
                 // Lowest common ancestor
-                Node lca = lcaFinder.LCA(source, target);
+                Node lca = lcaFinder.LCA<ILayoutNode>(source, target);
                 if (lca == null)
                 {
                     // This should never occur if we have a single root node, but may happen if
@@ -193,6 +196,7 @@ namespace SEE.Layout
                     }
                 }
             }
+            */
             return controlPoints;
         }
 
