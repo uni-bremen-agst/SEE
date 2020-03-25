@@ -11,7 +11,7 @@ namespace SEE.Layout
     /// the algorithm by Berkman, Omer and Vishkin, Uzi(1993), "Recursive Star-Tree 
     /// Parallel Data Structure", SIAM Journal on Computing, 22 (2): 221–242.
     /// </summary>
-    internal class LCAFinder
+    public class LCAFinder
     {
         private Graph graph;
         private IList<Node> roots;
@@ -34,12 +34,16 @@ namespace SEE.Layout
 
         /// <summary>
         /// Runs the preprocessing step to find the LCA in O(|V| log(|V|)) time and space.
-        /// Precondition: The graph forms a tree.
+        /// Precondition: The graph forms a tree and root is not null.
         /// </summary>
         /// <param name="graph">input graph (tree, really)</param>
         /// <param name="root">root of the tree</param>
         public LCAFinder(Graph graph, Node root)
         {
+            if (root == null)
+            {
+                throw new System.ArgumentNullException("Root must not be null.");
+            }
             IList<Node> roots = new List<Node>();
             roots.Add(root);
             Run(graph, roots);
