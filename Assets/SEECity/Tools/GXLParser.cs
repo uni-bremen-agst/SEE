@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
 
-namespace SEE.DataModel
+namespace SEE.Tools
 {
     public class GXLParser : IDisposable
     {

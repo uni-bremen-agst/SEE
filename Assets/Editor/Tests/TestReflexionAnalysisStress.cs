@@ -1,7 +1,9 @@
 ﻿using NUnit.Framework;
 using UnityEngine;
 
-namespace SEE.DataModel
+using SEE.DataModel;
+
+namespace SEE.Tools
 {
     internal class TestReflexionAnalysisStress : TestReflexionAnalysis
     {

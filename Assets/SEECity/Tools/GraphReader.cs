@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.DataModel
+using SEE.DataModel;
+
+namespace SEE.Tools
 {
     /// <summary>
     /// Reads a graph from a GXL file and returns it as a graph.
