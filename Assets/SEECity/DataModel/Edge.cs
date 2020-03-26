@@ -15,6 +15,27 @@ namespace SEE.DataModel
         // Source and target will be a shallow copy instead.
 
         /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="source">source of the edge</param>
+        /// <param name="target">target of the edge</param>
+        /// <param name="type">type of the edge</param>
+        public Edge(Node source, Node target, string type)
+        {
+            this.source = source;
+            this.target = target;
+            this.Type   = type;
+        }
+
+        /// <summary>
+        /// Constructor. Source, target, and type of the edge remain undefined.
+        /// </summary>
+        public Edge()
+        {
+            // intentionally left blank
+        }
+
+        /// <summary>
         /// The source of the edge.
         /// </summary
         [SerializeField]

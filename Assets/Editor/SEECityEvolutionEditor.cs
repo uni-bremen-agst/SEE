@@ -9,7 +9,7 @@ namespace SEEEditor
     /// </summary>
     [CustomEditor(typeof(SEECityEvolution))]
     [CanEditMultipleObjects]
-    public class SEECityEvolutionEditor : AbstractSEECityEditor
+    public class SEECityEvolutionEditor : StoredSEECityEditor
     {
         public override void OnInspectorGUI()
         {
