@@ -31,7 +31,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.DataModel
+using SEE.DataModel;
+
+namespace SEE.Tools
 {
     /// <summary>
     /// Super class for all exceptions thrown by the architecture analysis.

@@ -1,9 +1,12 @@
 ﻿using NUnit.Framework;
-using System.Collections.Generic;
-using UnityEngine;
 
-namespace SEE.DataModel
+using SEE.DataModel;
+
+namespace SEE.Tools
 {
+    /// <summary>
+    /// Test cases for the non-incremental reflexion analysis.
+    /// </summary>
     internal class TestNonincrementalReflexionAnalysis : TestReflexionAnalysis
     {
         //----------------------------
