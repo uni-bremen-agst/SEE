@@ -2025,6 +2025,91 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1352653018
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1352653020}
+  - component: {fileID: 1352653019}
+  m_Layer: 0
+  m_Name: RandomCity
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1352653019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1352653018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f60d2c87bfa2964d933dee0c2b9342e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PathPrefix: F:\develop\SEE\Assets\
+  origin: {x: 0, y: 0, z: 0}
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  WidthMetric: Metric.Number_of_Tokens
+  HeightMetric: Metric.Clone_Rate
+  DepthMetric: Metric.LOC
+  LeafStyleMetric: Metric.Complexity
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 4
+  NodeLayout: 5
+  EdgeLayout: 0
+  ZScoreScale: 1
+  EdgeWidth: 0.3
+  ShowErosions: 0
+  EdgesAboveBlocks: 1
+  ArchitectureIssue: Metric.Architecture_Violations
+  CloneIssue: Metric.Clone
+  CycleIssue: Metric.Cycle
+  Dead_CodeIssue: Metric.Dead_Code
+  MetricIssue: Metric.Metric
+  StyleIssue: Metric.Style
+  UniversalIssue: Metric.Universal
+  ArchitectureIssue_SUM: Metric.Architecture_Violations_SUM
+  CloneIssue_SUM: Metric.Clone_SUM
+  CycleIssue_SUM: Metric.Cycle_SUM
+  Dead_CodeIssue_SUM: Metric.Dead_Code_SUM
+  MetricIssue_SUM: Metric.Metric_SUM
+  StyleIssue_SUM: Metric.Style_SUM
+  UniversalIssue_SUM: Metric.Universal_SUM
+  InnerDonutMetric: Metric.IssuesTotal
+  gxlPath: ..\Data\GXL\linux-clones\net.gxl
+  csvPath: ..\Data\GXL\linux-clones\net.csv
+  LeafNodeType: File
+  InnerNodeType: Directory
+  NumberOfLeaves: 30
+  NumberOfInnerNodes: 4
+  LeafAttributes:
+  - Name: Metric.Number_of_Tokens
+    Mean: 400
+    StandardDeviation: 30
+--- !u!4 &1352653020
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1352653018}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 12
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1357088963
 GameObject:
   m_ObjectHideFlags: 0
