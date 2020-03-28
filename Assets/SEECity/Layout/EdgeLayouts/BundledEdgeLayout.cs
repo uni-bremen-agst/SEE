@@ -31,12 +31,12 @@ namespace SEE.Layout
             ICollection<ILayoutNode> roots = GetRoots(layoutNodes);
             maxDepth = GetMaxDepth(roots, -1);
 
-            minY = HighestRoofYLevel(layoutNodes);
-
             // TODO: We want the level distances be chosen relative to the maximal height of all
             // game objects within the same subtree. At the very least, we want that for siblings
             // whose edges are drawn as direct splines. They should be led across all other siblings.
             // CalculateMaxHeights(gameNodes);
+            MinMaxBlockY(layoutNodes, out minY, out float maxY, out float maxHeight);
+            minY *= 1.5f;
 
             LCAFinder<ILayoutNode> lca = new LCAFinder<ILayoutNode>(roots);
 
@@ -46,11 +46,19 @@ namespace SEE.Layout
                 {
                     layout.Add(new LayoutEdge(source, target,
                                               LinePoints.BSplineLinePoints(GetControlPoints(source, target, lca, maxDepth))));
+
                 }
             }
             return layout;
         }
 
+        /// <summary>
+        /// Returns the maximal tree depth of the given <paramref name="nodes"/>, that is, the 
+        /// longest path from a leaf to any node in <paramref name="nodes"/>.
+        /// </summary>
+        /// <param name="nodes">nodes whose maximal depth is to be determined</param>
+        /// <param name="currentDepth">the current depth of all <paramref name="nodes"/></param>
+        /// <returns>maximal tree depth</returns>
         private int GetMaxDepth(ICollection<ILayoutNode> nodes, int currentDepth)
         {
             int max = currentDepth + 1;
@@ -60,7 +68,6 @@ namespace SEE.Layout
             }
             return max;
         }
-
 
         /// <summary>
         /// Yields all nodes in <paramref name="layoutNodes"/> that do not have a parent,
@@ -122,9 +129,14 @@ namespace SEE.Layout
                         + source.LinkName + " and " + target.LinkName + "\n");
                     controlPoints = ThroughCenter(source, target, maxDepth);
                 }
+                else if (lca == source || lca == target)
+                {
+                    // The edge is along a node hierarchy path.
+                    // We will create a direct spline from source to target at the lowest level.
+                    controlPoints = DirectSpline(source, target, GetLevelHeight(maxDepth));
+                }
                 else
                 {
-
                     // assert: sourceObject != targetObject
                     // assert: lcaObject != null
                     // because the edges are only between leaves:
@@ -147,7 +159,12 @@ namespace SEE.Layout
                     if (sourceToLCA.Length == 2 && targetToLCA.Length == 2)
                     {
                         // source and target are siblings in the same subtree at the same level.
-                        controlPoints = BetweenSiblings(source, target, GetLevelHeight(1));
+                        // We assume that those nodes are close to each other for all hierarchical layouts,
+                        // which is true for EvoStreets, Balloon, TreeMap, and CirclePacking. If all edges 
+                        // between siblings were led over one single control point, they would often take 
+                        // a detour even though the nodes are close by. The detour would make it difficult 
+                        // to follow the edges visually.
+                        controlPoints = DirectSpline(source, target, GetLevelHeight(maxDepth));
                     }
                     else
                     {
@@ -188,18 +205,15 @@ namespace SEE.Layout
         /// The first control point is the center of the roof of <paramref name="source"/> and the last
         /// control point the center of the roof of <paramref name="target"/>. The second and third control point
         /// is the position in between <paramref name="source"/> and <paramref name="target"/> where
-        /// the y co-ordinate is specified by <paramref name="yLevel"/>. That means an edge between siblings is drawn
+        /// the y co-ordinate is specified by <paramref name="yLevel"/>. That means an edge between the nodes is drawn
         /// as a direct spline on the shortest path between the two nodes from roof to roof. Thus, no hierarchical
-        /// bundling is applied. We assume that siblings are close to each other for all hierarchical layouts,
-        /// which is true for EvoStreets, Balloon, TreeMap, and CirclePacking. If all edges between siblings were led 
-        /// over one single control point, they would often take a detour even though the nodes are close by. The
-        /// detour makes it difficult to follow the edges visually.
+        /// bundling is applied.
         /// </summary>
         /// <param name="source">the object where to start the edge</param>
         /// <param name="target">the object where to end the edge</param>
         /// <param name="yLevel">the y co-ordinate of the two middle control points</param>
-        /// <returns>control points for an edge between siblings</returns>
-        private Vector3[] BetweenSiblings(ILayoutNode source, ILayoutNode target, float yLevel)
+        /// <returns>control points for a direct spline between the two nodes</returns>
+        private Vector3[] DirectSpline(ILayoutNode source, ILayoutNode target, float yLevel)
         {
             // We do need at least four control points for Bsplines (it is fine to include 
             // the middle control point twice).
@@ -281,8 +295,9 @@ namespace SEE.Layout
 
         /// <summary>
         /// The number of Unity units per level of the hierarchy for the height of control points.
+        /// It will be chosen relative to the height of the largest leaf node.
         /// </summary>
-        private const float levelDistance = 2.0f;
+        private float levelDistance = 1.0f;
 
         /// <summary>
         /// The minimal y co-ordinate for all hierarchical control points at level 2 and above.
@@ -382,24 +397,6 @@ namespace SEE.Layout
             controlPoints[1] = center;
             controlPoints[2] = center;
             return controlPoints;
-        }
-
-        /// <summary>
-        /// Yields the largest roof co-ordinate over all given <paramref name="layoutNodes"/>.
-        /// </summary>
-        /// <returns>largest roof co-ordinate</returns>
-        private float HighestRoofYLevel(ICollection<ILayoutNode> layoutNodes)
-        {
-            float result = 0.0f;
-            foreach (ILayoutNode node in layoutNodes)
-            {
-                float y = node.CenterPosition.y + node.Scale.y / 2.0f;
-                if (y > result)
-                {
-                    result = y;
-                }
-            }
-            return result;
         }
     }
 }
