@@ -93,7 +93,7 @@ namespace SEE.Layout
         /// <param name="edges"></param>
         /// <param name="sublayouts"></param>
         /// <returns></returns>
-        public abstract Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutNode> sublayouts);
+        public abstract Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts);
 
         /// <summary>
         /// Adds the given <paramref name="offset"/> to every node position in the given <paramref name="layout"/>.
@@ -156,7 +156,7 @@ namespace SEE.Layout
         /// <param name="layoutNodes">nodes for which to apply the layout</param>
         /// <param name="edges">edges of the underlying graph</param>
         /// <param name="sublayouts">the sublayouts for the layout</param>
-        public void Apply(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutNode> sublayouts)
+        public void Apply(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
         {
             Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes, edges, sublayouts);
 

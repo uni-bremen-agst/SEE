@@ -453,7 +453,7 @@ namespace SEE.Layout
             return StreetWidth * ((maximalDepth + 1) - node.Depth) / (maximalDepth + 1);
         }
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutNode> sublayouts)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
         {
             throw new System.NotImplementedException();
         }

@@ -117,7 +117,7 @@ namespace SEE.Layout
 
             if (graphManager != null && graphManager.Layout.SublayoutNodes.Count != 0 && node != null)
             {
-                SublayoutNode sublayoutNode = CoseHelperFunctions.CheckIfNodeIsSublayouRoot(graphManager.Layout.SublayoutNodes, node);
+                SublayoutLayoutNode sublayoutNode = CoseHelperFunctions.CheckIfNodeIsSublayouRoot(graphManager.Layout.SublayoutNodes, node.LinkName);
 
                 if (sublayoutNode != null)
                 {

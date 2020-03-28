@@ -45,7 +45,7 @@ namespace SEE.Layout
         /// <summary>
         /// TODO
         /// </summary>
-        private List<SublayoutNode> sublayoutNodes = new List<SublayoutNode>();
+        private List<SublayoutLayoutNode> sublayoutNodes = new List<SublayoutLayoutNode>();
 
         /// <summary>
         /// Collection with all layoutNodes
@@ -76,7 +76,7 @@ namespace SEE.Layout
         public CoseLayoutSettings CoseLayoutSettings { get => coseLayoutSettings; set => coseLayoutSettings = value; }
         public Dictionary<string, NodeLayouts> Sublayouts { get => sublayouts; set => sublayouts = value; }
         public bool InnerNodesAreCircles { get => innerNodesAreCircles; set => innerNodesAreCircles = value; }
-        public List<SublayoutNode> SublayoutNodes { get => sublayoutNodes; set => sublayoutNodes = value; }
+        public List<SublayoutLayoutNode> SublayoutNodes { get => sublayoutNodes; set => sublayoutNodes = value; }
 
         /// <summary>
         /// Constructor
@@ -94,7 +94,7 @@ namespace SEE.Layout
             SetupGraphSettings(settings.CoseGraphSettings);
         }
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes, ICollection<Edge> edges, ICollection<SublayoutNode> coseSublayoutNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> coseSublayoutNodes)
         {
             this.edges = edges;
             this.SublayoutNodes = coseSublayoutNodes.ToList();
@@ -124,7 +124,7 @@ namespace SEE.Layout
 
                 if (graph.Parent != null && graph.Parent.NodeObject != null && SublayoutNodes.Count() > 0)
                 {
-                    SublayoutNode sublayoutNode = CoseHelperFunctions.CheckIfNodeIsSublayouRoot(SublayoutNodes, graph.Parent.NodeObject);
+                    SublayoutLayoutNode sublayoutNode = CoseHelperFunctions.CheckIfNodeIsSublayouRoot(SublayoutNodes, graph.Parent.NodeObject.LinkName);
 
                     if (sublayoutNode != null && sublayoutNode.NodeLayout == NodeLayouts.EvoStreets)
                     {
@@ -230,7 +230,7 @@ namespace SEE.Layout
             CreateTopology(root);
             CalculateSubLayouts(graphManager.RootGraph.Parent);
 
-            if (SublayoutNodes.Count > 0 && CoseHelperFunctions.CheckIfNodeIsSublayouRoot(SublayoutNodes, graphManager.RootGraph.Parent.NodeObject) != null)
+            if (SublayoutNodes.Count > 0 && CoseHelperFunctions.CheckIfNodeIsSublayouRoot(SublayoutNodes, graphManager.RootGraph.Parent.NodeObject.LinkName) != null)
             {
                 // nothing to do
             } else
@@ -324,7 +324,7 @@ namespace SEE.Layout
         private void CalculateSubLayouts(CoseNode root)
         {
             // sind immernoch nach Leveln sortiert
-            foreach (SublayoutNode sublayoutNode in sublayoutNodes)
+            foreach (SublayoutLayoutNode sublayoutNode in sublayoutNodes)
             {
                 List<CoseNode> allNodes = sublayoutNode.Nodes.Select(node => nodeToCoseNode[node]).ToList();
                 List<CoseNode> removedNodes = sublayoutNode.RemovedChildren.Select(node => nodeToCoseNode[node]).ToList();

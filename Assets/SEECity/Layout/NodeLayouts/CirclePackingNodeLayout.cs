@@ -160,7 +160,7 @@ namespace SEE.Layout
             return Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);
         }
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutNode> sublayouts)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
         {
             throw new System.NotImplementedException();
         }

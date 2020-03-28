@@ -32,24 +32,29 @@ namespace SEE.Game
                 default:
                     throw new Exception("Unhandled GraphSettings.LeafNodeKinds");
             }
-            switch (this.settings.InnerNodeObjects)
+            innerNodeFactory = GetInnerNodeFactory(this.settings.InnerNodeObjects);
+        }
+
+        /// <summary>
+        /// Returns the Factory for the inner nodes
+        /// </summary>
+        /// <param name="innerNodeKinds">the kind of the inner nodes</param>
+        /// <returns>inner node factory</returns>
+        private InnerNodeFactory GetInnerNodeFactory(AbstractSEECity.InnerNodeKinds innerNodeKinds)
+        {
+            switch (innerNodeKinds)
             {
-                case SEECity.InnerNodeKinds.Empty:
-                case SEECity.InnerNodeKinds.Donuts:
-                    innerNodeFactory = new VanillaFactory();
-                    break;
-                case SEECity.InnerNodeKinds.Circles:
-                    innerNodeFactory = new CircleFactory(leafNodeFactory.Unit);
-                    break;
-                case SEECity.InnerNodeKinds.Cylinders:
-                    innerNodeFactory = new CylinderFactory();
-                    break;
-                case SEECity.InnerNodeKinds.Rectangles:
-                    innerNodeFactory = new RectangleFactory(leafNodeFactory.Unit);
-                    break;
-                case SEECity.InnerNodeKinds.Blocks:
-                    innerNodeFactory = new CubeFactory();
-                    break;
+                case AbstractSEECity.InnerNodeKinds.Empty:
+                case AbstractSEECity.InnerNodeKinds.Donuts:
+                    return new VanillaFactory();
+                case AbstractSEECity.InnerNodeKinds.Circles:
+                    return new CircleFactory(leafNodeFactory.Unit);
+                case AbstractSEECity.InnerNodeKinds.Cylinders:
+                    return new CylinderFactory();
+                case AbstractSEECity.InnerNodeKinds.Rectangles:
+                    return new RectangleFactory(leafNodeFactory.Unit);
+                case AbstractSEECity.InnerNodeKinds.Blocks:
+                    return new CubeFactory();
                 default:
                     throw new Exception("Unhandled GraphSettings.InnerNodeKinds");
             }
@@ -74,6 +79,11 @@ namespace SEE.Game
         /// The scale used to normalize the metrics determining the lengths of the blocks.
         /// </summary>
         private IScale scaler;
+
+        /// <summary>
+        /// mapping from node to ilayoutNode
+        /// </summary>
+        private Dictionary<Node, ILayoutNode> to_layout_node;
 
         /// <summary>
         /// Draws the graph (nodes and edges and all decorations).
@@ -169,9 +179,12 @@ namespace SEE.Game
             // the sublayout nodes
             ICollection<SublayoutNode> sublayoutNodes = new List<SublayoutNode>();
             // for a hierarchical layout, we need to add the game objects for inner nodes
-            if (nodeLayout.IsHierarchical())
+            if (nodeLayout.IsHierarchical() && !nodeLayout.UsesEdgesAndSublayoutNodes())
             {
                 AddInnerNodes(nodeMap, nodes); // and inner nodes
+            } else
+            {
+                sublayoutNodes = AddInnerNodesForSublayouts(nodeMap, nodes);
             }
 
             // calculate and apply the node layout
@@ -181,8 +194,7 @@ namespace SEE.Game
             // differentiate between Layouts using Sublayouts and Edges and Layouts only using nodes 
             if (nodeLayout.UsesEdgesAndSublayoutNodes())
             {
-                // TODO Calcualte Sublayouts and sublayout decorators
-                nodeLayout.Apply(layoutNodes, graph.Edges(), sublayoutNodes);
+                nodeLayout.Apply(layoutNodes, graph.Edges(), ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList()));
             } else
             {
                 nodeLayout.Apply(layoutNodes);
@@ -193,6 +205,7 @@ namespace SEE.Game
 
             AddToParent(gameNodes, parent);
             // add the decorations, too
+            // TODO Sublayouts
             AddToParent(AddDecorations(gameNodes), parent);
             // create the laid out edges
             AddToParent(EdgeLayout(graph, gameNodes, layoutNodes), parent);
@@ -200,6 +213,122 @@ namespace SEE.Game
             GameObject plane = NewPlane(gameNodes);
             AddToParent(plane, parent);
         }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="nodeMap"></param>
+        /// <param name="nodes"></param>
+        /// <returns></returns>
+        private List<SublayoutNode> AddInnerNodesForSublayouts(Dictionary<Node, GameObject> nodeMap, List<Node> nodes)
+        {
+            List<SublayoutNode> coseSublayoutNodes = CreateCoseSublayoutNodes(nodes);
+
+            if (coseSublayoutNodes.Count > 0)
+            {
+                coseSublayoutNodes.Sort((n1, n2) => n2.Node.Level.CompareTo(n1.Node.Level));
+
+                CalculateNodesSublayout(coseSublayoutNodes);
+
+                List<Node> remainingNodes = new List<Node>(nodes);
+                foreach (SublayoutNode sublayoutNode in coseSublayoutNodes)
+                {
+                    AddInnerNodes(nodeMap, sublayoutNode.Nodes, GetInnerNodeFactory(sublayoutNode.InnerNodeKind));
+                    remainingNodes.RemoveAll(node => sublayoutNode.Nodes.Contains(node));
+                }
+                AddInnerNodes(nodeMap, remainingNodes);
+            }
+            else
+            {
+                AddInnerNodes(nodeMap, nodes);
+            }
+
+            return coseSublayoutNodes;
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="nodes"></param>
+        /// <returns></returns>
+        private List<SublayoutNode> CreateCoseSublayoutNodes(List<Node> nodes)
+        {
+            List<SublayoutNode> coseSublayoutNodes = new List<SublayoutNode>();
+            foreach (KeyValuePair<string, bool> dir in settings.CoseGraphSettings.ListDirToggle)
+            {
+                if (dir.Value)
+                {
+                    var name = dir.Key;
+                    if (settings.CoseGraphSettings.DirNodeLayout.ContainsKey(name) && settings.CoseGraphSettings.DirShape.ContainsKey(name))
+                    {
+                        IEnumerable<Node> matches = nodes.Where(i => i.LinkName.Equals(name));
+                        if (matches.Count() > 0)
+                        {
+                            coseSublayoutNodes.Add(new SublayoutNode(matches.First(), settings.CoseGraphSettings.DirShape[name], settings.CoseGraphSettings.DirNodeLayout[name]));
+                        }
+                    }
+                }
+            }
+            return coseSublayoutNodes;
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="coseSublayoutNodes"></param>
+        private void CalculateNodesSublayout(List<SublayoutNode> coseSublayoutNodes)
+        {
+            foreach (SublayoutNode sublayoutNode in coseSublayoutNodes)
+            {
+                List<Node> children = WithAllChildren(sublayoutNode.Node);
+                List<Node> childrenToRemove = new List<Node>();
+
+                foreach (Node child in children)
+                {
+                    SublayoutNode sublayout = CoseHelperFunctions.CheckIfNodeIsSublayouRoot(coseSublayoutNodes, child.LinkName);
+
+                    if (sublayout != null)
+                    {
+                        childrenToRemove.AddRange(sublayout.Nodes);
+                    }
+                }
+
+                sublayoutNode.RemovedChildren = childrenToRemove;
+                children.RemoveAll(child => childrenToRemove.Contains(child));
+                sublayoutNode.Nodes = children;
+            }
+        }
+
+        private List<SublayoutLayoutNode> ConvertSublayoutToLayoutNodes(List<SublayoutNode> sublayouts)
+        {
+            List<SublayoutLayoutNode> sublayoutLayoutNodes = new List<SublayoutLayoutNode>();
+            sublayouts.ForEach(sublayoutNode => {
+
+                SublayoutLayoutNode sublayout = new SublayoutLayoutNode(to_layout_node[sublayoutNode.Node], sublayoutNode.InnerNodeKind, sublayoutNode.NodeLayout);
+                sublayoutNode.Nodes.ForEach(n => sublayout.Nodes.Add(to_layout_node[sublayoutNode.Node]));
+                sublayoutNode.RemovedChildren.ForEach(n => sublayout.RemovedChildren.Add(to_layout_node[sublayoutNode.Node]));
+                sublayoutLayoutNodes.Add(sublayout);
+            });
+            return sublayoutLayoutNodes;
+        }
+
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="root"></param>
+        /// <returns></returns>
+        private List<Node> WithAllChildren(Node root)
+        {
+            List<Node> allNodes = new List<Node> { root };
+            foreach (Node node in root.Children())
+            {
+                allNodes.AddRange(WithAllChildren(node));
+            }
+
+            return allNodes;
+        }
+
 
         /// <summary>
         /// Returns the node layouter according to the settings. The node layouter will
@@ -385,7 +514,7 @@ namespace SEE.Game
             NodeFactory innerNodeFactory)
         {
             IList<ILayoutNode> result = new List<ILayoutNode>();
-            Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+            to_layout_node = new Dictionary<Node, ILayoutNode>();
 
             foreach (GameObject gameObject in gameNodes)
             {
@@ -737,8 +866,13 @@ namespace SEE.Game
         /// </summary>
         /// <param name="node">graph node for which to create the game node</param>
         /// <returns>new game object for the inner node</returns>
-        public GameObject NewInnerNode(Node node)
+        public GameObject NewInnerNode(Node node, InnerNodeFactory innerNodeFactory = null)
         {
+            if (innerNodeFactory == null)
+            {
+                innerNodeFactory = this.innerNodeFactory;
+            }
+
             GameObject innerGameObject = innerNodeFactory.NewBlock();
             innerGameObject.name = node.LinkName;
             innerGameObject.tag = Tags.Node;
@@ -753,14 +887,15 @@ namespace SEE.Game
         /// </summary>
         /// <param name="nodeMap">nodeMap to which the game objects are to be added</param>
         /// <param name="nodes">list of nodes for which to create blocks</param>
-        private void AddInnerNodes(Dictionary<Node, GameObject> nodeMap, IList<Node> nodes)
+        /// <param name="innerNodeFactory">the node factory for the inner nodes</param>
+        private void AddInnerNodes(Dictionary<Node, GameObject> nodeMap, IList<Node> nodes, InnerNodeFactory innerNodeFactory = null)
         {
             foreach (Node node in nodes)
             {
                 // We add only inner nodes.
                 if (! node.IsLeaf())
                 {
-                    GameObject innerGameObject = NewInnerNode(node);
+                    GameObject innerGameObject = NewInnerNode(node, innerNodeFactory);
                     nodeMap[node] = innerGameObject;
                 }
             }
