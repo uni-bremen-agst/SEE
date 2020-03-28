@@ -353,21 +353,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
-  InnerNodeStyleMetric: Metric.IssuesTotal
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Clone_Rate
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 2
-  NodeLayout: 1
-  EdgeLayout: 3
-  ZScoreScale: 0
-  EdgeWidth: 2
-  ShowErosions: 0
-  EdgesAboveBlocks: 1
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -383,6 +372,17 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 2
+  NodeLayout: 1
+  EdgeLayout: 3
+  ZScoreScale: 0
+  EdgeWidth: 2
+  ShowErosions: 0
+  EdgesAboveBlocks: 1
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &465914107
@@ -1825,21 +1825,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
-  InnerNodeStyleMetric: Metric.IssuesTotal
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Clone_Rate
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 1
-  NodeLayout: 3
-  EdgeLayout: 3
-  ZScoreScale: 0
-  EdgeWidth: 1
-  ShowErosions: 0
-  EdgesAboveBlocks: 1
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -1855,6 +1844,17 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 1
+  NodeLayout: 3
+  EdgeLayout: 3
+  ZScoreScale: 0
+  EdgeWidth: 1
+  ShowErosions: 0
+  EdgesAboveBlocks: 1
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &1003004809
@@ -1902,21 +1902,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
-  InnerNodeStyleMetric: Metric.IssuesTotal
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Clone_Rate
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 4
-  NodeLayout: 5
-  EdgeLayout: 2
-  ZScoreScale: 0
-  EdgeWidth: 1
-  ShowErosions: 0
-  EdgesAboveBlocks: 0
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -1932,6 +1921,17 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 4
+  NodeLayout: 5
+  EdgeLayout: 2
+  ZScoreScale: 0
+  EdgeWidth: 1
+  ShowErosions: 0
+  EdgesAboveBlocks: 0
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &1036186228
@@ -1979,21 +1979,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
-  InnerNodeStyleMetric: Metric.IssuesTotal
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Clone_Rate
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 3
-  NodeLayout: 4
-  EdgeLayout: 3
-  ZScoreScale: 0
-  EdgeWidth: 1
-  ShowErosions: 0
-  EdgesAboveBlocks: 0
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -2009,6 +1998,17 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 3
+  NodeLayout: 4
+  EdgeLayout: 3
+  ZScoreScale: 0
+  EdgeWidth: 1
+  ShowErosions: 0
+  EdgesAboveBlocks: 0
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &1206385286
@@ -2054,23 +2054,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f60d2c87bfa2964d933dee0c2b9342e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PathPrefix: F:\develop\SEE\Assets\
+  PathPrefix: 
   origin: {x: 0, y: 0, z: 0}
-  InnerNodeStyleMetric: Metric.IssuesTotal
   WidthMetric: Metric.Number_of_Tokens
   HeightMetric: Metric.Clone_Rate
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Complexity
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 4
-  NodeLayout: 5
-  EdgeLayout: 0
-  ZScoreScale: 1
-  EdgeWidth: 0.3
-  ShowErosions: 0
-  EdgesAboveBlocks: 1
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -2086,16 +2075,66 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 1
+  NodeLayout: 3
+  EdgeLayout: 3
+  ZScoreScale: 1
+  EdgeWidth: 0.4
+  ShowErosions: 0
+  EdgesAboveBlocks: 1
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
-  LeafNodeType: File
-  InnerNodeType: Directory
-  NumberOfLeaves: 30
-  NumberOfInnerNodes: 4
+  LeafConstraint:
+    NodeType: Class
+    EdgeType: calls
+    NodeNumber: 1000
+    EdgeDensity: 0.001
+  InnerNodeConstraint:
+    NodeType: Package
+    EdgeType: uses
+    NodeNumber: 100
+    EdgeDensity: 0.001
   LeafAttributes:
   - Name: Metric.Number_of_Tokens
-    Mean: 400
-    StandardDeviation: 30
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Clone_Rate
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.LOC
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Complexity
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Architecture_Violations
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Clone
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Cycle
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Dead_Code
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Metric
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Style
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Universal
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.IssuesTotal
+    Mean: 10
+    StandardDeviation: 3
 --- !u!4 &1352653020
 Transform:
   m_ObjectHideFlags: 0
@@ -2141,21 +2180,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
-  InnerNodeStyleMetric: Metric.IssuesTotal
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Clone_Rate
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 4
-  NodeLayout: 2
-  EdgeLayout: 1
-  ZScoreScale: 0
-  EdgeWidth: 1
-  ShowErosions: 1
-  EdgesAboveBlocks: 1
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -2171,6 +2199,17 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 4
+  NodeLayout: 2
+  EdgeLayout: 1
+  ZScoreScale: 0
+  EdgeWidth: 1
+  ShowErosions: 1
+  EdgesAboveBlocks: 1
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &1357088965
@@ -2362,21 +2401,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
-  InnerNodeStyleMetric: Metric.IssuesTotal
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Clone_Rate
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 0
-  NodeLayout: 0
-  EdgeLayout: 3
-  ZScoreScale: 0
-  EdgeWidth: 1
-  ShowErosions: 0
-  EdgesAboveBlocks: 1
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -2392,6 +2420,17 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 0
+  NodeLayout: 0
+  EdgeLayout: 3
+  ZScoreScale: 0
+  EdgeWidth: 1
+  ShowErosions: 0
+  EdgesAboveBlocks: 1
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &2092969280
