@@ -35,6 +35,11 @@ namespace SEE.DataModel
         /// <returns>the number of errors</returns>
         public static int Load(Graph graph, string filename, char separator = ';')
         {
+            if (!File.Exists(filename))
+            {
+                Debug.LogWarningFormat("Metric file {0} does not exist. Metrics will not be available.\n", filename);
+                return 0;
+            }
             int numberOfErrors = 0;
             try
             {

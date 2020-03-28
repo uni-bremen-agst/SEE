@@ -1,5 +1,5 @@
 ﻿using SEE.DataModel;
-using SEE.Layout;
+using SEE.GO;
 using UnityEngine;
 
 namespace SEE
@@ -74,12 +74,9 @@ namespace SEE
          + " This parameter must be greater than 0.")]
         public float absoluteMinimumSpeed = 0.1f;
 
+        [Tooltip("The absolute maximum speed that can be reached."
+         + " This parameter must be greater than 0.")]
         public const float absoluteMaximumSpeedDefault = 300.0f;
-
-        /// <summary>
-        /// Game object name of text field on the Canvas where a selected entity is shown.
-        /// </summary>
-        private const string TextFieldObjectName = "Objectname";
 
         [Tooltip("The absolute maximum speed that can be reached, no matter how much we accelerate and how"
             + " far we are off the ground. Must not be lower than the absolute minimum speed."
@@ -189,11 +186,49 @@ namespace SEE
         private Vector3 previousPosition = Vector3.zero;
         private Quaternion previousRotation = Quaternion.identity;
 
-        // The scene graph this camera observes.
-        // private SceneGraph sceneGraph = null; // TODO: Re-enable
-
-        // The GUI text field showing the object name of a the currently selected node.
+        /// <summary>
+        /// The GUI text field showing the object name of a the currently selected node.
+        /// Do not use this field directly. Prefer to use ObjectNameTextField to access
+        /// it, because it may not always exist during the game.
+        /// </summary>
         private GameObject guiObjectNameTextField = null;
+
+        /// <summary>
+        /// Game object name of text field on the Canvas where the name of a selected entity is shown.
+        /// </summary>
+        private const string TextFieldObjectName = "Objectname";
+
+        /// <summary>
+        /// Retrieves the GUI text field for the source object name of the selected game object.
+        /// </summary>
+        private GameObject ObjectNameTextField
+        {
+            get
+            {
+                // The comparison guiObjectNameTextField == null will not work as
+                // expected, because Unity overloads operator == for GameObject.
+                // The preferred way to check whether a game object truly exists is this:
+                if (guiObjectNameTextField??true)
+                {
+                    // guiObjectNameTextField is not yet set => search it.
+                    // The search will run each time the user clicks on the scene and hits
+                    // a game object until we finally find the text field. It may happen,
+                    // that the text field will never be part of the scene, in which case
+                    // we search for it every time again without any hope to ever find it.
+                    // On the other hand, the text field may not yet exist at the point
+                    // in time when Start() is run because there may be different canvases
+                    // for different modes and the canvas in which the text field is placed
+                    // is inactive at the start of the game.
+                    guiObjectNameTextField = GameObject.Find(TextFieldObjectName);
+                }
+                else
+                {
+                    Debug.LogWarningFormat("No UI textfield named {0} found. Please add one to the scene within the Unity editor.\n",
+                                           TextFieldObjectName);
+                }
+                return guiObjectNameTextField;
+            }
+        }
 
         // Spin the object in given direction around the origin of the object at rotationFactor per tick.
         private void Rotate(Vector3 direction, bool accelerationMode)
@@ -230,15 +265,6 @@ namespace SEE
         {
             Debug.Log("Starting FlyCamera\n");
             CenterCursor();
-            if (guiObjectNameTextField == null)
-            {
-                guiObjectNameTextField = GameObject.Find(TextFieldObjectName);
-            }
-            else
-            {
-                Debug.LogWarningFormat("No UI textfield named {0} found. Please add one to the scene within the Unity editor.\n",
-                                       TextFieldObjectName);
-            }
 
             mainCamera = gameObject.GetComponentInParent<Camera>();
 
@@ -267,26 +293,9 @@ namespace SEE
                 CenterCursor();
             }
 
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && mainCamera != null)
             {
-                // If a node is hit by a left mouse click, the name of the selected
-                // node is shown in the guiObjectNameTextField.
-                if (guiObjectNameTextField != null)
-                {
-                    if (mainCamera != null)
-                    {
-                        ShowSelectedObject(mainCamera);
-                    }
-                    else
-                    {
-                        Debug.LogError("No main camera found.\n");
-                    }
-                }
-                else
-                {
-                    Debug.LogWarningFormat("No UI textfield named {0} found. Please add one to the scene within the Unity editor.\n",
-                                           TextFieldObjectName);
-                }
+                ShowSelectedObject(mainCamera);
             }
 
             // whether the user wants us to accelerate by holding the shift key
@@ -358,52 +367,62 @@ namespace SEE
             }
         }
 
+        /// <summary>
+        /// Shows the name of the selected object if one was hit by the mouse.
+        /// 
+        /// Precondition: camera != null
+        /// </summary>
+        /// <param name="camera">the camera from which to cast the ray for the selection</param>
         private void ShowSelectedObject(Camera camera)
         {
-            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
-            // Note: The object to be hit needs a collider.
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            // If a node is hit by a left mouse click, the name of the selected
+            // node is shown in the ObjectNameTextField -- but only if ObjectNameTextField
+            // exists.
+            GameObject textField = ObjectNameTextField;
+            if (textField?? true)
             {
-                // if the hit object is a node, we show the Source.Name
-                // of the graph node the object represents if it has a
-                // name; in all other cases, the name attribute of object
-                // is used instead.
-
-                GameObject objectHit = hit.transform.gameObject;
-                UnityEngine.UI.Text text = guiObjectNameTextField.GetComponent<UnityEngine.UI.Text>();
-                if (objectHit.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                UnityEngine.UI.Text text = textField.GetComponent<UnityEngine.UI.Text>();
+                Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+                // Note: The object to be hit needs a collider.
+                if (Physics.Raycast(ray, out RaycastHit hit))
                 {
-                    if (nodeRef.node.TryGetString("Source.Name", out string nodeName))
+                    // If the hit object is a node, we show the Source.Name
+                    // of the graph node the object represents if it has a
+                    // name; in all other cases, the name attribute of object
+                    // is used instead.
+                    GameObject objectHit = hit.transform.gameObject;
+                    if (objectHit.TryGetComponent<NodeRef>(out NodeRef nodeRef))
                     {
-                        text.text = nodeName;
+                        if (nodeRef.node.TryGetString("Source.Name", out string nodeName))
+                        {
+                            text.text = nodeName;
+                        }
+                        else
+                        {
+                            text.text = nodeRef.node.Type;
+                            Debug.Log("Node has neither Source.Name nor unique linkname.\n");
+                            Dump(objectHit);
+                        }
                     }
-                    //else if (!string.IsNullOrEmpty(node.LinkName))
-                    //{
-                    //    text.text = node.LinkName;
-                    //}
-
+                    else if (objectHit.TryGetComponent<EdgeRef>(out EdgeRef edge))
+                    {
+                        text.text = "Edge " + objectHit.name;
+                    }
                     else
                     {
-                        text.text = nodeRef.node.Type;
-                        // text.text = objectHit.name;
-                        Debug.Log("Node has neither Source.Name nor unique linkname.\n");
-                        Dump(objectHit);
+                        text.text = objectHit.name;
                     }
-                }
-                else if (objectHit.TryGetComponent<EdgeRef>(out EdgeRef edge))
-                {
-                    text.text = "Edge " + objectHit.name;
-                    Debug.Log("Edge hit.\n");
                 }
                 else
                 {
-                    text.text = objectHit.name;
-                    Debug.Log("No node hit.\n");
+                    // Nothing hit => reset textField.
+                    text.text = "";
                 }
             }
             else
             {
-                Debug.Log("No object hit.\n");
+                Debug.LogWarningFormat("No UI textfield named {0} found. Please add one to the scene within the Unity editor.\n",
+                                       TextFieldObjectName);
             }
         }
 
