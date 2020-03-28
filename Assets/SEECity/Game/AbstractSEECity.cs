@@ -1,6 +1,8 @@
 ﻿using SEE.DataModel;
 using SEE.GO;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game
@@ -354,6 +356,39 @@ namespace SEE.Game
                 p.End();
                 Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
                 Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
+
+                Dictionary<string, bool> dirs = CoseGraphSettings.ListDirToggle;
+                // die neuen dirs 
+                Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
+                List<Node> dirsNodes = graph.GetRoots();
+
+                Dictionary<string, NodeLayouts> dirsLayout = new Dictionary<string, NodeLayouts>();
+                Dictionary<string, InnerNodeKinds> dirsShape = new Dictionary<string, InnerNodeKinds>();
+
+                foreach (Node node in graph.Nodes())
+                {
+                    if (!node.IsLeaf())
+                    {
+                        dirsShape.Add(node.LinkName, InnerNodeObjects);
+                        dirsLocal.Add(node.LinkName, false);
+                        dirsLayout.Add(node.LinkName, NodeLayout);
+                    }
+                }
+
+                // falls der key nicht in den alten dictonary ist
+                dirsLocal = dirsLocal.Where(i => !dirs.ContainsKey(i.Key)).ToDictionary(i => i.Key, i => i.Value);
+
+                CoseGraphSettings.show = new Dictionary<Node, bool>();
+                if (dirsLocal.Count != 0)
+                {
+                    CoseGraphSettings.DirShape = dirsShape;
+                    CoseGraphSettings.DirNodeLayout = dirsLayout;
+                    CoseGraphSettings.ListDirToggle = dirsLocal;
+                    // get roots
+                    CoseGraphSettings.dirs = dirsNodes;
+                }
+
+
                 return graph;
             }
         }
@@ -367,5 +402,16 @@ namespace SEE.Game
         /// measurements of the layout
         /// </summary>
         public SortedDictionary<string, string> Measurements = new SortedDictionary<string, string>();
+
+        /// <summary>
+        /// Dictionary with all Nodelayouts for leaf and inner nodes
+        /// </summary>
+        public Dictionary<NodeLayouts, string> SubLayoutsInnerNodes = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().Where(i => i != NodeLayouts.Manhattan && i != NodeLayouts.FlatRectanglePacking).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
+
+        /// <summary>
+        ///  Dictionary with all Nodelayouts only for leaf nodes
+        /// </summary>
+        public Dictionary<NodeLayouts, string> SubLayoutsLeafNodes = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
+
     }
 }

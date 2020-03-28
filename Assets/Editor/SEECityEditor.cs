@@ -20,12 +20,14 @@ namespace SEEEditor
             city.gxlPath = EditorGUILayout.TextField("GXL file", city.gxlPath);
             city.csvPath = EditorGUILayout.TextField("CSV file", city.csvPath);
 
+            EditorGUILayout.Space(10);
+
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Load City"))
+            if (GUILayout.Button("Load City", GUILayout.Height(30)))
             {
                 SetUp(city);
             }
-            if (GUILayout.Button("Delete City"))
+            if (GUILayout.Button("Delete City", GUILayout.Height(30)))
             {
                 Reset(city);
             }
