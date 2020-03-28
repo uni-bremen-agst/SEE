@@ -57,11 +57,11 @@ namespace SEE.Game
         /// <summary>
         /// The relative path for the GXL file containing the graph data.
         /// </summary>
-        public string gxlPath = "..\\Data\\GXL\\linux-clones\\net.gxl";
+        public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
         /// <summary>
         /// The relative path for the CSV file containing the node metrics.
         /// </summary>
-        public string csvPath = "..\\Data\\GXL\\linux-clones\\net.csv";
+        public string csvPath = "..\\Data\\GXL\\minimal_clones.csv";
 
         // Larger clone graph with single root (Linux directory "drivers"): 16.920 nodes, 10583 edges.
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\drivers.gxl";

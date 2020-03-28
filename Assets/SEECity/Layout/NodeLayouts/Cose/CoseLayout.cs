@@ -1041,7 +1041,7 @@ namespace SEE.Layout
         {
             List<ILayoutNode> nodes = layoutNodes.Where(layoutNode => layoutNode.LinkName == linkName).ToList();
 
-            if (nodes.Count > 0)
+            if (nodes.Count > 1)
             {
                 throw new System.Exception("Linkname should be unique");
             } else if (nodes.Count == 0)
