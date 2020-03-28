@@ -1,7 +1,9 @@
-﻿using SEE.DataModel;
-using SEE.GO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+
+using SEE.DataModel;
+using SEE.GO;
+using SEE.Tools;
 
 namespace SEE.Game
 {
@@ -52,34 +54,200 @@ namespace SEE.Game
             return result;
         }
 
-        //-----------------------------------
-        // Visual attributes of an inner node
-        //-----------------------------------
-        /// <summary>
-        /// The attribute name of the metric to be used for determining the style of inner nodes.
-        /// </summary>
-        public string InnerNodeStyleMetric = "Metric.IssuesTotal";
-
         //---------------------------------
         // Visual attributes of a leaf node
         //---------------------------------
         /// <summary>
         /// The attribute name of the metric to be used for the width of a building (x co-ordinate).
         /// </summary>
-        public string WidthMetric = "Metric.Number_of_Tokens";
+        public string WidthMetric = NumericAttributeNames.Number_Of_Tokens.Name();
         /// <summary>
         /// The attribute name of the metric to be used for the height of a building (y co-ordinate).
         /// </summary>
-        public string HeightMetric = "Metric.Clone_Rate";
+        public string HeightMetric = NumericAttributeNames.Clone_Rate.Name();
         /// <summary>
         /// The attribute name of the metric to be used for the breadth of a building (y co-ordinate).
         /// </summary>
-        public string DepthMetric = "Metric.LOC";
+        public string DepthMetric = NumericAttributeNames.LOC.Name();
         /// <summary>
         /// The attribute name of the metric to be used for determining the style of leaf nodes.
         /// </summary>
-        public string LeafStyleMetric = "Metric.Complexity";
+        public string LeafStyleMetric = NumericAttributeNames.Complexity.Name();
 
+        /// <summary>
+        /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
+        /// DepthMetric, and LeafStyleMetric). 
+        /// Note: A metric name occurs only once (i.e., duplicate names are removed).
+        /// </summary>
+        /// <returns>all metrics used for visual attributes of a leaf node</returns>
+        public ICollection<string> AllLeafMetrics()
+        {
+            return new HashSet<string> { WidthMetric, HeightMetric, DepthMetric, LeafStyleMetric };
+        }
+
+        //--------------------------------------------------------
+        // Software erosion issues shown as icons above leaf nodes
+        //--------------------------------------------------------
+
+        /// <summary>
+        /// The attribute name of the metric representing architecture violations.
+        /// </summary>
+        public string ArchitectureIssue = NumericAttributeNames.Architecture_Violations.Name();
+        /// <summary>
+        /// The attribute name of the metric representing duplicated code.
+        /// </summary>
+        public string CloneIssue = NumericAttributeNames.Clone.Name();
+        /// <summary>
+        /// The attribute name of the metric representing cylces.
+        /// </summary>
+        public string CycleIssue = NumericAttributeNames.Cycle.Name();
+        /// <summary>
+        /// The attribute name of the metric representing dead code.
+        /// </summary>
+        public string Dead_CodeIssue = NumericAttributeNames.Dead_Code.Name();
+        /// <summary>
+        /// The attribute name of the metric representing metric violations.
+        /// </summary>
+        public string MetricIssue = NumericAttributeNames.Metric.Name();
+        /// <summary>
+        /// The attribute name of the metric representing code-style violations.
+        /// </summary>
+        public string StyleIssue = NumericAttributeNames.Style.Name();
+        /// <summary>
+        /// The attribute name of the metric representing other kinds of violations.
+        /// </summary>
+        public string UniversalIssue = NumericAttributeNames.Universal.Name();
+
+        /// <summary>
+        /// Returns all attribute names of the different kinds of software erosions.
+        /// </summary>
+        /// <returns>all attribute names of the different kinds of software erosions</returns>
+        public IList<string> AllLeafIssues()
+        {
+            List<string> result = new List<string>()
+               {
+                  ArchitectureIssue,
+                  CloneIssue,
+                  CycleIssue,
+                  Dead_CodeIssue,
+                  MetricIssue,
+                  StyleIssue,
+                  UniversalIssue
+               };
+            return result;
+        }
+
+        //-----------------------------------------------------------------------
+        // Software erosion issues shown as icons on Donut charts for inner nodes
+        //-----------------------------------------------------------------------
+        public const string SUM_Postfix = "_SUM";
+        /// <summary>
+        /// The attribute name of the metric representing the sum of all architecture violations
+        /// for an inner node.
+        /// </summary>
+        public string ArchitectureIssue_SUM = NumericAttributeNames.Architecture_Violations.Name() + SUM_Postfix;
+        /// <summary>
+        /// The attribute name of the metric representing the sum of all clones
+        /// for an inner node.
+        /// </summary>
+        public string CloneIssue_SUM = NumericAttributeNames.Clone.Name() + SUM_Postfix;
+        /// <summary>
+        /// The attribute name of the metric representing the sum of all cycles
+        /// for an inner node.
+        /// </summary>
+        public string CycleIssue_SUM = NumericAttributeNames.Cycle.Name() + SUM_Postfix;
+        /// <summary>
+        /// The attribute name of the metric representing the sum of all dead entities
+        /// for an inner node.
+        /// </summary>
+        public string Dead_CodeIssue_SUM = NumericAttributeNames.Dead_Code.Name() + SUM_Postfix;
+        /// <summary>
+        /// The attribute name of the metric representing the sum of all metric violations
+        /// for an inner node.
+        /// </summary>
+        public string MetricIssue_SUM = NumericAttributeNames.Metric.Name() + SUM_Postfix;
+        /// <summary>
+        /// The attribute name of the metric representing the sum of all style violations
+        /// for an inner node.
+        /// </summary>
+        public string StyleIssue_SUM = NumericAttributeNames.Style.Name() + SUM_Postfix;
+        /// <summary>
+        /// The attribute name of the metric representing the sum of all other kinds of
+        /// software erosions for an inner node.
+        /// </summary>
+        public string UniversalIssue_SUM = NumericAttributeNames.Universal.Name() + SUM_Postfix;
+
+        /// <summary>
+        /// Returns all attribute names of the different kinds of software erosions for inner
+        /// nodes (the sums of their descendants).
+        /// </summary>
+        /// <returns>all attribute names of the different kinds of software erosions for inner nodes</returns>
+        public IList<string> AllInnerNodeIssues()
+        {
+            List<string> result = new List<string>()
+               {
+                  ArchitectureIssue_SUM,
+                  CloneIssue_SUM,
+                  CycleIssue_SUM,
+                  Dead_CodeIssue_SUM,
+                  MetricIssue_SUM,
+                  StyleIssue_SUM,
+                  UniversalIssue_SUM
+               };
+            return result;
+        }
+
+        /// <summary>
+        /// The metric to be put in the inner circle of a Donut chart.
+        /// </summary>
+        public string InnerDonutMetric = NumericAttributeNames.IssuesTotal.Name();
+
+        /// <summary>
+        /// Returns the names of all node metric attributes that are visualized somehow.
+        /// More precisely, the resulting list consists of the following metrics:
+        /// WidthMetric, HeightMetric, DepthMetric, LeafStyleMetric, AllLeafIssues(),
+        /// AllInnerNodeIssues(), and InnerDonutMetric.
+        /// </summary>
+        /// <returns>all node metric attributes</returns>
+        public List<string> AllMetricAttributes()
+        {
+            List<string> nodeMetrics = new List<string>(AllLeafMetrics());
+            nodeMetrics.AddRange(AllLeafIssues());
+            nodeMetrics.AddRange(AllInnerNodeIssues());
+            nodeMetrics.Add(InnerDonutMetric);
+            return nodeMetrics;
+        }
+
+        /// <summary>
+        /// Yields a mapping of all node attribute names that define erosion issues 
+        /// for leaf nodes in the GXL file onto the icons to be used for visualizing them.
+        /// </summary>
+        /// <returns>mapping of all node attribute names for leaves onto icon ids</returns>
+        public SerializableDictionary<string, IconFactory.Erosion> LeafIssueMap()
+        {
+            SerializableDictionary<string, IconFactory.Erosion> result = new SerializableDictionary<string, IconFactory.Erosion>
+            {
+                { ArchitectureIssue, IconFactory.Erosion.Architecture_Violation },
+                { CloneIssue, IconFactory.Erosion.Clone },
+                { CycleIssue, IconFactory.Erosion.Cycle },
+                { Dead_CodeIssue, IconFactory.Erosion.Dead_Code },
+                { MetricIssue, IconFactory.Erosion.Metric },
+                { StyleIssue, IconFactory.Erosion.Style },
+                { UniversalIssue, IconFactory.Erosion.Universal }
+            };
+            return result;
+        }
+        //-----------------------------------
+        // Visual attributes of an inner node
+        //-----------------------------------
+        /// <summary>
+        /// The attribute name of the metric to be used for determining the style of inner nodes.
+        /// </summary>
+        public string InnerNodeStyleMetric = NumericAttributeNames.IssuesTotal.Name();
+
+        //--------------------------------------
+        // Other visual attributes of leaf nodes
+        // -------------------------------------
         /// <summary>
         /// This parameter determines the minimal width, breadth, and height of each block
         /// representing a graph node visually. Must not be greater than MaximalBlockLength.
@@ -180,158 +348,6 @@ namespace SEE.Game
         /// if true, the edges are drawn above the houses;
         /// </summary>
         public bool EdgesAboveBlocks = true;
-
-        //--------------------------------------------------------
-        // Software erosion issues shown as icons above leaf nodes
-        //--------------------------------------------------------
-
-        /// <summary>
-        /// The attribute name of the metric representing architecture violations.
-        /// </summary>
-        public string ArchitectureIssue = "Metric.Architecture_Violations";
-        /// <summary>
-        /// The attribute name of the metric representing duplicated code.
-        /// </summary>
-        public string CloneIssue = "Metric.Clone";
-        /// <summary>
-        /// The attribute name of the metric representing cylces.
-        /// </summary>
-        public string CycleIssue = "Metric.Cycle";
-        /// <summary>
-        /// The attribute name of the metric representing dead code.
-        /// </summary>
-        public string Dead_CodeIssue = "Metric.Dead_Code";
-        /// <summary>
-        /// The attribute name of the metric representing metric violations.
-        /// </summary>
-        public string MetricIssue = "Metric.Metric";
-        /// <summary>
-        /// The attribute name of the metric representing code-style violations.
-        /// </summary>
-        public string StyleIssue = "Metric.Style";
-        /// <summary>
-        /// The attribute name of the metric representing other kinds of violations.
-        /// </summary>
-        public string UniversalIssue = "Metric.Universal";
-
-        /// <summary>
-        /// Returns all attribute names of the different kinds of software erosions.
-        /// </summary>
-        /// <returns>all attribute names of the different kinds of software erosions</returns>
-        public IList<string> AllLeafIssues()
-        {
-            List<string> result = new List<string>()
-               {
-                  ArchitectureIssue,
-                  CloneIssue,
-                  CycleIssue,
-                  Dead_CodeIssue,
-                  MetricIssue,
-                  StyleIssue,
-                  UniversalIssue
-               };
-            return result;
-        }
-
-        //-----------------------------------------------------------------------
-        // Software erosion issues shown as icons on Donut charts for inner nodes
-        //-----------------------------------------------------------------------
-        /// <summary>
-        /// The attribute name of the metric representing the sum of all architecture violations
-        /// for an inner node.
-        /// </summary>
-        public string ArchitectureIssue_SUM = "Metric.Architecture_Violations_SUM";
-        /// <summary>
-        /// The attribute name of the metric representing the sum of all clones
-        /// for an inner node.
-        /// </summary>
-        public string CloneIssue_SUM = "Metric.Clone_SUM";
-        /// <summary>
-        /// The attribute name of the metric representing the sum of all cycles
-        /// for an inner node.
-        /// </summary>
-        public string CycleIssue_SUM = "Metric.Cycle_SUM";
-        /// <summary>
-        /// The attribute name of the metric representing the sum of all dead entities
-        /// for an inner node.
-        /// </summary>
-        public string Dead_CodeIssue_SUM = "Metric.Dead_Code_SUM";
-        /// <summary>
-        /// The attribute name of the metric representing the sum of all metric violations
-        /// for an inner node.
-        /// </summary>
-        public string MetricIssue_SUM = "Metric.Metric_SUM";
-        /// <summary>
-        /// The attribute name of the metric representing the sum of all style violations
-        /// for an inner node.
-        /// </summary>
-        public string StyleIssue_SUM = "Metric.Style_SUM";
-        /// <summary>
-        /// The attribute name of the metric representing the sum of all other kinds of
-        /// software erosions for an inner node.
-        /// </summary>
-        public string UniversalIssue_SUM = "Metric.Universal_SUM";
-
-        /// <summary>
-        /// Returns all attribute names of the different kinds of software erosions for inner
-        /// nodes (the sums of their descendants).
-        /// </summary>
-        /// <returns>all attribute names of the different kinds of software erosions for inner nodes</returns>
-        public IList<string> AllInnerNodeIssues()
-        {
-            List<string> result = new List<string>()
-               {
-                  ArchitectureIssue_SUM,
-                  CloneIssue_SUM,
-                  CycleIssue_SUM,
-                  Dead_CodeIssue_SUM,
-                  MetricIssue_SUM,
-                  StyleIssue_SUM,
-                  UniversalIssue_SUM
-               };
-            return result;
-        }
-
-        /// <summary>
-        /// The metric to be put in the inner circle of a Donut chart.
-        /// </summary>
-        public string InnerDonutMetric = "Metric.IssuesTotal";
-
-        /// <summary>
-        /// Returns the names of all node metric attributes that are visualized somehow.
-        /// More precisely, the resulting list consists of the following metrics:
-        /// WidthMetric, HeightMetric, DepthMetric, LeafStyleMetric, AllLeafIssues(),
-        /// AllInnerNodeIssues(), and InnerDonutMetric.
-        /// </summary>
-        /// <returns>all node metric attributes</returns>
-        public List<string> AllMetricAttributes()
-        {
-            List<string> nodeMetrics = new List<string>() { WidthMetric, HeightMetric, DepthMetric, LeafStyleMetric };
-            nodeMetrics.AddRange(AllLeafIssues());
-            nodeMetrics.AddRange(AllInnerNodeIssues());
-            nodeMetrics.Add(InnerDonutMetric);
-            return nodeMetrics;
-        }
-
-        /// <summary>
-        /// Yields a mapping of all node attribute names that define erosion issues 
-        /// for leaf nodes in the GXL file onto the icons to be used for visualizing them.
-        /// </summary>
-        /// <returns>mapping of all node attribute names for leaves onto icon ids</returns>
-        public SerializableDictionary<string, IconFactory.Erosion> LeafIssueMap()
-        {
-            SerializableDictionary<string, IconFactory.Erosion> result = new SerializableDictionary<string, IconFactory.Erosion>
-            {
-                { ArchitectureIssue, IconFactory.Erosion.Architecture_Violation },
-                { CloneIssue, IconFactory.Erosion.Clone },
-                { CycleIssue, IconFactory.Erosion.Cycle },
-                { Dead_CodeIssue, IconFactory.Erosion.Dead_Code },
-                { MetricIssue, IconFactory.Erosion.Metric },
-                { StyleIssue, IconFactory.Erosion.Style },
-                { UniversalIssue, IconFactory.Erosion.Universal }
-            };
-            return result;
-        }
 
         /// <summary>
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.

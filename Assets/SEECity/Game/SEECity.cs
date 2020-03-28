@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+using SEE.Tools;
+
 namespace SEE.Game
 {
     /// <summary>
@@ -119,7 +121,7 @@ namespace SEE.Game
         /// Loads the graph data from the GXL file with GXLPath() and the metrics
         /// from the CSV file with CSVPath().
         /// </summary>
-        public void LoadData()
+        public virtual void LoadData()
         {
             if (string.IsNullOrEmpty(GXLPath()))
             {
@@ -137,7 +139,7 @@ namespace SEE.Game
         /// Draws the graph.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
-        private void DrawGraph()
+        protected void DrawGraph()
         {
             if (ReferenceEquals(ItsGraph, null))
             {

@@ -1,7 +1,9 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
 
-namespace SEE.DataModel 
+using SEE.DataModel;
+
+namespace SEE.Tools
 {
     /// <summary>
     /// Tests for the incremental reflexion analysis.

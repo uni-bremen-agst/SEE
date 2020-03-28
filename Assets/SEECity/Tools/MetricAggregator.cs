@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SEE.DataModel
+using SEE.DataModel;
+
+namespace SEE.Tools
 {
     /// <summary>
     /// Allows one to aggregate or derive metrics for nodes.

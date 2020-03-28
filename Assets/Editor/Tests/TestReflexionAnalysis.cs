@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.DataModel
+using SEE.DataModel;
+
+namespace SEE.Tools
 {
     /// <summary>
     /// Shared code of unit tests for ReflexionAnalysis.

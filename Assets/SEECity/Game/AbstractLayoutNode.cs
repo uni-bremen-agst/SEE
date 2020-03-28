@@ -135,5 +135,13 @@ namespace SEE.Game
         public abstract float Rotation { get; set; }
         public abstract Vector3 Roof { get; }
         public abstract Vector3 Ground { get; }
+
+        public override string ToString()
+        {
+            string result = base.ToString();
+            result += " Linkname=" + LinkName + " Level=" + Level + " IsLeaf=" + IsLeaf
+                + " Parent=" + (Parent != null ? Parent.LinkName : "<NO PARENT>");
+            return result;
+        }
     }
 }
