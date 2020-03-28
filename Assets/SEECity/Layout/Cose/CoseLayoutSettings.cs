@@ -9,7 +9,7 @@ namespace SEE.Layout
         /// <summary>
         /// the margin of a graph
         /// </summary>
-        public static int Graph_Margin = 2;
+        public static double Graph_Margin = 0.5;
 
         /// <summary>
         /// the margin of a compound node

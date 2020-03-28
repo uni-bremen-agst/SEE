@@ -216,7 +216,7 @@ namespace SEE.Layout
                     }
                 }
 
-                int defaultMargin = CoseLayoutSettings.Graph_Margin;
+                double defaultMargin = CoseLayoutSettings.Graph_Margin;
                 left -= defaultMargin;
                 right += defaultMargin;
                 top -= defaultMargin;
