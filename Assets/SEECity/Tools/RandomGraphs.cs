@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using SEE.Utils;
 
 namespace SEE.Tools
 {
@@ -34,74 +35,166 @@ namespace SEE.Tools
     }
 
     /// <summary>
+    /// Specifies parameters for the random generation of leaf nodes and inner nodes and their edges.
+    /// </summary>
+    [Serializable]
+    public class Constraint
+    {
+        /// <summary>
+        /// The type of the nodes to be generated.
+        /// </summary>
+        public string NodeType;
+        /// <summary>
+        /// The type for edges connecting the nodes.
+        /// </summary>
+        public string EdgeType;
+        /// <summary>
+        /// The number of nodes to be generated.
+        /// </summary>
+        public int NodeNumber;
+        /// <summary>
+        /// The likelihood of an edge between two generated nodes. Must be in the
+        /// range [0, 1].
+        /// </summary>
+        public float EdgeDensity;
+
+        public Constraint()
+        {
+        }
+
+        public Constraint(string nodeType, int nodeNumber, string edgeType, float edgeDensity)
+        {
+            this.NodeType = nodeType;
+            this.NodeNumber = nodeNumber;
+            this.EdgeType = edgeType;
+            this.EdgeDensity = edgeDensity;
+            Check();
+        }
+
+        internal void Check()
+        {
+            if (string.IsNullOrEmpty(NodeType))
+            {
+                throw new Exception("Node type must neither be null nor empty.");
+            }
+            else if (NodeNumber < 0)
+            {
+                throw new Exception("Number of nodes must be at least 0.");
+            }
+            else if (EdgeDensity < 0)
+            {
+                throw new Exception("Edge densitiy must be at least 0.");
+            }
+            else if (EdgeDensity > 1)
+            {
+                throw new Exception("Edge density must not be greater than 1.");
+            }
+        }
+    }
+
+    /// <summary>
     /// A generator of random graphs based on the Erdős–Rényi model, where a given probability
     /// determines whether there is an edge between every pair of nodes.
     /// </summary>
     public class RandomGraphs
     {
-        public RandomGraphs
-            (string leafNodeType = "File", 
-             string innerNodeType = "Directory", 
-             string edgeType = "Source_Dependency")
+        /// <summary>
+        /// The seed for the random generators. A fixed value to make the random generation
+        /// deterministic.
+        /// </summary>
+        private const int Seed = 500;
+
+        public Graph Create(Constraint leafConstraint, Constraint innerNodeConstraint, ICollection<RandomAttributeDescriptor> leafAttributes)
         {
-            this.leafNodeType = leafNodeType;
-            this.innerNodeType = innerNodeType;
-            this.edgeType = edgeType;
-        }
-
-        /// <summary>
-        /// The node type to be used for new leaf nodes of the graph.
-        /// </summary>
-        private readonly string leafNodeType;
-
-        /// <summary>
-        /// The node type to be used for new inner nodes of the graph.
-        /// </summary>
-        private readonly string innerNodeType;
-
-        /// <summary>
-        /// The edge type to be used for new edges of the graph.
-        /// </summary>
-        private readonly string edgeType;
-
-        public Graph Create(int numberOfNodes, float edgeDensity, ICollection<RandomAttributeDescriptor> leafAttributes)
-        {
-            if (edgeDensity < 0.0f || edgeDensity > 1.0f)
-            {
-                throw new Exception("Edge density must be between 0 and 1.");
-            }
+            leafConstraint.Check();
+            innerNodeConstraint.Check();
             Graph graph = new Graph();
-            ICollection<Node> leaves = CreateLeaves(graph, numberOfNodes, leafAttributes);
-            CreateEdges(graph, leaves, edgeDensity);
+            ICollection<Node> leaves = CreateLeaves(graph, leafConstraint, leafAttributes);
+            ICollection<Edge> leafEdges = CreateEdges(graph, leaves, leafConstraint);
+            IList<Node> innerNodes = CreateTree(graph, innerNodeConstraint);
+            AssignLeaves(graph, leaves, innerNodes);
+            ICollection<Edge> innerEdges = CreateEdges(graph, innerNodes, innerNodeConstraint);
+            PrintStatistics(graph, leaves.Count, leafEdges.Count, innerNodes.Count, innerEdges.Count);
             return graph;
         }
 
-        private void CreateEdges(Graph graph, ICollection<Node> leaves, float probability)
+        private void PrintStatistics(Graph graph, int leavesCount, int leafEdgesCount, int innerNodesCount, int innerEdgesCount)
         {
-            System.Random random = new System.Random();
+            Debug.LogFormat("Number of nodes:       {0}\n", graph.NodeCount);
+            Debug.LogFormat("Number of leaf nodes:  {0}\n", leavesCount);
+            Debug.LogFormat("Number of inner nodes: {0}\n", innerNodesCount);
 
-            foreach (Node source in leaves)
+            Debug.LogFormat("Number of edges:       {0}\n", graph.EdgeCount);
+            Debug.LogFormat("Number of leaf edges:  {0}\n", leafEdgesCount);
+            Debug.LogFormat("Leaf edge density:     {0}\n", (float)leafEdgesCount / (float)leavesCount);
+            Debug.LogFormat("Number of inner edges: {0}\n", innerEdgesCount);
+            Debug.LogFormat("Inner edge density:    {0}\n", (float)innerEdgesCount / (float)innerNodesCount);
+
+            Debug.LogFormat("Maximal tree depth:    {0}\n", graph.GetMaxDepth());
+        }
+
+        private void AssignLeaves(Graph graph, ICollection<Node> leaves, IList<Node> innerNodes)
+        {
+            System.Random random = new System.Random(Seed);
+            foreach (Node leaf in leaves)
             {
-                foreach (Node target in leaves)
-                {
-                    if (random.NextDouble() < probability)
-                    {
-                        graph.AddEdge(new Edge(source, target, edgeType));
-                    }
-                }
+                // Next(n) yields a non-negative number smaller than n.
+                int index = random.Next(innerNodes.Count);
+                // index is in range [0, innerNodes.Count-1]
+                innerNodes[index].AddChild(leaf);
             }
         }
 
-        private ICollection<Node> CreateLeaves(Graph graph, int numberOfNodes, ICollection<RandomAttributeDescriptor> leafAttributes)
+        private IList<Node> CreateTree(Graph graph, Constraint innerNodeConstraint)
         {
-            ICollection<Node> leaves = CreateNodes(graph, numberOfNodes, "Leaf~", leafNodeType);
+            // Create the inner nodes
+            IList<Node> innerNodes = new List<Node>(innerNodeConstraint.NodeNumber);
+            for (int i = 1; i <= innerNodeConstraint.NodeNumber; i++)
+            {
+                innerNodes.Add(CreateNode(graph, "Inner~" + i, innerNodeConstraint.NodeType));
+            }
+            // Create the tree.
+            int[] parent = RandomTrees.Random(innerNodeConstraint.NodeNumber, out int root);
+            for (int i = 0; i < parent.Length; i++)
+            {
+                if (parent[i] != -1)
+                {
+                    // i is not the root; add i to its parent
+                    innerNodes[parent[i]].AddChild(innerNodes[i]);
+                }
+            }
+            return innerNodes;
+        }
+
+        private ICollection<Edge> CreateEdges(Graph graph, ICollection<Node> nodes, Constraint constraint)
+        {
+            System.Random random = new System.Random(Seed);
+            ICollection<Edge> result = new List<Edge>();
+            foreach (Node source in nodes)
+            {
+                foreach (Node target in nodes)
+                {
+                    if (constraint.EdgeDensity == 1 || random.NextDouble() < constraint.EdgeDensity)
+                    {
+                        Edge edge = new Edge(source, target, constraint.EdgeType);
+                        result.Add(edge);
+                        graph.AddEdge(edge);
+                    }
+                }
+            }
+            return result;
+        }
+
+        private ICollection<Node> CreateLeaves(Graph graph, Constraint leafConstraint, ICollection<RandomAttributeDescriptor> leafAttributes)
+        {
+            ICollection<Node> leaves = CreateNodes(graph, leafConstraint.NodeNumber, "Leaf~", leafConstraint.NodeType);
             CreateAttributes(leaves, leafAttributes);
             return leaves;
         }
 
         private void CreateAttributes(ICollection<Node> nodes, ICollection<RandomAttributeDescriptor> attributes)
         {
-            System.Random random = new System.Random();
+            System.Random random = new System.Random(Seed);
 
             foreach (Node node in nodes)
             {
@@ -127,6 +220,7 @@ namespace SEE.Tools
             Node result = new Node
             {
                 LinkName = linkname,
+                SourceName = linkname,
                 Type = type
             };
             graph.AddNode(result);
