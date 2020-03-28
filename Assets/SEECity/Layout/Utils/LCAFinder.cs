@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using UnityEngine;
 
@@ -59,6 +60,43 @@ namespace SEE.Layout
             Run(roots);
         }
 
+        private void CheckTree(ICollection<HNode> roots)
+        {
+            HashSet<HNode> visited = new HashSet<HNode>();
+            foreach (HNode root in roots)
+            {
+                CheckTree(root, visited);
+            }
+        }
+
+        private void CheckTree(HNode node, HashSet<HNode> visited)
+        {
+            if (visited.Contains(node))
+            {
+                // node was already visited
+                throw new Exception("Input is not a tree. Node " + node + " can be reached more than once.");
+            }
+            else
+            {
+                visited.Add(node);
+                HNode parent = node.Parent;
+                // We should have visited the parent already in this pre-order depth-first traversal.
+                if (parent != null && ! visited.Contains(parent))
+                {
+                    throw new Exception("Parent in tree is inconsistent. Violating node: " + parent);
+                }
+                foreach (HNode child in node.Children())
+                {
+                    // Does child also believe it is a child of node?
+                    if (!ReferenceEquals(child.Parent, node))
+                    {
+                        throw new Exception("Parenting in tree is inconsistent: Child " + child + " is not a child of node " + parent);
+                    }
+                    CheckTree(child, visited);
+                }
+            }
+        }
+
         /// <summary>
         /// Yields the floor of the binary logarithm of n.
         /// </summary>
@@ -92,6 +130,7 @@ namespace SEE.Layout
         /// <param name="root">roots of the forest</param>
         private void Run(ICollection<HNode> roots)
         {
+            CheckTree(roots);
             int numberOfNodes = MapAllNodes(roots);
             this.maxLevel = 1 + Log2((uint)numberOfNodes);
             DetermineEulerTours(roots, numberOfNodes);
