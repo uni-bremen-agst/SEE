@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Layout;
-using static SEE.GraphSettings;
+using static SEE.Game.AbstractSEECity;
 
 namespace SEE.DataModel
 {

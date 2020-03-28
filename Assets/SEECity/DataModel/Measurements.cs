@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel;
+using SEE.Game;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace SEE
         /// <summary>
         /// settings for this graph
         /// </summary>
-        private GraphSettings settings;
+        private AbstractSEECity settings;
 
         /// <summary>
         /// width of this graph visualisation
@@ -51,7 +52,7 @@ namespace SEE
         /// <param name="settings">settings for this graph</param>
         /// <param name="leftFrontCorner">2D co-ordinate of the left front corner</param>
         /// <param name="rightBackCorner">2D co-ordinate of the right back corner</param>
-        public Measurements(Dictionary<Node, GameObject> nodeMap, Graph graph, GraphSettings settings, Vector2 leftFrontCorner, Vector2 rightBackCorner)
+        public Measurements(Dictionary<Node, GameObject> nodeMap, Graph graph, AbstractSEECity settings, Vector2 leftFrontCorner, Vector2 rightBackCorner)
         {
             this.graph = graph;
             this.nodes = nodeMap.Values;
