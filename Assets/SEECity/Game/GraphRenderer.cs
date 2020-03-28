@@ -239,7 +239,7 @@ namespace SEE.Game
         {
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             // Place the plane somewhat under ground level.
-            return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, settings.origin.y - 0.01f, Color.gray);
+            return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, settings.origin.y - 0.5f, Color.gray);
         }
 
         /// <summary>
@@ -346,6 +346,11 @@ namespace SEE.Game
                     break;
                 case SEECity.InnerNodeKinds.Cylinders:
                 case SEECity.InnerNodeKinds.Rectangles:
+                    {
+                        RectangleDecorator decorator = new RectangleDecorator(innerNodeFactory, Color.white);
+                        decorator.Add(InnerNodes(gameNodes));
+                    }
+                    break;
                 case SEECity.InnerNodeKinds.Blocks:
                     // TODO
                     break;
