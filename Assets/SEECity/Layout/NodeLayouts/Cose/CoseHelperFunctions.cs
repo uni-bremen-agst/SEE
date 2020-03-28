@@ -12,11 +12,23 @@ namespace SEE.Layout
 
         }
 
-        public static SublayoutNode CheckIfNodeIsSublayouRoot(ICollection<SublayoutNode> sublayoutNodes, ILayoutNode node)
+        public static SublayoutNode CheckIfNodeIsSublayouRoot(ICollection<SublayoutNode> sublayoutNodes, string linkname)
         {
             foreach (SublayoutNode subLayoutNode in sublayoutNodes)
             {
-                if (subLayoutNode.Node == node)
+                if (subLayoutNode.Node.LinkName == linkname)
+                {
+                    return subLayoutNode;
+                }
+            }
+            return null;
+        }
+
+        public static SublayoutLayoutNode CheckIfNodeIsSublayouRoot(ICollection<SublayoutLayoutNode> sublayoutNodes, string linkname)
+        {
+            foreach (SublayoutLayoutNode subLayoutNode in sublayoutNodes)
+            {
+                if (subLayoutNode.Node.LinkName == linkname)
                 {
                     return subLayoutNode;
                 }
