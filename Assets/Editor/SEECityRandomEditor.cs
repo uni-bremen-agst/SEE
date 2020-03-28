@@ -24,7 +24,7 @@ namespace SEEEditor
             leafAttributes.drawHeaderCallback
                 = (Rect rect) =>
                 {
-                    EditorGUI.LabelField(rect, "Node attributes (Name, Mean, SD)");
+                    EditorGUI.LabelField(rect, "Leaf node attributes (Name, Mean, SD)");
                 };
             leafAttributes.drawElementCallback
                 = (Rect rect, int index, bool isActive, bool isFocused) =>
@@ -63,11 +63,17 @@ namespace SEEEditor
             base.OnInspectorGUI();
             SEECityRandom city = target as SEECityRandom;
 
-            city.LeafNodeType = EditorGUILayout.TextField("Type of leaf nodes", city.LeafNodeType);
-            city.InnerNodeType = EditorGUILayout.TextField("Type of inner nodes", city.InnerNodeType);
+            GUILayout.Label("Leaf nodes", EditorStyles.boldLabel);
+            city.LeafConstraint.NodeType = EditorGUILayout.TextField("Node type", city.LeafConstraint.NodeType);
+            city.LeafConstraint.NodeNumber = EditorGUILayout.IntField("Number of nodes", city.LeafConstraint.NodeNumber);
+            city.LeafConstraint.EdgeType = EditorGUILayout.TextField("Edge type", city.LeafConstraint.EdgeType);
+            city.LeafConstraint.EdgeDensity = Mathf.Clamp(EditorGUILayout.FloatField("Edge density", city.LeafConstraint.EdgeDensity), 0.0f, 1.0f);
 
-            city.NumberOfLeaves = EditorGUILayout.IntField("Number of leaf nodes", city.NumberOfLeaves);
-            city.NumberOfInnerNodes = EditorGUILayout.IntField("Number of inner nodes", city.NumberOfInnerNodes);
+            GUILayout.Label("Inner nodes", EditorStyles.boldLabel);
+            city.InnerNodeConstraint.NodeType = EditorGUILayout.TextField("Node type", city.InnerNodeConstraint.NodeType);
+            city.InnerNodeConstraint.NodeNumber = EditorGUILayout.IntField("Number of nodes", city.InnerNodeConstraint.NodeNumber);
+            city.InnerNodeConstraint.EdgeType = EditorGUILayout.TextField("Edge type", city.InnerNodeConstraint.EdgeType);
+            city.InnerNodeConstraint.EdgeDensity = Mathf.Clamp(EditorGUILayout.FloatField("Edge density", city.InnerNodeConstraint.EdgeDensity), 0.0f, 1.0f);
 
             // List of leaf attributes.
             serializedObject.Update();
