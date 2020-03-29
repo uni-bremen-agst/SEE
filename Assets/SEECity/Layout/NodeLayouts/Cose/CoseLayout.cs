@@ -213,7 +213,7 @@ namespace SEE.Layout
                 if (node.IsLeaf())
                 {
                     ILayoutNode nNode = node.NodeObject;
-                    NodeTransform transform = new NodeTransform(new Vector3((float)node.GetCenterX(), groundLevel, (float)node.GetCenterY()), new Vector3(node.rect.width, groundLevel, node.rect.height));
+                    NodeTransform transform = new NodeTransform(new Vector3((float)node.GetCenterX(), groundLevel, (float)node.GetCenterY()), node.NodeObject.Scale);
                     layout_result[nNode] = transform;
                 }
 
@@ -941,7 +941,7 @@ namespace SEE.Layout
             {
                 CreateNode(child, null);
             }
-            SetScale(layoutNodes);
+            //SetScale(layoutNodes);
             Debug.Log("I am Groot");
 
             foreach (Edge edge in edges)

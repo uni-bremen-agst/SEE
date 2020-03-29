@@ -44,10 +44,27 @@ namespace SEE.Layout
         ICollection<T> Successors { get; }
     }
 
+    public interface ISublayoutNode<T>
+    {
+        Vector3 RelativePosition { get; set; }
+
+        bool IsSublayoutNode { get; set; }
+
+        bool IsSublayoutRoot { get; set; }
+
+        Sublayout Sublayout { get; set; }
+
+        T SublayoutRoot { get; set; }
+
+        void SetOrigin();
+
+        void SetRelative(T node);
+    }
+
     /// <summary>
     ///  Defines the methods for all nodes to be laid out.
     /// </summary>
-    public interface ILayoutNode : IGameNode, IGraphNode<ILayoutNode>, IHierarchyNode<ILayoutNode>
+    public interface ILayoutNode : IGameNode, IGraphNode<ILayoutNode>, IHierarchyNode<ILayoutNode>, ISublayoutNode<ILayoutNode>
     {
     }
 }
