@@ -49,6 +49,7 @@ namespace SEE.DataModel
             }
             else if (nodes.ContainsKey(node.LinkName))
             {
+                Debug.Log("Equal Linkname: "+node.LinkName);
                 throw new Exception("linknames must be unique");
             }
             else if (!ReferenceEquals(node.ItsGraph, null))

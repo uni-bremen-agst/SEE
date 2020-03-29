@@ -72,6 +72,8 @@ namespace SEE.Layout
         /// </summary>
         private AbstractSEECity settings;
 
+        private readonly NodeFactory leafNodeFactory;
+
         public CoseGraphManager GraphManager { get => graphManager; set => graphManager = value; }
         public CoseLayoutSettings CoseLayoutSettings { get => coseLayoutSettings; set => coseLayoutSettings = value; }
         public Dictionary<string, NodeLayouts> Sublayouts { get => sublayouts; set => sublayouts = value; }
@@ -86,11 +88,12 @@ namespace SEE.Layout
         /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
         /// <param name="edges">List of Edges</param>
         /// <param name="coseGraphSettings">Graph Settings, choosed by user</param>
-        public CoseLayout(float groundLevel, AbstractSEECity settings) : base(groundLevel)
+        public CoseLayout(float groundLevel, AbstractSEECity settings, NodeFactory leafNodeFactory) : base(groundLevel)
         {
             name = "Compound Spring Embedder Layout";
             nodeToCoseNode = new Dictionary<ILayoutNode, CoseNode>();
             this.settings = settings;
+            this.leafNodeFactory = leafNodeFactory;
             SetupGraphSettings(settings.CoseGraphSettings);
         }
 
@@ -228,7 +231,7 @@ namespace SEE.Layout
         private void PlaceNodes(ILayoutNode root)
         {
             CreateTopology(root);
-            CalculateSubLayouts(graphManager.RootGraph.Parent);
+            CalculateSubLayouts();
 
             if (SublayoutNodes.Count > 0 && CoseHelperFunctions.CheckIfNodeIsSublayouRoot(SublayoutNodes, graphManager.RootGraph.Parent.NodeObject.LinkName) != null)
             {
@@ -321,14 +324,14 @@ namespace SEE.Layout
         /// calculates the sublayouts
         /// </summary>
         /// <param name="graph">the graph for which the sublayout is calculated</param>
-        private void CalculateSubLayouts(CoseNode root)
+        private void CalculateSubLayouts()
         {
             // sind immernoch nach Leveln sortiert
             foreach (SublayoutLayoutNode sublayoutNode in sublayoutNodes)
             {
-                List<CoseNode> allNodes = sublayoutNode.Nodes.Select(node => nodeToCoseNode[node]).ToList();
-                List<CoseNode> removedNodes = sublayoutNode.RemovedChildren.Select(node => nodeToCoseNode[node]).ToList();
-                CoseSublayout sublayout = new CoseSublayout(nodeToCoseNode[sublayoutNode.Node], groundLevel, innerNodeHeight, sublayoutNode.NodeLayout, allNodes, removedNodes);
+                Dictionary<ILayoutNode, CoseNode> allNodes = new Dictionary<ILayoutNode, CoseNode>(sublayoutNode.Nodes.ToDictionary(node => node, node => nodeToCoseNode[node]));
+                Dictionary<ILayoutNode, CoseNode> removedNodes = new Dictionary<ILayoutNode, CoseNode>(sublayoutNode.RemovedChildren.ToDictionary(node => node, node => nodeToCoseNode[node]));
+                CoseSublayout sublayout = new CoseSublayout(nodeToCoseNode[sublayoutNode.Node], groundLevel, innerNodeHeight, sublayoutNode.NodeLayout, allNodes, removedNodes, leafNodeFactory);
                 sublayout.Layout();
             }
         }
