@@ -10,6 +10,9 @@
 	  <attr name="Linkage.Name">
         <string>Memory Manager</string>
       </attr>
+	  <attr name="Metric.LOC">
+        <int>100</int>
+      </attr>	  
     </node>
     <node id="N3361">
       <type xlink:href="Cluster"/>
@@ -18,6 +21,9 @@
       </attr>
 	  <attr name="Linkage.Name">
         <string>Print AST</string>
+      </attr>
+	  <attr name="Metric.LOC">
+        <int>100</int>
       </attr>
     </node>
     <node id="N3362">
@@ -36,7 +42,10 @@
       </attr>
       <attr name="Linkage.Name">
         <string>Optimizer</string>
-      </attr>	  
+      </attr>	
+	  <attr name="Metric.LOC">
+        <int>100</int>
+      </attr>
     </node>
     <node id="N3364">
       <type xlink:href="Cluster"/>
@@ -45,6 +54,9 @@
       </attr>
       <attr name="Linkage.Name">
         <string>Error Handler</string>
+      </attr>
+	  <attr name="Metric.LOC">
+        <int>100</int>
       </attr>	  
     </node>
     <node id="N3365">
@@ -54,6 +66,9 @@
       </attr>
       <attr name="Linkage.Name">
         <string>Constants Table</string>
+      </attr>	
+	  <attr name="Metric.LOC">
+        <int>100</int>
       </attr>	  
     </node>
     <node id="N3366">
@@ -63,7 +78,10 @@
       </attr>
       <attr name="Linkage.Name">
         <string>Main</string>
-      </attr>	  
+      </attr>	
+	  <attr name="Metric.LOC">
+        <int>100</int>
+      </attr>
     </node>
     <node id="N3367">
       <type xlink:href="Cluster"/>
@@ -81,7 +99,10 @@
       </attr>
       <attr name="Linkage.Name">
         <string>Parser</string>
-      </attr>	  
+      </attr>	
+	  <attr name="Metric.LOC">
+        <int>100</int>
+      </attr>
     </node>
     <node id="N3369">
       <type xlink:href="Cluster"/>
@@ -90,6 +111,9 @@
       </attr>
       <attr name="Linkage.Name">
         <string>Scanner</string>
+      </attr>	 
+	  <attr name="Metric.LOC">
+        <int>100</int>
       </attr>	  
     </node>
     <node id="N3370">
@@ -99,6 +123,9 @@
       </attr>
       <attr name="Linkage.Name">
         <string>Symbol Table</string>
+      </attr>
+	  <attr name="Metric.LOC">
+        <int>100</int>
       </attr>	  
     </node>
     <node id="N3371">
@@ -108,6 +135,9 @@
       </attr>
       <attr name="Linkage.Name">
         <string>IL</string>
+      </attr>	
+	  <attr name="Metric.LOC">
+        <int>100</int>
       </attr>	  
     </node>
     <node id="N3372">
@@ -171,6 +201,9 @@
       </attr>
       <attr name="Linkage.Name">
         <string>Macros</string>
+      </attr>
+	  <attr name="Metric.LOC">
+        <int>100</int>
       </attr>	  
     </node>
     <node id="N3379">
@@ -180,6 +213,9 @@
       </attr>
       <attr name="Linkage.Name">
         <string>Global Controls</string>
+      </attr>	 
+	  <attr name="Metric.LOC">
+        <int>100</int>
       </attr>	  
     </node>
     <node id="N3380">
@@ -189,7 +225,10 @@
       </attr>
       <attr name="Linkage.Name">
         <string>AST2Code</string>
-      </attr>	  
+      </attr>	
+	  <attr name="Metric.LOC">
+        <int>100</int>
+      </attr>
     </node>
     <node id="N3381">
       <type xlink:href="Cluster"/>
@@ -198,6 +237,9 @@
       </attr>
       <attr name="Linkage.Name">
         <string>IL2Code</string>
+      </attr>	
+	  <attr name="Metric.LOC">
+        <int>100</int>
       </attr>	  
     </node>
     <node id="N3382">
@@ -207,6 +249,9 @@
       </attr>
       <attr name="Linkage.Name">
         <string>Machine Description</string>
+      </attr>
+	  <attr name="Metric.LOC">
+        <int>100</int>
       </attr>	  
     </node>
     <node id="N3383">
@@ -214,6 +259,9 @@
       <attr name="Source.Name">
         <string>Type Info</string>
       </attr>
+	  <attr name="Metric.LOC">
+        <int>100</int>
+      </attr>	  
       <attr name="Linkage.Name">
         <string>Type Info</string>
       </attr>	  
@@ -226,6 +274,9 @@
       <attr name="Linkage.Name">
         <string>Target Program</string>
       </attr>	  
+	  <attr name="Metric.LOC">
+        <int>100</int>
+      </attr>	  
     </node>
     <node id="N3385">
       <type xlink:href="Cluster"/>
@@ -235,6 +286,9 @@
       <attr name="Linkage.Name">
         <string>AST-Main</string>
       </attr>	  
+	  <attr name="Metric.LOC">
+        <int>100</int>
+      </attr>
     </node>
     <node id="N3386">
       <type xlink:href="Cluster"/>
@@ -243,7 +297,10 @@
       </attr>
       <attr name="Linkage.Name">
         <string>Semantic Main</string>
-      </attr>	  
+      </attr>	
+	  	  <attr name="Metric.LOC">
+        <int>100</int>
+      </attr>
     </node>
     <edge id="E13925" from="N3381" to="N3384">
       <type xlink:href="Source_Dependency"/>
