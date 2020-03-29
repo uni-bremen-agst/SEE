@@ -305,8 +305,8 @@ namespace SEE.Game
             sublayouts.ForEach(sublayoutNode => {
 
                 SublayoutLayoutNode sublayout = new SublayoutLayoutNode(to_layout_node[sublayoutNode.Node], sublayoutNode.InnerNodeKind, sublayoutNode.NodeLayout);
-                sublayoutNode.Nodes.ForEach(n => sublayout.Nodes.Add(to_layout_node[sublayoutNode.Node]));
-                sublayoutNode.RemovedChildren.ForEach(n => sublayout.RemovedChildren.Add(to_layout_node[sublayoutNode.Node]));
+                sublayoutNode.Nodes.ForEach(n => sublayout.Nodes.Add(to_layout_node[n]));
+                sublayoutNode.RemovedChildren.ForEach(n => sublayout.RemovedChildren.Add(to_layout_node[n]));
                 sublayoutLayoutNodes.Add(sublayout);
             });
             return sublayoutLayoutNodes;
@@ -353,7 +353,7 @@ namespace SEE.Game
                 case SEECity.NodeLayouts.CirclePacking:
                     return new CirclePackingNodeLayout(groundLevel);
                 case SEECity.NodeLayouts.CompoundSpringEmbedder:
-                    return new CoseLayout(groundLevel, settings);
+                    return new CoseLayout(groundLevel, settings, leafNodeFactory);
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }

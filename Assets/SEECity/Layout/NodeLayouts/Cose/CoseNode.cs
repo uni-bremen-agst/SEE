@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace SEE.Layout
 {
-    public class CoseNode: ILayoutNode
+    public class CoseNode
     {
         /// <summary>
         /// The GraphManager of the current CoseLayout
@@ -87,23 +87,8 @@ namespace SEE.Layout
         public CoseGraphManager GraphManager { get => graphManager; set => graphManager = value; }
         public int InclusionTreeDepth { get => inclusionTreeDepth; set => inclusionTreeDepth = value; }
 
-        public string LinkName => throw new NotImplementedException();
+      
 
-        public Vector3 Scale { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Vector3 CenterPosition { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public float Rotation { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public Vector3 Roof => throw new NotImplementedException();
-
-        public Vector3 Ground => throw new NotImplementedException();
-
-        public ICollection<ILayoutNode> Successors => throw new NotImplementedException();
-
-        public ILayoutNode Parent => throw new NotImplementedException();
-
-        public int Level { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        bool IHierarchyNode<ILayoutNode>.IsLeaf => throw new NotImplementedException();
 
         /// <summary>
         /// Constructor
@@ -668,11 +653,6 @@ namespace SEE.Layout
         public float GetBottom()
         {
             return rect.y + rect.height;
-        }
-
-        public ICollection<ILayoutNode> Children()
-        {
-            throw new NotImplementedException();
         }
     }
 }

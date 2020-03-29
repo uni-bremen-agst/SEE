@@ -25,7 +25,7 @@ namespace SEE.Layout
         /// <summary>
         /// a map from every sublayout node to the corresponding gameobject
         /// </summary>
-        private Dictionary<CoseNode, GameObject> nodeMapSublayout;
+        private ICollection<ILayoutNode> sublayoutNodes;
 
         /// <summary>
         /// the y co-ordinate setting the ground level; all nodes will be placed on this level
@@ -52,19 +52,27 @@ namespace SEE.Layout
         /// </summary>
         private Node parentNodeObject;
 
+        private readonly NodeFactory leafNodeFactory;
+
         /// <summary>
-        /// 
+        /// Indicates whether the sublayout contains only leaf nodes
         /// </summary>
-        private readonly List<CoseNode> allNodes = new List<CoseNode>();
+        private readonly bool onlyLeaves;
 
         /// <summary>
         /// 
         /// </summary>
-        private readonly List<CoseNode> removedChildren = new List<CoseNode>();
+        private readonly Dictionary<ILayoutNode, CoseNode> allNodes = new Dictionary<ILayoutNode, CoseNode>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly Dictionary<ILayoutNode, CoseNode> removedChildren = new Dictionary<ILayoutNode, CoseNode>();
 
         public Vector3 LayoutScale { get => layoutScale; set => layoutScale = value; }
         public Vector3 LayoutPosition { get => layoutPosition; set => layoutPosition = value; }
-        public Dictionary<CoseNode, GameObject> NodeMapSublayout { get => nodeMapSublayout; set => nodeMapSublayout = value; }
+
+        Dictionary<ILayoutNode, CoseSublayoutNode> ILayout_to_CoseSublayoutNode = new Dictionary<ILayoutNode, CoseSublayoutNode>();
 
         /// <summary>
         /// constructor 
@@ -78,7 +86,7 @@ namespace SEE.Layout
         /// <param name="allNodes">TODO</param>
         /// <param name="nodeLayout">TODO</param>
         /// <param name="removedChildren">TODO</param>
-        public CoseSublayout(CoseNode root, float groundLevel, float innerNodeHeight, NodeLayouts nodeLayout, List<CoseNode> allNodes, List<CoseNode> removedChildren)
+        public CoseSublayout(CoseNode root, float groundLevel, float innerNodeHeight, NodeLayouts nodeLayout, Dictionary<ILayoutNode, CoseNode> allNodes, Dictionary<ILayoutNode, CoseNode> removedChildren, NodeFactory leafNodeFactory)
         {
             this.nodeLayout = nodeLayout;
             this.root = root;
@@ -86,10 +94,20 @@ namespace SEE.Layout
             this.innerNodeHeight = innerNodeHeight;
             this.allNodes = allNodes;
             this.removedChildren = removedChildren;
+            this.leafNodeFactory = leafNodeFactory;
+            this.onlyLeaves = OnlyLeaveNodes();
 
             if (root.Child != null)
             {
-                this.NodeMapSublayout = CalculateGameobjectsForSublayout();
+                sublayoutNodes = CalculateNodesForSublayout(onlyLeaves);
+
+                foreach(ILayoutNode layoutNode in sublayoutNodes)
+                {
+                    CoseSublayoutNode sublayoutNode = layoutNode as CoseSublayoutNode;
+                   
+                    CoseNode coseNode = allNodes.ContainsKey(sublayoutNode.Node) ? allNodes[sublayoutNode.Node] : removedChildren[sublayoutNode.Node];
+                    coseNode.SublayoutValues.IsSubLayoutNode = true; 
+                }
             }
 
             root.SublayoutValues.Sublayout = this;
@@ -100,56 +118,65 @@ namespace SEE.Layout
         /// </summary>
         public void Layout()
         {
-            Dictionary<GameObject, NodeTransform> layout = CalculateSublayout();
+            Dictionary<ILayoutNode, NodeTransform> layout = CalculateSublayout();
 
-            // TODO mal schauen, ob es ohne geht
             //root.NodeObject.Parent = parentNodeObject;
            
-            foreach (GameObject gameObject in layout.Keys)
+            foreach (ILayoutNode layoutNode in layout.Keys)
             {
-                Vector3 position = layout[gameObject].position;
-                Vector3 scale = layout[gameObject].scale; 
+                CoseSublayoutNode sublayoutNode = layoutNode as CoseSublayoutNode;
+                NodeTransform transform = layout[layoutNode];
 
-                CoseNode coseNode = NodeMapSublayout.FirstOrDefault(i => i.Value == gameObject).Key;
+                Vector3 position = transform.position;
+                Vector3 scale = transform.scale;
 
-                if (coseNode.IsLeaf() || removedChildren.Contains(coseNode))
+                CoseNode coseNode = allNodes.ContainsKey(sublayoutNode.Node) ? allNodes[sublayoutNode.Node] : removedChildren[sublayoutNode.Node];
+
+                if (coseNode.IsLeaf() || removedChildren.ContainsKey(sublayoutNode.Node))
                 {
                     if (nodeLayout != NodeLayouts.Treemap)
                     {
                         scale = new Vector3(coseNode.rect.width, innerNodeHeight, coseNode.rect.height);
                     } 
-                } 
+                }
 
+                Vector3 pos = transform.position;
                 coseNode.SetPositionScale(position, scale);
+                pos.y += transform.scale.y / 2.0f;
+                sublayoutNode.Node.CenterPosition = pos;
+                sublayoutNode.Node.Scale = scale;
+                sublayoutNode.Node.Rotation = transform.rotation;
+                
 
                 if (coseNode.SublayoutValues.IsSubLayoutRoot)
                 {
                     if (coseNode == root)
                     {
-                        LayoutScale = layout[gameObject].scale;
-                        LayoutPosition = layout[gameObject].position;
+                        LayoutScale = scale;
+                        LayoutPosition = position; 
                     }
                     else
                     {
                         // TODO reparieren
                         //coseNode.NodeObject.children = coseNode.SublayoutValues.removedChildren;
 
-                        foreach (KeyValuePair<CoseNode, GameObject> kvp in coseNode.SublayoutValues.Sublayout.NodeMapSublayout)
+                        foreach (ILayoutNode subNode in coseNode.SublayoutValues.Sublayout.sublayoutNodes)
                         {
+                            CoseSublayoutNode cSubNode = subNode as CoseSublayoutNode;
+                            CoseNode cNode = allNodes.ContainsKey(cSubNode.Node) ? allNodes[cSubNode.Node] : removedChildren[cSubNode.Node];
                             // child notes from subsublayout 
-                            if (kvp.Key != coseNode)
+                            if (cNode != coseNode)
                             {
-                                kvp.Key.SetOrigin(); // sub1 nodes total zu der neuen position von A_1_new setzen
-                                kvp.Key.SublayoutValues.relativeRect = kvp.Key.rect;
-                                kvp.Key.SublayoutValues.SubLayoutRoot = root;
+                                cNode.SetOrigin(); // sub1 nodes total zu der neuen position von A_1_new setzen
+                                cNode.SublayoutValues.relativeRect = cNode.rect;
+                                cNode.SublayoutValues.SubLayoutRoot = root;
 
-                                NodeMapSublayout.Add(kvp.Key, kvp.Value);
+                                sublayoutNodes.Add(new CoseSublayoutNode(cSubNode.Node, ILayout_to_CoseSublayoutNode));
 
-
-                                if (kvp.Key.Child != null )
+                                if (cNode.Child != null )
                                 {
-                                    CoseGraph child = kvp.Key.Child;
-                                    Rect bounds = kvp.Key.rect; 
+                                    CoseGraph child = cNode.Child;
+                                    Rect bounds = cNode.rect; 
                                     child.Left = bounds.xMin;
                                     child.Top = bounds.yMin;
                                     child.Right = bounds.xMax;
@@ -164,7 +191,7 @@ namespace SEE.Layout
             }
 
             // TODO nodelayout.isHierarchical()
-            if (nodeLayout == NodeLayouts.EvoStreets)
+            if (onlyLeaves || nodeLayout == NodeLayouts.EvoStreets)
             {
                 double left = Mathf.Infinity;
                 double right = Mathf.NegativeInfinity;
@@ -175,8 +202,11 @@ namespace SEE.Layout
                 double nodeTop;
                 double nodeBottom;
 
-                foreach (CoseNode cNode in NodeMapSublayout.Keys)
+                foreach (ILayoutNode n in sublayoutNodes)
                 {
+                    CoseSublayoutNode cSubNode = n as CoseSublayoutNode;
+                    CoseNode cNode = allNodes[cSubNode.Node];
+
                     nodeLeft = cNode.GetLeft();
                     nodeRight = cNode.GetRight();
                     nodeTop = cNode.GetTop();
@@ -222,37 +252,12 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// calculates the gameobjects and nodes needed for the sublayout
-        /// </summary>
-        /// <returns></returns>
-        private Dictionary<CoseNode, GameObject> CalculateGameobjectsForSublayout()
-        {
-            Dictionary<CoseNode, GameObject> nodeMapping = new Dictionary<CoseNode, GameObject>();
-            // todo onlyleaves
-            List<CoseNode> nodesForLayout = CalculateNodesForSublayout(true);
-
-            // prepair root node for layout
-            CoseGraph graph = root.Child;
-            /*parentNodeObject = graph.Parent.NodeObject.Parent;
-            graph.Parent.NodeObject.Parent = null;
-
-            nodesForLayout.ForEach(node => {
-                if (nodeMap.ContainsKey(node.NodeObject))
-                {
-                    nodeMapping.Add(node, nodeMap[node.NodeObject]);
-                }
-            });*/
-
-            return nodeMapping;
-        }
-
-        /// <summary>
         /// sets the sublayout node position relativ to its root node
         /// </summary>
         private void SetCoseNodeToLayoutPosition()
         {
-            List<CoseNode> nodes = new List<CoseNode>(allNodes);
-            nodes.AddRange(removedChildren);
+            List<CoseNode> nodes = new List<CoseNode>(allNodes.Values);
+            nodes.AddRange(removedChildren.Values);
             nodes.Remove(root);
 
             nodes.ForEach(node => {
@@ -264,71 +269,85 @@ namespace SEE.Layout
         /// Calculates the sublayout positions 
         /// </summary>
         /// <returns></returns>
-        private Dictionary<GameObject, NodeTransform> CalculateSublayout()
+        private Dictionary<ILayoutNode, NodeTransform> CalculateSublayout()
         {
-            //todo
-            /*List<GameObject> gameObjects = NodeMapSublayout.Values.ToList();
-
             switch (nodeLayout)
             {
                 case NodeLayouts.Manhattan:
-                    return new ManhattanLayout(groundLevel, leafNodeFactory.Unit).Layout(gameObjects);
+                    return new ManhattanLayout(groundLevel, leafNodeFactory.Unit).Layout(sublayoutNodes);
                 case NodeLayouts.FlatRectanglePacking:
-                    return new RectanglePacker(groundLevel, leafNodeFactory.Unit).Layout(gameObjects);
+                    return new RectanglePacker(groundLevel, leafNodeFactory.Unit).Layout(sublayoutNodes);
                 case NodeLayouts.EvoStreets:
-                    return new EvoStreetsNodeLayout(groundLevel, leafNodeFactory.Unit).Layout(gameObjects);
+                    return new EvoStreetsNodeLayout(groundLevel, leafNodeFactory.Unit).Layout(sublayoutNodes);
                 case NodeLayouts.Treemap:
-                    return new TreemapLayout(groundLevel, 10.0f * leafNodeFactory.Unit, 10.0f * leafNodeFactory.Unit).Layout(gameObjects);
+                    return new TreemapLayout(groundLevel, 10.0f * leafNodeFactory.Unit, 10.0f * leafNodeFactory.Unit).Layout(sublayoutNodes);
                 case NodeLayouts.Balloon:
-                    return new BalloonNodeLayout(groundLevel).Layout(gameObjects);
+                    return new BalloonNodeLayout(groundLevel).Layout(sublayoutNodes);
                 case NodeLayouts.CirclePacking:
-                    return new CirclePackingNodeLayout(groundLevel).Layout(gameObjects);
+                    return new CirclePackingNodeLayout(groundLevel).Layout(sublayoutNodes);
                 default:
                     throw new System.Exception("Unhandled node layout ");
-            }*/
-            return new Dictionary<GameObject, NodeTransform>();
+            }
         }
-
 
         /// <summary>
         /// Calculates all nodes needed for a sublayout with this graphs parent node as the sublayouts root node
         /// </summary>
         /// <param name="onlyLeaves"></param>
         /// <returns></returns>
-        public List<CoseNode> CalculateNodesForSublayout(bool onlyLeaves)
+        public ICollection<ILayoutNode> CalculateNodesForSublayout(bool onlyLeaves)
         {
-            List<CoseNode> nodesForLayout = new List<CoseNode>(allNodes);
-            nodesForLayout.ForEach(node => node.SublayoutValues.IsSubLayoutNode = true);
+            List<CoseNode> nodesForLayout = new List<CoseNode>(allNodes.Values);
+            nodesForLayout.Remove(root);
+            ICollection<ILayoutNode> sublayoutNodes = ConvertToCoseSublayoutNodes(nodesForLayout);
+            // TODO
+            //nodesForLayout.ForEach(node => node.SublayoutValues.IsSubLayoutNode = true);
 
             if (onlyLeaves)
             {
-                nodesForLayout.Remove(root);
-                return nodesForLayout;
+                return sublayoutNodes;
             } else
             {
+                sublayoutNodes.Add(new CoseSublayoutNode(root.NodeObject, root.NodeObject.Children(), root.NodeObject.IsLeaf, null, root.NodeObject.Scale, ILayout_to_CoseSublayoutNode));
+
                 // bei einem subsubLayout wird der root wieder hinzugefügt
-                removedChildren.ForEach( node =>
+                foreach (KeyValuePair<ILayoutNode, CoseNode> kvp in removedChildren)
                 {
+                    CoseNode node = kvp.Value;
+                    ILayoutNode layoutNode = kvp.Key;
                     if (node.SublayoutValues.IsSubLayoutRoot)
                     {
-                        nodesForLayout.Add(node);
-                        // TODO schauen, ob das geht
-                        //node.SublayoutValues.removedChildren = node.NodeObject.children;
-                        //node.NodeObject.children = new List<Node>();
-
-                        // set dimensions of this node to the dimensions of the subsublayout
-
-                        // TODO
-                        /*if (nodeMap.ContainsKey(node.NodeObject))
-                        {
-                            GameObject obj = nodeMap[node.NodeObject];
-                            Vector3 scale = node.SublayoutValues.Sublayout.layoutScale;
-                            obj.transform.localScale = scale;
-                        }*/
+                        sublayoutNodes.Add(new CoseSublayoutNode(layoutNode, new List<ILayoutNode>(), true, layoutNode.Parent, node.SublayoutValues.Sublayout.layoutScale, ILayout_to_CoseSublayoutNode));
                     }
-                });
+                }
             }
-            return nodesForLayout;
+            return sublayoutNodes;
+        }
+
+        /// <summary>
+        /// Calculates if the sublayout only contains leaf nodes
+        /// </summary>
+        /// <returns>only leave nodes</returns>
+        private bool OnlyLeaveNodes()
+        {
+            return nodeLayout == AbstractSEECity.NodeLayouts.Manhattan || nodeLayout == AbstractSEECity.NodeLayouts.FlatRectanglePacking;
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="layoutNodes"></param>
+        /// <returns></returns>
+        private ICollection<ILayoutNode> ConvertToCoseSublayoutNodes(List<CoseNode> layoutNodes)
+        {
+            List<ILayoutNode> sublayoutNodes = new List<ILayoutNode>();
+            layoutNodes.ForEach( layoutNode =>
+            {
+                ILayoutNode node = layoutNode.NodeObject;
+                sublayoutNodes.Add(new CoseSublayoutNode(node, ILayout_to_CoseSublayoutNode));
+            });
+
+            return sublayoutNodes;
         }
     }
 }
