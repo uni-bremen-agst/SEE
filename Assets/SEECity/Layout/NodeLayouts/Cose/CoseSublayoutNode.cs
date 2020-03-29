@@ -21,7 +21,13 @@ namespace SEE.Layout
         {
             return GetChildren();
         }
-        public ILayoutNode Node => node; 
+        public ILayoutNode Node => node;
+
+        public Vector3 RelativePosition { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public bool IsSublayoutNode { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public bool IsSublayoutRoot { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public Sublayout Sublayout { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public ILayoutNode SublayoutRoot { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
         private ICollection<ILayoutNode> children;
         private readonly bool isLeaf;
@@ -100,6 +106,16 @@ namespace SEE.Layout
                 children = childrenList;
             }
             return children;
+        }
+
+        public void SetOrigin()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SetRelative(ILayoutNode node)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

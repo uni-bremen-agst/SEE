@@ -95,7 +95,7 @@ namespace SEE.Layout
             this.allNodes = allNodes;
             this.removedChildren = removedChildren;
             this.leafNodeFactory = leafNodeFactory;
-            this.onlyLeaves = OnlyLeaveNodes();
+            onlyLeaves = OnlyLeaveNodes();
 
             if (root.Child != null)
             {
@@ -242,6 +242,7 @@ namespace SEE.Layout
                 Rect boundingRect = new Rect((float)left, (float)top, (float)(right - left), (float)(bottom - top));
                 Vector3 position = new Vector3(boundingRect.center.x, groundLevel, boundingRect.center.y);
                 Vector3 scale = new Vector3(boundingRect.width, innerNodeHeight, boundingRect.height);
+                // TODO das ist doch flasch oder?
                 LayoutScale = new Vector3(root.rect.width, innerNodeHeight, root.rect.height);
                 LayoutPosition = new Vector3(root.rect.x, groundLevel, root.rect.y);
                 root.SublayoutValues.IsSubLayoutNode = true;
@@ -308,7 +309,7 @@ namespace SEE.Layout
                 return sublayoutNodes;
             } else
             {
-                sublayoutNodes.Add(new CoseSublayoutNode(root.NodeObject, root.NodeObject.Children(), root.NodeObject.IsLeaf, null, root.NodeObject.Scale, ILayout_to_CoseSublayoutNode));
+                sublayoutNodes.Add(new CoseSublayoutNode(root.NodeObject, ILayout_to_CoseSublayoutNode));
 
                 // bei einem subsubLayout wird der root wieder hinzugefügt
                 foreach (KeyValuePair<ILayoutNode, CoseNode> kvp in removedChildren)
@@ -330,7 +331,7 @@ namespace SEE.Layout
         /// <returns>only leave nodes</returns>
         private bool OnlyLeaveNodes()
         {
-            return nodeLayout == AbstractSEECity.NodeLayouts.Manhattan || nodeLayout == AbstractSEECity.NodeLayouts.FlatRectanglePacking;
+            return nodeLayout == NodeLayouts.Manhattan || nodeLayout == NodeLayouts.FlatRectanglePacking;
         }
 
         /// <summary>

@@ -14,11 +14,6 @@ namespace SEE.Layout
         public Rect relativeRect = new Rect(0, 0, 0, 0);
 
         /// <summary>
-        /// if the node is a sublayout root thats the list of its sublayout nodes 
-        /// </summary>
-        private List<CoseNode> sublayoutNodes = new List<CoseNode>();
-
-        /// <summary>
         /// Indicates whether the node is a sublayout root
         /// </summary>
         private bool isSubLayoutRoot = false;
@@ -38,9 +33,6 @@ namespace SEE.Layout
         /// </summary>
         private CoseSublayout sublayout;
 
-        public List<Node> removedChildren = new List<Node>();
-
-        public List<CoseNode> SublayoutNodes { get => sublayoutNodes; set => sublayoutNodes = value; }
         public bool IsSubLayoutRoot { get => isSubLayoutRoot; set => isSubLayoutRoot = value; }
         public bool IsSubLayoutNode { get => isSubLayoutNode; set => isSubLayoutNode = value; }
         public CoseNode SubLayoutRoot { get => subLayoutRoot; set => subLayoutRoot = value; }
