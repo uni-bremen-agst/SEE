@@ -2,21 +2,89 @@
 using UnityEngine;
 
 using SEE.DataModel;
+using System;
 
 namespace SEE.Tools
 {
     internal class TestReflexionAnalysisStress : TestReflexionAnalysis
     {
+        /// <summary>
+        /// Non-incremental reflexion analysis for minilax example.
+        /// </summary>
         [Test]
-        public void TestMinilax()
+        public void TestMinilaxNonIncrementally()
         {
-            LoadAll("minilax", out Graph impl, out Graph arch, out Graph mapping);
-            Performance p = Performance.Begin("Running reflexion analysis");
+            NonIncrementally("minilax");
+            reflexion.DumpResults();
+        }
+
+        private void NonIncrementally(string folderName)
+        {
+            LoadAll(folderName, out Graph impl, out Graph arch, out Graph mapping);
+            Performance p = Performance.Begin("Running non-incremental reflexion analysis");
             reflexion = new Reflexion(impl, arch, mapping);
             reflexion.Register(this);
             reflexion.Run();
             p.End();
-            //reflexion.dump_results();
+        }
+
+        /// <summary>
+        /// Incremental reflexion analysis for minilax example.
+        /// </summary>
+        [Test]
+        public void TestMinilaxIncrementally()
+        {
+            Incrementally("minilax");
+            reflexion.DumpResults();
+        }
+
+        private void Incrementally(string folderName)
+        {
+            LoadAll(folderName, out Graph impl, out Graph arch, out Graph mapping);
+            Performance p = Performance.Begin("Running incremental reflexion analysis");
+            // Passing the empty graph as mapping argument to reflexion.
+            reflexion = new Reflexion(impl, arch, new Graph());
+            reflexion.Register(this);
+            reflexion.Run(); // from scratch
+            // Now add the mappings incrementally.
+            foreach (Edge map in mapping.Edges())
+            {
+                Node source = impl.GetNode(map.Source.LinkName);
+                Node target = arch.GetNode(map.Target.LinkName);
+                Assert.NotNull(source);
+                Assert.NotNull(target);
+                reflexion.Add_To_Mapping(source, target);
+            }
+            p.End();
+        }
+
+        /// <summary>
+        /// Compares the result of incremental and non-incremental reflexion analysis for minilax example.
+        /// </summary>
+        [Test]
+        public void TestMinilaxComparison()
+        {
+            string folderName = "minilax";
+            NonIncrementally(folderName);
+            int[] incrementally = CollectSummary(reflexion);
+            Teardown();
+            Setup();
+            Incrementally(folderName);
+            int[] nonincrementally = CollectSummary(reflexion);
+            Assert.AreEqual(incrementally, nonincrementally);
+        }
+
+        private int[] CollectSummary(Reflexion reflexion)
+        {
+            Graph _architecture = reflexion.Get_Architecture();
+            string[] stateNames = Enum.GetNames(typeof(State));
+            int[] summary = new int[stateNames.Length];
+
+            foreach (Edge edge in _architecture.Edges())
+            {
+                summary[(int)reflexion.Get_State(edge)] += reflexion.Get_Counter(edge);
+            }
+            return summary;
         }
 
         private Graph Load(string path)
