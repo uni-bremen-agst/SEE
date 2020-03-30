@@ -1079,25 +1079,63 @@ namespace SEE.Tools
         // --------------------------------------------------------------------
 
         /// <summary>
+        /// Prints a summary of the number of edges in each state using Unity's standard logger.
+        /// Is equivalent to PrintSummary(Summary()).
+        /// </summary>
+        public void PrintSummary()
+        {
+            PrintSummary(Summary());
+        }
+
+        /// <summary>
+        /// Prints the given <paramref name="summary"/> of the number of edges in each state 
+        /// using Unity's standard logger. The argument <paramref name="summary"/> can be 
+        /// computed by Summary(). It is assumed to have as many entries as there are different
+        /// State values. When indexed by a State value, it yields the number of edges in the
+        /// architecture that are in this state.
+        /// </summary>
+        /// <param name="summary"></param>
+        public void PrintSummary(int[] summary)
+        {
+            string[] stateNames = Enum.GetNames(typeof(State));
+            foreach (int s in Enum.GetValues(typeof(State)))
+            {
+                Debug.LogFormat("number of edges in state {0} = {1}\n", stateNames[s], summary[s]);
+            }
+        }
+
+        /// <summary>
+        /// Yields a summary of the number of edges in the architecture for each respective state.
+        /// The result has as many entries as there are different State values. When indexed by a 
+        /// State value, it yields the number of edges in the architecture that are in this state.
+        /// For instance, Summary()[(int)State.divergent] gives the number of architecture edges
+        /// that are in state divergent.
+        /// </summary>
+        /// <returns>summary of the number of edges in the architecture for each respective state</returns>
+        public int[] Summary()
+        {
+            Graph _architecture = this.Get_Architecture();
+            string[] stateNames = Enum.GetNames(typeof(State));
+            int[] summary = new int[stateNames.Length];
+
+            foreach (Edge edge in _architecture.Edges())
+            {
+                summary[(int)this.Get_State(edge)] += this.Get_Counter(edge);
+            }
+            return summary;
+        }
+
+        /// <summary>
         /// Dumps the edges of the architecture graph to Unity's debug console.
         /// Intended for debugging.
         /// </summary>
         public void DumpResults()
         {
-            string[] stateNames = Enum.GetNames(typeof(State));
-            int[] summary = new int[stateNames.Length];
-
             Debug.LogFormat("REFLEXION RESULT ({0} nodes and {1} edges): \n", _architecture.NodeCount, _architecture.EdgeCount);
             foreach (Edge edge in _architecture.Edges())
             {
                 // edge counter state
                 Debug.LogFormat("{0} {1} {2}\n", As_Clause(edge), Get_Counter(edge), Get_State(edge));
-                summary[(int)Get_State(edge)] += Get_Counter(edge);
-            }
-
-            foreach (int s in Enum.GetValues(typeof(State)))
-            {
-                Debug.LogFormat("counter of state {0} = {1}\n", stateNames[s], summary[s]);
             }
         }
 
