@@ -449,6 +449,8 @@ namespace SEE.DataModel
             target.parent = null;
             target.level = 0;
             target.children = new List<Node>();
+            target.outgoings = new List<Edge>();
+            target.incomings = new List<Edge>();
         }
 
         /// <summary>
