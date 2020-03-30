@@ -98,7 +98,7 @@ namespace SEE.Tools
 
         public override string ToString()
         {
-            return edge.ToString() + " changed from " + oldState + " to " + newState;
+            return base.ToString() + ": " + edge.ToString() + " changed from " + oldState + " to " + newState;
         }
     }
 
@@ -146,7 +146,7 @@ namespace SEE.Tools
 
         public override string ToString()
         {
-            return "new propagated edge " + propagatedEdge.ToString();
+            return base.ToString() + ": new propagated edge " + propagatedEdge.ToString();
         }
     }
 
@@ -165,7 +165,7 @@ namespace SEE.Tools
 
         public override string ToString()
         {
-            return "unpropagated edge " + propagatedEdge.ToString();
+            return base.ToString() + ": unpropagated edge " + propagatedEdge.ToString();
         }
     }
 
@@ -204,7 +204,7 @@ namespace SEE.Tools
 
         public override string ToString()
         {
-            return "new Maps_To edge " + mapsToEdge.ToString();
+            return base.ToString() + ": new Maps_To edge " + mapsToEdge.ToString();
         }
     }
 
@@ -223,7 +223,7 @@ namespace SEE.Tools
 
         public override string ToString()
         {
-            return "removed Maps_To edge " + mapsToEdge.ToString();
+            return base.ToString() + ": removed Maps_To edge " + mapsToEdge.ToString();
         }
     }
 
@@ -262,6 +262,7 @@ namespace SEE.Tools
             RegisterNodes();
             Add_Transitive_Mapping();
             From_Scratch();
+            DumpResults();
         }
 
         // --------------------------------------------------------------------
@@ -600,14 +601,14 @@ namespace SEE.Tools
                 // mapping 'from'
                 List<Node> subtree = Mapped_Subtree(from);
                 // was 'to' mapped implicitly at all?
-                if (_implicit_maps_to_table.TryGetValue(from, out Node oldTarget))
+                if (_implicit_maps_to_table.TryGetValue(from.LinkName, out Node oldTarget))
                 {
                     // from was actually mapped implicitly onto oldTarget
                     Unmap(subtree, oldTarget);
                 }
                 Add_To_Mapping_Graph(from, to);
                 // adjust explicit mapping
-                _explicit_maps_to_table[from] = to;
+                _explicit_maps_to_table[from.LinkName] = to;
                 // adjust implicit mapping
                 Change_Map(subtree, to);
                 Map(subtree, to);
@@ -673,14 +674,14 @@ namespace SEE.Tools
             {
                 foreach (Node node in subtree)
                 {
-                    _implicit_maps_to_table.Remove(node);
+                    _implicit_maps_to_table.Remove(node.LinkName);
                 }
             }
             else
             {
                 foreach (Node node in subtree)
                 {
-                    _implicit_maps_to_table[node] = target;
+                    _implicit_maps_to_table[node.LinkName] = target;
                 }
             }
         }
@@ -730,7 +731,7 @@ namespace SEE.Tools
                 foreach (Edge outgoing in impl_node.Outgoings)
                 {
                     // assert: outgoing is in implementation graph
-                    if (_implicit_maps_to_table.TryGetValue(outgoing.Target, out Node oldTarget))
+                    if (_implicit_maps_to_table.TryGetValue(outgoing.Target.LinkName, out Node oldTarget))
                     {
                         // outgoing is not dangling
                         if (oldTarget != arch_node)
@@ -743,7 +744,7 @@ namespace SEE.Tools
                 }
                 foreach (Edge incoming in impl_node.Incomings)
                 {
-                    if (_implicit_maps_to_table.TryGetValue(incoming.Source, out Node oldTarget))
+                    if (_implicit_maps_to_table.TryGetValue(incoming.Source.LinkName, out Node oldTarget))
                     {
                         // incoming cross or inner dependency
                         handler(incoming, oldTarget, arch_node);
@@ -904,7 +905,7 @@ namespace SEE.Tools
             {
                 throw new Exception("Implementation node " + impl_source + " is not mapped explicitly.");
             }
-            else if (!_explicit_maps_to_table.Remove(impl_source))
+            else if (!_explicit_maps_to_table.Remove(impl_source.LinkName))
             {
                 throw new Exception("Implementation node " + impl_source + " is not mapped explicitly.");
             }
@@ -924,7 +925,7 @@ namespace SEE.Tools
                     // If impl_source has a parent, all nodes in subtree should be mapped onto
                     // the architecture node onto which the parent is mapped -- if the parent
                     // is mapped at all (implicitly or explicitly).
-                    if (_implicit_maps_to_table.TryGetValue(impl_source_parent, out Node new_target))
+                    if (_implicit_maps_to_table.TryGetValue(impl_source_parent.LinkName, out Node new_target))
                     {
                         // new_target is the architecture node onto which the parent of impl_source is mapped.
                         Change_Map(subtree, new_target);
@@ -1077,19 +1078,28 @@ namespace SEE.Tools
         // debugging
         // --------------------------------------------------------------------
 
-        // dumps the convergences, absences, divergences to the logging channel
-        /*
-        public void dump_results()
+        /// <summary>
+        /// Dumps the edges of the architecture graph to Unity's debug console.
+        /// Intended for debugging.
+        /// </summary>
+        public void DumpResults()
         {
-            Debug.LogFormat("REFLEXION RESULT ({0} nodes and {1} edges): \n", _reflexion.NodeCount, _reflexion.EdgeCount);
-            foreach (Edge edge in _reflexion.Edges())
+            string[] stateNames = Enum.GetNames(typeof(State));
+            int[] summary = new int[stateNames.Length];
+
+            Debug.LogFormat("REFLEXION RESULT ({0} nodes and {1} edges): \n", _architecture.NodeCount, _architecture.EdgeCount);
+            foreach (Edge edge in _architecture.Edges())
             {
                 // edge counter state
-                Debug.LogFormat("{0} {1} {2}\n", as_clause(edge), get_counter(edge), get_state(edge));
+                Debug.LogFormat("{0} {1} {2}\n", As_Clause(edge), Get_Counter(edge), Get_State(edge));
+                summary[(int)Get_State(edge)] += Get_Counter(edge);
+            }
 
+            foreach (int s in Enum.GetValues(typeof(State)))
+            {
+                Debug.LogFormat("counter of state {0} = {1}\n", stateNames[s], summary[s]);
             }
         }
-        */
 
         /// <summary>
         /// Whether descendants may implicitly access their ancestors.
@@ -1189,14 +1199,14 @@ namespace SEE.Tools
 
         /// <summary>
         /// The implicit mapping as derived from _explicit_maps_to_table.
-        /// Note 1: the mapping key is a node in implementation and the mapping value a node in architecture
+        /// Note 1: the mapping key is the linkname of a node in implementation and the mapping value a node in architecture
         /// Note 2: not every node in implementation is a key in this dictionary; node in the implementation
         /// neither mapped explicitly nor implicitly will not be contained.
         /// </summary>
-        private SerializableDictionary<Node, Node> _implicit_maps_to_table;
+        private Dictionary<string, Node> _implicit_maps_to_table;
 
         /// <summary>
-        /// The explicit mapping from implementation nodes onto architecture nodes
+        /// The explicit mapping from implementation node linknames onto architecture nodes
         /// as derived from the mappings graph. This is equivalent to the content
         /// of the mapping graph where the corresponding nodes of the implementation
         /// (source of a mapping) and architecture (target of a mapping) are used-
@@ -1205,7 +1215,7 @@ namespace SEE.Tools
         /// Note: key is a node in the implementation and target a node in the 
         /// architecture graph.
         /// </summary>
-        private SerializableDictionary<Node, Node> _explicit_maps_to_table;
+        private Dictionary<string, Node> _explicit_maps_to_table;
 
         /// <summary>
         /// Creates the transitive closure for the mapping so that we
@@ -1218,7 +1228,7 @@ namespace SEE.Tools
             // mapper, which is done by consulting _explicit_maps_to_table, we need
             // to first create the explicit mapping and can only then map the otherwise
             // unmapped children
-            _explicit_maps_to_table = new SerializableDictionary<Node, Node>();
+            _explicit_maps_to_table = new Dictionary<string, Node>();
             foreach (Edge mapsto in _mapping.Edges())
             {
                 Node source = mapsto.Source;
@@ -1229,10 +1239,11 @@ namespace SEE.Tools
                 Debug.Assert(InImplementation[source.LinkName] != null);
                 //Debug.Log(target.LinkName + "\n");
                 Debug.Assert(InArchitecture[target.LinkName] != null);
-                _explicit_maps_to_table[InImplementation[source.LinkName]] = InArchitecture[target.LinkName];
+                _explicit_maps_to_table[source.LinkName] = InArchitecture[target.LinkName];
+                //_explicit_maps_to_table[InImplementation[source.LinkName]] = InArchitecture[target.LinkName];
             }
 
-            _implicit_maps_to_table = new SerializableDictionary<Node, Node>();
+            _implicit_maps_to_table = new Dictionary<string, Node>();
             foreach (Edge mapsto in _mapping.Edges())
             {
                 Node source = mapsto.Source;
@@ -1260,7 +1271,7 @@ namespace SEE.Tools
         /// <returns>true if node is explicitly mapped</returns>
         private bool Is_Mapper(Node node)
         {
-            return _explicit_maps_to_table.ContainsKey(node);
+            return _explicit_maps_to_table.ContainsKey(node.LinkName);
         }
 
         /// <summary>
@@ -1297,7 +1308,7 @@ namespace SEE.Tools
 #endif
                 }
             }
-            _implicit_maps_to_table[root] = target;
+            _implicit_maps_to_table[root.LinkName] = target;
         }
 
         // *****************************************
@@ -1430,7 +1441,7 @@ namespace SEE.Tools
             foreach (var mapsto in _implicit_maps_to_table)
             {
                 // source_node is in implementation
-                Node source_node = mapsto.Key;
+                Node source_node = InImplementation[mapsto.Key];
                 System.Diagnostics.Debug.Assert(source_node.ItsGraph == _implementation);
                 if (Is_Relevant(source_node))
                 {
@@ -1599,7 +1610,7 @@ namespace SEE.Tools
         private Node Maps_To(Node node)
         {
             System.Diagnostics.Debug.Assert(node.ItsGraph == _implementation);
-            if (_implicit_maps_to_table.TryGetValue(node, out Node target))
+            if (_implicit_maps_to_table.TryGetValue(node.LinkName, out Node target))
             {
                 return target;
             }
@@ -1802,7 +1813,7 @@ namespace SEE.Tools
                     // being propagated and lifted; it may be more concrete than the
                     // type of the specified architecture dependency.
                     if (Is_Specified(edge)
-                        && edge.Has_Supertype_Of(edge_type)
+                        // && edge.Has_Supertype_Of(edge_type) FIXME: We consider that edges match independent of their types
                         && parents.Contains(edge.Target))
                     {   // matching architecture dependency found
                         Change_Architecture_Dependency(edge, counter);
