@@ -2,7 +2,6 @@
 using UnityEngine;
 
 using SEE.DataModel;
-using System;
 
 namespace SEE.Tools
 {
@@ -66,25 +65,12 @@ namespace SEE.Tools
         {
             string folderName = "minilax";
             NonIncrementally(folderName);
-            int[] incrementally = CollectSummary(reflexion);
+            int[] incrementally = reflexion.Summary();
             Teardown();
             Setup();
             Incrementally(folderName);
-            int[] nonincrementally = CollectSummary(reflexion);
+            int[] nonincrementally = reflexion.Summary();
             Assert.AreEqual(incrementally, nonincrementally);
-        }
-
-        private int[] CollectSummary(Reflexion reflexion)
-        {
-            Graph _architecture = reflexion.Get_Architecture();
-            string[] stateNames = Enum.GetNames(typeof(State));
-            int[] summary = new int[stateNames.Length];
-
-            foreach (Edge edge in _architecture.Edges())
-            {
-                summary[(int)reflexion.Get_State(edge)] += reflexion.Get_Counter(edge);
-            }
-            return summary;
         }
 
         private Graph Load(string path)
