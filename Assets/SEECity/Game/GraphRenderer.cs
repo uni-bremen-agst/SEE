@@ -123,9 +123,19 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
+        /// <returns>all game objects created to represent the edges; may be empty</returns>
+        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
+        {
+            return EdgeLayout(graph, ToLayoutNodes(gameNodes));
+        }
+
+        /// <summary>
+        /// Apply the edge layout according to the the user's choice (settings).
+        /// </summary>
+        /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="layoutNodes">the subset of layout nodes for which to draw the edges</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes, ICollection<ILayoutNode> layoutNodes)
+        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<ILayoutNode> layoutNodes)
         {
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
@@ -182,7 +192,7 @@ namespace SEE.Game
             // add the decorations, too
             AddToParent(AddDecorations(gameNodes), parent);
             // create the laid out edges
-            AddToParent(EdgeLayout(graph, gameNodes, layoutNodes), parent);
+            AddToParent(EdgeLayout(graph, layoutNodes), parent);
             // add the plane surrounding all game objects for nodes
             GameObject plane = NewPlane(gameNodes);
             AddToParent(plane, parent);
@@ -238,7 +248,7 @@ namespace SEE.Game
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             PlaneFactory.AdjustXZ(plane, leftFrontCorner, rightBackCorner);
         }
- 
+
         /// <summary>
         /// Determines the new <paramref name="centerPosition"/> and <paramref name="scale"/> for the given 
         /// <paramref name="plane"/> so that it would enclose all given <paramref name="gameNodes"/>
