@@ -351,6 +351,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc88e4f6432d4ba48b75658619eda4cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
   WidthMetric: Metric.LOC
@@ -1792,7 +1825,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a388c80db8c323c41b6badd2530f9c6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  filename: path.csv
+  Filename: path.csv
   ShowPath: 0
 --- !u!1 &1003004807
 GameObject:
@@ -1823,6 +1856,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc88e4f6432d4ba48b75658619eda4cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
   WidthMetric: Metric.LOC
@@ -1900,6 +1966,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc88e4f6432d4ba48b75658619eda4cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
   WidthMetric: Metric.LOC
@@ -1977,6 +2076,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc88e4f6432d4ba48b75658619eda4cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
   WidthMetric: Metric.LOC
@@ -2054,6 +2186,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f60d2c87bfa2964d933dee0c2b9342e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   PathPrefix: 
   origin: {x: 0, y: 0, z: 0}
   WidthMetric: Metric.Number_of_Tokens
@@ -2178,6 +2343,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc88e4f6432d4ba48b75658619eda4cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
   WidthMetric: Metric.LOC
@@ -2399,6 +2597,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc88e4f6432d4ba48b75658619eda4cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
   WidthMetric: Metric.LOC
