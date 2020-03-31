@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using OdinSerializer;
 
 using SEE.DataModel;
 using SEE.GO;
@@ -14,7 +15,7 @@ namespace SEE.Game
     /// is the representation of a graph including the settings that have lead
     /// to its visualization.
     /// </summary>
-    public abstract class AbstractSEECity : MonoBehaviour
+    public abstract class AbstractSEECity : SerializedMonoBehaviour
     {
         /// <summary>
         /// The prefix of the absolute paths for the GXL and CSV data; that is,
@@ -24,20 +25,18 @@ namespace SEE.Game
         /// constructor. That is why we need to defer its definition to the 
         /// SEECityEditor.
         /// </summary>        
-        [SerializeField]
-        public string PathPrefix = null;
+        public string PathPrefix = null; // serialized by Unity
 
         /// <summary>
         /// The center origin where the graph should be placed in the world scene.
         /// </summary>
-        [SerializeField]
-        public Vector3 origin = Vector3.zero;
+        public Vector3 origin = Vector3.zero; // serialized by Unity
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
-        [SerializeField]
-        public HashSet<string> HierarchicalEdges = Hierarchical_Edge_Types();
+        [OdinSerialize]
+        public HashSet<string> HierarchicalEdges = Hierarchical_Edge_Types(); // serialized by Odin
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
@@ -60,19 +59,19 @@ namespace SEE.Game
         /// <summary>
         /// The attribute name of the metric to be used for the width of a building (x co-ordinate).
         /// </summary>
-        public string WidthMetric = NumericAttributeNames.Number_Of_Tokens.Name();
+        public string WidthMetric = NumericAttributeNames.Number_Of_Tokens.Name(); // serialized by Unity
         /// <summary>
         /// The attribute name of the metric to be used for the height of a building (y co-ordinate).
         /// </summary>
-        public string HeightMetric = NumericAttributeNames.Clone_Rate.Name();
+        public string HeightMetric = NumericAttributeNames.Clone_Rate.Name(); // serialized by Unity
         /// <summary>
         /// The attribute name of the metric to be used for the breadth of a building (y co-ordinate).
         /// </summary>
-        public string DepthMetric = NumericAttributeNames.LOC.Name();
+        public string DepthMetric = NumericAttributeNames.LOC.Name(); // serialized by Unity
         /// <summary>
         /// The attribute name of the metric to be used for determining the style of leaf nodes.
         /// </summary>
-        public string LeafStyleMetric = NumericAttributeNames.Complexity.Name();
+        public string LeafStyleMetric = NumericAttributeNames.Complexity.Name(); // serialized by Unity
 
         /// <summary>
         /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
@@ -92,31 +91,31 @@ namespace SEE.Game
         /// <summary>
         /// The attribute name of the metric representing architecture violations.
         /// </summary>
-        public string ArchitectureIssue = NumericAttributeNames.Architecture_Violations.Name();
+        public string ArchitectureIssue = NumericAttributeNames.Architecture_Violations.Name(); // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing duplicated code.
         /// </summary>
-        public string CloneIssue = NumericAttributeNames.Clone.Name();
+        public string CloneIssue = NumericAttributeNames.Clone.Name(); // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing cylces.
         /// </summary>
-        public string CycleIssue = NumericAttributeNames.Cycle.Name();
+        public string CycleIssue = NumericAttributeNames.Cycle.Name(); // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing dead code.
         /// </summary>
-        public string Dead_CodeIssue = NumericAttributeNames.Dead_Code.Name();
+        public string Dead_CodeIssue = NumericAttributeNames.Dead_Code.Name(); // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing metric violations.
         /// </summary>
-        public string MetricIssue = NumericAttributeNames.Metric.Name();
+        public string MetricIssue = NumericAttributeNames.Metric.Name(); // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing code-style violations.
         /// </summary>
-        public string StyleIssue = NumericAttributeNames.Style.Name();
+        public string StyleIssue = NumericAttributeNames.Style.Name(); // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing other kinds of violations.
         /// </summary>
-        public string UniversalIssue = NumericAttributeNames.Universal.Name();
+        public string UniversalIssue = NumericAttributeNames.Universal.Name(); // serialized by Unity
 
         /// <summary>
         /// Returns all attribute names of the different kinds of software erosions.
@@ -145,37 +144,37 @@ namespace SEE.Game
         /// The attribute name of the metric representing the sum of all architecture violations
         /// for an inner node.
         /// </summary>
-        public string ArchitectureIssue_SUM = NumericAttributeNames.Architecture_Violations.Name() + SUM_Postfix;
+        public string ArchitectureIssue_SUM = NumericAttributeNames.Architecture_Violations.Name() + SUM_Postfix; // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing the sum of all clones
         /// for an inner node.
         /// </summary>
-        public string CloneIssue_SUM = NumericAttributeNames.Clone.Name() + SUM_Postfix;
+        public string CloneIssue_SUM = NumericAttributeNames.Clone.Name() + SUM_Postfix; // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing the sum of all cycles
         /// for an inner node.
         /// </summary>
-        public string CycleIssue_SUM = NumericAttributeNames.Cycle.Name() + SUM_Postfix;
+        public string CycleIssue_SUM = NumericAttributeNames.Cycle.Name() + SUM_Postfix; // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing the sum of all dead entities
         /// for an inner node.
         /// </summary>
-        public string Dead_CodeIssue_SUM = NumericAttributeNames.Dead_Code.Name() + SUM_Postfix;
+        public string Dead_CodeIssue_SUM = NumericAttributeNames.Dead_Code.Name() + SUM_Postfix; // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing the sum of all metric violations
         /// for an inner node.
         /// </summary>
-        public string MetricIssue_SUM = NumericAttributeNames.Metric.Name() + SUM_Postfix;
+        public string MetricIssue_SUM = NumericAttributeNames.Metric.Name() + SUM_Postfix; // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing the sum of all style violations
         /// for an inner node.
         /// </summary>
-        public string StyleIssue_SUM = NumericAttributeNames.Style.Name() + SUM_Postfix;
+        public string StyleIssue_SUM = NumericAttributeNames.Style.Name() + SUM_Postfix; // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing the sum of all other kinds of
         /// software erosions for an inner node.
         /// </summary>
-        public string UniversalIssue_SUM = NumericAttributeNames.Universal.Name() + SUM_Postfix;
+        public string UniversalIssue_SUM = NumericAttributeNames.Universal.Name() + SUM_Postfix; // serialized by Unity
 
         /// <summary>
         /// Returns all attribute names of the different kinds of software erosions for inner
@@ -200,7 +199,7 @@ namespace SEE.Game
         /// <summary>
         /// The metric to be put in the inner circle of a Donut chart.
         /// </summary>
-        public string InnerDonutMetric = NumericAttributeNames.IssuesTotal.Name();
+        public string InnerDonutMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
 
         /// <summary>
         /// Returns the names of all node metric attributes that are visualized somehow.
@@ -223,9 +222,9 @@ namespace SEE.Game
         /// for leaf nodes in the GXL file onto the icons to be used for visualizing them.
         /// </summary>
         /// <returns>mapping of all node attribute names for leaves onto icon ids</returns>
-        public SerializableDictionary<string, IconFactory.Erosion> LeafIssueMap()
+        public Dictionary<string, IconFactory.Erosion> LeafIssueMap()
         {
-            SerializableDictionary<string, IconFactory.Erosion> result = new SerializableDictionary<string, IconFactory.Erosion>
+            Dictionary<string, IconFactory.Erosion> result = new Dictionary<string, IconFactory.Erosion>
             {
                 { ArchitectureIssue, IconFactory.Erosion.Architecture_Violation },
                 { CloneIssue, IconFactory.Erosion.Clone },
@@ -243,7 +242,7 @@ namespace SEE.Game
         /// <summary>
         /// The attribute name of the metric to be used for determining the style of inner nodes.
         /// </summary>
-        public string InnerNodeStyleMetric = NumericAttributeNames.IssuesTotal.Name();
+        public string InnerNodeStyleMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
 
         //--------------------------------------
         // Other visual attributes of leaf nodes
@@ -252,13 +251,13 @@ namespace SEE.Game
         /// This parameter determines the minimal width, breadth, and height of each block
         /// representing a graph node visually. Must not be greater than MaximalBlockLength.
         /// </summary>
-        public float MinimalBlockLength = 0.1f;
+        public float MinimalBlockLength = 0.1f; // serialized by Unity
 
         /// <summary>
         /// This parameter determines the maximal width, breadth, and height of each block
         /// representing a graph node visually. Must not be smaller than MinimalBlockLength.
         /// </summary>
-        public float MaximalBlockLength = 100.0f;
+        public float MaximalBlockLength = 100.0f; // serialized by Unity
 
         /// <summary>
         /// How leaf graph nodes should be depicted.
@@ -285,12 +284,12 @@ namespace SEE.Game
         /// <summary>
         /// What kinds of game objects are to be created for leaf nodes in the graph.
         /// </summary>
-        public LeafNodeKinds LeafObjects;
+        public LeafNodeKinds LeafObjects; // serialized by Unity
 
         /// <summary>
         /// What kinds of game objects are to be created for inner graph nodes.
         /// </summary>
-        public InnerNodeKinds InnerNodeObjects;
+        public InnerNodeKinds InnerNodeObjects; // serialized by Unity
 
         /// <summary>
         /// The kinds of node layouts available.
@@ -319,35 +318,35 @@ namespace SEE.Game
         /// <summary>
         /// The layout that should be used for nodes.
         /// </summary>
-        public NodeLayouts NodeLayout;
+        public NodeLayouts NodeLayout; // serialized by Unity
 
         /// <summary>
         /// The layout that should be used for edges.
         /// </summary>
-        public EdgeLayouts EdgeLayout;
+        public EdgeLayouts EdgeLayout; // serialized by Unity
 
         /// <summary>
         /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
         /// for range [0, max-value] is used, where max-value is the maximum value of a metric.
         /// </summary>
-        public bool ZScoreScale = true;
+        public bool ZScoreScale = true; // serialized by Unity
 
         /// <summary>
         /// The width of the line representing edges.
         /// </summary>
-        public float EdgeWidth = 0.3f;
+        public float EdgeWidth = 0.3f; // serialized by Unity
 
         /// <summary>
         /// Whether erosions should be visible above blocks.
         /// </summary>
-        public bool ShowErosions = false;
+        public bool ShowErosions = false; // serialized by Unity
 
         /// <summary>
         /// Orientation of the edges; 
         /// if false, the edges are drawn below the houses;
         /// if true, the edges are drawn above the houses;
         /// </summary>
-        public bool EdgesAboveBlocks = true;
+        public bool EdgesAboveBlocks = true; // serialized by Unity
 
         /// <summary>
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.

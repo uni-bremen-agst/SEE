@@ -26,7 +26,6 @@ namespace SEE.Game
         /// <summary>
         /// The leaf node attributes and their constraints for the random generation of their values.
         /// </summary>
-        [SerializeField]
         public List<RandomAttributeDescriptor> LeafAttributes = Defaults();
 
         /// <summary>
