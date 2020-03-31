@@ -37,6 +37,10 @@ namespace SEE.Layout
         /// </summary>
         protected readonly float groundLevel;
 
+        public float Groundlevel {get => groundLevel; }
+
+        public float InnerNodeHeight { get => innerNodeHeight; }
+
         /// <summary>
         /// The height of inner nodes (y co-ordinate).
         /// </summary>

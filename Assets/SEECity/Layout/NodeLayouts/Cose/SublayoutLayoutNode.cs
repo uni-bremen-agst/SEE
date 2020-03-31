@@ -12,7 +12,7 @@ namespace SEE.Layout
 
         public SublayoutLayoutNode(ILayoutNode node, InnerNodeKinds innerNodeKinds, NodeLayouts nodeLayouts) : base(node, innerNodeKinds, nodeLayouts)
         {
-
+            node.IsSublayoutRoot = true;
         }
     }
 }

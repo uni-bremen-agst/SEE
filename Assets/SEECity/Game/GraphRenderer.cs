@@ -86,6 +86,11 @@ namespace SEE.Game
         private Dictionary<Node, ILayoutNode> to_layout_node;
 
         /// <summary>
+        /// TODO
+        /// </summary>
+        float groundLevel = 0.0f;
+
+        /// <summary>
         /// Draws the graph (nodes and edges and all decorations).
         /// </summary>
         /// <param name="graph">the graph to be drawn</param>
@@ -179,13 +184,16 @@ namespace SEE.Game
             // the sublayout nodes
             ICollection<SublayoutNode> sublayoutNodes = new List<SublayoutNode>();
             // for a hierarchical layout, we need to add the game objects for inner nodes
-            if (nodeLayout.IsHierarchical() && !nodeLayout.UsesEdgesAndSublayoutNodes())
+            if (nodeLayout.IsHierarchical() )
             {
-                AddInnerNodes(nodeMap, nodes); // and inner nodes
-            } else
-            {
-                sublayoutNodes = AddInnerNodesForSublayouts(nodeMap, nodes);
-            }
+                if (nodeLayout.UsesEdgesAndSublayoutNodes())
+                {
+                    sublayoutNodes = AddInnerNodesForSublayouts(nodeMap, nodes);
+                } else
+                {
+                    AddInnerNodes(nodeMap, nodes); // and inner nodes
+                }
+            } 
 
             // calculate and apply the node layout
             Dictionary<Node, GameObject>.ValueCollection gameNodes = nodeMap.Values;
@@ -194,7 +202,13 @@ namespace SEE.Game
             // differentiate between Layouts using Sublayouts and Edges and Layouts only using nodes 
             if (nodeLayout.UsesEdgesAndSublayoutNodes())
             {
-                nodeLayout.Apply(layoutNodes, graph.Edges(), ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList()));
+                List<SublayoutLayoutNode> sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
+                foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
+                {
+                    Sublayout sublayout = new Sublayout(layoutNode, groundLevel, leafNodeFactory);
+                    sublayout.Layout();
+                }
+                nodeLayout.Apply(layoutNodes, graph.Edges(), sublayoutLayoutNodes);
             } else
             {
                 nodeLayout.Apply(layoutNodes);
@@ -337,7 +351,6 @@ namespace SEE.Game
         /// <returns>node layout selected</returns>
         public NodeLayout GetLayout()
         {
-            float groundLevel = 0.0f;
             switch (settings.NodeLayout)
             {
                 case SEECity.NodeLayouts.Manhattan:                    
