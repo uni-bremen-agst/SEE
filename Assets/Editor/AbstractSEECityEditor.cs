@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using SEE.Game;
-using System.IO;
-using SEE;
 
 namespace SEEEditor
 {
