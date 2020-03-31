@@ -1,11 +1,8 @@
-﻿using UnityEngine;
-
-namespace SEE.DataModel
+﻿namespace SEE.DataModel
 {
     /// <summary>
     /// Directed and typed edges of the graph with source and target node.
     /// </summary>
-    [System.Serializable]
     public class Edge : GraphElement
     {
         // IMPORTANT NOTES:
@@ -38,7 +35,6 @@ namespace SEE.DataModel
         /// <summary>
         /// The source of the edge.
         /// </summary
-        [SerializeField]
         private Node source;
 
         /// <summary>
@@ -53,7 +49,6 @@ namespace SEE.DataModel
         /// <summary>
         /// The target of the edge.
         /// </summary>
-        [SerializeField]
         private Node target;
 
         /// <summary>

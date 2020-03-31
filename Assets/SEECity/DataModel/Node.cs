@@ -7,7 +7,6 @@ namespace SEE.DataModel
     /// <summary>
     /// Node of a graph.
     /// </summary>
-    [System.Serializable]
     public class Node : GraphElement
     {
         // IMPORTANT NOTES:
@@ -27,7 +26,6 @@ namespace SEE.DataModel
         /// The unique identifier of a node. May be the empty string if the node has
         /// no such identifier set.
         /// </summary>
-        [SerializeField]
         public string LinkName
         {
             get
@@ -65,7 +63,6 @@ namespace SEE.DataModel
         /// <summary>
         /// The parent of this node. Is null if it has none.
         /// </summary>
-        [SerializeField]
         private Node parent;
 
         /// <summary>
@@ -121,7 +118,6 @@ namespace SEE.DataModel
         /// The ancestor of the node in the hierarchy. May be null if the node
         /// is a root.
         /// </summary>
-        [SerializeField]
         public Node Parent
         {
             get => parent;
@@ -166,13 +162,11 @@ namespace SEE.DataModel
         /// <summary>
         /// The incoming edges of this node.
         /// </summary>
-        [SerializeField]
         private List<Edge> incomings = new List<Edge>();
 
         /// <summary>
         /// The incoming edges of this node.
         /// </summary>
-        [SerializeField]
         public List<Edge> Incomings
         {
             get => incomings;
@@ -234,13 +228,11 @@ namespace SEE.DataModel
         /// <summary>
         /// The outgoing edges of this node.
         /// </summary>
-        [SerializeField]
         private List<Edge> outgoings = new List<Edge>();
 
         /// <summary>
         /// The outgoing edges of this node.
         /// </summary>
-        [SerializeField]
         public List<Edge> Outgoings
         {
             get => outgoings;
@@ -314,7 +306,6 @@ namespace SEE.DataModel
         /// <summary>
         /// The list of immediate children of this node in the hierarchy.
         /// </summary>
-        [SerializeField]
         private List<Node> children = new List<Node>();
 
         /// <summary>

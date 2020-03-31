@@ -1,7 +1,7 @@
-﻿using System;
+﻿using OdinSerializer;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace SEE.DataModel
 {
@@ -27,16 +27,18 @@ namespace SEE.DataModel
     /// <summary>
     /// Specifies and implements attributable objects with named toggle, int, float, and string attributes.
     /// </summary>
-    [System.Serializable]
-    public abstract class Attributable : ICloneable
+    public abstract class Attributable : ICloneable //, ISerializationCallbackReceiver
     {
+        //----------------------------------
+        // Toggle attributes
+        //----------------------------------
+
         /// <summary>
         /// The set of toggle attributes. A toggle is set if it is contained in this
         /// list, otherwise it is unset. Conceptionally, toggleAttributes is a HashSet,
         /// but HashSets are not serialized by Unity. That is why we use List instead.
         /// </summary>
-        [SerializeField]
-        private List<string> toggleAttributes = new List<string>();
+        private List<string> toggleAttributes = new List<string>(); // will be serialized by Unity
 
         public void SetToggle(string attributeName)
         {
@@ -51,11 +53,15 @@ namespace SEE.DataModel
             return toggleAttributes.Contains(attributeName);
         }
 
+        //----------------------------------
+        // String attributes
+        //----------------------------------
+
         // Unity does not serializes Dictionaries. That is why we need to use StringStringDictionary
         // instead here. Note that we need to declare the attribute here as a SerializeField 
         // nevertheless.
-        [UnityEngine.SerializeField]
-        private StringStringDictionary stringAttributes = new StringStringDictionary();
+        [OdinSerialize]
+        private Dictionary<string, string> stringAttributes = new Dictionary<string, string>();
 
         public void SetString(string attributeName, string value)
         {
@@ -79,8 +85,12 @@ namespace SEE.DataModel
             }
         }
 
-        [SerializeField]
-        private StringFloatDictionary floatAttributes = new StringFloatDictionary();
+        //----------------------------------
+        // Float attributes
+        //----------------------------------
+
+        [OdinSerialize]
+        private Dictionary<string, float> floatAttributes = new Dictionary<string, float>();
 
         public void SetFloat(string attributeName, float value)
         {
@@ -104,8 +114,12 @@ namespace SEE.DataModel
             return floatAttributes.TryGetValue(attributeName, out value);
         }
 
-        [SerializeField]
-        private StringIntDictionary intAttributes = new StringIntDictionary();
+        //----------------------------------
+        // Integer attributes
+        //----------------------------------
+
+        [OdinSerialize]
+        private Dictionary<string, int> intAttributes = new Dictionary<string, int>();
 
         public void SetInt(string attributeName, int value)
         {
@@ -129,6 +143,10 @@ namespace SEE.DataModel
             return intAttributes.TryGetValue(attributeName, out value);
         }
 
+        //----------------------------------
+        // Numeric attributes
+        //----------------------------------
+
         public bool TryGetNumeric(string attributeName, out float value)
         {
 
@@ -139,9 +157,14 @@ namespace SEE.DataModel
             }
             else
             {
+                // second try if we cannot find attributeName as an integer attribute
                 return floatAttributes.TryGetValue(attributeName, out value);
             }
         }
+
+        //----------------------------------
+        // General
+        //----------------------------------
 
         public override string ToString()
         {
@@ -190,18 +213,15 @@ namespace SEE.DataModel
         protected virtual void HandleCloned(object clone)
         {
             Attributable target = (Attributable)clone;
-            // deep copies of the attributes
+            // The dictionaries must be newly created and assigned because MemberwiseClone() creates
+            // a shallow copy in which those attributes will all refer to the dictionaries of the
+            // original attributable.
+            // Because the keys and values are primitive types, the following are deep copies of the 
+            // attributes.
             target.toggleAttributes = this.toggleAttributes.ToList();
-            // must be newly created and assigned because MemberwiseClone() creates a shallow
-            // copy in which those attributes will all refer to the dictionaries of the original 
-            // attributable
-            target.stringAttributes = new StringStringDictionary();
-            target.floatAttributes = new StringFloatDictionary();
-            target.intAttributes = new StringIntDictionary();
-            // now we can copy the correspondings attribute values in all lists
-            target.stringAttributes.CopyFrom(this.stringAttributes);
-            target.floatAttributes.CopyFrom(this.floatAttributes);
-            target.intAttributes.CopyFrom(this.intAttributes);
+            target.stringAttributes = new Dictionary<string, string>(this.stringAttributes);
+            target.floatAttributes = new Dictionary<string, float>(this.floatAttributes);
+            target.intAttributes = new Dictionary<string, int>(this.intAttributes);
         }
     }
 }

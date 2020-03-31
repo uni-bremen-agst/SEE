@@ -1,17 +1,13 @@
-﻿using UnityEngine;
-
-namespace SEE.DataModel
+﻿namespace SEE.DataModel
 {
     /// <summary>
     /// A type graph element. Either a node or an edge.
     /// </summary>
-    [System.Serializable]
     public abstract class GraphElement : Attributable
     {
         /// <summary>
         /// The type of the graph element.
         /// </summary>
-        [SerializeField]
         private string type;
 
         /// <summary>
@@ -21,7 +17,6 @@ namespace SEE.DataModel
         /// IMPORTANT NOTE: This attribute will not be serialized. It may
         /// be null at run-time or in the editor inspection view.
         /// </summary>
-        [System.NonSerialized]
         protected Graph graph;
 
         /// <summary>
@@ -42,7 +37,6 @@ namespace SEE.DataModel
         /// <summary>
         /// The type of this graph element.
         /// </summary>
-        [SerializeField]
         public string Type
         {
             get
