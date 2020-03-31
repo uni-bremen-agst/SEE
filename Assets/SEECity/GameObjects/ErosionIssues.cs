@@ -15,7 +15,7 @@ namespace SEE.GO
         /// <param name="issueMap">the relevant metrics for the erosion issues</param>
         /// <param name="leaveNodeFactory">factory that created the game nodes that are to be decorated</param>
         /// <param name="scaler">scaling to be applied on the metrics for the erosion issues</param>
-        public ErosionIssues(SerializableDictionary<string, IconFactory.Erosion> issueMap, NodeFactory leaveNodeFactory, IScale scaler)
+        public ErosionIssues(Dictionary<string, IconFactory.Erosion> issueMap, NodeFactory leaveNodeFactory, IScale scaler)
         {
             this.issueMap = issueMap;
             this.leaveNodeFactory = leaveNodeFactory;
@@ -25,7 +25,7 @@ namespace SEE.GO
         /// <summary>
         /// The settings that determine the relevant metrics for the erosion issues.
         /// </summary>
-        private readonly SerializableDictionary<string, IconFactory.Erosion> issueMap;
+        private readonly Dictionary<string, IconFactory.Erosion> issueMap;
 
         /// <summary>
         /// The factory that created the game nodes that are to be decorated.

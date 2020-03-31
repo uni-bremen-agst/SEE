@@ -33,12 +33,12 @@ namespace SEE.Game.Animation
         /// Drop-down menu that allows a user to select the revision to be shown.
         /// It contains all available revisions.
         /// </summary>
-        public Dropdown RevisionDropdown;
+        public Dropdown RevisionDropdown; // serialized by Unity
 
         /// <summary>
         /// Button to close this dialog.
         /// </summary>
-        public Button CloseViewButton;
+        public Button CloseViewButton; // serialized by Unity
 
         /// <summary>
         /// Checks whether all fields are initialized.

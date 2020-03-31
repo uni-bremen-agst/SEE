@@ -31,7 +31,7 @@ namespace SEE.Game.Animation
         /// <summary>
         /// The camera from the user.
         /// </summary>
-        public FlyCamera FlyCamera;
+        public FlyCamera FlyCamera; // serialized by Unity (it is a MonoBehaviour)
 
         /// <summary>
         /// The in-game animation canvas shown while viewing the animations. It contains
@@ -40,12 +40,12 @@ namespace SEE.Game.Animation
         /// of revisions and the auto-play toggle. If the ESC key is hit, the
         /// RevisionSelectionCanvas is shown again.
         /// </summary>
-        public GameObject AnimationCanvas;
+        public GameObject AnimationCanvas; // serialized by Unity
 
         /// <summary>
         /// The user-data model for AnimationCanvas.
         /// </summary>
-        private AnimationDataModel animationDataModel;
+        private AnimationDataModel animationDataModel; // not serialized; will be set in Init()
 
         /// <summary>
         /// The in-game canvas containing the menu for selecting the shown graph revision. 
@@ -53,17 +53,17 @@ namespace SEE.Game.Animation
         /// menu, it also contains a close button. If this button is pressed, the
         /// AnimationCanvas is shown again.
         /// </summary>
-        public GameObject RevisionSelectionCanvas;
+        public GameObject RevisionSelectionCanvas; // serialized by Unity
 
         /// <summary>
         /// The user-data model for RevisionSelectionCanvas.
         /// </summary>
-        private RevisionSelectionDataModel revisionSelectionDataModel;
+        private RevisionSelectionDataModel revisionSelectionDataModel; // not serialized; will be set in Init()
 
         /// <summary>
         /// The evolution renderer doing the rendering and animations of the graphs.
         /// </summary>
-        private EvolutionRenderer evolutionRenderer;
+        private EvolutionRenderer evolutionRenderer; // not serialized; will be set in property EvolutionRenderer
 
         /// <summary>
         /// The evolution renderer doing the rendering and animations of the graphs.
@@ -80,7 +80,7 @@ namespace SEE.Game.Animation
         /// <summary>
         /// Returns true if RevisionSelectionCanvas is currently shown.
         /// </summary>
-        public bool IsRevisionSelectionOpen => !FlyCamera.IsEnabled;
+        public bool IsRevisionSelectionOpen => !FlyCamera.IsEnabled; // serialized by Unity
 
         private void Init()
         {

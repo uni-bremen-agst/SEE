@@ -9,24 +9,19 @@ namespace SEE.DataModel
     /// A graph with nodes and edges representing the data to be visualized 
     /// by way of blocks and connections.
     /// </summary>
-    [System.Serializable]
     public class Graph : Attributable
     {
         // The list of graph nodes indexed by their unique linkname
-        [SerializeField]
-        private StringNodeDictionary nodes = new StringNodeDictionary();
+        private Dictionary<string, Node> nodes = new Dictionary<string, Node>();
 
         // The list of graph edges.
-        [SerializeField]
         private List<Edge> edges = new List<Edge>();
 
         // The (view) name of the graph.
-        [SerializeField]
         private string viewName = "";
 
         // The path of the file from which this graph was loaded. Could be the
         /// empty string if the graph was not created by loading it from disk.
-        [SerializeField]
         private string path = "";
 
         /// Adds a node to the graph. 
@@ -480,7 +475,7 @@ namespace SEE.DataModel
 
         private void CopyNodesTo(Graph target)
         {
-            target.nodes = new StringNodeDictionary();
+            target.nodes = new Dictionary<string, Node>();
             foreach (var entry in this.nodes)
             {
                 Node node = (Node)entry.Value.Clone();

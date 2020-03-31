@@ -1170,15 +1170,15 @@ namespace SEE.Tools
         /// <summary>
         /// Mapping of linknames onto nodes in the implementation graph.
         /// </summary>
-        private SerializableDictionary<string, Node> InImplementation;
+        private Dictionary<string, Node> InImplementation;
         /// <summary>
         /// Mapping of linknames onto nodes in the architecture graph.
         /// </summary>
-        private SerializableDictionary<string, Node> InArchitecture;
+        private Dictionary<string, Node> InArchitecture;
         /// <summary>
         /// Mapping of linknames onto nodes in the mapping graph.
         /// </summary>
-        private SerializableDictionary<string, Node> InMapping;
+        private Dictionary<string, Node> InMapping;
 
         // ********************************************************************************
         // predicates for nodes and edges from implementation relevant for reflexion analysis
@@ -2030,7 +2030,7 @@ namespace SEE.Tools
         /// where the qualified node name is used for source and target.
         /// </summary>
         /// <param name="table">mapping table to be dumped</param>
-        static void Dump_Table(SerializableDictionary<Node, Node> table)
+        static void Dump_Table(Dictionary<Node, Node> table)
         {
             foreach(var entry in table)
             {
