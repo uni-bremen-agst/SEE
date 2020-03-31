@@ -87,7 +87,7 @@ namespace SEE.Layout
         public CoseGraphManager GraphManager { get => graphManager; set => graphManager = value; }
         public int InclusionTreeDepth { get => inclusionTreeDepth; set => inclusionTreeDepth = value; }
 
-      
+        
 
 
         /// <summary>
@@ -99,17 +99,6 @@ namespace SEE.Layout
         {
             nodeObject = node;
             this.graphManager = graphManager;
-
-            if (graphManager != null && graphManager.Layout.SublayoutNodes.Count != 0 && node != null)
-            {
-                SublayoutLayoutNode sublayoutNode = CoseHelperFunctions.CheckIfNodeIsSublayouRoot(graphManager.Layout.SublayoutNodes, node.LinkName);
-
-                if (sublayoutNode != null)
-                {
-                    sublayoutValues.IsSubLayoutRoot = true;
-                }
-                
-            }
         }
 
         /// <summary>
@@ -440,7 +429,7 @@ namespace SEE.Layout
         /// <param name="y"></param>
         public void SetLocation(float x, float y)
         {
-            rect.center = new Vector2(x, y);
+            rect.position = new Vector2(x, y);
         }
 
         /// <summary>

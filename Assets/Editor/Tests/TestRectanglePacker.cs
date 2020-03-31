@@ -246,6 +246,16 @@ namespace SEE.Layout.RectanglePacking
                 return new List<ILayoutNode>();
             }
 
+            public void SetOrigin()
+            {
+                throw new System.NotImplementedException();
+            }
+
+            public void SetRelative(ILayoutNode node)
+            {
+                throw new System.NotImplementedException();
+            }
+
             private Vector3 scale;
 
             public Vector3 Scale
@@ -285,6 +295,12 @@ namespace SEE.Layout.RectanglePacking
             }
 
             public ICollection<ILayoutNode> Successors => new List<ILayoutNode>();
+
+            public Vector3 RelativePosition { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+            public bool IsSublayoutNode { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+            public bool IsSublayoutRoot { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+            public Sublayout Sublayout { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+            public ILayoutNode SublayoutRoot { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
         }
     }
 }

@@ -131,6 +131,7 @@ namespace SEE.Layout
 
                     if (sublayoutNode != null && sublayoutNode.NodeLayout == NodeLayouts.EvoStreets)
                     {
+                        // TODO
                         width = graph.Parent.SublayoutValues.Sublayout.LayoutScale.x;
                         height = graph.Parent.SublayoutValues.Sublayout.LayoutScale.z;
                     }
@@ -326,14 +327,79 @@ namespace SEE.Layout
         /// <param name="graph">the graph for which the sublayout is calculated</param>
         private void CalculateSubLayouts()
         {
+            // was nagepasst werden muss:
+            // x sublayoutvalue.isSublayoutNode/ Root auf ILayoutNode, bzw alle dieser werte
+            // scale aus den ILayouts auch für die Graphen und die position ist wichtig , cNode.child auf postion/ scale setzen
+            // centerposition und postion schaune, ob das überein stimt 
+            // coseNode.SetPositionScale
+
+
+            foreach (CoseNode node in graphManager.GetAllNodes())
+            {
+                Debug.Log(node);
+                node.SublayoutValues.IsSubLayoutNode = node.NodeObject.IsSublayoutNode;
+                node.SublayoutValues.IsSubLayoutRoot = node.NodeObject.IsSublayoutRoot;
+                if (node.NodeObject.SublayoutRoot != null)
+                {
+                    node.SublayoutValues.SubLayoutRoot = nodeToCoseNode[node.NodeObject.SublayoutRoot];
+                }
+
+                if (node.SublayoutValues.IsSubLayoutRoot)
+                {
+
+                    Rect rect = new Rect();
+                    rect.x = node.NodeObject.CenterPosition.x - node.NodeObject.Scale.x / 2;
+                    rect.y = node.NodeObject.CenterPosition.z - node.NodeObject.Scale.z / 2;
+                    rect.width = node.NodeObject.Scale.x;
+                    rect.height = node.NodeObject.Scale.x;
+
+                    node.SublayoutValues.relativeRect = rect;
+
+                    node.rect = new Rect(node.SublayoutValues.relativeRect);
+                   
+                }
+
+                if (node.SublayoutValues.IsSubLayoutNode && !node.SublayoutValues.IsSubLayoutRoot)
+                {
+                    Rect bounds = new Rect
+                    {
+                        x = node.NodeObject.CenterPosition.x - node.NodeObject.Scale.x / 2,
+                        y = node.NodeObject.CenterPosition.z - node.NodeObject.Scale.z / 2,
+                        width = node.NodeObject.Scale.x,
+                        height = node.NodeObject.Scale.z
+                    };
+                    node.rect = bounds;
+
+                    node.SublayoutValues.relativeRect = new Rect(bounds);
+
+                   
+
+                    node.SetPositionRelativ(node.SublayoutValues.SubLayoutRoot);
+
+                    if (node.Child != null)
+                    {
+                        node.Child.Left = bounds.xMin;
+                        node.Child.Top = bounds.yMin;
+                        node.Child.Right = bounds.xMax;
+                        node.Child.Bottom = bounds.yMax;
+                        node.Child.UpdateBoundingRect();
+                    }
+
+                    // (node.NodeObject.RelativePosition.x, node.NodeObject.RelativePosition.z, node.NodeObject.Scale.x, node.NodeObject.Scale.z);
+                }
+
+
+            }
+
+
             // sind immernoch nach Leveln sortiert
-            foreach (SublayoutLayoutNode sublayoutNode in sublayoutNodes)
+            /*foreach (SublayoutLayoutNode sublayoutNode in sublayoutNodes)
             {
                 Dictionary<ILayoutNode, CoseNode> allNodes = new Dictionary<ILayoutNode, CoseNode>(sublayoutNode.Nodes.ToDictionary(node => node, node => nodeToCoseNode[node]));
                 Dictionary<ILayoutNode, CoseNode> removedNodes = new Dictionary<ILayoutNode, CoseNode>(sublayoutNode.RemovedChildren.ToDictionary(node => node, node => nodeToCoseNode[node]));
                 CoseSublayout sublayout = new CoseSublayout(nodeToCoseNode[sublayoutNode.Node], groundLevel, innerNodeHeight, sublayoutNode.NodeLayout, allNodes, removedNodes, leafNodeFactory);
                 sublayout.Layout();
-            }
+            }*/
         }
 
     
@@ -956,7 +1022,7 @@ namespace SEE.Layout
                 
             }
 
-            graphManager.UpdateBounds();
+            //graphManager.UpdateBounds();
         }
 
         /// <summary>
@@ -986,11 +1052,10 @@ namespace SEE.Layout
             }
 
             // inital position
-            cNode.SetLocation(0, 0);
+            cNode.SetLocation(node.CenterPosition.x, node.CenterPosition.z);
 
             if (!node.IsLeaf)
             {
-
                 CoseGraph graph = new CoseGraph(null, this.graphManager);
                 graph.GraphObject = node;
                 graphManager.Add(graph, cNode);
@@ -1000,7 +1065,7 @@ namespace SEE.Layout
                     CreateNode(child, cNode);
                 }
 
-                cNode.UpdateBounds();
+                //cNode.UpdateBounds();
             }
             else
             {

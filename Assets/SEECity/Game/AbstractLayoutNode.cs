@@ -123,7 +123,8 @@ namespace SEE.Game
 
         public void SetRelative(ILayoutNode node)
         {
-            relativePosition -= node.CenterPosition;
+            relativePosition.x -= node.CenterPosition.x;
+            relativePosition.z -= node.CenterPosition.z;
             sublayoutRoot = node; 
         }
 

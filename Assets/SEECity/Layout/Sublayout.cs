@@ -26,7 +26,7 @@ namespace SEE.Layout
         /// <summary>
         /// he height of objects (y co-ordinate) drawn for inner nodes
         /// </summary>
-        private readonly float innerNodeHeight;
+        private float innerNodeHeight;
 
         /// <summary>
         /// TODO
@@ -54,11 +54,10 @@ namespace SEE.Layout
 
         Dictionary<ILayoutNode, CoseSublayoutNode> ILayout_to_CoseSublayoutNode = new Dictionary<ILayoutNode, CoseSublayoutNode>();
 
-        public Sublayout(SublayoutLayoutNode sublayout, float groundLevel, float innerNodeHeight, NodeLayouts nodeLayout, NodeFactory leafNodeFactory)
+        public Sublayout(SublayoutLayoutNode sublayout, float groundLevel, NodeFactory leafNodeFactory)
         {
-            this.nodeLayout = nodeLayout;
-            this.groundLevel = groundLevel;
-            this.innerNodeHeight = innerNodeHeight;  
+            this.nodeLayout = sublayout.NodeLayout;
+            this.groundLevel = groundLevel;  
             this.leafNodeFactory = leafNodeFactory;
             this.sublayout = sublayout;
             onlyLeaves = OnlyLeaveNodes();
@@ -158,6 +157,7 @@ namespace SEE.Layout
                 }
 
                 position.y += transform.scale.y / 2.0f;
+                sublayoutNode.RelativePosition = position; 
                 sublayoutNode.CenterPosition = position;
                 sublayoutNode.Scale = scale;
                 sublayoutNode.Rotation = transform.rotation;
@@ -269,20 +269,36 @@ namespace SEE.Layout
         /// <returns></returns>
         private Dictionary<ILayoutNode, NodeTransform> CalculateSublayout()
         {
+            NodeLayout layout = GetLayout();
+            innerNodeHeight = layout.InnerNodeHeight;
+            if (layout.UsesEdgesAndSublayoutNodes())
+            {
+                // TODO COSE LAYOUT
+                return layout.Layout(sublayoutNodes);
+            } else
+            {
+                return layout.Layout(sublayoutNodes);
+            }
+        }
+
+        public NodeLayout GetLayout()
+        {
             switch (nodeLayout)
             {
                 case NodeLayouts.Manhattan:
-                    return new ManhattanLayout(groundLevel, leafNodeFactory.Unit).Layout(sublayoutNodes);
+                    return new ManhattanLayout(groundLevel, leafNodeFactory.Unit);
                 case NodeLayouts.FlatRectanglePacking:
-                    return new RectanglePacker(groundLevel, leafNodeFactory.Unit).Layout(sublayoutNodes);
+                    return new RectanglePacker(groundLevel, leafNodeFactory.Unit);
                 case NodeLayouts.EvoStreets:
-                    return new EvoStreetsNodeLayout(groundLevel, leafNodeFactory.Unit).Layout(sublayoutNodes);
+                    return new EvoStreetsNodeLayout(groundLevel, leafNodeFactory.Unit);
                 case NodeLayouts.Treemap:
-                    return new TreemapLayout(groundLevel, 10.0f * leafNodeFactory.Unit, 10.0f * leafNodeFactory.Unit).Layout(sublayoutNodes);
+                    return new TreemapLayout(groundLevel, 10.0f * leafNodeFactory.Unit, 10.0f * leafNodeFactory.Unit);
                 case NodeLayouts.Balloon:
-                    return new BalloonNodeLayout(groundLevel).Layout(sublayoutNodes);
+                    return new BalloonNodeLayout(groundLevel);
                 case NodeLayouts.CirclePacking:
-                    return new CirclePackingNodeLayout(groundLevel).Layout(sublayoutNodes);
+                    return new CirclePackingNodeLayout(groundLevel);
+                //case NodeLayouts.CompoundSpringEmbedder:
+                    //return new CoseLayout(groundLevel, settings, leafNodeFactory);
                 default:
                     throw new System.Exception("Unhandled node layout ");
             }
