@@ -46,7 +46,6 @@ namespace SEE.GO
         /// <summary>
         /// The length unit of a block representation in Unity measures.
         /// </summary>
-        [SerializeField]
         public float Unit
         {
             get => unit;

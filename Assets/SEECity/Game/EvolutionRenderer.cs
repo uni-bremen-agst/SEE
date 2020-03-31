@@ -17,15 +17,18 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel;
-using SEE.Layout;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
-using SEE.Game.Animation;
 using SEE.GO;
+using OdinSerializer;
+
+using SEE.Game.Animation;
+using SEE.DataModel;
+using SEE.Layout;
 
 namespace SEE.Game
 {
@@ -52,7 +55,7 @@ namespace SEE.Game
         /// This attribute will be set in the setter of the attribute CityEvolution because it
         /// depends upon the city, which is set by this setter.
         /// </summary>
-        private GraphRenderer graphRenderer;
+        private GraphRenderer graphRenderer;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
         /// The manager of the game objects created for the city.         
@@ -60,18 +63,25 @@ namespace SEE.Game
         /// depends upon the graphRenderer, which in turn depends upon the city, which is set by 
         /// this setter.
         /// </summary>
-        private ObjectManager objectManager;
+        private ObjectManager objectManager;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
         /// The origin of the city. The resulting layout of each graph will be moved to 
         /// this origin.
         /// </summary>
-        private Vector3 cityOrigin;
+        private Vector3 cityOrigin;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
         /// The marker used to mark the new and removed game objects.
         /// </summary>
-        private Marker marker;
+        private Marker marker;  // not serialized by Unity; will be set in CityEvolution property
+
+        /// <summary>
+        /// The kind of comparison to determine whether there any differences between
+        /// two corresponding graph elements (corresponding by their linknames) in
+        /// two different graphs of the graph series.
+        /// </summary>
+        private GraphElementDiff diff;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
         /// The city evolution to be drawn by this renderer.
@@ -92,13 +102,6 @@ namespace SEE.Game
                 marker = new Marker(graphRenderer);
             }
         }
-
-        /// <summary>
-        /// The kind of comparison to determine whether there any differences between
-        /// two corresponding graph elements (corresponding by their linknames) in
-        /// two different graphs of the graph series.
-        /// </summary>
-        private GraphElementDiff diff;
 
         /// <summary>
         /// Shortest time period in which an animation can be run in seconds.
@@ -138,7 +141,7 @@ namespace SEE.Game
         /// <summary>
         /// Whether the animation is still ongoing.
         /// </summary>
-        private bool _isStillAnimating = false;
+        private bool _isStillAnimating = false;  // serialized by Unity
 
         /// <summary>
         /// True if animation is still ongoing.
@@ -155,7 +158,7 @@ namespace SEE.Game
         /// <summary>
         /// The duration of an animation. This value can be controlled by the user.
         /// </summary>
-        private float _animationDuration = AbstractAnimator.DefaultAnimationTime;
+        private float _animationDuration = AbstractAnimator.DefaultAnimationTime;  // not serialized by Unity
 
         /// <summary>
         /// The duration of an animation.
@@ -180,7 +183,7 @@ namespace SEE.Game
         /// <summary>
         /// The city (graph + layout) currently shown.
         /// </summary>
-        private LaidOutGraph _currentCity;
+        private LaidOutGraph _currentCity;  // not serialized by Unity
 
         /// <summary>
         /// The underlying graph of the city currently shown.
@@ -190,12 +193,12 @@ namespace SEE.Game
         /// The layout of the city currently shown. The layout is a mapping of the graph
         /// nodes' LinkName onto their layout nodes.
         /// </summary>
-        protected Dictionary<string, ILayoutNode> CurrentLayoutShown => _currentCity?.Layout;
+        protected Dictionary<string, ILayoutNode> CurrentLayoutShown => _currentCity?.Layout;  // not serialized by Unity
 
         /// <summary>
         /// The city (graph + layout) to be shown next.
         /// </summary>
-        private LaidOutGraph _nextCity;
+        private LaidOutGraph _nextCity;  // not serialized by Unity
         /// <summary>
         /// The next city (graph + layout) to be shown. 
         /// Note: 'next' does not necessarily mean that it is a graph coming later in the
@@ -203,12 +206,12 @@ namespace SEE.Game
         /// be shown. If the user goes backward in time, _nextCity is actually an older
         /// graph.
         /// </summary>
-        protected Graph NextGraphToBeShown => _nextCity?.Graph;
+        protected Graph NextGraphToBeShown => _nextCity?.Graph;  // not serialized by Unity
         /// <summary>
         /// The layout of _nextGraph. The layout is a mapping of the graph
         /// nodes' LinkName onto their ILayoutNodes.
         /// </summary>
-        protected Dictionary<string, ILayoutNode> NextLayoutToBeShown => _nextCity?.Layout;
+        protected Dictionary<string, ILayoutNode> NextLayoutToBeShown => _nextCity?.Layout;  // not serialized by Unity
 
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
@@ -224,7 +227,7 @@ namespace SEE.Game
         /// All pre-computed layouts for the whole graph series.
         /// </summary>
         private Dictionary<Graph, Dictionary<string, ILayoutNode>> Layouts { get; }
-             =  new Dictionary<Graph, Dictionary<string, ILayoutNode>>();
+             =  new Dictionary<Graph, Dictionary<string, ILayoutNode>>();  // not serialized by Unity
 
         /// <summary>
         /// Creates and saves the layouts for all given <paramref name="graphs"/>. This will 
@@ -247,7 +250,7 @@ namespace SEE.Game
         /// If true, inner nodes should not be rendered. This will be true if a non-hierarchical
         /// layout is applied.
         /// </summary>
-        private bool ignoreInnerNodes = true;
+        private bool ignoreInnerNodes = true;  // not serialized by Unity
 
         /// <summary>
         /// Calculates the layout data for <paramref name="graph"/> using the graphRenderer.
@@ -627,7 +630,7 @@ namespace SEE.Game
         /// <summary>
         /// The series of underlying graphs to be rendered.
         /// </summary>
-        private List<Graph> graphs;
+        private List<Graph> graphs;  // not serialized by Unity
 
         /// <summary>
         /// The number of graphs of the graph series to be rendered.
@@ -650,7 +653,7 @@ namespace SEE.Game
         /// <summary>
         /// The index of the currently visualized graph.
         /// </summary>
-        private int currentGraphIndex = 0;
+        private int currentGraphIndex = 0;  // not serialized by Unity
 
         /// <summary>
         /// Returns the index of the currently shown graph.
@@ -668,12 +671,12 @@ namespace SEE.Game
         /// <summary>
         /// An event fired when the viewn graph has changed.
         /// </summary>
-        private UnityEvent shownGraphHasChangedEvent = new UnityEvent();
+        private readonly UnityEvent shownGraphHasChangedEvent = new UnityEvent();
 
         /// <summary>
         /// Whether the user has selected auto-play mode.
         /// </summary>
-        private bool _isAutoplay = false;
+        private bool _isAutoplay = false;  // not serialized by Unity
 
         /// <summary>
         /// Returns true if automatic animations are active.

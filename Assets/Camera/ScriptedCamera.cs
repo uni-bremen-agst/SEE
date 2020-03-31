@@ -28,7 +28,7 @@ namespace SEE
         /// <summary>
         /// Name of the file where to load the captured data camera path points from.
         /// </summary>
-        public string filename = "path" + CameraPath.DotPathFileExtension;
+        public string Filename = "path" + CameraPath.DotPathFileExtension;
 
         /// <summary>
         /// As to whether the path should be drawn as a sequence of lines in the game.
@@ -94,15 +94,6 @@ namespace SEE
         }
 
         /// <summary>
-        /// Returns the name of the file from which to read the path data.
-        /// </summary>
-        /// <returns>name of the file from which to read the path data</returns>
-        private string Filename()
-        {
-            return filename;
-        }
-
-        /// <summary>
         /// Reads the path data from disk and sets up the data structures
         /// necessary to move the camera along the path.
         /// 
@@ -115,9 +106,8 @@ namespace SEE
         {
             try
             {
-                string filename = Filename();
-                path = CameraPath.ReadPath(filename);
-                Debug.LogFormat("Read camera path from {0}\n", filename);
+                path = CameraPath.ReadPath(Filename);
+                Debug.LogFormat("Read camera path from {0}\n", Filename);
                 if (ShowPath)
                 {
                     path.Draw();
@@ -125,7 +115,7 @@ namespace SEE
             }
             catch (Exception e)
             {
-                Debug.LogErrorFormat("ScriptedCamera: Could not read path from file {0}: {1}\n", Filename(), e.ToString());
+                Debug.LogErrorFormat("ScriptedCamera: Could not read path from file {0}: {1}\n", Filename, e.ToString());
                 pathIsEnabled = false;
                 return;
             }

@@ -34,17 +34,17 @@ namespace SEE.Game.Animation
         /// TextField for the animation time in seconds, that is, the time in 
         /// seconds for showing a single graph revision during auto-play animation.
         /// </summary>
-        public Text AnimationLagText;
+        public Text AnimationLagText; // serialized by Unity
 
         /// <summary>
         /// TextField for the shown revision in game.
         /// </summary>
-        public Text RevisionNumberText;
+        public Text RevisionNumberText; // serialized by Unity
 
         /// <summary>
         /// Toggle that shows whether auto-play mode is active.
         /// </summary>
-        public Toggle AutoplayToggle;
+        public Toggle AutoplayToggle; // serialized by Unity
 
         /// <summary>
         /// Checks if all fields are initialized.
