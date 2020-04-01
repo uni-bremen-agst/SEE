@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SEE.Runtime
+namespace SEE.Game.Runtime
 {
 
     /// <summary>
