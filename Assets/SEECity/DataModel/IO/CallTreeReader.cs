@@ -1,7 +1,7 @@
 ﻿namespace SEE.DataModel.IO
 {
     /// <summary>
-    /// Genereates a call tree out of a DYN-file.
+    /// Generates a call tree out of a DYN-file.
     /// </summary>
     public class CallTreeReader : DYNParser
     {
