@@ -2,6 +2,7 @@
 using UnityEngine;
 using SEE.DataModel;
 using SEE.Layout;
+using SEE.GO;
 
 namespace SEE.Runtime
 {
