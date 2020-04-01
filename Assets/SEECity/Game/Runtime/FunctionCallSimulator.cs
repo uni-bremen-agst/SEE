@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OdinSerializer;
+using System;
 using UnityEngine;
 
 namespace SEE.Game.Runtime
@@ -8,7 +9,7 @@ namespace SEE.Game.Runtime
     /// Simulates a function call via letting spheres fly from <see cref="source"/> to
     /// <see cref="target"/>.
     /// </summary>
-    public class FunctionCallSimulator : MonoBehaviour
+    public class FunctionCallSimulator : SerializedMonoBehaviour
     {
         /// <summary>
         /// The size (scale) of a sphere.
