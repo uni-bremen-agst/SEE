@@ -3,9 +3,8 @@ using UnityEngine;
 using SEE.DataModel;
 using SEE.GO;
 
-namespace SEE.Runtime
+namespace SEE.Game.Runtime
 {
-
     /// <summary>
     /// Is responsible for initializing some parts of call tree and managing the dynamic visualizations.
     /// </summary>

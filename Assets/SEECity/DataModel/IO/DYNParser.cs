@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace SEE.DataModel
+namespace SEE.DataModel.IO
 {
-
     /// <summary>
     /// Parses a file with DYN-extension.
     /// </summary>

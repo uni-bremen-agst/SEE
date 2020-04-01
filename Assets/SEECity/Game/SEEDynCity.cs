@@ -1,6 +1,8 @@
-﻿using SEE.DataModel;
-using System.IO;
+﻿using System.IO;
 using UnityEngine;
+
+using SEE.DataModel;
+using SEE.DataModel.IO;
 
 namespace SEE.Game
 {
