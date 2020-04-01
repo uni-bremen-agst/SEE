@@ -2,14 +2,15 @@
 using UnityEngine;
 using SEE.DataModel;
 using SEE.GO;
+using OdinSerializer;
+using System;
 
 namespace SEE.Game.Runtime
 {
     /// <summary>
     /// Is responsible for initializing some parts of call tree and managing the dynamic visualizations.
     /// </summary>
-    [System.Serializable]
-    public class Runtime : MonoBehaviour
+    public class Runtime : SerializedMonoBehaviour
     {
         /// <summary>
         /// Time in seconds for building animation loop.
@@ -25,7 +26,7 @@ namespace SEE.Game.Runtime
         /// <summary>
         /// The call tree to be visualized.
         /// </summary>
-        [SerializeField]
+        [NonSerialized, OdinSerialize]
         public CallTree callTree;
 
         /// <summary>
@@ -46,16 +47,17 @@ namespace SEE.Game.Runtime
         /// <summary>
         /// The list of the simulators.
         /// </summary>
+        [NonSerialized, OdinSerialize]
         private List<FunctionCallSimulator> functionCalls = new List<FunctionCallSimulator>();
 
         /// <summary>
         /// Initializes non serializable part of call tree and general initialization.
         /// </summary>
-        void Awake()
+        void Start()
         {
             if (callTree == null)
             {
-                Debug.LogError("'callTree' was null!");
+                throw new Exception("'callTree' is null!");
             }
             
             // The buildings representing function calls are all tagged with these tags.
