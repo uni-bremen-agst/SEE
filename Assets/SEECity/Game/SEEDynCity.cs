@@ -9,7 +9,7 @@ namespace SEE.Game
         /// <summary>
         /// The relative path for the DYN file containing the dynamic call graph.
         /// </summary>
-        public string dynPath = "..\\Data\\DYN\\example_02.dyn";
+        public string dynPath = "example_02.dyn";
 
         /// <summary>
         /// Returns the concatenation of pathPrefix and dynPath. That is the complete
