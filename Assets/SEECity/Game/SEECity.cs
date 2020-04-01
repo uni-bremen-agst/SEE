@@ -1,9 +1,10 @@
-﻿using SEE.DataModel;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 using SEE.Tools;
+using SEE.DataModel;
+using SEE.DataModel.IO;
 
 namespace SEE.Game
 {
@@ -72,6 +73,11 @@ namespace SEE.Game
         // Medium size include graph with single root (OpenSSL).
         //public string gxlPath = "..\\Data\\GXL\\OpenSSL\\openssl-include.gxl";
         //public string csvPath = "..\\Data\\GXL\\OpenSSL\\openssl-include.csv";
+        
+        // Examples for dynamic call graphs
+        //public string gxlPath = "..\\Data\\GXL\\dynamic-tests\\example_02.gxl";
+        //public string csvPath = "..\\Data\\GXL\\dynamic-tests\\empty.csv";
+        //public string dynPath = "..\\Data\\DYN\\example_02.dyn";
 
         /// <summary>
         /// Returns the concatenation of pathPrefix and gxlPath. That is the complete
@@ -119,7 +125,20 @@ namespace SEE.Game
 
         /// <summary>
         /// Loads the graph data from the GXL file with GXLPath() and the metrics
-        /// from the CSV file with CSVPath().
+        /// from the CSV file with CSVPath() and then draws it. Equivalent to:
+        ///   LoadData();
+        ///   DrawGraph();
+        /// </summary>
+        public virtual void LoadAndDrawGraph()
+        {
+            LoadData();
+            DrawGraph();
+        }
+
+        /// <summary>
+        /// Loads the graph data from the GXL file with GXLPath() and the metrics
+        /// from the CSV file with CSVPath(). Afterwards, DrawGraph() can be used
+        /// to actually render the graph data.
         /// </summary>
         public virtual void LoadData()
         {
@@ -131,7 +150,6 @@ namespace SEE.Game
             {
                 graph = LoadGraph(GXLPath());
                 LoadMetrics();
-                DrawGraph();
             }
         }
 
@@ -139,7 +157,7 @@ namespace SEE.Game
         /// Draws the graph.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
-        protected void DrawGraph()
+        public void DrawGraph()
         {
             if (ReferenceEquals(ItsGraph, null))
             {

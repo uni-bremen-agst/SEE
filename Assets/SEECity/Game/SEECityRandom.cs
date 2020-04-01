@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 using System;
 
 using SEE.Tools;
@@ -51,7 +50,7 @@ namespace SEE.Game
             return result;
         }
 
-        public override void LoadData()
+        public override void LoadAndDrawGraph()
         {
             // generate graph randomly
             RandomGraphs randomGraphs = new RandomGraphs();

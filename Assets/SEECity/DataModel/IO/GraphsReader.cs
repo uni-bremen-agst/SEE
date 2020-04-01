@@ -24,9 +24,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-using SEE.DataModel;
-
-namespace SEE.Tools
+namespace SEE.DataModel.IO
 {
     /// <summary>
     /// Loads and stores multiple GXL files from a directory.
