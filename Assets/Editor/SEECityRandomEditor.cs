@@ -99,7 +99,7 @@ namespace SEEEditor
         /// <param name="city">the city to be set up</param>
         private void SetUp(SEECityRandom city)
         {
-            city.LoadData();
+            city.LoadAndDrawGraph();
         }
 
         /// <summary>
