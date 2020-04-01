@@ -398,7 +398,7 @@ namespace SEE
                             Debug.LogError("NodeRef does not refer to a node.\n");
                             text.text = objectHit.name;
                         }
-                        else if (nodeRef.node.TryGetString("Source.Name", out string nodeName))
+                        else if (nodeRef.node.TryGetString(Node.SourceNameAttribute, out string nodeName))
                         {
                             text.text = nodeName;
                         }
