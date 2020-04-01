@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using SEE.DataModel;
-using SEE.Layout;
 using SEE.GO;
 
 namespace SEE.Runtime
@@ -51,11 +50,6 @@ namespace SEE.Runtime
         private List<FunctionCallSimulator> functionCalls = new List<FunctionCallSimulator>();
 
         /// <summary>
-        /// States whether of not the left trigger is currently pressed down.
-        /// </summary>
-        private bool isLeftTriggerDown = false;
-
-        /// <summary>
         /// Initializes non serializable part of call tree and general initialization.
         /// </summary>
         void Awake()
@@ -96,15 +90,16 @@ namespace SEE.Runtime
 
         /// <summary>
         /// Checks for user input and updates simulation accordingly.
+        /// 
+        /// Key Return => toggle simulation
+        /// Key +      => one step forward
+        /// Key -      => one step backward
         /// </summary>
         void Update()
         {
             bool leftTrackpadPressed = false;//Input.GetButtonDown("LeftVRTrackpadPress");
             float leftTrackpadHorizontalMovement = 0.0f;//Input.GetAxis("LeftVRTrackpadHorizontalMovement");
-
-            //float leftTriggerValue = Input.GetAxis("LeftVRTrigger");
-            bool leftTriggerPressed = false;//leftTriggerValue > 0.5f && !isLeftTriggerDown;
-            isLeftTriggerDown = false;//leftTriggerValue > 0.5f;
+            bool leftTriggerPressed = false;
 
             if (Input.GetKeyDown(KeyCode.Return) || leftTriggerPressed)
             {
