@@ -1,13 +1,13 @@
 ﻿using OdinSerializer;
-using System;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Game.Runtime
 {
 
     /// <summary>
-    /// Simulates a function call via letting spheres fly from <see cref="source"/> to
-    /// <see cref="target"/>.
+    /// Simulates a function call via letting spheres fly from <see cref="src"/> to
+    /// <see cref="dst"/>.
     /// </summary>
     public class FunctionCallSimulator : SerializedMonoBehaviour
     {
@@ -27,8 +27,8 @@ namespace SEE.Game.Runtime
         private const float SPHERE_HORIZONTAL_SPEED = 1.6f;
 
         /// <summary>
-        /// The maximum height of a sphere. Is reached right between <see cref="source"/>
-        /// and <see cref="target"/>.
+        /// The maximum height of a sphere. Is reached right between <see cref="src"/>
+        /// and <see cref="dst"/>.
         /// </summary>
         private const float SPHERE_MAX_ALTITUDE = 1.0f;
 
@@ -59,12 +59,12 @@ namespace SEE.Game.Runtime
         /// <summary>
         /// The source of the function call.
         /// </summary>
-        private GameObject source;
+        private GameObject src;
 
         /// <summary>
-        /// The target of the function call.
+        /// The destination of the function call.
         /// </summary>
-        private GameObject target;
+        private GameObject dst;
 
         /// <summary>
         /// The original scale of the source building.
@@ -100,15 +100,19 @@ namespace SEE.Game.Runtime
         /// <summary>
         /// Initializes the simulator. Sets source and target as given arguments.
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="target"></param>
-        public void Initialize(GameObject source, GameObject target, float t = 0.0f)
+        /// <param name="src">The source of the function call.</param>
+        /// <param name="dst">The destination of the function call.</param>
+        public void Initialize(GameObject src, GameObject dst, float t = 0.0f)
         {
-            this.source = source ?? throw new ArgumentException("'source' must not be null!");
-            this.target = target ?? throw new ArgumentException("'target' must not be null!");
+            Assert.IsNotNull(src, "'src' must not be null!");
+            Assert.IsNotNull(dst, "'dst' must not be null!");
+            Assert.IsTrue(t >= 0.0f && t <= 1.0f);
 
-            Vector3 sourcePosition = source.transform.position;
-            Vector3 targetPosition = target.transform.position;
+            this.src = src;
+            this.dst = dst;
+
+            Vector3 sourcePosition = src.transform.position;
+            Vector3 targetPosition = dst.transform.position;
             float sourceToTargetLength = Vector3.Distance(sourcePosition, targetPosition);
             int sphereCount = 1 + (int)(sourceToTargetLength / SPHERE_OPTIMAL_DISTANCE);
             sphereActualDistance = sourceToTargetLength / sphereCount;
@@ -121,10 +125,10 @@ namespace SEE.Game.Runtime
                 spheres[i].transform.localScale = new Vector3(SPHERE_SCALE, SPHERE_SCALE, SPHERE_SCALE);
                 spheres[i].transform.parent = transform;
             }
-            sourceOriginalScale = source.transform.localScale;
-            targetOriginalScale = target.transform.localScale;
-            sourceOriginalColor = source.GetComponentInChildren<MeshRenderer>().material.color;
-            targetOriginalColor = target.GetComponentInChildren<MeshRenderer>().material.color;
+            sourceOriginalScale = src.transform.localScale;
+            targetOriginalScale = dst.transform.localScale;
+            sourceOriginalColor = src.GetComponentInChildren<MeshRenderer>().material.color;
+            targetOriginalColor = dst.GetComponentInChildren<MeshRenderer>().material.color;
         }
         
         /// <summary>
@@ -132,10 +136,10 @@ namespace SEE.Game.Runtime
         /// </summary>
         public void Shutdown()
         {
-            source.transform.localScale = sourceOriginalScale;
-            target.transform.localScale = targetOriginalScale;
-            source.GetComponentInChildren<MeshRenderer>().material.color = sourceOriginalColor;
-            target.GetComponentInChildren<MeshRenderer>().material.color = targetOriginalColor;
+            src.transform.localScale = sourceOriginalScale;
+            dst.transform.localScale = targetOriginalScale;
+            src.GetComponentInChildren<MeshRenderer>().material.color = sourceOriginalColor;
+            dst.GetComponentInChildren<MeshRenderer>().material.color = targetOriginalColor;
             for (int i = 0; i < spheres.Length; i++)
             {
                 Destroy(spheres[i]);
@@ -148,6 +152,8 @@ namespace SEE.Game.Runtime
         /// <param name="t">The position of the animated loop between 0 and 1.</param>
         public void UpdateSimulation(float t)
         {
+            Assert.IsTrue(t >= 0.0f && t <= 1.0f);
+
             UpdateBlocks(t);
             UpdateSpheres();
         }
@@ -161,14 +167,14 @@ namespace SEE.Game.Runtime
             // scale
             float halfBlockScaleEnlargement = 0.5f * BLOCK_SCALE_ENLARGEMENT;
             float scale = halfBlockScaleEnlargement + halfBlockScaleEnlargement * Mathf.Cos(2.0f * Mathf.PI * t + Mathf.PI);
-            source.transform.localScale = sourceOriginalScale + new Vector3(scale, scale, scale);
-            target.transform.localScale = targetOriginalScale + new Vector3(scale, scale, scale);
+            src.transform.localScale = sourceOriginalScale + new Vector3(scale, scale, scale);
+            dst.transform.localScale = targetOriginalScale + new Vector3(scale, scale, scale);
 
             // color
             int colorIndex = (int)(viridisColorPalette.Length * (0.5f + 0.5f * Mathf.Cos(2.0f * Mathf.PI * t + Mathf.PI))) % viridisColorPalette.Length;
             Color color = viridisColorPalette[colorIndex];
-            source.GetComponentInChildren<MeshRenderer>().material.color = color;
-            target.GetComponentInChildren<MeshRenderer>().material.color = color;
+            src.GetComponentInChildren<MeshRenderer>().material.color = color;
+            dst.GetComponentInChildren<MeshRenderer>().material.color = color;
         }
 
         /// <summary>
@@ -176,64 +182,76 @@ namespace SEE.Game.Runtime
         /// </summary>
         private void UpdateSpheres()
         {
-            Vector3 sourcePosition = source.transform.position;
-            Vector3 targetPosition = target.transform.position;
-            float sourceToTargetLength = Vector3.Distance(sourcePosition, targetPosition);
-            if (sourceToTargetLength < float.Epsilon) // This is necessary for recursive function calls.
+            Vector3 srcPos = src.transform.position;
+            Vector3 dstPos = dst.transform.position;
+            Vector2 srcPosFlat = new Vector2(srcPos.x, srcPos.z);
+            Vector2 dstPosFlat = new Vector2(dstPos.x, dstPos.z);
+
+            Vector2 srcToDstFlat = dstPosFlat - srcPosFlat;
+            float srcToDstDistFlat = srcToDstFlat.magnitude;
+            if (srcToDstDistFlat < float.Epsilon) // Necessary for recursive function calls
             {
                 const float zeroOffset = 0.1f;
-                sourcePosition += new Vector3(zeroOffset, 0.0f, 0.0f);
-                targetPosition += new Vector3(-zeroOffset, 0.0f, 0.0f);
-                sourceToTargetLength = Vector3.Distance(sourcePosition, targetPosition);
+                srcPos += new Vector3(zeroOffset, 0.0f, 0.0f);
+                dstPos += new Vector3(-zeroOffset, 0.0f, 0.0f);
+                srcPosFlat += new Vector2(zeroOffset, 0.0f);
+                dstPosFlat += new Vector2(-zeroOffset, 0.0f);
+                srcToDstFlat = dstPosFlat - srcPosFlat;
+                srcToDstDistFlat = srcToDstFlat.magnitude;
             }
+            Vector2 flyDirFlat = srcToDstFlat.normalized;
+            
+            // Translate first sphere
+            Vector2 stepFlat = flyDirFlat * SPHERE_HORIZONTAL_SPEED * Time.deltaTime * Mathf.Sqrt(srcToDstDistFlat);
+            Vector2 fstPosFlat = new Vector2(spheres[0].transform.position.x, spheres[0].transform.position.z) + stepFlat;
 
-            // Translate the first sphere.
-            Vector3 direction = (targetPosition - sourcePosition).normalized;
-            Vector3 step = direction * SPHERE_HORIZONTAL_SPEED * Time.deltaTime * Mathf.Sqrt(sourceToTargetLength) * 1f;
-            spheres[0].transform.position = new Vector3(spheres[0].transform.position.x, targetPosition.y, spheres[0].transform.position.z);
-            Vector3 fstSpherePositionFlatToTarget = targetPosition - spheres[0].transform.position;
-            float fstSpherePositionFlatToTargetLength = fstSpherePositionFlatToTarget.magnitude;
-            if (step.magnitude > fstSpherePositionFlatToTargetLength)
+            float fstToDstDistFlat = Vector2.Distance(fstPosFlat, dstPosFlat);
+            float fstToSrcDistFlat = Vector2.Distance(fstPosFlat, srcPosFlat);
+            if (fstToSrcDistFlat > srcToDstDistFlat)
             {
-                step -= fstSpherePositionFlatToTarget;
-                spheres[0].transform.position = sourcePosition;
+                fstPosFlat -= srcToDstFlat;
             }
-            spheres[0].transform.position += step;
-            fstSpherePositionFlatToTarget = targetPosition - spheres[0].transform.position;
-            fstSpherePositionFlatToTargetLength = fstSpherePositionFlatToTarget.magnitude;
+            spheres[0].transform.position = new Vector3(fstPosFlat.x, 0.0f, fstPosFlat.y);
 
-            // Align remaining spheres.
-            Vector3 sphereOffset = direction * sphereActualDistance;
+            // Align remaining spheres
+            Vector2 sphereOffsetFlat = flyDirFlat * sphereActualDistance;
+            bool pastDst = false;
             for (int i = 1; i < spheres.Length; i++)
             {
-                if (sphereActualDistance > Vector3.Distance(spheres[i - 1].transform.position, targetPosition))
+                Vector3 spherePos = spheres[i].transform.position;
+                Vector2 spherePosFlat = new Vector2(spherePos.x, spherePos.z);
+
+                spherePosFlat = fstPosFlat + i * sphereOffsetFlat;
+                
+                if (!pastDst)
                 {
-                    Vector3 fromSourceOffset = sphereOffset - (targetPosition - spheres[i - 1].transform.position);
-                    spheres[i].transform.position = sourcePosition + fromSourceOffset;
+                    float sphereToSrcDstFlat = Vector2.Distance(spherePosFlat, srcPosFlat);
+                    pastDst = sphereToSrcDstFlat > srcToDstDistFlat;
                 }
-                else
+
+                if (pastDst)
                 {
-                    spheres[i].transform.position = spheres[i - 1].transform.position + sphereOffset;
+                    spherePosFlat -= srcToDstFlat;
                 }
+                spheres[i].transform.position = new Vector3(spherePosFlat.x, 0.0f, spherePosFlat.y);
             }
 
-            // Adjust colors and heights.
+            // Adjust colors and heights
             for (int i = 0; i < spheres.Length; i++)
             {
-                float sphereToTargetLength = Vector3.Distance(spheres[i].transform.position, targetPosition);
-                float t = 1.0f - (sphereToTargetLength / sourceToTargetLength);
+                Vector3 spherePos = spheres[i].transform.position;
+                Vector2 spherePosFlat = new Vector2(spherePos.x, spherePos.z);
 
-                // color
+                float sphereToDstDistFlat = Vector3.Distance(spherePosFlat, dstPosFlat);
+                float t = 1.0f - (sphereToDstDistFlat / srcToDstDistFlat);
+
+                // Color
                 Color color = viridisColorPalette[(int)(t * viridisColorPalette.Length) % viridisColorPalette.Length];
                 spheres[i].GetComponentInChildren<MeshRenderer>().material.color = color;
 
-                // height
-                float height = SPHERE_MAX_ALTITUDE * Mathf.Sin(t * Mathf.PI);
-                if (height == float.NaN)
-                {
-                    Debug.Log("");
-                }
-                spheres[i].transform.position = new Vector3(spheres[i].transform.position.x, height, spheres[i].transform.position.z);
+                // Altitude
+                float altitude = SPHERE_MAX_ALTITUDE * Mathf.Sin(t * Mathf.PI);
+                spheres[i].transform.position = new Vector3(spherePosFlat.x, altitude, spherePosFlat.y);
             }
         }
     }
