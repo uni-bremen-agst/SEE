@@ -104,7 +104,17 @@ namespace SEE.Tools
         /// </summary>
         private const int Seed = 500;
 
-        public Graph Create(Constraint leafConstraint, Constraint innerNodeConstraint, ICollection<RandomAttributeDescriptor> leafAttributes)
+        /// <summary>
+        /// Creates and returns a randomly generated graph for the given constraints.
+        /// </summary>
+        /// <param name="leafConstraint">constraint for the leaf nodes to be generated</param>
+        /// <param name="innerNodeConstraint">constraint for the inner nodes to be generated</param>
+        /// <param name="leafAttributes">constraints for node attributes to be generated</param>
+        /// <returns>a random graph fulfilling the given constraints</returns>
+        public Graph Create
+            (Constraint leafConstraint, 
+             Constraint innerNodeConstraint, 
+             ICollection<RandomAttributeDescriptor> leafAttributes)
         {
             leafConstraint.Check();
             innerNodeConstraint.Check();
@@ -114,6 +124,7 @@ namespace SEE.Tools
             IList<Node> innerNodes = CreateTree(graph, innerNodeConstraint);
             AssignLeaves(graph, leaves, innerNodes);
             ICollection<Edge> innerEdges = CreateEdges(graph, innerNodes, innerNodeConstraint);
+            graph.CalculateLevels();
             PrintStatistics(graph, leaves.Count, leafEdges.Count, innerNodes.Count, innerEdges.Count);
             return graph;
         }
