@@ -10,7 +10,14 @@ namespace SEE.GO
     /// </summary>
     public class NodeRef : SerializedMonoBehaviour
     {
-        [NonSerialized, OdinSerialize]
-        public Node node; // serialized by Odin only
+        /// <summary>
+        /// The graph node this node reference is referring to. It will be set either
+        /// by a graph renderer while in editor mode or at runtime by way of an
+        /// AbstractSEECity object.
+        /// It will not be serialized to prevent duplicating and endless serialization
+        /// by both Unity and Odin.
+        /// </summary>
+        [NonSerialized]
+        public Node node;
     }
 }
