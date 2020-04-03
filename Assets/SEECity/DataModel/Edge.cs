@@ -1,4 +1,6 @@
-﻿namespace SEE.DataModel
+﻿using System;
+
+namespace SEE.DataModel
 {
     /// <summary>
     /// Directed and typed edges of the graph with source and target node.
@@ -61,6 +63,48 @@
         }
 
         /// <summary>
+        /// Returns true if <paramref name="other"/> meets all of the following conditions:
+        /// (1) is not null
+        /// (2) has exactly the same C# type
+        /// (3) has exactly the same attributes with exactly the same values as this edge
+        /// (4) has the same type name
+        /// (5) the linkname of its source is the same as the linkname of the source of this edge
+        /// (6) the linkname of its target is the same as the linkname of the target of this edge
+        /// 
+        /// Note: This edge and the other edge may or may not be in the same graph.
+        /// </summary>
+        /// <param name="other">to be compared to</param>
+        /// <returns>true if equal</returns>
+        public override bool Equals(Object other)
+        {
+            if (!base.Equals(other))
+            {
+                return false;
+            }
+            else
+            {
+                Edge otherEdge = other as Edge;
+                bool equal = this.target.LinkName == otherEdge.target.LinkName
+                    && this.source.LinkName == otherEdge.source.LinkName;
+                if (!equal)
+                {
+                    Report(LinkName + ": Source or target are different.");
+                }
+                return equal;
+            }
+        }
+
+        /// <summary>
+        /// Returns a hash code.
+        /// </summary>
+        /// <returns>hash code</returns>
+        public override int GetHashCode()
+        {
+            // we are using the linkname which is intended to be unique
+            return LinkName.GetHashCode();
+        }
+
+        /// <summary>
         /// Creates deep copies of attributes where necessary. Is called by
         /// Clone() once the copy is created. Must be extended by every 
         /// subclass that adds fields that should be cloned, too.
@@ -95,9 +139,10 @@
         /// between those nodes with the edge's type.
         /// </summary>
         /// <returns>a string from both nodes' LinkNames as follows: Type + "#" + Source.LinkName + '#' + Target.LinkName</returns>
-        public string LinkName
+        public override string LinkName
         {
             get => Type + "#" + Source.LinkName + "#" + Target.LinkName;
+            set => throw new NotImplementedException();
         }
 
     }
