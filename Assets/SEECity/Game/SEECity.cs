@@ -53,7 +53,7 @@ namespace SEE.Game
         /// loaded nodes if GXLPath() yields a valid filename. This "deserializes"
         /// the graph to make it available at runtime.
         /// </summary>
-        protected void Start()
+        protected void Awake()
         {
             string filename = GXLPath();
             if (graph == null && !string.IsNullOrEmpty(filename))
