@@ -2219,7 +2219,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  PathPrefix: 
+  PathPrefix: F:\develop\SEE\Data\GXL\random\
   origin: {x: 0, y: 0, z: 0}
   WidthMetric: Metric.Number_of_Tokens
   HeightMetric: Metric.Clone_Rate
@@ -2251,8 +2251,8 @@ MonoBehaviour:
   EdgeWidth: 0.4
   ShowErosions: 0
   EdgesAboveBlocks: 1
-  gxlPath: ..\Data\GXL\linux-clones\net.gxl
-  csvPath: ..\Data\GXL\linux-clones\net.csv
+  gxlPath: random.gxl
+  csvPath: random.csv
   LeafConstraint:
     NodeType: Class
     EdgeType: calls
