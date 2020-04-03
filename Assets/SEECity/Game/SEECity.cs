@@ -5,6 +5,8 @@ using UnityEngine;
 using SEE.Tools;
 using SEE.DataModel;
 using SEE.DataModel.IO;
+using System;
+using SEE.GO;
 
 namespace SEE.Game
 {
@@ -17,7 +19,23 @@ namespace SEE.Game
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are 
         /// managed here.
+        /// We do not want to serialize it using Unity or Odin because both frameworks are
+        /// insufficient for the highly recursive structure of all the graph objects.
+        /// There are different points in time in which the underlying graph is created:
+        /// (1) in the editor mode or (2) during the game. If the graph is created in the
+        /// editor mode by a graph renderer, the graph renderer will attached the NodeRefs
+        /// to the game objects representing the nodes. So all the information about nodes
+        /// is available, for instance for the layouts or the inspector. During the game 
+        /// there are two different possible scenarios: (a) this SEECity is is created 
+        /// and configured at runtime or (b) the SEECity was created in the editor and then
+        /// the game is started. For scenario (a), we expect the graph to be loaded and
+        /// all NodeRefs be defined accordingly. For scenario (b), the graph attribute
+        /// will not be serialized and, hence, be null. In that case, we load the graph
+        /// from the GXL file, i.e., the GXL file is our persistent serialization we 
+        /// use to re-create the graph. We need, however, to set the NodeRefs at runtime.
+        /// All that is being done in Start() below.
         /// </summary>
+        [NonSerialized]
         protected Graph graph = null;
 
         /// <summary>
@@ -28,6 +46,49 @@ namespace SEE.Game
         {
             get => graph;
             set => graph = value;
+        }
+
+        /// <summary>
+        /// Loads the graph from GXLPath() and sets all NodeRef components to the
+        /// loaded nodes if GXLPath() yields a valid filename. This "deserializes"
+        /// the graph to make it available at runtime.
+        /// </summary>
+        protected void Awake()
+        {
+            string filename = GXLPath();
+            if (graph == null && !string.IsNullOrEmpty(filename))
+            {                
+                graph = LoadGraph(filename);
+                if (graph != null)
+                {
+                    SetNodeRefs(graph);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets all NodeRefs for this city to the nodes they correspond to.
+        /// We assume that the game objects with a NodeRef required to be defined to be
+        /// immediate children of this SEECity. Moreover, we assume a child
+        /// game object's name is the linkname of the corresponding graph node.
+        /// </summary>
+        /// <param name="graph">graph giving us the nodes who should be the
+        /// target of the NodeRefs</param>
+        protected void SetNodeRefs(Graph graph)
+        {
+            foreach (Transform childTransform in transform)
+            {
+                GameObject child = childTransform.gameObject;
+                NodeRef nodeRef = child.GetComponent<NodeRef>();
+                if (nodeRef != null)
+                {
+                    nodeRef.node = graph.GetNode(child.name);
+                    if (nodeRef.node == null)
+                    {
+                        Debug.LogWarningFormat("Could not resolve node reference {0}.\n", child.name);
+                    }
+                }
+            }
         }
 
         /// Clone graph with one directory and two files contained therein.

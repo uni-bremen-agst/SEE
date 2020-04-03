@@ -2,6 +2,7 @@
 using UnityEngine;
 using SEE.Game;
 using UnityEditorInternal;
+using SEE.DataModel.IO;
 
 namespace SEEEditor
 {
@@ -11,7 +12,7 @@ namespace SEEEditor
     /// </summary>
     [CustomEditor(typeof(SEECityRandom))]
     [CanEditMultipleObjects]
-    public class SEECityRandomEditor : AbstractSEECityEditor
+    public class SEECityRandomEditor : SEECityEditor
     {
         private ReorderableList leafAttributes;
 
@@ -58,9 +59,13 @@ namespace SEEEditor
                 };
         }
 
-        public override void OnInspectorGUI()
+        /// <summary>
+        /// In addition to the other attributes inherited, the specific attributes of 
+        /// the SEEDynCity instance are shown and set here.
+        /// </summary>
+        protected override void Attributes()
         {
-            base.OnInspectorGUI();
+            base.Attributes();
             SEECityRandom city = target as SEECityRandom;
 
             GUILayout.Label("Leaf nodes", EditorStyles.boldLabel);
@@ -80,34 +85,21 @@ namespace SEEEditor
             leafAttributes.DoLayoutList();
             serializedObject.ApplyModifiedProperties();
             EditorUtility.SetDirty(target);
-
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Load City"))
-            {
-                SetUp(city);
-            }
-            if (GUILayout.Button("Delete City"))
-            {
-                Reset(city);
-            }
-            EditorGUILayout.EndHorizontal();
         }
 
         /// <summary>
-        /// Generates the graph, aggregates the metrics to inner nodes and renders the graph in the scene.
+        /// Generates the random graph data and saves it.
         /// </summary>
         /// <param name="city">the city to be set up</param>
-        private void SetUp(SEECityRandom city)
+        protected override void SetUp(SEECity city)
         {
-            city.LoadAndDrawGraph();
-        }
-
-        /// <summary>
-        /// Deletes the underlying graph data of the given city.
-        /// </summary>
-        private void Reset(SEECityRandom city)
-        {
-            city.DeleteGraph();
+            base.SetUp(city);
+            // We select one hierarchicalEdge from the set of hierarchical edges arbitrarily.
+            foreach (string hierarchicalEdge in city.HierarchicalEdges)
+            {
+                GraphWriter.Save(city.GXLPath(), city.ItsGraph, hierarchicalEdge);
+                return;
+            }
         }
     }
 }
