@@ -55,7 +55,7 @@ namespace SEEEditor
         /// inner nodes and renders the graph in the scene.
         /// </summary>
         /// <param name="city">the city to be set up</param>
-        private void SetUp(SEECity city)
+        protected virtual void SetUp(SEECity city)
         {
             city.LoadAndDrawGraph();
         }
