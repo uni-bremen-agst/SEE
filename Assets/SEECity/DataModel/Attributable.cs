@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace SEE.DataModel
 {
@@ -178,9 +179,10 @@ namespace SEE.DataModel
         // General
         //----------------------------------
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected static void Report(string message)
         {
-            UnityEngine.Debug.Log(message + "\n");
+            // UnityEngine.Debug.Log(message + "\n");
         }
 
         /// <summary>
