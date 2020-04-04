@@ -20,23 +20,21 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// The maximal depth of the node hierarchy of the graph.
+        /// The maximal level of the node hierarchy of the graph. The first level is 0.
+        /// Thus, this value is greater or equal to zero. It is zero if we have only roots.
         /// </summary>
-        private int maxDepth = 0;
+        private int maxLevel = 0;
 
         public override ICollection<LayoutEdge> Create(ICollection<ILayoutNode> layoutNodes)
         {
             ICollection<LayoutEdge> layout = new List<LayoutEdge>();
 
             ICollection<ILayoutNode> roots = GetRoots(layoutNodes);
-            maxDepth = GetMaxDepth(roots, -1);
+            maxLevel = GetMaxLevel(roots, -1);
 
-            // TODO: We want the level distances be chosen relative to the maximal height of all
-            // game objects within the same subtree. At the very least, we want that for siblings
-            // whose edges are drawn as direct splines. They should be led across all other siblings.
-            // CalculateMaxHeights(gameNodes);
-            MinMaxBlockY(layoutNodes, out minY, out float maxY, out float maxHeight);
-            minY *= 1.5f;
+            MinMaxBlockY(layoutNodes, out float minY, out float maxY, out float maxHeight);
+            levelDistance = Math.Max(levelDistance, maxHeight / 5.0f);
+            minimalDistanceToGround = (edgesAboveBlocks ? maxY : minY) + levelDistance;            
 
             LCAFinder<ILayoutNode> lca = new LCAFinder<ILayoutNode>(roots);
 
@@ -44,27 +42,25 @@ namespace SEE.Layout
             {
                 foreach (ILayoutNode target in source.Successors)
                 {
-                    layout.Add(new LayoutEdge(source, target,
-                                              LinePoints.BSplineLinePoints(GetControlPoints(source, target, lca, maxDepth))));
-
+                    layout.Add(new LayoutEdge(source, target, GetLinePoints(source, target, lca, maxLevel)));
                 }
             }
             return layout;
         }
 
         /// <summary>
-        /// Returns the maximal tree depth of the given <paramref name="nodes"/>, that is, the 
+        /// Returns the maximal tree level of the given <paramref name="nodes"/>, that is, the 
         /// longest path from a leaf to any node in <paramref name="nodes"/>.
         /// </summary>
-        /// <param name="nodes">nodes whose maximal depth is to be determined</param>
-        /// <param name="currentDepth">the current depth of all <paramref name="nodes"/></param>
-        /// <returns>maximal tree depth</returns>
-        private int GetMaxDepth(ICollection<ILayoutNode> nodes, int currentDepth)
+        /// <param name="nodes">nodes whose maximal level is to be determined</param>
+        /// <param name="currentLevel">the current level of all <paramref name="nodes"/></param>
+        /// <returns>maximal tree level</returns>
+        private int GetMaxLevel(ICollection<ILayoutNode> nodes, int currentLevel)
         {
-            int max = currentDepth + 1;
+            int max = currentLevel + 1;
             foreach (ILayoutNode node in nodes)
             {
-                max = Math.Max(max, GetMaxDepth(node.Children(), currentDepth + 1));
+                max = Math.Max(max, GetMaxLevel(node.Children(), currentLevel + 1));
             }
             return max;
         }
@@ -89,7 +85,7 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Yields the list of control points for the bspline along the node hierarchy.
+        /// Yields the list of points for a spline along the node hierarchy.
         /// If source equals target, a self loop is generated atop of the node.
         /// If source and target have no common ancestor, the path starts at source
         /// and ends at target and reaches through the point on half distance between 
@@ -97,24 +93,22 @@ namespace SEE.Layout
         /// If source and target are siblings (immediate ancestors of the same parent
         /// node), the control points are all on ground level froum source to target
         /// via their parent.
-        /// Otherwise, the control points are chosen along the path from the source
+        /// Otherwise, the points are chosen along the path from the source
         /// node to their lowest common ancestor and then down again to the target 
-        /// node. The height of each such control point is proportional to the level 
+        /// node. The height of each such points is proportional to the level 
         /// of the node hierarchy. The higher the node in the hierarchy on this path,
-        /// the higher the control point.
+        /// the higher the points.
         /// </summary>
         /// <param name="source">starting node</param>
         /// <param name="target">ending node</param>
         /// <param name="lcaFinder">to retrieve the lowest common ancestor of source and target</param>
-        /// <param name="maxDepth">the maximal depth of the node hierarchy</param>
-        /// <returns>control points to draw a bspline between source and target</returns>
-        private Vector3[] GetControlPoints(ILayoutNode source, ILayoutNode target, LCAFinder<ILayoutNode> lcaFinder, int maxDepth)
-        {
-            Vector3[] controlPoints = null;
-
+        /// <param name="maxLevel">the maximal depth of the node hierarchy</param>
+        /// <returns>points to draw a spline between source and target</returns>
+        private Vector3[] GetLinePoints(ILayoutNode source, ILayoutNode target, LCAFinder<ILayoutNode> lcaFinder, int maxLevel)
+        { 
             if (source == target)
             {
-                controlPoints = SelfLoop(source);
+                return LinePoints.BSplineLinePoints(SelfLoop(source));
             }
             else
             {
@@ -127,13 +121,13 @@ namespace SEE.Layout
                     // forrest do not have a common ancestor.
                     Debug.LogError("Undefined lowest common ancestor for "
                         + source.LinkName + " and " + target.LinkName + "\n");
-                    controlPoints = ThroughCenter(source, target, maxDepth);
+                    return LinePoints.BSplineLinePoints(ThroughCenter(source, target, maxLevel));
                 }
                 else if (lca == source || lca == target)
                 {
                     // The edge is along a node hierarchy path.
                     // We will create a direct spline from source to target at the lowest level.
-                    controlPoints = DirectSpline(source, target, GetLevelHeight(maxDepth));
+                    return DirectSpline(source, target, GetLevelHeight(maxLevel));
                 }
                 else
                 {
@@ -164,7 +158,7 @@ namespace SEE.Layout
                         // between siblings were led over one single control point, they would often take 
                         // a detour even though the nodes are close by. The detour would make it difficult 
                         // to follow the edges visually.
-                        controlPoints = DirectSpline(source, target, GetLevelHeight(maxDepth));
+                        return DirectSpline(source, target, GetLevelHeight(maxLevel));
                     }
                     else
                     {
@@ -180,7 +174,7 @@ namespace SEE.Layout
                             fullPath[sourceToLCA.Length + i - 1] = targetToLCA[i];
                         }
                         // Calculate control points along the node hierarchy 
-                        controlPoints = new Vector3[fullPath.Length];
+                        Vector3[] controlPoints = new Vector3[fullPath.Length];
                         controlPoints[0] = source.Roof;
                         for (int i = 1; i < fullPath.Length - 1; i++)
                         {
@@ -193,11 +187,10 @@ namespace SEE.Layout
                                                + GetLevelHeight(fullPath[i].Level) * Vector3.up;
                         }
                         controlPoints[controlPoints.Length - 1] = target.Roof;
-                        //Dump(controlPoints);
+                        return Layout.LinePoints.BSplineLinePoints(controlPoints);
                     }
                 }
             }
-            return controlPoints;
         }
 
         /// <summary>
@@ -215,34 +208,12 @@ namespace SEE.Layout
         /// <returns>control points for a direct spline between the two nodes</returns>
         private Vector3[] DirectSpline(ILayoutNode source, ILayoutNode target, float yLevel)
         {
-            // We do need at least four control points for Bsplines (it is fine to include 
-            // the middle control point twice).
             Vector3 start = source.Roof;
             Vector3 end = target.Roof;
             // position in between start and end
             Vector3 middle = Vector3.Lerp(start, end, 0.5f);
-            middle.y += yLevel;
-            return SplineLinePoints(start, middle, end);
-        }
-
-        /// <summary>
-        /// Returns control points of for a B-spline for the following path:
-        ///  from <paramref name="start"/> to <paramref name="middle"/>
-        ///  and then from <paramref name="middle"/> to <paramref name="middle"/> 
-        ///  and finally from <paramref name="middle"/> to <paramref name="end"/>.
-        /// </summary>
-        /// <param name="start">first control point</param>
-        /// <param name="middle">second and third control point</param>
-        /// <param name="end">last control point</param>
-        /// <returns>control points</returns>
-        private static Vector3[] SplineLinePoints(Vector3 start, Vector3 middle, Vector3 end)
-        {
-            Vector3[] controlPoints = new Vector3[4];
-            controlPoints[0] = start;
-            controlPoints[1] = middle;
-            controlPoints[2] = middle;
-            controlPoints[3] = end;
-            return controlPoints;
+            middle.y = yLevel;
+            return LinePoints.SplineLinePoints(start, middle, end);
         }
 
         /// <summary>
@@ -295,44 +266,48 @@ namespace SEE.Layout
 
         /// <summary>
         /// The number of Unity units per level of the hierarchy for the height of control points.
-        /// It will be chosen relative to the height of the largest leaf node.
+        /// Its value must be greater than zero.
         /// </summary>
         private float levelDistance = 1.0f;
 
         /// <summary>
         /// The minimal y co-ordinate for all hierarchical control points at level 2 and above.
-        /// Control points at level 0 (self loop) will be handled separately: self loops will be
-        /// drawn on top of the roof or below the ground of a node. Likewise, edges for nodes
-        /// that are siblings in the hierarchy will be drawn as simple splines from roof to
-        /// roof or ground to ground, respectively. The y co-ordinate of inner control points 
-        /// of all other edges will be at minY or above. See GetLevelHeight() for more details.
+        /// Control points at level 0 (self loops) will be handled separately: self loops will be
+        /// drawn from corner to corner on the roof or ground, respectively, depending upon 
+        /// edgesAboveBlocks. Likewise, edges for nodes that are siblings in the hierarchy will be
+        /// drawn as simple splines from roof to roof or ground to ground of the two blocks, respectively,
+        /// on their shortest path. The y co-ordinate of inner control points of all other edges will be 
+        /// at minimalDistanceToGround or above with respect to the ground. See GetLevelHeight() for 
+        /// more details.
+        /// Its value is never negative. It will be set in Create().
         /// </summary>
-        private float minY;
+        private float minimalDistanceToGround = 0.0f;
 
         /// <summary>
         /// Returns the y co-ordinate for control points of nodes at the given <paramref name="level"/>
         /// of the node hierarchy. Root nodes are assumed to have level 0. There may be node hierarchies
-        /// that are actually forrests rather than simple trees. In such cases, the given <paramref name="level"/>
-        /// can be -1, which is perfectly acceptable. In such cases, the returned value will be just one 
-        /// levelDistance above those for normal root nodes. If level == maxDepth, minY will be returned;
-        /// in all other cases the returned value is guaranteed to be greater than minY.
+        /// that are actually forrests rather than simple trees. In such cases, the lowest common ancestor
+        /// of nodes in different trees does not exist and -1 will be passed as <paramref name="level"/>,
+        /// which is perfectly acceptable. In such cases, the returned value will be just one 
+        /// levelDistance above those for normal root nodes: 
+        ///     minimalDistanceToGround + (maxLevel + 1) * levelDistance
+        /// If level == maxLevel, minimalDistanceToGround will be returned.
+        /// In all other cases the returned value is guaranteed to be greater than minimalDistanceToGround.
         /// </summary>
         /// <param name="level">node hierarchy level</param>
-        /// <returns>y co-ordinate for control points</returns>
+        /// <returns>y co-ordinate for control points; always >= 0</returns>
         private float GetLevelHeight(int level)
         {
-            return minY + (maxDepth - level) * levelDistance;
+            return minimalDistanceToGround + (maxLevel - level) * levelDistance;
         }
 
         /// <summary>
-        /// Yields four control points for a self loop at a node. The first control 
+        /// Yields points of a spline for a self loop at a node. The first  
         /// point is the front left corner of the roof of <paramref name="node"/>
-        /// and the last control point is its opposite back right roof corner.
-        /// Thus, the edge is diagonal across the roof. The second and third control
-        /// points are the same position: the position directly in between the first
-        /// and last control point but with a y co-ordinate that is the roof's 
-        /// y co-ordinate plus the distance between the first and last control point.
-        /// As a consequence, self loops are wider and higher for larger roof areas.
+        /// and the last point is its opposite back right roof corner. Thus, the 
+        /// edge is diagonal across the roof. The peak of the spline is in the
+        /// middle of the begin and end where the y co-ordinate of that peak
+        /// is levelDistance above the roof or ground, respectively.
         /// </summary>
         /// <param name="node">node whose self loop control points are required</param>
         /// <returns>control points forming a self loop above the node</returns>
@@ -340,16 +315,11 @@ namespace SEE.Layout
         {
             Vector3 roofCenter = node.Roof;
             Vector3 extent = node.Scale / 2.0f;
-
             Vector3 start = new Vector3(roofCenter.x - extent.x, roofCenter.y, roofCenter.z - extent.z);
             Vector3 end = new Vector3(roofCenter.x + extent.x, roofCenter.y, roofCenter.z + extent.z);
-            Vector3 middle = roofCenter + Vector3.Distance(start, end) * Vector3.up;
-            Vector3[] controlPoints = new Vector3[4];
-            controlPoints[0] = start;
-            controlPoints[1] = middle;
-            controlPoints[2] = middle;
-            controlPoints[3] = end;
-            return controlPoints;
+            Vector3 middle = roofCenter;
+            middle.y += levelDistance;
+            return LinePoints.SplineLinePoints(start, middle, end);
         }
 
         /// <summary>
