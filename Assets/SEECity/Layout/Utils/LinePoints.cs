@@ -114,9 +114,17 @@ namespace SEE.Layout
             return result;
         }
 
+        /// <summary>
+        /// Returns the points of a spline from <paramref name="start"/> to <paramref name="end"/>.
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="above"></param>
+        /// <returns></returns>
         public static Vector3[] SplineLinePoints(Vector3 start, Vector3 end, bool above)
         {
-            // The offset of the edges above or below the ground chosen relative 
+            // The offset of the points are chosen relative 
             // to the distance between the two blocks.
             // We are using a value relative to the distance so that edges 
             // connecting close blocks do not shoot into the sky. Otherwise they
@@ -139,6 +147,28 @@ namespace SEE.Layout
             controlPoints[3].y = edgeLevel;
             controlPoints[3] = end;
             return BSplineLinePoints(controlPoints);
+        }
+
+        /// <summary>
+        /// Returns the points of a spline from <paramref name="start"/> over <paramref name="middle"/>
+        /// to <paramref name="end"/>. 
+        /// 
+        /// Note: The resultant spline actually goes through <paramref name="middle"/>.
+        /// </summary>
+        /// <param name="start">start of the spline</param>
+        /// <param name="middle">middle of the spline</param>
+        /// <param name="end">end of the spline</param>
+        /// <returns>points of a spline</returns>
+        public static Vector3[] SplineLinePoints(Vector3 start, Vector3 middle, Vector3 end)
+        {
+            List<double> path = new List<double>()
+               { start.x,  start.y,  start.z,
+                 middle.x, middle.y, middle.z,
+                 end.x,    end.y,    end.z
+               };
+
+            TinySpline.BSpline spline = TinySpline.Utils.interpolateCubic(path, dimensions);
+            return ListToVectors(spline.buckle(tension).sample());
         }
 
         /// <summary>
