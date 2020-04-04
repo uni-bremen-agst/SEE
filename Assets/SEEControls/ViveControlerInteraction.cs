@@ -1,16 +1,12 @@
-﻿using SEE.Controls;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace SEE.Controls
 {
     /// <summary>
-    /// This class maps functions from other scripts in the editor to the controler events.
-    /// Its the central point for processing controler input.
-    /// No other script within the level should use controler inputs.
+    /// This class maps functions from other scripts in the editor to the controller events.
+    /// It is the central point for processing controller input.
+    /// No other script within the level should use controller inputs.
     /// </summary>
     public class ViveControlerInteraction : MonoBehaviour
     {
@@ -34,18 +30,15 @@ namespace SEE.Controls
         [FormerlySerializedAs("OnRightTriggerAxis")]
         private AxisEvent _OnRightTriggerAxis = null;
 
-        public GameObject LeftControler;
-        public GameObject RightControler;
-
-        void Start()
-        {
-
-        }
+        public GameObject LeftController;
+        public GameObject RightController;
 
         void Update()
         {
             float LeftTriggerAxis = Input.GetAxis("LeftVRTrigger");
             float RightTriggerAxis = Input.GetAxis("RightVRTriggerMovement");
+
+            //Debug.LogFormat("LeftTriggerAxis={0} RightTriggerAxis={0}\n", LeftTriggerAxis, RightTriggerAxis);
 
             if (_OnLeftTrigger != null)
             {
@@ -71,21 +64,21 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Returns the GameObject which is assigned in the editor and represents the left controler within the level.
+        /// Returns the GameObject which is assigned in the editor and represents the left controller within the game.
         /// </summary>
-        /// <returns>the GameObject of the left controler</returns>
-        public GameObject GetLeftControler()
+        /// <returns>the GameObject of the left controller</returns>
+        public GameObject GetLeftController()
         {
-            return LeftControler;
+            return LeftController;
         }
 
         /// <summary>
-        /// Returns the GameObject which is assigned in the editor and represents the rigth controler within the level.
+        /// Returns the GameObject which is assigned in the editor and represents the rigth controller within the game.
         /// </summary>
-        /// <returns>the GameObject of the rigth controler</returns>
-        public GameObject GetRightControler()
+        /// <returns>the GameObject of the rigth controller</returns>
+        public GameObject GetRightController()
         {
-            return RightControler;
+            return RightController;
         }
     }
 }
