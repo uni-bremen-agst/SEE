@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using SEE.GO;
 
 namespace SEE.Layout.RectanglePacking
 {
@@ -10,18 +11,6 @@ namespace SEE.Layout.RectanglePacking
     /// </summary>
     internal class TestRectanglePacker
     {
-        //[SetUp]
-        //public virtual void Setup()
-        //{
-        //    Debug.Log("Setup\n");
-        //}
-
-        //[TearDown]
-        //public virtual void Teardown()
-        //{
-        //    Debug.Log("Teardown\n");
-        //}
-
         /// <summary>
         /// True if left and right are the same list (order is ignored).
         /// </summary>
@@ -219,19 +208,83 @@ namespace SEE.Layout.RectanglePacking
             Vector3 initialSize = Vector3.one;
 
             CubeFactory factory = new CubeFactory();
-            IList<GameObject> gameObjects = new List<GameObject>();
+            ICollection<ILayoutNode> gameObjects = new List<ILayoutNode>();
 
             for (int i = 1; i <= howManyNodes; i++)
             {
-                GameObject gameObject = factory.NewBlock(0);
-                factory.SetSize(gameObject, initialSize);
                 initialSize *= 1.01f;
-                gameObjects.Add(gameObject);
+                gameObjects.Add(new MyGameNode(initialSize, i));
             }
 
-            RectanglePacker packer = new RectanglePacker(0.0f, factory);
+            RectanglePacker packer = new RectanglePacker(0.0f, 1.0f);
 
-            Dictionary<GameObject, NodeTransform> layout = packer.Layout(gameObjects);
+            Dictionary<ILayoutNode, NodeTransform> layout = packer.Layout(gameObjects);
+        }
+
+        private class MyGameNode : ILayoutNode
+        {
+            private readonly int index;
+
+            public MyGameNode(Vector3 initialSize, int index)
+            {
+                this.scale = initialSize;
+                this.index = index;
+            }
+
+            public ILayoutNode Parent => null;
+
+            private int level = 0;
+
+            public int Level
+            {
+                get => level;
+                set => level = value;
+            }
+
+            public ICollection<ILayoutNode> Children()
+            {
+                return new List<ILayoutNode>();
+            }
+
+            private Vector3 scale;
+
+            public Vector3 Scale
+            {
+                get => scale;
+                set => scale = value;
+            }
+
+            private Vector3 centerPosition;
+
+            public Vector3 CenterPosition
+            {
+                get => centerPosition;
+                set => centerPosition = value;
+            }
+
+            public Vector3 Roof
+            {
+                get => centerPosition + Vector3.up * 0.5f * scale.y;
+            }
+
+            public Vector3 Ground
+            {
+                get => centerPosition - Vector3.up * 0.5f * scale.y;
+            }
+
+            public bool IsLeaf => false;
+
+            public string LinkName { get => index.ToString(); }
+
+            private float rotation;
+
+            public float Rotation
+            {
+                get => rotation;
+                set => rotation = value;
+            }
+
+            public ICollection<ILayoutNode> Successors => new List<ILayoutNode>();
         }
     }
 }

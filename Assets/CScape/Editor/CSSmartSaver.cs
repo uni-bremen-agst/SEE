@@ -22,7 +22,7 @@ public class CSSmartSaver : MonoBehaviour
             if (gObject.GetComponent<BuildingEditorOrganizer>() != null)
             {
                 BuildingEditorOrganizer getBO = gObject.GetComponent<BuildingEditorOrganizer>();
-                if (getBO.isMerged = true)
+                if (getBO.isMerged)
                 {
                     getBO.DeOrganize();
                 }
