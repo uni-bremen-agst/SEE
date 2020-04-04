@@ -339,67 +339,40 @@ namespace SEE.Layout
                 Debug.Log(node);
                 node.SublayoutValues.IsSubLayoutNode = node.NodeObject.IsSublayoutNode;
                 node.SublayoutValues.IsSubLayoutRoot = node.NodeObject.IsSublayoutRoot;
+                node.SublayoutValues.Sublayout = node.NodeObject.Sublayout;
                 if (node.NodeObject.SublayoutRoot != null)
                 {
                     node.SublayoutValues.SubLayoutRoot = nodeToCoseNode[node.NodeObject.SublayoutRoot];
                 }
 
-                if (node.SublayoutValues.IsSubLayoutRoot)
+                if (node.SublayoutValues.IsSubLayoutNode)
                 {
-
-                    Rect rect = new Rect();
-                    rect.x = node.NodeObject.CenterPosition.x - node.NodeObject.Scale.x / 2;
-                    rect.y = node.NodeObject.CenterPosition.z - node.NodeObject.Scale.z / 2;
-                    rect.width = node.NodeObject.Scale.x;
-                    rect.height = node.NodeObject.Scale.x;
-
-                    node.SublayoutValues.relativeRect = rect;
-
-                    node.rect = new Rect(node.SublayoutValues.relativeRect);
-                   
-                }
-
-                if (node.SublayoutValues.IsSubLayoutNode && !node.SublayoutValues.IsSubLayoutRoot)
-                {
-                    Rect bounds = new Rect
+                    Rect rect = new Rect
                     {
                         x = node.NodeObject.CenterPosition.x - node.NodeObject.Scale.x / 2,
                         y = node.NodeObject.CenterPosition.z - node.NodeObject.Scale.z / 2,
                         width = node.NodeObject.Scale.x,
                         height = node.NodeObject.Scale.z
                     };
-                    node.rect = bounds;
 
-                    node.SublayoutValues.relativeRect = new Rect(bounds);
+                    node.SublayoutValues.relativeRect = rect;
+                    node.rect = new Rect(node.SublayoutValues.relativeRect);
 
-                   
-
-                    node.SetPositionRelativ(node.SublayoutValues.SubLayoutRoot);
-
-                    if (node.Child != null)
+                    if (!node.SublayoutValues.IsSubLayoutRoot)
                     {
-                        node.Child.Left = bounds.xMin;
-                        node.Child.Top = bounds.yMin;
-                        node.Child.Right = bounds.xMax;
-                        node.Child.Bottom = bounds.yMax;
-                        node.Child.UpdateBoundingRect();
+                        node.SetPositionRelativ(node.SublayoutValues.SubLayoutRoot);
+
+                        if (node.Child != null)
+                        {
+                            node.Child.Left = rect.xMin;
+                            node.Child.Top = rect.yMin;
+                            node.Child.Right = rect.xMax;
+                            node.Child.Bottom = rect.yMax;
+                            node.Child.UpdateBoundingRect();
+                        }
                     }
-
-                    // (node.NodeObject.RelativePosition.x, node.NodeObject.RelativePosition.z, node.NodeObject.Scale.x, node.NodeObject.Scale.z);
                 }
-
-
             }
-
-
-            // sind immernoch nach Leveln sortiert
-            /*foreach (SublayoutLayoutNode sublayoutNode in sublayoutNodes)
-            {
-                Dictionary<ILayoutNode, CoseNode> allNodes = new Dictionary<ILayoutNode, CoseNode>(sublayoutNode.Nodes.ToDictionary(node => node, node => nodeToCoseNode[node]));
-                Dictionary<ILayoutNode, CoseNode> removedNodes = new Dictionary<ILayoutNode, CoseNode>(sublayoutNode.RemovedChildren.ToDictionary(node => node, node => nodeToCoseNode[node]));
-                CoseSublayout sublayout = new CoseSublayout(nodeToCoseNode[sublayoutNode.Node], groundLevel, innerNodeHeight, sublayoutNode.NodeLayout, allNodes, removedNodes, leafNodeFactory);
-                sublayout.Layout();
-            }*/
         }
 
     

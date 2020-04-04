@@ -110,7 +110,7 @@ namespace SEE.Layout
                 }
             }
 
-            root.SublayoutValues.Sublayout = this;
+            //root.SublayoutValues.Sublayout = this;
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace SEE.Layout
                         // TODO reparieren
                         //coseNode.NodeObject.children = coseNode.SublayoutValues.removedChildren;
 
-                        foreach (ILayoutNode subNode in coseNode.SublayoutValues.Sublayout.sublayoutNodes)
+                        /*foreach (ILayoutNode subNode in coseNode.SublayoutValues.Sublayout.sublayoutNodes)
                         {
                             CoseSublayoutNode cSubNode = subNode as CoseSublayoutNode;
                             CoseNode cNode = allNodes.ContainsKey(cSubNode.Node) ? allNodes[cSubNode.Node] : removedChildren[cSubNode.Node];
@@ -184,7 +184,7 @@ namespace SEE.Layout
                                     child.UpdateBoundingRect();
                                 }
                             } 
-                        }
+                        }*/
                         coseNode.SublayoutValues.IsSubLayoutRoot = false;
                     }
                 }
@@ -318,7 +318,7 @@ namespace SEE.Layout
                     ILayoutNode layoutNode = kvp.Key;
                     if (node.SublayoutValues.IsSubLayoutRoot)
                     {
-                        sublayoutNodes.Add(new CoseSublayoutNode(layoutNode, new List<ILayoutNode>(), true, layoutNode.Parent, node.SublayoutValues.Sublayout.layoutScale, ILayout_to_CoseSublayoutNode));
+                        //sublayoutNodes.Add(new CoseSublayoutNode(layoutNode, new List<ILayoutNode>(), true, layoutNode.Parent, node.SublayoutValues.Sublayout.layoutScale, ILayout_to_CoseSublayoutNode));
                     }
                 }
             }

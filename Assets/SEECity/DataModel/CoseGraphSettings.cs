@@ -21,7 +21,7 @@ namespace SEE.DataModel
         public int index = 0;
         public Dictionary<string, NodeLayouts> DirNodeLayout = new Dictionary<string, NodeLayouts>();
         public Dictionary<string, InnerNodeKinds> DirShape = new Dictionary<string, InnerNodeKinds>();
-        public List<Node> dirs = new List<Node>();
+        public List<Node> rootDirs = new List<Node>();
         public Dictionary<Node, bool> show = new Dictionary<Node, bool>();
         public bool useOptAlgorithm = false;
     }

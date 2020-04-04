@@ -66,10 +66,10 @@ namespace SEEEditor
 
             if (city.NodeLayout == AbstractSEECity.NodeLayouts.CompoundSpringEmbedder)
             {
-                if (city.CoseGraphSettings.dirs.Count > 0)
+                if (city.CoseGraphSettings.rootDirs != null && city.CoseGraphSettings.rootDirs.Count > 0)
                 {
                     GUILayout.Label("Choose Sublayouts", EditorStyles.boldLabel);
-                    List<Node> roots = city.CoseGraphSettings.dirs;
+                    List<Node> roots = city.CoseGraphSettings.rootDirs;
 
                     if (city.CoseGraphSettings.show.Count == 0)
                     {
@@ -115,7 +115,6 @@ namespace SEEEditor
                 }
             }
             EditorGUILayout.EndHorizontal();
-            //EditorGUILayout.EndHorizontal();
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
             // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
 
@@ -182,7 +181,7 @@ namespace SEEEditor
         private void TraverseThruNodes(Node root)
         {
             EditorGUIUtility.labelWidth = 80;
-            if (!root.IsLeaf())
+            if (root.Children() != null && !root.IsLeaf())
             {
                 GUILayout.BeginHorizontal();
 
@@ -313,7 +312,7 @@ namespace SEEEditor
         /// <param name="root">the root node</param>
         private void TraverseThruNodesCounter(Node root)
         {
-            if (!root.IsLeaf())
+            if (root.Children() != null && !root.IsLeaf())
             {
                 city.CoseGraphSettings.show.Add(root, true);
                 if (root.Children() != null || root.Children().Count > 0)
