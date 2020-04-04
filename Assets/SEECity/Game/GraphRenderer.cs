@@ -84,7 +84,7 @@ namespace SEE.Game
         /// <summary>
         /// mapping from node to ilayoutNode
         /// </summary>
-        private Dictionary<Node, ILayoutNode> to_layout_node;
+        private Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
 
         /// <summary>
         /// TODO
@@ -209,7 +209,8 @@ namespace SEE.Game
 
             // calculate and apply the node layout
             Dictionary<Node, GameObject>.ValueCollection gameNodes = nodeMap.Values;
-            ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(gameNodes);
+
+            ICollection<ILayoutNode> layoutNodes = nodeLayout.UsesEdgesAndSublayoutNodes() ? ToLayoutNodes(nodeMap, sublayoutNodes) : ToLayoutNodes(gameNodes);
 
             // differentiate between Layouts using Sublayouts and Edges and Layouts only using nodes 
             if (nodeLayout.UsesEdgesAndSublayoutNodes())
@@ -217,7 +218,7 @@ namespace SEE.Game
                 sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
                 foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
                 {
-                    Sublayout sublayout = new Sublayout(layoutNode, groundLevel, leafNodeFactory);
+                    Sublayout sublayout = new Sublayout(layoutNode, groundLevel, GetInnerNodeFactory(layoutNode.InnerNodeKind));
                     sublayout.Layout();
                 }
                 nodeLayout.Apply(layoutNodes, graph.Edges(), sublayoutLayoutNodes);
@@ -486,6 +487,8 @@ namespace SEE.Game
         /// <returns>the game objects added for the decorations; may be an empty collection</returns>
         private ICollection<GameObject> AddDecorations(ICollection<GameObject> gameNodes, InnerNodeKinds innerNodeKinds, NodeLayouts nodeLayout)
         {
+            var innerNodeFactory = GetInnerNodeFactory(innerNodeKinds);
+
             // Decorations must be applied after the blocks have been placed, so that
             // we also know their positions.
             List<GameObject> decorations = new List<GameObject>();
@@ -506,6 +509,7 @@ namespace SEE.Game
 
             // Add decorators specific to the shape of inner nodes (circle decorators for circles
             // and donut decorators for donuts.
+
             switch (innerNodeKinds)
             {
                 case SEECity.InnerNodeKinds.Empty:
@@ -555,6 +559,24 @@ namespace SEE.Game
             return ToLayoutNodes(gameObjects, leafNodeFactory, innerNodeFactory);
         }
 
+        private ICollection<ILayoutNode> ToLayoutNodes(Dictionary<Node, GameObject> nodeMap, ICollection<SublayoutNode> sublayoutNodes)
+        {
+            List<ILayoutNode> layoutNodes = new List<ILayoutNode>();
+            List<GameObject> remainingGameobjects = nodeMap.Values.ToList();
+
+            foreach (SublayoutNode sublayoutNode in sublayoutNodes)
+            {
+                ICollection<GameObject> gameObjects = new List<GameObject>();
+                sublayoutNode.Nodes.ForEach(node => gameObjects.Add(nodeMap[node]));
+                layoutNodes.AddRange(ToLayoutNodes(gameObjects, leafNodeFactory, GetInnerNodeFactory(sublayoutNode.InnerNodeKind)));
+                remainingGameobjects.RemoveAll(gameObject => gameObjects.Contains(gameObject));
+            }
+
+            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, leafNodeFactory, innerNodeFactory));
+
+            return layoutNodes;
+        }
+
         /// <summary>
         /// Transforms the given <paramref name="gameNodes"/> to a collection of LayoutNodes.
         /// Sets the node levels of all <paramref name="gameNodes"/>.
@@ -569,7 +591,6 @@ namespace SEE.Game
             NodeFactory innerNodeFactory)
         {
             IList<ILayoutNode> result = new List<ILayoutNode>();
-            to_layout_node = new Dictionary<Node, ILayoutNode>();
 
             foreach (GameObject gameObject in gameNodes)
             {
@@ -764,8 +785,13 @@ namespace SEE.Game
         /// </summary>
         /// <param name="node">node for which to determine the style index</param>
         /// <returns>style index</returns>
-        private int SelectStyle(Node node)
+        private int SelectStyle(Node node, InnerNodeFactory innerNodeFactory = null)
         {
+            if (innerNodeFactory == null)
+            {
+                innerNodeFactory = this.innerNodeFactory;
+            }
+
             bool isLeaf = node.IsLeaf();
             int style = isLeaf ? leafNodeFactory.NumberOfStyles() : innerNodeFactory.NumberOfStyles();
             string styleMetric = isLeaf ? settings.LeafStyleMetric : settings.InnerNodeStyleMetric;
@@ -838,8 +864,13 @@ namespace SEE.Game
         /// chosen to determine style.
         /// </summary>
         /// <param name="gameNode">a game node representing a leaf or inner graph node</param>
-        public void AdjustStyle(GameObject gameNode)
+        public void AdjustStyle(GameObject gameNode, InnerNodeFactory innerNodeFactory = null)
         {
+            if (innerNodeFactory == null)
+            {
+                innerNodeFactory = this.innerNodeFactory;
+            }
+
             NodeRef noderef = gameNode.GetComponent<NodeRef>();
             if (noderef == null)
             {
@@ -848,7 +879,7 @@ namespace SEE.Game
             else
             {
                 Node node = noderef.node;
-                int style = SelectStyle(node);
+                int style = SelectStyle(node, innerNodeFactory);
                 if (node.IsLeaf())
                 {
                     leafNodeFactory.SetStyle(gameNode, style);
@@ -932,7 +963,7 @@ namespace SEE.Game
             innerGameObject.name = node.LinkName;
             innerGameObject.tag = Tags.Node;
             AttachNode(innerGameObject, node);
-            AdjustStyle(innerGameObject);
+            AdjustStyle(innerGameObject, innerNodeFactory);
             return innerGameObject;
         }
 

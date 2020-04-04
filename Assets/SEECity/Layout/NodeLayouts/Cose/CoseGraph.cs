@@ -115,6 +115,7 @@ namespace SEE.Layout
                 this.right = parent.GetRight();
                 this.top = parent.GetTop();
                 this.bottom = parent.GetBottom();
+
                 UpdateBoundingRect();
 
                 foreach (CoseNode cNode in nodes)

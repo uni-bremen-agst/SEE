@@ -41,7 +41,7 @@ namespace SEE.Layout
         /// <summary>
         /// TODO
         /// </summary>
-        private readonly NodeFactory leafNodeFactory;
+        private readonly NodeFactory innerNodeFactory;
 
         /// <summary>
         /// Indicates whether the sublayout contains only leaf nodes
@@ -52,13 +52,15 @@ namespace SEE.Layout
 
         public Vector3 LayoutScale { get => layoutScale; set => layoutScale = value; }
 
+        public SublayoutLayoutNode SublayoutLayoutNode => sublayout;
+
         Dictionary<ILayoutNode, CoseSublayoutNode> ILayout_to_CoseSublayoutNode = new Dictionary<ILayoutNode, CoseSublayoutNode>();
 
-        public Sublayout(SublayoutLayoutNode sublayout, float groundLevel, NodeFactory leafNodeFactory)
+        public Sublayout(SublayoutLayoutNode sublayout, float groundLevel, NodeFactory innerNodeFactory)
         {
             this.nodeLayout = sublayout.NodeLayout;
             this.groundLevel = groundLevel;  
-            this.leafNodeFactory = leafNodeFactory;
+            this.innerNodeFactory = innerNodeFactory;
             this.sublayout = sublayout;
             onlyLeaves = OnlyLeaveNodes();
 
@@ -242,10 +244,12 @@ namespace SEE.Layout
 
                 Rect boundingRect = new Rect((float)left, (float)top, (float)(right - left), (float)(bottom - top));
                 Vector3 scale = new Vector3(boundingRect.width, innerNodeHeight, boundingRect.height);
+                Vector3 position = new Vector3(boundingRect.center.x, groundLevel, boundingRect.center.y);
                 // TODO das ist doch falsch so, bzw. jetzt richtig beim anderen noch falsch
                 LayoutScale = new Vector3(sublayout.Node.Scale.x, innerNodeHeight, sublayout.Node.Scale.z);
-                sublayout.Node.Scale = scale;
 
+                sublayout.Node.Scale = scale;
+                sublayout.Node.CenterPosition = position;
 
                 sublayout.Node.IsSublayoutNode = true;
             }
@@ -285,18 +289,18 @@ namespace SEE.Layout
             }
         }
 
-        public NodeLayout GetLayout()
+        private NodeLayout GetLayout()
         {
             switch (nodeLayout)
             {
                 case NodeLayouts.Manhattan:
-                    return new ManhattanLayout(groundLevel, leafNodeFactory.Unit);
+                    return new ManhattanLayout(groundLevel, innerNodeFactory.Unit);
                 case NodeLayouts.FlatRectanglePacking:
-                    return new RectanglePacker(groundLevel, leafNodeFactory.Unit);
+                    return new RectanglePacker(groundLevel, innerNodeFactory.Unit);
                 case NodeLayouts.EvoStreets:
-                    return new EvoStreetsNodeLayout(groundLevel, leafNodeFactory.Unit);
+                    return new EvoStreetsNodeLayout(groundLevel, innerNodeFactory.Unit);
                 case NodeLayouts.Treemap:
-                    return new TreemapLayout(groundLevel, 10.0f * leafNodeFactory.Unit, 10.0f * leafNodeFactory.Unit);
+                    return new TreemapLayout(groundLevel, 10.0f * innerNodeFactory.Unit, 10.0f * innerNodeFactory.Unit);
                 case NodeLayouts.Balloon:
                     return new BalloonNodeLayout(groundLevel);
                 case NodeLayouts.CirclePacking:
