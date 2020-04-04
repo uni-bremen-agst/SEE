@@ -31,12 +31,12 @@ namespace SEE.Layout
         /// <summary>
         /// 
         /// </summary>
-        private CoseSublayout sublayout;
+        private Sublayout sublayout;
 
         public bool IsSubLayoutRoot { get => isSubLayoutRoot; set => isSubLayoutRoot = value; }
         public bool IsSubLayoutNode { get => isSubLayoutNode; set => isSubLayoutNode = value; }
         public CoseNode SubLayoutRoot { get => subLayoutRoot; set => subLayoutRoot = value; }
-        public CoseSublayout Sublayout { get => sublayout; set => sublayout = value; }
+        public Sublayout Sublayout { get => sublayout; set => sublayout = value; }
 
 
 

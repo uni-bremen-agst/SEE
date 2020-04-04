@@ -378,7 +378,6 @@ namespace SEE.Game
                 Dictionary<string, bool> dirs = CoseGraphSettings.ListDirToggle;
                 // die neuen dirs 
                 Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
-                List<Node> dirsNodes = graph.GetRoots();
 
                 Dictionary<string, NodeLayouts> dirsLayout = new Dictionary<string, NodeLayouts>();
                 Dictionary<string, InnerNodeKinds> dirsShape = new Dictionary<string, InnerNodeKinds>();
@@ -394,17 +393,36 @@ namespace SEE.Game
                 }
 
                 // falls der key nicht in den alten dictonary ist
-                dirsLocal = dirsLocal.Where(i => !dirs.ContainsKey(i.Key)).ToDictionary(i => i.Key, i => i.Value);
+                //dirsLocal = dirsLocal.Where(i => !dirs.ContainsKey(i.Key)).ToDictionary(i => i.Key, i => i.Value);
 
                 CoseGraphSettings.show = new Dictionary<Node, bool>();
-                if (dirsLocal.Count != 0)
+
+                var diff1 = dirs.Keys.Except(dirsLocal.Keys).Any();
+                var diff2 = dirsLocal.Keys.Except(dirs.Keys).Any();
+
+                if (dirs.Count == dirsLocal.Count && !diff1 && !diff2)
+                {
+                    
+                } else
                 {
                     CoseGraphSettings.DirShape = dirsShape;
                     CoseGraphSettings.DirNodeLayout = dirsLayout;
                     CoseGraphSettings.ListDirToggle = dirsLocal;
                     // get roots
-                    CoseGraphSettings.dirs = dirsNodes;
+                    CoseGraphSettings.rootDirs = graph.GetRoots();
                 }
+
+                CoseGraphSettings.rootDirs = graph.GetRoots();
+
+
+
+                if (dirs.Count !=  0 && dirsLocal.Count == dirs.Count)
+                {
+                    // der alte graph
+                } else { 
+                    // ein neuer graph
+                    
+                } 
 
 
                 return graph;

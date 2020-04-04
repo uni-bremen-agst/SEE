@@ -73,6 +73,8 @@ namespace SEE.Layout
                     // TODO setsublayoutRoot
                 }
             }
+
+            sublayout.Node.Sublayout = this;
         }
 
         /// <summary>
@@ -106,7 +108,7 @@ namespace SEE.Layout
                 // bei einem subsubLayout wird der root wieder hinzugefügt
                 foreach (ILayoutNode node in sublayout.RemovedChildren)
                 {
-                    if (node.IsSublayoutNode)
+                    if (node.IsSublayoutRoot)
                     {
                         sublayoutNodes.Add(new CoseSublayoutNode(node, new List<ILayoutNode>(), true, node.Parent, node.Sublayout.layoutScale, ILayout_to_CoseSublayoutNode));
                     }
@@ -161,7 +163,6 @@ namespace SEE.Layout
                 sublayoutNode.CenterPosition = position;
                 sublayoutNode.Scale = scale;
                 sublayoutNode.Rotation = transform.rotation;
-
 
                 if (sublayoutNode.IsSublayoutRoot)
                 {
@@ -242,7 +243,10 @@ namespace SEE.Layout
                 Rect boundingRect = new Rect((float)left, (float)top, (float)(right - left), (float)(bottom - top));
                 Vector3 scale = new Vector3(boundingRect.width, innerNodeHeight, boundingRect.height);
                 // TODO das ist doch falsch so, bzw. jetzt richtig beim anderen noch falsch
-                LayoutScale = scale;
+                LayoutScale = new Vector3(sublayout.Node.Scale.x, innerNodeHeight, sublayout.Node.Scale.z);
+                sublayout.Node.Scale = scale;
+
+
                 sublayout.Node.IsSublayoutNode = true;
             }
 

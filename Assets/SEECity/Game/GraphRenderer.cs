@@ -5,6 +5,7 @@ using SEE.DataModel;
 using SEE.GO;
 using SEE.Layout;
 using UnityEngine;
+using static SEE.Game.AbstractSEECity;
 
 namespace SEE.Game
 {
@@ -193,6 +194,7 @@ namespace SEE.Game
             NodeLayout nodeLayout = GetLayout();
             // the sublayout nodes
             ICollection<SublayoutNode> sublayoutNodes = new List<SublayoutNode>();
+            List<SublayoutLayoutNode> sublayoutLayoutNodes = new List<SublayoutLayoutNode>();
             // for a hierarchical layout, we need to add the game objects for inner nodes
             if (nodeLayout.IsHierarchical() )
             {
@@ -212,7 +214,7 @@ namespace SEE.Game
             // differentiate between Layouts using Sublayouts and Edges and Layouts only using nodes 
             if (nodeLayout.UsesEdgesAndSublayoutNodes())
             {
-                List<SublayoutLayoutNode> sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
+                sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
                 foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
                 {
                     Sublayout sublayout = new Sublayout(layoutNode, groundLevel, leafNodeFactory);
@@ -224,13 +226,37 @@ namespace SEE.Game
                 nodeLayout.Apply(layoutNodes);
             }
 
-            
             NodeLayout.Move(layoutNodes, settings.origin);
 
             AddToParent(gameNodes, parent);
+
             // add the decorations, too
-            // TODO Sublayouts
-            AddToParent(AddDecorations(gameNodes), parent);
+            if (!nodeLayout.UsesEdgesAndSublayoutNodes() && sublayoutLayoutNodes.Count > 0)
+            {
+                AddToParent(AddDecorations(gameNodes), parent);
+            } else
+            {
+                List<ILayoutNode> remainingLayoutNodes = layoutNodes.ToList();
+                foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
+                {
+                    ICollection<GameObject> gameObjects = new List<GameObject>();
+                    foreach(GameNode gameNode in layoutNode.Nodes)
+                    {
+                        gameObjects.Add(gameNode.GetGameObject());
+                    }
+                    AddToParent(AddDecorations(gameObjects, layoutNode.InnerNodeKind, layoutNode.NodeLayout), parent);
+                    remainingLayoutNodes.RemoveAll(node => layoutNode.Nodes.Contains(node));
+                }
+
+                ICollection<GameObject> remainingGameObjects = new List<GameObject>();
+                foreach (GameNode gameNode in remainingLayoutNodes)
+                {
+                    remainingGameObjects.Add(gameNode.GetGameObject());
+                }
+
+                AddToParent(AddDecorations(remainingGameObjects), parent);
+            }
+            
             // create the laid out edges
             AddToParent(EdgeLayout(graph, layoutNodes), parent);
             // add the plane surrounding all game objects for nodes
@@ -447,12 +473,18 @@ namespace SEE.Game
             }
         }
 
+
+        private ICollection<GameObject> AddDecorations(ICollection<GameObject> gameNodes)
+        {
+            return AddDecorations(gameNodes, settings.InnerNodeObjects, settings.NodeLayout);
+        }
+
         /// <summary>
         /// Draws the decorations of the given game nodes.
         /// </summary>
         /// <param name="gameNodes">game nodes to be decorated</param>
         /// <returns>the game objects added for the decorations; may be an empty collection</returns>
-        private ICollection<GameObject> AddDecorations(ICollection<GameObject> gameNodes)
+        private ICollection<GameObject> AddDecorations(ICollection<GameObject> gameNodes, InnerNodeKinds innerNodeKinds, NodeLayouts nodeLayout)
         {
             // Decorations must be applied after the blocks have been placed, so that
             // we also know their positions.
@@ -466,15 +498,15 @@ namespace SEE.Game
             }
 
             // Add text labels for all inner nodes
-            if (settings.NodeLayout == SEECity.NodeLayouts.Balloon 
-                || settings.NodeLayout == SEECity.NodeLayouts.EvoStreets)
+            if (nodeLayout == SEECity.NodeLayouts.Balloon 
+                || nodeLayout == SEECity.NodeLayouts.EvoStreets)
             {
                 decorations.AddRange(AddLabels(InnerNodes(gameNodes)));
             }
 
             // Add decorators specific to the shape of inner nodes (circle decorators for circles
             // and donut decorators for donuts.
-            switch (settings.InnerNodeObjects)
+            switch (innerNodeKinds)
             {
                 case SEECity.InnerNodeKinds.Empty:
                     // do nothing

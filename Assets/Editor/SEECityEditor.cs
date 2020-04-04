@@ -15,7 +15,6 @@ namespace SEEEditor
         {
             base.OnInspectorGUI();
 
-            SEECity city = target as SEECity;
             Attributes();
             Buttons();
         }
