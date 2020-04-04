@@ -265,12 +265,12 @@ namespace SEEEditor
             GUILayout.FlexibleSpace();
             if (toggle)
             {
-                ShowShapeEnum(city.CoseGraphSettings.DirShape[root.LinkName], root);
+                ShowInnerNodesEnum(city.CoseGraphSettings.DirNodeLayout[root.LinkName], root);
             }
             else
             {
                 EditorGUI.BeginDisabledGroup(true);
-                ShowShapeEnum(city.CoseGraphSettings.DirShape[root.LinkName], root);
+                ShowInnerNodesEnum(city.CoseGraphSettings.DirNodeLayout[root.LinkName], root);
                 EditorGUI.EndDisabledGroup();
             }
         }
@@ -286,6 +286,31 @@ namespace SEEEditor
             EditorGUIUtility.labelWidth = 80;
             EditorGUILayout.PrefixLabel("Inner nodes");
             city.CoseGraphSettings.DirShape[root.LinkName] = (AbstractSEECity.InnerNodeKinds)EditorGUILayout.EnumPopup("", innerNodeKinds, guiOptions);
+            EditorGUIUtility.labelWidth = 150;
+        }
+
+        /// <summary>
+        /// Dropdown for the sublayout kinds
+        /// </summary>
+        /// <param name="nodeLayout"></param>
+        /// <param name="root"></param>
+        /// <param name="childrenAreLeaves"></param>
+        private void ShowInnerNodesEnum(AbstractSEECity.NodeLayouts nodeLayout, Node node)
+        {
+            GUILayoutOption[] guiOptions = { GUILayout.ExpandWidth(false), GUILayout.Width(200) };
+            EditorGUIUtility.labelWidth = 80; 
+            EditorGUILayout.PrefixLabel("Inner nodes");
+            Dictionary<AbstractSEECity.InnerNodeKinds, string> shapeKinds = nodeLayout.GetInnerNodeKinds().ToDictionary(kind => kind, kind => kind.ToString());
+            Debug.Log(shapeKinds);
+
+            if (shapeKinds.ContainsKey(city.CoseGraphSettings.DirShape[node.LinkName]))
+            {
+                city.CoseGraphSettings.DirShape[node.LinkName] = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(city.CoseGraphSettings.DirShape[node.LinkName]), shapeKinds.Values.ToArray(), guiOptions)).Key;
+            } else
+            {
+                city.CoseGraphSettings.DirShape[node.LinkName] = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(shapeKinds.First().Key), shapeKinds.Values.ToArray(), guiOptions)).Key;
+            }
+            
             EditorGUIUtility.labelWidth = 150;
         }
 

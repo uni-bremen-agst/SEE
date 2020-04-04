@@ -403,7 +403,7 @@ namespace SEE.Game
 
                 if (dirs.Count == dirsLocal.Count && !diff1 && !diff2)
                 {
-                    
+
                 } else
                 {
                     CoseGraphSettings.DirShape = dirsShape;
@@ -417,13 +417,13 @@ namespace SEE.Game
 
 
 
-                if (dirs.Count !=  0 && dirsLocal.Count == dirs.Count)
+                if (dirs.Count != 0 && dirsLocal.Count == dirs.Count)
                 {
                     // der alte graph
-                } else { 
+                } else {
                     // ein neuer graph
-                    
-                } 
+
+                }
 
 
                 return graph;
@@ -443,7 +443,7 @@ namespace SEE.Game
         /// <summary>
         /// Dictionary with all Nodelayouts for leaf and inner nodes
         /// </summary>
-        public Dictionary<NodeLayouts, string> SubLayoutsInnerNodes = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().Where(i => i != NodeLayouts.Manhattan && i != NodeLayouts.FlatRectanglePacking).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
+        public Dictionary<NodeLayouts, string> SubLayoutsInnerNodes = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().Where(nodeLayout => !nodeLayout.OnlyLeaves()).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
 
         /// <summary>
         ///  Dictionary with all Nodelayouts only for leaf nodes
@@ -452,84 +452,6 @@ namespace SEE.Game
 
     }
 
-    public static class NodeLayoutExtension
-    {
-        public static List<InnerNodeKinds> GetInnerNodeKinds(this NodeLayouts nodeLayout)
-        {
-            List<InnerNodeKinds> values = Enum.GetValues(typeof(InnerNodeKinds)).Cast<InnerNodeKinds>().ToList();
-
-            return nodeLayout switch
-            {
-                NodeLayouts.CompoundSpringEmbedder => values.Where(kind => kind.IsRectangular()).ToList(),
-                NodeLayouts.EvoStreets => values.Where(kind => kind.IsRectangular()).ToList(),
-                NodeLayouts.Balloon => values.Where(kind => kind.IsCircular()).ToList(),
-                NodeLayouts.FlatRectanglePacking => values.Where(kind => kind.IsRectangular()).ToList(),
-                NodeLayouts.Treemap => values.Where(kind => kind.IsRectangular()).ToList(),
-                NodeLayouts.CirclePacking => values.Where(kind => kind.IsCircular()).ToList(),
-                NodeLayouts.Manhattan => values.Where(kind => kind.IsRectangular()).ToList(),
-                _ => values.Where(kind => kind.IsRectangular()).ToList(),
-            };
-        }
-
-        public static bool OnlyLeaves(this NodeLayouts nodeLayout)
-        {
-            return nodeLayout switch
-            {
-                NodeLayouts.CompoundSpringEmbedder => false,
-                NodeLayouts.EvoStreets => false,
-                NodeLayouts.Balloon => false,
-                NodeLayouts.FlatRectanglePacking => true,
-                NodeLayouts.Treemap => false,
-                NodeLayouts.CirclePacking => false,
-                NodeLayouts.Manhattan => true,
-                _ => false,
-            };
-        }
-
-        public static bool InnerNodesEncloseLeafNodes(this NodeLayouts nodeLayout)
-        {
-            return nodeLayout switch
-            {
-                NodeLayouts.CompoundSpringEmbedder => true,
-                NodeLayouts.EvoStreets => false,
-                NodeLayouts.Balloon => true,
-                NodeLayouts.FlatRectanglePacking => false,
-                NodeLayouts.Treemap => true,
-                NodeLayouts.CirclePacking => true,
-                NodeLayouts.Manhattan => false,
-                _ => false,
-            };
-        }
-    }
-
-    public static class InnerNodeKindsExtension
-    {
-        public static bool IsCircular(this InnerNodeKinds innerNodeKind)
-        {
-            return innerNodeKind switch
-            {
-                InnerNodeKinds.Blocks => false,
-                InnerNodeKinds.Rectangles => false,
-                InnerNodeKinds.Donuts => true,
-                InnerNodeKinds.Circles => true,
-                InnerNodeKinds.Empty => true,
-                InnerNodeKinds.Cylinders => true,
-                _ => false,
-            };
-        }
-
-        public static bool IsRectangular(this InnerNodeKinds innerNodeKind)
-        {
-            return innerNodeKind switch
-            {
-                InnerNodeKinds.Blocks => true,
-                InnerNodeKinds.Rectangles => true,
-                InnerNodeKinds.Donuts => false,
-                InnerNodeKinds.Circles => false,
-                InnerNodeKinds.Empty => true,
-                InnerNodeKinds.Cylinders => false,
-                _ => false,
-            };
-        }
-    }
 }
+
+

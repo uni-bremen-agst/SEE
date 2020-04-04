@@ -1,4 +1,5 @@
-﻿using SEE.GO;
+﻿using SEE.Game;
+using SEE.GO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -43,11 +44,6 @@ namespace SEE.Layout
         /// </summary>
         private readonly NodeFactory innerNodeFactory;
 
-        /// <summary>
-        /// Indicates whether the sublayout contains only leaf nodes
-        /// </summary>
-        private readonly bool onlyLeaves;
-
         private SublayoutLayoutNode sublayout;
 
         public Vector3 LayoutScale { get => layoutScale; set => layoutScale = value; }
@@ -62,11 +58,10 @@ namespace SEE.Layout
             this.groundLevel = groundLevel;  
             this.innerNodeFactory = innerNodeFactory;
             this.sublayout = sublayout;
-            onlyLeaves = OnlyLeaveNodes();
 
             if (sublayout.Node.Children().Count > 0)
             {
-                sublayoutNodes = CalculateNodesForSublayout(onlyLeaves);
+                sublayoutNodes = CalculateNodesForSublayout();
 
                 foreach(ILayoutNode layoutNode in sublayoutNodes)
                 {
@@ -79,27 +74,18 @@ namespace SEE.Layout
             sublayout.Node.Sublayout = this;
         }
 
-        /// <summary>
-        /// Calculates if the sublayout only contains leaf nodes
-        /// </summary>
-        /// <returns>only leave nodes</returns>
-        private bool OnlyLeaveNodes()
-        {
-            return nodeLayout == NodeLayouts.Manhattan || nodeLayout == NodeLayouts.FlatRectanglePacking;
-        }
 
         /// <summary>
         /// Calculates all nodes needed for a sublayout with this graphs parent node as the sublayouts root node
         /// </summary>
-        /// <param name="onlyLeaves"></param>
         /// <returns></returns>
-        public ICollection<ILayoutNode> CalculateNodesForSublayout(bool onlyLeaves)
+        public ICollection<ILayoutNode> CalculateNodesForSublayout()
         {
             List<ILayoutNode> nodesForLayout = new List<ILayoutNode>(sublayout.Nodes);
             nodesForLayout.Remove(sublayout.Node);
             ICollection<ILayoutNode> sublayoutNodes = ConvertToCoseSublayoutNodes(nodesForLayout);
 
-            if (onlyLeaves)
+            if (sublayout.NodeLayout.OnlyLeaves())
             {
                 return sublayoutNodes;
             }
@@ -195,7 +181,7 @@ namespace SEE.Layout
                 }
             }
 
-            if (onlyLeaves || nodeLayout == NodeLayouts.EvoStreets)
+            if (!sublayout.NodeLayout.InnerNodesEncloseLeafNodes())
             {
                 double left = Mathf.Infinity;
                 double right = Mathf.NegativeInfinity;
