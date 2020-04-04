@@ -131,7 +131,6 @@ namespace SEE.Layout
 
                     if (sublayoutNode != null && sublayoutNode.NodeLayout == NodeLayouts.EvoStreets)
                     {
-                        // TODO
                         width = graph.Parent.SublayoutValues.Sublayout.LayoutScale.x;
                         height = graph.Parent.SublayoutValues.Sublayout.LayoutScale.z;
                     }
@@ -214,7 +213,7 @@ namespace SEE.Layout
                 if (node.IsLeaf())
                 {
                     ILayoutNode nNode = node.NodeObject;
-                    NodeTransform transform = new NodeTransform(new Vector3((float)node.GetCenterX(), groundLevel, (float)node.GetCenterY()), node.NodeObject.Scale);
+                    NodeTransform transform = new NodeTransform(new Vector3((float)node.GetCenterX(), groundLevel, (float)node.GetCenterY()), node.NodeObject.Scale, node.NodeObject.Rotation);
                     layout_result[nNode] = transform;
                 }
 
@@ -236,9 +235,11 @@ namespace SEE.Layout
 
             if (SublayoutNodes.Count > 0 && CoseHelperFunctions.CheckIfNodeIsSublayouRoot(SublayoutNodes, graphManager.RootGraph.Parent.NodeObject.LinkName) != null)
             {
-                // nothing to do
+                graphManager.UpdateBounds();
             } else
             {
+                
+
                 if (CoseLayoutSettings.Multilevel_Scaling)
                 {
                     // TODO sollte das auch in der Gui dann abgehakt werden?
@@ -333,43 +334,49 @@ namespace SEE.Layout
             // centerposition und postion schaune, ob das überein stimt 
             // coseNode.SetPositionScale
 
-
+            SetSublayoutValuesToNode(node: graphManager.RootGraph.Parent);
             foreach (CoseNode node in graphManager.GetAllNodes())
             {
-                Debug.Log(node);
-                node.SublayoutValues.IsSubLayoutNode = node.NodeObject.IsSublayoutNode;
-                node.SublayoutValues.IsSubLayoutRoot = node.NodeObject.IsSublayoutRoot;
-                node.SublayoutValues.Sublayout = node.NodeObject.Sublayout;
-                if (node.NodeObject.SublayoutRoot != null)
+                SetSublayoutValuesToNode(node: node);
+            }
+            
+        }
+
+
+        private void SetSublayoutValuesToNode(CoseNode node)
+        {
+            node.SublayoutValues.IsSubLayoutNode = node.NodeObject.IsSublayoutNode;
+            node.SublayoutValues.IsSubLayoutRoot = node.NodeObject.IsSublayoutRoot;
+            node.SublayoutValues.Sublayout = node.NodeObject.Sublayout;
+            if (node.NodeObject.SublayoutRoot != null)
+            {
+                node.SublayoutValues.SubLayoutRoot = nodeToCoseNode[node.NodeObject.SublayoutRoot];
+            }
+
+            if (node.SublayoutValues.IsSubLayoutNode)
+            {
+                Rect rect = new Rect
                 {
-                    node.SublayoutValues.SubLayoutRoot = nodeToCoseNode[node.NodeObject.SublayoutRoot];
-                }
+                    x = node.NodeObject.CenterPosition.x - node.NodeObject.Scale.x / 2,
+                    y = node.NodeObject.CenterPosition.z - node.NodeObject.Scale.z / 2,
+                    width = node.NodeObject.Scale.x,
+                    height = node.NodeObject.Scale.z
+                };
 
-                if (node.SublayoutValues.IsSubLayoutNode)
+                node.SublayoutValues.relativeRect = rect;
+                node.rect = new Rect(node.SublayoutValues.relativeRect);
+
+                if (!node.SublayoutValues.IsSubLayoutRoot)
                 {
-                    Rect rect = new Rect
+                    node.SetPositionRelativ(node.SublayoutValues.SubLayoutRoot);
+
+                    if (node.Child != null)
                     {
-                        x = node.NodeObject.CenterPosition.x - node.NodeObject.Scale.x / 2,
-                        y = node.NodeObject.CenterPosition.z - node.NodeObject.Scale.z / 2,
-                        width = node.NodeObject.Scale.x,
-                        height = node.NodeObject.Scale.z
-                    };
-
-                    node.SublayoutValues.relativeRect = rect;
-                    node.rect = new Rect(node.SublayoutValues.relativeRect);
-
-                    if (!node.SublayoutValues.IsSubLayoutRoot)
-                    {
-                        node.SetPositionRelativ(node.SublayoutValues.SubLayoutRoot);
-
-                        if (node.Child != null)
-                        {
-                            node.Child.Left = rect.xMin;
-                            node.Child.Top = rect.yMin;
-                            node.Child.Right = rect.xMax;
-                            node.Child.Bottom = rect.yMax;
-                            node.Child.UpdateBoundingRect();
-                        }
+                        node.Child.Left = rect.xMin;
+                        node.Child.Top = rect.yMin;
+                        node.Child.Right = rect.xMax;
+                        node.Child.Bottom = rect.yMax;
+                        node.Child.UpdateBoundingRect();
                     }
                 }
             }
