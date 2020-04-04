@@ -10,6 +10,7 @@ using OdinSerializer;
 using SEE.DataModel;
 using SEE.DataModel.IO;
 using SEE.GO;
+using static SEE.Game.AbstractSEECity;
 
 namespace SEE.Game
 {
@@ -449,5 +450,86 @@ namespace SEE.Game
         /// </summary>
         public Dictionary<NodeLayouts, string> SubLayoutsLeafNodes = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
 
+    }
+
+    public static class NodeLayoutExtension
+    {
+        public static List<InnerNodeKinds> GetInnerNodeKinds(this NodeLayouts nodeLayout)
+        {
+            List<InnerNodeKinds> values = Enum.GetValues(typeof(InnerNodeKinds)).Cast<InnerNodeKinds>().ToList();
+
+            return nodeLayout switch
+            {
+                NodeLayouts.CompoundSpringEmbedder => values.Where(kind => kind.IsRectangular()).ToList(),
+                NodeLayouts.EvoStreets => values.Where(kind => kind.IsRectangular()).ToList(),
+                NodeLayouts.Balloon => values.Where(kind => kind.IsCircular()).ToList(),
+                NodeLayouts.FlatRectanglePacking => values.Where(kind => kind.IsRectangular()).ToList(),
+                NodeLayouts.Treemap => values.Where(kind => kind.IsRectangular()).ToList(),
+                NodeLayouts.CirclePacking => values.Where(kind => kind.IsCircular()).ToList(),
+                NodeLayouts.Manhattan => values.Where(kind => kind.IsRectangular()).ToList(),
+                _ => values.Where(kind => kind.IsRectangular()).ToList(),
+            };
+        }
+
+        public static bool OnlyLeaves(this NodeLayouts nodeLayout)
+        {
+            return nodeLayout switch
+            {
+                NodeLayouts.CompoundSpringEmbedder => false,
+                NodeLayouts.EvoStreets => false,
+                NodeLayouts.Balloon => false,
+                NodeLayouts.FlatRectanglePacking => true,
+                NodeLayouts.Treemap => false,
+                NodeLayouts.CirclePacking => false,
+                NodeLayouts.Manhattan => true,
+                _ => false,
+            };
+        }
+
+        public static bool InnerNodesEncloseLeafNodes(this NodeLayouts nodeLayout)
+        {
+            return nodeLayout switch
+            {
+                NodeLayouts.CompoundSpringEmbedder => true,
+                NodeLayouts.EvoStreets => false,
+                NodeLayouts.Balloon => true,
+                NodeLayouts.FlatRectanglePacking => false,
+                NodeLayouts.Treemap => true,
+                NodeLayouts.CirclePacking => true,
+                NodeLayouts.Manhattan => false,
+                _ => false,
+            };
+        }
+    }
+
+    public static class InnerNodeKindsExtension
+    {
+        public static bool IsCircular(this InnerNodeKinds innerNodeKind)
+        {
+            return innerNodeKind switch
+            {
+                InnerNodeKinds.Blocks => false,
+                InnerNodeKinds.Rectangles => false,
+                InnerNodeKinds.Donuts => true,
+                InnerNodeKinds.Circles => true,
+                InnerNodeKinds.Empty => true,
+                InnerNodeKinds.Cylinders => true,
+                _ => false,
+            };
+        }
+
+        public static bool IsRectangular(this InnerNodeKinds innerNodeKind)
+        {
+            return innerNodeKind switch
+            {
+                InnerNodeKinds.Blocks => true,
+                InnerNodeKinds.Rectangles => true,
+                InnerNodeKinds.Donuts => false,
+                InnerNodeKinds.Circles => false,
+                InnerNodeKinds.Empty => true,
+                InnerNodeKinds.Cylinders => false,
+                _ => false,
+            };
+        }
     }
 }
