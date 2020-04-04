@@ -115,7 +115,7 @@ namespace SEEEditor
                 }
             }
             EditorGUILayout.EndHorizontal();
-            EditorGUILayout.EndHorizontal();
+            //EditorGUILayout.EndHorizontal();
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
             // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
 
