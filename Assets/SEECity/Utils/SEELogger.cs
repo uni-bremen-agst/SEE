@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SEE
 {
     public class SEELogger : ILogger
     {
-        public void LogInfo(string message)
+        public void LogDebug(string message)
         {
             Debug.Log(message);
         }
@@ -14,7 +15,12 @@ namespace SEE
             Debug.LogError(message);
         }
 
-        public void LogDebug(string message)
+        public void LogException(Exception exception)
+        {
+            Debug.LogException(exception);
+        }
+
+        public void LogInfo(string message)
         {
             Debug.Log(message);
         }
