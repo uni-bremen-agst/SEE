@@ -7,11 +7,11 @@ ScriptedImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-  script: {fileID: 11500000, guid: a57477913897c46af95d590f580878bd, type: 3}
+  script: {instanceID: 0}
   svgType: 0
   texturedSpriteMeshType: 0
   svgPixelsPerUnit: 100
-  gradientResolution: 128
+  gradientResolution: 64
   alignment: 0
   customPivot: {x: 0, y: 0}
   generatePhysicsShape: 0
@@ -49,6 +49,6 @@ ScriptedImporter:
         y: 0
         width: 0
         height: 0
-      spriteID: 6f7128d488b93db4bb289d05e40c7d7c
+      spriteID: d2b59525ce8c9274782d6f8163b16245
       internalID: 0
     PhysicsOutlines: []
