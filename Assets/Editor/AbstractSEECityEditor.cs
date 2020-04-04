@@ -276,25 +276,10 @@ namespace SEEEditor
         }
 
         /// <summary>
-        /// Dropdown for shape of the inner nodes
-        /// </summary>
-        /// <param name="innerNodeKinds">the inner node kinds</param>
-        /// <param name="root">the node</param>
-        private void ShowShapeEnum(AbstractSEECity.InnerNodeKinds innerNodeKinds, Node root)
-        {
-            GUILayoutOption[] guiOptions = { GUILayout.ExpandWidth(false), GUILayout.Width(200) };
-            EditorGUIUtility.labelWidth = 80;
-            EditorGUILayout.PrefixLabel("Inner nodes");
-            city.CoseGraphSettings.DirShape[root.LinkName] = (AbstractSEECity.InnerNodeKinds)EditorGUILayout.EnumPopup("", innerNodeKinds, guiOptions);
-            EditorGUIUtility.labelWidth = 150;
-        }
-
-        /// <summary>
-        /// Dropdown for the sublayout kinds
+        /// TODO
         /// </summary>
         /// <param name="nodeLayout"></param>
-        /// <param name="root"></param>
-        /// <param name="childrenAreLeaves"></param>
+        /// <param name="node"></param>
         private void ShowInnerNodesEnum(AbstractSEECity.NodeLayouts nodeLayout, Node node)
         {
             GUILayoutOption[] guiOptions = { GUILayout.ExpandWidth(false), GUILayout.Width(200) };
