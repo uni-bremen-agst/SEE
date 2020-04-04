@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace SEE.DataModel
 {
     /// <summary>
     /// Node of a graph.
     /// </summary>
-    [System.Serializable]
     public class Node : GraphElement
     {
         // IMPORTANT NOTES:
@@ -27,8 +25,7 @@ namespace SEE.DataModel
         /// The unique identifier of a node. May be the empty string if the node has
         /// no such identifier set.
         /// </summary>
-        [SerializeField]
-        public string LinkName
+        public override string LinkName
         {
             get
             {
@@ -65,7 +62,6 @@ namespace SEE.DataModel
         /// <summary>
         /// The parent of this node. Is null if it has none.
         /// </summary>
-        [SerializeField]
         private Node parent;
 
         /// <summary>
@@ -122,10 +118,8 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// The ancestor of the node in the hierarchy. May be null if the node
-        /// is a root.
+        /// The ancestor of the node in the hierarchy. May be null if the node is a root.
         /// </summary>
-        [SerializeField]
         public Node Parent
         {
             get => parent;
@@ -158,6 +152,101 @@ namespace SEE.DataModel
             return result;
         }
 
+        /// <summary>
+        /// Returns true if <paramref name="other"/> if other meets all of the following 
+        /// conditions:
+        ///  (1) is not null
+        ///  (2) has exactly the same C# type
+        ///  (3) has the same type name
+        ///  (4) has exactly the same attributes with exactly the same values
+        ///  (5) has a parent with the same linkname as the parent of this node
+        ///  (6) has the same level
+        ///  (7) has the same number of children
+        ///  (8) the set of linknames of the children are the same
+        ///  (9) has the same number of outgoing edges and the set of the edges' linknames are the same
+        /// (10) has the same number of incoming edges and the set of the edges' linknames are the same
+        ///  
+        /// Note: This node and the other node may or may not be in the same graph.
+        /// </summary>
+        /// <param name="other">to be compared to</param>
+        /// <returns>true if equal</returns>
+        public override bool Equals(System.Object other)
+        {
+            if (!base.Equals(other))
+            {
+                return false;
+            }
+            else
+            {
+                Node otherNode = other as Node;
+                if (this.level != otherNode.level)
+                {
+                    Report(LinkName + ": The levels are different");
+                    return false;
+                }
+                else if ((this.Parent == null && otherNode.Parent != null) 
+                          || ((this.Parent != null && otherNode.Parent == null)))
+                {
+                    Report(LinkName + ": The parents are different (only one of them is null)");
+                    return false;
+                }
+                else if (this.Parent != null && otherNode.Parent != null
+                          && this.Parent.LinkName != otherNode.Parent.LinkName)
+                {
+                    Report(LinkName + ": The parents' linknames are different");
+                    return false;
+                } 
+                else if (this.NumberOfChildren() != otherNode.NumberOfChildren() 
+                         || !GetLinkNames(this.children).SetEquals(GetLinkNames(otherNode.children)))
+                {
+                    Report(LinkName + ": The children are different.");
+                    return false;
+                }
+                else if (this.outgoings.Count != otherNode.outgoings.Count
+                         || !GetLinkNames(this.outgoings).SetEquals(GetLinkNames(otherNode.outgoings)))
+                {
+                    Report(LinkName + ": The outgoing edges are different.");
+                    return false;
+                }
+                else if (this.incomings.Count != otherNode.incomings.Count
+                         || !GetLinkNames(this.incomings).SetEquals(GetLinkNames(otherNode.incomings)))
+                {
+                    Report(LinkName + ": The incoming edges are different.");
+                    return false;
+                }
+                else 
+                {
+                    return true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the set of linknames of all given <paramref name="graphElements"/>.
+        /// </summary>
+        /// <typeparam name="T">a GraphElement type</typeparam>
+        /// <param name="graphElements">the graph elements whose linknames are to be collected</param>
+        /// <returns>linknames of all given <paramref name="graphElements"/></returns>
+        private HashSet<string> GetLinkNames<T>(IList<T> graphElements) where T : GraphElement
+        {
+            HashSet<string> result = new HashSet<string>();
+            foreach (GraphElement graphElement in graphElements)
+            {
+                result.Add(graphElement.LinkName);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns a hash code.
+        /// </summary>
+        /// <returns>hash code</returns>
+        public override int GetHashCode()
+        {
+            // we are using the linkname which is intended to be unique
+            return LinkName.GetHashCode();
+        }
+
         public override string ToString()
         {
             string result = "{\n";
@@ -170,13 +259,11 @@ namespace SEE.DataModel
         /// <summary>
         /// The incoming edges of this node.
         /// </summary>
-        [SerializeField]
         private List<Edge> incomings = new List<Edge>();
 
         /// <summary>
         /// The incoming edges of this node.
         /// </summary>
-        [SerializeField]
         public List<Edge> Incomings
         {
             get => incomings;
@@ -238,13 +325,11 @@ namespace SEE.DataModel
         /// <summary>
         /// The outgoing edges of this node.
         /// </summary>
-        [SerializeField]
         private List<Edge> outgoings = new List<Edge>();
 
         /// <summary>
         /// The outgoing edges of this node.
         /// </summary>
-        [SerializeField]
         public List<Edge> Outgoings
         {
             get => outgoings;
@@ -318,8 +403,7 @@ namespace SEE.DataModel
         /// <summary>
         /// The list of immediate children of this node in the hierarchy.
         /// </summary>
-        [SerializeField]
-        public List<Node> children = new List<Node>();
+        private List<Node> children = new List<Node>();
 
         /// <summary>
         /// The number of immediate children of this node in the hierarchy.
@@ -365,7 +449,8 @@ namespace SEE.DataModel
         /// <param name="comparison"></param>
         public void SortChildren(Comparison<Node> comparison)
         {
-            children.Sort(comparison);
+            List<Node> sortedChildren = children as List<Node>;
+            sortedChildren.Sort(comparison);
         }
 
         /// <summary>
@@ -453,6 +538,8 @@ namespace SEE.DataModel
             target.parent = null;
             target.level = 0;
             target.children = new List<Node>();
+            target.outgoings = new List<Edge>();
+            target.incomings = new List<Edge>();
         }
 
         /// <summary>

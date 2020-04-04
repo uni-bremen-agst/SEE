@@ -159,5 +159,14 @@ namespace SEE.Game
         public bool IsSublayoutRoot { get => isSublayoutRoot; set => isSublayoutRoot = value ; }
         public Sublayout Sublayout { get => sublayout; set => sublayout = value; }
         public ILayoutNode SublayoutRoot { get => sublayoutRoot; set => sublayoutRoot = value; }
+
+        public override string ToString()
+        {
+            string result = base.ToString();
+            result += " Linkname=" + LinkName + " Level=" + Level + " IsLeaf=" + IsLeaf
+                + " Parent=" + (Parent != null ? Parent.LinkName : "<NO PARENT>");
+            return result;
+        }
+
     }
 }

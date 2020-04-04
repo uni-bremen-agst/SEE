@@ -9,24 +9,19 @@ namespace SEE.DataModel
     /// A graph with nodes and edges representing the data to be visualized 
     /// by way of blocks and connections.
     /// </summary>
-    [System.Serializable]
     public class Graph : Attributable
     {
         // The list of graph nodes indexed by their unique linkname
-        [SerializeField]
-        private StringNodeDictionary nodes = new StringNodeDictionary();
+        private Dictionary<string, Node> nodes = new Dictionary<string, Node>();
 
         // The list of graph edges.
-        [SerializeField]
         private List<Edge> edges = new List<Edge>();
 
         // The (view) name of the graph.
-        [SerializeField]
         private string viewName = "";
 
         // The path of the file from which this graph was loaded. Could be the
         /// empty string if the graph was not created by loading it from disk.
-        [SerializeField]
         private string path = "";
 
         /// Adds a node to the graph. 
@@ -341,7 +336,7 @@ namespace SEE.DataModel
             for (int i = 0; i < level; i++)
             {
                 indentation += "-";
-            }            
+            }
             Debug.Log(indentation + root.LinkName + "\n");
             foreach (Node child in root.Children())
             {
@@ -481,7 +476,7 @@ namespace SEE.DataModel
 
         private void CopyNodesTo(Graph target)
         {
-            target.nodes = new StringNodeDictionary();
+            target.nodes = new Dictionary<string, Node>();
             foreach (var entry in this.nodes)
             {
                 Node node = (Node)entry.Value.Clone();
@@ -619,5 +614,96 @@ namespace SEE.DataModel
                 node.Children().ForEach(childNode => TraverseTree(childNode, innerNodeAction, leafAction));
             }
         }
+
+        /// <summary>
+        /// Returns true if <paramref name="other"/> meets all of the following 
+        /// conditions:
+        ///  (1) is not null
+        ///  (2) has exactly the same C# type
+        ///  (3) has exactly the same attributes with exactly the same values
+        ///  (4) has the same path
+        ///  (5) has the same graph name
+        ///  (6) has the same number of nodes and the sets of nodes are equal
+        ///  (7) has the same number of edges and the sets of edges are equal
+        ///  (8) has the same node hierarchy
+        ///  
+        /// Note: This node and the other node may or may not be in the same graph.
+        /// </summary>
+        /// <param name="other">to be compared to</param>
+        /// <returns>true if equal</returns>
+        public override bool Equals(System.Object other)
+        {
+            if (!base.Equals(other))
+            {
+                Graph otherNode = other as Graph;
+                if (other != null)
+                {
+                    Report("Graphs " + viewName + " " + otherNode.viewName + " have differences");
+                }
+                return false;
+            }
+            else
+            {
+                Graph otherGraph = other as Graph;
+                if (this.path != otherGraph.path)
+                {
+                    Report("Graph paths are different");
+                    return false;
+                }
+                else if (this.viewName != otherGraph.viewName)
+                {
+                    Report("Graph names are different");
+                    return false;
+                }
+                else if (this.NodeCount != otherGraph.NodeCount)
+                {
+                    Report("Number of nodes are different");
+                    return false;
+                }
+                else if (!AreEqual(this.nodes, otherGraph.nodes))
+                {
+                    // Note: because the Equals operation for nodes checks also the linknames
+                    // of the node's parents and children, we will also implicitly check the
+                    // node hierarchy.
+                    Report("Graph nodes are different");
+                    return false;
+                }
+                else if (this.edges.Count != otherGraph.edges.Count)
+                {
+                    Report("Number of edges are different");
+                    return false;
+                }
+                else
+                {
+                    bool equal = AreEqual(ToDictionary(this.edges), ToDictionary(otherGraph.edges));
+                    if (!equal)
+                    {
+                        Report("Graph edges are different");
+                    }
+                    return true;
+                }
+            }
+        }
+
+        private static Dictionary<string, Edge> ToDictionary(IList<Edge> edges)
+        {
+            Dictionary<string, Edge> result = new Dictionary<string, Edge>();
+            foreach (Edge edge in edges)
+            {
+                result[edge.LinkName] = edge;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns a hash code.
+        /// </summary>
+        /// <returns>hash code</returns>
+        public override int GetHashCode()
+        {
+            // we are using the viewName which is intended to be unique
+            return viewName.GetHashCode();
+        }
+
     }
 }

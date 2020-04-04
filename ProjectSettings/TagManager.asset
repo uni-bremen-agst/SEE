@@ -16,6 +16,10 @@ TagManager:
   - Decoration
   - Path
   - CCAnimation
+  - projectile
+  - FxTemporaire
+  - Runtime
+  - Function Call
   layers:
   - Default
   - TransparentFX

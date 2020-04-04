@@ -87,6 +87,9 @@ namespace SEE.Layout
         [Test]
         public void TestSimple()
         {
+            //       root
+            //       /  \
+            //      a    b
             LNode root = NewVertex();
             LNode a = NewVertex();
             LNode b = NewVertex();
@@ -100,6 +103,34 @@ namespace SEE.Layout
             Assert.AreEqual(root, lca.LCA(b, root));
             Assert.AreEqual(root, lca.LCA(a, root));
             Assert.AreEqual(root, lca.LCA(root, a));
+        }
+
+        [Test]
+        public void TestChain()
+        {
+            //       root
+            //        |  
+            //        a
+            //        |
+            //        b
+            LNode root = NewVertex();
+            LNode a = NewVertex();
+            LNode b = NewVertex();
+            root.AddChild(a);
+            a.AddChild(b);
+
+            LCAFinder<LNode> lca = new LCAFinder<LNode>(root);
+
+            Assert.AreEqual(root, lca.LCA(root, root));
+
+            Assert.AreEqual(a, lca.LCA(a, b));
+            Assert.AreEqual(a, lca.LCA(b, a));
+
+            Assert.AreEqual(root, lca.LCA(a, root));
+            Assert.AreEqual(root, lca.LCA(root, a));
+
+            Assert.AreEqual(root, lca.LCA(b, root));
+            Assert.AreEqual(root, lca.LCA(root, b));
         }
 
         [Test]
