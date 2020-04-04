@@ -14,33 +14,15 @@ namespace SEE.Game
             List<InnerNodeKinds> values = Enum.GetValues(typeof(InnerNodeKinds)).Cast<InnerNodeKinds>().ToList();
             List<InnerNodeKinds> list = new List<InnerNodeKinds>();
 
-            switch (nodeLayout)
-            {
-                case NodeLayouts.CompoundSpringEmbedder:
-                    list = values.Where(kind => kind.IsRectangular()).ToList();
-                    break;
-                case NodeLayouts.EvoStreets:
-                    list = values.Where(kind => kind.IsRectangular()).ToList();
-                    break;
-                case NodeLayouts.Balloon:
-                    list = values.Where(kind => kind.IsCircular()).ToList();
-                    break;
-                case NodeLayouts.FlatRectanglePacking:
-                    list = values.Where(kind => kind.IsRectangular()).ToList();
-                    break;
-                case NodeLayouts.Treemap:
-                    list = values.Where(kind => kind.IsRectangular()).ToList();
-                    break;
-                case NodeLayouts.CirclePacking:
-                    list = values.Where(kind => kind.IsCircular()).ToList();
-                    break;
-                case NodeLayouts.Manhattan:
-                    list = values.Where(kind => kind.IsRectangular()).ToList();
-                    break;
-            }
-
+            list = nodeLayout.IsCircular() ? values.Where(kind => kind.IsCircular()).ToList() : values.Where(kind => kind.IsRectangular()).ToList();
             list.OrderBy(kind => kind.ToString());
             return list;
+        }
+
+        public static List<NodeLayouts> GetPossibleSublayouts(this NodeLayouts nodeLayout)
+        {
+            List<NodeLayouts> values = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().ToList();
+            return nodeLayout.IsCircular() ? values.Where(layout => layout.IsCircular()).ToList() : values.Where(layout => layout.IsRectangular()).ToList();
         }
 
         public static bool OnlyLeaves(this NodeLayouts nodeLayout)
@@ -128,6 +110,52 @@ namespace SEE.Game
                     return false;
                 default:
                     return false;
+            }
+        }
+
+        public static bool IsCircular(this NodeLayouts nodeLayout)
+        {
+            switch (nodeLayout)
+            {
+                case NodeLayouts.CompoundSpringEmbedder:
+                    return false;
+                case NodeLayouts.EvoStreets:
+                    return false;
+                case NodeLayouts.Balloon:
+                    return true;
+                case NodeLayouts.FlatRectanglePacking:
+                    return false;
+                case NodeLayouts.Treemap:
+                    return false;
+                case NodeLayouts.CirclePacking:
+                    return true;
+                case NodeLayouts.Manhattan:
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
+        public static bool IsRectangular(this NodeLayouts nodeLayout)
+        {
+            switch (nodeLayout)
+            {
+                case NodeLayouts.CompoundSpringEmbedder:
+                    return true;
+                case NodeLayouts.EvoStreets:
+                    return true;
+                case NodeLayouts.Balloon:
+                    return false;
+                case NodeLayouts.FlatRectanglePacking:
+                    return true;
+                case NodeLayouts.Treemap:
+                    return true;
+                case NodeLayouts.CirclePacking:
+                    return false;
+                case NodeLayouts.Manhattan:
+                    return true;
+                default:
+                    return true;
             }
         }
     }
