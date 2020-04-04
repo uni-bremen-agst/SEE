@@ -17,11 +17,13 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel;
-using SEE.Game.Animation;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+
+using SEE.DataModel;
+using SEE.Game.Animation;
+using SEE.DataModel.IO;
 
 namespace SEE.Game
 {
@@ -34,12 +36,12 @@ namespace SEE.Game
         /// <summary>
         /// Sets the maximum number of revsions to load.
         /// </summary>
-        public int maxRevisionsToLoad = 500;
+        public int maxRevisionsToLoad = 500;  // serialized by Unity
 
         /// <summary>
         /// The renderer for rendering the evolution of the graph series.
         /// </summary>
-        private EvolutionRenderer evolutionRenderer;
+        private EvolutionRenderer evolutionRenderer;  // not serialized by Unity; will be set in Start()
 
         /// <summary>
         /// Factory method to create the used EvolutionRenderer.

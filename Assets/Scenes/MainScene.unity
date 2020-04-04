@@ -351,23 +351,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc88e4f6432d4ba48b75658619eda4cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
-  InnerNodeStyleMetric: Metric.IssuesTotal
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Clone_Rate
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 2
-  NodeLayout: 1
-  EdgeLayout: 3
-  ZScoreScale: 0
-  EdgeWidth: 2
-  ShowErosions: 0
-  EdgesAboveBlocks: 1
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -383,6 +405,17 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 2
+  NodeLayout: 1
+  EdgeLayout: 3
+  ZScoreScale: 0
+  EdgeWidth: 2
+  ShowErosions: 0
+  EdgesAboveBlocks: 1
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &465914107
@@ -1869,7 +1902,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a388c80db8c323c41b6badd2530f9c6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  filename: path.csv
+  Filename: path.csv
   ShowPath: 0
 --- !u!1 &1003004807
 GameObject:
@@ -1900,23 +1933,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc88e4f6432d4ba48b75658619eda4cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
-  InnerNodeStyleMetric: Metric.IssuesTotal
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Clone_Rate
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 1
-  NodeLayout: 3
-  EdgeLayout: 3
-  ZScoreScale: 0
-  EdgeWidth: 1
-  ShowErosions: 0
-  EdgesAboveBlocks: 1
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -1932,6 +1987,17 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 1
+  NodeLayout: 3
+  EdgeLayout: 3
+  ZScoreScale: 0
+  EdgeWidth: 1
+  ShowErosions: 0
+  EdgesAboveBlocks: 1
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &1003004809
@@ -1977,23 +2043,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc88e4f6432d4ba48b75658619eda4cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
-  InnerNodeStyleMetric: Metric.IssuesTotal
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Clone_Rate
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 4
-  NodeLayout: 5
-  EdgeLayout: 2
-  ZScoreScale: 0
-  EdgeWidth: 1
-  ShowErosions: 0
-  EdgesAboveBlocks: 0
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -2009,6 +2097,17 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 4
+  NodeLayout: 5
+  EdgeLayout: 2
+  ZScoreScale: 0
+  EdgeWidth: 1
+  ShowErosions: 0
+  EdgesAboveBlocks: 0
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &1036186228
@@ -2054,23 +2153,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc88e4f6432d4ba48b75658619eda4cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
-  InnerNodeStyleMetric: Metric.IssuesTotal
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Clone_Rate
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 3
-  NodeLayout: 4
-  EdgeLayout: 3
-  ZScoreScale: 0
-  EdgeWidth: 1
-  ShowErosions: 0
-  EdgesAboveBlocks: 0
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -2086,6 +2207,17 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 3
+  NodeLayout: 4
+  EdgeLayout: 3
+  ZScoreScale: 0
+  EdgeWidth: 1
+  ShowErosions: 0
+  EdgesAboveBlocks: 0
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &1206385286
@@ -2101,6 +2233,163 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1352653018
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1352653020}
+  - component: {fileID: 1352653019}
+  m_Layer: 0
+  m_Name: RandomCity
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1352653019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1352653018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f60d2c87bfa2964d933dee0c2b9342e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  PathPrefix: F:\develop\SEE\Data\GXL\random\
+  origin: {x: 0, y: 0, z: 0}
+  WidthMetric: Metric.Number_of_Tokens
+  HeightMetric: Metric.Clone_Rate
+  DepthMetric: Metric.LOC
+  LeafStyleMetric: Metric.Complexity
+  ArchitectureIssue: Metric.Architecture_Violations
+  CloneIssue: Metric.Clone
+  CycleIssue: Metric.Cycle
+  Dead_CodeIssue: Metric.Dead_Code
+  MetricIssue: Metric.Metric
+  StyleIssue: Metric.Style
+  UniversalIssue: Metric.Universal
+  ArchitectureIssue_SUM: Metric.Architecture_Violations_SUM
+  CloneIssue_SUM: Metric.Clone_SUM
+  CycleIssue_SUM: Metric.Cycle_SUM
+  Dead_CodeIssue_SUM: Metric.Dead_Code_SUM
+  MetricIssue_SUM: Metric.Metric_SUM
+  StyleIssue_SUM: Metric.Style_SUM
+  UniversalIssue_SUM: Metric.Universal_SUM
+  InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 1
+  NodeLayout: 3
+  EdgeLayout: 3
+  ZScoreScale: 1
+  EdgeWidth: 0.4
+  ShowErosions: 0
+  EdgesAboveBlocks: 1
+  gxlPath: random.gxl
+  csvPath: random.csv
+  LeafConstraint:
+    NodeType: Class
+    EdgeType: calls
+    NodeNumber: 1000
+    EdgeDensity: 0.001
+  InnerNodeConstraint:
+    NodeType: Package
+    EdgeType: uses
+    NodeNumber: 100
+    EdgeDensity: 0.001
+  LeafAttributes:
+  - Name: Metric.Number_of_Tokens
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Clone_Rate
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.LOC
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Complexity
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Architecture_Violations
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Clone
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Cycle
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Dead_Code
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Metric
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Style
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Universal
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.IssuesTotal
+    Mean: 10
+    StandardDeviation: 3
+--- !u!4 &1352653020
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1352653018}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1357088963
 GameObject:
@@ -2131,23 +2420,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc88e4f6432d4ba48b75658619eda4cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
-  InnerNodeStyleMetric: Metric.IssuesTotal
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Clone_Rate
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 4
-  NodeLayout: 2
-  EdgeLayout: 1
-  ZScoreScale: 0
-  EdgeWidth: 1
-  ShowErosions: 1
-  EdgesAboveBlocks: 1
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -2163,6 +2474,17 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 4
+  NodeLayout: 2
+  EdgeLayout: 1
+  ZScoreScale: 0
+  EdgeWidth: 1
+  ShowErosions: 1
+  EdgesAboveBlocks: 1
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &1357088965
@@ -2352,23 +2674,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc88e4f6432d4ba48b75658619eda4cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   PathPrefix: F:\develop\SEE\Assets\
   origin: {x: 0, y: 0, z: 0}
-  InnerNodeStyleMetric: Metric.IssuesTotal
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Clone_Rate
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 0
-  NodeLayout: 0
-  EdgeLayout: 3
-  ZScoreScale: 0
-  EdgeWidth: 1
-  ShowErosions: 0
-  EdgesAboveBlocks: 1
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -2384,6 +2728,17 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 0
+  NodeLayout: 0
+  EdgeLayout: 3
+  ZScoreScale: 0
+  EdgeWidth: 1
+  ShowErosions: 0
+  EdgesAboveBlocks: 1
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &2092969280

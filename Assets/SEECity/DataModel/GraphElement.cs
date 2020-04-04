@@ -1,17 +1,15 @@
-﻿using UnityEngine;
+﻿using System;
 
 namespace SEE.DataModel
 {
     /// <summary>
     /// A type graph element. Either a node or an edge.
     /// </summary>
-    [System.Serializable]
     public abstract class GraphElement : Attributable
     {
         /// <summary>
         /// The type of the graph element.
         /// </summary>
-        [SerializeField]
         private string type;
 
         /// <summary>
@@ -21,7 +19,6 @@ namespace SEE.DataModel
         /// IMPORTANT NOTE: This attribute will not be serialized. It may
         /// be null at run-time or in the editor inspection view.
         /// </summary>
-        [System.NonSerialized]
         protected Graph graph;
 
         /// <summary>
@@ -42,7 +39,6 @@ namespace SEE.DataModel
         /// <summary>
         /// The type of this graph element.
         /// </summary>
-        [SerializeField]
         public string Type
         {
             get
@@ -79,6 +75,50 @@ namespace SEE.DataModel
             return this.type == type;
         }
 
+        /// <summary>
+        /// Returns true if <paramref name="other"/> meets all of the following conditions: 
+        /// (1) is not null
+        /// (2) has exactly the same C# type
+        /// (3) has exactly the same attributes with exactly the same values as this graph element
+        /// (4) has the same type name
+        /// 
+        /// Note: This graph element and the other graph element may or may not be in the same graph.
+        /// </summary>
+        /// <param name="other">to be compared to</param>
+        /// <returns>true if equal</returns>
+        public override bool Equals(Object other)
+        {
+            if (!base.Equals(other))
+            {
+                GraphElement otherNode = other as GraphElement;
+                if (other != null)
+                {
+                    Report(LinkName + " " + otherNode.LinkName + " have differences");
+                }
+                return false;
+            }
+            else
+            {
+                GraphElement graphElement = other as GraphElement;                
+                bool equal = type == graphElement.type;
+                if (!equal)
+                {
+                    Report("The types are different");
+                }
+                return equal;
+            }
+        }
+
+        /// <summary>
+        /// A unique identifier (unique within the same graph).
+        /// </summary>
+        public abstract string LinkName { set; get; }
+
+        /// <summary>
+        /// Returns a string representation of the graph element's type and all its attributes and
+        /// their values.
+        /// </summary>
+        /// <returns>string representation of type and all attributes</returns>
         public override string ToString()
         {
             return " \"type\": " + type + "\",\n" + base.ToString();

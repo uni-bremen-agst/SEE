@@ -98,7 +98,6 @@ namespace SEE.GO
             get => instance;
         }
 
-        [SerializeField]
         // A mapping of Erosions onto sprite prefabs. During start up we load the
         // sprite prefabs from the Assets for each kind of Erosion and store them
         // in this field. Later when game objects are to be created from these 

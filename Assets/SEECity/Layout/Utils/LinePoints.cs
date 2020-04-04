@@ -45,6 +45,7 @@ namespace SEE.Layout
         /// <returns>points of the line along the B-spline</returns>
         public static Vector3[] BSplineLinePoints(Vector3[] controlPoints)
         {
+            Debug.Assert(controlPoints.Length > 3);
             // Create a cubic spline with control points in 3D using a clamped knot vector.
             TinySpline.BSpline spline = new TinySpline.BSpline((uint)controlPoints.Length, dimensions)
             {

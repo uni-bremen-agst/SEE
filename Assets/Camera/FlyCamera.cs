@@ -393,7 +393,12 @@ namespace SEE
                     GameObject objectHit = hit.transform.gameObject;
                     if (objectHit.TryGetComponent<NodeRef>(out NodeRef nodeRef))
                     {
-                        if (nodeRef.node.TryGetString("Source.Name", out string nodeName))
+                        if (nodeRef.node == null)
+                        {
+                            Debug.LogError("NodeRef does not refer to a node.\n");
+                            text.text = objectHit.name;
+                        }
+                        else if (nodeRef.node.TryGetString(Node.SourceNameAttribute, out string nodeName))
                         {
                             text.text = nodeName;
                         }
