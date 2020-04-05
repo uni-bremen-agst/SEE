@@ -22,7 +22,7 @@ namespace SEE.Game
         public static List<NodeLayouts> GetPossibleSublayouts(this NodeLayouts nodeLayout)
         {
             List<NodeLayouts> values = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().ToList();
-            return nodeLayout.IsCircular() ? values.Where(layout => layout.IsCircular()).ToList() : values.Where(layout => layout.IsRectangular()).ToList();
+            return nodeLayout.IsCircular() ? values.Where(layout => layout.IsCircular()).ToList() : values.Where(layout => !layout.IsCircular()).ToList();
         }
 
         public static bool OnlyLeaves(this NodeLayouts nodeLayout)
@@ -71,6 +71,29 @@ namespace SEE.Game
             }
         }
 
+        public static bool IsCircular(this NodeLayouts nodeLayout)
+        {
+            switch (nodeLayout)
+            {
+                case NodeLayouts.CompoundSpringEmbedder:
+                    return false;
+                case NodeLayouts.EvoStreets:
+                    return false;
+                case NodeLayouts.Balloon:
+                    return true;
+                case NodeLayouts.FlatRectanglePacking:
+                    return false;
+                case NodeLayouts.Treemap:
+                    return false;
+                case NodeLayouts.CirclePacking:
+                    return true;
+                case NodeLayouts.Manhattan:
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
         public static bool IsCircular(this InnerNodeKinds innerNodeKind)
         {
             switch (innerNodeKind)
@@ -110,52 +133,6 @@ namespace SEE.Game
                     return false;
                 default:
                     return false;
-            }
-        }
-
-        public static bool IsCircular(this NodeLayouts nodeLayout)
-        {
-            switch (nodeLayout)
-            {
-                case NodeLayouts.CompoundSpringEmbedder:
-                    return false;
-                case NodeLayouts.EvoStreets:
-                    return false;
-                case NodeLayouts.Balloon:
-                    return true;
-                case NodeLayouts.FlatRectanglePacking:
-                    return false;
-                case NodeLayouts.Treemap:
-                    return false;
-                case NodeLayouts.CirclePacking:
-                    return true;
-                case NodeLayouts.Manhattan:
-                    return false;
-                default:
-                    return false;
-            }
-        }
-
-        public static bool IsRectangular(this NodeLayouts nodeLayout)
-        {
-            switch (nodeLayout)
-            {
-                case NodeLayouts.CompoundSpringEmbedder:
-                    return true;
-                case NodeLayouts.EvoStreets:
-                    return true;
-                case NodeLayouts.Balloon:
-                    return false;
-                case NodeLayouts.FlatRectanglePacking:
-                    return true;
-                case NodeLayouts.Treemap:
-                    return true;
-                case NodeLayouts.CirclePacking:
-                    return false;
-                case NodeLayouts.Manhattan:
-                    return true;
-                default:
-                    return true;
             }
         }
     }
