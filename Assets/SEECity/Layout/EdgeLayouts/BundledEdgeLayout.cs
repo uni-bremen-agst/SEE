@@ -94,15 +94,15 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Returns the path from child to ancestor in the tree including
-        /// the child and the ancestor.
+        /// Returns the path from <paramref name="child"/> to <paramref name="child"/> in the 
+        /// node hierarchy including the child and the ancestor.
         /// Assertations on result: path[0] = child and path[path.Length-1] = ancestor.
         /// If child = ancestor, path[0] = child = path[path.Length-1] = ancestor.
         /// Precondition: child has ancestor.
         /// </summary>
         /// <param name="child">from where to start</param>
         /// <param name="ancestor">where to stop</param>
-        /// <returns>path from child to ancestor in the tree</returns>
+        /// <returns>path from child to ancestor in the node hierarchy</returns>
         private ILayoutNode[] Ancestors(ILayoutNode child, ILayoutNode ancestor)
         {
             int childLevel = child.Level;
@@ -130,14 +130,14 @@ namespace SEE.Layout
         /// <summary>
         /// Yields the list of points for a spline along the node hierarchy.
         /// If source equals target, a self loop is generated atop of the node.
-        /// If source and target have no common ancestor, the path starts at source
+        /// If source and target have no common LCA, the path starts at source
         /// and ends at target and reaches through the point on half distance between 
         /// these two nodes, but at the top-most edge height (given by maxLevel).
         /// If source and target are siblings (immediate ancestors of the same parent
         /// node), a direct spline is drawn between them.
-        /// Otherwise, the points are chosen along the hierarchy path from the source
-        /// node to their lowest common ancestor and then down again to the target 
-        /// node. The height of each such points is proportional to the level 
+        /// Otherwise, the control points of the splines are chosen along the node hierarchy 
+        /// path from the source node to their lowest common ancestor and then down again 
+        /// to the target node. The height of each such points is proportional to the level 
         /// of the node hierarchy. The higher the node in the hierarchy on this path,
         /// the higher the points.
         /// </summary>
@@ -146,7 +146,11 @@ namespace SEE.Layout
         /// <param name="lcaFinder">to retrieve the lowest common ancestor of source and target</param>
         /// <param name="maxLevel">the maximal level of the node hierarchy</param>
         /// <returns>points to draw a spline between source and target</returns>
-        private Vector3[] GetLinePoints(ILayoutNode source, ILayoutNode target, LCAFinder<ILayoutNode> lcaFinder, int maxLevel)
+        private Vector3[] GetLinePoints
+            (ILayoutNode source, 
+             ILayoutNode target, 
+             LCAFinder<ILayoutNode> lcaFinder, 
+             int maxLevel)
         { 
             if (source == target)
             {
@@ -161,7 +165,7 @@ namespace SEE.Layout
                     // This should never occur if we have a single root node, but may happen if
                     // there are multiple roots, in which case nodes in different trees of this
                     // forrest do not have a common ancestor.
-                    Debug.LogError("Undefined lowest common ancestor for "
+                    Debug.LogWarning("Undefined lowest common ancestor for "
                         + source.LinkName + " and " + target.LinkName + "\n");
                     return BetweenTrees(source, target);
                 }
@@ -180,18 +184,11 @@ namespace SEE.Layout
                     // assert: targetObject != lcaObject
 
                     ILayoutNode[] sourceToLCA = Ancestors(source, lca);
-                    //Debug.Assert(sourceToLCA.Length > 1);
-                    //Debug.Assert(sourceToLCA[0] == source);
-                    //Debug.Assert(sourceToLCA[sourceToLCA.Length - 1] == lcaNode);
-
                     ILayoutNode[] targetToLCA = Ancestors(target, lca);
-                    //Debug.Assert(targetToLCA.Length > 1);
-                    //Debug.Assert(targetToLCA[0] == target);
-                    //Debug.Assert(targetToLCA[targetToLCA.Length - 1] == lcaNode);
 
                     Array.Reverse(targetToLCA, 0, targetToLCA.Length);
 
-                    // Note: lcaNode is included in both paths
+                    // Note: lca is included in both paths
                     if (sourceToLCA.Length == 2 && targetToLCA.Length == 2)
                     {
                         // source and target are siblings in the same subtree at the same level.
@@ -243,7 +240,7 @@ namespace SEE.Layout
         /// the y co-ordinate is specified by <paramref name="yLevel"/>. If edges should be drawn below
         /// blocks, we use the negative value of <paramref name="yLevel"/> for the y co-ordinate.
         /// 
-        /// That means an edge between the nodes is drawn as a direct spline on the shortest path 
+        /// That means, an edge between the nodes is drawn as a direct spline on the shortest path 
         /// between the two nodes from roof/ground to roof/ground. Thus, no hierarchical bundling is applied.
         /// </summary>
         /// <param name="source">the node where to start the edge</param>
@@ -262,7 +259,8 @@ namespace SEE.Layout
 
         /// <summary>
         /// The number of Unity units per level of the hierarchy for the height of control points.
-        /// Its value must be greater than zero.
+        /// Its value must be greater than zero. It will be set relative to the maximal height
+        /// of the nodes whose edge are to be laid out (in Create()). The value set here is the minimum value.
         /// </summary>
         private float levelDistance = 1.0f;
 
@@ -284,10 +282,10 @@ namespace SEE.Layout
         /// of the node hierarchy. Root nodes are assumed to have level 0. There may be node hierarchies
         /// that are actually forrests rather than simple trees. In such cases, the lowest common ancestor
         /// of nodes in different trees does not exist and -1 will be passed as <paramref name="level"/>,
-        /// which is perfectly acceptable. In such cases, the returned value will be just one 
-        /// levelDistance above those for normal root nodes: 
+        /// which is perfectly acceptable. In such cases, the returned value will be just one levelDistance 
+        /// above those for normal root nodes: 
         ///     minimalDistanceToGround + (maxLevel + 1) * levelDistance
-        /// If level == maxLevel, minimalDistanceToGround will be returned.
+        /// If level = maxLevel, minimalDistanceToGround will be returned.
         /// In all other cases the returned value is guaranteed to be greater than minimalDistanceToGround.
         /// </summary>
         /// <param name="level">node hierarchy level</param>
@@ -298,15 +296,15 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Yields points of a spline for a self loop at a node. The first  
-        /// point is the front left corner of the roof/ground of <paramref name="node"/>
+        /// Yields points of a spline for a self loop at a node. The first point
+        /// is the front left corner of the roof/ground of <paramref name="node"/>
         /// and the last point is its opposite back right roof/ground corner. Thus, the 
         /// edge is diagonal across the roof/ground. The peak of the spline is in the
-        /// middle of the begin and end where the y co-ordinate of that peak
+        /// middle of the start and end, where the y co-ordinate of that peak
         /// is levelDistance above the roof or below the ground, respectively.
         /// </summary>
-        /// <param name="node">node whose self loop control points are required</param>
-        /// <returns>control points forming a self loop above the node</returns>
+        /// <param name="node">node whose self loop line points are required</param>
+        /// <returns>line points forming a self loop above <paramref name="node"/></returns>
         private Vector3[] SelfLoop(ILayoutNode node)
         {
             // center area (roof or ground)
@@ -327,10 +325,11 @@ namespace SEE.Layout
         /// is, the node hierarchy is a forest and not just a single tree. In this case,
         /// we want the spline to reach above/below all other splines of nodes having a common
         /// ancestor. 
-        /// The first and last points are the respective roofs/grounds of source and target
-        /// node. The peak point of the direct spline lies in between the two nodes with 
-        /// respect to the x and z axis; its height (y axis) is the highest hierarchical level, 
-        /// that is, one levelDistance above all other edges within the same trees.
+        /// The first and last points are the respective roofs/grounds of <paramref name="source"/>
+        /// and <paramref name="target"/>. The peak point of the direct spline lies in between the 
+        /// two nodes with respect to the x and z axis; its height (y axis) is the highest 
+        /// hierarchical level, that is, one levelDistance above all other edges within the same 
+        /// trees.
         /// </summary>
         /// <param name="source">start of edge (in one tree)</param>
         /// <param name="target">end of the edge (in another tree)</param>
