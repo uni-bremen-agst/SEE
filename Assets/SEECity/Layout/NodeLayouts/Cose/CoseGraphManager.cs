@@ -421,9 +421,9 @@ namespace SEE.Layout
                     }
                 }
 
-                node.LayoutValues.Next.SetLocation(node.rect.x, node.rect.y);
-                node.LayoutValues.Next.SetHeight(node.rect.height);
-                node.LayoutValues.Next.SetWidth(node.rect.width);
+                node.LayoutValues.Next.SetLocation(node.CenterPosition.x, node.CenterPosition.z);
+                node.LayoutValues.Next.SetHeight(node.Scale.z);
+                node.LayoutValues.Next.SetWidth(node.Scale.x);
             }
         }
 

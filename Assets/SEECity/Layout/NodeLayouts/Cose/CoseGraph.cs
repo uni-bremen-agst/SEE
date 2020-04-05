@@ -51,7 +51,13 @@ namespace SEE.Layout
         /// <summary>
         /// the bounding rect of this graph
         /// </summary>
-        public Rect boudingRect = new Rect();
+        //public Rect boudingRect = new Rect();
+
+        /// TODO
+        private Vector3 scale;
+
+        /// TODO
+        private Vector3 centerPosition;
 
         /// <summary>
         /// the esitmated size of this graph
@@ -86,11 +92,13 @@ namespace SEE.Layout
         public CoseGraphManager GraphManager { get => graphManager; set => graphManager = value; }
         public CoseNode Parent { get => parent; set => parent = value; }
         public List<CoseNode> Nodes { get => nodes; set => nodes = value; }
-        public Rect BoudingRect { get => boudingRect; set => boudingRect = value; }
+        //public Rect BoudingRect { get => boudingRect; set => boudingRect = value; }
         public bool IsConnected { get => isConnected; set => isConnected = value; }
         public List<CoseEdge> Edges { get => edges; set => edges = value; }
         public double EstimatedSize { get => estimatedSize; set => estimatedSize = value; }
         public bool IsSubLayout { get => isSubLayout; set => isSubLayout = value; }
+        public Vector3 Scale { get => scale; set => scale = value; }
+        public Vector3 CenterPosition { get => centerPosition; set => centerPosition = value; }
 
         /// <summary>
         /// constructor
@@ -210,10 +218,10 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="dx">displacement x direction</param>
         /// <param name="dy">displacement y direction</param>
-        public void SetXYDisplacementBoundingRect(double dx, double dy)
+        public void SetXZDisplacementBoundingRect(double dx, double dz)
         {
-            boudingRect.x += (float)dx;
-            boudingRect.y += (float)dy;
+            centerPosition.x += (float)dx;
+            centerPosition.z += (float)dz;
         }
 
         /// <summary>
@@ -221,7 +229,10 @@ namespace SEE.Layout
         /// </summary>
         public void UpdateBoundingRect()
         {
-            this.boudingRect = new Rect((float)left, (float)top, (float)right - (float)left, (float)bottom - (float)top);
+            scale.x = (float) right - (float) left;
+            scale.z = (float) bottom - (float) top;
+            centerPosition.x = (float) left + scale.x / 2;
+            centerPosition.z = (float) top + scale.z / 2;
         }
 
         /// <summary>

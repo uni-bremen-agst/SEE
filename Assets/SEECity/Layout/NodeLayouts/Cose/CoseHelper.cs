@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SEE.Layout
 {
-    public class CoseHelperFunctions
+    public class CoseHelper
     {
         public static void CalculateListSublayouts()
         {
@@ -34,6 +34,17 @@ namespace SEE.Layout
                 }
             }
             return null;
+        }
+
+        public static Rect NewRect(Vector3 scale, Vector3 center)
+        {
+            return new Rect
+            {
+                x = center.x - scale.x / 2,
+                y = center.z - scale.z / 2,
+                width = scale.x,
+                height = scale.z
+            }; 
         }
     }
 }

@@ -353,7 +353,7 @@ namespace SEE.Game
 
                 foreach (Node child in children)
                 {
-                    SublayoutNode sublayout = CoseHelperFunctions.CheckIfNodeIsSublayouRoot(coseSublayoutNodes, child.LinkName);
+                    SublayoutNode sublayout = CoseHelper.CheckIfNodeIsSublayouRoot(coseSublayoutNodes, child.LinkName);
 
                     if (sublayout != null)
                     {

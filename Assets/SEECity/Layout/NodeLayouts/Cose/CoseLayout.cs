@@ -122,15 +122,15 @@ namespace SEE.Layout
 
             foreach (CoseGraph graph in graphManager.Graphs)
             {
-                Vector3 position = new Vector3(graph.BoudingRect.center.x, groundLevel, graph.BoudingRect.center.y);
+                Vector3 position = new Vector3(graph.CenterPosition.x, groundLevel, graph.CenterPosition.z);
 
-                float width = graph.BoudingRect.width;
-                float height = graph.BoudingRect.height;
+                float width = graph.Scale.x;
+                float height = graph.Scale.z;
 
 
                 if (graph.Parent != null && graph.Parent.NodeObject != null && SublayoutNodes.Count() > 0)
                 {
-                    SublayoutLayoutNode sublayoutNode = CoseHelperFunctions.CheckIfNodeIsSublayouRoot(SublayoutNodes, graph.Parent.NodeObject.LinkName);
+                    SublayoutLayoutNode sublayoutNode = CoseHelper.CheckIfNodeIsSublayouRoot(SublayoutNodes, graph.Parent.NodeObject.LinkName);
 
                     if (sublayoutNode != null && sublayoutNode.NodeLayout == NodeLayouts.EvoStreets)
                     {
@@ -264,7 +264,7 @@ namespace SEE.Layout
             CreateTopology(root);
             CalculateSubLayouts();
 
-            if (SublayoutNodes.Count > 0 && CoseHelperFunctions.CheckIfNodeIsSublayouRoot(SublayoutNodes, graphManager.RootGraph.Parent.NodeObject.LinkName) != null)
+            if (SublayoutNodes.Count > 0 && CoseHelper.CheckIfNodeIsSublayouRoot(SublayoutNodes, graphManager.RootGraph.Parent.NodeObject.LinkName) != null)
             {
                 graphManager.UpdateBounds();
             } else
@@ -394,8 +394,11 @@ namespace SEE.Layout
                     height = node.NodeObject.Scale.z
                 };
 
-                node.SublayoutValues.relativeRect = rect;
-                node.rect = new Rect(node.SublayoutValues.relativeRect);
+                node.SublayoutValues.RelativeScale = new Vector3(node.NodeObject.Scale.x, node.NodeObject.Scale.y, node.NodeObject.Scale.z);
+                node.SublayoutValues.RelativeCenterPosition = new Vector3(node.NodeObject.CenterPosition.x, node.NodeObject.CenterPosition.y, node.NodeObject.CenterPosition.z);
+
+                node.Scale = new Vector3(node.NodeObject.Scale.x, node.NodeObject.Scale.y, node.NodeObject.Scale.z);
+                node.CenterPosition = new Vector3(node.NodeObject.CenterPosition.x, node.NodeObject.CenterPosition.y, node.NodeObject.CenterPosition.z);
 
                 if (!node.SublayoutValues.IsSubLayoutRoot)
                 {
@@ -608,8 +611,8 @@ namespace SEE.Layout
 
                                 if (!processedNodeSet.Contains(nodeB) && !surrounding.Contains(nodeB))
                                 {
-                                    double distanceX = Math.Abs(nodeA.GetCenterX() - nodeB.GetCenterX()) - ((nodeA.rect.width / 2) + (nodeB.rect.width / 2));
-                                    double distanceY = Math.Abs(nodeA.GetCenterY() - nodeB.GetCenterY()) - ((nodeA.rect.height / 2) + (nodeB.rect.height / 2));
+                                    double distanceX = Math.Abs(nodeA.GetCenterX() - nodeB.GetCenterX()) - ((nodeA.Scale.x / 2) + (nodeB.Scale.x / 2));
+                                    double distanceY = Math.Abs(nodeA.GetCenterY() - nodeB.GetCenterY()) - ((nodeA.Scale.z / 2) + (nodeB.Scale.z / 2));
                                     if ((distanceX <= coseLayoutSettings.RepulsionRange) && (distanceY <= coseLayoutSettings.RepulsionRange))
                                     {
                                         surrounding.Add(nodeB);
@@ -638,8 +641,8 @@ namespace SEE.Layout
         /// <param name="nodeB"></param>
         private void CalcRepulsionForce(CoseNode nodeA, CoseNode nodeB)
         {
-            var rectA = nodeA.rect;
-            var rectB = nodeB.rect;
+            //var rectA = nodeA.rect;
+            //var rectB = nodeB.rect;
             double[] overlapAmount = new double[2];
             double[] clipPoints = new double[4];
             double distanceX;
@@ -667,8 +670,8 @@ namespace SEE.Layout
             {
                 if (CoseLayoutSettings.Uniform_Leaf_Node_Size && nodeA.Child == null && nodeB.Child == null)
                 {
-                    distanceX = ((rectB.x + rectB.width) / 2) - ((rectA.x + rectA.width) / 2);
-                    distanceY = ((rectB.y + rectB.height) / 2) - ((rectA.y + rectA.height) / 2);
+                    distanceX = nodeB.CenterPosition.x - nodeA.CenterPosition.x;
+                    distanceY = nodeB.CenterPosition.z - nodeA.CenterPosition.z;
                 } else
                 {
                     clipPoints = nodeA.CalcIntersection(nodeB, clipPoints);
@@ -710,10 +713,10 @@ namespace SEE.Layout
         /// <param name="top">the top position</param>
         private void AddNodeToGrid(CoseNode v, double left, double top)
         {
-            int startX = (int)Math.Floor((v.rect.x - left) / coseLayoutSettings.RepulsionRange);
-            int finishX = (int)Math.Floor((v.rect.width + v.rect.x - left) / coseLayoutSettings.RepulsionRange);
-            int startY = (int)Math.Floor((v.rect.y - top) / coseLayoutSettings.RepulsionRange);
-            int finishY = (int)Math.Floor((v.rect.height + v.rect.y - top) / coseLayoutSettings.RepulsionRange);
+            int startX = (int)Math.Floor(((v.CenterPosition.x - v.Scale.x / 2) - left) / coseLayoutSettings.RepulsionRange);
+            int finishX = (int)Math.Floor((v.Scale.x + (v.CenterPosition.x - v.Scale.x / 2) - left) / coseLayoutSettings.RepulsionRange);
+            int startY = (int)Math.Floor(((v.CenterPosition.z - v.Scale.z / 2) - top) / coseLayoutSettings.RepulsionRange);
+            int finishY = (int)Math.Floor(((v.CenterPosition.z - v.Scale.z / 2) - top) / coseLayoutSettings.RepulsionRange);
 
             for (int i = startX; i <= finishX; i++)
             {
@@ -772,12 +775,12 @@ namespace SEE.Layout
             int estimatedSize;
 
             ownerGraph = node.Owner;
-            ownerCenterX = ownerGraph.BoudingRect.center.x; 
-            ownerCenterY = ownerGraph.BoudingRect.center.y;
+            ownerCenterX = ownerGraph.CenterPosition.x; 
+            ownerCenterY = ownerGraph.CenterPosition.z;
             distanceX = node.GetCenterX() - ownerCenterX;
             distanceY = node.GetCenterY() - ownerCenterY;
-            absDistanceX = Math.Abs(distanceX) + node.rect.width / 2;
-            absDistanceY = Math.Abs(distanceY) + node.rect.height / 2;
+            absDistanceX = Math.Abs(distanceX) + node.Scale.x / 2;
+            absDistanceY = Math.Abs(distanceY) + node.Scale.z / 2;
 
             if (node.Owner == graphManager.RootGraph)
             {
