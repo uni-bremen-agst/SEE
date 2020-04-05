@@ -121,7 +121,7 @@ namespace SEE.Layout
                     // forrest do not have a common ancestor.
                     Debug.LogError("Undefined lowest common ancestor for "
                         + source.LinkName + " and " + target.LinkName + "\n");
-                    return LinePoints.BSplineLinePoints(ThroughCenter(source, target, maxLevel));
+                    return BetweenTrees(source, target, maxLevel);
                 }
                 else if (lca == source || lca == target)
                 {
@@ -323,50 +323,22 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Yields control points for two nodes that do not have a common ancestor in the
+        /// Yields line points for two nodes that do not have a common ancestor in the
         /// node hierarchy. This may occur when we have multiple roots in the graph, that
         /// is, the node hierarchy is a forrest and not just a single tree. In this case,
         /// we want the spline to reach above all other splines of nodes having a common
         /// ancestor. 
-        /// The first and last control points are the respective roots of source and target
-        /// node. The second and third control points are the same: it lies in between 
-        /// the two nodes with respect to the x and z axis; its height (y axis) is the
-        /// highest hierarchical level, that is, one levelUnit above the level at maxDepth.
+        /// The first and last points are the respective roofs/grounds of source and target
+        /// node. The peak point of the direct spline lies in between the two nodes with 
+        /// respect to the x and z axis; its height (y axis) is the highest hierarchical level, 
+        /// that is, one levelDistance above all other edges within the same trees.
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="target"></param>
-        /// <param name="maxDepth">maximal depth of the node hierarchy</param>
-        /// <returns>control points for two nodes without common ancestor</returns>
-        private Vector3[] ThroughCenter(ILayoutNode source, ILayoutNode target, int maxDepth)
+        /// <param name="source">start of edge (in one tree)</param>
+        /// <param name="target">end of the edge (in another tree)</param>
+        /// <returns>line points for two nodes without common ancestor</returns>
+        private Vector3[] BetweenTrees(ILayoutNode source, ILayoutNode target)
         {
-            Vector3 start = source.Roof;
-            Vector3 end = target.Roof;
-            // note: height is independent of the roofs; it is the distance to the ground
-            return ThroughCenter(start, end, GetLevelHeight(-1));
-        }
-
-        /// <summary>
-        /// Yields control points for a B-spline from <paramref name="start"/> to <paramref name="end"/>.
-        /// The first and last control points are <paramref name="start"/> and <paramref name="end"/>,
-        /// respectively. The second and third control points are the same position that lies in between 
-        /// <paramref name="start"/> and <paramref name="end"/> with respect to the x and z axis; its height
-        /// (y axis) is <paramref name="yLevel"/>.
-        /// </summary>
-        /// <param name="sourceObject"></param>
-        /// <param name="targetObject"></param>
-        /// <param name="yLevel">y co-ordinate of the second and third control points returned</param>
-        /// <returns>control points for two nodes without common ancestor</returns>
-        private static Vector3[] ThroughCenter(Vector3 start, Vector3 end, float yLevel)
-        {
-            Vector3[] controlPoints = new Vector3[4];
-            controlPoints[0] = start;
-            controlPoints[3] = end;
-            // the point in between the start and end
-            Vector3 center = controlPoints[0] + 0.5f * (controlPoints[3] - controlPoints[0]);
-            center.y = yLevel;
-            controlPoints[1] = center;
-            controlPoints[2] = center;
-            return controlPoints;
+            return DirectSpline(source, target, GetLevelHeight(-1));
         }
     }
 }
