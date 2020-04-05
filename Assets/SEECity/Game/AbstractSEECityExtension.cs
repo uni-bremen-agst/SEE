@@ -48,6 +48,11 @@ namespace SEE.Game
             }
         }
 
+        public static bool CanApplySublayouts(this NodeLayouts nodeLayout)
+        {
+            return nodeLayout == NodeLayouts.CompoundSpringEmbedder;
+        }
+
         public static bool InnerNodesEncloseLeafNodes(this NodeLayouts nodeLayout)
         {
             switch (nodeLayout)
