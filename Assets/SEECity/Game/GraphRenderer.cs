@@ -192,77 +192,94 @@ namespace SEE.Game
             Dictionary<Node, GameObject> nodeMap = CreateBlocks(nodes);
             // the layout to be applied
             NodeLayout nodeLayout = GetLayout();
-            // the sublayout nodes
-            ICollection<SublayoutNode> sublayoutNodes = new List<SublayoutNode>();
-            List<SublayoutLayoutNode> sublayoutLayoutNodes = new List<SublayoutLayoutNode>();
             // for a hierarchical layout, we need to add the game objects for inner nodes
-            if (nodeLayout.IsHierarchical() )
+            Dictionary<Node, GameObject>.ValueCollection gameNodes;
+            ICollection<ILayoutNode> layoutNodes;
+
+            if (settings.NodeLayout.CanApplySublayouts())
             {
-                if (nodeLayout.UsesEdgesAndSublayoutNodes())
-                {
-                    sublayoutNodes = AddInnerNodesForSublayouts(nodeMap, nodes);
-                } else
-                {
-                    AddInnerNodes(nodeMap, nodes); // and inner nodes
-                }
-            } 
+                ICollection<SublayoutNode>  sublayoutNodes = AddInnerNodesForSublayouts(nodeMap, nodes);
+                gameNodes = nodeMap.Values;
+                layoutNodes = ToLayoutNodes(nodeMap, sublayoutNodes);
 
-            // calculate and apply the node layout
-            Dictionary<Node, GameObject>.ValueCollection gameNodes = nodeMap.Values;
-
-            ICollection<ILayoutNode> layoutNodes = nodeLayout.UsesEdgesAndSublayoutNodes() ? ToLayoutNodes(nodeMap, sublayoutNodes) : ToLayoutNodes(gameNodes);
-
-            // differentiate between Layouts using Sublayouts and Edges and Layouts only using nodes 
-            if (nodeLayout.UsesEdgesAndSublayoutNodes())
-            {
-                sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
+                List<SublayoutLayoutNode> sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
                 foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
                 {
                     Sublayout sublayout = new Sublayout(layoutNode, groundLevel, GetInnerNodeFactory(layoutNode.InnerNodeKind));
                     sublayout.Layout();
                 }
-                nodeLayout.Apply(layoutNodes, graph.Edges(), sublayoutLayoutNodes);
-            } else
-            {
-                nodeLayout.Apply(layoutNodes);
+
+                if (nodeLayout.UsesEdgesAndSublayoutNodes())
+                {
+                    nodeLayout.Apply(layoutNodes, graph.Edges(), sublayoutLayoutNodes);
+                }
+
+                NodeLayout.Move(layoutNodes, settings.origin);
+                AddToParent(gameNodes, parent);
+
+                // add the decorations, too
+                if (sublayoutLayoutNodes.Count <= 0)
+                {
+                    AddToParent(AddDecorations(gameNodes), parent);
+                }
+                else
+                {
+                    AddDecorationsForSublayouts(layoutNodes, sublayoutLayoutNodes, parent);
+                }
             }
-
-            NodeLayout.Move(layoutNodes, settings.origin);
-
-            AddToParent(gameNodes, parent);
-
-            // add the decorations, too
-            if (!nodeLayout.UsesEdgesAndSublayoutNodes() && sublayoutLayoutNodes.Count > 0)
+            else
             {
+                if (nodeLayout.IsHierarchical())
+                {
+                    AddInnerNodes(nodeMap, nodes); // and inner nodes
+                }
+
+                // calculate and apply the node layout
+                gameNodes = nodeMap.Values;
+                layoutNodes = ToLayoutNodes(gameNodes);
+                nodeLayout.Apply(layoutNodes);
+                NodeLayout.Move(layoutNodes, settings.origin);
+
+                AddToParent(gameNodes, parent);
+                // add the decorations, too
                 AddToParent(AddDecorations(gameNodes), parent);
-            } else
-            {
-                List<ILayoutNode> remainingLayoutNodes = layoutNodes.ToList();
-                foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
-                {
-                    ICollection<GameObject> gameObjects = new List<GameObject>();
-                    foreach(GameNode gameNode in layoutNode.Nodes)
-                    {
-                        gameObjects.Add(gameNode.GetGameObject());
-                    }
-                    AddToParent(AddDecorations(gameObjects, layoutNode.InnerNodeKind, layoutNode.NodeLayout), parent);
-                    remainingLayoutNodes.RemoveAll(node => layoutNode.Nodes.Contains(node));
-                }
-
-                ICollection<GameObject> remainingGameObjects = new List<GameObject>();
-                foreach (GameNode gameNode in remainingLayoutNodes)
-                {
-                    remainingGameObjects.Add(gameNode.GetGameObject());
-                }
-
-                AddToParent(AddDecorations(remainingGameObjects), parent);
             }
             
+
             // create the laid out edges
             AddToParent(EdgeLayout(graph, layoutNodes), parent);
             // add the plane surrounding all game objects for nodes
             GameObject plane = NewPlane(gameNodes);
             AddToParent(plane, parent);
+        }
+
+        /// <summary>
+        /// TODo
+        /// </summary>
+        /// <param name="layoutNodes"></param>
+        /// <param name="sublayoutLayoutNodes"></param>
+        /// <param name="parent"></param>
+        private void AddDecorationsForSublayouts(ICollection<ILayoutNode> layoutNodes, List<SublayoutLayoutNode> sublayoutLayoutNodes, GameObject parent)
+        {
+            List<ILayoutNode> remainingLayoutNodes = layoutNodes.ToList();
+            foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
+            {
+                ICollection<GameObject> gameObjects = new List<GameObject>();
+                foreach (GameNode gameNode in layoutNode.Nodes)
+                {
+                    gameObjects.Add(gameNode.GetGameObject());
+                }
+                AddToParent(AddDecorations(gameObjects, layoutNode.InnerNodeKind, layoutNode.NodeLayout), parent);
+                remainingLayoutNodes.RemoveAll(node => layoutNode.Nodes.Contains(node));
+            }
+
+            ICollection<GameObject> remainingGameObjects = new List<GameObject>();
+            foreach (GameNode gameNode in remainingLayoutNodes)
+            {
+                remainingGameObjects.Add(gameNode.GetGameObject());
+            }
+
+            AddToParent(AddDecorations(remainingGameObjects), parent);
         }
 
         /// <summary>
