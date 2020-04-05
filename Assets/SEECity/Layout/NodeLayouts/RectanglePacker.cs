@@ -30,7 +30,7 @@ namespace SEE.Layout
         public RectanglePacker(float groundLevel, float Unit, float padding = 0.1f)
             : base(groundLevel)
         {
-            name = "Rectangle Packing";
+            name = "Flat Rectangle Packing";
             this.padding = padding * Unit;
         }
 
@@ -60,17 +60,17 @@ namespace SEE.Layout
         /// all smaller rectangles. The largest contained rectangle appears at the 
         /// left lower corner of the containing rectangle at position (0, groundlevel, 0).
         /// 
-        /// Precondition: every node in <paramref name="gameNodes"/> must have been
+        /// Precondition: every node in <paramref name="layoutNodes"/> must have been
         /// created by the node factory passed to the constructor.
         /// </summary>
-        /// <param name="gameNodes">the game objects to be laid out</param>
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes)
+        /// <param name="layoutNodes">the game objects to be laid out</param>
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes)
         {
             /// The node layout we compute as a result.
             Dictionary<ILayoutNode, NodeTransform> layout_result = new Dictionary<ILayoutNode, NodeTransform>();
 
             List<ILayoutNode> elements = new List<ILayoutNode>();
-            elements.AddRange(gameNodes);
+            elements.AddRange(layoutNodes);
 
             // To increase the efficiency of the space usage, we order the elements by one of the sizes.
             // Elements must be sorted by size, descending
