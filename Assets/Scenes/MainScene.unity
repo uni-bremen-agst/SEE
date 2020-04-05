@@ -416,6 +416,7 @@ MonoBehaviour:
   EdgeWidth: 2
   ShowErosions: 0
   EdgesAboveBlocks: 1
+  Tension: 0.85
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &465914107
@@ -1921,6 +1922,7 @@ MonoBehaviour:
   EdgeWidth: 1
   ShowErosions: 0
   EdgesAboveBlocks: 1
+  Tension: 0.85
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &1003004809
@@ -2031,6 +2033,7 @@ MonoBehaviour:
   EdgeWidth: 1
   ShowErosions: 0
   EdgesAboveBlocks: 0
+  Tension: 0.85
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &1036186228
@@ -2141,6 +2144,7 @@ MonoBehaviour:
   EdgeWidth: 1
   ShowErosions: 0
   EdgesAboveBlocks: 0
+  Tension: 0.85
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &1206385286
@@ -2251,6 +2255,7 @@ MonoBehaviour:
   EdgeWidth: 0.4
   ShowErosions: 0
   EdgesAboveBlocks: 1
+  Tension: 0.85
   gxlPath: random.gxl
   csvPath: random.csv
   LeafConstraint:
@@ -2408,6 +2413,7 @@ MonoBehaviour:
   EdgeWidth: 1
   ShowErosions: 1
   EdgesAboveBlocks: 1
+  Tension: 0.85
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &1357088965
@@ -2662,6 +2668,7 @@ MonoBehaviour:
   EdgeWidth: 1
   ShowErosions: 0
   EdgesAboveBlocks: 1
+  Tension: 0.85
   gxlPath: ..\Data\GXL\linux-clones\net.gxl
   csvPath: ..\Data\GXL\linux-clones\net.csv
 --- !u!4 &2092969280

@@ -36,16 +36,20 @@ namespace SEE.Layout
         /// Determines the strength of the tension for bundling edges. This value may
         /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
         /// </summary>
-        public static float tension = 0.85f; // 0.85 is the value recommended by Holten
+        public const float tensionDefault = 0.85f; // 0.85 is the value recommended by Holten
 
         /// <summary>
         /// Returns the points of the line along the B-spline constrained by the given <paramref name="controlPoints"/>.
         /// </summary>
         /// <param name="controlPoints">control points of the B-spline</param>
+        /// <param name="tension">tension of the control points onto the spline points; must be in
+        /// the range [0, 1]</param>
         /// <returns>points of the line along the B-spline</returns>
-        public static Vector3[] BSplineLinePoints(Vector3[] controlPoints)
+        public static Vector3[] BSplineLinePoints(Vector3[] controlPoints, float tension = tensionDefault)
         {
             Debug.Assert(controlPoints.Length > 3);
+            Debug.Assert(0.0f <= tension && tension <= 1.0f);
+
             // Create a cubic spline with control points in 3D using a clamped knot vector.
             TinySpline.BSpline spline = new TinySpline.BSpline((uint)controlPoints.Length, dimensions)
             {
@@ -167,7 +171,7 @@ namespace SEE.Layout
                };
 
             TinySpline.BSpline spline = TinySpline.Utils.interpolateCubic(path, dimensions);
-            return ListToVectors(spline.buckle(tension).sample());
+            return ListToVectors(spline.buckle(1.0f).sample());
         }
 
         /// <summary>
