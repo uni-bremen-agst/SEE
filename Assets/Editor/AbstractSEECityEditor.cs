@@ -6,6 +6,7 @@ using SEE;
 using SEE.DataModel;
 using System.Collections.Generic;
 using System.Linq;
+using static SEE.Game.AbstractSEECity;
 
 namespace SEEEditor
 {
@@ -79,9 +80,10 @@ namespace SEEEditor
                         }
                     }
 
+                    List<NodeLayouts> parentNodeLayouts = new List<NodeLayouts>();
                     foreach (Node root in roots)
                     {
-                        TraverseThruNodes(root);
+                        TraverseThruNodes(root, parentNodeLayouts);
                     }
                 }
             }
@@ -178,7 +180,7 @@ namespace SEEEditor
         /// traverses thru the nodes and displays the sublayout hierarchie graph
         /// </summary>
         /// <param name="root"></param>
-        private void TraverseThruNodes(Node root)
+        private void TraverseThruNodes(Node root, List<NodeLayouts> parentNodelayouts)
         {
             EditorGUIUtility.labelWidth = 80;
             if (root.Children() != null && !root.IsLeaf())
@@ -204,8 +206,7 @@ namespace SEEEditor
                         city.CoseGraphSettings.show[root] = showPosition;
                         if (showPosition)
                         {
-
-                            ShowCheckBox(root, false);
+                            ShowCheckBox(root, false, parentNodelayouts);
 
                             GUILayout.EndHorizontal();
 
@@ -213,7 +214,7 @@ namespace SEEEditor
                             {
                                 foreach (Node child in root.Children())
                                 {
-                                    TraverseThruNodes(child);
+                                    TraverseThruNodes(child, new List<NodeLayouts>(parentNodelayouts));
                                 }
                             }
                         }
@@ -226,7 +227,7 @@ namespace SEEEditor
                     {
                         EditorGUIUtility.labelWidth = 80;
                         GUILayout.Label(root.LinkName, GUILayout.Width(120));
-                        ShowCheckBox(root, true);
+                        ShowCheckBox(root, true, parentNodelayouts);
                         GUILayout.EndHorizontal();
                     }
                 }
@@ -238,7 +239,7 @@ namespace SEEEditor
         /// </summary>
         /// <param name="root"></param>
         /// <param name="childrenAreLeaves"></param>
-        private void ShowCheckBox(Node root, bool childrenAreLeaves)
+        private void ShowCheckBox(Node root, bool childrenAreLeaves, List<NodeLayouts> parentNodeLayouts)
         {
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
@@ -249,12 +250,12 @@ namespace SEEEditor
 
             if (toggle)
             {
-                ShowSublayoutEnum(city.CoseGraphSettings.DirNodeLayout[root.LinkName], root, childrenAreLeaves);
+                ShowSublayoutEnum(city.CoseGraphSettings.DirNodeLayout[root.LinkName], root, childrenAreLeaves, parentNodeLayouts);
             }
             else
             {
                 EditorGUI.BeginDisabledGroup(true);
-                ShowSublayoutEnum(AbstractSEECity.NodeLayouts.CompoundSpringEmbedder, root, childrenAreLeaves);
+                ShowSublayoutEnum(AbstractSEECity.NodeLayouts.CompoundSpringEmbedder, root, childrenAreLeaves, new List<NodeLayouts>());
                 EditorGUI.EndDisabledGroup();
             }
 
@@ -286,7 +287,6 @@ namespace SEEEditor
             EditorGUIUtility.labelWidth = 80; 
             EditorGUILayout.PrefixLabel("Inner nodes");
             Dictionary<AbstractSEECity.InnerNodeKinds, string> shapeKinds = nodeLayout.GetInnerNodeKinds().ToDictionary(kind => kind, kind => kind.ToString());
-            Debug.Log(shapeKinds);
 
             if (shapeKinds.ContainsKey(city.CoseGraphSettings.DirShape[node.LinkName]))
             {
@@ -305,14 +305,30 @@ namespace SEEEditor
         /// <param name="nodeLayout"></param>
         /// <param name="root"></param>
         /// <param name="childrenAreLeaves"></param>
-        private void ShowSublayoutEnum(AbstractSEECity.NodeLayouts nodeLayout, Node root, bool childrenAreLeaves)
+        private void ShowSublayoutEnum(AbstractSEECity.NodeLayouts nodeLayout, Node root, bool childrenAreLeaves, List<NodeLayouts> parentNodeLayouts)
         {
             GUILayoutOption[] guiOptions = { GUILayout.ExpandWidth(false), GUILayout.Width(200) };
             EditorGUIUtility.labelWidth = 80;
             EditorGUILayout.PrefixLabel("Sublayouts");
-            Dictionary<AbstractSEECity.NodeLayouts, string> subLayoutNodeLayouts = new Dictionary<AbstractSEECity.NodeLayouts, string>();
-            subLayoutNodeLayouts = childrenAreLeaves ? city.SubLayoutsLeafNodes : city.SubLayoutsInnerNodes;
-            city.CoseGraphSettings.DirNodeLayout[root.LinkName] = subLayoutNodeLayouts.ElementAt(EditorGUILayout.Popup(subLayoutNodeLayouts.Keys.ToList().IndexOf(city.CoseGraphSettings.DirNodeLayout[root.LinkName]), subLayoutNodeLayouts.Values.ToArray(), guiOptions)).Key;
+            Dictionary<AbstractSEECity.NodeLayouts, string> subLayoutNodeLayouts = childrenAreLeaves ? city.SubLayoutsLeafNodes : city.SubLayoutsInnerNodes;
+
+            foreach (NodeLayouts layout in parentNodeLayouts)
+            {
+                List<NodeLayouts> possible = layout.GetPossibleSublayouts();
+                subLayoutNodeLayouts = subLayoutNodeLayouts.Where(elem => possible.Contains(elem.Key)).ToDictionary(x=> x.Key, x=> x.Value);
+            }
+
+            if (subLayoutNodeLayouts.ContainsKey(city.CoseGraphSettings.DirNodeLayout[root.LinkName]))
+            {
+                city.CoseGraphSettings.DirNodeLayout[root.LinkName] = subLayoutNodeLayouts.ElementAt(EditorGUILayout.Popup(subLayoutNodeLayouts.Keys.ToList().IndexOf(city.CoseGraphSettings.DirNodeLayout[root.LinkName]), subLayoutNodeLayouts.Values.ToArray(), guiOptions)).Key;
+
+            }
+            else
+            {
+                city.CoseGraphSettings.DirNodeLayout[root.LinkName] = subLayoutNodeLayouts.ElementAt(EditorGUILayout.Popup(subLayoutNodeLayouts.Keys.ToList().IndexOf(subLayoutNodeLayouts.First().Key), subLayoutNodeLayouts.Values.ToArray(), guiOptions)).Key;
+            }
+
+            parentNodeLayouts.Add(city.CoseGraphSettings.DirNodeLayout[root.LinkName]);
             EditorGUIUtility.labelWidth = 150;
         }
 
