@@ -161,7 +161,7 @@ namespace SEE.Layout
         public void UpdateLenght()
         {
             double[] clipPointCoordinates = new double[4];
-            Tuple<bool, double[]> result = CoseGeometry.GetIntersection(target.rect, source.rect, clipPointCoordinates);
+            Tuple<bool, double[]> result = CoseGeometry.GetIntersection( CoseHelper.NewRect(target.Scale, target.CenterPosition), CoseHelper.NewRect(source.Scale, source.CenterPosition), clipPointCoordinates);
             isOverlappingSourceAndTarget = result.Item1;
             clipPointCoordinates = result.Item2;
 

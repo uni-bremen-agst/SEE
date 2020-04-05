@@ -136,7 +136,7 @@ namespace SEE.Layout
                 {
                     if (nodeLayout != NodeLayouts.Treemap)
                     {
-                        scale = new Vector3(coseNode.rect.width, innerNodeHeight, coseNode.rect.height);
+                        scale = new Vector3(coseNode.Scale.x, innerNodeHeight, coseNode.Scale.z);
                     } 
                 }
 
@@ -152,8 +152,7 @@ namespace SEE.Layout
                 {
                     if (coseNode == root)
                     {
-                        LayoutScale = scale;
-                        LayoutPosition = position; 
+                        LayoutScale = scale; 
                     }
                     else
                     {
@@ -243,8 +242,7 @@ namespace SEE.Layout
                 Vector3 position = new Vector3(boundingRect.center.x, groundLevel, boundingRect.center.y);
                 Vector3 scale = new Vector3(boundingRect.width, innerNodeHeight, boundingRect.height);
                 // TODO das ist doch flasch oder?
-                LayoutScale = new Vector3(root.rect.width, innerNodeHeight, root.rect.height);
-                LayoutPosition = new Vector3(root.rect.x, groundLevel, root.rect.y);
+                LayoutScale = new Vector3(root.Scale.x, innerNodeHeight, root.Scale.z);
                 root.SublayoutValues.IsSubLayoutNode = true;
                 root.SetPositionScale(position, scale);
             }

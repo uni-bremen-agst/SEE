@@ -42,7 +42,13 @@ namespace SEE.Layout
         /// <summary>
         /// the bounding rect 
         /// </summary>
-        public Rect rect = new Rect(0, 0, 0, 0);
+        //public Rect rect = new Rect(0, 0, 0, 0);
+
+        /// TODO
+        private Vector3 scale;
+
+        /// TODO
+        private Vector3 centerPosition; 
 
         /// <summary>
         /// TODO
@@ -86,8 +92,10 @@ namespace SEE.Layout
         public ILayoutNode NodeObject { get => nodeObject; set => nodeObject = value; }
         public CoseGraphManager GraphManager { get => graphManager; set => graphManager = value; }
         public int InclusionTreeDepth { get => inclusionTreeDepth; set => inclusionTreeDepth = value; }
+        public Vector3 Scale { get => scale; set => scale = value; }
+        public Vector3 CenterPosition { get => centerPosition; set => centerPosition = value; }
 
-        
+
 
 
         /// <summary>
@@ -109,8 +117,8 @@ namespace SEE.Layout
         /// <returns></returns>
         public bool CalcOverlap(CoseNode nodeB, double[] overlapAmount)
         {
-            Rect rectA = rect;
-            Rect rectB = nodeB.rect;
+            Rect rectA = CoseHelper.NewRect(Scale, CenterPosition);
+            Rect rectB = CoseHelper.NewRect(nodeB.Scale, nodeB.CenterPosition);
 
             if (rectA.Overlaps(rectB))
             {
@@ -131,7 +139,7 @@ namespace SEE.Layout
         /// <returns></returns>
         public double[] CalcIntersection(CoseNode nodeB, double[] clipPoints)
         {
-            Tuple<bool, double[]> result = CoseGeometry.GetIntersection(rect, nodeB.rect, clipPoints);
+            Tuple<bool, double[]> result = CoseGeometry.GetIntersection(CoseHelper.NewRect(scale, centerPosition), CoseHelper.NewRect(nodeB.scale, nodeB.centerPosition), clipPoints);
             return result.Item2;
         }
 
@@ -277,7 +285,7 @@ namespace SEE.Layout
 
             if (child != null)
             {
-                child.SetXYDisplacementBoundingRect(dx, dy);
+                child.SetXZDisplacementBoundingRect(dx, dy);
 
                 foreach (CoseNode node in child.Nodes)
                 {
@@ -312,11 +320,11 @@ namespace SEE.Layout
         /// Changes the position of the nodes according to the given displacement values
         /// </summary>
         /// <param name="dx">the displacement of the x direction</param>
-        /// <param name="dy">the displacement of the y direction</param>
-        public void MoveBy(double dx, double dy)
+        /// <param name="dz">the displacement of the z direction</param>
+        public void MoveBy(double dx, double dz)
         {
-            rect.x += (float)dx;
-            rect.y += (float)dy;
+            centerPosition.x += (float)dx;
+            centerPosition.z += (float)dz;
         }
 
         /// <summary>
@@ -340,8 +348,7 @@ namespace SEE.Layout
         /// <param name="origin">the node</param>
         public void SetPositionRelativ(CoseNode origin)
         {
-            sublayoutValues.relativeRect.x -= origin.rect.x;
-            sublayoutValues.relativeRect.y -= origin.rect.y;
+            sublayoutValues.SetLocationRelative(sublayoutValues.RelativeCenterPosition.x - origin.centerPosition.x, sublayoutValues.RelativeCenterPosition.z - origin.centerPosition.z);
             sublayoutValues.SubLayoutRoot = origin;
         }
 
@@ -350,10 +357,10 @@ namespace SEE.Layout
         /// </summary>
         public void SetOrigin()
         {
-            rect.x = sublayoutValues.relativeRect.x + sublayoutValues.SubLayoutRoot.rect.x;
-            rect.y = sublayoutValues.relativeRect.y + sublayoutValues.SubLayoutRoot.rect.y;
-            SetWidth(sublayoutValues.relativeRect.width);
-            SetHeight(sublayoutValues.relativeRect.height);
+            centerPosition.x = sublayoutValues.RelativeCenterPosition.x + sublayoutValues.SubLayoutRoot.centerPosition.x;
+            centerPosition.z = sublayoutValues.RelativeCenterPosition.z + sublayoutValues.SubLayoutRoot.centerPosition.z;
+            SetWidth(sublayoutValues.RelativeScale.x);
+            SetHeight(sublayoutValues.RelativeScale.z);
         }
 
         /// <summary>
@@ -371,8 +378,8 @@ namespace SEE.Layout
             float top = position.z - (scale.z / 2);
             float bottom = position.z + (scale.z / 2);
 
-            sublayoutValues.UpdateRelativeRect(left, right, top, bottom);
-            UpdateRect(left, right, top, bottom);
+            sublayoutValues.UpdateRelativeBounding(left, right, top, bottom);
+            UpdateBounding(left, right, top, bottom);
 
             if (child != null)
             {
@@ -429,7 +436,9 @@ namespace SEE.Layout
         /// <param name="y"></param>
         public void SetLocation(float x, float y)
         {
-            rect.position = new Vector2(x, y);
+            centerPosition.x = x;
+            centerPosition.z = y;
+            //rect.position = new Vector2(x, y);
         }
 
         /// <summary>
@@ -444,8 +453,8 @@ namespace SEE.Layout
 
             if (sublayoutValues.IsSubLayoutRoot)
             {
-                SetWidth(sublayoutValues.relativeRect.width);
-                SetHeight(sublayoutValues.relativeRect.height);
+                SetWidth(sublayoutValues.RelativeScale.x);
+                SetHeight(sublayoutValues.RelativeScale.z);
                 child.UpdateBounds(true);
                 // rect.x/ rect.y müssen nicht gesetzt werden, da der Knoten seine Größe kennt und nicht abhängig von Child knoten ist
                 return;
@@ -457,11 +466,10 @@ namespace SEE.Layout
                 // damit das von anderen richtig berechnet werden kann
 
                 // set position to origin by using the relativ values 
-
-                rect.x = sublayoutValues.relativeRect.x + sublayoutValues.SubLayoutRoot.rect.x;
-                rect.y = sublayoutValues.relativeRect.y + sublayoutValues.SubLayoutRoot.rect.y;
-                SetWidth(sublayoutValues.relativeRect.width);
-                SetHeight(sublayoutValues.relativeRect.height);
+                centerPosition.x = sublayoutValues.RelativeCenterPosition.x + sublayoutValues.SubLayoutRoot.centerPosition.x;
+                centerPosition.z = sublayoutValues.RelativeCenterPosition.z + sublayoutValues.SubLayoutRoot.centerPosition.z;
+                SetWidth(sublayoutValues.RelativeScale.x);
+                SetHeight(sublayoutValues.RelativeScale.z);
                 child.UpdateBounds(true);
                 return;
             }
@@ -469,8 +477,16 @@ namespace SEE.Layout
             if (child.Nodes.Count != 0)
             {
                 child.UpdateBounds(true);
-                rect.x = (float) (child.Left - CoseLayoutSettings.Compound_Node_Margin);
-                rect.y = (float)(child.Top - CoseLayoutSettings.Compound_Node_Margin);
+               
+
+                centerPosition.x = (float)(child.Left + ((child.Right - child.Left) / 2));
+                centerPosition.z = (float)(child.Top + ((child.Bottom - child.Top) / 2));
+
+                SetWidth(child.Right - child.Left + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);//+ (2 * CoseDefaultValues.COMPOUND_NODE_MARGIN)); //+ diffWidth);
+                SetHeight(child.Bottom - child.Top + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);// + (2 * CoseDefaultValues.COMPOUND_NODE_MARGIN)); // + diffHeight);
+
+                //centerPosition.x = child.Left.x - CoseLayoutSettings.Compound_Node_Margin;
+                //centerPosition.z = child.CenterPosition.z - CoseLayoutSettings.Compound_Node_Margin;
 
                 // float width = childGraph.Right - childGraph.Left / Mathf.Sqrt(2);
                 // float height = childGraph.Bottom - childGraph.Top / Mathf.Sqrt(2);
@@ -479,22 +495,10 @@ namespace SEE.Layout
                 // float diffHeight = Mathf.Abs(height - rect.height);
 
                 // Here add Labelheight etc. 
-                if (graphManager.Layout.InnerNodesAreCircles)
-                {
-                    var width = Math.Abs(child.Right - child.Left);
-                    var height = Math.Abs(child.Bottom - child.Top);
 
-                    double boundsWidth = (width / Math.Sqrt(2)) - (width / 2);
-                    double boundsHeight = (height / Math.Sqrt(2)) - (height / 2);
 
-                    SetWidth(child.Right - child.Left + boundsWidth + boundsWidth);
-                    SetHeight(child.Bottom - child.Top + boundsHeight + boundsHeight);
-                }
-                else
-                {
-                    SetWidth(child.Right - child.Left + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);//+ (2 * CoseDefaultValues.COMPOUND_NODE_MARGIN)); //+ diffWidth);
-                    SetHeight(child.Bottom - child.Top + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);// + (2 * CoseDefaultValues.COMPOUND_NODE_MARGIN)); // + diffHeight);
-                }
+
+
             }
         }
 
@@ -521,14 +525,14 @@ namespace SEE.Layout
         {
             if (child == null)
             {
-                estimatedSize = (rect.width + rect.height) / 2;
+                estimatedSize = (scale.x + scale.z) / 2;
                 return estimatedSize;
             }
             else
             {
                 estimatedSize = child.CalcEstimatedSize();
-                rect.width = (float) estimatedSize;
-                rect.height = (float) estimatedSize;
+                scale.x = (float) estimatedSize;
+                scale.z = (float) estimatedSize;
                 return estimatedSize;
             }
         }
@@ -567,9 +571,12 @@ namespace SEE.Layout
         /// <param name="right">the right position</param>
         /// <param name="top">the top position</param>
         /// <param name="bottom">the bottom position</param>
-        public void UpdateRect(float left, float right, float top, float bottom)
+        public void UpdateBounding(float left, float right, float top, float bottom)
         {
-            rect = new Rect(left, top, right - left, bottom - top);
+            scale.x = right - left;
+            scale.z = bottom - top;
+            centerPosition.x = left + scale.x / 2;
+            centerPosition.z = top + scale.z / 2;
         }
 
         /// <summary>
@@ -578,7 +585,7 @@ namespace SEE.Layout
         /// <returns>center x postion</returns>
         public double GetCenterX()
         {
-            return rect.x + (rect.width / 2);
+            return centerPosition.x;
         }
 
         /// <summary>
@@ -587,7 +594,7 @@ namespace SEE.Layout
         /// <returns>center y postion</returns>
         public double GetCenterY()
         {
-            return rect.y + (rect.height / 2);
+            return centerPosition.z;
         }
 
         /// <summary>
@@ -596,7 +603,7 @@ namespace SEE.Layout
         /// <param name="height">the height</param>
         public void SetHeight(double height)
         {
-            rect.height = (float) height;
+            scale.z = (float)height;
         }
 
         /// <summary>
@@ -605,7 +612,7 @@ namespace SEE.Layout
         /// <param name="height">the width</param>
         public void SetWidth(double width)
         {
-            rect.width =(float) width;
+            scale.x = (float) width;
         }
 
         /// <summary>
@@ -614,7 +621,7 @@ namespace SEE.Layout
         /// <returns>the left position</returns>
         public float GetLeft()
         {
-            return rect.x;
+            return centerPosition.x - Scale.x / 2;
         }
 
         /// <summary>
@@ -623,7 +630,7 @@ namespace SEE.Layout
         /// <returns>the right position</returns>
         public float GetRight()
         {
-            return rect.x + rect.width;
+            return centerPosition.x + Scale.x / 2;
         }
 
         /// <summary>
@@ -632,7 +639,7 @@ namespace SEE.Layout
         /// <returns>the top position</returns>
         public float GetTop()
         {
-            return rect.y;
+            return centerPosition.z - Scale.z / 2;
         }
 
         /// <summary>
@@ -641,7 +648,7 @@ namespace SEE.Layout
         /// <returns>the bottom position</returns>
         public float GetBottom()
         {
-            return rect.y + rect.height;
+            return centerPosition.z + Scale.z / 2;
         }
     }
 }

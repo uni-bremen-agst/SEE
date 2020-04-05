@@ -11,7 +11,13 @@ namespace SEE.Layout
         /// <summary>
         /// the bounds of the node relative to its sublayout root 
         /// </summary>
-        public Rect relativeRect = new Rect(0, 0, 0, 0);
+        //public Rect relativeRect = new Rect(0, 0, 0, 0);
+
+        /// TODO, raucht man glab ich nicht, außer vielleicht für das evostreet?
+        private Vector3 relativeScale;
+
+        /// TODO
+        private Vector3 relativeCenterPosition;
 
         /// <summary>
         /// Indicates whether the node is a sublayout root
@@ -37,8 +43,19 @@ namespace SEE.Layout
         public bool IsSubLayoutNode { get => isSubLayoutNode; set => isSubLayoutNode = value; }
         public CoseNode SubLayoutRoot { get => subLayoutRoot; set => subLayoutRoot = value; }
         public Sublayout Sublayout { get => sublayout; set => sublayout = value; }
+        public Vector3 RelativeScale { get => relativeScale; set => relativeScale = value; }
+        public Vector3 RelativeCenterPosition { get => relativeCenterPosition; set => relativeCenterPosition = value; }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="z"></param>
+        public void SetLocationRelative(float x, float z)
+        {
+            relativeCenterPosition.x = x;
+            relativeCenterPosition.z = z;
+        }
 
         /// <summary>
         /// updates the relative bounding rect
@@ -47,9 +64,12 @@ namespace SEE.Layout
         /// <param name="right">the right position</param>
         /// <param name="top">the top position</param>
         /// <param name="bottom">the bottom position</param>
-        public void UpdateRelativeRect(float left, float right, float top, float bottom)
+        public void UpdateRelativeBounding(float left, float right, float top, float bottom)
         {
-            relativeRect = new Rect(left, top, right - left, bottom - top);
+            relativeScale.x = right - left;
+            relativeScale.z = bottom - top;
+            relativeCenterPosition.x = left + relativeScale.x / 2;
+            relativeCenterPosition.z = top + relativeScale.z / 2;
         }
     }
 }
