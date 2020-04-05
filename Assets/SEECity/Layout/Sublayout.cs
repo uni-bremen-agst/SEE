@@ -232,7 +232,14 @@ namespace SEE.Layout
                 Vector3 scale = new Vector3(boundingRect.width, innerNodeHeight, boundingRect.height);
                 Vector3 position = new Vector3(boundingRect.center.x, groundLevel, boundingRect.center.y);
                 // TODO das ist doch falsch so, bzw. jetzt richtig beim anderen noch falsch
-                LayoutScale = new Vector3(sublayout.Node.Scale.x, innerNodeHeight, sublayout.Node.Scale.z);
+
+                if (nodeLayout.OnlyLeaves())
+                {
+                    LayoutScale = scale; //new Vector3(sublayout.Node.Scale.x, innerNodeHeight, sublayout.Node.Scale.z);
+                } else
+                {
+                    LayoutScale = new Vector3(sublayout.Node.Scale.x, innerNodeHeight, sublayout.Node.Scale.z);
+                }
 
                 sublayout.Node.Scale = scale;
                 sublayout.Node.CenterPosition = position;
