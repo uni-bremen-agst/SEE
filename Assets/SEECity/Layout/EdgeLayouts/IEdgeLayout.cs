@@ -51,7 +51,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="nodes">list of nodes whose greatest and smallest y co-ordinate is required</param>
         /// <param name="minY">smallest y co-ordinate</param>
-        /// <param name="maxY">highest x co-ordinate</param>
+        /// <param name="maxY">largest y co-ordinate</param>
         /// <param name="maxHeight">maximal height of nodes</param>
         protected void MinMaxBlockY(ICollection<ILayoutNode> nodes, out float minY, out float maxY, out float maxHeight)
         {
@@ -60,19 +60,25 @@ namespace SEE.Layout
             maxHeight = 0.0f;
             foreach (ILayoutNode node in nodes)
             {
-                float y = node.Roof.y;
-                if (y > maxY)
+                float cy = node.CenterPosition.y;
+                float height = node.Scale.y;
                 {
-                    maxY = y;
+                    float roof = cy + height / 2.0f;
+                    if (roof > maxY)
+                    {
+                        maxY = roof;
+                    }
                 }
-                else if (y < minY)
                 {
-                    minY = y;
-                }
-                float h = node.Scale.y;
-                if (h > maxHeight)
+                    float ground = cy - height / 2.0f;
+                    if (ground < minY)
+                    {
+                        minY = ground;
+                    }
+                }                
+                if (height > maxHeight)
                 {
-                    maxHeight = h;
+                    maxHeight = height;
                 }
             }
         }
