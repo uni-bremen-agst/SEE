@@ -5,7 +5,10 @@ using System;
 namespace SEE.Layout
 {
     /// <summary>
-    /// Draws edges as hierarchically bundled edges.
+    /// Draws edges as hierarchically bundled edges. 
+    /// 
+    /// See D. Holten, "Hierarchical Edge Bundles: Visualization of Adjacency Relations in Hierarchical Data" 
+    /// in IEEE Transactions on Visualization and Computer Graphics, vol. 12, no. 5, pp. 741-748, Sept.-Oct. 2006.
     /// </summary>
     public class BundledEdgeLayout : IEdgeLayout
     {
@@ -20,11 +23,11 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// The maximal level of the node hierarchy of the graph. The first level is 0.
-        /// Thus, this value is greater or equal to zero. It is zero if we have only roots.
+        /// Returns hierarchically bundled splines for all edges among the given <paramref name="layoutNodes"/>.
+        /// 
         /// </summary>
-        private int maxLevel = 0;
-
+        /// <param name="layoutNodes">nodes whose connecting edges are to be drawn</param>
+        /// <returns>hierarchically bundled splines</returns>
         public override ICollection<LayoutEdge> Create(ICollection<ILayoutNode> layoutNodes)
         {
             ICollection<LayoutEdge> layout = new List<LayoutEdge>();
@@ -47,6 +50,12 @@ namespace SEE.Layout
             }
             return layout;
         }
+
+        /// <summary>
+        /// The maximal level of the node hierarchy of the graph. The first level is 0.
+        /// Thus, this value is greater or equal to zero. It is zero if we have only roots.
+        /// </summary>
+        private int maxLevel = 0;
 
         /// <summary>
         /// Returns the maximal tree level of the given <paramref name="nodes"/>, that is, the 
@@ -82,6 +91,40 @@ namespace SEE.Layout
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// Returns the path from child to ancestor in the tree including
+        /// the child and the ancestor.
+        /// Assertations on result: path[0] = child and path[path.Length-1] = ancestor.
+        /// If child = ancestor, path[0] = child = path[path.Length-1] = ancestor.
+        /// Precondition: child has ancestor.
+        /// </summary>
+        /// <param name="child">from where to start</param>
+        /// <param name="ancestor">where to stop</param>
+        /// <returns>path from child to ancestor in the tree</returns>
+        private ILayoutNode[] Ancestors(ILayoutNode child, ILayoutNode ancestor)
+        {
+            int childLevel = child.Level;
+            int ancestorLevel = ancestor.Level;
+            // Note: roots have level 0, lower nodes have a level greater than 0;
+            // thus, childLevel >= ancestorLevel
+
+            // if ancestorLevel = childLevel, then path.Count = 1
+            ILayoutNode[] path = new ILayoutNode[childLevel - ancestorLevel + 1];
+            ILayoutNode cursor = child;
+            int i = 0;
+            while (true)
+            {
+                path[i] = cursor;
+                if (cursor == ancestor)
+                {
+                    break;
+                }
+                cursor = cursor.Parent;
+                i++;
+            }
+            return path;
         }
 
         /// <summary>
@@ -215,40 +258,6 @@ namespace SEE.Layout
             Vector3 middle = Vector3.Lerp(start, end, 0.5f);
             middle.y = edgesAboveBlocks ? yLevel : -yLevel;
             return LinePoints.SplineLinePoints(start, middle, end);
-        }
-
-        /// <summary>
-        /// Returns the path from child to ancestor in the tree including
-        /// the child and the ancestor.
-        /// Assertations on result: path[0] = child and path[path.Length-1] = ancestor.
-        /// If child = ancestor, path[0] = child = path[path.Length-1] = ancestor.
-        /// Precondition: child has ancestor.
-        /// </summary>
-        /// <param name="child">from where to start</param>
-        /// <param name="ancestor">where to stop</param>
-        /// <returns>path from child to ancestor in the tree</returns>
-        private ILayoutNode[] Ancestors(ILayoutNode child, ILayoutNode ancestor)
-        {
-            int childLevel = child.Level;
-            int ancestorLevel = ancestor.Level;
-            // Note: roots have level 0, lower nodes have a level greater than 0;
-            // thus, childLevel >= ancestorLevel
-
-            // if ancestorLevel = childLevel, then path.Count = 1
-            ILayoutNode[] path = new ILayoutNode[childLevel - ancestorLevel + 1];
-            ILayoutNode cursor = child;
-            int i = 0;
-            while (true)
-            {
-                path[i] = cursor;
-                if (cursor == ancestor)
-                {
-                    break;
-                }
-                cursor = cursor.Parent;
-                i++;
-            }
-            return path;
         }
 
         /// <summary>
