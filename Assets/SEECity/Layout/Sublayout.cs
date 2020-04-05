@@ -37,7 +37,7 @@ namespace SEE.Layout
         /// <summary>
         /// TODO
         /// </summary>
-        private Vector3 layoutPosition;
+        private Vector3 layoutOffset;
 
         /// <summary>
         /// TODO
@@ -47,6 +47,8 @@ namespace SEE.Layout
         private SublayoutLayoutNode sublayout;
 
         public Vector3 LayoutScale { get => layoutScale; set => layoutScale = value; }
+
+        public Vector3 LayoutOffset { get => layoutOffset; set => layoutOffset = value; }
 
         public SublayoutLayoutNode SublayoutLayoutNode => sublayout;
 
@@ -138,15 +140,6 @@ namespace SEE.Layout
                 Vector3 position = transform.position;
                 Vector3 scale = transform.scale;
 
-                if (sublayoutNode.IsLeaf || sublayout.RemovedChildren.Contains(sublayoutNode))
-                {
-                    /*if (nodeLayout != NodeLayouts.Treemap)
-                    {
-                        scale = new Vector3(coseNode.rect.width, innerNodeHeight, coseNode.rect.height);
-                    }*/
-                }
-
-                position.y += transform.scale.y / 2.0f;
                 sublayoutNode.RelativePosition = position; 
                 sublayoutNode.CenterPosition = position;
                 sublayoutNode.Scale = scale;
@@ -239,11 +232,11 @@ namespace SEE.Layout
                 } else
                 {
                     LayoutScale = new Vector3(sublayout.Node.Scale.x, innerNodeHeight, sublayout.Node.Scale.z);
+                    LayoutOffset = position - sublayout.Node.CenterPosition;
                 }
 
                 sublayout.Node.Scale = scale;
                 sublayout.Node.CenterPosition = position;
-
                 sublayout.Node.IsSublayoutNode = true;
             }
 

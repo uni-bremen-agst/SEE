@@ -122,8 +122,11 @@ namespace SEE.Layout
 
             foreach (CoseGraph graph in graphManager.Graphs)
             {
+                Vector3 position = new Vector3(graph.BoudingRect.center.x, groundLevel, graph.BoudingRect.center.y);
+
                 float width = graph.BoudingRect.width;
                 float height = graph.BoudingRect.height;
+
 
                 if (graph.Parent != null && graph.Parent.NodeObject != null && SublayoutNodes.Count() > 0)
                 {
@@ -133,17 +136,29 @@ namespace SEE.Layout
                     {
                         width = graph.Parent.SublayoutValues.Sublayout.LayoutScale.x;
                         height = graph.Parent.SublayoutValues.Sublayout.LayoutScale.z;
+                        position -= graph.Parent.SublayoutValues.Sublayout.LayoutOffset;
                     }
                 }
-
-                Vector3 position = new Vector3(graph.BoudingRect.center.x, groundLevel, graph.BoudingRect.center.y);
 
                 if (graph != graphManager.RootGraph)
                 {
                     position.y += LevelLift(graph.Parent.NodeObject);
                 }
 
-                layout_result[graph.GraphObject] = new NodeTransform(position, new Vector3(width, innerNodeHeight, height));
+                //falls der knoten/ graph teil eines sublayouts war, dann ohne rotation, sonst mit rotation ... frag mich nicht worum
+                bool applyRotation = true;
+
+                foreach(SublayoutLayoutNode node in coseSublayoutNodes)
+                {
+                    if (node.Nodes.Contains(graph.GraphObject) && !node.Node.IsSublayoutRoot)
+                    {
+                        applyRotation = false;
+                        break;
+                    }
+                }
+
+                float rotation = applyRotation ? graph.GraphObject.Rotation : 0.0f;
+                layout_result[graph.GraphObject] = new NodeTransform(position, new Vector3(width, innerNodeHeight, height), rotation);
             }
 
             return layout_result;
@@ -213,7 +228,21 @@ namespace SEE.Layout
                 if (node.IsLeaf())
                 {
                     ILayoutNode nNode = node.NodeObject;
-                    NodeTransform transform = new NodeTransform(new Vector3((float)node.GetCenterX(), groundLevel, (float)node.GetCenterY()), node.NodeObject.Scale, node.NodeObject.Rotation);
+
+                    bool applyRotation = true;
+
+                    foreach (SublayoutLayoutNode sublayoutNode in SublayoutNodes)
+                    {
+                        if (sublayoutNode.Nodes.Contains(node.NodeObject) && !sublayoutNode.Node.IsSublayoutRoot)
+                        {
+                            applyRotation = false;
+                            break;
+                        }
+                    }
+
+                    float rotation = applyRotation ? node.NodeObject.Rotation : 0.0f;
+
+                    NodeTransform transform = new NodeTransform(new Vector3((float)node.GetCenterX(), groundLevel, (float)node.GetCenterY()), node.NodeObject.Scale, rotation);//, node.NodeObject.Rotation);
                     layout_result[nNode] = transform;
                 }
 
