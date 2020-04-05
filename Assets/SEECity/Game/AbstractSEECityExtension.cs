@@ -22,7 +22,7 @@ namespace SEE.Game
         public static List<NodeLayouts> GetPossibleSublayouts(this NodeLayouts nodeLayout)
         {
             List<NodeLayouts> values = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().ToList();
-            return nodeLayout.IsCircular() ? values.Where(layout => layout.IsCircular()).ToList() : values.Where(layout => !layout.IsCircular()).ToList();
+            return values; //nodeLayout.IsCircular() ? values.Where(layout => layout.IsCircular()).ToList() : values.Where(layout => !layout.IsCircular()).ToList();
         }
 
         public static bool OnlyLeaves(this NodeLayouts nodeLayout)
