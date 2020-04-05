@@ -39,6 +39,10 @@ namespace SEEEditor
             city.EdgeLayout = (SEECity.EdgeLayouts)EditorGUILayout.EnumPopup("Edge layout", city.EdgeLayout);
             city.EdgeWidth = EditorGUILayout.FloatField("Edge width", city.EdgeWidth);
             city.EdgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", city.EdgesAboveBlocks);
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Bundling tension");
+            city.Tension = EditorGUILayout.Slider(city.Tension, 0.0f, 1.0f);
+            EditorGUILayout.EndHorizontal();            
 
             GUILayout.Label("Data", EditorStyles.boldLabel);
             if (city.PathPrefix == null)

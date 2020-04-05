@@ -16,11 +16,20 @@ namespace SEE.Layout
         /// Constructor.
         /// </summary>
         /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
-        public BundledEdgeLayout(bool edgesAboveBlocks)
+        /// <param name="tension">strength of the tension for bundling edges; must be in the range [0,1]</param>
+        public BundledEdgeLayout(bool edgesAboveBlocks, float tension = 0.85f)
             : base(edgesAboveBlocks)
         {
             name = "Hierarchically Bundled";
+            Debug.Assert(0.0f <= tension && tension <= 1.0f);
+            this.tension = tension;
         }
+
+        /// <summary>
+        /// Determines the strength of the tension for bundling edges. This value may
+        /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
+        /// </summary>
+        private float tension = 0.85f; // 0.85 is the value recommended by Holten
 
         /// <summary>
         /// Returns hierarchically bundled splines for all edges among the given <paramref name="layoutNodes"/>.
@@ -226,7 +235,7 @@ namespace SEE.Layout
                                                + GetLevelHeight(fullPath[i].Level) * direction;
                         }
                         controlPoints[controlPoints.Length - 1] = edgesAboveBlocks ? target.Roof : target.Ground;
-                        return LinePoints.BSplineLinePoints(controlPoints);
+                        return LinePoints.BSplineLinePoints(controlPoints, tension);
                     }
                 }
             }
