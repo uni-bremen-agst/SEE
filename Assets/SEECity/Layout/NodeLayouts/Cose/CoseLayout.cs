@@ -134,9 +134,11 @@ namespace SEE.Layout
 
                     if (sublayoutNode != null && sublayoutNode.NodeLayout == NodeLayouts.EvoStreets)
                     {
-                        width = graph.Parent.SublayoutValues.Sublayout.LayoutScale.x;
-                        height = graph.Parent.SublayoutValues.Sublayout.LayoutScale.z;
+                        width = graph.Parent.SublayoutValues.Sublayout.RootNodeRealScale.x;
+                        height = graph.Parent.SublayoutValues.Sublayout.RootNodeRealScale.z;
+                        // maybe todo
                         position -= graph.Parent.SublayoutValues.Sublayout.LayoutOffset;
+
                     }
                 }
 
@@ -158,7 +160,7 @@ namespace SEE.Layout
                 }
 
                 float rotation = applyRotation ? graph.GraphObject.Rotation : 0.0f;
-                layout_result[graph.GraphObject] = new NodeTransform(position, new Vector3(width, innerNodeHeight, height), rotation);
+                layout_result[graph.GraphObject] = new NodeTransform(position, new Vector3(width, innerNodeHeight, height),  rotation);
             }
 
             return layout_result;

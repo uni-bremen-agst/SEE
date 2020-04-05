@@ -39,6 +39,9 @@ namespace SEE.Layout
         /// </summary>
         private Vector3 layoutOffset;
 
+        private Vector3 rootNodeRealScale;
+
+
         /// <summary>
         /// TODO
         /// </summary>
@@ -47,6 +50,8 @@ namespace SEE.Layout
         private SublayoutLayoutNode sublayout;
 
         public Vector3 LayoutScale { get => layoutScale; set => layoutScale = value; }
+
+        public Vector3 RootNodeRealScale { get => rootNodeRealScale; set => rootNodeRealScale = value; }
 
         public Vector3 LayoutOffset { get => layoutOffset; set => layoutOffset = value; }
 
@@ -158,8 +163,11 @@ namespace SEE.Layout
 
                         foreach (ILayoutNode subNode in sublayoutNode.Sublayout.sublayoutNodes)
                         {
+
                             ILayoutNode subSubNode = (subNode as CoseSublayoutNode).Node;
-                           
+
+                            subSubNode.Rotation = sublayoutNode.Rotation;
+
                             if (subSubNode != sublayoutNode)
                             {
                                 subSubNode.SetOrigin(); // sub1 nodes total zu der neuen position von A_1_new setzen
@@ -215,24 +223,23 @@ namespace SEE.Layout
                     }
                 }
 
-                double defaultMargin = 0.5;
+                /*double defaultMargin = 0.5;
                 left -= defaultMargin;
                 right += defaultMargin;
                 top -= defaultMargin;
-                bottom += defaultMargin;
+                bottom += defaultMargin;*/
 
                 Rect boundingRect = new Rect((float)left, (float)top, (float)(right - left), (float)(bottom - top));
                 Vector3 scale = new Vector3(boundingRect.width, innerNodeHeight, boundingRect.height);
                 Vector3 position = new Vector3(boundingRect.center.x, groundLevel, boundingRect.center.y);
                 // TODO das ist doch falsch so, bzw. jetzt richtig beim anderen noch falsch
 
-                if (nodeLayout.OnlyLeaves())
+                LayoutScale = scale; //new Vector3(sublayout.Node.Scale.x, innerNodeHeight, sublayout.Node.Scale.z);
+
+                if (!nodeLayout.OnlyLeaves())
                 {
-                    LayoutScale = scale; //new Vector3(sublayout.Node.Scale.x, innerNodeHeight, sublayout.Node.Scale.z);
-                } else
-                {
-                    LayoutScale = new Vector3(sublayout.Node.Scale.x, innerNodeHeight, sublayout.Node.Scale.z);
-                    LayoutOffset = position - sublayout.Node.CenterPosition;
+                   rootNodeRealScale = new Vector3(sublayout.Node.Scale.x, innerNodeHeight, sublayout.Node.Scale.z);
+                   LayoutOffset = position - sublayout.Node.CenterPosition;
                 }
 
                 sublayout.Node.Scale = scale;
