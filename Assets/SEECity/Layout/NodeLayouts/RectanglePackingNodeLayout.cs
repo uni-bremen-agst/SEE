@@ -61,7 +61,7 @@ namespace SEE.Layout
                         // The padding will later be removed again.
                         Vector3 scale = node.Scale;
                         scale.x += 2.0f * padding; 
-                        scale.y += 2.0f * padding;
+                        scale.z += 2.0f * padding;
                         layout_result[node] = new NodeTransform(Vector3.zero, scale);
                         numberOfLeaves++;
                     }
@@ -98,16 +98,20 @@ namespace SEE.Layout
 
         private void RemovePadding(Dictionary<ILayoutNode, NodeTransform> layout, float padding)
         {
-            foreach (var entry in layout)
+            ICollection<ILayoutNode> keys = new List<ILayoutNode>(layout.Keys);
+
+            foreach (ILayoutNode key in keys)
             {
-                Vector3 scale = layout[entry.Key].scale;
+                NodeTransform value = layout[key];
+                Vector3 scale = value.scale;
                 scale.x -= 2.0f * padding;
-                scale.y -= 2.0f * padding;
+                scale.z -= 2.0f * padding;
                 // Since we removed the padding, we need to adjust the position, too,
                 // to center the node within the assigned rectangle.
-                Vector3 position = layout[entry.Key].position;
+                Vector3 position = value.position;
                 position.x += padding;
                 position.z += padding;
+                layout[key] = new NodeTransform(position, scale);
             }
         }
 
@@ -176,14 +180,14 @@ namespace SEE.Layout
 
         /// <summary>
         /// Returns the ground area size of the given <paramref name="node"/>:
-        /// (x -> width, z -> depth) plus <paramref name="padding"/> on both axes.
+        /// (x -> width, z -> depth).
         /// </summary>
         /// <param name="node">node whose ground area size is requested</param>
         /// <returns>ground area size of the given <paramref name="node"/></returns>
-        private static Vector2 GetRectangleSize(NodeTransform node, float padding)
+        private static Vector2 GetRectangleSize(NodeTransform node)
         {
             Vector3 size = node.scale;
-            return new Vector2(size.x + padding, size.z + padding);
+            return new Vector2(size.x, size.z);
         }
 
         /// <summary>
@@ -196,14 +200,14 @@ namespace SEE.Layout
         /// (its scale is required only)</param>
         /// <param name="padding">the padding to be added to a node's ground area size</param>
         /// <returns>sum of the required ground area over all given <paramref name="nodes"/></returns>
-        private Vector2 Sum(List<ILayoutNode> nodes, Dictionary<ILayoutNode, NodeTransform> layout_result, float padding)
+        private Vector2 Sum(List<ILayoutNode> nodes, Dictionary<ILayoutNode, NodeTransform> layout_result)
         {
             Vector2 result = Vector2.zero;
             foreach (ILayoutNode element in nodes)
             {
                 Vector3 size = layout_result[element].scale;
-                result.x += size.x + padding;
-                result.y += size.z + padding;
+                result.x += size.x;
+                result.y += size.z;
             }
             return result;
         }
@@ -220,7 +224,7 @@ namespace SEE.Layout
             // Since we initially do not know how much space we need, we assign a space of the 
             // worst case to the root. Note that we want to add padding in between the nodes,
             // so we need to increase the required size accordingly.
-            Vector2 worstCaseSize = Sum(elements, layout_result, padding);
+            Vector2 worstCaseSize = Sum(elements, layout_result);
             Debug.LogFormat("Pack: worstCaseSize={0}\n", worstCaseSize);
             PTree tree = new PTree(Vector2.zero, worstCaseSize);
 
@@ -244,7 +248,7 @@ namespace SEE.Layout
                 // We assume that the scale of all nodes in elements have already been set.
 
                 // The size we need to place el plus the padding between nodes.                
-                Vector2 requiredSize = GetRectangleSize(layout_result[el], padding);
+                Vector2 requiredSize = GetRectangleSize(layout_result[el]);
 
                 preservers.Clear();
                 expanders.Clear();
@@ -310,11 +314,11 @@ namespace SEE.Layout
 
                 // The size of the node remains unchanged. We set only the position.
                 // The x and y co-ordinates of the rectangle denote the corner. The layout
-                // position returned must be the center plus the padding.
+                // position returned must be the center.
                 Vector3 scale = layout_result[el].scale;
-                layout_result[el] = new NodeTransform(new Vector3(fitNode.rectangle.position.x + (scale.x + padding) / 2.0f,
+                layout_result[el] = new NodeTransform(new Vector3(fitNode.rectangle.position.x + scale.x / 2.0f,
                                                                   groundLevel,
-                                                                  fitNode.rectangle.position.y + (scale.z + padding) / 2.0f),
+                                                                  fitNode.rectangle.position.y + scale.z / 2.0f),
                                                       scale);
 
                 // If fitNode is a boundary expander, then we need to expand coverc to the
