@@ -78,7 +78,7 @@ namespace SEE.Layout.RectanglePacking
             PNode result;
 
             // Node is no longer a free leaf. As a matter of fact, technically, it may
-            // still be a leave if the requested size perfectly matches the size of node,
+            // still be a leaf if the requested size perfectly matches the size of node,
             // so that it is actually not split, but it is not free.
             if (!FreeLeaves.Remove(node))
             {
@@ -105,7 +105,7 @@ namespace SEE.Layout.RectanglePacking
 
                     node.right = new PNode();
                     node.right.rectangle = new PRectangle(new Vector2(node.rectangle.position.x, node.rectangle.position.y + size.y),
-                                                         new Vector2(node.rectangle.size.x, node.rectangle.size.y - size.y));
+                                                          new Vector2(node.rectangle.size.x, node.rectangle.size.y - size.y));
                     FreeLeaves.Add(node.right);
                     result = node.left;
                 }
@@ -122,7 +122,7 @@ namespace SEE.Layout.RectanglePacking
 
                     node.right = new PNode();
                     node.right.rectangle = new PRectangle(new Vector2(node.rectangle.position.x + size.x, node.rectangle.position.y),
-                                                         new Vector2(node.rectangle.size.x - size.x, size.y));
+                                                          new Vector2(node.rectangle.size.x - size.x, size.y));
                     FreeLeaves.Add(node.right);
                     result = node.left;
                 }
