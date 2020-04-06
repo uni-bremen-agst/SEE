@@ -210,8 +210,6 @@ namespace SEE.Game
             {
                 case SEECity.NodeLayouts.Manhattan:                    
                     return new ManhattanLayout(groundLevel, leafNodeFactory.Unit);
-                case SEECity.NodeLayouts.FlatRectanglePacking:
-                    return new RectanglePacker(groundLevel, leafNodeFactory.Unit);
                 case SEECity.NodeLayouts.RectanglePacking:
                     return new RectanglePackingNodeLayout(groundLevel, leafNodeFactory.Unit);
                 case SEECity.NodeLayouts.EvoStreets:
