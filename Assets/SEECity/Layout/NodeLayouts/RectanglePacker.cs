@@ -24,7 +24,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
-        /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
+        /// <param name="Unit">the unit for blocks; will be used to adjust the padding</param>
         /// <param name="padding">the padding to be added between neighboring nodes;
         /// the actual value used is padding * leafNodeFactory.Unit()</param>
         public RectanglePacker(float groundLevel, float Unit, float padding = 0.1f)
@@ -35,18 +35,6 @@ namespace SEE.Layout
         }
 
         private readonly float padding;
-
-        /// <summary>
-        /// Returns the area size of given layout node, i.e., its width (x co-ordinate)
-        /// multiplied by its depth (z co-ordinate).
-        /// </summary>
-        /// <param name="layoutNode">node whose size is to be returned</param>
-        /// <returns>area size of given layout node</returns>
-        private static float AreaSize(ILayoutNode layoutNode)
-        {
-            Vector3 size = layoutNode.Scale;
-            return size.x * size.z;
-        }
 
         /// <summary>
         /// Places the given elements in a minimally sized rectangle without overlapping.
@@ -189,6 +177,18 @@ namespace SEE.Layout
                 }
             }
             return layout_result;
+        }
+
+        /// <summary>
+        /// Returns the area size of given layout node, i.e., its width (x co-ordinate)
+        /// multiplied by its depth (z co-ordinate).
+        /// </summary>
+        /// <param name="layoutNode">node whose size is to be returned</param>
+        /// <returns>area size of given layout node</returns>
+        private static float AreaSize(ILayoutNode layoutNode)
+        {
+            Vector3 size = layoutNode.Scale;
+            return size.x * size.z;
         }
 
         /// <summary>
