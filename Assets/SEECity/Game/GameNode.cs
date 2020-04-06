@@ -107,5 +107,10 @@ namespace SEE.Game
                 return nodeFactory.Ground(gameObject);
             }
         }
+
+        public override string ToString()
+        {
+            return "[" + base.ToString() + "]";
+        }
     }
 }
