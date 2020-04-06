@@ -1,5 +1,4 @@
 ﻿using SEE.Layout.RectanglePacking;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,8 +6,8 @@ using UnityEngine;
 namespace SEE.Layout
 {
     /// <summary>
-    /// This layout packs rectangles closely together as a set of nested rectangles to decrease 
-    /// the total area of city. It is an extension of the flat RectanglePacker for hierarchies.
+    /// This layout packs rectangles closely together as a set of nested packed rectangles to decrease 
+    /// the total area of city.
     /// </summary>
     public class RectanglePackingNodeLayout : HierarchicalNodeLayout
     {
@@ -27,16 +26,16 @@ namespace SEE.Layout
             this.padding = padding * Unit;
         }
 
-        public override bool IsHierarchical()
-        {
-            return false; // FIXME
-        }
-
         /// <summary>
         /// The padding between neighboring rectangles.
         /// </summary>
         private readonly float padding;
 
+        /// <summary>
+        /// Yields a layout of <paramref name="layoutNodes"/> as a set of nested packed rectangles.
+        /// </summary>
+        /// <param name="layoutNodes">nodes to be laid out</param>
+        /// <returns>retangle packing layout</returns>
         public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes)
         {
             Dictionary<ILayoutNode, NodeTransform> layout_result = new Dictionary<ILayoutNode, NodeTransform>();
@@ -91,11 +90,56 @@ namespace SEE.Layout
                 Vector3 position = new Vector3(0.0f, groundLevel, 0.0f);
                 // Maintain the original height of all inner nodes (and root is an inner node).
                 layout_result[root] = new NodeTransform(position, new Vector3(area.x, root.Scale.y, area.y));
-                MakeGlobal(layout_result, position, roots);
+                RemovePadding(layout_result, padding);
+                /// Pack() distributes the rectangles starting at the origin (0, 0) in the x/z plane
+                /// for each node hierarchy level anew. That is why we need to adjust the layout so
+                /// that all rectangles are truly nested.
+                MakeContained(layout_result, root);
                 return layout_result;
             }
         }
 
+        /// <summary>
+        /// Adjusts the layout so that all rectangles are truly nested. Also lifts the inner
+        /// nodes a bit along the y axis so that are stacked. This may be necessary for 
+        /// space filling inner nodes such as cubes. It is not needed for lines, however.
+        /// </summary>
+        /// <param name="layout">the layout to be adjusted</param>
+        /// <param name="parent">the parent node whose children are to be adjusted</param>
+        private static void MakeContained
+            (Dictionary<ILayoutNode, NodeTransform> layout,
+             ILayoutNode parent)
+        {
+            NodeTransform parentTransform = layout[parent];
+            Vector3 parentCenterPosition = parentTransform.position;
+            Vector3 parentExtent = parentTransform.scale / 2.0f;
+            // The x co-ordinate of the left lower corner of the parent.
+            float xCorner = parentCenterPosition.x - parentExtent.x;
+            // The z co-ordinate of the left lower corner of the parent.
+            float zCorner = parentCenterPosition.z - parentExtent.z;
+
+            foreach (ILayoutNode child in parent.Children())
+            {
+                NodeTransform childTransform = layout[child];
+                Vector3 newChildPosition = childTransform.position;
+                newChildPosition.x += xCorner;
+                newChildPosition.z += zCorner;
+                if (!child.IsLeaf)
+                {
+                    // The inner nodes will be slightly lifted along the y axis according to their
+                    // tree depth so that they can be stacked visually (level 0 is at the bottom).
+                    newChildPosition.y += LevelLift(child);
+                }
+                layout[child] = new NodeTransform(newChildPosition, childTransform.scale, childTransform.rotation);
+                MakeContained(layout, child);
+            }
+        }
+
+        /// <summary>
+        /// Removes the <paramref name="padding"/> for all NodeTransforms in <paramref name="layout"/>.
+        /// </summary>
+        /// <param name="layout">layout containing the NodeTransform.scale to be adjusted</param>
+        /// <param name="padding">padding to be removed</param>
         private void RemovePadding(Dictionary<ILayoutNode, NodeTransform> layout, float padding)
         {
             ICollection<ILayoutNode> keys = new List<ILayoutNode>(layout.Keys);
@@ -115,54 +159,58 @@ namespace SEE.Layout
             }
         }
 
-        private Vector2 PlaceNodes(Dictionary<ILayoutNode, NodeTransform> layout_result, ILayoutNode node)
+        /// <summary>
+        /// Recursively places the given node and its descendants in nested packed rectangles.
+        /// 
+        /// Precondition: layout has the final scale of all leaves already set.
+        /// </summary>
+        /// <param name="layout">the current layout; will be updated</param>
+        /// <param name="node">node to be laid out (includings all its descendants)</param>
+        /// <returns>the width and depth of the area covered by the rectangle for <paramref name="node"/></returns>
+        private Vector2 PlaceNodes(Dictionary<ILayoutNode, NodeTransform> layout, ILayoutNode node)
         {
-            Debug.LogFormat("PlaceNodes called with {0}\n", node);
             if (node.IsLeaf)
             {
-                Debug.LogFormat("Node {0} is a leaf.\n", node);
-                // Leaves maintain their scale. All positions are relative at the moment,
-                // hence, we use Vector3.zero. The position will be adjusted later.
-                // layout_result[node] = new NodeTransform(Vector3.zero, node.Scale); // Already set initially
-                return new Vector2(node.Scale.x, node.Scale.z); // FIXME: Add padding
+                // Leaves maintain their scale, which was already set initially. The position will 
+                // be adjusted later at a higher level of the node hierarchy when Pack() is 
+                // applied to this leaf and all its siblings.
+                return new Vector2(node.Scale.x, node.Scale.z);
             }
             else
             {
                 // Inner node.
-                Debug.LogFormat("Node {0} is an inner node.\n", node);
                 ICollection<ILayoutNode> children = node.Children();
 
                 // First recurse towards the leaves and determine the sizes of all descendants.
                 foreach (ILayoutNode child in children)
                 {
-                    if (child.IsLeaf)
+                    if (!child.IsLeaf)
                     {
-                        Debug.LogFormat("Child {0} of node {1} is a leaf.\n", child, node);
-                        // layout_result[child] = new NodeTransform(Vector3.zero, child.Scale); // Already set initially
-                    }
-                    else
-                    {
-                        Debug.LogFormat("Child {0} of node {1} is an inner node.\n", child, node);
-                        Vector2 childArea = PlaceNodes(layout_result, child);
-                        layout_result[child] = new NodeTransform(Vector3.zero, new Vector3(childArea.x, groundLevel, childArea.y));
-                        Debug.LogFormat("Child {0} of node {1} is an inner node has layout {2}.\n", child, node, layout_result[child]);
+                        Vector2 childArea = PlaceNodes(layout, child);
+                        // childArea is the ground area size required for this inner node.
+                        // The position of this inner node in layout will be below in the call to Pack().
+                        // The position is relative to the parent of this inner node.
+                        // We only need to set the scale here. 
+                        // Note: We have already added padding to leaf nodes, but this one here is an
+                        // inner node. Nevertheless, we do not add padding here, because padding is already
+                        // included in the returned childArea.
+                        layout[child] = new NodeTransform(Vector3.zero,
+                                                          new Vector3(childArea.x, groundLevel, childArea.y));
                     }
                 }
-                // The scales of all descendants of the node have now been set. Now
-                // let's pack the children of node.
+                // The scales of all children of the node have now been set. Now
+                // let's pack those children.
                 if (children.Count > 0)
                 {
-                    Vector2 area = Pack(layout_result, children.Cast<ILayoutNode>().ToList());
-                    // FIXME: Is the following assignment needed at all? The layout of a node will be set one level
-                    // up at the point where its parent iterates the children and the node is one of these children.
-                    //layout_result[node] = new NodeTransform(Vector3.zero, new Vector3(area.x, groundLevel, area.y));
-                    return area;
+                    Vector2 area = Pack(layout, children.Cast<ILayoutNode>().ToList());
+                    return new Vector2(area.x + 2.0f * padding, area.y + 2.0f * padding);
                 }
                 else
                 {
-                    return Vector2.zero;
+                    // Can we ever arrive here? That would mean that node is not a leaf
+                    // and does not have children.
+                    return new Vector2(node.Scale.x, node.Scale.z);
                 }
-               
             }
         }
 
@@ -212,21 +260,42 @@ namespace SEE.Layout
             return result;
         }
 
-        private Vector2 Pack(Dictionary<ILayoutNode, NodeTransform> layout_result, List<ILayoutNode> elements)
+        /// <summary>
+        /// Places the given <paramref name="nodes"/> in a minimally sized rectangle without 
+        /// overlapping.
+        /// 
+        /// Allows one to pack smaller rectangles into a single larger rectangle
+        /// so that the contained rectangles do not overlap, are as close together
+        /// as possible (without padding) and the containing rectangle is as
+        /// small as possible (no optimal solution is provided). The containing
+        /// rectangle is organized in stripes whose aspect ratio is as close to
+        /// one as possible. The layout maintains the size and orientation of
+        /// all smaller rectangles. The largest contained rectangle appears at the 
+        /// left lower corner of the containing rectangle at position (0, groundlevel, 0).
+        /// 
+        /// Precondition: The scales of all <paramref name="nodes"/> are set in 
+        /// the corresponding NodeTransforms in <paramref name="layout"/>.
+        /// </summary>
+        /// <param name="layout">the current layout (positions of <paramref name="nodes"/> 
+        /// will be updated</param>
+        /// <param name="nodes">the nodes to be laid out</param>
+        /// <returns>the width (x) and depth (y) of the outer rectangle in which all 
+        /// <paramref name="nodes"/> were placed</returns>
+        private Vector2 Pack(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes)
         {
             // To increase the efficiency of the space usage, we order the elements by one of the sizes.
             // Elements must be sorted by size, descending
-            elements.Sort(delegate (ILayoutNode left, ILayoutNode right)
-            { return AreaSize(layout_result[right]).CompareTo(AreaSize(layout_result[left])); });
-
-            Dump(elements, layout_result, "Pack");
+            nodes.Sort(delegate (ILayoutNode left, ILayoutNode right)
+            { return AreaSize(layout[right]).CompareTo(AreaSize(layout[left])); });
 
             // Since we initially do not know how much space we need, we assign a space of the 
             // worst case to the root. Note that we want to add padding in between the nodes,
             // so we need to increase the required size accordingly.
-            Vector2 worstCaseSize = Sum(elements, layout_result);
+            Vector2 worstCaseSize = Sum(nodes, layout);
             Debug.LogFormat("Pack: worstCaseSize={0}\n", worstCaseSize);
-            PTree tree = new PTree(Vector2.zero, worstCaseSize);
+            // The worst-case size is increased slightly to circumvent potential
+            // imprecisions of floating-point arithmetics.
+            PTree tree = new PTree(Vector2.zero, 1.1f * worstCaseSize);
 
             // Keeps track of the area currently covered by elements. It is the bounding
             // box containing all rectangles placed so far.
@@ -243,12 +312,13 @@ namespace SEE.Layout
             // place el.
             Dictionary<PNode, float> expanders = new Dictionary<PNode, float>();
 
-            foreach (ILayoutNode el in elements)
+            foreach (ILayoutNode el in nodes)
             {
                 // We assume that the scale of all nodes in elements have already been set.
 
                 // The size we need to place el plus the padding between nodes.                
-                Vector2 requiredSize = GetRectangleSize(layout_result[el]);
+                Vector2 requiredSize = GetRectangleSize(layout[el]);
+                Debug.LogFormat("Pack: node {0} requires size={1}\n", el, requiredSize);
 
                 preservers.Clear();
                 expanders.Clear();
@@ -308,18 +378,19 @@ namespace SEE.Layout
                     }
                 }
 
+                Debug.LogFormat("Pack: targetNode {0} is split with requested size={1}\n", targetNode, requiredSize);
                 // Place el into targetNode.
                 // The free leaf node that has the requested size allocated within targetNode. 
                 PNode fitNode = tree.Split(targetNode, requiredSize);
 
                 // The size of the node remains unchanged. We set only the position.
-                // The x and y co-ordinates of the rectangle denote the corner. The layout
-                // position returned must be the center.
-                Vector3 scale = layout_result[el].scale;
-                layout_result[el] = new NodeTransform(new Vector3(fitNode.rectangle.position.x + scale.x / 2.0f,
-                                                                  groundLevel,
-                                                                  fitNode.rectangle.position.y + scale.z / 2.0f),
-                                                      scale);
+                // The x and y co-ordinates of the rectangle denote the left front corner. The layout
+                // position returned must be the center. The y co-ordinate is the ground level.
+                Vector3 scale = layout[el].scale;
+                layout[el] = new NodeTransform(new Vector3(fitNode.rectangle.position.x + scale.x / 2.0f,
+                                                           groundLevel,
+                                                           fitNode.rectangle.position.y + scale.z / 2.0f),
+                                               scale);
 
                 // If fitNode is a boundary expander, then we need to expand coverc to the
                 // newly covered area.
@@ -338,14 +409,6 @@ namespace SEE.Layout
 
             }
             return covrec;
-        }
-
-        private void Dump(List<ILayoutNode> nodes, Dictionary<ILayoutNode, NodeTransform> layout, string message)
-        {
-            foreach (ILayoutNode node in nodes)
-            {
-                Debug.LogFormat("{0}: {1} with node transform={2}.\n", message, node, layout[node]);
-            }
         }
     }
 }
