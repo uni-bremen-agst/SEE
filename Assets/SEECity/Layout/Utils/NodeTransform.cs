@@ -27,7 +27,8 @@ namespace SEE.Layout
         /// <summary>
         /// Constructor setting the position, scale, and rotation. 
         /// The y co-ordinate of the position will be interpreted as the ground position of 
-        /// the game object (unlike in Unity where it is the center height).
+        /// the game object (unlike in Unity where it is the center height). The x and z
+        /// co-ordinate refer to the center of an object in the x/z plane (ground).
         /// </summary>
         /// <param name="position">position in the scene; y co-ordinate denotes the ground</param>
         /// <param name="scale">the scale of the object</param>
@@ -43,7 +44,8 @@ namespace SEE.Layout
         /// The position in the scene. 
         /// 
         /// IMPORTANT NOTE: The y co-ordinate will be interpreted as the ground position of 
-        /// the game object (unlike in Unity where it is the center height).
+        /// the game object (unlike in Unity where it is the center height).  The x and z
+        /// co-ordinate refer to the center of an object in the x/z plane (ground).
         /// </summary>
         public Vector3 position;
         /// <summary>

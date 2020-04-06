@@ -298,7 +298,7 @@ namespace SEE.Game
         {
             EvoStreets,
             Balloon,
-            FlatRectanglePacking,
+            RectanglePacking,
             Treemap,
             CirclePacking,
             Manhattan,
