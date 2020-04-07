@@ -36,16 +36,20 @@ namespace SEE.Layout
         /// Determines the strength of the tension for bundling edges. This value may
         /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
         /// </summary>
-        public static float tension = 0.85f; // 0.85 is the value recommended by Holten
+        public const float tensionDefault = 0.85f; // 0.85 is the value recommended by Holten
 
         /// <summary>
         /// Returns the points of the line along the B-spline constrained by the given <paramref name="controlPoints"/>.
         /// </summary>
         /// <param name="controlPoints">control points of the B-spline</param>
+        /// <param name="tension">tension of the control points onto the spline points; must be in
+        /// the range [0, 1]</param>
         /// <returns>points of the line along the B-spline</returns>
-        public static Vector3[] BSplineLinePoints(Vector3[] controlPoints)
+        public static Vector3[] BSplineLinePoints(Vector3[] controlPoints, float tension = tensionDefault)
         {
             Debug.Assert(controlPoints.Length > 3);
+            Debug.Assert(0.0f <= tension && tension <= 1.0f);
+
             // Create a cubic spline with control points in 3D using a clamped knot vector.
             TinySpline.BSpline spline = new TinySpline.BSpline((uint)controlPoints.Length, dimensions)
             {
@@ -114,39 +118,66 @@ namespace SEE.Layout
             return result;
         }
 
+        /// <summary>
+        /// Returns the points of a direct spline from <paramref name="start"/> to <paramref name="end"/>.
+        /// The y co-ordinate of the middle point of the spline is X above (if <paramref name="above"/>
+        /// is true) or below (if <paramref name="above"/> is false), respectively, the higher
+        /// (or lower if <paramref name="above"/> is false) of the two (<paramref name="start"/>
+        /// and <paramref name="end"/>), where X is half the distance between <paramref name="start"/>
+        /// and <paramref name="end"/>.
+        /// 
+        /// The y offset of the middle point is chosen relative to the distance between the two points.
+        /// We are using a value relative to the distance so that splines connecting close points do 
+        /// not shoot into the sky. Otherwise they would be difficult to read. Likewise, splines 
+        /// connecting two points farther away should go higher (or deeper, respectively) so that we 
+        /// avoid crossings with things that may be in between. This heuristic may help to better read 
+        /// the splines.
+        /// </summary>
+        /// <param name="start">starting point</param>
+        /// <param name="end">ending point</param>
+        /// <param name="above">whether middle point of the spline should be above <paramref name="start"/>
+        /// and <paramref name="end"/></param>
+        /// <returns>points of the spline</returns>
         public static Vector3[] SplineLinePoints(Vector3 start, Vector3 end, bool above)
         {
-            // The offset of the edges above or below the ground chosen relative 
-            // to the distance between the two blocks.
-            // We are using a value relative to the distance so that edges 
-            // connecting close blocks do not shoot into the sky. Otherwise they
-            // would be difficult to read. Likewise, edges connecting blocks farther
-            // away should go higher so that we avoid edge and node crossings.
-            // This heuristic may help to better read the edges.
-
             // This offset is used to draw the line somewhat below
             // or above the house (depending on the orientation).
-            float offset = 1.5f * Vector3.Distance(start, end); // must be positive
+            float offset = 0.5f * Vector3.Distance(start, end); // must be positive
             // The level at which edges are drawn.
             float edgeLevel = above ? Mathf.Max(start.y, end.y) + offset
                                     : Mathf.Min(start.y, end.y) - offset;
 
-            Vector3[] controlPoints = new Vector3[4];
-            controlPoints[0] = start;
-            controlPoints[1] = Vector3.Lerp(start, end, 0.333333f);
-            controlPoints[1].y = edgeLevel;
-            controlPoints[2] = Vector3.Lerp(start, end, 0.666666f);
-            controlPoints[3].y = edgeLevel;
-            controlPoints[3] = end;
-            return BSplineLinePoints(controlPoints);
+            Vector3 middle = Vector3.Lerp(start, end, 0.5f);
+            middle.y = edgeLevel;
+            return SplineLinePoints(start, middle, end);
+        }
+
+        /// <summary>
+        /// Returns the points of a spline from <paramref name="start"/> over <paramref name="middle"/>
+        /// to <paramref name="end"/>. 
+        /// 
+        /// Note: The resultant spline actually goes through <paramref name="middle"/>.
+        /// </summary>
+        /// <param name="start">start of the spline</param>
+        /// <param name="middle">middle of the spline</param>
+        /// <param name="end">end of the spline</param>
+        /// <returns>points of a spline</returns>
+        public static Vector3[] SplineLinePoints(Vector3 start, Vector3 middle, Vector3 end)
+        {
+            List<double> path = new List<double>()
+               { start.x,  start.y,  start.z,
+                 middle.x, middle.y, middle.z,
+                 end.x,    end.y,    end.z
+               };
+            return ListToVectors(TinySpline.Utils.interpolateCubic(path, dimensions).sample());
         }
 
         /// <summary>
         /// Returns the points from <paramref name="start"/> to <paramref name="end"/>
         /// on an offset straight line led on the given <paramref name="yLevel"/>. The first 
         /// point is <paramref name="start"/>. The second point has the same x and z 
-        /// co-ordiante as <paramref name="start"/> but its y co-ordinate is <paramref name="yLevel"/>.
-        /// The third point has the same x and z  co-ordiante as <paramref name="end"/> but again
+        /// co-ordinate as <paramref name="start"/> but its y co-ordinate is <paramref name="yLevel"/>.
+        /// The third point has the same x and z co-ordinate as <paramref name="end"/> but again
         /// its y co-ordinate is <paramref name="yLevel"/>. The last point is <paramref name="end"/>.
         /// </summary>
         /// <param name="start">start of the line</param>

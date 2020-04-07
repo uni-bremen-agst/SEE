@@ -298,7 +298,7 @@ namespace SEE.Game
         {
             EvoStreets,
             Balloon,
-            FlatRectanglePacking,
+            RectanglePacking,
             Treemap,
             CirclePacking,
             Manhattan,
@@ -347,6 +347,14 @@ namespace SEE.Game
         /// if true, the edges are drawn above the houses;
         /// </summary>
         public bool EdgesAboveBlocks = true; // serialized by Unity
+
+        /// <summary>
+        /// Determines the strength of the tension for bundling edges. This value may
+        /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
+        /// 0.85 is the value recommended by Holten
+        /// </summary>
+        [Tooltip("Tension for bundling edges.")]
+        public float Tension = 0.85f; // serialized by Unity
 
         /// <summary>
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.

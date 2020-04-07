@@ -379,7 +379,7 @@ namespace SEE
             // node is shown in the ObjectNameTextField -- but only if ObjectNameTextField
             // exists.
             GameObject textField = ObjectNameTextField;
-            if (textField?? true)
+            if (textField != null)
             {
                 UnityEngine.UI.Text text = textField.GetComponent<UnityEngine.UI.Text>();
                 Ray ray = camera.ScreenPointToRay(Input.mousePosition);
