@@ -28,11 +28,11 @@ namespace SEE.Layout
         /// </summary>
         Dictionary<ILayoutNode, NodeTransform> layout_result;
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes)
         {
             layout_result = new Dictionary<ILayoutNode, NodeTransform>();
 
-            ICollection<ILayoutNode> roots = LayoutNodes.GetRoots(gameNodes);
+            ICollection<ILayoutNode> roots = LayoutNodes.GetRoots(layoutNodes);
             if (roots.Count == 0)
             {
                 throw new System.Exception("Graph has no root node.");
@@ -49,25 +49,29 @@ namespace SEE.Layout
                 Vector3 position = new Vector3(0.0f, groundLevel, 0.0f);
                 layout_result[root] = new NodeTransform(position,
                                                         GetScale(root, out_radius));
-                MakeGlobal(position, root.Children());
+                MakeGlobal(layout_result, position, root.Children());
                 return layout_result;
             }
         }
 
         /// <summary>
-        /// "Globalizes" the layout. Initially, the position of children are relative to
-        /// their parent assuming that the parent has position Vector3.zero. This 
+        /// "Globalizes" the layout. Initially, the position of children are assumed to be 
+        /// relative to their parent, where the parent has position Vector3.zero. This 
         /// function adjusts the co-ordinates of all nodes to the world's co-ordinates.
         /// We also adjust the ground level of each inner node by its level lift.
         /// </summary>
+        /// <param name="layout_result">the layout to be adjusted</param>
         /// <param name="position">the position of the parent of all children</param>
         /// <param name="children">the children to be laid out</param>
-        private void MakeGlobal(Vector3 position, ICollection<ILayoutNode> children)
+        private static void MakeGlobal
+            (Dictionary<ILayoutNode, NodeTransform> layout_result,
+             Vector3 position,
+             ICollection<ILayoutNode> children)
         {
             foreach (ILayoutNode child in children)
             {
                 NodeTransform childTransform = layout_result[child];
-                if (! child.IsLeaf)
+                if (!child.IsLeaf)
                 {
                     // The inner nodes will be slightly lifted along the y axis according to their
                     // tree depth so that they can be stacked visually (level 0 is at the bottom).
@@ -75,7 +79,7 @@ namespace SEE.Layout
                 }
                 childTransform.position += position;
                 layout_result[child] = childTransform;
-                MakeGlobal(childTransform.position, child.Children());
+                MakeGlobal(layout_result, childTransform.position, child.Children());
             }
         }
 

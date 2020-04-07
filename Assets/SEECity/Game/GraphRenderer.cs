@@ -147,7 +147,7 @@ namespace SEE.Game
                     layout = new SplineEdgeLayout(settings.EdgesAboveBlocks);
                     break;
                 case SEECity.EdgeLayouts.Bundling:
-                    layout = new BundledEdgeLayout(settings.EdgesAboveBlocks);
+                    layout = new BundledEdgeLayout(settings.EdgesAboveBlocks, settings.Tension);
                     break;
                 case SEECity.EdgeLayouts.None:
                     // nothing to be done
@@ -210,8 +210,8 @@ namespace SEE.Game
             {
                 case SEECity.NodeLayouts.Manhattan:                    
                     return new ManhattanLayout(groundLevel, leafNodeFactory.Unit);
-                case SEECity.NodeLayouts.FlatRectanglePacking:
-                    return new RectanglePacker(groundLevel, leafNodeFactory.Unit);
+                case SEECity.NodeLayouts.RectanglePacking:
+                    return new RectanglePackingNodeLayout(groundLevel, leafNodeFactory.Unit);
                 case SEECity.NodeLayouts.EvoStreets:
                     return new EvoStreetsNodeLayout(groundLevel, leafNodeFactory.Unit);
                 case SEECity.NodeLayouts.Treemap:
