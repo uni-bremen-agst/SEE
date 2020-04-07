@@ -7,7 +7,7 @@ ScriptedImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-  script: {instanceID: 0}
+  script: {fileID: 11500000, guid: a57477913897c46af95d590f580878bd, type: 3}
   svgType: 0
   texturedSpriteMeshType: 0
   svgPixelsPerUnit: 100
@@ -49,6 +49,6 @@ ScriptedImporter:
         y: 0
         width: 0
         height: 0
-      spriteID: f25b0e7840e404448806dd53e96f86c8
+      spriteID: 0b688d791dcb0084d9c1b755df1fb158
       internalID: 0
     PhysicsOutlines: []
