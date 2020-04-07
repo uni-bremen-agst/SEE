@@ -37,6 +37,10 @@ namespace SEE.Layout
         /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
         /// </summary>
         public const float tensionDefault = 0.85f; // 0.85 is the value recommended by Holten
+        /// <summary>
+        /// The maximal tension for bundling lines.
+        /// </summary>
+        private const float maximalTension = 1.0f;
 
         /// <summary>
         /// Returns the points of the line along the B-spline constrained by the given <paramref name="controlPoints"/>.
@@ -171,7 +175,7 @@ namespace SEE.Layout
                };
 
             TinySpline.BSpline spline = TinySpline.Utils.interpolateCubic(path, dimensions);
-            return ListToVectors(spline.buckle(1.0f).sample());
+            return ListToVectors(spline.buckle(maximalTension).sample());
         }
 
         /// <summary>
