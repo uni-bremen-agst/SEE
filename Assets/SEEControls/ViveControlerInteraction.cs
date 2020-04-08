@@ -1,24 +1,28 @@
-﻿using SEE.Controls;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace SEE.Controls
 {
     /// <summary>
-    /// This class maps functions from other scripts in the editor to the controler events.
-    /// Its the central point for processing controler input.
-    /// No other script within the level should use controler inputs.
+    /// This class maps functions from other scripts in the editor to the controller events.
+    /// It is the central point for processing controller input.
+    /// No other script within the level should use controller inputs.
     /// </summary>
     public class ViveControlerInteraction : MonoBehaviour
     {
+        [Tooltip("Sensitivity of the left trigger. Only when the trigger is pressed more than this threshold, it will fire.")]
+        public float LeftTriggerDepth = 0.5f;
+        [Tooltip("Sensitivity of the right trigger. Only when the trigger is pressed more than this threshold, it will fire.")]
+        public float RightTriggerDepth = 0.5f;
+
+        [Tooltip("The game object to be used to visualize the left controller.")]
+        public GameObject LeftController;
+        [Tooltip("The game object to be used to visualize the right controller.")]
+        public GameObject RightController;
+
         [SerializeField]
         [FormerlySerializedAs("OnLeftTrigger")]
         private ButtonEvent _OnLeftTrigger = null;
-
-        public float LeftTriggerDepth = 0.5f;
 
         [SerializeField]
         [FormerlySerializedAs("OnLeftTriggerAxis")]
@@ -28,34 +32,46 @@ namespace SEE.Controls
         [FormerlySerializedAs("OnRightTrigger")]
         private ButtonEvent _OnRightTrigger = null;
 
-        public float RightTriggerDepth = 0.5f;
-
         [SerializeField]
         [FormerlySerializedAs("OnRightTriggerAxis")]
         private AxisEvent _OnRightTriggerAxis = null;
 
-        public GameObject LeftControler;
-        public GameObject RightControler;
-
-        void Start()
+        public void Start()
         {
-
+            if (ReferenceEquals(LeftController, null))
+            {
+                Debug.LogWarning("No game object has been assigned for left controller.\n");
+            }
+            if (ReferenceEquals(RightController, null))
+            {
+                Debug.LogWarning("No game object has been assigned for right controller.\n");
+            }
         }
-
         void Update()
         {
+            //ShowInput();
             float LeftTriggerAxis = Input.GetAxis("LeftVRTrigger");
             float RightTriggerAxis = Input.GetAxis("RightVRTriggerMovement");
+
+            Debug.LogFormat("LeftTriggerAxis={0} RightTriggerAxis={1}\n", LeftTriggerAxis, RightTriggerAxis);
 
             if (_OnLeftTrigger != null)
             {
                 if (LeftTriggerAxis > LeftTriggerDepth)
                     _OnLeftTrigger.Invoke();
             }
+            else
+            {
+                Debug.LogWarning("_OnLeftTrigger is null.\n");
+            }
 
             if (_OnLeftTriggerAxis != null)
             {
                 _OnLeftTriggerAxis.Invoke(LeftTriggerAxis);
+            }
+            else
+            {
+                Debug.LogWarning("_OnLeftTriggerAxis is null.\n");
             }
 
             if (_OnRightTrigger != null)
@@ -63,29 +79,63 @@ namespace SEE.Controls
                 if (RightTriggerAxis > RightTriggerDepth)
                     _OnRightTrigger.Invoke();
             }
+            else
+            {
+                Debug.LogWarning("_OnRightTrigger is null.\n");
+            }
 
             if (_OnRightTriggerAxis != null)
             {
                 _OnRightTriggerAxis.Invoke(RightTriggerAxis);
             }
+            else
+            {
+                Debug.LogWarning("_OnRightTriggerAxis is null.\n");
+            }
+        }
+
+        private void ShowInput()
+        {
+            ShowInput("Mouse X");
+            ShowInput("Mouse Y");
+            ShowInput("Mouse ScrollWheel");
+            ShowInput("Horizontal");
+            ShowInput("Vertical");
+            ShowInput("Fire1");
+            ShowInput("Fire2");
+            ShowInput("Fire3");
+            ShowInput("Jump");
+            ShowInput("Submit");
+            ShowInput("Cancel");
+            ShowInput("RightVRTriggerMovement");
+            ShowInput("RightVRGripButton");
+            ShowInput("LeftVRTrigger");
+            ShowInput("LeftVRGripButton");
+            ShowInput("LeftVRTouchButton");
+        }
+
+        private void ShowInput(string inputName)
+        {
+            Debug.LogFormat("input {0} = {1}\n", inputName, Input.GetAxis(inputName));
+        }
+
+
+        /// <summary>
+        /// Returns the GameObject which is assigned in the editor and represents the left controller within the game.
+        /// </summary>
+        /// <returns>the GameObject of the left controller</returns>
+        public GameObject GetLeftController()
+        {
+            return LeftController;
         }
 
         /// <summary>
-        /// Returns the GameObject which is assigned in the editor and represents the left controler within the level.
+        /// Returns the GameObject which is assigned in the editor and represents the right controller within the game.
         /// </summary>
-        /// <returns>the GameObject of the left controler</returns>
-        public GameObject GetLeftControler()
+        /// <returns>the GameObject of the rigth controller</returns>
+        public GameObject GetRightController()
         {
-            return LeftControler;
-        }
-
-        /// <summary>
-        /// Returns the GameObject which is assigned in the editor and represents the rigth controler within the level.
-        /// </summary>
-        /// <returns>the GameObject of the rigth controler</returns>
-        public GameObject GetRightControler()
-        {
-            return RightControler;
+            return RightController;
         }
     }
 }

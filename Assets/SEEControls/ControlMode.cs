@@ -1,11 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ControlMode : MonoBehaviour
 {
+    /// <summary>
+    /// If true, leap motion controller is activated.
+    /// </summary>
     public bool LeapMotion = false;
-    public bool ViveControler = false;
+    /// <summary>
+    /// If true, HTC Vive handheld controller is activated.
+    /// </summary>
+    public bool ViveController = true;
 
     void Start()
     {
@@ -17,11 +21,11 @@ public class ControlMode : MonoBehaviour
 
         GameObject InteractionManager = GameObject.Find("/Player Rig/Interaction Manager");
 
-        if(LeapMotion && ViveControler)
+        if(LeapMotion && ViveController)
         {
 
         }
-        else if (ViveControler)
+        else if (ViveController)
         {
             LeapMotion = false;
             LeapModels.SetActive(false);
@@ -30,7 +34,7 @@ public class ControlMode : MonoBehaviour
         }
         else if(LeapMotion)
         {
-            ViveControler = false;
+            ViveController = false;
             //VRControlerLeft.SetActive(false);
             //VRControlerRight.SetActive(false);
             //MovementControl.GetComponent<VRControlerMovement>().enabled = false;

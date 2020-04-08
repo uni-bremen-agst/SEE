@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.IO;
 using UnityEngine;
 
 namespace SEE
@@ -16,48 +16,102 @@ namespace SEE
         private Camera mainCamera;
 
         /// <summary>
-        /// The list of data points on the path captured and to be stored.
+        /// The recorded path.
         /// </summary>
-        private List<string> data = new List<string>();
+        private CameraPath path;
 
         /// <summary>
-        /// Name of the file where to store the captured data points.
+        /// The directory in which to store path files.
         /// </summary>
-        public string filename = "path.csv";
+        public string Directory;
 
-        void Start()
+        /// <summary>
+        /// Base name of the file where to store the captured data points.
+        /// </summary>
+        public string Basename = "path";
+
+        /// <summary>
+        /// The number of recording to be used for the filename.
+        /// </summary>
+        public int Take = 1;
+
+        /// <summary>
+        /// Returns the filename that does not currently exist taking into
+        /// account the path, basename, take, and extension.
+        /// </summary>
+        /// <returns>filename for the recording</returns>
+        private string Filename()
         {
-            //This gets the Main Camera from the Scene
-            mainCamera = Camera.main;
+            string result = NewName(Directory, Basename, Take, CameraPath.DotPathFileExtension);
+            while (File.Exists(result))
+            {
+                Take++;
+                result = NewName(Directory, Basename, Take, CameraPath.DotPathFileExtension);
+            }
+            return result;
         }
 
         /// <summary>
-        /// The delimiter to separate data points within the same line.
+        /// Returns the name of the file in which to store that path taking into
+        /// account the path, basename, take, and extension. This filename may or
+        /// may not already exist.
         /// </summary>
-        private const string delimiter = ";";
+        /// <param name="path">leading path</param>
+        /// <param name="basename">base name of the file</param>
+        /// <param name="take">the number of the take</param>
+        /// <param name="extension">file extension</param>
+        /// <returns>filename for the recording as a concatenation of all given input parameters</returns>
+        private string NewName(string path, string basename, int take, string extension)
+        {
+            if (!path.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            {
+                path += Path.DirectorySeparatorChar;
+            }
+            return path + basename + take + extension;
+        }
 
         /// <summary>
-        /// Converts a float value to a string with two digits and a period as a 
-        /// decimal separator.
+        /// The passed time of the current period.
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        private string FloatToString(float value)
+        private float accumulatedTime = 0.0f;
+
+        /// <summary>
+        /// The length of a period in which to record a path position.
+        /// </summary>
+        public float Period = 0.5f;
+
+        /// <summary>
+        /// Whether the recording is interactive. If true, a position is recorded only if
+        /// the user presses key P.
+        /// </summary>
+        public bool Interactive = false;
+
+        void Start()
         {
-            return value.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+            // This gets the Main Camera from the Scene
+            mainCamera = Camera.main;
+            path = new CameraPath();
+            if (string.IsNullOrEmpty(Directory))
+            {
+                Directory = UnityProject.GetPath();
+            }
         }
 
         void Update()
         {
-            //Press the L Button to switch cameras
-            if (Input.GetKeyDown(KeyCode.P))
+            accumulatedTime += Time.deltaTime;
+            if (accumulatedTime >= Period)
+            {
+                accumulatedTime = 0.0f;
+            }
+
+            // Press the P key to save position on user demand. If the period has
+            // been completed, the position is saved, too, if recording is not interactive.
+            if (Input.GetKeyDown(KeyCode.P) || (! Interactive && accumulatedTime == 0.0f))
             {
                 Vector3 position = mainCamera.transform.position;
-                string output = FloatToString(position.x) 
-                                + delimiter + FloatToString(position.y)
-                                + delimiter + FloatToString(position.z)
-                                + delimiter + Mathf.RoundToInt(Time.realtimeSinceStartup);
-                data.Add(output);
+                Quaternion rotation = mainCamera.transform.rotation;
+                path.Add(position, rotation, Interactive ? Mathf.RoundToInt(Time.realtimeSinceStartup) : Time.realtimeSinceStartup);
             }
         }
 
@@ -69,7 +123,7 @@ namespace SEE
         /// </summary>
         void OnApplicationQuit()
         {
-            if (data.Count == 0)
+            if (path == null || path.Count == 0)
             {
                 Debug.Log("Empty camera path is not stored.\n");
             }
@@ -84,11 +138,9 @@ namespace SEE
         /// </summary>
         public void SaveFile()
         {
-            // WriteAllLines creates a file, writes a collection of strings to the file,
-            // and then closes the file.  You do NOT need to call Flush() or Close().
-            string path = Application.persistentDataPath + "/" + filename;
-            System.IO.File.WriteAllLines(path, data);
-            Debug.LogFormat("Saved camera path to {0}\n", path);
+            string filename = Filename();
+            path.Save(filename);
+            Debug.LogFormat("Saved camera path to {0}\n", filename);
         }
     }
 }

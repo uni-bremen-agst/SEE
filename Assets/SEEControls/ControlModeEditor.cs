@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-
+﻿using UnityEditor;
 
 [CustomEditor(typeof(ControlMode))]
 [CanEditMultipleObjects]
@@ -14,7 +10,7 @@ public class ControlModeEditor : Editor
 
     private void OnEnable()
     {
-        viveSupport = serializedObject.FindProperty("ViveControler");
+        viveSupport = serializedObject.FindProperty("ViveController");
         leapMotionSupport = serializedObject.FindProperty("LeapMotion");
     }
 
