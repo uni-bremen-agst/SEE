@@ -7,7 +7,6 @@ using UnityEngine;
 /// </summary>
 public class RigMovement : MonoBehaviour
 {
-
     /// <summary>
     /// The factor of speed depending on the hight of the moving object.
     /// </summary>
