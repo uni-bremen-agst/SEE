@@ -4530,6 +4530,9 @@ MonoBehaviour:
   _OnRightTriggerAxis:
     m_PersistentCalls:
       m_Calls: []
+  _OnRightTriggerVector:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3253423552553498074
 GameObject:
   m_ObjectHideFlags: 0

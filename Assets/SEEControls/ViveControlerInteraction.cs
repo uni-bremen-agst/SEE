@@ -68,6 +68,10 @@ namespace SEE.Controls
         [FormerlySerializedAs("OnRightTriggerAxis")]
         public AxisEvent _OnRightTriggerAxis = null;
 
+        [SerializeField]
+        [FormerlySerializedAs("OnRightTriggerVector")]
+        public VectorEvent _OnRightTriggerVector = null;
+
         public void Start()
         {
             if (ReferenceEquals(LeftController, null))
@@ -108,7 +112,7 @@ namespace SEE.Controls
 
             if (_OnLeftTriggerVector != null)
             {
-                _OnLeftTriggerVector.Invoke(LeftController.transform.up, LeftTriggerAxis);
+                _OnLeftTriggerVector.Invoke(LeftController.transform.forward, LeftTriggerAxis);
             }
             else
             {
@@ -132,6 +136,15 @@ namespace SEE.Controls
             else
             {
                 Debug.LogWarning("_OnRightTriggerAxis is null.\n");
+            }
+
+            if (_OnRightTriggerVector != null)
+            {
+                _OnRightTriggerVector.Invoke(RightController.transform.forward, RightTriggerAxis);
+            }
+            else
+            {
+                Debug.LogWarning("_OnRightTriggerVector is null.\n");
             }
         }
 

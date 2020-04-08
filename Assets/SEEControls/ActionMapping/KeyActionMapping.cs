@@ -9,22 +9,22 @@ namespace SEE.Controls
     public class KeyActionMapping : ActionMapping
     {
         [SerializeField]
-        public UnityEvent<bool> OnWKey;
+        public ButtonEvent OnWKey;
 
         [SerializeField]
-        public UnityEvent<bool> OnAKey;
+        public ButtonEvent OnAKey;
 
         [SerializeField]
-        public UnityEvent<bool> OnSKey;
+        public ButtonEvent OnSKey;
 
         [SerializeField]
-        public UnityEvent<bool> OnDKey;
+        public ButtonEvent OnDKey;
 
         public override void CheckInput()
         {
             if(Input.GetKey("W"))
             {
-                OnWKey.Invoke(true);
+                OnWKey.Invoke();
             }
         }
 
