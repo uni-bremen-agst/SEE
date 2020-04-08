@@ -4513,8 +4513,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LeftTriggerDepth: 0.5
   RightTriggerDepth: 0.5
-  LeftControler: {fileID: 0}
-  RightControler: {fileID: 0}
+  LeftController: {fileID: 0}
+  RightController: {fileID: 0}
+  _OnLeftTrigger:
+    m_PersistentCalls:
+      m_Calls: []
+  _OnLeftTriggerAxis:
+    m_PersistentCalls:
+      m_Calls: []
+  _OnLeftTriggerVector:
+    m_PersistentCalls:
+      m_Calls: []
+  _OnRightTrigger:
+    m_PersistentCalls:
+      m_Calls: []
+  _OnRightTriggerAxis:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3253423552553498074
 GameObject:
   m_ObjectHideFlags: 0
