@@ -1,8 +1,36 @@
 ﻿using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.Events;
 
 namespace SEE.Controls
 {
+    /// <summary>
+    /// This event is called when a button is pressed.
+    /// </summary>
+    [System.Serializable]
+    public class ButtonEvent : UnityEvent
+    {
+
+    }
+
+    /// <summary>
+    /// This event is called when an input produces an axis value.
+    /// </summary>
+    [System.Serializable]
+    public class AxisEvent :UnityEvent<float>
+    {
+
+    }
+
+    /// <summary>
+    /// This event is used when the funktion needs the axis value and the direction.
+    /// </summary>
+    [System.Serializable]
+    public class VectorEvent : UnityEvent<Vector3,float>
+    {
+
+    }
+
     /// <summary>
     /// This class maps functions from other scripts in the editor to the controller events.
     /// It is the central point for processing controller input.
@@ -22,19 +50,23 @@ namespace SEE.Controls
 
         [SerializeField]
         [FormerlySerializedAs("OnLeftTrigger")]
-        private ButtonEvent _OnLeftTrigger = null;
+        public ButtonEvent _OnLeftTrigger = null;
 
         [SerializeField]
         [FormerlySerializedAs("OnLeftTriggerAxis")]
-        private AxisEvent _OnLeftTriggerAxis = null;
+        public AxisEvent _OnLeftTriggerAxis = null;
+
+        [SerializeField]
+        [FormerlySerializedAs("OnLeftTriggerVector")]
+        public VectorEvent _OnLeftTriggerVector = null;
 
         [SerializeField]
         [FormerlySerializedAs("OnRightTrigger")]
-        private ButtonEvent _OnRightTrigger = null;
+        public ButtonEvent _OnRightTrigger = null;
 
         [SerializeField]
         [FormerlySerializedAs("OnRightTriggerAxis")]
-        private AxisEvent _OnRightTriggerAxis = null;
+        public AxisEvent _OnRightTriggerAxis = null;
 
         public void Start()
         {
@@ -72,6 +104,15 @@ namespace SEE.Controls
             else
             {
                 Debug.LogWarning("_OnLeftTriggerAxis is null.\n");
+            }
+
+            if (_OnLeftTriggerVector != null)
+            {
+                _OnLeftTriggerVector.Invoke(LeftController.transform.up, LeftTriggerAxis);
+            }
+            else
+            {
+                Debug.LogWarning("_OnLeftTriggerVector is null.\n");
             }
 
             if (_OnRightTrigger != null)
