@@ -1,14 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
-///This class implements all positioning changing functions of a player controled rig.
+/// This class implements all positioning changing functions of a player-controlled rig.
 /// </summary>
 public class RigMovement : MonoBehaviour
 {
     /// <summary>
-    /// The factor of speed depending on the hight of the moving object.
+    /// The factor of speed depending on the height of the moving object.
     /// </summary>
     public float HightFactor = 1f;
 
