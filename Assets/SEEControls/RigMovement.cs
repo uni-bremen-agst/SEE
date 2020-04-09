@@ -5,11 +5,16 @@
 /// </summary>
 public class RigMovement : MonoBehaviour
 {
-    public float SpeedFactor = 10f;
+    public float BaseSpeed = 10f;
     /// <summary>
     /// The factor of speed depending on the height of the moving object.
     /// </summary>
     public float HightFactor = 1f;
+
+    private bool BoostOn = false;
+    public float BoostFactor = 2f;
+
+    private float SpeedFactor = 10f;
 
     /// <summary>
     /// The delegate to hold function that needs more than one tick for executing.
@@ -29,10 +34,21 @@ public class RigMovement : MonoBehaviour
             HightFactor = 5;
         }
 
+        if(BoostOn)
+        {
+            SpeedFactor = BaseSpeed * BoostFactor;
+        }
+        else
+        {
+            SpeedFactor = BaseSpeed;
+        }
+
         if(Lock != null)
         {
             Lock(v1, v2);
         }
+
+        BoostOn = false;
     }
 
     public void Move()
@@ -69,6 +85,11 @@ public class RigMovement : MonoBehaviour
     public void MoveRightward(float axis)
     {
         transform.Translate(transform.right * axis * SpeedFactor * Time.deltaTime);
+    }
+
+    public void Boost()
+    {
+        BoostOn = true;
     }
 
     /// <summary>
