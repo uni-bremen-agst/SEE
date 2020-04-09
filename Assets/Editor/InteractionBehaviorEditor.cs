@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using SEE.Controls;
 
@@ -9,7 +7,7 @@ using SEE.Controls;
 public class InteractionBehaviorEditor : Editor
 {
     /// <summary>
-    /// Reference to the script this editor representation is build for.
+    /// Reference to the script this editor representation is built for.
     /// </summary>
     private InteractionBehavior targetScript;
 
@@ -19,7 +17,7 @@ public class InteractionBehaviorEditor : Editor
     SerializedProperty SMappings;
 
     /// <summary>
-    /// Serialized mapping from original InteractionBehavior script which ich currently set active.
+    /// Serialized mapping from original InteractionBehavior script which is currently set active.
     /// </summary>
     SerializedProperty SCurrentMapping;
 
@@ -92,7 +90,7 @@ public class InteractionBehaviorEditor : Editor
     }
 
     /// <summary>
-    /// Creates new Window for editing.
+    /// Creates new window for editing.
     /// </summary>
     /// <param name="mapping"></param>
     private void OpenSettingWindow(ActionMapping mapping)
