@@ -89,7 +89,7 @@ namespace SEE.Controls
             float LeftTriggerAxis = Input.GetAxis("LeftVRTrigger");
             float RightTriggerAxis = Input.GetAxis("RightVRTriggerMovement");
 
-            Debug.LogFormat("LeftTriggerAxis={0} RightTriggerAxis={1}\n", LeftTriggerAxis, RightTriggerAxis);
+            //Debug.LogFormat("LeftTriggerAxis={0} RightTriggerAxis={1}\n", LeftTriggerAxis, RightTriggerAxis);
 
             if (_OnLeftTrigger != null)
             {
