@@ -9,7 +9,7 @@ namespace SEE.Controls
         /// The currently active mapping.
         /// </summary>
         [SerializeField]
-        private ActionMapping CurrentMapping;
+        public ActionMapping CurrentMapping;
 
         /// <summary>
         /// List of all available mappings.
@@ -84,6 +84,11 @@ namespace SEE.Controls
         public void RemoveMapping(int digit)
         {
             mappings.RemoveAt(digit);
+        }
+
+        public void SetActive(int digit)
+        {
+            CurrentMapping = mappings[digit];
         }
     }
 }
