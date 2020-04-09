@@ -90,5 +90,15 @@ namespace SEE.Controls
         {
             CurrentMapping = mappings[digit];
         }
+
+        public ActionMapping GetActive()
+        {
+            return CurrentMapping;
+        }
+
+        public ActionMapping GetMapping(int digit)
+        {
+            return mappings[digit];
+        }
     }
 }

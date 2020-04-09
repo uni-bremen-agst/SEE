@@ -55,23 +55,28 @@ public class InteractionBehaviorEditor : Editor
     {
         serializedObject.Update();
 
-        GUILayout.Label("Control Sets", EditorStyles.boldLabel);
-        GUILayout.Space(5f);
-
-        //EditorGUILayout.PropertyField(SCurrentMapping);
+        //shows current mapping in inspector
+        GUILayout.Space(10f);
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("active mapping:", EditorStyles.boldLabel);
+        GUILayout.Label(targetScript.GetActive().GetName());
+        GUILayout.Label("mapping type:", EditorStyles.boldLabel);
+        GUILayout.Label(targetScript.GetActive().GetTypeAsString());
+        GUILayout.EndHorizontal();
+        GUILayout.Space(10f);
 
         int size = SMappings.arraySize;
 
         for(int i = 0; i < size; i++)
         {
-            EditorGUILayout.PropertyField(SMappings.GetArrayElementAtIndex(i));
+            EditorGUILayout.PropertyField(SMappings.GetArrayElementAtIndex(i), new GUIContent(targetScript.GetMapping(i).GetName()));
 
             GUILayout.BeginHorizontal();
-            if(GUILayout.Button("Select"))
+            if(GUILayout.Button("Activate"))
             {
                 Debug.LogFormat("InteractionBehaviorEditor: index of selected mapping: {0}\n", i);
                 targetScript.SetActive(i);
-                //Debug.LogFormat("InteractionBehaviorEditor: selected mapping: {0}\n", SCurrentMapping);
+                Debug.LogFormat("InteractionBehaviorEditor: selected mapping: {0}\n", SCurrentMapping);
             }
             if(GUILayout.Button("Delete"))
             {
