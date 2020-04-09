@@ -1,45 +1,35 @@
-﻿using UnityEngine;
+﻿using Leap.Unity;
+using UnityEngine;
 
+/// <summary>
+/// Enables/disables the controller (leap motion or vive style).
+/// </summary>
 public class ControlMode : MonoBehaviour
 {
     /// <summary>
-    /// If true, leap motion controller is activated.
+    /// If true, the leap motion controller is activated. Will be set in the inspector.
     /// </summary>
-    public bool LeapMotion = false;
-    /// <summary>
-    /// If true, HTC Vive handheld controller is activated.
-    /// </summary>
-    public bool ViveController = true;
+    [Tooltip("If ticked, the leap motion controller is activated; otherwise a Vive-style controller will be used.")]
+    public bool EnableLeapMotion = false;
 
     void Start()
     {
-        GameObject LeapModels = GameObject.Find("/Player Rig/Hand Models");
-        GameObject HandAttachments = GameObject.Find("/Player Rig/Attachment Hands");
-        GameObject VRControlerRight = GameObject.Find("/Player Rig/Interaction Manager/VR Vive-style Controller (Left)");
-        GameObject VRControlerLeft = GameObject.Find("/Player Rig/Interaction Manager/VR Vive-style Controller (Left)");
-        GameObject MovementControl = GameObject.Find("/Player Rig/Movement Control");
-
-        GameObject InteractionManager = GameObject.Find("/Player Rig/Interaction Manager");
-
-        if(LeapMotion && ViveController)
+        if (! EnableLeapMotion)
         {
-
-        }
-        else if (ViveController)
-        {
-            LeapMotion = false;
+            GameObject LeapModels = GameObject.Find("/Player Rig/Hand Models");
             LeapModels.SetActive(false);
-            MovementControl.GetComponent<LeapMovementSEE>().enabled = false;
+
+            GameObject HandAttachments = GameObject.Find("/Player Rig/Attachment Hands");
             HandAttachments.SetActive(false);
-        }
-        else if(LeapMotion)
-        {
-            ViveController = false;
-            //VRControlerLeft.SetActive(false);
-            //VRControlerRight.SetActive(false);
-            //MovementControl.GetComponent<VRControlerMovement>().enabled = false;
+
+            GameObject MovementControl = GameObject.Find("/Player Rig/Movement Control");
+            MovementControl.GetComponent<LeapMovementSEE>().enabled = false;
+
+            // We are turning off the LeapXRServiceProvider to avoid warning messages
+            // by Leap Motion of the kind:
+            // "Leap Service not connected; attempting to reconnect for try..."
+            GameObject RigCamera = GameObject.Find("/Player Rig/Main Camera");
+            RigCamera.GetComponent<LeapXRServiceProvider>().enabled = false;
         }
     }
-
-
 }
