@@ -23,7 +23,7 @@ namespace SEE.Controls
     }
 
     /// <summary>
-    /// This event is used when the funktion needs the axis value and the direction.
+    /// This event is used when the function needs the axis value and the direction.
     /// </summary>
     [System.Serializable]
     public class VectorEvent : UnityEvent<Vector3,float>
