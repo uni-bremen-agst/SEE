@@ -70,8 +70,8 @@ public class InteractionBehaviorEditor : Editor
             if(GUILayout.Button("Select"))
             {
                 Debug.LogFormat("InteractionBehaviorEditor: index of selected mapping: {0}\n", i);
-                SCurrentMapping = SMappings.GetArrayElementAtIndex(i);
-                Debug.LogFormat("InteractionBehaviorEditor: selected mapping: {0}\n", SCurrentMapping);
+                targetScript.SetActive(i);
+                //Debug.LogFormat("InteractionBehaviorEditor: selected mapping: {0}\n", SCurrentMapping);
             }
             if(GUILayout.Button("Delete"))
             {

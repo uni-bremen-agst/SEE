@@ -1823,9 +1823,78 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7e7a70e3f015504dabdda322136b7bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentMapping: {fileID: 0}
+  CurrentMapping: {fileID: 910873897}
   mappings:
-  - {fileID: 1234910232}
+  - {fileID: 910873897}
+--- !u!114 &910873897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df3e1120858746340b0821f0809698c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MappingName: WASD
+  OnWKey:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 774140797}
+        m_MethodName: MoveForward
+        m_Mode: 4
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 1
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnAKey:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 774140797}
+        m_MethodName: MoveLeftward
+        m_Mode: 4
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 1
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnSKey:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 774140797}
+        m_MethodName: MoveBackward
+        m_Mode: 4
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 1
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnDKey:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 774140797}
+        m_MethodName: MoveRightward
+        m_Mode: 4
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 1
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -2296,42 +2365,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1234910232
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df3e1120858746340b0821f0809698c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MappingName: WASD
-  OnWKey:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 774140797}
-        m_MethodName: Move
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 1
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnAKey:
-    m_PersistentCalls:
-      m_Calls: []
-  OnSKey:
-    m_PersistentCalls:
-      m_Calls: []
-  OnDKey:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &1352653018
 GameObject:
   m_ObjectHideFlags: 0

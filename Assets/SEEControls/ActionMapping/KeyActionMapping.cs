@@ -22,9 +22,24 @@ namespace SEE.Controls
 
         public override void CheckInput()
         {
-            if(Input.GetKey("W"))
+            if(Input.GetKey(KeyCode.W))
             {
                 OnWKey.Invoke();
+            }
+
+            if (Input.GetKey(KeyCode.A))
+            {
+                OnAKey.Invoke();
+            }
+
+            if (Input.GetKey(KeyCode.S))
+            {
+                OnSKey.Invoke();
+            }
+
+            if (Input.GetKey(KeyCode.D))
+            {
+                OnDKey.Invoke();
             }
         }
 
