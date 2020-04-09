@@ -5,6 +5,7 @@
 /// </summary>
 public class RigMovement : MonoBehaviour
 {
+    public float SpeedFactor = 10f;
     /// <summary>
     /// The factor of speed depending on the height of the moving object.
     /// </summary>
@@ -42,32 +43,32 @@ public class RigMovement : MonoBehaviour
     public void MoveForward(float axis)
     {
         
-        transform.Translate(transform.forward * axis * Time.deltaTime);
+        transform.Translate(transform.forward * axis * SpeedFactor * Time.deltaTime);
     }
 
     public void MoveBackward(float axis)
     {
-        transform.Translate(transform.forward * -1 * axis * Time.deltaTime);
+        transform.Translate(transform.forward * -1 * axis * SpeedFactor * Time.deltaTime);
     }
 
     public void MoveUpward(float axis)
     {
-        transform.Translate(transform.up * axis * Time.deltaTime);
+        transform.Translate(transform.up * axis * SpeedFactor * Time.deltaTime);
     }
 
     public void MoveDownward(float axis)
     {
-        transform.Translate(transform.up * -1 * axis * Time.deltaTime);
+        transform.Translate(transform.up * -1 * axis * SpeedFactor * Time.deltaTime);
     }
 
     public void MoveLeftward(float axis)
     {
-        transform.Translate(transform.right * axis * Time.deltaTime);
+        transform.Translate(transform.right * -1 * axis * SpeedFactor * Time.deltaTime);
     }
 
     public void MoveRightward(float axis)
     {
-        transform.Translate(transform.right * -1 * axis * Time.deltaTime);
+        transform.Translate(transform.right * axis * SpeedFactor * Time.deltaTime);
     }
 
     /// <summary>

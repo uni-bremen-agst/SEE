@@ -20,6 +20,15 @@ namespace SEE.Controls
         [SerializeField]
         public ButtonEvent OnDKey;
 
+        [SerializeField]
+        public ButtonEvent OnCKey;
+
+        [SerializeField]
+        public ButtonEvent OnSchiftKey;
+
+        [SerializeField]
+        public ButtonEvent OnSpaceKey;
+
         public override void CheckInput()
         {
             if(Input.GetKey(KeyCode.W))
@@ -38,6 +47,21 @@ namespace SEE.Controls
             }
 
             if (Input.GetKey(KeyCode.D))
+            {
+                OnDKey.Invoke();
+            }
+
+            if (Input.GetKey(KeyCode.C))
+            {
+                OnDKey.Invoke();
+            }
+
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                OnDKey.Invoke();
+            }
+
+            if (Input.GetKey(KeyCode.Space))
             {
                 OnDKey.Invoke();
             }
