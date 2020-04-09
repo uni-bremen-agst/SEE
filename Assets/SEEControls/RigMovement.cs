@@ -34,8 +34,14 @@ public class RigMovement : MonoBehaviour
         }
     }
 
+    public void Move()
+    {
+        Debug.LogFormat("RigMovement.Move\n");
+    }
+
     public void MoveForward(float axis)
     {
+        
         transform.Translate(transform.forward * axis * Time.deltaTime);
     }
 

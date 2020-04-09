@@ -69,7 +69,9 @@ public class InteractionBehaviorEditor : Editor
             GUILayout.BeginHorizontal();
             if(GUILayout.Button("Select"))
             {
+                Debug.LogFormat("InteractionBehaviorEditor: index of selected mapping: {0}\n", i);
                 SCurrentMapping = SMappings.GetArrayElementAtIndex(i);
+                Debug.LogFormat("InteractionBehaviorEditor: selected mapping: {0}\n", SCurrentMapping);
             }
             if(GUILayout.Button("Delete"))
             {

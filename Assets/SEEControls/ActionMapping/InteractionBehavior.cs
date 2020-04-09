@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -18,14 +17,16 @@ namespace SEE.Controls
         [SerializeField]
         private List<ActionMapping> mappings = new List<ActionMapping>();
 
-        private void Start()
-        {
-
-        }
-
         private void Update()
         {
-            CurrentMapping.CheckInput();
+            if (CurrentMapping != null)
+            {
+                CurrentMapping.CheckInput();
+            }
+            else
+            {
+                Debug.LogError("There is no input-action mapping selected in the Interaction Behavior. You must select one in the inspector.\n");
+            }
         }
 
         /// <summary>
