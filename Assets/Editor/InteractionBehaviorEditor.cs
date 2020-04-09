@@ -116,7 +116,7 @@ public class InteractionBehaviorEditor : Editor
         switch (type)
         {
             case INPUTTYPE.Empty:
-                Debug.Log("Empty type cant be Instatiatet.");
+                Debug.Log("Empty type cant be instantiated.");
                 return;
             case INPUTTYPE.Keys:
                 NewMapping = ScriptableObject.CreateInstance<KeyActionMapping>();

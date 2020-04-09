@@ -24,7 +24,7 @@ namespace SEE.Controls
         public ButtonEvent OnCKey;
 
         [SerializeField]
-        public ButtonEvent OnSchiftKey;
+        public ButtonEvent OnLeftSchiftKey;
 
         [SerializeField]
         public ButtonEvent OnSpaceKey;
@@ -53,17 +53,17 @@ namespace SEE.Controls
 
             if (Input.GetKey(KeyCode.C))
             {
-                OnDKey.Invoke();
+                OnCKey.Invoke();
             }
 
             if (Input.GetKey(KeyCode.LeftShift))
             {
-                OnDKey.Invoke();
+                OnLeftSchiftKey.Invoke();
             }
 
             if (Input.GetKey(KeyCode.Space))
             {
-                OnDKey.Invoke();
+                OnSpaceKey.Invoke();
             }
         }
 
