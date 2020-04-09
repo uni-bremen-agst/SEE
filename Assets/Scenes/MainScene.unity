@@ -204,8 +204,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 69527823}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.6755902, y: 0.000000059061975, z: 0.00000006445483, w: 0.7372773}
+  m_LocalPosition: {x: 0.08000001, y: 24.989542, z: 0.23954336}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 684904724}
@@ -249,8 +249,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 209128883}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.6755902, y: 0.000000059061975, z: 0.00000006445483, w: 0.7372773}
+  m_LocalPosition: {x: 0.08436387, y: 24.959215, z: 0.2303653}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 684904724}
@@ -338,7 +338,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &465914106
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -595,7 +595,7 @@ MonoBehaviour:
   pinkyDistalJoint: {fileID: 0}
   pinkyTip: {fileID: 0}
   _chirality: 1
-  _isTracked: 0
+  _isTracked: 1
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -743,7 +743,7 @@ PrefabInstance:
     - target: {fileID: 2271365762940740645, guid: 7c99200408de3af44a7540758e9664f1,
         type: 3}
       propertyPath: ViveController
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2313588831237765229, guid: 7c99200408de3af44a7540758e9664f1,
         type: 3}
@@ -963,7 +963,7 @@ PrefabInstance:
     - target: {fileID: 3253423552527307479, guid: 7c99200408de3af44a7540758e9664f1,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3253423552718361297, guid: 7c99200408de3af44a7540758e9664f1,
         type: 3}
@@ -1831,7 +1831,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &963194226
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1964,7 +1964,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1003004808
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2075,7 +2075,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1036186227
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2186,7 +2186,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1206385285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2371,7 +2371,7 @@ MonoBehaviour:
   InnerNodeObjects: 1
   NodeLayout: 3
   EdgeLayout: 3
-  ZScoreScale: 1
+  ZScoreScale: 0
   EdgeWidth: 0.4
   ShowErosions: 0
   EdgesAboveBlocks: 1
@@ -2381,12 +2381,12 @@ MonoBehaviour:
   LeafConstraint:
     NodeType: Class
     EdgeType: calls
-    NodeNumber: 1000
+    NodeNumber: 100
     EdgeDensity: 0.001
   InnerNodeConstraint:
     NodeType: Package
     EdgeType: uses
-    NodeNumber: 100
+    NodeNumber: 10
     EdgeDensity: 0.001
   LeafAttributes:
   - Name: Metric.Number_of_Tokens
@@ -2455,7 +2455,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1357088964
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2710,7 +2710,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2092969279
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2843,8 +2843,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2093601547}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -25, z: 0}
+  m_LocalRotation: {x: -0.6755902, y: 1.0701312e-15, z: 1.1678433e-15, w: 0.7372773}
+  m_LocalPosition: {x: -0.084363855, y: -0.040784836, z: 0.2303653}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 570804339}
