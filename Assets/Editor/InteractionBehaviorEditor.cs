@@ -58,31 +58,52 @@ public class InteractionBehaviorEditor : Editor
         //shows current mapping in inspector
         GUILayout.Space(10f);
         GUILayout.BeginHorizontal();
-        GUILayout.Label("active mapping:", EditorStyles.boldLabel);
+        GUILayout.Label("Active mapping:", EditorStyles.boldLabel);
         GUILayout.Label(targetScript.GetActive().GetName());
-        GUILayout.Label("mapping type:", EditorStyles.boldLabel);
+        GUILayout.Label("Mapping type:", EditorStyles.boldLabel);
         GUILayout.Label(targetScript.GetActive().GetTypeAsString());
         GUILayout.EndHorizontal();
         GUILayout.Space(10f);
 
         int size = SMappings.arraySize;
 
-        for(int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++)
         {
-            EditorGUILayout.PropertyField(SMappings.GetArrayElementAtIndex(i), new GUIContent(targetScript.GetMapping(i).GetName()));
+            ActionMapping actionMapping = targetScript.GetMapping(i);
+            if (actionMapping != null)
+            {
+                string mappingName = actionMapping.GetName();
+                if (string.IsNullOrEmpty(mappingName))
+                {
+                    Debug.LogErrorFormat("Mapping at index {0} does not have a name. Please assign one.\n", i);
+                    mappingName = "";
+                }
+                EditorGUILayout.PropertyField(SMappings.GetArrayElementAtIndex(i),
+                                              new GUIContent(mappingName));
 
-            GUILayout.BeginHorizontal();
-            if(GUILayout.Button("Activate"))
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button("Activate"))
+                {
+                    Debug.LogFormat("InteractionBehaviorEditor: index of selected mapping: {0}\n", i);
+                    targetScript.SetActive(i);
+                    Debug.LogFormat("InteractionBehaviorEditor: selected mapping: {0}\n", SCurrentMapping);
+                }
+                if (GUILayout.Button("Delete"))
+                {
+                    targetScript.RemoveMapping(i);
+                }
+                GUILayout.EndHorizontal();
+            } 
+            else
             {
-                Debug.LogFormat("InteractionBehaviorEditor: index of selected mapping: {0}\n", i);
-                targetScript.SetActive(i);
-                Debug.LogFormat("InteractionBehaviorEditor: selected mapping: {0}\n", SCurrentMapping);
-            }
-            if(GUILayout.Button("Delete"))
-            {
+                Debug.LogErrorFormat("Mapping at index {0} (out of {1}) was undefined and has been removed.\n", i, size);
+                // We fix the problem by removing the undefined mapping and terminate the loop.
+                // The correction will become active in very short time when OnInspectorGUI()
+                // is called (note: OnInspectorGUI is called periodically when the inspector has
+                // the mouse focus).
                 targetScript.RemoveMapping(i);
+                break;
             }
-            GUILayout.EndHorizontal();
         }
 
         GUILayout.BeginHorizontal();
@@ -99,7 +120,7 @@ public class InteractionBehaviorEditor : Editor
     /// <summary>
     /// Creates new window for editing.
     /// </summary>
-    /// <param name="mapping"></param>
+    /// <param name="mapping">mapping to be edited</param>
     private void OpenSettingWindow(ActionMapping mapping)
     {
         SetEditingWindow instance = ScriptableObject.CreateInstance<SetEditingWindow>();
@@ -116,7 +137,7 @@ public class InteractionBehaviorEditor : Editor
         switch (type)
         {
             case INPUTTYPE.Empty:
-                Debug.Log("Empty type cant be instantiated.");
+                Debug.Log("Empty type cannot be instantiated.");
                 return;
             case INPUTTYPE.Keys:
                 NewMapping = ScriptableObject.CreateInstance<KeyActionMapping>();
@@ -129,6 +150,9 @@ public class InteractionBehaviorEditor : Editor
             case INPUTTYPE.Touch:
                 break;
             case INPUTTYPE.Con:
+                break;
+            default:
+                Debug.LogErrorFormat("Unhandled input type {0}\n", type);
                 break;
         }
 
