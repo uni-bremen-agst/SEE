@@ -7,14 +7,66 @@ using static SEE.Game.AbstractSEECity;
 
 namespace SEE.Game
 {
+    public class NodelayoutModel
+    {
+        public readonly bool OnlyLeaves;
+        public readonly bool CanApplySublayouts;
+        public readonly bool InnerNodesEncloseLeafNodes;
+        public readonly bool IsCircular;
+
+        public NodelayoutModel(bool OnlyLeaves, bool CanApplySublayouts, bool InnerNodesEncloseLeafNodes, bool IsCircular)
+        {
+            this.OnlyLeaves = OnlyLeaves;
+            this.CanApplySublayouts = CanApplySublayouts;
+            this.InnerNodesEncloseLeafNodes = InnerNodesEncloseLeafNodes;
+            this.IsCircular = IsCircular;
+        }
+    }
+
+    public class InnerNodeKindsModel
+    {
+        public readonly bool IsCircular;
+        public readonly bool IsRectangular;
+
+        public InnerNodeKindsModel(bool IsCircular, bool IsRectangular)
+        {
+            this.IsCircular = IsCircular;
+            this.IsRectangular = IsRectangular;
+        }
+    }
+
     public static class AbstractSEECityExtension
     {
+        public static NodelayoutModel GetModel(this NodeLayouts nodeLayout)
+        {
+            switch (nodeLayout)
+            {
+                case NodeLayouts.CompoundSpringEmbedder:
+                    return new NodelayoutModel(OnlyLeaves: false,  CanApplySublayouts: true,  InnerNodesEncloseLeafNodes: true,  IsCircular: false);
+                case NodeLayouts.EvoStreets:
+                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false);
+                case NodeLayouts.Balloon:
+                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: true);
+                case NodeLayouts.FlatRectanglePacking:
+                    return new NodelayoutModel(OnlyLeaves: true, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false);
+                case NodeLayouts.Treemap:
+                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false);
+                case NodeLayouts.CirclePacking:
+                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: true);
+                case NodeLayouts.Manhattan: 
+                    return new NodelayoutModel(OnlyLeaves: true, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false); 
+                default:
+                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false);
+            }
+        }
+
+
         public static List<InnerNodeKinds> GetInnerNodeKinds(this NodeLayouts nodeLayout)
         {
             List<InnerNodeKinds> values = Enum.GetValues(typeof(InnerNodeKinds)).Cast<InnerNodeKinds>().ToList();
             List<InnerNodeKinds> list = new List<InnerNodeKinds>();
 
-            list = nodeLayout.IsCircular() ? values.Where(kind => kind.IsCircular()).ToList() : values.Where(kind => kind.IsRectangular()).ToList();
+            list = nodeLayout.GetModel().IsCircular ? values.Where(kind => kind.GetModel().IsCircular).ToList() : values.Where(kind => kind.GetModel().IsRectangular).ToList();
             list.OrderBy(kind => kind.ToString());
             return list;
         }
@@ -25,119 +77,24 @@ namespace SEE.Game
             return values; //nodeLayout.IsCircular() ? values.Where(layout => layout.IsCircular()).ToList() : values.Where(layout => !layout.IsCircular()).ToList();
         }
 
-        public static bool OnlyLeaves(this NodeLayouts nodeLayout)
-        {
-            switch (nodeLayout)
-            {
-                case NodeLayouts.CompoundSpringEmbedder:
-                    return false;
-                case NodeLayouts.EvoStreets:
-                    return false;
-                case NodeLayouts.Balloon:
-                    return false;
-                case NodeLayouts.FlatRectanglePacking:
-                    return true;
-                case NodeLayouts.Treemap:
-                    return false;
-                case NodeLayouts.CirclePacking:
-                    return false;
-                case NodeLayouts.Manhattan:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        public static bool CanApplySublayouts(this NodeLayouts nodeLayout)
-        {
-            return nodeLayout == NodeLayouts.CompoundSpringEmbedder;
-        }
-
-        public static bool InnerNodesEncloseLeafNodes(this NodeLayouts nodeLayout)
-        {
-            switch (nodeLayout)
-            {
-                case NodeLayouts.CompoundSpringEmbedder:
-                    return true;
-                case NodeLayouts.EvoStreets:
-                    return false;
-                case NodeLayouts.Balloon:
-                    return true;
-                case NodeLayouts.FlatRectanglePacking:
-                    return false;
-                case NodeLayouts.Treemap:
-                    return true;
-                case NodeLayouts.CirclePacking:
-                    return true;
-                case NodeLayouts.Manhattan:
-                    return false;
-                default:
-                    return true;
-            }
-        }
-
-        public static bool IsCircular(this NodeLayouts nodeLayout)
-        {
-            switch (nodeLayout)
-            {
-                case NodeLayouts.CompoundSpringEmbedder:
-                    return false;
-                case NodeLayouts.EvoStreets:
-                    return false;
-                case NodeLayouts.Balloon:
-                    return true;
-                case NodeLayouts.FlatRectanglePacking:
-                    return false;
-                case NodeLayouts.Treemap:
-                    return false;
-                case NodeLayouts.CirclePacking:
-                    return true;
-                case NodeLayouts.Manhattan:
-                    return false;
-                default:
-                    return false;
-            }
-        }
-
-        public static bool IsCircular(this InnerNodeKinds innerNodeKind)
+        public static InnerNodeKindsModel GetModel(this InnerNodeKinds innerNodeKind)
         {
             switch (innerNodeKind)
             {
                 case InnerNodeKinds.Blocks:
-                    return false;
+                    return new InnerNodeKindsModel(IsCircular: false, IsRectangular: true);
                 case InnerNodeKinds.Rectangles:
-                    return false;
+                    return new InnerNodeKindsModel(IsCircular: false, IsRectangular: true);
                 case InnerNodeKinds.Donuts:
-                    return true;
+                    return new InnerNodeKindsModel(IsCircular: true, IsRectangular: false);
                 case InnerNodeKinds.Circles:
-                    return true;
+                    return new InnerNodeKindsModel(IsCircular: true, IsRectangular: false);
                 case InnerNodeKinds.Empty:
-                    return true;
+                    return new InnerNodeKindsModel(IsCircular: true, IsRectangular: true);
                 case InnerNodeKinds.Cylinders:
-                    return true;
+                    return new InnerNodeKindsModel(IsCircular: true, IsRectangular: false);
                 default:
-                    return false;
-            }
-        }
-
-        public static bool IsRectangular(this InnerNodeKinds innerNodeKind)
-        {
-            switch (innerNodeKind)
-            {
-                case InnerNodeKinds.Blocks:
-                    return true;
-                case InnerNodeKinds.Rectangles:
-                    return true;
-                case InnerNodeKinds.Donuts:
-                    return false;
-                case InnerNodeKinds.Circles:
-                    return false;
-                case InnerNodeKinds.Empty:
-                    return true;
-                case InnerNodeKinds.Cylinders:
-                    return false;
-                default:
-                    return false;
+                    return new InnerNodeKindsModel(IsCircular: false, IsRectangular: true);
             }
         }
     }
