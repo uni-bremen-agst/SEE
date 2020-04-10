@@ -196,7 +196,7 @@ namespace SEE.Game
             Dictionary<Node, GameObject>.ValueCollection gameNodes;
             ICollection<ILayoutNode> layoutNodes;
 
-            if (settings.NodeLayout.CanApplySublayouts())
+            if (settings.NodeLayout.GetModel().CanApplySublayouts)
             {
                 ICollection<SublayoutNode>  sublayoutNodes = AddInnerNodesForSublayouts(nodeMap, nodes);
                 gameNodes = nodeMap.Values;

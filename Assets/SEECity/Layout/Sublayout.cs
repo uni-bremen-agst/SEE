@@ -92,7 +92,7 @@ namespace SEE.Layout
             nodesForLayout.Remove(sublayout.Node);
             ICollection<ILayoutNode> sublayoutNodes = ConvertToCoseSublayoutNodes(nodesForLayout);
 
-            if (sublayout.NodeLayout.OnlyLeaves())
+            if (sublayout.NodeLayout.GetModel().OnlyLeaves)
             {
                 return sublayoutNodes;
             }
@@ -182,7 +182,7 @@ namespace SEE.Layout
                 }
             }
 
-            if (!sublayout.NodeLayout.InnerNodesEncloseLeafNodes())
+            if (!sublayout.NodeLayout.GetModel().InnerNodesEncloseLeafNodes)
             {
                 double left = Mathf.Infinity;
                 double right = Mathf.NegativeInfinity;
@@ -236,7 +236,7 @@ namespace SEE.Layout
 
                 LayoutScale = scale; //new Vector3(sublayout.Node.Scale.x, innerNodeHeight, sublayout.Node.Scale.z);
 
-                if (!nodeLayout.OnlyLeaves())
+                if (!nodeLayout.GetModel().OnlyLeaves)
                 {
                    rootNodeRealScale = new Vector3(sublayout.Node.Scale.x, innerNodeHeight, sublayout.Node.Scale.z);
                    LayoutOffset = position - sublayout.Node.CenterPosition;

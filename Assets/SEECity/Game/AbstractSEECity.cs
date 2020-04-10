@@ -443,7 +443,7 @@ namespace SEE.Game
         /// <summary>
         /// Dictionary with all Nodelayouts for leaf and inner nodes
         /// </summary>
-        public Dictionary<NodeLayouts, string> SubLayoutsInnerNodes = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().Where(nodeLayout => !nodeLayout.OnlyLeaves()).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
+        public Dictionary<NodeLayouts, string> SubLayoutsInnerNodes = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().Where(nodeLayout => !nodeLayout.GetModel().OnlyLeaves).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
 
         /// <summary>
         ///  Dictionary with all Nodelayouts only for leaf nodes
