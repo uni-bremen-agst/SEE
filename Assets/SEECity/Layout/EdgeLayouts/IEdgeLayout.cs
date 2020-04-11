@@ -84,17 +84,20 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Simplifies the given polyline. The greater <paramref name="epsilon"/> is, the more
-        /// aggressively points are removed from <paramref name="polyLine"/>.
+        /// Simplifies the given polyline. This function uses the Ramer–Douglas–Peucker
+        /// (RDP) algorithm to identify and remove points whose distances fall below
+        /// <paramref name="epsilon"/> (with respect to the line drawn between their
+        /// neighbors). The greater <paramref name="epsilon"/> is, the more  aggressively
+        /// points are removed.
         ///
         /// Precondition: <paramref name="polyLine"/> is not null.
-        /// Postcondition: The lenght of the returned vector is less than or equal to the
+        /// Postcondition: The lenght of the returned array is less than or equal to the
         /// lenght of <paramref name="polyLine"/>.
         /// </summary>
-        /// <param name="polyLine">Sequence of lines to simplify.</param>
+        /// <param name="polyLine">The polyline to simplify.</param>
         /// <param name="epsilon">Used to evaluate which points should be removed from
         /// <paramref name="polyLine"/>. Values less than 0 are mapped to 0.</param>
-        /// <returns></returns>
+        /// <returns>A similar polyline with the same amount or fewer points.</returns>
         protected Vector3[] Simplify(Vector3[] polyLine, float epsilon)
         {
             epsilon = Mathf.Max(0, epsilon);
