@@ -15,6 +15,7 @@ namespace SEE.Net.Internal
             public int[] indices;
         }
 
+        public string name;
         public IndexFormat indexFormat;
         public Matrix4x4[] bindposes;
         public int subMeshCount;
@@ -37,40 +38,42 @@ namespace SEE.Net.Internal
         public byte[] bonesPerVertex;
         public BoneWeight1[] boneWeights;
 
-        public SMesh(Mesh mesh)
+        public SMesh(Mesh m)
         {
-            indexFormat = mesh.indexFormat;
-            bindposes = mesh.bindposes;
-            subMeshCount = mesh.subMeshCount;
-            bounds = mesh.bounds;
-            vertices = mesh.vertices;
-            normals = mesh.normals;
-            tangents = mesh.tangents;
-            uv = mesh.uv;
-            uv2 = mesh.uv2;
-            uv3 = mesh.uv3;
-            uv4 = mesh.uv4;
-            uv5 = mesh.uv5;
-            uv6 = mesh.uv6;
-            uv7 = mesh.uv7;
-            uv8 = mesh.uv8;
+            name = m.name;
+            indexFormat = m.indexFormat;
+            bindposes = m.bindposes;
+            subMeshCount = m.subMeshCount;
+            bounds = m.bounds;
+            vertices = m.vertices;
+            normals = m.normals;
+            tangents = m.tangents;
+            uv = m.uv;
+            uv2 = m.uv2;
+            uv3 = m.uv3;
+            uv4 = m.uv4;
+            uv5 = m.uv5;
+            uv6 = m.uv6;
+            uv7 = m.uv7;
+            uv8 = m.uv8;
 
-            indices = new SIndices[mesh.subMeshCount];
-            topologies = new MeshTopology[mesh.subMeshCount];
-            for (int i = 0; i < mesh.subMeshCount; i++)
+            indices = new SIndices[m.subMeshCount];
+            topologies = new MeshTopology[m.subMeshCount];
+            for (int i = 0; i < m.subMeshCount; i++)
             {
                 indices[i] = new SIndices()
                 {
-                    indices = mesh.GetIndices(i)
+                    indices = m.GetIndices(i)
                 };
-                topologies[i] = mesh.GetTopology(i);
+                topologies[i] = m.GetTopology(i);
             }
-            bonesPerVertex = mesh.GetBonesPerVertex().ToArray();
-            boneWeights = mesh.GetAllBoneWeights().ToArray();
+            bonesPerVertex = m.GetBonesPerVertex().ToArray();
+            boneWeights = m.GetAllBoneWeights().ToArray();
         }
 
         public void Initialize(Mesh value)
         {
+            value.name = name;
             value.indexFormat = indexFormat;
             value.bindposes = bindposes;
             value.subMeshCount = subMeshCount;
