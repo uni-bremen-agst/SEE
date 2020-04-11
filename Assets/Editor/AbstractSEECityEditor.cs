@@ -42,7 +42,8 @@ namespace SEEEditor
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Bundling tension");
             city.Tension = EditorGUILayout.Slider(city.Tension, 0.0f, 1.0f);
-            EditorGUILayout.EndHorizontal();            
+            EditorGUILayout.EndHorizontal();
+            city.RDP = EditorGUILayout.FloatField("RDP", city.RDP);
 
             GUILayout.Label("Data", EditorStyles.boldLabel);
             if (city.PathPrefix == null)
