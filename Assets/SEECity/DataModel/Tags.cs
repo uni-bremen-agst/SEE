@@ -15,10 +15,12 @@
         public const string Erosion = "Erosion";
         public const string Decoration = "Decoration"; // Planes, trees, etc.
         public const string Path = "Path"; // for camera paths
+        public const string Runtime = "Runtime";
+        public const string FunctionCall = "Function Call";
 
         /// <summary>
         /// All existing tags in one.
         /// </summary>
-        public static readonly string[] All = new string[] { Graph, Node, Block, Building, Edge, NodePrefab, Text, Erosion, Decoration, Path };
+        public static readonly string[] All = new string[] { Graph, Node, Block, Building, Edge, NodePrefab, Text, Erosion, Decoration, Path, Runtime, FunctionCall };
     }
 }
