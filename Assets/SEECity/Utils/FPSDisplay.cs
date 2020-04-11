@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 /// <summary>
-/// Renders the frames per second (FPS) on the upper left corner.
+/// Displays the frames per second (FPS) on the upper left corner.
 /// 
 /// The code was taken from: https://wiki.unity3d.com/index.php/FramesPerSecond
 /// 
@@ -24,7 +23,7 @@ public class FPSDisplay : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Renders the FPS.
+	/// Displays the FPS.
 	/// </summary>
 	void OnGUI()
 	{
