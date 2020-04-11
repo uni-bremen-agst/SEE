@@ -15,17 +15,17 @@ namespace SEE.Layout
         /// <summary>
         /// the length of the edge
         /// </summary>
-        private double length = 0.0;
+        private float length = 0.0f;
 
         /// <summary>
         /// the length of the edge in x direction
         /// </summary>
-        private double lengthX = 0.0;
+        private float lengthX = 0.0f;
 
         /// <summary>
         /// the length of the edge in y direction
         /// </summary>
-        private double lengthY = 0.0;
+        private float lengthY = 0.0f;
 
         /// <summary>
         /// Indicates whether source and target node are overlapping
@@ -60,19 +60,19 @@ namespace SEE.Layout
         /// <summary>
         /// the ideal edge length of the edge
         /// </summary>
-        private double idealEdgeLength = CoseLayoutSettings.Edge_Length;
+        private float idealEdgeLength = CoseLayoutSettings.Edge_Length;
 
         public bool IsInterGraph { get => isInterGraph; set => isInterGraph = value; }
-        public double LengthX { get => lengthX; set => lengthX = value; }
-        public double LengthY { get => lengthY; set => lengthY = value; }
+        public float LengthX { get => lengthX; set => lengthX = value; }
+        public float LengthY { get => lengthY; set => lengthY = value; }
         public bool IsOverlappingSourceAndTarget { get => isOverlappingSourceAndTarget; set => isOverlappingSourceAndTarget = value; }
         public CoseGraph LowestCommonAncestor { get => lowestCommonAncestor; set => lowestCommonAncestor = value; }
         public CoseNode SourceInLca { get => sourceInLca; set => sourceInLca = value; }
         public CoseNode TargetInLca { get => targetInLca; set => targetInLca = value; }
         public CoseNode Source { get => source; set => source = value; }
         public CoseNode Target { get => target; set => target = value; }
-        public double IdealEdgeLength { get => idealEdgeLength; set => idealEdgeLength = value; }
-        public double Length { get => length; set => length = value; }
+        public float IdealEdgeLength { get => idealEdgeLength; set => idealEdgeLength = value; }
+        public float Length { get => length; set => length = value; }
 
         /// <summary>
         /// Constructor
@@ -142,17 +142,17 @@ namespace SEE.Layout
             lengthX = target.GetCenterX() - source.GetCenterX();
             lengthY = target.GetCenterY() - source.GetCenterY();
 
-            if (Math.Abs(lengthX) < 1.0)
+            if (Mathf.Abs(lengthX) < 1.0)
             {
-                lengthX = Math.Sign(lengthX);
+                lengthX = Mathf.Sign(lengthX);
             }
 
-            if (Math.Abs(lengthY) < 1.0)
+            if (Mathf.Abs(lengthY) < 1.0)
             {
-                lengthY = Math.Sign(lengthY);
+                lengthY = Mathf.Sign(lengthY);
             }
 
-            length = Math.Sqrt(lengthX * lengthX + lengthY * lengthY);
+            length = Mathf.Sqrt(lengthX * lengthX + lengthY * lengthY);
         }
 
         /// <summary>
@@ -167,20 +167,20 @@ namespace SEE.Layout
 
             if (!isOverlappingSourceAndTarget)
             {
-                lengthX = clipPointCoordinates[0] - clipPointCoordinates[2];
-                lengthY = clipPointCoordinates[1] - clipPointCoordinates[3];
+                lengthX = (float)clipPointCoordinates[0] - (float)clipPointCoordinates[2];
+                lengthY = (float)clipPointCoordinates[1] - (float)clipPointCoordinates[3];
 
-                if (Math.Abs(lengthX) < 1.0)
+                if (Mathf.Abs(lengthX) < 1.0)
                 {
-                    lengthX = Math.Sign(lengthX);
+                    lengthX = Mathf.Sign(lengthX);
                 }
 
-                if (Math.Abs(lengthY) < 1.0)
+                if (Mathf.Abs(lengthY) < 1.0)
                 {
-                    lengthY = Math.Sign(lengthY);
+                    lengthY = Mathf.Sign(lengthY);
                 }
 
-                length = Math.Sqrt(lengthX * lengthX + lengthY * lengthY);
+                length = Mathf.Sqrt(lengthX * lengthX + lengthY * lengthY);
             }
         }
     }

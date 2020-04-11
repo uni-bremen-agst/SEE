@@ -176,18 +176,18 @@ namespace SEE.Layout
             CoseLayout layout = graphManager.Layout;
             double maxNodeDisplacement = layout.CoseLayoutSettings.CoolingFactor * layout.CoseLayoutSettings.MaxNodeDisplacement;
 
-            layoutValues.DisplacementX = layout.CoseLayoutSettings.CoolingFactor * (layoutValues.SpringForceX + layoutValues.RepulsionForceX + layoutValues.GravitationForceX) / noOfChildren;
-            layoutValues.DisplacementY = layout.CoseLayoutSettings.CoolingFactor * (layoutValues.SpringForceY + layoutValues.RepulsionForceY + layoutValues.GravitationForceY) / noOfChildren;
+            layoutValues.DisplacementX = layout.CoseLayoutSettings.CoolingFactor * (float)(layoutValues.SpringForceX + layoutValues.RepulsionForceX + layoutValues.GravitationForceX) / noOfChildren;
+            layoutValues.DisplacementY = layout.CoseLayoutSettings.CoolingFactor * (float)(layoutValues.SpringForceY + layoutValues.RepulsionForceY + layoutValues.GravitationForceY) / noOfChildren;
 
 
             if (Math.Abs(layoutValues.DisplacementX) > maxNodeDisplacement)
             {
-                layoutValues.DisplacementX = maxNodeDisplacement * Math.Sign(layoutValues.DisplacementX);
+                layoutValues.DisplacementX = (float) maxNodeDisplacement * Mathf.Sign(layoutValues.DisplacementX);
             }
 
             if (Math.Abs(layoutValues.DisplacementY) > maxNodeDisplacement)
             {
-                layoutValues.DisplacementY = maxNodeDisplacement * Math.Sign(layoutValues.DisplacementY);
+                layoutValues.DisplacementY = (float) maxNodeDisplacement * Mathf.Sign(layoutValues.DisplacementY);
             }
 
             if (child == null && !sublayoutValues.IsSubLayoutNode) // TODO here maybe
@@ -279,7 +279,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="dx">the displacement of the x direction</param>
         /// <param name="dy">the displacement of the y direction</param>
-        public void PropogateDisplacementToSublayoutChildren(double dx, double dy)
+        public void PropogateDisplacementToSublayoutChildren(float dx, float dy)
         {
             MoveBy(dx, dy);
 
@@ -299,7 +299,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="dx">the displacement of the x direction</param>
         /// <param name="dy">the displacement of the y direction</param>
-        public void PropogateDisplacementToChildren(double dx, double dy)
+        public void PropogateDisplacementToChildren(float dx, float dy)
         {
             foreach (CoseNode node in child.Nodes)
             {
@@ -583,7 +583,7 @@ namespace SEE.Layout
         /// Returns the center of x postion
         /// </summary>
         /// <returns>center x postion</returns>
-        public double GetCenterX()
+        public float GetCenterX()
         {
             return centerPosition.x;
         }
@@ -592,7 +592,7 @@ namespace SEE.Layout
         /// Returns the center of y postion
         /// </summary>
         /// <returns>center y postion</returns>
-        public double GetCenterY()
+        public float GetCenterY()
         {
             return centerPosition.z;
         }

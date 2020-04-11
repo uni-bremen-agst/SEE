@@ -8,46 +8,53 @@ using System.Linq;
 using System.IO;
 using SEE.Game;
 using SEE.GO;
+using SEE.Tools;
 
 namespace SEE.Layout
 {
-    public class OptAlgorithm2 : GraphRenderer
+    public class OptAlgorithmGraphRenderer : GraphRenderer
     {
-        Dictionary<Node, GameObject> nodeMap;
+        List<ILayoutNode> layoutNodes;
         Graph graph;
-        AbstractSEECity settings;
         NodeFactory leafNodeFactory;
-        InnerNodeFactory innerNodeFactory;
         float groundLevel;
-        Dictionary<GameObject, NodeTransform> bestLayout;
         Dictionary<string, string> optimalMeasurements;
         SortedDictionary<string, string> bestMeasurements;
         int maxIterations = 2500;
         int iteration = 0;
         double bestScore = Mathf.Infinity;
-        List<SublayoutNode> sublayoutNodes;
+        List<SublayoutLayoutNode> sublayoutNodes = new List<SublayoutLayoutNode>();
         Dictionary<string, double> values = new Dictionary<string, double>();
         Dictionary<string, double> oldValues = new Dictionary<string, double>();
         Dictionary<List<double>, SortedDictionary<string, string>> results = new Dictionary<List<double>, SortedDictionary<string, string>>();
 
-        Dictionary<GameObject, Vector3> mapGameObjectOriginalSize = new Dictionary<GameObject, Vector3>();
+        Dictionary<ILayoutNode, Vector3> mapGameObjectOriginalSize = new Dictionary<ILayoutNode, Vector3>();
 
         int edgeLengthMin = 0;
         int edgeLengthMax = 300;
         int repulsionStrengthMin = 0;
         int repulsionStrengthMax = 300;
 
+        int maxNumberOfGraphs = 2;
+        int totalNumberOfGraphs = 0;
 
-        public OptAlgorithm2(AbstractSEECity settings, float groundLevel, Graph graph, List<SublayoutNode> sublayoutNodes, Dictionary<Node, GameObject> nodeMap, InnerNodeFactory innerNodeFactory, NodeFactory leafNodeFactory) : base(settings)
+        int CountLeafNodes = -1;
+        int CountInnerNodes = -1;
+        double EdgeDensityLeafNode = -0.1;
+
+        GameObject parent; 
+
+        public OptAlgorithmGraphRenderer(AbstractSEECity settings) : base(settings)
         {
-            this.nodeMap = nodeMap;
-            this.graph = graph;
-            this.settings = settings;
-            this.groundLevel = groundLevel;
-            this.sublayoutNodes = sublayoutNodes;
-            this.innerNodeFactory = innerNodeFactory;
-            this.leafNodeFactory = leafNodeFactory; 
 
+        }
+
+        public OptAlgorithmGraphRenderer(AbstractSEECity settings, float groundLevel, Graph graph, List<SublayoutNode> sublayoutNodes, List<ILayoutNode> layoutNodes) : base(settings)
+        {
+            this.layoutNodes = layoutNodes;
+            this.graph = graph;
+            this.groundLevel = groundLevel;
+           
             string path = "Assets/Resources/results.txt";
             //Write some text to the test.txt file
             StreamWriter writer = new StreamWriter(path, true);
@@ -55,35 +62,31 @@ namespace SEE.Layout
             writer.Close();
 
 
-            foreach(GameObject obj in nodeMap.Values)
+            foreach (ILayoutNode gameNode in layoutNodes)
             {
-                Vector3 scale = obj.transform.localScale;
-                mapGameObjectOriginalSize.Add(obj, new Vector3(scale.x, scale.y, scale.z));
+                Vector3 scale = gameNode.Scale;
+                mapGameObjectOriginalSize.Add(gameNode, new Vector3(scale.x, scale.y, scale.z));
             }
         }
 
         public void StartOptAlgorithm()
         {
-            //SetScaler(graph);
-            //graph.SortHierarchyByName();
             List<Node> nodes = graph.Nodes();
 
-            for (int i = 14; i <15; i += 1)
+            for (int i = 1; i < 15; i += 1)
             {
-                for (int j = 0; j < 1; j += 1)
+                for (int j = 1; j < 10; j += 1)
                 {
                     for (int a = 0; a < 2; a++)
                     {
                         // smart repulsion range
-                        for (int b  = 0; b < 2; b ++)
+                        for (int b = 0; b < 2; b++)
                         {
                             // smart edge calculation
                             for (int d = 0; d < 2; d++)
                             {
 
                                 // vielleicht auswerten mit welchen die beste Lösung? und dann kann man schaune, ob multilevelscaling etc. das Layout wirklich verbessern?
-
-
 
                                 settings.CoseGraphSettings.EdgeLength = i;
                                 settings.CoseGraphSettings.RepulsionStrength = j;
@@ -113,15 +116,17 @@ namespace SEE.Layout
                                 {
                                     settings.CoseGraphSettings.UseSmartIdealEdgeCalculation = true;
                                 }
-                                // TODO reparairen
-                               /* bestLayout = new CoseLayout(groundLevel, leafNodeFactory, false, graph.Edges(), settings, sublayoutNodes).Layout(nodeMap.Values);
-                                ICollection<GameObject> gameNodes = bestLayout.Keys;
-                                Apply(bestLayout, settings.origin);
-                                EdgeDistCalculation(graph, bestLayout.Keys);
 
-                                BoundingBox(gameNodes, out Vector2 FrontCorner, out Vector2 BackCorner, leafNodeFactory, innerNodeFactory);
-                                _ = new Measurements(nodeMap, graph, settings, FrontCorner, BackCorner);
-                                bestMeasurements = settings.Measurements; */
+                                NodeLayout nodeLayout = new CoseLayout(groundLevel, settings, leafNodeFactory);
+
+                                nodeLayout.Apply(layoutNodes.Cast<ILayoutNode>().ToList(), graph.Edges(), new List<SublayoutLayoutNode>());
+                                NodeLayout.Move(layoutNodes.Cast<ILayoutNode>().ToList(), settings.origin);
+
+                                EdgeDistCalculation(graph, layoutNodes);
+
+                                BoundingBox(layoutNodes, out Vector2 FrontCorner, out Vector2 BackCorner);
+                                _ = new Measurements(layoutNodes.Cast<GameNode>().ToList(), graph, settings, FrontCorner, BackCorner);
+                                bestMeasurements = settings.Measurements;
 
                                 if (bestMeasurements.ContainsKey("Nodes overlapping"))
                                 {
@@ -136,10 +141,10 @@ namespace SEE.Layout
                                     }
                                 }
 
-                                foreach (GameObject obj in nodeMap.Values)
+                                foreach (GameNode layoutNode in layoutNodes)
                                 {
-                                    obj.transform.localScale = mapGameObjectOriginalSize[obj];
-                                    obj.transform.position = new Vector3(0, 0, 0);
+                                    layoutNode.Scale = mapGameObjectOriginalSize[layoutNode];
+                                    layoutNode.CenterPosition = new Vector3(0, 0, 0);
                                 }
                             }
                         }
@@ -152,26 +157,30 @@ namespace SEE.Layout
 
             list.Sort((pair, pair2) => Int64.Parse(pair.Value["Number of edge crossings"]).CompareTo(Int64.Parse(pair2.Value["Number of edge crossings"])));
 
-            KeyValuePair<List<double>, SortedDictionary<string, string>> first = list.First();
+            if (list.Count > 0)
+            {
+                KeyValuePair<List<double>, SortedDictionary<string, string>> first = list.First();
 
-            list.RemoveAll(pair => pair.Value["Number of edge crossings"] != first.Value["Number of edge crossings"]);
+                list.RemoveAll(pair => pair.Value["Number of edge crossings"] != first.Value["Number of edge crossings"]);
 
-            list.Sort((pair, pair2) => Double.Parse(pair.Value["Area (Plane)"]).CompareTo(Double.Parse(pair2.Value["Area (Plane)"])));
+                list.Sort((pair, pair2) => Double.Parse(pair.Value["Area (Plane)"]).CompareTo(Double.Parse(pair2.Value["Area (Plane)"])));
 
-            KeyValuePair<List<double>, SortedDictionary<string, string>> result = list.First();
+                KeyValuePair<List<double>, SortedDictionary<string, string>> result = list.First();
+            }
+
         }
 
         private void WriteToFile(double edgeLength, double repulsionStrength, double nodesOverlapping, double area, double edgeCrossings, double a, double b, double d)
         {
             string path = "Assets/Resources/results.txt";
 
-            List<double> values = new List<double> { edgeLength, repulsionStrength, nodesOverlapping, area, edgeCrossings, a, b, d};
+            List<double> values = new List<double> { edgeLength, repulsionStrength, nodesOverlapping, area, edgeCrossings, a, b, d };
             //Write some text to the test.txt file
             StreamWriter writer = new StreamWriter(path, true);
             string line = "";
-            foreach(double value in values)
+            foreach (double value in values)
             {
-                line += (int) value + ";";
+                line += (int)value + ";";
             }
 
             line += CountNodes(graph) + ";";
@@ -179,6 +188,9 @@ namespace SEE.Layout
             line += CountDepth(graph) + ";";
             line += CountDepthAvg(graph) + ";";
             line += CountDensityAvg(graph) + ";";
+            line += CountLeafNodes + ";";
+            line += CountInnerNodes + ";";
+            line += EdgeDensityLeafNode + ";";
 
             writer.WriteLine(line);
             writer.Close();
@@ -202,7 +214,7 @@ namespace SEE.Layout
         {
             int depth = 0;
             int leafCount = 0;
-            foreach(Node node in graph.Nodes())
+            foreach (Node node in graph.Nodes())
             {
                 if (node.IsLeaf())
                 {
@@ -219,7 +231,7 @@ namespace SEE.Layout
             int density = 0;
             int countNodes = 0;
             List<Edge> edges = graph.Edges();
-            foreach(Node node in graph.Nodes())
+            foreach (Node node in graph.Nodes())
             {
                 List<Edge> edgeList = edges.Where(edge => edge.Source == node || edge.Target == node).ToList();
                 density += edgeList.Count;
@@ -230,6 +242,80 @@ namespace SEE.Layout
                 }
             }
             return density / countNodes;
+        }
+
+        private Graph CreateRandomCity()
+        {
+            Constraint LeafConstraint = new Tools.Constraint("Class", Random.Range(1, 301), "calls", Random.Range(0.001f, 0.021f));
+            Constraint InnerNodeConstraint = new Tools.Constraint("Package", Random.Range(1, 101), "uses", 0f);
+            SEECityRandom.DefaultAttributeMean = 10;
+            SEECityRandom.DefaultAttributeStandardDerivation = 2000;
+            List<RandomAttributeDescriptor> LeafAttributes = SEECityRandom.Defaults();
+
+            CountLeafNodes = LeafConstraint.NodeNumber;
+            EdgeDensityLeafNode = LeafConstraint.EdgeDensity;
+            CountInnerNodes = InnerNodeConstraint.NodeNumber;
+
+            RandomGraphs randomGraphs = new RandomGraphs();
+            return randomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes);
+        }
+
+        protected override void DrawCity(Graph graph, GameObject parent)
+        {
+            this.graph = graph;
+
+            List<Node> nodes = graph.Nodes();
+
+            Dictionary<Node, GameObject> nodeMap = CreateBlocks(nodes);
+            Dictionary<Node, GameObject>.ValueCollection gameNodes;
+            AddInnerNodes(nodeMap, nodes);
+
+            // calculate and apply the node layout
+            gameNodes = nodeMap.Values;
+            layoutNodes = ToLayoutNodes(gameNodes).Cast<ILayoutNode>().ToList();
+
+            string path = "Assets/Resources/results.txt";
+            //Write some text to the test.txt file
+            StreamWriter writer = new StreamWriter(path, true);
+            writer.WriteLine("edgeLength; RepulsionStrength; nodesOverlapping; Area; EdgeCrossings; MultiLevelScaling; SmartRepulsionRange; SmartEdgeLength; CountNodes; CountEdges; CountMaxDepth; CountAvgDepth; CountAvgDensity; CountLeafNodes; CountInnerNodes; EdgeDensityLeafNodes;");
+            writer.Close();
+
+            foreach (ILayoutNode gameNode in layoutNodes)
+            {
+                Vector3 scale = gameNode.Scale;
+                mapGameObjectOriginalSize.Add(gameNode, new Vector3(scale.x, scale.y, scale.z));
+            }
+
+            StartOptAlgorithm();
+
+            AddToParent(gameNodes, parent);
+            // add the decorations, too
+            AddToParent(AddDecorations(gameNodes), parent);
+
+            // create the laid out edges
+            AddToParent(EdgeLayout(graph, layoutNodes), parent);
+            // add the plane surrounding all game objects for nodes
+
+            BoundingBox(layoutNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+            GameObject plane = NewPlane(leftFrontCorner, rightBackCorner);
+            AddToParent(plane, parent);
+
+            totalNumberOfGraphs++;
+            if (totalNumberOfGraphs != maxNumberOfGraphs)
+            {
+                Draw();
+            }
+        }
+
+        public override void Draw(Graph graph, GameObject parent)
+        {
+            base.Draw(CreateRandomCity(), parent);
+            this.parent = parent;
+        }
+
+        private void Draw()
+        {
+            base.Draw(CreateRandomCity(), parent);
         }
     }
 }

@@ -24,8 +24,8 @@ namespace SEE.Layout
         int iteration = 0;
         double bestScore = Mathf.Infinity;
         List<SublayoutNode> sublayoutNodes;
-        Dictionary<string, double> values = new Dictionary<string, double>();
-        Dictionary<string, double> oldValues = new Dictionary<string, double>();
+        Dictionary<string, float> values = new Dictionary<string, float>();
+        Dictionary<string, float> oldValues = new Dictionary<string, float>();
         Dictionary<List<Double>, Measurements> results = new Dictionary<List<double>, Measurements>();
 
 
@@ -80,9 +80,9 @@ namespace SEE.Layout
             settings.CoseGraphSettings.RepulsionStrength = values["RepulsionStrength"];
         }
 
-        private Dictionary<string, double> SetValues(int edgeLength, double gravityStrength, double compoundGravityStrength, double RepulsionStrength)
+        private Dictionary<string, float> SetValues(int edgeLength, float gravityStrength, float compoundGravityStrength, float RepulsionStrength)
         {
-            Dictionary<string, double> values = new Dictionary<string, double>();
+            Dictionary<string, float> values = new Dictionary<string, float>();
             values.Add("EdgeLength", edgeLength);
             values.Add("GravityStrength", gravityStrength);
             values.Add("CompoundGravityStrength", compoundGravityStrength);
@@ -114,24 +114,24 @@ namespace SEE.Layout
                     settings.CoseGraphSettings.UseSmartRepulsionRangeCalculation = !settings.CoseGraphSettings.UseSmartRepulsionRangeCalculation;
                     break;*/
                 case 1:
-                    if ((settings.CoseGraphSettings.GravityStrength + 0.1 * minusPlus) > 0)
+                    if ((settings.CoseGraphSettings.GravityStrength + 0.1f * minusPlus) > 0)
                     {
-                        settings.CoseGraphSettings.GravityStrength += 0.1 * minusPlus;
+                        settings.CoseGraphSettings.GravityStrength += 0.1f * minusPlus;
                     }
                     else
                     {
-                        settings.CoseGraphSettings.GravityStrength += 0.1;
+                        settings.CoseGraphSettings.GravityStrength += 0.1f;
                     }
 
                     break;
                 case 2:
-                    if ((settings.CoseGraphSettings.CompoundGravityStrength + 0.1 * minusPlus) > 0)
+                    if ((settings.CoseGraphSettings.CompoundGravityStrength + 0.1f * minusPlus) > 0)
                     {
-                        settings.CoseGraphSettings.CompoundGravityStrength += 0.1 * minusPlus;
+                        settings.CoseGraphSettings.CompoundGravityStrength += 0.1f * minusPlus;
                     }
                     else
                     {
-                        settings.CoseGraphSettings.CompoundGravityStrength += 0.1;
+                        settings.CoseGraphSettings.CompoundGravityStrength += 0.1f;
                     }
                     break;
                 case 3:
