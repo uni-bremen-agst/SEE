@@ -118,11 +118,17 @@ namespace SEE.Layout
             ILayoutNode root = roots.FirstOrDefault();
 
             PlaceNodes(root);
-            PlacePositionNodes(graphManager.RootGraph);
+
+            Vector3 relativePositionRootGraph = graphManager.RootGraph.CenterPosition; // set to (0.0)
+            graphManager.RootGraph.CenterPosition = new Vector3(0.0f, groundLevel, 0.0f);
+
+            PlacePositionNodes(graphManager.RootGraph, relativePositionRootGraph);
 
             foreach (CoseGraph graph in graphManager.Graphs)
             {
-                Vector3 position = new Vector3(graph.CenterPosition.x, groundLevel, graph.CenterPosition.z);
+                
+                Vector3 position = graph != graphManager.RootGraph ? new Vector3(graph.CenterPosition.x - relativePositionRootGraph.x, groundLevel, graph.CenterPosition.z - relativePositionRootGraph.z) : new Vector3(graph.CenterPosition.x, groundLevel, graph.CenterPosition.z);
+
 
                 float width = graph.Scale.x;
                 float height = graph.Scale.z;
@@ -223,7 +229,7 @@ namespace SEE.Layout
         /// places the original node objects to the clauclated positions
         /// </summary>
         /// <param name="root"></param>
-        private void PlacePositionNodes(CoseGraph root)
+        private void PlacePositionNodes(CoseGraph root, Vector3 relativePositionRootGraph)
         {
             foreach (CoseNode node in root.Nodes)
             {
@@ -244,13 +250,15 @@ namespace SEE.Layout
 
                     float rotation = applyRotation ? node.NodeObject.Rotation : 0.0f;
 
-                    NodeTransform transform = new NodeTransform(new Vector3((float)node.GetCenterX(), groundLevel, (float)node.GetCenterY()), node.NodeObject.Scale, rotation);//, node.NodeObject.Rotation);
+                    Vector3 position = new Vector3(node.CenterPosition.x - relativePositionRootGraph.x, groundLevel, node.CenterPosition.z - relativePositionRootGraph.z);
+                    // TODO Levelshift?
+                    NodeTransform transform = new NodeTransform(position, node.NodeObject.Scale, rotation);//, node.NodeObject.Rotation);
                     layout_result[nNode] = transform;
                 }
 
                 if (node.Child != null)
                 {
-                    PlacePositionNodes(node.Child);
+                    PlacePositionNodes(node.Child, relativePositionRootGraph);
                 }
             }
         }
@@ -437,7 +445,7 @@ namespace SEE.Layout
                     // TODO
                     // based on www.btluke.com/simanf1.html, schedule 3
                     
-                    coseLayoutSettings.CoolingFactor = Math.Max(coseLayoutSettings.InitialCoolingFactor - Math.Pow(coseLayoutSettings.Coolingcycle, Math.Log(100 * (coseLayoutSettings.InitialCoolingFactor - coseLayoutSettings.FinalTemperature)) / Math.Log(coseLayoutSettings.MaxCoolingCycle)) / 100 * CoseLayoutSettings.Cooling_Adjuster, coseLayoutSettings.FinalTemperature);
+                    coseLayoutSettings.CoolingFactor = Mathf.Max(coseLayoutSettings.InitialCoolingFactor - Mathf.Pow(coseLayoutSettings.Coolingcycle, Mathf.Log(100 * (coseLayoutSettings.InitialCoolingFactor - coseLayoutSettings.FinalTemperature)) / Mathf.Log(coseLayoutSettings.MaxCoolingCycle)) / 100 * CoseLayoutSettings.Cooling_Adjuster, coseLayoutSettings.FinalTemperature);
                     //Debug.Log("cooling: " + coseLayoutSettings.CoolingFactor);
                 }
 
@@ -471,15 +479,15 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="edge"></param>
         /// <param name="idealEdgeLength"></param>
-        private void CalcSpringForce(CoseEdge edge, double idealEdgeLength)
+        private void CalcSpringForce(CoseEdge edge, float idealEdgeLength)
         {
             CoseNode source = edge.Source;
             CoseNode target = edge.Target;
 
-            double length;
-            double springForce;
-            double springForceX;
-            double springForceY;
+            float length;
+            float springForce;
+            float springForceX;
+            float springForceY;
 
             if (CoseLayoutSettings.Uniform_Leaf_Node_Size && source.Child == null && target.Child == null)
             {
@@ -497,16 +505,18 @@ namespace SEE.Layout
 
             length = edge.Length;
 
-            double dl = length - idealEdgeLength;
+            float dl = length - idealEdgeLength;
 
             if (dl == 0.0)
             {
-                throw new System.Exception("Length cant be 0.0");
+                springForceX = 0;
+                springForceY = 0;
+            } else
+            {
+                springForce = CoseLayoutSettings.Spring_Strength * dl;
+                springForceX = springForce * (edge.LengthX / length);
+                springForceY = springForce * (edge.LengthY / length);
             }
-
-            springForce = CoseLayoutSettings.Spring_Strength * dl;
-            springForceX = springForce * (edge.LengthX / length);
-            springForceY = springForce * (edge.LengthY / length);
 
             source.LayoutValues.SpringForceX += springForceX;
             source.LayoutValues.SpringForceY += springForceY;
@@ -611,8 +621,8 @@ namespace SEE.Layout
 
                                 if (!processedNodeSet.Contains(nodeB) && !surrounding.Contains(nodeB))
                                 {
-                                    double distanceX = Math.Abs(nodeA.GetCenterX() - nodeB.GetCenterX()) - ((nodeA.Scale.x / 2) + (nodeB.Scale.x / 2));
-                                    double distanceY = Math.Abs(nodeA.GetCenterY() - nodeB.GetCenterY()) - ((nodeA.Scale.z / 2) + (nodeB.Scale.z / 2));
+                                    double distanceX = Mathf.Abs(nodeA.GetCenterX() - nodeB.GetCenterX()) - ((nodeA.Scale.x / 2) + (nodeB.Scale.x / 2));
+                                    double distanceY = Mathf.Abs(nodeA.GetCenterY() - nodeB.GetCenterY()) - ((nodeA.Scale.z / 2) + (nodeB.Scale.z / 2));
                                     if ((distanceX <= coseLayoutSettings.RepulsionRange) && (distanceY <= coseLayoutSettings.RepulsionRange))
                                     {
                                         surrounding.Add(nodeB);
@@ -645,20 +655,20 @@ namespace SEE.Layout
             //var rectB = nodeB.rect;
             double[] overlapAmount = new double[2];
             double[] clipPoints = new double[4];
-            double distanceX;
-            double distanceY;
-            double distanceSquared;
-            double distance;
-            double repulsionForce;
-            double repulsionForceX;
-            double repulsionForceY;
+            float distanceX;
+            float distanceY;
+            float distanceSquared;
+            float distance;
+            float repulsionForce;
+            float repulsionForceX;
+            float repulsionForceY;
 
             if (nodeA.CalcOverlap(nodeB, overlapAmount))
             {
-                repulsionForceX = 2 * overlapAmount[0];
-                repulsionForceY = 2 * overlapAmount[1];
+                repulsionForceX = 2 * (float) overlapAmount[0];
+                repulsionForceY = 2 * (float) overlapAmount[1];
 
-                double childrenConstant = nodeA.NoOfChildren * nodeB.NoOfChildren / (double)(nodeA.NoOfChildren + nodeB.NoOfChildren);
+                float childrenConstant = nodeA.NoOfChildren * nodeB.NoOfChildren / (float)(nodeA.NoOfChildren + nodeB.NoOfChildren);
 
                 nodeA.LayoutValues.RepulsionForceX -= childrenConstant * repulsionForceX;
                 nodeA.LayoutValues.RepulsionForceY -= childrenConstant * repulsionForceY;
@@ -675,18 +685,18 @@ namespace SEE.Layout
                 } else
                 {
                     clipPoints = nodeA.CalcIntersection(nodeB, clipPoints);
-                    distanceX = clipPoints[2] - clipPoints[0];
-                    distanceY = clipPoints[3] - clipPoints[1];
+                    distanceX = (float)clipPoints[2] - (float)clipPoints[0];
+                    distanceY = (float)clipPoints[3] - (float)clipPoints[1];
                 }
 
-                if (Math.Abs(distanceX) < CoseLayoutSettings.Min_Repulsion_Dist)
+                if (Mathf.Abs(distanceX) < CoseLayoutSettings.Min_Repulsion_Dist)
                 {
-                    distanceX = Math.Sign(distanceX) * CoseLayoutSettings.Min_Repulsion_Dist;
+                    distanceX = Mathf.Sign(distanceX) * CoseLayoutSettings.Min_Repulsion_Dist;
                 }
 
-                if (Math.Abs(distanceY) < CoseLayoutSettings.Min_Repulsion_Dist)
+                if (Mathf.Abs(distanceY) < CoseLayoutSettings.Min_Repulsion_Dist)
                 {
-                    distanceY = Math.Sign(distanceY) * CoseLayoutSettings.Min_Repulsion_Dist;
+                    distanceY = Mathf.Sign(distanceY) * CoseLayoutSettings.Min_Repulsion_Dist;
                 }
 
                 distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
@@ -740,6 +750,9 @@ namespace SEE.Layout
 
             List<CoseNode>[,] collect;
 
+            var diff = (graph.Right - graph.Left);
+            var diffRep = diff / coseLayoutSettings.RepulsionRange;
+            var ceilDiff = Mathf.Ceil((float)diffRep);
             var sizeX = (int)Mathf.Ceil((float)((graph.Right - graph.Left) / coseLayoutSettings.RepulsionRange));
             var sizeY = (int)Mathf.Ceil((float)((graph.Bottom - graph.Top) / coseLayoutSettings.RepulsionRange));
 
@@ -766,12 +779,12 @@ namespace SEE.Layout
                 throw new System.Exception("gravitational force needs to be 0.0");
             }
             CoseGraph ownerGraph;
-            double ownerCenterX;
-            double ownerCenterY;
-            double distanceX;
-            double distanceY;
-            double absDistanceX;
-            double absDistanceY;
+            float ownerCenterX;
+            float ownerCenterY;
+            float distanceX;
+            float distanceY;
+            float absDistanceX;
+            float absDistanceY;
             int estimatedSize;
 
             ownerGraph = node.Owner;
@@ -779,8 +792,8 @@ namespace SEE.Layout
             ownerCenterY = ownerGraph.CenterPosition.z;
             distanceX = node.GetCenterX() - ownerCenterX;
             distanceY = node.GetCenterY() - ownerCenterY;
-            absDistanceX = Math.Abs(distanceX) + node.Scale.x / 2;
-            absDistanceY = Math.Abs(distanceY) + node.Scale.z / 2;
+            absDistanceX = Mathf.Abs(distanceX) + node.Scale.x / 2;
+            absDistanceY = Mathf.Abs(distanceY) + node.Scale.z / 2;
 
             if (node.Owner == graphManager.RootGraph)
             {
@@ -869,14 +882,14 @@ namespace SEE.Layout
         {
             if (CoseLayoutSettings.Incremental)
             {
-                coseLayoutSettings.CoolingFactor = 0.8;
-                coseLayoutSettings.InitialCoolingFactor = 0.8;
+                coseLayoutSettings.CoolingFactor = 0.8f;
+                coseLayoutSettings.InitialCoolingFactor = 0.8f;
                 coseLayoutSettings.MaxNodeDisplacement = CoseLayoutSettings.Max_Node_Displacement_Incremental;
             }
             else
             {
-                coseLayoutSettings.CoolingFactor = 1.0;
-                coseLayoutSettings.InitialCoolingFactor = 1.0;
+                coseLayoutSettings.CoolingFactor = 1.0f;
+                coseLayoutSettings.InitialCoolingFactor = 1.0f;
                 coseLayoutSettings.MaxNodeDisplacement = coseLayoutSettings.MaxNodeDisplacement;
             }
 

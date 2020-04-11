@@ -9,42 +9,42 @@ namespace SEE.Layout
         /// <summary>
         /// the spring force for the x direction
         /// </summary>
-        private double springForceX = 0.0;
+        private float springForceX = 0.0f;
 
         /// <summary>
         /// the spring force for the y direction
         /// </summary>
-        private double springForceY = 0.0;
+        private float springForceY = 0.0f;
 
         /// <summary>
         /// the repulsion force for the x direction
         /// </summary>
-        private double repulsionForceX = 0.0;
+        private float repulsionForceX = 0.0f;
 
         /// <summary>
         /// the repulsion force for the y direction
         /// </summary>
-        private double repulsionForceY = 0.0;
+        private float repulsionForceY = 0.0f;
 
         /// <summary>
         /// the gravitation force for the x direction
         /// </summary>
-        private double gravitationForceX = 0.0;
+        private float gravitationForceX = 0.0f;
 
         /// <summary>
         /// the gravitation force for the y direction
         /// </summary>
-        private double gravitationForceY = 0.0;
+        private float gravitationForceY = 0.0f;
 
         /// <summary>
         /// the displacement for the x direction
         /// </summary>
-        private double displacementX = 0.0;
+        private float displacementX = 0.0f;
 
         /// <summary>
         /// the displacement for the y direction
         /// </summary>
-        private double displacementY = 0.0;
+        private float displacementY = 0.0f;
 
         /// <summary>
         /// The first grid coorinate for the x axis
@@ -86,14 +86,14 @@ namespace SEE.Layout
         /// </summary>
         private bool isProcessed;
 
-        public double SpringForceX { get => springForceX; set => springForceX = value; }
-        public double SpringForceY { get => springForceY; set => springForceY = value; }
-        public double RepulsionForceX { get => repulsionForceX; set => repulsionForceX = value; }
-        public double RepulsionForceY { get => repulsionForceY; set => repulsionForceY = value; }
-        public double GravitationForceX { get => gravitationForceX; set => gravitationForceX = value; }
-        public double GravitationForceY { get => gravitationForceY; set => gravitationForceY = value; }
-        public double DisplacementX { get => displacementX; set => displacementX = value; }
-        public double DisplacementY { get => displacementY; set => displacementY = value; }
+        public float SpringForceX { get => springForceX; set => springForceX = value; }
+        public float SpringForceY { get => springForceY; set => springForceY = value; }
+        public float RepulsionForceX { get => repulsionForceX; set => repulsionForceX = value; }
+        public float RepulsionForceY { get => repulsionForceY; set => repulsionForceY = value; }
+        public float GravitationForceX { get => gravitationForceX; set => gravitationForceX = value; }
+        public float GravitationForceY { get => gravitationForceY; set => gravitationForceY = value; }
+        public float DisplacementX { get => displacementX; set => displacementX = value; }
+        public float DisplacementY { get => displacementY; set => displacementY = value; }
         public int StartX { get => startX; set => startX = value; }
         public int StartY { get => startY; set => startY = value; }
         public int FinishX { get => finishX; set => finishX = value; }

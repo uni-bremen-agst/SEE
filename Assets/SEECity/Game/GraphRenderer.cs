@@ -64,7 +64,7 @@ namespace SEE.Game
         /// <summary>
         /// Settings for the visualization.
         /// </summary>
-        private readonly AbstractSEECity settings;
+        protected readonly AbstractSEECity settings;
 
         /// <summary>
         /// The factory used to create blocks for leaves.
@@ -89,14 +89,14 @@ namespace SEE.Game
         /// <summary>
         /// TODO
         /// </summary>
-        float groundLevel = 0.0f;
+        protected float groundLevel = 0.0f;
 
         /// <summary>
         /// Draws the graph (nodes and edges and all decorations).
         /// </summary>
         /// <param name="graph">the graph to be drawn</param>
         /// <param name="parent">every game object drawn for this graph will be added to this parent</param>
-        public void Draw(Graph graph, GameObject parent)
+        public virtual void Draw(Graph graph, GameObject parent)
         {
             SetScaler(graph);
             graph.SortHierarchyByName();
@@ -184,7 +184,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph whose nodes and edges are to be laid out</param>
         /// <param name="parent">every game object drawn for this graph will be added to this parent</param>
-        protected void DrawCity(Graph graph, GameObject parent)
+        protected virtual void DrawCity(Graph graph, GameObject parent)
         {
             // all nodes of the graph
             List<Node> nodes = graph.Nodes();
@@ -196,8 +196,10 @@ namespace SEE.Game
             Dictionary<Node, GameObject>.ValueCollection gameNodes;
             ICollection<ILayoutNode> layoutNodes;
 
+            Performance p;
             if (settings.NodeLayout.GetModel().CanApplySublayouts)
             {
+
                 ICollection<SublayoutNode>  sublayoutNodes = AddInnerNodesForSublayouts(nodeMap, nodes);
                 gameNodes = nodeMap.Values;
                 layoutNodes = ToLayoutNodes(nodeMap, sublayoutNodes);
@@ -209,10 +211,12 @@ namespace SEE.Game
                     sublayout.Layout();
                 }
 
+                p = Performance.Begin("layout name" + settings.NodeLayout + ", layout of nodes");
                 if (nodeLayout.UsesEdgesAndSublayoutNodes())
                 {
                     nodeLayout.Apply(layoutNodes, graph.Edges(), sublayoutLayoutNodes);
                 }
+                p.End();
 
                 NodeLayout.Move(layoutNodes, settings.origin);
                 AddToParent(gameNodes, parent);
@@ -237,21 +241,54 @@ namespace SEE.Game
                 // calculate and apply the node layout
                 gameNodes = nodeMap.Values;
                 layoutNodes = ToLayoutNodes(gameNodes);
+                p = Performance.Begin("layout name" + settings.NodeLayout + ", layout of nodes");
                 nodeLayout.Apply(layoutNodes);
+                p.End();
                 NodeLayout.Move(layoutNodes, settings.origin);
 
                 AddToParent(gameNodes, parent);
                 // add the decorations, too
                 AddToParent(AddDecorations(gameNodes), parent);
             }
-            
 
+            EdgeDistCalculation(graph, layoutNodes);
             // create the laid out edges
             AddToParent(EdgeLayout(graph, layoutNodes), parent);
             // add the plane surrounding all game objects for nodes
-            GameObject plane = NewPlane(gameNodes);
+
+            BoundingBox(layoutNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+            GameObject plane = NewPlane(leftFrontCorner, rightBackCorner);
             AddToParent(plane, parent);
+
+            Measurements measurements = new Measurements(layoutNodes.Cast<GameNode>().ToList(), graph, settings, leftFrontCorner, rightBackCorner);
+            measurements.NodesPerformance(p);
         }
+
+        private void FindOptimalSolution(Graph graph, List<ILayoutNode> layoutNodes)
+        {
+            List<SublayoutNode> sublayoutNodes = new List<SublayoutNode>();
+            var optAlgo = new OptAlgorithmGraphRenderer(settings, groundLevel, graph, sublayoutNodes, layoutNodes);
+            optAlgo.StartOptAlgorithm();
+        }
+
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="gameNodes"></param>
+        protected void EdgeDistCalculation(Graph graph, ICollection<ILayoutNode> layoutNodes)
+        {
+
+            foreach (Edge edge in graph.Edges())
+            {
+                Vector3 sourcePosition = layoutNodes.Where(node => node.LinkName == edge.Source.LinkName).First().CenterPosition;
+
+                Vector3 targetPosition = layoutNodes.Where(node => node.LinkName == edge.Target.LinkName).First().CenterPosition;
+
+                edge.dist = Vector3.Distance(sourcePosition, targetPosition);
+            }
+        }
+
 
         /// <summary>
         /// TODo
@@ -435,6 +472,15 @@ namespace SEE.Game
         {
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             // Place the plane somewhat under ground level.
+            return NewPlane(leftFrontCorner, rightBackCorner); //PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, settings.origin.y - 0.5f, Color.gray);
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <returns></returns>
+        public GameObject NewPlane(Vector2 leftFrontCorner, Vector2 rightBackCorner)
+        {
             return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, settings.origin.y - 0.5f, Color.gray);
         }
 
@@ -473,7 +519,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="child">child to be added</param>
         /// <param name="parent">new parent of child</param>
-        private static void AddToParent(GameObject child, GameObject parent)
+        protected static void AddToParent(GameObject child, GameObject parent)
         {
             child.transform.SetParent(parent.transform, true);
         }
@@ -483,7 +529,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="children">children to be added</param>
         /// <param name="parent">new parent of children</param>
-        private static void AddToParent(ICollection<GameObject> children, GameObject parent)
+        protected static void AddToParent(ICollection<GameObject> children, GameObject parent)
         {
             foreach (GameObject child in children)
             {
@@ -492,7 +538,7 @@ namespace SEE.Game
         }
 
 
-        private ICollection<GameObject> AddDecorations(ICollection<GameObject> gameNodes)
+        protected ICollection<GameObject> AddDecorations(ICollection<GameObject> gameNodes)
         {
             return AddDecorations(gameNodes, settings.InnerNodeObjects, settings.NodeLayout);
         }
@@ -571,7 +617,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        private ICollection<ILayoutNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
+        protected ICollection<ILayoutNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
         {
             return ToLayoutNodes(gameObjects, leafNodeFactory, innerNodeFactory);
         }
@@ -755,7 +801,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="nodes">list of nodes for which to create blocks</param>
         /// <returns>blocks for all leaf nodes in given list of nodes</returns>
-        private Dictionary<Node, GameObject> CreateBlocks(IList<Node> nodes)
+        protected Dictionary<Node, GameObject> CreateBlocks(IList<Node> nodes)
         {
             Dictionary<Node, GameObject> result = new Dictionary<Node, GameObject>();
 
@@ -991,7 +1037,7 @@ namespace SEE.Game
         /// <param name="nodeMap">nodeMap to which the game objects are to be added</param>
         /// <param name="nodes">list of nodes for which to create blocks</param>
         /// <param name="innerNodeFactory">the node factory for the inner nodes</param>
-        private void AddInnerNodes(Dictionary<Node, GameObject> nodeMap, IList<Node> nodes, InnerNodeFactory innerNodeFactory = null)
+        protected void AddInnerNodes(Dictionary<Node, GameObject> nodeMap, IList<Node> nodes, InnerNodeFactory innerNodeFactory = null)
         {
             foreach (Node node in nodes)
             {
@@ -1029,6 +1075,64 @@ namespace SEE.Game
                     Vector3 extent = node.IsLeaf() ? leafNodeFactory.GetSize(go) / 2.0f : innerNodeFactory.GetSize(go) / 2.0f;
                     // Note: position denotes the center of the object
                     Vector3 position = node.IsLeaf() ? leafNodeFactory.GetCenterPosition(go) : innerNodeFactory.GetCenterPosition(go);
+                    {
+                        // x co-ordinate of lower left corner
+                        float x = position.x - extent.x;
+                        if (x < leftLowerCorner.x)
+                        {
+                            leftLowerCorner.x = x;
+                        }
+                    }
+                    {
+                        // z co-ordinate of lower left corner
+                        float z = position.z - extent.z;
+                        if (z < leftLowerCorner.y)
+                        {
+                            leftLowerCorner.y = z;
+                        }
+                    }
+                    {   // x co-ordinate of upper right corner
+                        float x = position.x + extent.x;
+                        if (x > rightUpperCorner.x)
+                        {
+                            rightUpperCorner.x = x;
+                        }
+                    }
+                    {
+                        // z co-ordinate of upper right corner
+                        float z = position.z + extent.z;
+                        if (z > rightUpperCorner.y)
+                        {
+                            rightUpperCorner.y = z;
+                        }
+                    }
+                }
+            }
+        }
+
+       /// <summary>
+       /// TODO
+       /// </summary>
+       /// <param name="layoutNodes"></param>
+       /// <param name="leftLowerCorner"></param>
+       /// <param name="rightUpperCorner"></param>
+        public void BoundingBox(ICollection<ILayoutNode> layoutNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
+        {
+            if (layoutNodes.Count == 0)
+            {
+                leftLowerCorner = Vector2.zero;
+                rightUpperCorner = Vector2.zero;
+            }
+            else
+            {
+                leftLowerCorner = new Vector2(Mathf.Infinity, Mathf.Infinity);
+                rightUpperCorner = new Vector2(Mathf.NegativeInfinity, Mathf.NegativeInfinity);
+
+                foreach (ILayoutNode layoutNode in layoutNodes)
+                {
+                    Vector3 extent = layoutNode.Scale / 2.0f;
+                    // Note: position denotes the center of the object
+                    Vector3 position = layoutNode.CenterPosition;
                     {
                         // x co-ordinate of lower left corner
                         float x = position.x - extent.x;

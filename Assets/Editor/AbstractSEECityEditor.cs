@@ -64,12 +64,12 @@ namespace SEEEditor
                 GUILayout.Label("Compound spring embedder layout attributes", EditorStyles.boldLabel);
                 city.CoseGraphSettings.EdgeLength = EditorGUILayout.IntField("Edge length", city.CoseGraphSettings.EdgeLength);
                 city.CoseGraphSettings.UseSmartIdealEdgeCalculation = EditorGUILayout.Toggle("Smart ideal edge length", city.CoseGraphSettings.UseSmartIdealEdgeCalculation);
-                city.CoseGraphSettings.PerLevelIdealEdgeLengthFactor = EditorGUILayout.DoubleField("Level edge length factor", city.CoseGraphSettings.PerLevelIdealEdgeLengthFactor);
+                city.CoseGraphSettings.PerLevelIdealEdgeLengthFactor = EditorGUILayout.FloatField("Level edge length factor", city.CoseGraphSettings.PerLevelIdealEdgeLengthFactor);
                 city.CoseGraphSettings.multiLevelScaling = EditorGUILayout.Toggle("MultiLevelscaling", city.CoseGraphSettings.multiLevelScaling);
                 city.CoseGraphSettings.UseSmartRepulsionRangeCalculation = EditorGUILayout.Toggle("Smart repulsion range", city.CoseGraphSettings.UseSmartRepulsionRangeCalculation);
-                city.CoseGraphSettings.RepulsionStrength = EditorGUILayout.DoubleField("Repulsion Strength", city.CoseGraphSettings.RepulsionStrength);
-                city.CoseGraphSettings.GravityStrength = EditorGUILayout.DoubleField("Gravity", city.CoseGraphSettings.GravityStrength);
-                city.CoseGraphSettings.CompoundGravityStrength = EditorGUILayout.DoubleField("Compound gravity", city.CoseGraphSettings.CompoundGravityStrength);
+                city.CoseGraphSettings.RepulsionStrength = EditorGUILayout.FloatField("Repulsion Strength", city.CoseGraphSettings.RepulsionStrength);
+                city.CoseGraphSettings.GravityStrength = EditorGUILayout.FloatField("Gravity", city.CoseGraphSettings.GravityStrength);
+                city.CoseGraphSettings.CompoundGravityStrength = EditorGUILayout.FloatField("Compound gravity", city.CoseGraphSettings.CompoundGravityStrength);
                 city.CoseGraphSettings.useOptAlgorithm = EditorGUILayout.Toggle("Use Opt-Algorithm", city.CoseGraphSettings.useOptAlgorithm);
             }
 

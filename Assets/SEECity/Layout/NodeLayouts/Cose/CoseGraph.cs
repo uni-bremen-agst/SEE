@@ -218,10 +218,10 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="dx">displacement x direction</param>
         /// <param name="dy">displacement y direction</param>
-        public void SetXZDisplacementBoundingRect(double dx, double dz)
+        public void SetXZDisplacementBoundingRect(float dx, float dz)
         {
-            centerPosition.x += (float)dx;
-            centerPosition.z += (float)dz;
+            centerPosition.x += dx;
+            centerPosition.z += dz;
         }
 
         /// <summary>

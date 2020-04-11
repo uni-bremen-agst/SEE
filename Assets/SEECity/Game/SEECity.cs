@@ -7,6 +7,7 @@ using SEE.DataModel;
 using SEE.DataModel.IO;
 using System;
 using SEE.GO;
+using SEE.Layout;
 
 namespace SEE.Game
 {
@@ -226,7 +227,8 @@ namespace SEE.Game
             }
             else
             {
-                GraphRenderer renderer = new GraphRenderer(this);
+                // TODO
+                GraphRenderer renderer = CoseGraphSettings.useOptAlgorithm ? new OptAlgorithmGraphRenderer(this):  new GraphRenderer(this);
                 // We assume here that this SEECity instance was added to a game object as
                 // a component. The inherited attribute gameObject identifies this game object.
                 renderer.Draw(ItsGraph, gameObject);
