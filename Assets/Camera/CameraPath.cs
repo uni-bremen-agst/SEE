@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Collections;
-using SEE.Layout;
+using SEE.GO;
 using SEE.DataModel;
 
 namespace SEE
@@ -142,7 +142,7 @@ namespace SEE
 
         /// <summary>
         /// The minimal number of columns a CSV file containing path data must have:
-        /// 3 (position = Vector3) + 4 (rotation = Quaternion) + 1 (time = float) = 7.
+        /// 3 (position = Vector3) + 3 (rotation = Euler angles) + 1 (time = float) = 6.
         /// </summary>
         private static readonly int minimalColumns = 6;
 

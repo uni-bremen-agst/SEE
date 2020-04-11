@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace SEE
@@ -37,7 +36,7 @@ namespace SEE
         {
             Stopwatch sw = new Stopwatch();
             Performance result = new Performance(action, sw);
-            Debug.Log("Begin of " + action + ".\n");
+            Debug.LogFormat("Begin of {0}.\n", action);
             sw.Start();
             return result;
         }
