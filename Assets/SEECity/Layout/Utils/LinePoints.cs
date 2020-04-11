@@ -35,16 +35,16 @@ namespace SEE.Layout
             TinySpline.BSpline spline = new TinySpline.BSpline((uint)controlPoints.Length, dimensions)
             {
                 // Setup control points.
-                controlPoints = VectorsToList(controlPoints)
+                ControlPoints = VectorsToList(controlPoints)
             };
 
-            IList<double> list = spline.buckle(tension).sample();
+            IList<double> list = spline.Tension(tension).Sample();
             return ListToVectors(list);
         }
 
         /// <summary>
         /// Serializes the co-ordinates of all given vectors as a list.
-        /// E.g., The list {(1.0, 2.0, 3.0), (4.0, 5.0, 6.0)} is serialized 
+        /// E.g., The list {(1.0, 2.0, 3.0), (4.0, 5.0, 6.0)} is serialized
         /// into {1.0, 2.0, 3.0, 4.0, 5.0, 6.0}.
         /// </summary>
         /// <param name="vectors">vectors to be serialized</param>
@@ -63,7 +63,7 @@ namespace SEE.Layout
 
         /// <summary>
         /// Deserializes the given co-oordindates back into 3D vectors.
-        /// E.g., The list [1.0, 2.0, 3.0, 4.0, 5.0, 6.0] is deserialized 
+        /// E.g., The list [1.0, 2.0, 3.0, 4.0, 5.0, 6.0] is deserialized
         /// into [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0)].
         /// </summary>
         /// <param name="values">co-ordinates to be deserialized</param>
@@ -106,12 +106,12 @@ namespace SEE.Layout
         /// (or lower if <paramref name="above"/> is false) of the two (<paramref name="start"/>
         /// and <paramref name="end"/>), where X is half the distance between <paramref name="start"/>
         /// and <paramref name="end"/>.
-        /// 
+        ///
         /// The y offset of the middle point is chosen relative to the distance between the two points.
-        /// We are using a value relative to the distance so that splines connecting close points do 
-        /// not shoot into the sky. Otherwise they would be difficult to read. Likewise, splines 
-        /// connecting two points farther away should go higher (or deeper, respectively) so that we 
-        /// avoid crossings with things that may be in between. This heuristic may help to better read 
+        /// We are using a value relative to the distance so that splines connecting close points do
+        /// not shoot into the sky. Otherwise they would be difficult to read. Likewise, splines
+        /// connecting two points farther away should go higher (or deeper, respectively) so that we
+        /// avoid crossings with things that may be in between. This heuristic may help to better read
         /// the splines.
         /// </summary>
         /// <param name="start">starting point</param>
@@ -135,8 +135,8 @@ namespace SEE.Layout
 
         /// <summary>
         /// Returns the points of a spline from <paramref name="start"/> over <paramref name="middle"/>
-        /// to <paramref name="end"/>. 
-        /// 
+        /// to <paramref name="end"/>.
+        ///
         /// Note: The resultant spline actually goes through <paramref name="middle"/>.
         /// </summary>
         /// <param name="start">start of the spline</param>
@@ -150,20 +150,20 @@ namespace SEE.Layout
                  middle.x, middle.y, middle.z,
                  end.x,    end.y,    end.z
                };
-            return ListToVectors(TinySpline.Utils.interpolateCubic(path, dimensions).sample());
+            return ListToVectors(TinySpline.BSpline.InterpolateCubic(path, dimensions).Sample());
         }
 
         /// <summary>
         /// Returns the points from <paramref name="start"/> to <paramref name="end"/>
-        /// on an offset straight line led on the given <paramref name="yLevel"/>. The first 
-        /// point is <paramref name="start"/>. The second point has the same x and z 
+        /// on an offset straight line led on the given <paramref name="yLevel"/>. The first
+        /// point is <paramref name="start"/>. The second point has the same x and z
         /// co-ordinate as <paramref name="start"/> but its y co-ordinate is <paramref name="yLevel"/>.
         /// The third point has the same x and z co-ordinate as <paramref name="end"/> but again
         /// its y co-ordinate is <paramref name="yLevel"/>. The last point is <paramref name="end"/>.
         /// </summary>
         /// <param name="start">start of the line</param>
         /// <param name="end">end of the line</param>
-        /// <param name="yLevel">the y co-ordinate of the two other points in between <paramref name="start"/> 
+        /// <param name="yLevel">the y co-ordinate of the two other points in between <paramref name="start"/>
         /// and <paramref name="end"/></param>
         /// <returns>the four points of the offset straight line</returns>
         public static Vector3[] StraightLinePoints(Vector3 start, Vector3 end, float yLevel)
