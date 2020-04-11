@@ -82,5 +82,27 @@ namespace SEE.Layout
                 }
             }
         }
+
+        /// <summary>
+        /// Simplifies the given polyline. The greater <paramref name="epsilon"/> is, the more
+        /// aggressively points are removed from <paramref name="polyLine"/>.
+        ///
+        /// Precondition: <paramref name="polyLine"/> is not null.
+        /// Postcondition: The lenght of the returned vector is less than or equal to the
+        /// lenght of <paramref name="polyLine"/>.
+        /// </summary>
+        /// <param name="polyLine">Sequence of lines to simplify.</param>
+        /// <param name="epsilon">Used to evaluate which points should be removed from
+        /// <paramref name="polyLine"/>. Values less than 0 are mapped to 0.</param>
+        /// <returns></returns>
+        protected Vector3[] Simplify(Vector3[] polyLine, float epsilon)
+        {
+            epsilon = Mathf.Max(0, epsilon);
+            // Unity already includes a suitable implemantation of the rdp algroithm.
+            List<Vector3> list = new List<Vector3>(polyLine.Length);
+            list.AddRange(polyLine);
+            LineUtility.Simplify(list, epsilon, list);
+            return list.ToArray();
+        }
     }
 }
