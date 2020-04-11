@@ -14,25 +14,6 @@ namespace SEE.Layout
         private const int dimensions = 3;
 
         /// <summary>
-        /// Returns the B-spline for the given <paramref name="controlPoints"/>.
-        /// </summary>
-        /// <param name="controlPoints">control points of the B-spline</param>
-        /// <returns>B-spline constrained by the given <paramref name="controlPoints"/></returns>
-        private static TinySpline.BSpline Spline(IList<Vector3> controlPoints)
-        {
-            // Create a cubic spline with 7 control points in 3D using
-            // a clamped knot vector. This call is equivalent to:
-            // BSpline spline = new BSpline(7, 2, 3, BSplineType.CLAMPED);
-            TinySpline.BSpline spline = new TinySpline.BSpline(7, dimensions);
-
-            // Setup control points. Note: This looks like a superflous assignment,
-            // but in fact is a call to the setter of the property with a side effect
-            // on spline.
-            IList<double> ctrlp = spline.controlPoints;
-            return spline;
-        }
-
-        /// <summary>
         /// Determines the strength of the tension for bundling edges. This value may
         /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
         /// </summary>
