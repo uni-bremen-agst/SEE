@@ -357,6 +357,16 @@ namespace SEE.Game
         public float Tension = 0.85f; // serialized by Unity
 
         /// <summary>
+        /// Determines to which extent the polylines of the generated splines are
+        /// simplified. Range: [0.0, inf] (0.0 means no simplification). More precisely,
+        /// stores the epsilon parameter of the Ramer–Douglas–Peucker algorithm which
+        /// is used to identify and remove points based on their distances to the line
+        /// drawn between their neighbors.
+        /// </summary>
+        [Tooltip("Epsilon for spline simplification (Ramer–Douglas–Peucker algorithm).")]
+        public float RDP = 0.05f;
+
+        /// <summary>
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.
         /// </summary>
         /// <returns>the loaded graph (may be empty if a graph could not be loaded)</returns>
