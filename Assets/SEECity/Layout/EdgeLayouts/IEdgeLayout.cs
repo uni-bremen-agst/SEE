@@ -87,8 +87,10 @@ namespace SEE.Layout
         /// Simplifies the given polyline. This function uses the Ramer–Douglas–Peucker
         /// (RDP) algorithm to identify and remove points whose distances fall below
         /// <paramref name="epsilon"/> (with respect to the line drawn between their
-        /// neighbors). The greater <paramref name="epsilon"/> is, the more  aggressively
-        /// points are removed.
+        /// neighbors). The greater <paramref name="epsilon"/> is, the more aggressively
+        /// points are removed (note: values greater than one are fine). A positive value 
+        /// close to zero results in a line with little to no reduction. A negative value 
+        /// is treated as 0. A value of zero has no effect.
         ///
         /// Precondition: <paramref name="polyLine"/> is not null.
         /// Postcondition: The lenght of the returned array is less than or equal to the
