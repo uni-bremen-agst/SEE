@@ -353,7 +353,8 @@ namespace SEE.Game
         /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
         /// 0.85 is the value recommended by Holten
         /// </summary>
-        [Tooltip("Tension for bundling edges.")]
+        [Tooltip("Tension for bundling edges: 0 means no bundling at all; the maximal value"
+            + " of 1 means maximal bundling. Recommended value: 0.85.")]
         public float Tension = 0.85f; // serialized by Unity
 
         /// <summary>
@@ -363,7 +364,9 @@ namespace SEE.Game
         /// is used to identify and remove points based on their distances to the line
         /// drawn between their neighbors.
         /// </summary>
-        [Tooltip("Epsilon for spline simplification (Ramer–Douglas–Peucker algorithm).")]
+        [Tooltip("Tolerance for spline simplification (Ramer–Douglas–Peucker algorithm):"
+            + " line points whose distances fall below that threshold are merged. A value <= 0 means "
+            + " no simplification. Recommended value: 0.05." )]
         public float RDP = 0.05f;
 
         /// <summary>
