@@ -144,10 +144,10 @@ namespace SEE.Game
                     layout = new StraightEdgeLayout(settings.EdgesAboveBlocks);
                     break;
                 case SEECity.EdgeLayouts.Spline:
-                    layout = new SplineEdgeLayout(settings.EdgesAboveBlocks);
+                    layout = new SplineEdgeLayout(settings.EdgesAboveBlocks, settings.RDP);
                     break;
                 case SEECity.EdgeLayouts.Bundling:
-                    layout = new BundledEdgeLayout(settings.EdgesAboveBlocks, settings.Tension);
+                    layout = new BundledEdgeLayout(settings.EdgesAboveBlocks, settings.Tension, settings.RDP);
                     break;
                 case SEECity.EdgeLayouts.None:
                     // nothing to be done
