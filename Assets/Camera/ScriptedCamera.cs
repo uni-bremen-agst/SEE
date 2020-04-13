@@ -119,15 +119,15 @@ namespace SEE
                 pathIsEnabled = false;
                 return;
             }
-            if (path.Count < 2)
+            if (path.Count < 1)
             {
-                Debug.LogWarning("ScriptedCamera: Requiring at least two locations.\n");
+                Debug.LogWarning("ScriptedCamera: Requiring at least one location.\n");
                 pathIsEnabled = false;
                 return;
             }
             try
             {
-                spline = TinySpline.BSpline.InterpolateCubic(VectorsToList(path), 4);
+                spline = TinySpline.BSpline.InterpolateCatmullRom(VectorsToList(path), 4);
                 pathIsEnabled = true;
             }
             catch (Exception e)
