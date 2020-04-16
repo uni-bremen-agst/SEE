@@ -207,7 +207,7 @@ namespace SEE.Game
                 List<SublayoutLayoutNode> sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
                 foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
                 {
-                    Sublayout sublayout = new Sublayout(layoutNode, groundLevel, GetInnerNodeFactory(layoutNode.InnerNodeKind));
+                    Sublayout sublayout = new Sublayout(layoutNode, groundLevel, leafNodeFactory);
                     sublayout.Layout();
                 }
 
@@ -260,8 +260,8 @@ namespace SEE.Game
             GameObject plane = NewPlane(leftFrontCorner, rightBackCorner);
             AddToParent(plane, parent);
 
-            Measurements measurements = new Measurements(layoutNodes.Cast<GameNode>().ToList(), graph, settings, leftFrontCorner, rightBackCorner);
-            measurements.NodesPerformance(p);
+            Measurements measurements = new Measurements(layoutNodes.Cast<GameNode>().ToList(), graph, leftFrontCorner, rightBackCorner, p);
+            settings.Measurements = measurements.ToStringDictionary();
         }
 
 

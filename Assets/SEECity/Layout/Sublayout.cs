@@ -45,7 +45,7 @@ namespace SEE.Layout
         /// <summary>
         /// TODO
         /// </summary>
-        private readonly NodeFactory innerNodeFactory;
+        private readonly NodeFactory leafNodeFactory;
 
         private SublayoutLayoutNode sublayout;
 
@@ -59,11 +59,11 @@ namespace SEE.Layout
 
         Dictionary<ILayoutNode, CoseSublayoutNode> ILayout_to_CoseSublayoutNode = new Dictionary<ILayoutNode, CoseSublayoutNode>();
 
-        public Sublayout(SublayoutLayoutNode sublayout, float groundLevel, NodeFactory innerNodeFactory)
+        public Sublayout(SublayoutLayoutNode sublayout, float groundLevel, NodeFactory leafNodeFactory)
         {
             this.nodeLayout = sublayout.NodeLayout;
             this.groundLevel = groundLevel;  
-            this.innerNodeFactory = innerNodeFactory;
+            this.leafNodeFactory = leafNodeFactory;
             this.sublayout = sublayout;
 
             if (sublayout.Node.Children().Count > 0)
@@ -287,13 +287,13 @@ namespace SEE.Layout
             switch (nodeLayout)
             {
                 case NodeLayouts.Manhattan:
-                    return new ManhattanLayout(groundLevel, innerNodeFactory.Unit);
-                case NodeLayouts.FlatRectanglePacking:
-                    return new RectanglePacker(groundLevel, innerNodeFactory.Unit);
+                    return new ManhattanLayout(groundLevel, leafNodeFactory.Unit);
+                case NodeLayouts.RectanglePacking:
+                    return new RectanglePackingNodeLayout(groundLevel, leafNodeFactory.Unit);
                 case NodeLayouts.EvoStreets:
-                    return new EvoStreetsNodeLayout(groundLevel, innerNodeFactory.Unit);
+                    return new EvoStreetsNodeLayout(groundLevel, leafNodeFactory.Unit);
                 case NodeLayouts.Treemap:
-                    return new TreemapLayout(groundLevel, 10.0f * innerNodeFactory.Unit, 10.0f * innerNodeFactory.Unit);
+                    return new TreemapLayout(groundLevel, 10.0f * leafNodeFactory.Unit, 10.0f * leafNodeFactory.Unit);
                 case NodeLayouts.Balloon:
                     return new BalloonNodeLayout(groundLevel);
                 case NodeLayouts.CirclePacking:
@@ -305,6 +305,10 @@ namespace SEE.Layout
             }
         }
 
+        private void EvaluateSublayout()
+        {
+
+        }
     }
 }
 

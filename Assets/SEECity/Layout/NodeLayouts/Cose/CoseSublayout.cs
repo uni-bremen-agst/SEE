@@ -274,7 +274,7 @@ namespace SEE.Layout
             {
                 case NodeLayouts.Manhattan:
                     return new ManhattanLayout(groundLevel, leafNodeFactory.Unit).Layout(sublayoutNodes);
-                case NodeLayouts.FlatRectanglePacking:
+                case NodeLayouts.RectanglePacking:
                     return new RectanglePacker(groundLevel, leafNodeFactory.Unit).Layout(sublayoutNodes);
                 case NodeLayouts.EvoStreets:
                     return new EvoStreetsNodeLayout(groundLevel, leafNodeFactory.Unit).Layout(sublayoutNodes);
@@ -329,7 +329,7 @@ namespace SEE.Layout
         /// <returns>only leave nodes</returns>
         private bool OnlyLeaveNodes()
         {
-            return nodeLayout == NodeLayouts.Manhattan || nodeLayout == NodeLayouts.FlatRectanglePacking;
+            return nodeLayout == NodeLayouts.Manhattan;
         }
 
         /// <summary>

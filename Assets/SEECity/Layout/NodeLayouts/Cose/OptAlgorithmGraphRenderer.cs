@@ -135,20 +135,12 @@ namespace SEE.Layout
                                 EdgeDistCalculation(graph, layoutNodes);
 
                                 BoundingBox(layoutNodes, out Vector2 FrontCorner, out Vector2 BackCorner);
-                                _ = new Measurements(layoutNodes.Cast<GameNode>().ToList(), graph, settings, FrontCorner, BackCorner);
-                                bestMeasurements = settings.Measurements;
+                                Measurements measurements = new Measurements(layoutNodes.Cast<GameNode>().ToList(), graph, FrontCorner, BackCorner);
 
-                                if (bestMeasurements.ContainsKey("Nodes overlapping"))
+                                var overlappingNodes = measurements.OverlappingGameNodes;
+                                if (overlappingNodes <= 0)
                                 {
-                                    int overlappingAmount = Int32.Parse(bestMeasurements["Nodes overlapping"]);
-                                    double area = Double.Parse(bestMeasurements["Area (Plane)"]);
-                                    double edgeCrossings = Double.Parse(bestMeasurements["Number of edge crossings"]);
-
-                                    if (overlappingAmount == 0)
-                                    {
-                            //results.Add(new List<double> { i, j }, new SortedDictionary<string, string>(bestMeasurements));
-                                        WriteToFile(i, j, overlappingAmount, area, edgeCrossings);//, a % 2, b % 2, d % 2);
-                                    }
+                                    WriteToFile(i, j, overlappingNodes, measurements.Area, measurements.EdgeCrossings);
                                 }
 
                                 foreach (GameNode layoutNode in layoutNodes)
