@@ -29,24 +29,14 @@ namespace SEE.Layout
         private List<CoseEdge> edges = new List<CoseEdge>();
 
         /// <summary>
-        /// top position of the graph
+        /// TODO
         /// </summary>
-        private double top;
+        private Vector2 leftFrontCorner;
 
         /// <summary>
-        /// left position of the graph
+        /// TODO
         /// </summary>
-        private double left;
-
-        /// <summary>
-        /// bottom position of the graph
-        /// </summary>
-        private double bottom;
-
-        /// <summary>
-        /// right position of the graph
-        /// </summary>
-        private double right;
+        private Vector2 rightBackCorner;
 
         /// <summary>
         /// the bounding rect of this graph
@@ -60,6 +50,14 @@ namespace SEE.Layout
         private Vector3 centerPosition;
 
         /// <summary>
+        /// TODO
+        /// </summary>
+        public Vector3 Extend
+        {
+            get => scale / 2;
+        }
+
+        /// <summary>
         /// the esitmated size of this graph
         /// </summary>
         private double estimatedSize = Mathf.NegativeInfinity;
@@ -67,7 +65,7 @@ namespace SEE.Layout
         /// <summary>
         /// the margin around this graph
         /// </summary>
-        private double defaultMargin = CoseLayoutSettings.Graph_Margin;
+        private float defaultMargin = CoseLayoutSettings.Graph_Margin;
 
         /// <summary>
         /// Indicates if the graph is connected
@@ -85,10 +83,6 @@ namespace SEE.Layout
         private bool isSubLayout = false;
 
         public ILayoutNode GraphObject { get => graphObject; set => graphObject = value; }
-        public double Left { get => left; set => left = value; }
-        public double Top { get => top; set => top = value; }
-        public double Bottom { get => bottom; set => bottom = value; }
-        public double Right { get => right; set => right = value; }
         public CoseGraphManager GraphManager { get => graphManager; set => graphManager = value; }
         public CoseNode Parent { get => parent; set => parent = value; }
         public List<CoseNode> Nodes { get => nodes; set => nodes = value; }
@@ -99,6 +93,8 @@ namespace SEE.Layout
         public bool IsSubLayout { get => isSubLayout; set => isSubLayout = value; }
         public Vector3 Scale { get => scale; set => scale = value; }
         public Vector3 CenterPosition { get => centerPosition; set => centerPosition = value; }
+        public Vector2 LeftFrontCorner { get => leftFrontCorner; set => leftFrontCorner = value; }
+        public Vector2 RightBackCorner { get => rightBackCorner; set => rightBackCorner = value; }
 
         /// <summary>
         /// constructor
@@ -112,19 +108,16 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Updates the bounds of the graph, depends of the position/ size of the nodes insite the graph
+        /// TODO
         /// </summary>
-        /// <param name="recursive">Indicates if the bounds should be calculated recursively</param>
         public void UpdateBounds(bool recursive)
         {
-            if (parent.SublayoutValues.IsSubLayoutNode) 
+            if (parent.SublayoutValues.IsSubLayoutNode)
             {
-                this.left = parent.GetLeft();
-                this.right = parent.GetRight();
-                this.top = parent.GetTop();
-                this.bottom = parent.GetBottom();
+                this.LeftFrontCorner = parent.GetLeftFrontCorner();
+                this.RightBackCorner = parent.GetRightBackCorner();
 
-                UpdateBoundingRect();
+                UpdateBounding();
 
                 foreach (CoseNode cNode in nodes)
                 {
@@ -140,14 +133,11 @@ namespace SEE.Layout
                 return;
             }
 
-            double left = Mathf.Infinity;
-            double right = Mathf.NegativeInfinity;
-            double top = Mathf.Infinity;
-            double bottom = Mathf.NegativeInfinity;
-            double nodeLeft;
-            double nodeRight;
-            double nodeTop;
-            double nodeBottom;
+            Vector2 leftLowerCorner = new Vector2(Mathf.Infinity, Mathf.NegativeInfinity);
+            Vector2 rightUpperCorner = new Vector2(Mathf.NegativeInfinity, Mathf.Infinity);
+
+            Vector2 leftLowerCornerNode;
+            Vector2 rightUpperCornerNode;
 
             foreach (CoseNode cNode in nodes)
             {
@@ -157,60 +147,43 @@ namespace SEE.Layout
                     cNode.UpdateBounds();
                 }
 
-                nodeLeft = cNode.GetLeft();
-                nodeRight = cNode.GetRight();
-                nodeTop = cNode.GetTop();
-                nodeBottom = cNode.GetBottom();
+                leftLowerCornerNode = cNode.GetLeftFrontCorner();
+                rightUpperCornerNode = cNode.GetRightBackCorner();
 
-                if (left > nodeLeft)
+                if (leftLowerCorner.x > leftLowerCornerNode.x)
                 {
-                    left = nodeLeft;
+                    leftLowerCorner.x = leftLowerCornerNode.x;
                 }
 
-                if (right < nodeRight)
+                if (rightUpperCorner.x < rightUpperCornerNode.x)
                 {
-                    right = nodeRight;
+                    rightUpperCorner.x = rightUpperCornerNode.x;
                 }
 
-                if (top > nodeTop)
+                if (rightUpperCorner.y > rightUpperCornerNode.y)
                 {
-                    top = nodeTop;
+                    rightUpperCorner.y = rightUpperCornerNode.y;
                 }
 
-                if (bottom < nodeBottom)
+                if (leftLowerCorner.y < leftLowerCornerNode.y)
                 {
-                    bottom = nodeBottom;
+                    leftLowerCorner.y = leftLowerCornerNode.y;
                 }
             }
 
-            Rect boundingRect = new Rect((float)left, (float)top, (float)(right - left), (float)(bottom - top));
-
-            if (left == Mathf.Infinity)
+            if (leftLowerCorner.x == Mathf.Infinity)
             {
-                this.left = parent.GetLeft();
-                this.right = parent.GetRight();
-                this.top = parent.GetTop();
-                this.bottom = parent.GetBottom();
+                this.leftFrontCorner = parent.GetLeftFrontCorner();
+                this.rightBackCorner = parent.GetRightBackCorner();
             }
 
-            if (graphManager.Layout.InnerNodesAreCircles)
-            {
-                var width = Math.Abs(this.right - this.left);
-                var height = Math.Abs(this.bottom - this.top);
+            this.leftFrontCorner.x = leftLowerCorner.x - defaultMargin;
+            this.leftFrontCorner.y = leftLowerCorner.y + defaultMargin;
 
-                var boundsWidth = (width / Math.Sqrt(2)) - (width / 2);
-                var boundsHeight = (height / Math.Sqrt(2)) - (height / 2);
+            this.rightBackCorner.x = rightUpperCorner.x + defaultMargin;
+            this.rightBackCorner.y = rightUpperCorner.y - defaultMargin;
 
-                defaultMargin = Math.Max(boundsWidth, defaultMargin);
-                defaultMargin = Math.Max(boundsHeight, defaultMargin);
-            }
-
-            this.left = boundingRect.x - defaultMargin;
-            this.right = boundingRect.x + boundingRect.width + defaultMargin;
-            this.top = boundingRect.y - defaultMargin;
-            this.bottom = boundingRect.y + boundingRect.height + defaultMargin;
-
-            UpdateBoundingRect();
+            UpdateBounding();
         }
 
         /// <summary>
@@ -227,12 +200,12 @@ namespace SEE.Layout
         /// <summary>
         /// updates the bounds of the boundingrectanle 
         /// </summary>
-        public void UpdateBoundingRect()
+        public void UpdateBounding()
         {
-            scale.x = (float) right - (float) left;
-            scale.z = (float) bottom - (float) top;
-            centerPosition.x = (float) left + scale.x / 2;
-            centerPosition.z = (float) top + scale.z / 2;
+            scale.x = RightBackCorner.x - LeftFrontCorner.x;
+            scale.z = LeftFrontCorner.y - RightBackCorner.y;
+            centerPosition.x = LeftFrontCorner.x + Extend.x;
+            centerPosition.z = RightBackCorner.y + Extend.z; 
         }
 
         /// <summary>

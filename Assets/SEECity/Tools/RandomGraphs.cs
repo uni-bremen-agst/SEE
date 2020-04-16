@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using SEE.Utils;
+using System.Linq;
 
 namespace SEE.Tools
 {
@@ -121,6 +122,22 @@ namespace SEE.Tools
             Graph graph = new Graph();
             ICollection<Node> leaves = CreateLeaves(graph, leafConstraint, leafAttributes);
             ICollection<Edge> leafEdges = CreateEdges(graph, leaves, leafConstraint);
+
+            // TODO
+            if (leafEdges.Count < 1)
+            {
+                System.Random random = new System.Random();
+
+                int sourceIndex = random.Next(leaves.Count);
+                int targetIndex = random.Next(leaves.Count);
+
+                List<Node> leaveNodes = leaves.Cast<Node>().ToList();
+
+                Edge edge = new Edge(leaveNodes[sourceIndex], leaveNodes[targetIndex], leafConstraint.EdgeType);
+                leafEdges.Add(edge);
+                graph.AddEdge(edge);
+            }
+
             IList<Node> innerNodes = CreateTree(graph, innerNodeConstraint);
             AssignLeaves(graph, leaves, innerNodes);
             ICollection<Edge> innerEdges = CreateEdges(graph, innerNodes, innerNodeConstraint);

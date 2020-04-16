@@ -264,13 +264,6 @@ namespace SEE.Game
             measurements.NodesPerformance(p);
         }
 
-        private void FindOptimalSolution(Graph graph, List<ILayoutNode> layoutNodes)
-        {
-            List<SublayoutNode> sublayoutNodes = new List<SublayoutNode>();
-            var optAlgo = new OptAlgorithmGraphRenderer(settings, groundLevel, graph, sublayoutNodes, layoutNodes);
-            optAlgo.StartOptAlgorithm();
-        }
-
 
         /// <summary>
         /// TODO

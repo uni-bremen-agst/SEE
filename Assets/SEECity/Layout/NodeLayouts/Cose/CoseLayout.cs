@@ -414,11 +414,9 @@ namespace SEE.Layout
 
                     if (node.Child != null)
                     {
-                        node.Child.Left = rect.xMin;
-                        node.Child.Top = rect.yMin;
-                        node.Child.Right = rect.xMax;
-                        node.Child.Bottom = rect.yMax;
-                        node.Child.UpdateBoundingRect();
+                        node.Child.LeftFrontCorner = node.GetLeftFrontCorner();
+                        node.Child.RightBackCorner = node.GetRightBackCorner();
+                        node.Child.UpdateBounding();
                     }
                 }
             }
@@ -552,7 +550,7 @@ namespace SEE.Layout
 
                     foreach (CoseNode node in nodes)
                     {
-                        AddNodeToGrid(node, graphManager.RootGraph.Left, graphManager.RootGraph.Top);
+                        AddNodeToGrid(node, graphManager.RootGraph.LeftFrontCorner.x, graphManager.RootGraph.RightBackCorner.y);
                     }
                 }
 
@@ -750,11 +748,11 @@ namespace SEE.Layout
 
             List<CoseNode>[,] collect;
 
-            var diff = (graph.Right - graph.Left);
+            var diff = (graph.RightBackCorner.x - graph.LeftFrontCorner.x);
             var diffRep = diff / coseLayoutSettings.RepulsionRange;
             var ceilDiff = Mathf.Ceil((float)diffRep);
-            var sizeX = (int)Mathf.Ceil((float)((graph.Right - graph.Left) / coseLayoutSettings.RepulsionRange));
-            var sizeY = (int)Mathf.Ceil((float)((graph.Bottom - graph.Top) / coseLayoutSettings.RepulsionRange));
+            var sizeX = (int)Mathf.Ceil((float)((graph.RightBackCorner.x - graph.LeftFrontCorner.x) / coseLayoutSettings.RepulsionRange));
+            var sizeY = (int)Mathf.Ceil((float)((graph.LeftFrontCorner.y - graph.RightBackCorner.y) / coseLayoutSettings.RepulsionRange));
 
             collect = new List<CoseNode>[sizeX, sizeY];
 
