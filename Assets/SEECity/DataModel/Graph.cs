@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SEE.Layout;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -405,6 +406,43 @@ namespace SEE.DataModel
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="selectedNodes"></param>
+        /// <returns></returns>
+        public IList<Edge> ConnectingEdges(ICollection<ILayoutNode> selectedNodes)
+        {
+            IList<Edge> result = new List<Edge>();
+
+            foreach (Edge edge in this.Edges())
+            {
+                if (FilterListForLayoutNode(edge.Source.LinkName, selectedNodes) && FilterListForLayoutNode(edge.Target.LinkName, selectedNodes))
+                {
+                    result.Add(edge);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="linkname"></param>
+        /// <param name="layoutNodes"></param>
+        /// <returns></returns>
+        private bool FilterListForLayoutNode(String linkname, ICollection<ILayoutNode> layoutNodes)
+        {
+            foreach (ILayoutNode gameNode in layoutNodes)
+            {
+                if (gameNode.LinkName == linkname)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private int GetMaxDepth(List<Node> nodes, int currentDepth)
