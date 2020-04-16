@@ -39,16 +39,16 @@ namespace SEE.Layout
         /// </summary>
         private List<CoseEdge> edges = new List<CoseEdge>();
 
-        /// <summary>
-        /// the bounding rect 
-        /// </summary>
-        //public Rect rect = new Rect(0, 0, 0, 0);
-
         /// TODO
         private Vector3 scale;
 
         /// TODO
         private Vector3 centerPosition; 
+
+        public Vector3 Extend
+        {
+            get => scale / 2;
+        }
 
         /// <summary>
         /// TODO
@@ -217,63 +217,6 @@ namespace SEE.Layout
             layout.CoseLayoutSettings.TotalDisplacement += Math.Abs(layoutValues.DisplacementX) + Math.Abs(layoutValues.DisplacementY);
         }
 
-        /*/// <summary>
-        /// Changes to Source/ Target node of the intergraph edges from all child nodes of the sublayout root to sublayout root
-        /// </summary>
-        public void SetIntergraphEdgesToSublayoutRoot()
-        {
-            //List<CoseEdge> edges = new List<CoseEdge>();
-            List<CoseEdge> allIntergraphEdges = new List<CoseEdge>();
-            allIntergraphEdges.AddRange(graphManager.Edges);
-
-            // here nur sublayout nodes für das jeweilige root 
-
-            List<CoseNode> nodes = new List<CoseNode>();//cNSubLValues.Sublayout.NodeMapSublayout.Keys.ToList();
-
-            foreach (CoseNode node in nodes)
-            {
-                if (node != this)
-                {
-                    foreach (CoseEdge edge in allIntergraphEdges)
-                    {
-                        // wenn es eine intergraphedge ist, welche aus dem sublayout-graph herausgeht 
-                        if (!nodes.Contains(edge.Source) || !nodes.Contains(edge.Target))
-                        {
-                            if (edge.Source == node)
-                            {
-                                if (edge.Target != node)
-                                {
-                                    edge.Source.Edges.Remove(edge);
-                                    edge.Source = this;
-                                    this.edges.Add(edge);
-                                }
-                                else
-                                {
-                                    allIntergraphEdges.Remove(edge);
-                                }
-
-                            }
-                            if (edge.Target == node)
-                            {
-                                if (edge.Source != node)
-                                {
-                                    edge.Target.Edges.Remove(edge);
-                                    edge.Target = this;
-                                    this.edges.Add(edge);
-                                }
-                                else
-                                {
-                                    allIntergraphEdges.Remove(edge);
-                                }
-
-                            }
-                        }
-                    }
-                }
-            }
-            graphManager.AllEdges = null;
-        }*/
-
         /// <summary>
         /// Propogates the displacement of the sublayout root to the sublayout children
         /// </summary>
@@ -373,21 +316,14 @@ namespace SEE.Layout
             SetWidth(scale.x);
             SetHeight(scale.z);
 
-            float left = position.x - (scale.x / 2);
-            float right = position.x + (scale.x / 2);
-            float top = position.z - (scale.z / 2);
-            float bottom = position.z + (scale.z / 2);
-
-            sublayoutValues.UpdateRelativeBounding(left, right, top, bottom);
-            UpdateBounding(left, right, top, bottom);
+            sublayoutValues.UpdateRelativeBounding(scale: scale, position: position);
+            UpdateBounding(position: position, scale: scale);
 
             if (child != null)
             {
-                child.Left = left;
-                child.Top = top;
-                child.Right = right;
-                child.Bottom = bottom;
-                child.UpdateBoundingRect();
+                child.LeftFrontCorner = GetLeftFrontCorner();
+                child.RightBackCorner = GetRightBackCorner();
+                child.UpdateBounding();
             }
         }
 
@@ -477,13 +413,15 @@ namespace SEE.Layout
             if (child.Nodes.Count != 0)
             {
                 child.UpdateBounds(true);
-               
 
-                centerPosition.x = (float)(child.Left + ((child.Right - child.Left) / 2));
-                centerPosition.z = (float)(child.Top + ((child.Bottom - child.Top) / 2));
+                centerPosition.x = child.LeftFrontCorner.x + child.Extend.x;
+                centerPosition.z = child.RightBackCorner.y + child.Extend.z; 
 
-                SetWidth(child.Right - child.Left + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);//+ (2 * CoseDefaultValues.COMPOUND_NODE_MARGIN)); //+ diffWidth);
-                SetHeight(child.Bottom - child.Top + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);// + (2 * CoseDefaultValues.COMPOUND_NODE_MARGIN)); // + diffHeight);
+                //centerPosition.x = (float)(child.Left + ((child.Right - child.Left) / 2));
+                //centerPosition.z = (float)(child.Top + ((child.Bottom - child.Top) / 2));
+
+                SetWidth(child.Scale.x + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);//+ (2 * CoseDefaultValues.COMPOUND_NODE_MARGIN)); //+ diffWidth);
+                SetHeight(child.Scale.z + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);// + (2 * CoseDefaultValues.COMPOUND_NODE_MARGIN)); // + diffHeight);
 
                 //centerPosition.x = child.Left.x - CoseLayoutSettings.Compound_Node_Margin;
                 //centerPosition.z = child.CenterPosition.z - CoseLayoutSettings.Compound_Node_Margin;
@@ -571,12 +509,10 @@ namespace SEE.Layout
         /// <param name="right">the right position</param>
         /// <param name="top">the top position</param>
         /// <param name="bottom">the bottom position</param>
-        public void UpdateBounding(float left, float right, float top, float bottom)
+        public void UpdateBounding(Vector2 position, Vector2 scale)
         {
-            scale.x = right - left;
-            scale.z = bottom - top;
-            centerPosition.x = left + scale.x / 2;
-            centerPosition.z = top + scale.z / 2;
+            this.scale = scale;
+            this.centerPosition = position;
         }
 
         /// <summary>
@@ -622,6 +558,26 @@ namespace SEE.Layout
         public float GetLeft()
         {
             return centerPosition.x - Scale.x / 2;
+        }
+
+        public Vector2 GetLeftFrontCorner()
+        {
+            Vector2 leftLowerCorner = new Vector2()
+            {
+                x = centerPosition.x - Extend.x,
+                y = centerPosition.z + Extend.z
+            };
+            return leftLowerCorner;
+        }
+
+        public Vector2 GetRightBackCorner()
+        {
+            Vector2 rightBackCorner = new Vector2()
+            {
+                x = centerPosition.x + Extend.x,
+                y = centerPosition.z - Extend.z
+            };
+            return rightBackCorner;
         }
 
         /// <summary>

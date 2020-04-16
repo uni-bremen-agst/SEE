@@ -64,12 +64,10 @@ namespace SEE.Layout
         /// <param name="right">the right position</param>
         /// <param name="top">the top position</param>
         /// <param name="bottom">the bottom position</param>
-        public void UpdateRelativeBounding(float left, float right, float top, float bottom)
+        public void UpdateRelativeBounding(Vector3 scale, Vector3 position)
         {
-            relativeScale.x = right - left;
-            relativeScale.z = bottom - top;
-            relativeCenterPosition.x = left + relativeScale.x / 2;
-            relativeCenterPosition.z = top + relativeScale.z / 2;
+            relativeScale = scale;
+            relativeCenterPosition = position;
         }
     }
 }
