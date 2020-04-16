@@ -73,7 +73,7 @@ namespace SEE
         /// <summary>
         /// Dictonary with nodes and corresonding gameobjects
         /// </summary>
-        protected ICollection<GameNode> layoutNodes;
+        protected ICollection<ILayoutNode> layoutNodes;
 
         public EdgesMeasurements EdgesMeasurements
         {
@@ -109,13 +109,13 @@ namespace SEE
         /// <param name="graph"> the graph displayed by the layout</param>
         /// <param name="leftFrontCorner">2D co-ordinate of the left front corner</param>
         /// <param name="rightBackCorner">2D co-ordinate of the right back corner</param>
-        public Measurements(ICollection<GameNode> layoutNodes, Graph graph, Vector2 leftFrontCorner, Vector2 rightBackCorner, Performance performance = null)
+        public Measurements(ICollection<ILayoutNode> layoutNodes, Graph graph, Vector2 leftFrontCorner, Vector2 rightBackCorner, Performance performance = null)
         {
             this.graph = graph;
             this.width = Distance(leftFrontCorner.x, rightBackCorner.x);
             this.height = Distance(leftFrontCorner.y, rightBackCorner.y);
             this.layoutNodes = layoutNodes;
-            this.edges = graph.Edges();
+            this.edges = graph.ConnectingEdges(layoutNodes);
             this.nodePerformance = performance;
         }
 
@@ -192,9 +192,9 @@ namespace SEE
             return totalCrossings;
         }
 
-        private GameNode FilterListForGameNode(String linkname)
+        private ILayoutNode FilterListForGameNode(String linkname)
         {
-            foreach (GameNode gameNode in layoutNodes)
+            foreach (ILayoutNode gameNode in layoutNodes)
             {
                 if (gameNode.LinkName == linkname)
                 {
@@ -356,14 +356,14 @@ namespace SEE
         {
             int overlapAmount = 0;
 
-            List<GameNode> nodesToIterate = new List<GameNode>();
+            List<ILayoutNode> nodesToIterate = new List<ILayoutNode>();
             nodesToIterate.AddRange(layoutNodes);
 
-            foreach (GameNode node in layoutNodes)
+            foreach (ILayoutNode node in layoutNodes)
             {
                 nodesToIterate.Remove(node);
 
-                foreach (GameNode node2 in nodesToIterate)
+                foreach (ILayoutNode node2 in nodesToIterate)
                 {
                     bool doOverlap = CheckOverlapping(node, node2);
                     bool inSameHierarchie = CheckIfInHierarchie(node, node2);
@@ -428,7 +428,7 @@ namespace SEE
         /// <param name="node1">the first node</param>
         /// <param name="node2">the second node</param>
         /// <returns></returns>
-        private bool CheckOverlapping(GameNode node1, GameNode node2)
+        private bool CheckOverlapping(ILayoutNode node1, ILayoutNode node2)
         {
             Bounds bounds1 = new Bounds(node1.CenterPosition, node1.Scale);
             Bounds bounds2 = new Bounds(node2.CenterPosition, node2.Scale);

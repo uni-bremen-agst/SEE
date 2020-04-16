@@ -135,7 +135,7 @@ namespace SEE.Layout
                                 EdgeDistCalculation(graph, layoutNodes);
 
                                 BoundingBox(layoutNodes, out Vector2 FrontCorner, out Vector2 BackCorner);
-                                Measurements measurements = new Measurements(layoutNodes.Cast<GameNode>().ToList(), graph, FrontCorner, BackCorner);
+                                Measurements measurements = new Measurements(layoutNodes, graph, FrontCorner, BackCorner);
 
                                 var overlappingNodes = measurements.OverlappingGameNodes;
                                 if (overlappingNodes <= 0)
