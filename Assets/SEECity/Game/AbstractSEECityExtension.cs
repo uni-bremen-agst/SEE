@@ -47,8 +47,8 @@ namespace SEE.Game
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false);
                 case NodeLayouts.Balloon:
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: true);
-                case NodeLayouts.FlatRectanglePacking:
-                    return new NodelayoutModel(OnlyLeaves: true, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false);
+                case NodeLayouts.RectanglePacking:
+                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false);
                 case NodeLayouts.Treemap:
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false);
                 case NodeLayouts.CirclePacking:

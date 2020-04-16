@@ -8,6 +8,41 @@ using UnityEngine;
 
 namespace SEE
 {
+
+    public class EdgesMeasurements {
+
+        public readonly float lengthMax;
+
+        public readonly float lengthMin;
+
+        public readonly float lengthTotal;
+
+        public readonly float lengthMaxArea;
+
+        public readonly float lengthMinArea;
+
+        public readonly float lengthTotalArea;
+
+        public readonly float lengthAverage;
+
+        public readonly float lengthVariance;
+
+        public readonly float lengthStandardDeviation; 
+
+        public EdgesMeasurements(float lengthMax, float lengthMin, float lengthTotal, float lengthMaxArea, float lengthMinArea, float lengthTotalArea, float lengthAverage, float lengthVariance, float lengthStandardDeviation)
+        {
+            this.lengthMax = lengthMax;
+            this.lengthMin = lengthMin;
+            this.lengthTotal = lengthTotal;
+            this.lengthMaxArea = lengthMaxArea;
+            this.lengthMinArea = lengthMinArea;
+            this.lengthTotalArea = lengthTotalArea;
+            this.lengthAverage = lengthAverage;
+            this.lengthVariance = lengthVariance;
+            this.lengthStandardDeviation = lengthStandardDeviation;
+        }
+    }
+
     public class Measurements
     {
         /// <summary>
@@ -26,11 +61,6 @@ namespace SEE
         private IList<Edge> edges;
 
         /// <summary>
-        /// settings for this graph
-        /// </summary>
-        private AbstractSEECity settings;
-
-        /// <summary>
         /// width of this graph visualisation
         /// </summary>
         private float width;
@@ -45,51 +75,98 @@ namespace SEE
         /// </summary>
         protected ICollection<GameNode> layoutNodes;
 
+        public EdgesMeasurements EdgesMeasurements
+        {
+            get => MeasurementsEdges();
+        }
+
+        public int OverlappingGameNodes 
+        {
+            get => CalcOverlappingGameNodes();
+        }
+
+        public float Area
+        {
+            get => MeasurementsArea();
+        }
+
+        public int EdgeCrossings
+        {
+            get => MeasureEdgeCrossing();
+        }
+
+        public string NodesPerformance
+        {
+            get => GetNodesPerformance();
+        }
+
+        private Performance nodePerformance = null;
+
         /// <summary>
         /// the constructor
         /// </summary>
         /// <param name="nodeMap">Dictonary with nodes and corresonding gameobjects</param>
         /// <param name="graph"> the graph displayed by the layout</param>
-        /// <param name="settings">settings for this graph</param>
         /// <param name="leftFrontCorner">2D co-ordinate of the left front corner</param>
         /// <param name="rightBackCorner">2D co-ordinate of the right back corner</param>
-        public Measurements(ICollection<GameNode> layoutNodes, Graph graph, AbstractSEECity settings, Vector2 leftFrontCorner, Vector2 rightBackCorner)
+        public Measurements(ICollection<GameNode> layoutNodes, Graph graph, Vector2 leftFrontCorner, Vector2 rightBackCorner, Performance performance = null)
         {
             this.graph = graph;
-            this.settings = settings;
-            this.height = Distance(leftFrontCorner.y, rightBackCorner.y);
             this.width = Distance(leftFrontCorner.x, rightBackCorner.x);
-
+            this.height = Distance(leftFrontCorner.y, rightBackCorner.y);
             this.layoutNodes = layoutNodes;
-
-            settings.Measurements = new SortedDictionary<string, string>();
-
-            edges = graph.Edges(); 
-
-            MeasurementsArea();
-            MeasurementsEdges();
-            MeasureEdgeCrossing();
-
-            settings.Measurements.Add("Nodes overlapping", OverlappingGameNodes(layoutNodes).ToString());
+            this.edges = graph.Edges();
+            this.nodePerformance = performance;
         }
 
         /// <summary>
         /// Adds the time needed for calculating the node layout to the measurements
         /// </summary>
         /// <param name="performance"></param>
-        public void NodesPerformance(Performance performance)
+        public string GetNodesPerformance()
         {
-            settings.Measurements.Add("Time for node layout", performance.GetElapsedTime());
+            if (nodePerformance != null )
+            {
+                return nodePerformance.GetElapsedTime();
+            }
+            return "";
+        }
+
+        public SortedDictionary<string, string> ToStringDictionary()
+        {
+            SortedDictionary<string, string> measurements = new SortedDictionary<string, string>
+            {
+                { "Nodes overlapping", OverlappingGameNodes.ToString() },
+                { "Number of edge crossings", EdgeCrossings.ToString() },
+                { "Straight Edge length max", Math.Round(EdgesMeasurements.lengthMax, 2).ToString() },
+                { "Straight Edge length min", Math.Round(EdgesMeasurements.lengthMin, 2).ToString() },
+                { "Straight Edge length total", Math.Round(EdgesMeasurements.lengthTotal, 2).ToString() },
+                { "Straight Edge length max (area)", Math.Round(EdgesMeasurements.lengthMaxArea, 2).ToString() },
+                { "Straight Edge length min (area)", Math.Round(EdgesMeasurements.lengthMinArea, 2).ToString() },
+                { "Straight Edge length total (area)", Math.Round(EdgesMeasurements.lengthTotalArea, 2).ToString() },
+                { "Straight Edge length average", Math.Round(EdgesMeasurements.lengthAverage, 2).ToString() },
+                { "Straight Edge length variance", Math.Round(EdgesMeasurements.lengthVariance, 2).ToString() },
+                { "Straight Edge length standard deviation", Math.Round(EdgesMeasurements.lengthStandardDeviation, 2).ToString() },
+                { "Area (Plane)", Area.ToString() }
+            };
+
+            string nodePerformance = NodesPerformance;
+            if (nodePerformance.Length > 0)
+            {
+                measurements.Add("Time for node layout", nodePerformance);
+            }
+
+            return measurements;
         }
 
         /// <summary>
         /// Measures the number of edge crossings
         /// </summary>
-        private void MeasureEdgeCrossing()
+        private int MeasureEdgeCrossing()
         {
             List<Edge> edgesToIterate = new List<Edge>();
             edgesToIterate.AddRange(edges);
-            float totalCrossings = 0;
+            int totalCrossings = 0;
 
             foreach (Edge edge in edges)
             {
@@ -112,7 +189,7 @@ namespace SEE
                     }
                 }
             }
-            settings.Measurements.Add("Number of edge crossings", totalCrossings.ToString());
+            return totalCrossings;
         }
 
         private GameNode FilterListForGameNode(String linkname)
@@ -180,7 +257,7 @@ namespace SEE
         /// <summary>
         /// calculates measurements for edges, e.g. maximal edge length
         /// </summary>
-        public void MeasurementsEdges()
+        private EdgesMeasurements MeasurementsEdges()
         {
             float minDistEdge = 0;
             float maxDistEdge = 0;
@@ -190,7 +267,7 @@ namespace SEE
             float relationTotalDist;
             float averageDistEdge = 0;
             float varianceDistEdge = 0;
-            float standardDeviation = 0;
+            float standardDeviation;
 
             if (edges.Count >= 0)
             {
@@ -232,26 +309,16 @@ namespace SEE
 
             standardDeviation = Mathf.Sqrt(varianceDistEdge);
 
-            settings.Measurements.Add("Straight Edge length max", Math.Round(maxDistEdge, 2).ToString());
-            settings.Measurements.Add("Straight Edge length min", Math.Round(minDistEdge, 2).ToString());
-            settings.Measurements.Add("Straight Edge length total", Math.Round(totalDist, 2).ToString());
-
-            settings.Measurements.Add("Straight Edge length max (area)", Math.Round(relationMaxDistEdge, 2).ToString());
-            settings.Measurements.Add("Straight Edge length min (area)", Math.Round(relationMinDistEdge, 2).ToString());
-            settings.Measurements.Add("Straight Edge length total (area)", Math.Round(relationTotalDist, 2).ToString());
-
-            settings.Measurements.Add("Straight Edge length average", Math.Round(averageDistEdge, 2).ToString());
-            settings.Measurements.Add("Straight Edge length variance", Math.Round(varianceDistEdge, 2).ToString());
-            settings.Measurements.Add("Straight Edge length standard deviation", Math.Round(standardDeviation, 2).ToString());
+            EdgesMeasurements edgesMeasurements = new EdgesMeasurements(maxDistEdge, minDistEdge, totalDist, relationMaxDistEdge, relationMinDistEdge, relationTotalDist, averageDistEdge, varianceDistEdge, standardDeviation);
+            return edgesMeasurements;
         }
 
         /// <summary>
         /// calculates measurement for the area
         /// </summary>
-        public void MeasurementsArea()
+        private float MeasurementsArea()
         {
-            float area = height * width;
-            settings.Measurements.Add("Area (Plane)", area.ToString());
+            return height * width;
         }
 
         /// <summary>
@@ -285,7 +352,7 @@ namespace SEE
         /// </summary>
         /// <param name="nodes">all nodes</param>
         /// <returns>the overlapping amount</returns>
-        private int OverlappingGameNodes(ICollection<GameNode> layoutNodes)
+        private int CalcOverlappingGameNodes()
         {
             int overlapAmount = 0;
 
