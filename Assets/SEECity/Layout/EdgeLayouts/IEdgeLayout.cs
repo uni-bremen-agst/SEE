@@ -51,7 +51,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="nodes">list of nodes whose greatest and smallest y co-ordinate is required</param>
         /// <param name="minY">smallest y co-ordinate</param>
-        /// <param name="maxY">highest x co-ordinate</param>
+        /// <param name="maxY">largest y co-ordinate</param>
         /// <param name="maxHeight">maximal height of nodes</param>
         protected void MinMaxBlockY(ICollection<ILayoutNode> nodes, out float minY, out float maxY, out float maxHeight)
         {
@@ -60,21 +60,54 @@ namespace SEE.Layout
             maxHeight = 0.0f;
             foreach (ILayoutNode node in nodes)
             {
-                float y = node.Roof.y;
-                if (y > maxY)
+                float cy = node.CenterPosition.y;
+                float height = node.Scale.y;
                 {
-                    maxY = y;
+                    float roof = cy + height / 2.0f;
+                    if (roof > maxY)
+                    {
+                        maxY = roof;
+                    }
                 }
-                else if (y < minY)
                 {
-                    minY = y;
-                }
-                float h = node.Scale.y;
-                if (h > maxHeight)
+                    float ground = cy - height / 2.0f;
+                    if (ground < minY)
+                    {
+                        minY = ground;
+                    }
+                }                
+                if (height > maxHeight)
                 {
-                    maxHeight = h;
+                    maxHeight = height;
                 }
             }
+        }
+
+        /// <summary>
+        /// Simplifies the given polyline. This function uses the Ramer–Douglas–Peucker
+        /// (RDP) algorithm to identify and remove points whose distances fall below
+        /// <paramref name="epsilon"/> (with respect to the line drawn between their
+        /// neighbors). The greater <paramref name="epsilon"/> is, the more aggressively
+        /// points are removed (note: values greater than one are fine). A positive value 
+        /// close to zero results in a line with little to no reduction. A negative value 
+        /// is treated as 0. A value of zero has no effect.
+        ///
+        /// Precondition: <paramref name="polyLine"/> is not null.
+        /// Postcondition: The lenght of the returned array is less than or equal to the
+        /// lenght of <paramref name="polyLine"/>.
+        /// </summary>
+        /// <param name="polyLine">The polyline to simplify.</param>
+        /// <param name="epsilon">Used to evaluate which points should be removed from
+        /// <paramref name="polyLine"/>. Values less than 0 are mapped to 0.</param>
+        /// <returns>A similar polyline with the same amount or fewer points.</returns>
+        protected Vector3[] Simplify(Vector3[] polyLine, float epsilon)
+        {
+            epsilon = Mathf.Max(0, epsilon);
+            // Unity already includes a suitable implemantation of the rdp algroithm.
+            List<Vector3> list = new List<Vector3>(polyLine.Length);
+            list.AddRange(polyLine);
+            LineUtility.Simplify(list, epsilon, list);
+            return list.ToArray();
         }
     }
 }
