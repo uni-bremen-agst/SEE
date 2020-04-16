@@ -67,7 +67,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="node">an inner node to be lifted</param>
         /// <returns>lift for an innner node</returns>
-        protected float LevelLift(ILayoutNode node)
+        protected static float LevelLift(ILayoutNode node)
         {
             return node.Level * levelIncreaseForInnerNodes;
         }

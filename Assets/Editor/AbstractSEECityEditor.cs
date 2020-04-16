@@ -77,6 +77,11 @@ namespace SEEEditor
             city.EdgeLayout = (SEECity.EdgeLayouts)EditorGUILayout.EnumPopup("Edge layout", city.EdgeLayout);
             city.EdgeWidth = EditorGUILayout.FloatField("Edge width", city.EdgeWidth);
             city.EdgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", city.EdgesAboveBlocks);
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Bundling tension");
+            city.Tension = EditorGUILayout.Slider(city.Tension, 0.0f, 1.0f);
+            EditorGUILayout.EndHorizontal();
+            city.RDP = EditorGUILayout.FloatField("RDP", city.RDP);
 
             if (city.NodeLayout == AbstractSEECity.NodeLayouts.CompoundSpringEmbedder)
             {

@@ -305,7 +305,7 @@ namespace SEE.Game
             CompoundSpringEmbedder,
             EvoStreets,
             Balloon,
-            FlatRectanglePacking,
+            RectanglePacking,
             Treemap,
             CirclePacking,
             Manhattan,
@@ -354,6 +354,27 @@ namespace SEE.Game
         /// if true, the edges are drawn above the houses;
         /// </summary>
         public bool EdgesAboveBlocks = true; // serialized by Unity
+
+        /// <summary>
+        /// Determines the strength of the tension for bundling edges. This value may
+        /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
+        /// 0.85 is the value recommended by Holten
+        /// </summary>
+        [Tooltip("Tension for bundling edges: 0 means no bundling at all; the maximal value"
+            + " of 1 means maximal bundling. Recommended value: 0.85.")]
+        public float Tension = 0.85f; // serialized by Unity
+
+        /// <summary>
+        /// Determines to which extent the polylines of the generated splines are
+        /// simplified. Range: [0.0, inf] (0.0 means no simplification). More precisely,
+        /// stores the epsilon parameter of the Ramer–Douglas–Peucker algorithm which
+        /// is used to identify and remove points based on their distances to the line
+        /// drawn between their neighbors.
+        /// </summary>
+        [Tooltip("Tolerance for spline simplification (Ramer–Douglas–Peucker algorithm):"
+            + " line points whose distances fall below that threshold are merged. A value <= 0 means "
+            + " no simplification. Recommended value: 0.05." )]
+        public float RDP = 0.05f;
 
         /// <summary>
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.

@@ -216,7 +216,7 @@ namespace SEE.Layout.RectanglePacking
                 gameObjects.Add(new MyGameNode(initialSize, i));
             }
 
-            RectanglePacker packer = new RectanglePacker(0.0f, 1.0f);
+            RectanglePackingNodeLayout packer = new RectanglePackingNodeLayout(0.0f, 1.0f);
 
             Dictionary<ILayoutNode, NodeTransform> layout = packer.Layout(gameObjects);
         }
