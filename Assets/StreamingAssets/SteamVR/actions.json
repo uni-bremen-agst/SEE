@@ -1,19 +1,19 @@
 {
   "actions": [
     {
-      "name": "/actions/default/in/InteractUI",
+      "name": "/actions/default/in/GrabPinch1",
       "type": "boolean"
     },
     {
-      "name": "/actions/default/in/Teleport",
+      "name": "/actions/default/in/GrabPinch2",
       "type": "boolean"
     },
     {
-      "name": "/actions/default/in/GrabPinch",
+      "name": "/actions/default/in/GrabGrip1",
       "type": "boolean"
     },
     {
-      "name": "/actions/default/in/GrabGrip",
+      "name": "/actions/default/in/GrabGrip2",
       "type": "boolean"
     },
     {
@@ -31,7 +31,12 @@
       "skeleton": "/skeleton/hand/right"
     },
     {
-      "name": "/actions/default/in/Squeeze",
+      "name": "/actions/default/in/Squeeze1",
+      "type": "vector1",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/default/in/Squeeze2",
       "type": "vector1",
       "requirement": "optional"
     },
@@ -41,32 +46,16 @@
       "requirement": "optional"
     },
     {
-      "name": "/actions/default/out/Haptic",
-      "type": "vibration"
-    },
-    {
-      "name": "/actions/platformer/in/Move",
-      "type": "vector2"
-    },
-    {
-      "name": "/actions/platformer/in/Jump",
-      "type": "boolean"
-    },
-    {
-      "name": "/actions/buggy/in/Steering",
-      "type": "vector2"
-    },
-    {
-      "name": "/actions/buggy/in/Throttle",
+      "name": "/actions/default/in/Throttle",
       "type": "vector1"
     },
     {
-      "name": "/actions/buggy/in/Brake",
-      "type": "boolean"
+      "name": "/actions/default/in/Trigger",
+      "type": "vector1"
     },
     {
-      "name": "/actions/buggy/in/Reset",
-      "type": "boolean"
+      "name": "/actions/default/out/Haptic",
+      "type": "vibration"
     },
     {
       "name": "/actions/mixedreality/in/ExternalCamera",
@@ -77,15 +66,7 @@
   "action_sets": [
     {
       "name": "/actions/default",
-      "usage": "single"
-    },
-    {
-      "name": "/actions/platformer",
-      "usage": "single"
-    },
-    {
-      "name": "/actions/buggy",
-      "usage": "single"
+      "usage": "leftright"
     },
     {
       "name": "/actions/mixedreality",
@@ -133,16 +114,19 @@
   "localization": [
     {
       "language_tag": "en_US",
-      "/actions/default/in/GrabGrip": "Grab Grip",
-      "/actions/default/in/GrabPinch": "Grab Pinch",
+      "/actions/default/in/GrabGrip1": "Grab Grip1",
+      "/actions/default/in/GrabGrip2": "Grab Grip2",
+      "/actions/default/in/GrabPinch1": "Grab Pinch1",
+      "/actions/default/in/GrabPinch2": "Grab Pinch2",
+      "/actions/default/in/Squeeze1": "Squeeze1",
+      "/actions/default/in/Squeeze2": "Squeeze2",
       "/actions/default/in/HeadsetOnHead": "Headset on head (proximity sensor)",
-      "/actions/default/in/InteractUI": "Interact With UI",
       "/actions/default/in/Pose": "Pose",
       "/actions/default/in/SkeletonLeftHand": "Skeleton (Left)",
       "/actions/default/in/SkeletonRightHand": "Skeleton (Right)",
-      "/actions/default/in/Teleport": "Teleport",
       "/actions/default/out/Haptic": "Haptic",
-      "/actions/platformer/in/Jump": "Jump"
+      "/actions/default/in/Throttle": "Throttle",
+      "/actions/default/in/Trigger": "Trigger"
     }
   ]
 }
