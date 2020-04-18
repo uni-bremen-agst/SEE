@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine;
 
 namespace SEE.Controls
 {
@@ -31,7 +28,7 @@ namespace SEE.Controls
 
         public override void CheckInput()
         {
-            if(Input.GetKey(KeyCode.W))
+            if (Input.GetKey(KeyCode.W))
             {
                 OnWKey.Invoke();
             }
