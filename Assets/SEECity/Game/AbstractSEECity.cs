@@ -25,7 +25,7 @@ namespace SEE.Game
         /// constructor. That is why we need to defer its definition to the 
         /// SEECityEditor.
         /// </summary>        
-        public string PathPrefix = null; // serialized by Unity
+        public string PathPrefix; // serialized by Unity
 
         /// <summary>
         /// The center origin where the graph should be placed in the world scene.
