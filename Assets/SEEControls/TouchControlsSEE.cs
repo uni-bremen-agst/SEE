@@ -56,6 +56,31 @@ public class TouchControlsSEE : MonoBehaviour
 
     private Camera mainCamera;
 
+    //-----   Development Debug     --------
+    void OnGUI()
+    {
+        GUILayout.BeginVertical();
+        var lab = new GUIStyle();
+        lab.fontStyle = FontStyle.Bold;
+        lab.normal.textColor = Color.red;
+        //GUILayout.Label("Released: " + Released, lab);
+        //GUILayout.Label("AnalogicStartPosition: " + AnalogicStartPosition, lab);
+        GUILayout.Label("Touchs: " + Input.touchCount, lab);
+        for (int i = 0; i < Input.touchCount; i++)
+        {
+            GUILayout.Label("Touch: " + Input.GetTouch(i), lab);
+            GUILayout.Label("   Id: " + i);
+            GUILayout.Label("   fingerId: " + Input.GetTouch(i).fingerId);
+            GUILayout.Label("   hash: " + Input.GetTouch(i).GetHashCode(), lab);
+            GUILayout.Label("   phase: " + Input.GetTouch(i).phase, lab);
+            GUILayout.Label("   position: " + Input.GetTouch(i).position, lab);
+            GUILayout.Label("   hash: " + Input.GetTouch(i).GetHashCode(), lab);
+
+        }
+
+        GUILayout.EndVertical();
+    }
+
     void Start()
     {
         if (Rig == null)
