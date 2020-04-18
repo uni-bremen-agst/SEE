@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Controls
 {
@@ -65,7 +64,7 @@ namespace SEE.Controls
 
                 if (selectedObject != null)
                 {
-                    Debug.LogFormat("hit point at {0}\n", hitInfo.point);
+                    //Debug.LogFormat("hit point at {0}\n", hitInfo.point);
                     line.SetPosition(1, hitInfo.point);
                     line.material.color = colorOnHit;
                 }
@@ -92,7 +91,6 @@ namespace SEE.Controls
         internal void SetCamera(Camera camera)
         {
             mainCamera = camera;
-            Debug.LogFormat("SelectionAction camera={0}\n", camera.name);
         }
 
         private GameObject Select(out RaycastHit hitInfo)
@@ -106,8 +104,8 @@ namespace SEE.Controls
             else
             {                
                 Ray ray = mainCamera.ScreenPointToRay(direction);
-                Debug.LogFormat("2d direction={0} at origin {1} and direction {2} camera {3}\n", direction, ray.origin, ray.direction, mainCamera.transform.position);
-                Debug.DrawRay(ray.origin, ray.direction * 10000, Color.yellow);
+                //Debug.LogFormat("2d direction={0} at origin {1} and direction {2} camera {3}\n", direction, ray.origin, ray.direction, mainCamera.transform.position);
+                //Debug.DrawRay(ray.origin, ray.direction * 10000, Color.yellow);
                 hit = Physics.Raycast(ray, out hitInfo);
             }
             if (hit)
