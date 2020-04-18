@@ -34,23 +34,23 @@ public class SelectBuilding : MonoBehaviour
         hitInfo = new RaycastHit();
         hit = Physics.Raycast(direction.position, direction.TransformDirection(Vector3.down), out hitInfo, Mathf.Infinity);
 
-            line.SetPosition(0, direction.position);
-            line.SetPosition(1, direction.position);
+        line.SetPosition(0, direction.position);
+        line.SetPosition(1, direction.position);
 
-            if (hit && hitInfo.collider.gameObject.CompareTag("Building"))
-            {
-                line.SetPosition(1, hitInfo.point);
-                line.material.color = colorOnHit;
-                currentName = hitInfo.collider.gameObject.name;
-            }
-            else
-            {
-                currentName = "";
-                line.material.color = defaultColor;
-            }
+        if (hit && hitInfo.collider.gameObject.CompareTag("Building"))
+        {
+            line.SetPosition(1, hitInfo.point);
+            line.material.color = colorOnHit;
+            currentName = hitInfo.collider.gameObject.name;
+        }
+        else
+        {
+            currentName = "";
+            line.material.color = defaultColor;
+        }
 
-            if (!lockBuilding)
-                text.text = currentName;
+        if (!lockBuilding)
+            text.text = currentName;
     }
 
     //private void OnCollisionEnter(Collision collision)
