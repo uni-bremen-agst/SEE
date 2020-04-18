@@ -1,36 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Serialization;
-using UnityEngine.Events;
 
 namespace SEE.Controls
 {
-    /// <summary>
-    /// This event is called when a button is pressed.
-    /// </summary>
-    [System.Serializable]
-    public class ButtonEvent : UnityEvent
-    {
-
-    }
-
-    /// <summary>
-    /// This event is called when an input produces an axis value.
-    /// </summary>
-    [System.Serializable]
-    public class AxisEvent :UnityEvent<float>
-    {
-
-    }
-
-    /// <summary>
-    /// This event is used when the function needs the axis value and the direction.
-    /// </summary>
-    [System.Serializable]
-    public class VectorEvent : UnityEvent<Vector3,float>
-    {
-
-    }
-
     /// <summary>
     /// This class maps functions from other scripts in the editor to the controller events.
     /// It is the central point for processing controller input.
@@ -86,8 +58,8 @@ namespace SEE.Controls
         void Update()
         {
             //ShowInput();
-            float LeftTriggerAxis = Input.GetAxis("LeftVRTrigger");
-            float RightTriggerAxis = Input.GetAxis("RightVRTriggerMovement");
+            float LeftTriggerAxis = UnityEngine.Input.GetAxis("LeftVRTrigger");
+            float RightTriggerAxis = UnityEngine.Input.GetAxis("RightVRTriggerMovement");
 
             //Debug.LogFormat("LeftTriggerAxis={0} RightTriggerAxis={1}\n", LeftTriggerAxis, RightTriggerAxis);
 
@@ -170,7 +142,7 @@ namespace SEE.Controls
 
         private void ShowInput(string inputName)
         {
-            Debug.LogFormat("input {0} = {1}\n", inputName, Input.GetAxis(inputName));
+            Debug.LogFormat("input {0} = {1}\n", inputName, UnityEngine.Input.GetAxis(inputName));
         }
 
 
