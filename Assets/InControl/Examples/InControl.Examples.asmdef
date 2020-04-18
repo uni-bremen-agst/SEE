@@ -1,0 +1,10 @@
+{
+    "name": "InControl.Examples",
+    "references": [
+        "InControl"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}
