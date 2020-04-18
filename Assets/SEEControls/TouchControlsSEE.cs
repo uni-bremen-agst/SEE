@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -7,11 +6,12 @@ using TinySpline;
 
 public class TouchControlsSEE : MonoBehaviour
 {
-    //basic movement stats
+    [Tooltip("The camera rig to be moved.")]
     public GameObject Rig;
+
     public float ZoomFactor = 50;
     public float SpeedFactor = 25;
-    public float movementEnv = 50;
+    public float MovementEnv = 50;
 
     //the mode avoids triggering actions with less fingers after lifting them from the screen
     private int mode = 0;
@@ -46,42 +46,54 @@ public class TouchControlsSEE : MonoBehaviour
     private float time = 0.0f;
     private Vector4[] locations = new Vector4[3];
 
-    //locks all actions for the time of camera auto movement
-    private bool Lock = false;
+    /// <summary>
+    /// Whether all actions for the time of camera auto movement are to be locked.
+    /// </summary>
+    private bool lockActions = false;
 
     //holds if the UI was touched last frame
     private bool UITouch = false;
 
+    private Camera mainCamera;
+
     void Start()
     {
+        if (Rig == null)
+        {
+            Debug.LogError("No camera rig has been assigned for the touch controller.\n");
+        }
+        else
+        {
+            mainCamera = Rig.GetComponent<Camera>();
+        }
         transObject = new GameObject();
         lookAtObject = new GameObject();
         target = GameObject.Find("Plane").transform;
         Rig.transform.LookAt(target);
 
-        if(OnTargetChanged == null)
+        if (OnTargetChanged == null)
         {
             OnTargetChanged = new UnityEvent();
         }
-
     }
 
     void Update()
     {
         //for tiny spline implementation
         time += Time.deltaTime;
-
-        //choose object as target
-        if (!Lock && Input.touchCount > 0)
+     
+        if (!lockActions && Input.touchCount > 0)
         {
             if (Input.touchCount == 1 && !UiIsTouched())
             {
+                // One finger touches, but not any UI element.
+                // => We select an element.
                 if (Input.GetTouch(0).phase == TouchPhase.Began)
                 {
                     mode = 1;
                 }
 
-                Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+                Ray ray = mainCamera.ScreenPointToRay(Input.GetTouch(0).position);
                 hit = Physics.Raycast(ray, out hitInfo, Mathf.Infinity);
 
                 if (hit && Input.GetTouch(0).phase == TouchPhase.Ended && mode == 1)
@@ -92,12 +104,15 @@ public class TouchControlsSEE : MonoBehaviour
             //zooming into target
             else if (Input.touchCount == 2)
             {
+                // Two fingers touch. 
                 if (Input.GetTouch(1).phase == TouchPhase.Began)
                 {
                     mode = 2;
                     distance = Vector2.Distance(Input.GetTouch(0).position, Input.GetTouch(1).position);
                 }
-                else if (Input.GetTouch(0).phase == TouchPhase.Moved || Input.GetTouch(1).phase == TouchPhase.Moved && mode == 2)
+                else if (Input.GetTouch(0).phase == TouchPhase.Moved 
+                         || Input.GetTouch(1).phase == TouchPhase.Moved 
+                         && mode == 2)
                 {
                     distanceDelta = Vector2.Distance(Input.GetTouch(0).position, Input.GetTouch(1).position) - distance;
                     distance = Vector2.Distance(Input.GetTouch(0).position, Input.GetTouch(1).position);
@@ -119,7 +134,7 @@ public class TouchControlsSEE : MonoBehaviour
                 }
                 else if (Input.GetTouch(2).phase == TouchPhase.Moved && mode == 3)
                 {
-                    float distanceFactor = Vector3.Distance(Rig.transform.position, target.position) / movementEnv;
+                    float distanceFactor = Vector3.Distance(Rig.transform.position, target.position) / MovementEnv;
 
                     GameObject PositionAhead = new GameObject();
                     PositionAhead.transform.position = Rig.transform.position;
@@ -147,19 +162,19 @@ public class TouchControlsSEE : MonoBehaviour
             UITouch = EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId);
         }
         
-        if(Lock && Rig.transform.position != transObject.transform.position)
+        if (lockActions && Rig.transform.position != transObject.transform.position)
         {
             MoveToTarget();
         }
         else
         {
-            Lock = false;
+            lockActions = false;
             if (TwoStepMove)
             {
                 SetOffset();
                 timeCount = 0;
                 TwoStepMove = false;
-                Lock = true;
+                lockActions = true;
             }
         }
     }
@@ -213,20 +228,17 @@ public class TouchControlsSEE : MonoBehaviour
 
     private bool UiIsTouched()
     {
-        if (!EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId) && !UITouch)
-            return false;
-        else
-            return true;
+        return EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId) && !UITouch;
     }
 
-    public void SetTarget(Transform obj)
+    public void SetTarget(Transform newTarget)
     {
         lastTarget = target;
-        target = obj;
+        target = newTarget;
         SetOffset();
         startPos = Rig.transform;
         timeCount = 0;
-        Lock = true;
+        lockActions = true;
         OnTargetChanged.Invoke();
     }
 
