@@ -46,7 +46,7 @@ public class InteractionBehaviorEditor : Editor
 
     private void OnEnable()
     {
-        targetScript = (InteractionBehavior)target;
+        targetScript = target as InteractionBehavior;
         SMappings = serializedObject.FindProperty("mappings");
         SCurrentMapping = serializedObject.FindProperty("CurrentMapping");
     }
@@ -55,13 +55,14 @@ public class InteractionBehaviorEditor : Editor
     {
         serializedObject.Update();
 
-        //shows current mapping in inspector
+        // Shows current mapping in inspector.
         GUILayout.Space(10f);
         GUILayout.BeginHorizontal();
-        GUILayout.Label("Active mapping:", EditorStyles.boldLabel);
-        GUILayout.Label(targetScript.GetActive().GetName());
+        GUILayout.Label("Active mapping:", EditorStyles.boldLabel);         
+        ActionMapping activeMapping = targetScript.GetActive();
+        GUILayout.Label(activeMapping != null ? activeMapping.Name : "");
         GUILayout.Label("Mapping type:", EditorStyles.boldLabel);
-        GUILayout.Label(targetScript.GetActive().GetTypeAsString());
+        GUILayout.Label(activeMapping != null ? activeMapping.GetTypeAsString() : "");
         GUILayout.EndHorizontal();
         GUILayout.Space(10f);
 
@@ -72,21 +73,22 @@ public class InteractionBehaviorEditor : Editor
             ActionMapping actionMapping = targetScript.GetMapping(i);
             if (actionMapping != null)
             {
-                string mappingName = actionMapping.GetName();
-                if (string.IsNullOrEmpty(mappingName))
+                // Name and type of mapping
+                GUILayout.BeginHorizontal();
+                string mappingName = actionMapping.Name;
+                string newName = EditorGUILayout.TextField(mappingName);
+                if (mappingName != newName)
                 {
-                    Debug.LogErrorFormat("Mapping at index {0} does not have a name. Please assign one.\n", i);
-                    mappingName = "";
+                    actionMapping.Name = newName;
                 }
-                EditorGUILayout.PropertyField(SMappings.GetArrayElementAtIndex(i),
-                                              new GUIContent(mappingName));
+                EditorGUILayout.PropertyField(SMappings.GetArrayElementAtIndex(i), GUIContent.none);
+                GUILayout.EndHorizontal();
 
+                // Activate and Delete buttons
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Activate"))
                 {
-                    Debug.LogFormat("InteractionBehaviorEditor: index of selected mapping: {0}\n", i);
                     targetScript.SetActive(i);
-                    Debug.LogFormat("InteractionBehaviorEditor: selected mapping: {0}\n", SCurrentMapping);
                 }
                 if (GUILayout.Button("Delete"))
                 {
@@ -108,7 +110,7 @@ public class InteractionBehaviorEditor : Editor
 
         GUILayout.BeginHorizontal();
         SelectedType = (INPUTTYPE)EditorGUILayout.EnumPopup("Type of Set:", SelectedType);
-        if (GUILayout.Button("Add new Set"))
+        if (GUILayout.Button("Add New Set"))
         {
             InstantiateNewMapping(SelectedType);
         }
@@ -137,7 +139,7 @@ public class InteractionBehaviorEditor : Editor
         switch (type)
         {
             case INPUTTYPE.Empty:
-                Debug.Log("Empty type cannot be instantiated.");
+                Debug.LogWarning("Empty type cannot be instantiated.\n");
                 return;
             case INPUTTYPE.Keys:
                 NewMapping = ScriptableObject.CreateInstance<KeyActionMapping>();
