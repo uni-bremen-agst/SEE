@@ -157,7 +157,13 @@ namespace SEE.Layout
             if (sourceGraph == targetGraph)
             {
                 newEdge.IsInterGraph = false;
-                return sourceGraph.Add(newEdge, cSource, cTarget);
+                newEdge = sourceGraph.Add(newEdge, cSource, cTarget);
+
+                if (newEdge.Source == null || newEdge.Target == null)
+                {
+                    Debug.Log("stop");
+                }
+                return newEdge;
             }
             else
             {
@@ -183,8 +189,15 @@ namespace SEE.Layout
                 }
                 newEdge.Source.Edges.Add(newEdge);
                 newEdge.Target.Edges.Add(newEdge);
+
+                if (newEdge.Source == null || newEdge.Target == null)
+                {
+                    Debug.Log("stop");
+                }
                 return newEdge;
             }
+
+            
         }
 
         /// <summary>
@@ -391,7 +404,32 @@ namespace SEE.Layout
 
             lastM.Layout.GraphManager = lastM;
 
+            this.AddEdges(lastM, newM);
+
             return newM;
+        }
+
+        private void AddEdges(CoseGraphManager lastM, CoseGraphManager newM)
+        {
+            foreach(CoseEdge edge in lastM.GetAllEdges())
+            {
+                if (edge.IsInterGraph || edge.Source.Child != null || edge.Target != null)
+                {
+                    if (!edge.Source.LayoutValues.Next.GetNeighborsList().Contains(edge.Target.LayoutValues.Next))
+                    {
+                        newM.Add(new CoseEdge(null, null), edge.Source.LayoutValues.Next, edge.Target.LayoutValues.Next);
+                    }
+                } else
+                {
+                    if (edge.Source.LayoutValues.Next != edge.Target.LayoutValues.Next)
+                    {
+                        if (!edge.Source.LayoutValues.Next.GetNeighborsList().Contains(edge.Target.LayoutValues.Next))
+                        {
+                            newM.Add(new CoseEdge(null, null), edge.Source.LayoutValues.Next, edge.Target.LayoutValues.Next);
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>

@@ -290,7 +290,7 @@ namespace SEE
                 }
             }
 
-            var areaLength = height + width;
+            var areaLength = (height + width) / 2;
             relationMaxDistEdge = maxDistEdge / areaLength;
             relationMinDistEdge = minDistEdge / areaLength;
             relationTotalDist = totalDist / areaLength;

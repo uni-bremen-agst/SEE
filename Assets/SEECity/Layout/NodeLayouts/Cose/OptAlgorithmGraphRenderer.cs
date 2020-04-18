@@ -31,7 +31,7 @@ namespace SEE.Layout
         Dictionary<ILayoutNode, Vector3> mapGameObjectOriginalSize = new Dictionary<ILayoutNode, Vector3>();
 
         int maxNumberOfGraphs = 500;
-        int totalNumberOfGraphs = 7;
+        int totalNumberOfGraphs = 151;
 
         int CountLeafNodes = -1;
         int CountInnerNodes = -1;
@@ -361,11 +361,11 @@ namespace SEE.Layout
         private Graph CreateRandomCity()
         {
             // 1, 301, Random.Range(1, 30), Random.Range(0.001f, 0.021f)
-            Constraint LeafConstraint = new Tools.Constraint("Class", Random.Range(1, 100), "calls", Random.Range(0.001f, 0.021f));
+            Constraint LeafConstraint = new Tools.Constraint("Class", Random.Range(1, 50), "calls", Random.Range(0.001f, 0.021f));
             // 1, 101, Random.Range(1, 5)
-            Constraint InnerNodeConstraint = new Tools.Constraint("Package", Random.Range(1, 20), "uses", 0f);
+            Constraint InnerNodeConstraint = new Tools.Constraint("Package", Random.Range(1, 10), "uses", 0f);
             SEECityRandom.DefaultAttributeMean = 10;
-            SEECityRandom.DefaultAttributeStandardDerivation = 1000;
+            SEECityRandom.DefaultAttributeStandardDerivation = 3;
             List<RandomAttributeDescriptor> LeafAttributes = SEECityRandom.Defaults();
 
             CountLeafNodes = LeafConstraint.NodeNumber;

@@ -199,7 +199,6 @@ namespace SEE.Game
             Performance p;
             if (settings.NodeLayout.GetModel().CanApplySublayouts)
             {
-
                 ICollection<SublayoutNode>  sublayoutNodes = AddInnerNodesForSublayouts(nodeMap, nodes);
                 gameNodes = nodeMap.Values;
                 layoutNodes = ToLayoutNodes(nodeMap, sublayoutNodes);

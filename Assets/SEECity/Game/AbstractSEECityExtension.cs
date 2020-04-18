@@ -74,6 +74,12 @@ namespace SEE.Game
         public static List<NodeLayouts> GetPossibleSublayouts(this NodeLayouts nodeLayout)
         {
             List<NodeLayouts> values = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().ToList();
+
+            if (nodeLayout == NodeLayouts.EvoStreets)
+            {
+                return values.Where(layout => !layout.GetModel().IsCircular).ToList();
+            }
+
             return values; //nodeLayout.IsCircular() ? values.Where(layout => layout.IsCircular()).ToList() : values.Where(layout => !layout.IsCircular()).ToList();
         }
 
