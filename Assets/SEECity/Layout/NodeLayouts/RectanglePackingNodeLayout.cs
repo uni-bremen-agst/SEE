@@ -419,7 +419,7 @@ namespace SEE.Layout
 
         public override bool UsesEdgesAndSublayoutNodes()
         {
-            throw new System.NotImplementedException();
+            return false; 
         }
     }
 }

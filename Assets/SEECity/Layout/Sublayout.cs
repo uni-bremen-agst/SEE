@@ -188,57 +188,63 @@ namespace SEE.Layout
 
             if (!sublayout.NodeLayout.GetModel().InnerNodesEncloseLeafNodes)
             {
-                double left = Mathf.Infinity;
-                double right = Mathf.NegativeInfinity;
-                double top = Mathf.Infinity;
-                double bottom = Mathf.NegativeInfinity;
-                double nodeLeft;
-                double nodeRight;
-                double nodeTop;
-                double nodeBottom;
+                Vector2 leftLowerCorner = new Vector2(Mathf.Infinity, Mathf.NegativeInfinity);
+                Vector2 rightUpperCorner = new Vector2(Mathf.NegativeInfinity, Mathf.Infinity);
+
+                Vector2 leftLowerCornerNode;
+                Vector2 rightUpperCornerNode;
 
                 foreach (ILayoutNode layoutNode in sublayoutNodes)
                 {
                     ILayoutNode sublayoutNode = (layoutNode as CoseSublayoutNode).Node;
 
-                    nodeLeft = sublayoutNode.CenterPosition.x - sublayoutNode.Scale.x / 2;
-                    nodeRight = sublayoutNode.CenterPosition.x + sublayoutNode.Scale.x / 2;
-                    nodeTop = sublayoutNode.CenterPosition.z - sublayoutNode.Scale.z / 2;
-                    nodeBottom = sublayoutNode.CenterPosition.z + sublayoutNode.Scale.z / 2;
-
-                    if (left > nodeLeft)
+                    leftLowerCornerNode = new Vector2()
                     {
-                        left = nodeLeft;
+                        x = sublayoutNode.CenterPosition.x - sublayoutNode.Scale.x / 2,
+                        y = sublayoutNode.CenterPosition.z + sublayoutNode.Scale.z / 2,
+                    };
+
+                    rightUpperCornerNode = new Vector2()
+                    {
+                        x = sublayoutNode.CenterPosition.x + sublayoutNode.Scale.x / 2,
+                        y = sublayoutNode.CenterPosition.z - sublayoutNode.Scale.z / 2,
+                    };
+
+
+                    if (leftLowerCorner.x > leftLowerCornerNode.x)
+                    {
+                        leftLowerCorner.x = leftLowerCornerNode.x;
                     }
 
-                    if (right < nodeRight)
+                    if (rightUpperCorner.x < rightUpperCornerNode.x)
                     {
-                        right = nodeRight;
+                        rightUpperCorner.x = rightUpperCornerNode.x;
                     }
 
-                    if (top > nodeTop)
+                    if (rightUpperCorner.y > rightUpperCornerNode.y)
                     {
-                        top = nodeTop;
+                        rightUpperCorner.y = rightUpperCornerNode.y;
                     }
 
-                    if (bottom < nodeBottom)
+                    if (leftLowerCorner.y < leftLowerCornerNode.y)
                     {
-                        bottom = nodeBottom;
+                        leftLowerCorner.y = leftLowerCornerNode.y;
                     }
                 }
 
-                /*double defaultMargin = 0.5;
-                left -= defaultMargin;
-                right += defaultMargin;
-                top -= defaultMargin;
-                bottom += defaultMargin;*/
+                Vector3 scale = new Vector3
+                {
+                    x = rightUpperCorner.x - leftLowerCorner.x,
+                    z = leftLowerCorner.y - rightUpperCorner.y
+                };
 
-                Rect boundingRect = new Rect((float)left, (float)top, (float)(right - left), (float)(bottom - top));
-                Vector3 scale = new Vector3(boundingRect.width, innerNodeHeight, boundingRect.height);
-                Vector3 position = new Vector3(boundingRect.center.x, groundLevel, boundingRect.center.y);
-                // TODO das ist doch falsch so, bzw. jetzt richtig beim anderen noch falsch
+                Vector3 position = new Vector3
+                {
+                    x = leftLowerCorner.x + scale.x / 2,
+                    z = rightUpperCorner.y + scale.z / 2
+                };
 
-                LayoutScale = scale; //new Vector3(sublayout.Node.Scale.x, innerNodeHeight, sublayout.Node.Scale.z);
+                LayoutScale = scale;
 
                 if (!nodeLayout.GetModel().OnlyLeaves)
                 {

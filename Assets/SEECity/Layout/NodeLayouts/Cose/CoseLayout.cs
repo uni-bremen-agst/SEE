@@ -320,8 +320,6 @@ namespace SEE.Layout
         /// </summary>
         private void MultiLevelScaling()
         {
-            Debug.Log("multilevel scaling");
-
             CoseGraphManager gm = graphManager;
             gmList = gm.CoarsenGraph();
 
@@ -340,6 +338,7 @@ namespace SEE.Layout
                 }
 
                 coseLayoutSettings.TotalIterations = 0;
+                coseLayoutSettings.Coolingcycle = 0;
                 coseLayoutSettings.Level--;
             }
             CoseLayoutSettings.Incremental = false;
@@ -352,10 +351,10 @@ namespace SEE.Layout
         {
             foreach (CoseNode node in graphManager.GetAllNodes())
             {
-                node.LayoutValues.Pred1.SetLocation(node.GetLeft(), node.GetTop());
+                node.LayoutValues.Pred1.SetLocation(node.CenterPosition.x, node.CenterPosition.z);
                 if (node.LayoutValues.Pred2 != null)
                 {
-                    node.LayoutValues.Pred2.SetLocation(node.GetLeft() + CoseLayoutSettings.Edge_Length, node.GetTop() + CoseLayoutSettings.Edge_Length);
+                    node.LayoutValues.Pred2.SetLocation(node.CenterPosition.x + CoseLayoutSettings.Edge_Length, node.CenterPosition.z + CoseLayoutSettings.Edge_Length);
                 }
             }
         }
@@ -439,12 +438,8 @@ namespace SEE.Layout
                         break;
                     }
                     coseLayoutSettings.Coolingcycle++;
-                    //CoolingFactor = initialCoolingFactor * ((maxIterations - totalIterations) / maxIterations);
-                    // TODO
                     // based on www.btluke.com/simanf1.html, schedule 3
-                    
                     coseLayoutSettings.CoolingFactor = Mathf.Max(coseLayoutSettings.InitialCoolingFactor - Mathf.Pow(coseLayoutSettings.Coolingcycle, Mathf.Log(100 * (coseLayoutSettings.InitialCoolingFactor - coseLayoutSettings.FinalTemperature)) / Mathf.Log(coseLayoutSettings.MaxCoolingCycle)) / 100 * CoseLayoutSettings.Cooling_Adjuster, coseLayoutSettings.FinalTemperature);
-                    //Debug.Log("cooling: " + coseLayoutSettings.CoolingFactor);
                 }
 
                 coseLayoutSettings.TotalDisplacement = 0;
@@ -938,7 +933,7 @@ namespace SEE.Layout
                     lcaDepth = edge.LowestCommonAncestor.GetInclusionTreeDepth();
 
                     // von depth zu level geändert
-                    edge.IdealEdgeLength += CoseLayoutSettings.Edge_Length * CoseLayoutSettings.Per_Level_Ideal_Edge_Length_Factor * (source.NodeObject.Level + target.NodeObject.Level - 2 * lcaDepth);
+                    edge.IdealEdgeLength += CoseLayoutSettings.Edge_Length * CoseLayoutSettings.Per_Level_Ideal_Edge_Length_Factor * (source.InclusionTreeDepth + target.InclusionTreeDepth - 2 * lcaDepth);
                 }
                 else
                 {
