@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine;
 
 namespace SEE.Controls
 {
@@ -27,7 +24,8 @@ namespace SEE.Controls
 
         public override void CheckInput()
         {
-            if(Input.GetButton("ViveLeftTrigger"))
+            base.CheckInput();
+            if (Input.GetButton("ViveLeftTrigger"))
             {
                 OnLeftTrigger.Invoke();
             }
@@ -48,7 +46,6 @@ namespace SEE.Controls
             {
                 OnRightTriggerAxis.Invoke(RightTriggerAxis);
             }
-
         }
 
         public override string GetTypeAsString()
