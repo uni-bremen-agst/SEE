@@ -142,14 +142,7 @@ public class LeapMovementSEE : MonoBehaviour
 
     bool TwoThumbsToIndex(Hand right, Hand left)
     {
-        if (left.PinchDistance < 20f && right.PinchDistance < 20f)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return left.PinchDistance < 20f && right.PinchDistance < 20f;
     }
 
     bool fist(Hand hand)
