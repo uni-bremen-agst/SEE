@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class TouchStickSEE : MonoBehaviour
 {
@@ -12,7 +10,6 @@ public class TouchStickSEE : MonoBehaviour
         collider = GetComponent<Collider2D>();
         oldScreenPos = transform.position;
     }
-
 
     void Update()
     {
