@@ -49,7 +49,7 @@ public class SetEditingWindow : EditorWindow
         }
         else
         {
-            SetName = mapping.GetName();
+            SetName = mapping.Name;
             SetType = GetTypeForClass(mapping);
             SelectedMapping = mapping;
         }
