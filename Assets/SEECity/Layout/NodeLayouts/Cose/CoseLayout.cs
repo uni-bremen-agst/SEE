@@ -77,9 +77,9 @@ namespace SEE.Layout
         /// <summary>
         /// Computes the Layout
         /// </summary>
-        /// <param name="layoutNodes"></param>
-        /// <param name="edges"></param>
-        /// <param name="coseSublayoutNodes"></param>
+        /// <param name="layoutNodes">the nodes to layout</param>
+        /// <param name="edges">the edges of the graph</param>
+        /// <param name="coseSublayoutNodes">the sublayouts</param>
         /// <returns></returns>
         public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> coseSublayoutNodes)
         {
@@ -103,7 +103,7 @@ namespace SEE.Layout
 
             PlaceNodes(root);
 
-            Vector3 relativePositionRootGraph = graphManager.RootGraph.CenterPosition; // set to (0.0)
+            Vector3 relativePositionRootGraph = graphManager.RootGraph.CenterPosition;
             graphManager.RootGraph.CenterPosition = new Vector3(0.0f, groundLevel, 0.0f);
 
             PlacePositionNodes(graphManager.RootGraph, relativePositionRootGraph);
@@ -126,7 +126,6 @@ namespace SEE.Layout
                     {
                         width = graph.Parent.SublayoutValues.Sublayout.RootNodeRealScale.x;
                         height = graph.Parent.SublayoutValues.Sublayout.RootNodeRealScale.z;
-                        // maybe todo
                         position -= graph.Parent.SublayoutValues.Sublayout.LayoutOffset;
 
                     }
@@ -137,7 +136,6 @@ namespace SEE.Layout
                     position.y += LevelLift(graph.Parent.NodeObject);
                 }
 
-                //falls der knoten/ graph teil eines sublayouts war, dann ohne rotation, sonst mit rotation ... frag mich nicht worum
                 bool applyRotation = true;
 
                 foreach(SublayoutLayoutNode node in coseSublayoutNodes)
@@ -192,25 +190,7 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Sets the scale to the CoseNodes
-        /// </summary>
-        /// <param name="gameNodes"></param>
-        private void SetScale(ICollection<ILayoutNode> layoutNodes)
-        {
-            foreach (ILayoutNode layoutNode in layoutNodes)
-            {
-                CoseNode coseNode = nodeToCoseNode[layoutNode];
-
-                if (layoutNode.IsLeaf)
-                {
-                    coseNode.SetWidth(layoutNode.Scale.x);
-                    coseNode.SetHeight(layoutNode.Scale.z);
-                }
-            }
-        }
-
-        /// <summary>
-        /// places the original node objects to the clauclated positions
+        /// places the original node objects to the calculated positions
         /// </summary>
         /// <param name="root"></param>
         private void PlacePositionNodes(CoseGraph root, Vector3 relativePositionRootGraph)
@@ -235,8 +215,7 @@ namespace SEE.Layout
                     float rotation = applyRotation ? node.NodeObject.Rotation : 0.0f;
 
                     Vector3 position = new Vector3(node.CenterPosition.x - relativePositionRootGraph.x, groundLevel, node.CenterPosition.z - relativePositionRootGraph.z);
-                    // TODO Levelshift?
-                    NodeTransform transform = new NodeTransform(position, node.NodeObject.Scale, rotation);//, node.NodeObject.Rotation);
+                    NodeTransform transform = new NodeTransform(position, node.NodeObject.Scale, rotation);
                     layout_result[nNode] = transform;
                 }
 
@@ -260,9 +239,7 @@ namespace SEE.Layout
             {
                 graphManager.UpdateBounds();
             } else
-            {
-                
-
+            { 
                 if (CoseLayoutSettings.Multilevel_Scaling)
                 {
                     // TODO sollte das auch in der Gui dann abgehakt werden?
@@ -292,7 +269,7 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// TODO
+        /// Calculates the number of children of every node 
         /// </summary>
         private void CalcNoOfChildrenForAllNodes()
         {
@@ -833,7 +810,7 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// TODO
+        /// This methode inspects whether the graph has reached to a minima. It returns true if the layout seems to be oscillating as well.
         /// </summary>
         /// <returns></returns>
         private bool IsConverged()
@@ -914,29 +891,7 @@ namespace SEE.Layout
 
                     lcaDepth = edge.LowestCommonAncestor.GetInclusionTreeDepth();
 
-                    // von depth zu level geändert
                     edge.IdealEdgeLength += CoseLayoutSettings.Edge_Length * CoseLayoutSettings.Per_Level_Ideal_Edge_Length_Factor * (source.InclusionTreeDepth + target.InclusionTreeDepth - 2 * lcaDepth);
-                }
-                else
-                {
-                    /*// TODO
-                    // density mit einbeziehen, aber nur in dem Graphen an sich
-
-                    CoseGraph owner = edge.Source.Owner;
-                    int edgeSum = 0;
-
-                    foreach (CoseEdge e in owner.Edges)
-                    {
-                        if (!e.IsInterGraph)
-                        {
-                            edgeSum++;
-                        }
-                    }
-
-                    if (edgeSum > 200)
-                    {
-                        edge.IdealEdgeLength = 300;
-                    }*/
                 }
             }
         }
@@ -966,7 +921,7 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// TODO
+        /// Check whether the node is with one of the given nodes in the same hierarchy
         /// </summary>
         /// <param name="node"></param>
         /// <param name="children"></param>
@@ -997,7 +952,6 @@ namespace SEE.Layout
         {
             graphManager = new CoseGraphManager(this);
 
-            //CreateNode(root, null);
             CoseNode rootNode = NewNode(root);
             CoseGraph rootGraph = graphManager.AddRootGraph();
             rootGraph.GraphObject = root;
