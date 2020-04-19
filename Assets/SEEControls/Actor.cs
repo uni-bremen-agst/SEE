@@ -90,7 +90,7 @@ namespace SEE.Controls
 
         protected void OnLookDirection(Vector3 direction)
         {
-            cameraAction.LookAt(direction);
+            cameraAction.RotateToward(direction);
         }
 
         protected void OnButtonB(bool activated)

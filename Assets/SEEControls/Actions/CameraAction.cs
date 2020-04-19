@@ -9,6 +9,6 @@ namespace SEE.Controls
         public abstract void SetBoost(float boost);
 
         public abstract void Look(bool activated);
-        public abstract void LookAt(Vector3 direction);
+        public abstract void RotateToward(Vector3 direction);
     }
 }

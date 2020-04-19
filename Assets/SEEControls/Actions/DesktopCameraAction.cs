@@ -2,6 +2,9 @@
 
 namespace SEE.Controls
 {
+	/// <summary>
+    /// Moves the camera this component is attached to.
+    /// </summary>			 
     public class DesktopCameraAction : CameraAction
     {
         [Header("Movement Settings")]
@@ -21,7 +24,16 @@ namespace SEE.Controls
         [Tooltip("Whether or not to invert our Y axis for mouse input to rotation.")]
         public bool invertY = false;
 
+        /// <summary>
+        /// If true, we are currently looking around rather than moving.
+        /// </summary>					 				  
         private bool looking;
+        /// <summary>
+        /// If <paramref name="activated"/> is true, we are entering the looking mode,
+        /// in which the mouse cursor is locked and invisible. If <paramref name="activated"/> 
+        /// is false, the mouse cursor is unlocked and visible again.
+        /// </summary>
+        /// <param name="activated">whether the looking mode is activated</param>
         public override void Look(bool activated)
         {
             looking = activated;
@@ -71,25 +83,29 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// The direction of looking with respect to the screen. Only the x and 
+        /// The direction of rotation with respect to the screen. Only the x and 
         /// y co-ordinates count.
         /// </summary>
-        private Vector3 lookDirection;
+        private Vector3 rotationDirection;
         /// <summary>
-        /// Sets the direction of looking with respect to the screen. Only the x and 
+        /// Sets the direction of rotation with respect to the screen. Only the x and 
         /// y co-ordinates count.
         /// </summary>
-        /// <param name="direction">x/y direction of looking </param>
-        public override void LookAt(Vector3 direction)
+        /// <param name="direction">x/y direction of rotation </param>
+        public override void RotateToward(Vector3 direction)
         {
-            //Debug.LogFormat("DesktopCameraAction.LookAt: {0}\n", direction);
-            lookDirection = direction;
+            rotationDirection = direction;
+			Debug.LogFormat("DesktopCameraAction.RotateToward {0}\n", direction);															   
         }
 
+        /// <summary>
+        /// Increases the acceleration of the movement where <paramref name="boost"/>
+        /// is used in an exponential function. It can be any value including
+        /// negative ones. The lower the value, the slower the movement.
+        /// </summary>
+        /// <param name="boost"></param>					 																															
         public override void SetBoost(float boost)
         {
-            // Modify movement by a boost factor (defined in Inspector and modified in 
-            // play mode through the mouse scroll wheel).
             this.boost += boost * 0.2f;
         }
 
@@ -153,7 +169,7 @@ namespace SEE.Controls
             // Rotation
             if (looking)
             {
-                var mouseMovement = new Vector2(lookDirection.x, lookDirection.y * (invertY ? 1 : -1));
+                var mouseMovement = new Vector2(rotationDirection.x, rotationDirection.y * (invertY ? 1 : -1));
 
                 var mouseSensitivityFactor = mouseSensitivityCurve.Evaluate(mouseMovement.magnitude);
 
