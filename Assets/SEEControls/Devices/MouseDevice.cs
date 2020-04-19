@@ -2,6 +2,9 @@
 
 namespace SEE.Controls
 {
+    /// <summary>
+    /// Input from a mouse. Supports trigger, buttonB, pointingDirection, and scroll.
+    /// </summary>
     public class MouseDevice : InputDevice
     {
         private const int MouseButtonA = 0;
