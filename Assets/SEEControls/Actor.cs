@@ -5,10 +5,10 @@ namespace SEE.Controls
 {
     public class Actor : MonoBehaviour
     {
-        [Tooltip("The first device from which to read the input for movement direction, throttle, and button B (looking).")]
+        [Tooltip("The first device from which to read the input for movement direction and throttle.")]
         public InputDevice inputDeviceA;
 
-        [Tooltip("The second device from which to read the input for pointing direction, trigger (speed), .")]
+        [Tooltip("The second device from which to read the input for rotation direction and selection.")]
         public InputDevice inputDeviceB;
 
         [Tooltip("The action applied to move the camera.")]
@@ -25,6 +25,7 @@ namespace SEE.Controls
             }
             else
             {
+                // Device A is used for movements (direction and speed).
                 inputDeviceA.ListenMovemementDirection(OnMoveDirection);
                 inputDeviceA.ListenThrottle(OnThrottle);
                 // inputDeviceA.ListenButtonB(OnButtonB); // not used?
@@ -35,12 +36,13 @@ namespace SEE.Controls
             }
             else
             {
-                inputDeviceB.ListenPointingDirection(OnPointingDirection);
-                inputDeviceB.ListenTrigger(OnTrigger);
-
-                inputDeviceB.ListenMovemementDirection(OnLookDirection);
-                inputDeviceB.ListenButtonB(OnButtonB);
-                inputDeviceB.ListenScroll(OnScroll);
+                // Device B is used for selection:
+                inputDeviceB.ListenPointingDirection(OnPointingDirection); // ray casting
+                inputDeviceB.ListenTrigger(OnTrigger); // selection turned on/off
+                // Device B is used for rotation
+                inputDeviceB.ListenMovemementDirection(OnLookDirection); // FIXME: collision with pointing
+                inputDeviceB.ListenButtonB(OnButtonB); // turn on/off rotation mode
+                inputDeviceB.ListenScroll(OnScroll); // speed boost
                 
             }
             if (cameraAction == null)
