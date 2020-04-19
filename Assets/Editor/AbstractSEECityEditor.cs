@@ -295,7 +295,7 @@ namespace SEEEditor
         }
 
         /// <summary>
-        /// TODO
+        /// Dropdown for the innernode Kinds 
         /// </summary>
         /// <param name="nodeLayout"></param>
         /// <param name="node"></param>

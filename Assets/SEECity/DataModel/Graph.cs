@@ -409,10 +409,10 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// TODO
+        /// Returns all edges of graph whose source and target is contained in selectedNodes.
         /// </summary>
         /// <param name="selectedNodes"></param>
-        /// <returns></returns>
+        /// <returns>all edges of graph whose source and target is contained in selectedNodes</returns>
         public IList<Edge> ConnectingEdges(ICollection<ILayoutNode> selectedNodes)
         {
             IList<Edge> result = new List<Edge>();
@@ -428,11 +428,11 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// TODO
+        /// Returns true if the node with the given linkname is contained in layoutNodes
         /// </summary>
         /// <param name="linkname"></param>
         /// <param name="layoutNodes"></param>
-        /// <returns></returns>
+        /// <returns>true if the node with the given linkname is contained in layoutNodes</returns>
         private bool FilterListForLayoutNode(String linkname, ICollection<ILayoutNode> layoutNodes)
         {
             foreach (ILayoutNode gameNode in layoutNodes)
