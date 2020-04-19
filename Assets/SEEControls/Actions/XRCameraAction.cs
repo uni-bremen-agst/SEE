@@ -26,7 +26,7 @@ namespace SEE.Controls
             // Nothing to be done.
         }
 
-        public override void LookAt(Vector3 direction)
+        public override void RotateToward(Vector3 direction)
         {
             // Nothing to be done.
         }
