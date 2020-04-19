@@ -31,7 +31,7 @@ namespace SEE.Layout
         Dictionary<ILayoutNode, Vector3> mapGameObjectOriginalSize = new Dictionary<ILayoutNode, Vector3>();
 
         int maxNumberOfGraphs = 500;
-        int totalNumberOfGraphs = 151;
+        int totalNumberOfGraphs = 254;
 
         int CountLeafNodes = -1;
         int CountInnerNodes = -1;

@@ -360,7 +360,7 @@ namespace SEE.Layout
             else
             {
                 // TODO auf level umgestellt, schauen was herauskommt
-                return parent.NodeObject.Level;
+                return parent.InclusionTreeDepth;
             }
         }
 

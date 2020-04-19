@@ -13,7 +13,7 @@ namespace SEE.Layout
     public class CoseLayout : NodeLayout
     {
         /// <summary>
-        /// Graphmanager
+        /// the Graphmanager of the layout
         /// </summary>
         private CoseGraphManager graphManager;
 
@@ -25,7 +25,7 @@ namespace SEE.Layout
         /// <summary>
         /// Mapping from Node to CoseNode
         /// </summary>
-        private Dictionary<ILayoutNode, CoseNode> nodeToCoseNode;
+        private readonly Dictionary<ILayoutNode, CoseNode> nodeToCoseNode;
 
         /// <summary>
         /// Layout Settings (idealEdgeLength etc.)
@@ -33,17 +33,12 @@ namespace SEE.Layout
         private CoseLayoutSettings coseLayoutSettings;
 
         /// <summary>
-        /// Grid for smart ideal edge length calculation
+        /// Grid for smart repulsion range calculation
         /// </summary>
         private List<CoseNode>[,] grid;
 
         /// <summary>
-        /// List with sublayouts, choosed by the user
-        /// </summary>
-        private Dictionary<string, NodeLayouts> sublayouts = new Dictionary<string, NodeLayouts>();
-
-        /// <summary>
-        /// TODO
+        /// All sublayouts (choosed by the user via GUI)
         /// </summary>
         private List<SublayoutLayoutNode> sublayoutNodes = new List<SublayoutLayoutNode>();
 
@@ -53,31 +48,17 @@ namespace SEE.Layout
         private List<ILayoutNode> layoutNodes;
 
         /// <summary>
-        /// Indicates Whether the inner nodes are circles
-        /// </summary>
-        private bool innerNodesAreCircles;
-
-        /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
         Dictionary<ILayoutNode, NodeTransform> layout_result;
 
         /// <summary>
-        /// A list with all graph managers (multilevel scaling)
+        /// A list with all graph managers (used for multilevel scaling)
         /// </summary>
         private List<CoseGraphManager> gmList;
 
-        /// <summary>
-        /// the settings for this graph
-        /// </summary>
-        private AbstractSEECity settings;
-
-        private readonly NodeFactory leafNodeFactory;
-
         public CoseGraphManager GraphManager { get => graphManager; set => graphManager = value; }
         public CoseLayoutSettings CoseLayoutSettings { get => coseLayoutSettings; set => coseLayoutSettings = value; }
-        public Dictionary<string, NodeLayouts> Sublayouts { get => sublayouts; set => sublayouts = value; }
-        public bool InnerNodesAreCircles { get => innerNodesAreCircles; set => innerNodesAreCircles = value; }
         public List<SublayoutLayoutNode> SublayoutNodes { get => sublayoutNodes; set => sublayoutNodes = value; }
 
         /// <summary>
@@ -85,27 +66,30 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
-        /// <param name="leafNodeFactory">the factory used to created leaf nodes</param>
-        /// <param name="edges">List of Edges</param>
-        /// <param name="coseGraphSettings">Graph Settings, choosed by user</param>
-        public CoseLayout(float groundLevel, AbstractSEECity settings, NodeFactory leafNodeFactory) : base(groundLevel)
+        /// <param name="settings">Graph Settings</param>
+        public CoseLayout(float groundLevel, AbstractSEECity settings) : base(groundLevel)
         {
             name = "Compound Spring Embedder Layout";
             nodeToCoseNode = new Dictionary<ILayoutNode, CoseNode>();
-            this.settings = settings;
-            this.leafNodeFactory = leafNodeFactory;
             SetupGraphSettings(settings.CoseGraphSettings);
         }
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> coseSublayoutNodes)
+        /// <summary>
+        /// Computes the Layout
+        /// </summary>
+        /// <param name="layoutNodes"></param>
+        /// <param name="edges"></param>
+        /// <param name="coseSublayoutNodes"></param>
+        /// <returns></returns>
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> coseSublayoutNodes)
         {
             this.edges = edges;
             this.SublayoutNodes = coseSublayoutNodes.ToList();
 
             layout_result = new Dictionary<ILayoutNode, NodeTransform>();
-            this.layoutNodes = gameNodes.ToList();
+            this.layoutNodes = layoutNodes.ToList();
 
-            ICollection<ILayoutNode> roots = LayoutNodes.GetRoots(gameNodes);
+            ICollection<ILayoutNode> roots = LayoutNodes.GetRoots(layoutNodes);
             if (roots.Count == 0)
             {
                 throw new System.Exception("Graph has no root node.");
@@ -341,6 +325,7 @@ namespace SEE.Layout
                 coseLayoutSettings.Coolingcycle = 0;
                 coseLayoutSettings.Level--;
             }
+
             CoseLayoutSettings.Incremental = false;
         }
 
@@ -716,10 +701,10 @@ namespace SEE.Layout
         /// <param name="top">the top position</param>
         private void AddNodeToGrid(CoseNode v, double left, double top)
         {
-            int startX = (int)Math.Floor(((v.CenterPosition.x - v.Scale.x / 2) - left) / coseLayoutSettings.RepulsionRange);
-            int finishX = (int)Math.Floor((v.Scale.x + (v.CenterPosition.x - v.Scale.x / 2) - left) / coseLayoutSettings.RepulsionRange);
-            int startY = (int)Math.Floor(((v.CenterPosition.z - v.Scale.z / 2) - top) / coseLayoutSettings.RepulsionRange);
-            int finishY = (int)Math.Floor(((v.CenterPosition.z - v.Scale.z / 2) - top) / coseLayoutSettings.RepulsionRange);
+            int startX = (int)Math.Floor((v.GetLeftFrontCorner().x - left) / coseLayoutSettings.RepulsionRange);
+            int finishX = (int)Math.Floor((v.Scale.x + v.GetLeftFrontCorner().x - left) / coseLayoutSettings.RepulsionRange);
+            int startY = (int)Math.Floor((v.GetRightBackCorner().y  - top) / coseLayoutSettings.RepulsionRange);
+            int finishY = (int)Math.Floor((v.Scale.z + v.GetRightBackCorner().y - top)/ coseLayoutSettings.RepulsionRange);
 
             for (int i = startX; i <= finishX; i++)
             {
@@ -742,10 +727,7 @@ namespace SEE.Layout
             int j;
 
             List<CoseNode>[,] collect;
-
-            var diff = (graph.RightBackCorner.x - graph.LeftFrontCorner.x);
-            var diffRep = diff / coseLayoutSettings.RepulsionRange;
-            var ceilDiff = Mathf.Ceil((float)diffRep);
+                                                                                                                                                                     
             var sizeX = (int)Mathf.Ceil((float)((graph.RightBackCorner.x - graph.LeftFrontCorner.x) / coseLayoutSettings.RepulsionRange));
             var sizeY = (int)Mathf.Ceil((float)((graph.LeftFrontCorner.y - graph.RightBackCorner.y) / coseLayoutSettings.RepulsionRange));
 
