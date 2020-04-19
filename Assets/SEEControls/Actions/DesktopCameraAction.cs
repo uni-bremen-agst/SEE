@@ -39,21 +39,50 @@ namespace SEE.Controls
             }
         }
 
+        /// <summary>
+        /// Whether the object should be moved. If and only if this value is 
+        /// greater than zero, it will be moved. The exact value does not 
+        /// matter otherwise.
+        /// </summary>
         private float speedUp;
+        /// <summary>
+        /// Whether the object should be moved. If and only if <paramref name="speed"/> is 
+        /// greater than zero, it will be moved. The exact value of <paramref name="speed"/>
+        /// does not matter otherwise.
+        /// </summary>
+        /// <param name="speed"></param>
         public override void SetSpeed(float speed)
         {
             speedUp = speed;
         }
 
+        /// <summary>
+        /// The direction of the movement in 3D. 
+        /// </summary>
         private Vector3 moveDirection;
+        /// <summary>
+        /// Sets the direction of the movement in 3D. 
+        /// </summary>
+        /// <param name="direction">direction of movement</param>
         public override void MoveToward(Vector3 direction)
         {
+            //Debug.LogFormat("DesktopCameraAction.MoveToward: {0}\n", direction);
             moveDirection = direction;
         }
 
+        /// <summary>
+        /// The direction of looking with respect to the screen. Only the x and 
+        /// y co-ordinates count.
+        /// </summary>
         private Vector3 lookDirection;
+        /// <summary>
+        /// Sets the direction of looking with respect to the screen. Only the x and 
+        /// y co-ordinates count.
+        /// </summary>
+        /// <param name="direction">x/y direction of looking </param>
         public override void LookAt(Vector3 direction)
         {
+            //Debug.LogFormat("DesktopCameraAction.LookAt: {0}\n", direction);
             lookDirection = direction;
         }
 
