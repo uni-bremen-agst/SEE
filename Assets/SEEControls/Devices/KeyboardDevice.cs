@@ -2,6 +2,9 @@
 
 namespace SEE.Controls
 {
+    /// <summary>
+    /// Input from a keyboard. Supports throttle and movement direction.
+    /// </summary>
     public class KeyboardDevice : InputDevice
     {
         private const KeyCode throttleKey = KeyCode.LeftShift;

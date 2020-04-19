@@ -5,10 +5,10 @@ namespace SEE.Controls
 {
     public class Actor : MonoBehaviour
     {
-        [Tooltip("The first device from which to read the input.")]
+        [Tooltip("The first device from which to read the input for movement direction, throttle, and button B (looking).")]
         public InputDevice inputDeviceA;
 
-        [Tooltip("The second device from which to read the input.")]
+        [Tooltip("The second device from which to read the input for pointing direction, trigger (speed), .")]
         public InputDevice inputDeviceB;
 
         [Tooltip("The action applied to move the camera.")]
@@ -27,7 +27,7 @@ namespace SEE.Controls
             {
                 inputDeviceA.ListenMovemementDirection(OnMoveDirection);
                 inputDeviceA.ListenThrottle(OnThrottle);
-                inputDeviceA.ListenButtonB(OnButtonB);
+                // inputDeviceA.ListenButtonB(OnButtonB); // not used?
             }
             if (inputDeviceB == null)
             {
