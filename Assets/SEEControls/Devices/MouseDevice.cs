@@ -35,6 +35,9 @@ namespace SEE.Controls
 
         private Vector3 GetDirection()
         {
+            // Input.GetAxis(axis): The value will be in the range -1...1 for keyboard and 
+            // joystick input. If the axis is setup to be delta mouse movement, the mouse 
+            // delta is multiplied by the axis sensitivity and the range is not -1...1.
             return new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), 0);
         }
 
