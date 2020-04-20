@@ -19,12 +19,6 @@ namespace SEE.Controls
             buttonB.AddListener(call);
         }
 
-        protected AxisEvent throttle = new AxisEvent();
-        public void ListenThrottle(UnityEngine.Events.UnityAction<float> call)
-        {
-            throttle.AddListener(call);
-        }
-
         protected AxisEvent trigger = new AxisEvent();
         public void ListenTrigger(UnityEngine.Events.UnityAction<float> call)
         {
@@ -48,5 +42,24 @@ namespace SEE.Controls
         {
             scroll.AddListener(call);
         }
+
+        /// <summary>
+        /// Name of the action set defined by VR Steam Input.
+        /// </summary>
+        protected const string defaultActionSet = "default";
+
+        /// <summary>
+        /// Name of the throttle action defined by VR Steam Input.
+        /// </summary>
+        protected const string ThrottleActionName = "Throttle";
+
+        /// <summary>
+        /// Name of the mouse X axis as defined in the Unity Input Manager.
+        /// </summary>
+        protected const string MouseXActionName = "mouse x"; // "Mouse X"; // "mouse x"
+        /// <summary>
+        /// Name of the mouse Y axis as defined in the Unity Input Manager.
+        /// </summary>
+        protected const string MouseYActionName = "mouse y"; // "Mouse Y"; // "mouse y"
     }
 }

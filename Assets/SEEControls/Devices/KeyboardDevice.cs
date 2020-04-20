@@ -7,18 +7,8 @@ namespace SEE.Controls
     /// </summary>
     public class KeyboardDevice : InputDevice
     {
-        private const KeyCode throttleKey = KeyCode.LeftShift;
-
         private void Update()
         {
-            if (Input.GetKeyUp(throttleKey))
-            {
-                throttle.Invoke(0);
-            }
-            if (Input.GetKeyDown(throttleKey))
-            {
-                throttle.Invoke(1);
-            }
             movementDirection.Invoke(GetDirection());
         }
 
