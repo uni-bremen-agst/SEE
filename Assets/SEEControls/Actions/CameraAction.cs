@@ -1,14 +1,36 @@
-﻿using UnityEngine;
+﻿using SEE.Controls.Devices;
+using UnityEngine;
 
 namespace SEE.Controls
 {
     public abstract class CameraAction : MonoBehaviour
     {
-        public abstract void SetSpeed(float speed);
-        public abstract void MoveToward(Vector3 direction);
-        public abstract void SetBoost(float boost);
+        protected Throttle throttleDevice;
+        public Throttle ThrottleDevice
+        {
+            get => throttleDevice;
+            set => throttleDevice = value;
+        }
 
-        public abstract void Look(bool activated);
-        public abstract void RotateToward(Vector3 direction);
+        protected Direction directionDevice;
+        public Direction DirectionDevice
+        {
+            get => directionDevice;
+            set => directionDevice = value;
+        }
+
+        protected Viewpoint viewpointDevice;
+        public Viewpoint ViewpointDevice
+        {
+            get => viewpointDevice;
+            set => viewpointDevice = value;
+        }
+
+        protected Boost boostDevice;
+        public Boost BoostDevice
+        {
+            get => boostDevice;
+            set => boostDevice = value;
+        }
     }
 }
