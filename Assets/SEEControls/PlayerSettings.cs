@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.XR;
 using Valve.VR.InteractionSystem;
 
@@ -14,34 +15,43 @@ namespace SEE.Controls
     /// </summary>
     public class PlayerSettings : MonoBehaviour
     {
-        [Tooltip("Whether VR should be enabled.")]
-        public bool EnableVR = true;
+        public enum PlayerInputType
+        {
+            Desktop,  // player for desktop and mouse input
+            Touch,    // player for touch devices
+            VR,       // player for virtual reality devices
+        }
 
-        [Tooltip("Whether the controllers should be hidden.")]
-        public bool HideControllers = false;
+        [Tooltip("What kind of player type should be enabled.")]
+        public PlayerInputType playerInputType = PlayerInputType.Desktop;
+
+        [Tooltip("Whether the VR controllers should be hidden (relevant only for VR players).")]
+        public bool HideVRControllers = false;
 
         private void Start()
         {
-            Debug.LogFormat("VR is enabled: {0}\n", EnableVR);
             // We have to explicitly disable VR if the user wants us to. Otherwise the
             // mouse positions will be wrong if VR is enabled and a head-mounted display (HMD)
             // is connected. That seems to be a bug.
-            XRSettings.enabled = EnableVR;
+            XRSettings.enabled = playerInputType == PlayerInputType.VR;
 
-            foreach (Transform child in transform)
+            SetActive("DesktopPlayer", playerInputType == PlayerInputType.Desktop);
+            SetActive("VRPlayer",      playerInputType == PlayerInputType.VR);
+            SetActive("TouchPlayer",   playerInputType == PlayerInputType.Touch);
+            SetActive("InControl",     playerInputType == PlayerInputType.Touch);
+        }
+
+        private void SetActive(string objectName, bool activate)
+        {
+            GameObject player = GameObject.Find(objectName);
+            if (player != null)
             {
-                if (child.name == "VRPlayer")
-                {
-                    child.gameObject.SetActive(EnableVR);
-                }
-                else if (child.name == "NonVRPlayer")
-                {
-                    child.gameObject.SetActive(!EnableVR);
-                }
-                else
-                {
-                    Debug.LogFormat("Do not know what to do with the child named '{0}'.\n", child.name);
-                }
+                player.SetActive(activate);
+                Debug.LogFormat("Game object {0} {1}.\n", player.name, activate ? "enabled" : "disabled");
+            }
+            else
+            {
+                Debug.LogFormat("No game object named {0} found.\n", objectName);
             }
         }
 
@@ -52,11 +62,11 @@ namespace SEE.Controls
         /// </summary>
         private void Update()
         {
-            if (EnableVR)
+            if (playerInputType == PlayerInputType.VR)
             {                
                 foreach (var hand in Player.instance.hands)
                 {
-                    if (HideControllers)
+                    if (HideVRControllers)
                     {
                         hand.HideController();
                         hand.SetSkeletonRangeOfMotion(Valve.VR.EVRSkeletalMotionRange.WithoutController);
