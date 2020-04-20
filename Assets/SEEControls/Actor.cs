@@ -1,118 +1,91 @@
-﻿using System;
+﻿using SEE.Controls.Devices;
 using UnityEngine;
 
 namespace SEE.Controls
 {
     public class Actor : MonoBehaviour
     {
-        [Tooltip("The first device from which to read the input for movement direction and throttle.")]
-        public InputDevice inputDeviceA;
+        [Tooltip("The camera of this player.")]
+        public Camera mainCamera;
 
-        [Tooltip("The second device from which to read the input for rotation direction and selection.")]
-        public InputDevice inputDeviceB;
+        [Tooltip("The device from which to read the input for speed.")]
+        public Throttle throttleDevice;
+
+        [Tooltip("The device from which to retrieve the boost for movements. The boost amplifies speed.")]
+        public Boost boostDevice;
+
+        [Tooltip("The device from which to read the input for the direction of movements.")]
+        public Direction directionDevice;
+
+        [Tooltip("The device from which to read the viewpoint.")]
+        public Viewpoint viewpointDevice;
+
+        [Tooltip("The device from which to read selection input.")]
+        public Selection selectionDevice;
 
         [Tooltip("The action applied to move the camera.")]
         public CameraAction cameraAction;
 
         [Tooltip("The action applied to select an object.")]
-        private SelectionAction selectionAction;
+        public SelectionAction selectionAction;
 
         private void Start()
         {
-            if (inputDeviceA == null)
-            {
-                Debug.LogError("No input device A set for actor.\n");
-            }
-            else
-            {
-                // Device A is used for movements (direction and speed).
-                inputDeviceA.ListenMovemementDirection(OnMoveDirection);
-                inputDeviceA.ListenThrottle(OnThrottle);
-                // inputDeviceA.ListenButtonB(OnButtonB); // not used?
-            }
-            if (inputDeviceB == null)
-            {
-                Debug.LogError("No input device B set for actor.\n");
-            }
-            else
-            {
-                // Device B is used for selection:
-                inputDeviceB.ListenPointingDirection(OnPointingDirection); // ray casting
-                inputDeviceB.ListenTrigger(OnTrigger); // selection turned on/off
-                // Device B is used for rotation
-                inputDeviceB.ListenMovemementDirection(OnLookDirection); // FIXME: collision with pointing
-                inputDeviceB.ListenButtonB(OnButtonB); // turn on/off rotation mode
-                inputDeviceB.ListenScroll(OnScroll); // speed boost
-                
-            }
-            if (cameraAction == null)
-            {
-                Debug.LogError("There is no camera action assigned to this actor.\n");
-            }
+            CameraSetup();
+            SelectionSetup();
+        }
+
+        private void SelectionSetup()
+        {
             if (selectionAction == null)
             {
-                // In VR, the selectionAction will be put on the pointing hand so that
-                // the selection ray starts at the hand rather than at the player.
-                // In Non-VR, it will be added to the player.
-                // FIXME: Do we have a smarter solution than this one? It introduces
-                // too many assumptions.
-                XRDevice pointer = gameObject.GetComponent<XRDevice>();
-                if (pointer != null)
+                Debug.LogError("Selection action must be set.\n");
+            }
+            else
+            {
+                if (selectionDevice == null)
                 {
-                    // Virtual reality
-                    selectionAction = pointer.PointingHand.gameObject.AddComponent<SelectionAction>();
-                    selectionAction.ThreeDimensions = true;
+                    Debug.LogWarning("Selection device not set.\n");
+                    selectionDevice = gameObject.AddComponent<NullSelection>();
                 }
-                else
-                {
-                    // Non-virtual reality
-                    selectionAction = gameObject.AddComponent<SelectionAction>();
-                    selectionAction.ThreeDimensions = false;
-                }
-                selectionAction.SetCamera(GetCamera());
+                selectionAction.SelectionDevice = selectionDevice;
+                selectionAction.MainCamera = mainCamera;
             }
         }
 
-        private Camera GetCamera()
+        private void CameraSetup()
         {
-            return gameObject.GetComponentInChildren<Camera>();
-        }
-
-        protected void OnThrottle(float speed)
-        {
-            //Debug.LogFormat("Actor speed={0}\n", speed);
-            cameraAction.SetSpeed(speed);
-        }
-
-        protected void OnMoveDirection(Vector3 direction)
-        {
-            //Debug.LogFormat("Actor direction={0}\n", direction);
-            cameraAction.MoveToward(direction);
-        }
-
-        protected void OnLookDirection(Vector3 direction)
-        {
-            cameraAction.RotateToward(direction);
-        }
-
-        protected void OnButtonB(bool activated)
-        {
-            cameraAction.Look(activated);
-        }
-
-        protected void OnScroll(float value)
-        {
-            cameraAction.SetBoost(value);
-        }
-
-        protected void OnPointingDirection(Vector3 direction)
-        {
-            selectionAction.SelectAt(direction);
-        }
-
-        protected void OnTrigger(float value)
-        {
-            selectionAction.RayOnOff(value > 0);
+            if (cameraAction == null)
+            {
+                Debug.LogError("Camera action must be set.\n");
+            }
+            else
+            {
+                if (throttleDevice == null)
+                {
+                    Debug.LogWarning("Throttle device not set.\n");
+                    cameraAction.ThrottleDevice = gameObject.AddComponent<NullThrottle>();
+                }
+                cameraAction.ThrottleDevice = throttleDevice;
+                if (directionDevice == null)
+                {
+                    Debug.LogWarning("Direction device not set.\n");
+                    cameraAction.DirectionDevice = gameObject.AddComponent<NullDirection>();
+                }
+                cameraAction.DirectionDevice = directionDevice;
+                if (viewpointDevice == null)
+                {
+                    Debug.LogWarning("Viewpoint device not set.\n");
+                    cameraAction.ViewpointDevice = gameObject.AddComponent<NullViewpoint>();
+                }
+                cameraAction.ViewpointDevice = viewpointDevice;
+                if (boostDevice == null)
+                {
+                    Debug.LogWarning("Boost device not set.\n");
+                    cameraAction.BoostDevice = gameObject.AddComponent<NullBoost>();
+                }
+                cameraAction.BoostDevice = boostDevice;
+            }
         }
     }
 }
