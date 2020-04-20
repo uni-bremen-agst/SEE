@@ -8,7 +8,7 @@ namespace SEE.Controls
     public class DesktopCameraAction : CameraAction
     {
         [Header("Movement Settings")]
-        [Tooltip("Exponential boost factor for acceleration when fire key is pressed.")]
+        [Tooltip("Exponential boost factor for acceleration when throttle is pressed.")]
         public float boost = 3.5f;
 
         [Tooltip("Time it takes to interpolate camera position 99% of the way to the target."), Range(0.001f, 1f)]
@@ -16,7 +16,7 @@ namespace SEE.Controls
 
         [Header("Rotation Settings")]
         [Tooltip("X = Change in mouse position.\nY = Multiplicative factor for camera rotation.")]
-        public AnimationCurve mouseSensitivityCurve = new AnimationCurve(new Keyframe(0f, 0.5f, 0f, 5f), new Keyframe(1f, 2.5f, 0f, 0f));
+        public AnimationCurve SensitivityCurve = new AnimationCurve(new Keyframe(0f, 0.5f, 0f, 5f), new Keyframe(1f, 2.5f, 0f, 0f));
 
         [Tooltip("Time it takes to interpolate camera rotation 99% of the way to the target."), Range(0.001f, 1f)]
         public float rotationLerpTime = 0.01f;
@@ -34,7 +34,7 @@ namespace SEE.Controls
         /// is false, the mouse cursor is unlocked and visible again.
         /// </summary>
         /// <param name="activated">whether the looking mode is activated</param>
-        public override void Look(bool activated)
+        private void Look(bool activated)
         {
             looking = activated;
 
@@ -49,64 +49,6 @@ namespace SEE.Controls
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
             }
-        }
-
-        /// <summary>
-        /// Whether the object should be moved. If and only if this value is 
-        /// greater than zero, it will be moved. The exact value does not 
-        /// matter otherwise.
-        /// </summary>
-        private float speedUp;
-        /// <summary>
-        /// Whether the object should be moved. If and only if <paramref name="speed"/> is 
-        /// greater than zero, it will be moved. The exact value of <paramref name="speed"/>
-        /// does not matter otherwise.
-        /// </summary>
-        /// <param name="speed"></param>
-        public override void SetSpeed(float speed)
-        {
-            speedUp = speed;
-        }
-
-        /// <summary>
-        /// The direction of the movement in 3D. 
-        /// </summary>
-        private Vector3 moveDirection;
-        /// <summary>
-        /// Sets the direction of the movement in 3D. 
-        /// </summary>
-        /// <param name="direction">direction of movement</param>
-        public override void MoveToward(Vector3 direction)
-        {
-            //Debug.LogFormat("DesktopCameraAction.MoveToward: {0}\n", direction);
-            moveDirection = direction;
-        }
-
-        /// <summary>
-        /// The direction of rotation with respect to the screen. Only the x and 
-        /// y co-ordinates count.
-        /// </summary>
-        private Vector3 rotationDirection;
-        /// <summary>
-        /// Sets the direction of rotation with respect to the screen. Only the x and 
-        /// y co-ordinates count.
-        /// </summary>
-        /// <param name="direction">x/y direction of rotation </param>
-        public override void RotateToward(Vector3 direction)
-        {
-            rotationDirection = direction;
-			Debug.LogFormat("DesktopCameraAction.RotateToward {0}\n", direction);															   
-        }
-
-        /// <summary>
-        /// Increases the acceleration of the movement where <paramref name="boost"/>
-        /// is used in an exponential function. It can be any value including
-        /// negative ones. The lower the value, the slower the movement.
-        /// </summary>
-        /// <param name="boost"></param>					 																															
-        public override void SetBoost(float boost)
-        {
-            this.boost += boost * 0.2f;
         }
 
         class CameraState
@@ -148,6 +90,11 @@ namespace SEE.Controls
                 z = Mathf.Lerp(z, target.z, positionLerpPct);
             }
 
+            /// <summary>
+            /// Moves the object according to the current settings of pitch, yaw, roll
+            /// and x, y, z.
+            /// </summary>
+            /// <param name="t"></param>
             public void UpdateTransform(Transform t)
             {
                 t.eulerAngles = new Vector3(pitch, yaw, roll);
@@ -166,22 +113,30 @@ namespace SEE.Controls
 
         void Update()
         {
-            // Rotation
-            if (looking)
+            boost += boostDevice.Value * 0.2f;
+
+            // Camera rotation for looking around
+            if (viewpointDevice.Activated)
             {
-                var mouseMovement = new Vector2(rotationDirection.x, rotationDirection.y * (invertY ? 1 : -1));
+                Look(true);
+                Vector2 viewpoint = viewpointDevice.Value;
+                Vector2 lookMovement = new Vector2(viewpoint.x, viewpoint.y * (invertY ? 1 : -1));
 
-                var mouseSensitivityFactor = mouseSensitivityCurve.Evaluate(mouseMovement.magnitude);
+                float sensitivityFactor = SensitivityCurve.Evaluate(lookMovement.magnitude);
 
-                m_TargetCameraState.yaw += mouseMovement.x * mouseSensitivityFactor;
-                m_TargetCameraState.pitch += mouseMovement.y * mouseSensitivityFactor;
+                m_TargetCameraState.yaw += lookMovement.x * sensitivityFactor;
+                m_TargetCameraState.pitch += lookMovement.y * sensitivityFactor;
+            }
+            else
+            {
+                Look(false);
             }
 
             // Translation
-            var translation = moveDirection * Time.deltaTime;
+            Vector3 translation = DirectionDevice.Value * Time.deltaTime;
 
             // Speed up movement.
-            if (speedUp > 0)
+            if (throttleDevice.Value > 0)
             {
                 translation *= 10.0f;
             }
@@ -196,7 +151,13 @@ namespace SEE.Controls
             var rotationLerpPct = 1f - Mathf.Exp((Mathf.Log(1f - 0.99f) / rotationLerpTime) * Time.deltaTime);
             m_InterpolatingCameraState.LerpTowards(m_TargetCameraState, positionLerpPct, rotationLerpPct);
 
+            // Finally move the object.
             m_InterpolatingCameraState.UpdateTransform(transform);
+            //if (DirectionDevice.Value.magnitude > 0)
+            //{
+            //    Debug.LogFormat("Move toward {0} with boost {1} => translation {2}, position {3}\n", 
+            //                    DirectionDevice.Value, boost, translation, transform.position);
+            //}
         }
     }
 }
