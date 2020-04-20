@@ -1,13 +1,17 @@
-﻿using UnityEngine;
+﻿using SEE.Controls.Devices;
+using UnityEngine;
 
 namespace SEE.Controls
 {
-    public class SelectionAction : MonoBehaviour
+    public abstract class SelectionAction : MonoBehaviour
     {
-        /// <summary>
-        /// The direction of pointing.
-        /// </summary>
-        private Vector3 direction;
+        protected Selection selectionDevice;
+        public Selection SelectionDevice
+        {
+            get => selectionDevice;
+            set => selectionDevice = value;
+        }
+
         /// <summary>
         /// The line renderer to draw the ray.
         /// </summary>
@@ -18,20 +22,18 @@ namespace SEE.Controls
         private GameObject lineHolder;
 
         private Camera mainCamera;
+        internal Camera MainCamera
+        {
+            get => mainCamera;
+            set => mainCamera = value;
+        }
 
         const float defaultWidth = 0.1f;
 
-        private bool threeDimensions = true;
-
-        public bool ThreeDimensions {
-            get => threeDimensions;
-            set => threeDimensions = value;
-        }
-
+        [Tooltip("The color used when an object was hit.")]
         public Color colorOnHit = Color.green;
+        [Tooltip("The color used when no object was hit.")]
         public Color defaultColor = Color.red;
-
-        private bool active = true;
 
         private void Start()
         {
@@ -50,15 +52,12 @@ namespace SEE.Controls
             line.endWidth = defaultWidth;
         }
 
-        private Vector3 Origin()
-        {
-            return threeDimensions ? gameObject.transform.position : mainCamera.transform.position;
-        }
-
         private void Update()
         {
-            if (active)
-            {
+            //Debug.LogFormat("selecting: {0}\n", selectionDevice.Activated);
+
+            if (selectionDevice.Activated)
+            {               
                 GameObject selectedObject = Select(out RaycastHit hitInfo);
                 ResetLine();
 
@@ -88,27 +87,9 @@ namespace SEE.Controls
             line.SetPosition(1, origin);
         }
 
-        internal void SetCamera(Camera camera)
-        {
-            mainCamera = camera;
-        }
-
         private GameObject Select(out RaycastHit hitInfo)
         {
-            bool hit;
-
-            if (ThreeDimensions)
-            {
-                hit = Physics.Raycast(gameObject.transform.position, direction, out hitInfo, Mathf.Infinity);                
-            }
-            else
-            {                
-                Ray ray = mainCamera.ScreenPointToRay(direction);
-                //Debug.LogFormat("2d direction={0} at origin {1} and direction {2} camera {3}\n", direction, ray.origin, ray.direction, mainCamera.transform.position);
-                //Debug.DrawRay(ray.origin, ray.direction * 10000, Color.yellow);
-                hit = Physics.Raycast(ray, out hitInfo);
-            }
-            if (hit)
+            if (Detect(out hitInfo))
             {
                 return hitInfo.collider.gameObject;
             }
@@ -118,19 +99,8 @@ namespace SEE.Controls
             }
         }
 
-        public void RayOnOff(bool turnOn)
-        {
-            if (!turnOn && line != null)
-            {
-                ResetLine();
-            }
-            active = turnOn;
-            //Debug.LogFormat("Ray on/off: {0}\n", active);
-        }
+        protected abstract bool Detect(out RaycastHit hitInfo);
 
-        public void SelectAt(Vector3 direction)
-        {
-            this.direction = direction;
-        }
+        protected abstract Vector3 Origin();
     }
 }
