@@ -26,10 +26,10 @@ namespace SEE.DataModel.IO
             AppendDOCType(doc);
             XmlElement gxl = AppendGXL(doc);
             XmlElement graphNode = AppendGraph(doc, gxl, graph);
-            Dictionary<string, string> linknamesToIDs = AppendNodes(doc, graphNode, graph);
+            Dictionary<string, string> nodeIDs_To_GXLids = AppendNodes(doc, graphNode, graph);
             int edgeCount = 1;
-            AppendDependencyEdges(doc, graphNode, graph, linknamesToIDs, ref edgeCount);
-            AppendChildren(doc, graphNode, graph, linknamesToIDs, edgeCount, hierarchicalEdgeType);
+            AppendDependencyEdges(doc, graphNode, graph, nodeIDs_To_GXLids, ref edgeCount);
+            AppendChildren(doc, graphNode, graph, nodeIDs_To_GXLids, edgeCount, hierarchicalEdgeType);
             doc.Save(filename);
         }
 
@@ -100,17 +100,17 @@ namespace SEE.DataModel.IO
         /// <param name="doc">the XML document in which to create the XML node</param>
         /// <param name="parentXMLNode"></param>
         /// <param name="graph"></param>
-        /// <returns>a mapping from node linknames onto node IDs used in the GXL file</returns>
+        /// <returns>a mapping from graph node ID onto node IDs used in the GXL file</returns>
         private static Dictionary<string, string> AppendNodes(XmlDocument doc, XmlElement parentXMLNode, Graph graph)
         {
-            Dictionary<string, string> linknameToID = new Dictionary<string, string>();
+            Dictionary<string, string> result = new Dictionary<string, string>();
 
             int nodeCount = 1;
             foreach (Node node in graph.Nodes())
             {
                 XmlElement xmlNode = doc.CreateElement("node");
                 string ID = "N" + nodeCount.ToString();
-                linknameToID[node.LinkName] = ID;
+                result[node.ID] = ID;
                 xmlNode.SetAttribute("id", ID);
 
                 AppendType(doc, xmlNode, node);
@@ -119,7 +119,7 @@ namespace SEE.DataModel.IO
 
                 nodeCount++;
             }
-            return linknameToID;
+            return result;
         }
 
         /// <summary>
@@ -129,20 +129,20 @@ namespace SEE.DataModel.IO
         /// <param name="doc">the XML document in which to create the XML node</param>
         /// <param name="parentXMLNode">the parent XML where to add the XML nodes generated here</param>
         /// <param name="graph">the graph containing the nodes whose parent-child relation is to be emitted</param>
-        /// <param name="linknamesToIDs">a mapping from node linknames onto node IDs used in the GXL file</param>
+        /// <param name="graphNodeIdsToGXLNodeIds">a mapping from graph node IDs onto node IDs used in the GXL file</param>
         /// <param name="edgeCount">the GXL index for the next edge to be added</param>
         private static void AppendDependencyEdges
             (XmlDocument doc, 
             XmlElement parentXMLNode, 
             Graph graph, 
-            Dictionary<string, string> linknamesToIDs,
+            Dictionary<string, string> graphNodeIdsToGXLNodeIds,
             ref int edgeCount)
         {  
             foreach (Edge edge in graph.Edges())
             {
                 string type = edge.Type;
-                string source = linknamesToIDs[edge.Source.LinkName];
-                string target = linknamesToIDs[edge.Target.LinkName];
+                string source = graphNodeIdsToGXLNodeIds[edge.Source.ID];
+                string target = graphNodeIdsToGXLNodeIds[edge.Target.ID];
 
                 XmlElement xmlNode = AppendEdge(doc, parentXMLNode, edgeCount, type, source, target);
                 AppendAttributes(doc, xmlNode, edge);
@@ -185,13 +185,13 @@ namespace SEE.DataModel.IO
         /// <param name="doc">the XML document in which to create the XML node</param>
         /// <param name="parentXMLNode">the parent XML where to add the XML nodes generated here</param>
         /// <param name="graph">the graph containing the nodes whose parent-child relation is to be emitted</param>
-        /// <param name="linknamesToIDs">a mapping from node linknames onto node IDs used in the GXL file</param>
+        /// <param name="graphNodeIDsToGXLNodeIDs">a mapping from node ID onto node IDs used in the GXL file</param>
         /// <param name="edgeCount">the GXL index for the next edge to be added</param>
         private static void AppendChildren
             (XmlDocument doc, 
             XmlElement parentXMLNode, 
             Graph graph, 
-            Dictionary<string, string> linknamesToIDs,
+            Dictionary<string, string> graphNodeIDsToGXLNodeIDs,
             int edgeCount,
             string hierarchicalEdgeType)
         {
@@ -200,8 +200,8 @@ namespace SEE.DataModel.IO
                 Node parent = child.Parent;
                 if (parent != null)
                 {
-                    string source = linknamesToIDs[child.LinkName];
-                    string target = linknamesToIDs[parent.LinkName];
+                    string source = graphNodeIDsToGXLNodeIDs[child.ID];
+                    string target = graphNodeIDsToGXLNodeIDs[parent.ID];
                     XmlElement xmlNode = AppendEdge(doc, parentXMLNode, edgeCount, hierarchicalEdgeType, source, target);
                     edgeCount++;
                 }

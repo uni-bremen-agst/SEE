@@ -55,7 +55,7 @@ namespace SEE.GO
             {
                 tag = Tags.Edge,
                 isStatic = true,
-                name = "(" + layoutEdge.Source.LinkName + ", " + layoutEdge.Target.LinkName + ")"
+                name = "(" + layoutEdge.Source.ID + ", " + layoutEdge.Target.ID + ")"
             };
             // FIXME: gameEdge.AddComponent<EdgeRef>().edge = edge;
             return gameEdge;

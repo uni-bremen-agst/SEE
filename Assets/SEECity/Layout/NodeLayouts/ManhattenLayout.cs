@@ -6,7 +6,7 @@ namespace SEE.Layout
 {
     /// <summary>
     /// Calculates a simple grid layout for leaf nodes (only). The order is
-    /// alphabetic with respect to the Linkname of the nodes. 
+    /// alphabetic with respect to the ID of the nodes. 
     /// </summary>
     public class ManhattanLayout : FlatNodeLayout
     {
@@ -33,8 +33,8 @@ namespace SEE.Layout
             float positionZ = 0.0f;    // co-ordinate in a row of the grid
             // Note: (position.X, position.Y) is the left lower corner of the game object in the X,Z plane
 
-            // Draw all nodes in a grid in ascending alphabetic order of their linkname.
-            foreach (ILayoutNode gameNode in gameNodes.OrderBy<ILayoutNode, string>(gameObject => gameObject.LinkName))
+            // Draw all nodes in a grid in ascending alphabetic order of their ID.
+            foreach (ILayoutNode gameNode in gameNodes.OrderBy<ILayoutNode, string>(gameObject => gameObject.ID))
             {
                 column++;
                 if (column > numberOfBuildingsPerRow)

@@ -219,8 +219,8 @@ namespace SEE.Tools
         {
             foreach (PropagatedEdge edge in propagatedEdges)
             {
-                if (from.LinkName == edge.propagatedEdge.Source.LinkName
-                    && to.LinkName == edge.propagatedEdge.Target.LinkName
+                if (from.ID == edge.propagatedEdge.Source.ID
+                    && to.ID == edge.propagatedEdge.Target.ID
                     && edgeType == edge.propagatedEdge.Type)
                 {
                     return true;
@@ -297,7 +297,7 @@ namespace SEE.Tools
         protected static Node NewNode(Graph graph, string linkname, string type = "Routine")
         {
             Node result = new Node();
-            result.LinkName = linkname;
+            result.ID = linkname;
             result.SourceName = linkname;
             result.Type = type;
             graph.AddNode(result);

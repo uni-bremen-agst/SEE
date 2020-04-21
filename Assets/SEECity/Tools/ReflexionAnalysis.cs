@@ -593,7 +593,7 @@ namespace SEE.Tools
         {
             if (Is_Mapper(from))
             {
-                throw new Exception("node " + from.LinkName + " is already mapped explicitly.");
+                throw new Exception("node " + from.ID + " is already mapped explicitly.");
             }
             else
             {
@@ -601,14 +601,14 @@ namespace SEE.Tools
                 // mapping 'from'
                 List<Node> subtree = Mapped_Subtree(from);
                 // was 'to' mapped implicitly at all?
-                if (_implicit_maps_to_table.TryGetValue(from.LinkName, out Node oldTarget))
+                if (_implicit_maps_to_table.TryGetValue(from.ID, out Node oldTarget))
                 {
                     // from was actually mapped implicitly onto oldTarget
                     Unmap(subtree, oldTarget);
                 }
                 Add_To_Mapping_Graph(from, to);
                 // adjust explicit mapping
-                _explicit_maps_to_table[from.LinkName] = to;
+                _explicit_maps_to_table[from.ID] = to;
                 // adjust implicit mapping
                 Change_Map(subtree, to);
                 Map(subtree, to);
@@ -639,9 +639,9 @@ namespace SEE.Tools
             _mapping.AddEdge(mapsTo);
             Notify(new MapsToEdgeAdded(mapsTo));
         }
-        
+
         /// <summary>
-        /// Returns the node with the same Linkage.Name as given node contained
+        /// Returns the node with the same ID as given node contained
         /// in _mapping. If no such node exists, a clone of the given node is
         /// created, added to _mapping, and returned.
         /// </summary>
@@ -649,7 +649,7 @@ namespace SEE.Tools
         /// <returns>clone of node in _mapping</returns>
         private Node CloneInMapping(Node node)
         {
-            Node clone = _mapping.GetNode(node.LinkName);
+            Node clone = _mapping.GetNode(node.ID);
             if (clone == null)
             {
                 clone = (Node)node.Clone();
@@ -674,14 +674,14 @@ namespace SEE.Tools
             {
                 foreach (Node node in subtree)
                 {
-                    _implicit_maps_to_table.Remove(node.LinkName);
+                    _implicit_maps_to_table.Remove(node.ID);
                 }
             }
             else
             {
                 foreach (Node node in subtree)
                 {
-                    _implicit_maps_to_table[node.LinkName] = target;
+                    _implicit_maps_to_table[node.ID] = target;
                 }
             }
         }
@@ -731,7 +731,7 @@ namespace SEE.Tools
                 foreach (Edge outgoing in impl_node.Outgoings)
                 {
                     // assert: outgoing is in implementation graph
-                    if (_implicit_maps_to_table.TryGetValue(outgoing.Target.LinkName, out Node oldTarget))
+                    if (_implicit_maps_to_table.TryGetValue(outgoing.Target.ID, out Node oldTarget))
                     {
                         // outgoing is not dangling
                         if (oldTarget != arch_node)
@@ -744,7 +744,7 @@ namespace SEE.Tools
                 }
                 foreach (Edge incoming in impl_node.Incomings)
                 {
-                    if (_implicit_maps_to_table.TryGetValue(incoming.Source.LinkName, out Node oldTarget))
+                    if (_implicit_maps_to_table.TryGetValue(incoming.Source.ID, out Node oldTarget))
                     {
                         // incoming cross or inner dependency
                         handler(incoming, oldTarget, arch_node);
@@ -863,7 +863,7 @@ namespace SEE.Tools
         public void Delete_From_Mapping(Edge edge)
         {
             // The mapping target in the architecture graph.
-            Node arch_target = _architecture.GetNode(edge.Target.LinkName);
+            Node arch_target = _architecture.GetNode(edge.Target.ID);
             if (arch_target == null)
             {
                 throw new Exception("Mapping target node " + edge.Target + " is not in the architecture.");
@@ -871,7 +871,7 @@ namespace SEE.Tools
             else
             {
                 // The mapping source in the implementation graph.
-                Node impl_source = _implementation.GetNode(edge.Source.LinkName);
+                Node impl_source = _implementation.GetNode(edge.Source.ID);
                 if (impl_source == null)
                 {
                     throw new Exception("Mapping source node " + edge.Source + " is not in the implementation.");
@@ -886,8 +886,8 @@ namespace SEE.Tools
         /// <summary>
         /// Reverts the effect of mapping from impl_source onto arch_target.
         /// Precondition: impl_source is in the implementation graph and is a mapper, arch_target is in the architecture
-        /// graph, and maps_to is in the mapping graph, where maps_to.Source.Linkname == impl_source.Linkname
-        /// and maps_to.Target.Linkname = arch_target.Linkname.
+        /// graph, and maps_to is in the mapping graph, where maps_to.Source.ID == impl_source.ID
+        /// and maps_to.Target.ID = arch_target.ID.
         /// Postconditions: 
         /// (1) <paramref name="maps_to"/> is removed from _mapping
         /// (2) <paramref name="impl_source"/> is removed from _explicit_mapping
@@ -905,7 +905,7 @@ namespace SEE.Tools
             {
                 throw new Exception("Implementation node " + impl_source + " is not mapped explicitly.");
             }
-            else if (!_explicit_maps_to_table.Remove(impl_source.LinkName))
+            else if (!_explicit_maps_to_table.Remove(impl_source.ID))
             {
                 throw new Exception("Implementation node " + impl_source + " is not mapped explicitly.");
             }
@@ -925,7 +925,7 @@ namespace SEE.Tools
                     // If impl_source has a parent, all nodes in subtree should be mapped onto
                     // the architecture node onto which the parent is mapped -- if the parent
                     // is mapped at all (implicitly or explicitly).
-                    if (_implicit_maps_to_table.TryGetValue(impl_source_parent.LinkName, out Node new_target))
+                    if (_implicit_maps_to_table.TryGetValue(impl_source_parent.ID, out Node new_target))
                     {
                         // new_target is the architecture node onto which the parent of impl_source is mapped.
                         Change_Map(subtree, new_target);
@@ -945,7 +945,7 @@ namespace SEE.Tools
         /// <summary>
         /// Removes the Maps_To edge between 'from' and 'to' from the mapping graph (more precisely,
         /// the nodes corresponding to <paramref name="from"/> and <paramref name="to"/> in the
-        /// mapping graph; where two nodes correspond if they have the same Linkage.Name). 
+        /// mapping graph; where two nodes correspond if they have the same ID). 
         /// Precondition: a Maps_To edge between 'from' and 'to' must be contained in the mapping graph,
         /// 'from' is contained in implementation graph and 'to' is contained in the architecture graph.
         /// Postcondition: the edge is no longer contained in the mapping graph and the reflexion
@@ -958,7 +958,7 @@ namespace SEE.Tools
         public void Delete_From_Mapping(Node from, Node to)
         {
             // The node corresponding to 'from' in the mapping.
-            Node map_from = _mapping.GetNode(from.LinkName);
+            Node map_from = _mapping.GetNode(from.ID);
             if (map_from == null)
             {
                 throw new Exception("Node " + from + " is not mapped.");
@@ -966,7 +966,7 @@ namespace SEE.Tools
             else
             {
                 // The node corresponding to 'to' in the mapping.
-                Node map_to = _mapping.GetNode(to.LinkName);
+                Node map_to = _mapping.GetNode(to.ID);
                 if (map_to == null)
                 {
                     throw new Exception("Node " + to + " is no mapping target.");
@@ -1164,19 +1164,19 @@ namespace SEE.Tools
         private Graph _mapping;
 
         // ******************************************************************
-        // node mappings from node linknames onto nodes in the various graphs
+        // node mappings from node IDs onto nodes in the various graphs
         // ******************************************************************
 
         /// <summary>
-        /// Mapping of linknames onto nodes in the implementation graph.
+        /// Mapping of IDs onto nodes in the implementation graph.
         /// </summary>
         private Dictionary<string, Node> InImplementation;
         /// <summary>
-        /// Mapping of linknames onto nodes in the architecture graph.
+        /// Mapping of IDs onto nodes in the architecture graph.
         /// </summary>
         private Dictionary<string, Node> InArchitecture;
         /// <summary>
-        /// Mapping of linknames onto nodes in the mapping graph.
+        /// Mapping of IDs onto nodes in the mapping graph.
         /// </summary>
         private Dictionary<string, Node> InMapping;
 
@@ -1237,19 +1237,19 @@ namespace SEE.Tools
 
         /// <summary>
         /// The implicit mapping as derived from _explicit_maps_to_table.
-        /// Note 1: the mapping key is the linkname of a node in implementation and the mapping value a node in architecture
+        /// Note 1: the mapping key is the ID of a node in implementation and the mapping value a node in architecture
         /// Note 2: not every node in implementation is a key in this dictionary; node in the implementation
         /// neither mapped explicitly nor implicitly will not be contained.
         /// </summary>
         private Dictionary<string, Node> _implicit_maps_to_table;
 
         /// <summary>
-        /// The explicit mapping from implementation node linknames onto architecture nodes
+        /// The explicit mapping from implementation node ID onto architecture nodes
         /// as derived from the mappings graph. This is equivalent to the content
         /// of the mapping graph where the corresponding nodes of the implementation
         /// (source of a mapping) and architecture (target of a mapping) are used-
         /// The correspondence of nodes between these three graphs is established
-        /// by way of the unique Linkage.Name attribute.
+        /// by way of the unique ID attribute.
         /// Note: key is a node in the implementation and target a node in the 
         /// architecture graph.
         /// </summary>
@@ -1271,14 +1271,14 @@ namespace SEE.Tools
             {
                 Node source = mapsto.Source;
                 Node target = mapsto.Target;
-                Debug.Assert(!String.IsNullOrEmpty(source.LinkName));
-                Debug.Assert(!String.IsNullOrEmpty(target.LinkName));
-                //Debug.Log(source.LinkName + "\n");
-                Debug.Assert(InImplementation[source.LinkName] != null);
-                //Debug.Log(target.LinkName + "\n");
-                Debug.Assert(InArchitecture[target.LinkName] != null);
-                _explicit_maps_to_table[source.LinkName] = InArchitecture[target.LinkName];
-                //_explicit_maps_to_table[InImplementation[source.LinkName]] = InArchitecture[target.LinkName];
+                Debug.Assert(!String.IsNullOrEmpty(source.ID));
+                Debug.Assert(!String.IsNullOrEmpty(target.ID));
+                //Debug.Log(source.ID + "\n");
+                Debug.Assert(InImplementation[source.ID] != null);
+                //Debug.Log(target.ID + "\n");
+                Debug.Assert(InArchitecture[target.ID] != null);
+                _explicit_maps_to_table[source.ID] = InArchitecture[target.ID];
+                //_explicit_maps_to_table[InImplementation[source.ID]] = InArchitecture[target.ID];
             }
 
             _implicit_maps_to_table = new Dictionary<string, Node>();
@@ -1286,7 +1286,7 @@ namespace SEE.Tools
             {
                 Node source = mapsto.Source;
                 Node target = mapsto.Target;
-                Add_Subtree_To_Implicit_Map(InImplementation[source.LinkName], InArchitecture[target.LinkName]);
+                Add_Subtree_To_Implicit_Map(InImplementation[source.ID], InArchitecture[target.ID]);
             }
 
 #if DEBUG
@@ -1309,7 +1309,7 @@ namespace SEE.Tools
         /// <returns>true if node is explicitly mapped</returns>
         private bool Is_Mapper(Node node)
         {
-            return _explicit_maps_to_table.ContainsKey(node.LinkName);
+            return _explicit_maps_to_table.ContainsKey(node.ID);
         }
 
         /// <summary>
@@ -1327,12 +1327,12 @@ namespace SEE.Tools
         {
             List<Node> children = root.Children();
 #if DEBUG
-            // Debug.LogFormat("node {0} has {1} children\n", root.LinkName, children.Count);
+            // Debug.LogFormat("node {0} has {1} children\n", root.ID, children.Count);
 #endif            
             foreach (Node child in children)
             {
 #if DEBUG
-                //Debug.LogFormat("mapping child {0} of {1}\n", child.LinkName, root.LinkName);
+                //Debug.LogFormat("mapping child {0} of {1}\n", child.ID, root.ID);
 #endif
                 // child is contained in implementation
                 if (!Is_Mapper(child))
@@ -1342,11 +1342,11 @@ namespace SEE.Tools
                 else
                 {
 #if DEBUG
-                    //Debug.LogFormat("child {0} of {1} is a mapper\n", child.LinkName, root.LinkName);
+                    //Debug.LogFormat("child {0} of {1} is a mapper\n", child.ID, root.ID);
 #endif
                 }
             }
-            _implicit_maps_to_table[root.LinkName] = target;
+            _implicit_maps_to_table[root.ID] = target;
         }
 
         // *****************************************
@@ -1442,29 +1442,29 @@ namespace SEE.Tools
         }
 
         /// <summary>
-        /// Registers all nodes of all graphs under their linkname in the respective mappings.
+        /// Registers all nodes of all graphs under their ID in the respective mappings.
         /// </summary>
         private void RegisterNodes()
         {
-            // Mapping of linknames onto nodes in the implementation graph.
+            // Mapping of IDs onto nodes in the implementation graph.
             InImplementation = new SerializableDictionary<string, Node>();
             foreach (Node n in _implementation.Nodes())
             {
-                InImplementation[n.LinkName] = n;
+                InImplementation[n.ID] = n;
             }
 
-            // Mapping of linknames onto nodes in the architecture graph.
+            // Mapping of IDs onto nodes in the architecture graph.
             InArchitecture = new SerializableDictionary<string, Node>();
             foreach (Node n in _architecture.Nodes())
             {
-                InArchitecture[n.LinkName] = n;
+                InArchitecture[n.ID] = n;
             }
 
-            // Mapping of linknames onto nodes in the mapping graph.
+            // Mapping of IDs onto nodes in the mapping graph.
             InMapping = new SerializableDictionary<string, Node>();
             foreach (Node n in _mapping.Nodes())
             {
-                InMapping[n.LinkName] = n;
+                InMapping[n.ID] = n;
             }
         }
 
@@ -1648,7 +1648,7 @@ namespace SEE.Tools
         private Node Maps_To(Node node)
         {
             System.Diagnostics.Debug.Assert(node.ItsGraph == _implementation);
-            if (_implicit_maps_to_table.TryGetValue(node.LinkName, out Node target))
+            if (_implicit_maps_to_table.TryGetValue(node.ID, out Node target))
             {
                 return target;
             }
@@ -1950,7 +1950,7 @@ namespace SEE.Tools
             if (be_verbose)
             {
                 return name
-                + " (" + node.LinkName + ") "
+                + " (" + node.ID + ") "
                 + node.GetType().Name;
             }
             else

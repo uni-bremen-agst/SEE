@@ -8,7 +8,7 @@ namespace SEE.Layout
         /// <summary>
         /// A unique ID for a node.
         /// </summary>
-        string LinkName { get; }
+        string ID { get; }
 
         /// <summary>
         /// Scale of a node.
