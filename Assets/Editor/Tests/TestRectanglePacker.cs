@@ -206,14 +206,18 @@ namespace SEE.Layout.RectanglePacking
         {
             int howManyNodes = 500;
             Vector3 initialSize = Vector3.one;
-
+            MyGameNode root = new MyGameNode(initialSize, 0);
             CubeFactory factory = new CubeFactory();
+
             ICollection<ILayoutNode> gameObjects = new List<ILayoutNode>();
+            gameObjects.Add(root);
 
             for (int i = 1; i <= howManyNodes; i++)
             {
                 initialSize *= 1.01f;
-                gameObjects.Add(new MyGameNode(initialSize, i));
+                MyGameNode child = new MyGameNode(initialSize, i);
+                gameObjects.Add(child);
+                root.AddChild(child);
             }
 
             RectanglePackingNodeLayout packer = new RectanglePackingNodeLayout(0.0f, 1.0f);
@@ -231,7 +235,13 @@ namespace SEE.Layout.RectanglePacking
                 this.index = index;
             }
 
-            public ILayoutNode Parent => null;
+            private ILayoutNode parent;
+
+            public ILayoutNode Parent
+            {
+                get => parent;
+                set => parent = value;
+            }
 
             private int level = 0;
 
@@ -241,9 +251,17 @@ namespace SEE.Layout.RectanglePacking
                 set => level = value;
             }
 
+            private List<ILayoutNode> children = new List<ILayoutNode>();
+
             public ICollection<ILayoutNode> Children()
             {
-                return new List<ILayoutNode>();
+                return children;
+            }
+
+            public void AddChild(MyGameNode node)
+            {
+                children.Add(node);
+                node.Parent = this;
             }
 
             private Vector3 scale;
@@ -272,9 +290,9 @@ namespace SEE.Layout.RectanglePacking
                 get => centerPosition - Vector3.up * 0.5f * scale.y;
             }
 
-            public bool IsLeaf => false;
+            public bool IsLeaf => children.Count == 0;
 
-            public string LinkName { get => index.ToString(); }
+            public string ID { get => index.ToString(); }
 
             private float rotation;
 

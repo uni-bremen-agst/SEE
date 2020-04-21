@@ -22,18 +22,18 @@ using System.Collections.Generic;
 namespace SEE.DataModel
 {
     /// <summary>
-    /// Compares two edges by Edge.LinkName() for equality.
+    /// Compares two edges by Edge.ID() for equality.
     /// </summary>
     public class EdgeEqualityComparer : IEqualityComparer<Edge>
     {
         public bool Equals(Edge x, Edge y)
         {
-            return x.LinkName.Equals(y.LinkName);
+            return x.ID.Equals(y.ID);
         }
 
         public int GetHashCode(Edge obj)
         {
-            return obj.LinkName.GetHashCode();
+            return obj.ID.GetHashCode();
         }
     }
 }

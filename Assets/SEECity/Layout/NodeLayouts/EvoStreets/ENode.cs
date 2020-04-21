@@ -109,7 +109,7 @@ namespace SEE.Layout.EvoStreets
 
         public override string ToString()
         {
-            return $"Node[Linkname={GraphNode.LinkName}]";
+            return $"Node[ID={GraphNode.ID}]";
         }
     }
 }

@@ -10,20 +10,22 @@ namespace SEE.DataModel.IO
     /// </summary>
     public class MetricImporter
     {
+        public const string IDColumnName = "ID";
+
         /// <summary>
         /// Loads node metric values from given CSV file with given separator.
         /// The file must contain a header with the column names. The first column
-        /// name must be Node.LinknameAttribute. Values must be either integers or
+        /// name must be the Node.ID. Values must be either integers or
         /// floats. All numerics will be added as float attributes to the node.
-        /// Floats must use . to separate the digits. The linkname is used to 
+        /// Floats must use . to separate the digits. The ID is used to 
         /// identify a node. 
         /// 
         /// The following errors may occur:
         /// ) The file cannot be read => default Exception
         /// ) The file is empty => IOException
-        /// ) The first row does not contain the linkname attribute in its first column => IOException
+        /// ) The first row does not contain the ID attribute in its first column => IOException
         /// ) There is a row that has either too many or to few entries (the length of header and data rows do not match)
-        /// ) A node with given linkname does not exist in the graph
+        /// ) A node with given ID does not exist in the graph
         /// ) The data entry in a column cannot be parsed as float
         /// 
         /// In the latter three situations, an error message is emitted and the error counter
@@ -58,14 +60,14 @@ namespace SEE.DataModel.IO
                         // The names of the columns
                         string[] columnNames = headerLine.Split(separator);
                         lineCount++;
-                        // We expect the linkname plus at least one metric
+                        // We expect the ID plus at least one metric
                         if (columnNames.Length > 1)
                         {
-                            // The first column must be the linkname
-                            if (columnNames[0] != Node.LinknameAttribute)
+                            // The first column must be the ID
+                            if (columnNames[0] != IDColumnName)
                             {
-                                Debug.LogErrorFormat("First header column in file {0} is not {1}.\n", filename, Node.LinknameAttribute);
-                                throw new IOException("First header column does not contain the expected attribute " + Node.LinknameAttribute);
+                                Debug.LogErrorFormat("First header column in file {0} is not {1}.\n", filename, IDColumnName);
+                                throw new IOException("First header column does not contain the expected attribute " + IDColumnName);
                             }
                             // Process each data row
                             while (!reader.EndOfStream)
@@ -80,7 +82,7 @@ namespace SEE.DataModel.IO
                                     Debug.LogErrorFormat("Unexpected number of entries in file {0} at line {1}.\n", filename, lineCount);
                                     numberOfErrors++;
                                 }
-                                // Linkname is expected to be in the first column. Try to
+                                // ID is expected to be in the first column. Try to
                                 // retrieve the corresponding node from the graph
                                 if (graph.TryGetNode(values[0], out Node node))
                                 {

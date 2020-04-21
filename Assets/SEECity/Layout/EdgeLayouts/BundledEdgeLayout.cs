@@ -14,15 +14,28 @@ namespace SEE.Layout
     {
         /// <summary>
         /// Constructor.
+        /// 
+        /// Parameter <paramref name="tension"/> specifies the degree of bundling. A value of 
+        /// zero means no bundling at all; the maximal value of 1 means maximal bundling.
+        /// 
+        /// Parameter <paramref name="rdp"/> specifies the extent the polylines of the generated
+        /// splines are simplified. Neighboring line points whose distances fall below 
+        /// <paramref name="rdp"/> (with respect to the line drawn between their neighbors) will 
+        /// be removed. The greater the value is, the more aggressively points are removed 
+        /// (note: values greater than one are fine). A positive value close to zero results 
+        /// in a line with little to no reduction. A negative value is treated as 0. A value 
+        /// of zero has no effect.
         /// </summary>
         /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
         /// <param name="tension">strength of the tension for bundling edges; must be in the range [0,1]</param>
-        public BundledEdgeLayout(bool edgesAboveBlocks, float tension = 0.85f)
+        /// <param name="rdp">epsilon parameter of the Ramer–Douglas–Peucker algorithm</param>
+        public BundledEdgeLayout(bool edgesAboveBlocks, float tension = 0.85f, float rdp = 0.0f)
             : base(edgesAboveBlocks)
         {
             name = "Hierarchically Bundled";
             Debug.Assert(0.0f <= tension && tension <= 1.0f);
             this.tension = tension;
+            this.rdp = rdp;
         }
 
         /// <summary>
@@ -30,6 +43,16 @@ namespace SEE.Layout
         /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
         /// </summary>
         private float tension = 0.85f; // 0.85 is the value recommended by Holten
+
+        /// <summary>
+        /// Determines to which extent the polylines of the generated splines are simplified.
+        /// Neighboring line points whose distances fall below rdp (with respect to the line 
+        /// drawn between their neighbors) will be removed. The greater the value is, the more 
+        /// aggressively points are removed (note: values greater than one are fine). A positive 
+        /// value close to zero results in a line with little to no reduction. A negative value 
+        /// is treated as 0. A value of zero has no effect.
+        /// </summary>
+        private float rdp = 0.0f; // 0.0f means no simplification
 
         /// <summary>
         /// Returns hierarchically bundled splines for all edges among the given <paramref name="layoutNodes"/>.
@@ -175,7 +198,7 @@ namespace SEE.Layout
                     // there are multiple roots, in which case nodes in different trees of this
                     // forrest do not have a common ancestor.
                     Debug.LogWarning("Undefined lowest common ancestor for "
-                        + source.LinkName + " and " + target.LinkName + "\n");
+                        + source.ID + " and " + target.ID + "\n");
                     return BetweenTrees(source, target);
                 }
                 else if (lca == source || lca == target)
@@ -235,7 +258,7 @@ namespace SEE.Layout
                                                + GetLevelHeight(fullPath[i].Level) * direction;
                         }
                         controlPoints[controlPoints.Length - 1] = edgesAboveBlocks ? target.Roof : target.Ground;
-                        return LinePoints.BSplineLinePoints(controlPoints, tension);
+                        return Simplify(LinePoints.BSplineLinePoints(controlPoints, tension), rdp);
                     }
                 }
             }

@@ -2,6 +2,7 @@
 using SEE.Tools;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.DataModel.IO
 {
@@ -24,6 +25,15 @@ namespace SEE.DataModel.IO
         /// relation among nodes.
         /// </summary>
         private const string hierarchicalEdgeType = "Enclosing";
+
+        [Test]
+        public void TestReadingRealBigGraph()
+        {
+            string filename = Application.dataPath + "/../Data/GXL/graphs/bash.gxl";
+            Performance p = Performance.Begin("Loading GXL file " + filename);
+            Graph graph = LoadGraph(filename);
+            p.End();
+        }
 
         /// <summary>
         /// Test for a simple artifically created graph.
@@ -141,7 +151,7 @@ namespace SEE.DataModel.IO
         private static Node NewNode(Graph graph, string linkname)
         {
             Node result = new Node();
-            result.LinkName = linkname;
+            result.ID = linkname;
             result.SourceName = linkname;
             result.Type = "Routine";
             result.SetToggle("Linkage.Is_Definition");

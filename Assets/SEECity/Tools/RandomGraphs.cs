@@ -230,7 +230,7 @@ namespace SEE.Tools
         {
             Node result = new Node
             {
-                LinkName = linkname,
+                ID = linkname,
                 SourceName = linkname,
                 Type = type
             };

@@ -14,7 +14,7 @@ namespace SEE.DataModel
         {
             Node node = new Node();
             node.Type = "Routine";
-            node.LinkName = linkname;
+            node.ID = linkname;
             node.SourceName = "Source_" + linkname;
             node.SetFloat("float", 1.0f);
             node.SetInt("int", 2);
@@ -32,7 +32,7 @@ namespace SEE.DataModel
 
             Node clone = (Node)original.Clone();
             Assert.That(clone.Type == original.Type);
-            Assert.That(clone.LinkName == original.LinkName);
+            Assert.That(clone.ID == original.ID);
             Assert.That(clone.SourceName == original.SourceName);
             Assert.That(clone.GetFloat("float") == original.GetFloat("float"));
             Assert.That(clone.GetInt("int") == original.GetInt("int"));
@@ -156,7 +156,7 @@ namespace SEE.DataModel
         {
             foreach (Node root in original.GetRoots())
             {
-                if (clone.TryGetNode(root.LinkName, out Node clonedRoot))
+                if (clone.TryGetNode(root.ID, out Node clonedRoot))
                 {
                     CompareHierarchy(root, clone, clonedRoot);
                 }
@@ -169,12 +169,12 @@ namespace SEE.DataModel
 
         private void CompareHierarchy(Node node, Graph clone, Node clonedNode)
         {
-            Assert.That(node.LinkName == clonedNode.LinkName, 
-                        "Linknames differ: " + node.LinkName + " != " + clonedNode.LinkName);
+            Assert.That(node.ID == clonedNode.ID, 
+                        "Linknames differ: " + node.ID + " != " + clonedNode.ID);
             Assert.That(node.NumberOfChildren() == clonedNode.NumberOfChildren());
             Assert.That(node.Level == clonedNode.Level,
                         "levels differ between correspondings nodes with linkname "
-                        + node.LinkName + ": "
+                        + node.ID + ": "
                         + node.Level + " (expected) != " + clonedNode.Level + " (actual)");
 
             if (node.IsRoot())
@@ -186,12 +186,12 @@ namespace SEE.DataModel
                 Assert.That(!clonedNode.IsRoot(), 
                             clonedNode.ToString() + " should not be a root. Corresponding node in original graph: "
                             + node.ToString());
-                Assert.That(node.Parent.LinkName == clonedNode.Parent.LinkName);
+                Assert.That(node.Parent.ID == clonedNode.Parent.ID);
             }
 
             foreach (Node nodeChild in node.Children())
             {
-                if (clone.TryGetNode(nodeChild.LinkName, out Node clonedChild))
+                if (clone.TryGetNode(nodeChild.ID, out Node clonedChild))
                 {
                     CompareHierarchy(nodeChild, clone, clonedChild);
                 }

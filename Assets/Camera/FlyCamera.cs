@@ -405,7 +405,7 @@ namespace SEE
                         else
                         {
                             text.text = nodeRef.node.Type;
-                            Debug.Log("Node has neither Source.Name nor unique linkname.\n");
+                            Debug.Log("Node has neither Source.Name nor unique ID.\n");
                             Dump(objectHit);
                         }
                     }
