@@ -14,9 +14,14 @@ namespace SEE.Controls.Devices
 
         private SteamVR_Action_Single TriggerAction = SteamVR_Input.GetSingleAction(defaultActionSet, "Trigger");
 
-        public override Vector3 Value
+        public override Vector3 Direction
         {
             get => SteamVR_Actions.default_Pose.GetLocalRotation(PointingHand.handType) * Vector3.forward;
+        }
+
+        public override Vector3 Position
+        {
+            get => PointingHand.transform.position; // SteamVR_Actions.default_Pose.GetLocalPosition(PointingHand.handType);
         }
 
         public override bool Activated
