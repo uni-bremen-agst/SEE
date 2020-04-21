@@ -49,8 +49,8 @@ namespace SEE.Tools
             // Now add the mappings incrementally.
             foreach (Edge map in mapping.Edges())
             {
-                Node source = impl.GetNode(map.Source.LinkName);
-                Node target = arch.GetNode(map.Target.LinkName);
+                Node source = impl.GetNode(map.Source.ID);
+                Node target = arch.GetNode(map.Target.ID);
                 Assert.NotNull(source);
                 Assert.NotNull(target);
                 reflexion.Add_To_Mapping(source, target);

@@ -11,7 +11,7 @@ namespace SEE.DataModel
         private static Node NewNode(Graph graph, string linkname)
         {
             Node result = new Node();
-            result.LinkName = linkname;
+            result.ID = linkname;
             result.Type = "Routine";
             graph.AddNode(result);
             return result;

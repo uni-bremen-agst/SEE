@@ -198,7 +198,7 @@ namespace SEE.Layout
                     // there are multiple roots, in which case nodes in different trees of this
                     // forrest do not have a common ancestor.
                     Debug.LogWarning("Undefined lowest common ancestor for "
-                        + source.LinkName + " and " + target.LinkName + "\n");
+                        + source.ID + " and " + target.ID + "\n");
                     return BetweenTrees(source, target);
                 }
                 else if (lca == source || lca == target)

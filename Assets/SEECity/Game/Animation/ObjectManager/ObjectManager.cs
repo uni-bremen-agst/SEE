@@ -29,8 +29,8 @@ namespace SEE.Game.Animation
     /// An ObjectManager creates and manages GameObjects by using a supplied
     /// GraphRenderer to create game objects for graph nodes. Those game objects
     /// will be cached, that is, non-existing GameObjects are created and stored 
-    /// for reuse during query. Each GameObject is identified by the LinkName of 
-    /// a node and can be retrieved via any node with the same LinkName.
+    /// for reuse during query. Each GameObject is identified by the ID of 
+    /// a node and can be retrieved via any node with the same ID.
     /// </summary>
     public class ObjectManager
     {
@@ -120,7 +120,7 @@ namespace SEE.Game.Animation
         /// <summary>
         /// Sets <paramref name="gameNode"/> to a cached GameObject for a leaf or inner node 
         /// or creates a new one if none has existed. The game object is identified
-        /// by the attribute Linkname of <paramref name="node"/>.
+        /// by the attribute ID of <paramref name="node"/>.
         /// If a game object existed already, the given <paramref name="node"/> will be
         /// attached to <paramref name="gameNode"/> replacing its previously attached graph
         /// node and that previously attached graph node will be returned. If no such game object
@@ -133,7 +133,7 @@ namespace SEE.Game.Animation
         /// such a game object existed or null if the game node was newly created</returns>
         public Node GetNode(Node node, out GameObject gameNode)
         {
-            if (nodes.TryGetValue(node.LinkName, out gameNode))
+            if (nodes.TryGetValue(node.ID, out gameNode))
             {
                 // The game object has already a node attached to it, but that
                 // node is part of a different graph (i.e,, different revision).
@@ -157,7 +157,7 @@ namespace SEE.Game.Animation
                     // we have the layout. 
                 }
                 // Add the newly created gameNode to the cache.
-                nodes[node.LinkName] = gameNode;
+                nodes[node.ID] = gameNode;
                 return null;
             }
         }
@@ -180,7 +180,7 @@ namespace SEE.Game.Animation
             {
                 // noderef should not be null
                 Debug.LogErrorFormat("Re-used game object for node '{0}' does not have a graph node attached to it\n",
-                                     node.LinkName);
+                                     node.ID);
                 noderef = gameObject.AddComponent<NodeRef>();
             }
             else
@@ -192,7 +192,7 @@ namespace SEE.Game.Animation
         }
 
         /// <summary>
-        /// Removes the game object representing the given <paramref name="node"/> by using the LinkName 
+        /// Removes the game object representing the given <paramref name="node"/> by using the ID 
         /// of the <paramref name="node"/> and returns the removed node in <paramref name="gameObject"/>, if 
         /// it existed. Returns true if such a game object existed in the cache.
         /// </summary>
@@ -203,8 +203,8 @@ namespace SEE.Game.Animation
         {
             node.AssertNotNull("node");
 
-            var wasNodeRemoved = nodes.TryGetValue(node.LinkName, out gameObject);
-            nodes.Remove(node.LinkName);
+            var wasNodeRemoved = nodes.TryGetValue(node.ID, out gameObject);
+            nodes.Remove(node.ID);
             return wasNodeRemoved;
         }
 

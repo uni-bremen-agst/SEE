@@ -144,15 +144,15 @@ namespace SEE.Tools
         private void AssertMapped(Node implNode, Node archNode)
         {
             Assert.AreEqual(1, mapsToEdgesAdded.Count);
-            Assert.AreEqual(implNode.LinkName, mapsToEdgesAdded[0].mapsToEdge.Source.LinkName);
-            Assert.AreEqual(archNode.LinkName, mapsToEdgesAdded[0].mapsToEdge.Target.LinkName);
+            Assert.AreEqual(implNode.ID, mapsToEdgesAdded[0].mapsToEdge.Source.ID);
+            Assert.AreEqual(archNode.ID, mapsToEdgesAdded[0].mapsToEdge.Target.ID);
         }
 
         private void AssertUnmapped(Node implNode, Node archNode)
         {
             Assert.AreEqual(1, mapsToEdgesRemoved.Count);
-            Assert.AreEqual(implNode.LinkName, mapsToEdgesRemoved[0].mapsToEdge.Source.LinkName);
-            Assert.AreEqual(archNode.LinkName, mapsToEdgesRemoved[0].mapsToEdge.Target.LinkName);
+            Assert.AreEqual(implNode.ID, mapsToEdgesRemoved[0].mapsToEdge.Source.ID);
+            Assert.AreEqual(archNode.ID, mapsToEdgesRemoved[0].mapsToEdge.Target.ID);
         }
 
         [Test]

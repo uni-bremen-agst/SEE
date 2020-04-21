@@ -28,7 +28,8 @@ namespace SEE.DataModel.IO
         /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
         /// <param name="rootName">name of the artifical root node if required</param>
         /// <param name="logger">the logger used for messages; if null, no messages are emitted</param>
-        public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string rootName = "", ILogger logger = null) : base(filename, logger)
+        public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string rootName = "", ILogger logger = null) 
+            : base(filename, logger)
         {
             this.hierarchicalEdgeTypes = hierarchicalEdgeTypes;
             this.rootName = string.IsNullOrEmpty(rootName) ? "" : rootName;
@@ -56,11 +57,12 @@ namespace SEE.DataModel.IO
                 }
                 else if (roots.Count > 1)
                 {
-                    Debug.LogWarningFormat("Graph stored in {0} has multiple roots. Adding an artificial single root {1}.\n", filename, rootName);
+                    Debug.LogWarningFormat("Graph stored in {0} has multiple roots. Adding an artificial single root {1}.\n", 
+                                           filename, rootName);
                     Node singleRoot = new Node
                     {
                         Type = rootName,
-                        LinkName = rootName,
+                        ID = rootName,
                         SourceName = rootName
                     };
                     graph.AddNode(singleRoot);
@@ -169,7 +171,7 @@ namespace SEE.DataModel.IO
         }
 
         /// <summary>
-        /// Sets the linkname of the current graph element (a node) and resets it to null.
+        /// Sets the ID of the current graph element (a node), inserts into the graph, and resets it to null.
         /// </summary>
         protected override void EndNode()
         {
@@ -188,7 +190,31 @@ namespace SEE.DataModel.IO
                     // Now the current node should have a linkname and we can
                     // actually add it to the graph.
                     Node node = (Node)current;
-                    if (String.IsNullOrEmpty(node.LinkName))
+                    if (node.TryGetString(Node.LinknameAttribute, out string linkname))
+                    {
+                        // The attribute Linkage.Name is actually not unique. There are cases where multiple
+                        // nodes may have the same value for Linkage.Name. They will differ in another attribute
+                        // Linkage.PIR_Node. If we have a node with both attributes, we can combine them to
+                        // make a unique ID. The attribute Linkage.PIR_Node is an integer attribute.
+                        if (node.TryGetInt("Linkage.PIR_Node", out int pir))
+                        {
+                            node.ID = linkname + "#" + pir;
+                        }
+                        else
+                        {
+                            node.ID = linkname;
+                        }
+                        try
+                        {
+                            graph.AddNode(node);
+                        }
+                        catch (Exception e)
+                        {
+                            LogError(e.Message);
+                            throw e;
+                        }
+                    }
+                    else
                     {
                         LogError("Node has no attribute " + Node.LinknameAttribute);
                         // let's try to use the Source.Name for the linkname instead, hoping it is unique
@@ -198,13 +224,9 @@ namespace SEE.DataModel.IO
                         }
                         else
                         {
-                            node.LinkName = node.SourceName;
+                            node.ID = node.SourceName;
                             graph.AddNode(node);
                         }
-                    }
-                    else
-                    {
-                        graph.AddNode(node);
                     }
                 }
                 current = null;
