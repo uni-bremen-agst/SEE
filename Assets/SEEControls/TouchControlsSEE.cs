@@ -236,7 +236,9 @@ public class TouchControlsSEE : MonoBehaviour
         locations[1] = ToVector4(transObject.transform.position, time + 2);
 
         //creating spline for MoveToTarget
-        spline = TinySpline.Utils.interpolateCubic(VectorsToList(locations), 4);
+        // FIXME: This line had to be removed after merging the master branch into control_cleanup.
+        // Because this file will likely be removed anyhow, I won't fix it now.
+        //spline = TinySpline.Utils.interpolateCubic(VectorsToList(locations), 4);
 
     }
     //moves the camera to offset position relative to the target
