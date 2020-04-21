@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using SEE;
+using SEE.Game;
 
 namespace SEEEditor
 {
@@ -9,17 +9,23 @@ namespace SEEEditor
     /// </summary>
     [CustomEditor(typeof(SEECity))]
     [CanEditMultipleObjects]
-    public class SEECityEditor : AbstractSEECityEditor
+    public class SEECityEditor : StoredSEECityEditor
     {
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
 
             SEECity city = target as SEECity;
+            Attributes();
+            Buttons();
+        }
 
-            city.gxlPath = EditorGUILayout.TextField("GXL file", city.gxlPath);
-            city.csvPath = EditorGUILayout.TextField("CSV file", city.csvPath);
-
+        /// <summary>
+        /// Creates the buttons for loading and deleting a city.
+        /// </summary>
+        protected void Buttons()
+        {
+            SEECity city = target as SEECity;
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Load City"))
             {
@@ -33,13 +39,25 @@ namespace SEEEditor
         }
 
         /// <summary>
+        /// Shows and sets the attributes of the SEECity managed here.
+        /// This method should be overridden by subclasses if they have additional
+        /// attributes to manage.
+        /// </summary>
+        protected virtual void Attributes()
+        {
+            SEECity city = target as SEECity;
+            city.gxlPath = EditorGUILayout.TextField("GXL file", city.gxlPath);
+            city.csvPath = EditorGUILayout.TextField("CSV file", city.csvPath);
+        }
+
+        /// <summary>
         /// Loads the graph data and metric data from disk, aggregates the metrics to
         /// inner nodes and renders the graph in the scene.
         /// </summary>
         /// <param name="city">the city to be set up</param>
-        private void SetUp(SEECity city)
+        protected virtual void SetUp(SEECity city)
         {
-            city.LoadData();
+            city.LoadAndDrawGraph();
         }
 
         /// <summary>

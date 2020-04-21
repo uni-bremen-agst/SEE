@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Collections;
-using SEE.Layout;
+using SEE.GO;
 using SEE.DataModel;
 
 namespace SEE

@@ -20,7 +20,7 @@ namespace SEE
         /// <summary>
         /// The current location index in the path. It identifies the position and rotation
         /// of the camera.
-        /// 
+        ///
         /// Invariant: 0 <= location < path.Count
         /// </summary>
         private int location = 0;
@@ -28,7 +28,7 @@ namespace SEE
         /// <summary>
         /// Name of the file where to load the captured data camera path points from.
         /// </summary>
-        public string filename = "path" + CameraPath.DotPathFileExtension;
+        public string Filename = "path" + CameraPath.DotPathFileExtension;
 
         /// <summary>
         /// As to whether the path should be drawn as a sequence of lines in the game.
@@ -75,7 +75,7 @@ namespace SEE
         /// Deserializes the list of doubles as list of Vector4s.
         /// </summary>
         /// <param name="list">list to be deserialized</param>
-        /// <returns>list of Vectors4 (x,y,z,w) where x,y,z are 
+        /// <returns>list of Vectors4 (x,y,z,w) where x,y,z are
         /// 3D co-ordinates and w is the time deserialized from given list</returns>
         private Vector4[] ListToVectors(IList<double> list)
         {
@@ -94,30 +94,20 @@ namespace SEE
         }
 
         /// <summary>
-        /// Returns the name of the file from which to read the path data.
-        /// </summary>
-        /// <returns>name of the file from which to read the path data</returns>
-        private string Filename()
-        {
-            return filename;
-        }
-
-        /// <summary>
         /// Reads the path data from disk and sets up the data structures
         /// necessary to move the camera along the path.
-        /// 
+        ///
         /// In case the path cannot be loaded from disk, pathIsEnabled is
         /// set to false.
-        /// 
+        ///
         /// Start is called before the first frame update.
         /// </summary>
         void Start()
         {
             try
             {
-                string filename = Filename();
-                path = CameraPath.ReadPath(filename);
-                Debug.LogFormat("Read camera path from {0}\n", filename);
+                path = CameraPath.ReadPath(Filename);
+                Debug.LogFormat("Read camera path from {0}\n", Filename);
                 if (ShowPath)
                 {
                     path.Draw();
@@ -125,19 +115,19 @@ namespace SEE
             }
             catch (Exception e)
             {
-                Debug.LogErrorFormat("ScriptedCamera: Could not read path from file {0}: {1}\n", Filename(), e.ToString());
+                Debug.LogErrorFormat("ScriptedCamera: Could not read path from file {0}: {1}\n", Filename, e.ToString());
                 pathIsEnabled = false;
                 return;
             }
-            if (path.Count < 2)
+            if (path.Count < 1)
             {
-                Debug.LogWarning("ScriptedCamera: Requiring at least two locations.\n");
+                Debug.LogWarning("ScriptedCamera: Requiring at least one location.\n");
                 pathIsEnabled = false;
                 return;
             }
             try
             {
-                spline = TinySpline.Utils.interpolateCubic(VectorsToList(path), 4);
+                spline = TinySpline.BSpline.InterpolateCatmullRom(VectorsToList(path), 4);
                 pathIsEnabled = true;
             }
             catch (Exception e)
@@ -145,10 +135,10 @@ namespace SEE
                 Debug.LogWarning($"ScriptedCamera: Interpolation failed with error '{e.Message}'\n");
                 Debug.LogWarning($"ScriptedCamera: Creating spline with default location\n");
                 spline = new BSpline(1, 4, 0);
-                spline.controlPoints = new List<double> { 0, 0, 0, 0 };
+                spline.ControlPoints = new List<double> { 0, 0, 0, 0 };
                 pathIsEnabled = false;
             }
-            transform.position = ListToVectors(spline.controlPointAt(0))[0];
+            transform.position = ListToVectors(spline.ControlPointAt(0))[0];
             transform.rotation = path[0].rotation;
         }
 
@@ -162,22 +152,22 @@ namespace SEE
             {
                 // Time.deltaTime is the time since the last Update() in seconds.
                 time += Time.deltaTime;
-                transform.position = ListToVectors(spline.bisect(time, 0.001, false, 3).result)[0];
+                transform.position = ListToVectors(spline.Bisect(time, 0.001, false, 3).Result)[0];
                 transform.rotation = Forward(ref location, time);
             }
         }
 
         /// <summary>
-        /// Yields the interpolated rotation on the way between two subsequent points 
-        /// P1 and P2 on the path, where P2 is the point path[I] at the smallest index I in path 
+        /// Yields the interpolated rotation on the way between two subsequent points
+        /// P1 and P2 on the path, where P2 is the point path[I] at the smallest index I in path
         /// where current <= I and time <= path[I].time and P1 is path[I-1].
-        /// 
+        ///
         /// Special cases: if current = 0, path[0].rotation is returned (the initial rotation
         /// of the camera) and if current = path.Count, the interpolated rotation between
-        /// path[path.Count-2].time and path[path.Count-1].time is returned (the output current 
+        /// path[path.Count-2].time and path[path.Count-1].time is returned (the output current
         /// will then be path.Count-1).
-        /// 
-        /// Increases the current index to the next point reached (but not farther than path.Count-1). 
+        ///
+        /// Increases the current index to the next point reached (but not farther than path.Count-1).
         /// </summary>
         /// <param name="current">the current index into the path; will be increased to the
         /// next index we need to reach at the given point in time</param>
@@ -206,7 +196,7 @@ namespace SEE
             float rightTime = path[current].time - previousTime;
             time -= previousTime;
             float relativeTime = time / rightTime;
-            return Quaternion.Slerp(path[current - 1].rotation, path[current].rotation, relativeTime);            
+            return Quaternion.Slerp(path[current - 1].rotation, path[current].rotation, relativeTime);
         }
     }
 }

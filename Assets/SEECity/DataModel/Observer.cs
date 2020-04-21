@@ -4,7 +4,13 @@
     /// The event information about the change of the state of the observed subject.
     /// This class is intended to be specialized for more specific change events.
     /// </summary>
-    public class ChangeEvent { }
+    public abstract class ChangeEvent
+    {
+        public override string ToString()
+        {
+            return this.GetType().Name;
+        }
+    }
 
     /// <summary>
     /// Common interface of all observers of instances of Observable.

@@ -22,18 +22,18 @@ using System.Collections.Generic;
 namespace SEE.DataModel
 {
     /// <summary>
-    /// Compares two nodes by Node.LinkName for equality.
+    /// Compares two nodes by Node.ID for equality.
     /// </summary>
     public class NodeEqualityComparer : IEqualityComparer<Node>
     {
         public bool Equals(Node x, Node y)
         {
-            return x.LinkName.Equals(y?.LinkName);
+            return x.ID.Equals(y?.ID);
         }
 
         public int GetHashCode(Node obj)
         {
-            return obj.LinkName.GetHashCode();
+            return obj.ID.GetHashCode();
         }
     }
 }

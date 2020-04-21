@@ -21,6 +21,10 @@ TagManager:
   - Chart
   - ChartContainer
   - CCAnimation
+  - projectile
+  - FxTemporaire
+  - Runtime
+  - Function Call
   layers:
   - Default
   - TransparentFX
