@@ -2,6 +2,7 @@
 using UnityEngine;
 using Leap;
 
+[System.Obsolete("Will be removed when the transition to new design of input-actions mapping is implemented.")]
 public class LeapMovementCV : MonoBehaviour
 {
     private Leap.Controller controller;

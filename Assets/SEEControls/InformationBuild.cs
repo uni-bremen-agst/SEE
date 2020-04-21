@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
+[System.Obsolete("Will be removed when the transition to new design of input-actions mapping is implemented.")]
 public class InformationBuild : MonoBehaviour
 {
     /// <summary>

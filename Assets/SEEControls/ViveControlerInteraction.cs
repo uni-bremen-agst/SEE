@@ -8,6 +8,7 @@ namespace SEE.Controls
     /// It is the central point for processing controller input.
     /// No other script within the level should use controller inputs.
     /// </summary>
+    [System.Obsolete("Will be removed when the transition to new design of input-actions mapping is implemented.")]
     public class ViveControlerInteraction : MonoBehaviour
     {
         [Tooltip("Sensitivity of the left trigger. Only when the trigger is pressed more than this threshold, it will fire.")]

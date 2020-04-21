@@ -4,6 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Enables/disables the controller (leap motion or vive style).
 /// </summary>
+[System.Obsolete("Will be removed when the transition to new design of input-actions mapping is implemented.")]
 public class ControlMode : MonoBehaviour
 {
     /// <summary>

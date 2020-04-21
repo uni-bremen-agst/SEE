@@ -4,6 +4,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using TinySpline;
 
+[System.Obsolete("Will be removed when the transition to new design of input-actions mapping is implemented.")]
 public class TouchControlsSEE : MonoBehaviour
 {
     [Tooltip("The camera rig to be moved.")]
