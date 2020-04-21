@@ -5,7 +5,13 @@ namespace SEE.Controls
 {
     public abstract class SelectionAction : MonoBehaviour
     {
+        /// <summary>
+        /// The device yielding the selection information.
+        /// </summary>
         protected Selection selectionDevice;
+        /// <summary>
+        /// The device yielding the selection information.
+        /// </summary>
         public Selection SelectionDevice
         {
             get => selectionDevice;
@@ -13,80 +19,53 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// The line renderer to draw the ray.
+        /// The camera from which to search for objects.
         /// </summary>
-        private LineRenderer line;
-        /// <summary>
-        /// The game object holding the line renderer.
-        /// </summary>
-        private GameObject lineHolder;
-
         private Camera mainCamera;
+        /// <summary>
+        /// The camera from which to search for objects.
+        /// </summary>
         internal Camera MainCamera
         {
             get => mainCamera;
             set => mainCamera = value;
         }
 
-        const float defaultWidth = 0.1f;
-
-        [Tooltip("The color used when an object was hit.")]
-        public Color colorOnHit = Color.green;
-        [Tooltip("The color used when no object was hit.")]
-        public Color defaultColor = Color.red;
-
-        private void Start()
-        {
-            lineHolder = new GameObject();
-            lineHolder.name = "Ray";
-            lineHolder.transform.parent = this.transform;
-            lineHolder.transform.localPosition = Vector3.up;
-
-            line = lineHolder.AddComponent<LineRenderer>();
-
-            // simplify rendering; no shadows
-            line.receiveShadows = false;
-            line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-
-            line.startWidth = defaultWidth;
-            line.endWidth = defaultWidth;
-        }
-
+        /// <summary>
+        /// If the search was activated, a ray is cast from the position of
+        /// the MainCamera or selectionDevice towards the selectionDevice's
+        /// pointing direction. During this search, visual feedback may be
+        /// given (depends upon the subclasses).
+        /// </summary>
         private void Update()
         {
-            //Debug.LogFormat("selecting: {0}\n", selectionDevice.Activated);
-
             if (selectionDevice.Activated)
-            {               
+            {
                 GameObject selectedObject = Select(out RaycastHit hitInfo);
-                ResetLine();
+
+                ShowFeedback(selectedObject, hitInfo);
 
                 if (selectedObject != null)
                 {
-                    //Debug.LogFormat("hit point at {0}\n", hitInfo.point);
-                    line.SetPosition(1, hitInfo.point);
-                    line.material.color = colorOnHit;
+                    ProcessSelectedObject(selectedObject);
                 }
-                else
-                {
-                    line.material.color = defaultColor;
-                }
-
-                // Do something with the selected object.
-                if (selectedObject != null)
-                {
-                    Debug.LogFormat("Selected object {0}\n", selectedObject.name);
-                }
+            }
+            else
+            {
+                HideFeedback();
             }
         }
 
-        private void ResetLine()
-        {
-            Vector3 origin = Origin();
-            line.SetPosition(0, origin);
-            line.SetPosition(1, origin);
-        }
-
+        /// <summary>
+        /// Tries to select an object. If one was selected, it is returned,
+        /// and <paramref name="hitInfo"/> contains additional information 
+        /// about the hit.
+        /// If none is selected, null is returned and <paramref name="hitInfo"/>
+        /// is undefined.
+        /// </summary>
+        /// <param name="hitInfo">information about the hit if an object was hit,
+        /// otherwise undefined</param>
+        /// <returns>the selected object or null if none was selected</returns>
         private GameObject Select(out RaycastHit hitInfo)
         {
             if (Detect(out hitInfo))
@@ -99,8 +78,39 @@ namespace SEE.Controls
             }
         }
 
+        /// <summary>
+        /// Casts a ray to search for objects using the selectionDevice's direction.
+        /// Returns true if an object was hit.
+        /// </summary>
+        /// <param name="hitInfo">additional information on the hit; defined only if this
+        /// method returns true</param>
+        /// <returns>true if an object was hit</returns>
         protected abstract bool Detect(out RaycastHit hitInfo);
 
-        protected abstract Vector3 Origin();
+        /// <summary>
+        /// Gives visual feedback on the current search for an object.
+        /// </summary>
+        /// <param name="selectedObject">the object selected or null if none was selected</param>
+        /// <param name="hitInfo">information about the hit (used only if <paramref name="selectedObject"/>
+        /// is not null)</param>
+        protected virtual void ShowFeedback(GameObject selectedObject, RaycastHit hitInfo)
+        {
+        }
+
+        /// <summary>
+        /// Terminates the visual feedback on the current search for an object.
+        /// </summary>
+        protected virtual void HideFeedback()
+        {
+        }
+
+        /// <summary>
+        /// Called when an object was selected (passed as parameter <paramref name="selectedObject"/>).
+        /// </summary>
+        /// <param name="selectedObject">the selected object</param>
+        protected virtual void ProcessSelectedObject(GameObject selectedObject)
+        {
+            Debug.LogFormat("Selected object {0}\n", selectedObject.name);
+        }
     }
 }

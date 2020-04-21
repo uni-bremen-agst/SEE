@@ -1,21 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Controls.Devices
 {
     public class NullSelection : Selection
     {
+        public override Vector3 Direction => Vector3.zero;
 
-        public override Vector3 Value
-        {
-            get => Vector3.zero;
-        }
+        public override bool Activated => false;
 
-        public override bool Activated
-        {
-            get => false;
-        }
+        public override Vector3 Position => Vector3.zero;
     }
 }

@@ -2,19 +2,22 @@
 
 namespace SEE.Controls
 {
+    /// <summary>
+    /// Selection of objects when the selection device offers only 2D locations
+    /// on the screen (e.g., mouse or touch devices).
+    /// </summary>
     public class Selection2DAction : SelectionAction
     {
-        protected override Vector3 Origin()
-        {
-            return MainCamera.transform.position;
-        }
-
+        /// <summary>
+        /// Casts a ray from the MainCamera through the selection.Direction (position
+        /// on the screen) to hit a game object. Returns true if one was hit.
+        /// </summary>
+        /// <param name="hitInfo">additional information on the hit; defined only if this
+        /// method returns true</param>
+        /// <returns>true if an object was hit</returns>
         protected override bool Detect(out RaycastHit hitInfo)
         {
-            Ray ray = MainCamera.ScreenPointToRay(selectionDevice.Value);
-            //Debug.LogFormat("2d direction={0} at origin {1} and direction {2} camera {3}\n", 
-            //                selectionDevice.Value, ray.origin, ray.direction, MainCamera.transform.position);
-            //Debug.DrawRay(ray.origin, ray.direction * 10000, Color.yellow);
+            Ray ray = MainCamera.ScreenPointToRay(selectionDevice.Direction);
             return Physics.Raycast(ray, out hitInfo);
         }
     }
