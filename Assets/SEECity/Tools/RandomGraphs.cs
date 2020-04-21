@@ -234,6 +234,7 @@ namespace SEE.Tools
                 SourceName = linkname,
                 Type = type
             };
+            result.SetString(Node.LinknameAttribute, linkname);
             graph.AddNode(result);
             return result;
         }
