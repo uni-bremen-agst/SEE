@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace SEE.DataModel
@@ -12,7 +11,7 @@ namespace SEE.DataModel
         private static Node NewNode(Graph graph, string linkname)
         {
             Node result = new Node();
-            result.LinkName = linkname;
+            result.ID = linkname;
             result.Type = "Routine";
             graph.AddNode(result);
             return result;
@@ -56,6 +55,11 @@ namespace SEE.DataModel
             Edge use_n1_n3_a  = NewEdge(g, n1, n3, "use");
             Assert.AreEqual(new HashSet<Edge>() { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a }, AsSet(n1.Outgoings));
             Edge use_n1_n3_b = NewEdge(g, n1, n3, "use");
+            // We have overridden Equals() for edges so that they are considered the same if
+            // they have the same type, same source and target linknames, and same attributes.
+            // Based on this comparison, use_n1_n3_a and use_n1_n3_b are equal. To make them different,
+            // we set an attribute for the latter.
+            use_n1_n3_b.SetToggle("Duplicated");
             Assert.AreEqual(new HashSet<Edge>() { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a, use_n1_n3_b }, AsSet(n1.Outgoings));
 
             Assert.AreEqual(new HashSet<Edge>(), AsSet(n1.From_To(n3, "none")));
@@ -64,7 +68,7 @@ namespace SEE.DataModel
 
             Edge call_n2_n3 = NewEdge(g, n2, n3, "call");
 
-            Edge call_n2_n2 = NewEdge(g, n3, n2, "call");
+            Edge call_n2_n2 = NewEdge(g, n2, n2, "call");
 
             HashSet<Node> nodes = new HashSet<Node>() { n1, n2, n3 };
             HashSet<Edge> edges = new HashSet<Edge>() { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a, use_n1_n3_b, call_n2_n3, call_n2_n2 };

@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using SEE;
-using System.IO;
+using SEE.Game;
 
 namespace SEEEditor
 {
@@ -40,6 +39,11 @@ namespace SEEEditor
             city.EdgeLayout = (SEECity.EdgeLayouts)EditorGUILayout.EnumPopup("Edge layout", city.EdgeLayout);
             city.EdgeWidth = EditorGUILayout.FloatField("Edge width", city.EdgeWidth);
             city.EdgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", city.EdgesAboveBlocks);
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Bundling tension");
+            city.Tension = EditorGUILayout.Slider(city.Tension, 0.0f, 1.0f);
+            EditorGUILayout.EndHorizontal();
+            city.RDP = EditorGUILayout.FloatField("RDP", city.RDP);
 
             GUILayout.Label("Data", EditorStyles.boldLabel);
             if (city.PathPrefix == null)
@@ -48,23 +52,6 @@ namespace SEEEditor
                 // constructor. That is why we need to set it here if it is not yet defined.
                 city.PathPrefix = UnityProject.GetPath();
             }
-            EditorGUILayout.BeginHorizontal();
-            {
-                city.PathPrefix = EditorGUILayout.TextField("Data path prefix", Filenames.OnCurrentPlatform(city.PathPrefix));
-                //EditorGUILayout.LabelField("Data path prefix", GUILayout.Width(EditorGUIUtility.labelWidth));
-                //EditorGUILayout.SelectableLabel(city.PathPrefix, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
-                if (GUILayout.Button("Select"))
-                {
-                    city.PathPrefix = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select GXL graph data directory", city.PathPrefix, ""));
-                }
-                // city.PathPrefix must end with a directory separator
-                if (city.PathPrefix.Length > 0 && city.PathPrefix[city.PathPrefix.Length - 1] != Path.DirectorySeparatorChar)
-                {
-                    city.PathPrefix = city.PathPrefix + Path.DirectorySeparatorChar;
-                }
-            }
-            EditorGUILayout.EndHorizontal();
-
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
             // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
 

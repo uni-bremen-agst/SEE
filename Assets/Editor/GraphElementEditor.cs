@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using SEE.DataModel;
-using SEE.Layout;
+using SEE.GO;
 
 namespace SEEEditor
 {
@@ -19,7 +19,7 @@ namespace SEEEditor
             }
             else
             {
-                node.LinkName = EditorGUILayout.TextField("Linkname:", node.LinkName);
+                node.ID = EditorGUILayout.TextField("Linkname:", node.ID);
                 EditorGUILayout.TextField("Graph:", node.ItsGraph == null ? "NONE" : node.ItsGraph.Name);
             }
         }

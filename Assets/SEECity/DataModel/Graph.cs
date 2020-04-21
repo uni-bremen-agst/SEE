@@ -9,31 +9,26 @@ namespace SEE.DataModel
     /// A graph with nodes and edges representing the data to be visualized 
     /// by way of blocks and connections.
     /// </summary>
-    [System.Serializable]
     public class Graph : Attributable
     {
-        // The list of graph nodes indexed by their unique linkname
-        [SerializeField]
-        private StringNodeDictionary nodes = new StringNodeDictionary();
+        // The list of graph nodes indexed by their unique IDs
+        private Dictionary<string, Node> nodes = new Dictionary<string, Node>();
 
         // The list of graph edges.
-        [SerializeField]
         private List<Edge> edges = new List<Edge>();
 
         // The (view) name of the graph.
-        [SerializeField]
         private string viewName = "";
 
         // The path of the file from which this graph was loaded. Could be the
         /// empty string if the graph was not created by loading it from disk.
-        [SerializeField]
         private string path = "";
 
         /// Adds a node to the graph. 
         /// Preconditions:
         ///   (1) node must not be null
-        ///   (2) node.Linkname must be defined.
-        ///   (3) a node with node.Linkname must not have been added before
+        ///   (2) node.ID must be defined.
+        ///   (3) a node with node.ID must not have been added before
         ///   (4) node must not be contained in another graph
         /// </summary>
         /// <param name="node"></param>
@@ -43,13 +38,16 @@ namespace SEE.DataModel
             {
                 throw new Exception("node must not be null");
             }
-            else if (String.IsNullOrEmpty(node.LinkName))
+            else if (String.IsNullOrEmpty(node.ID))
             {
-                throw new Exception("linkname of a node must neither be null nor empty");
+                throw new Exception("ID of a node must neither be null nor empty");
             }
-            else if (nodes.ContainsKey(node.LinkName))
+            else if (nodes.ContainsKey(node.ID))
             {
-                throw new Exception("linknames must be unique");
+                throw new Exception("ID '" + node.ID + "' is not unique:\n"
+                                    + node.ToString()
+                                    + ".\nDuplicate already in graph: " 
+                                    + nodes[node.ID].ToString());
             }
             else if (!ReferenceEquals(node.ItsGraph, null))
             {
@@ -57,7 +55,7 @@ namespace SEE.DataModel
             }
             else
             {
-                nodes[node.LinkName] = node;
+                nodes[node.ID] = node;
                 node.ItsGraph = this;
             }
         }
@@ -88,7 +86,7 @@ namespace SEE.DataModel
             }
             else
             {
-                if (nodes.Remove(node.LinkName))
+                if (nodes.Remove(node.ID))
                 {
                     // the edges of node are stored in the node's data structure as well as
                     // in the node's neighbor's data structure
@@ -114,40 +112,40 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// Returns true if this graph contains a node with the same unique linkname
+        /// Returns true if this graph contains a node with the same unique ID
         /// as the given node.
-        /// Throws an exception if node is null or node has no valid linkname.
+        /// Throws an exception if node is null or node has no valid ID.
         /// </summary>
         /// <param name="node">node to be checked for containment</param>
-        /// <returns>true iff there is a node contained in the graph with node.LinkName</returns>
+        /// <returns>true iff there is a node contained in the graph with node.ID</returns>
         public bool Contains(Node node)
         {
             if (ReferenceEquals(node, null))
             {
                 throw new System.Exception("node must not be null");
             }
-            else if (String.IsNullOrEmpty(node.LinkName))
+            else if (String.IsNullOrEmpty(node.ID))
             {
-                throw new System.Exception("linkname of a node must neither be null nor empty");
+                throw new System.Exception("ID of a node must neither be null nor empty");
             }
             else
             {
-                return nodes.ContainsKey(node.LinkName);
+                return nodes.ContainsKey(node.ID);
             }
         }
 
         /// <summary>
-        /// Returns the node with the given unique linkname if it exists; otherwise null.
+        /// Returns the node with the given unique ID if it exists; otherwise null.
         /// </summary>
-        /// <param name="linkname">unique linkname</param>
-        /// <returns>node with the given unique linkname if it exists; otherwise null</returns>
-        public Node GetNode(string linkname)
+        /// <param name="ID">unique ID</param>
+        /// <returns>node with the given unique ID if it exists; otherwise null</returns>
+        public Node GetNode(string ID)
         {
-            if (String.IsNullOrEmpty(linkname))
+            if (String.IsNullOrEmpty(ID))
             {
-                throw new System.Exception("linkname must neither be null nor empty");
+                throw new System.Exception("ID must neither be null nor empty");
             }
-            else if (nodes.TryGetValue(linkname, out Node node))
+            else if (nodes.TryGetValue(ID, out Node node))
             {
                 return node;
             }
@@ -282,16 +280,16 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// Returns the node with the given unique linkname. If there is no
+        /// Returns the node with the given unique ID. If there is no
         /// such node, node will be null and false will be returned; otherwise
         /// true will be returned.
         /// </summary>
-        /// <param name="linkname">unique linkname of the searched node</param>
+        /// <param name="ID">unique ID of the searched node</param>
         /// <param name="node">the found node, otherwise null</param>
         /// <returns>true if a node could be found</returns>
-        public bool TryGetNode(string linkname, out Node node)
+        public bool TryGetNode(string ID, out Node node)
         {
-            return nodes.TryGetValue(linkname, out node);
+            return nodes.TryGetValue(ID, out node);
         }
 
         /// <summary>
@@ -340,8 +338,8 @@ namespace SEE.DataModel
             for (int i = 0; i < level; i++)
             {
                 indentation += "-";
-            }            
-            Debug.Log(indentation + root.LinkName + "\n");
+            }
+            Debug.Log(indentation + root.ID + "\n");
             foreach (Node child in root.Children())
             {
                 DumpTree(child, level + 1);
@@ -373,7 +371,7 @@ namespace SEE.DataModel
 
         /// <summary>
         /// Sorts the list of children of all nodes using Node.CompareTo(), which compares the
-        /// nodes by their names (either Source.Name or Linkname).
+        /// nodes by their names (either Source.Name or ID).
         /// </summary>
         public void SortHierarchyByName()
         {
@@ -480,7 +478,7 @@ namespace SEE.DataModel
 
         private void CopyNodesTo(Graph target)
         {
-            target.nodes = new StringNodeDictionary();
+            target.nodes = new Dictionary<string, Node>();
             foreach (var entry in this.nodes)
             {
                 Node node = (Node)entry.Value.Clone();
@@ -495,22 +493,22 @@ namespace SEE.DataModel
             {
                 Edge clone = (Edge)edge.Clone();
                 // set corresponding source
-                if (target.TryGetNode(edge.Source.LinkName, out Node from))
+                if (target.TryGetNode(edge.Source.ID, out Node from))
                 {
                     clone.Source = from;
                 }
                 else
                 {
-                    throw new Exception("target graph does not have a node with linkname " + edge.Source.LinkName);
+                    throw new Exception("target graph does not have a node with ID " + edge.Source.ID);
                 }
                 // set corresponding target
-                if (target.TryGetNode(edge.Target.LinkName, out Node to))
+                if (target.TryGetNode(edge.Target.ID, out Node to))
                 {
                     clone.Target = to;
                 }
                 else
                 {
-                    throw new Exception("target graph does not have a node with linkname " + edge.Target.LinkName);
+                    throw new Exception("target graph does not have a node with ID " + edge.Target.ID);
                 }
                 target.AddEdge(clone);
             }
@@ -520,13 +518,13 @@ namespace SEE.DataModel
         {
             foreach (Node fromRoot in fromGraph.GetRoots())
             {
-                if (toGraph.TryGetNode(fromRoot.LinkName, out Node toRoot))
+                if (toGraph.TryGetNode(fromRoot.ID, out Node toRoot))
                 {
                     CopyHierarchy(fromRoot, toRoot, toGraph);
                 }
                 else
                 {
-                    throw new Exception("target graph does not have a node with linkname " + fromRoot.LinkName);
+                    throw new Exception("target graph does not have a node with ID " + fromRoot.ID);
                 }
             }
             toGraph.CalculateLevels();
@@ -543,7 +541,7 @@ namespace SEE.DataModel
             foreach (Node fromChild in fromParent.Children())
             {
                 // Get the node in toGraph corresponding to fromChild.
-                if (toGraph.TryGetNode(fromChild.LinkName, out Node toChild))
+                if (toGraph.TryGetNode(fromChild.ID, out Node toChild))
                 {
                     // fromChild is a parent of fromParent and
                     // toChild must become a child of toParent
@@ -552,7 +550,7 @@ namespace SEE.DataModel
                 }
                 else
                 {
-                    throw new Exception("target graph does not have a node with linkname " + fromChild.LinkName);
+                    throw new Exception("target graph does not have a node with ID " + fromChild.ID);
                 }
             }
         }
@@ -618,5 +616,96 @@ namespace SEE.DataModel
                 node.Children().ForEach(childNode => TraverseTree(childNode, innerNodeAction, leafAction));
             }
         }
+
+        /// <summary>
+        /// Returns true if <paramref name="other"/> meets all of the following 
+        /// conditions:
+        ///  (1) is not null
+        ///  (2) has exactly the same C# type
+        ///  (3) has exactly the same attributes with exactly the same values
+        ///  (4) has the same path
+        ///  (5) has the same graph name
+        ///  (6) has the same number of nodes and the sets of nodes are equal
+        ///  (7) has the same number of edges and the sets of edges are equal
+        ///  (8) has the same node hierarchy
+        ///  
+        /// Note: This node and the other node may or may not be in the same graph.
+        /// </summary>
+        /// <param name="other">to be compared to</param>
+        /// <returns>true if equal</returns>
+        public override bool Equals(System.Object other)
+        {
+            if (!base.Equals(other))
+            {
+                Graph otherNode = other as Graph;
+                if (other != null)
+                {
+                    Report("Graphs " + viewName + " " + otherNode.viewName + " have differences");
+                }
+                return false;
+            }
+            else
+            {
+                Graph otherGraph = other as Graph;
+                if (this.path != otherGraph.path)
+                {
+                    Report("Graph paths are different");
+                    return false;
+                }
+                else if (this.viewName != otherGraph.viewName)
+                {
+                    Report("Graph names are different");
+                    return false;
+                }
+                else if (this.NodeCount != otherGraph.NodeCount)
+                {
+                    Report("Number of nodes are different");
+                    return false;
+                }
+                else if (!AreEqual(this.nodes, otherGraph.nodes))
+                {
+                    // Note: because the Equals operation for nodes checks also the ID
+                    // of the node's parents and children, we will also implicitly check the
+                    // node hierarchy.
+                    Report("Graph nodes are different");
+                    return false;
+                }
+                else if (this.edges.Count != otherGraph.edges.Count)
+                {
+                    Report("Number of edges are different");
+                    return false;
+                }
+                else
+                {
+                    bool equal = AreEqual(ToDictionary(this.edges), ToDictionary(otherGraph.edges));
+                    if (!equal)
+                    {
+                        Report("Graph edges are different");
+                    }
+                    return true;
+                }
+            }
+        }
+
+        private static Dictionary<string, Edge> ToDictionary(IList<Edge> edges)
+        {
+            Dictionary<string, Edge> result = new Dictionary<string, Edge>();
+            foreach (Edge edge in edges)
+            {
+                result[edge.ID] = edge;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns a hash code.
+        /// </summary>
+        /// <returns>hash code</returns>
+        public override int GetHashCode()
+        {
+            // we are using the viewName which is intended to be unique
+            return viewName.GetHashCode();
+        }
+
     }
 }

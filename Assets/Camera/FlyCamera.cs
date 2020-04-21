@@ -1,5 +1,5 @@
 ﻿using SEE.DataModel;
-using SEE.Layout;
+using SEE.GO;
 using UnityEngine;
 
 namespace SEE
@@ -379,7 +379,7 @@ namespace SEE
             // node is shown in the ObjectNameTextField -- but only if ObjectNameTextField
             // exists.
             GameObject textField = ObjectNameTextField;
-            if (textField?? true)
+            if (textField != null)
             {
                 UnityEngine.UI.Text text = textField.GetComponent<UnityEngine.UI.Text>();
                 Ray ray = camera.ScreenPointToRay(Input.mousePosition);
@@ -393,14 +393,19 @@ namespace SEE
                     GameObject objectHit = hit.transform.gameObject;
                     if (objectHit.TryGetComponent<NodeRef>(out NodeRef nodeRef))
                     {
-                        if (nodeRef.node.TryGetString("Source.Name", out string nodeName))
+                        if (nodeRef.node == null)
+                        {
+                            Debug.LogError("NodeRef does not refer to a node.\n");
+                            text.text = objectHit.name;
+                        }
+                        else if (nodeRef.node.TryGetString(Node.SourceNameAttribute, out string nodeName))
                         {
                             text.text = nodeName;
                         }
                         else
                         {
                             text.text = nodeRef.node.Type;
-                            Debug.Log("Node has neither Source.Name nor unique linkname.\n");
+                            Debug.Log("Node has neither Source.Name nor unique ID.\n");
                             Dump(objectHit);
                         }
                     }
