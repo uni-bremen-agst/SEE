@@ -93,7 +93,7 @@ namespace SEE.GO
                 }
                 else
                 {
-                    Debug.LogWarningFormat("no metric value {0} for node {1}.\n", metrics[i], node.LinkName);
+                    Debug.LogWarningFormat("no metric value {0} for node {1}.\n", metrics[i], node.ID);
                     values[i] = 0.0f;
                 }
             }

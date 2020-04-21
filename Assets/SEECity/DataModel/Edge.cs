@@ -68,8 +68,8 @@ namespace SEE.DataModel
         /// (2) has exactly the same C# type
         /// (3) has exactly the same attributes with exactly the same values as this edge
         /// (4) has the same type name
-        /// (5) the linkname of its source is the same as the linkname of the source of this edge
-        /// (6) the linkname of its target is the same as the linkname of the target of this edge
+        /// (5) the ID of its source is the same as the ID of the source of this edge
+        /// (6) the ID of its target is the same as the ID of the target of this edge
         /// 
         /// Note: This edge and the other edge may or may not be in the same graph.
         /// </summary>
@@ -84,11 +84,11 @@ namespace SEE.DataModel
             else
             {
                 Edge otherEdge = other as Edge;
-                bool equal = this.target.LinkName == otherEdge.target.LinkName
-                    && this.source.LinkName == otherEdge.source.LinkName;
+                bool equal = this.target.ID == otherEdge.target.ID
+                    && this.source.ID == otherEdge.source.ID;
                 if (!equal)
                 {
-                    Report(LinkName + ": Source or target are different.");
+                    Report(ID + ": Source or target are different.");
                 }
                 return equal;
             }
@@ -100,8 +100,8 @@ namespace SEE.DataModel
         /// <returns>hash code</returns>
         public override int GetHashCode()
         {
-            // we are using the linkname which is intended to be unique
-            return LinkName.GetHashCode();
+            // we are using the ID which is intended to be unique
+            return ID.GetHashCode();
         }
 
         /// <summary>
@@ -125,8 +125,8 @@ namespace SEE.DataModel
         {
             string result = "{\n";
             result += " \"kind\": edge,\n";
-            result += " \"source\":  \"" + source.LinkName + "\",\n";
-            result += " \"target\": \"" + target.LinkName + "\",\n";
+            result += " \"source\":  \"" + source.ID + "\",\n";
+            result += " \"target\": \"" + target.ID + "\",\n";
             result += base.ToString();
             result += "}";
             return result;
@@ -134,14 +134,14 @@ namespace SEE.DataModel
 
         /// <summary>
         /// Creates a unique string representing the edge as the concatentation of its edge
-        /// type and the two linknames of the edge's source and target node.
-        /// IMPORTANT NOTE: This linkname is unique only if there is only a single edge
+        /// type and the two ID of the edge's source and target node.
+        /// IMPORTANT NOTE: This ID is unique only if there is only a single edge
         /// between those nodes with the edge's type.
         /// </summary>
-        /// <returns>a string from both nodes' LinkNames as follows: Type + "#" + Source.LinkName + '#' + Target.LinkName</returns>
-        public override string LinkName
+        /// <returns>a string from both nodes' ID as follows: Type + "#" + Source.ID + '#' + Target.ID</returns>
+        public override string ID
         {
-            get => Type + "#" + Source.LinkName + "#" + Target.LinkName;
+            get => Type + "#" + Source.ID + "#" + Target.ID;
             set => throw new NotImplementedException();
         }
 

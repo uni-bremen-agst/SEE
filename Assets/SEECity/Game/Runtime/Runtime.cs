@@ -78,11 +78,11 @@ namespace SEE.Game.Runtime
                     if (nodeRef != null && nodeRef.node != null)
                     {
                         gameObjectsWithTag[j].GetComponentInChildren<MeshRenderer>().material.color = Color.black;
-                        if (!gameObjects.TrueForAll((p) => !p.Key.Equals(nodeRef.node.LinkName)))
+                        if (!gameObjects.TrueForAll((p) => !p.Key.Equals(nodeRef.node.ID)))
                         {
                             Debug.LogWarning("Contains '" + nodeRef.node + "' already!");
                         }
-                        gameObjects.Add(new KeyValuePair<string, GameObject>(nodeRef.node.LinkName, gameObjectsWithTag[j]));
+                        gameObjects.Add(new KeyValuePair<string, GameObject>(nodeRef.node.ID, gameObjectsWithTag[j]));
                     }
                 }
             }

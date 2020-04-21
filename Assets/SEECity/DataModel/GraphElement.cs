@@ -93,7 +93,7 @@ namespace SEE.DataModel
                 GraphElement otherNode = other as GraphElement;
                 if (other != null)
                 {
-                    Report(LinkName + " " + otherNode.LinkName + " have differences");
+                    Report(ID + " " + otherNode.ID + " have differences");
                 }
                 return false;
             }
@@ -112,7 +112,7 @@ namespace SEE.DataModel
         /// <summary>
         /// A unique identifier (unique within the same graph).
         /// </summary>
-        public abstract string LinkName { set; get; }
+        public abstract string ID { set; get; }
 
         /// <summary>
         /// Returns a string representation of the graph element's type and all its attributes and

@@ -78,7 +78,7 @@ namespace SEE.Game
 
         /// <summary>
         /// The kind of comparison to determine whether there any differences between
-        /// two corresponding graph elements (corresponding by their linknames) in
+        /// two corresponding graph elements (corresponding by their ID) in
         /// two different graphs of the graph series.
         /// </summary>
         private GraphElementDiff diff;  // not serialized by Unity; will be set in CityEvolution property
@@ -191,7 +191,7 @@ namespace SEE.Game
         protected Graph CurrentGraphShown => _currentCity?.Graph;
         /// <summary>
         /// The layout of the city currently shown. The layout is a mapping of the graph
-        /// nodes' LinkName onto their layout nodes.
+        /// nodes' IDs onto their layout nodes.
         /// </summary>
         protected Dictionary<string, ILayoutNode> CurrentLayoutShown => _currentCity?.Layout;  // not serialized by Unity
 
@@ -209,7 +209,7 @@ namespace SEE.Game
         protected Graph NextGraphToBeShown => _nextCity?.Graph;  // not serialized by Unity
         /// <summary>
         /// The layout of _nextGraph. The layout is a mapping of the graph
-        /// nodes' LinkName onto their ILayoutNodes.
+        /// nodes' IDs onto their ILayoutNodes.
         /// </summary>
         protected Dictionary<string, ILayoutNode> NextLayoutToBeShown => _nextCity?.Layout;  // not serialized by Unity
 
@@ -305,7 +305,7 @@ namespace SEE.Game
             // must be later applied when render a city. Here, we only store the layout for later use.
             nodeLayout.Apply(layoutNodes);
             NodeLayout.Move(layoutNodes, cityOrigin);
-            return ToLinkNameLayout(layoutNodes);
+            return ToNodeIDLayout(layoutNodes);
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to 
             // objectManager.GetNode() above. Yet, inner nodes are generally not scaled by
@@ -345,16 +345,16 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns a mapping of graph-node linknames onto their corresponding <paramref name="layoutNodes"/>.
+        /// Returns a mapping of graph-node IDs onto their corresponding <paramref name="layoutNodes"/>.
         /// </summary>
         /// <param name="layoutNodes">collection of layout nodes to be mapped</param>
-        /// <returns>mapping indexed by the LinkName of the nodes corresponding to the layout nodes</returns>
-        private static Dictionary<string, ILayoutNode> ToLinkNameLayout(ICollection<ILayoutNode> layoutNodes)
+        /// <returns>mapping indexed by the IDs of the nodes corresponding to the layout nodes</returns>
+        private static Dictionary<string, ILayoutNode> ToNodeIDLayout(ICollection<ILayoutNode> layoutNodes)
         {
             Dictionary<string, ILayoutNode> result = new Dictionary<string, ILayoutNode>();
             foreach (ILayoutNode layoutNode in layoutNodes)
             {
-                result[layoutNode.LinkName] = layoutNode;
+                result[layoutNode.ID] = layoutNode;
             }
             return result;
         }
@@ -432,7 +432,7 @@ namespace SEE.Game
             {
                 // For all nodes of the current graph not in the next graph; that is, all
                 // nodes removed: remove those. Note: The comparison is based on the
-                // Linknames of the nodes because nodes between two graphs must be different
+                // IDs of the nodes because nodes between two graphs must be different
                 // even if they denote the "logically same" node.
                 current.Graph?
                     .Nodes().Except(next.Graph.Nodes(), nodeEqualityComparer).ToList()
@@ -443,7 +443,7 @@ namespace SEE.Game
 
                 // For all edges of the current graph not in the next graph; that is, all
                 // edges removed: remove those. As above, edges are compared by their
-                // linknames.
+                // IDs.
                 // FOR ANIMATION: current.Graph?
                 // FOR ANIMATION:     .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
                 // FOR ANIMATION:     .ForEach(RenderRemovedOldEdge);
@@ -548,7 +548,7 @@ namespace SEE.Game
         /// <param name="graphNode">graph node to be displayed</param>
         protected virtual void RenderNode(Node graphNode)
         {
-            ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.LinkName];
+            ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
 
             bool wasModified;
@@ -960,7 +960,7 @@ namespace SEE.Game
 
             public bool IsLeaf => throw new NotImplementedException();
 
-            public string LinkName => throw new NotImplementedException();
+            public string ID => throw new NotImplementedException();
 
             public float Rotation { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 

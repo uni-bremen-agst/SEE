@@ -70,7 +70,7 @@ namespace SEE.Game
         /// Sets all NodeRefs for this city to the nodes they correspond to.
         /// We assume that the game objects with a NodeRef required to be defined to be
         /// immediate children of this SEECity. Moreover, we assume a child
-        /// game object's name is the linkname of the corresponding graph node.
+        /// game object's name is the ID of the corresponding graph node.
         /// </summary>
         /// <param name="graph">graph giving us the nodes who should be the
         /// target of the NodeRefs</param>
