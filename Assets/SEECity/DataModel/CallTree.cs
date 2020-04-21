@@ -259,7 +259,7 @@ namespace SEE.DataModel
         /// <summary>
         /// Name of the linkage name attribute label.
         /// </summary>
-        public const string LINKAGE_NAME = "Linkage.Name";
+        public const string LINKAGE_NAME = Node.LinknameAttribute;
 
         /// <summary>
         /// Name of the level attribute label.

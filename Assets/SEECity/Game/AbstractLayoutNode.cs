@@ -62,10 +62,10 @@ namespace SEE.Game
         public bool IsLeaf => node.IsLeaf();
 
         /// <summary>
-        /// A unique ID for a node: the LinkName of the graph node underlying this layout node.
+        /// A unique ID for a node: the ID of the graph node underlying this layout node.
         /// </summary>
         /// <returns>unique ID for this node</returns>
-        public string LinkName { get => node.LinkName; }
+        public string ID { get => node.ID; }
 
         /// <summary>
         /// The parent of this node. May be null if it has none.
@@ -139,8 +139,8 @@ namespace SEE.Game
         public override string ToString()
         {
             string result = base.ToString();
-            result += " Linkname=" + LinkName + " Level=" + Level + " IsLeaf=" + IsLeaf
-                + " Parent=" + (Parent != null ? Parent.LinkName : "<NO PARENT>");
+            result += " ID=" + ID + " Level=" + Level + " IsLeaf=" + IsLeaf
+                + " Parent=" + (Parent != null ? Parent.ID : "<NO PARENT>");
             return result;
         }
     }

@@ -554,7 +554,7 @@ namespace SEE.Game
         {
             int style = SelectStyle(node);
             GameObject block = leafNodeFactory.NewBlock(style);
-            block.name = node.LinkName;
+            block.name = node.ID;
             AttachNode(block, node);
             AdjustScaleOfLeaf(block);
             return block;
@@ -730,7 +730,7 @@ namespace SEE.Game
         public GameObject NewInnerNode(Node node)
         {
             GameObject innerGameObject = innerNodeFactory.NewBlock();
-            innerGameObject.name = node.LinkName;
+            innerGameObject.name = node.ID;
             innerGameObject.tag = Tags.Node;
             AttachNode(innerGameObject, node);
             AdjustStyle(innerGameObject);
