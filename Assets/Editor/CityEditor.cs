@@ -33,7 +33,7 @@ namespace SEEEditor
         /// <summary>
         /// Whether VR mode is to be activated for the game.
         /// </summary>
-        private bool VRenabled = false;
+        //private bool VRenabled = false;
 
         /// <summary>
         /// Activates the leap rig for VR and deactivates the main camera for the monitor mode,
@@ -41,30 +41,30 @@ namespace SEEEditor
         /// the main camera for the monitor mode is deactivated.
         /// </summary>
         /// <param name="enableVR">whether the leap rig for the VR mode should be activated</param>
-        private static void EnableVR(bool enableVR)
-        {
-            XRSettings.enabled = enableVR;
-            // If VR is to be enabled, we need to disable the main camera for monitor games
-            // and active the Leap Rig. If instead VR is to be disabled, we need to disable 
-            // the Leap Rig and activate the main camera.
-            foreach (GameObject camera in Cameras.AllMainCameras())
-            {
-                if (camera.transform.parent == null)
-                {
-                    // The camera for the monitor game is at top-level.
-                    camera.SetActive(!enableVR);
-                    //Debug.LogFormat("main camera at top level: {0}\n", !enableVR);
-                }
-                else if (camera.transform.parent.name == "Leap Rig")
-                {
-                    // The camera of the Leap Rig is nested in a game object named accordingly.
-                    // We set the Leap Rig itself in which the found camera is directly nested.
-                    camera.transform.parent.gameObject.SetActive(enableVR);
-                    //Debug.LogFormat("Leap rig camera: {0}\n", enableVR);
-                }
-            }
-            EnableCanvas(enableVR);
-        }
+        //private static void EnableVR(bool enableVR)
+        //{
+        //    XRSettings.enabled = enableVR;
+        //    // If VR is to be enabled, we need to disable the main camera for monitor games
+        //    // and active the Leap Rig. If instead VR is to be disabled, we need to disable 
+        //    // the Leap Rig and activate the main camera.
+        //    foreach (GameObject camera in Cameras.AllMainCameras())
+        //    {
+        //        if (camera.transform.parent == null)
+        //        {
+        //            // The camera for the monitor game is at top-level.
+        //            camera.SetActive(!enableVR);
+        //            //Debug.LogFormat("main camera at top level: {0}\n", !enableVR);
+        //        }
+        //        else if (camera.transform.parent.name == "Leap Rig")
+        //        {
+        //            // The camera of the Leap Rig is nested in a game object named accordingly.
+        //            // We set the Leap Rig itself in which the found camera is directly nested.
+        //            camera.transform.parent.gameObject.SetActive(enableVR);
+        //            //Debug.LogFormat("Leap rig camera: {0}\n", enableVR);
+        //        }
+        //    }
+        //    EnableCanvas(enableVR);
+        //}
 
         /// <summary>
         /// In VR mode, the UI canvas must be disabled because of performance reasons and
@@ -72,17 +72,17 @@ namespace SEEEditor
         /// fact that it is expected to be at top level of the game object hierarchy.
         /// </summary>
         /// <param name="enableVR">whether to disable the canvas</param>
-        private static void EnableCanvas(bool enableVR)
-        {
-            // FindObjectsOfTypeAll returns also inactive game objects
-            foreach (GameObject o in Resources.FindObjectsOfTypeAll(typeof(UnityEngine.GameObject)))
-            {
-                if (o.name == "Canvas" && o.transform.parent == null)
-                {
-                    o.SetActive(! enableVR);
-                }
-            }
-        }
+        //private static void EnableCanvas(bool enableVR)
+        //{
+        //    // FindObjectsOfTypeAll returns also inactive game objects
+        //    foreach (GameObject o in Resources.FindObjectsOfTypeAll(typeof(UnityEngine.GameObject)))
+        //    {
+        //        if (o.name == "Canvas" && o.transform.parent == null)
+        //        {
+        //            o.SetActive(! enableVR);
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Creates a new window offering the city editor commands.
@@ -94,8 +94,8 @@ namespace SEEEditor
             // reason, do not run any expensive algorithm here unless it is really needed,
             // that is, only when any of its buttons is pressed or any of its entry are updated.
 
-            GUILayout.Label("VR settings", EditorStyles.boldLabel);
-            VRenabled = EditorGUILayout.Toggle("Enable VR", VRenabled);
+            //GUILayout.Label("VR settings", EditorStyles.boldLabel);
+            //VRenabled = EditorGUILayout.Toggle("Enable VR", VRenabled);
 
             float width = position.width - 5;
             const float height = 30;
