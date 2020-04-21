@@ -26,6 +26,7 @@ namespace SEE
     /// <summary>
     /// Moves the main camera based on keyboard input.
     /// </summary>
+    [System.Obsolete("Will be removed when the transition to new design of input-actions mapping is implemented.")]
     public class FlyCamera : MonoBehaviour
     {
         // These variables are exposed to the editor and can be changed by the user.

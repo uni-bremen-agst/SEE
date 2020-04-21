@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Obsolete("Will be removed when the transition to new design of input-actions mapping is implemented.")]
 public class CubeTrigger : MonoBehaviour
 {
     private BoxCollider triggerBox;
