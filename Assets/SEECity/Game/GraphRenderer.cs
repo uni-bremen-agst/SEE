@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Charts.Scripts;
 using SEE.DataModel;
 using SEE.GO;
 using SEE.Layout;
@@ -518,6 +519,10 @@ namespace SEE.Game
             nodeRef.node = node;
         }
 
+        /// <summary>
+        /// Adds a <see cref="NodeHighlights"/> component to the given game node.
+        /// </summary>
+        /// <param name="gameNode">The given game node.</param>
         protected void AttachHighlighter(GameObject gameNode)
         {
             gameNode.AddComponent<NodeHighlights>();
@@ -561,6 +566,7 @@ namespace SEE.Game
             GameObject block = leafNodeFactory.NewBlock(style);
             block.name = node.ID;
             AttachNode(block, node);
+            AttachHighlighter(block);
             AdjustScaleOfLeaf(block);
             return block;
         }
@@ -738,6 +744,7 @@ namespace SEE.Game
             innerGameObject.name = node.ID;
             innerGameObject.tag = Tags.Node;
             AttachNode(innerGameObject, node);
+            AttachHighlighter(innerGameObject);
             AdjustStyle(innerGameObject);
             return innerGameObject;
         }

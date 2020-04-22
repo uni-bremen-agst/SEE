@@ -24,7 +24,7 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// A toggle linked to this object.
 		/// </summary>
-		public ScrollViewToggle scrollViewToggle;
+		public ScrollViewToggle ScrollViewToggle;
 
 		/// <summary>
 		/// Initializes some variables.

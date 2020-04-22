@@ -102,8 +102,6 @@ namespace SEE.DataModel
             get => floatAttributes;
         }
 
-        public StringFloatDictionary FloatAttributes => floatAttributes;
-
         public void SetFloat(string attributeName, float value)
         {
             floatAttributes[attributeName] = value;
@@ -135,8 +133,6 @@ namespace SEE.DataModel
         {
             get => intAttributes;
         }
-
-        public StringIntDictionary IntAttributes => intAttributes;
 
         public void SetInt(string attributeName, int value)
         {
