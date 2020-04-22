@@ -27,11 +27,15 @@ namespace SEEEditor
         {
             SEECity city = target as SEECity;
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Load City"))
+            if (GUILayout.Button("Load Graph"))
             {
-                SetUp(city);
+                Load(city);
             }
-            if (GUILayout.Button("Delete City"))
+            if (GUILayout.Button("Draw Graph"))
+            {
+                Draw(city);
+            }
+            if (GUILayout.Button("Delete Graph"))
             {
                 Reset(city);
             }
@@ -52,16 +56,26 @@ namespace SEEEditor
 
         /// <summary>
         /// Loads the graph data and metric data from disk, aggregates the metrics to
-        /// inner nodes and renders the graph in the scene.
+        /// inner nodes.
         /// </summary>
         /// <param name="city">the city to be set up</param>
-        protected virtual void SetUp(SEECity city)
+        protected virtual void Load(SEECity city)
         {
-            city.LoadAndDrawGraph();
+            city.LoadData();
         }
 
         /// <summary>
-        /// Deletes the underlying graph data of the given city.
+        /// Rrenders the graph in the scene.
+        /// </summary>
+        /// <param name="city">the city to be set up</param>
+        protected virtual void Draw(SEECity city)
+        {
+            city.DrawGraph();
+        }
+
+        /// <summary>
+        /// Deletes the underlying graph data of the given city and deletes all its game
+        /// objects.
         /// </summary>
         private void Reset(SEECity city)
         {
