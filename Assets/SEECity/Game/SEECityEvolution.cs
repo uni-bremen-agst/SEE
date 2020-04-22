@@ -78,6 +78,44 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Yields the graph of the first GXL found in the directory named <code>PathPrefix</code>.
+        /// The order is ascending and alphabetic by the GXL filenames located in that directory.
+        /// 
+        /// Precondition: PathPrefix must be set and denote an existing directory in the
+        /// file system containing at least one GXL file.
+        /// </summary>
+        /// <returns>the loaded graph or null if none could be found</returns>
+        public Graph LoadFirstGraph()
+        {
+            if (String.IsNullOrEmpty(PathPrefix))
+            {
+                PathPrefix = UnityProject.GetPath() + "..\\Data\\GXL\\animation-clones\\";
+                Debug.LogErrorFormat("Path prefix not set. Using default: {0}.\n", PathPrefix);
+            }
+            GraphReader graphReader = new GraphReader(FirstFilename(this.PathPrefix), this.HierarchicalEdges);
+            graphReader.Load();
+            return graphReader.GetGraph();
+        }
+
+        /// <summary>
+        /// Yields the first name of a GXL file in the sorted list of GXL files located
+        /// in the given <paramref name="directory"/>.
+        /// 
+        /// If <paramref name="directory"/> does not contain any GXL file, an exception is
+        /// thrown.
+        /// </summary>
+        /// <param name="directory">directory in which to look up the first GXL file</param>
+        /// <returns>first filename</returns>
+        private string FirstFilename(string directory)
+        {
+            foreach (string filename in GraphsReader.GXLFilenames(directory))
+            {
+                return filename;
+            }
+            throw new Exception("No GXL files found in " + directory);
+        }
+
+        /// <summary>
         /// Called by Unity when this SEECityEvolution instances comes into existence 
         /// and can enter the game for the first time. Loads all graphs, calculates their
         /// layouts, and displays the first graph in the graph series.

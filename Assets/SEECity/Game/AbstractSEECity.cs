@@ -5,6 +5,7 @@ using OdinSerializer;
 using SEE.DataModel;
 using SEE.DataModel.IO;
 using SEE.GO;
+using System;
 
 namespace SEE.Game
 {
@@ -51,6 +52,49 @@ namespace SEE.Game
                 "Defined_In"
             };
             return result;
+        }
+
+        //---------------------------------
+        // Relevant node types
+        //---------------------------------
+        /// <summary>
+        /// A mapping of all node types of the nodes in the graph onto whether
+        /// they should be visualized or not.
+        /// </summary>
+        [NonSerialized, OdinSerialize]
+        private Dictionary<string, bool> nodeTypes = new Dictionary<string, bool>();
+        /// <summary>
+        /// A mapping of all node types of the nodes in the graph onto whether
+        /// they should be visualized or not.
+        /// </summary>
+        public Dictionary<string, bool> NodeTypes
+        {
+            get => nodeTypes;
+        }
+
+        /// <summary>
+        /// Sets the node types that occur in the graph.
+        /// </summary>
+        public void SetNodeTypes(Graph graph)
+        {
+            if (graph != null)
+            {
+                HashSet<string> types = new HashSet<string>();
+                foreach (Node node in graph.Nodes())
+                {
+                    types.Add(node.Type);
+                }
+                nodeTypes = new Dictionary<string, bool>();
+                foreach (string type in types)
+                {
+                    nodeTypes[type] = true;
+                }
+            }
+            else
+            {
+                nodeTypes.Clear();
+            }
+            //Debug.LogFormat("Number of node types: {0}\n", nodeTypes.Count);
         }
 
         //---------------------------------

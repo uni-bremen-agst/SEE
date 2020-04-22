@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 using SEE.Tools;
 using SEE.DataModel;
 using SEE.DataModel.IO;
-using System;
 using SEE.GO;
 
 namespace SEE.Game
@@ -36,7 +36,7 @@ namespace SEE.Game
         /// All that is being done in Start() below.
         /// </summary>
         [NonSerialized]
-        protected Graph graph = null;
+        private Graph graph = null;
 
         /// <summary>
         /// The graph underlying this SEE city. May be null.
@@ -45,7 +45,11 @@ namespace SEE.Game
         public Graph ItsGraph
         {
             get => graph;
-            set => graph = value;
+            set
+            {
+                graph = value;                
+                SetNodeTypes(graph);
+            }
         }
 
         /// <summary>
@@ -209,7 +213,7 @@ namespace SEE.Game
             }
             else
             {
-                graph = LoadGraph(GXLPath());
+                ItsGraph = LoadGraph(GXLPath());
                 LoadMetrics();
             }
         }
@@ -254,7 +258,7 @@ namespace SEE.Game
             {
                 graph.Destroy();
             }
-            graph = null;
+            ItsGraph = null;
         }
 
         /// <summary>
