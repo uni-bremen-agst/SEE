@@ -52,10 +52,15 @@ namespace SEE.Game
 
         public override void LoadAndDrawGraph()
         {
+            LoadData();
+            DrawGraph();
+        }
+
+        public override void LoadData()
+        {
             // generate graph randomly
             RandomGraphs randomGraphs = new RandomGraphs();
-            graph = randomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes);
-            DrawGraph();
+            ItsGraph = randomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes);
         }
     }
 }

@@ -3,6 +3,7 @@ using SEE.Game;
 using SEE;
 using UnityEngine;
 using System.IO;
+using System.Collections.Generic;
 
 namespace SEEEditor
 {
@@ -36,6 +37,21 @@ namespace SEEEditor
                 }
             }
             EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// Enables the user to select the node types to be visualized.
+        /// </summary>
+        /// <param name="city">city whose node types are to be selected</param>
+        protected void ShowNodeTypes(AbstractSEECity city)
+        {
+            GUILayout.Label("Node types:", EditorStyles.boldLabel);
+            // Make a copy to loop over the dictionary while making changes.
+            Dictionary<string, bool> selection = new Dictionary<string, bool>(city.NodeTypes);
+            foreach (var entry in selection)
+            {
+                city.NodeTypes[entry.Key] = EditorGUILayout.Toggle("  " + entry.Key, entry.Value);
+            }
         }
     }
 }

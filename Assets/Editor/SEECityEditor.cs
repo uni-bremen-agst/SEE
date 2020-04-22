@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using SEE.Game;
+using System.Collections.Generic;
 
 namespace SEEEditor
 {
@@ -17,6 +18,7 @@ namespace SEEEditor
 
             SEECity city = target as SEECity;
             Attributes();
+            ShowNodeTypes(city);
             Buttons();
         }
 
