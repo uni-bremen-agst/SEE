@@ -1,0 +1,702 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="Mapping" edgeids="true">
+    <node id="N2">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>CompilerException.java</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>CU~src/main/java/com/axivion/java/CompilerException.java</string>
+      </attr>
+    </node>
+    <node id="N10">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>FileDoesNotExist.java</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>CU~src/main/java/com/axivion/java/FileDoesNotExist.java</string>
+      </attr>
+    </node>
+    <node id="N16">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>Java2DGMain.java</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>CU~src/main/java/com/axivion/java/Java2DGMain.java</string>
+      </attr>
+    </node>
+    <node id="N22">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>util</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>java.util</string>
+      </attr>
+    </node>
+    <node id="N83">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>utils</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>com.axivion.java.dg.utils</string>
+      </attr>
+    </node>
+    <node id="N110">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>tools</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>com.axivion.tools</string>
+      </attr>
+    </node>
+    <node id="N138">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>astdump</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>com.axivion.java.dg.debug.astdump</string>
+      </attr>
+    </node>
+    <node id="N155">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>lang</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>java.lang</string>
+      </attr>
+    </node>
+    <node id="N236">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>RFGElementsHandler.java</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>CU~src/main/java/com/axivion/java/dg/core/RFGElementsHandler.java</string>
+      </attr>
+    </node>
+    <node id="N267">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>dg</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>com.axivion.dg</string>
+      </attr>
+    </node>
+    <node id="N363">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>DeclarationVisitor.java</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>CU~src/main/java/com/axivion/java/dg/core/DeclarationVisitor.java</string>
+      </attr>
+    </node>
+    <node id="N400">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>JavaASTNodeGenerator.java</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>CU~src/main/java/com/axivion/java/dg/core/JavaASTNodeGenerator.java</string>
+      </attr>
+    </node>
+    <node id="N425">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>JavaASTVisitor.java</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>CU~src/main/java/com/axivion/java/dg/core/JavaASTVisitor.java</string>
+      </attr>
+    </node>
+    <node id="N440">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>AbstractGenerator.java</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>CU~src/main/java/com/axivion/java/dg/core/AbstractGenerator.java</string>
+      </attr>
+    </node>
+    <node id="N460">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>LambdaBinding.java</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>CU~src/main/java/com/axivion/java/dg/core/LambdaBinding.java</string>
+      </attr>
+    </node>
+    <node id="N497">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>Linknames.java</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>CU~src/main/java/com/axivion/java/dg/core/Linknames.java</string>
+      </attr>
+    </node>
+    <node id="N511">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>BatchGenerator.java</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>CU~src/main/java/com/axivion/java/dg/core/BatchGenerator.java</string>
+      </attr>
+    </node>
+    <node id="N526">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>DependencyVisitor.java</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>CU~src/main/java/com/axivion/java/dg/core/DependencyVisitor.java</string>
+      </attr>
+    </node>
+    <node id="N606">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>igraph</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>com.axivion.java.dg.igraph</string>
+      </attr>
+    </node>
+    <node id="N621">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>GraphFactory.java</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>CU~src/main/java/com/axivion/java/dg/igraph/GraphFactory.java</string>
+      </attr>
+    </node>
+    <node id="N640">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>logging</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.apache.logging</string>
+      </attr>
+    </node>
+    <node id="N651">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>io</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>java.io</string>
+      </attr>
+    </node>
+    <node id="N681">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>core</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.eclipse.jdt.core</string>
+      </attr>
+    </node>
+    <node id="N833">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>nio</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>java.nio</string>
+      </attr>
+    </node>
+    <node id="N855">
+      <type xlink:href="Interface"/>
+      <attr name="Source.Name">
+        <string>IProgressMonitor</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.eclipse.core.runtime.IProgressMonitor</string>
+      </attr>
+    </node>
+    <node id="N857">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>core</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.eclipse.core</string>
+      </attr>
+    </node>
+    <node id="N858">
+      <type xlink:href="Interface"/>
+      <attr name="Source.Name">
+        <string>IStatus</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.eclipse.core.runtime.IStatus</string>
+      </attr>
+    </node>
+    <node id="N859">
+      <type xlink:href="Class"/>
+      <attr name="Source.Name">
+        <string>NullProgressMonitor</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.eclipse.core.runtime.NullProgressMonitor</string>
+      </attr>
+    </node>
+    <node id="N860">
+      <type xlink:href="Class"/>
+      <attr name="Source.Name">
+        <string>Status</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.eclipse.core.runtime.Status</string>
+      </attr>
+    </node>
+    <node id="N925">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>annotation</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.eclipse.jdt.annotation</string>
+      </attr>
+    </node>
+    <node id="N1003">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>util</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>com.axivion.util</string>
+      </attr>
+    </node>
+    <node id="N1100">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>commons</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.apache.commons</string>
+      </attr>
+    </node>
+    <node id="N1450">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>compiler</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>org.eclipse.jdt.internal.compiler</string>
+      </attr>
+    </node>
+    <node id="N1452">
+      <type xlink:href="Class"/>
+      <attr name="Source.Name">
+        <string>Application</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>com.axivion.bauhaus.Application</string>
+      </attr>
+    </node>
+    <node id="N1455">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>shared</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>com.axivion.shared</string>
+      </attr>
+    </node>
+    <node id="N1521">
+      <type xlink:href="Architecture_Component"/>
+      <attr name="Source.Name">
+        <string>Shared</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>2c66373f-5820-4e08-b4ec-ff0189eff8ed</string>
+      </attr>
+    </node>
+    <node id="N1522">
+      <type xlink:href="Architecture_Component"/>
+      <attr name="Source.Name">
+        <string>Util</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>be027a08-cfde-45da-a991-8d6b5828e17c</string>
+      </attr>
+    </node>
+    <node id="N1523">
+      <type xlink:href="Architecture_Component"/>
+      <attr name="Source.Name">
+        <string>Application</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>b7457002-d7c7-45da-898b-12c3921dad6d</string>
+      </attr>
+    </node>
+    <node id="N1524">
+      <type xlink:href="Architecture_Component"/>
+      <attr name="Source.Name">
+        <string>Tools</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>759737dd-a29e-493a-a9ac-6c8d587d4455</string>
+      </attr>
+    </node>
+    <node id="N1525">
+      <type xlink:href="Architecture_Component"/>
+      <attr name="Source.Name">
+        <string>Lang</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>40ad5320-1a75-4064-a0ee-6eada24c0a0b</string>
+      </attr>
+    </node>
+    <node id="N1526">
+      <type xlink:href="Architecture_Component"/>
+      <attr name="Source.Name">
+        <string>Util</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>6ff970c5-1555-4c03-aa59-0ed781a47e75</string>
+      </attr>
+    </node>
+    <node id="N1527">
+      <type xlink:href="Architecture_Component"/>
+      <attr name="Source.Name">
+        <string>IO</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>e2bbf2a8-b27b-49fa-9728-e868d751e7f2</string>
+      </attr>
+    </node>
+    <node id="N1528">
+      <type xlink:href="Architecture_Component"/>
+      <attr name="Source.Name">
+        <string>NIO</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>11565137-1b61-4581-9c1b-7ec06c1bffe1</string>
+      </attr>
+    </node>
+    <node id="N1531">
+      <type xlink:href="Architecture_Component"/>
+      <attr name="Source.Name">
+        <string>Core</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>1cfc5aca-6f55-494d-a240-f9a87a3848b7</string>
+      </attr>
+    </node>
+    <node id="N1532">
+      <type xlink:href="Architecture_Component"/>
+      <attr name="Source.Name">
+        <string>Logging</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>49321bed-a559-46b6-a7b7-089abdeaa022</string>
+      </attr>
+    </node>
+    <node id="N1533">
+      <type xlink:href="Architecture_Component"/>
+      <attr name="Source.Name">
+        <string>Commons</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>0bf62bdd-cef0-4d65-a21e-fd6c1b3c4b9d</string>
+      </attr>
+    </node>
+    <node id="N1534">
+      <type xlink:href="Architecture_Component"/>
+      <attr name="Source.Name">
+        <string>Utils</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>ea623844-0bb8-4c94-9542-975fed6fedb8</string>
+      </attr>
+    </node>
+    <node id="N1535">
+      <type xlink:href="Architecture_Component"/>
+      <attr name="Source.Name">
+        <string>Exceptions</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>16b3d795-f1f9-4b1a-a793-cd992ad84563</string>
+      </attr>
+    </node>
+    <node id="N1536">
+      <type xlink:href="Architecture_Component"/>
+      <attr name="Source.Name">
+        <string>Main</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>82503fb3-c3da-4cb5-9a99-4f7ad366be99</string>
+      </attr>
+    </node>
+    <node id="N1537">
+      <type xlink:href="Architecture_Component"/>
+      <attr name="Source.Name">
+        <string>ASTDump</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>467e8a8a-e758-4b61-9472-c1a74ad63742</string>
+      </attr>
+    </node>
+    <node id="N1540">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>AbstractGenerator</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>887f9ea5-1918-41af-8597-41804c339ff3</string>
+      </attr>
+    </node>
+    <node id="N1541">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>BatchGenerator</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>d9970af5-5b4b-4da0-84f3-ff429becd87c</string>
+      </attr>
+    </node>
+    <node id="N1545">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>JavaASTNodeGenerator</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>25e73833-f20e-493a-b655-a066e806e77e</string>
+      </attr>
+    </node>
+    <node id="N1549">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>RFGElementsHandler</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>ceb66567-ccb2-4ead-8762-8ff3b270b6fd</string>
+      </attr>
+    </node>
+    <node id="N1550">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>DeclarationVisitor</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>b09dfadb-5679-451f-8699-50a02415e04f</string>
+      </attr>
+    </node>
+    <node id="N1551">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>DependencyVisitor</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>3215d4d0-836c-4c68-967b-9c8350ef519f</string>
+      </attr>
+    </node>
+    <node id="N1552">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>JavaASTVisitor</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>f042e47e-024e-44a5-99ec-f8d242389740</string>
+      </attr>
+    </node>
+    <node id="N1553">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>LambdaBinding</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>9b75a449-dbbf-415e-8347-a65f4c3c4947</string>
+      </attr>
+    </node>
+    <node id="N1557">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>Annotation</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>76be90da-3d3d-4c98-8004-a8272715aef6</string>
+      </attr>
+    </node>
+    <node id="N1558">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>Core</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>a48373ef-5b33-4909-96de-b4a95e0df4ae</string>
+      </attr>
+    </node>
+    <node id="N1559">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>Compiler</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>cfa697dc-9a04-4015-81ec-8dddce01282a</string>
+      </attr>
+    </node>
+    <node id="N1565">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>RFG</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>4a93bde3-686a-48ed-9154-0c47f4e2a362</string>
+      </attr>
+    </node>
+    <node id="N1566">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>Graph</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>bb5beaa4-9c24-417e-97b7-988be4be7347</string>
+      </attr>
+    </node>
+    <node id="N1567">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>Linknames</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>eec45fc5-234c-4237-9af2-41a6130f2760</string>
+      </attr>
+    </node>
+    <node id="N1568">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>Progress</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>93f31ba4-1a32-4b25-b0b6-8c4996a34891</string>
+      </attr>
+    </node>
+    <node id="N1569">
+      <type xlink:href="Architecture_Unit"/>
+      <attr name="Source.Name">
+        <string>Status</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>3d86c52e-f93f-4318-83a4-ff3aeed59d53</string>
+      </attr>
+    </node>
+    <edge id="E7730" from="N1100" to="N1533">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7731" from="N640" to="N1532">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7732" from="N857" to="N1531">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7733" from="N925" to="N1557">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7734" from="N681" to="N1558">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7735" from="N1450" to="N1559">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7736" from="N651" to="N1527">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7737" from="N155" to="N1525">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7738" from="N833" to="N1528">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7739" from="N22" to="N1526">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7740" from="N1452" to="N1523">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7741" from="N2" to="N1535">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7742" from="N10" to="N1535">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7743" from="N16" to="N1536">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7744" from="N440" to="N1540">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7745" from="N511" to="N1541">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7746" from="N363" to="N1550">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7747" from="N526" to="N1551">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7748" from="N400" to="N1545">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7749" from="N460" to="N1553">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7750" from="N425" to="N1552">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7751" from="N236" to="N1549">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7752" from="N1455" to="N1521">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7753" from="N110" to="N1524">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7754" from="N1003" to="N1522">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7755" from="N138" to="N1537">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7759" from="N860" to="N1569">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7760" from="N858" to="N1569">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7761" from="N859" to="N1568">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E7762" from="N855" to="N1568">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E8219" from="N267" to="N1565">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E8220" from="N606" to="N1566">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E8223" from="N497" to="N1567">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E8224" from="N83" to="N1534">
+      <type xlink:href="Maps_To"/>
+    </edge>
+  </graph>
+</gxl>

@@ -26,13 +26,31 @@ namespace SEE.DataModel.IO
         /// </summary>
         private const string hierarchicalEdgeType = "Enclosing";
 
+        //[Test]
+        //public void TestReadingRealBigGraph()
+        //{
+        //    string filename = Application.dataPath + "/../Data/GXL/graphs/bash.gxl";
+        //    Performance p = Performance.Begin("Loading GXL file " + filename);
+        //    Graph graph = LoadGraph(filename);
+        //    p.End();
+        //}
+
         [Test]
-        public void TestReadingRealBigGraph()
+        public void TestReadingArchitecture()
         {
-            string filename = Application.dataPath + "/../Data/GXL/graphs/bash.gxl";
-            Performance p = Performance.Begin("Loading GXL file " + filename);
-            Graph graph = LoadGraph(filename);
-            p.End();
+            LoadGraph(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Architecture.gxl");
+        }
+
+        [Test]
+        public void TestReadingMapping()
+        {
+            LoadGraph(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/Mapping.gxl");
+        }
+
+        [Test]
+        public void TestReadingCodeFacts()
+        {
+            LoadGraph(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/CodeFacts.gxl");
         }
 
         /// <summary>
