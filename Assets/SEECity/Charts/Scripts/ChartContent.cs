@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel;
-using SEE.Layout;
+using SEE.GO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -207,7 +207,7 @@ namespace SEE.Charts.Scripts
 			toggle.Parent = parentToggle;
 			var highlights = dataObject.GetComponent<NodeHighlights>();
 			toggle.LinkedObject = highlights;
-			highlights.scrollViewToggle = toggle;
+			highlights.ScrollViewToggle = toggle;
 			toggle.SetLabel(dataObject.name);
 			tempObject.transform.localPosition = childOffset + new Vector2(0f, gap) * i;
 			toggle.Initialize(this);
@@ -249,7 +249,7 @@ namespace SEE.Charts.Scripts
 			Array.Copy(buildings, combined, buildings.Length);
 			Array.Copy(nodes, 0, combined, buildings.Length, nodes.Length);
 			_dataObjects = combined;
-
+			Debug.Log(combined);
 			foreach (var entry in combined)
 				if (!entry.GetComponent<NodeHighlights>().showInChart.Contains(this))
 					entry.GetComponent<NodeHighlights>().showInChart.Add(this, true);
@@ -444,7 +444,7 @@ namespace SEE.Charts.Scripts
 				marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
 				var script = marker.GetComponent<ChartMarker>();
 				script.linkedObject = data;
-				script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
+				script.ScrollViewToggle = data.GetComponent<NodeHighlights>().ScrollViewToggle;
 				var node = data.GetComponent<NodeRef>().node;
 				node.TryGetNumeric(axisDropdownX.Value, out var valueX);
 				node.TryGetNumeric(axisDropdownY.Value, out var valueY);
@@ -494,7 +494,7 @@ namespace SEE.Charts.Scripts
 					marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
 					var script = marker.GetComponent<ChartMarker>();
 					script.linkedObject = data;
-					script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
+					script.ScrollViewToggle = data.GetComponent<NodeHighlights>().ScrollViewToggle;
 					var node = data.GetComponent<NodeRef>().node;
 					node.TryGetNumeric(metric, out var value);
 					var type = node.IsLeaf() ? "Building" : "Node";
@@ -506,13 +506,11 @@ namespace SEE.Charts.Scripts
 					CheckOverlapping(marker, updatedMarkers.ToArray());
 					updatedMarkers.Add(marker);
 
-					if (activeMarkers.Count > 0)
-					{
-						var highlightTimeLeft = CheckOldMarkers(data);
-						if (highlightTimeLeft > 0f)
-							script.TriggerTimedHighlight(
-								chartManager.highlightDuration - highlightTimeLeft, true);
-					}
+					if (activeMarkers.Count <= 0) break;
+					var highlightTimeLeft = CheckOldMarkers(data);
+					if (highlightTimeLeft > 0f)
+						script.TriggerTimedHighlight(
+							chartManager.highlightDuration - highlightTimeLeft, true);
 				}
 
 				foreach (var marker in activeMarkers) Destroy(marker);
@@ -540,7 +538,7 @@ namespace SEE.Charts.Scripts
 				marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
 				var script = marker.GetComponent<ChartMarker>();
 				script.linkedObject = data;
-				script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
+				script.ScrollViewToggle = data.GetComponent<NodeHighlights>().ScrollViewToggle;
 				var node = data.GetComponent<NodeRef>().node;
 				node.TryGetNumeric(axisDropdownX.Value, out var valueX);
 				node.TryGetNumeric(axisDropdownY.Value, out var valueY);
@@ -552,13 +550,11 @@ namespace SEE.Charts.Scripts
 				CheckOverlapping(marker, updatedMarkers.ToArray());
 				updatedMarkers.Add(marker);
 
-				if (activeMarkers.Count > 0)
-				{
-					var highlightTimeLeft = CheckOldMarkers(data);
-					if (highlightTimeLeft > 0f)
-						script.TriggerTimedHighlight(
-							chartManager.highlightDuration - highlightTimeLeft, true);
-				}
+				if (activeMarkers.Count <= 0) break;
+				var highlightTimeLeft = CheckOldMarkers(data);
+				if (highlightTimeLeft > 0f)
+					script.TriggerTimedHighlight(chartManager.highlightDuration - highlightTimeLeft,
+						true);
 			}
 
 			foreach (var marker in activeMarkers) Destroy(marker);

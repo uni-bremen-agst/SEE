@@ -1,4 +1,4 @@
-﻿using SEE.Layout;
+﻿using SEE.GO;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.XR;
