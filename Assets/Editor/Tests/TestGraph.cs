@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace SEE.DataModel
@@ -8,11 +9,11 @@ namespace SEE.DataModel
     /// </summary>
     internal class TestGraph
     {
-        private static Node NewNode(Graph graph, string linkname)
+        private static Node NewNode(Graph graph, string id, string type = "Routine")
         {
             Node result = new Node();
-            result.ID = linkname;
-            result.Type = "Routine";
+            result.ID = id;
+            result.Type = type;
             graph.AddNode(result);
             return result;
         }
@@ -222,6 +223,150 @@ namespace SEE.DataModel
                             new HashSet<Edge>() { });
             Assert.AreEqual(n3.Incomings,
                             new HashSet<Edge>() { });
+        }
+
+        [Test]
+        public void TestSubGraph()
+        {
+            Graph g = new Graph();
+            string r = "relevant";
+            string i = "irrelevant";
+
+            Node a = NewNode(g, "a", i);
+            Node b = NewNode(g, "b", i);
+            Node ba = Child(g, b, "ba", i);
+            Node baa = Child(g, ba, "baa", r);
+            Node baaa = Child(g, baa, "baaa", i);
+            Node baaaa = Child(g, baaa, "baaaa", r);
+            Node bb = Child(g, b, "bb", r);
+            Node bba = Child(g, bb, "bba", r);
+            Node bbaa = Child(g, bba, "bbaa", i);
+            Node bc = Child(g, b, "bc", i);
+            Node bca = Child(g, bc, "bca", r);
+            Node bcaa = Child(g, bca, "bcaa", r);
+            Node bcab = Child(g, bca, "bcab", r);
+            Node bcb = Child(g, bc, "bcb", i);
+            Node bcba = Child(g, bcb, "bcba", r);
+            Node bd = Child(g, b, "bd", r);
+            Node bda = Child(g, bd, "bda", i);
+            Node bdaa = Child(g, bda, "bdaa", r);
+            Node c = NewNode(g, "c", r);
+            Node d = NewNode(g, "d", i);
+            Node da = Child(g, d, "da", r);
+            Node e = NewNode(g, "e", r);
+            Node ea = Child(g, e, "ea", i);
+
+            string edgeType = "call";
+            List<Edge> edges = new List<Edge>()
+            {
+                NewEdge(g, a, ba, edgeType),      // lost
+                NewEdge(g, a, b, edgeType),       // lost
+                NewEdge(g, baa, baaa, edgeType),  // kept
+                NewEdge(g, baa, bba, edgeType),   // kept
+                NewEdge(g, bb, bba, edgeType),    // kept
+                NewEdge(g, bbaa, bba, edgeType),  // kept
+                NewEdge(g, bcab, bcba, edgeType), // kept
+                NewEdge(g, bdaa, baaa, edgeType), // kept
+                NewEdge(g, bdaa, bd, edgeType),   // kept
+                NewEdge(g, bdaa, bdaa, edgeType), // kept
+                NewEdge(g, c, e, edgeType),       // kept
+                NewEdge(g, d, d, edgeType),       // lost
+                NewEdge(g, ea, d, edgeType),      // lost
+            };
+
+            HashSet<string> relevantNodeTypes = new HashSet<string>() { r };
+            Graph subgraph = g.Subgraph(relevantNodeTypes);
+            // Nodes in subgraph must have a relevant node type.
+            foreach (Node node in subgraph.Nodes())
+            {
+                Assert.That(relevantNodeTypes.Contains(node.Type));
+            }
+            // There are 13 nodes with a relevant node type.
+            Assert.AreEqual(13, subgraph.NodeCount);
+
+            Assert.IsNull(Pendant(subgraph, a));
+            Assert.IsNull(Pendant(subgraph, b));
+            Assert.IsNull(Pendant(subgraph, ba));
+            Node BAA = Pendant(subgraph, baa);
+            Node BB = Pendant(subgraph, bb);
+            Assert.IsNull(Pendant(subgraph, bc));
+            Node BCA = Pendant(subgraph, bca);
+            Assert.IsNull(Pendant(subgraph, bcb));
+            Node BCBA = Pendant(subgraph, bcba);
+            Node BD = Pendant(subgraph, bd);
+            Node C = Pendant(subgraph, c);
+            Assert.IsNull(Pendant(subgraph, d));
+            Node DA = Pendant(subgraph, da);
+            Node E = Pendant(subgraph, e);
+            Node BAAAA = Pendant(subgraph, baaaa);
+            Node BBA = Pendant(subgraph, bba);
+            Node BCAA = Pendant(subgraph, bcaa);
+            Node BCAB = Pendant(subgraph, bcab);
+            Node BDAA = Pendant(subgraph, bdaa);
+
+            Assert.That(BAA.IsRoot);
+            Assert.That(BB.IsRoot);
+            Assert.That(BCA.IsRoot);
+            Assert.That(BCBA.IsRoot);
+            Assert.That(BD.IsRoot);
+            Assert.That(C.IsRoot);
+            Assert.That(DA.IsRoot);
+            Assert.That(E.IsRoot);
+            Assert.That(BAAAA.IsLeaf);
+            Assert.That(BBA.IsLeaf);   
+            Assert.That(BCAA.IsLeaf);          
+            Assert.That(BCAB.IsLeaf);
+            Assert.That(BCBA.IsLeaf);
+            Assert.That(BDAA.IsLeaf);
+            Assert.That(C.IsLeaf);
+            Assert.That(E.IsLeaf);
+
+            AssertHasChild(subgraph, baa, baaaa);
+            AssertHasChild(subgraph, bb, bba);
+            AssertHasChild(subgraph, bca, bcaa);
+            AssertHasChild(subgraph, bca, bcab);
+            AssertHasChild(subgraph, bd, bdaa);
+
+            // There are 9 edges kept.
+            Assert.AreEqual(9, subgraph.EdgeCount);
+            Assert.That(HasEdge(BAA, BAA, edgeType));
+            Assert.That(HasEdge(BAA, BBA, edgeType));
+            Assert.That(HasEdge(BB, BBA, edgeType));
+            Assert.That(HasEdge(BBA, BBA, edgeType));
+            Assert.That(HasEdge(BCAB, BCBA, edgeType));
+            Assert.That(HasEdge(BDAA, BAA, edgeType));
+            Assert.That(HasEdge(BDAA, BDAA, edgeType));
+            Assert.That(HasEdge(BDAA, BD, edgeType));
+            Assert.That(HasEdge(C, E, edgeType));
+        }
+
+        private bool HasEdge(Node source, Node target, string edgeType)
+        {
+            foreach (Edge outgoing in source.Outgoings)
+            {
+                if (outgoing.Type == edgeType && outgoing.Target == target)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void AssertHasChild(Graph subgraph, Node parent, Node child)
+        {
+            Assert.AreSame(Pendant(subgraph, parent), Pendant(subgraph, child).Parent);
+        }
+
+        private Node Pendant(Graph subgraph, Node baa)
+        {
+            return subgraph.GetNode(baa.ID);
+        }
+
+        private static Node Child(Graph g, Node parent, string id, string nodeType)
+        {
+            Node child = NewNode(g, id, nodeType);
+            parent.AddChild(child);
+            return child;
         }
     }
 }
