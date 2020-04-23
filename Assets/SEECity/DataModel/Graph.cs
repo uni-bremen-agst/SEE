@@ -556,6 +556,151 @@ namespace SEE.DataModel
         }
 
         /// <summary>
+        /// Yields a subgraph of given graph that contains only nodes with one of the given
+        /// <paramref name="nodeTypes"/>. The edges of this graph are "lifted" in the subgraph.
+        /// More precisely, let mapsTo be a mapping of nodes from this graph onto nodes in 
+        /// in the resulting subgraph defined as follows (for every node N in this graph):
+        /// (A) if N has a type in <paramref name="nodeTypes"/>,
+        ///     then N has a clone N' in the subgraph and mapsTo[N] = N'
+        /// (B) if N has no type in <paramref name="nodeTypes"/>,
+        ///     then N has no clone in subgraph and
+        ///     (1) if N has a nearest ancestor A that has a type in <paramref name="nodeTypes"/>,
+        ///         then mapsTo[N] = mapsTo[A]
+        ///     or     
+        ///     (2) none of the ancestors of N has a type in <paramref name="nodeTypes"/>,
+        ///         then mapsTo[N] = null
+        /// 
+        /// Given this mapping mapsTo, edges in the resulting subgraph are present as follows.
+        /// For every edge E in this graph, there is a cloned edge E' in the resulting subgraph
+        /// if and only if mapsTo[E.Source] != null and mapsTo[E.Target] != null where
+        /// E'.Source = mapsTo[E.Source] and E'.Target = mapsTo[E.Target].
+        /// 
+        /// Notes: 
+        /// 
+        /// The result is a new graph, that is, the nodes and edges are copies; they are not
+        /// shared. Graph elements in the resulting subgraph can be mapped onto their original
+        /// corresponding graph elements in this graph by way of their ID.
+        /// 
+        /// The resulting subgraph may have fewer edges: if an edge of this graph has a 
+        /// source or target, N, for which mapsTo[N] = null, it will be lost.
+        /// </summary>
+        /// <param name="nodeTypes">the node types that should be kept</param>
+        /// <returns>subgraph containing only nodes with given <paramref name="nodeTypes"/></returns>
+        public Graph Subgraph(ICollection<string> nodeTypes)
+        {
+            Graph subgraph = new Graph();
+            HashSet<string> relevantTypes = new HashSet<string>(nodeTypes);
+            Dictionary<Node, Node> mapsTo = AddNodesToSubgraph(subgraph, relevantTypes);
+            AddEdgesToSubgraph(subgraph, mapsTo);
+            return subgraph;
+        }
+
+        /// <summary>
+        /// Recursively adds all nodes to <paramref name="subgraph"/> if their type is one of
+        /// <paramref name="relevantTypes"/>. Starts at the roots and traverses all nodes in this graph.
+        /// </summary>
+        /// <param name="subgraph">subgraph where to add the nodes</param>
+        /// <param name="relevantTypes">the node types that should be kept</param>
+        /// <returns>a mapping of nodes from this graph onto the subgraph's nodes</returns>
+        private Dictionary<Node, Node> AddNodesToSubgraph(Graph subgraph, HashSet<string> relevantTypes)
+        {
+            Dictionary<Node, Node> mapsTo = new Dictionary<Node, Node>();
+            foreach (Node root in GetRoots())
+            {
+                // the node that corresponds to root in subgraph (may be null if
+                // there is no corresponding node)
+                Node rootInSubgraph = null;
+                if (relevantTypes.Contains(root.Type))
+                {
+                    // root must be kept => a corresponding node is added to subgraph
+                    // and root is mapped onto that node
+                    rootInSubgraph = (Node)root.Clone();
+                    subgraph.AddNode(rootInSubgraph);
+                    mapsTo[root] = rootInSubgraph;
+                }
+                else
+                {
+                    mapsTo[root] = null;
+                }
+                AddToSubGraph(subgraph, relevantTypes, mapsTo, root);
+            }
+            return mapsTo;
+        }
+
+        /// <summary>
+        /// Adds all ancestors of <paramref name="parent"/> to <paramref name="subgraph"/> if their 
+        /// type is one of <paramref name="relevantTypes"/>. The mapping <paramref name="mapsTo"/>
+        /// is updated accordingly.
+        /// </summary>
+        /// <param name="subgraph">subgraph where to add the nodes</param>
+        /// <param name="relevantTypes">the node types that should be kept</param>
+        /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
+        /// <param name="parent">root of a subtree to be mapped; is a node in this graph</param>
+        private void AddToSubGraph
+            (Graph subgraph,
+             HashSet<string> relevantTypes,
+             Dictionary<Node, Node> mapsTo,
+             Node parent)
+        {
+            foreach (Node child in parent.Children())
+            {
+                if (relevantTypes.Contains(child.Type))
+                {
+                    // The child must be kept => a corresponding node is created
+                    // in the subgraph and child is mapped onto that node
+                    Node childInSubgraph = (Node)child.Clone();
+                    subgraph.AddNode(childInSubgraph);
+                    mapsTo[child] = childInSubgraph;
+                    // The child in the subgraph must become a child of the node
+                    // corresponding to the parent (i.e., mapsTo[parent]) if
+                    // one exists; it may happen that parent has no corresponding
+                    // node in the subgraph if and only if either the parent is 
+                    // a root with a type to be ignored or if all its ascendants
+                    // have a type to be ignored.
+                    Node parentInSubgraph = mapsTo[parent];
+                    if (parentInSubgraph != null)
+                    {
+                        parentInSubgraph.AddChild(childInSubgraph);
+                    }
+                    AddToSubGraph(subgraph, relevantTypes, mapsTo, child);
+                }
+                else
+                {
+                    // The child has a type to be ignored. Hence, no corresponding node
+                    // is added in the subgraph for it. That means, it must be mapped
+                    // onto mapsTo[parent]. There are cases in which mapsTo[parent]
+                    // may be null, but that is OK: We allow null values in the mapping.
+                    mapsTo[child] = mapsTo[parent];
+                    AddToSubGraph(subgraph, relevantTypes, mapsTo, child);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Propagates edge from this graph onto <paramref name="subgraph"/> as follows:
+        /// For every edge E in this graph, there is a cloned edge E' in the resulting subgraph
+        /// if and only if mapsTo[E.Source] != null and mapsTo[E.Target] != null where
+        /// E'.Source = mapsTo[E.Source] and E'.Target = mapsTo[E.Target].
+        /// </summary>
+        /// <param name="subgraph">graph where to propagate the edges too</param>
+        /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
+        private void AddEdgesToSubgraph(Graph subgraph, Dictionary<Node, Node> mapsTo)
+        {
+            foreach (Edge edge in Edges())
+            {
+                Node sourceInSubgraph = mapsTo[edge.Source];
+                Node targetInSubgraph = mapsTo[edge.Target];
+                if (sourceInSubgraph != null && targetInSubgraph != null)
+                {
+                    Edge edgeInSubgraph = (Edge)edge.Clone();
+                    edgeInSubgraph.Source = sourceInSubgraph;
+                    edgeInSubgraph.Target = targetInSubgraph;
+                    subgraph.AddEdge(edgeInSubgraph);
+                }
+            }
+        }
+
+        /// <summary>
         /// Traverses the given graph. On every root node rootAction is called.
         /// On every node that is a leaf, leafAction is called, otherwise innerNodeAction is called.
         /// If an action ist null, it just won't be called.
