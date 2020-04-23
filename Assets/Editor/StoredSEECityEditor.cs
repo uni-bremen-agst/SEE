@@ -47,10 +47,10 @@ namespace SEEEditor
         {
             GUILayout.Label("Node types:", EditorStyles.boldLabel);
             // Make a copy to loop over the dictionary while making changes.
-            Dictionary<string, bool> selection = new Dictionary<string, bool>(city.NodeTypes);
+            Dictionary<string, bool> selection = new Dictionary<string, bool>(city.SelectedNodeTypes);
             foreach (var entry in selection)
             {
-                city.NodeTypes[entry.Key] = EditorGUILayout.Toggle("  " + entry.Key, entry.Value);
+                city.SelectedNodeTypes[entry.Key] = EditorGUILayout.Toggle("  " + entry.Key, entry.Value);
             }
         }
     }

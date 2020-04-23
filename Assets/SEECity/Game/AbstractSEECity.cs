@@ -67,7 +67,7 @@ namespace SEE.Game
         /// A mapping of all node types of the nodes in the graph onto whether
         /// they should be visualized or not.
         /// </summary>
-        public Dictionary<string, bool> NodeTypes
+        public Dictionary<string, bool> SelectedNodeTypes
         {
             get => nodeTypes;
         }
