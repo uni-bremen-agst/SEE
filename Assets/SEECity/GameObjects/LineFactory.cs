@@ -7,7 +7,7 @@ namespace SEE.GO
     /// </summary>
     class LineFactory
     {
-        const float defaultWidth = 0.1f;
+        public const float defaultWidth = 0.1f;
 
         /// <summary>
         /// Path to the material used for edges.
