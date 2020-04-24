@@ -11,6 +11,8 @@ namespace SEE.Net.Internal
         {
         }
 
+
+
         protected override bool HandleCityBuildingPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             CityBuildingPacket packet = CityBuildingPacket.Deserialize(data);
@@ -25,6 +27,7 @@ namespace SEE.Net.Internal
 
             return true;
         }
+
         protected override bool HandleCityEdgePacket(PacketHeader packetHeader, Connection connection, string data)
         {
             CityEdgePacket packet = CityEdgePacket.Deserialize(data);
@@ -41,6 +44,7 @@ namespace SEE.Net.Internal
             lineRenderer.material = new Material(Shader.Find("Legacy Shaders/Particles/Additive")); // TODO: is there a more general way?
             return true;
         }
+
         protected override bool HandleCityNodePacket(PacketHeader packetHeader, Connection connection, string data)
         {
             CityNodePacket packet = CityNodePacket.Deserialize(data);
@@ -54,6 +58,18 @@ namespace SEE.Net.Internal
 
             return true;
         }
+
+        protected override bool HandleCommandPacket(PacketHeader packetHeader, Connection connection, string data)
+        {
+            CommandPacket packet = CommandPacket.Deserialize(data);
+            if (packet == null || packet.command == null)
+            {
+                return false;
+            }
+            packet.command.ExecuteLocally();
+            return true;
+        }
+
         protected override bool HandleInstantiatePacket(PacketHeader packetHeader, Connection connection, string data)
         {
             InstantiatePacket packet = InstantiatePacket.Deserialize(data);
@@ -79,28 +95,21 @@ namespace SEE.Net.Internal
             obj.transform.localScale = packet.scale;
             return true;
         }
-        protected override bool HandleInteractionPacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            InteractionPacket packet = InteractionPacket.Deserialize(data);
-            if (packet == null || packet.interaction == null)
-            {
-                return false;
-            }
-            packet.interaction.ExecuteLocally();
-            return true;
-        }
+
         protected override bool HandleTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             TransformViewPositionPacket packet = TransformViewPositionPacket.Deserialize(data);
             packet?.transformView?.SetNextPosition(packet.updateTime, packet.position);
             return true;
         }
+
         protected override bool HandleTransformViewRotationPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             TransformViewRotationPacket packet = TransformViewRotationPacket.Deserialize(data);
             packet?.transformView?.SetNextRotation(packet.updateTime, packet.rotation);
             return true;
         }
+
         protected override bool HandleTransformViewScalePacket(PacketHeader packetHeader, Connection connection, string data)
         {
             TransformViewScalePacket packet = TransformViewScalePacket.Deserialize(data);

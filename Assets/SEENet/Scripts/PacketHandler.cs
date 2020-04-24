@@ -31,7 +31,7 @@ namespace SEE.Net.Internal
                 { packetTypePrefix + CityEdgePacket.PACKET_TYPE, HandleCityEdgePacket },
                 { packetTypePrefix + CityNodePacket.PACKET_TYPE, HandleCityNodePacket },
                 { packetTypePrefix + InstantiatePacket.PACKET_TYPE, HandleInstantiatePacket },
-                { packetTypePrefix + InteractionPacket.PACKET_TYPE, HandleInteractionPacket },
+                { packetTypePrefix + CommandPacket.PACKET_TYPE, HandleCommandPacket },
                 { packetTypePrefix + TransformViewPositionPacket.PACKET_TYPE, HandleTransformViewPositionPacket },
                 { packetTypePrefix + TransformViewRotationPacket.PACKET_TYPE, HandleTransformViewRotationPacket },
                 { packetTypePrefix + TransformViewScalePacket.PACKET_TYPE, HandleTransformViewScalePacket }
@@ -69,7 +69,7 @@ namespace SEE.Net.Internal
         protected abstract bool HandleCityEdgePacket(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleCityNodePacket(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleInstantiatePacket(PacketHeader packetHeader, Connection connection, string data);
-        protected abstract bool HandleInteractionPacket(PacketHeader packetHeader, Connection connection, string data);
+        protected abstract bool HandleCommandPacket(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleTransformViewRotationPacket(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleTransformViewScalePacket(PacketHeader packetHeader, Connection connection, string data);
