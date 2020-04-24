@@ -41,21 +41,21 @@ namespace SEE.Charts.Scripts.VR
 		public override void AreaSelection(Vector2 min, Vector2 max, bool direction)
 		{
 			if (direction)
-				foreach (var marker in activeMarkers)
+				foreach (var marker in ActiveMarkers)
 				{
 					var markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y &&
 					    markerPos.y < max.y)
-						chartManager.HighlightObject(
+						ChartManager.HighlightObject(
 							marker.GetComponent<ChartMarker>().linkedObject);
 				}
 			else
-				foreach (var marker in activeMarkers)
+				foreach (var marker in ActiveMarkers)
 				{
 					var markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y &&
 					    markerPos.y > max.y)
-						chartManager.HighlightObject(
+						ChartManager.HighlightObject(
 							marker.GetComponent<ChartMarker>().linkedObject);
 				}
 		}
@@ -65,7 +65,7 @@ namespace SEE.Charts.Scripts.VR
 		/// </summary>
 		public void SetSelectionMode()
 		{
-			chartManager.selectionMode = selectionToggle.isOn;
+			ChartManager.selectionMode = selectionToggle.isOn;
 		}
 	}
 }

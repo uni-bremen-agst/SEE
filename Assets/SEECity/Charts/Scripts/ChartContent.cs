@@ -19,7 +19,7 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// Contains some settings used in this script.
 		/// </summary>
-		protected ChartManager chartManager;
+		protected ChartManager ChartManager;
 
 		/// <summary>
 		/// The distance to another marker to recognize it as overlapping.
@@ -49,7 +49,7 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// If a draw is queued, this wont be null.
 		/// </summary>
-		[HideInInspector] public Coroutine drawing;
+		[HideInInspector] public Coroutine Drawing;
 
 		/// <summary>
 		/// All objects to be listed in the chart.
@@ -59,12 +59,12 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// The number of nodes in a scene to determine the performance of graphs.
 		/// </summary>
-		[HideInInspector] public int citySize;
+		[HideInInspector] public int CitySize;
 
 		/// <summary>
 		/// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
 		/// </summary>
-		protected List<GameObject> activeMarkers = new List<GameObject>();
+		protected List<GameObject> ActiveMarkers = new List<GameObject>();
 
 		/// <summary>
 		/// Handles the movement of charts.
@@ -142,7 +142,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void Awake()
 		{
-			chartManager = GameObject.FindGameObjectWithTag("ChartManager")
+			ChartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
 			FindDataObjects();
 			GetAllFloats();
@@ -155,7 +155,9 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		protected virtual void Start()
 		{
-			var time = citySize > 50 ? 5f : 0.2f;
+			var time = CitySize > 50 ? 5f : 0.2f;
+			axisDropdownX.SetOther(axisDropdownY);
+			axisDropdownY.SetOther(axisDropdownX);
 			Invoke(nameof(CallDrawData), time);
 		}
 
@@ -243,17 +245,16 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void FindDataObjects()
 		{
-			GameObject[] buildings = GameObject.FindGameObjectsWithTag("Building");
-			GameObject[] nodes = GameObject.FindGameObjectsWithTag("Node");
-			GameObject[] combined = new GameObject[buildings.Length + nodes.Length];
+			var buildings = GameObject.FindGameObjectsWithTag("Building");
+			var nodes = GameObject.FindGameObjectsWithTag("Node");
+			var combined = new GameObject[buildings.Length + nodes.Length];
 			Array.Copy(buildings, combined, buildings.Length);
 			Array.Copy(nodes, 0, combined, buildings.Length, nodes.Length);
 			_dataObjects = combined;
-			Debug.Log(combined);
 			foreach (var entry in combined)
 				if (!entry.GetComponent<NodeHighlights>().showInChart.Contains(this))
 					entry.GetComponent<NodeHighlights>().showInChart.Add(this, true);
-			citySize = _dataObjects.Length;
+			CitySize = _dataObjects.Length;
 
 			FillScrollView();
 		}
@@ -273,13 +274,13 @@ namespace SEE.Charts.Scripts
 		/// <returns></returns>
 		public IEnumerator QueueDraw()
 		{
-			if (citySize > 50)
+			if (CitySize > 50)
 				yield return new WaitForSeconds(2f);
 			else
 				yield return new WaitForSeconds(0.5f);
 
 			DrawData(false);
-			drawing = null;
+			Drawing = null;
 		}
 
 		/// <summary>
@@ -296,7 +297,7 @@ namespace SEE.Charts.Scripts
 			else
 				DrawTwoAxes();
 
-			if (activeMarkers.Count == 0) noDataWarning.SetActive(true);
+			if (ActiveMarkers.Count == 0) noDataWarning.SetActive(true);
 		}
 
 		/// <summary>
@@ -327,7 +328,7 @@ namespace SEE.Charts.Scripts
 			}
 
 			var maxY = minY;
-			List<GameObject> toDraw = new List<GameObject>();
+			var toDraw = new List<GameObject>();
 			foreach (var data in _dataObjects)
 			{
 				node = data.GetComponent<NodeRef>().node;
@@ -359,23 +360,23 @@ namespace SEE.Charts.Scripts
 				{
 					(float min, float max) = minX.Equals(maxX) ? (minY, maxY) : (minX, maxX);
 					AddMarkers(toDraw, min, max);
-					minXText.text = xEqual ? "0" : minX.ToString("0.00");
-					maxXText.text = xEqual ? toDraw.Count.ToString() : maxX.ToString("0.00");
-					minYText.text = yEqual ? "0" : minY.ToString("0.00");
-					maxYText.text = yEqual ? toDraw.Count.ToString() : maxY.ToString("0.00");
+					minXText.text = xEqual ? "0" : minX.ToString("N0");
+					maxXText.text = xEqual ? toDraw.Count.ToString() : maxX.ToString("N0");
+					minYText.text = yEqual ? "0" : minY.ToString("N0");
+					maxYText.text = yEqual ? toDraw.Count.ToString() : maxY.ToString("N0");
 				}
 				else
 				{
 					AddMarkers(toDraw, minX, maxX, minY, maxY);
-					minXText.text = minX.ToString("0.00");
-					maxXText.text = maxX.ToString("0.00");
-					minYText.text = minY.ToString("0.00");
-					maxYText.text = maxY.ToString("0.00");
+					minXText.text = minX.ToString("N0");
+					maxXText.text = maxX.ToString("N0");
+					minYText.text = minY.ToString("N0");
+					maxYText.text = maxY.ToString("N0");
 				}
 			}
 			else
 			{
-				foreach (var activeMarker in activeMarkers) Destroy(activeMarker);
+				foreach (var activeMarker in ActiveMarkers) Destroy(activeMarker);
 				noDataWarning.SetActive(true);
 			}
 		}
@@ -391,7 +392,7 @@ namespace SEE.Charts.Scripts
 			var metric = axisDropdownY.Value;
 
 			foreach (var dataObject in _dataObjects)
-				if (dataObject.GetComponent<NodeRef>().node.TryGetNumeric(metric, out var _) &&
+				if (dataObject.GetComponent<NodeRef>().node.TryGetNumeric(metric, out _) &&
 				    (bool) dataObject.GetComponent<NodeHighlights>().showInChart[this])
 					toDraw.Add(dataObject);
 
@@ -411,12 +412,12 @@ namespace SEE.Charts.Scripts
 
 				minXText.text = "0";
 				maxXText.text = toDraw.Count.ToString();
-				minYText.text = min.ToString("0.00");
-				maxYText.text = max.ToString("0.00");
+				minYText.text = min.ToString("N0");
+				maxYText.text = max.ToString("N0");
 			}
 			else
 			{
-				foreach (var activeMarker in activeMarkers) Destroy(activeMarker);
+				foreach (var activeMarker in ActiveMarkers) Destroy(activeMarker);
 				noDataWarning.SetActive(true);
 			}
 		}
@@ -429,10 +430,10 @@ namespace SEE.Charts.Scripts
 		/// <param name="maxX">The maximum value on the x-axis.</param>
 		/// <param name="minY">The minimum value on the y-axis.</param>
 		/// <param name="maxY">The maximum value on the y-axis.</param>
-		private void AddMarkers(List<GameObject> toDraw, float minX, float maxX, float minY,
+		private void AddMarkers(IEnumerable<GameObject> toDraw, float minX, float maxX, float minY,
 			float maxY)
 		{
-			List<GameObject> updatedMarkers = new List<GameObject>();
+			var updatedMarkers = new List<GameObject>();
 			var dataRect = dataPanel.rect;
 			var width = dataRect.width / (maxX - minX);
 			var height = dataRect.height / (maxY - minY);
@@ -450,7 +451,7 @@ namespace SEE.Charts.Scripts
 				node.TryGetNumeric(axisDropdownY.Value, out var valueY);
 				var type = node.IsLeaf() ? "Building" : "Node";
 				script.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
-				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("0.00"));
+				                   valueX.ToString("N") + ", Y: " + valueY.ToString("N"));
 				marker.GetComponent<RectTransform>().anchoredPosition =
 					new Vector2((valueX - minX) * width, (valueY - minY) * height);
 				CheckOverlapping(marker, updatedMarkers.ToArray());
@@ -458,12 +459,12 @@ namespace SEE.Charts.Scripts
 
 				var highlightTimeLeft = CheckOldMarkers(data);
 				if (highlightTimeLeft > 0f)
-					script.TriggerTimedHighlight(chartManager.highlightDuration -
+					script.TriggerTimedHighlight(ChartManager.highlightDuration -
 					                             highlightTimeLeft, true);
 			}
 
-			foreach (var marker in activeMarkers) Destroy(marker);
-			activeMarkers = updatedMarkers;
+			foreach (var marker in ActiveMarkers) Destroy(marker);
+			ActiveMarkers = updatedMarkers;
 		}
 
 		/// <summary>
@@ -480,7 +481,7 @@ namespace SEE.Charts.Scripts
 			}
 			else
 			{
-				List<GameObject> updatedMarkers = new List<GameObject>();
+				var updatedMarkers = new List<GameObject>();
 				var dataRect = dataPanel.rect;
 				var width = dataRect.width / (toDraw.Count - 1);
 				var height = dataRect.height / (max - min);
@@ -500,21 +501,21 @@ namespace SEE.Charts.Scripts
 					var type = node.IsLeaf() ? "Building" : "Node";
 					script.SetInfoText("Linked to: " + data.name + " of type " + type + "\n" +
 					                   metric +
-					                   ": " + value.ToString("0.00"));
+					                   ": " + value.ToString("N"));
 					marker.GetComponent<RectTransform>().anchoredPosition =
 						new Vector2(x++ * width, (value - min) * height);
 					CheckOverlapping(marker, updatedMarkers.ToArray());
 					updatedMarkers.Add(marker);
 
-					if (activeMarkers.Count <= 0) break;
+					if (ActiveMarkers.Count <= 0) break;
 					var highlightTimeLeft = CheckOldMarkers(data);
 					if (highlightTimeLeft > 0f)
 						script.TriggerTimedHighlight(
-							chartManager.highlightDuration - highlightTimeLeft, true);
+							ChartManager.highlightDuration - highlightTimeLeft, true);
 				}
 
-				foreach (var marker in activeMarkers) Destroy(marker);
-				activeMarkers = updatedMarkers;
+				foreach (var marker in ActiveMarkers) Destroy(marker);
+				ActiveMarkers = updatedMarkers;
 			}
 		}
 
@@ -524,7 +525,7 @@ namespace SEE.Charts.Scripts
 		/// <param name="toDraw">The markers to add to the chart.</param>
 		private void AddMarkers(List<GameObject> toDraw)
 		{
-			List<GameObject> updatedMarkers = new List<GameObject>();
+			var updatedMarkers = new List<GameObject>();
 			var dataRect = dataPanel.rect;
 			var width = dataRect.width / toDraw.Count;
 			var height = dataRect.height / toDraw.Count;
@@ -544,21 +545,21 @@ namespace SEE.Charts.Scripts
 				node.TryGetNumeric(axisDropdownY.Value, out var valueY);
 				var type = node.IsLeaf() ? "Building" : "Node";
 				script.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
-				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("0.00"));
+				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("N"));
 				marker.GetComponent<RectTransform>().anchoredPosition =
 					new Vector2(x++ * width, y++ * height);
 				CheckOverlapping(marker, updatedMarkers.ToArray());
 				updatedMarkers.Add(marker);
 
-				if (activeMarkers.Count <= 0) break;
+				if (ActiveMarkers.Count <= 0) break;
 				var highlightTimeLeft = CheckOldMarkers(data);
 				if (highlightTimeLeft > 0f)
-					script.TriggerTimedHighlight(chartManager.highlightDuration - highlightTimeLeft,
+					script.TriggerTimedHighlight(ChartManager.highlightDuration - highlightTimeLeft,
 						true);
 			}
 
-			foreach (var marker in activeMarkers) Destroy(marker);
-			activeMarkers = updatedMarkers;
+			foreach (var marker in ActiveMarkers) Destroy(marker);
+			ActiveMarkers = updatedMarkers;
 		}
 
 		/// <summary>
@@ -606,18 +607,18 @@ namespace SEE.Charts.Scripts
 		private float CheckOldMarkers(GameObject marker)
 		{
 			loop:
-			foreach (var oldMarker in activeMarkers)
+			foreach (var oldMarker in ActiveMarkers)
 				if (oldMarker.Equals(null))
 				{
 					Destroy(oldMarker);
-					activeMarkers.Remove(oldMarker);
+					ActiveMarkers.Remove(oldMarker);
 					goto loop;
 				}
 				else if (oldMarker.TryGetComponent(out ChartMarker oldScript) &&
 				         oldScript.linkedObject.GetInstanceID() == marker.GetInstanceID() &&
 				         oldScript.TimedHighlight != null)
 				{
-					activeMarkers.Remove(oldMarker);
+					ActiveMarkers.Remove(oldMarker);
 					Destroy(oldMarker);
 					return oldScript.HighlightTime;
 				}
@@ -634,21 +635,21 @@ namespace SEE.Charts.Scripts
 		public virtual void AreaSelection(Vector2 min, Vector2 max, bool direction)
 		{
 			if (direction)
-				foreach (var marker in activeMarkers)
+				foreach (var marker in ActiveMarkers)
 				{
 					Vector2 markerPos = marker.transform.position;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y &&
 					    markerPos.y < max.y)
-						chartManager.HighlightObject(
+						ChartManager.HighlightObject(
 							marker.GetComponent<ChartMarker>().linkedObject);
 				}
 			else
-				foreach (var marker in activeMarkers)
+				foreach (var marker in ActiveMarkers)
 				{
 					Vector2 markerPos = marker.transform.position;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y &&
 					    markerPos.y > max.y)
-						chartManager.HighlightObject(
+						ChartManager.HighlightObject(
 							marker.GetComponent<ChartMarker>().linkedObject);
 				}
 		}
@@ -674,12 +675,12 @@ namespace SEE.Charts.Scripts
 		/// <param name="highlight">The object the marker will refer to.</param>
 		public void HighlightCorrespondingMarker(GameObject highlight)
 		{
-			foreach (var activeMarker in activeMarkers)
+			foreach (var activeMarker in ActiveMarkers)
 				if (!activeMarker.Equals(null))
 				{
 					var script = activeMarker.GetComponent<ChartMarker>();
 					if (!script.linkedObject.Equals(highlight)) continue;
-					script.TriggerTimedHighlight(chartManager.highlightDuration, false);
+					script.TriggerTimedHighlight(ChartManager.highlightDuration, false);
 					break;
 				}
 		}
@@ -691,7 +692,7 @@ namespace SEE.Charts.Scripts
 		/// <param name="highlight">The object the marker will refer to.</param>
 		public void AccentuateCorrespondingMarker(GameObject highlight)
 		{
-			foreach (var activeMarker in activeMarkers)
+			foreach (var activeMarker in ActiveMarkers)
 			{
 				var script = activeMarker.GetComponent<ChartMarker>();
 				if (!script.linkedObject.Equals(highlight)) continue;
