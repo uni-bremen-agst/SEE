@@ -1,23 +1,22 @@
-﻿using SEE.Layout;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace SEE.Net.Internal
 {
 
-    public class CityEdgePacket : Packet
+    internal class CityEdgePacket : Packet
     {
-        public static readonly string PACKET_TYPE = "CityEdge";
-        public static readonly int FIELD_COUNT = 6;
+        internal static readonly string PACKET_TYPE = "CityEdge";
+        internal static readonly int FIELD_COUNT = 6;
 
-        public int id;
-        public Vector3[] positions;
-        public float startWidth;
-        public float endWidth;
-        public Color startColor;
-        public Color endColor;
+        internal int id;
+        internal Vector3[] positions;
+        internal float startWidth;
+        internal float endWidth;
+        internal Color startColor;
+        internal Color endColor;
 
-        public CityEdgePacket(GameObject edge) : base(PACKET_TYPE)
+        internal CityEdgePacket(GameObject edge) : base(PACKET_TYPE)
         {
             Assert.IsNotNull(edge);
             LineRenderer lineRenderer = edge.GetComponent<LineRenderer>();
@@ -33,11 +32,10 @@ namespace SEE.Net.Internal
             startColor = lineRenderer.startColor;
             endColor = lineRenderer.endColor;
         }
-        private CityEdgePacket() : base(PACKET_TYPE)
-        {
-        }
 
-        public override string Serialize()
+        private CityEdgePacket() : base(PACKET_TYPE) { }
+
+        internal override string Serialize()
         {
             int objectCount = (FIELD_COUNT - 1) + (1 + positions.Length);
             object[] objects = new object[objectCount];
@@ -56,7 +54,8 @@ namespace SEE.Net.Internal
 
             return Serialize(objects);
         }
-        public static CityEdgePacket Deserialize(string data)
+
+        internal static CityEdgePacket Deserialize(string data)
         {
             CityEdgePacket packet = new CityEdgePacket();
 

@@ -99,6 +99,15 @@ namespace SEE.Net.Internal
             }
             return true;
         }
+        protected override bool HandleInteractionPacket(PacketHeader packetHeader, Connection connection, string data)
+        {
+            InteractionPacket packet = InteractionPacket.Deserialize(data);
+            foreach (Connection co in Server.Connections)
+            {
+                Network.Send(co, packet);
+            }
+            return true;
+        }
         protected override bool HandleTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             TransformViewPositionPacket packet = TransformViewPositionPacket.Deserialize(data);

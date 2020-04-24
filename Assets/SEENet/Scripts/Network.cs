@@ -16,7 +16,6 @@ namespace SEE.Net
     public class Network : MonoBehaviour
     {
         private const Internal.Logger.Severity DEFAULT_SEVERITY = Internal.Logger.Severity.High;
-
         private static Network instance;
 
         [SerializeField] private bool useInOfflineMode = true;
@@ -24,23 +23,29 @@ namespace SEE.Net
         [SerializeField] private string serverIPAddress = string.Empty;
         [SerializeField] private int localServerPort = 55555;
         [SerializeField] private int remoteServerPort = 0;
+
 #if UNITY_EDITOR
-        [SerializeField] private bool loggingEnabled = false;
+        [SerializeField] private bool nativeLoggingEnabled = false;
         [SerializeField] private Internal.Logger.Severity minimalSeverity = DEFAULT_SEVERITY;
 #endif
 
+
+
         public static bool UseInOfflineMode { get => instance ? instance.useInOfflineMode : true; }
+
         public static bool HostServer { get => instance ? instance.hostServer : false; }
+
         public static string ServerIPAddress { get => instance ? instance.serverIPAddress : ""; }
+
         public static int LocalServerPort { get => instance ? instance.localServerPort : -1; }
+
         public static int RemoteServerPort { get => instance ? instance.remoteServerPort : -1; }
-#if UNITY_EDITOR
-        public static bool Logging { get => instance ? false : instance.loggingEnabled; }
-        public static Internal.Logger.Severity MinimalSeverity { get => instance ? instance.minimalSeverity : DEFAULT_SEVERITY; }
-#endif
 
         public static Thread MainThread { get; private set; } = Thread.CurrentThread;
+
         private static List<Connection> deadConnections = new List<Connection>();
+
+
 
         private void Awake()
         {
@@ -59,7 +64,7 @@ namespace SEE.Net
             }
 
 #if UNITY_EDITOR
-            if (loggingEnabled)
+            if (nativeLoggingEnabled)
             {
                 NetworkComms.EnableLogging(new Internal.Logger(minimalSeverity));
             }
@@ -77,9 +82,10 @@ namespace SEE.Net
             }
             Client.Initialize();
 
-            InitializeSEE();
+            Initialize();
         }
-        private void InitializeSEE()
+
+        private void Initialize()
         {
             Instantiate("Prefabs/SEENetPlayer");
 
@@ -111,6 +117,7 @@ namespace SEE.Net
 #endif
             }
         }
+
         private void Update()
         {
             if (hostServer && !useInOfflineMode)
@@ -119,6 +126,7 @@ namespace SEE.Net
             }
             Client.Update();
         }
+
         private void OnDestroy()
         {
             if (!useInOfflineMode)
@@ -156,10 +164,13 @@ namespace SEE.Net
                 }
             }
         }
+
+
         public static void Instantiate(string prefabName)
         {
             Instantiate(prefabName, Vector3.zero, Quaternion.identity, Vector3.one);
         }
+
         public static void Instantiate(string prefabName, Vector3 position, Quaternion rotation, Vector3 scale)
         {
             InstantiatePacket p = new InstantiatePacket(prefabName, Client.LocalEndPoint, position, rotation, scale);
@@ -176,7 +187,9 @@ namespace SEE.Net
                 Send(Client.Connection, p);
             }
         }
-        public static void Send(Connection connection, Internal.Packet packet, SendReceiveOptions options = null)
+
+
+        internal static void Send(Connection connection, Internal.Packet packet, SendReceiveOptions options = null)
         {
             Assert.IsNotNull(connection);
             Assert.IsNotNull(packet);
@@ -219,6 +232,8 @@ namespace SEE.Net
                 }
             })).Start();
         }
+
+
         public static bool IsLocalIPAddress(IPAddress ipAddress)
         {
             if (ipAddress == null)
@@ -229,11 +244,30 @@ namespace SEE.Net
             IPAddress[] localIPAddresses = LookupLocalIPAddresses();
             return localIPAddresses.Contains(ipAddress);
         }
+
         public static IPAddress[] LookupLocalIPAddresses()
         {
             string hostName = Dns.GetHostName(); ;
             IPHostEntry hostEntry = Dns.GetHostEntry(hostName);
             return hostEntry.AddressList;
+        }
+
+
+        internal static void ExecuteInteraction(Interaction interaction)
+        {
+            InteractionPacket interactionPacket = new InteractionPacket(interaction);
+            if (instance.useInOfflineMode)
+            {
+                Client.PacketHandler.Push(
+                    new PacketHeader(Client.PACKET_PREFIX + InteractionPacket.PACKET_TYPE, 0),
+                    null,
+                    interactionPacket.Serialize()
+                );
+            }
+            else
+            {
+                Send(Client.Connection, interactionPacket);
+            }
         }
     }
 
