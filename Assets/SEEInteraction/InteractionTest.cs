@@ -1,13 +1,14 @@
-﻿using SEE;
+﻿using SEE.Game;
+using SEE.Interact;
 using UnityEngine;
 
 public class InteractionTest : MonoBehaviour
 {
-    public GameObject building;
+    public GameObject seeCityGO;
 
     void Start()
     {
-        DeleteBuildingInteraction dbi = new DeleteBuildingInteraction(building);
-        dbi.Execute();
+        LoadCityInteraction lci = new LoadCityInteraction(seeCityGO.GetComponent<SEECity>());
+        lci.Execute();
     }
 }

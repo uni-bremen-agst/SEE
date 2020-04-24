@@ -24,7 +24,7 @@ namespace SEE.Game
         /// Application.dataPath (used within ProjectPath()) must not be called in a 
         /// constructor. That is why we need to defer its definition to the 
         /// SEECityEditor.
-        /// </summary>        
+        /// </summary>
         public string PathPrefix = null; // serialized by Unity
 
         /// <summary>
@@ -371,11 +371,20 @@ namespace SEE.Game
             {
                 SEE.Performance p = SEE.Performance.Begin("loading graph data from " + filename);
                 GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "ROOT", new SEELogger());
-                graphCreator.Load();
+                try
+                {
+                    graphCreator.Load();
+                }
+                catch (System.IO.DirectoryNotFoundException)
+                {
+                }
                 Graph graph = graphCreator.GetGraph();
                 p.End();
-                Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
-                Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
+                if (graph != null)
+                {
+                    Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
+                    Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
+                }
                 return graph;
             }
         }

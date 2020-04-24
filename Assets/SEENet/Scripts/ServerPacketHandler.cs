@@ -15,21 +15,26 @@ namespace SEE.Net.Internal
         {
             public PacketHeader header;
             public Connection connection;
-            public Packet packet;
+            public string packetType;
+            public string packetData;
         }
+
+
 
         private List<BufferedPacket> bufferedPackets = new List<BufferedPacket>();
         private int lastViewID = -1;
 
-        public ServerPacketHandler(string packetTypePrefix) : base(packetTypePrefix)
-        {
-        }
+
+
+        public ServerPacketHandler(string packetTypePrefix) : base(packetTypePrefix) { }
+
+
 
         public void OnConnectionEstablished(Connection connection)
         {
             for (int i = 0; i < bufferedPackets.Count; i++)
             {
-                Network.Send(connection, bufferedPackets[i].packet);
+                Network.Send(connection, bufferedPackets[i].packetType, bufferedPackets[i].packetData);
             }
 
             if (!Client.LocalEndPoint.Equals(connection.ConnectionInfo.RemoteEndPoint))
@@ -48,6 +53,7 @@ namespace SEE.Net.Internal
                 }
             }
         }
+
         public void OnConnectionClosed(Connection connection)
         {
             // TODO: remove instantiated objects
@@ -70,18 +76,23 @@ namespace SEE.Net.Internal
 #endif
         }
 
+
+
         protected override bool HandleCityBuildingPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             throw new Exception("A server should never receive this type of packet!");
         }
+
         protected override bool HandleCityEdgePacket(PacketHeader packetHeader, Connection connection, string data)
         {
             throw new Exception("A server should never receive this type of packet!");
         }
+
         protected override bool HandleCityNodePacket(PacketHeader packetHeader, Connection connection, string data)
         {
             throw new Exception("A server should never receive this type of packet!");
         }
+
         protected override bool HandleInstantiatePacket(PacketHeader packetHeader, Connection connection, string data)
         {
             InstantiatePacket packet = InstantiatePacket.Deserialize(data);
@@ -90,7 +101,8 @@ namespace SEE.Net.Internal
             {
                 header = new PacketHeader(Client.PACKET_PREFIX + InstantiatePacket.PACKET_TYPE, packetHeader.TotalPayloadSize),
                 connection = connection,
-                packet = packet
+                packetType = packet.packetType,
+                packetData = data
             };
             bufferedPackets.Add(bufferedPacket);
             for (int i = 0; i < Server.Connections.Count; i++)
@@ -99,15 +111,30 @@ namespace SEE.Net.Internal
             }
             return true;
         }
+
         protected override bool HandleInteractionPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             InteractionPacket packet = InteractionPacket.Deserialize(data);
+
+            if (packet.interaction.buffer)
+            {
+                BufferedPacket bufferedPacket = new BufferedPacket()
+                {
+                    header = new PacketHeader(Client.PACKET_PREFIX + InteractionPacket.PACKET_TYPE, packetHeader.TotalPayloadSize),
+                    connection = connection,
+                    packetType = packet.packetType,
+                    packetData = data
+                };
+                bufferedPackets.Add(bufferedPacket);
+            }
+
             foreach (Connection co in Server.Connections)
             {
                 Network.Send(co, packet);
             }
             return true;
         }
+
         protected override bool HandleTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             TransformViewPositionPacket packet = TransformViewPositionPacket.Deserialize(data);
@@ -117,6 +144,7 @@ namespace SEE.Net.Internal
             }
             return true;
         }
+
         protected override bool HandleTransformViewRotationPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             TransformViewRotationPacket packet = TransformViewRotationPacket.Deserialize(data);
@@ -126,6 +154,7 @@ namespace SEE.Net.Internal
             }
             return true;
         }
+
         protected override bool HandleTransformViewScalePacket(PacketHeader packetHeader, Connection connection, string data)
         {
             TransformViewScalePacket packet = TransformViewScalePacket.Deserialize(data);
