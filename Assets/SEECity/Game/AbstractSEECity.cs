@@ -6,6 +6,7 @@ using SEE.DataModel;
 using SEE.DataModel.IO;
 using SEE.GO;
 using System;
+using System.Linq;
 
 namespace SEE.Game
 {
@@ -71,10 +72,31 @@ namespace SEE.Game
         {
             get => nodeTypes;
         }
+        
+        /// <summary>
+        /// True if all node types in nodeTypes are relevant.
+        /// </summary>
+        private bool AllNodeTypesAreRelevant
+        {
+            get
+            {
+                foreach (bool relevant in nodeTypes.Values)
+                {
+                    if (!relevant)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
 
         /// <summary>
-        /// Sets the node types that occur in the graph.
+        /// Sets the node types that occur in the graph as all being
+        /// relevant. The node types can be retrieved and also be
+        /// marked as irrelevant via property SelectedNodeTypes.
         /// </summary>
+        /// <param name="graph">graph from which to retrieve the node types (may be null)</param>
         public void SetNodeTypes(Graph graph)
         {
             if (graph != null)
@@ -94,7 +116,30 @@ namespace SEE.Game
             {
                 nodeTypes.Clear();
             }
-            //Debug.LogFormat("Number of node types: {0}\n", nodeTypes.Count);
+        }
+
+        /// <summary>
+        /// Returns a subgraph of <paramref name="graph"/> where all nodes were 
+        /// removed that have a type considered to be irrelevant. If all node 
+        /// types are considered relevant, <paramref name="graph"/> will be returned.
+        /// If not all types are considered relevant, a copied subgraph is returned.
+        /// </summary>
+        /// <param name="graph">graph whose subgraph is requested</param>
+        /// <returns>subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/></returns>
+        protected Graph RelevantGraph(Graph graph)
+        {
+            if (AllNodeTypesAreRelevant)
+            {
+                Debug.Log("All node types are relevant.\n");
+                return graph;
+            } 
+            else
+            {
+                ICollection<string> matches = nodeTypes.Where(pair => pair.Value == true)
+                  .Select(pair => pair.Key).ToList();
+                Debug.Log("Considering only a subgraph.\n");
+                return graph.Subgraph(matches);
+            }
         }
 
         //---------------------------------

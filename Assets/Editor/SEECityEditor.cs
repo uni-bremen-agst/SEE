@@ -29,15 +29,19 @@ namespace SEEEditor
         {
             SEECity city = target as SEECity;
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Load Graph"))
+            if (GUILayout.Button("Load"))
             {
                 Load(city);
             }
-            if (GUILayout.Button("Draw Graph"))
+            if (GUILayout.Button("Draw"))
             {
                 Draw(city);
             }
-            if (GUILayout.Button("Delete Graph"))
+            if (GUILayout.Button("Re-Draw"))
+            {
+                ReDraw(city);
+            }
+            if (GUILayout.Button("Delete"))
             {
                 Reset(city);
             }
@@ -67,12 +71,21 @@ namespace SEEEditor
         }
 
         /// <summary>
-        /// Rrenders the graph in the scene.
+        /// Renders the graph in the scene.
         /// </summary>
         /// <param name="city">the city to be set up</param>
         protected virtual void Draw(SEECity city)
         {
             city.DrawGraph();
+        }
+
+        /// <summary>
+        /// Renders the graph in the scene once again without deleting the underlying graph loaded.
+        /// </summary>
+        /// <param name="city">the city to be re-drawn</param>
+        protected virtual void ReDraw(SEECity city)
+        {
+            city.ReDrawGraph();
         }
 
         /// <summary>

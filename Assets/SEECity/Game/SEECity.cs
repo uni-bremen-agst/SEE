@@ -36,19 +36,38 @@ namespace SEE.Game
         /// All that is being done in Start() below.
         /// </summary>
         [NonSerialized]
-        private Graph graph = null;
+        private Graph loadedGraph = null;
 
         /// <summary>
-        /// The graph underlying this SEE city. May be null.
-        /// the element is currently not in a graph.
+        /// The graph underlying this SEE city that was loaded from disk. May be null.
         /// </summary>
-        public Graph ItsGraph
+        public Graph LoadedGraph
         {
-            get => graph;
+            get => loadedGraph;
             set
             {
-                graph = value;                
-                SetNodeTypes(graph);
+                loadedGraph = value;
+                SetNodeTypes(loadedGraph);
+            }
+        }
+
+        /// <summary>
+        /// The graph to be visualized. It may be a subgraph of the loaded graph
+        /// containing only nodes with relevant node types or the original LoadedGraph
+        /// if all node types are relevant. It is null if no graph has been loaded yet.
+        /// </summary>
+        public Graph VisualizedSubGraph
+        {
+            get 
+            {
+                if (loadedGraph == null)
+                {
+                    return loadedGraph;
+                } 
+                else
+                {
+                    return RelevantGraph(loadedGraph);
+                }
             }
         }
 
@@ -60,12 +79,12 @@ namespace SEE.Game
         protected void Awake()
         {
             string filename = GXLPath();
-            if (graph == null && !string.IsNullOrEmpty(filename))
+            if (loadedGraph == null && !string.IsNullOrEmpty(filename))
             {                
-                graph = LoadGraph(filename);
-                if (graph != null)
+                loadedGraph = LoadGraph(filename);
+                if (loadedGraph != null)
                 {
-                    SetNodeRefs(graph);
+                    SetNodeRefs(loadedGraph);
                 }
             }
         }
@@ -170,13 +189,13 @@ namespace SEE.Game
         /// </summary>
         private void LoadMetrics()
         {
-            int numberOfErrors = MetricImporter.Load(ItsGraph, CSVPath());
+            int numberOfErrors = MetricImporter.Load(LoadedGraph, CSVPath());
             if (numberOfErrors > 0)
             {
                 Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", CSVPath(), numberOfErrors);
             }
             {
-                MetricAggregator.AggregateSum(ItsGraph, AllLeafIssues().ToArray<string>());
+                MetricAggregator.AggregateSum(LoadedGraph, AllLeafIssues().ToArray<string>());
                 // Note: We do not want to compute the derived metric editorSettings.InnerDonutMetric
                 // when we have a single root node in the graph. This metric will be used to define the color
                 // of inner circles of Donut charts. Because the color is a linear interpolation of the whole
@@ -184,7 +203,7 @@ namespace SEE.Game
                 // sum over all) and hence the maximal color gradient. The color of the other nodes would be
                 // hardly distinguishable. 
                 // FIXME: We need a better solution. This is a kind of hack.
-                MetricAggregator.DeriveSum(ItsGraph, AllInnerNodeIssues().ToArray<string>(), InnerDonutMetric, true);
+                MetricAggregator.DeriveSum(LoadedGraph, AllInnerNodeIssues().ToArray<string>(), InnerDonutMetric, true);
             }
         }
 
@@ -213,8 +232,26 @@ namespace SEE.Game
             }
             else
             {
-                ItsGraph = LoadGraph(GXLPath());
+                LoadedGraph = LoadGraph(GXLPath());
                 LoadMetrics();
+            }
+        }
+
+        /// <summary>
+        /// Re-draws the graph without deleting the underlying loaded graph.
+        /// Only the game objects generated for the nodes are deleted first.
+        /// Precondition: The graph and its metrics have been loaded.
+        /// </summary>
+        public void ReDrawGraph()
+        {
+            if (loadedGraph == null)
+            {
+                Debug.LogError("No graph loaded.\n");
+            }
+            else
+            {
+                DeleteGameObjects();
+                DrawGraph();
             }
         }
 
@@ -224,20 +261,28 @@ namespace SEE.Game
         /// </summary>
         public void DrawGraph()
         {
-            if (ReferenceEquals(ItsGraph, null))
+            if (loadedGraph == null)
             {
                 Debug.LogError("No graph loaded.\n");
             }
             else
             {
-                GraphRenderer renderer = new GraphRenderer(this);
-                // We assume here that this SEECity instance was added to a game object as
-                // a component. The inherited attribute gameObject identifies this game object.
-                renderer.Draw(ItsGraph, gameObject);
-                // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
-                // We may have cities with blocks and cities with CScape buildings in the same scene.
-                // We cannot simply alternate the speed each time when a graph is loaded.
-                // Cameras.AdjustCameraSpeed(renderer.Unit());
+                Graph visualizedSubGraph = VisualizedSubGraph;
+                if (ReferenceEquals(visualizedSubGraph, null))
+                {
+                    Debug.LogError("No graph loaded.\n");
+                }
+                else
+                {
+                    GraphRenderer renderer = new GraphRenderer(this);
+                    // We assume here that this SEECity instance was added to a game object as
+                    // a component. The inherited attribute gameObject identifies this game object.
+                    renderer.Draw(visualizedSubGraph, gameObject);
+                    // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
+                    // We may have cities with blocks and cities with CScape buildings in the same scene.
+                    // We cannot simply alternate the speed each time when a graph is loaded.
+                    // Cameras.AdjustCameraSpeed(renderer.Unit());
+                }
             }
         }
 
@@ -246,6 +291,21 @@ namespace SEE.Game
         /// </summary>
         public void DeleteGraph()
         {
+            DeleteGameObjects();
+            // Delete the underlying graph.
+            if (loadedGraph != null)
+            {
+                loadedGraph.Destroy();
+            }
+            LoadedGraph = null;
+        }
+
+        /// <summary>
+        /// Deletes all game objects that were created for rendering the graph.
+        /// The underlying loaded graph is not deleted.
+        /// </summary>
+        private void DeleteGameObjects()
+        {
             // Delete all children.
             // Note: foreach (GameObject child in transform)... would not work;
             // we really need to collect all children first and only then can destroy each.
@@ -253,12 +313,6 @@ namespace SEE.Game
             {
                 Destroyer.DestroyGameObject(child);
             }
-            // Delete the underlying graph.
-            if (graph != null)
-            {
-                graph.Destroy();
-            }
-            ItsGraph = null;
         }
 
         /// <summary>
