@@ -1,5 +1,6 @@
 ﻿using UnityEditor;
 using SEE.Game;
+using UnityEngine;
 
 namespace SEEEditor
 {
@@ -17,6 +18,20 @@ namespace SEEEditor
             SEECityEvolution city = target as SEECityEvolution;
 
             city.maxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.maxRevisionsToLoad);
+            ShowNodeTypes(city);
+            Buttons();
+        }
+
+        /// <summary>
+        /// Creates the buttons for loading the first graph of the evolution series.
+        /// </summary>
+        protected void Buttons()
+        {
+            SEECityEvolution city = target as SEECityEvolution;
+            if (GUILayout.Button("Load First Graph"))
+            {
+                city.InspectSchema(city.LoadFirstGraph());
+            }
         }
     }
 }

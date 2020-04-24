@@ -292,7 +292,6 @@ namespace SEE.Layout
             // worst case to the root. Note that we want to add padding in between the nodes,
             // so we need to increase the required size accordingly.
             Vector2 worstCaseSize = Sum(nodes, layout);
-            Debug.LogFormat("Pack: worstCaseSize={0}\n", worstCaseSize);
             // The worst-case size is increased slightly to circumvent potential
             // imprecisions of floating-point arithmetics.
             PTree tree = new PTree(Vector2.zero, 1.1f * worstCaseSize);
@@ -318,7 +317,6 @@ namespace SEE.Layout
 
                 // The size we need to place el plus the padding between nodes.                
                 Vector2 requiredSize = GetRectangleSize(layout[el]);
-                Debug.LogFormat("Pack: node {0} requires size={1}\n", el, requiredSize);
 
                 preservers.Clear();
                 expanders.Clear();
@@ -378,7 +376,6 @@ namespace SEE.Layout
                     }
                 }
 
-                Debug.LogFormat("Pack: targetNode {0} is split with requested size={1}\n", targetNode, requiredSize);
                 // Place el into targetNode.
                 // The free leaf node that has the requested size allocated within targetNode. 
                 PNode fitNode = tree.Split(targetNode, requiredSize);
