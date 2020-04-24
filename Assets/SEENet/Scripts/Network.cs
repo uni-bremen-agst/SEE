@@ -1,5 +1,6 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
+using SEE.Interact;
 using SEE.Net.Internal;
 using System;
 using System.Collections.Generic;
@@ -189,17 +190,21 @@ namespace SEE.Net
         }
 
 
+
         internal static void Send(Connection connection, Internal.Packet packet, SendReceiveOptions options = null)
         {
+            Send(connection, packet.packetType, packet.Serialize(), options);
+        }
+
+        internal static void Send(Connection connection, string packetType, string packetData, SendReceiveOptions options = null)
+        {
             Assert.IsNotNull(connection);
-            Assert.IsNotNull(packet);
+            Assert.IsNotNull(packetData);
+            Assert.IsNotNull(packetType);
             Assert.IsNotNull(Client.Connection);
 
             string packetTargetPrefix = Client.Connection.Equals(connection) ? Server.PACKET_PREFIX : Client.PACKET_PREFIX;
-            string packetType = packetTargetPrefix + packet.packetType;
-            string data = packet.Serialize();
-
-            Assert.IsNotNull(data);
+            string fullPacketType = packetTargetPrefix + packetType;
 
             if (instance.useInOfflineMode)
             {
@@ -211,7 +216,7 @@ namespace SEE.Net
             {
                 try
                 {
-                    connection.SendObject(packetType, data, options ?? NetworkComms.DefaultSendReceiveOptions);
+                    connection.SendObject(fullPacketType, packetData, options ?? NetworkComms.DefaultSendReceiveOptions);
                 }
                 catch (Exception)
                 {
@@ -253,19 +258,15 @@ namespace SEE.Net
         }
 
 
-        internal static void ExecuteInteraction(Interaction interaction)
+        internal static void ExecuteInteraction(AbstractInteraction interaction)
         {
-            InteractionPacket interactionPacket = new InteractionPacket(interaction);
             if (instance.useInOfflineMode)
             {
-                Client.PacketHandler.Push(
-                    new PacketHeader(Client.PACKET_PREFIX + InteractionPacket.PACKET_TYPE, 0),
-                    null,
-                    interactionPacket.Serialize()
-                );
+                interaction.ExecuteLocally();
             }
             else
             {
+                InteractionPacket interactionPacket = new InteractionPacket(interaction);
                 Send(Client.Connection, interactionPacket);
             }
         }

@@ -1,13 +1,15 @@
-﻿namespace SEE.Net.Internal
+﻿using SEE.Interact;
+
+namespace SEE.Net.Internal
 {
 
     internal class InteractionPacket : Packet
     {
         internal static readonly string PACKET_TYPE = "Interaction";
 
-        public Interaction interaction;
+        public AbstractInteraction interaction;
 
-        internal InteractionPacket(Interaction interaction) : base(PACKET_TYPE)
+        internal InteractionPacket(AbstractInteraction interaction) : base(PACKET_TYPE)
         {
             this.interaction = interaction;
         }
