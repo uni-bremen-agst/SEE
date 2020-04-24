@@ -60,7 +60,7 @@ namespace SEE.Game
         {
             // generate graph randomly
             RandomGraphs randomGraphs = new RandomGraphs();
-            ItsGraph = randomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes);
+            LoadedGraph = randomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes);
         }
     }
 }

@@ -97,7 +97,7 @@ namespace SEEEditor
             // We select one hierarchicalEdge from the set of hierarchical edges arbitrarily.
             foreach (string hierarchicalEdge in city.HierarchicalEdges)
             {
-                GraphWriter.Save(city.GXLPath(), city.ItsGraph, hierarchicalEdge);
+                GraphWriter.Save(city.GXLPath(), city.LoadedGraph, hierarchicalEdge);
                 return;
             }
         }
