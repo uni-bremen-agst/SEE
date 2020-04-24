@@ -21,6 +21,16 @@ namespace SEE.Charts.Scripts
 		private TMP_Dropdown _dropdown;
 
 		/// <summary>
+		/// The other dropdown of this chart.
+		/// </summary>
+		private AxisContentDropdown _other;
+
+		/// <summary>
+		/// The old value of the other <see cref="AxisContentDropdown" />.
+		/// </summary>
+		private int _oldNone;
+
+		/// <summary>
 		/// A list containing all options for the <see cref="_dropdown" />
 		/// </summary>
 		private string[] _options;
@@ -40,6 +50,9 @@ namespace SEE.Charts.Scripts
 			GetKeys();
 			Value = "Metric." + _dropdown.options[0].text;
 			_chartContent.SetInfoText();
+			var noneText = "(NONE) " + _dropdown.options[0].text;
+			_dropdown.options[0].text = noneText;
+			_dropdown.captionText.text = noneText;
 		}
 
 		/// <summary>
@@ -58,9 +71,26 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		public void ChangeValue()
 		{
-			Value = "Metric." + _dropdown.options[_dropdown.value].text;
+			var currentValue = _dropdown.options[_dropdown.value].text;
+			if (currentValue.StartsWith("(NONE) ")) currentValue = currentValue.Remove(0, 7);
+			Value = "Metric." + currentValue;
 			_chartContent.DrawData(true);
 			_chartContent.SetInfoText();
+			_other.OtherChanged(_dropdown.value);
+		}
+
+		/// <summary>
+		/// Adds an indicator to a value in the dropdown, that signalizes that the same value is used on the
+		/// other axis.
+		/// </summary>
+		/// <param name="value">The value of the other <see cref="AxisContentDropdown" />.</param>
+		private void OtherChanged(int value)
+		{
+			_dropdown.options[_oldNone].text = _dropdown.options[_oldNone].text.Remove(0, 7);
+			_dropdown.options[value].text = "(NONE) " + _dropdown.options[value].text;
+			if (value == _dropdown.value)
+				_dropdown.captionText.text = _dropdown.options[value].text;
+			_oldNone = value;
 		}
 
 		/// <summary>
@@ -70,6 +100,11 @@ namespace SEE.Charts.Scripts
 		public void SetText(string text)
 		{
 			_dropdown.captionText.text = text;
+		}
+
+		public void SetOther(AxisContentDropdown other)
+		{
+			_other = other;
 		}
 	}
 }

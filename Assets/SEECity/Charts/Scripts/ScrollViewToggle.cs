@@ -96,8 +96,8 @@ namespace SEE.Charts.Scripts
 				LinkedObject.showInChart[_chartContent] = toggle.isOn;
 				if (Parent.StatusUpdate == null)
 					Parent.StatusUpdate = StartCoroutine(Parent.UpdateStatus());
-				if (_chartContent.drawing == null)
-					_chartContent.drawing = StartCoroutine(_chartContent.QueueDraw());
+				if (_chartContent.Drawing == null)
+					_chartContent.Drawing = StartCoroutine(_chartContent.QueueDraw());
 			}
 		}
 
