@@ -238,7 +238,7 @@ namespace SEE.Game
             // for some inner nodes, we should rather iterate on nodeMaps.Keys.
             ICollection<Node> roots = graph.GetRoots();
 
-            if (roots.Count > 0)
+            if (roots.Count > 1)
             {
                 Node artificalRoot = new Node()
                 {
