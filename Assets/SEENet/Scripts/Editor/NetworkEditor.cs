@@ -18,7 +18,7 @@ namespace SEE.Net.Internal
             SerializedProperty remoteServerPort = serializedObject.FindProperty("remoteServerPort");
             SerializedProperty useInOfflineMode = serializedObject.FindProperty("useInOfflineMode");
             SerializedProperty hostServer = serializedObject.FindProperty("hostServer");
-            SerializedProperty loggingEnabled = serializedObject.FindProperty("loggingEnabled");
+            SerializedProperty nativeLoggingEnabled = serializedObject.FindProperty("nativeLoggingEnabled");
             SerializedProperty minimalSeverity = serializedObject.FindProperty("minimalSeverity");
 
             // Infos
@@ -70,8 +70,8 @@ namespace SEE.Net.Internal
                 {
                     EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
                     {
-                        EditorGUILayout.PropertyField(loggingEnabled);
-                        EditorGUI.BeginDisabledGroup(!loggingEnabled.boolValue);
+                        EditorGUILayout.PropertyField(nativeLoggingEnabled);
+                        EditorGUI.BeginDisabledGroup(!nativeLoggingEnabled.boolValue);
                         {
                             EditorGUILayout.PropertyField(minimalSeverity);
                         }

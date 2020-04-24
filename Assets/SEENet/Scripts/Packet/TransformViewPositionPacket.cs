@@ -4,22 +4,22 @@ using UnityEngine;
 namespace SEE.Net.Internal
 {
 
-    public class TransformViewPositionPacket : Packet
+    internal class TransformViewPositionPacket : Packet
     {
-        public static readonly string PACKET_TYPE = "TransformViewPosition";
+        internal static readonly string PACKET_TYPE = "TransformViewPosition";
 
-        public TransformView transformView;
-        public Vector3 position;
-        public DateTime updateTime;
+        internal TransformView transformView;
+        internal Vector3 position;
+        internal DateTime updateTime;
 
-        public TransformViewPositionPacket(TransformView transformView, Vector3 position, DateTime updateTime) : base(PACKET_TYPE)
+        internal TransformViewPositionPacket(TransformView transformView, Vector3 position, DateTime updateTime) : base(PACKET_TYPE)
         {
             this.transformView = transformView;
             this.position = position;
             this.updateTime = updateTime;
         }
 
-        public override string Serialize()
+        internal override string Serialize()
         {
             return Serialize(new object[]
             {
@@ -29,18 +29,23 @@ namespace SEE.Net.Internal
                 updateTime
             });
         }
-        public static TransformViewPositionPacket Deserialize(string data)
+
+        internal static TransformViewPositionPacket Deserialize(string data)
         {
             ViewContainer viewContainer = ViewContainer.GetViewContainerByID(DeserializeInt(data, out string d));
+
             if (viewContainer == null)
             {
                 return null;
             }
+
             TransformView transformView = (TransformView)viewContainer.GetViewByIndex(DeserializeInt(d, out d));
+
             if (transformView == null)
             {
                 return null;
             }
+
             return new TransformViewPositionPacket(
                 transformView,
                 DeserializeVector3(d, out d),

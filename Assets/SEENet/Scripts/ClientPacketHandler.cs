@@ -79,6 +79,16 @@ namespace SEE.Net.Internal
             obj.transform.localScale = packet.scale;
             return true;
         }
+        protected override bool HandleInteractionPacket(PacketHeader packetHeader, Connection connection, string data)
+        {
+            InteractionPacket packet = InteractionPacket.Deserialize(data);
+            if (packet == null || packet.interaction == null)
+            {
+                return false;
+            }
+            packet.interaction.ExecuteLocally();
+            return true;
+        }
         protected override bool HandleTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             TransformViewPositionPacket packet = TransformViewPositionPacket.Deserialize(data);

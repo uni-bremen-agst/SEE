@@ -4,17 +4,17 @@ using UnityEngine.Assertions;
 namespace SEE.Net.Internal
 {
 
-    public class CityBuildingPacket : Packet
+    internal class CityBuildingPacket : Packet
     {
-        public static readonly string PACKET_TYPE = "CityBuilding";
+        internal static readonly string PACKET_TYPE = "CityBuilding";
 
-        public int id;
-        public Vector3 position;
-        public Quaternion rotation;
-        public Vector3 scale;
-        public Color color;
+        internal int id;
+        internal Vector3 position;
+        internal Quaternion rotation;
+        internal Vector3 scale;
+        internal Color color;
 
-        public CityBuildingPacket(GameObject building) : base(PACKET_TYPE)
+        internal CityBuildingPacket(GameObject building) : base(PACKET_TYPE)
         {
             Assert.IsNotNull(building);
             Assert.IsNotNull(building.GetComponent<MeshRenderer>());
@@ -25,11 +25,10 @@ namespace SEE.Net.Internal
             scale = building.transform.lossyScale;
             color = building.GetComponent<MeshRenderer>().material.color;
         }
-        private CityBuildingPacket() : base(PACKET_TYPE)
-        {
-        }
 
-        public override string Serialize()
+        private CityBuildingPacket() : base(PACKET_TYPE) { }
+
+        internal override string Serialize()
         {
             return Serialize(new object[]
             {
@@ -40,7 +39,8 @@ namespace SEE.Net.Internal
                 color
             });
         }
-        public static CityBuildingPacket Deserialize(string data)
+
+        internal static CityBuildingPacket Deserialize(string data)
         {
             return new CityBuildingPacket()
             {

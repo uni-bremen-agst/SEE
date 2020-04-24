@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SEE.Net.Internal
 {
 
-    public class InstantiatePacket : Packet
+    internal class InstantiatePacket : Packet
     {
         public static readonly string PACKET_TYPE = "Instantiate";
 
@@ -16,14 +16,16 @@ namespace SEE.Net.Internal
         public Vector3 scale;
         public int viewID;
 
-        public InstantiatePacket(string prefabName, IPEndPoint owner, int viewID = -1) : base(PACKET_TYPE)
+        internal InstantiatePacket(string prefabName, IPEndPoint owner, int viewID = -1) : base(PACKET_TYPE)
         {
             Initialize(prefabName, owner, Vector3.zero, Quaternion.identity, Vector3.one, viewID);
         }
-        public InstantiatePacket(string prefabName, IPEndPoint owner, Vector3 position, Quaternion rotation, Vector3 scale, int viewID = -1) : base(PACKET_TYPE)
+
+        internal InstantiatePacket(string prefabName, IPEndPoint owner, Vector3 position, Quaternion rotation, Vector3 scale, int viewID = -1) : base(PACKET_TYPE)
         {
             Initialize(prefabName, owner, position, rotation, scale, viewID);
         }
+
         private void Initialize(string prefabName, IPEndPoint owner, Vector3 position, Quaternion rotation, Vector3 scale, int viewID)
         {
 #if UNITY_EDITOR
@@ -31,16 +33,21 @@ namespace SEE.Net.Internal
             {
                 throw new ArgumentNullException("prefabName");
             }
+
             GameObject prefab = Resources.Load<GameObject>(prefabName);
+
             if (!prefab)
             {
                 throw new ArgumentException("Prefab of name '" + prefabName + "' does not exist!");
             }
+
             ViewContainer viewContainer = prefab.GetComponent<ViewContainer>();
+
             if (!viewContainer)
             {
                 throw new MissingComponentException("Prefab of name '" + prefabName + "' must contain a '" + typeof(ViewContainer).ToString() + "' component!");
             }
+
             if (owner == null || owner.Address == null)
             {
                 throw new ArgumentException("Argument is invalid!", "owner");
@@ -54,7 +61,7 @@ namespace SEE.Net.Internal
             this.viewID = viewID;
         }
 
-        public override string Serialize()
+        internal override string Serialize()
         {
             return Serialize(new object[]
             {
@@ -67,7 +74,8 @@ namespace SEE.Net.Internal
                 viewID
             });
         }
-        public static InstantiatePacket Deserialize(string data)
+
+        internal static InstantiatePacket Deserialize(string data)
         {
             return new InstantiatePacket(
                 DeserializeString(data, out string d),

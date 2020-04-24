@@ -8,13 +8,13 @@ using UnityEngine.Assertions;
 namespace SEE.Net.Internal
 {
 
-    public abstract class Packet
+    internal abstract class Packet
     {
-        public static readonly string DATE_TIME_FORMAT = "yyyy.MM.dd HH:mm:ss.fffffff";
+        internal static readonly string DATE_TIME_FORMAT = "yyyy.MM.dd HH:mm:ss.fffffff";
         private const char DELIM = ';';
         private static readonly char[] DELIMS = new char[] { DELIM };
 
-        public readonly string packetType = null;
+        internal readonly string packetType = null;
 
         protected Packet(string packetType)
         {
@@ -23,7 +23,7 @@ namespace SEE.Net.Internal
         }
 
         #region Serialization
-        public abstract string Serialize();
+        internal abstract string Serialize();
         protected static string Serialize(object[] tokens)
         {
             Assert.IsNotNull(tokens);
