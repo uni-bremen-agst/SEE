@@ -122,7 +122,7 @@ namespace SEEEditor
                 SEECity city = o.GetComponent<SEECity>();
                 if (city != null)
                 {
-                    city.DeleteGraph();
+                    city.Reset();
                 }
             }
             // Deletes all left-over game objects tagged by any of the tags in SEE.DataModel.Tags.All.
