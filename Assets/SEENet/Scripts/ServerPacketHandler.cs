@@ -36,22 +36,6 @@ namespace SEE.Net.Internal
             {
                 Network.Send(connection, bufferedPackets[i].packetType, bufferedPackets[i].packetData);
             }
-
-            if (!Client.LocalEndPoint.Equals(connection.ConnectionInfo.RemoteEndPoint))
-            {
-                foreach (GameObject building in GameObject.FindGameObjectsWithTag(Tags.Building))
-                {
-                    Network.Send(connection, new CityBuildingPacket(building));
-                }
-                foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
-                {
-                    Network.Send(connection, new CityNodePacket(node));
-                }
-                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
-                {
-                    Network.Send(connection, new CityEdgePacket(edge));
-                }
-            }
         }
 
         public void OnConnectionClosed(Connection connection)
@@ -93,6 +77,29 @@ namespace SEE.Net.Internal
             throw new Exception("A server should never receive this type of packet!");
         }
 
+        protected override bool HandleCommandPacket(PacketHeader packetHeader, Connection connection, string data)
+        {
+            CommandPacket packet = CommandPacket.Deserialize(data);
+
+            if (packet.command.buffer)
+            {
+                BufferedPacket bufferedPacket = new BufferedPacket()
+                {
+                    header = new PacketHeader(Client.PACKET_PREFIX + CommandPacket.PACKET_TYPE, packetHeader.TotalPayloadSize),
+                    connection = connection,
+                    packetType = packet.packetType,
+                    packetData = data
+                };
+                bufferedPackets.Add(bufferedPacket);
+            }
+
+            foreach (Connection co in Server.Connections)
+            {
+                Network.Send(co, packet);
+            }
+            return true;
+        }
+
         protected override bool HandleInstantiatePacket(PacketHeader packetHeader, Connection connection, string data)
         {
             InstantiatePacket packet = InstantiatePacket.Deserialize(data);
@@ -108,29 +115,6 @@ namespace SEE.Net.Internal
             for (int i = 0; i < Server.Connections.Count; i++)
             {
                 Network.Send(Server.Connections[i], packet);
-            }
-            return true;
-        }
-
-        protected override bool HandleInteractionPacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            InteractionPacket packet = InteractionPacket.Deserialize(data);
-
-            if (packet.interaction.buffer)
-            {
-                BufferedPacket bufferedPacket = new BufferedPacket()
-                {
-                    header = new PacketHeader(Client.PACKET_PREFIX + InteractionPacket.PACKET_TYPE, packetHeader.TotalPayloadSize),
-                    connection = connection,
-                    packetType = packet.packetType,
-                    packetData = data
-                };
-                bufferedPackets.Add(bufferedPacket);
-            }
-
-            foreach (Connection co in Server.Connections)
-            {
-                Network.Send(co, packet);
             }
             return true;
         }

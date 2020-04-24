@@ -2636,7 +2636,7 @@ GameObject:
   - component: {fileID: 2001236746}
   - component: {fileID: 2001236745}
   m_Layer: 0
-  m_Name: InteractionTest
+  m_Name: CommandTest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

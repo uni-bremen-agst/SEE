@@ -1,6 +1,6 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
-using SEE.Interact;
+using SEE.Command;
 using SEE.Net.Internal;
 using System;
 using System.Collections.Generic;
@@ -258,16 +258,16 @@ namespace SEE.Net
         }
 
 
-        internal static void ExecuteInteraction(AbstractInteraction interaction)
+        internal static void ExecuteCommand(AbstractCommand command)
         {
             if (instance.useInOfflineMode)
             {
-                interaction.ExecuteLocally();
+                command.ExecuteLocally();
             }
             else
             {
-                InteractionPacket interactionPacket = new InteractionPacket(interaction);
-                Send(Client.Connection, interactionPacket);
+                CommandPacket commandPacket = new CommandPacket(command);
+                Send(Client.Connection, commandPacket);
             }
         }
     }
