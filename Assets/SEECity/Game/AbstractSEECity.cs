@@ -74,6 +74,15 @@ namespace SEE.Game
         }
         
         /// <summary>
+        /// Resets everything that is specific to a given graph. Here: the 
+        /// node types.
+        /// </summary>
+        public virtual void Reset()
+        {
+            nodeTypes = new Dictionary<string, bool>();
+        }
+
+        /// <summary>
         /// True if all node types in nodeTypes are relevant.
         /// </summary>
         private bool AllNodeTypesAreRelevant
@@ -92,12 +101,13 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Sets the node types that occur in the graph as all being
-        /// relevant. The node types can be retrieved and also be
-        /// marked as irrelevant via property SelectedNodeTypes.
+        /// Inspects the node types and attributes that occur in the graph.
+        /// All node types are considered relevant initially. The node types 
+        /// can be retrieved and also be marked as irrelevant later via property 
+        /// SelectedNodeTypes.
         /// </summary>
         /// <param name="graph">graph from which to retrieve the node types (may be null)</param>
-        public void SetNodeTypes(Graph graph)
+        public void InspectSchema(Graph graph)
         {
             if (graph != null)
             {
