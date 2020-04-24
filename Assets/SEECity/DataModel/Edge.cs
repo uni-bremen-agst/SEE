@@ -35,6 +35,13 @@ namespace SEE.DataModel
         }
 
         /// <summary>
+        /// The name of the toggle attribute that marks edges that where lifted from
+        /// lower level nodes to higher level nodes rather than being part of the 
+        /// original graph loaded. Such edges are introduced artifically.
+        /// </summary>
+        public const string IsLiftedToggle = "IsLifted";
+
+        /// <summary>
         /// The source of the edge.
         /// </summary
         private Node source;
@@ -144,6 +151,5 @@ namespace SEE.DataModel
             get => Type + "#" + Source.ID + "#" + Target.ID;
             set => throw new NotImplementedException();
         }
-
     }
 }

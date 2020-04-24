@@ -573,7 +573,10 @@ namespace SEE.DataModel
         /// Given this mapping mapsTo, edges in the resulting subgraph are present as follows.
         /// For every edge E in this graph, there is a cloned edge E' in the resulting subgraph
         /// if and only if mapsTo[E.Source] != null and mapsTo[E.Target] != null where
-        /// E'.Source = mapsTo[E.Source] and E'.Target = mapsTo[E.Target].
+        /// E'.Source = mapsTo[E.Source] and E'.Target = mapsTo[E.Target] and there is
+        /// not already an edge (of any type) from mapsTo[E.Source] to mapsTo[E.Target]
+        /// (i.e., not mapsTo[E.Source].HasSuccessor(mapsTo[E.Target]). Every propatated
+        /// edge is marked with the toggle attribute Edge.IsLiftedToggle.
         /// 
         /// Notes: 
         /// 
@@ -583,6 +586,11 @@ namespace SEE.DataModel
         /// 
         /// The resulting subgraph may have fewer edges: if an edge of this graph has a 
         /// source or target, N, for which mapsTo[N] = null, it will be lost.
+        /// 
+        /// An edge, E, is not propagated to a pair of nodes that already have an edge, E', 
+        /// independent of the types of E and E'. As a consequence, there can only be one
+        /// propagated edge from one node to another node. Because the edge types are
+        /// neglected, we loose information. On the other hand, we reduce the number of edges.
         /// </summary>
         /// <param name="nodeTypes">the node types that should be kept</param>
         /// <returns>subgraph containing only nodes with given <paramref name="nodeTypes"/></returns>
@@ -680,7 +688,10 @@ namespace SEE.DataModel
         /// Propagates edge from this graph onto <paramref name="subgraph"/> as follows:
         /// For every edge E in this graph, there is a cloned edge E' in the resulting subgraph
         /// if and only if mapsTo[E.Source] != null and mapsTo[E.Target] != null where
-        /// E'.Source = mapsTo[E.Source] and E'.Target = mapsTo[E.Target].
+        /// E'.Source = mapsTo[E.Source] and E'.Target = mapsTo[E.Target] and there is
+        /// not already an edge (of any type) from mapsTo[E.Source] to mapsTo[E.Target]
+        /// (i.e., not mapsTo[E.Source].HasSuccessor(mapsTo[E.Target]). Every propatated
+        /// edge is marked with the toggle attribute Edge.IsLiftedToggle.
         /// </summary>
         /// <param name="subgraph">graph where to propagate the edges too</param>
         /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
@@ -690,11 +701,14 @@ namespace SEE.DataModel
             {
                 Node sourceInSubgraph = mapsTo[edge.Source];
                 Node targetInSubgraph = mapsTo[edge.Target];
-                if (sourceInSubgraph != null && targetInSubgraph != null)
+
+                if (sourceInSubgraph != null && targetInSubgraph != null 
+                    && !sourceInSubgraph.HasSuccessor(targetInSubgraph, edge.Type))
                 {
                     Edge edgeInSubgraph = (Edge)edge.Clone();
                     edgeInSubgraph.Source = sourceInSubgraph;
                     edgeInSubgraph.Target = targetInSubgraph;
+                    edgeInSubgraph.SetToggle(Edge.IsLiftedToggle);
                     subgraph.AddEdge(edgeInSubgraph);
                 }
             }
