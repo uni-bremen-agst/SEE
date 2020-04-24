@@ -30,7 +30,7 @@ namespace SEEEditor
             SEECityEvolution city = target as SEECityEvolution;
             if (GUILayout.Button("Load First Graph"))
             {
-                city.SetNodeTypes(city.LoadFirstGraph());
+                city.InspectSchema(city.LoadFirstGraph());
             }
         }
     }

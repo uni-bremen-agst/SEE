@@ -94,7 +94,7 @@ namespace SEEEditor
         /// </summary>
         private void Reset(SEECity city)
         {
-            city.DeleteGraph();   
+            city.Reset();   
         }
     }
 }

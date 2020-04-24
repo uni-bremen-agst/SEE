@@ -47,7 +47,7 @@ namespace SEE.Game
             set
             {
                 loadedGraph = value;
-                SetNodeTypes(loadedGraph);
+                InspectSchema(loadedGraph);
             }
         }
 
@@ -232,6 +232,10 @@ namespace SEE.Game
             }
             else
             {
+                if (LoadedGraph != null)
+                {
+                    Reset();
+                }
                 LoadedGraph = LoadGraph(GXLPath());
                 LoadMetrics();
             }
@@ -287,10 +291,12 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Destroys the underlying graph and all game objects visualizing information about it.
+        /// Resets everything that is specific to a given graph. Here: the node types,
+        /// the underlying graph, and all game objects visualizing information about it.
         /// </summary>
-        public void DeleteGraph()
+        public override void Reset()
         {
+            base.Reset();
             DeleteGameObjects();
             // Delete the underlying graph.
             if (loadedGraph != null)
