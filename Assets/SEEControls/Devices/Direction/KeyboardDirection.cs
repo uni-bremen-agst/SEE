@@ -2,8 +2,20 @@
 
 namespace SEE.Controls.Devices
 {
+    /// <summary>
+    /// An input device providing the direction of movements based on the keyboard
+    /// by WASDQE and the arrow keys.
+    /// </summary>
     public class KeyboardDirection: Direction
     {
+        /// <summary>
+        /// W arrow-up    => forward
+        /// S arrow-down  => backward
+        /// A arrow-left  => left
+        /// D arrow-right => right
+        /// Q             => down
+        /// E             => up
+        /// </summary>
         public override Vector3 Value
         {
             get

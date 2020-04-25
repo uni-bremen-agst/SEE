@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-namespace SEE.Controls.Devices
+﻿namespace SEE.Controls.Devices
 {
+    /// <summary>
+    /// An input device providing a constant boost factor 0 for movements.
+    /// It can be used when no boost is required.
+    /// </summary>
     public class NullBoost : Boost
     {
         public override float Value

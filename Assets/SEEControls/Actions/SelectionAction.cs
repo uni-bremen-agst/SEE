@@ -3,6 +3,10 @@ using UnityEngine;
 
 namespace SEE.Controls
 {
+    /// <summary>
+    /// Abstract super class of all selection actions. A selection action
+    /// is one that is selected by the player.
+    /// </summary>
     public abstract class SelectionAction : MonoBehaviour
     {
         /// <summary>

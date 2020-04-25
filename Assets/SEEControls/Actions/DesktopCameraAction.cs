@@ -3,7 +3,7 @@
 namespace SEE.Controls
 {
 	/// <summary>
-    /// Moves the camera this component is attached to.
+    /// Moves and rotates the game object this component is attached to as a component.
     /// </summary>			 
     public class DesktopCameraAction : CameraAction
     {
@@ -91,10 +91,10 @@ namespace SEE.Controls
             }
 
             /// <summary>
-            /// Moves the object according to the current settings of pitch, yaw, roll
+            /// Moves the object <paramref name="t"/> according to the current settings of pitch, yaw, roll
             /// and x, y, z.
             /// </summary>
-            /// <param name="t"></param>
+            /// <param name="t">the transform to be set</param>
             public void UpdateTransform(Transform t)
             {
                 t.eulerAngles = new Vector3(pitch, yaw, roll);
@@ -113,13 +113,13 @@ namespace SEE.Controls
 
         void Update()
         {
-            boost += boostDevice.Value * 0.2f;
+            boost += BoostDevice.Value * 0.2f;
 
             // Camera rotation for looking around
-            if (viewpointDevice.Activated)
+            if (ViewpointDevice.Activated)
             {
                 Look(true);
-                Vector2 viewpoint = viewpointDevice.Value;
+                Vector2 viewpoint = ViewpointDevice.Value;
                 Vector2 lookMovement = new Vector2(viewpoint.x, viewpoint.y * (invertY ? 1 : -1));
 
                 float sensitivityFactor = SensitivityCurve.Evaluate(lookMovement.magnitude);
@@ -136,7 +136,7 @@ namespace SEE.Controls
             Vector3 translation = DirectionDevice.Value * Time.deltaTime;
 
             // Speed up movement.
-            if (throttleDevice.Value > 0)
+            if (ThrottleDevice.Value > 0)
             {
                 translation *= 10.0f;
             }
@@ -153,11 +153,6 @@ namespace SEE.Controls
 
             // Finally move the object.
             m_InterpolatingCameraState.UpdateTransform(transform);
-            //if (DirectionDevice.Value.magnitude > 0)
-            //{
-            //    Debug.LogFormat("Move toward {0} with boost {1} => translation {2}, position {3}\n", 
-            //                    DirectionDevice.Value, boost, translation, transform.position);
-            //}
         }
     }
 }

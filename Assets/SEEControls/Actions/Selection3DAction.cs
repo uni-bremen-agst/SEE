@@ -3,7 +3,7 @@
 namespace SEE.Controls
 {
     /// <summary>
-    /// Selection of objects when the selection device offers only 3D directions
+    /// Selection of objects when the selection device offers 3D directions
     /// (e.g., XR controllers). A line is drawn as a visual feedback for the
     /// search. 
     /// </summary>
