@@ -57,7 +57,7 @@ namespace SEE.Tools
         allowed = 1,            // allowed propagated dependency towards a convergence; only for implementation dependencies
         divergent = 2,          // disallowed propagated dependency (divergence); only for implementation dependencies
         absent = 3,             // specified architecture dependency without corresponding implementation dependency (absence); only for architecture dependencies
-        convergent = 4,         // specified architecture dependency without corresponding implementation dependency (convergence); only for architecture dependencies
+        convergent = 4,         // specified architecture dependency with corresponding implementation dependency (convergence); only for architecture dependencies
         implicitly_allowed = 5, // self-usage is always implicitly allowed; only for implementation dependencies
         allowed_absent = 6,     // absence, but Architecture.Is_Optional attribute set
         specified = 7           // tags an architecture edge that was created by the architect, 
