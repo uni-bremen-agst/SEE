@@ -1,5 +1,8 @@
 ﻿namespace SEE.Controls.Devices
 {
+    /// <summary>
+    /// An input device providing a boost factor for movements based on a mouse wheel.
+    /// </summary>
     public class MouseBoost : Boost
     {
         public override float Value

@@ -4,6 +4,9 @@ using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls.Devices
 {
+    /// <summary>
+    /// A selection device using a virtual reality controller.
+    /// </summary>
     public class XRSelection : Selection
     {
         [Tooltip("The threshold at which the trigger is considered to be activated."), Range(0.01f, 1.0f)]
@@ -14,16 +17,26 @@ namespace SEE.Controls.Devices
 
         private SteamVR_Action_Single TriggerAction = SteamVR_Input.GetSingleAction(defaultActionSet, "Trigger");
 
+        /// <summary>
+        /// The direction the PointingHand points to.
+        /// </summary>
         public override Vector3 Direction
         {
             get => SteamVR_Actions.default_Pose.GetLocalRotation(PointingHand.handType) * Vector3.forward;
         }
 
+        /// <summary>
+        /// The position of the PointingHand.
+        /// </summary>
         public override Vector3 Position
         {
-            get => PointingHand.transform.position; // SteamVR_Actions.default_Pose.GetLocalPosition(PointingHand.handType);
+            get => PointingHand.transform.position; 
         }
 
+        /// <summary>
+        /// True if the trigger action ("Trigger" in SteamVR) has been activated
+        /// above the Threshold.
+        /// </summary>
         public override bool Activated
         {
             get => TriggerAction != null ? TriggerAction.axis >= Threshold : false;

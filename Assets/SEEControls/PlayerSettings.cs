@@ -33,17 +33,28 @@ namespace SEE.Controls
             // We have to explicitly disable VR if the user wants us to. Otherwise the
             // mouse positions will be wrong if VR is enabled and a head-mounted display (HMD)
             // is connected. That seems to be a bug.
-            XRSettings.enabled = playerInputType == PlayerInputType.VR;
-
+            try
+            {
+                XRSettings.enabled = playerInputType == PlayerInputType.VR;
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarningFormat("VR enabling/disabling issue: {0}\n", e);
+            }
             SetActive("DesktopPlayer", playerInputType == PlayerInputType.Desktop);
             SetActive("VRPlayer",      playerInputType == PlayerInputType.VR);
             SetActive("TouchPlayer",   playerInputType == PlayerInputType.Touch);
             SetActive("InControl",     playerInputType == PlayerInputType.Touch);
         }
 
-        private void SetActive(string objectName, bool activate)
+        /// <summary>
+        /// Enables or disables a game object with the given <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">name of the object to be enabled/disabled</param>
+        /// <param name="activate">whether to enable or disable the object</param>
+        private void SetActive(string name, bool activate)
         {
-            GameObject player = GameObject.Find(objectName);
+            GameObject player = GameObject.Find(name);
             if (player != null)
             {
                 player.SetActive(activate);
@@ -51,7 +62,7 @@ namespace SEE.Controls
             }
             else
             {
-                Debug.LogFormat("No game object named {0} found.\n", objectName);
+                Debug.LogFormat("No game object named {0} found.\n", name);
             }
         }
 

@@ -2,6 +2,10 @@
 
 namespace SEE.Controls.Devices
 {
+    /// <summary>
+    /// An input device providing data for the viewpoint, i.e., rotation of the
+    /// camera, based on mouse input.
+    /// </summary>
     public class MouseViewpoint : Viewpoint
     {
         [Tooltip("The index of the mouse button needed to be pressed to change the viewpoint (0 = left, 1 = right).")]
@@ -18,6 +22,9 @@ namespace SEE.Controls.Devices
             }
         }
 
+        /// <summary>
+        /// True if the MouseButton was pressed.
+        /// </summary>
         public override bool Activated
         {
             get => Input.GetMouseButton(MouseButton);

@@ -2,6 +2,17 @@
 
 namespace SEE.Controls
 {
+    /// <summary>
+    /// Abstract super class of all input devices. An input devices abstracts
+    /// from the low-level details of the different kinds of controls which 
+    /// depend upon the environment such as keyboard&mouse, touch screen,
+    /// gamepads, or virtual reality controllers. The input devices also 
+    /// hide the concrete implementation (input for virtual reality is
+    /// derived from SteamVR, other data may be derived from Unity Input
+    /// system or InControl). An input device also lifts the abstraction
+    /// from low-level controls (e.g., a trigger is pressed) to higher-level
+    /// actions (a throttle is activated to give gas).
+    /// </summary>
     public abstract class InputDevice : MonoBehaviour
     {
         [Tooltip("Name of the device")]
@@ -20,10 +31,10 @@ namespace SEE.Controls
         /// <summary>
         /// Name of the mouse X axis as defined in the Unity Input Manager.
         /// </summary>
-        protected const string MouseXActionName = "mouse x"; // "Mouse X"; // "mouse x"
+        protected const string MouseXActionName = "mouse x";
         /// <summary>
         /// Name of the mouse Y axis as defined in the Unity Input Manager.
         /// </summary>
-        protected const string MouseYActionName = "mouse y"; // "Mouse Y"; // "mouse y"
+        protected const string MouseYActionName = "mouse y";
     }
 }

@@ -3,6 +3,24 @@ using UnityEngine;
 
 namespace SEE.Controls
 {
+    /// <summary>
+    /// An actor defines the reactions of the player on input stimuli. It 
+    /// maps input devices onto high-level actions, such as movements
+    /// or selections, requiring and reacting to these inputs. 
+    /// This mapping can be specified by the user in the inspector.
+    /// For instance, in a desktop environment, input of input devices
+    /// based on mice or keyboards are mapped onto the respective actions
+    /// in that kind of environment. In a virtual reality environment,
+    /// on the other hand, input from VR controllers based on SteamVR
+    /// will be mapped onto actions that may be specific to this kind
+    /// of environment.
+    /// The implementation of high-level actions may be specific to the
+    /// kind of environment (e.g., how feedback is given when the player
+    /// selects an object) and may also require particular kinds of
+    /// inputs (e.g., 2D or 3D directions). Hence, the mapping between
+    /// input devices and actions is not arbitrary.
+    /// The reactions may depend upon the state of the player.
+    /// </summary>
     public class Actor : MonoBehaviour
     {
         [Tooltip("The camera of this player.")]
@@ -23,11 +41,17 @@ namespace SEE.Controls
         [Tooltip("The device from which to read selection input.")]
         public Selection selectionDevice;
 
+        [Tooltip("The device from which to read viewport selection input.")]
+        private ControllerSelection viewportSelectionDevice;
+
         [Tooltip("The action applied to move the camera.")]
         public CameraAction cameraAction;
 
         [Tooltip("The action applied to select an object.")]
         public SelectionAction selectionAction;
+
+        [Tooltip("The action applied to select an object by way of the viewport.")]
+        private SelectionViewportAction viewportSelectionAction;
 
         private void Start()
         {
@@ -51,8 +75,29 @@ namespace SEE.Controls
                 selectionAction.SelectionDevice = selectionDevice;
                 selectionAction.MainCamera = mainCamera;
             }
+            // The selectionDevice and selectionAction are suitable for 2D or 3D
+            // positional selection. As a secondary way to select something with
+            // a device that offers neither 2D nor 3D positional data (e.g., if we
+            // only have a gamepad controller that allows use to fly through a scene
+            // but offers no way to point to something), we use a viewportSelectionDevice
+            // and viewportSelectionAction, which simply selects an objects that can be
+            // hit by a ray through the center of the viewport.
+            if (viewportSelectionDevice == null)
+            {
+                viewportSelectionDevice = gameObject.AddComponent<ControllerSelection>();
+                if (viewportSelectionAction == null)
+                {
+                    viewportSelectionAction = gameObject.AddComponent<SelectionViewportAction>();
+                }
+                viewportSelectionAction.SelectionDevice = viewportSelectionDevice;
+                viewportSelectionAction.MainCamera = mainCamera;
+            }
         }
 
+        /// <summary>
+        /// Sets up the connection between the camera and the actions steering it
+        /// (throttle, boost, direction, and viewpoint).
+        /// </summary>
         private void CameraSetup()
         {
             if (cameraAction == null)
