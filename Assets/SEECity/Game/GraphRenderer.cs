@@ -173,30 +173,92 @@ namespace SEE.Game
         {
             // all nodes of the graph
             List<Node> nodes = graph.Nodes();
+            if (nodes.Count == 0)
+            {
+                Debug.LogWarning("The graph has no nodes.\n");
+                return;
+            }
             // game objects for the leaves
             Dictionary<Node, GameObject> nodeMap = CreateBlocks(nodes);
             // the layout to be applied
             NodeLayout nodeLayout = GetLayout();
             // for a hierarchical layout, we need to add the game objects for inner nodes
-            if (nodeLayout.IsHierarchical())
+            Node root = null;
+            try
             {
-                AddInnerNodes(nodeMap, nodes); // and inner nodes
+                if (nodeLayout.IsHierarchical())
+                {
+                    AddInnerNodes(nodeMap, nodes);
+                    root = AddRootIfNecessary(graph, nodeMap);
+                }
+
+                // calculate and apply the node layout
+                Dictionary<Node, GameObject>.ValueCollection gameNodes = nodeMap.Values;
+                ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(gameNodes);
+                nodeLayout.Apply(layoutNodes);
+                NodeLayout.Move(layoutNodes, settings.origin);
+
+                AddToParent(gameNodes, parent);
+                // add the decorations, too
+                AddToParent(AddDecorations(gameNodes), parent);
+                // create the laid out edges
+                AddToParent(EdgeLayout(graph, layoutNodes), parent);
+                // add the plane surrounding all game objects for nodes
+                GameObject plane = NewPlane(gameNodes);
+                AddToParent(plane, parent);
             }
+            finally
+            {
+                // If we added an artifical root node to the graph, we must remove it again
+                // from the graph when we are done.
+                if (root != null)
+                {
+                    graph.RemoveNode(root);
+                }
+            }
+        }
 
-            // calculate and apply the node layout
-            Dictionary<Node, GameObject>.ValueCollection gameNodes = nodeMap.Values;
-            ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(gameNodes);
-            nodeLayout.Apply(layoutNodes);
-            NodeLayout.Move(layoutNodes, settings.origin);
+        /// <summary>
+        /// If <paramref name="graph"/> has a single root, nothing is done. Otherwise
+        /// an artifical root is created and added to both the <paramref name="graph"/>
+        /// and <paramref name="nodeMap"/> (and there mapped onto a newly created game 
+        /// object for inner nodes). All true roots of <paramref name="graph"/> will
+        /// become children of this artificial root.
+        /// </summary>
+        /// <param name="graph">graph where a unique root node should be added</param>
+        /// <param name="nodeMap">mapping of nodes onto game object, which will be updated
+        /// when a new artifical root is added</param>
+        /// <returns>the new artifical root or null if <paramref name="graph"/> has
+        /// already a single root</returns>
+        private Node AddRootIfNecessary(Graph graph, Dictionary<Node, GameObject> nodeMap)
+        {
+            // Note: Because this method is called only when a hierarchical layout is to
+            // be applied (and then both leaves and inner nodes were added to nodeMap), we 
+            // could traverse through graph.GetRoots() or nodeMaps.Keys. It would not make
+            // a difference. If -- for any reason --, we decide not to create a game object
+            // for some inner nodes, we should rather iterate on nodeMaps.Keys.
+            ICollection<Node> roots = graph.GetRoots();
 
-            AddToParent(gameNodes, parent);
-            // add the decorations, too
-            AddToParent(AddDecorations(gameNodes), parent);
-            // create the laid out edges
-            AddToParent(EdgeLayout(graph, layoutNodes), parent);
-            // add the plane surrounding all game objects for nodes
-            GameObject plane = NewPlane(gameNodes);
-            AddToParent(plane, parent);
+            if (roots.Count > 1)
+            {
+                Node artificalRoot = new Node()
+                {
+                    ID = graph.Name + "#ROOT",
+                    SourceName = graph.Name + "#ROOT",
+                    Type = "ROOTTYPE"
+                };
+                graph.AddNode(artificalRoot);
+                foreach (Node root in roots)
+                {
+                    artificalRoot.AddChild(root);
+                }
+                nodeMap[artificalRoot] = NewInnerNode(artificalRoot);
+                return artificalRoot;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>

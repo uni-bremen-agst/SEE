@@ -91,13 +91,13 @@ namespace SEEEditor
         /// Generates the random graph data and saves it.
         /// </summary>
         /// <param name="city">the city to be set up</param>
-        protected override void SetUp(SEECity city)
+        protected override void Draw(SEECity city)
         {
-            base.SetUp(city);
+            base.Draw(city);
             // We select one hierarchicalEdge from the set of hierarchical edges arbitrarily.
             foreach (string hierarchicalEdge in city.HierarchicalEdges)
             {
-                GraphWriter.Save(city.GXLPath(), city.ItsGraph, hierarchicalEdge);
+                GraphWriter.Save(city.GXLPath(), city.LoadedGraph, hierarchicalEdge);
                 return;
             }
         }

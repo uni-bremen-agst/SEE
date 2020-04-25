@@ -564,5 +564,26 @@ namespace SEE.DataModel
                 return result;
             }
         }
+
+        /// <summary>
+        /// Yields true if there is an edge, E, from this node to <paramref name="other"/> node.
+        /// If <paramref name="edgeType"/> is null or the empty string, E may have any edge type.
+        /// Otherwise, E.Type = <paramref name="edgeType"/> must hold.
+        /// </summary>
+        /// <param name="other">other node to be checked for successorship</param>
+        /// <param name="edgeType">the requested edge type; may be null or empty</param>
+        /// <returns>true if <paramref name="other"/>is a successor</returns>
+        public bool HasSuccessor(Node other, string edgeType)
+        {
+            foreach (Edge outgoing in Outgoings)
+            {
+                if (outgoing.Target == other 
+                    && (string.IsNullOrEmpty(edgeType) || outgoing.Type == edgeType))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

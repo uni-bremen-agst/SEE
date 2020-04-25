@@ -5,6 +5,8 @@ using OdinSerializer;
 using SEE.DataModel;
 using SEE.DataModel.IO;
 using SEE.GO;
+using System;
+using System.Linq;
 
 namespace SEE.Game
 {
@@ -51,6 +53,103 @@ namespace SEE.Game
                 "Defined_In"
             };
             return result;
+        }
+
+        //---------------------------------
+        // Relevant node types
+        //---------------------------------
+        /// <summary>
+        /// A mapping of all node types of the nodes in the graph onto whether
+        /// they should be visualized or not.
+        /// </summary>
+        [NonSerialized, OdinSerialize]
+        private Dictionary<string, bool> nodeTypes = new Dictionary<string, bool>();
+        /// <summary>
+        /// A mapping of all node types of the nodes in the graph onto whether
+        /// they should be visualized or not.
+        /// </summary>
+        public Dictionary<string, bool> SelectedNodeTypes
+        {
+            get => nodeTypes;
+        }
+        
+        /// <summary>
+        /// Resets everything that is specific to a given graph. Here: the 
+        /// node types.
+        /// </summary>
+        public virtual void Reset()
+        {
+            nodeTypes = new Dictionary<string, bool>();
+        }
+
+        /// <summary>
+        /// True if all node types in nodeTypes are relevant.
+        /// </summary>
+        private bool AllNodeTypesAreRelevant
+        {
+            get
+            {
+                foreach (bool relevant in nodeTypes.Values)
+                {
+                    if (!relevant)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Inspects the node types and attributes that occur in the graph.
+        /// All node types are considered relevant initially. The node types 
+        /// can be retrieved and also be marked as irrelevant later via property 
+        /// SelectedNodeTypes.
+        /// </summary>
+        /// <param name="graph">graph from which to retrieve the node types (may be null)</param>
+        public void InspectSchema(Graph graph)
+        {
+            if (graph != null)
+            {
+                HashSet<string> types = new HashSet<string>();
+                foreach (Node node in graph.Nodes())
+                {
+                    types.Add(node.Type);
+                }
+                nodeTypes = new Dictionary<string, bool>();
+                foreach (string type in types)
+                {
+                    nodeTypes[type] = true;
+                }
+            }
+            else
+            {
+                nodeTypes.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Returns a subgraph of <paramref name="graph"/> where all nodes were 
+        /// removed that have a type considered to be irrelevant. If all node 
+        /// types are considered relevant, <paramref name="graph"/> will be returned.
+        /// If not all types are considered relevant, a copied subgraph is returned.
+        /// </summary>
+        /// <param name="graph">graph whose subgraph is requested</param>
+        /// <returns>subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/></returns>
+        protected Graph RelevantGraph(Graph graph)
+        {
+            if (AllNodeTypesAreRelevant)
+            {
+                Debug.Log("All node types are relevant.\n");
+                return graph;
+            } 
+            else
+            {
+                ICollection<string> matches = nodeTypes.Where(pair => pair.Value == true)
+                  .Select(pair => pair.Key).ToList();
+                Debug.Log("Considering only a subgraph.\n");
+                return graph.Subgraph(matches);
+            }
         }
 
         //---------------------------------

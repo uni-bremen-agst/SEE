@@ -45,24 +45,14 @@ namespace SEE.DataModel.IO
         /// <param name="maxRevisionsToLoad">the upper limit of files to be loaded</param>
         public void Load(string directory, HashSet<string> hierarchicalEdgeTypes, int maxRevisionsToLoad)
         {
-            if (String.IsNullOrEmpty(directory))
-            {
-                throw new Exception("Directory not set.");
-            }
-            SEE.Performance p = SEE.Performance.Begin("Loading GXL files from " + directory);
-
-            // get all GXL files sorted by numbers in their name
-            IEnumerable<string> sortedGraphNames = Directory
-                .GetFiles(directory, "*.gxl", SearchOption.TopDirectoryOnly)
-                .Where(e => !string.IsNullOrEmpty(e));
-
+            IEnumerable<string> sortedGraphNames = GXLFilenames(directory);
             if (sortedGraphNames.Count<string>() == 0)
             {
                 throw new Exception("Directory '" + directory + "' has no GXL files.");
             }
-            sortedGraphNames = sortedGraphNames.Distinct().NumericalSort();
-
             graphs.Clear();
+
+            SEE.Performance p = SEE.Performance.Begin("Loading GXL files from " + directory);
             // for all found GXL files load and save the graph data
             foreach (string gxlPath in sortedGraphNames)
             {
@@ -88,6 +78,34 @@ namespace SEE.DataModel.IO
             }
             p.End();
             Debug.Log("Number of graphs loaded: " + graphs.Count + "\n");
+        }
+
+        /// <summary>
+        /// Returns the sorted list of GXL filenames of the given <paramref name="directory"/>.
+        /// 
+        /// Precondition: <paramref name="directory"/> must not be null or empty and must exist
+        /// as a directory in the file system.
+        /// </summary>
+        /// <param name="directory">name of the directory in which to search for GXL files</param>
+        /// <returns>sorted list of GXL filenames</returns>
+        public static IEnumerable<string> GXLFilenames(string directory)
+        {
+            if (String.IsNullOrEmpty(directory))
+            {
+                throw new Exception("Directory not set.");
+            }
+            else if (!Directory.Exists(directory))
+            {
+                throw new Exception("Directory " + directory + " does not exist.");
+            }
+
+            // get all GXL files sorted by numbers in their name
+            IEnumerable<string> sortedGraphNames = Directory
+                .GetFiles(directory, "*.gxl", SearchOption.TopDirectoryOnly)
+                .Where(e => !string.IsNullOrEmpty(e));
+
+            sortedGraphNames = sortedGraphNames.Distinct().NumericalSort();
+            return sortedGraphNames;
         }
     }
 
