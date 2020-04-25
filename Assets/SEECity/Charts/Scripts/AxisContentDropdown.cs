@@ -87,6 +87,8 @@ namespace SEE.Charts.Scripts
 		private void OtherChanged(int value)
 		{
 			_dropdown.options[_oldNone].text = _dropdown.options[_oldNone].text.Remove(0, 7);
+			if (_oldNone == _dropdown.value)
+				_dropdown.captionText.text = _dropdown.captionText.text.Remove(0, 7);
 			_dropdown.options[value].text = "(NONE) " + _dropdown.options[value].text;
 			if (value == _dropdown.value)
 				_dropdown.captionText.text = _dropdown.options[value].text;

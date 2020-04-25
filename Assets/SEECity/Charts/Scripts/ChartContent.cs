@@ -7,6 +7,7 @@ using SEE.GO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace SEE.Charts.Scripts
@@ -49,7 +50,8 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// If a draw is queued, this wont be null.
 		/// </summary>
-		[HideInInspector] public Coroutine Drawing;
+		[FormerlySerializedAs("Drawing"), HideInInspector]
+		public Coroutine drawing;
 
 		/// <summary>
 		/// All objects to be listed in the chart.
@@ -59,7 +61,8 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// The number of nodes in a scene to determine the performance of graphs.
 		/// </summary>
-		[HideInInspector] public int CitySize;
+		[FormerlySerializedAs("CitySize"), HideInInspector]
+		public int citySize;
 
 		/// <summary>
 		/// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
@@ -155,7 +158,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		protected virtual void Start()
 		{
-			var time = CitySize > 50 ? 5f : 0.2f;
+			var time = citySize > 50 ? 5f : 0.2f;
 			axisDropdownX.SetOther(axisDropdownY);
 			axisDropdownY.SetOther(axisDropdownX);
 			Invoke(nameof(CallDrawData), time);
@@ -222,10 +225,14 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void GetAllFloats()
 		{
+			Debug.Log("Floats");
 			foreach (var data in _dataObjects)
 			foreach (var key in data.GetComponent<NodeRef>().node.FloatAttributes.Keys)
 				if (!AllKeys.Contains(key))
+				{
 					AllKeys.Add(key);
+					Debug.Log(key);
+				}
 		}
 
 		/// <summary>
@@ -234,10 +241,14 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void GetAllIntegers()
 		{
+			Debug.Log("Integers");
 			foreach (var data in _dataObjects)
 			foreach (var key in data.GetComponent<NodeRef>().node.IntAttributes.Keys)
 				if (!AllKeys.Contains(key))
+				{
 					AllKeys.Add(key);
+					Debug.Log(key);
+				}
 		}
 
 		/// <summary>
@@ -254,7 +265,7 @@ namespace SEE.Charts.Scripts
 			foreach (var entry in combined)
 				if (!entry.GetComponent<NodeHighlights>().showInChart.Contains(this))
 					entry.GetComponent<NodeHighlights>().showInChart.Add(this, true);
-			CitySize = _dataObjects.Length;
+			citySize = _dataObjects.Length;
 
 			FillScrollView();
 		}
@@ -274,13 +285,13 @@ namespace SEE.Charts.Scripts
 		/// <returns></returns>
 		public IEnumerator QueueDraw()
 		{
-			if (CitySize > 50)
+			if (citySize > 50)
 				yield return new WaitForSeconds(2f);
 			else
 				yield return new WaitForSeconds(0.5f);
 
 			DrawData(false);
-			Drawing = null;
+			drawing = null;
 		}
 
 		/// <summary>
@@ -388,7 +399,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void DrawOneAxis()
 		{
-			List<GameObject> toDraw = new List<GameObject>();
+			var toDraw = new List<GameObject>();
 			var metric = axisDropdownY.Value;
 
 			foreach (var dataObject in _dataObjects)
