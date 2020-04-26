@@ -92,13 +92,18 @@ namespace SEE.GO
                 // FIXME
                 // put a capsule collider around the straight main line
                 // (the one from points[1] to points[2]
-                CapsuleCollider capsule = gameEdge.AddComponent<CapsuleCollider>();
-                capsule.radius = Math.Max(line.startWidth, line.endWidth) / 2.0f;
-                capsule.center = Vector3.zero;
-                capsule.direction = 2; // Z-axis for easier "LookAt" orientation
-                capsule.transform.position = points[1] + (points[2] - points[1]) / 2;
-                capsule.transform.LookAt(points[1]);
-                capsule.height = (points[2] - points[1]).magnitude;
+                // FIXME: The following works only for straight lines with at least
+                // three points, but a layoutEdge can have fewer lines and generally
+                // is not a line in the first place. We need a better approach to
+                // make edges selectable. For the time being, this code will be
+                // disabled.
+                //CapsuleCollider capsule = gameEdge.AddComponent<CapsuleCollider>();
+                //capsule.radius = Math.Max(line.startWidth, line.endWidth) / 2.0f;
+                //capsule.center = Vector3.zero;
+                //capsule.direction = 2; // Z-axis for easier "LookAt" orientation
+                //capsule.transform.position = points[1] + (points[2] - points[1]) / 2;
+                //capsule.transform.LookAt(points[1]);
+                //capsule.height = (points[2] - points[1]).magnitude;
             }
             return result;
         }
