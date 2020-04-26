@@ -6,7 +6,7 @@ namespace SEE.Controls.Devices
     /// <summary>
     /// A viewpoint device based on a gamepad controller or touch screen based on InControl.
     /// </summary>
-    public class TouchViewpoint : Viewpoint
+    public class TouchGamepadViewpoint : Viewpoint
     {
         [Tooltip("The threshold determining whether a viewpoint value has to be considered."), Range(0.001f, 1f)]
         public float Threshold = 0.3f;
