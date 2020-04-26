@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OdinSerializer;
+using System;
 using UnityEngine;
 using UnityEngine.XR;
 using Valve.VR.InteractionSystem;
@@ -23,6 +24,7 @@ namespace SEE.Controls
         }
 
         [Tooltip("What kind of player type should be enabled.")]
+        [OdinSerialize]
         public PlayerInputType playerInputType = PlayerInputType.Desktop;
 
         [Tooltip("Whether the VR controllers should be hidden (relevant only for VR players).")]
