@@ -7,6 +7,7 @@ using SEE.DataModel.IO;
 using SEE.GO;
 using System;
 using System.Linq;
+using System.IO;
 
 namespace SEE.Game
 {
@@ -481,14 +482,22 @@ namespace SEE.Game
             }
             else
             {
-                SEE.Performance p = SEE.Performance.Begin("loading graph data from " + filename);
-                GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "ROOT", new SEELogger());
-                graphCreator.Load();
-                Graph graph = graphCreator.GetGraph();
-                p.End();
-                Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
-                Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
-                return graph;
+                if (File.Exists(filename))
+                {
+                    SEE.Performance p = SEE.Performance.Begin("loading graph data from " + filename);
+                    GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "ROOT", new SEELogger());
+                    graphCreator.Load();
+                    Graph graph = graphCreator.GetGraph();
+                    p.End();
+                    Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
+                    Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
+                    return graph;
+                }
+                else
+                {
+                    Debug.LogWarningFormat("GXL file {0} does not exist.\n", filename);
+                    return new Graph();
+                } 
             }
         }
     }
