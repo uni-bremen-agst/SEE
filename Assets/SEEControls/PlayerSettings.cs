@@ -6,20 +6,20 @@ using Valve.VR.InteractionSystem;
 namespace SEE.Controls
 {
     /// <summary>
-    /// Allows a user to specify various settings of a player. 
-    /// This script is assumed to be attached to a game object
-    /// containing child objects named "VRPlayer" or "NonVRPlayer".
-    /// The game objects named "VRPlayer" are assumed to be a SteamVR
-    /// Player rig. Child objects named "NonVRPlayer" are camera rigs
-    /// for non-VR environments (desktop with keyboard and mouse).
+    /// Allows a user to select the kind of environment in which the game
+    /// runs: (1) desktop with keyboard and mouse input, (2) touch devices 
+    /// or gamepads using InControl, or (3) virtual reality.
     /// </summary>
     public class PlayerSettings : MonoBehaviour
     {
+        /// <summary>
+        /// What kind of input devices the player uses.
+        /// </summary>
         public enum PlayerInputType
         {
-            Desktop,  // player for desktop and mouse input
-            Touch,    // player for touch devices
-            VR,       // player for virtual reality devices
+            Desktop,      // player for desktop and mouse input
+            TouchGamepad, // player for touch devices or gamepads using InControl
+            VR,           // player for virtual reality devices
         }
 
         [Tooltip("What kind of player type should be enabled.")]
@@ -28,6 +28,10 @@ namespace SEE.Controls
         [Tooltip("Whether the VR controllers should be hidden (relevant only for VR players).")]
         public bool HideVRControllers = false;
 
+        /// <summary>
+        /// Depending on the user's selection, turns VR mode on or off and activates/deactivates
+        /// the game objects representing the player in the scene.
+        /// </summary>
         private void Start()
         {
             // We have to explicitly disable VR if the user wants us to. Otherwise the
@@ -43,8 +47,8 @@ namespace SEE.Controls
             }
             SetActive("DesktopPlayer", playerInputType == PlayerInputType.Desktop);
             SetActive("VRPlayer",      playerInputType == PlayerInputType.VR);
-            SetActive("TouchPlayer",   playerInputType == PlayerInputType.Touch);
-            SetActive("InControl",     playerInputType == PlayerInputType.Touch);
+            SetActive("GamepadPlayer", playerInputType == PlayerInputType.TouchGamepad);
+            SetActive("InControl",     playerInputType == PlayerInputType.TouchGamepad);
         }
 
         /// <summary>
@@ -67,9 +71,10 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// If and only if HideControllers is true, the controllers will not be shown
-        /// together with the hands. Apparently, this hiding/showing must be run at each frame
-        /// and, hence, we need to put this code into an Update() method.
+        /// If and only if HideControllers is true (when a VR player is playing), the VR controllers 
+        /// will not be visualized together with the hands of the player. Apparently, this 
+        /// hiding/showing must be run at each frame and, hence, we need to put this code into 
+        /// an Update() method.
         /// </summary>
         private void Update()
         {

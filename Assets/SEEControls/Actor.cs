@@ -59,6 +59,9 @@ namespace SEE.Controls
             SelectionSetup();
         }
 
+        /// <summary>
+        /// Sets up and connects the selection input device and the selection action.
+        /// </summary>
         private void SelectionSetup()
         {
             if (selectionAction == null)
