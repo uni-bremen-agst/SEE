@@ -7,7 +7,7 @@ namespace SEE.Controls.Devices
     /// Input device providing direction through 2D co-ordinates on the screen.
     /// The input is retrieved from gamepad controllers or touch screens managed by InControl.
     /// </summary>
-    public class TouchDirection : Direction
+    public class TouchGamepadDirection : Direction
     {
         [Tooltip("The threshold determining whether a direction value has to be considered."), Range(0.001f, 1f)]
         public float Threshold = 0.3f;
