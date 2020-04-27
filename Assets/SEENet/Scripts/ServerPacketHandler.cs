@@ -70,7 +70,12 @@ namespace SEE.Net.Internal
                 return false;
             }
 
-            packet.command.ExecuteOnServer();
+            switch (packet.command.action)
+            {
+                case Command.CommandAction.Execute: packet.command.ExecuteOnServer(); break;
+                case Command.CommandAction.Redo:    packet.command.RedoOnServer();    break;
+                case Command.CommandAction.Undo:    packet.command.UndoOnServer();    break;
+            }
 
             if (packet.command.buffer)
             {

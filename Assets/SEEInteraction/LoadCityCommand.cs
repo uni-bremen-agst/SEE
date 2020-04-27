@@ -159,6 +159,24 @@ namespace SEE.Command
         internal override void ExecuteOnServer()
         {
         }
+
+        internal override void RedoOnClient()
+        {
+            ExecuteOnClient();
+        }
+
+        internal override void RedoOnServer()
+        {
+        }
+
+        internal override void UndoOnClient()
+        {
+            UnityEngine.Object.Destroy(GameObject.Find(type.ToString()));
+        }
+
+        internal override void UndoOnServer()
+        {
+        }
     }
 
 }
