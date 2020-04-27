@@ -21,12 +21,12 @@ namespace SEE.Controls
         /// <summary>
         /// The default width of the ray line.
         /// </summary>
-        const float defaultWidth = 0.1f;
+        const float defaultWidth = 0.03f;
 
         /// <summary>
         /// The maximal length the casted ray can reach.
         /// </summary>
-        const float RayDistance = 1000.0f;
+        const float RayDistance = 100.0f;
 
         [Tooltip("The color used when an object was hit.")]
         public Color colorOnHit = Color.green;
