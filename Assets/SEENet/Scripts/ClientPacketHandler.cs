@@ -16,11 +16,19 @@ namespace SEE.Net.Internal
         protected override bool HandleCommandPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             CommandPacket packet = CommandPacket.Deserialize(data);
+
             if (packet == null || packet.command == null)
             {
                 return false;
             }
-            packet.command.ExecuteOnClient();
+
+            switch (packet.command.action)
+            {
+                case Command.CommandAction.Execute: packet.command.ExecuteOnClient(); break;
+                case Command.CommandAction.Redo:    packet.command.RedoOnClient(); break;
+                case Command.CommandAction.Undo:    packet.command.UndoOnClient(); break;
+            }
+
             return true;
         }
 

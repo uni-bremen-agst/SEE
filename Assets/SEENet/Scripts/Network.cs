@@ -136,6 +136,8 @@ namespace SEE.Net
                 }
 #endif
             }
+
+            CommandHistory.Clear();
         }
 
         private void Update()
@@ -254,16 +256,21 @@ namespace SEE.Net
         }
 
 
-        internal static void ExecuteCommand(AbstractCommand command)
+        internal static void SendCommand(AbstractCommand command)
         {
             if (instance.useInOfflineMode)
             {
-                command.ExecuteOnClient();
+                switch (command.action)
+                {
+                    case CommandAction.Execute: command.ExecuteOnServer(); command.ExecuteOnClient(); break;
+                    case CommandAction.Redo:    command.RedoOnServer();    command.RedoOnClient();    break;
+                    case CommandAction.Undo:    command.UndoOnServer();    command.UndoOnClient();    break;
+                }
             }
             else
             {
-                CommandPacket commandPacket = new CommandPacket(command);
-                Send(Client.Connection, commandPacket);
+                CommandPacket executeCommandPacket = new CommandPacket(command);
+                Send(Client.Connection, executeCommandPacket);
             }
         }
     }

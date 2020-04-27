@@ -66,6 +66,26 @@ namespace SEE.Command
         {
             viewID = ++lastViewID;
         }
+
+        internal override void RedoOnClient()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        internal override void RedoOnServer()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        internal override void UndoOnClient()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        internal override void UndoOnServer()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 
 }
