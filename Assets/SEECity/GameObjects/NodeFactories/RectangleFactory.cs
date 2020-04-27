@@ -53,35 +53,9 @@ namespace SEE.GO
         {
             LineRenderer line = rectangle.AddComponent<LineRenderer>();
 
-            // TODO: for some reason, the next three functions break the build game. thus, i inlined them...
-
-            //LineFactory.SetDefaults(line);
-            //LineFactory.SetColor(line, color);
-            //LineFactory.SetWidth(line, lineWidth);
-
-            // START: LineFactory.SetDefaults(line);
-            line.sortingLayerName = "OnTop";
-            line.sortingOrder = 5;
-
-            // simplify rendering; no shadows
-            line.receiveShadows = false;
-            line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-
-            line.startColor = Color.green;
-            line.endColor = Color.red;
-            line.startWidth = 0.1f;
-            line.endWidth = 0.1f;
-            // END:   LineFactory.SetDefaults(line);
-
-            // START: LineFactory.SetColor(line, color);
-            line.startColor = color;
-            line.endColor = color;
-            // END:   LineFactory.SetColor(line, color);
-
-            // START: LineFactory.SetWidth(line, lineWidth);
-            line.startWidth = lineWidth;
-            line.endWidth = lineWidth;
-            // END:   LineFactory.SetWidth(line, lineWidth);
+            LineFactory.SetDefaults(line);
+            LineFactory.SetColor(line, color);
+            LineFactory.SetWidth(line, lineWidth);
 
             // We want to set the points of the circle lines relative to the game object.
             // If the containing object moves, the line renderer should move along with it.

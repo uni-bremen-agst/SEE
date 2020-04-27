@@ -32,10 +32,16 @@ namespace SEE.GO
         /// <returns>default material for edges</returns>
         private static Material LineMaterial()
         {
-            Material material = new Material(Shader.Find(materialPath));
-            if (material == null)
+            // TODO: the material can not be found in the build game! path must probably be relative?
+            Material material = null;
+            try
             {
-                Debug.LogError("Could not find material " + materialPath + "\n");
+                material = new Material(Shader.Find(materialPath));
+            }
+            catch (ArgumentNullException e)
+            {
+                Debug.LogException(e);
+                Debug.LogError("Could not find material " + materialPath);
             }
             return material;
         }
@@ -75,7 +81,11 @@ namespace SEE.GO
                 // use sharedMaterial if changes to the original material should affect all
                 // objects using this material; renderer.material instead will create a copy
                 // of the material and will not be affected by changes of the original material
-                line.sharedMaterial = defaultLineMaterial;
+
+                if (defaultLineMaterial != null)
+                {
+                    line.sharedMaterial = defaultLineMaterial;
+                }
 
                 LineFactory.SetDefaults(line);
                 LineFactory.SetWidth(line, edgeWidth);

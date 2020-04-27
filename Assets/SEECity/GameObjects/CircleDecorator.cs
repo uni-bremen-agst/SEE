@@ -33,7 +33,7 @@ namespace SEE.GO
         /// The material we use for the circle line. It is the same for all circle lines
         /// to reduce the number of drawing calls.
         /// </summary>
-        private Material material = new Material(LineFactory.DefaultLineMaterial);
+        private Material material = LineFactory.DefaultLineMaterial == null ? null : new Material(LineFactory.DefaultLineMaterial);
 
         /// <summary>
         /// Attaches a circle line to all game nodes. 
@@ -91,7 +91,10 @@ namespace SEE.GO
             // We want to set the points of the circle lines relative to the game object.
             line.useWorldSpace = false;
 
-            line.sharedMaterial = material;
+            if (material != null)
+            {
+                line.sharedMaterial = material;
+            }
 
             line.positionCount = segments + 1;
             const int pointCount = segments + 1; // add extra point to make startpoint and endpoint the same to close the circle
