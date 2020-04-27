@@ -16,6 +16,8 @@ namespace SEE.Net.Internal
             SerializedProperty serverIPAddress = serializedObject.FindProperty("serverIPAddress");
             SerializedProperty localServerPort = serializedObject.FindProperty("localServerPort");
             SerializedProperty remoteServerPort = serializedObject.FindProperty("remoteServerPort");
+            SerializedProperty loadCityOnStart = serializedObject.FindProperty("loadCityOnStart");
+            SerializedProperty loadCityGameObject = serializedObject.FindProperty("loadCityGameObject");
             SerializedProperty useInOfflineMode = serializedObject.FindProperty("useInOfflineMode");
             SerializedProperty hostServer = serializedObject.FindProperty("hostServer");
             SerializedProperty nativeLoggingEnabled = serializedObject.FindProperty("nativeLoggingEnabled");
@@ -49,6 +51,12 @@ namespace SEE.Net.Internal
                         if (hostServer.boolValue)
                         {
                             EditorGUILayout.PropertyField(localServerPort, new GUIContent("Local Server Port", "The Port of the local server."));
+                            EditorGUILayout.PropertyField(loadCityOnStart, new GUIContent("Load City On Start", "Whether the city should be loaded on start of the application."));
+                            EditorGUI.BeginDisabledGroup(!loadCityOnStart.boolValue);
+                            {
+                                EditorGUILayout.PropertyField(loadCityGameObject, new GUIContent("City Loading GameObject", "If the given GameObject contains some AbstractSEECity-script, the defined city can be built for each client."));
+                            }
+                            EditorGUI.EndDisabledGroup();
                         }
                         else
                         {

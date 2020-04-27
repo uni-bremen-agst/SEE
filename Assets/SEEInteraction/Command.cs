@@ -9,7 +9,7 @@ namespace SEE.Command
     {
         public bool buffer;
 
-        public AbstractCommand(bool buffer = true)
+        public AbstractCommand(bool buffer)
         {
             this.buffer = buffer;
         }
@@ -29,7 +29,8 @@ namespace SEE.Command
             Net.Network.ExecuteCommand(this);
         }
 
-        internal abstract void ExecuteLocally();
+        internal abstract void ExecuteOnClient();
+        internal abstract void ExecuteOnServer();
     }
 
     internal static class CommandSerializer
@@ -47,7 +48,8 @@ namespace SEE.Command
 
         private static readonly Dictionary<Type, Func<string, AbstractCommand>> deserializationDict = new Dictionary<Type, Func<string, AbstractCommand>>()
         {
-            { typeof(LoadCityCommand), (s) => JsonUtility.FromJson<LoadCityCommand>(s) }
+            { typeof(LoadCityCommand), (s) => JsonUtility.FromJson<LoadCityCommand>(s) },
+            { typeof(InstantiateCommand), (s) => JsonUtility.FromJson<InstantiateCommand>(s) }
         };
 
         internal static string Serialize(AbstractCommand command)

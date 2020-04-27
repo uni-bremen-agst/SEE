@@ -1,6 +1,7 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using SEE.Command;
+using SEE.Game;
 using SEE.Net.Internal;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,8 @@ namespace SEE.Net
         [SerializeField] private string serverIPAddress = string.Empty;
         [SerializeField] private int localServerPort = 55555;
         [SerializeField] private int remoteServerPort = 0;
+        [SerializeField] private bool loadCityOnStart = false;
+        [SerializeField] private GameObject loadCityGameObject = null;
 
 #if UNITY_EDITOR
         [SerializeField] private bool nativeLoggingEnabled = false;
@@ -83,12 +86,21 @@ namespace SEE.Net
             }
             Client.Initialize();
 
-            Initialize();
+            InitializeGame();
         }
 
-        private void Initialize()
+        private void InitializeGame()
         {
-            Instantiate("Prefabs/SEENetPlayer");
+            if (loadCityOnStart && loadCityGameObject != null)
+            {
+                AbstractSEECity seeCity = loadCityGameObject.GetComponent<AbstractSEECity>();
+                if (seeCity)
+                {
+                    new LoadCityCommand(seeCity).Execute();
+                }
+            }
+
+            new InstantiateCommand("Prefabs/SEENetPlayer").Execute();
 
             GameObject rig = GameObject.Find("Player Rig");
             if (rig)
@@ -102,9 +114,9 @@ namespace SEE.Net
 #endif
                 if (mode.ViveController)
                 {
-                    Instantiate("Prefabs/SEENetViveControllerLeft");
-                    Instantiate("Prefabs/SEENetViveControllerRight");
-                    Instantiate("Prefabs/SEENetViveControllerRay");
+                    new InstantiateCommand("Prefabs/SEENetViveControllerLeft").Execute();
+                    new InstantiateCommand("Prefabs/SEENetViveControllerRight").Execute();
+                    new InstantiateCommand("Prefabs/SEENetViveControllerRay").Execute();
                 }
                 else if (mode.LeapMotion)
                 {
@@ -163,29 +175,6 @@ namespace SEE.Net
                         break;
                     }
                 }
-            }
-        }
-
-
-        public static void Instantiate(string prefabName)
-        {
-            Instantiate(prefabName, Vector3.zero, Quaternion.identity, Vector3.one);
-        }
-
-        public static void Instantiate(string prefabName, Vector3 position, Quaternion rotation, Vector3 scale)
-        {
-            InstantiatePacket p = new InstantiatePacket(prefabName, Client.LocalEndPoint, position, rotation, scale);
-            if (instance.useInOfflineMode)
-            {
-                Client.PacketHandler.Push(
-                    new PacketHeader(Client.PACKET_PREFIX + InstantiatePacket.PACKET_TYPE, 0),
-                    null,
-                    p.Serialize()
-                );
-            }
-            else
-            {
-                Send(Client.Connection, p);
             }
         }
 
@@ -262,7 +251,7 @@ namespace SEE.Net
         {
             if (instance.useInOfflineMode)
             {
-                command.ExecuteLocally();
+                command.ExecuteOnClient();
             }
             else
             {

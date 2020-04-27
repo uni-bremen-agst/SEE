@@ -66,7 +66,7 @@ namespace SEE.Net.Internal
             {
                 return false;
             }
-            packet.command.ExecuteLocally();
+            packet.command.ExecuteOnClient();
             return true;
         }
 

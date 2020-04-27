@@ -41,7 +41,7 @@ namespace SEE.Command
         public Tools.Constraint leafConstraint;
         public Tools.Constraint innerNodeConstraint;
 
-        public LoadCityCommand(AbstractSEECity city)
+        public LoadCityCommand(AbstractSEECity city) : base(true)
         {
             type = city.GetType().ToString();
 
@@ -84,7 +84,7 @@ namespace SEE.Command
             }
         }
 
-        internal override void ExecuteLocally()
+        internal override void ExecuteOnClient()
         {
             GameObject gameObject = new GameObject(type.ToString());
             AbstractSEECity city = null;
@@ -154,6 +154,10 @@ namespace SEE.Command
             {
                 Debug.LogError("Unknown city-type!");
             }
+        }
+
+        internal override void ExecuteOnServer()
+        {
         }
     }
 
