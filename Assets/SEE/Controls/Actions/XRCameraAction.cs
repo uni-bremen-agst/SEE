@@ -7,6 +7,9 @@ namespace SEE.Controls
     /// </summary>
     public class XRCameraAction : CameraAction
     {
+        [Tooltip("If true, movements stay in the x/z plane. You cannot go up or down.")]
+        public bool KeepDirectionInPlane = true;
+
         /// <summary>
         /// Moves the game object this action is attached to based on input of the direction
         /// and throttle device. The speed of the movement depends on the throttle and the
@@ -21,7 +24,9 @@ namespace SEE.Controls
                 heightFactor = 5;
             }
             float speed = ThrottleDevice.Value * heightFactor * BoostDevice.Value;
-            gameObject.transform.Translate(DirectionDevice.Value * speed * Time.deltaTime);
+            Vector3 direction = KeepDirectionInPlane ? Vector3.ProjectOnPlane(DirectionDevice.Value, Vector3.up)
+                                                     : DirectionDevice.Value;
+            gameObject.transform.Translate(direction * speed * Time.deltaTime);
         }
     }
 }
