@@ -1,4 +1,6 @@
-﻿namespace SEE.Controls.Devices
+﻿using UnityEngine;
+
+namespace SEE.Controls.Devices
 {
     /// <summary>
     /// An input device providing a constant boost factor for movements that
@@ -6,7 +8,8 @@
     /// </summary>
     public class NullBoost : Boost
     {
-        public float boost = 0.01f;
+        [Tooltip("Boost factor for movements."), Range(0.01f, 10.0f)]
+        public float boost = 1.0f;
 
         public override float Value
         {
