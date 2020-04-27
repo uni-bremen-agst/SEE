@@ -179,7 +179,6 @@ namespace SEE.Game
             // for a hierarchical layout, we need to add the game objects for inner nodes
             if (nodeLayout.IsHierarchical())
             {
-                // TODO: BROKEN 1
                 AddInnerNodes(nodeMap, nodes); // and inner nodes
             }
 
@@ -730,7 +729,6 @@ namespace SEE.Game
         /// <returns>new game object for the inner node</returns>
         public GameObject NewInnerNode(Node node)
         {
-            // TODO: BROKEN 3
             GameObject innerGameObject = innerNodeFactory.NewBlock();
             innerGameObject.name = node.LinkName;
             innerGameObject.tag = Tags.Node;
@@ -752,7 +750,6 @@ namespace SEE.Game
                 // We add only inner nodes.
                 if (! node.IsLeaf())
                 {
-                    // TODO: BROKEN 2
                     GameObject innerGameObject = NewInnerNode(node);
                     nodeMap[node] = innerGameObject;
                 }

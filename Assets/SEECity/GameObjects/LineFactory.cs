@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -27,10 +28,16 @@ namespace SEE.GO
         /// <returns>default material for edges</returns>
         public static Material NewLineMaterial()
         {
-            Material material = new Material(Shader.Find(materialPath));
-            if (material == null)
+            Material material = null;
+            try
             {
-                Debug.LogError("Could not find material " + materialPath + "\n");
+                // TODO: this material can not be found in build game! Path is probably wrong here!
+                material = new Material(Shader.Find(materialPath));
+            }
+            catch (ArgumentNullException e)
+            {
+                Debug.LogException(e);
+                Debug.LogError("Could not find material " + materialPath);
             }
             return material;
         }
