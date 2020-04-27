@@ -267,6 +267,15 @@
                },
                "mode" : "trigger",
                "path" : "/user/hand/right/input/trigger"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/interactui"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/left/input/a"
             }
          ]
       },
