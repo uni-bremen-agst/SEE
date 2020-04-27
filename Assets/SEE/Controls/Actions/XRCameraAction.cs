@@ -3,7 +3,7 @@
 namespace SEE.Controls
 {
     /// <summary>
-    /// A camera action for virtual reality.
+    /// A camera movement action for virtual reality.
     /// </summary>
     public class XRCameraAction : CameraAction
     {
@@ -20,8 +20,7 @@ namespace SEE.Controls
             {
                 heightFactor = 5;
             }
-            Vector3 translation = DirectionDevice.Value * ThrottleDevice.Value * heightFactor;
-            gameObject.transform.Translate(translation);
+            gameObject.transform.Translate(DirectionDevice.Value * ThrottleDevice.Value * heightFactor * BoostDevice.Value);
         }
     }
 }
