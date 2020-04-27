@@ -20,7 +20,8 @@ namespace SEE.Controls
             {
                 heightFactor = 5;
             }
-            gameObject.transform.Translate(DirectionDevice.Value * ThrottleDevice.Value * heightFactor * BoostDevice.Value);
+            float speed = ThrottleDevice.Value * heightFactor * BoostDevice.Value;
+            gameObject.transform.Translate(DirectionDevice.Value * speed * Time.deltaTime);
         }
     }
 }
