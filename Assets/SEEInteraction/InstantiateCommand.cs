@@ -31,8 +31,8 @@ namespace SEE.Command
         private void Initialize(string prefabPath, Vector3 position, Quaternion rotation, Vector3 scale)
         {
             this.prefabPath = prefabPath;
-            ownerIpAddress = Client.LocalEndPoint.Address.ToString();
-            ownerPort = Client.LocalEndPoint.Port;
+            ownerIpAddress = Net.Network.UseInOfflineMode ? null : Client.LocalEndPoint.Address.ToString();
+            ownerPort = Net.Network.UseInOfflineMode ? -1 : Client.LocalEndPoint.Port;
             this.position = position;
             this.rotation = rotation;
             this.scale = scale;
@@ -53,7 +53,10 @@ namespace SEE.Command
                 Debug.Log("Object could not be instantiated with prefab '" + prefab + "'!");
                 return;
             }
-            go.GetComponent<ViewContainer>().Initialize(viewID, new IPEndPoint(IPAddress.Parse(ownerIpAddress), ownerPort));
+            if (!Net.Network.UseInOfflineMode)
+            {
+                go.GetComponent<ViewContainer>().Initialize(viewID, new IPEndPoint(IPAddress.Parse(ownerIpAddress), ownerPort));
+            }
             go.transform.position = position;
             go.transform.rotation = rotation;
             go.transform.localScale = scale;
