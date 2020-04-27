@@ -62,36 +62,43 @@ namespace SEE.Net
 
             instance = this;
 
-            if (useInOfflineMode)
+            if (!useInOfflineMode)
             {
-                return;
-            }
-
 #if UNITY_EDITOR
-            if (nativeLoggingEnabled)
-            {
-                NetworkComms.EnableLogging(new Internal.Logger(minimalSeverity));
-            }
-            else
-            {
-                NetworkComms.DisableLogging();
-            }
+                if (nativeLoggingEnabled)
+                {
+                    NetworkComms.EnableLogging(new Internal.Logger(minimalSeverity));
+                }
+                else
+                {
+                    NetworkComms.DisableLogging();
+                }
 #else
-            NetworkComms.DisableLogging();
+                NetworkComms.DisableLogging();
 #endif
 
-            if (hostServer)
-            {
-                Server.Initialize();
+                try
+                {
+                    if (hostServer)
+                    {
+                        Server.Initialize();
+                    }
+                    Client.Initialize();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    Debug.LogWarning("Some network-error happened! Continuing in offline mode...");
+                    useInOfflineMode = true;
+                }
             }
-            Client.Initialize();
 
             InitializeGame();
         }
 
         private void InitializeGame()
         {
-            if (loadCityOnStart && loadCityGameObject != null)
+            if ((useInOfflineMode || hostServer) && loadCityOnStart && loadCityGameObject != null)
             {
                 AbstractSEECity seeCity = loadCityGameObject.GetComponent<AbstractSEECity>();
                 if (seeCity)

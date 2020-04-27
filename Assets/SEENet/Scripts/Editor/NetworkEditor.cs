@@ -45,20 +45,33 @@ namespace SEE.Net.Internal
                 using (new EditorGUI.IndentLevelScope())
                 {
                     EditorGUILayout.PropertyField(useInOfflineMode);
+
                     EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
                     {
                         EditorGUILayout.PropertyField(hostServer);
-                        if (hostServer.boolValue)
+                    }
+                    EditorGUI.EndDisabledGroup();
+
+                    EditorGUI.BeginDisabledGroup(!useInOfflineMode.boolValue && !hostServer.boolValue);
+                    {
+                        EditorGUILayout.PropertyField(loadCityOnStart, new GUIContent("Load City On Start", "Whether the city should be loaded on start of the application."));
+                        EditorGUI.BeginDisabledGroup(!loadCityOnStart.boolValue);
+                        {
+                            EditorGUILayout.PropertyField(loadCityGameObject, new GUIContent("City Loading GameObject", "If the given GameObject contains some AbstractSEECity-script, the defined city can be built for each client."));
+                        }
+                        EditorGUI.EndDisabledGroup();
+                    }
+                    EditorGUI.EndDisabledGroup();
+
+                    EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
+                    {
+                        EditorGUI.BeginDisabledGroup(!hostServer.boolValue);
                         {
                             EditorGUILayout.PropertyField(localServerPort, new GUIContent("Local Server Port", "The Port of the local server."));
-                            EditorGUILayout.PropertyField(loadCityOnStart, new GUIContent("Load City On Start", "Whether the city should be loaded on start of the application."));
-                            EditorGUI.BeginDisabledGroup(!loadCityOnStart.boolValue);
-                            {
-                                EditorGUILayout.PropertyField(loadCityGameObject, new GUIContent("City Loading GameObject", "If the given GameObject contains some AbstractSEECity-script, the defined city can be built for each client."));
-                            }
-                            EditorGUI.EndDisabledGroup();
                         }
-                        else
+                        EditorGUI.EndDisabledGroup();
+
+                        EditorGUI.BeginDisabledGroup(hostServer.boolValue);
                         {
                             EditorGUILayout.PropertyField(serverIPAddress, new GUIContent("Remote IP-Address", "The IP-Address of the remote server."));
                             EditorGUILayout.PropertyField(remoteServerPort, new GUIContent("Remote Server Port", "The Port of the remote server."));

@@ -195,8 +195,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68cd993404524eb45918638d10b68356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useInOfflineMode: 0
-  hostServer: 1
+  useInOfflineMode: 1
+  hostServer: 0
   serverIPAddress: 192.168.178.22
   localServerPort: 55555
   remoteServerPort: 55555
