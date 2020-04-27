@@ -54,6 +54,14 @@
       "type": "vector1"
     },
     {
+      "name": "/actions/default/in/InteractUI",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/Teleport",
+      "type": "boolean"
+    },
+    {
       "name": "/actions/default/out/Haptic",
       "type": "vibration"
     },
@@ -126,7 +134,9 @@
       "/actions/default/in/SkeletonRightHand": "Skeleton (Right)",
       "/actions/default/out/Haptic": "Haptic",
       "/actions/default/in/Throttle": "Throttle",
-      "/actions/default/in/Trigger": "Trigger"
+      "/actions/default/in/Trigger": "Trigger",
+      "/actions/default/in/InteractUI": "Interact With UI",
+      "/actions/default/in/Teleport": "Teleport"
     }
   ]
 }
