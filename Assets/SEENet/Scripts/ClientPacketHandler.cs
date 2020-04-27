@@ -11,53 +11,7 @@ namespace SEE.Net.Internal
         {
         }
 
-
-
-        protected override bool HandleCityBuildingPacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            CityBuildingPacket packet = CityBuildingPacket.Deserialize(data);
-
-            GameObject building = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            building.name = "Building";
-            building.AddComponent<GameObjectIdentifier>().id = packet.id;
-            building.transform.position = packet.position;
-            building.transform.rotation = packet.rotation;
-            building.transform.localScale = packet.scale;
-            building.GetComponent<MeshRenderer>().material.color = packet.color;
-
-            return true;
-        }
-
-        protected override bool HandleCityEdgePacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            CityEdgePacket packet = CityEdgePacket.Deserialize(data);
-
-            GameObject edge = new GameObject("Edge");
-            edge.AddComponent<GameObjectIdentifier>().id = packet.id;
-            LineRenderer lineRenderer = edge.AddComponent<LineRenderer>();
-            lineRenderer.positionCount = packet.positions.Length;
-            lineRenderer.SetPositions(packet.positions);
-            lineRenderer.startWidth = packet.startWidth;
-            lineRenderer.endWidth = packet.endWidth;
-            lineRenderer.startColor = packet.startColor;
-            lineRenderer.endColor = packet.endColor;
-            lineRenderer.material = new Material(Shader.Find("Legacy Shaders/Particles/Additive")); // TODO: is there a more general way?
-            return true;
-        }
-
-        protected override bool HandleCityNodePacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            CityNodePacket packet = CityNodePacket.Deserialize(data);
-
-            GameObject node = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            node.AddComponent<GameObjectIdentifier>().id = packet.id;
-            node.transform.position = packet.position;
-            node.transform.rotation = packet.rotation;
-            node.transform.localScale = packet.scale;
-            node.GetComponent<MeshRenderer>().material.color = packet.color;
-
-            return true;
-        }
+        
 
         protected override bool HandleCommandPacket(PacketHeader packetHeader, Connection connection, string data)
         {
@@ -67,32 +21,6 @@ namespace SEE.Net.Internal
                 return false;
             }
             packet.command.ExecuteOnClient();
-            return true;
-        }
-
-        protected override bool HandleInstantiatePacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            InstantiatePacket packet = InstantiatePacket.Deserialize(data);
-            if (packet == null)
-            {
-                return false;
-            }
-            GameObject prefab = Resources.Load<GameObject>(packet.prefabName);
-            if (!prefab)
-            {
-                Debug.LogError("Prefab of name '" + packet.prefabName + "' could not be found!");
-                return false;
-            }
-            GameObject obj = UnityEngine.Object.Instantiate(prefab, null, true);
-            if (!obj)
-            {
-                Debug.Log("Object could not be instantiated with prefab '" + prefab + "'!");
-                return false;
-            }
-            obj.GetComponent<ViewContainer>().Initialize(packet.viewID, packet.owner);
-            obj.transform.position = packet.position;
-            obj.transform.rotation = packet.rotation;
-            obj.transform.localScale = packet.scale;
             return true;
         }
 
