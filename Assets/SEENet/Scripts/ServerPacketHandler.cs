@@ -81,6 +81,13 @@ namespace SEE.Net.Internal
         {
             CommandPacket packet = CommandPacket.Deserialize(data);
 
+            if (packet == null || packet.command == null)
+            {
+                return false;
+            }
+
+            packet.command.ExecuteOnServer();
+
             if (packet.command.buffer)
             {
                 BufferedPacket bufferedPacket = new BufferedPacket()
@@ -88,7 +95,7 @@ namespace SEE.Net.Internal
                     header = new PacketHeader(Client.PACKET_PREFIX + CommandPacket.PACKET_TYPE, packetHeader.TotalPayloadSize),
                     connection = connection,
                     packetType = packet.packetType,
-                    packetData = data
+                    packetData = packet.Serialize()
                 };
                 bufferedPackets.Add(bufferedPacket);
             }
