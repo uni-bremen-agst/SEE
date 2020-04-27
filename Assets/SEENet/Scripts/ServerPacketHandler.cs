@@ -22,7 +22,6 @@ namespace SEE.Net.Internal
 
 
         private List<BufferedPacket> bufferedPackets = new List<BufferedPacket>();
-        private int lastViewID = -1;
 
 
 
@@ -60,22 +59,7 @@ namespace SEE.Net.Internal
 #endif
         }
 
-
-
-        protected override bool HandleCityBuildingPacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            throw new Exception("A server should never receive this type of packet!");
-        }
-
-        protected override bool HandleCityEdgePacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            throw new Exception("A server should never receive this type of packet!");
-        }
-
-        protected override bool HandleCityNodePacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            throw new Exception("A server should never receive this type of packet!");
-        }
+        
 
         protected override bool HandleCommandPacket(PacketHeader packetHeader, Connection connection, string data)
         {
@@ -103,25 +87,6 @@ namespace SEE.Net.Internal
             foreach (Connection co in Server.Connections)
             {
                 Network.Send(co, packet);
-            }
-            return true;
-        }
-
-        protected override bool HandleInstantiatePacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            InstantiatePacket packet = InstantiatePacket.Deserialize(data);
-            packet.viewID = ++lastViewID; // TODO: this could potentially overflow. server should be able to run forever without having to restart!
-            BufferedPacket bufferedPacket = new BufferedPacket()
-            {
-                header = new PacketHeader(Client.PACKET_PREFIX + InstantiatePacket.PACKET_TYPE, packetHeader.TotalPayloadSize),
-                connection = connection,
-                packetType = packet.packetType,
-                packetData = data
-            };
-            bufferedPackets.Add(bufferedPacket);
-            for (int i = 0; i < Server.Connections.Count; i++)
-            {
-                Network.Send(Server.Connections[i], packet);
             }
             return true;
         }
