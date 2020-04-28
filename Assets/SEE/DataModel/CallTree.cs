@@ -364,7 +364,7 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="gameObjects">List containing pairs of linkage name and corresponding
         /// actual GameObjects.</param>
-        public void MapGameObjects(List<KeyValuePair<string, GameObject>> gameObjects)
+        public void MapGameObjects(Dictionary<string, GameObject> gameObjects)
         {
             for (int i = 0; i < functionCalls.Count; i++)
             {
@@ -377,9 +377,8 @@ namespace SEE.DataModel
                 }
 
                 bool mapped = false;
-                for (int j = 0; j < gameObjects.Count; j++)
+                foreach (var go in gameObjects)
                 {
-                    KeyValuePair<string, GameObject> go = gameObjects[j];
                     string gxlLinkageName = go.Key;
                     FunctionInformation gxlFunctionInformation = FunctionInformation.CreateFromGXLLinkageName(gxlLinkageName);
                     if (gxlFunctionInformation == null)
@@ -394,7 +393,6 @@ namespace SEE.DataModel
                         break;
                     }
                 }
-
                 if (!mapped)
                 {
                     Debug.LogWarning("Could not map '" + functionCalls[i] + "'!");
