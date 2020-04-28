@@ -17,35 +17,19 @@ namespace Valve.VR
     public class SteamVR_Input_ActionSet_default : Valve.VR.SteamVR_ActionSet
     {
         
-        public virtual SteamVR_Action_Boolean GrabPinch1
+        public virtual SteamVR_Action_Boolean GrabPinch
         {
             get
             {
-                return SteamVR_Actions.default_GrabPinch1;
+                return SteamVR_Actions.default_GrabPinch;
             }
         }
         
-        public virtual SteamVR_Action_Boolean GrabPinch2
+        public virtual SteamVR_Action_Boolean GrabGrip
         {
             get
             {
-                return SteamVR_Actions.default_GrabPinch2;
-            }
-        }
-        
-        public virtual SteamVR_Action_Boolean GrabGrip1
-        {
-            get
-            {
-                return SteamVR_Actions.default_GrabGrip1;
-            }
-        }
-        
-        public virtual SteamVR_Action_Boolean GrabGrip2
-        {
-            get
-            {
-                return SteamVR_Actions.default_GrabGrip2;
+                return SteamVR_Actions.default_GrabGrip;
             }
         }
         
@@ -73,19 +57,11 @@ namespace Valve.VR
             }
         }
         
-        public virtual SteamVR_Action_Single Squeeze1
+        public virtual SteamVR_Action_Single Squeeze
         {
             get
             {
-                return SteamVR_Actions.default_Squeeze1;
-            }
-        }
-        
-        public virtual SteamVR_Action_Single Squeeze2
-        {
-            get
-            {
-                return SteamVR_Actions.default_Squeeze2;
+                return SteamVR_Actions.default_Squeeze;
             }
         }
         
