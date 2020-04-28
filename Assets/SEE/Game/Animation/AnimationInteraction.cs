@@ -31,7 +31,17 @@ namespace SEE.Game.Animation
         /// <summary>
         /// The camera from the user.
         /// </summary>
-        public FlyCamera FlyCamera; // serialized by Unity (it is a MonoBehaviour)
+        //public FlyCamera FlyCamera; // serialized by Unity (it is a MonoBehaviour)
+
+        /// <summary>
+        /// As to whether the UI for selecting revisions is currently shown.
+        /// </summary>
+        private bool isRevisionSelectionOpen = false;
+
+        /// <summary>
+        /// Returns true if RevisionSelectionCanvas is currently shown.
+        /// </summary>
+        public bool IsRevisionSelectionOpen => isRevisionSelectionOpen; // serialized by Unity
 
         /// <summary>
         /// The in-game animation canvas shown while viewing the animations. It contains
@@ -76,11 +86,6 @@ namespace SEE.Game.Animation
                 Init();
             }
         }
-
-        /// <summary>
-        /// Returns true if RevisionSelectionCanvas is currently shown.
-        /// </summary>
-        public bool IsRevisionSelectionOpen => !FlyCamera.IsEnabled; // serialized by Unity
 
         private void Init()
         {
@@ -135,7 +140,7 @@ namespace SEE.Game.Animation
             }
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                SetMode(FlyCamera.IsEnabled);
+                ToogleMode();
             }
         }
 
@@ -150,7 +155,7 @@ namespace SEE.Game.Animation
         /// </summary>
         private void ToogleMode()
         {
-            SetMode(FlyCamera.IsEnabled);
+            SetMode(!isRevisionSelectionOpen);
         }
 
         /// <summary>
@@ -173,11 +178,12 @@ namespace SEE.Game.Animation
         /// animation-interaction mode is turned on</param>
         private void SetMode(bool enabled)
         {
-            FlyCamera.IsEnabled = !enabled;
-            AnimationCanvas.SetActive(!enabled);
-            RevisionSelectionCanvas.SetActive(enabled);
+            isRevisionSelectionOpen = enabled;
+
+            AnimationCanvas.SetActive(!isRevisionSelectionOpen);
+            RevisionSelectionCanvas.SetActive(isRevisionSelectionOpen);
             evolutionRenderer.SetAutoPlay(false);
-            if (enabled)
+            if (isRevisionSelectionOpen)
             {
                 // if revision-selection mode is enabled, we re-fill the drop-down
                 // selection menu with all available graph indices.
