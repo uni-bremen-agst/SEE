@@ -18,7 +18,7 @@ namespace SEEEditor
             GUILayout.Label("Node attributes", EditorStyles.boldLabel);
             if (nodeRef.node != null)
             {
-                EditorGUILayout.TextField("Linkage name", nodeRef.node.ID);
+                EditorGUILayout.TextField("ID", nodeRef.node.ID);
                 EditorGUILayout.TextField("Type", nodeRef.node.Type);
 
                 GUILayout.Label("String attributes", EditorStyles.boldLabel);
