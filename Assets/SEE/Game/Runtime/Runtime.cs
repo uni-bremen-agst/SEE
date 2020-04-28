@@ -68,7 +68,7 @@ namespace SEE.Game.Runtime
             callTree.GenerateTree();
 
             // Finds GameObjects, that represent functions and maps them onto call tree.
-            List<KeyValuePair<string, GameObject>> gameObjects = new List<KeyValuePair<string, GameObject>>(FindObjectsOfType<GameObject>().Length);
+            Dictionary<string, GameObject> gameObjects = new Dictionary<string, GameObject>(FindObjectsOfType<GameObject>().Length);
             for (int i = 0; i < tags.Length; i++)
             {
                 GameObject[] gameObjectsWithTag = GameObject.FindGameObjectsWithTag(tags[i]);
@@ -84,15 +84,13 @@ namespace SEE.Game.Runtime
                         if (nodeRef.node.TryGetString(Node.LinknameAttribute, out string linkname))
                         {
                             gameObjectsWithTag[j].GetComponentInChildren<MeshRenderer>().material.color = Color.black;
-                            // FIXME: This looks like an expensive lookup. It is linear to the number of elements
-                            // contained in gameObjects.
-                            if (!gameObjects.TrueForAll((p) => !p.Key.Equals(linkname)))
+                            if (gameObjects.ContainsKey(linkname))
                             {
                                 Debug.LogWarning("Contains '" + nodeRef.node + "' already!");
                             }
                             else
                             {
-                                gameObjects.Add(new KeyValuePair<string, GameObject>(linkname, gameObjectsWithTag[j]));
+                                gameObjects[linkname] = gameObjectsWithTag[j];
                             }
                         }
                         else
