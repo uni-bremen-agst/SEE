@@ -37,9 +37,16 @@ namespace SEE.GO
         // The renderer of the gameObject.
         private Renderer gameObjectRenderer;
 
+        Camera mainCamera;
+
         private void Start()
         {
             gameObjectRenderer = gameObject.GetComponentInChildren<Renderer>();
+            mainCamera = Camera.main;
+            if (mainCamera == null)
+            {
+                Debug.LogError("There is no camera tagged by MainCamera.\n");
+            }
         }
 
         /// <summary>
@@ -57,8 +64,7 @@ namespace SEE.GO
             timer -= Time.deltaTime;
             if (timer < 0.0f)
             {
-                timer = updatePeriod;
-                Camera mainCamera = Camera.main;
+                timer = updatePeriod;                
                 if (mainCamera.transform.position != lastCameraPosition)
                 {
                     // Alternative calculation of difference, which does not quite work on updates, however.
