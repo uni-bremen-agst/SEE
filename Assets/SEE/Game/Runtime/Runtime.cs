@@ -77,12 +77,28 @@ namespace SEE.Game.Runtime
                     NodeRef nodeRef = gameObjectsWithTag[j].GetComponent<NodeRef>();
                     if (nodeRef != null && nodeRef.node != null)
                     {
-                        gameObjectsWithTag[j].GetComponentInChildren<MeshRenderer>().material.color = Color.black;
-                        if (!gameObjects.TrueForAll((p) => !p.Key.Equals(nodeRef.node.ID)))
+                        // We retrieve the linkname because that contains the encoding of the signature
+                        // of a method specifying its parameters and return type.
+                        // FIXME: This makes assumptions about the information content of a linkname
+                        // that may not necessarily hold. 
+                        if (nodeRef.node.TryGetString(Node.LinknameAttribute, out string linkname))
                         {
-                            Debug.LogWarning("Contains '" + nodeRef.node + "' already!");
+                            gameObjectsWithTag[j].GetComponentInChildren<MeshRenderer>().material.color = Color.black;
+                            // FIXME: This looks like an expensive lookup. It is linear to the number of elements
+                            // contained in gameObjects.
+                            if (!gameObjects.TrueForAll((p) => !p.Key.Equals(linkname)))
+                            {
+                                Debug.LogWarning("Contains '" + nodeRef.node + "' already!");
+                            }
+                            else
+                            {
+                                gameObjects.Add(new KeyValuePair<string, GameObject>(linkname, gameObjectsWithTag[j]));
+                            }
                         }
-                        gameObjects.Add(new KeyValuePair<string, GameObject>(nodeRef.node.ID, gameObjectsWithTag[j]));
+                        else
+                        {
+                            Debug.LogWarningFormat("Node with ID {0} has no linkname.\n", nodeRef.node.ID);
+                        }
                     }
                 }
             }
