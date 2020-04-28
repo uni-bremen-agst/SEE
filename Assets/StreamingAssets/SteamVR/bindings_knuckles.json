@@ -151,7 +151,7 @@
             {
                "inputs" : {
                   "grab" : {
-                     "output" : "/actions/default/in/grabgrip1"
+                     "output" : "/actions/default/in/grabgrip"
                   }
                },
                "mode" : "grab",
@@ -177,7 +177,7 @@
             {
                "inputs" : {
                   "grab" : {
-                     "output" : "/actions/default/in/grabpinch1"
+                     "output" : "/actions/default/in/grabpinch"
                   }
                },
                "mode" : "grab",
@@ -190,7 +190,7 @@
             {
                "inputs" : {
                   "grab" : {
-                     "output" : "/actions/default/in/grabpinch2"
+                     "output" : "/actions/default/in/grabpinch"
                   }
                },
                "mode" : "grab",

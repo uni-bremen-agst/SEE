@@ -1,19 +1,11 @@
 {
   "actions": [
     {
-      "name": "/actions/default/in/GrabPinch1",
+      "name": "/actions/default/in/GrabPinch",
       "type": "boolean"
     },
     {
-      "name": "/actions/default/in/GrabPinch2",
-      "type": "boolean"
-    },
-    {
-      "name": "/actions/default/in/GrabGrip1",
-      "type": "boolean"
-    },
-    {
-      "name": "/actions/default/in/GrabGrip2",
+      "name": "/actions/default/in/GrabGrip",
       "type": "boolean"
     },
     {
@@ -31,12 +23,7 @@
       "skeleton": "/skeleton/hand/right"
     },
     {
-      "name": "/actions/default/in/Squeeze1",
-      "type": "vector1",
-      "requirement": "optional"
-    },
-    {
-      "name": "/actions/default/in/Squeeze2",
+      "name": "/actions/default/in/Squeeze",
       "type": "vector1",
       "requirement": "optional"
     },
@@ -74,7 +61,7 @@
   "action_sets": [
     {
       "name": "/actions/default",
-      "usage": "leftright"
+      "usage": "single"
     },
     {
       "name": "/actions/mixedreality",
@@ -122,12 +109,6 @@
   "localization": [
     {
       "language_tag": "en_US",
-      "/actions/default/in/GrabGrip1": "Grab Grip1",
-      "/actions/default/in/GrabGrip2": "Grab Grip2",
-      "/actions/default/in/GrabPinch1": "Grab Pinch1",
-      "/actions/default/in/GrabPinch2": "Grab Pinch2",
-      "/actions/default/in/Squeeze1": "Squeeze1",
-      "/actions/default/in/Squeeze2": "Squeeze2",
       "/actions/default/in/HeadsetOnHead": "Headset on head (proximity sensor)",
       "/actions/default/in/Pose": "Pose",
       "/actions/default/in/SkeletonLeftHand": "Skeleton (Left)",
@@ -136,7 +117,9 @@
       "/actions/default/in/Throttle": "Throttle",
       "/actions/default/in/Trigger": "Trigger",
       "/actions/default/in/InteractUI": "Interact With UI",
-      "/actions/default/in/Teleport": "Teleport"
+      "/actions/default/in/Teleport": "Teleport",
+      "/actions/default/in/GrabGrip": "Grab Grip",
+      "/actions/default/in/GrabPinch": "Grab Pinch"
     }
   ]
 }
