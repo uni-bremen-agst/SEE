@@ -1,0 +1,978 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns="http://www.w3.org/1999/xlink">
+  <graph id="" edgeids="true" xmlns="">
+    <node id="N1">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~1</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>3.005822</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>9.567183</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>2.692165</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>8.499214</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>6.625897</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>11.9815</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>7.684883</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>8.002719</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>10.87738</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>11.79762</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>7.725081</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>9.034426</float>
+      </attr>
+    </node>
+    <node id="N2">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~2</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~2</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>13.45083</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>4.483221</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>10.29897</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>12.86981</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>7.20164</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>8.016296</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>11.3874</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>15.00405</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>8.056369</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>11.20612</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>12.75023</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>9.183783</float>
+      </attr>
+    </node>
+    <node id="N3">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~3</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~3</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>6.709562</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>13.20475</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>3.530794</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>7.717131</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>9.279924</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>11.91949</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>5.694532</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>13.77487</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>3.902415</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>11.69689</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>7.213538</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>11.07902</float>
+      </attr>
+    </node>
+    <node id="N4">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~4</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~4</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>9.5842</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>7.254706</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>8.294059</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>8.389661</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>5.594083</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>7.978423</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>9.37762</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>11.75821</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>10.76066</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>8.19681</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>12.46569</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>11.53678</float>
+      </attr>
+    </node>
+    <node id="N5">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~5</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~5</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>17.5344</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>18.41319</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>6.715088</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>3.41269</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>8.201104</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>9.455538</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>7.917063</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>8.930182</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>12.90619</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>10.90588</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>8.47981</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>12.76398</float>
+      </attr>
+    </node>
+    <node id="N6">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~6</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~6</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>7.350413</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>6.077834</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>8.500455</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>12.15227</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>8.905338</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>11.13081</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>12.44719</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>16.64785</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>13.93846</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>9.271445</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>5.583845</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>7.918116</float>
+      </attr>
+    </node>
+    <node id="N7">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~7</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~7</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>14.7237</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>7.802173</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>18.23094</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>8.210164</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>11.02764</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>11.62735</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>3.531345</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>10.5446</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>11.21903</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>12.21828</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>10.80577</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>10.91353</float>
+      </attr>
+    </node>
+    <node id="N8">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~8</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~8</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>10.76079</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>13.18858</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>11.10817</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>11.69459</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>11.85316</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>13.9651</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>10.48105</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>12.70065</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>13.9329</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>13.50169</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>9.936235</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>10.12278</float>
+      </attr>
+    </node>
+    <node id="N9">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~9</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~9</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>7.336979</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>6.761904</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>10.85106</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>11.43069</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>12.25174</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>12.50498</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>12.99249</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>11.9985</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>11.56975</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>16.07551</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>11.31931</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>6.154446</float>
+      </attr>
+    </node>
+    <node id="N10">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~10</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~10</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>9.626266</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>12.02</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>17.09597</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>8.373775</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>9.571186</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>10.73678</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>14.64112</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>13.02201</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>14.12689</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>14.53306</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>12.35077</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>6.547242</float>
+      </attr>
+    </node>
+    <node id="N11">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~11</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~11</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>9.837015</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>7.331029</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>12.80952</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>5.370637</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>14.82144</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>10.39378</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>8.002694</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>6.017992</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>10.61026</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>14.4132</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>9.759533</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>8.564905</float>
+      </attr>
+    </node>
+    <node id="N12">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~12</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~12</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>10.39426</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>7.5643</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>7.310414</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>10.49194</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>11.54626</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>10.0827</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>12.01869</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>12.61323</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>7.694418</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>9.552379</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>14.8439</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>9.023911</float>
+      </attr>
+    </node>
+    <node id="N13">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~13</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~13</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>8.038339</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>14.96711</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>8.656649</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>6.228736</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>10.65071</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>13.74838</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>11.64188</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>10.38285</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>15.40034</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>10.98062</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>6.75975</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>10.13541</float>
+      </attr>
+    </node>
+    <node id="N14">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~14</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~14</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>14.44213</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>10.6856</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>10.57379</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>13.54643</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>12.48851</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>11.45026</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>13.89317</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>18.08598</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>10.52987</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>14.18215</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>6.066906</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>0.08726931</float>
+      </attr>
+    </node>
+    <node id="N15">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~15</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~15</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>12.25316</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>7.155307</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>8.101752</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>6.141574</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>7.600825</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>9.862833</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>8.306396</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>2.461951</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>5.9538</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>13.64048</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>6.179513</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>10.08867</float>
+      </attr>
+    </node>
+    <node id="N16">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~16</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~16</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>9.3783</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>6.555197</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>12.28891</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>11.70714</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>16.7618</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>11.21145</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>16.0368</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>7.901073</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>9.266647</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>12.56336</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>9.66962</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>5.163786</float>
+      </attr>
+    </node>
+    <node id="N17">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~17</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~17</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>7.969772</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>12.79885</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>14.40872</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>12.7813</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>12.31846</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>6.572761</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>4.835594</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>3.261846</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>10.29652</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>12.18343</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>12.52874</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>8.568487</float>
+      </attr>
+    </node>
+    <node id="N18">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~18</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~18</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>11.39384</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>11.21299</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>1.790642</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>9.687572</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>10.73137</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>11.04548</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>7.508154</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>11.59666</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>7.712703</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>11.57223</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>12.25427</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>12.67403</float>
+      </attr>
+    </node>
+    <node id="N19">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~19</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~19</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>9.382474</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>9.139998</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>8.206331</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>14.85011</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>13.85181</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>9.064654</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>8.79034</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>11.27329</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>9.780955</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>8.724616</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>11.25493</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>7.398066</float>
+      </attr>
+    </node>
+    <node id="N20">
+      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Leaf~20</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Leaf~20</string>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <float>4.545095</float>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>12.56221</float>
+      </attr>
+      <attr name="Metric.LOC">
+        <float>10.02841</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>10.38806</float>
+      </attr>
+      <attr name="Metric.Architecture_Violations">
+        <float>11.10711</float>
+      </attr>
+      <attr name="Metric.Clone">
+        <float>9.854901</float>
+      </attr>
+      <attr name="Metric.Cycle">
+        <float>6.971188</float>
+      </attr>
+      <attr name="Metric.Dead_Code">
+        <float>15.99691</float>
+      </attr>
+      <attr name="Metric.Metric">
+        <float>12.5612</float>
+      </attr>
+      <attr name="Metric.Style">
+        <float>7.81408</float>
+      </attr>
+      <attr name="Metric.Universal">
+        <float>7.482333</float>
+      </attr>
+      <attr name="Metric.IssuesTotal">
+        <float>10.21059</float>
+      </attr>
+    </node>
+    <node id="N21">
+      <type xlink:href="Package" xmlns:xlink="http://www.w3.org/1999/xlink" />
+      <attr name="Source.Name">
+        <string>Inner~1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Inner~1</string>
+      </attr>
+    </node>
+    <edge id="E1" from="N9" to="N13">
+      <type xlink:href="calls" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E2" from="N1" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E3" from="N2" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E4" from="N3" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E5" from="N4" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E6" from="N5" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E7" from="N6" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E8" from="N7" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E9" from="N8" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E10" from="N9" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E11" from="N10" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E12" from="N11" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E13" from="N12" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E14" from="N13" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E15" from="N14" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E16" from="N15" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E17" from="N16" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E18" from="N17" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E19" from="N18" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E20" from="N19" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+    <edge id="E21" from="N20" to="N21">
+      <type xlink:href="Enclosing" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </edge>
+  </graph>
+</gxl>

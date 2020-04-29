@@ -18,9 +18,29 @@ namespace SEEEditor
             GUILayout.Label("Node attributes", EditorStyles.boldLabel);
             if (nodeRef.node != null)
             {
-                nodeRef.node.LinkName = EditorGUILayout.TextField("Linkage name", nodeRef.node.LinkName);
-                nodeRef.node.SourceName = EditorGUILayout.TextField("Source name", nodeRef.node.SourceName);
-                nodeRef.node.Type = EditorGUILayout.TextField("Type", nodeRef.node.Type);
+                EditorGUILayout.TextField("ID", nodeRef.node.ID);
+                EditorGUILayout.TextField("Type", nodeRef.node.Type);
+
+                GUILayout.Label("String attributes", EditorStyles.boldLabel);
+                foreach (var entry in nodeRef.node.StringAttributes)
+                {
+                    EditorGUILayout.TextField(entry.Key, entry.Value);
+                }
+                GUILayout.Label("Float attributes", EditorStyles.boldLabel);
+                foreach (var entry in nodeRef.node.FloatAttributes)
+                {
+                    EditorGUILayout.TextField(entry.Key, entry.Value.ToString());
+                }
+                GUILayout.Label("Integer attributes", EditorStyles.boldLabel);
+                foreach (var entry in nodeRef.node.IntAttributes)
+                {
+                    EditorGUILayout.TextField(entry.Key, entry.Value.ToString());
+                }
+                GUILayout.Label("Toggle attributes", EditorStyles.boldLabel);
+                foreach (var entry in nodeRef.node.ToggleAttributes)
+                {
+                    EditorGUILayout.LabelField(entry);
+                }
             }
             else
             {
