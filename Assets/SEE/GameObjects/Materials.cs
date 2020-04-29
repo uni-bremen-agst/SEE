@@ -100,7 +100,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the default material for the given indes (always the identical 
+        /// Returns the default material for the given <paramref name="degree"/> (always the identical 
         /// material, no matter how often this method is called). That means, if 
         /// the caller modifies this material, other objects using it will be affected, too.
         /// 
@@ -115,6 +115,18 @@ namespace SEE.GO
                 throw new Exception("color degree " + degree + " out of range [0," + (numberOfColors - 1) + "]");
             }
             return materials[degree];
+        }
+
+        private static Material highlightMaterial;
+
+        public static Material HighlightMaterial()
+        {
+            if (highlightMaterial == null)
+            {
+                Shader shader = Shader.Find(shaderName);
+                highlightMaterial = NewMaterial(shader, Color.yellow);
+            }
+            return highlightMaterial;
         }
     }
 }
