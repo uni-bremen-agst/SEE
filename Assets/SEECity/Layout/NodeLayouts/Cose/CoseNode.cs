@@ -214,7 +214,7 @@ namespace SEE.Layout
 
             }
 
-            layout.CoseLayoutSettings.TotalDisplacement += Math.Abs(layoutValues.DisplacementX) + Math.Abs(layoutValues.DisplacementY);
+            layout.CoseLayoutSettings.TotalDisplacement += (decimal) (Math.Abs(layoutValues.DisplacementX) + Math.Abs(layoutValues.DisplacementY));
         }
 
         /// <summary>

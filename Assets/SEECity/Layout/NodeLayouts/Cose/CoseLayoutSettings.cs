@@ -49,7 +49,7 @@ namespace SEE.Layout
         /// <summary>
         /// the maximum value of the displacement of a node when the layout prozess is incrementally calculated
         /// </summary>
-        public static float Max_Node_Displacement_Incremental = 30.0f;//100.0f;
+        public static float Max_Node_Displacement_Incremental = 100.0f;
 
         /// <summary>
         ///  the maximum value of the displacement of a node when the layout prozess is not incrementally calculated
@@ -84,7 +84,7 @@ namespace SEE.Layout
         /// <summary>
         /// the minimal distance for applying the repulsion strength
         /// </summary>
-        public static float Min_Repulsion_Dist = Edge_Length / 10.0f;
+        public static float Min_Repulsion_Dist = Edge_Length / 10;
 
         /// <summary>
         /// the repulsion strength 
@@ -179,12 +179,12 @@ namespace SEE.Layout
         /// <summary>
         /// the amount of the displacement done
         /// </summary>
-        private double totalDisplacement;
+        private decimal totalDisplacement;
 
         /// <summary>
         /// the old amount of the displacement done
         /// </summary>
-        private double oldTotalDisplacement;
+        private decimal oldTotalDisplacement;
 
         /// <summary>
         /// current level (multilevel scaling)
@@ -202,13 +202,13 @@ namespace SEE.Layout
             initialCoolingFactor = 1.0f;
             coolingcycle = 0;
             finalTemperature = 0;
-            maxIterations = 2500;
+            maxIterations = 4000;
             finalTemperature = Convergence_Check_Periode / maxIterations;
             maxCoolingCycle = maxIterations / Convergence_Check_Periode;
             displacementThresholdPerNode = (3.0 * Edge_Length) / 100;
             totalIterations = 0;
-            totalDisplacement = 0.0;
-            oldTotalDisplacement = 0.0;
+            totalDisplacement = 0.0m;
+            oldTotalDisplacement = 0.0m;
             level = 0;
         }
 
@@ -221,11 +221,11 @@ namespace SEE.Layout
         public double RepulsionRange { get => repulsionRange; set => repulsionRange = value; }
         public double DisplacementThresholdPerNode { get => displacementThresholdPerNode; set => displacementThresholdPerNode = value; }
         public double TotalIterations { get => totalIterations; set => totalIterations = value; }
-        public double OldTotalDisplacement { get => oldTotalDisplacement; set => oldTotalDisplacement = value; }
+        public decimal OldTotalDisplacement { get => oldTotalDisplacement; set => oldTotalDisplacement = value; }
         public int Level { get => level; set => level = value; }
         public float CoolingFactor { get => coolingFactor; set => coolingFactor = value; }
         public double MaxNodeDisplacement { get => maxNodeDisplacement; set => maxNodeDisplacement = value; }
-        public double TotalDisplacement { get => totalDisplacement; set => totalDisplacement = value; }
+        public decimal TotalDisplacement { get => totalDisplacement; set => totalDisplacement = value; }
         public int NoOfLevels { get => noOfLevels; set => noOfLevels = value; }
     }
 }

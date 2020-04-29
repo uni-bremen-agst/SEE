@@ -462,6 +462,11 @@ namespace SEE.Game
         public SortedDictionary<string, string> Measurements = new SortedDictionary<string, string>();
 
         /// <summary>
+        /// Indicates whether the measurements should be calculated or not
+        /// </summary>
+        public bool calculateMeasurements = false;
+
+        /// <summary>
         /// Dictionary with all Nodelayouts for leaf and inner nodes
         /// </summary>
         public Dictionary<NodeLayouts, string> SubLayoutsInnerNodes = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().Where(nodeLayout => !nodeLayout.GetModel().OnlyLeaves).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());

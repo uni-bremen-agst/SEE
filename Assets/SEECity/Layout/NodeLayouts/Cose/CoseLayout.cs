@@ -61,6 +61,8 @@ namespace SEE.Layout
         public CoseLayoutSettings CoseLayoutSettings { get => coseLayoutSettings; set => coseLayoutSettings = value; }
         public List<SublayoutLayoutNode> SublayoutNodes { get => sublayoutNodes; set => sublayoutNodes = value; }
 
+        AbstractSEECity settings;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -71,6 +73,7 @@ namespace SEE.Layout
         {
             name = "Compound Spring Embedder Layout";
             nodeToCoseNode = new Dictionary<ILayoutNode, CoseNode>();
+            this.settings = settings;
             SetupGraphSettings(settings.CoseGraphSettings);
         }
 
@@ -88,6 +91,9 @@ namespace SEE.Layout
 
             layout_result = new Dictionary<ILayoutNode, NodeTransform>();
             this.layoutNodes = layoutNodes.ToList();
+
+
+            //GetGoodParameter(settings: settings, layoutNodes: layoutNodes, edges.Count);
 
             ICollection<ILayoutNode> roots = LayoutNodes.GetRoots(layoutNodes);
             if (roots.Count == 0)
@@ -111,7 +117,7 @@ namespace SEE.Layout
             foreach (CoseGraph graph in graphManager.Graphs)
             {
                 
-                Vector3 position = graph != graphManager.RootGraph ? new Vector3(graph.CenterPosition.x - relativePositionRootGraph.x, groundLevel, graph.CenterPosition.z - relativePositionRootGraph.z) : new Vector3(graph.CenterPosition.x, groundLevel, graph.CenterPosition.z);
+                Vector3 position = graph != graphManager.RootGraph ? new Vector3(graph.CenterPosition.x - relativePositionRootGraph.x, graph.CenterPosition.y, graph.CenterPosition.z - relativePositionRootGraph.z) : new Vector3(graph.CenterPosition.x, graph.CenterPosition.y, graph.CenterPosition.z);
 
 
                 float width = graph.Scale.x;
@@ -157,6 +163,49 @@ namespace SEE.Layout
         public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes)
         {
             throw new System.NotImplementedException();
+        }
+
+        public void GetGoodParameter(AbstractSEECity settings, ICollection<ILayoutNode> layoutNodes, int countEdges)
+        {
+            int countNode = layoutNodes.Count;
+            int innerNodeCount = 0;
+
+            int countMax = CountDepthMax(layoutNodes);
+
+            foreach (ILayoutNode layoutNode in layoutNodes)
+            {
+                if (!layoutNode.IsLeaf)
+                {
+                    innerNodeCount++;
+                }
+            }
+
+            var rep1 = settings.CoseGraphSettings.RepulsionStrength = 0.0039f * Mathf.Pow(countNode, 2) * 0.0328f + countNode + 2.8198f;
+            var rep2 = 3.4084f * Mathf.Log(countEdges) + 2.8951f;
+
+            settings.CoseGraphSettings.RepulsionStrength = rep2;
+            var edgeLength1 = (int)Mathf.Round(2.7507f* countMax - 2.654f);//1.5484f * innerNodeCount + 1.8616f);
+            var edgeLength2 = (int)Mathf.Round(1.5484f * innerNodeCount + 1.8616f);
+
+            settings.CoseGraphSettings.EdgeLength = (edgeLength1 + edgeLength2) / 2;
+
+        }
+
+        private int CountDepthMax(ICollection<ILayoutNode> layoutNodes)
+        {
+            int depth = 0;
+            foreach (ILayoutNode node in layoutNodes)
+            {
+                if (node.IsLeaf)
+                {
+                    if (depth < node.Level)
+                    {
+                        depth = node.Level;
+                    }
+                }
+            }
+
+            return depth ;
         }
 
         /// <summary>
@@ -214,7 +263,7 @@ namespace SEE.Layout
 
                     float rotation = applyRotation ? node.NodeObject.Rotation : 0.0f;
 
-                    Vector3 position = new Vector3(node.CenterPosition.x - relativePositionRootGraph.x, groundLevel, node.CenterPosition.z - relativePositionRootGraph.z);
+                    Vector3 position = new Vector3(node.CenterPosition.x - relativePositionRootGraph.x, node.CenterPosition.y, node.CenterPosition.z - relativePositionRootGraph.z);
                     NodeTransform transform = new NodeTransform(position, node.NodeObject.Scale, rotation);
                     layout_result[nNode] = transform;
                 }
@@ -248,6 +297,7 @@ namespace SEE.Layout
                 }
                 else
                 {
+                    CoseLayoutSettings.Incremental = true;
                     ClassicLayout();
                 }
             } 
@@ -822,7 +872,7 @@ namespace SEE.Layout
             {
                 oscilating = Math.Abs(coseLayoutSettings.TotalDisplacement - coseLayoutSettings.OldTotalDisplacement) < 2;
             }
-            converged = coseLayoutSettings.TotalDisplacement < coseLayoutSettings.TotalDisplacementThreshold;
+            converged = coseLayoutSettings.TotalDisplacement < (decimal) coseLayoutSettings.TotalDisplacementThreshold;
             coseLayoutSettings.OldTotalDisplacement = coseLayoutSettings.TotalDisplacement;
             return converged || oscilating;
         }
