@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using SEE.Game;
+using System.Collections.Generic;
 
 namespace SEEEditor
 {
@@ -15,7 +16,9 @@ namespace SEEEditor
         {
             base.OnInspectorGUI();
 
+            SEECity city = target as SEECity;
             Attributes();
+            ShowNodeTypes(city);
             Buttons();
         }
 
@@ -26,11 +29,21 @@ namespace SEEEditor
         {
             SEECity city = target as SEECity;
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Load City", GUILayout.Height(30)))
+
+            if (GUILayout.Button("Load", GUILayout.Height(30)))
             {
-                SetUp(city);
+                Load(city);
             }
-            if (GUILayout.Button("Delete City", GUILayout.Height(30)))
+
+            if (GUILayout.Button("Draw", GUILayout.Height(30)))
+            {
+                Draw(city);
+            }
+            if (GUILayout.Button("Re-Draw", GUILayout.Height(30)))
+            {
+                ReDraw(city);
+            }
+            if (GUILayout.Button("Delete", GUILayout.Height(30)))
             {
                 Reset(city);
             }
@@ -51,20 +64,39 @@ namespace SEEEditor
 
         /// <summary>
         /// Loads the graph data and metric data from disk, aggregates the metrics to
-        /// inner nodes and renders the graph in the scene.
+        /// inner nodes.
         /// </summary>
         /// <param name="city">the city to be set up</param>
-        protected virtual void SetUp(SEECity city)
+        protected virtual void Load(SEECity city)
         {
-            city.LoadAndDrawGraph();
+            city.LoadData();
         }
 
         /// <summary>
-        /// Deletes the underlying graph data of the given city.
+        /// Renders the graph in the scene.
+        /// </summary>
+        /// <param name="city">the city to be set up</param>
+        protected virtual void Draw(SEECity city)
+        {
+            city.DrawGraph();
+        }
+
+        /// <summary>
+        /// Renders the graph in the scene once again without deleting the underlying graph loaded.
+        /// </summary>
+        /// <param name="city">the city to be re-drawn</param>
+        protected virtual void ReDraw(SEECity city)
+        {
+            city.ReDrawGraph();
+        }
+
+        /// <summary>
+        /// Deletes the underlying graph data of the given city and deletes all its game
+        /// objects.
         /// </summary>
         private void Reset(SEECity city)
         {
-            city.DeleteGraph();   
+            city.Reset();   
         }
     }
 }
