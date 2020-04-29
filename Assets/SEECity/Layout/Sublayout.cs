@@ -31,26 +31,34 @@ namespace SEE.Layout
         private float innerNodeHeight;
 
         /// <summary>
-        /// TODO
+        /// the scale of the calculated layout
         /// </summary>
         private Vector3 layoutScale;
 
         /// <summary>
-        /// TODO
+        /// the layout offset
         /// </summary>
         private Vector3 layoutOffset;
 
+        /// <summary>
+        /// the "real" scale of the root node (is needed, if the nodelayout doenst enclose the inner nodes)
+        /// </summary>
         private Vector3 rootNodeRealScale;
 
-
         /// <summary>
-        /// TODO
+        /// the leaf node factory
         /// </summary>
         private readonly NodeFactory leafNodeFactory;
 
-        private SublayoutLayoutNode sublayout;
+        /// <summary>
+        ///  the sublayout node
+        /// </summary>
+        private readonly SublayoutLayoutNode sublayout;
 
-        private Graph graph;
+        /// <summary>
+        /// the graph
+        /// </summary>
+        private readonly Graph graph;
 
         public Vector3 LayoutScale { get => layoutScale; set => layoutScale = value; }
 
@@ -62,6 +70,13 @@ namespace SEE.Layout
 
         Dictionary<ILayoutNode, CoseSublayoutNode> ILayout_to_CoseSublayoutNode = new Dictionary<ILayoutNode, CoseSublayoutNode>();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sublayout">the sublayout node</param>
+        /// <param name="groundLevel">the groundlevel for the nodes</param>
+        /// <param name="leafNodeFactory">the leafnodefactory</param>
+        /// <param name="graph">the underlying graph</param>
         public Sublayout(SublayoutLayoutNode sublayout, float groundLevel, NodeFactory leafNodeFactory, Graph graph)
         {
             this.nodeLayout = sublayout.NodeLayout;
@@ -117,7 +132,7 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// TODO
+        /// Converts a layoutNode to a layout node used for the sublayout calculation
         /// </summary>
         /// <param name="layoutNodes"></param>
         /// <returns></returns>
@@ -315,6 +330,10 @@ namespace SEE.Layout
             }
         }
 
+        /// <summary>
+        /// evalutates the sublayout 
+        /// </summary>
+        /// <returns></returns>
         private bool EvaluateSublayout()
         {
             Vector2 leftLowerCorner = new Vector2(Mathf.Infinity, Mathf.Infinity);

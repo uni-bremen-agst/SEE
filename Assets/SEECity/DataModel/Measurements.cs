@@ -11,24 +11,63 @@ namespace SEE
 
     public class EdgesMeasurements {
 
+        /// <summary>
+        /// The maximum length of an edge
+        /// </summary>
         public readonly float lengthMax;
 
+        /// <summary>
+        /// The minimum length of an edge
+        /// </summary>
         public readonly float lengthMin;
 
+        /// <summary>
+        /// The total length of all edges
+        /// </summary>
         public readonly float lengthTotal;
 
+        /// <summary>
+        /// The maximum length of an edge in relation to the area (height + width / 2)
+        /// </summary>
         public readonly float lengthMaxArea;
 
+        /// <summary>
+        /// The minimum length of an edge in relation to the area (height + width / 2)
+        /// </summary>
         public readonly float lengthMinArea;
 
+        /// <summary>
+        /// The total length of all edges in relation to the area (height + width / 2)
+        /// </summary>
         public readonly float lengthTotalArea;
 
+        /// <summary>
+        /// The average length of an edge in relation to the area (height + width / 2)
+        /// </summary>
         public readonly float lengthAverage;
 
+        /// <summary>
+        /// The variance length of any edge in relation to the area (height + width / 2)
+        /// </summary>
         public readonly float lengthVariance;
 
+        /// <summary>
+        /// The standart deviation of any edge length in relation to the area (height + width / 2)
+        /// </summary>
         public readonly float lengthStandardDeviation; 
 
+        /// <summary>
+        /// class holding all measurements value of the edges
+        /// </summary>
+        /// <param name="lengthMax"></param>
+        /// <param name="lengthMin"></param>
+        /// <param name="lengthTotal"></param>
+        /// <param name="lengthMaxArea"></param>
+        /// <param name="lengthMinArea"></param>
+        /// <param name="lengthTotalArea"></param>
+        /// <param name="lengthAverage"></param>
+        /// <param name="lengthVariance"></param>
+        /// <param name="lengthStandardDeviation"></param>
         public EdgesMeasurements(float lengthMax, float lengthMin, float lengthTotal, float lengthMaxArea, float lengthMinArea, float lengthTotalArea, float lengthAverage, float lengthVariance, float lengthStandardDeviation)
         {
             this.lengthMax = lengthMax;
@@ -100,6 +139,8 @@ namespace SEE
             get => GetNodesPerformance();
         }
 
+        public SortedDictionary<string, string> measurementsDict = new SortedDictionary<string, string>();
+
         private Performance nodePerformance = null;
 
         /// <summary>
@@ -114,7 +155,7 @@ namespace SEE
             this.graph = graph;
             this.width = Distance(leftFrontCorner.x, rightBackCorner.x);
             this.height = Distance(leftFrontCorner.y, rightBackCorner.y);
-            this.layoutNodes = layoutNodes;
+            this.layoutNodes = new List<ILayoutNode>(layoutNodes);
             this.edges = graph.ConnectingEdges(layoutNodes);
             this.nodePerformance = performance;
         }
@@ -134,6 +175,11 @@ namespace SEE
 
         public SortedDictionary<string, string> ToStringDictionary()
         {
+            if (measurementsDict.Count > 0)
+            {
+                return measurementsDict;
+            }
+
             SortedDictionary<string, string> measurements = new SortedDictionary<string, string>
             {
                 { "Nodes overlapping", OverlappingGameNodes.ToString() },
@@ -156,7 +202,8 @@ namespace SEE
                 measurements.Add("Time for node layout", nodePerformance);
             }
 
-            return measurements;
+            measurementsDict = measurements;
+            return measurementsDict;
         }
 
         /// <summary>

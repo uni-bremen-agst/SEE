@@ -260,7 +260,15 @@ namespace SEE.Game
             AddToParent(plane, parent);
 
             Measurements measurements = new Measurements(layoutNodes, graph, leftFrontCorner, rightBackCorner, p);
-            settings.Measurements = measurements.ToStringDictionary();
+
+            if (settings.calculateMeasurements)
+            {
+                settings.Measurements = measurements.ToStringDictionary();
+            } else
+            {
+                settings.Measurements = new SortedDictionary<string, string>();
+            }
+            
         }
 
 
@@ -449,7 +457,7 @@ namespace SEE.Game
                 case SEECity.NodeLayouts.CirclePacking:
                     return new CirclePackingNodeLayout(groundLevel);
                 case SEECity.NodeLayouts.CompoundSpringEmbedder:
-                    return new CoseLayout(groundLevel, settings, leafNodeFactory);
+                    return new CoseLayout(groundLevel, settings);
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }

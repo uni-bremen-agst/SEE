@@ -9,6 +9,7 @@ using System.IO;
 using SEE.Game;
 using SEE.GO;
 using SEE.Tools;
+using OdinSerializer.Utilities;
 
 namespace SEE.Layout
 {
@@ -31,7 +32,7 @@ namespace SEE.Layout
         Dictionary<ILayoutNode, Vector3> mapGameObjectOriginalSize = new Dictionary<ILayoutNode, Vector3>();
 
         int maxNumberOfGraphs = 500;
-        int totalNumberOfGraphs = 254;
+        int totalNumberOfGraphs = 0;
 
         int CountLeafNodes = -1;
         int CountInnerNodes = -1;
@@ -81,8 +82,8 @@ namespace SEE.Layout
         public void StartOptAlgorithm(OptAlgoIterations it, bool save)
         {
             settings.CoseGraphSettings.multiLevelScaling = false;
-            settings.CoseGraphSettings.UseSmartRepulsionRangeCalculation = false;
-            settings.CoseGraphSettings.UseSmartIdealEdgeCalculation = false;
+            settings.CoseGraphSettings.UseSmartRepulsionRangeCalculation = true;
+            settings.CoseGraphSettings.UseSmartIdealEdgeCalculation = true;
 
             for (int i = it.edgeLength.start; i < it.edgeLength.end; i += it.edgeLength.iterationStep)
             {
@@ -99,7 +100,7 @@ namespace SEE.Layout
                                 // vielleicht auswerten mit welchen die beste Lösung? und dann kann man schaune, ob multilevelscaling etc. das Layout wirklich verbessern?
 
                                 settings.CoseGraphSettings.EdgeLength = (int)i;
-                                settings.CoseGraphSettings.RepulsionStrength = j;
+                                 settings.CoseGraphSettings.RepulsionStrength = j;
                                 /*if (a % 2 == 0)
                                 {
                                     settings.CoseGraphSettings.multiLevelScaling = false;
@@ -127,7 +128,7 @@ namespace SEE.Layout
                                     settings.CoseGraphSettings.UseSmartIdealEdgeCalculation = true;
                                 }*/
 
-                                NodeLayout nodeLayout = new CoseLayout(groundLevel, settings, leafNodeFactory);
+                                NodeLayout nodeLayout = new CoseLayout(groundLevel, settings);
 
                                 nodeLayout.Apply(layoutNodes.Cast<ILayoutNode>().ToList(), graph.Edges(), new List<SublayoutLayoutNode>());
                                 NodeLayout.Move(layoutNodes.Cast<ILayoutNode>().ToList(), settings.origin);
@@ -439,7 +440,10 @@ namespace SEE.Layout
             SetupFile(path: path);
             base.Draw(CreateRandomCity(), parent);
             this.parent = parent;
-            
+
+           // combine();
+
+
         }
 
         private void Draw()
@@ -462,6 +466,69 @@ namespace SEE.Layout
                 //writer.WriteLine(firstLine);
             }
            
+        }
+
+
+        private void combine()
+        {
+            Dictionary<Tuple<int, int>, List<int>> result = new Dictionary<Tuple<int, int>, List<int>>();
+
+            Dictionary<Tuple<int, int>, int> newResult = new Dictionary<Tuple<int, int>, int>();
+
+
+            var linesToKeep = File.ReadLines("Assets/Resources/repulsionForce.txt").ToList();
+
+            if (linesToKeep.Count > 1)
+            {
+                linesToKeep.ForEach(line =>
+                {
+                    var values = line.Split(';');
+                    int countNodes = ParseInt(values[0]);
+                    int countEdges = ParseInt(values[1]);
+                    int repulsionForce = ParseInt(values[2]);
+
+                    var tuple = new Tuple<int, int>(countNodes, countEdges);
+
+                    if (result.ContainsKey(tuple))
+                    {
+                        result[tuple].Add(repulsionForce);
+                    }
+                    else
+                    {
+                        result.Add(tuple, new List<int>(repulsionForce));
+                    }
+                });
+
+            }
+
+            result.ForEach( entry =>{
+                var length = entry.Value.Count;
+
+                var sum = 0;
+
+                entry.Value.ForEach(item => {
+                    sum += item;
+                });
+
+
+                if (length > 0)
+                {
+                    var avg = sum / length;
+
+                    newResult.Add(entry.Key, avg);
+                }
+
+                
+            });
+
+            using (StreamWriter writer = File.CreateText("Assets/Resources/repulsionForceResult.txt"))
+            {
+
+                newResult.ForEach( kvp => {
+                    string line = kvp.Key.Item1 + ";" + kvp.Key.Item2 + ";" + kvp.Value;
+                writer.WriteLine(line);
+                });
+            }
         }
     }
 

@@ -106,11 +106,16 @@ namespace SEEEditor
                 }
             }
 
-            if (city.Measurements.Count > 0)
+            EditorGUIUtility.labelWidth = 150;
+            GUILayout.Label("Measurements", EditorStyles.boldLabel);
+
+            city.calculateMeasurements = EditorGUILayout.Toggle("Calculate Measurements", city.calculateMeasurements);
+
+            if (city.calculateMeasurements)
             {
-                GUILayout.Label("Measurements", EditorStyles.boldLabel);
                 MeasurementsTable(city.Measurements);
             }
+
 
             GUILayout.Label("Data", EditorStyles.boldLabel);
             if (city.PathPrefix == null)
