@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using SEE.DataModel;
+using SEE.DataModel.IO;
 
 namespace SEE.Tools
 {
@@ -23,6 +24,8 @@ namespace SEE.Tools
         /// </summary>
         protected HashSet<string> HierarchicalEdges;
 
+        protected const string Enclosing = "Enclosing";
+
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
@@ -30,7 +33,7 @@ namespace SEE.Tools
         {
             HashSet<string> result = new HashSet<string>
             {
-                "Enclosing",
+                Enclosing,
                 "Belongs_To",
                 "Part_Of",
                 "Defined_In"
@@ -262,7 +265,19 @@ namespace SEE.Tools
             {
                 Debug.LogFormat("changed {0} from {1} to {2}\n", e.edge.ToString(), e.oldState, e.newState);
             }
+        }
 
+        /// <summary>
+        /// Saves the given graphs to disk in GXL format.
+        /// </summary>
+        /// <param name="impl">implementation graph</param>
+        /// <param name="arch">architecture graph</param>
+        /// <param name="map">mapping graph</param>
+        protected static void Save(Graph impl, Graph arch, Graph map)
+        {
+            GraphWriter.Save("implementation.gxl", impl, Enclosing);
+            GraphWriter.Save("architecture.gxl", arch, Enclosing);
+            GraphWriter.Save("mapping.gxl", map, Enclosing);
         }
 
         /// <summary>
