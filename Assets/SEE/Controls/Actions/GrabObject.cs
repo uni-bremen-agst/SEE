@@ -222,12 +222,42 @@ namespace SEE.Controls
             gameObject.GetComponent<Renderer>().sharedMaterial = oldMaterial;
         }
 
-        //------------------------------------
-        // Actions when the object is hovered.
-        //------------------------------------
+        //------------------------------------------
+        // Public actions when the object is hovered.
+        //-------------------------------------------
+
+        public void OnHoverBegin()
+        {
+            Debug.LogFormat("OnHoverBegin({0})\n", graphNode.ID);
+            ShowInformation();
+            HighlightMaterial();
+        }
+
+        public void OnHoverEnd()
+        {
+            Debug.LogFormat("OnHoverEnd({0})\n", graphNode.ID);
+            HideInformation();
+            ResetMaterial();
+        }
+
+        public void OnReleased()
+        {
+            Debug.LogFormat("OnReleased({0})\n", graphNode.ID);
+            ResetToSavedPosition();
+        }
+
+        public void OnGrabbed()
+        {
+            Debug.LogFormat("OnGrabbed({0})\n", graphNode.ID);
+            SaveCurrentPosition();
+        }
+
+        //---------------------------------------------------------------
+        // Private actions called by the hand when the object is hovered.
+        //---------------------------------------------------------------
 
         /// <summary>
-        /// Called when a Hand starts hovering over this object.
+        /// Called by the Hand when that Hand starts hovering over this object.
         /// 
         /// Activates the source name and detail text and highlights the object by
         /// material with a different color.
@@ -236,13 +266,12 @@ namespace SEE.Controls
         private void OnHandHoverBegin(Hand hand)
         {
             //Debug.Log("OnHandHoverEnd");
-            ShowInformation();
-            HighlightMaterial();
+            OnHoverBegin();
             //hand.ShowGrabHint();
         }
 
         /// <summary>
-        /// Called when a Hand stops hovering over this object
+        /// Called by the Hand when that Hand stops hovering over this object
         /// 
         /// Deactivates the source name and detail text and restores the original material.
         /// </summary>
@@ -250,8 +279,7 @@ namespace SEE.Controls
         private void OnHandHoverEnd(Hand hand)
         {
             //Debug.Log("OnHandHoverEnd");
-            HideInformation();
-            ResetMaterial();
+            OnHoverEnd();
             //hand.HideGrabHint();
         }
 
@@ -262,7 +290,7 @@ namespace SEE.Controls
                  & (~Hand.AttachmentFlags.VelocityMovement);
 
         /// <summary>
-        /// Called every Update() while a Hand is hovering over this object
+        /// Called every Update() by a Hand while that Hand is hovering over this object.
         /// </summary>
         /// <param name="hand">the hand hovering over the object</param>
         private void HandHoverUpdate(Hand hand)
@@ -274,7 +302,7 @@ namespace SEE.Controls
             if (interactable.attachedToHand == null && startingGrabType != GrabTypes.None)
             {
                 // The hand is grabbing the object
-                SaveCurrentPosition();
+                OnGrabbed();
 
                 // Call this to continue receiving HandHoverUpdate messages,
                 // and prevent the hand from hovering over anything else
@@ -294,8 +322,7 @@ namespace SEE.Controls
 
                 // Call this to undo HoverLock
                 hand.HoverUnlock(interactable);
-
-                ResetToSavedPosition();
+                OnReleased();
             }
         }
 

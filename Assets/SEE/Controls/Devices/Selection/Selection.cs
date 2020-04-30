@@ -22,8 +22,13 @@ namespace SEE.Controls.Devices
         public abstract Vector3 Position { get; }
 
         /// <summary>
-        /// True if the device activated (e.g., when a mouse button was pressed).
+        /// True if the device is activated (e.g., when a mouse button was pressed).
         /// </summary>
         public abstract bool Activated { get; }
+
+        /// <summary>
+        /// True if the device is grabbing (e.g., when a particular grabbing key was pressed).
+        /// </summary>
+        public abstract bool IsGrabbing { get; }
     }
 }

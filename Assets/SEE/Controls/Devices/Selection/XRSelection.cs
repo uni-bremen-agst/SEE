@@ -17,6 +17,8 @@ namespace SEE.Controls.Devices
 
         private SteamVR_Action_Single TriggerAction = SteamVR_Input.GetSingleAction(defaultActionSet, "Trigger");
 
+        private SteamVR_Action_Boolean SelectionButton = SteamVR_Input.GetBooleanAction(defaultActionSet, "Grabbing");
+
         /// <summary>
         /// The direction the PointingHand points to.
         /// </summary>
@@ -41,5 +43,10 @@ namespace SEE.Controls.Devices
         {
             get => TriggerAction != null ? TriggerAction.axis >= Threshold : false;
         }
+
+        /// <summary>
+        /// True if the user presses the grabbing button ("Grabbing" in SteamVR).
+        /// </summary>
+        public override bool IsGrabbing => SelectionButton != null ? SelectionButton.state : false;
     }
 }
