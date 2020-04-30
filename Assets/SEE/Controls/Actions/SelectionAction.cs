@@ -36,27 +36,81 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// The object currently grabbed. May be null.
+        /// </summary>
+        private GameObject grabbedObject;
+        /// <summary>
+        /// The object currently hovered over. May be null.
+        /// </summary>
+        private GameObject hoveredObject;
+
+        /// <summary>
         /// If the search was activated, a ray is cast from the position of
         /// the MainCamera or selectionDevice towards the selectionDevice's
         /// pointing direction. During this search, visual feedback may be
-        /// given (depends upon the subclasses).
+        /// given (depends upon the subclasses). If an object is hit and
+        /// the user intends to grab it, it will be grabbed.
         /// </summary>
         private void Update()
         {
-            if (selectionDevice.Activated)
+            if (grabbedObject == null)
             {
-                GameObject selectedObject = Select(out RaycastHit hitInfo);
-
-                ShowFeedback(selectedObject, hitInfo);
-
-                if (selectedObject != null)
+                // nothing grabbed; we allow searching
+                if (selectionDevice.Activated)
                 {
-                    ProcessSelectedObject(selectedObject);
+                    // we are searching for objects
+                    GameObject hitObject = Select(out RaycastHit hitInfo);
+                    // give visual feedback on where we search
+                    ShowSearchFeedback(hitObject, hitInfo);
+                    // Have we hit anything?
+                    if (hitObject == null)
+                    {
+                        // nothing hit; in case something was previously hovered over,
+                        // it must be reset
+                        if (hoveredObject != null)
+                        {
+                            UnhoverObject(hoveredObject);
+                            hoveredObject = null;
+                        }
+                    } 
+                    else
+                    {
+                        // something was hit
+                        // in case something was previously hovered over, it must be reset
+                        if (hoveredObject != null)
+                        {
+                            UnhoverObject(hoveredObject);
+                        }
+                        // the hit object is the new object that is currently being hovered over
+                        hoveredObject = hitObject;
+                        HoverObject(hoveredObject);
+                        if (selectionDevice.IsGrabbing)
+                        {
+                            // If the user wants us to grab the hovered object, we grab it.
+                            // Note: hovering is possible only while we have not already grabbed
+                            // an object, hence, at this point we do not release any grabbed object
+                            grabbedObject = hoveredObject;
+                            GrabObject(grabbedObject);
+                        }
+                    }
+                }
+                else
+                {
+                    // not searching => no visual feedback for search
+                    HideSearchFeedback();
                 }
             }
             else
             {
-                HideFeedback();
+                // An object is already grabbed; we do not allow searching. Similarly,
+                // an object can only be grabbed if it is being hovered over.
+                // Grabbing works as a toggle. Activating grabbing while an object is
+                // already grabbed, releases the grabbed object.
+                if (selectionDevice.IsGrabbing)
+                {
+                    grabbedObject = hoveredObject;
+                    ReleaseObject(grabbedObject);
+                }
             }
         }
 
@@ -97,24 +151,67 @@ namespace SEE.Controls
         /// <param name="selectedObject">the object selected or null if none was selected</param>
         /// <param name="hitInfo">information about the hit (used only if <paramref name="selectedObject"/>
         /// is not null)</param>
-        protected virtual void ShowFeedback(GameObject selectedObject, RaycastHit hitInfo)
+        protected virtual void ShowSearchFeedback(GameObject selectedObject, RaycastHit hitInfo)
         {
         }
 
         /// <summary>
         /// Terminates the visual feedback on the current search for an object.
         /// </summary>
-        protected virtual void HideFeedback()
+        protected virtual void HideSearchFeedback()
         {
         }
 
         /// <summary>
-        /// Called when an object was selected (passed as parameter <paramref name="selectedObject"/>).
+        /// Called when an object is being hovered over (passed as parameter <paramref name="selectedObject"/>).
         /// </summary>
         /// <param name="selectedObject">the selected object</param>
-        protected virtual void ProcessSelectedObject(GameObject selectedObject)
+        protected virtual void HoverObject(GameObject selectedObject)
         {
-            Debug.LogFormat("Selected object {0}\n", selectedObject.name);
+            GrabObject grabbingComponent = selectedObject.GetComponent<GrabObject>();
+            if (grabbingComponent != null)
+            {
+                grabbingComponent.OnHoverBegin();
+            }
+        }
+
+        /// <summary>
+        /// Called when an object is no longer being hovered over (passed as parameter <paramref name="selectedObject"/>).
+        /// </summary>
+        /// <param name="selectedObject">the selected object</param>
+        protected virtual void UnhoverObject(GameObject selectedObject)
+        {
+            GrabObject grabbingComponent = selectedObject.GetComponent<GrabObject>();
+            if (grabbingComponent != null)
+            {
+                grabbingComponent.OnHoverEnd();
+            }
+        }
+
+        /// <summary>
+        /// Called when an object is grabbed (passed as parameter <paramref name="selectedObject"/>).
+        /// </summary>
+        /// <param name="selectedObject">the selected object</param>
+        protected virtual void GrabObject(GameObject selectedObject)
+        {
+            GrabObject grabbingComponent = selectedObject.GetComponent<GrabObject>();
+            if (grabbingComponent != null)
+            {
+                grabbingComponent.OnGrabbed();
+            }
+        }
+
+        /// <summary>
+        /// Called when an object is released, i.e., no longer grabbed (passed as parameter <paramref name="selectedObject"/>).
+        /// </summary>
+        /// <param name="selectedObject">the selected object</param>
+        protected virtual void ReleaseObject(GameObject selectedObject)
+        {
+            GrabObject grabbingComponent = selectedObject.GetComponent<GrabObject>();
+            if (grabbingComponent != null)
+            {
+                grabbingComponent.OnReleased();
+            }
         }
     }
 }
