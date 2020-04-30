@@ -36,6 +36,11 @@ namespace SEE.Game
         public Vector3 origin = Vector3.zero; // serialized by Unity
 
         /// <summary>
+        /// The width (x axis) of the generated city.
+        /// </summary>
+        public float width = 1.0f; // serialized by Unity
+
+        /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
         [OdinSerialize]

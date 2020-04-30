@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Controls;
 using SEE.DataModel;
 using SEE.GO;
 using SEE.Layout;
@@ -192,19 +193,21 @@ namespace SEE.Game
                 }
 
                 // calculate and apply the node layout
-                Dictionary<Node, GameObject>.ValueCollection gameNodes = nodeMap.Values;
+                ICollection<GameObject> gameNodes = nodeMap.Values;
                 ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(gameNodes);
-                nodeLayout.Apply(layoutNodes);
+                nodeLayout.Apply(layoutNodes);                
+                NodeLayout.Scale(layoutNodes, settings.width);
                 NodeLayout.Move(layoutNodes, settings.origin);
 
-                AddToParent(gameNodes, parent);
-                // add the decorations, too
-                AddToParent(AddDecorations(gameNodes), parent);
-                // create the laid out edges
-                AddToParent(EdgeLayout(graph, layoutNodes), parent);
                 // add the plane surrounding all game objects for nodes
                 GameObject plane = NewPlane(gameNodes);
                 AddToParent(plane, parent);
+
+                CreateObjectHierarchy(nodeMap, parent);
+                InteractionDecorator.PrepareForInteraction(gameNodes);
+
+                // create the laid out edges
+                AddToParent(EdgeLayout(graph, layoutNodes), parent);
             }
             finally
             {
@@ -215,6 +218,36 @@ namespace SEE.Game
                     graph.RemoveNode(root);
                 }
             }
+        }
+
+        /// <summary>
+        /// Creates the same nesting of all game objects in <paramref name="nodeMap"/> as in
+        /// the graph node hierarchy. Every root node in the graph node hierarchy will become
+        /// a child of the given <paramref name="root"/>.
+        /// </summary>
+        /// <param name="nodeMap">mapping of graph nodes onto their representing game objects</param>
+        /// <param name="root">the parent of every game object not nested in any other game object</param>
+        private void CreateObjectHierarchy(Dictionary<Node, GameObject> nodeMap, GameObject root)
+        {
+            foreach (var entry in nodeMap)
+            {
+                Node node = entry.Key;
+                Node parent = node.Parent;
+
+                if (parent == null)
+                {
+                    // node is a root => it will be added to parent as a child
+                    AddToParent(entry.Value, root);
+                }
+                else
+                {
+                    // node is a child of another game node
+                    AddToParent(entry.Value, nodeMap[parent]);
+                }
+            }
+            
+            // FIXEM: add the decorations, too
+            // AddToParent(AddDecorations(gameNodes), parent);
         }
 
         /// <summary>
