@@ -178,7 +178,7 @@ namespace SEE.Controls
         /// <summary>
         /// Restores the grabbed object to is original scale, position and rotation by animation.
         /// </summary>
-        private void Reset()
+        private void ResetToSavedPosition()
         {
             HideInformation();
             gameObject.transform.rotation = oldRotation;
@@ -295,7 +295,7 @@ namespace SEE.Controls
                 // Call this to undo HoverLock
                 hand.HoverUnlock(interactable);
 
-                Reset();
+                ResetToSavedPosition();
             }
         }
 
