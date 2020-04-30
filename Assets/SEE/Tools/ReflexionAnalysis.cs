@@ -262,7 +262,7 @@ namespace SEE.Tools
             RegisterNodes();
             Add_Transitive_Mapping();
             From_Scratch();
-            DumpResults();
+            //DumpResults();
         }
 
         // --------------------------------------------------------------------
@@ -280,7 +280,7 @@ namespace SEE.Tools
         /// </summary>
         /// <param name="edge">a dependency in the architecture</param>
         /// <returns>the state of 'edge' in the architecture</returns>
-        public State Get_State(Edge edge)
+        public static State Get_State(Edge edge)
         {
             if (edge.TryGetInt(state_attribute, out int value))
             {
@@ -298,7 +298,7 @@ namespace SEE.Tools
         /// </summary>
         /// <param name="edge">edge whose initial state is to be set</param>
         /// <param name="initial_state">the initial state to be set</param>
-        private void Set_Initial(Edge edge, State initial_state)
+        private static void Set_Initial(Edge edge, State initial_state)
         {
             edge.SetInt(state_attribute, (int)initial_state);
         }
@@ -309,7 +309,7 @@ namespace SEE.Tools
         /// </summary>
         /// <param name="edge">edge whose state is to be set</param>
         /// <param name="new_state">the state to be set</param>
-        private void Set_State(Edge edge, State new_state)
+        private static void Set_State(Edge edge, State new_state)
         {
             edge.SetInt(state_attribute, (int)new_state);
         }
@@ -387,7 +387,7 @@ namespace SEE.Tools
         /// </summary>
         /// <param name="edge">an architecture dependency whose counter is to be retrieved</param>
         /// <returns>the counter of 'edge'</returns>
-        public int Get_Counter(Edge edge)
+        public static int Get_Counter(Edge edge)
         {
             if (edge.TryGetInt(counter_attribute, out int value))
             {
@@ -710,21 +710,29 @@ namespace SEE.Tools
         /// Dangling dependencies will be ignored. For every inner or cross dependency, e, the given handler
         /// will be applied with the following arguments:
         /// 
-        ///   if e is an outgoing cross dependency, i.e., e.Source is contained in subtree
-        ///   but maps_to(e.Source) != maps_to(e.Target):
+        ///   if e is an outgoing cross dependency, i.e., e.Source is contained in subtree:
         ///     handler(e, arch_node, maps_to(e.Target)) 
-        ///   if e is an inner or incoming cross dependency, i.e., e.Target is contained in subtree
-        ///   and maps_to(e.Source) may or may not be equal to maps_to(e.Target):
+        ///   if e is an incoming cross dependency, i.e., e.Target is contained in subtree:
         ///     handler(e, maps_to(e.Source), arch_node)
+        ///   if e is an inner dependency:
+        ///     handler(e, arch_node, arch_node)
         ///     
         /// Precondition: given arch_node is in the architecture graph and all nodes in subtree are in the
         /// implementation graph.
         /// </summary>
         /// <param name="subtree">implementation nodes whose mapping is to be adjusted</param>
-        /// <param name="arch_node">architecture node related to the nodes in subtree (to be mapped or unmapped)</param>
+        /// <param name="arch_node">architecture node related to the nodes in subtree (to be mapped or unmapped);
+        /// this may either be the architecture node onto which the nodes in subtree were mapped originally
+        /// when this function is called to unmap a subtree or architecture node onto which the nodes in subtree 
+        /// are to be mapped as new</param>
         /// <param name="handler">delegate handling the necessary adjustment</param>
         private void Handle_Mapped_Subtree(List<Node> subtree, Node arch_node, Handle_Mapping_Change handler)
         {
+            // An inner dependency may occur twice in the iteration below, once it the set
+            // of outgoing edges and once in the set of incoming edges of any nodes in the subtree.
+            // We may call the handler only once for these that is why we need to keep a log of
+            // inner edges already handled.
+            HashSet<Edge> innerEdgesAlreadyHandled = new HashSet<Edge>();
             foreach (Node impl_node in subtree)
             {
                 // assert: impl_node is in implementation graph
@@ -733,21 +741,44 @@ namespace SEE.Tools
                     // assert: outgoing is in implementation graph
                     if (_implicit_maps_to_table.TryGetValue(outgoing.Target.ID, out Node oldTarget))
                     {
-                        // outgoing is not dangling
-                        if (oldTarget != arch_node)
+                        // outgoing is not dangling; it is either an inner or cross dependency
+                        if (oldTarget == arch_node)
                         {
-                            // outgoing is no inner dependency: it is an outgoing cross dependency;
-                            // inner dependencies will be handled only once in the loop below
+                            // outgoing is an inner dependency
+                            if (innerEdgesAlreadyHandled.Add(outgoing))
+                            {
+                                // Note: HashSet.Add(e) yields true if e has not been contained in the set so far.
+                                // That is, outgoing has not been processed yet.
+                                handler(outgoing, arch_node, arch_node);
+                            }
+                        }
+                        else
+                        {
+                            // outgoing is an outgoing cross dependency
                             handler(outgoing, arch_node, oldTarget);
                         }
                     }
                 }
                 foreach (Edge incoming in impl_node.Incomings)
                 {
+                    // assert: incoming is in implementation graph
                     if (_implicit_maps_to_table.TryGetValue(incoming.Source.ID, out Node oldTarget))
                     {
-                        // incoming cross or inner dependency
-                        handler(incoming, oldTarget, arch_node);
+                        // incoming is not dangling; it is either an incoming cross or inner dependency
+                        if (oldTarget == arch_node)
+                        {
+                            // outgoing is an inner dependency
+                            if (innerEdgesAlreadyHandled.Add(incoming))
+                            {
+                                // Note: HashSet.Add(e) yields true if e has not been contained in the set so far.
+                                // That is, incoming has not been processed yet.
+                                handler(incoming, arch_node, arch_node);
+                            }
+                        }
+                        else
+                        {
+                            handler(incoming, oldTarget, arch_node);
+                        }
                     }
                 }
             }
@@ -866,7 +897,7 @@ namespace SEE.Tools
             Node arch_target = _architecture.GetNode(edge.Target.ID);
             if (arch_target == null)
             {
-                throw new Exception("Mapping target node " + edge.Target + " is not in the architecture.");
+                throw new Exception("Mapping target node " + edge.Target.ID + " is not in the architecture.");
             }
             else
             {
@@ -874,7 +905,7 @@ namespace SEE.Tools
                 Node impl_source = _implementation.GetNode(edge.Source.ID);
                 if (impl_source == null)
                 {
-                    throw new Exception("Mapping source node " + edge.Source + " is not in the implementation.");
+                    throw new Exception("Mapping source node " + edge.Source.ID + " is not in the implementation.");
                 }
                 else
                 {
@@ -935,10 +966,16 @@ namespace SEE.Tools
                         Map(subtree, new_target);
                     }
                 }
+                // First notify before we delete the maps_to edge for good.
+                Notify(new MapsToEdgeRemoved(maps_to));
                 // When an edge is removed from the graph, its source and target and graph containment are
                 // deleted.
-                Notify(new MapsToEdgeRemoved(maps_to));
                 _mapping.RemoveEdge(maps_to);
+                _mapping.RemoveNode(maps_to.Source);
+                if (maps_to.Target.Incomings.Count == 0)
+                {
+                    _mapping.RemoveNode(maps_to.Target);
+                }
             }
         }
 
@@ -986,8 +1023,8 @@ namespace SEE.Tools
                     }
                     else
                     {
-                        Edge maps_to_edge = maps_to_edges[0];
-                        Delete_Maps_To(from, to, maps_to_edge);
+                        // Deletes the unique Maps_To edge from map_from to map_to in mapping graph
+                        Delete_Maps_To(from, to, maps_to_edges[0]);
                     }
                 }
             }
@@ -1075,7 +1112,7 @@ namespace SEE.Tools
         }
 
         // --------------------------------------------------------------------
-        // debugging
+        // Summaries
         // --------------------------------------------------------------------
 
         /// <summary>
@@ -1120,23 +1157,9 @@ namespace SEE.Tools
 
             foreach (Edge edge in _architecture.Edges())
             {
-                summary[(int)this.Get_State(edge)] += this.Get_Counter(edge);
+                summary[(int)Get_State(edge)] += Get_Counter(edge);
             }
             return summary;
-        }
-
-        /// <summary>
-        /// Dumps the edges of the architecture graph to Unity's debug console.
-        /// Intended for debugging.
-        /// </summary>
-        public void DumpResults()
-        {
-            Debug.LogFormat("REFLEXION RESULT ({0} nodes and {1} edges): \n", _architecture.NodeCount, _architecture.EdgeCount);
-            foreach (Edge edge in _architecture.Edges())
-            {
-                // edge counter state
-                Debug.LogFormat("{0} {1} {2}\n", As_Clause(edge), Get_Counter(edge), Get_State(edge));
-            }
         }
 
         /// <summary>
@@ -1418,7 +1441,7 @@ namespace SEE.Tools
                     case State.specified:
                         Set_Counter(edge, 0); // Note: architecture edges have a counter
                         Set_Initial(edge, State.specified); // initial state must be State.specified
-                        break; 
+                        break;
                     case State.absent:
                     case State.convergent:
                         // The initial state of an architecture dependency that was not propagated is specified.
@@ -1579,11 +1602,11 @@ namespace SEE.Tools
 #if DEBUG
                 //Debug.Log("source or target are not mapped; bailing out\n");
 #endif
-                return; 
+                return;
             }
             Edge propagated_architecture_dep = Get_Propagated_Dependency(arch_source, arch_target, impl_type);
             // Assert: architecture_dep is in architecture graph or null.
-            System.Diagnostics.Debug.Assert(propagated_architecture_dep == null ||propagated_architecture_dep.ItsGraph == _architecture);
+            System.Diagnostics.Debug.Assert(propagated_architecture_dep == null || propagated_architecture_dep.ItsGraph == _architecture);
             Edge allowing_edge = null;
             if (propagated_architecture_dep == null)
             {   // a propagated dependency has not existed yet; we need to create one
@@ -1606,7 +1629,7 @@ namespace SEE.Tools
                 Lift(propagated_architecture_dep.Source,
                      propagated_architecture_dep.Target,
                      impl_type,
-                     impl_counter, 
+                     impl_counter,
                      out allowing_edge);
                 Change_Impl_Ref(propagated_architecture_dep, impl_counter);
             }
@@ -1667,7 +1690,7 @@ namespace SEE.Tools
         /// <param name="edge">dependency edge to be checked</param>
         /// <returns>true if this causing edge is a dependency from child to
         /// parent</returns>
-        private bool Is_Dependency_To_Parent(Edge edge) 
+        private bool Is_Dependency_To_Parent(Edge edge)
         {
             Node mapped_source = Maps_To(edge.Source);
             Node mapped_target = Maps_To(edge.Target);
@@ -1780,9 +1803,9 @@ namespace SEE.Tools
                 Transition(propagated_architecture_dep, State.undefined, State.implicitly_allowed);
                 // Note: there is no specified architecture dependency that allows this implementation
                 // dependency. Self dependencies are implicitly allowed.
-                allowing_edge_out = null; 
+                allowing_edge_out = null;
             }
-            else if (_allow_dependencies_to_parents 
+            else if (_allow_dependencies_to_parents
                      && Is_Descendant_Of(propagated_architecture_dep.Source, propagated_architecture_dep.Target))
             {
                 Transition(propagated_architecture_dep, State.undefined, State.implicitly_allowed);
@@ -1846,7 +1869,7 @@ namespace SEE.Tools
                 List<Edge> outs = cursor.Outgoings;
                 // Assert: all edges in outs are in architecture.
                 foreach (Edge edge in outs)
-                { 
+                {
                     // Assert: edge is in architecture; edge_type is the type of edge
                     // being propagated and lifted; it may be more concrete than the
                     // type of the specified architecture dependency.
@@ -1870,10 +1893,10 @@ namespace SEE.Tools
         }
 
         //------------------------------------------------------------------
-        // Static helper methods for debugging
+        // Helper methods for debugging
         //------------------------------------------------------------------
 
-        private const string File_Name_Attribute   = "Source.File";
+        private const string File_Name_Attribute = "Source.File";
         private const string Line_Number_Attribute = "Source.Line";
         private const string Object_Name_Attribute = "Source.Name";
 
@@ -2026,18 +2049,63 @@ namespace SEE.Tools
         }
 
         /// <summary>
-        /// Dumps given mapping table as a list of source --maps_to--> target 
-        /// where the qualified node name is used for source and target.
+        /// Dumps the nodes and edges of the architecture graph to Unity's debug console.
+        /// Intended for debugging.
         /// </summary>
-        /// <param name="table">mapping table to be dumped</param>
-        static void Dump_Table(Dictionary<Node, Node> table)
+        public void DumpArchitecture()
         {
-            foreach(var entry in table)
+            DumpGraph(_architecture);
+            //Debug.LogFormat("REFLEXION RESULT ({0} nodes and {1} edges): \n", _architecture.NodeCount, _architecture.EdgeCount);
+            //Debug.Log("NODES\n");
+            //foreach (Node node in _architecture.Nodes())
+            //{
+            //    Debug.Log(node.ToString());
+            //}
+            //Debug.Log("EDGES\n");
+            //foreach (Edge edge in _architecture.Edges())
+            //{
+            //    // edge counter state
+            //    Debug.LogFormat("{0} {1} {2}\n", As_Clause(edge), Get_Counter(edge), Get_State(edge));
+            //}
+        }
+
+        /// <summary>
+        /// Dumps the nodes and edges of the <paramref name="graph"/> to Unity's debug console.
+        /// Intended for debugging.
+        /// </summary>
+        public static void DumpGraph(Graph graph)
+        {
+            Debug.LogFormat("Graph {0} with {1} nodes and {2} edges: \n", graph.Name, graph.NodeCount, graph.EdgeCount);
+            Debug.Log("NODES\n");
+            foreach (Node node in graph.Nodes())
             {
-                Debug.LogFormat("{0} --maps_to--> {1}\n",
-                                Qualified_Node_Name(entry.Key, true),
-                                Qualified_Node_Name(entry.Value, true));
+                Debug.Log(node.ToString());
+            }
+            Debug.Log("EDGES\n");
+            foreach (Edge edge in graph.Edges())
+            {
+                // edge counter state
+                Debug.LogFormat("{0} {1} {2}\n", As_Clause(edge), Get_Counter(edge), Get_State(edge));
             }
         }
-    } // namespace SEE
-} // namespace DataModel
+
+        public void DumpMapping()
+        {
+            Debug.Log("EXPLICITLY MAPPED NODES\n");
+            DumpTable(_explicit_maps_to_table);
+            Debug.Log("IMPLICITLY MAPPED NODES\n");
+            DumpTable(_implicit_maps_to_table);
+            Debug.Log("MAPPING GRAPH\n");
+            DumpGraph(_mapping);
+        }
+
+        public static void DumpTable(Dictionary<string, Node> table)
+        {
+            foreach (var entry in table)
+            {
+                Debug.LogFormat("  {0} -> {1}\n", entry.Key, entry.Value.ID);
+            }
+        }
+
+    } // ReflexionAnalysis
+} // namespace 
