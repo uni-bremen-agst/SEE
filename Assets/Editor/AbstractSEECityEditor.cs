@@ -17,6 +17,7 @@ namespace SEEEditor
 
             GUILayout.Label("Graph", EditorStyles.boldLabel);
             city.origin = EditorGUILayout.Vector3Field("Origin", city.origin);
+            city.width = EditorGUILayout.FloatField("Width (x axis)", city.width);
 
             GUILayout.Label("Attributes of leaf nodes", EditorStyles.boldLabel);
             city.WidthMetric = EditorGUILayout.TextField("Width", city.WidthMetric);
