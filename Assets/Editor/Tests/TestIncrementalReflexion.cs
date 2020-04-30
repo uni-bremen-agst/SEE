@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 
 using SEE.DataModel;
-using UnityEngine;
-using SEE.DataModel.IO;
 
 namespace SEE.Tools
 {
