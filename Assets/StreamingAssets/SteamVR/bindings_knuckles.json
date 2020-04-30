@@ -230,13 +230,21 @@
                "path" : "/user/hand/right/input/system"
             },
             {
-               "inputs" : {},
-               "mode" : "none",
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/interactui"
+                  }
+               },
+               "mode" : "button",
                "path" : "/user/hand/left/input/b"
             },
             {
-               "inputs" : {},
-               "mode" : "none",
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/interactui"
+                  }
+               },
+               "mode" : "button",
                "path" : "/user/hand/right/input/b"
             },
             {
@@ -250,13 +258,21 @@
                "path" : "/user/hand/right/input/skeleton/left"
             },
             {
-               "inputs" : {},
-               "mode" : "none",
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/grabbing"
+                  }
+               },
+               "mode" : "button",
                "path" : "/user/hand/left/input/a"
             },
             {
-               "inputs" : {},
-               "mode" : "none",
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/grabbing"
+                  }
+               },
+               "mode" : "button",
                "path" : "/user/hand/right/input/a"
             },
             {
@@ -267,15 +283,6 @@
                },
                "mode" : "trigger",
                "path" : "/user/hand/right/input/trigger"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/default/in/interactui"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/a"
             }
          ]
       },

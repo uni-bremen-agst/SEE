@@ -49,6 +49,10 @@
       "type": "boolean"
     },
     {
+      "name": "/actions/default/in/Grabbing",
+      "type": "boolean"
+    },
+    {
       "name": "/actions/default/out/Haptic",
       "type": "vibration"
     },
@@ -119,7 +123,8 @@
       "/actions/default/in/InteractUI": "Interact With UI",
       "/actions/default/in/Teleport": "Teleport",
       "/actions/default/in/GrabGrip": "Grab Grip",
-      "/actions/default/in/GrabPinch": "Grab Pinch"
+      "/actions/default/in/GrabPinch": "Grab Pinch",
+      "/actions/default/in/Grabbing": "Grabbing"
     }
   ]
 }
