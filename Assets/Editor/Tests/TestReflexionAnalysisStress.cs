@@ -15,7 +15,7 @@ namespace SEE.Tools
         public void TestMinilaxNonIncrementally()
         {
             NonIncrementally("minilax");
-            reflexion.DumpResults();
+            //reflexion.DumpArchitecture();
         }
 
         private void NonIncrementally(string folderName)
@@ -35,7 +35,7 @@ namespace SEE.Tools
         public void TestMinilaxIncrementally()
         {
             Incrementally("minilax");
-            reflexion.DumpResults();
+            //reflexion.DumpArchitecture();
         }
 
         private void Incrementally(string folderName)
