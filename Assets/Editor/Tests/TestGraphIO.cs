@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using SEE.Tools;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -188,7 +187,7 @@ namespace SEE.DataModel.IO
             result.Target = to;
             result.SetToggle("Is Real");
             result.SetString("Source.Path", "path");
-            result.SetFloat("Pi",3.14f);
+            result.SetFloat("Pi", 3.14f);
             result.SetInt("Source.Line", 10);
             result.SetInt("Source.Column", 1);
             graph.AddEdge(result);
