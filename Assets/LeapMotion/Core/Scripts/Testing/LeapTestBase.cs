@@ -34,7 +34,7 @@ namespace Leap.Unity {
       testObj = LoadObject(objectName);
     }
 
-    #region Spawn Utilities
+#region Spawn Utilities
 
     protected T Spawn<T>(T original, Vector3 position) where T : MonoBehaviour {
       return GameObject.Instantiate<T>(original,
@@ -89,9 +89,9 @@ namespace Leap.Unity {
       return obj;
     }
 
-    #endregion
+#endregion
 
-    #region Frame Utilities
+#region Frame Utilities
 
     protected const bool GO_SLOW = false;
 
@@ -108,7 +108,7 @@ namespace Leap.Unity {
       }
     }
 
-    #endregion
+#endregion
 
   }
 
