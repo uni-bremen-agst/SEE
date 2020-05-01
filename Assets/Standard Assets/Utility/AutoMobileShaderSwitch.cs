@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -84,7 +83,7 @@ namespace UnityStandardAssets.Utility
 namespace UnityStandardAssets.Utility.Inspector
 {
 #if UNITY_EDITOR
-    [CustomPropertyDrawer(typeof (AutoMobileShaderSwitch.ReplacementList))]
+    [CustomPropertyDrawer(typeof(AutoMobileShaderSwitch.ReplacementList))]
     public class ReplacementListDrawer : PropertyDrawer
     {
         const float k_LineHeight = 18;
@@ -103,9 +102,9 @@ namespace UnityStandardAssets.Utility.Inspector
             EditorGUI.indentLevel = 0;
 
             var items = property.FindPropertyRelative("items");
-            var titles = new string[] {"Original", "Replacement", ""};
-            var props = new string[] {"original", "replacement", "-"};
-            var widths = new float[] {.45f, .45f, .1f};
+            var titles = new string[] { "Original", "Replacement", "" };
+            var props = new string[] { "original", "replacement", "-" };
+            var widths = new float[] { .45f, .45f, .1f };
             const float lineHeight = 18;
             bool changedLength = false;
             if (items.arraySize > 0)
@@ -117,7 +116,7 @@ namespace UnityStandardAssets.Utility.Inspector
                     float rowX = x;
                     for (int n = 0; n < props.Length; ++n)
                     {
-                        float w = widths[n]*inspectorWidth;
+                        float w = widths[n] * inspectorWidth;
 
                         // Calculate rects
                         Rect rect = new Rect(rowX, y, w, lineHeight);
@@ -173,8 +172,8 @@ namespace UnityStandardAssets.Utility.Inspector
             }
 
             // add button
-            var addButtonRect = new Rect((x + position.width) - widths[widths.Length - 1]*inspectorWidth, y,
-                                         widths[widths.Length - 1]*inspectorWidth, lineHeight);
+            var addButtonRect = new Rect((x + position.width) - widths[widths.Length - 1] * inspectorWidth, y,
+                                         widths[widths.Length - 1] * inspectorWidth, lineHeight);
             if (GUI.Button(addButtonRect, "+"))
             {
                 items.InsertArrayElementAtIndex(items.arraySize);
@@ -192,7 +191,7 @@ namespace UnityStandardAssets.Utility.Inspector
         {
             SerializedProperty items = property.FindPropertyRelative("items");
             float lineAndSpace = k_LineHeight + k_Spacing;
-            return 40 + (items.arraySize*lineAndSpace) + lineAndSpace;
+            return 40 + (items.arraySize * lineAndSpace) + lineAndSpace;
         }
     }
 #endif

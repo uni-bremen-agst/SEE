@@ -234,19 +234,19 @@ namespace UnityStandardAssets.Water
         static Matrix4x4 CalculateReflectionMatrix(Matrix4x4 reflectionMat, Vector4 plane)
         {
             reflectionMat.m00 = (1.0F - 2.0F * plane[0] * plane[0]);
-            reflectionMat.m01 = (- 2.0F * plane[0] * plane[1]);
-            reflectionMat.m02 = (- 2.0F * plane[0] * plane[2]);
-            reflectionMat.m03 = (- 2.0F * plane[3] * plane[0]);
+            reflectionMat.m01 = (-2.0F * plane[0] * plane[1]);
+            reflectionMat.m02 = (-2.0F * plane[0] * plane[2]);
+            reflectionMat.m03 = (-2.0F * plane[3] * plane[0]);
 
-            reflectionMat.m10 = (- 2.0F * plane[1] * plane[0]);
+            reflectionMat.m10 = (-2.0F * plane[1] * plane[0]);
             reflectionMat.m11 = (1.0F - 2.0F * plane[1] * plane[1]);
-            reflectionMat.m12 = (- 2.0F * plane[1] * plane[2]);
-            reflectionMat.m13 = (- 2.0F * plane[3] * plane[1]);
+            reflectionMat.m12 = (-2.0F * plane[1] * plane[2]);
+            reflectionMat.m13 = (-2.0F * plane[3] * plane[1]);
 
-            reflectionMat.m20 = (- 2.0F * plane[2] * plane[0]);
-            reflectionMat.m21 = (- 2.0F * plane[2] * plane[1]);
+            reflectionMat.m20 = (-2.0F * plane[2] * plane[0]);
+            reflectionMat.m21 = (-2.0F * plane[2] * plane[1]);
             reflectionMat.m22 = (1.0F - 2.0F * plane[2] * plane[2]);
-            reflectionMat.m23 = (- 2.0F * plane[3] * plane[2]);
+            reflectionMat.m23 = (-2.0F * plane[3] * plane[2]);
 
             reflectionMat.m30 = 0.0F;
             reflectionMat.m31 = 0.0F;

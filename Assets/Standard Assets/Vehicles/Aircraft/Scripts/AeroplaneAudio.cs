@@ -82,16 +82,16 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
 
             // Increase the engine's pitch by an amount proportional to the aeroplane's forward speed.
             // (this makes the pitch increase when going into a dive!)
-            m_EngineSoundSource.pitch += m_Plane.ForwardSpeed*m_EngineFwdSpeedMultiplier;
+            m_EngineSoundSource.pitch += m_Plane.ForwardSpeed * m_EngineFwdSpeedMultiplier;
 
             // Set the engine's volume to be proportional to the engine's current power.
-            m_EngineSoundSource.volume = Mathf.InverseLerp(0, m_Plane.MaxEnginePower*m_AdvancedSetttings.engineMasterVolume,
+            m_EngineSoundSource.volume = Mathf.InverseLerp(0, m_Plane.MaxEnginePower * m_AdvancedSetttings.engineMasterVolume,
                                                          m_Plane.EnginePower);
 
             // Set the wind's pitch and volume to be proportional to the aeroplane's forward speed.
             float planeSpeed = m_Rigidbody.velocity.magnitude;
-            m_WindSoundSource.pitch = m_WindBasePitch + planeSpeed*m_WindSpeedPitchFactor;
-            m_WindSoundSource.volume = Mathf.InverseLerp(0, m_WindMaxSpeedVolume, planeSpeed)*m_AdvancedSetttings.windMasterVolume;
+            m_WindSoundSource.pitch = m_WindBasePitch + planeSpeed * m_WindSpeedPitchFactor;
+            m_WindSoundSource.volume = Mathf.InverseLerp(0, m_WindMaxSpeedVolume, planeSpeed) * m_AdvancedSetttings.windMasterVolume;
         }
     }
 }

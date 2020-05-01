@@ -1,6 +1,5 @@
-using UnityEngine;
-using System;
 using UnityEditor;
+using UnityEngine;
 
 
 namespace UnityStandardAssets.Water
