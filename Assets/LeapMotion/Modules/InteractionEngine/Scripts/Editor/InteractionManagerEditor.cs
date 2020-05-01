@@ -10,6 +10,8 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Leap.Unity.RuntimeGizmos;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.Interaction
 {
