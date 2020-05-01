@@ -7,16 +7,16 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Interaction {
+namespace Leap.Unity.Interaction
+{
 
-  public class ContactBoneParent : MonoBehaviour {
+    public class ContactBoneParent : MonoBehaviour
+    {
 
-    public InteractionController controller;
+        public InteractionController controller;
 
-  }
+    }
 
 }
