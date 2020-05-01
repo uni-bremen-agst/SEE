@@ -7,6 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using LeapInternal;
 using NUnit.Framework;
 using System;
 using System.Runtime.InteropServices;

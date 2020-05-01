@@ -12,6 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.Tests
 {
@@ -618,11 +619,11 @@ namespace Leap.Unity.Tests
                 _count = values.Count;
             }
 
-            public Query<int> ToQuery()
+            public Leap.Unity.Query.Query<int> ToQuery()
             {
                 int[] copy = new int[_array.Length];
                 _array.CopyTo(copy, 0);
-                return new Query<int>(copy, _count);
+                return new Leap.Unity.Query.Query<int>(copy, _count);
             }
 
             public List<int> ToList()
