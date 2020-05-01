@@ -48,7 +48,7 @@ namespace SEE.DataModel.IO
         }
 
         #region Logging
-        
+
         protected virtual void LogDebug(string message)
         {
             logger?.LogDebug(message);
