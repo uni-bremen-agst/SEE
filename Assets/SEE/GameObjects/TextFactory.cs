@@ -47,7 +47,7 @@ namespace SEE.GO
             tm.fontSizeMin = 3;
             tm.fontSizeMax = 400;
           
-            TextFacingCamera textFacing = result.AddComponent<TextFacingCamera>();
+            FacingCamera textFacing = result.AddComponent<FacingCamera>();
             // Rendering distance is set relative to the text's width
             textFacing.minimalDistance = width;
             textFacing.maximalDistance = 10.0f * width;

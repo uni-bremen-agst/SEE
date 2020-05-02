@@ -3,23 +3,23 @@
 namespace SEE.GO
 {
     /// <summary>
-    /// Rotates a 3D text so that it always looks to the main camera such that
-    /// it can be seen from all angles.
+    /// Rotates the game object this component is attachted to so that it always looks 
+    /// to the main camera such that it can be seen from all angles.
     /// </summary>
-    public class TextFacingCamera : MonoBehaviour
+    public class FacingCamera : MonoBehaviour
     {
-        // The time in seconds until the text is updated again.
+        // The time in seconds until the game object is updated again.
         private const float updatePeriod = 0.5f;
 
         /// <summary>
-        /// The minimal distance between the text and the main camera to become visible.
+        /// The minimal distance between the game object and the main camera to become visible.
         /// If the actual distance is below this value, the object will not be visible.
         /// If minimalDistance > maximalDistance, the object will not be visible.
         /// </summary>
         public float minimalDistance = 2.0f;
 
         /// <summary>
-        /// The maximal distance between the text and the main camera to become visible.
+        /// The maximal distance between the game object and the main camera to become visible.
         /// If the actual distance is above this value, the object will not be visible.
         /// If minimalDistance > maximalDistance, the object will not be visible.
         /// </summary>
@@ -31,7 +31,8 @@ namespace SEE.GO
         // The last known position of the main camera.
         private Vector3 lastCameraPosition = Vector3.zero;
 
-        // Vector to describe the rotation of the text. Needed to show the text correctly.
+        // Vector to describe the rotation of the game object. Needed to show the game object 
+        // correctly.
         private static Vector3 rotation = Vector3.up - new Vector3(0, 180, 0);
 
         // The renderer of the gameObject.
@@ -57,7 +58,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Updates the associated game object (the text) every update period if the
+        /// Updates the associated game object every update period if the
         /// camera has moved at all since the last update. The associated object will
         /// be rendered if its distance to the main camera does not exceed the
         /// minimalDistance. If it is rendered, it will be rotated to the face the
@@ -65,9 +66,6 @@ namespace SEE.GO
         /// </summary>
         void Update()
         {
-            // TODO: We could add a little animation enlarging the text when it
-            // comes into the visible range (and decreasing it again when the 
-            // the distance is out of range). Currently, the text is turned on and off.
             timer -= Time.deltaTime;
             if (timer < 0.0f)
             {
