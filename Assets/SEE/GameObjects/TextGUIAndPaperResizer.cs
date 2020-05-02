@@ -131,5 +131,21 @@ namespace SEE.GO
             // set new rect width and height for fitting together with paper
             textObject.GetComponent<RectTransform>().sizeDelta = new Vector2(textComponent.preferredWidth, textComponent.preferredHeight);
         }
+
+        /// <summary>
+        /// Returns the height (y axis) of the given <paramref name="textOnPaper"/>.
+        /// 
+        /// Precondition: <paramref name="textOnPaper"/> must meet the assumption 
+        /// described above: it must have a child named "Paper" with a MeshRenderer
+        /// from which the height can be derived.
+        /// </summary>
+        /// <param name="textOnPaper">object whose height is requested</param>
+        /// <returns>height</returns>
+        public static float Height(GameObject textOnPaper)
+        {
+            GameObject paper = textOnPaper.transform.Find(PaperName).gameObject;
+            MeshRenderer paperRenderer = paper.GetComponent<MeshRenderer>();
+            return paperRenderer != null ? paperRenderer.bounds.size.y : 0.0f;
+        }
     }
 }
