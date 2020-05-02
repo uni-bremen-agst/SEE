@@ -15,8 +15,8 @@ namespace SEE.GO
         private readonly static Color TextColor = new Color(0.5f, 0.5f, 0.5f, 1); // Color.white;
 
         /// <summary>
-        /// Returns a game object showing the tiven text at given position. The
-        /// text rotates towards the main camera.
+        /// Returns a game object showing the given <paramref name="text"/> at given <paramref name="position"/>. 
+        /// The text rotates towards the main camera.
         /// </summary>
         /// <param name="text">the text to be drawn</param>
         /// <param name="position">the center position at which to draw the text</param>
