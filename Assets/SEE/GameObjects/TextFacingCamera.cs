@@ -37,11 +37,18 @@ namespace SEE.GO
         // The renderer of the gameObject.
         private Renderer gameObjectRenderer;
 
+        /// <summary>
+        /// The camera the gameObject should be facing to.
+        /// </summary>
         Camera mainCamera;
 
         private void Start()
         {
             gameObjectRenderer = gameObject.GetComponentInChildren<Renderer>();
+            if (gameObjectRenderer == null)
+            {
+                Debug.LogErrorFormat("Game object {0} does not have a renderer.\n", gameObject.name);
+            }
             mainCamera = Camera.main;
             if (mainCamera == null)
             {
