@@ -72,6 +72,16 @@ namespace SEE.Controls
             {
                 Debug.LogWarningFormat("The game object {0} has no node reference.\n", gameObject.name);
             }
+            if (textOnPaperPrefab == null)
+            {
+                // Filename of the prefab for the text on paper excluding its file extension .prefab
+                string path = "Prefabs/TextOnPaper";
+                textOnPaperPrefab = Resources.Load<GameObject>(path);
+                if (textOnPaperPrefab == null)
+                {
+                    Debug.LogErrorFormat("Prefab {0} not found.\n", path);
+                }
+            }
         }
 
         //-------------------------------------------------
@@ -79,63 +89,67 @@ namespace SEE.Controls
         //-------------------------------------------------
 
         /// <summary>
-        /// A text field showing information on the graphNode when it is hovered over.
-        /// This component will be created on demand.
-        /// </summary>
-        private TextMesh textField = null;
-        /// <summary>
-        /// A game object holding the textField.
-        /// </summary>
-        private GameObject textFieldObject = null;
-        /// <summary>
         /// The local position of the textFieldObject relative to gameObject.
         /// </summary>
-        private readonly Vector3 localPositionOfTextFieldObject = new Vector3(0.075f, 0.025f, 0.0f);
+        private readonly Vector3 localPositionOfTextFieldObject = new Vector3(0.0f, 1.025f, 0.0f);
 
         /// <summary>
-        /// Shows information about the currently grabbed object using the textField.
-        /// If the textField and its container textFieldObject do not exist, they will
-        /// be created first.
+        /// A child object of gameObject to show textual information when the object
+        /// is being hovered over. It is an instantiation of the textOnPaperPrefab.
+        /// It will be activated during hovering and deactived when hovering ends.
+        /// </summary>
+        GameObject textOnPaper = null;
+
+        /// <summary>
+        /// The prefab used to instantiate text-on-paper objects. It is the same for every one,
+        /// hence, the attribute is declared static.
+        /// </summary>
+        private static GameObject textOnPaperPrefab;
+
+        /// <summary>
+        /// Shows information about the currently grabbed object using textOnPaper.
+        /// If the textOnPaper does not exist, it will be instantiated from textOnPaperPrefab
+        /// first. If it already existed, it will just be activated again.
         /// </summary>
         private void ShowInformation()
         {
-            if (textFieldObject == null)
+            if (textOnPaper == null)
             {
-                textFieldObject = new GameObject("Hovering Text Field");
-                textFieldObject.transform.SetParent(gameObject.transform);
-                textFieldObject.transform.localPosition = localPositionOfTextFieldObject;
-                textField = AddTextMesh(textFieldObject);
+                textOnPaper = Instantiate(textOnPaperPrefab, Vector3.zero, Quaternion.identity);
+                textOnPaper.name = "Hovering Text Field";
+                textOnPaper.GetComponent<TextGUIAndPaperResizer>().Text = GetAttributes(graphNode);
+
+                // Now textOnPaper has been re-sized properly; so we can derive its absolute height.
+                float paperHeight = TextGUIAndPaperResizer.Height(textOnPaper);
+
+                // Absolute height of the gameObject.
+                Renderer renderer = GetComponent<Renderer>();
+                float gameObjectHeight = renderer != null ? renderer.bounds.size.y : 0;
+
+                //// We put the textOnPaper above the center of roof the gameObject.
+                Vector3 position = transform.position; // absolute world co-ordinates of center
+                position.y += (gameObjectHeight + paperHeight) / 2.0f;
+                textOnPaper.transform.position = position;
+
+                // Note: Here is alternative way to put textOnPaper above the roof of gameObject
+                // using co-ordinates relative to textOnPaper. This works but textOnPaper becomes 
+                // simply too small.
+                //   textOnPaper.transform.SetParent(gameObject.transform, false);
+                //   Vector3 localPosition = Vector3.zero;
+                //   localPosition.y = 0.5f + textOnPaper.transform.localScale.y / 2.0f;
+                //   textOnPaper.transform.localPosition = localPosition;
             }
-            textField.text = GetAttributes(graphNode);
+            textOnPaper.SetActive(true);
         }
 
         /// <summary>
-        /// Adds the necessary components MeshRenderer and TextMesh to <paramref name="textField"/>
-        /// </summary>
-        /// <param name="textField">the object holding the text</param>
-        /// <returns>the TextMash that was added to <paramref name="textField"/> as a component</returns>
-        private TextMesh AddTextMesh(GameObject textField)
-        {
-            MeshRenderer rendender = textField.AddComponent<MeshRenderer>();
-
-            rendender.receiveShadows = false;
-            rendender.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-
-            TextMesh textMesh = textField.AddComponent<TextMesh>();
-            textMesh.characterSize = 0.0025f;
-            textMesh.fontSize = 120;
-
-            return textMesh;
-        }
-
-        /// <summary>
-        /// Resets the currently shown text in textField to the empty string.
+        /// Deactivates textOnPaper.
         /// </summary>
         private void HideInformation()
         {
-            textField.text = "";
-            // We keep textFieldObject for later use. Chances are that an object is selected
-            // when it was selected once.
+            textOnPaper.SetActive(false);
+            // We keep textOnPaper for later use. Chances are that an object is hovered
+            // over again when it was hovered once.
         }
 
         //-----------------------------------------------
