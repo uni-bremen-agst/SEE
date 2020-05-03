@@ -45,16 +45,19 @@ namespace SEE.Controls.Devices
         {
             if (Input.GetMouseButtonDown(SelectionMouseButton))
             {
-                if (!oneClick) // first click no previous click
+                if (!oneClick) 
                 {
+                    // This is the first click.
                     oneClick = true;
                     timeOfLastClick = Time.time;
+                    return false;
                 }
                 else
                 {
-                    // found a double click, now reset
-                    oneClick = false; 
-                    return true;
+                    // found a double click => reset
+                    oneClick = false;
+                    // has the double click happened in the waiting period?
+                    return (Time.time - timeOfLastClick) <= maxDelay;
                 }
             }
             if (oneClick)
