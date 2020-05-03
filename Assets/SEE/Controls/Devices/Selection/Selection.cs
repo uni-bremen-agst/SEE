@@ -30,5 +30,10 @@ namespace SEE.Controls.Devices
         /// True if the device is grabbing (e.g., when a particular grabbing key was pressed).
         /// </summary>
         public abstract bool IsGrabbing { get; }
+
+        /// <summary>
+        /// True if the device is releasing an object it has currently grabbed.
+        /// </summary>
+        public abstract bool IsReleasing { get; }
     }
 }

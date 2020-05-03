@@ -104,12 +104,10 @@ namespace SEE.Controls
             {
                 // An object is already grabbed; we do not allow searching. Similarly,
                 // an object can only be grabbed if it is being hovered over.
-                // Grabbing works as a toggle. Activating grabbing while an object is
-                // already grabbed, releases the grabbed object.
-                if (selectionDevice.IsGrabbing)
+                if (selectionDevice.IsReleasing)
                 {
-                    grabbedObject = hoveredObject;
                     ReleaseObject(grabbedObject);
+                    grabbedObject = null;
                 }
             }
         }

@@ -26,5 +26,7 @@ namespace SEE.Controls.Devices
         public override Vector3 Position => viewPortCenter;
 
         public override bool IsGrabbing => InputManager.ActiveDevice.RightTrigger.Value >= Threshold;
+
+        public override bool IsReleasing => InputManager.ActiveDevice.RightTrigger.Value >= Threshold;
     }
 }
