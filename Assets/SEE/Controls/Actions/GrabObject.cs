@@ -260,10 +260,17 @@ namespace SEE.Controls
             ResetToSavedPosition();
         }
 
-        public void OnGrabbed()
+        /// <summary>
+        /// Action to be run when given <paramref name="grabber"/> grabs the gameObject.
+        /// Saves the position of gameObject and moves it toward <paramref name="grabber"/>
+        /// using some animation.
+        /// </summary>
+        /// <param name="grabber">the object grabbing gameObject</param>
+        public void OnGrabbed(GameObject grabber)
         {
             Debug.LogFormat("OnGrabbed({0})\n", graphNode.ID);
             SaveCurrentPosition();
+            iTween.MoveTo(gameObject, grabber.transform.position, 2.0f);
         }
 
         //---------------------------------------------------------------
@@ -316,7 +323,7 @@ namespace SEE.Controls
             if (interactable.attachedToHand == null && startingGrabType != GrabTypes.None)
             {
                 // The hand is grabbing the object
-                OnGrabbed();
+                OnGrabbed(hand.gameObject);
 
                 // Call this to continue receiving HandHoverUpdate messages,
                 // and prevent the hand from hovering over anything else
