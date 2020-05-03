@@ -119,7 +119,8 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="layoutNodes">layout nodes to be scaled</param>
         /// <param name="width">the absolute width (x axis) the required space for the laid out nodes must have</param>
-        public static void Scale(ICollection<ILayoutNode> layoutNodes, float width)
+        /// <returns>the factor by which the scale of edge node was multiplied</returns>
+        public static float Scale(ICollection<ILayoutNode> layoutNodes, float width)
         {
             BoundingBox(layoutNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner);
             float currentWidth = rightUpperCorner.x - leftLowerCorner.x;
@@ -132,6 +133,7 @@ namespace SEE.Layout
                 //newPosition.y = layoutNode.CenterPosition.y;
                 layoutNode.CenterPosition = newPosition;
             }
+            return scaleFactor;
         }
 
         /// <summary>
