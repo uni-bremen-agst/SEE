@@ -195,7 +195,7 @@ namespace SEE.Controls
             GrabObject grabbingComponent = selectedObject.GetComponent<GrabObject>();
             if (grabbingComponent != null)
             {
-                grabbingComponent.OnGrabbed();
+                grabbingComponent.OnGrabbed(gameObject);
             }
         }
 
