@@ -124,10 +124,11 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
+        /// <param name="scaleFactor">factor by which to scale settings.EdgeWidth</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
+        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes, float scaleFactor)
         {
-            return EdgeLayout(graph, ToLayoutNodes(gameNodes));
+            return EdgeLayout(graph, ToLayoutNodes(gameNodes), scaleFactor);
         }
 
         /// <summary>
@@ -135,20 +136,21 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="layoutNodes">the subset of layout nodes for which to draw the edges</param>
+        /// <param name="scaleFactor">factor by which to scale settings.EdgeWidth</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<ILayoutNode> layoutNodes)
+        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<ILayoutNode> layoutNodes, float scaleFactor)
         {
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
             {
                 case SEECity.EdgeLayouts.Straight:
-                    layout = new StraightEdgeLayout(settings.EdgesAboveBlocks);
+                    layout = new StraightEdgeLayout(settings.EdgesAboveBlocks, scaleFactor);
                     break;
                 case SEECity.EdgeLayouts.Spline:
-                    layout = new SplineEdgeLayout(settings.EdgesAboveBlocks, settings.RDP);
+                    layout = new SplineEdgeLayout(settings.EdgesAboveBlocks, scaleFactor, settings.RDP);
                     break;
                 case SEECity.EdgeLayouts.Bundling:
-                    layout = new BundledEdgeLayout(settings.EdgesAboveBlocks, settings.Tension, settings.RDP);
+                    layout = new BundledEdgeLayout(settings.EdgesAboveBlocks, scaleFactor, settings.Tension, settings.RDP);
                     break;
                 case SEECity.EdgeLayouts.None:
                     // nothing to be done
@@ -157,7 +159,7 @@ namespace SEE.Game
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
             }
             Performance p = Performance.Begin("edge layout " + layout.Name);
-            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
+            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth * scaleFactor);
             ICollection<GameObject> result = edgeFactory.DrawEdges(layoutNodes);
             p.End();
             return result;
@@ -196,7 +198,7 @@ namespace SEE.Game
                 ICollection<GameObject> gameNodes = nodeMap.Values;
                 ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(gameNodes);
                 nodeLayout.Apply(layoutNodes);                
-                NodeLayout.Scale(layoutNodes, settings.width);
+                float scaleFactor = NodeLayout.Scale(layoutNodes, settings.width);
                 NodeLayout.Move(layoutNodes, settings.origin);
 
                 // add the plane surrounding all game objects for nodes
@@ -206,8 +208,9 @@ namespace SEE.Game
                 CreateObjectHierarchy(nodeMap, parent);
                 InteractionDecorator.PrepareForInteraction(gameNodes);
 
-                // create the laid out edges
-                AddToParent(EdgeLayout(graph, layoutNodes), parent);
+                // create the game objects for the laid out edges
+                ICollection<GameObject> edges = EdgeLayout(graph, layoutNodes, scaleFactor);
+                AddToParent(edges, parent);
             }
             finally
             {
