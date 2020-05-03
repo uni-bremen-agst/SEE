@@ -61,6 +61,19 @@ namespace SEE.Game
             }
         }
 
+        public override void ScaleBy(float factor)
+        {
+            LineRenderer renderer = gameObject.GetComponent<LineRenderer>();
+            if (renderer != null)
+            {
+                // This object is drawn by a line. The width of the line must
+                // be adjusted.
+                renderer.startWidth *= factor;
+                renderer.endWidth *= factor;
+            }
+            Scale *= factor;
+        }
+
         /// <summary>
         /// The center position of this node in world space.
         /// </summary>

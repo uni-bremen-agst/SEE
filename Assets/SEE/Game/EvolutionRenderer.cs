@@ -24,8 +24,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using SEE.GO;
-using OdinSerializer;
-
 using SEE.Game.Animation;
 using SEE.DataModel;
 using SEE.Layout;
@@ -952,6 +950,11 @@ namespace SEE.Game
             {
                 get => centerPosition;
                 set => centerPosition = value;
+            }
+
+            public void ScaleBy(float factor)
+            {
+                throw new NotImplementedException();
             }
 
             public ILayoutNode Parent => throw new NotImplementedException();

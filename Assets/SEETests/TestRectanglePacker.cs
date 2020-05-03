@@ -272,6 +272,11 @@ namespace SEE.Layout.RectanglePacking
                 set => scale = value;
             }
 
+            public void ScaleBy(float factor)
+            {
+                scale *= factor;
+            }
+
             private Vector3 centerPosition;
 
             public Vector3 CenterPosition
