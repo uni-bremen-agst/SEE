@@ -15,5 +15,7 @@ namespace SEE.Controls.Devices
         public override Vector3 Position => Vector3.zero;
 
         public override bool IsGrabbing => false;
+
+        public override bool IsReleasing => false;
     }
 }

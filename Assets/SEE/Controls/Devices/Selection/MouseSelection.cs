@@ -10,17 +10,62 @@ namespace SEE.Controls.Devices
     public class MouseSelection: Selection
     {
         [Tooltip("The index of the mouse button needed to be pressed to change the viewpoint (0 = left, 1 = right).")]
-        public int ViewpointMouseButton = 0;
-
-        [Tooltip("The index of the mouse button needed to be pressed to grab an object (0 = left, 1 = right).")]
-        public int GrabbingMouseButton = 3;
+        public int SelectionMouseButton = 0;
 
         public override Vector3 Direction => Input.mousePosition;
 
-        public override bool Activated => Input.GetMouseButton(ViewpointMouseButton);        
+        public override bool Activated => Input.GetMouseButton(SelectionMouseButton);        
 
         public override Vector3 Position => Input.mousePosition;
 
-        public override bool IsGrabbing => Input.GetMouseButton(GrabbingMouseButton);
+        public override bool IsGrabbing => DoubleClick();
+
+        public override bool IsReleasing => DoubleClick(); 
+
+        /// <summary>
+        /// True if the first click of an expected double click happened.
+        /// </summary>
+        private bool oneClick = false;
+        /// <summary>
+        /// The point in time since game start of the last single click.
+        /// </summary>
+        private float timeOfLastClick;
+        /// <summary>
+        /// The maximal time in seconds we allow between two clicks to
+        /// consider them a double click.
+        /// </summary>
+        private readonly float maxDelay = 0.5f;
+
+        /// <summary>
+        /// True if the user presses the SelectionMouseButton twice with a maximal delay
+        /// of mayDelay.
+        /// </summary>
+        /// <returns>true if user double clicks</returns>
+        private bool DoubleClick()
+        {
+            if (Input.GetMouseButtonDown(SelectionMouseButton))
+            {
+                if (!oneClick) // first click no previous click
+                {
+                    oneClick = true;
+                    timeOfLastClick = Time.time;
+                }
+                else
+                {
+                    // found a double click, now reset
+                    oneClick = false; 
+                    return true;
+                }
+            }
+            if (oneClick)
+            {
+                // if the time now is maxDelay seconds after the first click, we need to reset
+                if ((Time.time - timeOfLastClick) > maxDelay)
+                {
+                    oneClick = false;
+                }
+            }
+            return false;
+        }
     }
 }

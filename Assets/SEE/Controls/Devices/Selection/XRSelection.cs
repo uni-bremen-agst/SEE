@@ -48,5 +48,10 @@ namespace SEE.Controls.Devices
         /// True if the user presses the grabbing button ("Grabbing" in SteamVR).
         /// </summary>
         public override bool IsGrabbing => SelectionButton != null ? SelectionButton.state : false;
+
+        /// <summary>
+        /// True if the user presses the grabbing button ("Grabbing" in SteamVR).
+        /// </summary>
+        public override bool IsReleasing => IsGrabbing;
     }
 }
