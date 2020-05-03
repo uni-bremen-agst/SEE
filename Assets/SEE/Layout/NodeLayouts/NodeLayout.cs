@@ -126,7 +126,7 @@ namespace SEE.Layout
             float scaleFactor = width / currentWidth;
             foreach (ILayoutNode layoutNode in layoutNodes)
             {
-                layoutNode.Scale *= scaleFactor;
+                layoutNode.ScaleBy(scaleFactor);
                 // The x/z co-ordinates must be adjusted after scaling, but we do maintain the height
                 Vector3 newPosition = layoutNode.CenterPosition * scaleFactor;
                 //newPosition.y = layoutNode.CenterPosition.y;

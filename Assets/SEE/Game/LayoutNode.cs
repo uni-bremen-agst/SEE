@@ -34,6 +34,11 @@ namespace SEE.Game
             set => scale = value;
         }
 
+        public override void ScaleBy(float factor)
+        {
+            scale *= factor;
+        }
+
         private Vector3 centerPosition;
 
         public override Vector3 CenterPosition

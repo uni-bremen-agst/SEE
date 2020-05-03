@@ -16,6 +16,12 @@ namespace SEE.Layout
         Vector3 Scale { get; set; }
 
         /// <summary>
+        /// Scales the node by the given <paramref name="factor"/>.
+        /// </summary>
+        /// <param name="factor">factory by which to scale the node</param>
+        void ScaleBy(float factor);
+
+        /// <summary>
         /// Center position of a node in world space.
         /// </summary>
         Vector3 CenterPosition { get; set; }
@@ -48,6 +54,6 @@ namespace SEE.Layout
     ///  Defines the methods for all nodes to be laid out.
     /// </summary>
     public interface ILayoutNode : IGameNode, IGraphNode<ILayoutNode>, IHierarchyNode<ILayoutNode>
-    {
+    {     
     }
 }

@@ -129,8 +129,9 @@ namespace SEE.Game
             }
         }
 
-        // Features defined by LayoutNode that must be implemented by subclasses of 
+        // Features defined by LayoutNode that must be implemented by subclasses.
         public abstract Vector3 Scale { get; set; }
+        public abstract void ScaleBy(float factor);
         public abstract Vector3 CenterPosition { get; set; }
         public abstract float Rotation { get; set; }
         public abstract Vector3 Roof { get; }
