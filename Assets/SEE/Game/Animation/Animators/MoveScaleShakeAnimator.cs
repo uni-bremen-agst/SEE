@@ -58,8 +58,8 @@ namespace SEE.Game.Animation
             // hence, the two spaces may be different.
             // We may need to transform nodeTransform.scale from world space to local space.
             Vector3 localScale = gameObject.transform.parent == null ?
-                                     layout.Scale
-                                   : gameObject.transform.parent.InverseTransformVector(layout.Scale);
+                                     layout.LocalScale
+                                   : gameObject.transform.parent.InverseTransformVector(layout.LocalScale);
 
             //Debug.LogFormat("animating {0} from pos={1} scale={2} to pos={3} scale={4}\n",
             //    gameObject.name,

@@ -46,7 +46,7 @@ namespace SEE.Layout
                     maxZ = 0.0f;
                     positionX = 0.0f;
                 }
-                Vector3 size = gameNode.Scale;
+                Vector3 size = gameNode.LocalScale;
                 if (size.z > maxZ)
                 {
                     maxZ = size.z;

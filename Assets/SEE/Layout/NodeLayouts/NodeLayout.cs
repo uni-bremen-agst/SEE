@@ -156,7 +156,7 @@ namespace SEE.Layout
 
                 foreach (ILayoutNode go in layoutNodes)
                 {
-                    Vector3 extent = go.Scale;
+                    Vector3 extent = go.LocalScale;
                     // Note: position denotes the center of the object
                     Vector3 position = go.CenterPosition;
                     {
@@ -216,7 +216,7 @@ namespace SEE.Layout
                 Vector3 position = transform.position;
                 position.y += transform.scale.y / 2.0f;
                 node.CenterPosition = position;
-                node.Scale = transform.scale;
+                node.LocalScale = transform.scale;
                 node.Rotation = transform.rotation;
             }
         }

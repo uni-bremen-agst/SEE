@@ -49,7 +49,7 @@ namespace SEE.Game.Animation
                    string callbackName,
                    Action<object> callback)
         {
-            gameObject.transform.localScale = layout.Scale;
+            gameObject.transform.localScale = layout.LocalScale;
             if (callBackTarget != null)
             {
                 iTween.MoveTo(gameObject, iTween.Hash(

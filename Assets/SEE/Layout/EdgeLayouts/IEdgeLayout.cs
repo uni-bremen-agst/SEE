@@ -53,7 +53,8 @@ namespace SEE.Layout
         protected readonly float scaleFactor;
 
         /// <summary>
-        /// Yields the greatest and smallest y co-ordinate and the maximal height of all <paramref name="nodes"/> given.
+        /// Yields the greatest and smallest y co-ordinate and the maximal height (all in
+        /// world space) of all given <paramref name="nodes"/>. 
         /// 
         /// Precondition: <paramref name="nodes"/> is not empty.
         /// </summary>
@@ -69,7 +70,7 @@ namespace SEE.Layout
             foreach (ILayoutNode node in nodes)
             {
                 float cy = node.CenterPosition.y;
-                float height = node.Scale.y;
+                float height = node.AbsoluteScale.y;
                 {
                     float roof = cy + height / 2.0f;
                     if (roof > maxY)

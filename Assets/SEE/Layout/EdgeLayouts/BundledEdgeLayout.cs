@@ -351,7 +351,7 @@ namespace SEE.Layout
         {
             // center area (roof or ground)
             Vector3 center = edgesAboveBlocks ? node.Roof : node.Ground;
-            Vector3 extent = node.Scale / 2.0f;
+            Vector3 extent = node.LocalScale / 2.0f;
             // left front corner of center area
             Vector3 start = new Vector3(center.x - extent.x, center.y, center.z - extent.z);
             // right back corner of center area

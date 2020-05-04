@@ -56,7 +56,7 @@ namespace SEE.Layout
                 ILayoutNode singleNode = gameNodes.FirstOrDefault();
                 Dictionary<ILayoutNode, NodeTransform> layout_result = new Dictionary<ILayoutNode, NodeTransform>
                 {
-                    [singleNode] = new NodeTransform(Vector3.zero, singleNode.Scale)
+                    [singleNode] = new NodeTransform(Vector3.zero, singleNode.LocalScale)
                 };
                 return layout_result;
             }
@@ -307,7 +307,7 @@ namespace SEE.Layout
         private void SetHouseScale(ENode node)
         {
             // Scaled metric values for the dimensions.
-            Vector3 size = node.GraphNode.Scale;
+            Vector3 size = node.GraphNode.LocalScale;
             node.Scale = new Vector3(size.x, size.y, size.z);
         }
 

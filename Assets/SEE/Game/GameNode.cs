@@ -49,7 +49,7 @@ namespace SEE.Game
         /// <summary>
         /// The scale of this node.
         /// </summary>
-        public override Vector3 Scale
+        public override Vector3 LocalScale
         {
             get
             {
@@ -59,6 +59,16 @@ namespace SEE.Game
             {
                 nodeFactory.SetSize(gameObject, value);
             }
+        }
+
+        /// <summary>
+        /// The absolute scale of a node in world co-ordinates.
+        /// 
+        /// Note: This value may be meaningful only if the node is not skewed.
+        /// </summary>
+        public override Vector3 AbsoluteScale
+        {
+            get => gameObject.transform.lossyScale;
         }
 
         /// <summary>
@@ -77,7 +87,7 @@ namespace SEE.Game
                 renderer.startWidth *= factor;
                 renderer.endWidth *= factor;
             }
-            Scale *= factor;
+            LocalScale *= factor;
         }
 
         /// <summary>
