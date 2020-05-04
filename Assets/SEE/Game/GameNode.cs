@@ -61,6 +61,12 @@ namespace SEE.Game
             }
         }
 
+        /// <summary>
+        /// Scales this node by the given <paramref name="factor"/>: its current
+        /// Scale is multiplied by <paramref name="factor"/>. If the object 
+        /// contains a line, the line width is multiplied by <paramref name="factor"/>, too.
+        /// </summary>
+        /// <param name="factor">factor by which to mulitply the scale</param>
         public override void ScaleBy(float factor)
         {
             LineRenderer renderer = gameObject.GetComponent<LineRenderer>();
