@@ -362,27 +362,28 @@ namespace SEE.Controls
             {
                 return gameObject.name;
             }
-            string result = "";
-            result += "ID" + graphNode.ID + "\n";
-            result += "Type" + graphNode.Type + "\n";
+            return graphNode.ID;
+            //string result = "";
+            //result += "ID" + graphNode.ID + "\n";
+            //result += "Type" + graphNode.Type + "\n";
 
-            foreach (var entry in graphNode.StringAttributes)
-            {
-                result += string.Format("{0}: {1}\n", entry.Key, entry.Value);
-            }
-            foreach (var entry in graphNode.FloatAttributes)
-            {
-                result += string.Format("{0}: {1}\n", entry.Key, entry.Value);
-            }
-            foreach (var entry in graphNode.IntAttributes)
-            {
-                result += string.Format("{0}: {1}\n", entry.Key, entry.Value);
-            }
-            foreach (var entry in graphNode.ToggleAttributes)
-            {
-                result += entry + "\n";
-            }
-            return result;
+            //foreach (var entry in graphNode.StringAttributes)
+            //{
+            //    result += string.Format("{0}: {1}\n", entry.Key, entry.Value);
+            //}
+            //foreach (var entry in graphNode.FloatAttributes)
+            //{
+            //    result += string.Format("{0}: {1}\n", entry.Key, entry.Value);
+            //}
+            //foreach (var entry in graphNode.IntAttributes)
+            //{
+            //    result += string.Format("{0}: {1}\n", entry.Key, entry.Value);
+            //}
+            //foreach (var entry in graphNode.ToggleAttributes)
+            //{
+            //    result += entry + "\n";
+            //}
+            //return result;
         }
 
         //---------------------------------------------------------
