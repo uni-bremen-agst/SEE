@@ -11,9 +11,16 @@ namespace SEE.Layout
         string ID { get; }
 
         /// <summary>
-        /// Scale of a node.
+        /// The local scale of a node (i.e., scale relative to its parent).
         /// </summary>
-        Vector3 Scale { get; set; }
+        Vector3 LocalScale { get; set; }
+
+        /// <summary>
+        /// The absolute scale of a node in world co-ordinates.
+        /// 
+        /// Note: This value may be meaningful only if the node is not skewed.
+        /// </summary>
+        Vector3 AbsoluteScale { get; }
 
         /// <summary>
         /// Scales the node by the given <paramref name="factor"/>.

@@ -266,7 +266,7 @@ namespace SEE.Layout.RectanglePacking
 
             private Vector3 scale;
 
-            public Vector3 Scale
+            public Vector3 LocalScale
             {
                 get => scale;
                 set => scale = value;
@@ -308,6 +308,8 @@ namespace SEE.Layout.RectanglePacking
             }
 
             public ICollection<ILayoutNode> Successors => new List<ILayoutNode>();
+
+            public Vector3 AbsoluteScale => scale;
         }
     }
 }

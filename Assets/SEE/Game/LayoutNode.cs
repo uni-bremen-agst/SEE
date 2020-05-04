@@ -28,10 +28,15 @@ namespace SEE.Game
 
         private Vector3 scale;
 
-        public override Vector3 Scale
+        public override Vector3 LocalScale
         {
             get => scale;
             set => scale = value;
+        }
+
+        public override Vector3 AbsoluteScale
+        {
+            get => scale;
         }
 
         public override void ScaleBy(float factor)

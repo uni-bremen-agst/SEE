@@ -88,9 +88,9 @@ namespace SEE.Game.Animation
                 // the center as normally in Unity. The following position is the one in
                 // Unity's terms where the y co-ordinate denotes the center.
                 Vector3 position = nodeTransform.CenterPosition;
-                position.y += nodeTransform.Scale.y / 2;
+                position.y += nodeTransform.LocalScale.y / 2;
                 gameObject.transform.position = position;
-                gameObject.transform.localScale = nodeTransform.Scale;
+                gameObject.transform.localScale = nodeTransform.LocalScale;
                 callback?.Invoke(gameObject);
             }
             else if (callback == null)

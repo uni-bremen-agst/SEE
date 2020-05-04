@@ -562,14 +562,14 @@ namespace SEE.Game
                 // Leaf nodes were created as blocks by leaveNodeFactory.
                 // We need to first scale the game node and only afterwards set its
                 // position because transform.scale refers to the center position.
-                leafNodeFactory.SetSize(gameNode, layout.Scale);
+                leafNodeFactory.SetSize(gameNode, layout.LocalScale);
                 // FIXME: Must adjust layout.CenterPosition.y
                 leafNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
             }
             else
             {
                 // Inner nodes were created by innerNodeFactory.
-                innerNodeFactory.SetSize(gameNode, layout.Scale);
+                innerNodeFactory.SetSize(gameNode, layout.LocalScale);
                 // FIXME: Must adjust layout.CenterPosition.y
                 innerNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
             }
