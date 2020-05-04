@@ -72,7 +72,7 @@ namespace SEE.Layout
             MinMaxBlockY(layoutNodes, out float minY, out float maxY, out float maxHeight);
             levelDistance = Math.Max(levelDistance * scaleFactor, maxHeight / 5.0f);
             levelOffset = edgesAboveBlocks ? maxY + levelDistance : minY - levelDistance;
-            Debug.LogFormat("scaleFactor {0} levelDistance {1} levelOffset {2} maxHeight {3}\n", scaleFactor, levelDistance, levelOffset, maxHeight);
+            //Debug.LogFormat("scaleFactor {0} levelDistance {1} levelOffset {2} maxHeight {3}\n", scaleFactor, levelDistance, levelOffset, maxHeight);
 
             LCAFinder<ILayoutNode> lca = new LCAFinder<ILayoutNode>(roots);
 
