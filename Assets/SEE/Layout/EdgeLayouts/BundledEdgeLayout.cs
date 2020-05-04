@@ -27,6 +27,8 @@ namespace SEE.Layout
         /// of zero has no effect.
         /// </summary>
         /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
+        /// <param name="scaleFactor">factor by which certain aspects of an edge are scaled; here: the distance
+        /// between hierarchical levels for the bundling</param>
         /// <param name="tension">strength of the tension for bundling edges; must be in the range [0,1]</param>
         /// <param name="rdp">epsilon parameter of the Ramer–Douglas–Peucker algorithm</param>
         public BundledEdgeLayout(bool edgesAboveBlocks, float scaleFactor, float tension = 0.85f, float rdp = 0.0f)
@@ -70,7 +72,7 @@ namespace SEE.Layout
             MinMaxBlockY(layoutNodes, out float minY, out float maxY, out float maxHeight);
             levelDistance = Math.Max(levelDistance * scaleFactor, maxHeight / 5.0f);
             levelOffset = edgesAboveBlocks ? maxY + levelDistance : minY - levelDistance;
-            Debug.LogFormat("levelDistance {0} levelOffset {1}\n", levelDistance, levelOffset);
+            Debug.LogFormat("scaleFactor {0} levelDistance {1} levelOffset {2} maxHeight {3}\n", scaleFactor, levelDistance, levelOffset, maxHeight);
 
             LCAFinder<ILayoutNode> lca = new LCAFinder<ILayoutNode>(roots);
 
@@ -292,7 +294,8 @@ namespace SEE.Layout
         /// <summary>
         /// The number of Unity units per level of the hierarchy for the height of control points.
         /// Its value must be greater than zero. It will be set relative to the maximal height
-        /// of the nodes whose edges are to be laid out (in Create()). The value set here is the minimum value.
+        /// of the nodes whose edges are to be laid out (in Create()). The value set here is the 
+        /// initial minimum value.
         /// </summary>
         private float levelDistance = 1.0f;
 

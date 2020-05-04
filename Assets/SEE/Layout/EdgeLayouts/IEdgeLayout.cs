@@ -58,9 +58,9 @@ namespace SEE.Layout
         /// Precondition: <paramref name="nodes"/> is not empty.
         /// </summary>
         /// <param name="nodes">list of nodes whose greatest and smallest y co-ordinate is required</param>
-        /// <param name="minY">smallest y co-ordinate</param>
-        /// <param name="maxY">largest y co-ordinate</param>
-        /// <param name="maxHeight">maximal height of nodes</param>
+        /// <param name="minY">smallest y world co-ordinate</param>
+        /// <param name="maxY">largest y world co-ordinate</param>
+        /// <param name="maxHeight">maximal height of nodes in world scale</param>
         protected void MinMaxBlockY(ICollection<ILayoutNode> nodes, out float minY, out float maxY, out float maxHeight)
         {
             maxY = Mathf.NegativeInfinity;
