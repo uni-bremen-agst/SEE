@@ -46,6 +46,7 @@ namespace SEE.Controls
             try
             {
                 XRSettings.enabled = playerInputType == PlayerInputType.VR;
+                Debug.LogFormat("VR enabled: {0}\n", XRSettings.enabled);
             }
             catch (Exception e)
             {
