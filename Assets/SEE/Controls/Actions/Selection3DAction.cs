@@ -19,18 +19,20 @@ namespace SEE.Controls
         private GameObject lineHolder;
 
         /// <summary>
-        /// The default width of the ray line.
+        /// The width of the ray line.
         /// </summary>
-        const float defaultWidth = 0.03f;
+        [Tooltip("The width of the selection ray line")]
+        public float rayWidth = 0.005f;
 
         /// <summary>
         /// The maximal length the casted ray can reach.
         /// </summary>
-        const float RayDistance = 100.0f;
+        [Tooltip("The maximal length the selection ray can reach.")]
+        public float RayDistance = 5.0f;
 
-        [Tooltip("The color used when an object was hit.")]
+        [Tooltip("The color of the selection ray used when an object was hit.")]
         public Color colorOnHit = Color.green;
-        [Tooltip("The color used when no object was hit.")]
+        [Tooltip("The color of the selection ray used when no object was hit.")]
         public Color defaultColor = Color.red;
 
         /// <summary>
@@ -53,8 +55,8 @@ namespace SEE.Controls
             line.receiveShadows = false;
             line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
-            line.startWidth = defaultWidth;
-            line.endWidth = defaultWidth;
+            line.startWidth = rayWidth;
+            line.endWidth = rayWidth;
         }
 
         /// <summary>
