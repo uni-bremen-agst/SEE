@@ -6,7 +6,7 @@ namespace SEE.Controls
     /// <summary>
     /// Implements interactions with a grabbed game object.
     /// </summary>
-    public class GrabObject : InteractableObject
+    public class GrabbableObject : InteractableObject
     {
         /// <summary>
         /// Sets up interactable and graphNode
