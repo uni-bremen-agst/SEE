@@ -166,10 +166,10 @@ namespace SEE.Controls
         /// <param name="selectedObject">the selected object</param>
         protected virtual void HoverObject(GameObject selectedObject)
         {
-            GrabObject grabbingComponent = selectedObject.GetComponent<GrabObject>();
-            if (grabbingComponent != null)
+            HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
+            if (hoverComponent != null)
             {
-                grabbingComponent.OnHoverBegin();
+                hoverComponent.OnHoverBegin();
             }
         }
 
@@ -179,10 +179,10 @@ namespace SEE.Controls
         /// <param name="selectedObject">the selected object</param>
         protected virtual void UnhoverObject(GameObject selectedObject)
         {
-            GrabObject grabbingComponent = selectedObject.GetComponent<GrabObject>();
-            if (grabbingComponent != null)
+            HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
+            if (hoverComponent != null)
             {
-                grabbingComponent.OnHoverEnd();
+                hoverComponent.OnHoverEnd();
             }
         }
 
