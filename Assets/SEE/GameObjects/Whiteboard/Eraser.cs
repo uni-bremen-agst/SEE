@@ -47,7 +47,7 @@ namespace SEE.GO.Whiteboard
             {
                 renderer.material.color = color;
             }
-
+            // FIXME: painter is not assigned.
             painter.Initialize(paintReceiver);
             painter.ChangeColour(color);
         }
