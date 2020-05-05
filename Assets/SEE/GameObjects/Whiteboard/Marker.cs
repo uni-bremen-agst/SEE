@@ -34,7 +34,7 @@ namespace SEE.GO.Whiteboard
         private MeshRenderer[] colouredParts;
 
         [SerializeField]
-        private Painter painter;
+        private Painter painter; // FIXME: Never assigned.
 
         [SerializeField]
         private PaintReceiver paintReceiver;

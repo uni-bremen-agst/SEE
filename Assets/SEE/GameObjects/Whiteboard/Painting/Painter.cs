@@ -31,7 +31,7 @@ namespace SEE.GO.Whiteboard
         private PaintMode paintMode;
 
         [SerializeField]
-        private Transform paintingTransform;
+        private Transform paintingTransform; // FIXME: Never assigned.
 
         [SerializeField]
         private float raycastLength = 0.01f;
@@ -59,6 +59,7 @@ namespace SEE.GO.Whiteboard
         public void Initialize(PaintReceiver newPaintReceiver)
         {
             stamp = new Stamp(brush);
+            // FIXME: paintMode is never assigned
             stamp.mode = paintMode;
 
             paintReceiver = newPaintReceiver;

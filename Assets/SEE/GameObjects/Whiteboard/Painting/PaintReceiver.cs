@@ -35,7 +35,6 @@ namespace SEE.GO.Whiteboard
         private Texture2D newTexture;
         private Color32[] originalTexture;
         private Color32[] currentTexture;
-        private float currentStampRotation = 0f;
 
         private int textureWidth;
         private int textureHeight;
