@@ -94,8 +94,9 @@ namespace SEEEditor
                     {
                         foreach (Node root in roots)
                         {
-                            TraverseThruNodesCounter(root); ;
+                            TraverseThruNodesCounter(root);
                         }
+                        Debug.Log("show empty");
                     }
 
                     List<NodeLayouts> parentNodeLayouts = new List<NodeLayouts>();
@@ -225,8 +226,9 @@ namespace SEEEditor
 
                     if (!allLeaves)
                     {
-                        bool showPosition = EditorGUILayout.Foldout(city.CoseGraphSettings.show[root], root.ID);
-                        city.CoseGraphSettings.show[root] = showPosition;
+                        var showPosition = EditorGUILayout.Foldout(city.CoseGraphSettings.show[root.ID], root.ID, true);
+                        city.CoseGraphSettings.show[root.ID] = showPosition;
+
                         if (showPosition)
                         {
                             ShowCheckBox(root, false, parentNodelayouts);
@@ -363,7 +365,7 @@ namespace SEEEditor
         {
             if (root.Children() != null && !root.IsLeaf())
             {
-                city.CoseGraphSettings.show.Add(root, true);
+                city.CoseGraphSettings.show.Add(root.ID, true);
                 if (root.Children() != null || root.Children().Count > 0)
                 {
                     foreach (Node child in root.Children())

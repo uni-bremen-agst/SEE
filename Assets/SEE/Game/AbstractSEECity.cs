@@ -518,7 +518,7 @@ namespace SEE.Game
                     // falls der key nicht in den alten dictonary ist
                     //dirsLocal = dirsLocal.Where(i => !dirs.ContainsKey(i.Key)).ToDictionary(i => i.Key, i => i.Value);
 
-                    CoseGraphSettings.show = new Dictionary<Node, bool>();
+                    CoseGraphSettings.show = new Dictionary<string, bool>();
 
                     var diff1 = dirs.Keys.Except(dirsLocal.Keys).Any();
                     var diff2 = dirsLocal.Keys.Except(dirs.Keys).Any();

@@ -204,39 +204,51 @@ namespace SEE.Game
             Node root = null;
 
             Performance p;
-            if (settings.NodeLayout.GetModel().CanApplySublayouts)
+            if (settings.NodeLayout.GetModel().CanApplySublayouts && nodeLayout.IsHierarchical())
             {
-                ICollection<SublayoutNode>  sublayoutNodes = AddInnerNodesForSublayouts(nodeMap, nodes);
-                root = AddRootIfNecessary(graph, nodeMap);
-                gameNodes = nodeMap.Values;
-                layoutNodes = ToLayoutNodes(nodeMap, sublayoutNodes);
-
-                List<SublayoutLayoutNode> sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
-                foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
+                try
                 {
-                    Sublayout sublayout = new Sublayout(layoutNode, groundLevel, leafNodeFactory, graph);
-                    sublayout.Layout();
-                }
+                    ICollection<SublayoutNode> sublayoutNodes = AddInnerNodesForSublayouts(nodeMap, nodes);
+                    root = AddRootIfNecessary(graph, nodeMap);
+                    gameNodes = nodeMap.Values;
+                    layoutNodes = ToLayoutNodes(nodeMap, sublayoutNodes);
 
-                p = Performance.Begin("layout name" + settings.NodeLayout + ", layout of nodes");
-                if (nodeLayout.UsesEdgesAndSublayoutNodes())
-                {
-                    nodeLayout.Apply(layoutNodes, graph.Edges(), sublayoutLayoutNodes);
-                }
-                p.End();
+                    List<SublayoutLayoutNode> sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
+                    foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
+                    {
+                        Sublayout sublayout = new Sublayout(layoutNode, groundLevel, leafNodeFactory, graph);
+                        sublayout.Layout();
+                    }
 
-                NodeLayout.Move(layoutNodes, settings.origin);
-                AddToParent(gameNodes, parent);
+                    p = Performance.Begin("layout name" + settings.NodeLayout + ", layout of nodes");
+                    if (nodeLayout.UsesEdgesAndSublayoutNodes())
+                    {
+                        nodeLayout.Apply(layoutNodes, graph.ConnectingEdges(layoutNodes), sublayoutLayoutNodes);
+                    }
+                    p.End();
 
-                // add the decorations, too
-                if (sublayoutLayoutNodes.Count <= 0)
+                    NodeLayout.Move(layoutNodes, settings.origin);
+                    AddToParent(gameNodes, parent);
+
+                    // add the decorations, too
+                    if (sublayoutLayoutNodes.Count <= 0)
+                    {
+                        AddToParent(AddDecorations(gameNodes), parent);
+                    }
+                    else
+                    {
+                        AddDecorationsForSublayouts(layoutNodes, sublayoutLayoutNodes, parent);
+                    }
+                } finally
                 {
-                    AddToParent(AddDecorations(gameNodes), parent);
+                    // If we added an artifical root node to the graph, we must remove it again
+                    // from the graph when we are done.
+                    if (root != null)
+                    {
+                        graph.RemoveNode(root);
+                    }
                 }
-                else
-                {
-                    AddDecorationsForSublayouts(layoutNodes, sublayoutLayoutNodes, parent);
-                }
+               
             }
             else
             {
@@ -291,6 +303,16 @@ namespace SEE.Game
             }
             
         }
+
+       /* private ICollection<Edge> GetEdges()
+        {
+            foreach (ILayoutNode source in layoutNodes)
+            {
+                foreach (ILayoutNode target in source.Successors)
+                {
+                }
+            }
+        }*/
 
 
         /// <summary>
@@ -631,7 +653,7 @@ namespace SEE.Game
             if (nodeLayout == SEECity.NodeLayouts.Balloon 
                 || nodeLayout == SEECity.NodeLayouts.EvoStreets)
             {
-                decorations.AddRange(AddLabels(InnerNodes(gameNodes)));
+                decorations.AddRange(AddLabels(InnerNodes(gameNodes), innerNodeFactory));
             }
 
             // Add decorators specific to the shape of inner nodes (circle decorators for circles
@@ -739,8 +761,9 @@ namespace SEE.Game
         /// Adds the source name as a label to the center of the given game nodes.
         /// </summary>
         /// <param name="gameNodes">game nodes whose source name is to be added</param>
+        /// <param name="innerNodeFactory">inner node factory</param>
         /// <returns>the game objects created for the text labels</returns>
-        private ICollection<GameObject> AddLabels(ICollection<GameObject> gameNodes)
+        private ICollection<GameObject> AddLabels(ICollection<GameObject> gameNodes, NodeFactory innerNodeFactory)
         {
             IList<GameObject> result = new List<GameObject>();
 

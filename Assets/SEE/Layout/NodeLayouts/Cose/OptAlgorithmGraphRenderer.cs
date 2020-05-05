@@ -468,6 +468,66 @@ namespace SEE.Layout
            
         }
 
+        private void GetAverage()
+        {
+            Dictionary<int, List<int>> result = new Dictionary<int, List<int>>();
+            Dictionary<int, int> newResult = new Dictionary<int, int>();
+
+
+            var linesToKeep = File.ReadLines("Assets/Resources/repulsionForce.txt").ToList();
+
+            if (linesToKeep.Count > 1)
+            {
+                linesToKeep.ForEach(line =>
+                {
+                    var values = line.Split(';');
+                    int countEdges = ParseInt(values[1]);
+                    int repulsionForce = ParseInt(values[2]);
+
+                    
+
+                    if (result.ContainsKey(repulsionForce))
+                    {
+                        result[repulsionForce].Add(countEdges);
+                    }
+                    else
+                    {
+                        result.Add(repulsionForce, new List<int>(countEdges));
+                    }
+                });
+
+            }
+
+            result.ForEach(entry => {
+                var length = entry.Value.Count;
+
+                var sum = 0;
+
+                entry.Value.ForEach(item => {
+                    sum += item;
+                });
+
+
+                if (length > 0)
+                {
+                    var avg = sum / length;
+
+                    newResult.Add(entry.Key, avg);
+                }
+
+
+            });
+
+            using (StreamWriter writer = File.CreateText("Assets/Resources/repulsionForceResult.txt"))
+            {
+
+                newResult.ForEach(kvp => {
+                    string line = kvp.Key + ";" + kvp.Value + ";";
+                    writer.WriteLine(line);
+                });
+            }
+        }
+
 
         private void combine()
         {
