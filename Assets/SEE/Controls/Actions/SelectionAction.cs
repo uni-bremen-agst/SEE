@@ -192,7 +192,7 @@ namespace SEE.Controls
         /// <param name="selectedObject">the selected object</param>
         protected virtual void GrabObject(GameObject selectedObject)
         {
-            GrabObject grabbingComponent = selectedObject.GetComponent<GrabObject>();
+            GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
             if (grabbingComponent != null)
             {
                 grabbingComponent.OnGrabbed(gameObject);
@@ -205,7 +205,7 @@ namespace SEE.Controls
         /// <param name="selectedObject">the selected object</param>
         protected virtual void ReleaseObject(GameObject selectedObject)
         {
-            GrabObject grabbingComponent = selectedObject.GetComponent<GrabObject>();
+            GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
             if (grabbingComponent != null)
             {
                 grabbingComponent.OnReleased();

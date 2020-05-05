@@ -106,7 +106,6 @@ namespace SEE.Controls
         {
             if (textOnPaper == null)
             {
-                Debug.LogFormat("New text on paper for {0}\n", gameObject.name);
                 textOnPaper = Instantiate(textOnPaperPrefab, Vector3.zero, Quaternion.identity);
                 textOnPaper.name = "Hovering Text Field";
                 textOnPaper.GetComponent<TextGUIAndPaperResizer>().Text = GetAttributes(graphNode);
@@ -132,10 +131,6 @@ namespace SEE.Controls
                 //   Vector3 localPosition = Vector3.zero;
                 //   localPosition.y = 0.5f + textOnPaper.transform.localScale.y / 2.0f;
                 //   textOnPaper.transform.localPosition = localPosition;
-            }
-            else
-            {
-                Debug.LogFormat("Re-using text on paper for {0}\n", gameObject.name);
             }
             textOnPaper.SetActive(true);
         }
