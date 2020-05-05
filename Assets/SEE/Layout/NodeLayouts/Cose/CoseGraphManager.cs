@@ -80,6 +80,7 @@ namespace SEE.Layout
         public CoseGraph AddRootGraph()
         {
             rootGraph = Add(new CoseGraph(null, this), new CoseNode(null, this));
+            rootGraph.GraphManager = this;
             return rootGraph;
         }
 
