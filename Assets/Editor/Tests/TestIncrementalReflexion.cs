@@ -40,7 +40,12 @@ namespace SEE.Tools
             base.Setup();
             impl = NewImplementation();
             arch = NewArchitecture();
-            mapping = new Graph();
+            mapping = new Graph("mapping");
+            SetupReflexion();
+        }
+
+        private void SetupReflexion()
+        {
             reflexion = new Reflexion(impl, arch, mapping);
             reflexion.Register(this);
             // An initial run is necessary to set up the necessary data structures.
@@ -55,6 +60,14 @@ namespace SEE.Tools
             a = null;
         }
 
+        /// <summary>
+        /// Saves iml, arch, and mapping to separate GXL files. Useful for debugging.
+        /// </summary>
+        protected void SaveGraphs()
+        {
+            Save(impl, arch, mapping);
+        }
+
         private static void AddToGraph(Graph graph, Edge edge, Node from, Node to)
         {
             edge.Source = from;
@@ -62,9 +75,28 @@ namespace SEE.Tools
             graph.AddEdge(edge);
         }
 
+        /// <summary>
+        /// Creates an architecture as follows:
+        /// 
+        /// Node hierarchy (child => parent):
+        ///   a1 => a8
+        ///   a2 => a8
+        ///   a3
+        ///   a4
+        ///   a5 => a7
+        ///   a6 => a7
+        ///   a7
+        ///   a8
+        /// Dependency edges (n1 depends on n2: n1 -> n2):
+        ///   s1: a3 -> a7
+        ///   s2: a1 -> a3
+        ///   s3: a8 -> a8
+        ///   s4: a2 -> a4
+        /// </summary>
+        /// <returns></returns>
         private Graph NewArchitecture()
         {
-            Graph arch = new Graph();
+            Graph arch = new Graph("architecture");
             a = new Dictionary<int, Node>();
             for (int j = 1; j <= 9; j++)
             {
@@ -93,7 +125,7 @@ namespace SEE.Tools
 
         private Graph NewImplementation()
         {
-            Graph impl = new Graph();
+            Graph impl = new Graph("implementation");
             i = new Dictionary<int, Node>();
             for (int j = 1; j <= 17; j++)
             {
@@ -153,6 +185,132 @@ namespace SEE.Tools
             Assert.AreEqual(1, mapsToEdgesRemoved.Count);
             Assert.AreEqual(implNode.ID, mapsToEdgesRemoved[0].mapsToEdge.Source.ID);
             Assert.AreEqual(archNode.ID, mapsToEdgesRemoved[0].mapsToEdge.Target.ID);
+        }
+
+        /// <summary>
+        /// Mapping i1 -> a1 and i2 -> a1.
+        /// Expected result: a propagated edge from a1 to a1 that is implicitly allowed.
+        /// </summary>
+        [Test]
+        public void TestMappingToSameComponentA()
+        {
+            // We want to start with fresh empty graphs (Setup creates filled ones)
+            impl = new Graph("implementation");
+            arch = new Graph("architecture");
+            mapping = new Graph("mapping");
+            SetupReflexion();
+            ResetEvents();
+
+            Node a1 = NewNode(arch, "a1", "Component");
+            Node a2 = NewNode(arch, "a2", "Component");
+
+            Node i1 = NewNode(impl, "i1", "Routine");
+            Node i2 = NewNode(impl, "i2", "Routine");
+            Edge e = NewEdge(impl, i1, i2, call);
+
+            // i1 -> a1
+            reflexion.Add_To_Mapping(i1, a1);
+            AssertMapped(i1, a1);
+            ResetEvents();
+
+            // i2 -> a1
+            reflexion.Add_To_Mapping(i2, a1);
+            AssertMapped(i2, a1);
+            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            Assert.That(IsPropagated(a1, a1, call));
+            Assert.AreEqual(1, edgeChanges.Count);
+            Assert.That(IsImplicitlyAllowed(edgeChanges, a1, a1, call));
+            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            ResetEvents();
+        }
+
+        /// <summary>
+        /// Mapping i2 -> a1 and i1 -> a1 (analogous to TestMappingToSameComponentA, but
+        /// the order of the mapping is swapped).
+        /// Expected result: a propagated edge from a1 to a1 that is implicitly allowed.
+        /// </summary>
+        [Test]
+        public void TestMappingToSameComponentB()
+        {
+            // We want to start with fresh empty graphs (Setup creates filled ones)
+            impl = new Graph("implementation");
+            arch = new Graph("architecture");
+            mapping = new Graph("mapping");
+            SetupReflexion();
+            ResetEvents();
+
+            Node a1 = NewNode(arch, "a1", "Component");
+            Node a2 = NewNode(arch, "a2", "Component");
+
+            Node i1 = NewNode(impl, "i1", "Routine");
+            Node i2 = NewNode(impl, "i2", "Routine");
+            Edge e = NewEdge(impl, i1, i2, call);
+
+            // i2 -> a1
+            reflexion.Add_To_Mapping(i2, a1);
+            AssertMapped(i2, a1);
+            ResetEvents();
+
+            // i1 -> a1
+            reflexion.Add_To_Mapping(i1, a1);
+            AssertMapped(i1, a1);
+            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            Assert.That(IsPropagated(a1, a1, call));
+            Assert.AreEqual(1, edgeChanges.Count);
+            Assert.That(IsImplicitlyAllowed(edgeChanges, a1, a1, call));
+            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            ResetEvents();
+        }
+
+        [Test]
+        public void TestRemapping()
+        {
+            // We want to start with fresh empty graphs (Setup creates filled ones)
+            impl = new Graph("implementation");
+            arch = new Graph("architecture");
+            mapping = new Graph("mapping");
+            SetupReflexion();
+            ResetEvents();
+
+            Node a1 = NewNode(arch, "a1", "Component");
+            Node a2 = NewNode(arch, "a2", "Component");
+
+            Node i1 = NewNode(impl, "i1", "Routine");
+            Node i2 = NewNode(impl, "i2", "Routine");
+            Edge e = NewEdge(impl, i1, i2, call);
+
+            // i1 -> a1
+            reflexion.Add_To_Mapping(i1, a1);
+            AssertMapped(i1, a1);
+            ResetEvents();
+
+            // i2 -> a2
+            reflexion.Add_To_Mapping(i2, a2);
+            AssertMapped(i2, a2);
+            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            Assert.That(IsPropagated(a1, a2, call));
+            Assert.AreEqual(1, edgeChanges.Count);
+            Assert.That(IsDivergent(edgeChanges, a1, a2, call));
+            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            ResetEvents();
+
+            // unmap i1
+            reflexion.Delete_From_Mapping(i1, a1);
+            AssertUnmapped(i1, a1);
+            Assert.AreEqual(1, propagatedEdgesRemoved.Count);
+            Assert.That(IsUnpropagated(a1, a2, call));
+            Assert.AreEqual(0, propagatedEdgesAdded.Count);
+            Assert.AreEqual(0, edgeChanges.Count);
+            ResetEvents();
+
+            // i1 -> a2
+            reflexion.Add_To_Mapping(i1, a2);
+            AssertMapped(i1, a2);
+            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            Assert.That(IsPropagated(a2, a2, call));
+            Assert.AreEqual(1, edgeChanges.Count);
+            Assert.That(IsImplicitlyAllowed(edgeChanges, a2, a2, call));
+            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
         }
 
         [Test]
@@ -235,14 +393,16 @@ namespace SEE.Tools
             Assert.That(IsPropagated(a[9], a[3], call));
             Assert.That(IsPropagated(a[1], a[9], call));
             Assert.That(IsPropagated(a[9], a[9], call));
+            Assert.AreEqual(2, propagatedEdgesRemoved.Count);
+            Assert.That(IsUnpropagated(a[1], a[3], call));
+            Assert.That(IsUnpropagated(a[1], a[1], call));
             Assert.AreEqual(5, edgeChanges.Count);
             Assert.That(IsDivergent(edgeChanges, a[9], a[3], call));
             Assert.That(IsDivergent(edgeChanges, a[1], a[9], call));
             Assert.That(IsImplicitlyAllowed(edgeChanges, a[9], a[9], call));
             Assert.That(IsAbsent(edgeChanges, a[1], a[3], call));
             Assert.That(IsAbsent(edgeChanges, a[8], a[8], call));
-            Assert.AreEqual(2, propagatedEdgesRemoved.Count);
-
+            
             ResetEvents();
             reflexion.Add_To_Mapping(i[10], a[2]);
             AssertMapped(i[10], a[2]);

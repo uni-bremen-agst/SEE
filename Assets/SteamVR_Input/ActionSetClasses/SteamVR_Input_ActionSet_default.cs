@@ -17,35 +17,35 @@ namespace Valve.VR
     public class SteamVR_Input_ActionSet_default : Valve.VR.SteamVR_ActionSet
     {
         
-        public virtual SteamVR_Action_Boolean InteractUI
+        public virtual SteamVR_Action_Boolean GrabPinch1
         {
             get
             {
-                return SteamVR_Actions.default_InteractUI;
+                return SteamVR_Actions.default_GrabPinch1;
             }
         }
         
-        public virtual SteamVR_Action_Boolean Teleport
+        public virtual SteamVR_Action_Boolean GrabPinch2
         {
             get
             {
-                return SteamVR_Actions.default_Teleport;
+                return SteamVR_Actions.default_GrabPinch2;
             }
         }
         
-        public virtual SteamVR_Action_Boolean GrabPinch
+        public virtual SteamVR_Action_Boolean GrabGrip1
         {
             get
             {
-                return SteamVR_Actions.default_GrabPinch;
+                return SteamVR_Actions.default_GrabGrip1;
             }
         }
         
-        public virtual SteamVR_Action_Boolean GrabGrip
+        public virtual SteamVR_Action_Boolean GrabGrip2
         {
             get
             {
-                return SteamVR_Actions.default_GrabGrip;
+                return SteamVR_Actions.default_GrabGrip2;
             }
         }
         
@@ -73,11 +73,19 @@ namespace Valve.VR
             }
         }
         
-        public virtual SteamVR_Action_Single Squeeze
+        public virtual SteamVR_Action_Single Squeeze1
         {
             get
             {
-                return SteamVR_Actions.default_Squeeze;
+                return SteamVR_Actions.default_Squeeze1;
+            }
+        }
+        
+        public virtual SteamVR_Action_Single Squeeze2
+        {
+            get
+            {
+                return SteamVR_Actions.default_Squeeze2;
             }
         }
         
@@ -89,11 +97,19 @@ namespace Valve.VR
             }
         }
         
-        public virtual SteamVR_Action_Vector2 MoveChartInOut
+        public virtual SteamVR_Action_Single Throttle
         {
             get
             {
-                return SteamVR_Actions.default_MoveChartInOut;
+                return SteamVR_Actions.default_Throttle;
+            }
+        }
+        
+        public virtual SteamVR_Action_Single Trigger
+        {
+            get
+            {
+                return SteamVR_Actions.default_Trigger;
             }
         }
         
