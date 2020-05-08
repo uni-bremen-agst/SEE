@@ -65,6 +65,7 @@ namespace SEE.Controls
                     ControllerButtonHints.HideAllButtonHints(hand);
                     ControllerButtonHints.HideAllTextHints(hand);
                 }
+                Teleport.instance.CancelTeleportHint();
             }
         }
 
