@@ -49,7 +49,11 @@
       "type": "boolean"
     },
     {
-      "name": "/actions/default/in/Grabbing",
+      "name": "/actions/default/in/Grab",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/Select",
       "type": "boolean"
     },
     {
@@ -114,8 +118,9 @@
       "/actions/default/in/Teleport": "Teleport",
       "/actions/default/in/GrabGrip": "Grab Grip",
       "/actions/default/in/GrabPinch": "Grab Pinch",
-      "/actions/default/in/Grabbing": "Grabbing",
-      "/actions/default/out/Haptic": "Haptic"
+      "/actions/default/out/Haptic": "Haptic",
+      "/actions/default/in/Select": "Select",
+      "/actions/default/in/Grab": "Grab"
     }
   ]
 }
