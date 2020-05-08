@@ -1,10 +1,15 @@
-﻿namespace SEE.Controls.Devices
+﻿using UnityEngine;
+
+namespace SEE.Controls.Devices
 {
     /// <summary>
     /// An input device providing a boost factor for movements based on a mouse wheel.
     /// </summary>
     public class MouseBoost : Boost
     {
+        [Tooltip("This mouse button must be held while the mouse wheel is turned to change the boost factor.")]
+        public int MouseButton = 1;
+
         public override float Value
         {
             get =>
@@ -14,7 +19,7 @@
             // a center scroll wheel is typical on a PC. Modern macOS uses double finger movement 
             // up and down on the trackpad to emulate center scrolling. The value returned by 
             // mouseScrollDelta will need to be adjusted according to the scroll rate.
-            UnityEngine.Input.mouseScrollDelta.y;
+            Input.GetMouseButton(MouseButton) ? UnityEngine.Input.mouseScrollDelta.y : 0.0f;
         }
     }
 }

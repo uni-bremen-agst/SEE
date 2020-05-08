@@ -117,16 +117,15 @@ namespace SEE.GO
             return materials[degree];
         }
 
-        private static Material highlightMaterial;
-
-        public static Material HighlightMaterial()
+        /// <summary>
+        /// Returns a new material with the given <paramref name="color"/>.
+        /// </summary>
+        /// <param name="color">color for the material</param>
+        /// <returns>new material with given <paramref name="color"/></returns>
+        public static Material NewMaterial(Color color)
         {
-            if (highlightMaterial == null)
-            {
-                Shader shader = Shader.Find(shaderName);
-                highlightMaterial = NewMaterial(shader, Color.yellow);
-            }
-            return highlightMaterial;
+            Shader shader = Shader.Find(shaderName);
+            return NewMaterial(shader, color);
         }
     }
 }

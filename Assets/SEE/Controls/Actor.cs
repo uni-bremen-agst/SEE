@@ -44,6 +44,9 @@ namespace SEE.Controls
         [Tooltip("The device from which to read viewport selection input.")]
         private ControllerSelection viewportSelectionDevice;
 
+        [Tooltip("The device from which to read input for transforming a selected object.")]
+        public Transformation transformationDevice;
+
         [Tooltip("The action applied to move the camera.")]
         public CameraAction cameraAction;
 
@@ -53,14 +56,18 @@ namespace SEE.Controls
         [Tooltip("The action applied to select an object by way of the viewport.")]
         private SelectionViewportAction viewportSelectionAction;
 
+        [Tooltip("The action applied to transform a selected object.")]
+        private TransformationAction transformationAction;
+
         private void Start()
         {
             CameraSetup();
             SelectionSetup();
+            TransformSetup();
         }
 
         /// <summary>
-        /// Sets up and connects the selection input device and the selection action.
+        /// Sets up and connects the selection input device and selection action.
         /// </summary>
         private void SelectionSetup()
         {
@@ -77,6 +84,7 @@ namespace SEE.Controls
                 }
                 selectionAction.SelectionDevice = selectionDevice;
                 selectionAction.MainCamera = mainCamera;
+                selectionAction.OnObjectGrabbed.AddListener(OnObjectGrabbed);
             }
             // The selectionDevice and selectionAction are suitable for 2D or 3D
             // positional selection. As a secondary way to select something with
@@ -94,6 +102,56 @@ namespace SEE.Controls
                 }
                 viewportSelectionAction.SelectionDevice = viewportSelectionDevice;
                 viewportSelectionAction.MainCamera = mainCamera;
+            }
+        }
+
+        /// <summary>
+        /// Called by the selection action when an object was grabbed or released.
+        /// If an object is grabbed, we start the transformation action.
+        /// If an object is released, we terminate the transforamtion action.
+        /// </summary>
+        /// <param name="grabbedObject">the object grabbed or null if a grabbed object was released</param>
+        private void OnObjectGrabbed(GameObject grabbedObject)
+        {
+            if (grabbedObject == null)
+            {
+                // Grabbed object is released.
+                Debug.LogFormat("Releasing grabbed object {0}\n", transformationAction.TransformedObject.name);
+                transformationAction.TransformedObject = null;
+                transformationAction.enabled = false;
+            }
+            else
+            {
+                // Newly grabbed object.
+                transformationAction.enabled = true;
+                transformationAction.TransformedObject = grabbedObject;
+                Debug.LogFormat("Transforming grabbed object {0}\n", grabbedObject.name);
+            }
+        }
+
+        /// <summary>
+        /// Sets up and connects the transformation input device and transformation action.
+        /// The transformation input device must exist, but the transformation action 
+        /// will be created because it is the same for all transformation input devices.
+        /// No parameterization by the user is needed here.
+        /// </summary>
+        private void TransformSetup()
+        {
+            if (transformationDevice == null)
+            {
+                Debug.LogError("Transformation device must be set.\n");
+            }
+            else
+            {
+                transformationAction = gameObject.GetComponent<TransformationAction>();
+                if (transformationAction == null)
+                {
+                    transformationAction = gameObject.AddComponent<TransformationAction>();
+                }
+                transformationAction.TranformationDevice = transformationDevice;
+                // This action is initially disabled. It will be activated only when an
+                // object was selected.
+                transformationAction.enabled = false;
             }
         }
 

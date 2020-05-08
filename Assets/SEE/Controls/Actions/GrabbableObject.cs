@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.GO;
+using UnityEngine;
 using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls
@@ -6,32 +7,25 @@ namespace SEE.Controls
     /// <summary>
     /// Implements interactions with a grabbed game object.
     /// </summary>
-    public class GrabbableObject : InteractableObject
+    public class GrabbableObject : HoverableObject
     {
+        [Tooltip("The color to be used when the object is grabbed.")]
+        public Color GrabbingColor = Color.blue;
+
         /// <summary>
-        /// Sets up interactable and graphNode
-        /// 
-        /// The following assumptions are made:
-        /// 1) gameObject has a component Interactable attached to it
-        /// 2) gameObject has a NodeRef component attached to it
-        /// 3) this NodeRef refers to a valid graph node with a valid information that can
-        ///    be retrieved and shown when the user hovers over the object
+        /// True if the object is currently grabbed.
         /// </summary>
+        private bool isGrabbed = false;
+
+        /// <summary>
+        /// For highlighting the gameObject while it is being hovered over.
+        /// </summary>
+        private MaterialChanger grabbingMaterial;
+
         protected override void Start()
         {
             base.Start();
-        }
-
-        /// <summary>
-        /// Action to be run when the grabbing object released this 
-        /// grabbed object. 
-        /// 
-        /// The grabbed object is reset to its original position.
-        /// </summary>
-        public void OnReleased()
-        {
-            //Debug.LogFormat("OnReleased({0})\n", graphNode.ID);
-            ResetToSavedPosition();
+            grabbingMaterial = new MaterialChanger(gameObject, Materials.NewMaterial(GrabbingColor));
         }
 
         /// <summary>
@@ -41,11 +35,54 @@ namespace SEE.Controls
         /// using some animation.
         /// </summary>
         /// <param name="grabber">the object grabbing gameObject</param>
-        public void OnGrabbed(GameObject grabber)
+        public void Grab(GameObject grabber)
         {
+            if (isHovered)
+            {
+                base.Unhovered();
+            }
             //Debug.LogFormat("OnGrabbed({0})\n", graphNode.ID);
+            isGrabbed = true;
+            grabbingMaterial.UseSpecialMaterial();
             SaveCurrentPosition();
-            iTween.MoveTo(gameObject, grabber.transform.position, 2.0f);
+        }
+
+        /// <summary>
+        /// Action to be run when the grabbing object released this 
+        /// grabbed object. 
+        /// 
+        /// The grabbed object is reset to its original position.
+        /// </summary>
+        public void Release()
+        {
+            //Debug.LogFormat("OnReleased({0})\n", graphNode.ID);
+            isGrabbed = false;
+            ResetToSavedPosition();
+            grabbingMaterial.ResetMaterial();
+            if (isHovered)
+            {
+                base.Hovered();
+            }
+        }
+
+        /// <summary>
+        /// Action to be run while the object is being grabbed.
+        /// 
+        /// Moves the gameObject toward given <paramref name="position"/>.
+        /// </summary>
+        /// <param name="position">the position the gameObject should be moved to</param>
+        public void Continue(Vector3 position)
+        {
+            if (isGrabbed)
+            {
+                //iTween.MoveTo(gameObject, position, 0.5f);
+                gameObject.transform.position = position;
+                Debug.LogFormat("{0} is being held.\n", gameObject.name);
+            }
+            else
+            {
+                Debug.LogErrorFormat("Continue called for object {0} not grabbed.\n", gameObject.name);
+            }
         }
 
         //----------------------------------------------------------------
@@ -72,7 +109,7 @@ namespace SEE.Controls
             if (interactable.attachedToHand == null && startingGrabType != GrabTypes.None)
             {
                 // The hand is grabbing the object
-                OnGrabbed(hand.gameObject);
+                Grab(hand.gameObject);
 
                 // Call this to continue receiving HandHoverUpdate messages,
                 // and prevent the hand from hovering over anything else
@@ -92,7 +129,7 @@ namespace SEE.Controls
 
                 // Call this to undo HoverLock
                 hand.HoverUnlock(interactable);
-                OnReleased();
+                Unhovered();
             }
         }
 

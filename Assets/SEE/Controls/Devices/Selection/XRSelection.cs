@@ -17,7 +17,9 @@ namespace SEE.Controls.Devices
 
         private SteamVR_Action_Single TriggerAction = SteamVR_Input.GetSingleAction(defaultActionSet, "Trigger");
 
-        private SteamVR_Action_Boolean SelectionButton = SteamVR_Input.GetBooleanAction(defaultActionSet, "Grabbing");
+        private SteamVR_Action_Boolean GrabButton = SteamVR_Input.GetBooleanAction(defaultActionSet, "Grab");
+
+        private SteamVR_Action_Boolean SelectionButton = SteamVR_Input.GetBooleanAction(defaultActionSet, "Select");
 
         /// <summary>
         /// The direction the PointingHand points to.
@@ -32,26 +34,25 @@ namespace SEE.Controls.Devices
         /// </summary>
         public override Vector3 Position
         {
-            get => PointingHand.transform.position; 
+            get => PointingHand.transform.position;
         }
 
         /// <summary>
-        /// True if the trigger action ("Trigger" in SteamVR) has been activated
-        /// above the Threshold.
+        /// True if the user presses the select button ("Select" in SteamVR).
         /// </summary>
-        public override bool Activated
+        public override bool IsSelecting
         {
-            get => TriggerAction != null ? TriggerAction.axis >= Threshold : false;
+            get => SelectionButton != null ? SelectionButton.state : false;
         }
 
         /// <summary>
-        /// True if the user presses the grabbing button ("Grabbing" in SteamVR).
+        /// True if the user presses the grabbing button ("Grab" in SteamVR).
         /// </summary>
-        public override bool IsGrabbing => SelectionButton != null ? SelectionButton.state : false;
+        public override bool IsGrabbing => GrabButton != null ? GrabButton.state : false;
 
         /// <summary>
-        /// True if the user presses the grabbing button ("Grabbing" in SteamVR).
+        /// The degree of the trigger (the SteamVR axis assigned as "Trigger").
         /// </summary>
-        public override bool IsReleasing => IsGrabbing;
+        public override float Pull => TriggerAction.axis;
     }
 }
