@@ -52,14 +52,9 @@ namespace SEE.Controls
         /// </summary>
         private GameObject hoveredObject;
 
-        /// <summary>
-        /// Objects in this layer will be ignored for the selection.
-        /// </summary>
-        protected LayerMask ignoreLayer;
 
-        private void Start()
+        protected virtual void Start()
         {
-            ignoreLayer = LayerMask.GetMask("Ignore Raycast");
         }
 
         /// <summary>
