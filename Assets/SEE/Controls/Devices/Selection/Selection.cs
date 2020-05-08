@@ -24,16 +24,17 @@ namespace SEE.Controls.Devices
         /// <summary>
         /// True if the device is activated (e.g., when a mouse button was pressed).
         /// </summary>
-        public abstract bool Activated { get; }
+        public abstract bool IsSelecting { get; }
 
         /// <summary>
-        /// True if the device is grabbing (e.g., when a particular grabbing key was pressed).
+        /// True if the device is grabbing is toggled (e.g., when a particular grabbing 
+        /// key was pressed).
         /// </summary>
         public abstract bool IsGrabbing { get; }
 
         /// <summary>
-        /// True if the device is releasing an object it has currently grabbed.
+        /// The degree of pulling. A value between 0 and 1.
         /// </summary>
-        public abstract bool IsReleasing { get; }
+        public abstract float Pull { get; }
     }
 }

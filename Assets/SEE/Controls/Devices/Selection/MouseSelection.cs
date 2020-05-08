@@ -14,13 +14,34 @@ namespace SEE.Controls.Devices
 
         public override Vector3 Direction => Input.mousePosition;
 
-        public override bool Activated => Input.GetMouseButton(SelectionMouseButton);        
+        public override bool IsSelecting => Input.GetMouseButton(SelectionMouseButton);
 
         public override Vector3 Position => Input.mousePosition;
 
         public override bool IsGrabbing => DoubleClick();
 
-        public override bool IsReleasing => DoubleClick(); 
+        private float pullDegree = 0.0f;
+
+        public const float MouseWheelScale = 0.1f;
+
+        public override float Pull
+        {
+            get
+            {
+                // Input.mouseScrollDelta is stored in a Vector2.y property. (The Vector2.x value is ignored.) 
+                // Input.mouseScrollDelta can be positive (up) or negative (down). The value is zero when the 
+                // mouse scroll is not rotated. Note that a mouse with a center scroll wheel is typical on 
+                // a PC. Modern macOS uses double finger movement up and down on the trackpad to emulate 
+                // center scrolling. The value returned by mouseScrollDelta will need to be adjusted according 
+                // to the scroll rate. 
+                float delta = Input.mouseScrollDelta.y * MouseWheelScale;
+                // When the wheel is turned towards the hand, delta is negative; otherwise positive.
+                // Intuitively, one would interpret wheel turns towards the hand as trying to draw 
+                // an object towards the hand and vice versa. Hence, we need to negate delta.
+                pullDegree = Mathf.Clamp(-delta, -1, 1);
+                return pullDegree;
+            }
+        }
 
         /// <summary>
         /// True if the first click of an expected double click happened.

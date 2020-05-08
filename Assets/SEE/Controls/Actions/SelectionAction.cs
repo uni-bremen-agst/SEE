@@ -1,5 +1,6 @@
 ﻿using SEE.Controls.Devices;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SEE.Controls
 {
@@ -36,6 +37,13 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// Event invoked when an object was grabbed or released. In the former case,
+        /// the grabbed object is passed as a parameter; in the latter case, null
+        /// is passed.
+        /// </summary>
+        public GameObjectEvent OnObjectGrabbed = new GameObjectEvent();
+
+        /// <summary>
         /// The object currently grabbed. May be null.
         /// </summary>
         private GameObject grabbedObject;
@@ -43,6 +51,16 @@ namespace SEE.Controls
         /// The object currently hovered over. May be null.
         /// </summary>
         private GameObject hoveredObject;
+
+        /// <summary>
+        /// Objects in this layer will be ignored for the selection.
+        /// </summary>
+        protected LayerMask ignoreLayer;
+
+        private void Start()
+        {
+            ignoreLayer = LayerMask.GetMask("Ignore Raycast");
+        }
 
         /// <summary>
         /// If the search was activated, a ray is cast from the position of
@@ -53,62 +71,64 @@ namespace SEE.Controls
         /// </summary>
         private void Update()
         {
-            if (grabbedObject == null)
+            GameObject hitObject = null;
+            
+            bool isGrabbing = selectionDevice.IsGrabbing;
+            bool isSelecting = isGrabbing ? false : selectionDevice.IsSelecting;
+
+            if (isGrabbing && grabbedObject != null)
             {
-                // nothing grabbed; we allow searching
-                if (selectionDevice.Activated)
-                {
-                    // we are searching for objects
-                    GameObject hitObject = Select(out RaycastHit hitInfo);
-                    // give visual feedback on where we search
-                    ShowSearchFeedback(hitObject, hitInfo);
-                    // Have we hit anything?
-                    if (hitObject == null)
-                    {
-                        // nothing hit; in case something was previously hovered over,
-                        // it must be reset
-                        if (hoveredObject != null)
-                        {
-                            UnhoverObject(hoveredObject);
-                            hoveredObject = null;
-                        }
-                    } 
-                    else
-                    {
-                        // something was hit
-                        // in case something was previously hovered over, it must be reset
-                        if (hoveredObject != null)
-                        {
-                            UnhoverObject(hoveredObject);
-                        }
-                        // the hit object is the new object that is currently being hovered over
-                        hoveredObject = hitObject;
-                        HoverObject(hoveredObject);
-                        if (selectionDevice.IsGrabbing)
-                        {
-                            // If the user wants us to grab the hovered object, we grab it.
-                            // Note: hovering is possible only while we have not already grabbed
-                            // an object, hence, at this point we do not release any grabbed object
-                            grabbedObject = hoveredObject;
-                            GrabObject(grabbedObject);
-                        }
-                    }
-                }
-                else
-                {
-                    // not searching => no visual feedback for search
-                    HideSearchFeedback();
-                }
+                // The user triggered grabbing while an object was already grabbed.
+                // That means we need to release the grabbed object.
+                // selectionDevice.IsGrabbing works as a toggle.
+                ReleaseObject(grabbedObject);
+                grabbedObject = null;
+            }
+            else if (isSelecting || (isGrabbing && grabbedObject == null))
+            {
+                // While the user wants to select or grab and has not yet grabbed anything
+                // we will show the ray and try to hit an object.               
+                hitObject = Select(out RaycastHit hitInfo);
+                // give visual feedback on where we search
+                ShowSearchFeedback(hitObject, hitInfo);
             }
             else
             {
-                // An object is already grabbed; we do not allow searching. Similarly,
-                // an object can only be grabbed if it is being hovered over.
-                if (selectionDevice.IsReleasing)
+                // not searching/grabbing => no visual feedback for search
+                HideSearchFeedback();
+            }
+
+            if (hitObject != null)
+            {
+                // Something was hit
+                if (isGrabbing && hitObject != grabbedObject)
                 {
-                    ReleaseObject(grabbedObject);
-                    grabbedObject = null;
+                    if (grabbedObject != null)
+                    {
+                        // first release grabbed object
+                        ReleaseObject(grabbedObject);
+                        //if (grabbedObject == hoveredObject)
+                        //{
+                        //    UnhoverObject(hoveredObject);
+                        //    hoveredObject = null;
+                        //}
+                    }
+                    grabbedObject = hitObject;
+                    GrabObject(grabbedObject);
+                } 
+                else if (isSelecting && hitObject != hoveredObject)
+                {
+                    if (hoveredObject != null)
+                    {
+                        UnhoverObject(hoveredObject);
+                    }
+                    hoveredObject = hitObject;
+                    HoverObject(hoveredObject);
                 }
+            }
+            if (grabbedObject != null)
+            {
+                HoldObject(grabbedObject);
             }
         }
 
@@ -169,7 +189,7 @@ namespace SEE.Controls
             HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
             if (hoverComponent != null)
             {
-                hoverComponent.OnHoverBegin();
+                hoverComponent.Hovered();
             }
         }
 
@@ -182,7 +202,7 @@ namespace SEE.Controls
             HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
             if (hoverComponent != null)
             {
-                hoverComponent.OnHoverEnd();
+                hoverComponent.Unhovered();
             }
         }
 
@@ -195,7 +215,32 @@ namespace SEE.Controls
             GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
             if (grabbingComponent != null)
             {
-                grabbingComponent.OnGrabbed(gameObject);
+                grabbingComponent.Grab(gameObject);
+            }
+            OnObjectGrabbed.Invoke(selectedObject);
+        }
+
+        public float Speed = 10.0f;
+
+        /// <summary>
+        /// Called while an object is being grabbed (passed as parameter <paramref name="selectedObject"/>).
+        /// This method is called on very Update().
+        /// </summary>
+        /// <param name="selectedObject">the selected object</param>
+        protected virtual void HoldObject(GameObject selectedObject)
+        {
+            GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
+            if (grabbingComponent != null)
+            {
+                float strength = selectionDevice.Pull;
+                // A positive strength is interpreted as drawing the object toward the MainCamera.
+                // A negative strength means that the object is moved farther away.
+                float step = strength * Speed * Time.deltaTime;
+                Vector3 targetPosition = Vector3.MoveTowards(selectedObject.transform.position, selectionDevice.Position, step);
+
+                //Debug.LogFormat("Pulling grabbed object {0} at {1} towards {2} by strength {3} by step {4}\n",
+                //                selectedObject.name, selectedObject.transform.position, targetPosition, strength, step);
+                grabbingComponent.Continue(targetPosition);
             }
         }
 
@@ -208,8 +253,9 @@ namespace SEE.Controls
             GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
             if (grabbingComponent != null)
             {
-                grabbingComponent.OnReleased();
+                grabbingComponent.Release();
             }
+            OnObjectGrabbed.Invoke(null);
         }
     }
 }

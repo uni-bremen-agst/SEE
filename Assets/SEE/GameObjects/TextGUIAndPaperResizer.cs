@@ -33,7 +33,7 @@ namespace SEE.GO
         }
 
         [SerializeField, Tooltip("Text margin")]
-        public Vector2 Margin = new Vector2(10, 10); // default margin
+        public Vector2 Margin = new Vector2(1, 1); // default margin
 
         [Tooltip("Scale of the font")]
         public float FontScale = 1.0f;

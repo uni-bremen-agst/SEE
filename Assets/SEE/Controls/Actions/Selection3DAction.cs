@@ -31,10 +31,13 @@ namespace SEE.Controls
         public float RayDistance = 5.0f;
 
         [Tooltip("The color of the selection ray used when an object was hit.")]
-        public Color colorOnHit = Color.green;
+        public Color colorOnSelectionHit = Color.green;
         [Tooltip("The color of the selection ray used when no object was hit.")]
-        public Color defaultColor = Color.red;
-
+        public Color colorOnSelectionMissed = Color.red;
+        [Tooltip("The color of the grabbing ray used when an object was hit.")]
+        public Color colorOnGrabbingHit = Color.blue;
+        [Tooltip("The color of the grabbing ray used when no object was hit.")]
+        public Color colorOnGrabbingMissed = Color.yellow;
         /// <summary>
         /// Sets up the object holding the line renderer for the shown ray
         /// and other parameters of the line.
@@ -76,11 +79,25 @@ namespace SEE.Controls
             if (selectedObject != null)
             {
                 line.SetPosition(1, hitInfo.point);
-                line.material.color = colorOnHit;
+                if (selectionDevice.IsGrabbing)
+                {
+                    line.material.color = colorOnGrabbingHit;
+                }
+                else
+                {
+                    line.material.color = colorOnSelectionHit;
+                }
             }
             else
             {
-                line.material.color = defaultColor;
+                if (selectionDevice.IsGrabbing)
+                {
+                    line.material.color = colorOnGrabbingMissed;
+                }
+                else
+                {
+                    line.material.color = colorOnSelectionMissed;
+                }
                 line.SetPosition(1, origin + RayDistance * selectionDevice.Direction.normalized);
             }
         }
@@ -104,7 +121,7 @@ namespace SEE.Controls
         /// <returns>true if an object was hit</returns>
         protected override bool Detect(out RaycastHit hitInfo)
         {
-            return Physics.Raycast(selectionDevice.Position, selectionDevice.Direction, out hitInfo, RayDistance);
+            return Physics.Raycast(selectionDevice.Position, selectionDevice.Direction, out hitInfo, RayDistance, ignoreLayer);
         }
     }
 }

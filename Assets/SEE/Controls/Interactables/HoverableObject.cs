@@ -1,14 +1,13 @@
 ﻿using SEE.DataModel;
 using SEE.GO;
 using UnityEngine;
-using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls
 {
     /// <summary>
     /// Implements interactions with a game object that is hovered over.
     /// </summary>
-    public class HoverableObject : InteractableObject
+    public class HoverableObject : HighlightableObject
     {
         protected override void Start()
         {
@@ -29,50 +28,16 @@ namespace SEE.Controls
         // Public actions when the object is hovered.
         //-------------------------------------------
 
-        public void OnHoverBegin()
+        public override void Hovered()
         {
-            //Debug.LogFormat("OnHoverBegin({0})\n", graphNode.ID);
+            base.Hovered();
             ShowInformation();
-            HighlightMaterial();
         }
 
-        public void OnHoverEnd()
+        public override void Unhovered()
         {
-            //Debug.LogFormat("OnHoverEnd({0})\n", graphNode.ID);
             HideInformation();
-            ResetMaterial();
-        }
-
-        //----------------------------------------------------------------
-        // Private actions called by the hand when the object is hovered.
-        // These methods are called by SteamVR by way of the interactable.
-        //----------------------------------------------------------------
-
-        /// <summary>
-        /// Called by the Hand when that Hand starts hovering over this object.
-        /// 
-        /// Activates the source name and detail text and highlights the object by
-        /// material with a different color.
-        /// </summary>
-        /// <param name="hand">the hand hovering over the object</param>
-        private void OnHandHoverBegin(Hand hand)
-        {
-            //Debug.Log("OnHandHoverEnd");
-            OnHoverBegin();
-            //hand.ShowGrabHint();
-        }
-
-        /// <summary>
-        /// Called by the Hand when that Hand stops hovering over this object
-        /// 
-        /// Deactivates the source name and detail text and restores the original material.
-        /// </summary>
-        /// <param name="hand">the hand hovering over the object</param>
-        private void OnHandHoverEnd(Hand hand)
-        {
-            //Debug.Log("OnHandHoverEnd");
-            OnHoverEnd();
-            //hand.HideGrabHint();
+            base.Unhovered();
         }
 
         //-------------------------------------------------
@@ -109,6 +74,8 @@ namespace SEE.Controls
                 textOnPaper = Instantiate(textOnPaperPrefab, Vector3.zero, Quaternion.identity);
                 textOnPaper.name = "Hovering Text Field";
                 textOnPaper.GetComponent<TextGUIAndPaperResizer>().Text = GetAttributes(graphNode);
+                // We do not want textOnPaper to collide with the selection raycast.
+                textOnPaper.layer = LayerMask.GetMask("Ignore Raycast");
 
                 // Now textOnPaper has been re-sized properly; so we can derive its absolute height.
                 float paperHeight = TextGUIAndPaperResizer.Height(textOnPaper);
@@ -182,36 +149,6 @@ namespace SEE.Controls
             //    result += entry + "\n";
             //}
             //return result;
-        }
-
-        // -------------------------------
-        // Highlighting the hovered object
-        // -------------------------------
-
-        /// <summary>
-        /// The material before the object was hovered so that it can be restored
-        /// when the object is no longer hovered. While hovering, a highlighting
-        /// material will be used.
-        /// </summary>
-        private Material oldMaterial;
-
-        /// <summary>
-        /// Highlights the hovered gameNode by assigning a particular highlight material.
-        /// Stores the original material in oldMaterial.
-        /// </summary>
-        private void HighlightMaterial()
-        {
-            Renderer renderer = gameObject.GetComponent<Renderer>();
-            oldMaterial = renderer.sharedMaterial;
-            renderer.sharedMaterial = Materials.HighlightMaterial();
-        }
-
-        /// <summary>
-        /// Resets the original material of gameNode using the material stored in oldMaterial.
-        /// </summary>
-        private void ResetMaterial()
-        {
-            gameObject.GetComponent<Renderer>().sharedMaterial = oldMaterial;
         }
     }
 }
