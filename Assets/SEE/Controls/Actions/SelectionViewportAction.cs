@@ -19,7 +19,7 @@ namespace SEE.Controls
         protected override bool Detect(out RaycastHit hitInfo)
         {
             Ray ray = MainCamera.ViewportPointToRay(selectionDevice.Direction);
-            return Physics.Raycast(ray, out hitInfo, Mathf.Infinity, ignoreLayer);
+            return Physics.Raycast(ray, out hitInfo, Mathf.Infinity, Physics.IgnoreRaycastLayer);
         }
     }
 }

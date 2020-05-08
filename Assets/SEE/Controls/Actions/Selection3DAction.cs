@@ -38,12 +38,15 @@ namespace SEE.Controls
         public Color colorOnGrabbingHit = Color.blue;
         [Tooltip("The color of the grabbing ray used when no object was hit.")]
         public Color colorOnGrabbingMissed = Color.yellow;
+
         /// <summary>
         /// Sets up the object holding the line renderer for the shown ray
         /// and other parameters of the line.
         /// </summary>
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
+
             // We create game object holding the line renderer for the ray.
             // This game object will be added to the game object this component
             // is attached to.
@@ -121,7 +124,10 @@ namespace SEE.Controls
         /// <returns>true if an object was hit</returns>
         protected override bool Detect(out RaycastHit hitInfo)
         {
-            return Physics.Raycast(selectionDevice.Position, selectionDevice.Direction, out hitInfo, RayDistance, ignoreLayer);
+            return Physics.Raycast(origin: selectionDevice.Position,
+                                   direction: selectionDevice.Direction,
+                                   hitInfo: out hitInfo,
+                                   maxDistance: RayDistance);
         }
     }
 }

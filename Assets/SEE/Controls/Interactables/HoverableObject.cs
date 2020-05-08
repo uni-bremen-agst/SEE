@@ -75,7 +75,7 @@ namespace SEE.Controls
                 textOnPaper.name = "Hovering Text Field";
                 textOnPaper.GetComponent<TextGUIAndPaperResizer>().Text = GetAttributes(graphNode);
                 // We do not want textOnPaper to collide with the selection raycast.
-                textOnPaper.layer = LayerMask.GetMask("Ignore Raycast");
+                textOnPaper.layer = Physics.IgnoreRaycastLayer;
 
                 // Now textOnPaper has been re-sized properly; so we can derive its absolute height.
                 float paperHeight = TextGUIAndPaperResizer.Height(textOnPaper);
