@@ -15,7 +15,7 @@ namespace SEE.GO
         public override GameObject NewBlock(int style)
         {
             GameObject result = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            result.tag = Tags.Building;
+            result.tag = Tags.Node;
             Renderer renderer = result.GetComponent<Renderer>();
             // Object should not cast shadows: too expensive and may hide information,
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
