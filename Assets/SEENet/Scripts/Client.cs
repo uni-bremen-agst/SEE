@@ -19,7 +19,7 @@ namespace SEE.Net.Internal
         public static void Initialize()
         {
             void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => PacketHandler.Push(packetHeader, connection, data);
-
+            
             foreach (string packetType in from handlerFuncDictEntry in PacketHandler.handlerFuncDict select handlerFuncDictEntry.Key)
             {
                 NetworkComms.AppendGlobalIncomingPacketHandler<string>(packetType, OnIncomingPacket);

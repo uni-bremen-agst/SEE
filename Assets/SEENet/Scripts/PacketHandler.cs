@@ -19,14 +19,22 @@ namespace SEE.Net.Internal
             public string packet;
         }
 
+
+
         public readonly Dictionary<string, HandlerFunc> handlerFuncDict;
+        protected string packetTypePrefix;
         private List<PendingPacket> pendingMessages = new List<PendingPacket>();
+
+
 
         public PacketHandler(string packetTypePrefix)
         {
             Assert.IsNotNull(packetTypePrefix);
+
+            this.packetTypePrefix = packetTypePrefix;
             handlerFuncDict = new Dictionary<string, HandlerFunc>
             {
+                { packetTypePrefix + BufferedPacketsPacket.PACKET_TYPE, HandleBufferedPacketsPacket },
                 { packetTypePrefix + ExecuteCommandPacket.PACKET_TYPE, HandleExecuteCommandPacket },
                 { packetTypePrefix + RedoCommandPacket.PACKET_TYPE, HandleRedoCommandPacket},
                 { packetTypePrefix + TransformViewPositionPacket.PACKET_TYPE, HandleTransformViewPositionPacket },
@@ -35,6 +43,8 @@ namespace SEE.Net.Internal
                 { packetTypePrefix + UndoCommandPacket.PACKET_TYPE, HandleUndoCommandPacket}
             };
         }
+
+
 
         public void Push(PacketHeader packetHeader, Connection connection, string incomingObject)
         {
@@ -48,6 +58,7 @@ namespace SEE.Net.Internal
                 });
             }
         }
+
         public void HandlePendingPackets()
         {
             lock (pendingMessages)
@@ -64,11 +75,18 @@ namespace SEE.Net.Internal
             }
         }
 
+        protected abstract bool HandleBufferedPacketsPacket(PacketHeader packetHeader, Connection connection, string data);
+
         protected abstract bool HandleExecuteCommandPacket(PacketHeader packetHeader, Connection connection, string data);
+
         protected abstract bool HandleRedoCommandPacket(PacketHeader packetHeader, Connection connection, string data);
+
         protected abstract bool HandleTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data);
+
         protected abstract bool HandleTransformViewRotationPacket(PacketHeader packetHeader, Connection connection, string data);
+
         protected abstract bool HandleTransformViewScalePacket(PacketHeader packetHeader, Connection connection, string data);
+
         protected abstract bool HandleUndoCommandPacket(PacketHeader packetHeader, Connection connection, string data);
     }
 

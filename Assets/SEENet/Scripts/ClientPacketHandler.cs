@@ -1,6 +1,7 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using SEE.Command;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
@@ -9,13 +10,33 @@ using UnityEngine.Assertions;
 namespace SEE.Net.Internal
 {
 
+    using HandlerFunc = Func<PacketHeader, Connection, string, bool>;
+
     public class ClientPacketHandler : PacketHandler
     {
         public ClientPacketHandler(string packetTypePrefix) : base(packetTypePrefix)
         {
         }
 
-        
+
+
+        protected override bool HandleBufferedPacketsPacket(PacketHeader packetHeader, Connection connection, string data)
+        {
+            BufferedPacketsPacket packet = BufferedPacketsPacket.Deserialize(data);
+
+            if (packet == null || packet.packetTypes == null || packet.packetDatas == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < packet.packetTypes.Length; i++)
+            {
+                bool result = handlerFuncDict.TryGetValue(packetTypePrefix + packet.packetTypes[i], out HandlerFunc func);
+                Assert.IsTrue(result);
+                func(null, null, packet.packetDatas[i]);
+            }
+            return true;
+        }
 
         protected override bool HandleExecuteCommandPacket(PacketHeader packetHeader, Connection connection, string data)
         {

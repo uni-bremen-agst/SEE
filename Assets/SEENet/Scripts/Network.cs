@@ -191,14 +191,12 @@ namespace SEE.Net
 
 
 
-        internal static void Send(Connection connection, Internal.AbstractPacket packet, SendReceiveOptions options = null)
+        internal static void Send(Connection connection, AbstractPacket packet)
         {
-            Send(connection, packet.packetType, packet.Serialize(), options);
+            Send(connection, packet.packetType, packet.Serialize());
         }
 
-        Thread currentThread = null;
-
-        internal static void Send(Connection connection, string packetType, string packetData, SendReceiveOptions options = null)
+        internal static void Send(Connection connection, string packetType, string packetData)
         {
             Assert.IsNotNull(connection);
             Assert.IsNotNull(packetData);
@@ -214,33 +212,27 @@ namespace SEE.Net
                 return;
             }
 
-            instance.currentThread?.Join();
-            instance.currentThread = new Thread(new ThreadStart(() =>
+            try
             {
-                try
+                connection.SendObject(fullPacketType, packetData);
+            }
+            catch (Exception)
+            {
+                lock (deadConnections)
                 {
-                    connection.SendObject(fullPacketType, packetData, options ?? NetworkComms.DefaultSendReceiveOptions);
-                }
-                catch (Exception)
-                {
-                    lock (deadConnections)
+                    if (!deadConnections.Contains(connection))
                     {
-                        if (!deadConnections.Contains(connection))
-                        {
-                            deadConnections.Add(connection);
-                            Invoker.Invoke((Connection c) => { deadConnections.Remove(c); }, 1.0f, connection);
-                            Debug.LogWarning(
-                                "Packet could not be sent to '" +
-                                connection.ConnectionInfo.RemoteEndPoint.ToString() +
-                                "'! Destination may not be listening or connection timed out. Closing connection!"
-                            );
-                            // TODO: close connection. also, look at exception above
-                        }
+                        deadConnections.Add(connection);
+                        Invoker.Invoke((Connection c) => { deadConnections.Remove(c); }, 1.0f, connection);
+                        Debug.LogWarning(
+                            "Packet could not be sent to '" +
+                            connection.ConnectionInfo.RemoteEndPoint.ToString() +
+                            "'! Destination may not be listening or connection timed out. Closing connection!"
+                        );
+                        // TODO: close connection. also, look at exception above
                     }
                 }
-            }));
-
-            instance.currentThread.Start();
+            }
         }
 
 
