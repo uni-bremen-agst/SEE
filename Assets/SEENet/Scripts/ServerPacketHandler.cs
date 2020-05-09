@@ -7,18 +7,15 @@ using UnityEngine;
 namespace SEE.Net.Internal
 {
 
+    internal struct BufferedPacket
+    {
+        public Connection connection;
+        public string packetType;
+        public string packetData;
+    }
+
     public class ServerPacketHandler : PacketHandler
     {
-        private struct BufferedPacket
-        {
-            public PacketHeader header;
-            public Connection connection;
-            public string packetType;
-            public string packetData;
-        }
-
-
-
         private List<BufferedPacket> bufferedPackets = new List<BufferedPacket>();
 
 
@@ -29,10 +26,15 @@ namespace SEE.Net.Internal
 
         public void OnConnectionEstablished(Connection connection)
         {
+            string[] packetTypes = new string[bufferedPackets.Count];
+            string[] packetDatas = new string[bufferedPackets.Count];
             for (int i = 0; i < bufferedPackets.Count; i++)
             {
-                Network.Send(connection, bufferedPackets[i].packetType, bufferedPackets[i].packetData);
+                packetTypes[i] = bufferedPackets[i].packetType;
+                packetDatas[i] = bufferedPackets[i].packetData;
             }
+            BufferedPacketsPacket packet = new BufferedPacketsPacket(packetTypes, packetDatas);
+            Network.Send(connection, packet);
         }
 
         public void OnConnectionClosed(Connection connection)
@@ -57,7 +59,13 @@ namespace SEE.Net.Internal
 #endif
         }
 
-        
+
+
+        protected override bool HandleBufferedPacketsPacket(PacketHeader packetHeader, Connection connection, string data)
+        {
+            Assertions.InvalidCodePath("The server only sends these types of packets but never receives them!");
+            return false;
+        }
 
         protected override bool HandleExecuteCommandPacket(PacketHeader packetHeader, Connection connection, string data)
         {
@@ -74,7 +82,6 @@ namespace SEE.Net.Internal
             {
                 BufferedPacket bufferedPacket = new BufferedPacket()
                 {
-                    header = new PacketHeader(Client.PACKET_PREFIX + ExecuteCommandPacket.PACKET_TYPE, packetHeader.TotalPayloadSize),
                     connection = connection,
                     packetType = packet.packetType,
                     packetData = packet.Serialize()
@@ -100,7 +107,6 @@ namespace SEE.Net.Internal
 
             BufferedPacket bufferedPacket = new BufferedPacket()
             {
-                header = new PacketHeader(Client.PACKET_PREFIX + RedoCommandPacket.PACKET_TYPE, packetHeader.TotalPayloadSize),
                 connection = connection,
                 packetType = packet.packetType,
                 packetData = packet.Serialize()
@@ -155,7 +161,6 @@ namespace SEE.Net.Internal
 
             BufferedPacket bufferedPacket = new BufferedPacket()
             {
-                header = new PacketHeader(Client.PACKET_PREFIX + UndoCommandPacket.PACKET_TYPE, packetHeader.TotalPayloadSize),
                 connection = connection,
                 packetType = packet.packetType,
                 packetData = packet.Serialize()

@@ -18,6 +18,8 @@ namespace SEE.Net.Internal
         private static Stack<Connection> pendingEstablishedConnections = new Stack<Connection>();
         private static Stack<Connection> pendingClosedConnections = new Stack<Connection>();
 
+
+
         public static void Initialize()
         {
             NetworkComms.AppendGlobalConnectionEstablishHandler((Connection c) => pendingEstablishedConnections.Push(c));
@@ -43,6 +45,7 @@ namespace SEE.Net.Internal
                 Debug.LogException(e);
             }
         }
+
         public static void Update()
         {
             packetHandler.HandlePendingPackets();
@@ -55,6 +58,7 @@ namespace SEE.Net.Internal
                 OnConnectionClosed(pendingClosedConnections.Pop());
             }
         }
+
         public static void Shutdown()
         {
             lock (Connections)
@@ -68,6 +72,7 @@ namespace SEE.Net.Internal
                 Connections.Clear();
             }
         }
+
         private static void OnConnectionEstablished(Connection connection)
         {
             if ((from connectionListener in ConnectionListeners select connectionListener.LocalListenEndPoint).Contains(connection.ConnectionInfo.LocalEndPoint))
@@ -84,6 +89,7 @@ namespace SEE.Net.Internal
                 }
             }
         }
+
         private static void OnConnectionClosed(Connection connection)
         {
             if ((from connectionListener in ConnectionListeners select connectionListener.LocalListenEndPoint).Contains(connection.ConnectionInfo.LocalEndPoint))
