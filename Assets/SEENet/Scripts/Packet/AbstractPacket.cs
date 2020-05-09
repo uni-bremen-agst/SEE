@@ -8,7 +8,7 @@ using UnityEngine.Assertions;
 namespace SEE.Net.Internal
 {
 
-    internal abstract class Packet
+    internal abstract class AbstractPacket
     {
         internal static readonly string DATE_TIME_FORMAT = "yyyy.MM.dd HH:mm:ss.fffffff";
         private const char DELIM = ';';
@@ -16,7 +16,7 @@ namespace SEE.Net.Internal
 
         internal readonly string packetType = null;
 
-        protected Packet(string packetType)
+        protected AbstractPacket(string packetType)
         {
             Assert.IsNotNull(packetType);
             this.packetType = packetType;

@@ -1,5 +1,6 @@
 ﻿using SEE.Net;
 using SEE.Net.Internal;
+using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
 
@@ -39,19 +40,24 @@ namespace SEE.Command
             viewID = -1;
         }
 
-        internal override void ExecuteOnClient()
+        internal override void ExecuteOnServer()
+        {
+            viewID = ++lastViewID;
+        }
+
+        internal override KeyValuePair<GameObject[], GameObject[]> ExecuteOnClient()
         {
             GameObject prefab = Resources.Load<GameObject>(prefabPath);
             if (!prefab)
             {
-                Debug.LogError("Prefab of path '" + prefabPath + "' could not be found!");
-                return;
+                Assertions.InvalidCodePath("Prefab of path '" + prefabPath + "' could not be found!");
+                return new KeyValuePair<GameObject[], GameObject[]>();
             }
             GameObject go = Object.Instantiate(prefab, null, true);
             if (!go)
             {
-                Debug.Log("Object could not be instantiated with prefab '" + prefab + "'!");
-                return;
+                Assertions.InvalidCodePath("Object could not be instantiated with prefab '" + prefab + "'!");
+                return new KeyValuePair<GameObject[], GameObject[]>();
             }
             if (!Net.Network.UseInOfflineMode)
             {
@@ -60,31 +66,11 @@ namespace SEE.Command
             go.transform.position = position;
             go.transform.rotation = rotation;
             go.transform.localScale = scale;
-        }
 
-        internal override void ExecuteOnServer()
-        {
-            viewID = ++lastViewID;
-        }
-
-        internal override void RedoOnClient()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        internal override void RedoOnServer()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        internal override void UndoOnClient()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        internal override void UndoOnServer()
-        {
-            throw new System.NotImplementedException();
+            GameObject[] originalGameObjects = new GameObject[] { null };
+            GameObject[] copiedAndModifiedGameObjects = new GameObject[] { go };
+            KeyValuePair<GameObject[], GameObject[]> result = new KeyValuePair<GameObject[], GameObject[]>(originalGameObjects, copiedAndModifiedGameObjects);
+            return result;
         }
     }
 

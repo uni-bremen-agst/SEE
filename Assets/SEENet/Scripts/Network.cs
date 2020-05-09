@@ -105,6 +105,10 @@ namespace SEE.Net
                 {
                     new LoadCityCommand(seeCity).Execute();
                 }
+                else
+                {
+                    Debug.LogWarning("Attached GameObject does not contain an AbstractSEECity script! City will not be loaded!");
+                }
             }
 
             new InstantiateCommand("Prefabs/SEENetPlayer").Execute();
@@ -189,7 +193,7 @@ namespace SEE.Net
 
 
 
-        internal static void Send(Connection connection, Internal.Packet packet, SendReceiveOptions options = null)
+        internal static void Send(Connection connection, Internal.AbstractPacket packet, SendReceiveOptions options = null)
         {
             Send(connection, packet.packetType, packet.Serialize(), options);
         }
@@ -256,21 +260,47 @@ namespace SEE.Net
         }
 
 
-        internal static void SendCommand(AbstractCommand command)
+        internal static void ExecuteCommand(AbstractCommand command)
         {
             if (instance.useInOfflineMode)
             {
-                switch (command.action)
+                command.ExecuteOnServer();
+                KeyValuePair<GameObject[], GameObject[]> result = command.ExecuteOnClient();
+                if (command.buffer)
                 {
-                    case CommandAction.Execute: command.ExecuteOnServer(); command.ExecuteOnClient(); break;
-                    case CommandAction.Redo:    command.RedoOnServer();    command.RedoOnClient();    break;
-                    case CommandAction.Undo:    command.UndoOnServer();    command.UndoOnClient();    break;
+                    CommandHistory.OnExecute(null, result.Key, result.Value);
                 }
             }
             else
             {
-                CommandPacket executeCommandPacket = new CommandPacket(command);
-                Send(Client.Connection, executeCommandPacket);
+                ExecuteCommandPacket packet = new ExecuteCommandPacket(command);
+                Send(Client.Connection, packet);
+            }
+        }
+
+        internal static void RedoCommand()
+        {
+            if (instance.useInOfflineMode)
+            {
+                CommandHistory.RedoOnClient();
+            }
+            else
+            {
+                RedoCommandPacket packet = new RedoCommandPacket();
+                Send(Client.Connection, packet);
+            }
+        }
+
+        internal static void UndoCommand()
+        {
+            if (instance.useInOfflineMode)
+            {
+                CommandHistory.UndoOnClient();
+            }
+            else
+            {
+                UndoCommandPacket packet = new UndoCommandPacket();
+                Send(Client.Connection, packet);
             }
         }
     }

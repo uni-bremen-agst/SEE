@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SEE.Net.Internal
 {
 
-    internal class TransformViewScalePacket : Packet
+    internal class TransformViewScalePacket : AbstractPacket
     {
         internal static readonly string PACKET_TYPE = "TransformViewScale";
 

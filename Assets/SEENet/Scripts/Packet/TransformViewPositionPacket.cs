@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SEE.Net.Internal
 {
 
-    internal class TransformViewPositionPacket : Packet
+    internal class TransformViewPositionPacket : AbstractPacket
     {
         internal static readonly string PACKET_TYPE = "TransformViewPosition";
 

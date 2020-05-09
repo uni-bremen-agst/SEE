@@ -1,7 +1,5 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
-using SEE.DataModel;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -61,33 +59,53 @@ namespace SEE.Net.Internal
 
         
 
-        protected override bool HandleCommandPacket(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleExecuteCommandPacket(PacketHeader packetHeader, Connection connection, string data)
         {
-            CommandPacket packet = CommandPacket.Deserialize(data);
+            ExecuteCommandPacket packet = ExecuteCommandPacket.Deserialize(data);
 
             if (packet == null || packet.command == null)
             {
                 return false;
             }
 
-            switch (packet.command.action)
-            {
-                case Command.CommandAction.Execute: packet.command.ExecuteOnServer(); break;
-                case Command.CommandAction.Redo:    packet.command.RedoOnServer();    break;
-                case Command.CommandAction.Undo:    packet.command.UndoOnServer();    break;
-            }
+            packet.command.ExecuteOnServer();
 
             if (packet.command.buffer)
             {
                 BufferedPacket bufferedPacket = new BufferedPacket()
                 {
-                    header = new PacketHeader(Client.PACKET_PREFIX + CommandPacket.PACKET_TYPE, packetHeader.TotalPayloadSize),
+                    header = new PacketHeader(Client.PACKET_PREFIX + ExecuteCommandPacket.PACKET_TYPE, packetHeader.TotalPayloadSize),
                     connection = connection,
                     packetType = packet.packetType,
                     packetData = packet.Serialize()
                 };
                 bufferedPackets.Add(bufferedPacket);
             }
+
+            foreach (Connection co in Server.Connections)
+            {
+                Network.Send(co, packet);
+            }
+            return true;
+        }
+
+        protected override bool HandleRedoCommandPacket(PacketHeader packetHeader, Connection connection, string data)
+        {
+            RedoCommandPacket packet = RedoCommandPacket.Deserialize(data);
+
+            if (packet == null)
+            {
+                return false;
+            }
+
+            BufferedPacket bufferedPacket = new BufferedPacket()
+            {
+                header = new PacketHeader(Client.PACKET_PREFIX + RedoCommandPacket.PACKET_TYPE, packetHeader.TotalPayloadSize),
+                connection = connection,
+                packetType = packet.packetType,
+                packetData = packet.Serialize()
+            };
+            bufferedPackets.Add(bufferedPacket);
 
             foreach (Connection co in Server.Connections)
             {
@@ -120,6 +138,31 @@ namespace SEE.Net.Internal
         {
             TransformViewScalePacket packet = TransformViewScalePacket.Deserialize(data);
             foreach (Connection co in from c in Server.Connections where !c.ConnectionInfo.RemoteEndPoint.Equals(packet.transformView.viewContainer.owner) select c)
+            {
+                Network.Send(co, packet);
+            }
+            return true;
+        }
+
+        protected override bool HandleUndoCommandPacket(PacketHeader packetHeader, Connection connection, string data)
+        {
+            UndoCommandPacket packet = UndoCommandPacket.Deserialize(data);
+
+            if (packet == null)
+            {
+                return false;
+            }
+
+            BufferedPacket bufferedPacket = new BufferedPacket()
+            {
+                header = new PacketHeader(Client.PACKET_PREFIX + UndoCommandPacket.PACKET_TYPE, packetHeader.TotalPayloadSize),
+                connection = connection,
+                packetType = packet.packetType,
+                packetData = packet.Serialize()
+            };
+            bufferedPackets.Add(bufferedPacket);
+
+            foreach (Connection co in Server.Connections)
             {
                 Network.Send(co, packet);
             }
