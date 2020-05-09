@@ -1,0 +1,71 @@
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+namespace SEE.Utils
+{
+    /// <summary>
+    /// Calculation of bounding boxes containing game objects.
+    /// </summary>
+    public static class BoundingBox
+    {
+        /// <summary>
+        /// Returns the bounding box (2D rectangle) enclosing all given <paramref name="gameObjects"/>
+        /// in terms of world space.
+        /// </summary>
+        /// <param name="gameObjects">the list of objects that are enclosed in the resulting bounding box</param>
+        /// <param name="leftLowerCorner">the left lower front corner (x axis in 3D space) of the bounding box</param>
+        /// <param name="rightUpperCorner">the right lower back corner (z axis in 3D space) of the bounding box</param>
+        public static void Get(ICollection<GameObject> gameObjects, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
+        {
+            if (gameObjects.Count == 0)
+            {
+                leftLowerCorner = Vector2.zero;
+                rightUpperCorner = Vector2.zero;
+            }
+            else
+            {
+                leftLowerCorner = new Vector2(Mathf.Infinity, Mathf.Infinity);
+                rightUpperCorner = new Vector2(Mathf.NegativeInfinity, Mathf.NegativeInfinity);
+
+                foreach (GameObject go in gameObjects)
+                {
+                    // Note: lossyScale might not properly work if an object is skewed.
+                    Vector3 extent = go.transform.lossyScale;
+                    // Note: position denotes the center of the object
+                    Vector3 position = go.transform.position;
+                    {
+                        // x co-ordinate of lower left corner
+                        float x = position.x - extent.x;
+                        if (x < leftLowerCorner.x)
+                        {
+                            leftLowerCorner.x = x;
+                        }
+                    }
+                    {
+                        // z co-ordinate of lower left corner
+                        float z = position.z - extent.z;
+                        if (z < leftLowerCorner.y)
+                        {
+                            leftLowerCorner.y = z;
+                        }
+                    }
+                    {   // x co-ordinate of upper right corner
+                        float x = position.x + extent.x;
+                        if (x > rightUpperCorner.x)
+                        {
+                            rightUpperCorner.x = x;
+                        }
+                    }
+                    {
+                        // z co-ordinate of upper right corner
+                        float z = position.z + extent.z;
+                        if (z > rightUpperCorner.y)
+                        {
+                            rightUpperCorner.y = z;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
