@@ -67,7 +67,9 @@ namespace SEE.Game
                 } 
                 else
                 {
-                    return RelevantGraph(loadedGraph);
+                    var graph = RelevantGraph(loadedGraph);
+                    LoadDataForGraphListing(graph: graph);
+                    return graph;
                 }
             }
         }

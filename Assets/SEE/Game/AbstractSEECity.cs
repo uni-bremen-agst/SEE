@@ -497,45 +497,7 @@ namespace SEE.Game
                     Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
                     Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
 
-
-                    Dictionary<string, bool> dirs = CoseGraphSettings.ListDirToggle;
-                    // die neuen dirs 
-                    Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
-
-                    Dictionary<string, NodeLayouts> dirsLayout = new Dictionary<string, NodeLayouts>();
-                    Dictionary<string, InnerNodeKinds> dirsShape = new Dictionary<string, InnerNodeKinds>();
-
-                    foreach (Node node in graph.Nodes())
-                    {
-                        if (!node.IsLeaf())
-                        {
-                            dirsShape.Add(node.ID, InnerNodeObjects);
-                            dirsLocal.Add(node.ID, false);
-                            dirsLayout.Add(node.ID, NodeLayout);
-                        }
-                    }
-
-                    // falls der key nicht in den alten dictonary ist
-                    //dirsLocal = dirsLocal.Where(i => !dirs.ContainsKey(i.Key)).ToDictionary(i => i.Key, i => i.Value);
-
-                    CoseGraphSettings.show = new Dictionary<string, bool>();
-
-                    var diff1 = dirs.Keys.Except(dirsLocal.Keys).Any();
-                    var diff2 = dirsLocal.Keys.Except(dirs.Keys).Any();
-
-                    if (dirs.Count == dirsLocal.Count && !diff1 && !diff2)
-                    {
-
-                    } else
-                    {
-                        CoseGraphSettings.DirShape = dirsShape;
-                        CoseGraphSettings.DirNodeLayout = dirsLayout;
-                        CoseGraphSettings.ListDirToggle = dirsLocal;
-                        // get roots
-                        CoseGraphSettings.rootDirs = graph.GetRoots();
-                    }
-
-                    CoseGraphSettings.rootDirs = graph.GetRoots();
+                    LoadDataForGraphListing(graph);
 
                     return graph;
                 }
@@ -572,8 +534,54 @@ namespace SEE.Game
         /// </summary>
         public Dictionary<NodeLayouts, string> SubLayoutsLeafNodes = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
 
-    }
 
+        public void LoadDataForGraphListing(Graph graph)
+        {
+            if (NodeLayout == NodeLayouts.CompoundSpringEmbedder)
+            {
+                Dictionary<string, bool> dirs = CoseGraphSettings.ListDirToggle;
+                // die neuen dirs 
+                Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
+
+                Dictionary<string, NodeLayouts> dirsLayout = new Dictionary<string, NodeLayouts>();
+                Dictionary<string, InnerNodeKinds> dirsShape = new Dictionary<string, InnerNodeKinds>();
+
+                foreach (Node node in graph.Nodes())
+                {
+                    if (!node.IsLeaf())
+                    {
+                        dirsShape.Add(node.ID, InnerNodeObjects);
+                        dirsLocal.Add(node.ID, false);
+                        dirsLayout.Add(node.ID, NodeLayout);
+                    }
+                }
+
+                // falls der key nicht in den alten dictonary ist
+                //dirsLocal = dirsLocal.Where(i => !dirs.ContainsKey(i.Key)).ToDictionary(i => i.Key, i => i.Value);
+
+                CoseGraphSettings.show = new Dictionary<string, bool>();
+
+                var diff1 = dirs.Keys.Except(dirsLocal.Keys).Any();
+                var diff2 = dirsLocal.Keys.Except(dirs.Keys).Any();
+
+                if (dirs.Count == dirsLocal.Count && !diff1 && !diff2)
+                {
+
+                }
+                else
+                {
+                    CoseGraphSettings.DirShape = dirsShape;
+                    CoseGraphSettings.DirNodeLayout = dirsLayout;
+                    CoseGraphSettings.ListDirToggle = dirsLocal;
+                    // get roots
+                    CoseGraphSettings.rootDirs = graph.GetRoots();
+                }
+
+                CoseGraphSettings.loadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value == true).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                CoseGraphSettings.rootDirs = graph.GetRoots();
+            }
+        }
+    }
 }
 
 
