@@ -82,8 +82,8 @@ namespace SEE.Layout
         public void StartOptAlgorithm(OptAlgoIterations it, bool save)
         {
             settings.CoseGraphSettings.multiLevelScaling = false;
-            settings.CoseGraphSettings.UseSmartRepulsionRangeCalculation = true;
-            settings.CoseGraphSettings.UseSmartIdealEdgeCalculation = true;
+            settings.CoseGraphSettings.UseSmartRepulsionRangeCalculation = false;
+            settings.CoseGraphSettings.UseSmartIdealEdgeCalculation = false;
 
             for (int i = it.edgeLength.start; i < it.edgeLength.end; i += it.edgeLength.iterationStep)
             {

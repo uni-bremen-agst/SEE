@@ -144,12 +144,12 @@ namespace SEE.Layout
 
             if (Mathf.Abs(lengthX) < 1.0)
             {
-                lengthX = Mathf.Sign(lengthX);
+                lengthX = CoseHelper.Sign(lengthX);
             }
 
             if (Mathf.Abs(lengthY) < 1.0)
             {
-                lengthY = Mathf.Sign(lengthY);
+                lengthY = CoseHelper.Sign(lengthY);
             }
 
             length = Mathf.Sqrt(lengthX * lengthX + lengthY * lengthY);
@@ -172,16 +172,18 @@ namespace SEE.Layout
 
                 if (Mathf.Abs(lengthX) < 1.0)
                 {
-                    lengthX = Mathf.Sign(lengthX);
+                    lengthX = CoseHelper.Sign(lengthX);
                 }
 
                 if (Mathf.Abs(lengthY) < 1.0)
                 {
-                    lengthY = Mathf.Sign(lengthY);
+                    lengthY = CoseHelper.Sign(lengthY);
                 }
 
                 length = Mathf.Sqrt(lengthX * lengthX + lengthY * lengthY);
             }
         }
+
+        
     }
 }

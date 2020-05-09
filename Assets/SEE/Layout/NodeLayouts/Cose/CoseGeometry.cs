@@ -340,9 +340,9 @@ namespace SEE.Layout
         /// <param name="rectB">the second rectangle</param>
         /// <param name="overlapAmount">the amount of overlapping</param>
         /// <param name="separationBuffer">the separation buffer</param>
-        public static void CalcSeparationAmount(Rect _rectA, Rect rectB, double[] overlapAmount, double separationBuffer)
+        public static void CalcSeparationAmount(Rect rectA, Rect rectB, double[] overlapAmount, double separationBuffer)
         {
-            Rect rectA = _rectA;
+            //Rect rectA = _rectA;
             if (!rectA.Overlaps(rectB))
             {
                 throw new System.Exception("Needs overlap");

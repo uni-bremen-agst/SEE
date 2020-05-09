@@ -49,7 +49,7 @@ namespace SEE.Layout
         /// <summary>
         /// the maximum value of the displacement of a node when the layout prozess is incrementally calculated
         /// </summary>
-        public static float Max_Node_Displacement_Incremental = 100.0f;
+        public static float Max_Node_Displacement_Incremental = 50.0f;
 
         /// <summary>
         ///  the maximum value of the displacement of a node when the layout prozess is not incrementally calculated
@@ -69,7 +69,7 @@ namespace SEE.Layout
         /// <summary>
         /// the strength of a spring
         /// </summary>
-        public static float Spring_Strength = 0.4f;
+        public static float Spring_Strength = 0.45f;
 
         /// <summary>
         /// Indicates whether is smart repulsion range calculation is used

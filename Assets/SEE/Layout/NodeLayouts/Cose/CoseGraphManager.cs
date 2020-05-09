@@ -196,9 +196,7 @@ namespace SEE.Layout
                     Debug.Log("stop");
                 }
                 return newEdge;
-            }
-
-            
+            }  
         }
 
         /// <summary>

@@ -117,7 +117,15 @@ namespace SEE.Layout
         /// <returns></returns>
         public bool CalcOverlap(CoseNode nodeB, double[] overlapAmount)
         {
-            Rect rectA = CoseHelper.NewRect(Scale, CenterPosition);
+            Vector3 center = CenterPosition;
+            if (center == nodeB.CenterPosition)
+            {
+                center = new Vector3(center.x, center.y, center.z + 0.001f);
+            }
+
+            centerPosition = center;
+            
+            Rect rectA = CoseHelper.NewRect(Scale, centerPosition);
             Rect rectB = CoseHelper.NewRect(nodeB.Scale, nodeB.CenterPosition);
 
             if (rectA.Overlaps(rectB))
@@ -176,18 +184,17 @@ namespace SEE.Layout
             CoseLayout layout = graphManager.Layout;
             double maxNodeDisplacement = layout.CoseLayoutSettings.CoolingFactor * layout.CoseLayoutSettings.MaxNodeDisplacement;
 
-            layoutValues.DisplacementX = layout.CoseLayoutSettings.CoolingFactor * (float)(layoutValues.SpringForceX + layoutValues.RepulsionForceX + layoutValues.GravitationForceX) / noOfChildren;
-            layoutValues.DisplacementY = layout.CoseLayoutSettings.CoolingFactor * (float)(layoutValues.SpringForceY + layoutValues.RepulsionForceY + layoutValues.GravitationForceY) / noOfChildren;
-
+            layoutValues.DisplacementX = layout.CoseLayoutSettings.CoolingFactor * (layoutValues.SpringForceX + layoutValues.RepulsionForceX + layoutValues.GravitationForceX) / noOfChildren;
+            layoutValues.DisplacementY = layout.CoseLayoutSettings.CoolingFactor * (layoutValues.SpringForceY + layoutValues.RepulsionForceY + layoutValues.GravitationForceY) / noOfChildren;
 
             if (Math.Abs(layoutValues.DisplacementX) > maxNodeDisplacement)
             {
-                layoutValues.DisplacementX = (float) maxNodeDisplacement * Mathf.Sign(layoutValues.DisplacementX);
+                layoutValues.DisplacementX = (float) maxNodeDisplacement * CoseHelper.Sign(layoutValues.DisplacementX);
             }
 
             if (Math.Abs(layoutValues.DisplacementY) > maxNodeDisplacement)
             {
-                layoutValues.DisplacementY = (float) maxNodeDisplacement * Mathf.Sign(layoutValues.DisplacementY);
+                layoutValues.DisplacementY = (float) maxNodeDisplacement * CoseHelper.Sign(layoutValues.DisplacementY);
             }
 
             if (child == null && !sublayoutValues.IsSubLayoutNode) // TODO here maybe
@@ -214,7 +221,7 @@ namespace SEE.Layout
 
             }
 
-            layout.CoseLayoutSettings.TotalDisplacement += (decimal) (Math.Abs(layoutValues.DisplacementX) + Math.Abs(layoutValues.DisplacementY));
+            layout.CoseLayoutSettings.TotalDisplacement += (decimal)(Math.Abs(layoutValues.DisplacementX) + Math.Abs(layoutValues.DisplacementY));
         }
 
         /// <summary>
