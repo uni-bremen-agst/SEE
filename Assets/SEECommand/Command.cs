@@ -107,16 +107,6 @@ namespace SEE.Command
                 }
             }
         }
-
-        internal static void Clear()
-        {
-            foreach (State state in history)
-            {
-                state.Destroy();
-            }
-            history.Clear();
-            currentState = -1;
-        }
     }
 
     public abstract class AbstractCommand

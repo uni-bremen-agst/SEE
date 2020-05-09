@@ -1,7 +1,10 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using SEE.Command;
+using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Net.Internal
 {
@@ -23,7 +26,15 @@ namespace SEE.Net.Internal
                 return false;
             }
 
-            packet.command.ExecuteOnClient();
+            Assert.IsNotNull(packet.command.requesterIPAddress);
+            Assert.IsTrue(packet.command.requesterPort != -1);
+
+            KeyValuePair<GameObject[], GameObject[]> result = packet.command.ExecuteOnClient();
+            IPEndPoint stateOwner = new IPEndPoint(IPAddress.Parse(packet.command.requesterIPAddress), packet.command.requesterPort);
+            if (packet.command.buffer)
+            {
+                CommandHistory.OnExecute(stateOwner, result.Key, result.Value);
+            }
 
             return true;
         }
