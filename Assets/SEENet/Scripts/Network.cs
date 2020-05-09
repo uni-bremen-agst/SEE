@@ -140,8 +140,6 @@ namespace SEE.Net
                 }
 #endif
             }
-
-            CommandHistory.Clear();
         }
 
         private void Update()
