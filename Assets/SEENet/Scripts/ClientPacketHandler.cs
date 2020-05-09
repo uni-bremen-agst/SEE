@@ -1,5 +1,6 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
+using SEE.Command;
 using UnityEngine;
 
 namespace SEE.Net.Internal
@@ -13,22 +14,30 @@ namespace SEE.Net.Internal
 
         
 
-        protected override bool HandleCommandPacket(PacketHeader packetHeader, Connection connection, string data)
+        protected override bool HandleExecuteCommandPacket(PacketHeader packetHeader, Connection connection, string data)
         {
-            CommandPacket packet = CommandPacket.Deserialize(data);
+            ExecuteCommandPacket packet = ExecuteCommandPacket.Deserialize(data);
 
             if (packet == null || packet.command == null)
             {
                 return false;
             }
 
-            switch (packet.command.action)
+            packet.command.ExecuteOnClient();
+
+            return true;
+        }
+
+        protected override bool HandleRedoCommandPacket(PacketHeader packetHeader, Connection connection, string data)
+        {
+            RedoCommandPacket packet = RedoCommandPacket.Deserialize(data);
+
+            if (packet == null)
             {
-                case Command.CommandAction.Execute: packet.command.ExecuteOnClient(); break;
-                case Command.CommandAction.Redo:    packet.command.RedoOnClient(); break;
-                case Command.CommandAction.Undo:    packet.command.UndoOnClient(); break;
+                return false;
             }
 
+            CommandHistory.RedoOnClient();
             return true;
         }
 
@@ -50,6 +59,19 @@ namespace SEE.Net.Internal
         {
             TransformViewScalePacket packet = TransformViewScalePacket.Deserialize(data);
             packet?.transformView?.SetNextScale(packet.updateTime, packet.scale);
+            return true;
+        }
+
+        protected override bool HandleUndoCommandPacket(PacketHeader packetHeader, Connection connection, string data)
+        {
+            UndoCommandPacket packet = UndoCommandPacket.Deserialize(data);
+
+            if (packet == null)
+            {
+                return false;
+            }
+
+            CommandHistory.UndoOnClient();
             return true;
         }
     }

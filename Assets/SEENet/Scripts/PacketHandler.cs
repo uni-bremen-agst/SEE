@@ -20,17 +20,19 @@ namespace SEE.Net.Internal
         }
 
         public readonly Dictionary<string, HandlerFunc> handlerFuncDict;
-        private Stack<PendingPacket> pendingMessages = new Stack<PendingPacket>();
+        private List<PendingPacket> pendingMessages = new List<PendingPacket>();
 
         public PacketHandler(string packetTypePrefix)
         {
             Assert.IsNotNull(packetTypePrefix);
             handlerFuncDict = new Dictionary<string, HandlerFunc>
             {
-                { packetTypePrefix + CommandPacket.PACKET_TYPE, HandleCommandPacket },
+                { packetTypePrefix + ExecuteCommandPacket.PACKET_TYPE, HandleExecuteCommandPacket },
+                { packetTypePrefix + RedoCommandPacket.PACKET_TYPE, HandleRedoCommandPacket},
                 { packetTypePrefix + TransformViewPositionPacket.PACKET_TYPE, HandleTransformViewPositionPacket },
                 { packetTypePrefix + TransformViewRotationPacket.PACKET_TYPE, HandleTransformViewRotationPacket },
-                { packetTypePrefix + TransformViewScalePacket.PACKET_TYPE, HandleTransformViewScalePacket }
+                { packetTypePrefix + TransformViewScalePacket.PACKET_TYPE, HandleTransformViewScalePacket },
+                { packetTypePrefix + UndoCommandPacket.PACKET_TYPE, HandleUndoCommandPacket}
             };
         }
 
@@ -38,7 +40,7 @@ namespace SEE.Net.Internal
         {
             lock (pendingMessages)
             {
-                pendingMessages.Push(new PendingPacket
+                pendingMessages.Add(new PendingPacket
                 {
                     header = packetHeader,
                     connection = connection,
@@ -51,20 +53,23 @@ namespace SEE.Net.Internal
             lock (pendingMessages)
             {
                 Assert.AreEqual(Thread.CurrentThread, Network.MainThread);
-                while (pendingMessages.Count != 0)
+                for (int i = 0; i < pendingMessages.Count; i++)
                 {
-                    PendingPacket packet = pendingMessages.Pop();
+                    PendingPacket packet = pendingMessages[i];
                     bool result = handlerFuncDict.TryGetValue(packet.header.PacketType, out HandlerFunc func);
                     Assert.IsTrue(result);
                     func(packet.header, packet.connection, packet.packet);
                 }
+                pendingMessages.Clear();
             }
         }
 
-        protected abstract bool HandleCommandPacket(PacketHeader packetHeader, Connection connection, string data);
+        protected abstract bool HandleExecuteCommandPacket(PacketHeader packetHeader, Connection connection, string data);
+        protected abstract bool HandleRedoCommandPacket(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleTransformViewRotationPacket(PacketHeader packetHeader, Connection connection, string data);
         protected abstract bool HandleTransformViewScalePacket(PacketHeader packetHeader, Connection connection, string data);
+        protected abstract bool HandleUndoCommandPacket(PacketHeader packetHeader, Connection connection, string data);
     }
 
 }
