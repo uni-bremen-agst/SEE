@@ -24,6 +24,8 @@ namespace SEE.DataModel
         public List<Node> rootDirs = new List<Node>();
         public Dictionary<string, bool> show = new Dictionary<string, bool>();
         public bool useOptAlgorithm = false;
+        public bool showGraphListing = true;
+        public Dictionary<string, bool> loadedForNodeTypes = new Dictionary<string, bool>();
     }
 }
 

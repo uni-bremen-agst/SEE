@@ -513,24 +513,19 @@ namespace SEE.Layout
 
             length = edge.Length;
 
-            if (length == 0.0)
-            {
-                throw new System.Exception("edge length is 0");
-            }
-
             float dl = length - idealEdgeLength;
 
-            /*if (dl == 0.0)
+            if (dl == 0.0)
             {
                 springForceX = 0;
                 springForceY = 0;
-            } else*/
+            } else
+            {
+                springForce = CoseLayoutSettings.Spring_Strength * dl;
+                springForceX = springForce * (edge.LengthX / length);
+                springForceY = springForce * (edge.LengthY / length);
+            }
             
-            springForce = CoseLayoutSettings.Spring_Strength * dl;
-            springForceX = springForce * (edge.LengthX / length);
-            springForceY = springForce * (edge.LengthY / length);
-            
-
             source.LayoutValues.SpringForceX += springForceX;
             source.LayoutValues.SpringForceY += springForceY;
             target.LayoutValues.SpringForceX -= springForceX;

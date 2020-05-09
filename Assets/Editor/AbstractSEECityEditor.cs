@@ -96,13 +96,14 @@ namespace SEEEditor
                         {
                             TraverseThruNodesCounter(root);
                         }
-                        Debug.Log("show empty");
-                    }
+                    } 
 
-                    List<NodeLayouts> parentNodeLayouts = new List<NodeLayouts>();
-                    foreach (Node root in roots)
-                    {
-                        TraverseThruNodes(root, parentNodeLayouts);
+                    if (city.CoseGraphSettings.showGraphListing) {
+                        List<NodeLayouts> parentNodeLayouts = new List<NodeLayouts>();
+                        foreach (Node root in roots)
+                        {
+                            TraverseThruNodes(root, parentNodeLayouts);
+                        }
                     }
                 }
             }
