@@ -44,7 +44,23 @@ namespace SEE.Layout
                 y = center.z - scale.z / 2,
                 width = scale.x,
                 height = scale.z
-            }; 
+            };
+        }
+
+        public static int Sign(float value)
+        {
+            if (value > 0)
+            {
+                return 1;
+            }
+            else if (value < 0)
+            {
+                return -1;
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 }

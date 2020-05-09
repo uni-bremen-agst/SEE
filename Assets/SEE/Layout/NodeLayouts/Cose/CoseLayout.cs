@@ -153,8 +153,12 @@ namespace SEE.Layout
                     }
                 }
 
-                float rotation = applyRotation ? graph.GraphObject.Rotation : 0.0f;
-                layout_result[graph.GraphObject] = new NodeTransform(position, new Vector3(width, innerNodeHeight, height),  rotation);
+                if (graph.GraphObject != null)
+                {
+                    float rotation = applyRotation ? graph.GraphObject.Rotation : 0.0f;
+                    layout_result[graph.GraphObject] = new NodeTransform(position, new Vector3(width, innerNodeHeight, height), rotation);
+                }
+                
             }
 
             return layout_result;
@@ -284,7 +288,7 @@ namespace SEE.Layout
             CreateTopology(root);
             CalculateSubLayouts();
 
-            if (SublayoutNodes.Count > 0 && CoseHelper.CheckIfNodeIsSublayouRoot(SublayoutNodes, graphManager.RootGraph.Parent.NodeObject.ID) != null)
+            if (SublayoutNodes.Count > 0 && CoseHelper.CheckIfNodeIsSublayouRoot(SublayoutNodes, graphManager.RootGraph.Nodes.First().NodeObject.ID) != null)
             {
                 graphManager.UpdateBounds();
             } else
@@ -384,7 +388,6 @@ namespace SEE.Layout
             // centerposition und postion schaune, ob das überein stimt 
             // coseNode.SetPositionScale
 
-            SetSublayoutValuesToNode(node: graphManager.RootGraph.Parent);
             foreach (CoseNode node in graphManager.GetAllNodes())
             {
                 SetSublayoutValuesToNode(node: node);
@@ -510,18 +513,23 @@ namespace SEE.Layout
 
             length = edge.Length;
 
+            if (length == 0.0)
+            {
+                throw new System.Exception("edge length is 0");
+            }
+
             float dl = length - idealEdgeLength;
 
-            if (dl == 0.0)
+            /*if (dl == 0.0)
             {
                 springForceX = 0;
                 springForceY = 0;
-            } else
-            {
-                springForce = CoseLayoutSettings.Spring_Strength * dl;
-                springForceX = springForce * (edge.LengthX / length);
-                springForceY = springForce * (edge.LengthY / length);
-            }
+            } else*/
+            
+            springForce = CoseLayoutSettings.Spring_Strength * dl;
+            springForceX = springForce * (edge.LengthX / length);
+            springForceY = springForce * (edge.LengthY / length);
+            
 
             source.LayoutValues.SpringForceX += springForceX;
             source.LayoutValues.SpringForceY += springForceY;
@@ -656,8 +664,6 @@ namespace SEE.Layout
         /// <param name="nodeB"></param>
         private void CalcRepulsionForce(CoseNode nodeA, CoseNode nodeB)
         {
-            //var rectA = nodeA.rect;
-            //var rectB = nodeB.rect;
             double[] overlapAmount = new double[2];
             double[] clipPoints = new double[4];
             float distanceX;
@@ -690,6 +696,7 @@ namespace SEE.Layout
                 } else
                 {
                     clipPoints = nodeA.CalcIntersection(nodeB, clipPoints);
+
                     distanceX = (float)clipPoints[2] - (float)clipPoints[0];
                     distanceY = (float)clipPoints[3] - (float)clipPoints[1];
                 }
@@ -956,18 +963,17 @@ namespace SEE.Layout
         {
             // Kanten zwischen Vorgängern und Nachfolgern in der gleichen Hierarchie werden vom Layout ausgeschlossen 
 
-            Node source = edge.Source;
+            ILayoutNode sourceNode = layoutNodes.Where(node => node.ID == edge.Source.ID).First();
+            ILayoutNode targetNode = layoutNodes.Where(node => node.ID == edge.Target.ID).First();
 
-            Node target = edge.Target;
-
-            if (target.Level == source.Level)
+            if (sourceNode.Level == targetNode.Level)
             {
                 return true;
             }
 
-            Node startNode = source.Level <= target.Level ? source : target;
+            ILayoutNode startNode = sourceNode.Level <= targetNode.Level ? sourceNode : targetNode;
 
-            return CheckChildrenForHierachie(startNode, startNode.Children());
+            return CheckChildrenForHierachie(targetNode, startNode.Children());
         }
 
         /// <summary>
@@ -976,11 +982,11 @@ namespace SEE.Layout
         /// <param name="node"></param>
         /// <param name="children"></param>
         /// <returns></returns>
-        private bool CheckChildrenForHierachie(Node node, List<Node> children) 
+        private bool CheckChildrenForHierachie(ILayoutNode node, ICollection<ILayoutNode> children) 
         {
-            foreach(Node child in children)
+            foreach(ILayoutNode child in children)
             {
-                if (node.Equals(child))
+                if (node.ID == child.ID)
                 {
                     return false;
                 }
@@ -1002,23 +1008,26 @@ namespace SEE.Layout
         {
             graphManager = new CoseGraphManager(this);
 
-            CoseNode rootNode = NewNode(root);
+            //CoseNode rootNode = NewNode(root);
             CoseGraph rootGraph = graphManager.AddRootGraph();
-            rootGraph.GraphObject = root;
-            rootGraph.Parent = rootNode;
-            rootNode.Child = rootGraph;
-            this.nodeToCoseNode.Add(root, rootNode);
+            //rootGraph.GraphObject = root;
 
-            foreach (ILayoutNode child in root.Children())
+            //rootGraph.Parent = rootNode;
+            //rootNode.Child = rootGraph;
+            //this.nodeToCoseNode.Add(root, rootNode);
+
+            CreateNode(root, null);
+            /*foreach (ILayoutNode child in root.Children())
             {
                 CreateNode(child, null);
-            }
+            }*/
             //SetScale(layoutNodes);
             Debug.Log("I am Groot");
 
             foreach (Edge edge in edges)
             {
-                if (ExcludeEdgesInSameHierarchie(edge))
+                // TODO
+                if (ExcludeEdgesInSameHierarchie(edge) && (edge.Source.ID != edge.Target.ID))
                 {
                     CreateEdge(edge);
                 } else
