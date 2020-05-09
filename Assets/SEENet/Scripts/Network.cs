@@ -196,6 +196,8 @@ namespace SEE.Net
             Send(connection, packet.packetType, packet.Serialize(), options);
         }
 
+        Thread currentThread = null;
+
         internal static void Send(Connection connection, string packetType, string packetData, SendReceiveOptions options = null)
         {
             Assert.IsNotNull(connection);
@@ -212,7 +214,8 @@ namespace SEE.Net
                 return;
             }
 
-            new Thread(new ThreadStart(() =>
+            instance.currentThread?.Join();
+            instance.currentThread = new Thread(new ThreadStart(() =>
             {
                 try
                 {
@@ -235,7 +238,9 @@ namespace SEE.Net
                         }
                     }
                 }
-            })).Start();
+            }));
+
+            instance.currentThread.Start();
         }
 
 

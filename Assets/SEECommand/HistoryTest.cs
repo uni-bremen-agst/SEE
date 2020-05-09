@@ -33,7 +33,7 @@ public class HistoryTest : MonoBehaviour
 
         if (dragging)
         {
-            new MoveBlockCommand(draggedTransform.gameObject, oldPosition, Camera.main.transform.position + Camera.main.ScreenPointToRay(Input.mousePosition).direction * distanceToCamera, Input.GetMouseButtonDown(0)).Execute();
+            new MoveBlockCommand(draggedTransform.gameObject, oldPosition, Camera.main.transform.position + Camera.main.ScreenPointToRay(Input.mousePosition).direction * distanceToCamera, !Input.GetMouseButton(0)).Execute();
             if (!Input.GetMouseButton(0))
             {
                 draggedTransform = null;

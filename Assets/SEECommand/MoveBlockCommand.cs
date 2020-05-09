@@ -7,13 +7,13 @@ namespace SEE.Command
     public class MoveBlockCommand : AbstractCommand
     {
         public int id;
+        public Vector3 originalPosition;
         public Vector3 newPosition;
-        public Vector3 oldPosition;
 
-        public MoveBlockCommand(GameObject block, Vector3 oldPosition, Vector3 newPosition, bool buffer) : base(buffer)
+        public MoveBlockCommand(GameObject block, Vector3 originalPosition, Vector3 newPosition, bool buffer) : base(buffer)
         {
             id = block.GetComponent<Interactable>().id;
-            this.oldPosition = oldPosition;
+            this.originalPosition = originalPosition;
             this.newPosition = newPosition;
         }
 
@@ -31,6 +31,7 @@ namespace SEE.Command
                     if (buffer)
                     {
                         go = Object.Instantiate(interactable.gameObject);
+                        interactable.gameObject.transform.position = originalPosition;
                     }
                     else
                     {
