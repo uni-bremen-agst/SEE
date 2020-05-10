@@ -13,7 +13,7 @@ namespace SEE.GO
         /// <summary>
         /// Name of default shader to obtain the default material.
         /// </summary>
-        private const string shaderName = "Diffuse";
+        private const string shaderName = "Standard";
 
         /// <summary>
         /// Creates default numberOfColors materials in the color range from
@@ -64,7 +64,7 @@ namespace SEE.GO
             }
             // Shader to retrieve the default material.
             Shader shader = Shader.Find(shaderName);
-
+           
             Material[] result = new Material[numberOfColors];
 
             if (numberOfColors == 1)
