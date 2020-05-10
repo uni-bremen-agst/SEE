@@ -18,6 +18,8 @@ namespace SEE.Game
 
         private GameObject focus;
 
+        private bool animationIsRunning = false;
+
         /// ----------------------------------------------------------------------------------------------
         /// Initial state
         /// ----------------------------------------------------------------------------------------------
@@ -105,7 +107,6 @@ namespace SEE.Game
             ICollection<GameObject> descendants = Descendants(focus);
             initialTransforms = GetMementos(descendants);
             BoundingBox.Get(descendants, out initalLeftLowerCorner, out initialRightUpperCorner);
-            //ZoomIn(gameObject);
         }
 
         /// ----------------------------------------------------------------------------------------------
@@ -185,7 +186,7 @@ namespace SEE.Game
             HashSet<GameObject> newlyVisible = Descendants(parent);
             // All currently visible elements that need to be hidden.
             currentlyVisible.ExceptWith(newlyVisible);
-            ResetAndHide(currentlyVisible);
+            Hide(currentlyVisible);
             focus = parent;
             FitInto(parent, newlyVisible);
             // Invariant: all nodes except for newlyVisible have their original
@@ -204,6 +205,9 @@ namespace SEE.Game
                     {
                         // Currently, focus and all its descendants are visible.
                         HashSet<GameObject> currentlyVisible = Descendants(focus);
+
+                        // TODO: Shrink and move currentlyVisible to their previous location within parent
+
                         Reset(currentlyVisible);
                         // All elements in the subtree rooted by parent will be visible next.
                         // This set includes currentlyVisible.
@@ -229,13 +233,23 @@ namespace SEE.Game
             }
         }
 
-        private void ResetAndHide(HashSet<GameObject> gameObjects)
+        private void Hide(HashSet<GameObject> gameObjects)
         {
             foreach (GameObject go in gameObjects)
             {
                 Show(go, false);
+                // There is a FadeTo animation in iTween, but it does not
+                // work for objects drawn by a LineRenderer
+                //if (go.GetComponent<LineRenderer>() == null)
+                //{
+                //    iTween.FadeTo(go, iTween.Hash(
+                //      "alpha", 0,
+                //      "time", 1.5f
+                //    //"oncompletetarget", gameObject,
+                //    //"oncomplete", "OnFitIntoCompleted"
+                //    ));
+                //}
             }
-            Reset(gameObjects);
         }
 
         private void HideAll()
@@ -247,25 +261,13 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Adds the given <paramref name="offset"/> to every node in <paramref name="gameObjects"/>.
-        /// </summary>
-        /// <param name="gameObjects">game objects to be moved</param>
-        /// <param name="offset">offset to be added</param>
-        private static void Move(ICollection<GameObject> gameObjects, Vector3 offset)
-        {
-            foreach (GameObject layoutNode in gameObjects)
-            {
-                layoutNode.transform.position += offset;
-            }
-        }
-
-        /// <summary>
-        /// Scales all nodes in <paramref name="descendants"/> so that the total width
-        /// of the layout (along the x axis) equals <paramref name="width"/>.
+        /// Scales <paramref name="parent"/> so that the total width of the size
+        /// requested for its <paramref name="descendants"/> fits into initial
+        /// rectangle.
         /// The aspect ratio of every node is maintained.
         /// </summary>
+        /// <param name="parent">the parent of all <paramref name="descendants"/></param>
         /// <param name="descendants">layout nodes to be scaled</param>
-        /// <param name="width">the absolute width (x axis) the required space for the laid out nodes must have</param>
         /// <returns>the factor by which the scale of edge node was multiplied</returns>
         private float FitInto(GameObject parent, ICollection<GameObject> descendants)
         {
@@ -276,18 +278,38 @@ namespace SEE.Game
             BoundingBox.Get(descendants, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner);
 
             float currentWidth = rightUpperCorner.x - leftLowerCorner.x;
-            float scaleFactor = requestedWidth / currentWidth;
-
-            parent.transform.localScale *= scaleFactor;
-
-            Vector2 cornerDelta = initalLeftLowerCorner - leftLowerCorner;
-            Vector2 center = CenterPoint;
+            float scaleFactor = requestedWidth / currentWidth;            
             // We maintain parent's y co-ordinate. We move it only within the x/z plane.
             Vector3 position = parent.transform.position;
+            Vector2 center = CenterPoint;
             position.x = center.x;
             position.z = center.y;
-            parent.transform.position = position;
+
+            Debug.LogFormat("Moving {0} from {1} to {2}\n", parent.name, parent.transform.position, position);
+            // Adjust position and scale by some animation.
+            animationIsRunning = true;
+            iTween.MoveTo(parent, iTween.Hash(
+                                          "position", position,
+                                          "time", 1.0f
+                ));
+            iTween.ScaleTo(parent, iTween.Hash(
+                              "scale", parent.transform.localScale * scaleFactor,
+                              "delay", 1.0f,
+                              "time", 1.5f,
+                              "oncompletetarget", gameObject,
+                              "oncomplete", "OnFitIntoCompleted"
+                ));
             return scaleFactor;
+        }
+
+        /// <summary>
+        /// This method will be called by iTween when the animation triggered in FitInto
+        /// is completed.
+        /// </summary>
+        private void OnFitIntoCompleted()
+        {
+            Debug.Log("OnFitIntoCompleted\n");
+            animationIsRunning = false;
         }
 
         ///--------------------------------------------------------------------------------------------------
@@ -296,25 +318,28 @@ namespace SEE.Game
         ///
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.R))
+            if (!animationIsRunning)
             {
-                ResetAll();
-            }
-            if (Input.GetKeyDown(KeyCode.H))
-            {
-                HideAll();
-            }
-            if (Input.GetKeyDown(KeyCode.I))
-            {
-                GameObject child = RandomChild(focus);
-                if (child != null)
+                if (Input.GetKeyDown(KeyCode.R))
                 {
-                    ZoomIn(child);
+                    ResetAll();
                 }
-            }
-            if (Input.GetKeyDown(KeyCode.O))
-            {
-                ZoomOut();
+                if (Input.GetKeyDown(KeyCode.H))
+                {
+                    HideAll();
+                }
+                if (Input.GetKeyDown(KeyCode.I))
+                {
+                    GameObject child = RandomChild(focus);
+                    if (child != null)
+                    {
+                        ZoomIn(child);
+                    }
+                }
+                if (Input.GetKeyDown(KeyCode.O))
+                {
+                    ZoomOut();
+                }
             }
         }
 
