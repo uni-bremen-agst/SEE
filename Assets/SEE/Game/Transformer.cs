@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 
 using SEE.Utils;
-using System;
 using SEE.DataModel;
+using SEE.GO;
+using System;
 
 namespace SEE.Game
 {
@@ -14,17 +15,13 @@ namespace SEE.Game
     //[RequireComponent(typeof(AbstractSEECity))]
     public class Transformer : MonoBehaviour
     {
-        [Tooltip("The center of the visible area")]
-        public Vector3 CenterOfVisibleArea = Vector3.zero;
-
-        [Tooltip("The width of the visible area")]
-        public float WidthOfVisibleArea = 1.0f;
-
-        [Tooltip("The depth of the visible area")]
-        public float DepthOfVisibleArea = 1.0f;
 
         private GameObject focus;
 
+        /// ----------------------------------------------------------------------------------------------
+        /// Initial state
+        /// ----------------------------------------------------------------------------------------------
+        /// 
         /// <summary>
         /// The left lower corner of the initial bounding box of the gameObject in world space (x/z plane).
         /// </summary>
@@ -34,15 +31,87 @@ namespace SEE.Game
         /// </summary>
         private Vector2 initialRightUpperCorner;
 
-        private void Start()
+        private Vector2 CenterPoint
         {
-            initialTransforms = new Dictionary<GameObject, Transform>();            
+            get
+            {
+                float width = initialRightUpperCorner.x - initalLeftLowerCorner.y;
+                float height = initialRightUpperCorner.y - initalLeftLowerCorner.y;
+                return new Vector2(initalLeftLowerCorner.x + width / 2.0f, initalLeftLowerCorner.y + height / 2.0f);
+            }
+        }
+
+        private struct ObjectMemento
+        {
+            public ObjectMemento(GameObject go)
+            {
+                this.go = go;
+                this.localPosition = go.transform.localPosition;
+                this.localScale = go.transform.localScale;
+
+            }
+            private GameObject go;
+            private Vector3 localPosition;
+            private Vector3 localScale;
+            public void Reset()
+            {
+                go.transform.localPosition = localPosition;
+                go.transform.localScale = localScale;
+
+            }
+            public GameObject Node
+            {
+                get => go;
+            }
+        }
+
+        // All descendants of gameObject tagged by Tags.Node.
+        private Dictionary<string, ObjectMemento> initialTransforms;
+
+        public void ResetAll()
+        {
+            foreach (ObjectMemento memento in initialTransforms.Values)
+            {
+                memento.Reset();
+                Show(memento.Node, true);
+            }
+        }
+
+        private void Reset(ICollection<GameObject> gameObjects)
+        {
+            foreach (GameObject go in gameObjects)
+            {
+                ObjectMemento initial = initialTransforms[go.ID()];
+                initial.Reset();
+            }
+        }
+
+        private Dictionary<string, ObjectMemento> GetMementos(ICollection<GameObject> descendants)
+        {
+            Dictionary<string, ObjectMemento> result = new Dictionary<string, ObjectMemento>();
+            foreach (GameObject go in descendants)
+            {
+                result[go.ID()] = new ObjectMemento(go);
+            }
+            return result;
+        }
+
+        /// ----------------------------------------------------------------------------------------------
+        /// Start up
+        /// ----------------------------------------------------------------------------------------------
+        private void Start()
+        {       
             focus = GetRootNode(gameObject);
-            SaveTransforms(focus);
-            BoundingBox.Get(initialTransforms.Keys, out initalLeftLowerCorner, out initialRightUpperCorner);
+            ICollection<GameObject> descendants = Descendants(focus);
+            initialTransforms = GetMementos(descendants);
+            BoundingBox.Get(descendants, out initalLeftLowerCorner, out initialRightUpperCorner);
             //ZoomIn(gameObject);
         }
 
+        /// ----------------------------------------------------------------------------------------------
+        /// Hierarchy
+        /// ----------------------------------------------------------------------------------------------
+        /// 
         private GameObject GetRootNode(GameObject parent)
         {
             GameObject result = null;
@@ -67,48 +136,6 @@ namespace SEE.Game
             return result;
         }
 
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                ResetAll();
-            }
-            if (Input.GetKeyDown(KeyCode.H))
-            {
-                HideAll();
-            }
-            if (Input.GetKeyDown(KeyCode.I))
-            {
-                GameObject child = RandomChild(focus);
-                if (child != null)
-                {
-                    ZoomIn(child);
-                }
-            }
-            if (Input.GetKeyDown(KeyCode.O))
-            {
-                ZoomOut();
-            }
-        }
-
-        private GameObject RandomChild(GameObject parent)
-        {
-            GameObject selectedChild = null;
-            int maxLevel = 0;
-
-            // always select the child with the greatest depth
-            foreach (Transform child in parent.transform)
-            {
-                int level = GetDepth(child.gameObject);
-                if (level > maxLevel)
-                {
-                    maxLevel = level;
-                    selectedChild = child.gameObject;
-                }
-            }
-            return selectedChild;
-        }
-
         private int GetDepth(GameObject parent)
         {
             int maxLevel = 0;
@@ -123,35 +150,31 @@ namespace SEE.Game
             return maxLevel + 1;
         }
 
-        private void SaveTransforms(GameObject parent)
+        private static HashSet<GameObject> Descendants(GameObject parent)
         {
-            // if parent is not the Plane
-            if (parent.name != "Plane" && parent.tag != Tags.Decoration)
+            // all descendants of gameObject including parent
+            HashSet<GameObject> descendants = new HashSet<GameObject>();
+
+            // collect all descendants (non-recursively)
+            Stack<GameObject> toBeVisited = new Stack<GameObject>();
+            toBeVisited.Push(parent);
+            while (toBeVisited.Count > 0)
             {
-                initialTransforms[parent] = parent.transform;
-                foreach (Transform child in parent.transform)
+                GameObject current = toBeVisited.Pop();
+                Show(current, true);
+                descendants.Add(current);
+                foreach (Transform child in current.transform)
                 {
-                    SaveTransforms(child.gameObject);
+                    toBeVisited.Push(child.gameObject);
                 }
             }
+            return descendants;
         }
 
-        // All descendants of gameObject. Does include the gameObject itself,
-        // but does not include the Plane.
-        private Dictionary<GameObject, Transform> initialTransforms;
-
-        public void ResetAll()
-        {
-            foreach (var entry in initialTransforms)
-            {
-                entry.Key.transform.localPosition = entry.Value.localPosition;
-                entry.Key.transform.localScale = entry.Value.localScale;
-                entry.Key.transform.localRotation = entry.Value.localRotation;
-                Show(entry.Key, true);
-
-            }
-        }
-
+        /// ----------------------------------------------------------------------------------------------
+        /// Zooming in and out
+        /// ----------------------------------------------------------------------------------------------
+        /// 
         public void ZoomIn(GameObject parent)
         {
             Debug.LogFormat("Zooming into subtree at {0}\n", parent.name);
@@ -206,7 +229,7 @@ namespace SEE.Game
             }
         }
 
-        public void ResetAndHide(HashSet<GameObject> gameObjects)
+        private void ResetAndHide(HashSet<GameObject> gameObjects)
         {
             foreach (GameObject go in gameObjects)
             {
@@ -215,33 +238,12 @@ namespace SEE.Game
             Reset(gameObjects);
         }
 
-        public void HideAll()
+        private void HideAll()
         {
-            foreach (GameObject go in initialTransforms.Keys)
+            foreach (ObjectMemento memento in initialTransforms.Values)
             {
-                Show(go, false);
+                Show(memento.Node, false);
             }
-        }
-
-        private static HashSet<GameObject> Descendants(GameObject parent)
-        {
-            // all descendants of gameObject including parent
-            HashSet<GameObject> descendants = new HashSet<GameObject>();
-
-            // collect all descendants (non-recursively)
-            Stack<GameObject> toBeVisited = new Stack<GameObject>();
-            toBeVisited.Push(parent);
-            while (toBeVisited.Count > 0)
-            {
-                GameObject current = toBeVisited.Pop();
-                Show(current, true);
-                descendants.Add(current);
-                foreach (Transform child in current.transform)
-                {
-                    toBeVisited.Push(child.gameObject);
-                }
-            }
-            return descendants;
         }
 
         /// <summary>
@@ -276,20 +278,62 @@ namespace SEE.Game
             float currentWidth = rightUpperCorner.x - leftLowerCorner.x;
             float scaleFactor = requestedWidth / currentWidth;
 
-            Debug.LogFormat("requestedWidth {0} currentWidth {1} scaleFactor {2}\n", requestedWidth, currentWidth, scaleFactor);
             parent.transform.localScale *= scaleFactor;
+
+            Vector2 cornerDelta = initalLeftLowerCorner - leftLowerCorner;
+            Vector2 center = CenterPoint;
+            // We maintain parent's y co-ordinate. We move it only within the x/z plane.
+            Vector3 position = parent.transform.position;
+            position.x = center.x;
+            position.z = center.y;
+            parent.transform.position = position;
             return scaleFactor;
         }
 
-        private void Reset(ICollection<GameObject> gameObjects)
+        ///--------------------------------------------------------------------------------------------------
+        /// To be removed
+        ///--------------------------------------------------------------------------------------------------
+        ///
+        private void Update()
         {
-            foreach (GameObject go in gameObjects)
+            if (Input.GetKeyDown(KeyCode.R))
             {
-                Transform initial = initialTransforms[go];
-                go.transform.localPosition = initial.localPosition;
-                go.transform.localScale = initial.localScale;
-                go.transform.localRotation = initial.localRotation;
+                ResetAll();
             }
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                HideAll();
+            }
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                GameObject child = RandomChild(focus);
+                if (child != null)
+                {
+                    ZoomIn(child);
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.O))
+            {
+                ZoomOut();
+            }
+        }
+
+        private GameObject RandomChild(GameObject parent)
+        {
+            GameObject selectedChild = null;
+            int maxLevel = 0;
+
+            // always select the child with the greatest depth
+            foreach (Transform child in parent.transform)
+            {
+                int level = GetDepth(child.gameObject);
+                if (level > maxLevel)
+                {
+                    maxLevel = level;
+                    selectedChild = child.gameObject;
+                }
+            }
+            return selectedChild;
         }
     }
 }
