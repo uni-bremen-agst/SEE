@@ -48,6 +48,16 @@ namespace SEE.Charts.Scripts
 		[SerializeField] private Vector2 childOffset;
 
 		/// <summary>
+		/// The gap between entries in the <see cref="scrollContent" /> indicating a new hierarchy layer.
+		/// </summary>
+		private float _xGap;
+
+		/// <summary>
+		/// The gap between entries in the <see cref="scrollContent" /> to not make them overlap.
+		/// </summary>
+		private float _yGap;
+
+		/// <summary>
 		/// If a draw is queued, this wont be null.
 		/// </summary>
 		[FormerlySerializedAs("Drawing"), HideInInspector]
@@ -147,6 +157,8 @@ namespace SEE.Charts.Scripts
 		{
 			ChartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
+			_xGap = childOffset.x - headerOffset.x;
+			_yGap = childOffset.y - headerOffset.y;
 			FindDataObjects();
 			GetAllFloats();
 			GetAllIntegers();
@@ -170,7 +182,6 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void FillScrollView()
 		{
-			var gap = childOffset.y - headerOffset.y;
 			foreach (Transform child in scrollContent.transform) Destroy(child.gameObject);
 
 			var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
@@ -179,22 +190,63 @@ namespace SEE.Charts.Scripts
 			tempObject.transform.localPosition = headerOffset;
 			parentToggle.Initialize(this);
 
-			var i = 0;
+			var index = 0;
 			foreach (var dataObject in _dataObjects)
 				if (dataObject.CompareTag("Building"))
-					CreateChildToggle(dataObject, parentToggle, i++, gap);
+					CreateChildToggle(dataObject, parentToggle, index++, _yGap);
 
 			tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
 			parentToggle = tempObject.GetComponent<ScrollViewToggle>();
 			parentToggle.SetLabel("Nodes");
-			tempObject.transform.localPosition = headerOffset + new Vector2(0, gap) * ++i;
+			tempObject.transform.localPosition = headerOffset + new Vector2(0, _yGap) * ++index;
 			parentToggle.Initialize(this);
 
 			foreach (var dataObject in _dataObjects)
 				if (dataObject.CompareTag("Node"))
-					CreateChildToggle(dataObject, parentToggle, i++, gap);
+					CreateChildToggle(dataObject, parentToggle, index++, _yGap);
+
 			scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(
-				scrollContent.GetComponent<RectTransform>().sizeDelta.x, i * Mathf.Abs(gap) + 40);
+				scrollContent.GetComponent<RectTransform>().sizeDelta.x,
+				index * Mathf.Abs(_yGap) + 40);
+		}
+
+		private void FillScrollView(bool tree)
+		{
+			foreach (Transform child in scrollContent.transform) Destroy(child.gameObject);
+
+			if (!tree)
+			{
+				FillScrollView();
+				return;
+			}
+
+			var graph = _dataObjects[0].GetComponent<NodeRef>().node.ItsGraph;
+			var roots = graph.GetRoots();
+			var index = 0;
+			var hierarchy = 0;
+			var maxHierarchy = 0;
+
+			foreach (var root in roots)
+			{
+				var inScene = _dataObjects.First(entry =>
+					entry.GetComponent<NodeRef>().node.ID.Equals(root.ID));
+				var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+				var rootToggle = tempObject.GetComponent<ScrollViewToggle>();
+				var highlights = inScene.GetComponent<NodeHighlights>();
+				rootToggle.LinkedObject = highlights;
+				highlights.ScrollViewToggle = rootToggle;
+				rootToggle.SetLabel(root.SourceName);
+				tempObject.transform.localPosition =
+					headerOffset + new Vector2(0f, _yGap) * ++index;
+				rootToggle.Initialize(this);
+				if (hierarchy > maxHierarchy) maxHierarchy = hierarchy;
+				hierarchy = 0;
+				CreateChildToggles(root, rootToggle, ref index, ref hierarchy);
+			}
+
+			scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(
+				scrollContent.GetComponent<RectTransform>().sizeDelta.x,
+				index * Mathf.Abs(_yGap) + 40);
 		}
 
 		/// <summary>
@@ -202,9 +254,10 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		/// <param name="dataObject">The object to be toggled.</param>
 		/// <param name="parentToggle">The toggle that will toggle this one when clicked.</param>
-		/// <param name="i">The position of the toggle in the scrollview.</param>
+		/// <param name="index">The position of the toggle in the scrollview.</param>
 		/// <param name="gap">The gap between two toggles in the scrollview.</param>
-		private void CreateChildToggle(GameObject dataObject, ScrollViewToggle parentToggle, int i,
+		private void CreateChildToggle(GameObject dataObject, ScrollViewToggle parentToggle,
+			int index,
 			float gap)
 		{
 			var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
@@ -214,9 +267,35 @@ namespace SEE.Charts.Scripts
 			toggle.LinkedObject = highlights;
 			highlights.ScrollViewToggle = toggle;
 			toggle.SetLabel(dataObject.name);
-			tempObject.transform.localPosition = childOffset + new Vector2(0f, gap) * i;
+			tempObject.transform.localPosition = childOffset + new Vector2(0f, gap) * index;
 			toggle.Initialize(this);
 			parentToggle.AddChild(toggle);
+		}
+
+		private void CreateChildToggles(Node root, ScrollViewToggle parentToggle, ref int index,
+			ref int hierarchy)
+		{
+			if (root.IsLeaf()) return;
+
+			hierarchy++;
+			foreach (var child in root.Children())
+			{
+				var inScene = _dataObjects.First(entry =>
+					entry.GetComponent<NodeRef>().node.ID.Equals(root.ID));
+				var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+				var toggle = tempObject.GetComponent<ScrollViewToggle>();
+				toggle.Parent = parentToggle;
+				var highlights = inScene.GetComponent<NodeHighlights>();
+				toggle.LinkedObject = highlights;
+				highlights.ScrollViewToggle = toggle;
+				toggle.SetLabel(child.SourceName);
+				tempObject.transform.localPosition =
+					childOffset + new Vector2(_xGap, 0f) * hierarchy +
+					new Vector2(0f, _yGap) * ++index;
+				toggle.Initialize(this);
+				parentToggle.AddChild(toggle);
+				CreateChildToggles(child, toggle, ref index, ref hierarchy);
+			}
 		}
 
 		/// <summary>
@@ -229,10 +308,7 @@ namespace SEE.Charts.Scripts
 			foreach (var data in _dataObjects)
 			foreach (var key in data.GetComponent<NodeRef>().node.FloatAttributes.Keys)
 				if (!AllKeys.Contains(key))
-				{
 					AllKeys.Add(key);
-					Debug.Log(key);
-				}
 		}
 
 		/// <summary>
@@ -245,10 +321,7 @@ namespace SEE.Charts.Scripts
 			foreach (var data in _dataObjects)
 			foreach (var key in data.GetComponent<NodeRef>().node.IntAttributes.Keys)
 				if (!AllKeys.Contains(key))
-				{
 					AllKeys.Add(key);
-					Debug.Log(key);
-				}
 		}
 
 		/// <summary>
@@ -267,7 +340,7 @@ namespace SEE.Charts.Scripts
 					entry.GetComponent<NodeHighlights>().showInChart.Add(this, true);
 			citySize = _dataObjects.Length;
 
-			FillScrollView();
+			FillScrollView(false); //TODO: Move to settings
 		}
 
 		/// <summary>
