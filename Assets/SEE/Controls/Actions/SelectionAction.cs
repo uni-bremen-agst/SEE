@@ -1,6 +1,5 @@
 ﻿using SEE.Controls.Devices;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace SEE.Controls
 {
@@ -53,6 +52,10 @@ namespace SEE.Controls
         private GameObject hoveredObject;
 
 
+        /// <summary>
+        /// This method is declared here because it will be overridden by 
+        /// subclasses.
+        /// </summary>
         protected virtual void Start()
         {
         }
