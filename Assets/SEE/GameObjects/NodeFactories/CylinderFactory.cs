@@ -13,8 +13,16 @@ namespace SEE.GO
         }
 
         public override GameObject NewBlock(int index = 0)
-        {
+        {            
             GameObject result = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            // Note: An capsule collider is already attached to the cylinder, but
+            // the default capsule collider's dimensions do not fulfill our 
+            // requirements. That is why we remove it and replace it by a
+            // MeshCollider.
+            CapsuleCollider collider = result.GetComponent<CapsuleCollider>();
+            Destroyer.DestroyComponent(collider);
+            result.AddComponent<MeshCollider>();
+
             result.isStatic = true;
             Renderer renderer = result.GetComponent<Renderer>();
             // Re-use default material for all cylinders.
@@ -24,8 +32,6 @@ namespace SEE.GO
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
 
-            // Add collider so that we can interact with the object.
-            result.AddComponent<BoxCollider>();
             return result;
         }
     }
