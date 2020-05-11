@@ -181,10 +181,13 @@ namespace SEE.Game
             int maxLevel = 0;
             foreach (Transform child in parent.transform)
             {
-                int level = GetDepth(child.gameObject);
-                if (level > maxLevel)
+                if (child.gameObject.tag == Tags.Node)
                 {
-                    maxLevel = level;
+                    int level = GetDepth(child.gameObject);
+                    if (level > maxLevel)
+                    {
+                        maxLevel = level;
+                    }
                 }
             }
             return maxLevel + 1;
@@ -192,12 +195,13 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns all descendants of given <paramref name="parent"/> including
-        /// <paramref name="parent"/> that are tagged by Tags.Node.
+        /// <paramref name="parent"/> (no matter whether they are tagged by Tags.Node
+        /// or not).
         /// 
         /// Precondition: <paramref name="parent"/> is tagged by Tags.Node.
         /// </summary>
         /// <param name="parent">the root of the subtree to be returned</param>
-        /// <returns>all descendants tagged Tags.Node</returns>
+        /// <returns>all descendants</returns>
         private static HashSet<GameObject> Descendants(GameObject parent)
         {
             // all descendants of gameObject including parent
@@ -212,10 +216,7 @@ namespace SEE.Game
                 descendants.Add(current);
                 foreach (Transform child in current.transform)
                 {
-                    if (child.gameObject.tag == Tags.Node)
-                    {
-                        toBeVisited.Push(child.gameObject);
-                    }
+                    toBeVisited.Push(child.gameObject);
                 }
             }
             return descendants;
@@ -226,7 +227,9 @@ namespace SEE.Game
         /// ----------------------------------------------------------------------------------------------
         public void ZoomIn(GameObject enteredNode)
         {
-            if (enteredNode != null)
+            if (enteredNode != null 
+                && enteredNode.tag == Tags.Node
+                && activeAscendants.Peek().Node != enteredNode)
             {
                 Debug.LogFormat("Zooming into subtree at {0}\n", enteredNode.name);
                 // Save temporary scale and position of the node to be entered
@@ -461,11 +464,14 @@ namespace SEE.Game
             // always select the child with the greatest depth
             foreach (Transform child in parent.transform)
             {
-                int level = GetDepth(child.gameObject);
-                if (level > maxLevel)
+                if (child.gameObject.tag == Tags.Node)
                 {
-                    maxLevel = level;
-                    selectedChild = child.gameObject;
+                    int level = GetDepth(child.gameObject);
+                    if (level > maxLevel)
+                    {
+                        maxLevel = level;
+                        selectedChild = child.gameObject;
+                    }
                 }
             }
             return selectedChild;
