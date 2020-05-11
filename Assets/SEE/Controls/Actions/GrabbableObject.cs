@@ -183,8 +183,7 @@ namespace SEE.Controls
                                           //"islocal", true,
                                           //"rotation", oldRotation,
                                           "time", ResetAnimationTime
-                ));
-            
+                ));            
         }
     }
 }
