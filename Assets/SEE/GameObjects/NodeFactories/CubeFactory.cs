@@ -14,6 +14,7 @@ namespace SEE.GO
     {
         public override GameObject NewBlock(int style)
         {
+            // Note: An appropriate box collider is already attached to the cube.
             GameObject result = GameObject.CreatePrimitive(PrimitiveType.Cube);
             result.tag = Tags.Node;
             Renderer renderer = result.GetComponent<Renderer>();
@@ -23,9 +24,6 @@ namespace SEE.GO
 
             // Assigns a material to the object.
             renderer.sharedMaterial = materials.DefaultMaterial(Mathf.Clamp(style, 0, NumberOfStyles()-1));
-
-            // Add collider so that we can interact with the object.
-            result.AddComponent<BoxCollider>();
 
             // Object should be static so that we save rendering time at run-time.
             result.isStatic = true;
