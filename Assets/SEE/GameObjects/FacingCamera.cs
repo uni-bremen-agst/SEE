@@ -26,14 +26,14 @@ namespace SEE.GO
         public float maximalDistance = 30.0f;
 
         // Time since the start of the last update period.
-        private float timer = updatePeriod;
+        private float timer = 0;
 
         // The last known position of the main camera.
         private Vector3 lastCameraPosition = Vector3.zero;
 
         // Vector to describe the rotation of the game object. Needed to show the game object 
         // correctly.
-        private static Vector3 rotation = Vector3.up - new Vector3(0, 180, 0);
+        private static readonly Vector3 rotation = Vector3.up - new Vector3(0, 180, 0);
 
         // The renderer of the gameObject.
         private Renderer gameObjectRenderer;
