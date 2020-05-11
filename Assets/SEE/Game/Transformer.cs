@@ -48,16 +48,16 @@ namespace SEE.Game
             public ObjectMemento(GameObject go)
             {
                 this.go = go;
-                this.localPosition = go.transform.localPosition;
+                this.position = go.transform.position;
                 this.localScale = go.transform.localScale;
-
             }
-            private GameObject go;
-            private Vector3 localPosition;
+            private readonly GameObject go;
+            private Vector3 position;
             private Vector3 localScale;
+
             public void Reset()
             {
-                go.transform.localPosition = localPosition;
+                go.transform.position = position;
                 go.transform.localScale = localScale;
 
             }
@@ -65,7 +65,40 @@ namespace SEE.Game
             {
                 get => go;
             }
+            /// <summary>
+            /// Original world space position.
+            /// </summary>
+            public Vector3 Position 
+            { 
+                get => position;
+            }
+            /// <summary>
+            /// Original world space scale (lossy scale).
+            /// </summary>
+            public Vector3 LocalScale 
+            {
+                get => localScale;
+            }
+
+            public override string ToString()
+            {
+                return go.name
+                    + " position=" + position
+                    + " localScale=" + localScale;
+            }
         }
+
+        /// <summary>
+        /// Contains all ascendants of the currently visible nodes in the 
+        /// node hierarchy. The top-most element is the immediate parent of
+        /// those visible nodes. The deepest element on the stack is the
+        /// root of all nodes. The stored memento represents the state
+        /// when the node was entered and before it was fit into the visible
+        /// area, that is, it has the scale and position of the node within
+        /// the ascendant that was shown when the node was selected to be
+        /// entered.
+        /// </summary>
+        private Stack<ObjectMemento> activeAscendants = new Stack<ObjectMemento>();
 
         // All descendants of gameObject tagged by Tags.Node.
         private Dictionary<string, ObjectMemento> initialTransforms;
@@ -83,9 +116,14 @@ namespace SEE.Game
         {
             foreach (GameObject go in gameObjects)
             {
-                ObjectMemento initial = initialTransforms[go.ID()];
-                initial.Reset();
+                Reset(go);
             }
+        }
+
+        private void Reset(GameObject go)
+        {
+            ObjectMemento initial = initialTransforms[go.ID()];
+            initial.Reset();
         }
 
         private Dictionary<string, ObjectMemento> GetMementos(ICollection<GameObject> descendants)
@@ -104,6 +142,7 @@ namespace SEE.Game
         private void Start()
         {       
             focus = GetRootNode(gameObject);
+            activeAscendants.Push(new ObjectMemento(focus));
             ICollection<GameObject> descendants = Descendants(focus);
             initialTransforms = GetMementos(descendants);
             BoundingBox.Get(descendants, out initalLeftLowerCorner, out initialRightUpperCorner);
@@ -151,6 +190,14 @@ namespace SEE.Game
             return maxLevel + 1;
         }
 
+        /// <summary>
+        /// Returns all descendants of given <paramref name="parent"/> including
+        /// <paramref name="parent"/> that are tagged by Tags.Node.
+        /// 
+        /// Precondition: <paramref name="parent"/> is tagged by Tags.Node.
+        /// </summary>
+        /// <param name="parent">the root of the subtree to be returned</param>
+        /// <returns>all descendants tagged Tags.Node</returns>
         private static HashSet<GameObject> Descendants(GameObject parent)
         {
             // all descendants of gameObject including parent
@@ -162,62 +209,186 @@ namespace SEE.Game
             while (toBeVisited.Count > 0)
             {
                 GameObject current = toBeVisited.Pop();
-                Show(current, true);
                 descendants.Add(current);
                 foreach (Transform child in current.transform)
                 {
-                    toBeVisited.Push(child.gameObject);
+                    if (child.gameObject.tag == Tags.Node)
+                    {
+                        toBeVisited.Push(child.gameObject);
+                    }
                 }
             }
             return descendants;
         }
 
         /// ----------------------------------------------------------------------------------------------
-        /// Zooming in and out
+        /// Zooming in
         /// ----------------------------------------------------------------------------------------------
-        /// 
-        public void ZoomIn(GameObject parent)
+        public void ZoomIn(GameObject enteredNode)
         {
-            Debug.LogFormat("Zooming into subtree at {0}\n", parent.name);
-
+            Debug.LogFormat("Zooming into subtree at {0}\n", enteredNode.name);
+            // Save temporary scale and position of the node to be entered
+            // so that we can later restore it when zooming out. This must
+            // be done before we fit it into the visible area, that is: here.
+            activeAscendants.Push(new ObjectMemento(enteredNode));
+            DumpActiveAscendants();
             // Currently, focus and all its descendants are visible.
             HashSet<GameObject> currentlyVisible = Descendants(focus);
-            // All elements in the subtree rooted by parent will be visible next.
-            HashSet<GameObject> newlyVisible = Descendants(parent);
+            // All elements in the subtree rooted by enteredNode will be visible next.
+            HashSet<GameObject> newlyVisible = Descendants(enteredNode);
             // All currently visible elements that need to be hidden.
             currentlyVisible.ExceptWith(newlyVisible);
             Hide(currentlyVisible);
-            focus = parent;
-            FitInto(parent, newlyVisible);
-            // Invariant: all nodes except for newlyVisible have their original
-            // position, size, and rotation.
+            focus = enteredNode;
+            FitInto(enteredNode, newlyVisible);
         }
 
+        /// <summary>
+        /// Scales <paramref name="parent"/> so that the total width of the size
+        /// requested for its <paramref name="descendants"/> fits into initial
+        /// rectangle.
+        /// The aspect ratio of every node is maintained.
+        /// </summary>
+        /// <param name="parent">the parent of all <paramref name="descendants"/></param>
+        /// <param name="descendants">layout nodes to be scaled</param>
+        /// <returns>the factor by which the scale of edge node was multiplied</returns>
+        private float FitInto(GameObject parent, ICollection<GameObject> descendants)
+        {
+            float requestedWidth = initialRightUpperCorner.x - initalLeftLowerCorner.x;
+            // We always start with the original positions, rotations, and scales
+            //Reset(descendants);
+
+            BoundingBox.Get(descendants, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner);
+
+            float currentWidth = rightUpperCorner.x - leftLowerCorner.x;
+            float scaleFactor = requestedWidth / currentWidth;
+            // We maintain parent's y co-ordinate. We move it only within the x/z plane.
+            Vector3 newPosition = parent.transform.position;
+            Vector2 center = CenterPoint;
+            newPosition.x = center.x;
+            newPosition.z = center.y;
+            Vector3 newScale = parent.transform.localScale * scaleFactor;
+
+            Debug.LogFormat("Transforming {0} from [{1} {2}] to [{3} {4}]\n", 
+                            parent.name, 
+                            parent.transform.position, parent.transform.localScale,
+                            newPosition, newScale);
+            // Adjust position and scale by some animation.
+            animationIsRunning = true;
+            iTween.MoveTo(parent, iTween.Hash(
+                                          "position", newPosition,
+                                          "time", 1.5f
+                ));
+            iTween.ScaleTo(parent, iTween.Hash(
+                              "scale", newScale,
+                              //"delay", 1.0f,
+                              "time", 1.5f,
+                              "oncompletetarget", gameObject,
+                              "oncomplete", "OnFitIntoCompleted",
+                              "oncompleteparams", parent
+                ));
+            return scaleFactor;
+        }
+
+        /// <summary>
+        /// This method will be called by iTween when the animation triggered in FitInto
+        /// is completed.
+        /// </summary>
+        private void OnFitIntoCompleted(GameObject parent)
+        {
+            Debug.Log("OnFitIntoCompleted\n");
+            Debug.LogFormat("Final transform result {0}: [{1} {2}]\n",
+                            parent.name,
+                            parent.transform.position, parent.transform.localScale);
+            animationIsRunning = false;
+        }
+
+        private void DumpActiveAscendants()
+        {
+            // Iteration starts at the top-most element on the stack.
+            foreach (ObjectMemento memento in activeAscendants)
+            {
+                Debug.Log(memento.ToString() + "\n");
+            }
+        }
+
+        /// ----------------------------------------------------------------------------------------------
+        /// Zooming out
+        /// ----------------------------------------------------------------------------------------------
         public void ZoomOut()
         {
-            if (focus != null)
-            {
-                Transform parent = focus.transform.parent;
-                if (parent != null)
-                {
-                    GameObject newFocus = parent.gameObject;
-                    if (newFocus.tag == Tags.Node)
-                    {
-                        // Currently, focus and all its descendants are visible.
-                        HashSet<GameObject> currentlyVisible = Descendants(focus);
-
-                        // TODO: Shrink and move currentlyVisible to their previous location within parent
-
-                        Reset(currentlyVisible);
-                        // All elements in the subtree rooted by parent will be visible next.
-                        // This set includes currentlyVisible.
-                        HashSet<GameObject> newlyVisible = Descendants(newFocus);
-                        // Assert: all newlyVisibles have their original position, size, and scale. 
-                        focus = newFocus;
-                        FitInto(newFocus, newlyVisible);
-                    }
-                }
+            // The root will never be popped from the stack, that is why we are using 1
+            // instead of 0 in the following condition.
+            if (activeAscendants.Count > 1)
+            {                                
+                animationIsRunning = true;
+                // This is the memento of the current focus.
+                ObjectMemento memento = activeAscendants.Peek();
+                Debug.Assert(memento.Node == focus);
+                Debug.LogFormat("Zooming out of subtree at {0}\n", memento.Node.name);
+                DumpActiveAscendants();
+                // First restore the previous scale and position of focus by some animation.
+                Debug.LogFormat("Transforming {0} from [{1} {2}] to [{3} {4}]\n",
+                                memento.Node.name,
+                                memento.Node.transform.position, memento.Node.transform.localScale,
+                                memento.Position, memento.LocalScale);
+                iTween.ScaleTo(focus, 
+                               iTween.Hash("scale", memento.LocalScale,
+                                           "time", 1.5f
+                               ));
+                iTween.MoveTo(focus, 
+                              iTween.Hash("position", memento.Position,
+                                          "time", 1.5f,
+                                          //"delay", 0.6f,
+                                          "oncompletetarget", gameObject,
+                                          "oncomplete", "OnZoomOutCompleted"
+                               ));                
+                // Once the animation is finished, we continue in OnZoomOutCompleted()
+                // to show the siblings of focus again.
             }
+        }
+
+        /// <summary>
+        /// This method will be called by iTween when the animation triggered in ZoomOut
+        /// is completed.
+        /// </summary>
+        private void OnZoomOutCompleted()
+        {
+            Debug.Log("OnZoomOutCompleted()\n");
+            // This is the memento of the current focus.
+            ObjectMemento memento = activeAscendants.Pop();
+            Debug.Assert(memento.Node == focus);
+
+            Debug.LogFormat("Final transform result {0}: [{1} {2}]\n",
+                            memento.Node.name,
+                            memento.Node.transform.position, memento.Node.transform.localScale);
+            memento.Reset();
+            // The current focus node has now its previous scale and position within its ascendant.
+            ObjectMemento newFocusMemento = activeAscendants.Peek();
+            //newFocusMemento.Reset();
+            GameObject newFocus = newFocusMemento.Node;
+
+            //Restore(memento);
+
+            //GameObject newFocus = ascendant.Node;
+
+            //// Currently, focus and all its descendants are visible.
+            HashSet<GameObject> currentlyVisible = Descendants(focus);
+
+            //// All elements in the subtree rooted by newFocus will be visible next.
+            //// This set includes currentlyVisible.
+            HashSet<GameObject> newlyVisible = Descendants(newFocus);
+
+            Unhide(newlyVisible);
+
+            //// Assert: all newlyVisibles have their original position, size, and scale. 
+
+
+            //Reset(currentlyVisible);
+            focus = newFocus;
+            //FitInto(newFocus, newlyVisible);
+
+            animationIsRunning = false;
         }
 
         private static void Show(GameObject go, bool show)
@@ -252,64 +423,20 @@ namespace SEE.Game
             }
         }
 
+        private void Unhide(HashSet<GameObject> gameObjects)
+        {
+            foreach (GameObject go in gameObjects)
+            {
+                Show(go, true);
+            }
+        }
+
         private void HideAll()
         {
             foreach (ObjectMemento memento in initialTransforms.Values)
             {
                 Show(memento.Node, false);
             }
-        }
-
-        /// <summary>
-        /// Scales <paramref name="parent"/> so that the total width of the size
-        /// requested for its <paramref name="descendants"/> fits into initial
-        /// rectangle.
-        /// The aspect ratio of every node is maintained.
-        /// </summary>
-        /// <param name="parent">the parent of all <paramref name="descendants"/></param>
-        /// <param name="descendants">layout nodes to be scaled</param>
-        /// <returns>the factor by which the scale of edge node was multiplied</returns>
-        private float FitInto(GameObject parent, ICollection<GameObject> descendants)
-        {
-            float requestedWidth = initialRightUpperCorner.x - initalLeftLowerCorner.x;
-            // We always start with the original positions, rotations, and scales
-            //Reset(descendants);
-
-            BoundingBox.Get(descendants, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner);
-
-            float currentWidth = rightUpperCorner.x - leftLowerCorner.x;
-            float scaleFactor = requestedWidth / currentWidth;            
-            // We maintain parent's y co-ordinate. We move it only within the x/z plane.
-            Vector3 position = parent.transform.position;
-            Vector2 center = CenterPoint;
-            position.x = center.x;
-            position.z = center.y;
-
-            Debug.LogFormat("Moving {0} from {1} to {2}\n", parent.name, parent.transform.position, position);
-            // Adjust position and scale by some animation.
-            animationIsRunning = true;
-            iTween.MoveTo(parent, iTween.Hash(
-                                          "position", position,
-                                          "time", 1.0f
-                ));
-            iTween.ScaleTo(parent, iTween.Hash(
-                              "scale", parent.transform.localScale * scaleFactor,
-                              "delay", 1.0f,
-                              "time", 1.5f,
-                              "oncompletetarget", gameObject,
-                              "oncomplete", "OnFitIntoCompleted"
-                ));
-            return scaleFactor;
-        }
-
-        /// <summary>
-        /// This method will be called by iTween when the animation triggered in FitInto
-        /// is completed.
-        /// </summary>
-        private void OnFitIntoCompleted()
-        {
-            Debug.Log("OnFitIntoCompleted\n");
-            animationIsRunning = false;
         }
 
         ///--------------------------------------------------------------------------------------------------
