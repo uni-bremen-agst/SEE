@@ -226,21 +226,24 @@ namespace SEE.Game
         /// ----------------------------------------------------------------------------------------------
         public void ZoomIn(GameObject enteredNode)
         {
-            Debug.LogFormat("Zooming into subtree at {0}\n", enteredNode.name);
-            // Save temporary scale and position of the node to be entered
-            // so that we can later restore it when zooming out. This must
-            // be done before we fit it into the visible area, that is: here.
-            activeAscendants.Push(new ObjectMemento(enteredNode));
-            DumpActiveAscendants();
-            // Currently, focus and all its descendants are visible.
-            HashSet<GameObject> currentlyVisible = Descendants(focus);
-            // All elements in the subtree rooted by enteredNode will be visible next.
-            HashSet<GameObject> newlyVisible = Descendants(enteredNode);
-            // All currently visible elements that need to be hidden.
-            currentlyVisible.ExceptWith(newlyVisible);
-            Hide(currentlyVisible);
-            focus = enteredNode;
-            FitInto(enteredNode, newlyVisible);
+            if (enteredNode != null)
+            {
+                Debug.LogFormat("Zooming into subtree at {0}\n", enteredNode.name);
+                // Save temporary scale and position of the node to be entered
+                // so that we can later restore it when zooming out. This must
+                // be done before we fit it into the visible area, that is: here.
+                activeAscendants.Push(new ObjectMemento(enteredNode));
+                DumpActiveAscendants();
+                // Currently, focus and all its descendants are visible.
+                HashSet<GameObject> currentlyVisible = Descendants(focus);
+                // All elements in the subtree rooted by enteredNode will be visible next.
+                HashSet<GameObject> newlyVisible = Descendants(enteredNode);
+                // All currently visible elements that need to be hidden.
+                currentlyVisible.ExceptWith(newlyVisible);
+                Hide(currentlyVisible);
+                focus = enteredNode;
+                FitInto(enteredNode, newlyVisible);
+            }
         }
 
         /// <summary>
@@ -254,14 +257,10 @@ namespace SEE.Game
         /// <returns>the factor by which the scale of edge node was multiplied</returns>
         private float FitInto(GameObject parent, ICollection<GameObject> descendants)
         {
-            float requestedWidth = initialRightUpperCorner.x - initalLeftLowerCorner.x;
-            // We always start with the original positions, rotations, and scales
-            //Reset(descendants);
-
             BoundingBox.Get(descendants, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner);
 
-            float currentWidth = rightUpperCorner.x - leftLowerCorner.x;
-            float scaleFactor = requestedWidth / currentWidth;
+            float scaleFactor = Mathf.Min((initialRightUpperCorner.x - initalLeftLowerCorner.x) / (rightUpperCorner.x - leftLowerCorner.x),
+                                          (initialRightUpperCorner.y - initalLeftLowerCorner.y) / (rightUpperCorner.y - leftLowerCorner.y));
             // We maintain parent's y co-ordinate. We move it only within the x/z plane.
             Vector3 newPosition = parent.transform.position;
             Vector2 center = CenterPoint;
@@ -368,25 +367,9 @@ namespace SEE.Game
             //newFocusMemento.Reset();
             GameObject newFocus = newFocusMemento.Node;
 
-            //Restore(memento);
-
-            //GameObject newFocus = ascendant.Node;
-
-            //// Currently, focus and all its descendants are visible.
-            HashSet<GameObject> currentlyVisible = Descendants(focus);
-
-            //// All elements in the subtree rooted by newFocus will be visible next.
-            //// This set includes currentlyVisible.
-            HashSet<GameObject> newlyVisible = Descendants(newFocus);
-
-            Unhide(newlyVisible);
-
-            //// Assert: all newlyVisibles have their original position, size, and scale. 
-
-
-            //Reset(currentlyVisible);
+            // All elements in the subtree rooted by newFocus will be visible next.
+            Unhide(Descendants(newFocus));
             focus = newFocus;
-            //FitInto(newFocus, newlyVisible);
 
             animationIsRunning = false;
         }
