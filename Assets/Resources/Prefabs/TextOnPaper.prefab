@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   text: 
-  Margin: {x: 10, y: 10}
+  Margin: {x: 1, y: 1}
   FontScale: 1
 --- !u!114 &8158726549510656408
 MonoBehaviour:
@@ -243,7 +243,7 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 10, y: 10, z: 10, w: 10}
+  m_margin: {x: 1, y: 1, z: 1, w: 1}
   m_textInfo:
     textComponent: {fileID: 647703342020183243}
     characterCount: 0
