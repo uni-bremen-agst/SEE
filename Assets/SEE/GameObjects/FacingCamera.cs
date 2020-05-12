@@ -16,14 +16,14 @@ namespace SEE.GO
         /// If the actual distance is below this value, the object will not be visible.
         /// If minimalDistance > maximalDistance, the object will not be visible.
         /// </summary>
-        public float minimalDistance = 2.0f;
+        public float minimalDistance = 0.3f;
 
         /// <summary>
         /// The maximal distance between the game object and the main camera to become visible.
         /// If the actual distance is above this value, the object will not be visible.
         /// If minimalDistance > maximalDistance, the object will not be visible.
         /// </summary>
-        public float maximalDistance = 30.0f;
+        public float maximalDistance = 5.0f;
 
         // Time since the start of the last update period.
         private float timer = 0;
@@ -41,9 +41,9 @@ namespace SEE.GO
         /// <summary>
         /// The camera the gameObject should be facing to.
         /// </summary>
-        Camera mainCamera;
+        protected Camera mainCamera;
 
-        private void Start()
+        protected virtual void Start()
         {
             gameObjectRenderer = gameObject.GetComponentInChildren<Renderer>();
             if (gameObjectRenderer == null)
@@ -64,7 +64,7 @@ namespace SEE.GO
         /// minimalDistance. If it is rendered, it will be rotated to the face the
         /// camera so that it can always be seen.
         /// </summary>
-        void Update()
+        private void Update()
         {
             timer -= Time.deltaTime;
             if (timer < 0.0f)
@@ -83,11 +83,16 @@ namespace SEE.GO
                     if (gameObjectRenderer.enabled)
                     {
                         lastCameraPosition = mainCamera.transform.position;
-                        gameObject.transform.LookAt(mainCamera.transform);
-                        gameObject.transform.Rotate(rotation);
+                        LookAtCamera();
                     }
                 }
             }
+        }
+
+        protected virtual void LookAtCamera()
+        {
+            gameObject.transform.LookAt(mainCamera.transform);
+            gameObject.transform.Rotate(rotation);
         }
     }
 }
