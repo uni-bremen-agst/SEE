@@ -1,6 +1,5 @@
 ﻿using SEE.GO;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.XR;
 using Valve.VR;
 
@@ -82,7 +81,6 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// The length of the beam appearing above highlighted objects.
 		/// </summary>
-		[FormerlySerializedAs("HighlightLineLength")]
 		public float highlightLineLength = 20f;
 
 		/// <summary>
@@ -175,6 +173,11 @@ namespace SEE.Charts.Scripts
 		private float highlightOutlineAnim = 0.001f;
 
 		/// <summary>
+		/// Contains the chart UI.
+		/// </summary>
+		private GameObject _chartsOpen;
+
+		/// <summary>
 		/// Enforces the singleton pattern.
 		/// </summary>
 		private void Awake()
@@ -193,7 +196,7 @@ namespace SEE.Charts.Scripts
 			if (!_isVirtualReality)
 			{
 				foreach (var vrObject in vrObjects) Destroy(vrObject);
-				Instantiate(chartsPrefab);
+				_chartsOpen = Instantiate(chartsPrefab).transform.Find("ChartsOpen").gameObject;
 			}
 			else
 			{
@@ -222,9 +225,9 @@ namespace SEE.Charts.Scripts
 						HighlightObject(hit.transform.gameObject);
 				}
 
-				if (Input.GetButtonDown("SelectionMode")) selectionMode = true;
+				//if (Input.GetButtonDown("SelectionMode")) selectionMode = true;
 
-				if (Input.GetButtonUp("SelectionMode")) selectionMode = false;
+				//if (Input.GetButtonUp("SelectionMode")) selectionMode = false; TODO: Fix
 			}
 		}
 
@@ -243,7 +246,7 @@ namespace SEE.Charts.Scripts
 		private void ResetPosition()
 		{
 			var cameraPosition = Camera.main.transform;
-			GameObject[] charts = GameObject.FindGameObjectsWithTag("ChartContainer");
+			var charts = GameObject.FindGameObjectsWithTag("ChartContainer");
 			var offset = 0f;
 			foreach (var chart in charts)
 			{
@@ -270,7 +273,7 @@ namespace SEE.Charts.Scripts
 		/// <param name="highlight"></param>
 		public void Accentuate(GameObject highlight)
 		{
-			GameObject[] charts = GameObject.FindGameObjectsWithTag("Chart");
+			var charts = GameObject.FindGameObjectsWithTag("Chart");
 			foreach (var chart in charts)
 				chart.GetComponent<ChartContent>().AccentuateCorrespondingMarker(highlight);
 
@@ -288,6 +291,19 @@ namespace SEE.Charts.Scripts
 					return;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Toggles the chart UI.
+		/// </summary>
+		public void ToggleCharts()
+		{
+			_chartsOpen.SetActive(!_chartsOpen.activeInHierarchy);
+		}
+
+		public void ToggleSelectionMode()
+		{
+			selectionMode = !selectionMode;
 		}
 
 		/// <summary>
