@@ -44,13 +44,16 @@ namespace SEE.GO
             rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, width);
 
             tm.enableAutoSizing = true;
-            tm.fontSizeMin = 3;
-            tm.fontSizeMax = 400;
-          
-            FacingCamera textFacing = result.AddComponent<FacingCamera>();
-            // Rendering distance is set relative to the text's width
-            textFacing.minimalDistance = width;
-            textFacing.maximalDistance = 10.0f * width;
+            tm.fontSizeMin = 0.0f;
+            tm.fontSizeMax = 5;
+
+            if (false)
+            {
+                TextFacingCamera textFacing = result.AddComponent<TextFacingCamera>();
+                // Rendering distance is set relative to the text's width
+                textFacing.minimalDistance = width;
+                textFacing.maximalDistance = 10.0f * width;
+            }
 
             // No shading as this might be expensive and even distracts.
             Renderer renderer = result.GetComponent<Renderer>();
