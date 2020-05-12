@@ -7,7 +7,6 @@ using SEE.GO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace SEE.Charts.Scripts
@@ -60,8 +59,7 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// If a draw is queued, this wont be null.
 		/// </summary>
-		[FormerlySerializedAs("Drawing"), HideInInspector]
-		public Coroutine drawing;
+		[HideInInspector] public Coroutine drawing;
 
 		/// <summary>
 		/// All objects to be listed in the chart.
@@ -71,8 +69,7 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// The number of nodes in a scene to determine the performance of graphs.
 		/// </summary>
-		[FormerlySerializedAs("CitySize"), HideInInspector]
-		public int citySize;
+		[HideInInspector] public int citySize;
 
 		/// <summary>
 		/// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
@@ -304,7 +301,6 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void GetAllFloats()
 		{
-			Debug.Log("Floats");
 			foreach (var data in _dataObjects)
 			foreach (var key in data.GetComponent<NodeRef>().node.FloatAttributes.Keys)
 				if (!AllKeys.Contains(key))
@@ -317,7 +313,6 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void GetAllIntegers()
 		{
-			Debug.Log("Integers");
 			foreach (var data in _dataObjects)
 			foreach (var key in data.GetComponent<NodeRef>().node.IntAttributes.Keys)
 				if (!AllKeys.Contains(key))
