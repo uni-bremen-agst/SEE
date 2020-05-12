@@ -29,10 +29,11 @@ namespace SEE.Layout
         private readonly float OffsetBetweenBuildings = 1.0f;
 
         /// <summary>
-        /// The street width that will be adjusted by the "depth" of the street.
+        /// The base street width that will be adjusted by the "depth" of the street
+        /// (<see cref="RelativeStreetWidth"/>).
         /// The actual value used will be multiplied by leafNodeFactory.Unit.
         /// </summary>
-        private readonly float StreetWidth = 2.0f;
+        private readonly float StreetWidth = 10.0f;
 
         /// <summary>
         /// The height (y co-ordinate) of game objects (inner tree nodes) represented by streets.
