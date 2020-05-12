@@ -447,6 +447,11 @@ namespace SEE.Game
         public bool ShowErosions = false; // serialized by Unity
 
         /// <summary>
+        /// The maximal absolute width of a sprite representing an erosion in world-space Unity units.
+        /// </summary>
+        public float MaxErosionWidth = 1.0f; // serialized by Unity
+
+        /// <summary>
         /// Orientation of the edges; 
         /// if false, the edges are drawn below the houses;
         /// if true, the edges are drawn above the houses;

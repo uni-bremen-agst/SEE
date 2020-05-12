@@ -15,11 +15,16 @@ namespace SEE.GO
         /// <param name="issueMap">the relevant metrics for the erosion issues</param>
         /// <param name="leaveNodeFactory">factory that created the game nodes that are to be decorated</param>
         /// <param name="scaler">scaling to be applied on the metrics for the erosion issues</param>
-        public ErosionIssues(Dictionary<string, IconFactory.Erosion> issueMap, NodeFactory leaveNodeFactory, IScale scaler)
+        /// <param name="maxSpriteWidth">the maximal absolute width of a sprite representing an erosion in world-space Unity units</param>
+        public ErosionIssues(Dictionary<string, IconFactory.Erosion> issueMap, 
+                             NodeFactory leaveNodeFactory, 
+                             IScale scaler,
+                             float maxSpriteWidth)
         {
             this.issueMap = issueMap;
             this.leaveNodeFactory = leaveNodeFactory;
             this.scaler = scaler;
+            this.maxSpriteWidth = maxSpriteWidth;
         }
 
         /// <summary>
@@ -38,28 +43,30 @@ namespace SEE.GO
         private readonly IScale scaler;
 
         /// <summary>
-        /// Creates sprites for software-erosion indicators for all given game nodes.
+        /// The maximal absolute width of a sprite representing an erosion in world-space Unity units.
+        /// </summary>
+        private readonly float maxSpriteWidth;
+
+        /// <summary>
+        /// Creates sprites for software-erosion indicators for all given game nodes as children.
         /// </summary>
         /// <param name="gameNodes">list of game nodes for which to create erosion visualizations</param>
-        /// <returns>the list of sprites created</returns>
-        public ICollection<GameObject> Add(ICollection<GameObject> gameNodes)
+        public void Add(ICollection<GameObject> gameNodes)
         {
-            List<GameObject> result = new List<GameObject>();
             foreach (GameObject block in gameNodes)
             {
-                result.AddRange(AddErosionIssues(block));
+                AddErosionIssues(block);
             }
-            return result;
         }
 
         /// <summary>
         /// Stacks sprites for software-erosion issues atop of the roof of the given node
         /// in ascending order in terms of the sprite width. The sprite width is proportional
-        /// to the normalized metric value for the erosion issue.
+        /// to the normalized metric value for the erosion issue. The sprites are added as
+        /// children to <paramref name="gameNode"/>.
         /// </summary>
         /// <param name="gameNode">the game node which the sprites are to be created for</param>
-        /// <returns>the list of sprites created</returns>
-        protected ICollection<GameObject> AddErosionIssues(GameObject gameNode)
+        protected void AddErosionIssues(GameObject gameNode)
         {
             Node node = gameNode.GetComponent<NodeRef>().node;
 
@@ -73,19 +80,30 @@ namespace SEE.GO
                 {
                     if (value > 0.0f)
                     {
+                        // Scale the erosion issue by normalization set in relation to the
+                        // maximum value of the normalized metric. Hence, this value is in [0,1].
+                        float metricScale = scaler.GetNormalizedValue(issue.Key, node)
+                                           / scaler.GetNormalizedMaximum(issue.Key);
+
                         GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
                         sprite.name = sprite.name + " " + node.SourceName;
 
                         Vector3 spriteSize = GetSizeOfSprite(sprite);
                         // Scale the sprite to one Unity unit.
                         float spriteScale = 1.0f / spriteSize.x;
-                        // Scale the erosion issue by normalization.
-                        float metricScale = scaler.GetNormalizedValue(issue.Key, node);
-                        // First: scale its width to unit size 1.0 maintaining the aspect ratio
-                        sprite.transform.localScale *= spriteScale * leaveNodeFactory.Unit;
+                        Vector3 scale = sprite.transform.localScale;
+                        // First: scale its width to unit size 1.0 maintaining the aspect ratio.
+                        scale *= spriteScale;
+                        // assert: scale.x = 1
                         // Now scale it by the normalized metric.
-                        sprite.transform.localScale *= metricScale;
+                        scale *= metricScale;
+                        // assert: scale.x in [0,1]
+                        // No scale the sprite into the corridor [0, maxSpriteWidth]
+                        scale *= Mathf.Lerp(0, maxSpriteWidth, scale.x);
+
+                        sprite.transform.localScale = scale;
                         sprite.transform.position = leaveNodeFactory.Roof(gameNode);
+                        
                         sprites.Add(sprite);
                     }
                 }
@@ -107,7 +125,12 @@ namespace SEE.GO
                     currentRoof = sprite.transform.position + halfHeight;
                 }
             }
-            return sprites;
+            // The sprites have reached their final scale and position. Now we can
+            // add them to their parent.
+            foreach (GameObject sprite in sprites)
+            {
+                sprite.transform.SetParent(gameNode.transform);
+            }
         }
 
         /// <summary>
