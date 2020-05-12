@@ -208,6 +208,10 @@ namespace SEE.Game
                 CreateObjectHierarchy(nodeMap, parent);
                 InteractionDecorator.PrepareForInteraction(gameNodes);
 
+                // Decorations must be applied after the blocks have been placed, so that
+                // we also know their positions.
+                AddDecorations(nodeMap.Values);
+
                 // create the game objects for the laid out edges
                 ICollection<GameObject> edges = EdgeLayout(graph, layoutNodes, scaleFactor);
                 AddToParent(edges, parent);
@@ -248,9 +252,6 @@ namespace SEE.Game
                     AddToParent(entry.Value, nodeMap[parent]);
                 }
             }
-            
-            // FIXEM: add the decorations, too
-            // AddToParent(AddDecorations(gameNodes), parent);
         }
 
         /// <summary>
@@ -392,25 +393,20 @@ namespace SEE.Game
         /// Draws the decorations of the given game nodes.
         /// </summary>
         /// <param name="gameNodes">game nodes to be decorated</param>
-        /// <returns>the game objects added for the decorations; may be an empty collection</returns>
-        private ICollection<GameObject> AddDecorations(ICollection<GameObject> gameNodes)
-        {
-            // Decorations must be applied after the blocks have been placed, so that
-            // we also know their positions.
-            List<GameObject> decorations = new List<GameObject>();
-
+        private void AddDecorations(ICollection<GameObject> gameNodes)
+        {            
             // Add software erosion decorators for all leaf nodes if requested.
             if (settings.ShowErosions)
             {
-                ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leafNodeFactory, scaler);
-                decorations.AddRange(issueDecorator.Add(LeafNodes(gameNodes)));
+                ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leafNodeFactory, scaler, settings.MaxErosionWidth);
+                issueDecorator.Add(LeafNodes(gameNodes));
             }
 
             // Add text labels for all inner nodes
             if (settings.NodeLayout == SEECity.NodeLayouts.Balloon 
                 || settings.NodeLayout == SEECity.NodeLayouts.EvoStreets)
             {
-                decorations.AddRange(AddLabels(InnerNodes(gameNodes)));
+                AddLabels(InnerNodes(gameNodes));
             }
 
             // Add decorators specific to the shape of inner nodes (circle decorators for circles
@@ -445,7 +441,6 @@ namespace SEE.Game
                 default:
                     throw new Exception("Unhandled GraphSettings.InnerNodeKinds " + settings.InnerNodeObjects);
             }
-            return decorations;
         }
 
         /// <summary>
@@ -492,14 +487,11 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Adds the source name as a label to the center of the given game nodes.
+        /// Adds the source name as a label to the center of the given game nodes as a child.
         /// </summary>
         /// <param name="gameNodes">game nodes whose source name is to be added</param>
-        /// <returns>the game objects created for the text labels</returns>
-        private ICollection<GameObject> AddLabels(ICollection<GameObject> gameNodes)
+        private void AddLabels(ICollection<GameObject> gameNodes)
         {
-            IList<GameObject> result = new List<GameObject>();
-
             foreach (GameObject node in gameNodes)
             {
                 Vector3 size = innerNodeFactory.GetSize(node);
@@ -507,9 +499,8 @@ namespace SEE.Game
                 // The text may occupy up to 30% of the length.
                 GameObject text = TextFactory.GetText(node.GetComponent<NodeRef>().node.SourceName, 
                                                       node.transform.position, length * 0.3f);
-                result.Add(text);
+                text.transform.SetParent(node.transform);
             }
-            return result;
         }
 
         /// <summary>
