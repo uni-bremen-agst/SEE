@@ -5,7 +5,7 @@ using SEE.DataModel;
 using SEE.DataModel.IO;
 using SEE.Utils;
 
-namespace SEE.Tools
+namespace SEE.Tools.Architecture
 {
     internal class TestReflexionAnalysisStress : TestReflexionAnalysis
     {

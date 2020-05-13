@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using SEE.DataModel;
 
-namespace SEE.Tools
+namespace SEE.Tools.Architecture
 {
     /// <summary>
     /// Tests for the incremental reflexion analysis.
