@@ -8,6 +8,7 @@ using SEE.GO;
 using System;
 using System.Linq;
 using System.IO;
+using SEE.Utils;
 
 namespace SEE.Game
 {
@@ -494,7 +495,7 @@ namespace SEE.Game
             {
                 if (File.Exists(filename))
                 {
-                    SEE.Performance p = SEE.Performance.Begin("loading graph data from " + filename);
+                    SEE.Utils.Performance p = SEE.Utils.Performance.Begin("loading graph data from " + filename);
                     GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "ROOT", new SEELogger());
                     graphCreator.Load();
                     Graph graph = graphCreator.GetGraph();

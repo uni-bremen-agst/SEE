@@ -24,6 +24,7 @@ using UnityEngine;
 using SEE.DataModel;
 using SEE.Game.Animation;
 using SEE.DataModel.IO;
+using SEE.Utils;
 
 namespace SEE.Game
 {

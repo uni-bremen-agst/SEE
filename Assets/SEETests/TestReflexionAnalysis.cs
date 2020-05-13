@@ -4,6 +4,7 @@ using UnityEngine;
 
 using SEE.DataModel;
 using SEE.DataModel.IO;
+using SEE.Utils;
 
 namespace SEE.Tools
 {
@@ -17,7 +18,7 @@ namespace SEE.Tools
         protected Graph arch;
         protected Graph mapping;
         protected Reflexion reflexion;
-        protected SEELogger logger = new SEE.SEELogger();
+        protected SEELogger logger = new SEELogger();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.

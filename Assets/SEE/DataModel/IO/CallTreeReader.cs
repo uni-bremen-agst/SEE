@@ -1,4 +1,6 @@
-﻿namespace SEE.DataModel.IO
+﻿using SEE.Utils;
+
+namespace SEE.DataModel.IO
 {
     /// <summary>
     /// Generates a call tree out of a DYN-file.

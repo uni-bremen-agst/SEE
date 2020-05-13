@@ -2,9 +2,8 @@
 using UnityEngine;
 using System;
 using TinySpline;
-using System.Globalization;
 
-namespace SEE
+namespace SEE.Utils.Cameras
 {
     /// <summary>
     /// A script to move a camera programmatically along a path. This

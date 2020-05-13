@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using UnityEngine;
 
-namespace SEE
+namespace SEE.Utils.Cameras
 {
     /// <summary>
     /// This scripts logs the position, rotation, and time in seconds since game start

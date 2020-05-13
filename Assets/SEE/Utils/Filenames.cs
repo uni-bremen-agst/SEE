@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace SEE
+namespace SEE.Utils
 {
     /// <summary>
     /// Utilities for pathnames.

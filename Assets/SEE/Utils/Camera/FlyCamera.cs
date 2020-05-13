@@ -2,7 +2,7 @@
 using SEE.GO;
 using UnityEngine;
 
-namespace SEE
+namespace SEE.Utils.Cameras
 {
     /*
      * Allows to move the camera with WASD, Shift and Space.

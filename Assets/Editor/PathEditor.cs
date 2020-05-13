@@ -2,8 +2,10 @@
 using UnityEditor;
 using System.IO;
 using System;
+using SEE.Utils;
+using SEE.Utils.Cameras;
 
-namespace SEE
+namespace SEEEditor
 {
     /// <summary>
     /// Implements an editor for camera path data to be used at game-design time.

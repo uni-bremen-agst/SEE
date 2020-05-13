@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE
+namespace SEE.Utils
 {
     /// <summary>
     /// Functions to destroy GameObjects.
