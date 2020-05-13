@@ -3,7 +3,7 @@ using UnityEditor;
 using System.IO;
 using System;
 using SEE.Utils;
-using SEE.Utils.Cameras;
+using SEE.CameraPaths;
 
 namespace SEEEditor
 {
