@@ -4,18 +4,22 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - AxisDropdownX: {instanceID: 0}
-  - AxisDropdownY: {instanceID: 0}
-  - _markerPrefab: {fileID: 7900548257253700385, guid: 1b7447dbbbeee5b459fcbc17d2feae1c,
+  - scrollContent: {instanceID: 0}
+  - scrollEntryPrefab: {instanceID: 0}
+  - moveHandler: {instanceID: 0}
+  - axisDropdownX: {instanceID: 0}
+  - axisDropdownY: {instanceID: 0}
+  - markerPrefab: {fileID: 7900548257253700385, guid: 1b7447dbbbeee5b459fcbc17d2feae1c,
       type: 3}
-  - _entries: {instanceID: 0}
-  - _minX: {instanceID: 0}
-  - _maxX: {instanceID: 0}
-  - _minY: {instanceID: 0}
-  - _maxY: {instanceID: 0}
-  - _parent: {instanceID: 0}
-  - DataPanel: {instanceID: 0}
-  - LabelsPanel: {instanceID: 0}
+  - entries: {instanceID: 0}
+  - noDataWarning: {instanceID: 0}
+  - minXText: {instanceID: 0}
+  - maxXText: {instanceID: 0}
+  - minYText: {instanceID: 0}
+  - maxYText: {instanceID: 0}
+  - parent: {instanceID: 0}
+  - dataPanel: {instanceID: 0}
+  - labelsPanel: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
