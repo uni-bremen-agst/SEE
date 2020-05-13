@@ -2,7 +2,7 @@
 
 using SEE.DataModel;
 
-namespace SEE.Tools
+namespace SEE.Tools.Architecture
 {
     /// <summary>
     /// Test cases for the non-incremental reflexion analysis.

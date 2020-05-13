@@ -6,7 +6,7 @@ using SEE.DataModel;
 using SEE.DataModel.IO;
 using SEE.Utils;
 
-namespace SEE.Tools
+namespace SEE.Tools.Architecture
 {
     /// <summary>
     /// Shared code of unit tests for ReflexionAnalysis.
