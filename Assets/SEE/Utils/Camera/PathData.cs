@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE
+namespace SEE.Utils.Cameras
 {
     /// <summary>
     /// The data captured about a particular position (including rotation) in a camera path 

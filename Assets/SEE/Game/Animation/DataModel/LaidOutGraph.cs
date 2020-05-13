@@ -19,6 +19,7 @@
 
 using SEE.DataModel;
 using SEE.Layout;
+using SEE.Utils;
 using System.Collections.Generic;
 
 namespace SEE.Game.Animation

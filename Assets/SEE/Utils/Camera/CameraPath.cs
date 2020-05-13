@@ -5,7 +5,7 @@ using System.Collections;
 using SEE.GO;
 using SEE.DataModel;
 
-namespace SEE
+namespace SEE.Utils.Cameras
 {
     /// <summary>
     /// Represents a camera path with position and rotation of the camera in a series of 

@@ -7,7 +7,7 @@ namespace SEE.Tools
 {
     public class GXLParser : IDisposable
     {
-        public GXLParser(string filename, ILogger logger = null)
+        public GXLParser(string filename, SEE.Utils.ILogger logger = null)
         {
             this.filename = filename;
             this.logger = logger;
@@ -102,7 +102,7 @@ namespace SEE.Tools
         protected Stack<State> context = new Stack<State>();
         protected string filename;
         protected XmlTextReader reader;
-        protected ILogger logger = null;
+        protected SEE.Utils.ILogger logger = null;
 
         [Serializable]
         public class SyntaxError : Exception
