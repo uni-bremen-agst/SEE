@@ -21,7 +21,7 @@ using SEE.Layout;
 using System;
 using UnityEngine;
 
-namespace SEE.Game.Animation
+namespace SEE.Game.Evolution
 {
     /// <summary>
     /// Animates the move of a given GameObject over the full <see cref="AbstractAnimator.MaxAnimationTime"/>.
