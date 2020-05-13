@@ -1,39 +1,40 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
-public class ChangePanel : MonoBehaviour
+namespace SEE.Game.Animation
 {
-    /// <summary>
-    /// Unity Event that gets invoked when the panel, this script is attached to, closes.
-    /// </summary>
-    public UnityEvent OnPanelClose;
-
-    private void Start()
+    public class ChangePanel : MonoBehaviour
     {
-        if(OnPanelClose == null)
-        {
-            OnPanelClose = new UnityEvent();
-        }
-    }
+        /// <summary>
+        /// Unity Event that gets invoked when the panel, this script is attached to, closes.
+        /// </summary>
+        public UnityEvent OnPanelClose;
 
-    /// <summary>
-    /// Opens the given panel by using its animator component.
-    /// Also closes the panel this script is attached to.
-    /// </summary>
-    /// <param name="panel">the panel which should be opened</param>
-    public void OpenOtherPanel(GameObject panel)
-    {
-        Animator currentPanelAnimator = gameObject.GetComponent<Animator>();
-        Animator newPanelAnimator = panel.GetComponent<Animator>();
-
-        if(currentPanelAnimator != null && newPanelAnimator != null)
+        private void Start()
         {
-            currentPanelAnimator.SetBool("isOpen", !currentPanelAnimator.GetBool("isOpen"));
-            newPanelAnimator.SetBool("isOpen", !newPanelAnimator.GetBool("isOpen"));
+            if (OnPanelClose == null)
+            {
+                OnPanelClose = new UnityEvent();
+            }
         }
 
-        OnPanelClose.Invoke();
+        /// <summary>
+        /// Opens the given panel by using its animator component.
+        /// Also closes the panel this script is attached to.
+        /// </summary>
+        /// <param name="panel">the panel which should be opened</param>
+        public void OpenOtherPanel(GameObject panel)
+        {
+            Animator currentPanelAnimator = gameObject.GetComponent<Animator>();
+            Animator newPanelAnimator = panel.GetComponent<Animator>();
+
+            if (currentPanelAnimator != null && newPanelAnimator != null)
+            {
+                currentPanelAnimator.SetBool("isOpen", !currentPanelAnimator.GetBool("isOpen"));
+                newPanelAnimator.SetBool("isOpen", !newPanelAnimator.GetBool("isOpen"));
+            }
+
+            OnPanelClose.Invoke();
+        }
     }
 }
