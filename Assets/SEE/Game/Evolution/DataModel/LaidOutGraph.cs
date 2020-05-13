@@ -22,7 +22,7 @@ using SEE.Layout;
 using SEE.Utils;
 using System.Collections.Generic;
 
-namespace SEE.Game.Animation
+namespace SEE.Game.Evolution
 {
     /// <summary>
     /// Data model containing a graph and its node layout. The node layout is indexed by the

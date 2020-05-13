@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.Animation
+namespace SEE.Game.Evolution
 {
     public class ChangePanel : MonoBehaviour
     {

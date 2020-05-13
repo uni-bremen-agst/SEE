@@ -22,7 +22,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEE.Game.Animation
+namespace SEE.Game.Evolution
 {
     /// <summary>
     /// The AnimationInteraction manages user inputs and interfaces.

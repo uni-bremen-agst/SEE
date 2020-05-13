@@ -22,7 +22,7 @@ using SEE.Utils;
 using System;
 using UnityEngine;
 
-namespace SEE.Game.Animation
+namespace SEE.Game.Evolution
 {
     /// <summary>
     /// An abstract animator that makes it simple to swap an existing type of animation.

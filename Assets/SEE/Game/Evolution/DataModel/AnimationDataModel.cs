@@ -21,7 +21,7 @@ using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEE.Game.Animation
+namespace SEE.Game.Evolution
 {
     /// <summary>
     /// Data model for the animation-related user interactions consisting
