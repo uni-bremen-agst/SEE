@@ -1512,7 +1512,7 @@ MonoBehaviour:
   selectionDevice: {fileID: 337283377}
   cameraAction: {fileID: 337283382}
   selectionAction: {fileID: 337283375}
-  toggleChartDevice: {fileID: 337283386}
+  chartControlDevice: {fileID: 337283386}
   chartAction: {fileID: 337283385}
 --- !u!4 &337283384
 Transform:
@@ -1540,7 +1540,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49626a155a935004f985ad777a29244b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  toggleChartsDevice: {fileID: 0}
+  chartControlsDevice: {fileID: 0}
 --- !u!114 &337283386
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2776,7 +2776,7 @@ MonoBehaviour:
   selectionDevice: {fileID: 581319047}
   cameraAction: {fileID: 581319052}
   selectionAction: {fileID: 581319048}
-  toggleChartDevice: {fileID: 581319057}
+  chartControlDevice: {fileID: 581319057}
   chartAction: {fileID: 581319058}
 --- !u!81 &581319054
 AudioListener:
@@ -2868,7 +2868,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ec1d2d9cc7d93648bf1b7bd19008861, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  toggleChartsDevice: {fileID: 0}
+  chartControlsDevice: {fileID: 0}
 --- !u!1 &600411954
 GameObject:
   m_ObjectHideFlags: 0
@@ -6080,6 +6080,11 @@ PrefabInstance:
       propertyPath: chartAction
       value: 
       objectReference: {fileID: 1363832755}
+    - target: {fileID: -7490321690962560821, guid: 4ccd5ea94039989458149588b86c9e40,
+        type: 3}
+      propertyPath: chartControlDevice
+      value: 
+      objectReference: {fileID: 1363832756}
     - target: {fileID: 253438901750427098, guid: 4ccd5ea94039989458149588b86c9e40,
         type: 3}
       propertyPath: m_textInfo.characterCount
@@ -6330,7 +6335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ec1d2d9cc7d93648bf1b7bd19008861, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  toggleChartsDevice: {fileID: 0}
+  chartControlsDevice: {fileID: 0}
 --- !u!114 &1363832756
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -47,6 +47,11 @@ namespace SEE.Charts.Scripts
 		[SerializeField] private Vector2 childOffset;
 
 		/// <summary>
+		/// Determines if the entries in the <see cref="scrollContent" /> are displayed as tree.
+		/// </summary>
+		private bool _displayAsTree;
+
+		/// <summary>
 		/// The gap between entries in the <see cref="scrollContent" /> indicating a new hierarchy layer.
 		/// </summary>
 		private float _xGap;
@@ -234,7 +239,7 @@ namespace SEE.Charts.Scripts
 				highlights.ScrollViewToggle = rootToggle;
 				rootToggle.SetLabel(root.SourceName);
 				tempObject.transform.localPosition =
-					headerOffset + new Vector2(0f, _yGap) * ++index;
+					headerOffset + new Vector2(0f, _yGap) * index;
 				rootToggle.Initialize(this);
 				if (hierarchy > maxHierarchy) maxHierarchy = hierarchy;
 				hierarchy = 0;
@@ -288,7 +293,7 @@ namespace SEE.Charts.Scripts
 				toggle.SetLabel(child.SourceName);
 				tempObject.transform.localPosition =
 					childOffset + new Vector2(_xGap, 0f) * hierarchy +
-					new Vector2(0f, _yGap) * ++index;
+					new Vector2(0f, _yGap) * index++;
 				toggle.Initialize(this);
 				parentToggle.AddChild(toggle);
 				CreateChildToggles(child, toggle, ref index, ref hierarchy);
@@ -335,7 +340,7 @@ namespace SEE.Charts.Scripts
 					entry.GetComponent<NodeHighlights>().showInChart.Add(this, true);
 			citySize = _dataObjects.Length;
 
-			FillScrollView(false); //TODO: Move to settings
+			FillScrollView(_displayAsTree);
 		}
 
 		/// <summary>
@@ -745,6 +750,12 @@ namespace SEE.Charts.Scripts
 			else
 				moveHandler.SetInfoText("X-Axis: " + axisDropdownX.Value + "\n" + "Y-Axis: " +
 				                        axisDropdownY.Value);
+		}
+
+		public void SetDisplayAsTree(bool displayAsTree)
+		{
+			_displayAsTree = displayAsTree;
+			FillScrollView(_displayAsTree);
 		}
 
 		/// <summary>
