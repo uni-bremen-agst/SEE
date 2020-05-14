@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="Architecture" edgeids="true">
+    <node id="N323559">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>GO</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>f637a50c-dc7d-4385-8baf-412b9ed17016</string>
+      </attr>
+    </node>
+    <node id="N323560">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Whiteboard</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>b77416bc-7c04-4c74-bc39-8748eb637fdb</string>
+      </attr>
+    </node>
+    <node id="N323561">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Layout</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>f94ee527-3249-4710-ae66-ec86c61b0dd9</string>
+      </attr>
+    </node>
+    <node id="N323562">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Game</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>8382655d-8d54-4cb4-9ecc-152ac0b2ffb0</string>
+      </attr>
+    </node>
+    <node id="N323563">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Controls</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>b5d982ca-5256-4e00-b9bb-8ca51d47e3f6</string>
+      </attr>
+    </node>
+    <node id="N323564">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Utils</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>cd3fb42d-095f-4195-9f25-e11dbcbf8059</string>
+      </attr>
+    </node>
+    <node id="N323565">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Tools</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>a4fe7f5b-2a9c-41f5-ba32-c807cd42d746</string>
+      </attr>
+    </node>
+    <node id="N323566">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>DataModel</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>75929d73-bb3e-472f-ac2e-250bdf9f5a01</string>
+      </attr>
+    </node>
+    <node id="N323567">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Devices</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>9f24cc16-a8b5-4a57-884c-8c61a7864be0</string>
+      </attr>
+    </node>
+    <node id="N323568">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>CameraPaths</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>fbd6c463-b5db-4f82-b83b-4c06ba22ce73</string>
+      </attr>
+    </node>
+    <node id="N323569">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>EvoStreets</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>956d7423-0d4c-4221-b152-e1c45cbf6eae</string>
+      </attr>
+    </node>
+    <node id="N323570">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>CirclePacking</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>ae18e12f-a43a-4f49-9abe-4901b48dac5e</string>
+      </attr>
+    </node>
+    <node id="N323571">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>RectanglePacking</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>55b0f05e-def6-4a5f-8557-53356e12517c</string>
+      </attr>
+    </node>
+    <node id="N323572">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>TreeMap</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>7d40c558-b795-4894-821a-1dc97273c0aa</string>
+      </attr>
+    </node>
+    <node id="N323573">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>IO</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>f3fc52a8-8a06-4002-b854-260c7c9e7db4</string>
+      </attr>
+    </node>
+    <node id="N323574">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Runtime</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>aa5dab18-3f81-4d3b-b566-f6ef9db83799</string>
+      </attr>
+    </node>
+    <node id="N323575">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Evolution</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>09be49ec-e689-4e53-a486-20a23b41f411</string>
+      </attr>
+    </node>
+    <node id="N323576">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>SEEEditor</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>2aca3f40-f13b-4ceb-83c0-72efeaef833b</string>
+      </attr>
+    </node>
+    <edge id="E1007839" from="N323560" to="N323559">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E1007840" from="N323567" to="N323563">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E1007841" from="N323569" to="N323561">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E1007842" from="N323570" to="N323561">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E1007843" from="N323571" to="N323561">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E1007844" from="N323572" to="N323561">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E1007845" from="N323573" to="N323566">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E1007846" from="N323574" to="N323562">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E1007847" from="N323575" to="N323562">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E1007848" from="N323566" to="N323564">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007849" from="N323568" to="N323559">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007850" from="N323559" to="N323566">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007851" from="N323574" to="N323559">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007852" from="N323559" to="N323561">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007855" from="N323576" to="N323565">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007856" from="N323576" to="N323568">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007857" from="N323576" to="N323564">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007858" from="N323576" to="N323559">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007859" from="N323568" to="N323566">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007860" from="N323565" to="N323564">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007861" from="N323574" to="N323566">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007862" from="N323563" to="N323566">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007863" from="N323561" to="N323572">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007864" from="N323561" to="N323571">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007865" from="N323561" to="N323570">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007866" from="N323561" to="N323569">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007867" from="N323563" to="N323567">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007868" from="N323563" to="N323559">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007869" from="N323562" to="N323574">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007870" from="N323562" to="N323575">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007871" from="N323562" to="N323566">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007872" from="N323562" to="N323565">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007873" from="N323562" to="N323564">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007874" from="N323562" to="N323563">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007875" from="N323562" to="N323559">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007876" from="N323562" to="N323561">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1007877" from="N323565" to="N323566">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1008393" from="N323576" to="N323562">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E1008508" from="N323576" to="N323566">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+  </graph>
+</gxl>
