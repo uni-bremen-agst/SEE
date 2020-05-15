@@ -1,4 +1,5 @@
 ﻿using SEE.Controls.Devices;
+using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -218,27 +219,78 @@ namespace SEE.Controls
             OnObjectGrabbed.Invoke(selectedObject);
         }
 
-        public float Speed = 10.0f;
-
         /// <summary>
-        /// Called while an object is being grabbed (passed as parameter <paramref name="selectedObject"/>).
+        /// Called while an object is being grabbed (passed as parameter <paramref name="grabbedObject"/>).
         /// This method is called on very Update().
         /// </summary>
-        /// <param name="selectedObject">the selected object</param>
-        protected virtual void HoldObject(GameObject selectedObject)
+        /// <param name="grabbedObject">the grabbed object</param>
+        protected virtual void HoldObject(GameObject grabbedObject)
         {
-            GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
+            GrabbableObject grabbingComponent = grabbedObject.GetComponent<GrabbableObject>();
             if (grabbingComponent != null)
             {
-                float strength = selectionDevice.Pull;
-                // A positive strength is interpreted as drawing the object toward the MainCamera.
-                // A negative strength means that the object is moved farther away.
-                float step = strength * Speed * Time.deltaTime;
-                Vector3 targetPosition = Vector3.MoveTowards(selectedObject.transform.position, selectionDevice.Position, step);
-
-                //Debug.LogFormat("Pulling grabbed object {0} at {1} towards {2} by strength {3} by step {4}\n",
-                //                selectedObject.name, selectedObject.transform.position, targetPosition, strength, step);
+                Vector3 targetPosition = EndOfRay(grabbedObject);
                 grabbingComponent.Continue(targetPosition);
+            }
+        }
+
+        private class GrabLine
+        {
+
+        }
+        private LineRenderer grabLine;
+        private Vector3[] linePoints;
+
+        protected virtual Vector3 EndOfRay(GameObject heldObject)
+        {
+            if (grabLine == null)
+            {
+                grabLine = gameObject.AddComponent<LineRenderer>();
+                LineFactory.SetDefaults(grabLine);
+                LineFactory.SetWidth(grabLine, 0.01f);
+                linePoints = new Vector3[2];
+                grabLine.positionCount = linePoints.Length;
+                grabLine.useWorldSpace = true;                
+            }
+
+            // Distance between player and held object.
+            float rayLength = Vector3.Distance(MainCamera.transform.position, heldObject.transform.position);
+
+            // Draw a ray from the player to the held object.
+            // The origin of the ray must be slightly off the camera. Otherwise it cannot be seen.
+            linePoints[0] = MainCamera.transform.position + Vector3.down * 0.1f;
+            linePoints[1] = heldObject.transform.position;
+            grabLine.SetPositions(linePoints);
+
+            // Now move the held object following the pointing direction of the player.
+            Vector3 direction = selectionDevice.Direction;
+            Ray ray = MainCamera.ScreenPointToRay(direction);
+            // A positive pull is interpreted as drawing the object towards the MainCamera.
+            // A negative pull means that the object is moved farther away.
+            float pull = selectionDevice.Pull; // pull direction
+            float pullDirection = pull > 0.01f ? 1.0f : (pull < -0.01f ? -1.0f : 0.0f);
+
+            float speed = 10.0f; // base speed; true speed is speed * pull
+            float step = speed * Time.deltaTime * pullDirection;  // distance to move
+            Vector3 target = ray.origin + ray.direction.normalized * rayLength; // head of the ray
+            target = Vector3.MoveTowards(target, ray.origin, step);
+
+            //if (pullDirection != 0)
+            //{
+            //    Debug.LogFormat("mouse direction {0} ray.origin {1} ray.direction {2} raylength {3} pull {4} step={5} from {6} to {7} by {8}\n",
+            //                    direction, ray.origin, ray.direction, rayLength, pullDirection, step, heldObject.transform.position, target, Vector3.Distance(heldObject.transform.position, target));
+            //}
+            // Due to imprecisions of floating point arithmetics there may be tiny differences
+            // between the positions which, however, accumulate to larger differences
+            // because this method is called at the frame rate. That is why we will
+            // return the original position of the held object if the difference is minor.
+            if (Vector3.Distance(heldObject.transform.position, target) > 0.05f)
+            {
+                return target;
+            }
+            else
+            {
+                return heldObject.transform.position;
             }
         }
 
