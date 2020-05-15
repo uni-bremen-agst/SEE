@@ -186,10 +186,7 @@ namespace SEE.Controls
         protected virtual void HoverObject(GameObject selectedObject)
         {
             HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
-            if (hoverComponent != null)
-            {
-                hoverComponent.Hovered();
-            }
+            hoverComponent?.Hovered();
         }
 
         /// <summary>
@@ -199,10 +196,7 @@ namespace SEE.Controls
         protected virtual void UnhoverObject(GameObject selectedObject)
         {
             HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
-            if (hoverComponent != null)
-            {
-                hoverComponent.Unhovered();
-            }
+            hoverComponent?.Unhovered();
         }
 
         /// <summary>
@@ -212,16 +206,13 @@ namespace SEE.Controls
         protected virtual void GrabObject(GameObject selectedObject)
         {
             GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
-            if (grabbingComponent != null)
-            {
-                grabbingComponent.Grab(gameObject);
-            }
+            grabbingComponent?.Grab(gameObject);
             OnObjectGrabbed.Invoke(selectedObject);
         }
 
         /// <summary>
         /// Called while an object is being grabbed (passed as parameter <paramref name="grabbedObject"/>).
-        /// This method is called on very Update().
+        /// This method is called on every Update().
         /// </summary>
         /// <param name="grabbedObject">the grabbed object</param>
         protected virtual void HoldObject(GameObject grabbedObject)
@@ -229,38 +220,62 @@ namespace SEE.Controls
             GrabbableObject grabbingComponent = grabbedObject.GetComponent<GrabbableObject>();
             if (grabbingComponent != null)
             {
-                Vector3 targetPosition = EndOfRay(grabbedObject);
-                grabbingComponent.Continue(targetPosition);
+                grabbingComponent.Continue(EndOfRay(grabbedObject));
             }
         }
 
+        /// <summary>
+        /// To draw a line from the player to the grabbed object when an object
+        /// is grabbed.
+        /// </summary>
         private class GrabLine
         {
+            private readonly LineRenderer renderer;
+            private readonly Vector3[] linePoints = new Vector3[2];
 
+            public GrabLine(GameObject gameObject)
+            {
+                renderer = gameObject.AddComponent<LineRenderer>();
+                LineFactory.SetDefaults(renderer);
+                LineFactory.SetWidth(renderer, 0.01f);
+                renderer.positionCount = linePoints.Length;
+                renderer.useWorldSpace = true;
+            }
+
+            public void Draw(Vector3 from, Vector3 to)
+            {
+                renderer.enabled = true;
+                linePoints[0] = from;
+                linePoints[1] = to;
+                renderer.SetPositions(linePoints);
+            }
+
+            public void Off()
+            {
+                linePoints[1] = linePoints[0];
+                renderer.SetPositions(linePoints);
+                renderer.enabled = false;
+            }
         }
-        private LineRenderer grabLine;
-        private Vector3[] linePoints;
+
+        /// <summary>
+        /// The line drawn from the player to the grabbed object when an object
+        /// is grabbed.
+        /// </summary>
+        private GrabLine grabLine;
 
         protected virtual Vector3 EndOfRay(GameObject heldObject)
         {
             if (grabLine == null)
             {
-                grabLine = gameObject.AddComponent<LineRenderer>();
-                LineFactory.SetDefaults(grabLine);
-                LineFactory.SetWidth(grabLine, 0.01f);
-                linePoints = new Vector3[2];
-                grabLine.positionCount = linePoints.Length;
-                grabLine.useWorldSpace = true;                
+                grabLine = new GrabLine(gameObject);
             }
+            // Draw a ray from the player to the held object.
+            // The origin of the ray must be slightly off the camera. Otherwise it cannot be seen.
+            grabLine.Draw(MainCamera.transform.position + Vector3.down * 0.1f, heldObject.transform.position);
 
             // Distance between player and held object.
             float rayLength = Vector3.Distance(MainCamera.transform.position, heldObject.transform.position);
-
-            // Draw a ray from the player to the held object.
-            // The origin of the ray must be slightly off the camera. Otherwise it cannot be seen.
-            linePoints[0] = MainCamera.transform.position + Vector3.down * 0.1f;
-            linePoints[1] = heldObject.transform.position;
-            grabLine.SetPositions(linePoints);
 
             // Now move the held object following the pointing direction of the player.
             Vector3 direction = selectionDevice.Direction;
@@ -301,10 +316,8 @@ namespace SEE.Controls
         protected virtual void ReleaseObject(GameObject selectedObject)
         {
             GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
-            if (grabbingComponent != null)
-            {
-                grabbingComponent.Release();
-            }
+            grabbingComponent?.Release();
+            grabLine?.Off();
             OnObjectGrabbed.Invoke(null);
         }
     }
