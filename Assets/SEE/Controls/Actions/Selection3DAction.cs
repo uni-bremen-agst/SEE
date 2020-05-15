@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Controls.Devices;
+using UnityEngine;
 
 namespace SEE.Controls
 {
@@ -82,7 +83,7 @@ namespace SEE.Controls
             if (selectedObject != null)
             {
                 line.SetPosition(1, hitInfo.point);
-                if (selectionDevice.IsGrabbing)
+                if (selectionDevice.CurrentState == Selection.State.IsGrabbing)
                 {
                     line.material.color = colorOnGrabbingHit;
                 }
@@ -93,7 +94,7 @@ namespace SEE.Controls
             }
             else
             {
-                if (selectionDevice.IsGrabbing)
+                if (selectionDevice.CurrentState == Selection.State.IsGrabbing)
                 {
                     line.material.color = colorOnGrabbingMissed;
                 }

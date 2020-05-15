@@ -71,11 +71,10 @@ namespace SEE.Controls
         private void Update()
         {
             GameObject hitObject = null;
-            
-            bool isGrabbing = selectionDevice.IsGrabbing;
-            bool isSelecting = isGrabbing ? false : selectionDevice.IsSelecting;
 
-            if (isGrabbing && grabbedObject != null)
+            Selection.State currentSelectionState = selectionDevice.CurrentState;
+
+            if (currentSelectionState == Selection.State.IsGrabbing && grabbedObject != null)
             {
                 // The user triggered grabbing while an object was already grabbed.
                 // That means we need to release the grabbed object.
@@ -83,7 +82,8 @@ namespace SEE.Controls
                 ReleaseObject(grabbedObject);
                 grabbedObject = null;
             }
-            else if (isSelecting || (isGrabbing && grabbedObject == null))
+            else if (currentSelectionState == Selection.State.IsSelecting 
+                     || (currentSelectionState == Selection.State.IsGrabbing && grabbedObject == null))
             {
                 // While the user wants to select or grab and has not yet grabbed anything
                 // we will show the ray and try to hit an object.               
@@ -100,7 +100,7 @@ namespace SEE.Controls
             if (hitObject != null)
             {
                 // Something was hit
-                if (isGrabbing && hitObject != grabbedObject)
+                if (currentSelectionState == Selection.State.IsGrabbing && hitObject != grabbedObject)
                 {
                     if (grabbedObject != null)
                     {
@@ -115,7 +115,7 @@ namespace SEE.Controls
                     grabbedObject = hitObject;
                     GrabObject(grabbedObject);
                 } 
-                else if (isSelecting && hitObject != hoveredObject)
+                else if (currentSelectionState == Selection.State.IsSelecting && hitObject != hoveredObject)
                 {
                     if (hoveredObject != null)
                     {

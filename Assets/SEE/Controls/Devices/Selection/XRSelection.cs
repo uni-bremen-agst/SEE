@@ -38,21 +38,27 @@ namespace SEE.Controls.Devices
         }
 
         /// <summary>
-        /// True if the user presses the select button ("Select" in SteamVR).
-        /// </summary>
-        public override bool IsSelecting
-        {
-            get => SelectionButton != null ? SelectionButton.state : false;
-        }
-
-        /// <summary>
-        /// True if the user presses the grabbing button ("Grab" in SteamVR).
-        /// </summary>
-        public override bool IsGrabbing => GrabButton != null ? GrabButton.state : false;
-
-        /// <summary>
         /// The degree of the trigger (the SteamVR axis assigned as "Trigger").
         /// </summary>
         public override float Pull => TriggerAction.axis;
+
+        private void Update()
+        {
+            if (SelectionButton != null ? SelectionButton.state : false)
+            {
+                switch (state)
+                {
+                    case State.Idle:
+                        state = State.IsSelecting;
+                        break;
+                    case State.IsSelecting:
+                        state = State.IsGrabbing;
+                        break;
+                    case State.IsGrabbing:
+                        state = State.Idle;
+                        break;
+                }
+            }
+        }
     }
 }
