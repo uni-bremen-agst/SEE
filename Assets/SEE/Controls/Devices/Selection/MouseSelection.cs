@@ -14,7 +14,11 @@ namespace SEE.Controls.Devices
 
         public override Vector3 Direction => Input.mousePosition;
 
+        public override bool IsSelecting => Input.GetMouseButton(SelectionMouseButton);
+
         public override Vector3 Position => Input.mousePosition;
+
+        public override bool IsGrabbing => DoubleClick();
 
         private float pullDegree = 0.0f;
 
@@ -39,40 +43,6 @@ namespace SEE.Controls.Devices
             }
         }
 
-        private void Update()
-        {
-            State nextState = State.Idle;
-            if (Input.GetMouseButtonDown(SelectionMouseButton))
-            {
-                if (!oneClick)
-                {
-                    // This is the first click.
-                    oneClick = true;
-                    timeOfLastClick = Time.time;
-                    nextState = State.IsSelecting;
-                }
-                else
-                {
-                    // found a double click => reset
-                    oneClick = false;
-                    // has the double click happened in the waiting period?
-                    if ((Time.time - timeOfLastClick) <= maxDelay)
-                    {
-                        nextState = State.IsGrabbing;
-                    }
-                }
-            }
-            if (oneClick)
-            {
-                // if the time now is maxDelay seconds after the first click, we need to reset
-                if ((Time.time - timeOfLastClick) > maxDelay)
-                {
-                    oneClick = false;
-                }
-            }
-            state = nextState;
-        }
-
         /// <summary>
         /// True if the first click of an expected double click happened.
         /// </summary>
@@ -86,5 +56,40 @@ namespace SEE.Controls.Devices
         /// consider them a double click.
         /// </summary>
         private readonly float maxDelay = 0.5f;
+
+        /// <summary>
+        /// True if the user presses the SelectionMouseButton twice with a maximal delay
+        /// of mayDelay.
+        /// </summary>
+        /// <returns>true if user double clicks</returns>
+        private bool DoubleClick()
+        {
+            if (Input.GetMouseButtonDown(SelectionMouseButton))
+            {
+                if (!oneClick) 
+                {
+                    // This is the first click.
+                    oneClick = true;
+                    timeOfLastClick = Time.time;
+                    return false;
+                }
+                else
+                {
+                    // found a double click => reset
+                    oneClick = false;
+                    // has the double click happened in the waiting period?
+                    return (Time.time - timeOfLastClick) <= maxDelay;
+                }
+            }
+            if (oneClick)
+            {
+                // if the time now is maxDelay seconds after the first click, we need to reset
+                if ((Time.time - timeOfLastClick) > maxDelay)
+                {
+                    oneClick = false;
+                }
+            }
+            return false;
+        }
     }
 }

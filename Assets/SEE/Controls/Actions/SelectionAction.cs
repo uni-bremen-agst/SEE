@@ -69,66 +69,109 @@ namespace SEE.Controls
         /// the user intends to grab it, it will be grabbed.
         /// </summary>
         private void Update()
-        {
-            GameObject hitObject = null;
+        {            
+            bool isGrabbing = selectionDevice.IsGrabbing;
+            // The user could be both selecting and grabbing. However, grabbing overrules 
+            // selecting.
+            bool isSelecting = isGrabbing ? false : selectionDevice.IsSelecting;
 
-            Selection.State currentSelectionState = selectionDevice.CurrentState;
-
-            if (currentSelectionState == Selection.State.IsGrabbing && grabbedObject != null)
+            if (isGrabbing)
             {
-                // The user triggered grabbing while an object was already grabbed.
-                // That means we need to release the grabbed object.
-                // selectionDevice.IsGrabbing works as a toggle.
-                ReleaseObject(grabbedObject);
-                grabbedObject = null;
-            }
-            else if (currentSelectionState == Selection.State.IsSelecting 
-                     || (currentSelectionState == Selection.State.IsGrabbing && grabbedObject == null))
-            {
-                // While the user wants to select or grab and has not yet grabbed anything
-                // we will show the ray and try to hit an object.               
-                hitObject = Select(out RaycastHit hitInfo);
-                // give visual feedback on where we search
-                ShowSearchFeedback(hitObject, hitInfo);
-            }
-            else
-            {
-                // not searching/grabbing => no visual feedback for search
-                HideSearchFeedback();
-            }
-
-            if (hitObject != null)
-            {
-                // Something was hit
-                if (currentSelectionState == Selection.State.IsGrabbing && hitObject != grabbedObject)
+                if (grabbedObject != null)
                 {
-                    if (grabbedObject != null)
-                    {
-                        // first release grabbed object
-                        ReleaseObject(grabbedObject);
-                        //if (grabbedObject == hoveredObject)
-                        //{
-                        //    UnhoverObject(hoveredObject);
-                        //    hoveredObject = null;
-                        //}
-                    }
-                    grabbedObject = hitObject;
+                    // The user triggered grabbing while an object was already grabbed.
+                    // That means we need to release the grabbed object.
+                    // selectionDevice.IsGrabbing works as a toggle.
+                    ReleaseObject(grabbedObject);
+                    grabbedObject = null;
+                }
+                else if (hoveredObject != null)
+                {                    
+                    // The hovered object becomes the grabbed object. If no object is
+                    // currently hovered over, nothing will be grabbed.
+                    grabbedObject = hoveredObject;
                     GrabObject(grabbedObject);
-                } 
-                else if (currentSelectionState == Selection.State.IsSelecting && hitObject != hoveredObject)
+                }
+            }
+            // Note: isGrabbing => !isSelecting
+            // No selection while an object is already grabbed.
+            if (isSelecting && grabbedObject == null)
+            {
+                // While the user wants to select we will show the ray and try to 
+                // hit an object.               
+                GameObject hitObject = Select(out RaycastHit hitInfo);
+                // Give visual feedback on where we search.
+                ShowSearchFeedback(hitObject, hitInfo);
+                if (hitObject != hoveredObject)
                 {
+                    // Note: hitObject and hoveredObject may both be null here.
                     if (hoveredObject != null)
                     {
                         UnhoverObject(hoveredObject);
                     }
                     hoveredObject = hitObject;
-                    HoverObject(hoveredObject);
+                    if (hoveredObject != null)
+                    {
+                        HoverObject(hoveredObject);
+                    }
                 }
+            }
+            else
+            {
+                // not selecting (independent from isGrabbing) => no visual feedback for search
+                HideSearchFeedback();
             }
             if (grabbedObject != null)
             {
                 HoldObject(grabbedObject);
             }
+
+            //if (isGrabbing && grabbedObject != null)
+            //{
+
+            //}
+            //else if (isGrabbing && grabbedObject == null && hoveredObject != null)
+            //{
+            //    // While the user wants to select or grab and has not yet grabbed anything
+            //    // we will show the ray and try to hit an object.               
+            //    hitObject = Select(out RaycastHit hitInfo);
+            //    // give visual feedback on where we search
+            //    ShowSearchFeedback(hitObject, hitInfo);
+            //}
+            //else
+            //{
+
+            //}
+
+            //if (hitObject != null)
+            //{
+            //    // Something was hit
+            //    if (isGrabbing && hitObject != grabbedObject)
+            //    {
+            //        if (grabbedObject != null)
+            //        {
+            //            // first release grabbed object
+            //            ReleaseObject(grabbedObject);
+            //            //if (grabbedObject == hoveredObject)
+            //            //{
+            //            //    UnhoverObject(hoveredObject);
+            //            //    hoveredObject = null;
+            //            //}
+            //        }
+            //        grabbedObject = hitObject;
+            //        GrabObject(grabbedObject);
+            //    } 
+            //    else if (isSelecting && hitObject != hoveredObject)
+            //    {
+            //        if (hoveredObject != null)
+            //        {
+            //            UnhoverObject(hoveredObject);
+            //        }
+            //        hoveredObject = hitObject;
+            //        HoverObject(hoveredObject);
+            //    }
+            //}
+
         }
 
         /// <summary>
