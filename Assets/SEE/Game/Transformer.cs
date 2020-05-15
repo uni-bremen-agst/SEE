@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using SEE.Utils;
 using SEE.DataModel;
 using SEE.GO;
-using System;
 
 namespace SEE.Game
 {
