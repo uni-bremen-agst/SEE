@@ -70,18 +70,18 @@ namespace SEE.Controls
         /// 
         /// Moves the gameObject toward given <paramref name="position"/>.
         /// </summary>
-        /// <param name="position">the position the gameObject should be moved to</param>
+        /// <param name="position">the position the gameObject should be moved to in 
+        /// world space</param>
         public void Continue(Vector3 position)
         {
             if (isGrabbed)
             {
-                //iTween.MoveTo(gameObject, position, 0.5f);
                 gameObject.transform.position = position;
-                Debug.LogFormat("{0} is being held.\n", gameObject.name);
             }
             else
             {
-                Debug.LogErrorFormat("Continue called for object {0} not grabbed.\n", gameObject.name);
+                Debug.LogErrorFormat("Continue called for object {0} not grabbed.\n", 
+                                     gameObject.name);
             }
         }
 
