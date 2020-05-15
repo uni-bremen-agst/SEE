@@ -22,24 +22,15 @@ namespace SEE.Controls.Devices
         public abstract Vector3 Position { get; }
 
         /// <summary>
-        /// The current action mode.
+        /// True if the user wants to select (e.g., when a mouse button was pressed).
         /// </summary>
-        public enum State
-        {
-            Idle,         // nothing requested by the user
-            IsSelecting,  // the user wants to select an object
-            IsGrabbing    // the user wants to grab an object
-        }
+        public abstract bool IsSelecting { get; }
 
         /// <summary>
-        /// The current action.
+        /// True if the user wants to grab a selected object (e.g., when a particular grabbing 
+        /// key was pressed).
         /// </summary>
-        protected State state = State.Idle;
-
-        /// <summary>
-        /// The current action.
-        /// </summary>
-        public virtual State CurrentState { get => state; }
+        public abstract bool IsGrabbing { get; }
 
         /// <summary>
         /// The degree of pulling. A value between 0 and 1.

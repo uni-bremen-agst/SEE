@@ -21,26 +21,11 @@ namespace SEE.Controls.Devices
 
         public override Vector3 Direction => viewPortCenter;
 
-        public override State CurrentState 
-        {
-            get
-            {
-                if (InputManager.ActiveDevice.LeftTrigger.Value >= Threshold)
-                {
-                    return State.IsSelecting;
-                }
-                else if (InputManager.ActiveDevice.RightTrigger.Value >= Threshold)
-                {
-                    return State.IsGrabbing;
-                }
-                else
-                {
-                    return State.Idle;
-                }
-            }
-        }
+        public override bool IsSelecting => InputManager.ActiveDevice.LeftTrigger.Value >= Threshold;
 
         public override Vector3 Position => viewPortCenter;
+
+        public override bool IsGrabbing => InputManager.ActiveDevice.RightTrigger.Value >= Threshold;
 
         public override float Pull => throw new System.NotImplementedException();
     }
