@@ -13,13 +13,15 @@ namespace SEE.Game
         public readonly bool CanApplySublayouts;
         public readonly bool InnerNodesEncloseLeafNodes;
         public readonly bool IsCircular;
+        public readonly bool IsHierarchical;
 
-        public NodelayoutModel(bool OnlyLeaves, bool CanApplySublayouts, bool InnerNodesEncloseLeafNodes, bool IsCircular)
+        public NodelayoutModel(bool OnlyLeaves, bool CanApplySublayouts, bool InnerNodesEncloseLeafNodes, bool IsCircular, bool isHierarchical)
         {
             this.OnlyLeaves = OnlyLeaves;
             this.CanApplySublayouts = CanApplySublayouts;
             this.InnerNodesEncloseLeafNodes = InnerNodesEncloseLeafNodes;
             this.IsCircular = IsCircular;
+            this.IsHierarchical = isHierarchical;
         }
     }
 
@@ -42,21 +44,21 @@ namespace SEE.Game
             switch (nodeLayout)
             {
                 case NodeLayouts.CompoundSpringEmbedder:
-                    return new NodelayoutModel(OnlyLeaves: false,  CanApplySublayouts: true,  InnerNodesEncloseLeafNodes: true,  IsCircular: false);
+                    return new NodelayoutModel(OnlyLeaves: false,  CanApplySublayouts: true,  InnerNodesEncloseLeafNodes: true,  IsCircular: false, isHierarchical: true);
                 case NodeLayouts.EvoStreets:
-                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false);
+                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false, isHierarchical: true);
                 case NodeLayouts.Balloon:
-                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: true);
+                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: true, isHierarchical: true);
                 case NodeLayouts.RectanglePacking:
-                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false);
+                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
                 case NodeLayouts.Treemap:
-                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false);
+                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
                 case NodeLayouts.CirclePacking:
-                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: true);
+                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: true, isHierarchical: true);
                 case NodeLayouts.Manhattan: 
-                    return new NodelayoutModel(OnlyLeaves: true, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false); 
+                    return new NodelayoutModel(OnlyLeaves: true, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false, isHierarchical: false); 
                 default:
-                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false);
+                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
             }
         }
 

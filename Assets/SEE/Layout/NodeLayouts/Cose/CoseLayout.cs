@@ -107,8 +107,29 @@ namespace SEE.Layout
 
             ILayoutNode root = roots.FirstOrDefault();
 
+            if (CoseLayoutSettings.Automatic_Parameter_Calculation)
+            {
+                GetGoodParameter();
+            }
+            
             PlaceNodes(root);
+            SetCalculatedLayoutPositionToNodes();
 
+            if (CoseLayoutSettings.Automatic_Parameter_Calculation)
+            {
+                CalculateParameterAutomatically();
+            }
+
+            return layout_result;
+        }
+
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SetCalculatedLayoutPositionToNodes()
+        {
             Vector3 relativePositionRootGraph = graphManager.RootGraph.CenterPosition;
             graphManager.RootGraph.CenterPosition = new Vector3(0.0f, groundLevel, 0.0f);
 
@@ -116,7 +137,7 @@ namespace SEE.Layout
 
             foreach (CoseGraph graph in graphManager.Graphs)
             {
-                
+
                 Vector3 position = graph != graphManager.RootGraph ? new Vector3(graph.CenterPosition.x - relativePositionRootGraph.x, graph.CenterPosition.y, graph.CenterPosition.z - relativePositionRootGraph.z) : new Vector3(graph.CenterPosition.x, graph.CenterPosition.y, graph.CenterPosition.z);
 
 
@@ -144,7 +165,7 @@ namespace SEE.Layout
 
                 bool applyRotation = true;
 
-                foreach(SublayoutLayoutNode node in coseSublayoutNodes)
+                foreach (SublayoutLayoutNode node in SublayoutNodes)
                 {
                     if (node.Nodes.Contains(graph.GraphObject) && !node.Node.IsSublayoutRoot)
                     {
@@ -158,18 +179,20 @@ namespace SEE.Layout
                     float rotation = applyRotation ? graph.GraphObject.Rotation : 0.0f;
                     layout_result[graph.GraphObject] = new NodeTransform(position, new Vector3(width, innerNodeHeight, height), rotation);
                 }
-                
+
             }
-
-            return layout_result;
         }
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes)
+        public void Reset()
         {
-            throw new System.NotImplementedException();
+            foreach(ILayoutNode layoutNode in layoutNodes)
+            {
+                layoutNode.CenterPosition = new Vector3(0, groundLevel, 0);
+                layoutNode.Rotation = 0.0f;
+            }
         }
 
-        public void GetGoodParameter(AbstractSEECity settings, ICollection<ILayoutNode> layoutNodes, int countEdges)
+        public void GetGoodParameter()
         {
             int countNode = layoutNodes.Count;
             int innerNodeCount = 0;
@@ -184,15 +207,93 @@ namespace SEE.Layout
                 }
             }
 
-            var rep1 = settings.CoseGraphSettings.RepulsionStrength = 0.0039f * Mathf.Pow(countNode, 2) * 0.0328f + countNode + 2.8198f;
-            var rep2 = 3.4084f * Mathf.Log(countEdges) + 2.8951f;
+            var rep1 = 0.0039f * Mathf.Pow(countNode, 2) * 0.0328f + countNode + 2.8198f;
+            var rep2 = 0.0f;
+
+            if (edges.Count ==  0) {
+                rep2 = rep1;
+            } else
+            {
+                rep2 = (3.4084f * Mathf.Log(edges.Count)) + 2.8951f;
+            }
+            
 
             settings.CoseGraphSettings.RepulsionStrength = rep2;
-            var edgeLength1 = (int)Mathf.Round(2.7507f* countMax - 2.654f);//1.5484f * innerNodeCount + 1.8616f);
+            var edgeLength1 = (int)Mathf.Round(2.7507f * countMax - 2.654f);//1.5484f * innerNodeCount + 1.8616f);
             var edgeLength2 = (int)Mathf.Round(1.5484f * innerNodeCount + 1.8616f);
 
-            settings.CoseGraphSettings.EdgeLength = (edgeLength1 + edgeLength2) / 2;
+            var finalEdgeLength = (edgeLength1 + edgeLength2) / 2;
 
+            settings.CoseGraphSettings.EdgeLength = finalEdgeLength;
+
+            CoseLayoutSettings.Edge_Length = finalEdgeLength;
+
+            CoseLayoutSettings.Repulsion_Strength = rep2;
+
+        }
+
+        private void CalculateParameterAutomatically ()
+        {
+            int currentEdgeLength = CoseLayoutSettings.Edge_Length;
+            int currentRepulsionStrength = (int)CoseLayoutSettings.Repulsion_Strength;
+
+            IterationConstraint edgeLengthConstraint = new IterationConstraint(start: currentEdgeLength, end: currentEdgeLength + 15, iterationStep: 5);
+            IterationConstraint repulsionRangeConstraint = new IterationConstraint(start: currentRepulsionStrength, end: currentRepulsionStrength + 15, iterationStep: 5);
+
+            ApplyLayout();
+            Measurements measurements = new Measurements(layoutNodes: layoutNodes, edges: edges.ToList());
+
+            while (measurements.OverlappingGameNodes > 0)
+            {
+                int nextRep = currentRepulsionStrength + repulsionRangeConstraint.iterationStep;
+                if (nextRep <= repulsionRangeConstraint.end)
+                {
+                    currentRepulsionStrength = nextRep;
+                } else
+                {
+                    int nextEdgeLength = currentEdgeLength + edgeLengthConstraint.iterationStep;
+
+                    if (nextEdgeLength <= edgeLengthConstraint.end)
+                    {
+                        currentEdgeLength = nextEdgeLength;
+                        currentRepulsionStrength = repulsionRangeConstraint.start;
+                    } else
+                    {
+                        break;
+                    }  
+                }
+
+                Reset();
+                CalculateParameterIterativ(edgeLength: currentEdgeLength, repulsionStrength: currentRepulsionStrength);
+                ApplyLayout();
+                measurements = new Measurements(layoutNodes: layoutNodes, edges: edges.ToList());
+            }
+            Reset();
+        }
+
+        private void ApplyLayout()
+        {
+            foreach (var entry in layout_result)
+            {
+                ILayoutNode node = entry.Key;
+                NodeTransform transform = entry.Value;
+                Vector3 position = transform.position;
+                position.y += transform.scale.y / 2.0f;
+                node.CenterPosition = position;
+                node.Scale = transform.scale;
+                node.Rotation = transform.rotation;
+            }
+        }
+
+        private void CalculateParameterIterativ(int edgeLength, int repulsionStrength)
+        {
+            CoseLayoutSettings.Edge_Length = edgeLength;
+            CoseLayoutSettings.Repulsion_Strength = repulsionStrength;
+            settings.CoseGraphSettings.EdgeLength = edgeLength;
+            settings.CoseGraphSettings.RepulsionStrength = repulsionStrength;
+
+            StartLayoutProzess();
+            SetCalculatedLayoutPositionToNodes();
         }
 
         private int CountDepthMax(ICollection<ILayoutNode> layoutNodes)
@@ -228,6 +329,8 @@ namespace SEE.Layout
             CoseLayoutSettings.Compound_Gravity_Strength = settings.CompoundGravityStrength;
             CoseLayoutSettings.Repulsion_Strength = settings.RepulsionStrength;
             CoseLayoutSettings.Multilevel_Scaling = settings.multiLevelScaling;
+            CoseLayoutSettings.Use_Smart_Multilevel_Calculation = settings.UseSmartMultilevelScaling;
+            CoseLayoutSettings.Automatic_Parameter_Calculation = settings.useCalculationParameter;
 
             coseLayoutSettings = new CoseLayoutSettings();
 
@@ -292,19 +395,27 @@ namespace SEE.Layout
             {
                 graphManager.UpdateBounds();
             } else
-            { 
-                if (CoseLayoutSettings.Multilevel_Scaling)
-                {
-                    // TODO sollte das auch in der Gui dann abgehakt werden?
-                    CoseLayoutSettings.Incremental = false;
-                    MultiLevelScaling();
-                }
-                else
-                {
-                    CoseLayoutSettings.Incremental = true;
-                    ClassicLayout();
-                }
+            {
+                StartLayoutProzess();
             } 
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        private void StartLayoutProzess()
+        {
+            if (CoseLayoutSettings.Multilevel_Scaling)
+            {
+                // TODO sollte das auch in der Gui dann abgehakt werden?
+                CoseLayoutSettings.Incremental = false;
+                MultiLevelScaling();
+            }
+            else
+            {
+                CoseLayoutSettings.Incremental = true;
+                ClassicLayout();
+            }
         }
 
         /// <summary>
@@ -341,9 +452,35 @@ namespace SEE.Layout
             coseLayoutSettings.NoOfLevels = gmList.Count - 1;
             coseLayoutSettings.Level = coseLayoutSettings.NoOfLevels;
 
+            Dictionary<int, int> edgeLengths = new Dictionary<int, int>();
+
+            if (CoseLayoutSettings.Use_Smart_Multilevel_Calculation)
+            {
+                int originalEdgeLength = CoseLayoutSettings.Edge_Length;
+
+                edgeLengths.Add(0, originalEdgeLength);
+
+                // we dont have to look at the original graph 
+                for (int i = 1; i < gmList.Count; i++)
+                {
+                    var k = edgeLengths[i - 1];
+                    var fac = Math.Sqrt(4.0 / 7);
+                    var newEdgeLength = (int)(fac * k);
+                    newEdgeLength = Math.Max(newEdgeLength, 1);
+                    Debug.Log("");
+                    edgeLengths.Add(i, newEdgeLength);
+                }
+            }
+            
             while (coseLayoutSettings.Level >= 0)
             {
                 graphManager = gmList[coseLayoutSettings.Level];
+
+                if (CoseLayoutSettings.Use_Smart_Multilevel_Calculation)
+                {
+                    CoseLayoutSettings.Edge_Length = edgeLengths[coseLayoutSettings.Level];
+                }
+                
                 ClassicLayout();
                 CoseLayoutSettings.Incremental = true;
 
@@ -454,7 +591,9 @@ namespace SEE.Layout
                     }
                     coseLayoutSettings.Coolingcycle++;
                     // based on www.btluke.com/simanf1.html, schedule 3
-                    coseLayoutSettings.CoolingFactor = Mathf.Max(coseLayoutSettings.InitialCoolingFactor - Mathf.Pow(coseLayoutSettings.Coolingcycle, Mathf.Log(100 * (coseLayoutSettings.InitialCoolingFactor - coseLayoutSettings.FinalTemperature)) / Mathf.Log(coseLayoutSettings.MaxCoolingCycle)) / 100 * CoseLayoutSettings.Cooling_Adjuster, coseLayoutSettings.FinalTemperature);
+                    
+                    coseLayoutSettings.CoolingFactor = Mathf.Max(coseLayoutSettings.InitialCoolingFactor - Mathf.Pow(coseLayoutSettings.Coolingcycle, Mathf.Log(100 * (coseLayoutSettings.InitialCoolingFactor - coseLayoutSettings.FinalTemperature)) / Mathf.Log(coseLayoutSettings.MaxCoolingCycle)) / 100 , coseLayoutSettings.FinalTemperature);
+                    Debug.Log(coseLayoutSettings.CoolingFactor);
                 }
 
                 coseLayoutSettings.TotalDisplacement = 0;
@@ -515,6 +654,11 @@ namespace SEE.Layout
 
             float dl = length - idealEdgeLength;
 
+            if (length == 0.0)
+            {
+                length = 0.1f;
+            }
+
             if (dl == 0.0)
             {
                 springForceX = 0;
@@ -524,6 +668,11 @@ namespace SEE.Layout
                 springForce = CoseLayoutSettings.Spring_Strength * dl;
                 springForceX = springForce * (edge.LengthX / length);
                 springForceY = springForce * (edge.LengthY / length);
+            }
+
+            if (float.IsNaN(springForceX))
+            {
+                Debug.Log("");
             }
             
             source.LayoutValues.SpringForceX += springForceX;
@@ -719,6 +868,11 @@ namespace SEE.Layout
 
                 nodeB.LayoutValues.RepulsionForceX += repulsionForceX;
                 nodeB.LayoutValues.RepulsionForceY += repulsionForceY;
+            }
+
+            if (float.IsNaN(nodeA.LayoutValues.RepulsionForceX))
+            {
+                Debug.Log("");
             }
         }
 
@@ -921,8 +1075,6 @@ namespace SEE.Layout
             int lcaDepth;
             CoseNode source;
             CoseNode target;
-            int sizeOfSourceInLca;
-            int sizeOfTargetInLca;
 
             foreach (CoseEdge edge in graphManager.GetAllEdges())
             {
@@ -933,11 +1085,13 @@ namespace SEE.Layout
                     source = edge.Source;
                     target = edge.Target;
 
-                    sizeOfSourceInLca = (int)Math.Round(edge.SourceInLca.EstimatedSize);
-                    sizeOfTargetInLca = (int)Math.Round(edge.TargetInLca.EstimatedSize);
+                    
 
                     if (CoseLayoutSettings.Use_Smart_Ideal_Edge_Calculation)
                     {
+                        int sizeOfSourceInLca = (int)Math.Round(edge.SourceInLca.EstimatedSize);
+                        int sizeOfTargetInLca = (int)Math.Round(edge.TargetInLca.EstimatedSize);
+
                         edge.IdealEdgeLength += sizeOfSourceInLca + sizeOfTargetInLca - 2 * CoseLayoutSettings.Simple_Node_Size;
                     }
 
@@ -1025,10 +1179,10 @@ namespace SEE.Layout
                 if (ExcludeEdgesInSameHierarchie(edge) && (edge.Source.ID != edge.Target.ID))
                 {
                     CreateEdge(edge);
-                } else
+                } /*else
                 {
                     Debug.Log("Edge: "+edge+" is excluded from the layout prozess, because the source and target node are in the same inclusion branch (hierarchie)");
-                }
+                }*/
                 
             }
 
