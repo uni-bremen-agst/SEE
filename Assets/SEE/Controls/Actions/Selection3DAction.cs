@@ -74,7 +74,7 @@ namespace SEE.Controls
         /// <param name="selectedObject">the object selected or null</param>
         /// <param name="hitInfo">information about the hit (used only if <paramref name="selectedObject"/>
         /// is not null)</param>
-        protected override void ShowSearchFeedback(GameObject selectedObject, RaycastHit hitInfo)
+        protected override void ShowHoveringFeedback(GameObject selectedObject, RaycastHit hitInfo)
         {
             Vector3 origin = selectionDevice.Position;
             line.SetPosition(0, origin);
@@ -108,7 +108,7 @@ namespace SEE.Controls
         /// <summary>
         /// Resets the ray line so that it becomes invisible again.
         /// </summary>
-        protected override void HideSearchFeedback()
+        protected override void HideHoveringFeedback()
         {
             Vector3 origin = selectionDevice.Position;
             line.SetPosition(0, origin);
@@ -128,6 +128,21 @@ namespace SEE.Controls
                                    direction: selectionDevice.Direction,
                                    hitInfo: out hitInfo,
                                    maxDistance: RayDistance);
+        }
+
+        /// <summary>
+        /// Returns a ray going from the position of the selection device through the pointing direction of 
+        /// the selection device.
+        /// </summary>
+        /// <returns>ray from selection device through selectionDevice.Direction</returns>
+        protected override Ray GetRay()
+        {
+            return new Ray(selectionDevice.Position, selectionDevice.Direction);
+        }
+
+        protected override Vector3 GrabbingRayStart()
+        {
+            return selectionDevice.Position;
         }
     }
 }

@@ -57,6 +57,10 @@
       "type": "boolean"
     },
     {
+      "name": "/actions/default/in/Move",
+      "type": "vector2"
+    },
+    {
       "name": "/actions/default/out/Haptic",
       "type": "vibration"
     }
@@ -120,7 +124,8 @@
       "/actions/default/in/GrabPinch": "Grab Pinch",
       "/actions/default/out/Haptic": "Haptic",
       "/actions/default/in/Select": "Select",
-      "/actions/default/in/Grab": "Grab"
+      "/actions/default/in/Grab": "Grab",
+      "/actions/default/in/Move": "Move"
     }
   ]
 }
