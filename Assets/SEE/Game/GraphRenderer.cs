@@ -69,7 +69,7 @@ namespace SEE.Game
         /// <summary>
         /// The factory used to create blocks for leaves.
         /// </summary>
-        private readonly NodeFactory leafNodeFactory;
+        protected readonly NodeFactory leafNodeFactory;
 
         /// <summary>
         /// The factory used to create game nodes for inner graph nodes.

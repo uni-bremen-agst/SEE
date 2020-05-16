@@ -153,6 +153,11 @@ namespace SEE.Layout
             }
 
             length = Mathf.Sqrt(lengthX * lengthX + lengthY * lengthY);
+
+            if (length == 0.0)
+            {
+                Debug.Log("");
+            }
         }
 
         /// <summary>

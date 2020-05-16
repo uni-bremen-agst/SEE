@@ -32,6 +32,11 @@ namespace SEE.Layout
         public static bool Use_Smart_Ideal_Edge_Calculation = false;
 
         /// <summary>
+        /// true if smart multilevel calculation is used 
+        /// </summary>
+        public static bool Use_Smart_Multilevel_Calculation = false; 
+
+        /// <summary>
         /// the simple node size
         /// </summary>
         public static int Simple_Node_Size = 1;
@@ -120,6 +125,11 @@ namespace SEE.Layout
         /// the cooling adjuster
         /// </summary>
         public static int Cooling_Adjuster = 1;
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        public static bool Automatic_Parameter_Calculation = false;
 
         /// <summary>
         /// the cooling factor

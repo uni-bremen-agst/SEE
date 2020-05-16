@@ -221,6 +221,11 @@ namespace SEE.Layout
 
             }
 
+            if (float.IsNaN(layoutValues.DisplacementX))
+            {
+                Debug.Log("");
+            }
+
             layout.CoseLayoutSettings.TotalDisplacement += (decimal)(Math.Abs(layoutValues.DisplacementX) + Math.Abs(layoutValues.DisplacementY));
         }
 
