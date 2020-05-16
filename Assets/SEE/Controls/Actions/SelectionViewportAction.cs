@@ -18,8 +18,12 @@ namespace SEE.Controls
         /// <returns>true if an object was hit</returns>
         protected override bool Detect(out RaycastHit hitInfo)
         {
-            Ray ray = MainCamera.ViewportPointToRay(selectionDevice.Direction);
-            return Physics.Raycast(ray, out hitInfo, Mathf.Infinity, Physics.IgnoreRaycastLayer);
+            return Physics.Raycast(GetRay(), out hitInfo, Mathf.Infinity, Physics.IgnoreRaycastLayer);
+        }
+
+        protected override Ray GetRay()
+        {
+            return MainCamera.ViewportPointToRay(selectionDevice.Direction);
         }
     }
 }

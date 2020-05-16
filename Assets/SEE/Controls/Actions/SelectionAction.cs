@@ -71,7 +71,7 @@ namespace SEE.Controls
         private void Update()
         {            
             bool isGrabbing = selectionDevice.IsGrabbing;
-            // The user could be both selecting and grabbing. However, grabbing overrules 
+            // The user could be doing both selecting and grabbing. However, grabbing overrules 
             // selecting.
             bool isSelecting = isGrabbing ? false : selectionDevice.IsSelecting;
 
@@ -101,7 +101,7 @@ namespace SEE.Controls
                 // hit an object.               
                 GameObject hitObject = Select(out RaycastHit hitInfo);
                 // Give visual feedback on where we search.
-                ShowSearchFeedback(hitObject, hitInfo);
+                ShowHoveringFeedback(hitObject, hitInfo);
                 if (hitObject != hoveredObject)
                 {
                     // Note: hitObject and hoveredObject may both be null here.
@@ -119,59 +119,12 @@ namespace SEE.Controls
             else
             {
                 // not selecting (independent from isGrabbing) => no visual feedback for search
-                HideSearchFeedback();
+                HideHoveringFeedback();
             }
             if (grabbedObject != null)
             {
                 HoldObject(grabbedObject);
             }
-
-            //if (isGrabbing && grabbedObject != null)
-            //{
-
-            //}
-            //else if (isGrabbing && grabbedObject == null && hoveredObject != null)
-            //{
-            //    // While the user wants to select or grab and has not yet grabbed anything
-            //    // we will show the ray and try to hit an object.               
-            //    hitObject = Select(out RaycastHit hitInfo);
-            //    // give visual feedback on where we search
-            //    ShowSearchFeedback(hitObject, hitInfo);
-            //}
-            //else
-            //{
-
-            //}
-
-            //if (hitObject != null)
-            //{
-            //    // Something was hit
-            //    if (isGrabbing && hitObject != grabbedObject)
-            //    {
-            //        if (grabbedObject != null)
-            //        {
-            //            // first release grabbed object
-            //            ReleaseObject(grabbedObject);
-            //            //if (grabbedObject == hoveredObject)
-            //            //{
-            //            //    UnhoverObject(hoveredObject);
-            //            //    hoveredObject = null;
-            //            //}
-            //        }
-            //        grabbedObject = hitObject;
-            //        GrabObject(grabbedObject);
-            //    } 
-            //    else if (isSelecting && hitObject != hoveredObject)
-            //    {
-            //        if (hoveredObject != null)
-            //        {
-            //            UnhoverObject(hoveredObject);
-            //        }
-            //        hoveredObject = hitObject;
-            //        HoverObject(hoveredObject);
-            //    }
-            //}
-
         }
 
         /// <summary>
@@ -205,67 +158,30 @@ namespace SEE.Controls
         /// <returns>true if an object was hit</returns>
         protected abstract bool Detect(out RaycastHit hitInfo);
 
+        //-----------------------------------------------------------------------
+        // Visual hovering feedback
+        //-----------------------------------------------------------------------
+
         /// <summary>
         /// Gives visual feedback on the current search for an object.
         /// </summary>
         /// <param name="selectedObject">the object selected or null if none was selected</param>
         /// <param name="hitInfo">information about the hit (used only if <paramref name="selectedObject"/>
         /// is not null)</param>
-        protected virtual void ShowSearchFeedback(GameObject selectedObject, RaycastHit hitInfo)
+        protected virtual void ShowHoveringFeedback(GameObject selectedObject, RaycastHit hitInfo)
         {
         }
 
         /// <summary>
         /// Terminates the visual feedback on the current search for an object.
         /// </summary>
-        protected virtual void HideSearchFeedback()
+        protected virtual void HideHoveringFeedback()
         {
         }
 
-        /// <summary>
-        /// Called when an object is being hovered over (passed as parameter <paramref name="selectedObject"/>).
-        /// </summary>
-        /// <param name="selectedObject">the selected object</param>
-        protected virtual void HoverObject(GameObject selectedObject)
-        {
-            HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
-            hoverComponent?.Hovered();
-        }
-
-        /// <summary>
-        /// Called when an object is no longer being hovered over (passed as parameter <paramref name="selectedObject"/>).
-        /// </summary>
-        /// <param name="selectedObject">the selected object</param>
-        protected virtual void UnhoverObject(GameObject selectedObject)
-        {
-            HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
-            hoverComponent?.Unhovered();
-        }
-
-        /// <summary>
-        /// Called when an object is grabbed (passed as parameter <paramref name="selectedObject"/>).
-        /// </summary>
-        /// <param name="selectedObject">the selected object</param>
-        protected virtual void GrabObject(GameObject selectedObject)
-        {
-            GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
-            grabbingComponent?.Grab(gameObject);
-            OnObjectGrabbed.Invoke(selectedObject);
-        }
-
-        /// <summary>
-        /// Called while an object is being grabbed (passed as parameter <paramref name="grabbedObject"/>).
-        /// This method is called on every Update().
-        /// </summary>
-        /// <param name="grabbedObject">the grabbed object</param>
-        protected virtual void HoldObject(GameObject grabbedObject)
-        {
-            GrabbableObject grabbingComponent = grabbedObject.GetComponent<GrabbableObject>();
-            if (grabbingComponent != null)
-            {
-                grabbingComponent.Continue(EndOfRay(grabbedObject));
-            }
-        }
+        //-----------------------------------------------------------------------
+        // Visual grabbing feedback
+        //-----------------------------------------------------------------------
 
         /// <summary>
         /// To draw a line from the player to the grabbed object when an object
@@ -307,42 +223,132 @@ namespace SEE.Controls
         /// </summary>
         private GrabLine grabLine;
 
-        protected virtual Vector3 EndOfRay(GameObject heldObject)
+        /// <summary>
+        /// Gives visual feedback when an object was grabbed.
+        /// </summary>
+        /// <param name="heldObject">the object selected or null if none was selected</param>
+        protected void ShowGrabbingFeedback(GameObject heldObject)
         {
             if (grabLine == null)
             {
                 grabLine = new GrabLine(gameObject);
             }
             // Draw a ray from the player to the held object.
-            // The origin of the ray must be slightly off the camera. Otherwise it cannot be seen.
-            grabLine.Draw(MainCamera.transform.position + Vector3.down * 0.1f, heldObject.transform.position);
+            grabLine.Draw(GrabbingRayStart(), heldObject.transform.position);
+        }
 
+        protected virtual Vector3 GrabbingRayStart()
+        {
+            // The origin of the ray must be slightly off the camera. Otherwise it cannot be seen.
+            return MainCamera.transform.position + Vector3.down * 0.1f;
+        }
+
+        /// <summary>
+        /// Terminates the visual feedback on the currently ongoing grabbing.
+        /// </summary>
+        protected void HideGrabbingFeedback()
+        {
+            grabLine?.Off();
+        }
+
+        //-----------------------------------------------------------------------
+        // Hovering actions
+        //-----------------------------------------------------------------------
+
+        /// <summary>
+        /// Called when an object is being hovered over (passed as parameter <paramref name="selectedObject"/>).
+        /// </summary>
+        /// <param name="selectedObject">the selected object</param>
+        protected virtual void HoverObject(GameObject selectedObject)
+        {
+            HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
+            hoverComponent?.Hovered();
+        }
+
+        /// <summary>
+        /// Called when an object is no longer being hovered over (passed as parameter <paramref name="selectedObject"/>).
+        /// </summary>
+        /// <param name="selectedObject">the selected object</param>
+        protected virtual void UnhoverObject(GameObject selectedObject)
+        {
+            HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
+            hoverComponent?.Unhovered();
+        }
+
+        //-----------------------------------------------------------------------
+        // Grabbing actions
+        //-----------------------------------------------------------------------
+
+        /// <summary>
+        /// Called when an object is grabbed (passed as parameter <paramref name="selectedObject"/>).
+        /// </summary>
+        /// <param name="selectedObject">the selected object</param>
+        protected virtual void GrabObject(GameObject selectedObject)
+        {
+            GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
+            grabbingComponent?.Grab(gameObject);
+            OnObjectGrabbed.Invoke(selectedObject);
+        }
+
+        /// <summary>
+        /// Called while an object is being grabbed (passed as parameter <paramref name="grabbedObject"/>).
+        /// This method is called on every Update().
+        /// </summary>
+        /// <param name="grabbedObject">the grabbed object</param>
+        protected virtual void HoldObject(GameObject grabbedObject)
+        {            
+            GrabbableObject grabbingComponent = grabbedObject.GetComponent<GrabbableObject>();
+            if (grabbingComponent != null)
+            {
+                ShowGrabbingFeedback(grabbedObject);
+                grabbingComponent.Continue(TipOfGrabbingRay(grabbedObject));
+            }
+        }
+
+        /// <summary>
+        ///  Pull speed of the grabbing when a remote object was grabbed.
+        /// </summary>
+        [Tooltip("Pull speed of the grabbing when a remote object was grabbed."), Range(0.1f, 100.0f)]
+        public float PullSpeed = 10.0f;
+
+        [Tooltip("A grabbed object must be moved at least that far to become actually moved."), Range(0.01f, 0.3f)]
+        public float MoveSensitivity = 0.01f;
+
+        /// <summary>
+        /// Yields the tip of the grabbing ray. The grabbing ray initially starts at the origin of the 
+        /// selection device and ends at the grabbed object. It follows the pointing direction of
+        /// the selection device. In addition, the user can pull the grabbed object. Depending on
+        /// the direction of the pulling, the grabbed object can be drawn towards the player 
+        /// or pushed farther away along the direction of the grabbing ray. The position of the tip
+        /// of the ray (the position where the grabbed object should be moved according to the
+        /// user) is returned.
+        /// 
+        /// </summary>
+        /// <param name="heldObject">the object currently held</param>
+        /// <returns>new position where the held object should be moved</returns>
+        protected virtual Vector3 TipOfGrabbingRay(GameObject heldObject)
+        {
+            Ray ray = GetRay();
             // Distance between player and held object.
-            float rayLength = Vector3.Distance(MainCamera.transform.position, heldObject.transform.position);
+            float rayLength = Vector3.Distance(ray.origin, heldObject.transform.position);
 
             // Now move the held object following the pointing direction of the player.
-            Vector3 direction = selectionDevice.Direction;
-            Ray ray = MainCamera.ScreenPointToRay(direction);
-            // A positive pull is interpreted as drawing the object towards the MainCamera.
+
+            // A positive pull is interpreted as drawing the object towards the player.
             // A negative pull means that the object is moved farther away.
             float pull = selectionDevice.Pull; // pull direction
             float pullDirection = pull > 0.01f ? 1.0f : (pull < -0.01f ? -1.0f : 0.0f);
+            //Debug.LogFormat("pull {0} pullDirection {1}\n", pull, pullDirection);
 
-            float speed = 10.0f; // base speed; true speed is speed * pull
-            float step = speed * Time.deltaTime * pullDirection;  // distance to move
+            float step = PullSpeed * Time.deltaTime * pullDirection;  // distance to move
             Vector3 target = ray.origin + ray.direction.normalized * rayLength; // head of the ray
             target = Vector3.MoveTowards(target, ray.origin, step);
 
-            //if (pullDirection != 0)
-            //{
-            //    Debug.LogFormat("mouse direction {0} ray.origin {1} ray.direction {2} raylength {3} pull {4} step={5} from {6} to {7} by {8}\n",
-            //                    direction, ray.origin, ray.direction, rayLength, pullDirection, step, heldObject.transform.position, target, Vector3.Distance(heldObject.transform.position, target));
-            //}
             // Due to imprecisions of floating point arithmetics there may be tiny differences
             // between the positions which, however, accumulate to larger differences
             // because this method is called at the frame rate. That is why we will
             // return the original position of the held object if the difference is minor.
-            if (Vector3.Distance(heldObject.transform.position, target) > 0.05f)
+            if (Vector3.Distance(heldObject.transform.position, target) >= MoveSensitivity)
             {
                 return target;
             }
@@ -353,6 +359,12 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// Returns a ray cast from the player along the pointing direction of the selection device.
+        /// </summary>
+        /// <returns></returns>
+        protected abstract Ray GetRay();
+
+        /// <summary>
         /// Called when an object is released, i.e., no longer grabbed (passed as parameter <paramref name="selectedObject"/>).
         /// </summary>
         /// <param name="selectedObject">the selected object</param>
@@ -360,7 +372,7 @@ namespace SEE.Controls
         {
             GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
             grabbingComponent?.Release();
-            grabLine?.Off();
+            HideGrabbingFeedback();
             OnObjectGrabbed.Invoke(null);
         }
     }

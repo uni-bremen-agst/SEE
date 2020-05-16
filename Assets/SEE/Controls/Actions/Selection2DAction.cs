@@ -9,6 +9,16 @@ namespace SEE.Controls
     public class Selection2DAction : SelectionAction
     {
         /// <summary>
+        /// Returns a ray going from the MainCamera through the pointing direction of 
+        /// the selection device.
+        /// </summary>
+        /// <returns>ray from MainCamera through selectionDevice.Direction</returns>
+        protected override Ray GetRay()
+        {
+            return MainCamera.ScreenPointToRay(selectionDevice.Direction);
+        }
+
+        /// <summary>
         /// Casts a ray from the MainCamera through the selection.Direction (position
         /// on the screen) to hit a game object. Returns true if one was hit.
         /// </summary>
@@ -17,8 +27,7 @@ namespace SEE.Controls
         /// <returns>true if an object was hit</returns>
         protected override bool Detect(out RaycastHit hitInfo)
         {
-            Ray ray = MainCamera.ScreenPointToRay(selectionDevice.Direction);
-            return Physics.Raycast(ray, out hitInfo, Physics.IgnoreRaycastLayer);
+            return Physics.Raycast(GetRay(), out hitInfo, Physics.IgnoreRaycastLayer);
         }
     }
 }
