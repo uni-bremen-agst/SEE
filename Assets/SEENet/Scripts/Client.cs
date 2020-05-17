@@ -16,6 +16,9 @@ namespace SEE.Net.Internal
         public static IPEndPoint LocalEndPoint { get => Connection != null ? (IPEndPoint)Connection.ConnectionInfo.LocalEndPoint : null; }
         public static IPEndPoint RemoteEndPoint { get => Connection != null ? (IPEndPoint)Connection.ConnectionInfo.RemoteEndPoint : null; }
 
+        public static ulong incomingPacketID = 0;
+        public static ulong outgoingPacketID = 0;
+
 
 
         public static void Initialize()

@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace SEE.Net.Internal
 {
@@ -13,8 +14,14 @@ namespace SEE.Net.Internal
         {
         }
 
-        internal abstract string Serialize();
-        internal abstract void Deserialize(string serializedPacket);
+        internal virtual string Serialize()
+        {
+            return "";
+        }
+
+        internal virtual void Deserialize(string serializedPacket)
+        {
+        }
     }
 
     internal static class PacketSerializer

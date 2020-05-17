@@ -33,6 +33,8 @@ namespace SEE.Net
         [SerializeField] private Internal.Logger.Severity minimalSeverity = DEFAULT_SEVERITY;
 #endif
 
+        private Dictionary<Connection, List<string>> submittedSerializedPackets = new Dictionary<Connection, List<string>>();
+
 
 
         public static bool UseInOfflineMode { get => instance ? instance.useInOfflineMode : true; }
@@ -141,14 +143,39 @@ namespace SEE.Net
 #endif
             }
         }
-
-        private void Update()
+        
+        private void LateUpdate()
         {
             if (hostServer && !useInOfflineMode)
             {
                 Server.Update();
             }
             Client.Update();
+
+            if (!useInOfflineMode)
+            {
+                if (submittedSerializedPackets.Count != 0)
+                {
+                    foreach (Connection connection in submittedSerializedPackets.Keys)
+                    {
+                        ulong id = ulong.MaxValue;
+                        if (Server.Connections.Contains(connection))
+                        {
+                            id = Server.outgoingPacketSequenceIDs[connection]++;
+                        }
+                        else if (Client.Connection.Equals(connection))
+                        {
+                            id = Client.outgoingPacketID++;
+                        }
+                        Assert.IsTrue(id != ulong.MaxValue);
+
+                        List<string> serializedObjects = submittedSerializedPackets[connection];
+                        PacketSequencePacket packet = new PacketSequencePacket(id, serializedObjects.ToArray());
+                        Send(connection, PacketSerializer.Serialize(packet));
+                    }
+                    submittedSerializedPackets.Clear();
+                }
+            }
         }
 
         private void OnDestroy()
@@ -191,17 +218,29 @@ namespace SEE.Net
 
 
 
-        internal static void SendPacket(Connection connection, AbstractPacket packet)
+        internal static void SubmitPacket(Connection connection, AbstractPacket packet)
         {
             Assert.IsNotNull(connection);
             Assert.IsNotNull(packet);
 
-            instance?.SendPacket(connection, PacketSerializer.Serialize(packet));
+            SubmitPacket(connection, PacketSerializer.Serialize(packet));
         }
 
-        private void SendPacket(Connection connection, string serializedPacket)
+        internal static void SubmitPacket(Connection connection, string serializedPacket)
+        {
+            bool result = instance.submittedSerializedPackets.TryGetValue(connection, out List<string> serializedPackets);
+            if (!result)
+            {
+                serializedPackets = new List<string>();
+                instance.submittedSerializedPackets.Add(connection, serializedPackets);
+            }
+            serializedPackets.Add(serializedPacket);
+        }
+
+        private void Send(Connection connection, string serializedPacket)
         {
             string packetType = Client.Connection.Equals(connection) ? Server.PACKET_TYPE : Client.PACKET_TYPE;
+
             try
             {
                 connection.SendObject(packetType, serializedPacket);
@@ -259,7 +298,7 @@ namespace SEE.Net
             else
             {
                 ExecuteCommandPacket packet = new ExecuteCommandPacket(command);
-                SendPacket(Client.Connection, packet);
+                SubmitPacket(Client.Connection, packet);
             }
         }
 
@@ -272,7 +311,7 @@ namespace SEE.Net
             else
             {
                 RedoCommandPacket packet = new RedoCommandPacket();
-                SendPacket(Client.Connection, packet);
+                SubmitPacket(Client.Connection, packet);
             }
         }
 
@@ -285,7 +324,7 @@ namespace SEE.Net
             else
             {
                 UndoCommandPacket packet = new UndoCommandPacket();
-                SendPacket(Client.Connection, packet);
+                SubmitPacket(Client.Connection, packet);
             }
         }
     }

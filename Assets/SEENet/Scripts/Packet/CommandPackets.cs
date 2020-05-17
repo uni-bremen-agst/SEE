@@ -38,35 +38,11 @@ namespace SEE.Net.Internal
         public RedoCommandPacket()
         {
         }
-
-
-
-        internal override string Serialize()
-        {
-            string result = "";
-            return result;
-        }
-
-        internal override void Deserialize(string serializedPacket)
-        {
-        }
     }
 
     internal class UndoCommandPacket : AbstractPacket
     {
         public UndoCommandPacket()
-        {
-        }
-
-
-
-        internal override string Serialize()
-        {
-            string result = "";
-            return result;
-        }
-
-        internal override void Deserialize(string serializedPacket)
         {
         }
     }

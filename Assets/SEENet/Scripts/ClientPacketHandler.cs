@@ -1,7 +1,6 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using SEE.Command;
-using System;
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
@@ -18,16 +17,23 @@ namespace SEE.Net.Internal
 
 
 
-        internal override void HandlePacket(PacketHeader packetHeader, Connection connection, BufferedPacketsPacket packet)
+        internal override bool TryHandlePacketSequence(PacketHeader packetHeader, Connection connection, PacketSequencePacket packetSequence)
         {
-            if (packet != null && packet.packetDatas != null)
+            Assert.IsNotNull(connection);
+            Assert.IsNotNull(packetSequence);
+            Assert.IsTrue(Client.Connection == connection);
+
+            if (packetSequence.id == Client.incomingPacketID)
             {
-                foreach (string serializedPacket in packet.packetDatas)
+                Client.incomingPacketID++;
+                foreach (string serializedPacket in packetSequence.serializedPackets)
                 {
-                    AbstractPacket p = PacketSerializer.Deserialize(serializedPacket);
-                    HandlePacket(packetHeader, connection, p);
+                    AbstractPacket packet = PacketSerializer.Deserialize(serializedPacket);
+                    HandlePacket(packetHeader, connection, packet);
                 }
+                return true;
             }
+            return false;
         }
 
         internal override void HandlePacket(PacketHeader packetHeader, Connection connection, ExecuteCommandPacket packet)
