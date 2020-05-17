@@ -10,9 +10,9 @@ namespace SEE.Net.Internal
 
     public static class Client
     {
-        public static readonly string PACKET_PREFIX = "Client.";
+        public static readonly string PACKET_TYPE = "Client.";
         public static Connection Connection { get; private set; } = null;
-        public static ClientPacketHandler PacketHandler { get; private set; } = new ClientPacketHandler(PACKET_PREFIX);
+        public static ClientPacketHandler PacketHandler { get; private set; } = new ClientPacketHandler(PACKET_TYPE);
         public static IPEndPoint LocalEndPoint { get => Connection != null ? (IPEndPoint)Connection.ConnectionInfo.LocalEndPoint : null; }
         public static IPEndPoint RemoteEndPoint { get => Connection != null ? (IPEndPoint)Connection.ConnectionInfo.RemoteEndPoint : null; }
 
@@ -21,11 +21,7 @@ namespace SEE.Net.Internal
         public static void Initialize()
         {
             void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => PacketHandler.Push(packetHeader, connection, data);
-            
-            foreach (string packetType in from handlerFuncDictEntry in PacketHandler.handlerFuncDict select handlerFuncDictEntry.Key)
-            {
-                NetworkComms.AppendGlobalIncomingPacketHandler<string>(packetType, OnIncomingPacket);
-            }
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_TYPE, OnIncomingPacket);
 
             List<IPEndPoint> endPoints = Network.HostServer
                 ? (from connectionListener in Server.ConnectionListeners select connectionListener.LocalListenEndPoint as IPEndPoint).ToList()

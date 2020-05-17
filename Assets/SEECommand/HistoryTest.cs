@@ -1,6 +1,26 @@
 ﻿using SEE.Command;
 using UnityEngine;
 
+public abstract class T0
+{
+    public int i = 0;
+}
+
+public class T1 : T0
+{
+    public int j = 0;
+
+    public T1(int j)
+    {
+        this.j = j;
+    }
+}
+
+public class T2
+{
+    public T0 t0;
+}
+
 public class HistoryTest : MonoBehaviour
 {
     private Transform draggedTransform = null;

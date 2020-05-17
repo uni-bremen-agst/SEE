@@ -184,8 +184,8 @@ namespace SEE.Command
         internal static AbstractCommand Deserialize(string data)
         {
             string[] tokens = data.Split(new char[] { ';' }, 2, StringSplitOptions.None);
-            AbstractCommand command = (AbstractCommand)JsonUtility.FromJson(tokens[1], Type.GetType(tokens[0]));
-            return command;
+            AbstractCommand result = (AbstractCommand)JsonUtility.FromJson(tokens[1], Type.GetType(tokens[0]));
+            return result;
         }
     }
 

@@ -8,8 +8,6 @@ using UnityEngine.Assertions;
 namespace SEE.Net.Internal
 {
 
-    using HandlerFunc = Func<PacketHeader, Connection, string, bool>;
-
     public abstract class PacketHandler
     {
         private struct PendingPacket
@@ -21,7 +19,6 @@ namespace SEE.Net.Internal
 
 
 
-        public readonly Dictionary<string, HandlerFunc> handlerFuncDict;
         protected string packetTypePrefix;
         private List<PendingPacket> pendingMessages = new List<PendingPacket>();
 
@@ -32,18 +29,11 @@ namespace SEE.Net.Internal
             Assert.IsNotNull(packetTypePrefix);
 
             this.packetTypePrefix = packetTypePrefix;
-            handlerFuncDict = new Dictionary<string, HandlerFunc>
-            {
-                { packetTypePrefix + BufferedPacketsPacket.PACKET_TYPE, HandleBufferedPacketsPacket },
-                { packetTypePrefix + ExecuteCommandPacket.PACKET_TYPE, HandleExecuteCommandPacket },
-                { packetTypePrefix + RedoCommandPacket.PACKET_TYPE, HandleRedoCommandPacket},
-                { packetTypePrefix + UndoCommandPacket.PACKET_TYPE, HandleUndoCommandPacket}
-            };
         }
 
 
 
-        public void Push(PacketHeader packetHeader, Connection connection, string serializedPacket)
+        internal void Push(PacketHeader packetHeader, Connection connection, string serializedPacket)
         {
             lock (pendingMessages)
             {
@@ -56,29 +46,45 @@ namespace SEE.Net.Internal
             }
         }
 
-        public void HandlePendingPackets()
+        internal void HandlePendingPackets()
         {
             lock (pendingMessages)
             {
                 Assert.AreEqual(Thread.CurrentThread, Network.MainThread);
                 for (int i = 0; i < pendingMessages.Count; i++)
                 {
-                    PendingPacket packet = pendingMessages[i];
-                    bool result = handlerFuncDict.TryGetValue(packet.header.PacketType, out HandlerFunc func);
-                    Assert.IsTrue(result);
-                    func(packet.header, packet.connection, packet.serializedPacket);
+                    PendingPacket pendingPacket = pendingMessages[i];
+                    AbstractPacket packet = PacketSerializer.Deserialize(pendingPacket.serializedPacket);
+                    HandlePacket(pendingPacket.header, pendingPacket.connection, packet);
                 }
                 pendingMessages.Clear();
             }
         }
 
-        protected abstract bool HandleBufferedPacketsPacket(PacketHeader packetHeader, Connection connection, string data);
+        internal void HandlePacket(PacketHeader packetHeader, Connection connection, AbstractPacket packet)
+        {
+            if (packet.GetType() == typeof(BufferedPacketsPacket))
+            {
+                HandlePacket(packetHeader, connection, (BufferedPacketsPacket)packet);
+            }
+            else if (packet.GetType() == typeof(ExecuteCommandPacket))
+            {
+                HandlePacket(packetHeader, connection, (ExecuteCommandPacket)packet);
+            }
+            else if (packet.GetType() == typeof(RedoCommandPacket))
+            {
+                HandlePacket(packetHeader, connection, (RedoCommandPacket)packet);
+            }
+            else if (packet.GetType() == typeof(UndoCommandPacket))
+            {
+                HandlePacket(packetHeader, connection, (UndoCommandPacket)packet);
+            };
+        }
 
-        protected abstract bool HandleExecuteCommandPacket(PacketHeader packetHeader, Connection connection, string data);
-
-        protected abstract bool HandleRedoCommandPacket(PacketHeader packetHeader, Connection connection, string data);
-
-        protected abstract bool HandleUndoCommandPacket(PacketHeader packetHeader, Connection connection, string data);
+        internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, BufferedPacketsPacket packet);
+        internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, ExecuteCommandPacket packet);
+        internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, RedoCommandPacket packet);
+        internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, UndoCommandPacket packet);
     }
 
 }

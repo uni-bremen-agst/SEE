@@ -11,10 +11,10 @@ namespace SEE.Net.Internal
 
     public static class Server
     {
-        public static readonly string PACKET_PREFIX = "Server.";
+        public static readonly string PACKET_TYPE = "Server.";
         public static List<Connection> Connections { get; private set; } = new List<Connection>();
         public static List<ConnectionListenerBase> ConnectionListeners { get; private set; } = new List<ConnectionListenerBase>();
-        private static ServerPacketHandler packetHandler = new ServerPacketHandler(PACKET_PREFIX);
+        private static ServerPacketHandler packetHandler = new ServerPacketHandler(PACKET_TYPE);
         private static Stack<Connection> pendingEstablishedConnections = new Stack<Connection>();
         private static Stack<Connection> pendingClosedConnections = new Stack<Connection>();
 
@@ -26,11 +26,7 @@ namespace SEE.Net.Internal
             NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => pendingClosedConnections.Push(c));
 
             void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => packetHandler.Push(packetHeader, connection, data);
-
-            foreach (string packetType in from handlerFuncDictEntry in packetHandler.handlerFuncDict select handlerFuncDictEntry.Key)
-            {
-                NetworkComms.AppendGlobalIncomingPacketHandler<string>(packetType, OnIncomingPacket);
-            }
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_TYPE, OnIncomingPacket);
             
             try
             {

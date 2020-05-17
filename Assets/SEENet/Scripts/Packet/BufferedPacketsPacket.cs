@@ -6,19 +6,21 @@ namespace SEE.Net.Internal
 
     internal class BufferedPacketsPacket : AbstractPacket
     {
-        internal static readonly string PACKET_TYPE = "BufferedPackets";
-
-        public string[] packetTypes;
         public string[] packetDatas;
 
-        public BufferedPacketsPacket(string[] packetTypes, string[] packetDatas) : base(PACKET_TYPE)
-        {
-            Assert.IsNotNull(packetTypes);
-            Assert.IsNotNull(packetDatas);
 
-            this.packetTypes = packetTypes;
+
+        public BufferedPacketsPacket()
+        {
+        }
+
+        public BufferedPacketsPacket(string[] packetDatas)
+        {
+            Assert.IsNotNull(packetDatas);
             this.packetDatas = packetDatas;
         }
+
+
 
         internal override string Serialize()
         {
@@ -26,10 +28,10 @@ namespace SEE.Net.Internal
             return result;
         }
 
-        internal static BufferedPacketsPacket Deserialize(string data)
+        internal override void Deserialize(string serializedPacket)
         {
-            BufferedPacketsPacket result = JsonUtility.FromJson<BufferedPacketsPacket>(data);
-            return result;
+            BufferedPacketsPacket deserializedPacket = JsonUtility.FromJson<BufferedPacketsPacket>(serializedPacket);
+            packetDatas = deserializedPacket.packetDatas;
         }
     }
 
