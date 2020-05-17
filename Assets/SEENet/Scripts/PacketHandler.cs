@@ -10,17 +10,31 @@ namespace SEE.Net.Internal
 
     public abstract class PacketHandler
     {
-        private struct PendingPacket
+        private struct SerializedPendingPacket
         {
-            public PacketHeader header;
-            public Connection connection;
-            public string serializedPacket;
+            internal PacketHeader packetHeader;
+            internal Connection connection;
+            internal string serializedPacket;
+        }
+
+        private struct TranslatedPendingPacket : IComparable<TranslatedPendingPacket>
+        {
+            internal PacketHeader packetHeader;
+            internal Connection connection;
+            internal PacketSequencePacket packet;
+
+            public int CompareTo(TranslatedPendingPacket other)
+            {
+                int result = packet.id.CompareTo(other.packet.id);
+                return result;
+            }
         }
 
 
 
         protected string packetTypePrefix;
-        private List<PendingPacket> pendingMessages = new List<PendingPacket>();
+        private List<SerializedPendingPacket> serializedPendingPackets = new List<SerializedPendingPacket>();
+        private List<TranslatedPendingPacket> translatedPendingPackets = new List<TranslatedPendingPacket>();
 
 
 
@@ -35,39 +49,58 @@ namespace SEE.Net.Internal
 
         internal void Push(PacketHeader packetHeader, Connection connection, string serializedPacket)
         {
-            lock (pendingMessages)
+            lock (serializedPendingPackets)
             {
-                pendingMessages.Add(new PendingPacket
-                {
-                    header = packetHeader,
-                    connection = connection,
-                    serializedPacket = serializedPacket
-                });
+                serializedPendingPackets.Add(
+                    new SerializedPendingPacket()
+                    {
+                        packetHeader = packetHeader,
+                        connection = connection,
+                        serializedPacket = serializedPacket
+                    }
+                );
             }
         }
 
         internal void HandlePendingPackets()
         {
-            lock (pendingMessages)
+            lock (serializedPendingPackets)
             {
                 Assert.AreEqual(Thread.CurrentThread, Network.MainThread);
-                for (int i = 0; i < pendingMessages.Count; i++)
+                foreach (SerializedPendingPacket serializedPendingPacket in serializedPendingPackets)
                 {
-                    PendingPacket pendingPacket = pendingMessages[i];
-                    AbstractPacket packet = PacketSerializer.Deserialize(pendingPacket.serializedPacket);
-                    HandlePacket(pendingPacket.header, pendingPacket.connection, packet);
+                    PacketSequencePacket packet = (PacketSequencePacket)PacketSerializer.Deserialize(serializedPendingPacket.serializedPacket);
+                    translatedPendingPackets.Add(
+                        new TranslatedPendingPacket()
+                        {
+                            packetHeader = serializedPendingPacket.packetHeader,
+                            connection = serializedPendingPacket.connection,
+                            packet = packet
+                        }
+                    );
                 }
-                pendingMessages.Clear();
+                serializedPendingPackets.Clear();
+
+                translatedPendingPackets.Sort();
+                for (int i = 0; i < translatedPendingPackets.Count; i++)
+                {
+                    TranslatedPendingPacket translatedPendingPacket = translatedPendingPackets[i];
+                    bool result = TryHandlePacketSequence(translatedPendingPacket.packetHeader, translatedPendingPacket.connection, translatedPendingPacket.packet);
+                    if (result)
+                    {
+                        translatedPendingPackets.RemoveAt(i--);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
             }
         }
 
         internal void HandlePacket(PacketHeader packetHeader, Connection connection, AbstractPacket packet)
         {
-            if (packet.GetType() == typeof(BufferedPacketsPacket))
-            {
-                HandlePacket(packetHeader, connection, (BufferedPacketsPacket)packet);
-            }
-            else if (packet.GetType() == typeof(ExecuteCommandPacket))
+            if (packet.GetType() == typeof(ExecuteCommandPacket))
             {
                 HandlePacket(packetHeader, connection, (ExecuteCommandPacket)packet);
             }
@@ -81,7 +114,7 @@ namespace SEE.Net.Internal
             };
         }
 
-        internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, BufferedPacketsPacket packet);
+        internal abstract bool TryHandlePacketSequence(PacketHeader packetHeader, Connection connection, PacketSequencePacket packetSequence);
         internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, ExecuteCommandPacket packet);
         internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, RedoCommandPacket packet);
         internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, UndoCommandPacket packet);

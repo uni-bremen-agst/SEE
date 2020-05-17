@@ -18,6 +18,9 @@ namespace SEE.Net.Internal
         private static Stack<Connection> pendingEstablishedConnections = new Stack<Connection>();
         private static Stack<Connection> pendingClosedConnections = new Stack<Connection>();
 
+        public static Dictionary<Connection, ulong> incomingPacketSequenceIDs = new Dictionary<Connection, ulong>();
+        public static Dictionary<Connection, ulong> outgoingPacketSequenceIDs = new Dictionary<Connection, ulong>();
+
 
 
         public static void Initialize()
@@ -77,6 +80,8 @@ namespace SEE.Net.Internal
                 {
                     Debug.Log("Connection established: " + connection.ToString());
                     Connections.Add(connection);
+                    incomingPacketSequenceIDs.Add(connection, 0);
+                    outgoingPacketSequenceIDs.Add(connection, 0);
                     packetHandler.OnConnectionEstablished(connection);
                 }
                 else
@@ -93,6 +98,8 @@ namespace SEE.Net.Internal
                 Debug.Log("Connection closed: " + connection.ToString());
                 Connections.Remove(connection);
                 packetHandler.OnConnectionClosed(connection);
+                incomingPacketSequenceIDs.Remove(connection);
+                outgoingPacketSequenceIDs.Remove(connection);
             }
         }
     }
