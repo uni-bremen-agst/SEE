@@ -191,30 +191,21 @@ namespace SEE.Net
 
 
 
-        internal static void Send(Connection connection, AbstractPacket packet)
-        {
-            Send(connection, packet.packetType, packet.Serialize());
-        }
-
-        internal static void Send(Connection connection, string packetType, string packetData)
+        internal static void SendPacket(Connection connection, AbstractPacket packet)
         {
             Assert.IsNotNull(connection);
-            Assert.IsNotNull(packetData);
-            Assert.IsNotNull(packetType);
-            Assert.IsNotNull(Client.Connection);
+            Assert.IsNotNull(packet);
 
+            instance?.SendPacket(connection, packet.packetType, packet.Serialize());
+        }
+
+        private void SendPacket(Connection connection, string packetType, string serializedPacket)
+        {
             string packetTargetPrefix = Client.Connection.Equals(connection) ? Server.PACKET_PREFIX : Client.PACKET_PREFIX;
             string fullPacketType = packetTargetPrefix + packetType;
-
-            if (instance.useInOfflineMode)
-            {
-                Debug.LogWarning("Packets can not be sent in offline mode!");
-                return;
-            }
-
             try
             {
-                connection.SendObject(fullPacketType, packetData);
+                connection.SendObject(fullPacketType, serializedPacket);
             }
             catch (Exception)
             {
@@ -269,7 +260,7 @@ namespace SEE.Net
             else
             {
                 ExecuteCommandPacket packet = new ExecuteCommandPacket(command);
-                Send(Client.Connection, packet);
+                SendPacket(Client.Connection, packet);
             }
         }
 
@@ -282,7 +273,7 @@ namespace SEE.Net
             else
             {
                 RedoCommandPacket packet = new RedoCommandPacket();
-                Send(Client.Connection, packet);
+                SendPacket(Client.Connection, packet);
             }
         }
 
@@ -295,7 +286,7 @@ namespace SEE.Net
             else
             {
                 UndoCommandPacket packet = new UndoCommandPacket();
-                Send(Client.Connection, packet);
+                SendPacket(Client.Connection, packet);
             }
         }
     }

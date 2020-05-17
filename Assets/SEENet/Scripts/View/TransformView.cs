@@ -1,4 +1,5 @@
-﻿using SEE.Net.Internal;
+﻿using SEE.Command;
+using SEE.Net.Internal;
 using System;
 using System.Diagnostics;
 using UnityEngine;
@@ -37,9 +38,7 @@ namespace SEE.Net
         private Vector3 scaleLast;
         private Vector3 scaleNext;
 
-        private DateTime lastUpdateTimePosition = DateTime.MinValue;
-        private DateTime lastUpdateTimeRotation = DateTime.MinValue;
-        private DateTime lastUpdateTimeScale = DateTime.MinValue;
+
 
         protected override void InitializeImpl()
         {
@@ -60,6 +59,7 @@ namespace SEE.Net
             }
             teleportMinDistanceSquared = teleportMinDistance * teleportMinDistance;
         }
+
         protected override void UpdateImpl()
         {
             if (viewContainer != null && !viewContainer.IsOwner())
@@ -98,59 +98,42 @@ namespace SEE.Net
             }
         }
 
-        public void SetNextPosition(DateTime updateTime, Vector3 nextPosition)
+
+
+        public void SetNextPosition(Vector3 nextPosition)
         {
-            if (updateTime < lastUpdateTimePosition)
-            {
-                return;
-            }
-            lastUpdateTimePosition = updateTime;
             positionUpdateStopwatch.Restart();
             positionLast = transformToSynchronize.position;
             positionNext = nextPosition;
         }
-        public void SetNextRotation(DateTime updateTime, Quaternion nextRotation)
+
+        public void SetNextRotation(Quaternion nextRotation)
         {
-            if (updateTime < lastUpdateTimeRotation)
-            {
-                return;
-            }
-            lastUpdateTimeRotation = updateTime;
             rotationUpdateStopwatch.Restart();
             rotationLast = transformToSynchronize.rotation;
             rotationNext = nextRotation;
         }
-        public void SetNextScale(DateTime updateTime, Vector3 nextScale)
+
+        public void SetNextScale(Vector3 nextScale)
         {
-            if (updateTime < lastUpdateTimeScale)
-            {
-                return;
-            }
-            lastUpdateTimeScale = updateTime;
             scaleUpdateStopwatch.Restart();
             scaleLast = transformToSynchronize.localScale;
             scaleNext = nextScale;
         }
+
         private void SynchronizePosition()
         {
-            Network.Send(
-                Client.Connection,
-                new TransformViewPositionPacket(this, transformToSynchronize.position, DateTime.Now)
-            );
+            new TransformViewPositionCommand(this, transformToSynchronize.position).Execute();
         }
+
         private void SynchronizeRotation()
         {
-            Network.Send(
-                Client.Connection,
-                new TransformViewRotationPacket(this, transformToSynchronize.rotation, DateTime.Now)
-            );
+            new TransformViewRotationCommand(this, transformToSynchronize.rotation).Execute();
         }
+
         private void SynchronizeScale()
         {
-            Network.Send(
-                Client.Connection,
-                new TransformViewScalePacket(this, transformToSynchronize.localScale, DateTime.Now)
-            );
+            new TransformViewScaleCommand(this, transformToSynchronize.localScale).Execute();
         }
     }
 

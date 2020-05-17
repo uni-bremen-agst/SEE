@@ -16,6 +16,8 @@ namespace SEE.Net.Internal
         public static IPEndPoint LocalEndPoint { get => Connection != null ? (IPEndPoint)Connection.ConnectionInfo.LocalEndPoint : null; }
         public static IPEndPoint RemoteEndPoint { get => Connection != null ? (IPEndPoint)Connection.ConnectionInfo.RemoteEndPoint : null; }
 
+
+
         public static void Initialize()
         {
             void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => PacketHandler.Push(packetHeader, connection, data);
@@ -45,10 +47,12 @@ namespace SEE.Net.Internal
                 throw new ConnectionSetupException();
             }
         }
+
         public static void Update()
         {
             PacketHandler.HandlePendingPackets();
         }
+
         public static void Shutdown() // TODO: send message to server
         {
             Connection?.CloseConnection(false);

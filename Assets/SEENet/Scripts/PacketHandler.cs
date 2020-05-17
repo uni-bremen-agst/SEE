@@ -16,7 +16,7 @@ namespace SEE.Net.Internal
         {
             public PacketHeader header;
             public Connection connection;
-            public string packet;
+            public string serializedPacket;
         }
 
 
@@ -37,16 +37,13 @@ namespace SEE.Net.Internal
                 { packetTypePrefix + BufferedPacketsPacket.PACKET_TYPE, HandleBufferedPacketsPacket },
                 { packetTypePrefix + ExecuteCommandPacket.PACKET_TYPE, HandleExecuteCommandPacket },
                 { packetTypePrefix + RedoCommandPacket.PACKET_TYPE, HandleRedoCommandPacket},
-                { packetTypePrefix + TransformViewPositionPacket.PACKET_TYPE, HandleTransformViewPositionPacket },
-                { packetTypePrefix + TransformViewRotationPacket.PACKET_TYPE, HandleTransformViewRotationPacket },
-                { packetTypePrefix + TransformViewScalePacket.PACKET_TYPE, HandleTransformViewScalePacket },
                 { packetTypePrefix + UndoCommandPacket.PACKET_TYPE, HandleUndoCommandPacket}
             };
         }
 
 
 
-        public void Push(PacketHeader packetHeader, Connection connection, string incomingObject)
+        public void Push(PacketHeader packetHeader, Connection connection, string serializedPacket)
         {
             lock (pendingMessages)
             {
@@ -54,7 +51,7 @@ namespace SEE.Net.Internal
                 {
                     header = packetHeader,
                     connection = connection,
-                    packet = incomingObject
+                    serializedPacket = serializedPacket
                 });
             }
         }
@@ -69,7 +66,7 @@ namespace SEE.Net.Internal
                     PendingPacket packet = pendingMessages[i];
                     bool result = handlerFuncDict.TryGetValue(packet.header.PacketType, out HandlerFunc func);
                     Assert.IsTrue(result);
-                    func(packet.header, packet.connection, packet.packet);
+                    func(packet.header, packet.connection, packet.serializedPacket);
                 }
                 pendingMessages.Clear();
             }
@@ -80,12 +77,6 @@ namespace SEE.Net.Internal
         protected abstract bool HandleExecuteCommandPacket(PacketHeader packetHeader, Connection connection, string data);
 
         protected abstract bool HandleRedoCommandPacket(PacketHeader packetHeader, Connection connection, string data);
-
-        protected abstract bool HandleTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data);
-
-        protected abstract bool HandleTransformViewRotationPacket(PacketHeader packetHeader, Connection connection, string data);
-
-        protected abstract bool HandleTransformViewScalePacket(PacketHeader packetHeader, Connection connection, string data);
 
         protected abstract bool HandleUndoCommandPacket(PacketHeader packetHeader, Connection connection, string data);
     }

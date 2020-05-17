@@ -72,28 +72,7 @@ namespace SEE.Net.Internal
             CommandHistory.RedoOnClient();
             return true;
         }
-
-        protected override bool HandleTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            TransformViewPositionPacket packet = TransformViewPositionPacket.Deserialize(data);
-            packet?.transformView?.SetNextPosition(packet.updateTime, packet.position);
-            return true;
-        }
-
-        protected override bool HandleTransformViewRotationPacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            TransformViewRotationPacket packet = TransformViewRotationPacket.Deserialize(data);
-            packet?.transformView?.SetNextRotation(packet.updateTime, packet.rotation);
-            return true;
-        }
-
-        protected override bool HandleTransformViewScalePacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            TransformViewScalePacket packet = TransformViewScalePacket.Deserialize(data);
-            packet?.transformView?.SetNextScale(packet.updateTime, packet.scale);
-            return true;
-        }
-
+        
         protected override bool HandleUndoCommandPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             UndoCommandPacket packet = UndoCommandPacket.Deserialize(data);

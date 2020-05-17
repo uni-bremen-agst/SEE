@@ -28,7 +28,7 @@ namespace SEE.Command
                 if (interactable.id == id)
                 {
                     GameObject go = null;
-                    if (buffer)
+                    if (buffer)// TODO: ask for gameobject, this can be abstracted away entirely
                     {
                         go = Object.Instantiate(interactable.gameObject);
                         interactable.gameObject.transform.position = originalPosition;
