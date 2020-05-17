@@ -16,7 +16,7 @@ namespace SEE.Net
         [SerializeField] public IPEndPoint owner;
         [SerializeField] private View[] views = new View[1];
         
-        private static Dictionary<int, ViewContainer> viewContainers = new Dictionary<int, ViewContainer>(); // TODO: could probably just be an array
+        private static Dictionary<int, ViewContainer> viewContainers = new Dictionary<int, ViewContainer>();
 
         public void Initialize(int id, IPEndPoint owner)
         {

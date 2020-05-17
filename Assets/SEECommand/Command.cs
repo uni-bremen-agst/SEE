@@ -3,109 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Command
 {
 
-    public class State
+    internal static class CommandHistory
     {
-        public IPEndPoint stateOwner;
-        public GameObject[] predecessors;
-        public GameObject[] gameObjects;
+        private static List<AbstractCommand> commands = new List<AbstractCommand>();
 
-        public State(IPEndPoint stateOwner, GameObject[] predecessors, GameObject[] gameObjects)
+        internal static void OnExecute(AbstractCommand command)
         {
-            this.stateOwner = stateOwner;
-            this.predecessors = predecessors;
-            this.gameObjects = gameObjects;
-        }
-
-        public void Destroy()
-        {
-            foreach (GameObject go in gameObjects)
-            {
-                UnityEngine.Object.Destroy(go);
-            }
-        }
-    }
-
-    public static class CommandHistory
-    {
-        private static int currentState = -1;
-        private static List<State> history = new List<State>(); // TODO: circular array, so we can limit the history memory
-
-        internal static void OnExecute(IPEndPoint stateOwner, GameObject[] originalGameObjects, GameObject[] copiedAndModifiedGameObjects)
-        {
-            Assert.IsNotNull(originalGameObjects);
-            Assert.IsNotNull(copiedAndModifiedGameObjects);
-            Assert.IsTrue(originalGameObjects.Length == copiedAndModifiedGameObjects.Length);
-
-            State state = new State(stateOwner, originalGameObjects, copiedAndModifiedGameObjects);
-
-            if (currentState + 1 < history.Count)
-            {
-                for (int i = currentState + 1; i < history.Count; i++)
-                {
-                    history[i].Destroy();
-                }
-                history.RemoveRange(currentState + 1, history.Count - (currentState + 1));
-            }
-
-            if (currentState != -1)
-            {
-                for (int i = 0; i < originalGameObjects.Length; i++)
-                {
-                    originalGameObjects[i]?.SetActive(false);
-                }
-            }
-
-            currentState++;
-            history.Add(state);
-        }
-
-        public static void Undo()
-        {
-            bool canUndo = currentState != -1 && (Client.LocalEndPoint == null || Client.LocalEndPoint.Equals(history[currentState].stateOwner));
-            if (canUndo)
-            {
-                Net.Network.UndoCommand();
-            }
-        }
-
-        internal static void UndoOnClient()
-        {
-            if (currentState != -1)
-            {
-                for (int i = 0; i < history[currentState].gameObjects.Length; i++)
-                {
-                    history[currentState].gameObjects[i]?.SetActive(false);
-                    history[currentState].predecessors[i]?.SetActive(true);
-                }
-                currentState--;
-            }
-        }
-
-        public static void Redo()
-        {
-            bool canRedo = currentState + 1 < history.Count && (Client.LocalEndPoint == null || Client.LocalEndPoint.Equals(history[currentState + 1].stateOwner));
-            if (canRedo)
-            {
-                Net.Network.RedoCommand();
-            }
-        }
-
-        internal static void RedoOnClient()
-        {
-            if (currentState + 1 < history.Count)
-            {
-                currentState++;
-                for (int i = 0; i < history[currentState].gameObjects.Length; i++)
-                {
-                    history[currentState].predecessors[i]?.SetActive(false);
-                    history[currentState].gameObjects[i]?.SetActive(true);
-                }
-            }
+            commands.Add(command);
         }
     }
 
@@ -114,9 +22,9 @@ namespace SEE.Command
         public string requesterIPAddress;
         public int requesterPort;
         public bool buffer;
+        public bool executed;
 
-        // has NOT is used, so deserialization always deserializes this to false, as it is a private field
-        private bool hasNotBeenExecutedYet = true;
+
 
         public AbstractCommand(bool buffer)
         {
@@ -132,46 +40,187 @@ namespace SEE.Command
                 requesterPort = -1;
             }
             this.buffer = buffer;
+            executed = false;
         }
+
+
 
         public void Execute()
         {
-            if (hasNotBeenExecutedYet)
+            if (!executed)
             {
+                executed = true;
+                if (Net.Network.UseInOfflineMode)
+                {
+                    ExecuteOnServerBase();
+                    ExecuteOnClientBase();
+                    CommandHistory.OnExecute(this);
+                }
+                else
+                {
 #if UNITY_EDITOR
-                try
-                {
-                    JsonUtility.ToJson(this);
-                }
-                catch (Exception)
-                {
-                    Debug.LogError("This command can not be serialized into json! This class probably contains GameObjects or other components. Consider removing some members of '" + GetType().ToString() + "'!");
-                }
+                    DebugAssertCanBeSerialized();
 #endif
-                hasNotBeenExecutedYet = false;
-                Net.Network.ExecuteCommand(this);
+                    ExecuteCommandPacket packet = new ExecuteCommandPacket(this);
+                    Net.Network.SubmitPacket(Client.Connection, packet);
+                }
             }
         }
 
+        public void Undo()
+        {
+            if (executed)
+            {
+                executed = false;
+                if (Net.Network.UseInOfflineMode)
+                {
+                    UndoOnServer();
+                    UndoOnClient();
+                }
+                else
+                {
+#if UNITY_EDITOR
+                    DebugAssertCanBeSerialized();
+#endif
+                    UndoCommandPacket packet = new UndoCommandPacket(this);
+                    Net.Network.SubmitPacket(Client.Connection, packet);
+                }
+            }
+        }
+
+        public void Redo()
+        {
+            if (!executed)
+            {
+                executed = true;
+                if (Net.Network.UseInOfflineMode)
+                {
+                    RedoOnServer();
+                    RedoOnClient();
+                }
+                else
+                {
+#if UNITY_EDITOR
+                    DebugAssertCanBeSerialized();
+#endif
+                    RedoCommandPacket packet = new RedoCommandPacket(this);
+                    Net.Network.SubmitPacket(Client.Connection, packet);
+                }
+            }
+        }
+
+
+
         internal void ExecuteOnServerBase()
         {
-            ExecuteOnServer();
+            try
+            {
+                ExecuteOnServer();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
         }
 
         internal void ExecuteOnClientBase()
         {
-            KeyValuePair<GameObject[], GameObject[]> gameObjects = ExecuteOnClient();
-            if (buffer)
+            try
             {
-                IPEndPoint stateOwner = Client.LocalEndPoint == null ? null : new IPEndPoint(IPAddress.Parse(requesterIPAddress), requesterPort);
-                CommandHistory.OnExecute(stateOwner, gameObjects.Key, gameObjects.Value);
+                ExecuteOnClient();
+                if (buffer)
+                {
+                    CommandHistory.OnExecute(this);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
             }
         }
 
-        internal abstract void ExecuteOnServer();
+        internal void UndoOnServerBase()
+        {
+            try
+            {
+                UndoOnServer();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
 
-        internal abstract KeyValuePair<GameObject[], GameObject[]> ExecuteOnClient();
+        internal void UndoOnClientBase()
+        {
+            try
+            {
+                UndoOnClient();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
+
+        internal void RedoOnServerBase()
+        {
+            try
+            {
+                RedoOnServer();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
+
+        internal void RedoOnClientBase()
+        {
+            try
+            {
+                RedoOnClient();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
+
+
+
+        protected abstract void ExecuteOnServer();
+
+        protected abstract void ExecuteOnClient();
+
+        protected abstract void UndoOnServer();
+
+        protected abstract void UndoOnClient();
+
+        protected abstract void RedoOnServer();
+
+        protected abstract void RedoOnClient();
+
+
+
+#if UNITY_EDITOR
+        private bool DebugAssertCanBeSerialized()
+        {
+            try
+            {
+                JsonUtility.ToJson(this);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("This command can not be serialized into json! This class probably contains GameObjects or other components. Consider removing some members of '" + GetType().ToString() + "'!");
+                throw e;
+            }
+        }
+#endif
     }
+
+
 
     internal static class CommandSerializer
     {

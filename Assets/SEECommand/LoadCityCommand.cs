@@ -1,6 +1,5 @@
 ﻿using SEE.Game;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -85,11 +84,11 @@ namespace SEE.Command
             }
         }
 
-        internal override void ExecuteOnServer()
+        protected override void ExecuteOnServer()
         {
         }
 
-        internal override KeyValuePair<GameObject[], GameObject[]> ExecuteOnClient()
+        protected override void ExecuteOnClient()
         {
             GameObject gameObject = new GameObject(type.ToString());
             AbstractSEECity city = null;
@@ -159,11 +158,24 @@ namespace SEE.Command
             {
                 Debug.LogError("Unknown city-type!");
             }
+        }
 
-            GameObject[] originalGameObjects = new GameObject[] { null };
-            GameObject[] copiedAndModifiedGameObjects = new GameObject[] { gameObject };
-            KeyValuePair<GameObject[], GameObject[]> result = new KeyValuePair<GameObject[], GameObject[]>(originalGameObjects, copiedAndModifiedGameObjects);
-            return result;
+        protected override void UndoOnServer()
+        {
+        }
+
+        protected override void UndoOnClient()
+        {
+            UnityEngine.Object.Destroy(GameObject.Find(type.ToString()));
+        }
+
+        protected override void RedoOnServer()
+        {
+            ExecuteOnClient();
+        }
+
+        protected override void RedoOnClient()
+        {
         }
     }
 

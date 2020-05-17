@@ -16,23 +16,42 @@ namespace SEE.Command
             this.position = position;
         }
 
-        internal override void ExecuteOnServer()
+        protected override void ExecuteOnServer()
         {
             id = ++lastID;
         }
 
-        internal override KeyValuePair<GameObject[], GameObject[]> ExecuteOnClient()
+        protected override void ExecuteOnClient()
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
             go.name = "Block " + id;
             go.transform.position = position;
             Interactable interactable = go.AddComponent<Interactable>();
             interactable.id = id;
+        }
 
-            GameObject[] originalGameObjects = new GameObject[] { null };
-            GameObject[] copiedAndModifiedGameObjects = new GameObject[] { go };
-            KeyValuePair<GameObject[], GameObject[]> result = new KeyValuePair<GameObject[], GameObject[]>(originalGameObjects, copiedAndModifiedGameObjects);
-            return result;
+        protected override void UndoOnServer()
+        {
+        }
+
+        protected override void UndoOnClient()
+        {
+            foreach (Interactable interactable in Object.FindObjectsOfType<Interactable>())
+            {
+                if (interactable.id == id)
+                {
+                    Object.Destroy(interactable.gameObject);
+                }
+            }
+        }
+
+        protected override void RedoOnServer()
+        {
+        }
+
+        protected override void RedoOnClient()
+        {
+            ExecuteOnClient();
         }
     }
 

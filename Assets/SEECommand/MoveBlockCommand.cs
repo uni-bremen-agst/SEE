@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Command
 {
@@ -17,37 +16,51 @@ namespace SEE.Command
             this.newPosition = newPosition;
         }
 
-        internal override void ExecuteOnServer()
+        protected override void ExecuteOnServer()
         {
         }
 
-        internal override KeyValuePair<GameObject[], GameObject[]> ExecuteOnClient()
+        protected override void ExecuteOnClient()
         {
             foreach (Interactable interactable in Object.FindObjectsOfType<Interactable>())
             {
                 if (interactable.id == id)
                 {
-                    GameObject go = null;
-                    if (buffer)// TODO: ask for gameobject, this can be abstracted away entirely
-                    {
-                        go = Object.Instantiate(interactable.gameObject);
-                        interactable.gameObject.transform.position = originalPosition;
-                    }
-                    else
-                    {
-                        go = interactable.gameObject;
-                    }
-                    go.transform.position = newPosition;
-
-                    GameObject[] originalGameObjects = new GameObject[] { interactable.gameObject };
-                    GameObject[] copiedAndModifiedGameObjects = new GameObject[] { go };
-                    KeyValuePair<GameObject[], GameObject[]> result = new KeyValuePair<GameObject[], GameObject[]>(originalGameObjects, copiedAndModifiedGameObjects);
-                    return result;
+                    interactable.transform.position = newPosition;
+                    return;
                 }
             }
 
-            Assertions.InvalidCodePath("Currently, only existing objects should be attempted to be moved!");
-            return new KeyValuePair<GameObject[], GameObject[]>();
+            Assertions.InvalidCodePath("Only existing objects can be moved!");
+        }
+
+        protected override void UndoOnServer()
+        {
+        }
+
+        protected override void UndoOnClient()
+        {
+            foreach (Interactable interactable in Object.FindObjectsOfType<Interactable>())
+            {
+                if (interactable.id == id)
+                {
+                    if (interactable.transform.position == newPosition)
+                    {
+                        interactable.transform.position = originalPosition;
+                    }
+                    return;
+                }
+            }
+
+            Assertions.InvalidCodePath("Only movement of existing objects can be undone!");
+        }
+
+        protected override void RedoOnServer()
+        {
+        }
+
+        protected override void RedoOnClient()
+        {
         }
     }
 

@@ -1,14 +1,13 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using System.Collections.Generic;
-using UnityEngine.Assertions;
 
 namespace SEE.Net.Internal
 {
 
     public class ServerPacketHandler : PacketHandler
     {
-        private List<string> bufferedSerializedPackets = new List<string>();
+        private List<AbstractPacket> bufferedPackets = new List<AbstractPacket>();
 
 
 
@@ -20,9 +19,9 @@ namespace SEE.Net.Internal
 
         public void OnConnectionEstablished(Connection connection)
         {
-            foreach (string bufferedSerializedPacket in bufferedSerializedPackets)
+            foreach (AbstractPacket bufferedPacket in bufferedPackets)
             {
-                Network.SubmitPacket(connection, bufferedSerializedPacket);
+                Network.SubmitPacket(connection, PacketSerializer.Serialize(bufferedPacket));
             }
         }
 
@@ -54,11 +53,11 @@ namespace SEE.Net.Internal
         {
             if (packet != null && packet.command != null)
             {
-                packet.command.ExecuteOnServer();
+                packet.command.ExecuteOnServerBase();
 
                 if (packet.command.buffer)
                 {
-                    bufferedSerializedPackets.Add(PacketSerializer.Serialize(packet));
+                    bufferedPackets.Add(packet);
                 }
 
                 foreach (Connection co in Server.Connections)
@@ -72,7 +71,8 @@ namespace SEE.Net.Internal
         {
             if (packet != null)
             {
-                bufferedSerializedPackets.Add(PacketSerializer.Serialize(packet));
+                bufferedPackets.Add(packet);
+                packet.command.RedoOnServerBase();
 
                 foreach (Connection co in Server.Connections)
                 {
@@ -85,7 +85,8 @@ namespace SEE.Net.Internal
         {
             if (packet != null)
             {
-                bufferedSerializedPackets.Add(PacketSerializer.Serialize(packet));
+                bufferedPackets.Add(packet);
+                packet.command.UndoOnServerBase();
 
                 foreach (Connection co in Server.Connections)
                 {

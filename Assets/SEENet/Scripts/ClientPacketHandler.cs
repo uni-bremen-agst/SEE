@@ -43,11 +43,10 @@ namespace SEE.Net.Internal
                 Assert.IsNotNull(packet.command.requesterIPAddress);
                 Assert.IsTrue(packet.command.requesterPort != -1);
 
-                KeyValuePair<GameObject[], GameObject[]> result = packet.command.ExecuteOnClient();
-                IPEndPoint stateOwner = new IPEndPoint(IPAddress.Parse(packet.command.requesterIPAddress), packet.command.requesterPort);
+                packet.command.ExecuteOnClientBase();
                 if (packet.command.buffer)
                 {
-                    CommandHistory.OnExecute(stateOwner, result.Key, result.Value);
+                    CommandHistory.OnExecute(packet.command);
                 }
             }
         }
@@ -56,7 +55,7 @@ namespace SEE.Net.Internal
         {
             if (packet != null)
             {
-                CommandHistory.RedoOnClient();
+                packet.command.RedoOnClientBase();
             }
         }
 
@@ -64,7 +63,7 @@ namespace SEE.Net.Internal
         {
             if (packet != null)
             {
-                CommandHistory.UndoOnClient();
+                packet.command.UndoOnClientBase();
             }
         }
     }

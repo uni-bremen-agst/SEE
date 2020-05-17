@@ -1,5 +1,4 @@
 ﻿using SEE.Net;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Command
@@ -38,22 +37,33 @@ namespace SEE.Command
             this.position = position;
         }
 
-        internal override void ExecuteOnServer()
+        protected override void ExecuteOnServer()
         {
         }
 
-        internal override KeyValuePair<GameObject[], GameObject[]> ExecuteOnClient()
+        protected override void ExecuteOnClient()
         {
-            KeyValuePair<GameObject[], GameObject[]> result;
-
             TransformView transformView = TransformViewCommandHelper.AcquireTransformView(id, index);
             if (transformView)
             {
-                result = new KeyValuePair<GameObject[], GameObject[]>(new GameObject[] {transformView.gameObject }, new GameObject[] { transformView.gameObject });
                 transformView.SetNextPosition(position);
             }
+        }
 
-            return result;
+        protected override void UndoOnServer()
+        {
+        }
+
+        protected override void UndoOnClient()
+        {
+        }
+
+        protected override void RedoOnServer()
+        {
+        }
+
+        protected override void RedoOnClient()
+        {
         }
     }
 
@@ -70,22 +80,33 @@ namespace SEE.Command
             this.rotation = rotation;
         }
 
-        internal override void ExecuteOnServer()
+        protected override void ExecuteOnServer()
         {
         }
 
-        internal override KeyValuePair<GameObject[], GameObject[]> ExecuteOnClient()
+        protected override void ExecuteOnClient()
         {
-            KeyValuePair<GameObject[], GameObject[]> result;
-
             TransformView transformView = TransformViewCommandHelper.AcquireTransformView(id, index);
             if (transformView)
             {
-                result = new KeyValuePair<GameObject[], GameObject[]>(new GameObject[] {transformView.gameObject }, new GameObject[] { transformView.gameObject });
                 transformView.SetNextRotation(rotation);
             }
+        }
 
-            return result;
+        protected override void UndoOnServer()
+        {
+        }
+
+        protected override void UndoOnClient()
+        {
+        }
+
+        protected override void RedoOnServer()
+        {
+        }
+
+        protected override void RedoOnClient()
+        {
         }
     }
 
@@ -102,22 +123,33 @@ namespace SEE.Command
             this.scale = scale;
         }
 
-        internal override void ExecuteOnServer()
+        protected override void ExecuteOnServer()
         {
         }
 
-        internal override KeyValuePair<GameObject[], GameObject[]> ExecuteOnClient()
+        protected override void ExecuteOnClient()
         {
-            KeyValuePair<GameObject[], GameObject[]> result;
-
             TransformView transformView = TransformViewCommandHelper.AcquireTransformView(id, index);
             if (transformView)
             {
-                result = new KeyValuePair<GameObject[], GameObject[]>(new GameObject[] {transformView.gameObject }, new GameObject[] { transformView.gameObject });
                 transformView.SetNextScale(scale);
             }
+        }
 
-            return result;
+        protected override void UndoOnServer()
+        {
+        }
+
+        protected override void UndoOnClient()
+        {
+        }
+
+        protected override void RedoOnServer()
+        {
+        }
+
+        protected override void RedoOnClient()
+        {
         }
     }
 

@@ -189,7 +189,7 @@ namespace SEE.Net
                 Client.Shutdown();
             }
 
-            // TODO: there must be a better way to stop the logging spam!
+            // TODO(torben): there must be a better way to stop the logging spam!
             string currentDirectory = Directory.GetCurrentDirectory();
             DirectoryInfo directoryInfo = new DirectoryInfo(currentDirectory);
             FileInfo[] fileInfos = directoryInfo.GetFiles();
@@ -258,7 +258,7 @@ namespace SEE.Net
                             connection.ConnectionInfo.RemoteEndPoint.ToString() +
                             "'! Destination may not be listening or connection timed out. Closing connection!"
                         );
-                        // TODO: close connection. also, look at exception above
+                        // TODO(torben): close connection. also, look at exception above
                     }
                 }
             }
@@ -281,51 +281,6 @@ namespace SEE.Net
             string hostName = Dns.GetHostName(); ;
             IPHostEntry hostEntry = Dns.GetHostEntry(hostName);
             return hostEntry.AddressList;
-        }
-
-
-        internal static void ExecuteCommand(AbstractCommand command)
-        {
-            if (instance.useInOfflineMode)
-            {
-                command.ExecuteOnServer();
-                KeyValuePair<GameObject[], GameObject[]> result = command.ExecuteOnClient();
-                if (command.buffer)
-                {
-                    CommandHistory.OnExecute(null, result.Key, result.Value);
-                }
-            }
-            else
-            {
-                ExecuteCommandPacket packet = new ExecuteCommandPacket(command);
-                SubmitPacket(Client.Connection, packet);
-            }
-        }
-
-        internal static void RedoCommand()
-        {
-            if (instance.useInOfflineMode)
-            {
-                CommandHistory.RedoOnClient();
-            }
-            else
-            {
-                RedoCommandPacket packet = new RedoCommandPacket();
-                SubmitPacket(Client.Connection, packet);
-            }
-        }
-
-        internal static void UndoCommand()
-        {
-            if (instance.useInOfflineMode)
-            {
-                CommandHistory.UndoOnClient();
-            }
-            else
-            {
-                UndoCommandPacket packet = new UndoCommandPacket();
-                SubmitPacket(Client.Connection, packet);
-            }
         }
     }
 
