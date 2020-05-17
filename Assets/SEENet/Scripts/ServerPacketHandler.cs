@@ -34,7 +34,7 @@ namespace SEE.Net.Internal
                 packetDatas[i] = bufferedPackets[i].packetData;
             }
             BufferedPacketsPacket packet = new BufferedPacketsPacket(packetTypes, packetDatas);
-            Network.Send(connection, packet);
+            Network.SendPacket(connection, packet);
         }
 
         public void OnConnectionClosed(Connection connection)
@@ -91,7 +91,7 @@ namespace SEE.Net.Internal
 
             foreach (Connection co in Server.Connections)
             {
-                Network.Send(co, packet);
+                Network.SendPacket(co, packet);
             }
             return true;
         }
@@ -115,41 +115,11 @@ namespace SEE.Net.Internal
 
             foreach (Connection co in Server.Connections)
             {
-                Network.Send(co, packet);
+                Network.SendPacket(co, packet);
             }
             return true;
         }
-
-        protected override bool HandleTransformViewPositionPacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            TransformViewPositionPacket packet = TransformViewPositionPacket.Deserialize(data);
-            foreach (Connection co in from c in Server.Connections where !c.ConnectionInfo.RemoteEndPoint.Equals(packet.transformView.viewContainer.owner) select c)
-            {
-                Network.Send(co, packet);
-            }
-            return true;
-        }
-
-        protected override bool HandleTransformViewRotationPacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            TransformViewRotationPacket packet = TransformViewRotationPacket.Deserialize(data);
-            foreach (Connection co in from c in Server.Connections where !c.ConnectionInfo.RemoteEndPoint.Equals(packet.transformView.viewContainer.owner) select c)
-            {
-                Network.Send(co, packet);
-            }
-            return true;
-        }
-
-        protected override bool HandleTransformViewScalePacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            TransformViewScalePacket packet = TransformViewScalePacket.Deserialize(data);
-            foreach (Connection co in from c in Server.Connections where !c.ConnectionInfo.RemoteEndPoint.Equals(packet.transformView.viewContainer.owner) select c)
-            {
-                Network.Send(co, packet);
-            }
-            return true;
-        }
-
+        
         protected override bool HandleUndoCommandPacket(PacketHeader packetHeader, Connection connection, string data)
         {
             UndoCommandPacket packet = UndoCommandPacket.Deserialize(data);
@@ -169,7 +139,7 @@ namespace SEE.Net.Internal
 
             foreach (Connection co in Server.Connections)
             {
-                Network.Send(co, packet);
+                Network.SendPacket(co, packet);
             }
             return true;
         }
