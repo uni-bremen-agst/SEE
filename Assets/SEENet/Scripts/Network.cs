@@ -196,16 +196,15 @@ namespace SEE.Net
             Assert.IsNotNull(connection);
             Assert.IsNotNull(packet);
 
-            instance?.SendPacket(connection, packet.packetType, packet.Serialize());
+            instance?.SendPacket(connection, PacketSerializer.Serialize(packet));
         }
 
-        private void SendPacket(Connection connection, string packetType, string serializedPacket)
+        private void SendPacket(Connection connection, string serializedPacket)
         {
-            string packetTargetPrefix = Client.Connection.Equals(connection) ? Server.PACKET_PREFIX : Client.PACKET_PREFIX;
-            string fullPacketType = packetTargetPrefix + packetType;
+            string packetType = Client.Connection.Equals(connection) ? Server.PACKET_TYPE : Client.PACKET_TYPE;
             try
             {
-                connection.SendObject(fullPacketType, serializedPacket);
+                connection.SendObject(packetType, serializedPacket);
             }
             catch (Exception)
             {

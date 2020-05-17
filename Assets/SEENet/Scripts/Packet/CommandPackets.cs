@@ -5,14 +5,20 @@ namespace SEE.Net.Internal
 
     internal class ExecuteCommandPacket : AbstractPacket
     {
-        internal static readonly string PACKET_TYPE = "ExecuteCommand";
-
         public AbstractCommand command;
 
-        internal ExecuteCommandPacket(AbstractCommand command) : base(PACKET_TYPE)
+
+
+        public ExecuteCommandPacket()
+        {
+        }
+
+        public ExecuteCommandPacket(AbstractCommand command)
         {
             this.command = command;
         }
+
+
 
         internal override string Serialize()
         {
@@ -20,20 +26,20 @@ namespace SEE.Net.Internal
             return result;
         }
 
-        internal static ExecuteCommandPacket Deserialize(string data)
+        internal override void Deserialize(string serializedPacket)
         {
-            ExecuteCommandPacket result = new ExecuteCommandPacket(CommandSerializer.Deserialize(data));
-            return result;
+            ExecuteCommandPacket deserializedPacket = new ExecuteCommandPacket(CommandSerializer.Deserialize(serializedPacket));
+            command = deserializedPacket.command;
         }
     }
 
     internal class RedoCommandPacket : AbstractPacket
     {
-        internal static readonly string PACKET_TYPE = "RedoCommand";
-
-        internal RedoCommandPacket() : base(PACKET_TYPE)
+        public RedoCommandPacket()
         {
         }
+
+
 
         internal override string Serialize()
         {
@@ -41,20 +47,18 @@ namespace SEE.Net.Internal
             return result;
         }
 
-        internal static RedoCommandPacket Deserialize(string data)
+        internal override void Deserialize(string serializedPacket)
         {
-            RedoCommandPacket p = new RedoCommandPacket();
-            return p;
         }
     }
 
     internal class UndoCommandPacket : AbstractPacket
     {
-        internal static readonly string PACKET_TYPE = "UndoCommand";
-
-        internal UndoCommandPacket() : base(PACKET_TYPE)
+        public UndoCommandPacket()
         {
         }
+
+
 
         internal override string Serialize()
         {
@@ -62,10 +66,8 @@ namespace SEE.Net.Internal
             return result;
         }
 
-        internal static UndoCommandPacket Deserialize(string data)
+        internal override void Deserialize(string serializedPacket)
         {
-            UndoCommandPacket p = new UndoCommandPacket();
-            return p;
         }
     }
 

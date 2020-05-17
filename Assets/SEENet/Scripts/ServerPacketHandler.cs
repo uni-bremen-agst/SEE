@@ -10,7 +10,6 @@ namespace SEE.Net.Internal
     internal struct BufferedPacket
     {
         public Connection connection;
-        public string packetType;
         public string packetData;
     }
 
@@ -26,14 +25,12 @@ namespace SEE.Net.Internal
 
         public void OnConnectionEstablished(Connection connection)
         {
-            string[] packetTypes = new string[bufferedPackets.Count];
             string[] packetDatas = new string[bufferedPackets.Count];
             for (int i = 0; i < bufferedPackets.Count; i++)
             {
-                packetTypes[i] = bufferedPackets[i].packetType;
                 packetDatas[i] = bufferedPackets[i].packetData;
             }
-            BufferedPacketsPacket packet = new BufferedPacketsPacket(packetTypes, packetDatas);
+            BufferedPacketsPacket packet = new BufferedPacketsPacket(packetDatas);
             Network.SendPacket(connection, packet);
         }
 
@@ -61,87 +58,68 @@ namespace SEE.Net.Internal
 
 
 
-        protected override bool HandleBufferedPacketsPacket(PacketHeader packetHeader, Connection connection, string data)
+        internal override void HandlePacket(PacketHeader packetHeader, Connection connection, BufferedPacketsPacket packet)
         {
             Assertions.InvalidCodePath("The server only sends these types of packets but never receives them!");
-            return false;
         }
 
-        protected override bool HandleExecuteCommandPacket(PacketHeader packetHeader, Connection connection, string data)
+        internal override void HandlePacket(PacketHeader packetHeader, Connection connection, ExecuteCommandPacket packet)
         {
-            ExecuteCommandPacket packet = ExecuteCommandPacket.Deserialize(data);
-
-            if (packet == null || packet.command == null)
+            if (packet != null && packet.command != null)
             {
-                return false;
+                packet.command.ExecuteOnServer();
+
+                if (packet.command.buffer)
+                {
+                    BufferedPacket bufferedPacket = new BufferedPacket()
+                    {
+                        connection = connection,
+                        packetData = PacketSerializer.Serialize(packet)
+                    };
+                    bufferedPackets.Add(bufferedPacket);
+                }
+
+                foreach (Connection co in Server.Connections)
+                {
+                    Network.SendPacket(co, packet);
+                }
             }
+        }
 
-            packet.command.ExecuteOnServer();
-
-            if (packet.command.buffer)
+        internal override void HandlePacket(PacketHeader packetHeader, Connection connection, RedoCommandPacket packet)
+        {
+            if (packet != null)
             {
                 BufferedPacket bufferedPacket = new BufferedPacket()
                 {
                     connection = connection,
-                    packetType = packet.packetType,
-                    packetData = packet.Serialize()
+                    packetData = PacketSerializer.Serialize(packet)
                 };
                 bufferedPackets.Add(bufferedPacket);
-            }
 
-            foreach (Connection co in Server.Connections)
-            {
-                Network.SendPacket(co, packet);
+                foreach (Connection co in Server.Connections)
+                {
+                    Network.SendPacket(co, packet);
+                }
             }
-            return true;
         }
 
-        protected override bool HandleRedoCommandPacket(PacketHeader packetHeader, Connection connection, string data)
+        internal override void HandlePacket(PacketHeader packetHeader, Connection connection, UndoCommandPacket packet)
         {
-            RedoCommandPacket packet = RedoCommandPacket.Deserialize(data);
-
-            if (packet == null)
+            if (packet != null)
             {
-                return false;
+                BufferedPacket bufferedPacket = new BufferedPacket()
+                {
+                    connection = connection,
+                    packetData = PacketSerializer.Serialize(packet)
+                };
+                bufferedPackets.Add(bufferedPacket);
+
+                foreach (Connection co in Server.Connections)
+                {
+                    Network.SendPacket(co, packet);
+                }
             }
-
-            BufferedPacket bufferedPacket = new BufferedPacket()
-            {
-                connection = connection,
-                packetType = packet.packetType,
-                packetData = packet.Serialize()
-            };
-            bufferedPackets.Add(bufferedPacket);
-
-            foreach (Connection co in Server.Connections)
-            {
-                Network.SendPacket(co, packet);
-            }
-            return true;
-        }
-        
-        protected override bool HandleUndoCommandPacket(PacketHeader packetHeader, Connection connection, string data)
-        {
-            UndoCommandPacket packet = UndoCommandPacket.Deserialize(data);
-
-            if (packet == null)
-            {
-                return false;
-            }
-
-            BufferedPacket bufferedPacket = new BufferedPacket()
-            {
-                connection = connection,
-                packetType = packet.packetType,
-                packetData = packet.Serialize()
-            };
-            bufferedPackets.Add(bufferedPacket);
-
-            foreach (Connection co in Server.Connections)
-            {
-                Network.SendPacket(co, packet);
-            }
-            return true;
         }
     }
 
