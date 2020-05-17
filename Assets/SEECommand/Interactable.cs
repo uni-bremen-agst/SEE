@@ -1,11 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Command
+public class Interactable : MonoBehaviour
 {
-
-    internal class Interactable : MonoBehaviour
-    {
-        public int id = -1;
-    }
-
+    public int id;
 }

@@ -66,14 +66,5 @@ public class HistoryTest : MonoBehaviour
         {
             new CreateBlockCommand(new Vector3(Random.Range(-10.0f, 10.0f), Random.Range(-10.0f, 10.0f), Random.Range(-10.0f, 10.0f))).Execute();
         }
-
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            CommandHistory.Undo();
-        }
-        else if (Input.GetKeyDown(KeyCode.R))
-        {
-            CommandHistory.Redo();
-        }
     }
 }

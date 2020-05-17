@@ -33,17 +33,67 @@ namespace SEE.Net.Internal
         }
     }
 
-    internal class RedoCommandPacket : AbstractPacket
-    {
-        public RedoCommandPacket()
-        {
-        }
-    }
+
 
     internal class UndoCommandPacket : AbstractPacket
     {
+        public AbstractCommand command;
+
+
+
         public UndoCommandPacket()
         {
+        }
+
+        public UndoCommandPacket(AbstractCommand command)
+        {
+            this.command = command;
+        }
+
+
+
+        internal override string Serialize()
+        {
+            string result = CommandSerializer.Serialize(command);
+            return result;
+        }
+
+        internal override void Deserialize(string serializedPacket)
+        {
+            UndoCommandPacket deserializedPacket = new UndoCommandPacket(CommandSerializer.Deserialize(serializedPacket));
+            command = deserializedPacket.command;
+        }
+    }
+
+
+
+    internal class RedoCommandPacket : AbstractPacket
+    {
+        public AbstractCommand command;
+
+
+
+        public RedoCommandPacket()
+        {
+        }
+
+        public RedoCommandPacket(AbstractCommand command)
+        {
+            this.command = command;
+        }
+
+
+
+        internal override string Serialize()
+        {
+            string result = CommandSerializer.Serialize(command);
+            return result;
+        }
+
+        internal override void Deserialize(string serializedPacket)
+        {
+            RedoCommandPacket deserializedPacket = new RedoCommandPacket(CommandSerializer.Deserialize(serializedPacket));
+            command = deserializedPacket.command;
         }
     }
 

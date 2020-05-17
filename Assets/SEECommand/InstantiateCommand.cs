@@ -1,6 +1,5 @@
 ﻿using SEE.Net;
 using SEE.Net.Internal;
-using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
 
@@ -40,25 +39,27 @@ namespace SEE.Command
             viewID = -1;
         }
 
-        internal override void ExecuteOnServer()
+        protected override void ExecuteOnServer()
         {
             viewID = ++lastViewID;
         }
 
-        internal override KeyValuePair<GameObject[], GameObject[]> ExecuteOnClient()
+        protected override void ExecuteOnClient()
         {
             GameObject prefab = Resources.Load<GameObject>(prefabPath);
             if (!prefab)
             {
                 Assertions.InvalidCodePath("Prefab of path '" + prefabPath + "' could not be found!");
-                return new KeyValuePair<GameObject[], GameObject[]>();
+                return;
             }
+
             GameObject go = Object.Instantiate(prefab, null, true);
             if (!go)
             {
                 Assertions.InvalidCodePath("Object could not be instantiated with prefab '" + prefab + "'!");
-                return new KeyValuePair<GameObject[], GameObject[]>();
+                return;
             }
+
             if (!Net.Network.UseInOfflineMode)
             {
                 go.GetComponent<ViewContainer>().Initialize(viewID, new IPEndPoint(IPAddress.Parse(ownerIpAddress), ownerPort));
@@ -66,11 +67,24 @@ namespace SEE.Command
             go.transform.position = position;
             go.transform.rotation = rotation;
             go.transform.localScale = scale;
+        }
 
-            GameObject[] originalGameObjects = new GameObject[] { null };
-            GameObject[] copiedAndModifiedGameObjects = new GameObject[] { go };
-            KeyValuePair<GameObject[], GameObject[]> result = new KeyValuePair<GameObject[], GameObject[]>(originalGameObjects, copiedAndModifiedGameObjects);
-            return result;
+        protected override void UndoOnServer()
+        {
+        }
+
+        protected override void UndoOnClient()
+        {
+            Object.Destroy(ViewContainer.GetViewContainerByID(viewID).gameObject);
+        }
+
+        protected override void RedoOnServer()
+        {
+            ExecuteOnClient();
+        }
+
+        protected override void RedoOnClient()
+        {
         }
     }
 
