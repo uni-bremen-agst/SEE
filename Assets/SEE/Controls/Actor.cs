@@ -42,7 +42,7 @@ namespace SEE.Controls
         public Selection selectionDevice;
 
         [Tooltip("The device from which to read viewport selection input.")]
-        private ControllerSelection viewportSelectionDevice;
+        private TouchGamepadSelection viewportSelectionDevice;
 
         [Tooltip("The device from which to read input for transforming a selected object.")]
         public Transformation transformationDevice;
@@ -95,7 +95,7 @@ namespace SEE.Controls
             // hit by a ray through the center of the viewport.
             if (viewportSelectionDevice == null)
             {
-                viewportSelectionDevice = gameObject.AddComponent<ControllerSelection>();
+                viewportSelectionDevice = gameObject.AddComponent<TouchGamepadSelection>();
                 if (viewportSelectionAction == null)
                 {
                     viewportSelectionAction = gameObject.AddComponent<SelectionViewportAction>();

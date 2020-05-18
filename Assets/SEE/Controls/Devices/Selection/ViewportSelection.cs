@@ -12,7 +12,7 @@ namespace SEE.Controls.Devices
     /// space. In this case, we can select an objects that can be hit by a ray 
     /// through the center of the viewport.
     /// </summary>
-    public class ControllerSelection : Selection
+    public class TouchGamepadSelection : Selection
     {
         [Tooltip("The threshold determining whether a selection trigger value has to be considered."), Range(0.001f, 1f)]
         public float Threshold = 0.3f;
