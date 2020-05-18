@@ -43,6 +43,8 @@ namespace SEE.Controls.Devices
             }
         }
 
+        public override bool IsCanceling => false; // FIXME throw new System.NotImplementedException();
+
         /// <summary>
         /// True if the first click of an expected double click happened.
         /// </summary>

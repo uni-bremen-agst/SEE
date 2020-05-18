@@ -81,11 +81,11 @@ namespace Valve.VR
             }
         }
         
-        public virtual SteamVR_Action_Single Trigger
+        public virtual SteamVR_Action_Single Grab
         {
             get
             {
-                return SteamVR_Actions.default_Trigger;
+                return SteamVR_Actions.default_Grab;
             }
         }
         
@@ -105,19 +105,19 @@ namespace Valve.VR
             }
         }
         
-        public virtual SteamVR_Action_Boolean Grab
-        {
-            get
-            {
-                return SteamVR_Actions.default_Grab;
-            }
-        }
-        
         public virtual SteamVR_Action_Boolean Select
         {
             get
             {
                 return SteamVR_Actions.default_Select;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean Cancel
+        {
+            get
+            {
+                return SteamVR_Actions.default_Cancel;
             }
         }
         

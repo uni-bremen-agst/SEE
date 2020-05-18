@@ -44,7 +44,7 @@ namespace SEE.Controls
             //Debug.LogFormat("OnGrabbed({0})\n", graphNode.ID);
             isGrabbed = true;
             grabbingMaterial.UseSpecialMaterial();
-            SaveCurrentPosition();
+            //SaveCurrentPosition();
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace SEE.Controls
         {
             //Debug.LogFormat("OnReleased({0})\n", graphNode.ID);
             isGrabbed = false;
-            ResetToSavedPosition();
+            //ResetToSavedPosition();
             grabbingMaterial.ResetMaterial();
             if (isHovered)
             {

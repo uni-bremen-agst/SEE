@@ -37,7 +37,7 @@
       "type": "vector1"
     },
     {
-      "name": "/actions/default/in/Trigger",
+      "name": "/actions/default/in/Grab",
       "type": "vector1"
     },
     {
@@ -49,11 +49,11 @@
       "type": "boolean"
     },
     {
-      "name": "/actions/default/in/Grab",
+      "name": "/actions/default/in/Select",
       "type": "boolean"
     },
     {
-      "name": "/actions/default/in/Select",
+      "name": "/actions/default/in/Cancel",
       "type": "boolean"
     },
     {
@@ -117,7 +117,6 @@
       "/actions/default/in/SkeletonLeftHand": "Skeleton (Left)",
       "/actions/default/in/SkeletonRightHand": "Skeleton (Right)",
       "/actions/default/in/Throttle": "Throttle",
-      "/actions/default/in/Trigger": "Trigger",
       "/actions/default/in/InteractUI": "Interact With UI",
       "/actions/default/in/Teleport": "Teleport",
       "/actions/default/in/GrabGrip": "Grab Grip",
@@ -125,6 +124,7 @@
       "/actions/default/out/Haptic": "Haptic",
       "/actions/default/in/Select": "Select",
       "/actions/default/in/Grab": "Grab",
+      "/actions/default/in/Cancel": "Cancel",
       "/actions/default/in/Move": "Move"
     }
   ]
