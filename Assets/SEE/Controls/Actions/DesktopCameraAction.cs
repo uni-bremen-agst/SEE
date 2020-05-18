@@ -113,8 +113,6 @@ namespace SEE.Controls
 
         void Update()
         {
-            boost += BoostDevice.Value * 0.2f;
-
             // Camera rotation for looking around
             if (ViewpointDevice.Activated)
             {
@@ -141,7 +139,8 @@ namespace SEE.Controls
                 translation *= 10.0f;
             }
 
-            translation *= Mathf.Pow(2.0f, boost);
+            //translation *= Mathf.Pow(2.0f, BoostDevice.Value);
+            translation *= BoostDevice.Value;
 
             m_TargetCameraState.Translate(translation);
 
