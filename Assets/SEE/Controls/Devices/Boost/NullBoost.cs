@@ -8,9 +8,6 @@ namespace SEE.Controls.Devices
     /// </summary>
     public class NullBoost : Boost
     {
-        [Tooltip("Boost factor for movements."), Range(0.01f, 10.0f)]
-        public float boost = 1.0f;
-
         public override float Value
         {
             get => boost;
