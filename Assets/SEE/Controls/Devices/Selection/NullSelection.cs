@@ -17,5 +17,7 @@ namespace SEE.Controls.Devices
         public override bool IsGrabbing => false;
 
         public override float Pull => 0;
+
+        public override bool IsCanceling => false;
     }
 }

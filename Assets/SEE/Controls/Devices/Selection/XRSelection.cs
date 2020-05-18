@@ -22,13 +22,13 @@ namespace SEE.Controls.Devices
 
         private SteamVR_Action_Vector2 PullAction = SteamVR_Input.GetVector2Action(defaultActionSet, "Move");
 
-        //private SteamVR_Action_Single TriggerAction = SteamVR_Input.GetSingleAction(defaultActionSet, "Trigger");
+        private SteamVR_Action_Single GrabAction = SteamVR_Input.GetSingleAction(defaultActionSet, "Grab");
 
         /// <summary>
         /// The default assignment of the grab button in SteamVR is the B button,
         /// but it may be re-assigned by the user.
         /// </summary>
-        private SteamVR_Action_Boolean GrabButton = SteamVR_Input.GetBooleanAction(defaultActionSet, "Grab");
+        private SteamVR_Action_Boolean CancelButton = SteamVR_Input.GetBooleanAction(defaultActionSet, "Cancel");
 
         /// <summary>
         /// The default assignment of the selection button in SteamVR is the A button,
@@ -55,15 +55,17 @@ namespace SEE.Controls.Devices
         /// <summary>
         /// The current toggle value of the select button ("Select" in SteamVR).
         /// </summary>
-        public override bool IsSelecting => selectionButton.State;        
+        public override bool IsSelecting => selectionButton.State;
 
         /// <summary>
-        /// True if the user presses the grabbing button ("Grab" in SteamVR) long enough.
+        /// True if the user presses the grabbing button ("Grab" in SteamVR) deeply enough.
         /// </summary>
-        public override bool IsGrabbing => grabButton.TransientState;
+        public override bool IsGrabbing => GrabAction.axis >= 0.9f;
+
+        public override bool IsCanceling => CancelButton.active;
 
         /// <summary>
-        /// The degree of the trigger (the SteamVR axis assigned as "Trigger").
+        /// The degree of the move axis (the SteamVR axis assigned as "Move").
         /// </summary>
         public override float Pull
         {
@@ -78,11 +80,6 @@ namespace SEE.Controls.Devices
         /// Manages the behaviour of SelectionButton.
         /// </summary>
         private DelayedToggle selectionButton;
-
-        /// <summary>
-        /// Manages the behaviour of GrabButton.
-        /// </summary>
-        private DelayedToggle grabButton;
 
         private class DelayedToggle
         {
@@ -171,13 +168,11 @@ namespace SEE.Controls.Devices
         private void Start()
         {
             selectionButton = new DelayedToggle(SelectionButton);
-            grabButton = new DelayedToggle(GrabButton);
         }
 
         private void Update()
         {
             selectionButton.OnUpdate();
-            grabButton.OnUpdate();
         }
     }
 }

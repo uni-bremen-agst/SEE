@@ -249,7 +249,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/default/in/grab"
+                     "output" : "/actions/default/in/cancel"
                   }
                },
                "mode" : "button",
@@ -286,7 +286,7 @@
             {
                "inputs" : {
                   "pull" : {
-                     "output" : "/actions/default/in/trigger"
+                     "output" : "/actions/default/in/grab"
                   }
                },
                "mode" : "trigger",

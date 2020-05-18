@@ -44,14 +44,15 @@ namespace SEE.Controls
         public GameObjectEvent OnObjectGrabbed = new GameObjectEvent();
 
         /// <summary>
-        /// The object currently grabbed. May be null.
+        /// The object currently grabbed or hovered over. May be null.
         /// </summary>
-        private GameObject grabbedObject;
-        /// <summary>
-        /// The object currently hovered over. May be null.
-        /// </summary>
-        private GameObject hoveredObject;
+        private GameObject handledObject;
 
+        /// <summary>
+        /// The memento of the state of handledObject just before it was grabbed.
+        /// Invariant: handledObject != null => handledObjectMemento != null.
+        /// </summary>
+        private ObjectMemento handledObjectMemento;
 
         /// <summary>
         /// This method is declared here because it will be overridden by 
@@ -69,62 +70,101 @@ namespace SEE.Controls
         /// the user intends to grab it, it will be grabbed.
         /// </summary>
         private void Update()
-        {            
+        {
+            // The user could be doing everything together selecting, canceling, and grabbing. 
+            // We are using the following priorities:
+            // Canceling is possible only when an object is selected or grabbed.
+            // In those cases, canceling overrules selecting and grabbing.
+            // Grabbing overrules canceling.
+            bool isCanceling = selectionDevice.IsCanceling;
             bool isGrabbing = selectionDevice.IsGrabbing;
-            // The user could be doing both selecting and grabbing. However, grabbing overrules 
-            // selecting.
-            bool isSelecting = isGrabbing ? false : selectionDevice.IsSelecting;
+            bool isSelecting = selectionDevice.IsSelecting;
 
-            if (isGrabbing)
+            if (isCanceling)
             {
-                if (grabbedObject != null)
+                if (handledObject != null)
                 {
-                    // The user triggered grabbing while an object was already grabbed.
-                    // That means we need to release the grabbed object.
-                    // selectionDevice.IsGrabbing works as a toggle.
-                    ReleaseObject(grabbedObject);
-                    grabbedObject = null;
-                }
-                else if (hoveredObject != null)
-                {                    
-                    // The hovered object becomes the grabbed object. If no object is
-                    // currently hovered over, nothing will be grabbed.
-                    grabbedObject = hoveredObject;
-                    GrabObject(grabbedObject);
+                    if (isGrabbing)
+                    {
+                        ReleaseObject(handledObject);
+                        handledObjectMemento.Reset();
+                    }
+                    else if (isSelecting)
+                    {
+                        HideHoveringFeedback();
+                    }                    
+                    handledObject = null;
                 }
             }
-            // Note: isGrabbing => !isSelecting
-            // No selection while an object is already grabbed.
-            if (isSelecting && grabbedObject == null)
+            else if (isGrabbing || isSelecting)
             {
-                // While the user wants to select we will show the ray and try to 
-                // hit an object.               
                 GameObject hitObject = Select(out RaycastHit hitInfo);
                 // Give visual feedback on where we search.
                 ShowHoveringFeedback(hitObject, hitInfo);
-                if (hitObject != hoveredObject)
+                if (isGrabbing)
                 {
-                    // Note: hitObject and hoveredObject may both be null here.
-                    if (hoveredObject != null)
+                    if (handledObject != null)
                     {
-                        UnhoverObject(hoveredObject);
+                        // The user continues grabbing while an object was already grabbed.
+                        HoldObject(handledObject);
                     }
-                    hoveredObject = hitObject;
-                    if (hoveredObject != null)
+                    else if (hitObject != null)
                     {
-                        HoverObject(hoveredObject);
+                        // The user is currently not holding an object and hit a new object.
+                        handledObject = hitObject;
+                        GrabObject(handledObject);
+                        handledObjectMemento = new ObjectMemento(handledObject);
                     }
                 }
+                else if (hitObject != null && hitObject != handledObject)
+                {
+                    // The user is selecting, not grabbing, and hit a new object.
+                    if (handledObject != null)
+                    {
+                        UnhoverObject(handledObject);
+                    }
+                    handledObject = hitObject;
+                    HoverObject(handledObject);
+                }
             }
-            else
-            {
-                // not selecting (independent from isGrabbing) => no visual feedback for search
-                HideHoveringFeedback();
-            }
-            if (grabbedObject != null)
-            {
-                HoldObject(grabbedObject);
-            }
+
+            //else if (handledObject != null)
+            //{
+            //    ReleaseObject(handledObject);
+            //    handledObject = null;
+            //}
+            //// Note: isGrabbing => !isSelecting
+            //// No selection while an object is already grabbed.
+            //if (isSelecting && handledObject == null)
+            //{
+            //    // While the user wants to select we will show the ray and try to 
+            //    // hit an object.               
+            //    GameObject hitObject = Select(out RaycastHit hitInfo);
+            //    // Give visual feedback on where we search.
+            //    ShowHoveringFeedback(hitObject, hitInfo);
+            //    if (hitObject != hoveredObject)
+            //    {
+            //        // Note: hitObject and hoveredObject may both be null here.
+            //        if (hoveredObject != null)
+            //        {
+            //            UnhoverObject(hoveredObject);
+            //        }
+            //        hoveredObject = hitObject;
+            //        if (hoveredObject != null)
+            //        {
+            //            HoverObject(hoveredObject);
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    // not selecting (independent from isGrabbing) => no visual feedback for search
+            //    HideHoveringFeedback();
+            //}
+            //if (handledObject != null)
+            //{
+            //    HoldObject(handledObject);
+            //}
         }
 
         /// <summary>

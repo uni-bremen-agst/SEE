@@ -21,12 +21,38 @@ namespace SEE.Controls.Devices
 
         public override Vector3 Direction => viewPortCenter;
 
-        public override bool IsSelecting => InputManager.ActiveDevice.LeftTrigger.Value >= Threshold;
+        public override float Pull => throw new System.NotImplementedException();
 
         public override Vector3 Position => viewPortCenter;
 
+        // For the standardized layout of gamepads supported by InControl, see:
+        // http://www.gallantgames.com/pages/incontrol-standardized-controls
+
+        private bool isSelecting = false;
+
+        /// <summary>
+        /// Whether the Action2 button was pressed on the gamepad. This is typically the button labeled "A".
+        /// The button works as a toggle.
+        /// </summary>
+        public override bool IsSelecting => isSelecting;
+
+        /// <summary>
+        /// Whether the right trigger has been pressed deeply enough.
+        /// </summary>
         public override bool IsGrabbing => InputManager.ActiveDevice.RightTrigger.Value >= Threshold;
 
-        public override float Pull => throw new System.NotImplementedException();
+        /// <summary>
+        /// Whether the Action1 button was pressed on the gamepad. This is typically the button labeled "B".
+        /// The button works as a transient event.
+        /// </summary>
+        public override bool IsCanceling => InputManager.ActiveDevice.Action1.State;
+
+        private void Update()
+        {
+            if (InputManager.ActiveDevice.Action2.WasPressed)
+            {
+                isSelecting = !isSelecting;
+            }
+        }
     }
 }

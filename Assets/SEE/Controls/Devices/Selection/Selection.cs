@@ -22,19 +22,35 @@ namespace SEE.Controls.Devices
         public abstract Vector3 Position { get; }
 
         /// <summary>
+        /// The degree of pulling. A value between 0 and 1.
+        /// </summary>
+        public abstract float Pull { get; }
+
+        /// Note on the different actions selecting, grabbing, canceling: These actions
+        /// are not mutually exclusive. The client of this API must resolve potential
+        /// conflicts.
+
+        /// <summary>
         /// True if the user wants to select (e.g., when a mouse button was pressed).
+        /// This event is continuous, meaning, the same values is returned while the
+        /// user requests this action.
         /// </summary>
         public abstract bool IsSelecting { get; }
 
         /// <summary>
         /// True if the user wants to grab a selected object (e.g., when a particular grabbing 
         /// key was pressed).
+        /// This event is continuous, meaning, the same values is returned while the
+        /// user requests this action.
         /// </summary>
         public abstract bool IsGrabbing { get; }
 
         /// <summary>
-        /// The degree of pulling. A value between 0 and 1.
+        /// True if the user wants to cancel the currently requested action.
+        /// This event is a non-persistent one-time event, meaning, the value is returned only
+        /// once at the moment when this property is queried.
         /// </summary>
-        public abstract float Pull { get; }
+        public abstract bool IsCanceling { get; }
+
     }
 }
