@@ -12,16 +12,60 @@ namespace SEE.Controls.Devices
         [Tooltip("The index of the mouse button needed to be pressed to change the viewpoint (0 = left, 1 = right).")]
         public int SelectionMouseButton = 0;
 
-        public override Vector3 Direction => Input.mousePosition;
+        [Tooltip("The least amount of seconds the mouse button must have been pressed to be considered grabbing."),
+         Range(0.01f, 1.0f)]
+        public float ButtonDurationThreshold = 0.5f;
 
-        public override bool IsSelecting => Input.GetMouseButton(SelectionMouseButton);
+        public override Vector3 Direction => Input.mousePosition;
 
         public override Vector3 Position => Input.mousePosition;
 
-        public override bool IsGrabbing => DoubleClick();
+        private enum State
+        {
+            Idle,
+            Selecting,
+            Grabbing
+        }
 
+        private State state = State.Idle;
+
+        /// <summary>
+        /// Time since the start of a selection in seconds.
+        /// </summary>
+        private float timeButtonHeld = 0.0f;
+
+        private void Update()
+        {
+            if (Input.GetMouseButtonDown(SelectionMouseButton))
+            {
+                state = State.Selecting;
+                timeButtonHeld = Time.realtimeSinceStartup;
+            }
+            if (Input.GetMouseButton(SelectionMouseButton) 
+                && Time.realtimeSinceStartup - timeButtonHeld >= ButtonDurationThreshold)
+            {
+                state = State.Grabbing;
+            }
+            if (Input.GetMouseButtonUp(SelectionMouseButton))
+            {
+                state = State.Idle;
+                timeButtonHeld = float.PositiveInfinity;
+            }
+        }
+
+        public override bool IsSelecting => state == State.Selecting;
+
+        public override bool IsGrabbing => state == State.Grabbing;
+
+        /// <summary>
+        /// The degree by which the mouse wheel was turned. A value in the range
+        /// [-1, 1].
+        /// </summary>
         private float pullDegree = 0.0f;
 
+        /// <summary>
+        /// The delta to be added to the pullDegree for each mouse wheel increment.
+        /// </summary>
         public const float MouseWheelScale = 0.1f;
 
         public override float Pull
@@ -43,7 +87,7 @@ namespace SEE.Controls.Devices
             }
         }
 
-        public override bool IsCanceling => false; // FIXME throw new System.NotImplementedException();
+        public override bool IsCanceling => Input.GetKeyDown(KeyCode.C);
 
         /// <summary>
         /// True if the first click of an expected double click happened.
