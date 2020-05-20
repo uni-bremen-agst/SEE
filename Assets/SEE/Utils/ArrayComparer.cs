@@ -1,6 +1,5 @@
-﻿namespace SEE
+﻿namespace SEE.Utils
 {
-
     /// <summary>
     /// Compares two arrays for equivalence.
     /// </summary>
@@ -41,5 +40,4 @@
             return true;
         }
     }
-
 }

@@ -24,11 +24,10 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using SEE.GO;
-using OdinSerializer;
-
-using SEE.Game.Animation;
+using SEE.Game.Evolution;
 using SEE.DataModel;
 using SEE.Layout;
+using SEE.Utils;
 
 namespace SEE.Game
 {
@@ -337,7 +336,7 @@ namespace SEE.Game
                 // We must transfer the scale from gameObject to layoutNode.
                 // Rotation and CenterPosition are all zero. They will be computed by the layout,
                 // but the layout needs the game object's scale.
-                layoutNode.Scale = graphRenderer.GetSize(gameObject);
+                layoutNode.LocalScale = graphRenderer.GetSize(gameObject);
                 result.Add(layoutNode);
             }
             LayoutNodes.SetLevels(result);
@@ -559,11 +558,11 @@ namespace SEE.Game
                 // Note layoutNode.position.y denotes the ground position of
                 // a game object, not its center.
                 Vector3 position = layoutNode.CenterPosition;
-                position.y -= layoutNode.Scale.y;
+                position.y -= layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
                 graphRenderer.Apply(currentGameNode, layoutNode);
                 // Revert the change to the y co-ordindate.
-                position.y += layoutNode.Scale.y;
+                position.y += layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
                 marker.MarkBorn(currentGameNode);
                 wasModified = false;
@@ -942,16 +941,26 @@ namespace SEE.Game
                 this.scale = scale;
             }
 
-            public Vector3 Scale
+            public Vector3 LocalScale
             {
                 get => scale;
                 set => scale = value;
+            }
+
+            public Vector3 AbsoluteScale
+            {
+                get => scale;
             }
 
             public Vector3 CenterPosition
             {
                 get => centerPosition;
                 set => centerPosition = value;
+            }
+
+            public void ScaleBy(float factor)
+            {
+                throw new NotImplementedException();
             }
 
             public ILayoutNode Parent => throw new NotImplementedException();

@@ -8,6 +8,7 @@ using SEE.GO;
 using System;
 using System.Linq;
 using System.IO;
+using SEE.Utils;
 
 namespace SEE.Game
 {
@@ -34,6 +35,11 @@ namespace SEE.Game
         /// The center origin where the graph should be placed in the world scene.
         /// </summary>
         public Vector3 origin = Vector3.zero; // serialized by Unity
+
+        /// <summary>
+        /// The width (x axis) of the generated city.
+        /// </summary>
+        public float width = 1.0f; // serialized by Unity
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
@@ -442,6 +448,11 @@ namespace SEE.Game
         public bool ShowErosions = false; // serialized by Unity
 
         /// <summary>
+        /// The maximal absolute width of a sprite representing an erosion in world-space Unity units.
+        /// </summary>
+        public float MaxErosionWidth = 1.0f; // serialized by Unity
+
+        /// <summary>
         /// Orientation of the edges; 
         /// if false, the edges are drawn below the houses;
         /// if true, the edges are drawn above the houses;
@@ -484,7 +495,7 @@ namespace SEE.Game
             {
                 if (File.Exists(filename))
                 {
-                    SEE.Performance p = SEE.Performance.Begin("loading graph data from " + filename);
+                    SEE.Utils.Performance p = SEE.Utils.Performance.Begin("loading graph data from " + filename);
                     GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "ROOT", new SEELogger());
                     graphCreator.Load();
                     Graph graph = graphCreator.GetGraph();

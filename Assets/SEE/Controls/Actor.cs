@@ -42,7 +42,10 @@ namespace SEE.Controls
         public Selection selectionDevice;
 
         [Tooltip("The device from which to read viewport selection input.")]
-        private ControllerSelection viewportSelectionDevice;
+        private TouchGamepadSelection viewportSelectionDevice;
+
+        [Tooltip("The device from which to read input for transforming a selected object.")]
+        public Transformation transformationDevice;
 
         [Tooltip("The action applied to move the camera.")]
         public CameraAction cameraAction;
@@ -50,17 +53,18 @@ namespace SEE.Controls
         [Tooltip("The action applied to select an object.")]
         public SelectionAction selectionAction;
 
-        [Tooltip("The action applied to select an object by way of the viewport.")]
-        private SelectionViewportAction viewportSelectionAction;
+        [Tooltip("The action applied to transform a selected object.")]
+        private TransformationAction transformationAction;
 
         private void Start()
         {
             CameraSetup();
             SelectionSetup();
+            TransformSetup();
         }
 
         /// <summary>
-        /// Sets up and connects the selection input device and the selection action.
+        /// Sets up and connects the selection input device and selection action.
         /// </summary>
         private void SelectionSetup()
         {
@@ -77,23 +81,55 @@ namespace SEE.Controls
                 }
                 selectionAction.SelectionDevice = selectionDevice;
                 selectionAction.MainCamera = mainCamera;
+                selectionAction.OnObjectGrabbed.AddListener(OnObjectGrabbed);
             }
-            // The selectionDevice and selectionAction are suitable for 2D or 3D
-            // positional selection. As a secondary way to select something with
-            // a device that offers neither 2D nor 3D positional data (e.g., if we
-            // only have a gamepad controller that allows use to fly through a scene
-            // but offers no way to point to something), we use a viewportSelectionDevice
-            // and viewportSelectionAction, which simply selects an objects that can be
-            // hit by a ray through the center of the viewport.
-            if (viewportSelectionDevice == null)
+        }
+
+        /// <summary>
+        /// Called by the selection action when an object was grabbed or released.
+        /// If an object is grabbed, we start the transformation action.
+        /// If an object is released, we terminate the transforamtion action.
+        /// </summary>
+        /// <param name="grabbedObject">the object grabbed or null if a grabbed object was released</param>
+        private void OnObjectGrabbed(GameObject grabbedObject)
+        {
+            if (grabbedObject == null)
             {
-                viewportSelectionDevice = gameObject.AddComponent<ControllerSelection>();
-                if (viewportSelectionAction == null)
+                // Grabbed object is released.
+                transformationAction.TransformedObject = null;
+                transformationAction.enabled = false;
+            }
+            else
+            {
+                // Newly grabbed object.
+                transformationAction.enabled = true;
+                transformationAction.TransformedObject = grabbedObject;
+            }
+        }
+
+        /// <summary>
+        /// Sets up and connects the transformation input device and transformation action.
+        /// The transformation input device must exist, but the transformation action 
+        /// will be created because it is the same for all transformation input devices.
+        /// No parameterization by the user is needed here.
+        /// </summary>
+        private void TransformSetup()
+        {
+            if (transformationDevice == null)
+            {
+                Debug.LogError("Transformation device must be set.\n");
+            }
+            else
+            {
+                transformationAction = gameObject.GetComponent<TransformationAction>();
+                if (transformationAction == null)
                 {
-                    viewportSelectionAction = gameObject.AddComponent<SelectionViewportAction>();
+                    transformationAction = gameObject.AddComponent<TransformationAction>();
                 }
-                viewportSelectionAction.SelectionDevice = viewportSelectionDevice;
-                viewportSelectionAction.MainCamera = mainCamera;
+                transformationAction.TranformationDevice = transformationDevice;
+                // This action is initially disabled. It will be activated only when an
+                // object was selected.
+                transformationAction.enabled = false;
             }
         }
 
