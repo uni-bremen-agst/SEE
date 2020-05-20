@@ -37,13 +37,11 @@ namespace SEE.Controls.Devices
         // For the standardized layout of gamepads supported by InControl, see:
         // http://www.gallantgames.com/pages/incontrol-standardized-controls
 
-        private bool isSelecting = false;
-
         /// <summary>
         /// Whether the Action2 button was pressed on the gamepad. This is typically the button labeled "A".
         /// The button works as a toggle.
         /// </summary>
-        public override bool IsSelecting => InputManager.ActiveDevice.Action2.WasPressed; // Button A isSelecting;
+        public override bool IsSelecting => InputManager.ActiveDevice.Action2.WasPressed; 
 
         /// <summary>
         /// Whether the right trigger has been pressed deeply enough.
@@ -55,13 +53,5 @@ namespace SEE.Controls.Devices
         /// The button works as a transient event.
         /// </summary>
         public override bool IsCanceling => InputManager.ActiveDevice.Action1.WasPressed;
-
-        private void Update()
-        {
-            if (InputManager.ActiveDevice.Action2.WasPressed) // Button A
-            {
-                isSelecting = !isSelecting;
-            }
-        }
     }
 }
