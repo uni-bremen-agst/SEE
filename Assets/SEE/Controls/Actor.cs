@@ -53,9 +53,6 @@ namespace SEE.Controls
         [Tooltip("The action applied to select an object.")]
         public SelectionAction selectionAction;
 
-        [Tooltip("The action applied to select an object by way of the viewport.")]
-        private SelectionViewportAction viewportSelectionAction;
-
         [Tooltip("The action applied to transform a selected object.")]
         private TransformationAction transformationAction;
 
@@ -85,23 +82,6 @@ namespace SEE.Controls
                 selectionAction.SelectionDevice = selectionDevice;
                 selectionAction.MainCamera = mainCamera;
                 selectionAction.OnObjectGrabbed.AddListener(OnObjectGrabbed);
-            }
-            // The selectionDevice and selectionAction are suitable for 2D or 3D
-            // positional selection. As a secondary way to select something with
-            // a device that offers neither 2D nor 3D positional data (e.g., if we
-            // only have a gamepad controller that allows use to fly through a scene
-            // but offers no way to point to something), we use a viewportSelectionDevice
-            // and viewportSelectionAction, which simply selects an objects that can be
-            // hit by a ray through the center of the viewport.
-            if (viewportSelectionDevice == null)
-            {
-                viewportSelectionDevice = gameObject.AddComponent<TouchGamepadSelection>();
-                if (viewportSelectionAction == null)
-                {
-                    viewportSelectionAction = gameObject.AddComponent<SelectionViewportAction>();
-                }
-                viewportSelectionAction.SelectionDevice = viewportSelectionDevice;
-                viewportSelectionAction.MainCamera = mainCamera;
             }
         }
 
