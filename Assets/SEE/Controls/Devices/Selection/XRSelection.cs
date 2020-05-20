@@ -9,10 +9,9 @@ namespace SEE.Controls.Devices
     /// </summary>
     public class XRSelection : Selection
     {
-
         [Tooltip("The least amount of seconds the selection and grab buttons must have been pressed to be considered activated."), 
-                  Range(0.01f, 1.0f)]
-        public const float ButtonDurationThreshold = 0.5f;
+         Range(0.01f, 1.0f)]
+        public float ButtonDurationThreshold = 0.5f;
 
         [Tooltip("The threshold at which the trigger is considered to be activated."), Range(0.01f, 1.0f)]
         public float Threshold = 0.1f;
@@ -62,7 +61,7 @@ namespace SEE.Controls.Devices
         /// </summary>
         public override bool IsGrabbing => GrabAction.axis >= 0.9f;
 
-        public override bool IsCanceling => CancelButton.active;
+        public override bool IsCanceling => CancelButton.stateDown;
 
         /// <summary>
         /// The degree of the move axis (the SteamVR axis assigned as "Move").
@@ -126,12 +125,20 @@ namespace SEE.Controls.Devices
             private SteamVR_Action_Boolean button;
 
             /// <summary>
+            /// The selection device using this delayed toggle. It is needed to 
+            /// obtain the ButtonDurationThreshold.
+            /// </summary>
+            private XRSelection selection;
+
+            /// <summary>
             /// Constructor.
             /// </summary>
             /// <param name="button">the SteamVR button from which to get the user input</param>
-            public DelayedToggle(SteamVR_Action_Boolean button)
+            /// <param name="selection">the selection device using this delayed toggle</param>
+            public DelayedToggle(XRSelection selection, SteamVR_Action_Boolean button)
             {
                 this.button = button;
+                this.selection = selection;
             }
 
             public void OnUpdate()
@@ -156,7 +163,8 @@ namespace SEE.Controls.Devices
                 }
                 else if (button.state)
                 {
-                    if (!buttonEventConsumed && Time.realtimeSinceStartup - button.changedTime >= ButtonDurationThreshold)
+                    if (!buttonEventConsumed 
+                        && Time.realtimeSinceStartup - button.changedTime >= selection.ButtonDurationThreshold)
                     {
                         state = !state;
                         buttonEventConsumed = true;
@@ -167,7 +175,7 @@ namespace SEE.Controls.Devices
 
         private void Start()
         {
-            selectionButton = new DelayedToggle(SelectionButton);
+            selectionButton = new DelayedToggle(this, SelectionButton);
         }
 
         private void Update()
