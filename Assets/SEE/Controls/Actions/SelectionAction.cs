@@ -62,6 +62,15 @@ namespace SEE.Controls
         {
         }
 
+        private enum ObjectState
+        {
+            None,
+            IsSelected,
+            IsGrabbed
+        }
+
+        private ObjectState objectState = ObjectState.None;
+
         /// <summary>
         /// If the search was activated, a ray is cast from the position of
         /// the MainCamera or selectionDevice towards the selectionDevice's
@@ -71,6 +80,10 @@ namespace SEE.Controls
         /// </summary>
         private void Update()
         {
+            if (animationIsRunning)
+            {
+                return;
+            }
             // The user could be doing everything together selecting, canceling, and grabbing. 
             // We are using the following priorities:
             // Canceling is possible only when an object is selected or grabbed.
@@ -84,14 +97,13 @@ namespace SEE.Controls
             {
                 if (handledObject != null)
                 {
-                    if (isGrabbing)
+                    if (objectState == ObjectState.IsGrabbed)
                     {
-                        ReleaseObject(handledObject);
-                        handledObjectMemento.Reset();
+                        ReleaseObject(handledObject, false);
                     }
-                    else if (isSelecting)
+                    else if (objectState == ObjectState.IsSelected)
                     {
-                        HideHoveringFeedback();
+                        UnhoverObject(handledObject);
                     }                    
                     handledObject = null;
                 }
@@ -105,19 +117,22 @@ namespace SEE.Controls
                 {
                     if (handledObject != null)
                     {
-                        // The user continues grabbing while an object was already grabbed.
-                        HoldObject(handledObject);
-                    }
-                    else if (hitObject != null)
-                    {
-                        // The user is currently not holding an object and hit a new object.
-                        handledObject = hitObject;
-                        GrabObject(handledObject);
-                        handledObjectMemento = new ObjectMemento(handledObject);
+                        // handledObject != null may be true because an object was selected
+                        // but is not yet grabbed.
+                        if (objectState == ObjectState.IsSelected)
+                        {
+                            GrabObject(handledObject);
+                        }
+                        else
+                        {
+                            // The user continues grabbing while an object was already grabbed.
+                            HoldObject(handledObject);
+                        }
                     }
                 }
                 else if (hitObject != null && hitObject != handledObject)
                 {
+                    // assert: !isGrabbing && isSelecting && hitObject != null && hitObject != handledObject
                     // The user is selecting, not grabbing, and hit a new object.
                     if (handledObject != null)
                     {
@@ -127,44 +142,16 @@ namespace SEE.Controls
                     HoverObject(handledObject);
                 }
             }
-
-            //else if (handledObject != null)
-            //{
-            //    ReleaseObject(handledObject);
-            //    handledObject = null;
-            //}
-            //// Note: isGrabbing => !isSelecting
-            //// No selection while an object is already grabbed.
-            //if (isSelecting && handledObject == null)
-            //{
-            //    // While the user wants to select we will show the ray and try to 
-            //    // hit an object.               
-            //    GameObject hitObject = Select(out RaycastHit hitInfo);
-            //    // Give visual feedback on where we search.
-            //    ShowHoveringFeedback(hitObject, hitInfo);
-            //    if (hitObject != hoveredObject)
-            //    {
-            //        // Note: hitObject and hoveredObject may both be null here.
-            //        if (hoveredObject != null)
-            //        {
-            //            UnhoverObject(hoveredObject);
-            //        }
-            //        hoveredObject = hitObject;
-            //        if (hoveredObject != null)
-            //        {
-            //            HoverObject(hoveredObject);
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    // not selecting (independent from isGrabbing) => no visual feedback for search
-            //    HideHoveringFeedback();
-            //}
-            //if (handledObject != null)
-            //{
-            //    HoldObject(handledObject);
-            //}
+            else if (objectState == ObjectState.IsGrabbed)
+            {
+                // assert: !isCanceling && !isGrabbing && !isSelecting && objectState == ObjectState.IsGrabbed
+                // Grabbed object is released and the action was not canceled.
+                ReleaseObject(handledObject, true);
+            }
+            if (!isGrabbing && !isSelecting)
+            {
+                HideHoveringFeedback();
+            }
         }
 
         /// <summary>
@@ -224,71 +211,18 @@ namespace SEE.Controls
         //-----------------------------------------------------------------------
 
         /// <summary>
-        /// To draw a line from the player to the grabbed object when an object
-        /// is grabbed.
-        /// </summary>
-        private class GrabLine
-        {
-            private readonly LineRenderer renderer;
-            private readonly Vector3[] linePoints = new Vector3[2];
-
-            public GrabLine(GameObject gameObject)
-            {
-                renderer = gameObject.AddComponent<LineRenderer>();
-                LineFactory.SetDefaults(renderer);
-                LineFactory.SetWidth(renderer, 0.01f);
-                renderer.positionCount = linePoints.Length;
-                renderer.useWorldSpace = true;
-            }
-
-            public void Draw(Vector3 from, Vector3 to)
-            {
-                renderer.enabled = true;
-                linePoints[0] = from;
-                linePoints[1] = to;
-                renderer.SetPositions(linePoints);
-            }
-
-            public void Off()
-            {
-                linePoints[1] = linePoints[0];
-                renderer.SetPositions(linePoints);
-                renderer.enabled = false;
-            }
-        }
-
-        /// <summary>
-        /// The line drawn from the player to the grabbed object when an object
-        /// is grabbed.
-        /// </summary>
-        private GrabLine grabLine;
-
-        /// <summary>
         /// Gives visual feedback when an object was grabbed.
         /// </summary>
         /// <param name="heldObject">the object selected or null if none was selected</param>
-        protected void ShowGrabbingFeedback(GameObject heldObject)
+        protected virtual void ShowGrabbingFeedback(GameObject heldObject)
         {
-            if (grabLine == null)
-            {
-                grabLine = new GrabLine(gameObject);
-            }
-            // Draw a ray from the player to the held object.
-            grabLine.Draw(GrabbingRayStart(), heldObject.transform.position);
-        }
-
-        protected virtual Vector3 GrabbingRayStart()
-        {
-            // The origin of the ray must be slightly off the camera. Otherwise it cannot be seen.
-            return MainCamera.transform.position + Vector3.down * 0.1f;
         }
 
         /// <summary>
         /// Terminates the visual feedback on the currently ongoing grabbing.
         /// </summary>
-        protected void HideGrabbingFeedback()
+        protected virtual void HideGrabbingFeedback()
         {
-            grabLine?.Off();
         }
 
         //-----------------------------------------------------------------------
@@ -301,8 +235,10 @@ namespace SEE.Controls
         /// <param name="selectedObject">the selected object</param>
         protected virtual void HoverObject(GameObject selectedObject)
         {
+            //Debug.LogFormat("HoverObject {0}\n", selectedObject.name);
             HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
             hoverComponent?.Hovered();
+            objectState = ObjectState.IsSelected;
         }
 
         /// <summary>
@@ -311,8 +247,10 @@ namespace SEE.Controls
         /// <param name="selectedObject">the selected object</param>
         protected virtual void UnhoverObject(GameObject selectedObject)
         {
+            //Debug.LogFormat("UnhoverObject {0}\n", selectedObject.name);
             HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
             hoverComponent?.Unhovered();
+            objectState = ObjectState.None;
         }
 
         //-----------------------------------------------------------------------
@@ -325,9 +263,12 @@ namespace SEE.Controls
         /// <param name="selectedObject">the selected object</param>
         protected virtual void GrabObject(GameObject selectedObject)
         {
+            //Debug.LogFormat("GrabObject {0}\n", selectedObject.name);
             GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
             grabbingComponent?.Grab(gameObject);
-            OnObjectGrabbed.Invoke(selectedObject);
+            objectState = ObjectState.IsGrabbed;
+            handledObjectMemento = new ObjectMemento(selectedObject);
+            OnObjectGrabbed.Invoke(selectedObject);           
         }
 
         /// <summary>
@@ -336,13 +277,41 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="grabbedObject">the grabbed object</param>
         protected virtual void HoldObject(GameObject grabbedObject)
-        {            
+        {
+            //Debug.LogFormat("HoldObject {0}\n", grabbedObject.name);
             GrabbableObject grabbingComponent = grabbedObject.GetComponent<GrabbableObject>();
             if (grabbingComponent != null)
             {
                 ShowGrabbingFeedback(grabbedObject);
                 grabbingComponent.Continue(TipOfGrabbingRay(grabbedObject));
             }
+        }
+
+        /// <summary>
+        /// Called when an object is released, i.e., no longer grabbed (passed as parameter <paramref name="grabbedObject"/>).
+        /// </summary>
+        /// <param name="grabbedObject">the selected object</param>
+        /// <param name="actionFinalized">if true, the object should be released at its final destination; otherwise
+        /// the movement should be canceled and its original position be restored</param>
+        protected virtual void ReleaseObject(GameObject grabbedObject, bool actionFinalized)
+        {
+            //Debug.LogFormat("ReleaseObject {0} {1}\n", grabbedObject.name, actionFinalized);
+            GrabbableObject grabbingComponent = grabbedObject.GetComponent<GrabbableObject>();
+            grabbingComponent?.Release();
+            HideGrabbingFeedback();
+            if (!actionFinalized)
+            {
+                // assert: selectedObject == handledObject.gameObject
+                animationIsRunning = true;
+                iTween.MoveTo(handledObject.gameObject,
+                              iTween.Hash("position", handledObjectMemento.Position,
+                                          "time", 0.75f,
+                                          "oncompletetarget", gameObject,
+                                          "oncomplete", "ResetCompleted"
+               ));
+            }
+            OnObjectGrabbed.Invoke(null);
+            objectState = ObjectState.IsSelected;
         }
 
         /// <summary>
@@ -405,15 +374,23 @@ namespace SEE.Controls
         protected abstract Ray GetRay();
 
         /// <summary>
-        /// Called when an object is released, i.e., no longer grabbed (passed as parameter <paramref name="selectedObject"/>).
+        /// If true, the re-location of a grabbed to its original position where it was 
+        /// grabbed is animated. During that animation, no user interactions are accepted.
         /// </summary>
-        /// <param name="selectedObject">the selected object</param>
-        protected virtual void ReleaseObject(GameObject selectedObject)
+        private bool animationIsRunning = false;
+
+        /// <summary>
+        /// Called by iTween when grabbing was cancelled and the grabbed object
+        /// has reached its original position (the one where it was located before
+        /// being grabbed). After that, the animation is over and animationIsRunning
+        /// can be reset to false.
+        /// 
+        /// Note: Its call is requested in ReleaseObject(). Watch out when you rename 
+        /// this method. Then you need to adjust the parameter 
+        /// </summary>
+        protected void ResetCompleted()
         {
-            GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
-            grabbingComponent?.Release();
-            HideGrabbingFeedback();
-            OnObjectGrabbed.Invoke(null);
+            animationIsRunning = false;
         }
     }
 }
