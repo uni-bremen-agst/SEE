@@ -76,9 +76,20 @@ namespace SEE.Controls
         /// </summary>
         private class GrabLine
         {
+            /// <summary>
+            /// Line renderer use to draw the line.
+            /// </summary>
             private readonly LineRenderer renderer;
+
+            /// <summary>
+            /// The start and end position of the line in world space.
+            /// </summary>
             private readonly Vector3[] linePoints = new Vector3[2];
 
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="gameObject">the object where to attach the line renderer</param>
             public GrabLine(GameObject gameObject)
             {
                 renderer = gameObject.AddComponent<LineRenderer>();
@@ -88,6 +99,11 @@ namespace SEE.Controls
                 renderer.useWorldSpace = true;
             }
 
+            /// <summary>
+            /// Draws a line from <paramref name="from"/> to <paramref name="to"/>.
+            /// </summary>
+            /// <param name="from">begin of the line</param>
+            /// <param name="to">end of the line</param>
             public void Draw(Vector3 from, Vector3 to)
             {
                 renderer.enabled = true;
@@ -96,9 +112,11 @@ namespace SEE.Controls
                 renderer.SetPositions(linePoints);
             }
 
+            /// <summary>
+            /// Turns the line off.
+            /// </summary>
             public void Off()
             {
-                Debug.Log("GrabLine.Off()\n");
                 linePoints[1] = linePoints[0];
                 renderer.SetPositions(linePoints);
                 renderer.enabled = false;
