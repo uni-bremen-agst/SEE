@@ -96,7 +96,6 @@ namespace SEE.Controls
             if (grabbedObject == null)
             {
                 // Grabbed object is released.
-                Debug.LogFormat("Releasing grabbed object {0}\n", transformationAction.TransformedObject.name);
                 transformationAction.TransformedObject = null;
                 transformationAction.enabled = false;
             }
@@ -105,7 +104,6 @@ namespace SEE.Controls
                 // Newly grabbed object.
                 transformationAction.enabled = true;
                 transformationAction.TransformedObject = grabbedObject;
-                Debug.LogFormat("Transforming grabbed object {0}\n", grabbedObject.name);
             }
         }
 
