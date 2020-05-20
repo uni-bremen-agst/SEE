@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SEE.Controls
 {
@@ -7,6 +8,7 @@ namespace SEE.Controls
     /// (e.g., a gamepad controller). In that case, we simply use the center of the
     /// viewport.
     /// </summary>
+    [Obsolete("Use Selection2DAction instead.")]
     public class SelectionViewportAction : SelectionAction
     {
         /// <summary>
