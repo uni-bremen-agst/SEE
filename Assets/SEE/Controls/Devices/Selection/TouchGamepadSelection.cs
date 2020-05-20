@@ -17,13 +17,22 @@ namespace SEE.Controls.Devices
         [Tooltip("The threshold determining whether a selection trigger value has to be considered."), Range(0.001f, 1f)]
         public float Threshold = 0.3f;
 
-        private readonly Vector3 viewPortCenter = new Vector3(0.5f, 0.5f, 0f);
+        public override Vector3 Direction => new Vector3(Screen.width / 2.0f, Screen.height / 2.0f, 0.0f);
 
-        public override Vector3 Direction => viewPortCenter;
+        public override float Pull
+        {
+            get
+            {
+                float up = InputManager.ActiveDevice.DPadDown.Value;
+                if (up > 0)
+                {
+                    return up;
+                }
+                return -InputManager.ActiveDevice.DPadUp.Value;
+            }
+        }
 
-        public override float Pull => throw new System.NotImplementedException();
-
-        public override Vector3 Position => viewPortCenter;
+        public override Vector3 Position => Direction;
 
         // For the standardized layout of gamepads supported by InControl, see:
         // http://www.gallantgames.com/pages/incontrol-standardized-controls
@@ -34,7 +43,7 @@ namespace SEE.Controls.Devices
         /// Whether the Action2 button was pressed on the gamepad. This is typically the button labeled "A".
         /// The button works as a toggle.
         /// </summary>
-        public override bool IsSelecting => isSelecting;
+        public override bool IsSelecting => InputManager.ActiveDevice.Action2.WasPressed; // Button A isSelecting;
 
         /// <summary>
         /// Whether the right trigger has been pressed deeply enough.
@@ -45,11 +54,11 @@ namespace SEE.Controls.Devices
         /// Whether the Action1 button was pressed on the gamepad. This is typically the button labeled "B".
         /// The button works as a transient event.
         /// </summary>
-        public override bool IsCanceling => InputManager.ActiveDevice.Action1.State;
+        public override bool IsCanceling => InputManager.ActiveDevice.Action1.WasPressed;
 
         private void Update()
         {
-            if (InputManager.ActiveDevice.Action2.WasPressed)
+            if (InputManager.ActiveDevice.Action2.WasPressed) // Button A
             {
                 isSelecting = !isSelecting;
             }
