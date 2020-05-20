@@ -9,21 +9,24 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Examples {
+namespace Leap.Unity.Examples
+{
 
-  [AddComponentMenu("")]
-  public class LinearSpeedTextBehaviour : MonoBehaviour {
+    [AddComponentMenu("")]
+    public class LinearSpeedTextBehaviour : MonoBehaviour
+    {
 
-    public TextMesh textMesh;
+        public TextMesh textMesh;
 
-    public Spaceship ship;
+        public Spaceship ship;
 
-    public string linearSpeedPrefixText;
+        public string linearSpeedPrefixText;
 
-    public string linearSpeedPostfixText;
+        public string linearSpeedPostfixText;
 
-    void Update() {
-      textMesh.text = linearSpeedPrefixText + ship.shipAlignedVelocity.magnitude.ToString("G3") + linearSpeedPostfixText;
+        void Update()
+        {
+            textMesh.text = linearSpeedPrefixText + ship.shipAlignedVelocity.magnitude.ToString("G3") + linearSpeedPostfixText;
+        }
     }
-  }
 }

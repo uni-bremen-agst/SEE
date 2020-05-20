@@ -21,7 +21,7 @@ namespace InControl.UnityDeviceProfiles
 
 			IncludePlatforms = new[]
 			{
-				"Android",
+				"Android"
 			};
 
 			Matchers = new[] { new InputDeviceMatcher { NameLiteral = "SteelSeries Stratus XL" } };

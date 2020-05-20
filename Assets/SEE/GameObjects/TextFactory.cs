@@ -15,8 +15,8 @@ namespace SEE.GO
         private readonly static Color TextColor = new Color(0.5f, 0.5f, 0.5f, 1); // Color.white;
 
         /// <summary>
-        /// Returns a game object showing the tiven text at given position. The
-        /// text rotates towards the main camera.
+        /// Returns a game object showing the given <paramref name="text"/> at given <paramref name="position"/>. 
+        /// The text rotates towards the main camera.
         /// </summary>
         /// <param name="text">the text to be drawn</param>
         /// <param name="position">the center position at which to draw the text</param>
@@ -44,13 +44,16 @@ namespace SEE.GO
             rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, width);
 
             tm.enableAutoSizing = true;
-            tm.fontSizeMin = 3;
-            tm.fontSizeMax = 400;
-          
-            TextFacingCamera textFacing = result.AddComponent<TextFacingCamera>();
-            // Rendering distance is set relative to the text's width
-            textFacing.minimalDistance = width;
-            textFacing.maximalDistance = 10.0f * width;
+            tm.fontSizeMin = 0.0f;
+            tm.fontSizeMax = 5;
+
+            if (false)
+            {
+                TextFacingCamera textFacing = result.AddComponent<TextFacingCamera>();
+                // Rendering distance is set relative to the text's width
+                textFacing.minimalDistance = width;
+                textFacing.maximalDistance = 10.0f * width;
+            }
 
             // No shading as this might be expensive and even distracts.
             Renderer renderer = result.GetComponent<Renderer>();

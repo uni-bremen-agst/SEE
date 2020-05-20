@@ -1,3 +1,7 @@
+### v1.8.1
+* Added armv7 support to Native Input plugin for iOS.
+* Fixed error in version parsing with some alpha and beta versions of Unity.
+
 ### v1.8.0
 * Added MFi support through Apple's Game Controller framework for iOS and tvOS in the Native Input module. This will always be used when Native Input is enabled.
 * Added MFi support through Apple's Game Controller framework for macOS in the Native Input module. This is currently BETA and must be explicitly enabled.

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace UnityStandardAssets.Vehicles.Aeroplane
@@ -35,7 +34,7 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
         private void Update()
         {
             // Rotate the propellor model at a rate proportional to the throttle.
-            m_PropellorModel.Rotate(0, m_MaxRpm*m_Plane.Throttle*Time.deltaTime*k_RpmToDps, 0);
+            m_PropellorModel.Rotate(0, m_MaxRpm * m_Plane.Throttle * Time.deltaTime * k_RpmToDps, 0);
 
             // Create an integer for the new state of the blur textures.
             var newBlurState = 0;
@@ -44,7 +43,7 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
             if (m_Plane.Throttle > m_ThrottleBlurStart)
             {
                 var throttleBlurProportion = Mathf.InverseLerp(m_ThrottleBlurStart, m_ThrottleBlurEnd, m_Plane.Throttle);
-                newBlurState = Mathf.FloorToInt(throttleBlurProportion*(m_PropellorBlurTextures.Length - 1));
+                newBlurState = Mathf.FloorToInt(throttleBlurProportion * (m_PropellorBlurTextures.Length - 1));
             }
 
             // If the blur state has changed

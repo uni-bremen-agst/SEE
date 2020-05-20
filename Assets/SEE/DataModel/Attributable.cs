@@ -244,7 +244,7 @@ namespace SEE.DataModel
         /// <param name="left">left dictionary for the comparison</param>
         /// <param name="right">right dictionary for the comparison</param>
         /// <returns></returns>
-        protected static bool AreEqual<V>(Dictionary<string,V> left, Dictionary<string,V> right)
+        protected static bool AreEqual<V>(Dictionary<string, V> left, Dictionary<string, V> right)
         {
             return left.Count == right.Count && !left.Except(right).Any();
         }

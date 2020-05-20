@@ -32,50 +32,50 @@ namespace InControl.UnityDeviceProfiles
 				{
 					Name = "A",
 					Target = InputControlType.Action2,
-					Source = Button( 0 ),
+					Source = Button( 0 )
 				},
 				new InputControlMapping
 				{
 					Name = "B",
 					Target = InputControlType.Action1,
-					Source = Button( 1 ),
+					Source = Button( 1 )
 				},
 				new InputControlMapping
 				{
 					Name = "X",
 					Target = InputControlType.Action4,
-					Source = Button( 2 ),
+					Source = Button( 2 )
 				},
 				new InputControlMapping
 				{
 					Name = "Y",
 					Target = InputControlType.Action3,
-					Source = Button( 3 ),
+					Source = Button( 3 )
 				},
 				new InputControlMapping
 				{
 					Name = "L",
 					Target = InputControlType.LeftBumper,
-					Source = Button( 4 ),
+					Source = Button( 4 )
 				},
 				new InputControlMapping
 				{
 					Name = "R",
 					Target = InputControlType.RightBumper,
-					Source = Button( 5 ),
+					Source = Button( 5 )
 				},
 				new InputControlMapping
 				{
 					Name = "Select",
 					Target = InputControlType.Select,
-					Source = Button( 11 ),
+					Source = Button( 11 )
 				},
 				new InputControlMapping
 				{
 					Name = "Start",
 					Target = InputControlType.Start,
-					Source = Button( 10 ),
-				},
+					Source = Button( 10 )
+				}
 			};
 
 			AnalogMappings = new[]
@@ -86,7 +86,7 @@ namespace InControl.UnityDeviceProfiles
 					Target = InputControlType.DPadLeft,
 					Source = Analog( 0 ),
 					SourceRange = InputRangeType.ZeroToMinusOne,
-					TargetRange = InputRangeType.ZeroToOne,
+					TargetRange = InputRangeType.ZeroToOne
 				},
 				new InputControlMapping
 				{
@@ -94,7 +94,7 @@ namespace InControl.UnityDeviceProfiles
 					Target = InputControlType.DPadRight,
 					Source = Analog( 0 ),
 					SourceRange = InputRangeType.ZeroToOne,
-					TargetRange = InputRangeType.ZeroToOne,
+					TargetRange = InputRangeType.ZeroToOne
 				},
 				new InputControlMapping
 				{
@@ -102,7 +102,7 @@ namespace InControl.UnityDeviceProfiles
 					Target = InputControlType.DPadUp,
 					Source = Analog( 1 ),
 					SourceRange = InputRangeType.ZeroToMinusOne,
-					TargetRange = InputRangeType.ZeroToOne,
+					TargetRange = InputRangeType.ZeroToOne
 				},
 				new InputControlMapping
 				{
@@ -110,8 +110,8 @@ namespace InControl.UnityDeviceProfiles
 					Target = InputControlType.DPadDown,
 					Source = Analog( 1 ),
 					SourceRange = InputRangeType.ZeroToOne,
-					TargetRange = InputRangeType.ZeroToOne,
-				},
+					TargetRange = InputRangeType.ZeroToOne
+				}
 			};
 		}
 	}

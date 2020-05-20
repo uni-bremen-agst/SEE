@@ -146,7 +146,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 95745262}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 8.231146, y: -4, z: 0}
+  m_LocalPosition: {x: 4.2249293, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 949891151}
@@ -1173,6 +1173,7 @@ GameObject:
   - component: {fileID: 439613520}
   - component: {fileID: 439613519}
   - component: {fileID: 439613518}
+  - component: {fileID: 439613530}
   m_Layer: 0
   m_Name: GamepadPlayer
   m_TagString: MainCamera
@@ -1220,7 +1221,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Name: 
-  MouseButton: 0
+  SelectionMouseButton: 0
 --- !u!114 &439613521
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1233,6 +1234,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4876b4728ca1a1f4d9867dcdd2920755, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Speed: 0.1
 --- !u!114 &439613522
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1260,6 +1262,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Name: Scrollwheel
+  MouseButton: 1
 --- !u!114 &439613524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1332,6 +1335,7 @@ MonoBehaviour:
   directionDevice: {fileID: 439613524}
   viewpointDevice: {fileID: 439613518}
   selectionDevice: {fileID: 439613520}
+  transformationDevice: {fileID: 439613530}
   cameraAction: {fileID: 439613525}
   selectionAction: {fileID: 439613521}
 --- !u!81 &439613527
@@ -1399,6 +1403,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &439613530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 439613517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9514951335d02224f938b713d3ccb90f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: 
 --- !u!1 &450244759
 GameObject:
   m_ObjectHideFlags: 0
@@ -1726,6 +1743,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerInputType: 0
   HideVRControllers: 0
+  ShowControllerHints: 0
 --- !u!4 &797670734
 Transform:
   m_ObjectHideFlags: 0
@@ -1758,6 +1776,7 @@ GameObject:
   - component: {fileID: 874125996}
   - component: {fileID: 874125995}
   - component: {fileID: 874125994}
+  - component: {fileID: 874126004}
   m_Layer: 0
   m_Name: DesktopPlayer
   m_TagString: MainCamera
@@ -1777,6 +1796,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4876b4728ca1a1f4d9867dcdd2920755, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Speed: 0.1
 --- !u!20 &874125995
 Camera:
   m_ObjectHideFlags: 0
@@ -1833,7 +1853,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Name: 
-  MouseButton: 0
+  SelectionMouseButton: 0
 --- !u!114 &874125997
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1874,6 +1894,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Name: Scrollwheel
+  MouseButton: 1
 --- !u!114 &874126000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1945,6 +1966,7 @@ MonoBehaviour:
   directionDevice: {fileID: 874125997}
   viewpointDevice: {fileID: 874125998}
   selectionDevice: {fileID: 874125996}
+  transformationDevice: {fileID: 874126004}
   cameraAction: {fileID: 874126001}
   selectionAction: {fileID: 874125994}
 --- !u!4 &874126003
@@ -1961,6 +1983,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &874126004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 874125993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9514951335d02224f938b713d3ccb90f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: 
 --- !u!1 &949891148
 GameObject:
   m_ObjectHideFlags: 0
@@ -2357,6 +2392,7 @@ MonoBehaviour:
       Data: 
   PathPrefix: F:\develop\SEE\Data\GXL\animation-clones\
   origin: {x: 0, y: 0, z: 0}
+  width: 1
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
@@ -2386,6 +2422,7 @@ MonoBehaviour:
   ZScoreScale: 0
   EdgeWidth: 1
   ShowErosions: 0
+  MaxErosionWidth: 1
   EdgesAboveBlocks: 1
   Tension: 0.85
   RDP: 0.05
@@ -3634,6 +3671,7 @@ MonoBehaviour:
   directionDevice: {fileID: 1712072792}
   viewpointDevice: {fileID: 1712072791}
   selectionDevice: {fileID: 1712072787}
+  transformationDevice: {fileID: 1712072795}
   cameraAction: {fileID: 1712072788}
   selectionAction: {fileID: 1712072790}
 --- !u!114 &1712072787
@@ -3663,6 +3701,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0aaf563b479bff4e9f39f736ced3ddb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  KeepDirectionInPlane: 1
 --- !u!114 &1712072789
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3693,8 +3732,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1546c162f8d6ab3448f14b36f925dc2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colorOnHit: {r: 0, g: 1, b: 0, a: 1}
-  defaultColor: {r: 1, g: 0, b: 0, a: 1}
+  Speed: 0.1
+  rayWidth: 0.005
+  RayDistance: 5
+  colorOnSelectionHit: {r: 0, g: 1, b: 0, a: 1}
+  colorOnSelectionMissed: {r: 1, g: 0, b: 0, a: 1}
+  colorOnGrabbingHit: {r: 0, g: 0, b: 1, a: 1}
+  colorOnGrabbingMissed: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!114 &1712072791
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3736,6 +3780,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Name: 
+  boost: 1
 --- !u!114 &1712072794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3749,6 +3794,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Name: 
+--- !u!114 &1712072795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1712072782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae4223f4b252c74482c90911d4eea62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: 
+  LeftHand: {fileID: 1712072785}
+  RightHand: {fileID: 1712072784}
+  MinimalGestureTime: 0.1
+  FingerStretchedThreshold: 0.15
+  FingerClosedThreshold: 0.8
 --- !u!1 &1726082359
 GameObject:
   m_ObjectHideFlags: 0
@@ -3774,7 +3837,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1726082359}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.231146, y: -4, z: 0}
+  m_LocalPosition: {x: -4.2249293, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 949891151}
@@ -4257,6 +4320,7 @@ MonoBehaviour:
       Data: 
   PathPrefix: F:\develop\SEE\Data\GXL\animation-clones\
   origin: {x: 0, y: 500, z: 0}
+  width: 1
   WidthMetric: Metric.Number_of_Tokens
   HeightMetric: Metric.Clone_Rate
   DepthMetric: Metric.LOC
@@ -4286,6 +4350,7 @@ MonoBehaviour:
   ZScoreScale: 0
   EdgeWidth: 1
   ShowErosions: 0
+  MaxErosionWidth: 1
   EdgesAboveBlocks: 1
   Tension: 0.85
   RDP: 0.05

@@ -7,18 +7,17 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+namespace Leap.Unity
+{
 
-namespace Leap.Unity {
+    public static class Type<T>
+    {
+        public static readonly bool isValueType;
 
-  public static class Type<T> {
-    public static readonly bool isValueType;
-
-    static Type() {
-      isValueType = typeof(T).IsValueType;
+        static Type()
+        {
+            isValueType = typeof(T).IsValueType;
+        }
     }
-  }
 
 }

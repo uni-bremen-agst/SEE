@@ -68,8 +68,8 @@ namespace InControl
 			{
 				major = 1,
 				minor = 8,
-				patch = 0,
-				build = 9351
+				patch = 1,
+				build = 9354
 			};
 		}
 
@@ -80,7 +80,7 @@ namespace InControl
 		/// <returns>The current version of Unity.</returns>
 		public static VersionInfo UnityVersion()
 		{
-			var match = Regex.Match( Application.unityVersion, @"^(\d+)\.(\d+)\.(\d+)f(\d+)" );
+			var match = Regex.Match( Application.unityVersion, @"^(\d+)\.(\d+)\.(\d+)[a-zA-Z](\d+)" );
 			return new VersionInfo
 			{
 				major = Convert.ToInt32( match.Groups[1].Value ),

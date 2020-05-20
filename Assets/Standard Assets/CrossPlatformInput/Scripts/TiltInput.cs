@@ -61,30 +61,30 @@ namespace UnityStandardAssets.CrossPlatformInput
                 switch (tiltAroundAxis)
                 {
                     case AxisOptions.ForwardAxis:
-                        angle = Mathf.Atan2(Input.acceleration.x, -Input.acceleration.y)*Mathf.Rad2Deg +
+                        angle = Mathf.Atan2(Input.acceleration.x, -Input.acceleration.y) * Mathf.Rad2Deg +
                                 centreAngleOffset;
                         break;
                     case AxisOptions.SidewaysAxis:
-                        angle = Mathf.Atan2(Input.acceleration.z, -Input.acceleration.y)*Mathf.Rad2Deg +
+                        angle = Mathf.Atan2(Input.acceleration.z, -Input.acceleration.y) * Mathf.Rad2Deg +
                                 centreAngleOffset;
                         break;
                 }
             }
 
-            float axisValue = Mathf.InverseLerp(-fullTiltAngle, fullTiltAngle, angle)*2 - 1;
+            float axisValue = Mathf.InverseLerp(-fullTiltAngle, fullTiltAngle, angle) * 2 - 1;
             switch (mapping.type)
             {
                 case AxisMapping.MappingType.NamedAxis:
                     m_SteerAxis.Update(axisValue);
                     break;
                 case AxisMapping.MappingType.MousePositionX:
-                    CrossPlatformInputManager.SetVirtualMousePositionX(axisValue*Screen.width);
+                    CrossPlatformInputManager.SetVirtualMousePositionX(axisValue * Screen.width);
                     break;
                 case AxisMapping.MappingType.MousePositionY:
-                    CrossPlatformInputManager.SetVirtualMousePositionY(axisValue*Screen.width);
+                    CrossPlatformInputManager.SetVirtualMousePositionY(axisValue * Screen.width);
                     break;
                 case AxisMapping.MappingType.MousePositionZ:
-                    CrossPlatformInputManager.SetVirtualMousePositionZ(axisValue*Screen.width);
+                    CrossPlatformInputManager.SetVirtualMousePositionZ(axisValue * Screen.width);
                     break;
             }
         }
@@ -101,7 +101,7 @@ namespace UnityStandardAssets.CrossPlatformInput
 namespace UnityStandardAssets.CrossPlatformInput.Inspector
 {
 #if UNITY_EDITOR
-    [CustomPropertyDrawer(typeof (TiltInput.AxisMapping))]
+    [CustomPropertyDrawer(typeof(TiltInput.AxisMapping))]
     public class TiltInputAxisStylePropertyDrawer : PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -116,18 +116,18 @@ namespace UnityStandardAssets.CrossPlatformInput.Inspector
             var indent = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0;
 
-            var props = new[] {"type", "axisName"};
-            var widths = new[] {.4f, .6f};
+            var props = new[] { "type", "axisName" };
+            var widths = new[] { .4f, .6f };
             if (property.FindPropertyRelative("type").enumValueIndex > 0)
             {
                 // hide name if not a named axis
-                props = new[] {"type"};
-                widths = new[] {1f};
+                props = new[] { "type" };
+                widths = new[] { 1f };
             }
             const float lineHeight = 18;
             for (int n = 0; n < props.Length; ++n)
             {
-                float w = widths[n]*inspectorWidth;
+                float w = widths[n] * inspectorWidth;
 
                 // Calculate rects
                 Rect rect = new Rect(x, y, w, lineHeight);

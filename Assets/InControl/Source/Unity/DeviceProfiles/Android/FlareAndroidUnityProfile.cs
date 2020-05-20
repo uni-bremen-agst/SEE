@@ -19,7 +19,7 @@ namespace InControl.UnityDeviceProfiles
 
 			IncludePlatforms = new[]
 			{
-				"Android",
+				"Android"
 			};
 
 			Matchers = new[] { new InputDeviceMatcher { NameLiteral = "MTK BT HID" } };
@@ -66,13 +66,13 @@ namespace InControl.UnityDeviceProfiles
 				{
 					Name = "Left Trigger",
 					Target = InputControlType.LeftTrigger,
-					Source = Button( 6 ),
+					Source = Button( 6 )
 				},
 				new InputControlMapping
 				{
 					Name = "Right Trigger",
 					Target = InputControlType.RightTrigger,
-					Source = Button( 7 ),
+					Source = Button( 7 )
 				},
 				new InputControlMapping
 				{

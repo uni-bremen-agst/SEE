@@ -36,7 +36,7 @@ namespace InControl.UnityDeviceProfiles
 					Name = "A",
 					Target = InputControlType.Action1,
 					Source = Button( 0 )
-				},
+				}
 			};
 
 			AnalogMappings = new[]
@@ -44,7 +44,7 @@ namespace InControl.UnityDeviceProfiles
 				DPadLeftMapping( 4 ),
 				DPadRightMapping( 4 ),
 				DPadUpMapping( 5 ),
-				DPadDownMapping( 5 ),
+				DPadDownMapping( 5 )
 			};
 		}
 	}

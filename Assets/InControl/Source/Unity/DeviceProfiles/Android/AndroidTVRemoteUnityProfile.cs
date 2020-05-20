@@ -42,7 +42,7 @@ namespace InControl.UnityDeviceProfiles
 					Name = "Back",
 					Target = InputControlType.Back,
 					Source = EscapeKey
-				},
+				}
 			};
 
 			AnalogMappings = new[]
@@ -50,7 +50,7 @@ namespace InControl.UnityDeviceProfiles
 				DPadLeftMapping( 4 ),
 				DPadRightMapping( 4 ),
 				DPadUpMapping( 5 ),
-				DPadDownMapping( 5 ),
+				DPadDownMapping( 5 )
 			};
 		}
 	}

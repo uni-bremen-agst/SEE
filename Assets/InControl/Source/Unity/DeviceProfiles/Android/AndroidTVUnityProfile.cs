@@ -90,7 +90,7 @@ namespace InControl.UnityDeviceProfiles
 					Name = "Back",
 					Target = InputControlType.Back,
 					Source = EscapeKey
-				},
+				}
 			};
 
 			AnalogMappings = new[]
@@ -121,7 +121,7 @@ namespace InControl.UnityDeviceProfiles
 					Name = "Right Trigger",
 					Target = InputControlType.RightTrigger,
 					Source = Analog( 7 )
-				},
+				}
 			};
 		}
 	}

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace UnityStandardAssets.CrossPlatformInput
@@ -7,11 +6,11 @@ namespace UnityStandardAssets.CrossPlatformInput
     {
         public string axis;
 
-	    void Update() { }
+        void Update() { }
 
-	    public void HandleInput(float value)
+        public void HandleInput(float value)
         {
-            CrossPlatformInputManager.SetAxis(axis, (value*2f) - 1f);
+            CrossPlatformInputManager.SetAxis(axis, (value * 2f) - 1f);
         }
     }
 }

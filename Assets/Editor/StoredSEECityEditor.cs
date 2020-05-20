@@ -1,9 +1,9 @@
 ﻿using UnityEditor;
 using SEE.Game;
-using SEE;
 using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
+using SEE.Utils;
 
 namespace SEEEditor
 {
