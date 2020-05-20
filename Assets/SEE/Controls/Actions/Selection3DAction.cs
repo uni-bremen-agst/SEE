@@ -139,10 +139,5 @@ namespace SEE.Controls
         {
             return new Ray(selectionDevice.Position, selectionDevice.Direction);
         }
-
-        protected override Vector3 GrabbingRayStart()
-        {
-            return selectionDevice.Position;
-        }
     }
 }
