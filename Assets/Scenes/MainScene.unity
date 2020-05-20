@@ -1608,7 +1608,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcc1cedcf0a20b04ca3d2bb78035f3cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInputType: 1
+  playerInputType: 0
   HideVRControllers: 1
   ShowControllerHints: 0
 --- !u!4 &1510433995
