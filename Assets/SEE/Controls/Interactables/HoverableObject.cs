@@ -1,5 +1,7 @@
 ﻿using SEE.DataModel;
 using SEE.GO;
+using SEE.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -80,24 +82,17 @@ namespace SEE.Controls
                 // Now textOnPaper has been re-sized properly; so we can derive its absolute height.
                 float paperHeight = TextGUIAndPaperResizer.Height(textOnPaper);
 
-                // Absolute height of the gameObject.
-                Renderer renderer = GetComponent<Renderer>();
-                float gameObjectHeight = renderer != null ? renderer.bounds.size.y : 0;
-
-                //// We put the textOnPaper above the center of roof the gameObject.
+                // We want to put the label above the roof of the gameObject. The gameObject,
+                // however, could be composed of multiple child objects of different height
+                // (e.g., an inner node which typically has a very low height because it is
+                // visualized as an area, but the area contains many child objects).
+                // That is why we gather the roof of the complete object hierarchy rooted
+                // by gameObject.
                 Vector3 position = transform.position; // absolute world co-ordinates of center
-                position.y += (gameObjectHeight + paperHeight) / 2.0f;
+                position.y = BoundingBox.GetRoof(GameObjectHierarchy.Descendants(gameObject, Tags.Node)) + paperHeight / 2.0f;
                 textOnPaper.transform.position = position;
 
                 textOnPaper.transform.SetParent(gameObject.transform);
-
-                // Note: Here is alternative way to put textOnPaper above the roof of gameObject
-                // using co-ordinates relative to textOnPaper. This works but textOnPaper becomes 
-                // simply too small.
-                //   textOnPaper.transform.SetParent(gameObject.transform, false);
-                //   Vector3 localPosition = Vector3.zero;
-                //   localPosition.y = 0.5f + textOnPaper.transform.localScale.y / 2.0f;
-                //   textOnPaper.transform.localPosition = localPosition;
             }
             textOnPaper.SetActive(true);
         }
