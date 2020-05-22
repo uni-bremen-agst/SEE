@@ -10,6 +10,7 @@ namespace SEE.DataModel
     {
         public int EdgeLength = CoseLayoutSettings.Edge_Length;
         public bool UseSmartIdealEdgeCalculation = CoseLayoutSettings.Use_Smart_Ideal_Edge_Calculation;
+        public bool UseSmartMultilevelScaling = CoseLayoutSettings.Use_Smart_Multilevel_Calculation;
         public float PerLevelIdealEdgeLengthFactor = CoseLayoutSettings.Per_Level_Ideal_Edge_Length_Factor;
         public bool Incremental = CoseLayoutSettings.Incremental;
         public bool UseSmartRepulsionRangeCalculation = CoseLayoutSettings.Use_Smart_Repulsion_Range_Calculation;
@@ -26,6 +27,8 @@ namespace SEE.DataModel
         public bool useOptAlgorithm = false;
         public bool showGraphListing = true;
         public Dictionary<string, bool> loadedForNodeTypes = new Dictionary<string, bool>();
+        public bool useCalculationParameter = false;
+        public bool useItertivCalclation = false; 
     }
 }
 

@@ -216,7 +216,7 @@ namespace SEE.Game
                     List<SublayoutLayoutNode> sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
                     foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
                     {
-                        Sublayout sublayout = new Sublayout(layoutNode, groundLevel, leafNodeFactory, graph);
+                        Sublayout sublayout = new Sublayout(layoutNode, groundLevel, leafNodeFactory, graph, settings);
                         sublayout.Layout();
                     }
 

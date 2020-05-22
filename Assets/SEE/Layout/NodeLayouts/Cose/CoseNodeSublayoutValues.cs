@@ -9,14 +9,13 @@ namespace SEE.Layout
     public class CoseNodeSublayoutValues
     {
         /// <summary>
-        /// the bounds of the node relative to its sublayout root 
+        /// the scale of the calculated sublayout. If the node layout is not enclosing all its childnodes, the position and scale of the root node will be adaped.
         /// </summary>
-        //public Rect relativeRect = new Rect(0, 0, 0, 0);
-
-        /// TODO, raucht man glab ich nicht, außer vielleicht für das evostreet?
         private Vector3 relativeScale;
 
-        /// TODO
+        /// <summary>
+        /// the centerposition of the calculated sublayout. If the node layout is not enclosing all its childnodes, the position and scale of the root node will be adaped.
+        /// </summary>
         private Vector3 relativeCenterPosition;
 
         /// <summary>
@@ -35,7 +34,7 @@ namespace SEE.Layout
         private CoseNode subLayoutRoot = null;
 
         /// <summary>
-        /// 
+        /// is the node is sublayoutRoot, the sublayout if this node 
         /// </summary>
         private Sublayout sublayout;
 
@@ -47,10 +46,10 @@ namespace SEE.Layout
         public Vector3 RelativeCenterPosition { get => relativeCenterPosition; set => relativeCenterPosition = value; }
 
         /// <summary>
-        /// 
+        /// Set the given x/ z position the the relative centerPosition
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="z"></param>
+        /// <param name="x">x value</param>
+        /// <param name="z">z value</param>
         public void SetLocationRelative(float x, float z)
         {
             relativeCenterPosition.x = x;
@@ -60,10 +59,8 @@ namespace SEE.Layout
         /// <summary>
         /// updates the relative bounding rect
         /// </summary>
-        /// <param name="left">the left position</param>
-        /// <param name="right">the right position</param>
-        /// <param name="top">the top position</param>
-        /// <param name="bottom">the bottom position</param>
+        /// <param name="scale">the scale</param>
+        /// <param name="position">the centerPosition</param>
         public void UpdateRelativeBounding(Vector3 scale, Vector3 position)
         {
             relativeScale = scale;

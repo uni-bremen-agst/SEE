@@ -20,7 +20,7 @@ namespace SEE.Layout
         private ILayoutNode nodeObject;
 
         /// <summary>
-        /// TODO
+        /// indicates whether this node is connected/ parent graph is connected
         /// </summary>
         private bool isConnected = true;
 
@@ -39,19 +39,26 @@ namespace SEE.Layout
         /// </summary>
         private List<CoseEdge> edges = new List<CoseEdge>();
 
-        /// TODO
+        /// <summary>
+        /// the scale of this node
+        /// </summary>
         private Vector3 scale;
 
-        /// TODO
-        private Vector3 centerPosition; 
+        /// <summary>
+        /// the centerPosition of this node
+        /// </summary>
+        private Vector3 centerPosition;
 
+        /// <summary>
+        /// the extend of this node
+        /// </summary>
         public Vector3 Extend
         {
             get => scale / 2;
         }
 
         /// <summary>
-        /// TODO
+        /// the sublayout values
         /// </summary>
         private CoseNodeSublayoutValues sublayoutValues = new CoseNodeSublayoutValues();
 
@@ -61,7 +68,7 @@ namespace SEE.Layout
         private double estimatedSize = Mathf.NegativeInfinity;
 
         /// <summary>
-        /// TODO
+        /// the layout value
         /// </summary>
         private CoseNodeLayoutValues layoutValues = new CoseNodeLayoutValues();
 
@@ -76,7 +83,7 @@ namespace SEE.Layout
         private int noOfChildren;
 
         /// <summary>
-        /// TODO
+        /// the inclusion tree depth
         /// </summary>
         private int inclusionTreeDepth = int.MaxValue;
 
@@ -94,9 +101,6 @@ namespace SEE.Layout
         public int InclusionTreeDepth { get => inclusionTreeDepth; set => inclusionTreeDepth = value; }
         public Vector3 Scale { get => scale; set => scale = value; }
         public Vector3 CenterPosition { get => centerPosition; set => centerPosition = value; }
-
-
-
 
         /// <summary>
         /// Constructor
@@ -154,8 +158,8 @@ namespace SEE.Layout
         /// <summary>
         /// Returns a list with this nodes and its children nodes
         /// </summary>
-        /// <param name="withOwner"></param>
-        /// <returns></returns>
+        /// <param name="withOwner">if tue the owner nodes are also added</param>
+        /// <returns>a list with this nodes and its children nodes</returns>
         public List<CoseNode> WithChildren(bool withOwner = true)
         {
             List<CoseNode> withNeighbors = new List<CoseNode>();
@@ -197,11 +201,11 @@ namespace SEE.Layout
                 layoutValues.DisplacementY = (float) maxNodeDisplacement * CoseHelper.Sign(layoutValues.DisplacementY);
             }
 
-            if (child == null && !sublayoutValues.IsSubLayoutNode) // TODO here maybe
+            if (child == null && !sublayoutValues.IsSubLayoutNode)
             {
                 MoveBy(layoutValues.DisplacementX, layoutValues.DisplacementY);
             }
-            else if (child.Nodes.Count == 0 && !sublayoutValues.IsSubLayoutNode) // todo here maybe 
+            else if (child.Nodes.Count == 0 && !sublayoutValues.IsSubLayoutNode)
             {
                 MoveBy(layoutValues.DisplacementX, layoutValues.DisplacementY);
             }
@@ -219,11 +223,6 @@ namespace SEE.Layout
                     }
                 }
 
-            }
-
-            if (float.IsNaN(layoutValues.DisplacementX))
-            {
-                Debug.Log("");
             }
 
             layout.CoseLayoutSettings.TotalDisplacement += (decimal)(Math.Abs(layoutValues.DisplacementX) + Math.Abs(layoutValues.DisplacementY));
@@ -342,7 +341,7 @@ namespace SEE.Layout
         /// <summary>
         /// Return wheather the node is a leaf node
         /// </summary>
-        /// <returns></returns>
+        /// <returns>true if the node is a leaf node</returns>
         public bool IsLeaf()
         {
             return child == null || child.Nodes.Count == 0;
@@ -351,7 +350,7 @@ namespace SEE.Layout
         /// <summary>
         /// Calculates the number of children
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the number of children</returns>
         public int CalcNumberOfChildren()
         {
             int noOfChildren = 0;
@@ -378,15 +377,14 @@ namespace SEE.Layout
 
 
         /// <summary>
-        /// Sets the node to the given Location
+        /// Sets the node to the given center Location
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public void SetLocation(float x, float y)
+        /// <param name="x">x position</param>
+        /// <param name="z">z position</param>
+        public void SetLocation(float x, float z)
         {
             centerPosition.x = x;
-            centerPosition.z = y;
-            //rect.position = new Vector2(x, y);
+            centerPosition.z = z;
         }
 
         /// <summary>
@@ -427,38 +425,20 @@ namespace SEE.Layout
                 child.UpdateBounds(true);
 
                 centerPosition.x = child.LeftFrontCorner.x + child.Extend.x;
-                centerPosition.z = child.RightBackCorner.y + child.Extend.z; 
+                centerPosition.z = child.RightBackCorner.y + child.Extend.z;
 
-                //centerPosition.x = (float)(child.Left + ((child.Right - child.Left) / 2));
-                //centerPosition.z = (float)(child.Top + ((child.Bottom - child.Top) / 2));
-
-                SetWidth(child.Scale.x + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);//+ (2 * CoseDefaultValues.COMPOUND_NODE_MARGIN)); //+ diffWidth);
-                SetHeight(child.Scale.z + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);// + (2 * CoseDefaultValues.COMPOUND_NODE_MARGIN)); // + diffHeight);
-
-                //centerPosition.x = child.Left.x - CoseLayoutSettings.Compound_Node_Margin;
-                //centerPosition.z = child.CenterPosition.z - CoseLayoutSettings.Compound_Node_Margin;
-
-                // float width = childGraph.Right - childGraph.Left / Mathf.Sqrt(2);
-                // float height = childGraph.Bottom - childGraph.Top / Mathf.Sqrt(2);
-
-                //float diffWidth = Mathf.Abs(width - rect.width);
-                // float diffHeight = Mathf.Abs(height - rect.height);
-
-                // Here add Labelheight etc. 
-
-
-
-
+                SetWidth(child.Scale.x + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);
+                SetHeight(child.Scale.z + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);
             }
         }
 
         /// <summary>
         /// Sets the grid start/ end coorinates for this node
         /// </summary>
-        /// <param name="_startX"></param>
-        /// <param name="_finishX"></param>
-        /// <param name="_startY"></param>
-        /// <param name="_finishY"></param>
+        /// <param name="_startX">start x</param>
+        /// <param name="_finishX">finish x</param>
+        /// <param name="_startY">start y</param>
+        /// <param name="_finishY">finish y</param>
         public void SetGridCoordinates(int startX, int finishX, int startY, int finishY)
         {
             layoutValues.StartX = startX;
@@ -517,10 +497,8 @@ namespace SEE.Layout
         /// <summary>
         /// updates the bounding rect of the node
         /// </summary>
-        /// <param name="left">the left position</param>
-        /// <param name="right">the right position</param>
-        /// <param name="top">the top position</param>
-        /// <param name="bottom">the bottom position</param>
+        /// <param name="position">the center position</param>
+        /// <param name="scale">the scale</param>
         public void UpdateBounding(Vector2 position, Vector2 scale)
         {
             this.scale = scale;
@@ -572,6 +550,10 @@ namespace SEE.Layout
             return centerPosition.x - Scale.x / 2;
         }
 
+        /// <summary>
+        /// Returns the left front corner of this node as a 2D Vector
+        /// </summary>
+        /// <returns>left front corner</returns>
         public Vector2 GetLeftFrontCorner()
         {
             Vector2 leftLowerCorner = new Vector2()
@@ -582,6 +564,10 @@ namespace SEE.Layout
             return leftLowerCorner;
         }
 
+        /// <summary>
+        /// Returns the right back corner of this node as a 2D Vector
+        /// </summary>
+        /// <returns>right back corner</returns>
         public Vector2 GetRightBackCorner()
         {
             Vector2 rightBackCorner = new Vector2()

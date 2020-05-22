@@ -132,6 +132,11 @@ namespace SEE.Layout
         public static bool Automatic_Parameter_Calculation = false;
 
         /// <summary>
+        /// TODO
+        /// </summary>
+        public static bool Iterativ_Parameter_Calculation = false; 
+
+        /// <summary>
         /// the cooling factor
         /// </summary>
         private float coolingFactor;
