@@ -8,16 +8,229 @@ using SEE.GO;
 namespace SEE.Game
 {
     /// <summary>
-    /// A behaviour component that can be attached to a node representing a
-    /// code city in order to zoom into it.
+    /// Manages zooming for composite nodes tagged by Tags.Node.
     /// </summary>
-    //[RequireComponent(typeof(AbstractSEECity))]
-    public class Transformer : MonoBehaviour
+    public class Transformer
     {
+        /// <summary>
+        /// Name of the method of the caller of ZoomInto or ZoomRoot to be
+        /// called when those function's animations have finished. This
+        /// method will be called via GameObject.SendMessage(). As a
+        /// consequence, it will be received only by all MonoBehaviours
+        /// of the caller game object.
+        /// </summary>
+        private const string OnZoomingComplete = "OnZoomingComplete";
 
+        /// <summary>
+        /// Name of the method of the caller of ZoomOutOf to be
+        /// called when ZoomOutOf's animations have finished. This
+        /// method will be called via GameObject.SendMessage(). As a
+        /// consequence, it will be received only by all MonoBehaviours
+        /// of the caller game object. The signature of this method
+        /// is assumed to be as follows:
+        /// 
+        ///  void OnZoomingOutComplete(Transformer transfomer)
+        /// 
+        /// When the caller receives this notification, it is expected
+        /// to call transfomer.FinalizeZoomOut() to finalize resetting
+        /// the positions of all objects previously hidden.
+        /// </summary>
+        private const string OnZoomingOutComplete = "OnZoomingOutComplete";
+
+        /// <summary>
+        /// Zooms into the given <paramref name="gameObject"/>, that is, all ascendants
+        /// and their respective descendants are hidden and <paramref name="gameObject"/>
+        /// and its descendants are scaled up and relocated so that they occupy the
+        /// complete space originally available for the whole game-object tree when 
+        /// any of the game objects of that game-object tree was zoomed into.
+        /// </summary>
+        /// <param name="caller">the caller of this method to be notified when
+        /// the zooming is finished; the parameter-less message "OnZoomingComplete" 
+        /// will be used for the notification</param>
+        /// <param name="gameObject">the object to be zoomed into</param>
+        public static void ZoomInto(GameObject caller, GameObject gameObject)
+        {
+
+            Transformer transformer = GetTransformer(gameObject);
+            if (transformer != null)
+            {
+                transformer.ZoomIn(caller, gameObject);
+            }
+            else
+            {
+                caller.SendMessage(OnZoomingComplete);
+            }
+        }
+
+        /// <summary>
+        /// Restores the top-level view of the game-object hierarchy the given <paramref name="gameObject"/>
+        /// belongs to.
+        /// Note: <paramref name="gameObject"/> is used only to determine the node hierarchy
+        /// where we want to zoom out. It is not necessarily the root of this hierarchy.
+        /// </summary>
+        /// <param name="caller">the caller of this method to be notified when
+        /// the zooming is finished; the parameter-less message "OnZoomingComplete" 
+        /// will be used for the notification</param>
+        /// <param name="gameObject">the node used to identify the game-object hierarchy
+        /// in which we are zooming</param>
+        public static void ZoomRoot(GameObject caller, GameObject gameObject)
+        {
+            Transformer transformer = GetTransformer(gameObject);
+            if (transformer != null)
+            {
+                transformer.ZoomToTopLevel(caller);
+            }
+            else
+            {
+                caller.SendMessage(OnZoomingComplete);
+            }
+        }
+
+        /// <summary>
+        /// Zooms out of the node that was last zoomed in, that is, for which ZoomInto()
+        /// was called last in the game-object hierarchy the given <paramref name="gameObject"/>
+        /// is contained in. 
+        /// Note: <paramref name="gameObject"/> is used only to determine the node hierarchy
+        /// where we want to zoom out. It is not necessarily the node being zoomed out.
+        /// 
+        /// Let N be the node we want to zoom out. Zooming out of N means to restore the 
+        /// scales and positions of all nodes in the game-object hierarchy that were visible 
+        /// just before we zoomed into N.
+        /// 
+        /// The caller will receive a OnZoomingOutComplete(Transformer) notification when all 
+        /// animations have finished. The signature of this method is assumed to be as follows:
+        /// 
+        ///  void OnZoomingOutComplete(Transformer transfomer)
+        /// 
+        /// When the caller receives this notification, it is expected
+        /// to call transfomer.FinalizeZoomOut() to finalize resetting
+        /// the positions of all objects previously hidden.
+        /// </summary>
+        /// <param name="caller">the caller of this method to be notified when
+        /// the zooming is finished; the parameter-less message "OnZoomingOutComplete" 
+        /// will be used for the notification</param>
+        /// <param name="gameObject">the node used to identify the game-object hierarchy
+        /// in which we are zooming</param>
+        public static void ZoomOutOf(GameObject caller, GameObject gameObject)
+        {
+            Transformer transformer = GetTransformer(gameObject);
+            if (transformer != null)
+            {
+                transformer.ZoomOut(caller);
+            }
+            else
+            {
+                caller.SendMessage(OnZoomingComplete);
+            }
+        }
+
+        /// <summary>
+        /// This method will be called by iTween when the animation triggered in ZoomOut()
+        /// is completed.
+        /// </summary>
+        /// <param name="caller">the original caller of the zooming request to be notified when
+        /// the zooming is finished; the parameter-less message "OnZoomingComplete" 
+        /// will be used for the notification</param>        
+        public void FinalizeZoomOut()
+        {
+            Debug.Log("FinalizeZoomOut()\n");
+            // This is the memento of the current focus.
+            ObjectMemento memento = activeAscendants.Pop();
+            Debug.Assert(memento.Node == focus);
+
+            Debug.LogFormat("Final transform result {0}: [{1} {2}]\n",
+                            memento.Node.name,
+                            memento.Node.transform.position, memento.Node.transform.localScale);
+            memento.Reset();
+            // The current focus node has now its previous scale and position within its ascendant.
+            ObjectMemento newFocusMemento = activeAscendants.Peek();
+            GameObject newFocus = newFocusMemento.Node;
+
+            // All elements in the subtree rooted by newFocus will be visible next
+            // (no matter how they are tagged).
+            Unhide(GameObjectHierarchy.Descendants(newFocus));
+            focus = newFocus;
+        }
+
+        /// <summary>
+        /// Returns a Transformer instance responsible for the given <paramref name="gameObject"/>.
+        /// If no such Transformer instance has existed yet, it will be created, added to 
+        /// responsibleTransformer, and returned. May return null if <paramref name="gameObject"/>
+        /// and none of its ascendants is tagged by Tags.Node.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <returns>responsible transformer or null</returns>
+        private static Transformer GetTransformer(GameObject gameObject)
+        {
+            GameObject root = Root(gameObject);
+            Debug.LogFormat("focus {0} root {1}\n", gameObject.name, root.name);
+            if (root != null)
+            {
+                if (!responsibleTransformer.TryGetValue(root, out Transformer transformer))
+                {
+                    // If we do not yet have a responsible transformer, we will create
+                    // one on demand.
+                    transformer = new Transformer(root);
+                    responsibleTransformer[root] = transformer;
+                }
+                return transformer;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// A mapping of root nodes tagged by Tags.Node onto the Transformer
+        /// instance handling its zooming. Because we could have multiple composite
+        /// objects we want to zoom in and out, we store the Transformer
+        /// instances responsible for those here in this mapping.
+        /// </summary>
+        private static Dictionary<GameObject, Transformer> responsibleTransformer 
+            = new Dictionary<GameObject, Transformer>();
+
+        /// <summary>
+        /// Searches in all ascendants of given <paramref name="gameObject"/> for the 
+        /// farthest game object that is tagged by Tags.Node. If no such node
+        /// exists, null is returned.
+        /// </summary>
+        private static GameObject Root(GameObject gameObject)
+        {
+            GameObject result = gameObject;
+            while (result.transform.parent != null 
+                   && result.transform.parent.gameObject.CompareTag(Tags.Node))
+            {
+                result = result.transform.parent.gameObject;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// The game object in the game-object hierarchy that is currently 
+        /// shown along with it descendants.
+        /// </summary>
         private GameObject focus;
 
-        private bool animationIsRunning = false;
+        /// ----------------------------------------------------------------------------------------------
+        /// Start up
+        /// ----------------------------------------------------------------------------------------------
+        private Transformer(GameObject root)
+        {
+            focus = root;
+            activeAscendants.Push(new ObjectMemento(focus));
+            // We store the states of only those descendants that are tagged by Tags.Node
+            // because only their absolute position and scale will be changed. There may be
+            // other kinds of descendants such as erosion indicators or labels but since
+            // their scale and position is relative to a game object tagged by Tags.Node
+            // they will adjust along with their parent. 
+            ICollection<GameObject> descendants = GameObjectHierarchy.Descendants(focus, Tags.Node);
+            initialTransforms = GetMementos(descendants);
+            // Similarly, only the descands tagged by Tags.Node are relevant for calculating
+            // the bounding box. We assume that all other kinds of game objects in this game-object
+            // hierarchy are visualized above the nodes. The bounding box is the area in the x/z plane.
+            BoundingBox.Get(descendants, out initalLeftLowerCorner, out initialRightUpperCorner);
+        }
 
         /// ----------------------------------------------------------------------------------------------
         /// Initial state
@@ -58,15 +271,6 @@ namespace SEE.Game
         // All descendants of gameObject tagged by Tags.Node.
         private Dictionary<string, ObjectMemento> initialTransforms;
 
-        public void ResetAll()
-        {
-            foreach (ObjectMemento memento in initialTransforms.Values)
-            {
-                memento.Reset();
-                Show(memento.Node, true);
-            }
-        }
-
         private void Reset(ICollection<GameObject> gameObjects)
         {
             foreach (GameObject go in gameObjects)
@@ -92,46 +296,10 @@ namespace SEE.Game
         }
 
         /// ----------------------------------------------------------------------------------------------
-        /// Start up
-        /// ----------------------------------------------------------------------------------------------
-        private void Start()
-        {       
-            focus = GetRootNode(gameObject);
-            activeAscendants.Push(new ObjectMemento(focus));
-            ICollection<GameObject> descendants = Descendants(focus);
-            initialTransforms = GetMementos(descendants);
-            BoundingBox.Get(descendants, out initalLeftLowerCorner, out initialRightUpperCorner);
-        }
-
-        /// ----------------------------------------------------------------------------------------------
         /// Hierarchy
         /// ----------------------------------------------------------------------------------------------
-        /// 
-        private GameObject GetRootNode(GameObject parent)
-        {
-            GameObject result = null;
-            foreach (Transform child in parent.transform)
-            {
-                if (child.gameObject.tag == Tags.Node)
-                {
-                    if (result != null)
-                    {
-                        Debug.LogErrorFormat("Root node of {0} is not unique: {1} and {2}", parent.name, result.name, child.gameObject.name);
-                    }
-                    else
-                    {
-                        result = child.gameObject;
-                    }
-                }
-            }
-            if (result == null)
-            {
-                Debug.LogErrorFormat("Object {0} has no root.\n", parent.name);
-            }
-            return result;
-        }
 
-        private int GetDepth(GameObject parent)
+        private static int GetDepth(GameObject parent)
         {
             int maxLevel = 0;
             foreach (Transform child in parent.transform)
@@ -148,77 +316,79 @@ namespace SEE.Game
             return maxLevel + 1;
         }
 
+        /// ----------------------------------------------------------------------------------------------
+        /// Zooming home to the top level.
+        /// ----------------------------------------------------------------------------------------------
+        
         /// <summary>
-        /// Returns all descendants of given <paramref name="parent"/> including
-        /// <paramref name="parent"/> (no matter whether they are tagged by Tags.Node
-        /// or not).
-        /// 
-        /// Precondition: <paramref name="parent"/> is tagged by Tags.Node.
+        /// Resets all game objects to their original state and shows them.
+        /// That means, we showing the top level again.
         /// </summary>
-        /// <param name="parent">the root of the subtree to be returned</param>
-        /// <returns>all descendants</returns>
-        private static HashSet<GameObject> Descendants(GameObject parent)
+        private void ZoomToTopLevel(GameObject caller)
         {
-            // all descendants of gameObject including parent
-            HashSet<GameObject> descendants = new HashSet<GameObject>();
-
-            // collect all descendants (non-recursively)
-            Stack<GameObject> toBeVisited = new Stack<GameObject>();
-            toBeVisited.Push(parent);
-            while (toBeVisited.Count > 0)
+            foreach (ObjectMemento memento in initialTransforms.Values)
             {
-                GameObject current = toBeVisited.Pop();
-                descendants.Add(current);
-                foreach (Transform child in current.transform)
-                {
-                    toBeVisited.Push(child.gameObject);
-                }
+                memento.Reset();
+                Show(memento.Node, true);
             }
-            return descendants;
+            caller.SendMessage(OnZoomingComplete);
         }
 
         /// ----------------------------------------------------------------------------------------------
         /// Zooming in
         /// ----------------------------------------------------------------------------------------------
-        public void ZoomIn(GameObject enteredNode)
+        private void ZoomIn(GameObject caller, GameObject enteredNode)
         {
             if (enteredNode != null 
                 && enteredNode.tag == Tags.Node
                 && activeAscendants.Peek().Node != enteredNode)
             {
                 Debug.LogFormat("Zooming into subtree at {0}\n", enteredNode.name);
+
+                // When zooming into enteredNode, we need to save the current state
+                // of enteredNode only. When this node is entered, the siblings of
+                // enteredNode and its descendant become hidden, so their positions
+                // cannot be changed. If any of the descendants of enteredNode 
+                // are changed, then only their positions relative to enteredNode
+                // will be changed. If we restore only the state of the enteredNode
+                // when zooming out, then the user's changes will be maintained.
+
                 // Save temporary scale and position of the node to be entered
                 // so that we can later restore it when zooming out. This must
                 // be done before we fit it into the visible area, that is: here.
                 activeAscendants.Push(new ObjectMemento(enteredNode));
                 DumpActiveAscendants();
                 // Currently, focus and all its descendants are visible.
-                HashSet<GameObject> currentlyVisible = Descendants(focus);
+                HashSet<GameObject> currentlyVisible = GameObjectHierarchy.Descendants(focus);
                 // All elements in the subtree rooted by enteredNode will be visible next.
-                HashSet<GameObject> newlyVisible = Descendants(enteredNode);
+                HashSet<GameObject> newlyVisible = GameObjectHierarchy.Descendants(enteredNode);
                 // All currently visible elements that need to be hidden.
                 currentlyVisible.ExceptWith(newlyVisible);
                 Hide(currentlyVisible);
                 focus = enteredNode;
-                FitInto(enteredNode, newlyVisible);
+                FitInto(caller, enteredNode);
             }
         }
 
         /// <summary>
         /// Scales <paramref name="parent"/> so that the total width of the size
-        /// requested for its <paramref name="descendants"/> fits into initial
-        /// rectangle.
+        /// requested for its descendants fits into initial rectangle.
         /// The aspect ratio of every node is maintained.
         /// </summary>
+        /// <param name="caller">the original caller of the zooming request to be notified when
+        /// the zooming is finished; the parameter-less message "OnZoomingComplete" 
+        /// will be used for the notification</param>        
         /// <param name="parent">the parent of all <paramref name="descendants"/></param>
-        /// <param name="descendants">layout nodes to be scaled</param>
         /// <returns>the factor by which the scale of edge node was multiplied</returns>
-        private float FitInto(GameObject parent, ICollection<GameObject> descendants)
+        private float FitInto(GameObject caller, GameObject parent)
         {
-            BoundingBox.Get(descendants, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner);
+            // All elements tagged by Tags.Node in the subtree rooted by parent must fit into the area.
+            BoundingBox.Get(GameObjectHierarchy.Descendants(parent, Tags.Node), 
+                            out Vector2 leftLowerCorner, out Vector2 rightUpperCorner);
 
             float scaleFactor = Mathf.Min((initialRightUpperCorner.x - initalLeftLowerCorner.x) / (rightUpperCorner.x - leftLowerCorner.x),
                                           (initialRightUpperCorner.y - initalLeftLowerCorner.y) / (rightUpperCorner.y - leftLowerCorner.y));
+
             // We maintain parent's y co-ordinate. We move it only within the x/z plane.
             Vector3 newPosition = parent.transform.position;
             Vector2 center = CenterPoint;
@@ -226,38 +396,25 @@ namespace SEE.Game
             newPosition.z = center.y;
             Vector3 newScale = parent.transform.localScale * scaleFactor;
 
-            Debug.LogFormat("Transforming {0} from [{1} {2}] to [{3} {4}]\n", 
-                            parent.name, 
-                            parent.transform.position, parent.transform.localScale,
-                            newPosition, newScale);
+            //Debug.LogFormat("Transforming {0} from [p={1} ls={2} ws={3}] to [p={4} ls={5}].\n", 
+            //                parent.name, 
+            //                parent.transform.position, parent.transform.localScale, parent.transform.lossyScale,
+            //                newPosition, newScale);
+            //Debug.LogFormat("initalLeftLowerCorner {0} initialRightUpperCorner {1} leftLowerCorner {2} rightUpperCorner {3} scaleFactor {4}\n",
+            //                initalLeftLowerCorner, initialRightUpperCorner, leftLowerCorner, rightUpperCorner, scaleFactor);
             // Adjust position and scale by some animation.
-            animationIsRunning = true;
             iTween.MoveTo(parent, iTween.Hash(
                                           "position", newPosition,
-                                          "time", 1.5f
+                                          "time", 0.75f
                 ));
             iTween.ScaleTo(parent, iTween.Hash(
                               "scale", newScale,
-                              //"delay", 1.0f,
-                              "time", 1.5f,
-                              "oncompletetarget", gameObject,
-                              "oncomplete", "OnFitIntoCompleted",
-                              "oncompleteparams", parent
+                              "delay", 0.75f,
+                              "time", 0.75f,
+                              "oncompletetarget", caller,
+                              "oncomplete", OnZoomingComplete
                 ));
             return scaleFactor;
-        }
-
-        /// <summary>
-        /// This method will be called by iTween when the animation triggered in FitInto
-        /// is completed.
-        /// </summary>
-        private void OnFitIntoCompleted(GameObject parent)
-        {
-            Debug.Log("OnFitIntoCompleted\n");
-            Debug.LogFormat("Final transform result {0}: [{1} {2}]\n",
-                            parent.name,
-                            parent.transform.position, parent.transform.localScale);
-            animationIsRunning = false;
         }
 
         private void DumpActiveAscendants()
@@ -265,20 +422,19 @@ namespace SEE.Game
             // Iteration starts at the top-most element on the stack.
             foreach (ObjectMemento memento in activeAscendants)
             {
-                Debug.Log(memento.ToString() + "\n");
+                Debug.Log("ancestor stack " + memento.ToString() + "\n");
             }
         }
 
         /// ----------------------------------------------------------------------------------------------
         /// Zooming out
         /// ----------------------------------------------------------------------------------------------
-        public void ZoomOut()
+        private void ZoomOut(GameObject caller)
         {
             // The root will never be popped from the stack, that is why we are using 1
             // instead of 0 in the following condition.
             if (activeAscendants.Count > 1)
             {                                
-                animationIsRunning = true;
                 // This is the memento of the current focus.
                 ObjectMemento memento = activeAscendants.Peek();
                 Debug.Assert(memento.Node == focus);
@@ -297,39 +453,18 @@ namespace SEE.Game
                               iTween.Hash("position", memento.Position,
                                           "time", 1.5f,
                                           //"delay", 0.6f,
-                                          "oncompletetarget", gameObject,
-                                          "oncomplete", "OnZoomOutCompleted"
-                               ));                
+                                          "oncompletetarget", caller,
+                                          "oncomplete", OnZoomingOutComplete,
+                                          "oncompleteparams", this
+                               ));
                 // Once the animation is finished, we continue in OnZoomOutCompleted()
-                // to show the siblings of focus again.
+                // to show the siblings of focus again. OnZoomOutCompleted() in turn
+                // will notifiy the original caller that everything is then finished.
             }
-        }
-
-        /// <summary>
-        /// This method will be called by iTween when the animation triggered in ZoomOut
-        /// is completed.
-        /// </summary>
-        private void OnZoomOutCompleted()
-        {
-            Debug.Log("OnZoomOutCompleted()\n");
-            // This is the memento of the current focus.
-            ObjectMemento memento = activeAscendants.Pop();
-            Debug.Assert(memento.Node == focus);
-
-            Debug.LogFormat("Final transform result {0}: [{1} {2}]\n",
-                            memento.Node.name,
-                            memento.Node.transform.position, memento.Node.transform.localScale);
-            memento.Reset();
-            // The current focus node has now its previous scale and position within its ascendant.
-            ObjectMemento newFocusMemento = activeAscendants.Peek();
-            //newFocusMemento.Reset();
-            GameObject newFocus = newFocusMemento.Node;
-
-            // All elements in the subtree rooted by newFocus will be visible next.
-            Unhide(Descendants(newFocus));
-            focus = newFocus;
-
-            animationIsRunning = false;
+            else
+            {
+                caller.SendMessage(OnZoomingComplete);
+            }
         }
 
         private static void Show(GameObject go, bool show)
@@ -372,64 +507,64 @@ namespace SEE.Game
             }
         }
 
-        private void HideAll()
-        {
-            foreach (ObjectMemento memento in initialTransforms.Values)
-            {
-                Show(memento.Node, false);
-            }
-        }
+        //private void HideAll()
+        //{
+        //    foreach (ObjectMemento memento in initialTransforms.Values)
+        //    {
+        //        Show(memento.Node, false);
+        //    }
+        //}
 
         ///--------------------------------------------------------------------------------------------------
         /// To be removed
         ///--------------------------------------------------------------------------------------------------
         ///
-        private void Update()
-        {
-            if (!animationIsRunning)
-            {
-                if (Input.GetKeyDown(KeyCode.R))
-                {
-                    ResetAll();
-                }
-                if (Input.GetKeyDown(KeyCode.H))
-                {
-                    HideAll();
-                }
-                if (Input.GetKeyDown(KeyCode.I))
-                {
-                    GameObject child = RandomChild(focus);
-                    if (child != null)
-                    {
-                        ZoomIn(child);
-                    }
-                }
-                if (Input.GetKeyDown(KeyCode.O))
-                {
-                    ZoomOut();
-                }
-            }
-        }
+        //private void Update()
+        //{
+        //    if (!animationIsRunning)
+        //    {
+        //        if (Input.GetKeyDown(KeyCode.R))
+        //        {
+        //            ZoomToTopLevel();
+        //        }
+        //        if (Input.GetKeyDown(KeyCode.H))
+        //        {
+        //            HideAll();
+        //        }
+        //        if (Input.GetKeyDown(KeyCode.I))
+        //        {
+        //            GameObject child = RandomChild(focus);
+        //            if (child != null)
+        //            {
+        //                ZoomIn(child);
+        //            }
+        //        }
+        //        if (Input.GetKeyDown(KeyCode.O))
+        //        {
+        //            ZoomOut();
+        //        }
+        //    }
+        //}
 
-        private GameObject RandomChild(GameObject parent)
-        {
-            GameObject selectedChild = null;
-            int maxLevel = 0;
+        //private GameObject RandomChild(GameObject parent)
+        //{
+        //    GameObject selectedChild = null;
+        //    int maxLevel = 0;
 
-            // always select the child with the greatest depth
-            foreach (Transform child in parent.transform)
-            {
-                if (child.gameObject.tag == Tags.Node)
-                {
-                    int level = GetDepth(child.gameObject);
-                    if (level > maxLevel)
-                    {
-                        maxLevel = level;
-                        selectedChild = child.gameObject;
-                    }
-                }
-            }
-            return selectedChild;
-        }
+        //    // always select the child with the greatest depth
+        //    foreach (Transform child in parent.transform)
+        //    {
+        //        if (child.gameObject.tag == Tags.Node)
+        //        {
+        //            int level = GetDepth(child.gameObject);
+        //            if (level > maxLevel)
+        //            {
+        //                maxLevel = level;
+        //                selectedChild = child.gameObject;
+        //            }
+        //        }
+        //    }
+        //    return selectedChild;
+        //}
     }
 }

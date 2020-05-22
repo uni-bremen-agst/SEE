@@ -1,4 +1,5 @@
 ﻿using SEE.Controls.Devices;
+using SEE.Game;
 using SEE.GO;
 using UnityEngine;
 
@@ -84,11 +85,13 @@ namespace SEE.Controls
             {
                 return;
             }
-            // The user could be doing everything together selecting, canceling, and grabbing. 
+            // The user could be doing everything together selecting, canceling, grabbing,
+            // and zooming. 
             // We are using the following priorities:
             // Canceling is possible only when an object is selected or grabbed.
-            // In those cases, canceling overrules selecting and grabbing.
-            // Grabbing overrules canceling.
+            // Zooming is possible only when an object is selected but not grabbed.
+            // In those cases, canceling overrules all other actions.
+            // Grabbing overrules selecting and selecting overrules zooming.
             bool isCanceling = selectionDevice.IsCanceling;
             bool isGrabbing = selectionDevice.IsGrabbing;
             bool isSelecting = selectionDevice.IsSelecting;
@@ -148,10 +151,51 @@ namespace SEE.Controls
                 // Grabbed object is released and the action was not canceled.
                 ReleaseObject(handledObject, true);
             }
+            else if (objectState == ObjectState.IsSelected)
+            {
+                // assert: !isCanceling && !isGrabbing && !isSelecting && objectState == ObjectState.IsSelected
+                // Zooming uses animation. When the animation is complete, we will
+                // notified via a call to OnZoomingComplete().
+                if (selectionDevice.IsZoomingIn)
+                {
+                    animationIsRunning = true;
+                    Transformer.ZoomInto(gameObject, handledObject);
+                }
+                else if (selectionDevice.IsZoomingOut)
+                {
+                    animationIsRunning = true;
+                    Transformer.ZoomOutOf(gameObject, handledObject);
+                }
+                else if (selectionDevice.IsZoomingHome)
+                {
+                    animationIsRunning = true;
+                    Transformer.ZoomRoot(gameObject, handledObject);
+                }
+            }
+
             if (!isGrabbing && !isSelecting)
             {
                 HideHoveringFeedback();
             }
+        }
+
+        /// <summary>
+        /// This method will be called by Transformer when the animation of the zooming
+        /// is completed.
+        /// </summary>
+        private void OnZoomingComplete()
+        {
+            animationIsRunning = false;
+        }
+
+        /// <summary>
+        /// This method will be called by Transformer when the animation of the zooming
+        /// is completed.
+        /// </summary>
+        private void OnZoomingOutComplete(Transformer transformer)
+        {
+            animationIsRunning = false;
+            transformer.FinalizeZoomOut();
         }
 
         /// <summary>
@@ -235,7 +279,7 @@ namespace SEE.Controls
         /// <param name="selectedObject">the selected object</param>
         protected virtual void HoverObject(GameObject selectedObject)
         {
-            //Debug.LogFormat("HoverObject {0}\n", selectedObject.name);
+            Debug.LogFormat("HoverObject {0}\n", selectedObject.name);
             HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
             hoverComponent?.Hovered();
             objectState = ObjectState.IsSelected;
@@ -247,7 +291,7 @@ namespace SEE.Controls
         /// <param name="selectedObject">the selected object</param>
         protected virtual void UnhoverObject(GameObject selectedObject)
         {
-            //Debug.LogFormat("UnhoverObject {0}\n", selectedObject.name);
+            Debug.LogFormat("UnhoverObject {0}\n", selectedObject.name);
             HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
             hoverComponent?.Unhovered();
             objectState = ObjectState.None;
@@ -263,13 +307,15 @@ namespace SEE.Controls
         /// <param name="selectedObject">the selected object</param>
         protected virtual void GrabObject(GameObject selectedObject)
         {
-            //Debug.LogFormat("GrabObject {0}\n", selectedObject.name);
+            Debug.LogFormat("GrabObject {0}\n", selectedObject.name);
             GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
             grabbingComponent?.Grab(gameObject);
             objectState = ObjectState.IsGrabbed;
             handledObjectMemento = new ObjectMemento(selectedObject);
             OnObjectGrabbed.Invoke(selectedObject);           
         }
+
+        private float timeHeld = 0;
 
         /// <summary>
         /// Called while an object is being grabbed (passed as parameter <paramref name="grabbedObject"/>).
@@ -278,7 +324,11 @@ namespace SEE.Controls
         /// <param name="grabbedObject">the grabbed object</param>
         protected virtual void HoldObject(GameObject grabbedObject)
         {
-            //Debug.LogFormat("HoldObject {0}\n", grabbedObject.name);
+            if (Time.realtimeSinceStartup - timeHeld > 1.0f)
+            {
+                timeHeld = Time.realtimeSinceStartup;
+                Debug.LogFormat("HoldObject {0}\n", grabbedObject.name);
+            }
             GrabbableObject grabbingComponent = grabbedObject.GetComponent<GrabbableObject>();
             if (grabbingComponent != null)
             {
@@ -295,7 +345,7 @@ namespace SEE.Controls
         /// the movement should be canceled and its original position be restored</param>
         protected virtual void ReleaseObject(GameObject grabbedObject, bool actionFinalized)
         {
-            //Debug.LogFormat("ReleaseObject {0} {1}\n", grabbedObject.name, actionFinalized);
+            Debug.LogFormat("ReleaseObject {0} {1}\n", grabbedObject.name, actionFinalized);
             GrabbableObject grabbingComponent = grabbedObject.GetComponent<GrabbableObject>();
             grabbingComponent?.Release();
             HideGrabbingFeedback();
