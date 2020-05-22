@@ -307,6 +307,8 @@ namespace SEE.Game
                 loadedGraph.Destroy();
             }
             LoadedGraph = null;
+
+            Measurements = new SortedDictionary<string, string>();
         }
 
         /// <summary>

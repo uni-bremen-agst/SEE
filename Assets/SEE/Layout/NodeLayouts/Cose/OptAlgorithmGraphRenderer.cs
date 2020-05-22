@@ -16,72 +16,91 @@ namespace SEE.Layout
 {
     public class OptAlgorithmGraphRenderer : GraphRenderer
     {
+        /// <summary>
+        /// the layout nodes
+        /// </summary>
         List<ILayoutNode> layoutNodes;
+
+        /// <summary>
+        /// the graph
+        /// </summary>
         Graph graph;
-        float groundLevel;
-        Dictionary<string, string> optimalMeasurements;
-        SortedDictionary<string, string> bestMeasurements;
-        int maxIterations = 2500;
-        int iteration = 0;
-        double bestScore = Mathf.Infinity;
-        List<SublayoutLayoutNode> sublayoutNodes = new List<SublayoutLayoutNode>();
-        Dictionary<string, double> values = new Dictionary<string, double>();
-        Dictionary<string, double> oldValues = new Dictionary<string, double>();
-        //Dictionary<List<double>, SortedDictionary<string, string>> results = new Dictionary<List<double>, SortedDictionary<string, string>>();
 
-        private OptTypes type = OptTypes.CompareNodeLayouts;
+        /// <summary>
+        /// the type of the optimization
+        /// </summary>
+        private readonly OptTypes type = OptTypes.CompareNodeLayouts;
 
+        /// <summary>
+        /// A dictionary holding layoutNodes with there inital size
+        /// </summary>
         Dictionary<ILayoutNode, Vector3> mapGameObjectOriginalSize = new Dictionary<ILayoutNode, Vector3>();
 
-        int maxNumberOfGraphs = 500;
+        /// <summary>
+        /// maximum number of graphs 
+        /// </summary>
+        private readonly int maxNumberOfGraphs = 500;
+
+        /// <summary>
+        /// the current number of graph 
+        /// </summary>
         int totalNumberOfGraphs = 0;
 
+        /// <summary>
+        /// number of leaf nodes
+        /// </summary>
         int CountLeafNodes = -1;
+
+        /// <summary>
+        /// number of inner nodes 
+        /// </summary>
         int CountInnerNodes = -1;
+
+        /// <summary>
+        /// edge density for the leaf nodes
+        /// </summary>
         float EdgeDensityLeafNode = -0.1f;
 
+        /// <summary>
+        /// path prefix for result folder
+        /// </summary>
+        private readonly string pathPrefix = "Assets/Resources/Results/";
 
-        string pathPrefix = "Assets/Resources/Results/";
-        string globalPath = "Assets/Resources/globalResults.txt";
-        string path = "";
-        string compareNodeLayoutsPath = "Assets/Resources/compareNodelayouts.txt";
-        //string firstLine = "edgeLength; RepulsionStrength; nodesOverlapping; Area; EdgeCrossings; MultiLevelScaling; SmartRepulsionRange; SmartEdgeLength; CountNodes; CountEdges; CountMaxDepth; CountAvgDepth; CountAvgDensity;";
+        /// <summary>
+        /// path prefix for the global result file
+        /// </summary>
+        private readonly string globalPath = "Assets/Resources/globalResults.txt";
 
-        GameObject parent;
+        /// <summary>
+        /// the current path
+        /// </summary>
+        private string path = "";
 
-        OptAlgoIterationsRun itValue = new OptAlgoIterationsRun();
+        /// <summary>
+        /// the path to the file for comparing the node layouts with each other 
+        /// </summary>
+        private readonly string compareNodeLayoutsPath = "Assets/Resources/compareNodelayouts.txt";
+
+        /// <summary>
+        /// the parent gameobject
+        /// </summary>
+        private GameObject parent;
+
+        /// <summary>
+        /// holding parameter values for the iterativ process
+        /// </summary>
+        private readonly OptAlgoIterationsRun itValue = new OptAlgoIterationsRun();
 
         public OptAlgorithmGraphRenderer(AbstractSEECity settings) : base(settings)
         {
-
+            // do nothing
         }
 
-        public OptAlgorithmGraphRenderer(AbstractSEECity settings, float groundLevel, Graph graph, List<SublayoutNode> sublayoutNodes, List<ILayoutNode> layoutNodes) : base(settings)
-        {
-            this.layoutNodes = layoutNodes;
-            this.graph = graph;
-            this.groundLevel = groundLevel;
-
-            string path = "Assets/Resources/results.txt";
-            //Write some text to the test.txt file
-            StreamWriter writer = new StreamWriter(path, true);
-            writer.WriteLine("edgeLength; RepulsionStrength; nodesOverlapping; Area; EdgeCrossings; MultiLevelScaling; SmartRepulsionRange; SmartEdgeLength; CountNodes; CountEdges; CountMaxDepth; CountAvgDepth; CountAvgDensity;");
-            writer.Close();
-
-
-            foreach (ILayoutNode gameNode in layoutNodes)
-            {
-                Vector3 scale = gameNode.Scale;
-                mapGameObjectOriginalSize.Add(gameNode, new Vector3(scale.x, scale.y, scale.z));
-            }
-        }
-        /*
-         * - Wo ist der Start-/ End Wert
-         * - Wie groß sind die Schritte
-         *
-         *
-         */
-
+        /// <summary>
+        /// Starts and performs the iterative calculation process
+        /// </summary>
+        /// <param name="it">the parameter values for the iterations</param>
+        /// <param name="save">true if the results should be saved</param>
         public void StartOptAlgorithm(OptAlgoIterations it, bool save)
         {
             settings.CoseGraphSettings.multiLevelScaling = false;
@@ -92,69 +111,32 @@ namespace SEE.Layout
             {
                 for (int j = it.repulsionRange.start; j < it.repulsionRange.end; j += it.repulsionRange.iterationStep)
                 {
-                    /*for (int a = it.multiLevelScaling.start; a < it.multiLevelScaling.end; a += it.multiLevelScaling.iterationStep)
+
+                    settings.CoseGraphSettings.EdgeLength = (int)i;
+                    settings.CoseGraphSettings.RepulsionStrength = j;
+
+                    NodeLayout nodeLayout = new CoseLayout(groundLevel, settings);
+
+                    nodeLayout.Apply(layoutNodes.Cast<ILayoutNode>().ToList(), graph.Edges(), new List<SublayoutLayoutNode>());
+                    NodeLayout.Move(layoutNodes.Cast<ILayoutNode>().ToList(), settings.origin);
+
+                    EdgeDistCalculation(graph, layoutNodes);
+
+                    BoundingBox(layoutNodes, out Vector2 FrontCorner, out Vector2 BackCorner);
+                    Measurements measurements = new Measurements(layoutNodes, graph, FrontCorner, BackCorner);
+
+                    var overlappingNodes = measurements.OverlappingGameNodes;
+                    if (overlappingNodes <= 0)
                     {
-                        // smart repulsion range
-                        for (int b = it.smartRepulsionRange.start; b < it.smartRepulsionRange.end; b += it.smartRepulsionRange.iterationStep)
-                        {
-                            // smart edge calculation
-                            for (int d = it.smartEdgeLengthCalculation.start; d < it.smartEdgeLengthCalculation.end; d += it.smartEdgeLengthCalculation.iterationStep)
-                            {*/
-                                // vielleicht auswerten mit welchen die beste Lösung? und dann kann man schaune, ob multilevelscaling etc. das Layout wirklich verbessern?
+                        WriteToFile(i, j, overlappingNodes, measurements.Area, measurements.EdgeCrossings);
+                    }
 
-                                settings.CoseGraphSettings.EdgeLength = (int)i;
-                                 settings.CoseGraphSettings.RepulsionStrength = j;
-                                /*if (a % 2 == 0)
-                                {
-                                    settings.CoseGraphSettings.multiLevelScaling = false;
-                                }
-                                else
-                                {
-                                    settings.CoseGraphSettings.multiLevelScaling = true;
-                                }
+                    foreach (GameNode layoutNode in layoutNodes)
+                    {
+                        layoutNode.Scale = mapGameObjectOriginalSize[layoutNode];
+                        layoutNode.CenterPosition = new Vector3(0, 0, 0);
+                    }
 
-                                if (b % 2 == 0)
-                                {
-                                    settings.CoseGraphSettings.UseSmartRepulsionRangeCalculation = false;
-                                }
-                                else
-                                {
-                                    settings.CoseGraphSettings.UseSmartRepulsionRangeCalculation = true;
-                                }
-
-                                if (d % 2 == 0)
-                                {
-                                    settings.CoseGraphSettings.UseSmartIdealEdgeCalculation = false;
-                                }
-                                else
-                                {
-                                    settings.CoseGraphSettings.UseSmartIdealEdgeCalculation = true;
-                                }*/
-
-                                NodeLayout nodeLayout = new CoseLayout(groundLevel, settings);
-
-                                nodeLayout.Apply(layoutNodes.Cast<ILayoutNode>().ToList(), graph.Edges(), new List<SublayoutLayoutNode>());
-                                NodeLayout.Move(layoutNodes.Cast<ILayoutNode>().ToList(), settings.origin);
-
-                                EdgeDistCalculation(graph, layoutNodes);
-
-                                BoundingBox(layoutNodes, out Vector2 FrontCorner, out Vector2 BackCorner);
-                                Measurements measurements = new Measurements(layoutNodes, graph, FrontCorner, BackCorner);
-
-                                var overlappingNodes = measurements.OverlappingGameNodes;
-                                if (overlappingNodes <= 0)
-                                {
-                                    WriteToFile(i, j, overlappingNodes, measurements.Area, measurements.EdgeCrossings);
-                                }
-
-                                foreach (GameNode layoutNode in layoutNodes)
-                                {
-                                    layoutNode.Scale = mapGameObjectOriginalSize[layoutNode];
-                                    layoutNode.CenterPosition = new Vector3(0, 0, 0);
-                                }
-                            /*}
-                        }
-                    }*/
                 }
             }
 
@@ -172,20 +154,23 @@ namespace SEE.Layout
 
                 StartOptAlgorithm(it: itValue.specific, save: true);
             }
-
-            // TODO wenn durch grobes Ausprobieren eine Lösung gefunden, dann nochmal genauer probieren 
         }
 
+        /// <summary>
+        /// Calculates a layout for a given node layout
+        /// </summary>
+        /// <param name="nodeLayout">the nodelayout to use</param>
         public void CalcLayout(NodeLayouts nodeLayout)
         {
             NodeLayout layout = CoseHelper.GetNodelayout(nodeLayout, groundLevel, leafNodeFactory.Unit, settings);
 
             Performance p = Performance.Begin("layout name" + settings.NodeLayout + ", layout of nodes");
-           
+
             if (layout.UsesEdgesAndSublayoutNodes())
             {
                 layout.Apply(layoutNodes.Cast<ILayoutNode>().ToList(), graph.Edges(), new List<SublayoutLayoutNode>());
-            } else
+            }
+            else
             {
                 layout.Apply(layoutNodes.Cast<ILayoutNode>().ToList());
             }
@@ -193,7 +178,7 @@ namespace SEE.Layout
 
             EdgeDistCalculation(graph, layoutNodes);
 
-             BoundingBox(layoutNodes, out Vector2 FrontCorner, out Vector2 BackCorner);
+            BoundingBox(layoutNodes, out Vector2 FrontCorner, out Vector2 BackCorner);
             Measurements measurements = new Measurements(layoutNodes, graph, FrontCorner, BackCorner, p);
 
             WriteResultsToFile(measurements, nodeLayout);
@@ -205,9 +190,11 @@ namespace SEE.Layout
             }
         }
 
-        public void CompareNodelayoutResults()
+        /// <summary>
+        /// Calculates the layout for all nodelayouts
+        /// </summary>
+        public void CalcLayoutForNodelayouts()
         {
-
             foreach (NodeLayouts nodeLayout in Enum.GetValues(typeof(NodeLayouts)))
             {
                 if (nodeLayout.GetModel().IsHierarchical)
@@ -217,6 +204,11 @@ namespace SEE.Layout
             }
         }
 
+        /// <summary>
+        /// Writes the measurements/ graph properties of a layout to the file
+        /// </summary>
+        /// <param name="measurements"></param>
+        /// <param name="nodeLayout"></param>
         public void WriteResultsToFile(Measurements measurements, NodeLayouts nodeLayout)
         {
             StreamWriter writer = new StreamWriter(compareNodeLayoutsPath, true);
@@ -247,11 +239,18 @@ namespace SEE.Layout
             writer.Close();
         }
 
+        /// <summary>
+        /// returns the smallest value from a file for a given value index
+        /// </summary>
+        /// <param name="file">the file</param>
+        /// <param name="index">the index of the value</param>
+        /// <returns></returns>
         private int GetMinValue(List<String> file, int index)
         {
             int minValue = Int32.MaxValue;
 
-            file.ForEach(line => {
+            file.ForEach(line =>
+            {
                 var values = line.Split(';');
 
                 string valueString = values[index];
@@ -266,7 +265,11 @@ namespace SEE.Layout
             return minValue;
         }
 
-
+        /// <summary>
+        /// parses a string to an int 
+        /// </summary>
+        /// <param name="str">the string to parse </param>
+        /// <returns></returns>
         private int ParseInt(string str)
         {
             int value = Int32.MaxValue;
@@ -284,6 +287,11 @@ namespace SEE.Layout
             return value;
         }
 
+        /// <summary>
+        /// Finds and saves the best solution to a file and returns a tuple containing the edgeLength and repulsionStrength
+        /// </summary>
+        /// <param name="save">indicates if the best solution should be saved</param>
+        /// <returns>a tuple containing the edgeLength and repulsionStrength</returns>
         private Tuple<int, int> BestSolution(bool save)
         {
             int edgeCrossingIndex = 4;
@@ -299,7 +307,8 @@ namespace SEE.Layout
 
             int minEdgeCrossing = GetMinValue(file: linesToKeep, index: edgeCrossingIndex);
 
-            linesToKeep = linesToKeep.Where(line => {
+            linesToKeep = linesToKeep.Where(line =>
+            {
                 var values = line.Split(';');
                 int value = ParseInt(values[edgeCrossingIndex]);
 
@@ -308,7 +317,8 @@ namespace SEE.Layout
 
             int minArea = GetMinValue(file: linesToKeep, index: areaIndex);
 
-            linesToKeep = linesToKeep.Where(line => {
+            linesToKeep = linesToKeep.Where(line =>
+            {
                 var values = line.Split(';');
                 int value = ParseInt(values[areaIndex]);
 
@@ -319,15 +329,16 @@ namespace SEE.Layout
             if (linesToKeep.Count == 1)
             {
                 finalLine = linesToKeep.First();
-            } else if (linesToKeep.Count > 1)
+            }
+            else if (linesToKeep.Count > 1)
             {
                 linesToKeep.Sort((line1, line2) =>
                 {
                     var values1 = line1.Split(';');
                     var values2 = line2.Split(';');
 
-                    int value1 = ParseInt(values1[edgeLengthIndex]);  
-                    int value2 = ParseInt(values2[edgeLengthIndex]); 
+                    int value1 = ParseInt(values1[edgeLengthIndex]);
+                    int value2 = ParseInt(values2[edgeLengthIndex]);
 
                     return value1.CompareTo(value2);
                 });
@@ -358,11 +369,18 @@ namespace SEE.Layout
             //File.Delete(path);
         }
 
-
-        private void WriteToFile(int edgeLength, double repulsionStrength, double nodesOverlapping, double area, double edgeCrossings)//, double a, double b, double d)
+        /// <summary>
+        /// Writes the results to a result file
+        /// </summary>
+        /// <param name="edgeLength">the edgeLength</param>
+        /// <param name="repulsionStrength">the repulsionStrength</param>
+        /// <param name="nodesOverlapping">true if nodes overlapp</param>
+        /// <param name="area">the area used for the layout</param>
+        /// <param name="edgeCrossings">number of edge crossings</param>
+        private void WriteToFile(int edgeLength, double repulsionStrength, double nodesOverlapping, double area, double edgeCrossings)
         {
-            List<double> values = new List<double> { repulsionStrength, nodesOverlapping, area, edgeCrossings };//, a, b, d };
-            //Write some text to the test.txt file
+            List<double> values = new List<double> { repulsionStrength, nodesOverlapping, area, edgeCrossings };
+
             StreamWriter writer = new StreamWriter(path, true);
             string line = "";
 
@@ -385,20 +403,41 @@ namespace SEE.Layout
             writer.Close();
         }
 
+        /// <summary>
+        /// Returns the number of nodes for a given graph
+        /// </summary>
+        /// <param name="graph">a graph</param>
+        /// <returns>count of nodes</returns>
         private int CountNodes(Graph graph)
         {
             return graph.NodeCount;
         }
+
+        /// <summary>
+        /// Returns the number of edges for a given graph
+        /// </summary>
+        /// <param name="graph">a graph</param>
+        /// <returns>count of edges</returns>
         private int CountEdges(Graph graph)
         {
             return graph.EdgeCount;
         }
 
+        /// <summary>
+        /// Returns maximal depth of a graph
+        /// </summary>
+        /// <param name="graph">a graph</param>
+        /// <returns>max depth</returns>
         private int CountDepth(Graph graph)
         {
             return graph.GetMaxDepth();
         }
 
+        /// <summary>
+        /// count the average depth of nodes for a graph
+        /// </summary>
+        /// <param name="graph">the graph</param>
+        /// <returns>the average depth</returns>
         private int CountDepthAvg(Graph graph)
         {
             int depth = 0;
@@ -415,6 +454,11 @@ namespace SEE.Layout
             return depth / leafCount;
         }
 
+        /// <summary>
+        /// Calc the average edge density for a node of a given graph
+        /// </summary>
+        /// <param name="graph">a graph</param>
+        /// <returns>average edge density</returns>
         private int CountDensityAvg(Graph graph)
         {
             int density = 0;
@@ -433,6 +477,10 @@ namespace SEE.Layout
             return density / countNodes;
         }
 
+        /// <summary>
+        /// Creates a Random City 
+        /// </summary>
+        /// <returns>the created graph</returns>
         private Graph CreateRandomCity()
         {
             // 1, 301, Random.Range(1, 30), Random.Range(0.001f, 0.021f)
@@ -451,6 +499,11 @@ namespace SEE.Layout
             return randomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes);
         }
 
+        /// <summary>
+        /// Draw a city 
+        /// </summary>
+        /// <param name="graph">the graph to draw</param>
+        /// <param name="parent">the parent gameObject</param>
         protected override void DrawCity(Graph graph, GameObject parent)
         {
             this.graph = graph;
@@ -473,25 +526,12 @@ namespace SEE.Layout
 
             if (type == OptTypes.CompareNodeLayouts)
             {
-                CompareNodelayoutResults();
-            } else
+                CalcLayoutForNodelayouts();
+            }
+            else
             {
                 StartOptAlgorithm(it: itValue.initial, save: true);
             }
-
-
-
-            //AddToParent(gameNodes, parent);
-            // add the decorations, too
-            //AddToParent(AddDecorations(gameNodes), parent);
-
-            // create the laid out edges
-            //AddToParent(EdgeLayout(graph, layoutNodes), parent);
-            // add the plane surrounding all game objects for nodes
-
-            //BoundingBox(layoutNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-            //GameObject plane = NewPlane(leftFrontCorner, rightBackCorner);
-            //AddToParent(plane, parent);
 
             totalNumberOfGraphs++;
 
@@ -506,8 +546,6 @@ namespace SEE.Layout
             {
                 graph.Destroy();
             }
-            graph = null;
-
 
             if (totalNumberOfGraphs != maxNumberOfGraphs)
             {
@@ -515,6 +553,11 @@ namespace SEE.Layout
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="graph"></param>
+        /// <param name="parent"></param>
         public override void Draw(Graph graph, GameObject parent)
         {
             if (type == OptTypes.CompareNodeLayouts)
@@ -533,7 +576,8 @@ namespace SEE.Layout
                 settings.CoseGraphSettings.UseSmartRepulsionRangeCalculation = false;
                 settings.CoseGraphSettings.multiLevelScaling = false;
                 settings.CoseGraphSettings.useCalculationParameter = true;
-            } else
+            }
+            else
             {
                 //SetupFile(path: globalPath);
                 path = pathPrefix + totalNumberOfGraphs + ".txt";
@@ -544,7 +588,7 @@ namespace SEE.Layout
             base.Draw(CreateRandomCity(), parent);
             this.parent = parent;
 
-           // combine();
+            // combine();
 
 
         }
@@ -573,7 +617,7 @@ namespace SEE.Layout
             {
                 //writer.WriteLine(firstLine);
             }
-           
+
         }
 
         private void GetAverage()
@@ -592,7 +636,7 @@ namespace SEE.Layout
                     int countEdges = ParseInt(values[1]);
                     int repulsionForce = ParseInt(values[2]);
 
-                    
+
 
                     if (result.ContainsKey(repulsionForce))
                     {
@@ -606,12 +650,14 @@ namespace SEE.Layout
 
             }
 
-            result.ForEach(entry => {
+            result.ForEach(entry =>
+            {
                 var length = entry.Value.Count;
 
                 var sum = 0;
 
-                entry.Value.ForEach(item => {
+                entry.Value.ForEach(item =>
+                {
                     sum += item;
                 });
 
@@ -629,7 +675,8 @@ namespace SEE.Layout
             using (StreamWriter writer = File.CreateText("Assets/Resources/repulsionForceResult.txt"))
             {
 
-                newResult.ForEach(kvp => {
+                newResult.ForEach(kvp =>
+                {
                     string line = kvp.Key + ";" + kvp.Value + ";";
                     writer.WriteLine(line);
                 });
@@ -669,12 +716,14 @@ namespace SEE.Layout
 
             }
 
-            result.ForEach( entry =>{
+            result.ForEach(entry =>
+            {
                 var length = entry.Value.Count;
 
                 var sum = 0;
 
-                entry.Value.ForEach(item => {
+                entry.Value.ForEach(item =>
+                {
                     sum += item;
                 });
 
@@ -686,28 +735,47 @@ namespace SEE.Layout
                     newResult.Add(entry.Key, avg);
                 }
 
-                
+
             });
 
             using (StreamWriter writer = File.CreateText("Assets/Resources/repulsionForceResult.txt"))
             {
 
-                newResult.ForEach( kvp => {
+                newResult.ForEach(kvp =>
+                {
                     string line = kvp.Key.Item1 + ";" + kvp.Key.Item2 + ";" + kvp.Value;
-                writer.WriteLine(line);
+                    writer.WriteLine(line);
                 });
             }
         }
     }
 
+    /// <summary>
+    /// a class holding parameter values 
+    /// </summary>
     public class IterationConstraint
     {
+        /// <summary>
+        /// the start value
+        /// </summary>
         public int start;
 
+        /// <summary>
+        /// the end value
+        /// </summary>
         public int end;
 
+        /// <summary>
+        /// The value by which the parameter value is increased within each iteration
+        /// </summary>
         public int iterationStep;
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="start"> the start value</param>
+        /// <param name="end">the end value</param>
+        /// <param name="iterationStep">The value by which the parameter value is increased within each iteration</param>
         public IterationConstraint(int start, int end, int iterationStep)
         {
             this.start = start;
@@ -718,16 +786,15 @@ namespace SEE.Layout
 
     public class OptAlgoIterations
     {
-        // edge lngth is int 
+        /// <summary>
+        /// parameter values for edge length
+        /// </summary>
         public IterationConstraint edgeLength = new IterationConstraint(start: 1, end: 30, iterationStep: 1);
 
+        /// <summary>
+        /// parameter values for repulsion range
+        /// </summary>
         public IterationConstraint repulsionRange = new IterationConstraint(start: 1, end: 20, iterationStep: 1);
-
-        public IterationConstraint multiLevelScaling = new IterationConstraint(start: 0, end: 2, iterationStep: 1);
-
-        public IterationConstraint smartRepulsionRange = new IterationConstraint(start: 0, end: 2, iterationStep: 1);
-
-        public IterationConstraint smartEdgeLengthCalculation = new IterationConstraint(start: 0, end: 2, iterationStep: 1);
 
         public OptAlgoIterations()
         {
@@ -736,10 +803,19 @@ namespace SEE.Layout
 
     }
 
+    /// <summary>
+    /// paramter values gfor the optimization 
+    /// </summary>
     public class OptAlgoIterationsRun
     {
+        /// <summary>
+        /// the inital values
+        /// </summary>
         public readonly OptAlgoIterations initial = new OptAlgoIterations();
 
+        /// <summary>
+        /// more specific values
+        /// </summary>
         public OptAlgoIterations specific = new OptAlgoIterations();
 
         public OptAlgoIterationsRun()
@@ -749,8 +825,19 @@ namespace SEE.Layout
         }
     }
 
-    public enum OptTypes {
+    /// <summary>
+    /// Types of the optimization algorithm
+    /// </summary>
+    public enum OptTypes
+    {
+        /// <summary>
+        /// Try to find good parameters for random generated graphs
+        /// </summary>
         FindGoodParameter,
+
+        /// <summary>
+        /// Calculates Layouts for all nodeLayouts for random generated graphs
+        /// </summary>
         CompareNodeLayouts
     }
 }

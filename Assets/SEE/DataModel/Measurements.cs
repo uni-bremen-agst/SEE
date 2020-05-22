@@ -4,6 +4,7 @@ using SEE.Layout;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 using UnityEngine;
 
 namespace SEE
@@ -42,19 +43,34 @@ namespace SEE
         public readonly float lengthTotalArea;
 
         /// <summary>
-        /// The average length of an edge in relation to the area (height + width / 2)
+        /// The average length of an edge
         /// </summary>
         public readonly float lengthAverage;
 
         /// <summary>
-        /// The variance length of any edge in relation to the area (height + width / 2)
+        /// The average length of an edge in relation to the area (height + width / 2)
+        /// </summary>
+        public readonly float lengthAverageArea;
+
+        /// <summary>
+        /// The variance length of any edge
         /// </summary>
         public readonly float lengthVariance;
 
         /// <summary>
+        /// The standart deviation of any edge length
+        /// </summary>
+        public readonly float lengthStandardDeviation;
+
+        /// <summary>
+        /// The variance length of any edge in relation to the area (height + width / 2)
+        /// </summary>
+        public readonly float lengthVarianceArea;
+
+        /// <summary>
         /// The standart deviation of any edge length in relation to the area (height + width / 2)
         /// </summary>
-        public readonly float lengthStandardDeviation; 
+        public readonly float lengthStandardDeviationArea;
 
         /// <summary>
         /// class holding all measurements value of the edges
@@ -68,7 +84,7 @@ namespace SEE
         /// <param name="lengthAverage"></param>
         /// <param name="lengthVariance"></param>
         /// <param name="lengthStandardDeviation"></param>
-        public EdgesMeasurements(float lengthMax, float lengthMin, float lengthTotal, float lengthMaxArea, float lengthMinArea, float lengthTotalArea, float lengthAverage, float lengthVariance, float lengthStandardDeviation)
+        public EdgesMeasurements(float lengthMax, float lengthMin, float lengthTotal, float lengthMaxArea, float lengthMinArea, float lengthTotalArea, float lengthAverage, float lengthAverageArea, float lengthVariance, float lengthStandardDeviation, float lengthVarianceArea, float lengthStandardDeviationArea)
         {
             this.lengthMax = lengthMax;
             this.lengthMin = lengthMin;
@@ -77,8 +93,11 @@ namespace SEE
             this.lengthMinArea = lengthMinArea;
             this.lengthTotalArea = lengthTotalArea;
             this.lengthAverage = lengthAverage;
+            this.lengthAverageArea = lengthAverageArea;
             this.lengthVariance = lengthVariance;
             this.lengthStandardDeviation = lengthStandardDeviation;
+            this.lengthVarianceArea = lengthVarianceArea;
+            this.lengthStandardDeviationArea = lengthStandardDeviationArea;
         }
     }
 
@@ -102,12 +121,12 @@ namespace SEE
         /// <summary>
         /// width of this graph visualisation
         /// </summary>
-        private float width;
+        private readonly float width = 0.0f;
 
         /// <summary>
         /// height of this graph visualisation
         /// </summary>
-        private float height;
+        private readonly float height = 0.0f;
 
         /// <summary>
         /// Dictonary with nodes and corresonding gameobjects
@@ -161,6 +180,17 @@ namespace SEE
         }
 
         /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="layoutNodes"></param>
+        /// <param name="graph"></param>
+        public Measurements(ICollection<ILayoutNode> layoutNodes, List<Edge> edges)
+        {
+            this.layoutNodes = new List<ILayoutNode>(layoutNodes);
+            this.edges = edges; 
+        }
+
+        /// <summary>
         /// Adds the time needed for calculating the node layout to the measurements
         /// </summary>
         /// <param name="performance"></param>
@@ -182,6 +212,7 @@ namespace SEE
 
             SortedDictionary<string, string> measurements = new SortedDictionary<string, string>
             {
+                { "Area", Math.Round (Area, 2).ToString() },
                 { "Nodes overlapping", OverlappingGameNodes.ToString() },
                 { "Number of edge crossings", EdgeCrossings.ToString() },
                 { "Straight Edge length max", Math.Round(EdgesMeasurements.lengthMax, 2).ToString() },
@@ -191,9 +222,11 @@ namespace SEE
                 { "Straight Edge length min (area)", Math.Round(EdgesMeasurements.lengthMinArea, 2).ToString() },
                 { "Straight Edge length total (area)", Math.Round(EdgesMeasurements.lengthTotalArea, 2).ToString() },
                 { "Straight Edge length average", Math.Round(EdgesMeasurements.lengthAverage, 2).ToString() },
+                { "Straight Edge length average (area)", Math.Round(EdgesMeasurements.lengthAverageArea, 2).ToString() },
                 { "Straight Edge length variance", Math.Round(EdgesMeasurements.lengthVariance, 2).ToString() },
                 { "Straight Edge length standard deviation", Math.Round(EdgesMeasurements.lengthStandardDeviation, 2).ToString() },
-                { "Area (Plane)", Area.ToString() }
+                { "Straight Edge length variance (area)", Math.Round(EdgesMeasurements.lengthVarianceArea, 2).ToString() },
+                { "Straight Edge length standard deviation (area)", Math.Round(EdgesMeasurements.lengthStandardDeviationArea, 2).ToString() },
             };
 
             string nodePerformance = NodesPerformance;
@@ -312,11 +345,14 @@ namespace SEE
             float relationMinDistEdge;
             float relationMaxDistEdge;
             float relationTotalDist;
+            float relationAvgDist; 
             float averageDistEdge = 0;
             float varianceDistEdge = 0;
+            float relativeVarianceDistEdge = 0;
             float standardDeviation;
+            float relativeStandardDeviation;
 
-            if (edges.Count >= 0)
+            if (edges.Count > 0)
             {
                 minDistEdge = edges[0].dist;
                 maxDistEdge = edges[0].dist;
@@ -342,6 +378,8 @@ namespace SEE
             relationMinDistEdge = minDistEdge / areaLength;
             relationTotalDist = totalDist / areaLength;
 
+            
+
             if (edges.Count > 0)
             {
                 averageDistEdge = totalDist / edges.Count;
@@ -353,10 +391,36 @@ namespace SEE
                 }
                 varianceDistEdge = variance / (edges.Count - 1);
             }
-
             standardDeviation = Mathf.Sqrt(varianceDistEdge);
 
-            EdgesMeasurements edgesMeasurements = new EdgesMeasurements(maxDistEdge, minDistEdge, totalDist, relationMaxDistEdge, relationMinDistEdge, relationTotalDist, averageDistEdge, varianceDistEdge, standardDeviation);
+
+            relationAvgDist = averageDistEdge / areaLength;
+            if (edges.Count > 0)
+            {
+                float varianceRelative = 0f;
+
+                foreach (Edge edge in edges)
+                {
+                    var edgeDistRelative = edge.dist / areaLength;
+                    varianceRelative += (edgeDistRelative - relationAvgDist) * (edgeDistRelative - relationAvgDist);
+                }
+                relativeVarianceDistEdge = varianceRelative / (edges.Count - 1);
+            }
+            relativeStandardDeviation = Mathf.Sqrt(relativeVarianceDistEdge);
+
+            EdgesMeasurements edgesMeasurements = new EdgesMeasurements(lengthMax: maxDistEdge, 
+                                                                        lengthMin: minDistEdge, 
+                                                                        lengthTotal:  totalDist,
+                                                                        lengthMaxArea: relationMaxDistEdge,
+                                                                        lengthMinArea: relationMinDistEdge,
+                                                                        lengthTotalArea: relationTotalDist,
+                                                                        lengthAverage: averageDistEdge,
+                                                                        lengthAverageArea: relationAvgDist,
+                                                                        lengthVariance: varianceDistEdge,
+                                                                        lengthStandardDeviation: standardDeviation, 
+                                                                        lengthVarianceArea: relativeVarianceDistEdge, 
+                                                                        lengthStandardDeviationArea: relativeStandardDeviation);
+
             return edgesMeasurements;
         }
 

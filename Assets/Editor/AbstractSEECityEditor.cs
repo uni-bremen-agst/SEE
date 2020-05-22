@@ -65,12 +65,29 @@ namespace SEEEditor
                 city.CoseGraphSettings.EdgeLength = EditorGUILayout.IntField("Edge length", city.CoseGraphSettings.EdgeLength);
                 city.CoseGraphSettings.UseSmartIdealEdgeCalculation = EditorGUILayout.Toggle("Smart ideal edge length", city.CoseGraphSettings.UseSmartIdealEdgeCalculation);
                 city.CoseGraphSettings.PerLevelIdealEdgeLengthFactor = EditorGUILayout.FloatField("Level edge length factor", city.CoseGraphSettings.PerLevelIdealEdgeLengthFactor);
-                city.CoseGraphSettings.multiLevelScaling = EditorGUILayout.Toggle("MultiLevelscaling", city.CoseGraphSettings.multiLevelScaling);
+                city.CoseGraphSettings.multiLevelScaling = EditorGUILayout.Toggle("MultiLevel-Scaling", city.CoseGraphSettings.multiLevelScaling);
+                city.CoseGraphSettings.UseSmartMultilevelScaling = EditorGUILayout.Toggle("Smart multilevel-scaling", city.CoseGraphSettings.UseSmartMultilevelScaling);
                 city.CoseGraphSettings.UseSmartRepulsionRangeCalculation = EditorGUILayout.Toggle("Smart repulsion range", city.CoseGraphSettings.UseSmartRepulsionRangeCalculation);
                 city.CoseGraphSettings.RepulsionStrength = EditorGUILayout.FloatField("Repulsion Strength", city.CoseGraphSettings.RepulsionStrength);
                 city.CoseGraphSettings.GravityStrength = EditorGUILayout.FloatField("Gravity", city.CoseGraphSettings.GravityStrength);
                 city.CoseGraphSettings.CompoundGravityStrength = EditorGUILayout.FloatField("Compound gravity", city.CoseGraphSettings.CompoundGravityStrength);
                 city.CoseGraphSettings.useOptAlgorithm = EditorGUILayout.Toggle("Use Opt-Algorithm", city.CoseGraphSettings.useOptAlgorithm);
+                if (city.CoseGraphSettings.useOptAlgorithm)
+                {
+                    //city.CoseGraphSettings.useCalculationParameter = false; 
+                }
+                city.CoseGraphSettings.useCalculationParameter = EditorGUILayout.Toggle("Calc parameters automatically", city.CoseGraphSettings.useCalculationParameter);
+                city.CoseGraphSettings.useItertivCalclation = EditorGUILayout.Toggle("Find parameters iteratively", city.CoseGraphSettings.useItertivCalclation);
+                if (city.CoseGraphSettings.useCalculationParameter || city.CoseGraphSettings.useItertivCalclation)
+                {
+                    city.CoseGraphSettings.useOptAlgorithm = false;
+                    city.ZScoreScale = true;
+
+                    city.CoseGraphSettings.multiLevelScaling = false;
+                    city.CoseGraphSettings.UseSmartMultilevelScaling = false;
+                    city.CoseGraphSettings.UseSmartIdealEdgeCalculation = false;
+                    city.CoseGraphSettings.UseSmartRepulsionRangeCalculation = false; 
+                }
             }
 
             GUILayout.Label("Edges and Edge Layout", EditorStyles.boldLabel);

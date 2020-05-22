@@ -70,6 +70,10 @@ namespace SEE.Layout
 
         Dictionary<ILayoutNode, CoseSublayoutNode> ILayout_to_CoseSublayoutNode = new Dictionary<ILayoutNode, CoseSublayoutNode>();
 
+        public AbstractSEECity settings;
+
+        private ICollection<Edge> edges = new List<Edge>();
+
         /// <summary>
         /// 
         /// </summary>
@@ -77,13 +81,14 @@ namespace SEE.Layout
         /// <param name="groundLevel">the groundlevel for the nodes</param>
         /// <param name="leafNodeFactory">the leafnodefactory</param>
         /// <param name="graph">the underlying graph</param>
-        public Sublayout(SublayoutLayoutNode sublayout, float groundLevel, NodeFactory leafNodeFactory, Graph graph)
+        public Sublayout(SublayoutLayoutNode sublayout, float groundLevel, NodeFactory leafNodeFactory, Graph graph, AbstractSEECity settings)
         {
             this.nodeLayout = sublayout.NodeLayout;
             this.groundLevel = groundLevel;  
             this.leafNodeFactory = leafNodeFactory;
             this.sublayout = sublayout;
             this.graph = graph;
+            this.settings = settings;
 
             if (sublayout.Node.Children().Count > 0)
             {
@@ -97,6 +102,7 @@ namespace SEE.Layout
                 }
             }
 
+            edges = graph.ConnectingEdges(sublayoutNodes);
             sublayout.Node.Sublayout = this;
         }
 
@@ -299,8 +305,7 @@ namespace SEE.Layout
             innerNodeHeight = layout.InnerNodeHeight;
             if (layout.UsesEdgesAndSublayoutNodes())
             {
-                // TODO COSE LAYOUT
-                return layout.Layout(sublayoutNodes);
+                return layout.Layout(sublayoutNodes, edges, new List<SublayoutLayoutNode>());
             } else
             {
                 return layout.Layout(sublayoutNodes);
@@ -323,8 +328,8 @@ namespace SEE.Layout
                     return new BalloonNodeLayout(groundLevel);
                 case NodeLayouts.CirclePacking:
                     return new CirclePackingNodeLayout(groundLevel);
-                //case NodeLayouts.CompoundSpringEmbedder:
-                    //return new CoseLayout(groundLevel, settings, leafNodeFactory);
+                case NodeLayouts.CompoundSpringEmbedder:
+                    return new CoseLayout(groundLevel, settings);
                 default:
                     throw new System.Exception("Unhandled node layout ");
             }
