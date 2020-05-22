@@ -27,8 +27,10 @@ namespace SEE.Controls
         /// method returns true</param>
         /// <returns>true if an object was hit</returns>
         protected override bool Detect(out RaycastHit hitInfo)
-        {
-            return Physics.Raycast(GetRay(), out hitInfo, Physics.IgnoreRaycastLayer);
+        {            
+            Ray ray = GetRay();
+            Debug.DrawRay(ray.origin, ray.direction);
+            return Physics.Raycast(ray, out hitInfo, Physics.IgnoreRaycastLayer);
         }
 
         protected Vector3 GrabbingRayStart()
