@@ -89,6 +89,12 @@ namespace SEE.Controls.Devices
 
         public override bool IsCanceling => Input.GetKeyDown(KeyCode.C);
 
+        public override bool IsZoomingIn => Input.GetKeyDown(KeyCode.I);
+
+        public override bool IsZoomingOut => Input.GetKeyDown(KeyCode.O);
+
+        public override bool IsZoomingHome => Input.GetKeyDown(KeyCode.R);
+
         /// <summary>
         /// True if the first click of an expected double click happened.
         /// </summary>
