@@ -67,5 +67,23 @@ namespace SEE.Utils
                 }
             }
         }
+
+        /// <summary>
+        /// Returns the maximal y co-ordinate of all given <paramref name="gameObjects"/> in world space.
+        /// </summary>
+        /// <param name="gameObjects">the game objects whose maximal y co-ordinate is requested</param>
+        /// <returns>maximal y co-ordinate</returns>
+        public static float GetRoof(ICollection<GameObject> gameObjects)
+        {
+            float result = float.NegativeInfinity;
+            foreach (GameObject gameObject in gameObjects)
+            {
+                if (gameObject.transform.position.y > result)
+                {
+                    result = gameObject.transform.position.y + gameObject.transform.lossyScale.y / 2.0f;
+                }
+            }
+            return result;
+        }
     }
 }
