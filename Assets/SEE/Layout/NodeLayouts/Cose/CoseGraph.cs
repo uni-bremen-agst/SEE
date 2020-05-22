@@ -29,28 +29,25 @@ namespace SEE.Layout
         private List<CoseEdge> edges = new List<CoseEdge>();
 
         /// <summary>
-        /// TODO
+        /// the left front corner of the graph
         /// </summary>
         private Vector2 leftFrontCorner;
 
         /// <summary>
-        /// TODO
+        /// the right back corner of this graph
         /// </summary>
         private Vector2 rightBackCorner;
 
         /// <summary>
-        /// the bounding rect of this graph
+        /// the scale of this graph
         /// </summary>
-        //public Rect boudingRect = new Rect();
-
-        /// TODO
         private Vector3 scale;
 
-        /// TODO
+        /// the centerPosition of this graph
         private Vector3 centerPosition;
 
         /// <summary>
-        /// TODO
+        /// the extend of this graph
         /// </summary>
         public Vector3 Extend
         {
@@ -65,7 +62,7 @@ namespace SEE.Layout
         /// <summary>
         /// the margin around this graph
         /// </summary>
-        private float defaultMargin = CoseLayoutSettings.Graph_Margin;
+        private readonly float defaultMargin = CoseLayoutSettings.Graph_Margin;
 
         /// <summary>
         /// Indicates if the graph is connected
@@ -86,7 +83,6 @@ namespace SEE.Layout
         public CoseGraphManager GraphManager { get => graphManager; set => graphManager = value; }
         public CoseNode Parent { get => parent; set => parent = value; }
         public List<CoseNode> Nodes { get => nodes; set => nodes = value; }
-        //public Rect BoudingRect { get => boudingRect; set => boudingRect = value; }
         public bool IsConnected { get => isConnected; set => isConnected = value; }
         public List<CoseEdge> Edges { get => edges; set => edges = value; }
         public double EstimatedSize { get => estimatedSize; set => estimatedSize = value; }
@@ -108,8 +104,9 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// TODO
+        /// update the bounds of this graph
         /// </summary>
+        /// <param name="recursive">if true the update of the bounds is performed recursively</param>
         public void UpdateBounds(bool recursive)
         {
             if (parent.SublayoutValues.IsSubLayoutNode)
@@ -190,7 +187,7 @@ namespace SEE.Layout
         /// Adds the given displacment values to the graphs position
         /// </summary>
         /// <param name="dx">displacement x direction</param>
-        /// <param name="dy">displacement y direction</param>
+        /// <param name="dz">displacement z direction</param>
         public void SetXZDisplacementBoundingRect(float dx, float dz)
         {
             centerPosition.x += dx;
@@ -277,7 +274,7 @@ namespace SEE.Layout
         /// <param name="newEdge">the new edge</param>
         /// <param name="sourceNode">the source node</param>
         /// <param name="targetNode">the target node</param>
-        /// <returns></returns>
+        /// <returns>the new edge</returns>
         public CoseEdge Add(CoseEdge newEdge, CoseNode sourceNode, CoseNode targetNode)
         {
             if (!nodes.Contains(sourceNode) || !nodes.Contains(targetNode))
@@ -325,7 +322,7 @@ namespace SEE.Layout
         /// <summary>
         /// calculates the estimated size of this graph
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the estimated size</returns>
         public double CalcEstimatedSize()
         {
             double size = 0;
@@ -359,7 +356,6 @@ namespace SEE.Layout
             }
             else
             {
-                // TODO auf level umgestellt, schauen was herauskommt
                 return parent.InclusionTreeDepth;
             }
         }
@@ -408,7 +404,7 @@ namespace SEE.Layout
         /// <summary>
         /// Removes a given edge from this graph
         /// </summary>
-        /// <param name="edge"></param>
+        /// <param name="edge">the edge to remove from this graph</param>
         public void Remove(CoseEdge edge)
         {
             if (edge == null)
@@ -442,32 +438,6 @@ namespace SEE.Layout
 
             edge.Source.Owner.Edges.Remove(edge);
         }
-
-        /*/// <summary>
-        /// Calculates all nodes needed for a sublayout with this graphs parent node as the sublayouts root node
-        /// </summary>
-        /// <param name="onlyLeaves"></param>
-        /// <returns></returns>
-        public List<CoseNode> CalculateNodesForSublayout(bool onlyLeaves)
-        {
-            List<CoseNode> nodesForLayout = new List<CoseNode>();
-            foreach (CoseNode node in nodes)
-            {
-                if (onlyLeaves)
-                {
-                    if (node.IsLeaf())
-                    {
-                        nodesForLayout.Add(node);
-                        node.SublayoutValues.IsSubLayoutNode = true;
-                    }
-                }
-                else
-                {
-                    nodesForLayout.Add(node);
-                    node.SublayoutValues.IsSubLayoutNode = true;
-                }
-            }
-        }*/
     }
 }
 

@@ -60,27 +60,35 @@ namespace SEE.Layout
         /// </summary>
         private readonly Graph graph;
 
+        /// <summary>
+        /// A Mapping from ILayoutNodes to ILayoutSublayoutNodes
+        /// </summary>
+        private Dictionary<ILayoutNode, ILayoutSublayoutNode> ILayout_to_CoseSublayoutNode = new Dictionary<ILayoutNode, ILayoutSublayoutNode>();
+
+        /// <summary>
+        /// abstract see city settings 
+        /// </summary>
+        public AbstractSEECity settings;
+
+        /// <summary>
+        /// the edges of the sublayout
+        /// </summary>
+        private readonly ICollection<Edge> edges = new List<Edge>();
+
         public Vector3 LayoutScale { get => layoutScale; set => layoutScale = value; }
 
         public Vector3 RootNodeRealScale { get => rootNodeRealScale; set => rootNodeRealScale = value; }
 
         public Vector3 LayoutOffset { get => layoutOffset; set => layoutOffset = value; }
 
-        public SublayoutLayoutNode SublayoutLayoutNode => sublayout;
-
-        Dictionary<ILayoutNode, CoseSublayoutNode> ILayout_to_CoseSublayoutNode = new Dictionary<ILayoutNode, CoseSublayoutNode>();
-
-        public AbstractSEECity settings;
-
-        private ICollection<Edge> edges = new List<Edge>();
-
         /// <summary>
-        /// 
+        /// constructor
         /// </summary>
         /// <param name="sublayout">the sublayout node</param>
         /// <param name="groundLevel">the groundlevel for the nodes</param>
         /// <param name="leafNodeFactory">the leafnodefactory</param>
         /// <param name="graph">the underlying graph</param>
+        /// <param name="settings">abstract see city settings</param>
         public Sublayout(SublayoutLayoutNode sublayout, float groundLevel, NodeFactory leafNodeFactory, Graph graph, AbstractSEECity settings)
         {
             this.nodeLayout = sublayout.NodeLayout;
@@ -96,9 +104,8 @@ namespace SEE.Layout
 
                 foreach(ILayoutNode layoutNode in sublayoutNodes)
                 {
-                    ILayoutNode sublayoutNode = (layoutNode as CoseSublayoutNode).Node;
+                    ILayoutNode sublayoutNode = (layoutNode as ILayoutSublayoutNode).Node;
                     sublayoutNode.IsSublayoutNode = true; 
-                    // TODO setsublayoutRoot
                 }
             }
 
@@ -110,7 +117,7 @@ namespace SEE.Layout
         /// <summary>
         /// Calculates all nodes needed for a sublayout with this graphs parent node as the sublayouts root node
         /// </summary>
-        /// <returns></returns>
+        /// <returns>a collection with ILayoutSublayoutNodes</returns>
         public ICollection<ILayoutNode> CalculateNodesForSublayout()
         {
             List<ILayoutNode> nodesForLayout = new List<ILayoutNode>(sublayout.Nodes);
@@ -123,14 +130,14 @@ namespace SEE.Layout
             }
             else
             {
-                sublayoutNodes.Add(new CoseSublayoutNode(sublayout.Node,  ILayout_to_CoseSublayoutNode));
+                sublayoutNodes.Add(new ILayoutSublayoutNode(sublayout.Node,  ILayout_to_CoseSublayoutNode));
 
                 // bei einem subsubLayout wird der root wieder hinzugefügt
                 foreach (ILayoutNode node in sublayout.RemovedChildren)
                 {
                     if (node.IsSublayoutRoot)
                     {
-                        sublayoutNodes.Add(new CoseSublayoutNode(node, new List<ILayoutNode>(), true, node.Parent, node.Sublayout.layoutScale, ILayout_to_CoseSublayoutNode));
+                        sublayoutNodes.Add(new ILayoutSublayoutNode(node, new List<ILayoutNode>(), true, node.Parent, node.Sublayout.layoutScale, ILayout_to_CoseSublayoutNode));
                     }
                 }
             }
@@ -141,13 +148,13 @@ namespace SEE.Layout
         /// Converts a layoutNode to a layout node used for the sublayout calculation
         /// </summary>
         /// <param name="layoutNodes"></param>
-        /// <returns></returns>
+        /// <returns>a collection with ILayoutSublayoutNodes</returns>
         private ICollection<ILayoutNode> ConvertToCoseSublayoutNodes(List<ILayoutNode> layoutNodes)
         {
             List<ILayoutNode> sublayoutNodes = new List<ILayoutNode>();
             layoutNodes.ForEach(layoutNode =>
             {
-                sublayoutNodes.Add(new CoseSublayoutNode(layoutNode, ILayout_to_CoseSublayoutNode));
+                sublayoutNodes.Add(new ILayoutSublayoutNode(layoutNode, ILayout_to_CoseSublayoutNode));
             });
 
             return sublayoutNodes;
@@ -164,7 +171,7 @@ namespace SEE.Layout
 
             foreach (ILayoutNode layoutNode in layout.Keys)
             {
-                ILayoutNode sublayoutNode = (layoutNode as CoseSublayoutNode).Node;
+                ILayoutNode sublayoutNode = (layoutNode as ILayoutSublayoutNode).Node;
                 NodeTransform transform = layout[layoutNode];
 
                 Vector3 position = transform.position;
@@ -183,22 +190,18 @@ namespace SEE.Layout
                     }
                     else
                     {
-                        // TODO reparieren
-                        //coseNode.NodeObject.children = coseNode.SublayoutValues.removedChildren;
-
                         foreach (ILayoutNode subNode in sublayoutNode.Sublayout.sublayoutNodes)
                         {
-
-                            ILayoutNode subSubNode = (subNode as CoseSublayoutNode).Node;
+                            ILayoutNode subSubNode = (subNode as ILayoutSublayoutNode).Node;
 
                             subSubNode.Rotation = sublayoutNode.Rotation;
 
                             if (subSubNode != sublayoutNode)
                             {
-                                subSubNode.SetOrigin(); // sub1 nodes total zu der neuen position von A_1_new setzen
+                                subSubNode.SetOrigin(); 
                                 subSubNode.RelativePosition = subSubNode.CenterPosition;
 
-                                sublayoutNodes.Add(new CoseSublayoutNode(subSubNode, ILayout_to_CoseSublayoutNode));
+                                sublayoutNodes.Add(new ILayoutSublayoutNode(subSubNode, ILayout_to_CoseSublayoutNode));
 
                             }
                         }
@@ -217,7 +220,7 @@ namespace SEE.Layout
 
                 foreach (ILayoutNode layoutNode in sublayoutNodes)
                 {
-                    ILayoutNode sublayoutNode = (layoutNode as CoseSublayoutNode).Node;
+                    ILayoutNode sublayoutNode = (layoutNode as ILayoutSublayoutNode).Node;
 
                     leftLowerCornerNode = new Vector2()
                     {
@@ -298,10 +301,10 @@ namespace SEE.Layout
         /// <summary>
         /// Calculates the sublayout positions 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>a mapping from iLayoutNode to the calcualted nodeTransform</returns>
         private Dictionary<ILayoutNode, NodeTransform> CalculateSublayout()
         {
-            NodeLayout layout = GetLayout();
+            NodeLayout layout = CoseHelper.GetNodelayout(nodeLayout, groundLevel, leafNodeFactory.Unit, settings);
             innerNodeHeight = layout.InnerNodeHeight;
             if (layout.UsesEdgesAndSublayoutNodes())
             {
@@ -309,29 +312,6 @@ namespace SEE.Layout
             } else
             {
                 return layout.Layout(sublayoutNodes);
-            }
-        }
-
-        private NodeLayout GetLayout()
-        {
-            switch (nodeLayout)
-            {
-                case NodeLayouts.Manhattan:
-                    return new ManhattanLayout(groundLevel, leafNodeFactory.Unit);
-                case NodeLayouts.RectanglePacking:
-                    return new RectanglePackingNodeLayout(groundLevel, leafNodeFactory.Unit);
-                case NodeLayouts.EvoStreets:
-                    return new EvoStreetsNodeLayout(groundLevel, leafNodeFactory.Unit);
-                case NodeLayouts.Treemap:
-                    return new TreemapLayout(groundLevel, 10.0f * leafNodeFactory.Unit, 10.0f * leafNodeFactory.Unit);
-                case NodeLayouts.Balloon:
-                    return new BalloonNodeLayout(groundLevel);
-                case NodeLayouts.CirclePacking:
-                    return new CirclePackingNodeLayout(groundLevel);
-                case NodeLayouts.CompoundSpringEmbedder:
-                    return new CoseLayout(groundLevel, settings);
-                default:
-                    throw new System.Exception("Unhandled node layout ");
             }
         }
 

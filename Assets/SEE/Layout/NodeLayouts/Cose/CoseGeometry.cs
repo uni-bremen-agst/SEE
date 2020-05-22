@@ -363,13 +363,13 @@ namespace SEE.Layout
             /* Case x.1:
              *
              * rectA
-             * 	|                       |
-             * 	|        ___      |
-             * 	|        |       |      |
-             * 	|___|__|__|
-             * 			 |       |
-             *           |       |
-             *        rectB
+		     * 	|                       |
+		     * 	|        _________      |
+		     * 	|        |       |      |
+		     * 	|________|_______|______|
+		     * 			 |       |
+		     *           |       |
+		     *        rectB
              */
             {
                 overlapAmount[0] += Mathf.Min((rectB.x - rectA.x),
@@ -379,13 +379,13 @@ namespace SEE.Layout
             /* Case x.2:
              *
              * rectB
-             * 	|                       |
-             * 	|        ___      |
-             * 	|        |       |      |
-             * 	|___|__|__|
-             * 			 |       |
-             *           |       |
-             *        rectA
+		     * 	|                       |
+		     * 	|        _________      |
+		     * 	|        |       |      |
+		     * 	|________|_______|______|
+		     * 			 |       |
+		     *           |       |
+	    	 *        rectA
              */
             {
                 overlapAmount[0] += Mathf.Min((rectA.x - rectB.x),
@@ -394,17 +394,17 @@ namespace SEE.Layout
 
             if ((rectA.y <= rectB.y) && (rectA.yMax >= rectB.yMax))
             /* Case y.1:
-             *          ____ rectA
-             *         |
-             *         |
-             *   __|__  rectB
-             *         |    |
-             *         |    |
-             *   __|__|
-             *         |
-             *         |
-             *         |____
-             *
+             *          ________ rectA
+		     *         |
+		     *         |
+		     *   ______|____  rectB
+	    	 *         |    |
+	    	 *         |    |
+	    	 *   ______|____|
+	    	 *         |
+	    	 *         |
+	    	 *         |________
+	    	 *
              */
             {
                 overlapAmount[1] += Mathf.Min((rectB.y - rectA.y),
@@ -412,17 +412,17 @@ namespace SEE.Layout
             }
             else if ((rectB.y <= rectA.y) && (rectB.yMax >= rectA.yMax))
             /* Case y.2:
-             *          ____ rectB
-             *         |
-             *         |
-             *   __|__  rectA
-             *         |    |
-             *         |    |
-             *   __|__|
-             *         |
-             *         |
-             *         |____
-             *
+             *          ________ rectB
+		     *         |
+	    	 *         |
+	    	 *   ______|____  rectA
+	    	 *         |    |
+	    	 *         |    |
+	    	 *   ______|____|
+	    	 *         |
+	    	 *         |
+	    	 *         |________
+    		 *
              */
             {
                 overlapAmount[1] += Mathf.Min((rectA.y - rectB.y),

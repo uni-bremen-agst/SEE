@@ -1127,6 +1127,7 @@ namespace SEE.Layout
         private void CreateTopology(ILayoutNode root)
         {
             graphManager = new CoseGraphManager(this);
+            CoseGraph _ = graphManager.AddRootGraph();
             CreateNode(root, null);
 
             foreach (Edge edge in edges)

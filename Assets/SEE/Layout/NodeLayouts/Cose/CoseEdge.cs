@@ -117,7 +117,7 @@ namespace SEE.Layout
         /// Returns the other end node of the edge 
         /// </summary>
         /// <param name="node"></param>
-        /// <returns></returns>
+        /// <returns>the other end node of this edge</returns>
         public CoseNode GetOtherEnd(CoseNode node)
         {
             if (node.Equals(source))
@@ -153,11 +153,6 @@ namespace SEE.Layout
             }
 
             length = Mathf.Sqrt(lengthX * lengthX + lengthY * lengthY);
-
-            if (length == 0.0)
-            {
-                Debug.Log("");
-            }
         }
 
         /// <summary>
@@ -188,7 +183,5 @@ namespace SEE.Layout
                 length = Mathf.Sqrt(lengthX * lengthX + lengthY * lengthY);
             }
         }
-
-        
     }
 }
