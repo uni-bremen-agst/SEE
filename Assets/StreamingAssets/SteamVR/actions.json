@@ -61,6 +61,10 @@
       "type": "vector2"
     },
     {
+      "name": "/actions/default/in/Home",
+      "type": "boolean"
+    },
+    {
       "name": "/actions/default/out/Haptic",
       "type": "vibration"
     }
@@ -125,7 +129,8 @@
       "/actions/default/in/Select": "Select",
       "/actions/default/in/Grab": "Grab",
       "/actions/default/in/Cancel": "Cancel",
-      "/actions/default/in/Move": "Move"
+      "/actions/default/in/Move": "Move",
+      "/actions/default/in/Home": "Home"
     }
   ]
 }
