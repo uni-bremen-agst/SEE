@@ -52,5 +52,25 @@ namespace SEE.Controls.Devices
         /// </summary>
         public abstract bool IsCanceling { get; }
 
+        /// <summary>
+        /// True if the user wants to zoom into details.
+        /// This event is a non-persistent one-time event, meaning, the value is returned only
+        /// once at the moment when this property is queried.        
+        /// </summary>
+        public abstract bool IsZoomingIn { get; }
+
+        /// <summary>
+        /// True if the user wants to zoom out of details.
+        /// This event is a non-persistent one-time event, meaning, the value is returned only
+        /// once at the moment when this property is queried.        
+        /// </summary>
+        public abstract bool IsZoomingOut { get; }
+
+        /// <summary>
+        /// True if the user wants to zoom out of all details back to the top level.
+        /// This event is a non-persistent one-time event, meaning, the value is returned only
+        /// once at the moment when this property is queried.        
+        /// </summary>
+        public abstract bool IsZoomingHome { get; }
     }
 }

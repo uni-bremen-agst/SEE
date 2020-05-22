@@ -53,5 +53,11 @@ namespace SEE.Controls.Devices
         /// The button works as a transient event.
         /// </summary>
         public override bool IsCanceling => InputManager.ActiveDevice.Action1.WasPressed;
+
+        public override bool IsZoomingIn => InputManager.ActiveDevice.DPadRight.WasPressed && !InputManager.ActiveDevice.DPadLeft.WasPressed;
+
+        public override bool IsZoomingOut => InputManager.ActiveDevice.DPadLeft.WasPressed && !InputManager.ActiveDevice.DPadRight.WasPressed;
+
+        public override bool IsZoomingHome => InputManager.ActiveDevice.LeftBumper.WasPressed;
     }
 }
