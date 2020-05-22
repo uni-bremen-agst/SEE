@@ -47,14 +47,6 @@ namespace SEE.GO
             tm.fontSizeMin = 0.0f;
             tm.fontSizeMax = 5;
 
-            if (false)
-            {
-                TextFacingCamera textFacing = result.AddComponent<TextFacingCamera>();
-                // Rendering distance is set relative to the text's width
-                textFacing.minimalDistance = width;
-                textFacing.maximalDistance = 10.0f * width;
-            }
-
             // No shading as this might be expensive and even distracts.
             Renderer renderer = result.GetComponent<Renderer>();
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
