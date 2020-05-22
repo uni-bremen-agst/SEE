@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls.Devices
 {
+    [Obsolete("This functionality is covered by a selection device.")]
     public class XRGestureTransformation : Transformation
     {
         [Tooltip("The left hand of the VR player")]

@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SEE.Controls.Devices
 {
+    [Obsolete("This functionality is covered by a selection device.")]
     public abstract class Transformation : InputDevice
     {
         /// <summary>
