@@ -127,12 +127,12 @@ namespace SEE.Layout
         public static int Cooling_Adjuster = 1;
 
         /// <summary>
-        /// TODO
+        /// true if the parameter edgeLength/ repulsionStrength should be calculated automatically 
         /// </summary>
         public static bool Automatic_Parameter_Calculation = false;
 
         /// <summary>
-        /// TODO
+        /// true if the layout process continues until a "good" layout is found
         /// </summary>
         public static bool Iterativ_Parameter_Calculation = false; 
 

@@ -9,13 +9,17 @@ using static SEE.Game.AbstractSEECity;
 
 namespace SEE.Layout
 {
+    /// <summary>
+    /// Helper functions
+    /// </summary>
     public class CoseHelper
     {
-        public static void CalculateListSublayouts()
-        {
-
-        }
-
+        /// <summary>
+        /// checks if the node with the given id is a sublayout root node
+        /// </summary>
+        /// <param name="sublayoutNodes">all sublayout nodes</param>
+        /// <param name="ID">the id</param>
+        /// <returns>true if the node with the given id is a sublayout root node</returns>
         public static SublayoutNode CheckIfNodeIsSublayouRoot(ICollection<SublayoutNode> sublayoutNodes, string ID)
         {
             foreach (SublayoutNode subLayoutNode in sublayoutNodes)
@@ -28,6 +32,12 @@ namespace SEE.Layout
             return null;
         }
 
+        /// <summary>
+        /// checks if the node with the given id is a sublayout root node
+        /// </summary>
+        /// <param name="sublayoutNodes">all sublayout nodes</param>
+        /// <param name="ID">the id</param>
+        /// <returns>true if the node with the given id is a sublayout root node</returns>
         public static SublayoutLayoutNode CheckIfNodeIsSublayouRoot(ICollection<SublayoutLayoutNode> sublayoutNodes, string ID)
         {
             foreach (SublayoutLayoutNode subLayoutNode in sublayoutNodes)
@@ -40,6 +50,12 @@ namespace SEE.Layout
             return null;
         }
 
+        /// <summary>
+        /// Returns a new Rect with the given scale and center position
+        /// </summary>
+        /// <param name="scale">the scale</param>
+        /// <param name="center">the center postion</param>
+        /// <returns>a new rect</returns>
         public static Rect NewRect(Vector3 scale, Vector3 center)
         {
             return new Rect
@@ -51,6 +67,11 @@ namespace SEE.Layout
             };
         }
 
+        /// <summary>
+        /// Sign function 
+        /// </summary>
+        /// <param name="value">the value </param>
+        /// <returns>the sign of the given value</returns>
         public static int Sign(float value)
         {
             if (value > 0)
@@ -67,6 +88,14 @@ namespace SEE.Layout
             }
         }
 
+        /// <summary>
+        /// return a NodeLayout of the given nodeLayout type
+        /// </summary>
+        /// <param name="nodeLayout">the node layout</param>
+        /// <param name="groundLevel">the groundlevel</param>
+        /// <param name="unit">the leafNode unit</param>
+        /// <param name="settings">the abstract see city settings</param>
+        /// <returns>a node layout object</returns>
         public static NodeLayout GetNodelayout(NodeLayouts nodeLayout, float groundLevel, float unit, AbstractSEECity settings)
         {
             switch (nodeLayout)
@@ -90,6 +119,12 @@ namespace SEE.Layout
             }
         }
 
+        /// <summary>
+        /// Calculates a good edge length for the given number of nodes and maximal depth
+        /// </summary>
+        /// <param name="countNodes">the number of nodes</param>
+        /// <param name="maxDepth">the maximal depth</param>
+        /// <returns>edge length</returns>
         public static int GetGoodEgdeLength(int countNodes, int maxDepth)
         {
             float constant = -5.882f;
@@ -100,6 +135,12 @@ namespace SEE.Layout
             return Math.Max((int)Math.Ceiling(edgeLength), 2);
         }
 
+        /// <summary>
+        /// Calculates a good repulsion strength for the given number of edges and maximal depth
+        /// </summary>
+        /// <param name="countNodes">the number of nodes</param>
+        /// <param name="maxDepth">the maximal depth</param>
+        /// <returns>repulsion strength</returns>
         public static int GetGoodRepulsionRange(int maxDepth, int countEdges)
         {
             float constant = 0.537f;
@@ -111,11 +152,11 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// TODO
+        /// Returns the layout node with the given ID
         /// </summary>
-        /// <param name="ID"></param>
-        /// <returns></returns>
-        public static ILayoutNode GetLayoutNodeFromLinkname(String ID, List<ILayoutNode> layoutNodes)
+        /// <param name="ID">the ID</param>
+        /// <returns>layout node with the given ID</returns>
+        public static ILayoutNode GetLayoutNodeFromLinkname(String ID, ICollection<ILayoutNode> layoutNodes)
         {
             List<ILayoutNode> nodes = layoutNodes.Where(layoutNode => layoutNode.ID == ID).ToList();
 

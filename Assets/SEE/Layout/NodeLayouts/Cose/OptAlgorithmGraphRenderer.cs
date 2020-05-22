@@ -29,7 +29,7 @@ namespace SEE.Layout
         /// <summary>
         /// the type of the optimization
         /// </summary>
-        private readonly OptTypes type = OptTypes.CompareNodeLayouts;
+        private readonly OptTypes type = OptTypes.FindGoodParameter;
 
         /// <summary>
         /// A dictionary holding layoutNodes with there inital size
@@ -484,7 +484,8 @@ namespace SEE.Layout
         private Graph CreateRandomCity()
         {
             // 1, 301, Random.Range(1, 30), Random.Range(0.001f, 0.021f)
-            Constraint LeafConstraint = new Tools.Constraint("Class", Random.Range(1, 100), "calls", Random.Range(0.001f, 0.05f));
+            // Random.Range(1, 100), "calls", Random.Range(0.001f, 0.05f)
+            Constraint LeafConstraint = new Tools.Constraint("Class", Random.Range(1, 50), "calls", Random.Range(0.001f, 0.05f));
             // 1, 101, Random.Range(1, 5)
             Constraint InnerNodeConstraint = new Tools.Constraint("Package", Random.Range(1, 10), "uses", 0f);
             SEECityRandom.DefaultAttributeMean = 10;
@@ -554,12 +555,18 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// 
+        /// calculates the layout for a given graph
         /// </summary>
         /// <param name="graph"></param>
         /// <param name="parent"></param>
         public override void Draw(Graph graph, GameObject parent)
         {
+            settings.CoseGraphSettings.UseSmartIdealEdgeCalculation = false;
+            settings.CoseGraphSettings.UseSmartMultilevelScaling = false;
+            settings.CoseGraphSettings.UseSmartRepulsionRangeCalculation = false;
+            settings.CoseGraphSettings.multiLevelScaling = false;
+            settings.CoseGraphSettings.useCalculationParameter = false;
+
             if (type == OptTypes.CompareNodeLayouts)
             {
                 SetupFile(compareNodeLayoutsPath);
@@ -571,14 +578,11 @@ namespace SEE.Layout
                 writer.WriteLine(line);
                 writer.Close();
 
-                settings.CoseGraphSettings.UseSmartIdealEdgeCalculation = false;
-                settings.CoseGraphSettings.UseSmartMultilevelScaling = false;
-                settings.CoseGraphSettings.UseSmartRepulsionRangeCalculation = false;
-                settings.CoseGraphSettings.multiLevelScaling = false;
-                settings.CoseGraphSettings.useCalculationParameter = true;
+                settings.CoseGraphSettings.useItertivCalclation = true;
             }
             else
             {
+                settings.CoseGraphSettings.useItertivCalclation = false;
                 //SetupFile(path: globalPath);
                 path = pathPrefix + totalNumberOfGraphs + ".txt";
                 SetupFile(path: path);
@@ -587,12 +591,11 @@ namespace SEE.Layout
 
             base.Draw(CreateRandomCity(), parent);
             this.parent = parent;
-
-            // combine();
-
-
         }
 
+        /// <summary>
+        /// Resets and prefairs for a new graph and starts calculation process
+        /// </summary>
         private void Draw()
         {
             mapGameObjectOriginalSize = new Dictionary<ILayoutNode, Vector3>();
@@ -606,146 +609,15 @@ namespace SEE.Layout
             base.Draw(CreateRandomCity(), parent);
         }
 
+        /// <summary>
+        /// Sets up a file
+        /// </summary>
+        /// <param name="path">the path for the file</param>
         private void SetupFile(String path)
         {
             if (File.Exists(path))
             {
                 File.Delete(path);
-            }
-
-            using (StreamWriter writer = File.CreateText(path))
-            {
-                //writer.WriteLine(firstLine);
-            }
-
-        }
-
-        private void GetAverage()
-        {
-            Dictionary<int, List<int>> result = new Dictionary<int, List<int>>();
-            Dictionary<int, int> newResult = new Dictionary<int, int>();
-
-
-            var linesToKeep = File.ReadLines("Assets/Resources/repulsionForce.txt").ToList();
-
-            if (linesToKeep.Count > 1)
-            {
-                linesToKeep.ForEach(line =>
-                {
-                    var values = line.Split(';');
-                    int countEdges = ParseInt(values[1]);
-                    int repulsionForce = ParseInt(values[2]);
-
-
-
-                    if (result.ContainsKey(repulsionForce))
-                    {
-                        result[repulsionForce].Add(countEdges);
-                    }
-                    else
-                    {
-                        result.Add(repulsionForce, new List<int>(countEdges));
-                    }
-                });
-
-            }
-
-            result.ForEach(entry =>
-            {
-                var length = entry.Value.Count;
-
-                var sum = 0;
-
-                entry.Value.ForEach(item =>
-                {
-                    sum += item;
-                });
-
-
-                if (length > 0)
-                {
-                    var avg = sum / length;
-
-                    newResult.Add(entry.Key, avg);
-                }
-
-
-            });
-
-            using (StreamWriter writer = File.CreateText("Assets/Resources/repulsionForceResult.txt"))
-            {
-
-                newResult.ForEach(kvp =>
-                {
-                    string line = kvp.Key + ";" + kvp.Value + ";";
-                    writer.WriteLine(line);
-                });
-            }
-        }
-
-
-        private void combine()
-        {
-            Dictionary<Tuple<int, int>, List<int>> result = new Dictionary<Tuple<int, int>, List<int>>();
-
-            Dictionary<Tuple<int, int>, int> newResult = new Dictionary<Tuple<int, int>, int>();
-
-
-            var linesToKeep = File.ReadLines("Assets/Resources/repulsionForce.txt").ToList();
-
-            if (linesToKeep.Count > 1)
-            {
-                linesToKeep.ForEach(line =>
-                {
-                    var values = line.Split(';');
-                    int countNodes = ParseInt(values[0]);
-                    int countEdges = ParseInt(values[1]);
-                    int repulsionForce = ParseInt(values[2]);
-
-                    var tuple = new Tuple<int, int>(countNodes, countEdges);
-
-                    if (result.ContainsKey(tuple))
-                    {
-                        result[tuple].Add(repulsionForce);
-                    }
-                    else
-                    {
-                        result.Add(tuple, new List<int>(repulsionForce));
-                    }
-                });
-
-            }
-
-            result.ForEach(entry =>
-            {
-                var length = entry.Value.Count;
-
-                var sum = 0;
-
-                entry.Value.ForEach(item =>
-                {
-                    sum += item;
-                });
-
-
-                if (length > 0)
-                {
-                    var avg = sum / length;
-
-                    newResult.Add(entry.Key, avg);
-                }
-
-
-            });
-
-            using (StreamWriter writer = File.CreateText("Assets/Resources/repulsionForceResult.txt"))
-            {
-
-                newResult.ForEach(kvp =>
-                {
-                    string line = kvp.Key.Item1 + ";" + kvp.Key.Item2 + ";" + kvp.Value;
-                    writer.WriteLine(line);
-                });
             }
         }
     }

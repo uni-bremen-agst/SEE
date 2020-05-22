@@ -139,7 +139,7 @@ namespace SEE.Layout
         /// <param name="newEdge">the new edge</param>
         /// <param name="cSource">the source of this edge</param>
         /// <param name="cTarget">the target of the edge</param>
-        /// <returns></returns>
+        /// <returns>the new edge</returns>
         public CoseEdge Add(CoseEdge newEdge, CoseNode cSource, CoseNode cTarget)
         {
             CoseGraph sourceGraph = cSource.Owner;
@@ -210,7 +210,7 @@ namespace SEE.Layout
         /// <summary>
         /// Returns all nodes of the graphManager
         /// </summary>
-        /// <returns></returns>
+        /// <returns>all nodes of the graphManager</returns>
         public List<CoseNode> GetAllNodes()
         {
             if (allNodes == null)
@@ -227,6 +227,9 @@ namespace SEE.Layout
             return allNodes;
         }
 
+        /// <summary>
+        /// Calculates the inclusion tree depth for all nodes
+        /// </summary>
         public void CalcInclusionTreeDepths()
         {
             CalcInclusionTreeDepth(RootGraph, 1);
@@ -234,8 +237,10 @@ namespace SEE.Layout
 
 
         /// <summary>
-        /// TODO
+        ///  Calculates the inclusion tree depth for all nodes for a given graph
         /// </summary>
+        /// <param name="graph">the graph</param>
+        /// <param name="depth">depth of the current graph</param>
         private void CalcInclusionTreeDepth(CoseGraph graph, int depth)
         {
             graph.Nodes.ForEach(node =>
@@ -389,7 +394,7 @@ namespace SEE.Layout
         /// Coarsen a graph manager (once)
         /// </summary>
         /// <param name="lastM"></param>
-        /// <returns></returns>
+        /// <returns>a new graph manager</returns>
         private CoseGraphManager Coarsen(CoseGraphManager lastM)
         {
             CoseGraphManager newM = new CoseGraphManager(lastM.Layout);
@@ -408,6 +413,11 @@ namespace SEE.Layout
             return newM;
         }
 
+        /// <summary>
+        /// Adds all edges from one graphManager to another graphManager
+        /// </summary>
+        /// <param name="lastM">the "old" graphManager</param>
+        /// <param name="newM">the new graphManager</param>
         private void AddEdges(CoseGraphManager lastM, CoseGraphManager newM)
         {
             foreach(CoseEdge edge in lastM.GetAllEdges())
@@ -500,7 +510,7 @@ namespace SEE.Layout
         /// <summary>
         /// Removes an edge from this graphManager
         /// </summary>
-        /// <param name="edge"></param>
+        /// <param name="edge">the edge to remove</param>
         public void Remove(CoseEdge edge)
         {
             if (edge == null)

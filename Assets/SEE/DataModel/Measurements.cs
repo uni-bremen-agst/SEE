@@ -4,6 +4,7 @@ using SEE.Layout;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http.Headers;
 using UnityEngine;
 
@@ -75,15 +76,18 @@ namespace SEE
         /// <summary>
         /// class holding all measurements value of the edges
         /// </summary>
-        /// <param name="lengthMax"></param>
-        /// <param name="lengthMin"></param>
-        /// <param name="lengthTotal"></param>
-        /// <param name="lengthMaxArea"></param>
-        /// <param name="lengthMinArea"></param>
-        /// <param name="lengthTotalArea"></param>
-        /// <param name="lengthAverage"></param>
-        /// <param name="lengthVariance"></param>
-        /// <param name="lengthStandardDeviation"></param>
+        /// <param name="lengthMax">the length of the longest edge</param>
+        /// <param name="lengthMin">the length of the shortest edge</param>
+        /// <param name="lengthTotal">the total length of all edges</param>
+        /// <param name="lengthMaxArea">the length of the longest edge in relation to the area</param>
+        /// <param name="lengthMinArea">The minimum length of an edge in relation to the area (height + width / 2)</param>
+        /// <param name="lengthTotalArea">The total length of all edges in relation to the area (height + width / 2)</param>
+        /// <param name="lengthAverage">The average length of an edge</param>
+        /// <param name="lengthVariance"> The variance length of any edge</param>
+        /// <param name="lengthStandardDeviation">The variance length of any edge in relation to the area (height + width / 2)</param>
+        /// <param name="lengthAverageArea">The average length of an edge in relation to the area (height + width / 2)</param>
+        /// <param name="lengthStandardDeviationArea">The standart deviation of any edge length in relation to the area (height + width / 2)</param>
+        /// <param name="lengthVarianceArea">The variance length of any edge in relation to the area (height + width / 2)</param>
         public EdgesMeasurements(float lengthMax, float lengthMin, float lengthTotal, float lengthMaxArea, float lengthMinArea, float lengthTotalArea, float lengthAverage, float lengthAverageArea, float lengthVariance, float lengthStandardDeviation, float lengthVarianceArea, float lengthStandardDeviationArea)
         {
             this.lengthMax = lengthMax;
@@ -104,19 +108,9 @@ namespace SEE
     public class Measurements
     {
         /// <summary>
-        /// the graph displayed by the layout
-        /// </summary>
-        private Graph graph;
-
-        /// <summary>
-        /// all gameobjects 
-        /// </summary>
-        private ICollection<GameObject> nodes;
-
-        /// <summary>
         /// all edges
         /// </summary>
-        private IList<Edge> edges;
+        private readonly IList<Edge> edges;
 
         /// <summary>
         /// width of this graph visualisation
@@ -132,6 +126,16 @@ namespace SEE
         /// Dictonary with nodes and corresonding gameobjects
         /// </summary>
         protected ICollection<ILayoutNode> layoutNodes;
+
+        /// <summary>
+        /// a dictionary containing all measurements with the according values
+        /// </summary>
+        public SortedDictionary<string, string> measurementsDict = new SortedDictionary<string, string>();
+
+        /// <summary>
+        /// the performance of the layout of the nodes
+        /// </summary>
+        private readonly Performance nodePerformance = null;
 
         public EdgesMeasurements EdgesMeasurements
         {
@@ -158,20 +162,17 @@ namespace SEE
             get => GetNodesPerformance();
         }
 
-        public SortedDictionary<string, string> measurementsDict = new SortedDictionary<string, string>();
-
-        private Performance nodePerformance = null;
 
         /// <summary>
         /// the constructor
         /// </summary>
-        /// <param name="nodeMap">Dictonary with nodes and corresonding gameobjects</param>
         /// <param name="graph"> the graph displayed by the layout</param>
         /// <param name="leftFrontCorner">2D co-ordinate of the left front corner</param>
         /// <param name="rightBackCorner">2D co-ordinate of the right back corner</param>
+        /// <param name="layoutNodes">the layoutNodes</param>
+        /// <param name="performance">nodes performance</param>
         public Measurements(ICollection<ILayoutNode> layoutNodes, Graph graph, Vector2 leftFrontCorner, Vector2 rightBackCorner, Performance performance = null)
         {
-            this.graph = graph;
             this.width = Distance(leftFrontCorner.x, rightBackCorner.x);
             this.height = Distance(leftFrontCorner.y, rightBackCorner.y);
             this.layoutNodes = new List<ILayoutNode>(layoutNodes);
@@ -180,10 +181,10 @@ namespace SEE
         }
 
         /// <summary>
-        /// TODO
+        /// constructor
         /// </summary>
-        /// <param name="layoutNodes"></param>
-        /// <param name="graph"></param>
+        /// <param name="layoutNodes">the layout nodes</param>
+        /// <param name="edges">edges</param>
         public Measurements(ICollection<ILayoutNode> layoutNodes, List<Edge> edges)
         {
             this.layoutNodes = new List<ILayoutNode>(layoutNodes);
@@ -191,9 +192,8 @@ namespace SEE
         }
 
         /// <summary>
-        /// Adds the time needed for calculating the node layout to the measurements
+        /// Gets the time needed for calculating the node layout to the measurements
         /// </summary>
-        /// <param name="performance"></param>
         public string GetNodesPerformance()
         {
             if (nodePerformance != null )
@@ -203,6 +203,10 @@ namespace SEE
             return "";
         }
 
+        /// <summary>
+        /// Transforms all measurements to a string dictinary containing the measurements with it values
+        /// </summary>
+        /// <returns>string dictinary with measurements</returns>
         public SortedDictionary<string, string> ToStringDictionary()
         {
             if (measurementsDict.Count > 0)
@@ -255,10 +259,10 @@ namespace SEE
                 foreach (Edge edge2 in edgesToIterate)
                 {
 
-                    Vector3 sourcePosition = FilterListForGameNode(edge.Source.ID).CenterPosition;
-                    Vector3 targetPosition = FilterListForGameNode(edge.Target.ID).CenterPosition;
-                    Vector3 sourcePosition2 = FilterListForGameNode(edge2.Source.ID).CenterPosition;
-                    Vector3 targetPosition2 = FilterListForGameNode(edge2.Target.ID).CenterPosition;
+                    Vector3 sourcePosition = CoseHelper.GetLayoutNodeFromLinkname(edge.Source.ID, layoutNodes).CenterPosition; 
+                    Vector3 targetPosition = CoseHelper.GetLayoutNodeFromLinkname(edge.Target.ID, layoutNodes).CenterPosition; 
+                    Vector3 sourcePosition2 = CoseHelper.GetLayoutNodeFromLinkname(edge2.Source.ID, layoutNodes).CenterPosition; 
+                    Vector3 targetPosition2 = CoseHelper.GetLayoutNodeFromLinkname(edge2.Target.ID, layoutNodes).CenterPosition; 
                     bool doIntersect = FasterLineSegmentIntersection(new Vector2(sourcePosition.x, sourcePosition.z),
                                                   new Vector2(targetPosition.x, targetPosition.z),
                                                   new Vector2(sourcePosition2.x, sourcePosition2.z),
@@ -271,18 +275,6 @@ namespace SEE
             }
             return totalCrossings;
         }
-
-        private ILayoutNode FilterListForGameNode(String ID)
-        {
-            foreach (ILayoutNode gameNode in layoutNodes)
-            {
-                if (gameNode.ID == ID)
-                {
-                    return gameNode;
-                }
-            }
-            return null;
-        } 
 
         /// <summary>
         /// calculates whether two lines intersect
@@ -461,7 +453,6 @@ namespace SEE
         /// <summary>
         /// Returns the amount of overlapping of nodes
         /// </summary>
-        /// <param name="nodes">all nodes</param>
         /// <returns>the overlapping amount</returns>
         private int CalcOverlappingGameNodes()
         {
