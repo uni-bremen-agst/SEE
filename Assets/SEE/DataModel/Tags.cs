@@ -1,10 +1,13 @@
-﻿namespace SEE.DataModel
+﻿using UnityEngine.PlayerLoop;
+
+namespace SEE.DataModel
 {
     /// <summary>
     /// The Unity tags for the graph entities represented by the GameObjects.
     /// </summary>
     public class Tags
     {
+        public const string None = ""; // pseudo tag whenever a value for no tag is needed
         public const string Graph = "Graph";
         public const string Node = "Node"; // for logical graph nodes (not their visual representation such as Blocks and Buildings)
         public const string Edge = "Edge";
