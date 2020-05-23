@@ -253,7 +253,7 @@ namespace SEE.Game
         {
             get
             {
-                float width = initialRightUpperCorner.x - initialLeftLowerCorner.y;
+                float width = initialRightUpperCorner.x - initialLeftLowerCorner.x;
                 float depth = initialRightUpperCorner.y - initialLeftLowerCorner.y;
                 return new Vector2(initialLeftLowerCorner.x + width / 2.0f, initialLeftLowerCorner.y + depth / 2.0f);
             }
@@ -402,10 +402,11 @@ namespace SEE.Game
             newPosition.z = center.y;
             Vector3 newScale = parent.transform.localScale * scaleFactor;
 
-            //Debug.LogFormat("Transforming {0} from [p={1} ls={2} ws={3}] to [p={4} ls={5}].\n", 
-            //                parent.name, 
-            //                parent.transform.position, parent.transform.localScale, parent.transform.lossyScale,
-            //                newPosition, newScale);
+            //Debug.LogFormat("Transforming {0} from [p={1} s={2}] to [p={3} s={4}]. CenterPoint={5}.\n",
+            //                parent.name,
+            //                parent.transform.position, parent.Size(),
+            //                newPosition, newScale,
+            //                CenterPoint);
             //Debug.LogFormat("initialLeftLowerCorner {0} initialRightUpperCorner {1} leftLowerCorner {2} rightUpperCorner {3} scaleFactor {4}\n",
             //                initialLeftLowerCorner, initialRightUpperCorner, leftLowerCorner, rightUpperCorner, scaleFactor);
             // Adjust position and scale by some animation.
