@@ -81,7 +81,7 @@ namespace SEE.Controls
         /// </summary>
         private void Update()
         {
-            if (animationIsRunning)
+            if (Animation.IsOn())
             {
                 return;
             }
@@ -158,17 +158,17 @@ namespace SEE.Controls
                 // notified via a call to OnZoomingComplete().
                 if (selectionDevice.IsZoomingIn)
                 {
-                    animationIsRunning = true;
+                    Animation.Start();
                     Transformer.ZoomInto(gameObject, handledObject);
                 }
                 else if (selectionDevice.IsZoomingOut)
                 {
-                    animationIsRunning = true;
+                    Animation.Start();
                     Transformer.ZoomOutOf(gameObject, handledObject);
                 }
                 else if (selectionDevice.IsZoomingHome)
                 {
-                    animationIsRunning = true;
+                    Animation.Start();
                     Transformer.ZoomRoot(gameObject, handledObject);
                 }
             }
@@ -185,7 +185,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnZoomingComplete()
         {
-            animationIsRunning = false;
+            Animation.End();
         }
 
         /// <summary>
@@ -194,7 +194,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnZoomingOutComplete(Transformer transformer)
         {
-            animationIsRunning = false;
+            Animation.End();
             transformer.FinalizeZoomOut();
         }
 
@@ -352,7 +352,7 @@ namespace SEE.Controls
             if (!actionFinalized)
             {
                 // assert: selectedObject == handledObject.gameObject
-                animationIsRunning = true;
+                Animation.Start();
                 iTween.MoveTo(handledObject.gameObject,
                               iTween.Hash("position", handledObjectMemento.Position,
                                           "time", 0.75f,
@@ -424,12 +424,6 @@ namespace SEE.Controls
         protected abstract Ray GetRay();
 
         /// <summary>
-        /// If true, the re-location of a grabbed to its original position where it was 
-        /// grabbed is animated. During that animation, no user interactions are accepted.
-        /// </summary>
-        private bool animationIsRunning = false;
-
-        /// <summary>
         /// Called by iTween when grabbing was cancelled and the grabbed object
         /// has reached its original position (the one where it was located before
         /// being grabbed). After that, the animation is over and animationIsRunning
@@ -440,7 +434,57 @@ namespace SEE.Controls
         /// </summary>
         protected void ResetCompleted()
         {
-            animationIsRunning = false;
+            Animation.End();
+        }
+
+        /// <summary>
+        /// Animation mode with a time out.
+        /// </summary>
+        private static class Animation
+        {
+            /// <summary>
+            /// Whether any animation is currently running.
+            /// </summary>
+            private static bool animationIsRunning = false;
+
+            /// <summary>
+            /// Remaining waiting time for the time out in seconds.
+            /// </summary>
+            private static float animationTimeOut = 0.0f;
+
+            /// <summary>
+            /// Indicates the start of a new animation.
+            /// </summary>
+            public static void Start()
+            {
+                animationIsRunning = true;
+                animationTimeOut = 3.0f;
+            }
+
+            /// <summary>
+            /// Indicates the end of a running animation.
+            /// </summary>
+            public static void End()
+            {
+                animationIsRunning = false;
+            }
+
+            /// <summary>
+            /// Returns if there is no animation is currently running or if the 
+            /// waiting time for an animation to be finished is up. Must be called
+            /// exactly once per frame.
+            /// </summary>
+            /// <returns>true if animation is finished or time is up</returns>
+            public static bool IsOn()
+            {
+                animationTimeOut -= Time.deltaTime;
+                if (animationTimeOut <= 0)
+                {
+                    Debug.LogWarning("Animation time out.\n");
+                    animationIsRunning = false;
+                }
+                return animationIsRunning;
+            }
         }
     }
 }
