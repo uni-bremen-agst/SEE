@@ -229,7 +229,7 @@ namespace SEE.Game
             // Similarly, only the descands tagged by Tags.Node are relevant for calculating
             // the bounding box. We assume that all other kinds of game objects in this game-object
             // hierarchy are visualized above the nodes. The bounding box is the area in the x/z plane.
-            BoundingBox.Get(descendants, out initalLeftLowerCorner, out initialRightUpperCorner);
+            BoundingBox.Get(descendants, out initialLeftLowerCorner, out initialRightUpperCorner);
         }
 
         /// ----------------------------------------------------------------------------------------------
@@ -239,22 +239,25 @@ namespace SEE.Game
         /// <summary>
         /// The left lower corner of the initial bounding box of the gameObject in world space (x/z plane).
         /// </summary>
-        private Vector2 initalLeftLowerCorner;
+        private Vector2 initialLeftLowerCorner;
         /// <summary>
         /// The right upper corner of the initial bounding box of the gameObject in world space (x/z plane).
         /// </summary>
         private Vector2 initialRightUpperCorner;
 
+        /// <summary>
+        /// The center point of the rectangle defined by initalLeftLowerCorner and initialRightUpperCorner 
+        /// in world space.
+        /// </summary>
         private Vector2 CenterPoint
         {
             get
             {
-                float width = initialRightUpperCorner.x - initalLeftLowerCorner.y;
-                float height = initialRightUpperCorner.y - initalLeftLowerCorner.y;
-                return new Vector2(initalLeftLowerCorner.x + width / 2.0f, initalLeftLowerCorner.y + height / 2.0f);
+                float width = initialRightUpperCorner.x - initialLeftLowerCorner.y;
+                float depth = initialRightUpperCorner.y - initialLeftLowerCorner.y;
+                return new Vector2(initialLeftLowerCorner.x + width / 2.0f, initialLeftLowerCorner.y + depth / 2.0f);
             }
         }
-
 
         /// <summary>
         /// Contains all ascendants of the currently visible nodes in the 
@@ -268,7 +271,10 @@ namespace SEE.Game
         /// </summary>
         private Stack<ObjectMemento> activeAscendants = new Stack<ObjectMemento>();
 
-        // All descendants of gameObject tagged by Tags.Node.
+        /// <summary>
+        /// All descendants of gameObject tagged by Tags.Node.
+        /// </summary>
+
         private Dictionary<string, ObjectMemento> initialTransforms;
 
         private void Reset(ICollection<GameObject> gameObjects)
@@ -386,8 +392,8 @@ namespace SEE.Game
             BoundingBox.Get(GameObjectHierarchy.Descendants(parent, Tags.Node), 
                             out Vector2 leftLowerCorner, out Vector2 rightUpperCorner);
 
-            float scaleFactor = Mathf.Min((initialRightUpperCorner.x - initalLeftLowerCorner.x) / (rightUpperCorner.x - leftLowerCorner.x),
-                                          (initialRightUpperCorner.y - initalLeftLowerCorner.y) / (rightUpperCorner.y - leftLowerCorner.y));
+            float scaleFactor = Mathf.Min((initialRightUpperCorner.x - initialLeftLowerCorner.x) / (rightUpperCorner.x - leftLowerCorner.x),
+                                          (initialRightUpperCorner.y - initialLeftLowerCorner.y) / (rightUpperCorner.y - leftLowerCorner.y));
 
             // We maintain parent's y co-ordinate. We move it only within the x/z plane.
             Vector3 newPosition = parent.transform.position;
@@ -400,17 +406,17 @@ namespace SEE.Game
             //                parent.name, 
             //                parent.transform.position, parent.transform.localScale, parent.transform.lossyScale,
             //                newPosition, newScale);
-            //Debug.LogFormat("initalLeftLowerCorner {0} initialRightUpperCorner {1} leftLowerCorner {2} rightUpperCorner {3} scaleFactor {4}\n",
-            //                initalLeftLowerCorner, initialRightUpperCorner, leftLowerCorner, rightUpperCorner, scaleFactor);
+            //Debug.LogFormat("initialLeftLowerCorner {0} initialRightUpperCorner {1} leftLowerCorner {2} rightUpperCorner {3} scaleFactor {4}\n",
+            //                initialLeftLowerCorner, initialRightUpperCorner, leftLowerCorner, rightUpperCorner, scaleFactor);
             // Adjust position and scale by some animation.
             iTween.MoveTo(parent, iTween.Hash(
                                           "position", newPosition,
-                                          "time", 0.75f
+                                          "time", 1.5f
                 ));
             iTween.ScaleTo(parent, iTween.Hash(
                               "scale", newScale,
-                              "delay", 0.75f,
-                              "time", 0.75f,
+                              //"delay", 0.75f,
+                              "time", 1.5f,
                               "oncompletetarget", caller,
                               "oncomplete", OnZoomingComplete
                 ));
