@@ -47,7 +47,7 @@ namespace SEE.GO
             return go.name
                 + " position=" + position
                 + " localScale=" + localScale
-                + " worldScale=" + go.transform.lossyScale;
+                + " worldSize=" + go.Size();
         }
     }
 }
