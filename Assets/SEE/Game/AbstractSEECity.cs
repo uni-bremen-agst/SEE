@@ -32,16 +32,6 @@ namespace SEE.Game
         public string PathPrefix; // serialized by Unity
 
         /// <summary>
-        /// The center origin where the graph should be placed in the world scene.
-        /// </summary>
-        public Vector3 origin = Vector3.zero; // serialized by Unity
-
-        /// <summary>
-        /// The width (x axis) of the generated city.
-        /// </summary>
-        public float width = 1.0f; // serialized by Unity
-
-        /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
         [OdinSerialize]

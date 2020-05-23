@@ -42,6 +42,12 @@ namespace SEE.Game.Evolution
         private readonly GraphRenderer _graphRenderer;
 
         /// <summary>
+        /// The game object representing the city; its position and scale determines
+        /// the position and scaling of the city elements visualized by the renderer.
+        /// </summary>
+        private readonly GameObject city;
+
+        /// <summary>
         /// The plane enclosing all game objects of the city.
         /// </summary>
         private GameObject currentPlane;
@@ -58,10 +64,13 @@ namespace SEE.Game.Evolution
         /// Constructor.
         /// </summary>
         /// <param name="renderer">the graph renderer used to create the game objects</param>
-        public ObjectManager(GraphRenderer renderer)
+        /// <param name="city">the game object representing the city; its position and scale determines
+        /// the position and scaling of the city elements visualized by the renderer</param>
+        public ObjectManager(GraphRenderer renderer, GameObject city)
         {
             renderer.AssertNotNull("renderer");
             _graphRenderer = renderer;
+            this.city = city;
         }
 
         /// <summary>
@@ -82,14 +91,14 @@ namespace SEE.Game.Evolution
         /// plane encloses all currently cached game objects of the city only if it was newly 
         /// generated. It may need to be adjusted if it was not newly generated. 
         /// </summary>
-        /// <param name="plane">the plane intended to enclose all game objects of the city</param>
+        /// <param name="plane">the plane intended to enclose all game objects of the city; the y co-ordinate of the plane will be 0</param>
         /// <returns>true if the plane already existed (thus, can be re-used) and false if it was newly created</returns>
         public bool GetPlane(out GameObject plane)
         {
             bool hasPlane = currentPlane != null;
             if (!hasPlane)
             {
-                currentPlane = _graphRenderer.NewPlane(gameObjects);
+                currentPlane = _graphRenderer.NewPlane(gameObjects, city.transform.position.y);
             }
             plane = currentPlane;
             return hasPlane;
