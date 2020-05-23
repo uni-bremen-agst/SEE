@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SEE.GO;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -11,6 +12,8 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the bounding box (2D rectangle) enclosing all given <paramref name="gameObjects"/>
         /// in terms of world space.
+        /// 
+        /// Precondition: All <paramref name="gameObjects"/> have a renderer component attached to them.
         /// </summary>
         /// <param name="gameObjects">the list of objects that are enclosed in the resulting bounding box</param>
         /// <param name="leftLowerCorner">the left lower front corner (x axis in 3D space) of the bounding box</param>
@@ -29,8 +32,7 @@ namespace SEE.Utils
 
                 foreach (GameObject go in gameObjects)
                 {
-                    // Note: lossyScale might not properly work if an object is skewed.
-                    Vector3 extent = go.transform.lossyScale;
+                    Vector3 extent = go.Size() / 2.0f;
                     // Note: position denotes the center of the object
                     Vector3 position = go.transform.position;
                     {
@@ -80,7 +82,7 @@ namespace SEE.Utils
             {
                 if (gameObject.transform.position.y > result)
                 {
-                    result = gameObject.transform.position.y + gameObject.transform.lossyScale.y / 2.0f;
+                    result = gameObject.transform.position.y + gameObject.Size().y / 2.0f;
                 }
             }
             return result;
