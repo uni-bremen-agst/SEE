@@ -478,7 +478,7 @@ namespace SEE.Controls
             public static bool IsOn()
             {
                 animationTimeOut -= Time.deltaTime;
-                if (animationTimeOut <= 0)
+                if (animationIsRunning && animationTimeOut <= 0)
                 {
                     Debug.LogWarning("Animation time out.\n");
                     animationIsRunning = false;
