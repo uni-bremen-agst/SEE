@@ -1069,8 +1069,6 @@ MonoBehaviour:
       Entry: 8
       Data: 
   PathPrefix: F:\develop\SEE\Data\GXL\reflexion\minilax\
-  origin: {x: 1, y: 1, z: -0.5}
-  width: 2
   WidthMetric: Metric.Number_of_Tokens
   HeightMetric: Metric.Clone_Rate
   DepthMetric: Metric.LOC
@@ -1094,7 +1092,7 @@ MonoBehaviour:
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
-  InnerNodeObjects: 3
+  InnerNodeObjects: 5
   NodeLayout: 4
   EdgeLayout: 0
   ZScoreScale: 1
@@ -1114,8 +1112,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 916716864}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 1, y: 1, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 13
@@ -1204,7 +1202,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1206385286}
   - component: {fileID: 1206385285}
-  - component: {fileID: 1206385287}
   m_Layer: 0
   m_Name: Implementation
   m_TagString: Untagged
@@ -1278,8 +1275,6 @@ MonoBehaviour:
       Entry: 8
       Data: 
   PathPrefix: F:\develop\SEE\Assets\
-  origin: {x: -0.4, y: 1, z: -0.35}
-  width: 2.8
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
@@ -1323,24 +1318,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1206385284}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.7, y: 1, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.25, y: 1, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1206385287
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1206385284}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b6af444e460f0c4694475e8db389274, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1245159332
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1481,8 +1464,6 @@ MonoBehaviour:
       Entry: 8
       Data: 
   PathPrefix: F:\develop\SEE\Data\GXL\random\
-  origin: {x: -0.4, y: 1, z: -0.35}
-  width: 10
   WidthMetric: Metric.Number_of_Tokens
   HeightMetric: Metric.Clone_Rate
   DepthMetric: Metric.LOC

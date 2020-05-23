@@ -15,10 +15,6 @@ namespace SEEEditor
         {
             AbstractSEECity city = target as AbstractSEECity;
 
-            GUILayout.Label("Graph", EditorStyles.boldLabel);
-            city.origin = EditorGUILayout.Vector3Field("Origin", city.origin);
-            city.width = EditorGUILayout.FloatField("Width (x axis)", city.width);
-
             GUILayout.Label("Attributes of leaf nodes", EditorStyles.boldLabel);
             city.WidthMetric = EditorGUILayout.TextField("Width", city.WidthMetric);
             city.HeightMetric = EditorGUILayout.TextField("Height", city.HeightMetric);
