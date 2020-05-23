@@ -133,14 +133,8 @@ namespace SEE.Game
         /// will be used for the notification</param>        
         public void FinalizeZoomOut()
         {
-            Debug.Log("FinalizeZoomOut()\n");
             // This is the memento of the current focus.
             ObjectMemento memento = activeAscendants.Pop();
-            Debug.Assert(memento.Node == focus);
-
-            Debug.LogFormat("Final transform result {0}: [{1} {2}]\n",
-                            memento.Node.name,
-                            memento.Node.transform.position, memento.Node.transform.localScale);
             memento.Reset();
             // The current focus node has now its previous scale and position within its ascendant.
             ObjectMemento newFocusMemento = activeAscendants.Peek();
@@ -163,7 +157,6 @@ namespace SEE.Game
         private static Transformer GetTransformer(GameObject gameObject)
         {
             GameObject root = Root(gameObject);
-            Debug.LogFormat("focus {0} root {1}\n", gameObject.name, root.name);
             if (root != null)
             {
                 if (!responsibleTransformer.TryGetValue(root, out Transformer transformer))
@@ -355,9 +348,7 @@ namespace SEE.Game
             if (enteredNode != null 
                 && enteredNode.tag == Tags.Node
                 && activeAscendants.Peek().Node != enteredNode)
-            {
-                Debug.LogFormat("Zooming into subtree at {0}\n", enteredNode.name);
-
+            {                
                 // When zooming into enteredNode, we need to save the current state
                 // of enteredNode only. When this node is entered, the siblings of
                 // enteredNode and its descendant become hidden, so their positions
@@ -370,7 +361,7 @@ namespace SEE.Game
                 // so that we can later restore it when zooming out. This must
                 // be done before we fit it into the visible area, that is: here.
                 activeAscendants.Push(new ObjectMemento(enteredNode));
-                DumpActiveAscendants();
+                // DumpActiveAscendants();
                 // Currently, focus and all its descendants are visible.
                 HashSet<GameObject> currentlyVisible = GameObjectHierarchy.Descendants(focus);
                 // All elements in the subtree rooted by enteredNode will be visible next.
@@ -409,13 +400,6 @@ namespace SEE.Game
             newPosition.z = center.y;
             Vector3 newScale = parent.transform.localScale * scaleFactor;
 
-            //Debug.LogFormat("Transforming {0} from [p={1} s={2}] to [p={3} s={4}]. CenterPoint={5}.\n",
-            //                parent.name,
-            //                parent.transform.position, parent.Size(),
-            //                newPosition, newScale,
-            //                CenterPoint);
-            //Debug.LogFormat("initialLeftLowerCorner {0} initialRightUpperCorner {1} leftLowerCorner {2} rightUpperCorner {3} scaleFactor {4}\n",
-            //                initialLeftLowerCorner, initialRightUpperCorner, leftLowerCorner, rightUpperCorner, scaleFactor);
             // Adjust position and scale by some animation.
             iTween.MoveTo(parent, iTween.Hash(
                                           "position", newPosition,
@@ -451,14 +435,8 @@ namespace SEE.Game
             {                                
                 // This is the memento of the current focus.
                 ObjectMemento memento = activeAscendants.Peek();
-                Debug.Assert(memento.Node == focus);
-                Debug.LogFormat("Zooming out of subtree at {0}\n", memento.Node.name);
-                DumpActiveAscendants();
+                //DumpActiveAscendants();
                 // First restore the previous scale and position of focus by some animation.
-                Debug.LogFormat("Transforming {0} from [{1} {2}] to [{3} {4}]\n",
-                                memento.Node.name,
-                                memento.Node.transform.position, memento.Node.transform.localScale,
-                                memento.Position, memento.LocalScale);
                 iTween.ScaleTo(focus, 
                                iTween.Hash("scale", memento.LocalScale,
                                            "time", 1.5f

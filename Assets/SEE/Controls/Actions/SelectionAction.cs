@@ -279,7 +279,7 @@ namespace SEE.Controls
         /// <param name="selectedObject">the selected object</param>
         protected virtual void HoverObject(GameObject selectedObject)
         {
-            Debug.LogFormat("HoverObject {0}\n", selectedObject.name);
+            //Debug.LogFormat("HoverObject {0}\n", selectedObject.name);
             HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
             hoverComponent?.Hovered();
             objectState = ObjectState.IsSelected;
@@ -291,7 +291,7 @@ namespace SEE.Controls
         /// <param name="selectedObject">the selected object</param>
         protected virtual void UnhoverObject(GameObject selectedObject)
         {
-            Debug.LogFormat("UnhoverObject {0}\n", selectedObject.name);
+            //Debug.LogFormat("UnhoverObject {0}\n", selectedObject.name);
             HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
             hoverComponent?.Unhovered();
             objectState = ObjectState.None;
@@ -307,15 +307,13 @@ namespace SEE.Controls
         /// <param name="selectedObject">the selected object</param>
         protected virtual void GrabObject(GameObject selectedObject)
         {
-            Debug.LogFormat("GrabObject {0}\n", selectedObject.name);
+            //Debug.LogFormat("GrabObject {0}\n", selectedObject.name);
             GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
             grabbingComponent?.Grab(gameObject);
             objectState = ObjectState.IsGrabbed;
             handledObjectMemento = new ObjectMemento(selectedObject);
             OnObjectGrabbed.Invoke(selectedObject);           
         }
-
-        private float timeHeld = 0;
 
         /// <summary>
         /// Called while an object is being grabbed (passed as parameter <paramref name="grabbedObject"/>).
@@ -324,11 +322,6 @@ namespace SEE.Controls
         /// <param name="grabbedObject">the grabbed object</param>
         protected virtual void HoldObject(GameObject grabbedObject)
         {
-            if (Time.realtimeSinceStartup - timeHeld > 1.0f)
-            {
-                timeHeld = Time.realtimeSinceStartup;
-                Debug.LogFormat("HoldObject {0}\n", grabbedObject.name);
-            }
             GrabbableObject grabbingComponent = grabbedObject.GetComponent<GrabbableObject>();
             if (grabbingComponent != null)
             {
@@ -345,7 +338,7 @@ namespace SEE.Controls
         /// the movement should be canceled and its original position be restored</param>
         protected virtual void ReleaseObject(GameObject grabbedObject, bool actionFinalized)
         {
-            Debug.LogFormat("ReleaseObject {0} {1}\n", grabbedObject.name, actionFinalized);
+            //Debug.LogFormat("ReleaseObject {0} {1}\n", grabbedObject.name, actionFinalized);
             GrabbableObject grabbingComponent = grabbedObject.GetComponent<GrabbableObject>();
             grabbingComponent?.Release();
             HideGrabbingFeedback();
