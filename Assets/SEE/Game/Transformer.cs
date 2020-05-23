@@ -328,7 +328,7 @@ namespace SEE.Game
         
         /// <summary>
         /// Resets all game objects to their original state and shows them.
-        /// That means, we showing the top level again.
+        /// That means, we are showing the top level again.
         /// </summary>
         private void ZoomToTopLevel(GameObject caller)
         {
@@ -337,6 +337,13 @@ namespace SEE.Game
                 memento.Reset();
                 Show(memento.Node, true);
             }
+            // Remove all elements but the deepest one (the original root) from the
+            // stack of the active ascendants. We are at top level again.
+            while (activeAscendants.Count > 1)
+            {
+                activeAscendants.Pop();
+            }
+            focus = activeAscendants.Peek().Node;
             caller.SendMessage(OnZoomingComplete);
         }
 
