@@ -19,5 +19,11 @@ namespace SEE.Controls.Devices
         public override float Pull => 0;
 
         public override bool IsCanceling => false;
+
+        public override bool IsZoomingIn => false;
+
+        public override bool IsZoomingOut => false;
+
+        public override bool IsZoomingHome => false;
     }
 }

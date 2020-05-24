@@ -65,12 +65,6 @@ namespace SEE.Game
         private ObjectManager objectManager;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
-        /// The origin of the city. The resulting layout of each graph will be moved to 
-        /// this origin.
-        /// </summary>
-        private Vector3 cityOrigin;  // not serialized by Unity; will be set in CityEvolution property
-
-        /// <summary>
         /// The marker used to mark the new and removed game objects.
         /// </summary>
         private Marker marker;  // not serialized by Unity; will be set in CityEvolution property
@@ -95,9 +89,8 @@ namespace SEE.Game
                 // assign a new city, we also need a new graph renderer for that city.
                 // So in fact this is the perfect place to assign graphRenderer.
                 graphRenderer = new GraphRenderer(value);
-                cityOrigin = value.origin;
                 diff = new NumericAttributeDiff(value.AllMetricAttributes());
-                objectManager = new ObjectManager(graphRenderer);
+                objectManager = new ObjectManager(graphRenderer, gameObject);
                 marker = new Marker(graphRenderer);
             }
         }
@@ -303,7 +296,8 @@ namespace SEE.Game
             // these layoutNodes represent. Here, we leave the game objects untouched. The layout
             // must be later applied when render a city. Here, we only store the layout for later use.
             nodeLayout.Apply(layoutNodes);
-            NodeLayout.Move(layoutNodes, cityOrigin);
+            NodeLayout.Move(layoutNodes, gameObject.transform.position);
+            NodeLayout.Scale(layoutNodes, gameObject.transform.position.x);
             return ToNodeIDLayout(layoutNodes);
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to 

@@ -211,8 +211,11 @@
             },
             {
                "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/home"
+                  },
                   "position" : {
-                     "output" : "/actions/default/in/move"
+                     "output" : "/actions/default/in/zoom"
                   }
                },
                "mode" : "joystick",

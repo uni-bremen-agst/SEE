@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using SEE.Controls.Devices;
+using System;
 
+[Obsolete("This functionality is covered by Transform.")]
 public class TransformationAction : MonoBehaviour
 {
 

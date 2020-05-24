@@ -16,14 +16,14 @@ namespace SEE.GO
         /// If the actual distance is below this value, the object will not be visible.
         /// If minimalDistance > maximalDistance, the object will not be visible.
         /// </summary>
-        public float minimalDistance = 0.3f;
+        public float minimalDistance = 0.01f;
 
         /// <summary>
         /// The maximal distance between the game object and the main camera to become visible.
         /// If the actual distance is above this value, the object will not be visible.
         /// If minimalDistance > maximalDistance, the object will not be visible.
         /// </summary>
-        public float maximalDistance = 5.0f;
+        public float maximalDistance = 10.0f;
 
         // Time since the start of the last update period.
         private float timer = 0;

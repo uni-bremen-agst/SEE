@@ -1,4 +1,5 @@
 ﻿using SEE.Controls.Devices;
+using SEE.Game;
 using SEE.GO;
 using UnityEngine;
 
@@ -80,15 +81,17 @@ namespace SEE.Controls
         /// </summary>
         private void Update()
         {
-            if (animationIsRunning)
+            if (Animation.IsOn())
             {
                 return;
             }
-            // The user could be doing everything together selecting, canceling, and grabbing. 
+            // The user could be doing everything together selecting, canceling, grabbing,
+            // and zooming. 
             // We are using the following priorities:
             // Canceling is possible only when an object is selected or grabbed.
-            // In those cases, canceling overrules selecting and grabbing.
-            // Grabbing overrules canceling.
+            // Zooming is possible only when an object is selected but not grabbed.
+            // In those cases, canceling overrules all other actions.
+            // Grabbing overrules selecting and selecting overrules zooming.
             bool isCanceling = selectionDevice.IsCanceling;
             bool isGrabbing = selectionDevice.IsGrabbing;
             bool isSelecting = selectionDevice.IsSelecting;
@@ -148,10 +151,57 @@ namespace SEE.Controls
                 // Grabbed object is released and the action was not canceled.
                 ReleaseObject(handledObject, true);
             }
+
+            if (objectState == ObjectState.IsSelected)
+            {
+                AllowZooming();
+            }
+
             if (!isGrabbing && !isSelecting)
             {
                 HideHoveringFeedback();
             }
+        }
+
+        private void AllowZooming()
+        {
+            // assert: !isCanceling && !isGrabbing && !isSelecting && objectState == ObjectState.IsSelected
+            // Zooming uses animation. When the animation is complete, we will
+            // notified via a call to OnZoomingComplete().
+            if (selectionDevice.IsZoomingIn)
+            {
+                Animation.Start();
+                Transformer.ZoomInto(gameObject, handledObject);
+            }
+            else if (selectionDevice.IsZoomingOut)
+            {
+                Animation.Start();
+                Transformer.ZoomOutOf(gameObject, handledObject);
+            }
+            else if (selectionDevice.IsZoomingHome)
+            {
+                Animation.Start();
+                Transformer.ZoomRoot(gameObject, handledObject);
+            }
+        }
+
+        /// <summary>
+        /// This method will be called by Transformer when the animation of the zooming
+        /// is completed.
+        /// </summary>
+        private void OnZoomingComplete()
+        {
+            Animation.End();
+        }
+
+        /// <summary>
+        /// This method will be called by Transformer when the animation of the zooming
+        /// is completed.
+        /// </summary>
+        private void OnZoomingOutComplete(Transformer transformer)
+        {
+            Animation.End();
+            transformer.FinalizeZoomOut();
         }
 
         /// <summary>
@@ -278,7 +328,6 @@ namespace SEE.Controls
         /// <param name="grabbedObject">the grabbed object</param>
         protected virtual void HoldObject(GameObject grabbedObject)
         {
-            //Debug.LogFormat("HoldObject {0}\n", grabbedObject.name);
             GrabbableObject grabbingComponent = grabbedObject.GetComponent<GrabbableObject>();
             if (grabbingComponent != null)
             {
@@ -302,7 +351,7 @@ namespace SEE.Controls
             if (!actionFinalized)
             {
                 // assert: selectedObject == handledObject.gameObject
-                animationIsRunning = true;
+                Animation.Start();
                 iTween.MoveTo(handledObject.gameObject,
                               iTween.Hash("position", handledObjectMemento.Position,
                                           "time", 0.75f,
@@ -374,12 +423,6 @@ namespace SEE.Controls
         protected abstract Ray GetRay();
 
         /// <summary>
-        /// If true, the re-location of a grabbed to its original position where it was 
-        /// grabbed is animated. During that animation, no user interactions are accepted.
-        /// </summary>
-        private bool animationIsRunning = false;
-
-        /// <summary>
         /// Called by iTween when grabbing was cancelled and the grabbed object
         /// has reached its original position (the one where it was located before
         /// being grabbed). After that, the animation is over and animationIsRunning
@@ -390,7 +433,57 @@ namespace SEE.Controls
         /// </summary>
         protected void ResetCompleted()
         {
-            animationIsRunning = false;
+            Animation.End();
+        }
+
+        /// <summary>
+        /// Animation mode with a time out.
+        /// </summary>
+        private static class Animation
+        {
+            /// <summary>
+            /// Whether any animation is currently running.
+            /// </summary>
+            private static bool animationIsRunning = false;
+
+            /// <summary>
+            /// Remaining waiting time for the time out in seconds.
+            /// </summary>
+            private static float animationTimeOut = 0.0f;
+
+            /// <summary>
+            /// Indicates the start of a new animation.
+            /// </summary>
+            public static void Start()
+            {
+                animationIsRunning = true;
+                animationTimeOut = 3.0f;
+            }
+
+            /// <summary>
+            /// Indicates the end of a running animation.
+            /// </summary>
+            public static void End()
+            {
+                animationIsRunning = false;
+            }
+
+            /// <summary>
+            /// Returns if there is no animation is currently running or if the 
+            /// waiting time for an animation to be finished is up. Must be called
+            /// exactly once per frame.
+            /// </summary>
+            /// <returns>true if animation is finished or time is up</returns>
+            public static bool IsOn()
+            {
+                animationTimeOut -= Time.deltaTime;
+                if (animationIsRunning && animationTimeOut <= 0)
+                {
+                    Debug.LogWarning("Animation time out.\n");
+                    animationIsRunning = false;
+                }
+                return animationIsRunning;
+            }
         }
     }
 }

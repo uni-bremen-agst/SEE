@@ -199,11 +199,11 @@ namespace SEE.Game
                 ICollection<GameObject> gameNodes = nodeMap.Values;
                 ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(gameNodes);
                 nodeLayout.Apply(layoutNodes);                
-                float scaleFactor = NodeLayout.Scale(layoutNodes, settings.width);
-                NodeLayout.Move(layoutNodes, settings.origin);
+                float scaleFactor = NodeLayout.Scale(layoutNodes, parent.transform.localScale.x);
+                NodeLayout.Move(layoutNodes, parent.transform.position);
 
                 // add the plane surrounding all game objects for nodes
-                GameObject plane = NewPlane(gameNodes);
+                GameObject plane = NewPlane(gameNodes, parent.transform.position.y);
                 AddToParent(plane, parent);
 
                 CreateObjectHierarchy(nodeMap, parent);
@@ -330,11 +330,11 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">the game objects to be enclosed by the new plane</param>
         /// <returns>new plane enclosing all given <paramref name="gameNodes"/></returns>
-        public GameObject NewPlane(ICollection<GameObject> gameNodes)
+        public GameObject NewPlane(ICollection<GameObject> gameNodes, float yLevel)
         {
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             // Place the plane somewhat under ground level.
-            return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, settings.origin.y - 0.01f, Color.gray);
+            return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, yLevel - 0.01f, Color.gray);
         }
 
         /// <summary>

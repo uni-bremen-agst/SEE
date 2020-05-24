@@ -21,7 +21,11 @@ namespace SEE.Controls.Devices
 
         private SteamVR_Action_Vector2 PullAction = SteamVR_Input.GetVector2Action(defaultActionSet, "Move");
 
+        private SteamVR_Action_Vector2 ZoomAction = SteamVR_Input.GetVector2Action(defaultActionSet, "Zoom");
+
         private SteamVR_Action_Single GrabAction = SteamVR_Input.GetSingleAction(defaultActionSet, "Grab");
+
+        private SteamVR_Action_Boolean HomeButton = SteamVR_Input.GetBooleanAction(defaultActionSet, "Home");
 
         /// <summary>
         /// The default assignment of the grab button in SteamVR is the B button,
@@ -70,10 +74,32 @@ namespace SEE.Controls.Devices
         {
             get
             {
-                float move = PullAction.axis.y;
-                return Mathf.Abs(move) >= Threshold ? -move : 0.0f;
+                float pull = PullAction.axis.y;
+                return Mathf.Abs(pull) >= Threshold ? -pull : 0.0f;
             }
         }
+
+        public override bool IsZoomingIn
+        {
+            get
+            {
+                // zoom joystick moved forward
+                float zoom = ZoomAction.axis.y;
+                return zoom >= Threshold;
+            }
+        }
+
+        public override bool IsZoomingOut
+        {
+            get
+            {
+                // zoom joystick moved backward
+                float zoom = ZoomAction.axis.y;
+                return -zoom >= Threshold;
+            }
+        }
+
+        public override bool IsZoomingHome => HomeButton.stateDown;
 
         /// <summary>
         /// Manages the behaviour of SelectionButton.
