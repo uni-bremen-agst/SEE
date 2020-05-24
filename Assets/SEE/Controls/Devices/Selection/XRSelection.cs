@@ -21,6 +21,8 @@ namespace SEE.Controls.Devices
 
         private SteamVR_Action_Vector2 PullAction = SteamVR_Input.GetVector2Action(defaultActionSet, "Move");
 
+        private SteamVR_Action_Vector2 ZoomAction = SteamVR_Input.GetVector2Action(defaultActionSet, "Zoom");
+
         private SteamVR_Action_Single GrabAction = SteamVR_Input.GetSingleAction(defaultActionSet, "Grab");
 
         private SteamVR_Action_Boolean HomeButton = SteamVR_Input.GetBooleanAction(defaultActionSet, "Home");
@@ -81,9 +83,9 @@ namespace SEE.Controls.Devices
         {
             get
             {
-                // pull joystick moved to the right
-                float pull = PullAction.axis.x;
-                return pull >= Threshold;
+                // zoom joystick moved forward
+                float zoom = ZoomAction.axis.y;
+                return zoom >= Threshold;
             }
         }
 
@@ -91,9 +93,9 @@ namespace SEE.Controls.Devices
         {
             get
             {
-                // pull joystick moved to the left
-                float pull = PullAction.axis.x;
-                return -pull >= Threshold;
+                // zoom joystick moved backward
+                float zoom = ZoomAction.axis.y;
+                return -zoom >= Threshold;
             }
         }
 
