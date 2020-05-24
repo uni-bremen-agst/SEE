@@ -151,31 +151,37 @@ namespace SEE.Controls
                 // Grabbed object is released and the action was not canceled.
                 ReleaseObject(handledObject, true);
             }
-            else if (objectState == ObjectState.IsSelected)
+
+            if (objectState == ObjectState.IsSelected)
             {
-                // assert: !isCanceling && !isGrabbing && !isSelecting && objectState == ObjectState.IsSelected
-                // Zooming uses animation. When the animation is complete, we will
-                // notified via a call to OnZoomingComplete().
-                if (selectionDevice.IsZoomingIn)
-                {
-                    Animation.Start();
-                    Transformer.ZoomInto(gameObject, handledObject);
-                }
-                else if (selectionDevice.IsZoomingOut)
-                {
-                    Animation.Start();
-                    Transformer.ZoomOutOf(gameObject, handledObject);
-                }
-                else if (selectionDevice.IsZoomingHome)
-                {
-                    Animation.Start();
-                    Transformer.ZoomRoot(gameObject, handledObject);
-                }
+                AllowZooming();
             }
 
             if (!isGrabbing && !isSelecting)
             {
                 HideHoveringFeedback();
+            }
+        }
+
+        private void AllowZooming()
+        {
+            // assert: !isCanceling && !isGrabbing && !isSelecting && objectState == ObjectState.IsSelected
+            // Zooming uses animation. When the animation is complete, we will
+            // notified via a call to OnZoomingComplete().
+            if (selectionDevice.IsZoomingIn)
+            {
+                Animation.Start();
+                Transformer.ZoomInto(gameObject, handledObject);
+            }
+            else if (selectionDevice.IsZoomingOut)
+            {
+                Animation.Start();
+                Transformer.ZoomOutOf(gameObject, handledObject);
+            }
+            else if (selectionDevice.IsZoomingHome)
+            {
+                Animation.Start();
+                Transformer.ZoomRoot(gameObject, handledObject);
             }
         }
 
