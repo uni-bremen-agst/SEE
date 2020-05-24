@@ -196,7 +196,9 @@ namespace SEE.Charts.Scripts
 			if (!_isVirtualReality)
 			{
 				foreach (var vrObject in vrObjects) Destroy(vrObject);
-				_chartsOpen = Instantiate(chartsPrefab).transform.Find("ChartsOpen").gameObject;
+				_chartsOpen = GameObject.Find("ChartCanvas") != null
+					? GameObject.Find("ChartCanvas").transform.Find("ChartsOpen").gameObject
+					: Instantiate(chartsPrefab).transform.Find("ChartsOpen").gameObject;
 			}
 			else
 			{
