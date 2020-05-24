@@ -359,7 +359,7 @@ namespace SEE.Charts.Scripts
 		public IEnumerator QueueDraw()
 		{
 			if (citySize > 50)
-				yield return new WaitForSeconds(2f);
+				yield return new WaitForSeconds(5f);
 			else
 				yield return new WaitForSeconds(0.5f);
 
@@ -479,7 +479,6 @@ namespace SEE.Charts.Scripts
 				if (dataObject.GetComponent<NodeRef>().node.TryGetNumeric(metric, out _) &&
 				    (bool) dataObject.GetComponent<NodeHighlights>().showInChart[this])
 					toDraw.Add(dataObject);
-
 			if (toDraw.Count > 0)
 			{
 				toDraw.Sort(delegate(GameObject go1, GameObject go2)
@@ -591,7 +590,7 @@ namespace SEE.Charts.Scripts
 					CheckOverlapping(marker, updatedMarkers.ToArray());
 					updatedMarkers.Add(marker);
 
-					if (ActiveMarkers.Count <= 0) break;
+					if (ActiveMarkers.Count <= 0) continue;
 					var highlightTimeLeft = CheckOldMarkers(data);
 					if (highlightTimeLeft > 0f)
 						script.TriggerTimedHighlight(

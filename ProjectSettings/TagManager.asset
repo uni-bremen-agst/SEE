@@ -25,6 +25,7 @@ TagManager:
   - FxTemporaire
   - Runtime
   - Function Call
+  - TestHelper
   layers:
   - Default
   - TransparentFX
