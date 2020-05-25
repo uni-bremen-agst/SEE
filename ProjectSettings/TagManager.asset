@@ -11,8 +11,6 @@ TagManager:
   - Text
   - Erosion
   - Fire
-  - Building
-  - Block
   - Decoration
   - Path
   - Pointer
@@ -35,7 +33,7 @@ TagManager:
   - UI
   - 
   - 
-  - 
+  - Player
   - 
   - 
   - 

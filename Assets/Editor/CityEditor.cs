@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using SEE;
+using SEE.Utils;
 using SEE.Game;
 
 namespace SEEEditor
@@ -38,9 +38,6 @@ namespace SEEEditor
             // as well as when any of its widgets are hovered by the mouse cursor. For this
             // reason, do not run any expensive algorithm here unless it is really needed,
             // that is, only when any of its buttons is pressed or any of its entry are updated.
-
-            //GUILayout.Label("VR settings", EditorStyles.boldLabel);
-            //VRenabled = EditorGUILayout.Toggle("Enable VR", VRenabled);
 
             float width = position.width - 5;
             const float height = 30;

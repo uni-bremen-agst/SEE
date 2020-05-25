@@ -104,7 +104,7 @@ namespace InControl.UnityDeviceProfiles
 					Name = "R3",
 					Target = InputControlType.RightStickButton,
 					Source = Button( 9 )
-				},
+				}
 			};
 
 			AnalogMappings = new[]
@@ -122,7 +122,7 @@ namespace InControl.UnityDeviceProfiles
 				DPadLeftMapping( 4 ),
 				DPadRightMapping( 4 ),
 				DPadUpMapping( 5 ),
-				DPadDownMapping( 5 ),
+				DPadDownMapping( 5 )
 			};
 		}
 	}

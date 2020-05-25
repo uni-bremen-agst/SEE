@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Controls;
 using SEE.Charts.Scripts;
 using SEE.DataModel;
 using SEE.GO;
 using SEE.Layout;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game
@@ -124,10 +126,11 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
+        /// <param name="scaleFactor">factor by which to scale settings.EdgeWidth</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
+        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes, float scaleFactor)
         {
-            return EdgeLayout(graph, ToLayoutNodes(gameNodes));
+            return EdgeLayout(graph, ToLayoutNodes(gameNodes), scaleFactor);
         }
 
         /// <summary>
@@ -135,20 +138,21 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="layoutNodes">the subset of layout nodes for which to draw the edges</param>
+        /// <param name="scaleFactor">factor by which to scale settings.EdgeWidth</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<ILayoutNode> layoutNodes)
+        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<ILayoutNode> layoutNodes, float scaleFactor)
         {
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
             {
                 case SEECity.EdgeLayouts.Straight:
-                    layout = new StraightEdgeLayout(settings.EdgesAboveBlocks);
+                    layout = new StraightEdgeLayout(settings.EdgesAboveBlocks, scaleFactor);
                     break;
                 case SEECity.EdgeLayouts.Spline:
-                    layout = new SplineEdgeLayout(settings.EdgesAboveBlocks, settings.RDP);
+                    layout = new SplineEdgeLayout(settings.EdgesAboveBlocks, scaleFactor, settings.RDP);
                     break;
                 case SEECity.EdgeLayouts.Bundling:
-                    layout = new BundledEdgeLayout(settings.EdgesAboveBlocks, settings.Tension, settings.RDP);
+                    layout = new BundledEdgeLayout(settings.EdgesAboveBlocks, scaleFactor, settings.Tension, settings.RDP);
                     break;
                 case SEECity.EdgeLayouts.None:
                     // nothing to be done
@@ -157,7 +161,7 @@ namespace SEE.Game
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
             }
             Performance p = Performance.Begin("edge layout " + layout.Name);
-            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
+            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth * scaleFactor);
             ICollection<GameObject> result = edgeFactory.DrawEdges(layoutNodes);
             p.End();
             return result;
@@ -193,19 +197,26 @@ namespace SEE.Game
                 }
 
                 // calculate and apply the node layout
-                Dictionary<Node, GameObject>.ValueCollection gameNodes = nodeMap.Values;
+                ICollection<GameObject> gameNodes = nodeMap.Values;
                 ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(gameNodes);
-                nodeLayout.Apply(layoutNodes);
-                NodeLayout.Move(layoutNodes, settings.origin);
+                nodeLayout.Apply(layoutNodes);                
+                float scaleFactor = NodeLayout.Scale(layoutNodes, parent.transform.localScale.x);
+                NodeLayout.Move(layoutNodes, parent.transform.position);
 
-                AddToParent(gameNodes, parent);
-                // add the decorations, too
-                AddToParent(AddDecorations(gameNodes), parent);
-                // create the laid out edges
-                AddToParent(EdgeLayout(graph, layoutNodes), parent);
                 // add the plane surrounding all game objects for nodes
-                GameObject plane = NewPlane(gameNodes);
+                GameObject plane = NewPlane(gameNodes, parent.transform.position.y);
                 AddToParent(plane, parent);
+
+                CreateObjectHierarchy(nodeMap, parent);
+                InteractionDecorator.PrepareForInteraction(gameNodes);
+
+                // Decorations must be applied after the blocks have been placed, so that
+                // we also know their positions.
+                AddDecorations(nodeMap.Values);
+
+                // create the game objects for the laid out edges
+                ICollection<GameObject> edges = EdgeLayout(graph, layoutNodes, scaleFactor);
+                AddToParent(edges, parent);
             }
             finally
             {
@@ -214,6 +225,33 @@ namespace SEE.Game
                 if (root != null)
                 {
                     graph.RemoveNode(root);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates the same nesting of all game objects in <paramref name="nodeMap"/> as in
+        /// the graph node hierarchy. Every root node in the graph node hierarchy will become
+        /// a child of the given <paramref name="root"/>.
+        /// </summary>
+        /// <param name="nodeMap">mapping of graph nodes onto their representing game objects</param>
+        /// <param name="root">the parent of every game object not nested in any other game object</param>
+        private void CreateObjectHierarchy(Dictionary<Node, GameObject> nodeMap, GameObject root)
+        {
+            foreach (var entry in nodeMap)
+            {
+                Node node = entry.Key;
+                Node parent = node.Parent;
+
+                if (parent == null)
+                {
+                    // node is a root => it will be added to parent as a child
+                    AddToParent(entry.Value, root);
+                }
+                else
+                {
+                    // node is a child of another game node
+                    AddToParent(entry.Value, nodeMap[parent]);
                 }
             }
         }
@@ -293,11 +331,11 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">the game objects to be enclosed by the new plane</param>
         /// <returns>new plane enclosing all given <paramref name="gameNodes"/></returns>
-        public GameObject NewPlane(ICollection<GameObject> gameNodes)
+        public GameObject NewPlane(ICollection<GameObject> gameNodes, float yLevel)
         {
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             // Place the plane somewhat under ground level.
-            return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, settings.origin.y - 0.01f, Color.gray);
+            return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, yLevel - 0.01f, Color.gray);
         }
 
         /// <summary>
@@ -357,25 +395,20 @@ namespace SEE.Game
         /// Draws the decorations of the given game nodes.
         /// </summary>
         /// <param name="gameNodes">game nodes to be decorated</param>
-        /// <returns>the game objects added for the decorations; may be an empty collection</returns>
-        private ICollection<GameObject> AddDecorations(ICollection<GameObject> gameNodes)
-        {
-            // Decorations must be applied after the blocks have been placed, so that
-            // we also know their positions.
-            List<GameObject> decorations = new List<GameObject>();
-
+        private void AddDecorations(ICollection<GameObject> gameNodes)
+        {            
             // Add software erosion decorators for all leaf nodes if requested.
             if (settings.ShowErosions)
             {
-                ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leafNodeFactory, scaler);
-                decorations.AddRange(issueDecorator.Add(LeafNodes(gameNodes)));
+                ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leafNodeFactory, scaler, settings.MaxErosionWidth);
+                issueDecorator.Add(LeafNodes(gameNodes));
             }
 
             // Add text labels for all inner nodes
             if (settings.NodeLayout == SEECity.NodeLayouts.Balloon 
                 || settings.NodeLayout == SEECity.NodeLayouts.EvoStreets)
             {
-                decorations.AddRange(AddLabels(InnerNodes(gameNodes)));
+                AddLabels(InnerNodes(gameNodes));
             }
 
             // Add decorators specific to the shape of inner nodes (circle decorators for circles
@@ -410,7 +443,6 @@ namespace SEE.Game
                 default:
                     throw new Exception("Unhandled GraphSettings.InnerNodeKinds " + settings.InnerNodeObjects);
             }
-            return decorations;
         }
 
         /// <summary>
@@ -457,14 +489,11 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Adds the source name as a label to the center of the given game nodes.
+        /// Adds the source name as a label to the center of the given game nodes as a child.
         /// </summary>
         /// <param name="gameNodes">game nodes whose source name is to be added</param>
-        /// <returns>the game objects created for the text labels</returns>
-        private ICollection<GameObject> AddLabels(ICollection<GameObject> gameNodes)
+        private void AddLabels(ICollection<GameObject> gameNodes)
         {
-            IList<GameObject> result = new List<GameObject>();
-
             foreach (GameObject node in gameNodes)
             {
                 Vector3 size = innerNodeFactory.GetSize(node);
@@ -472,9 +501,8 @@ namespace SEE.Game
                 // The text may occupy up to 30% of the length.
                 GameObject text = TextFactory.GetText(node.GetComponent<NodeRef>().node.SourceName, 
                                                       node.transform.position, length * 0.3f);
-                result.Add(text);
+                text.transform.SetParent(node.transform);
             }
-            return result;
         }
 
         /// <summary>
@@ -527,14 +555,14 @@ namespace SEE.Game
                 // Leaf nodes were created as blocks by leaveNodeFactory.
                 // We need to first scale the game node and only afterwards set its
                 // position because transform.scale refers to the center position.
-                leafNodeFactory.SetSize(gameNode, layout.Scale);
+                leafNodeFactory.SetSize(gameNode, layout.LocalScale);
                 // FIXME: Must adjust layout.CenterPosition.y
                 leafNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
             }
             else
             {
                 // Inner nodes were created by innerNodeFactory.
-                innerNodeFactory.SetSize(gameNode, layout.Scale);
+                innerNodeFactory.SetSize(gameNode, layout.LocalScale);
                 // FIXME: Must adjust layout.CenterPosition.y
                 innerNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
             }

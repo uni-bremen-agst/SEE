@@ -91,7 +91,7 @@ namespace InControl.UnityDeviceProfiles
 					Name = "View",
 					Target = InputControlType.View,
 					Source = Button( 11 )
-				},
+				}
 			};
 
 			AnalogMappings = new[]

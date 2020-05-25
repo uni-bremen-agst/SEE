@@ -17,6 +17,7 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -52,7 +53,7 @@ namespace SEE.DataModel.IO
             }
             graphs.Clear();
 
-            SEE.Performance p = SEE.Performance.Begin("Loading GXL files from " + directory);
+            SEE.Utils.Performance p = SEE.Utils.Performance.Begin("Loading GXL files from " + directory);
             // for all found GXL files load and save the graph data
             foreach (string gxlPath in sortedGraphNames)
             {

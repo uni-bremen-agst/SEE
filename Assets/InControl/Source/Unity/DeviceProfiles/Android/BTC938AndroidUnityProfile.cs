@@ -13,76 +13,91 @@
 
 			DeviceClass = InputDeviceClass.Controller;
 
-			IncludePlatforms = new[] {
+			IncludePlatforms = new[]
+			{
 				"Android"
 			};
 
 			Matchers = new[] { new InputDeviceMatcher { NameLiteral = "BTC-938" } };
 
-			ButtonMappings = new[] {
-				new InputControlMapping {
+			ButtonMappings = new[]
+			{
+				new InputControlMapping
+				{
 					Name = "A",
 					Target = InputControlType.Action1,
 					Source = Button( 0 )
 				},
-				new InputControlMapping {
+				new InputControlMapping
+				{
 					Name = "B",
 					Target = InputControlType.Action2,
 					Source = Button( 1 )
 				},
-				new InputControlMapping {
+				new InputControlMapping
+				{
 					Name = "X",
 					Target = InputControlType.Action3,
 					Source = Button( 2 )
 				},
-				new InputControlMapping {
+				new InputControlMapping
+				{
 					Name = "Y",
 					Target = InputControlType.Action4,
 					Source = Button( 3 )
 				},
-				new InputControlMapping {
+				new InputControlMapping
+				{
 					Name = "L1",
 					Target = InputControlType.LeftBumper,
 					Source = Button( 4 )
 				},
-				new InputControlMapping {
+				new InputControlMapping
+				{
 					Name = "L2",
 					Target = InputControlType.LeftTrigger,
 					Source = Button( 6 )
 				},
-				new InputControlMapping {
+				new InputControlMapping
+				{
 					Name = "R1",
 					Target = InputControlType.RightBumper,
 					Source = Button( 5 )
 				},
-				new InputControlMapping {
+				new InputControlMapping
+				{
 					Name = "R2",
 					Target = InputControlType.RightTrigger,
 					Source = Button( 7 )
 				},
-				new InputControlMapping {
+				new InputControlMapping
+				{
 					Name = "Left Stick Button",
 					Target = InputControlType.LeftStickButton,
 					Source = Button( 8 )
 				},
-				new InputControlMapping {
+				new InputControlMapping
+				{
 					Name = "Right Stick Button",
 					Target = InputControlType.RightStickButton,
 					Source = Button( 9 )
 				},
-				new InputControlMapping {
+				new InputControlMapping
+				{
 					Name = "Select",
 					Target = InputControlType.Select,
 					Source = Button( 11 )
 				},
-				new InputControlMapping {
+				new InputControlMapping
+				{
 					Name = "Start",
 					Target = InputControlType.Start,
 					Source = Button( 10 )
 				}
 			};
 
-			AnalogMappings = new[] {
+			AnalogMappings = new[]
+			{
 				LeftStickLeftMapping( 0 ),
 				LeftStickRightMapping( 0 ),
 				LeftStickUpMapping( 1 ),
@@ -96,9 +111,10 @@
 				DPadLeftMapping( 4 ),
 				DPadRightMapping( 4 ),
 				DPadUpMapping( 5 ),
-				DPadDownMapping( 5 ),
+				DPadDownMapping( 5 )
 			};
 		}
 	}
+
 	// @endcond
 }

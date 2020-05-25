@@ -1,23 +1,15 @@
 {
-   "alias_info" : {},
-   "app_key" : "application.generated.unity.steamvr.exe",
+  "app_key": "application.generated.unity.steamvr.exe",
   "bindings": {
     "/actions/mixedreality": {
-      "haptics": [
-      ],
-      "poses": [
-        {
-          "output": "/actions/mixedreality/in/ExternalCamera",
-          "path": "/user/camera/pose/raw"
-        }
-      ],
-      "sources": [
-      ]
+      "chords": [],
+      "poses": [],
+      "haptics": [],
+      "sources": [],
+      "skeleton": []
     }
   },
-   "controller_type" : "vive_tracker_camera",
-   "description" : "",
-   "name" : "tracker_forcamera",
-   "options" : {},
-   "simulated_actions" : []
+  "controller_type": "vive_tracker_camera",
+  "description": "",
+  "name": "tracker_forcamera"
 }

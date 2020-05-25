@@ -26,8 +26,8 @@ namespace UnityStandardAssets.Utility
                 deltaTime = (Time.realtimeSinceStartup - m_LastRealTime);
                 m_LastRealTime = Time.realtimeSinceStartup;
             }
-            transform.Translate(moveUnitsPerSecond.value*deltaTime, moveUnitsPerSecond.space);
-            transform.Rotate(rotateDegreesPerSecond.value*deltaTime, moveUnitsPerSecond.space);
+            transform.Translate(moveUnitsPerSecond.value * deltaTime, moveUnitsPerSecond.space);
+            transform.Rotate(rotateDegreesPerSecond.value * deltaTime, moveUnitsPerSecond.space);
         }
 
 

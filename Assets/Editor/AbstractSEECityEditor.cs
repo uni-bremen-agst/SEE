@@ -15,9 +15,6 @@ namespace SEEEditor
         {
             AbstractSEECity city = target as AbstractSEECity;
 
-            GUILayout.Label("Graph", EditorStyles.boldLabel);
-            city.origin = EditorGUILayout.Vector3Field("Origin", city.origin);
-
             GUILayout.Label("Attributes of leaf nodes", EditorStyles.boldLabel);
             city.WidthMetric = EditorGUILayout.TextField("Width", city.WidthMetric);
             city.HeightMetric = EditorGUILayout.TextField("Height", city.HeightMetric);
@@ -34,6 +31,7 @@ namespace SEEEditor
 
             city.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", city.ZScoreScale);
             city.ShowErosions = EditorGUILayout.Toggle("Show erosions", city.ShowErosions);
+            city.MaxErosionWidth = EditorGUILayout.FloatField("Max. width of erosion icon", city.MaxErosionWidth);
 
             GUILayout.Label("Edges and Edge Layout", EditorStyles.boldLabel);
             city.EdgeLayout = (SEECity.EdgeLayouts)EditorGUILayout.EnumPopup("Edge layout", city.EdgeLayout);

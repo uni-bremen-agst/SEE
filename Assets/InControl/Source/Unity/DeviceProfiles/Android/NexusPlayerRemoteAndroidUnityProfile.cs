@@ -45,7 +45,7 @@ namespace InControl.UnityDeviceProfiles
 				DPadLeftMapping( 4 ),
 				DPadRightMapping( 4 ),
 				DPadUpMapping( 5 ),
-				DPadDownMapping( 5 ),
+				DPadDownMapping( 5 )
 			};
 		}
 	}

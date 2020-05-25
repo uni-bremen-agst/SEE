@@ -113,6 +113,88 @@ namespace SEE.Layout
         }
 
         /// <summary>
+        /// Scales all nodes in <paramref name="layoutNodes"/> so that the total width
+        /// of the layout (along the x axis) equals <paramref name="width"/>.
+        /// The aspect ratio of every node is maintained.
+        /// </summary>
+        /// <param name="layoutNodes">layout nodes to be scaled</param>
+        /// <param name="width">the absolute width (x axis) the required space for the laid out nodes must have</param>
+        /// <returns>the factor by which the scale of edge node was multiplied</returns>
+        public static float Scale(ICollection<ILayoutNode> layoutNodes, float width)
+        {
+            BoundingBox(layoutNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner);
+            float currentWidth = rightUpperCorner.x - leftLowerCorner.x;
+            float scaleFactor = width / currentWidth;
+            foreach (ILayoutNode layoutNode in layoutNodes)
+            {
+                layoutNode.ScaleBy(scaleFactor);
+                // The x/z co-ordinates must be adjusted after scaling, but we do maintain the height
+                Vector3 newPosition = layoutNode.CenterPosition * scaleFactor;
+                //newPosition.y = layoutNode.CenterPosition.y;
+                layoutNode.CenterPosition = newPosition;
+            }
+            return scaleFactor;
+        }
+
+        /// <summary>
+        /// Returns the bounding box (2D rectangle) enclosing all given <paramref name="layoutNodes"/>.
+        /// </summary>
+        /// <param name="layoutNodes">the list of layout nodes that are enclosed in the resulting bounding box</param>
+        /// <param name="leftLowerCorner">the left lower front corner (x axis in 3D space) of the bounding box</param>
+        /// <param name="rightUpperCorner">the right lower back corner (z axis in 3D space) of the bounding box</param>
+        public static void BoundingBox(ICollection<ILayoutNode> layoutNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
+        {
+            if (layoutNodes.Count == 0)
+            {
+                leftLowerCorner = Vector2.zero;
+                rightUpperCorner = Vector2.zero;
+            }
+            else
+            {
+                leftLowerCorner = new Vector2(Mathf.Infinity, Mathf.Infinity);
+                rightUpperCorner = new Vector2(Mathf.NegativeInfinity, Mathf.NegativeInfinity);
+
+                foreach (ILayoutNode go in layoutNodes)
+                {
+                    Vector3 extent = go.LocalScale;
+                    // Note: position denotes the center of the object
+                    Vector3 position = go.CenterPosition;
+                    {
+                        // x co-ordinate of lower left corner
+                        float x = position.x - extent.x;
+                        if (x < leftLowerCorner.x)
+                        {
+                            leftLowerCorner.x = x;
+                        }
+                    }
+                    {
+                        // z co-ordinate of lower left corner
+                        float z = position.z - extent.z;
+                        if (z < leftLowerCorner.y)
+                        {
+                            leftLowerCorner.y = z;
+                        }
+                    }
+                    {   // x co-ordinate of upper right corner
+                        float x = position.x + extent.x;
+                        if (x > rightUpperCorner.x)
+                        {
+                            rightUpperCorner.x = x;
+                        }
+                    }
+                    {
+                        // z co-ordinate of upper right corner
+                        float z = position.z + extent.z;
+                        if (z > rightUpperCorner.y)
+                        {
+                            rightUpperCorner.y = z;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// If true, the layout can handle both inner nodes and leaves; otherwise
         /// only leaves.
         /// </summary>
@@ -134,7 +216,7 @@ namespace SEE.Layout
                 Vector3 position = transform.position;
                 position.y += transform.scale.y / 2.0f;
                 node.CenterPosition = position;
-                node.Scale = transform.scale;
+                node.LocalScale = transform.scale;
                 node.Rotation = transform.rotation;
             }
         }

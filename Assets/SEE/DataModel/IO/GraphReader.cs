@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using SEE.Tools;
+using SEE.Utils;
 
 namespace SEE.DataModel.IO
 {
@@ -28,7 +28,7 @@ namespace SEE.DataModel.IO
         /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
         /// <param name="rootName">name of the artifical root node if required</param>
         /// <param name="logger">the logger used for messages; if null, no messages are emitted</param>
-        public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string rootName = "", ILogger logger = null) 
+        public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string rootName = "", SEE.Utils.ILogger logger = null) 
             : base(filename, logger)
         {
             this.hierarchicalEdgeTypes = hierarchicalEdgeTypes;

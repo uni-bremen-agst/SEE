@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace UnityStandardAssets.Vehicles.Aeroplane
 {
-    [RequireComponent(typeof (ParticleSystem))]
+    [RequireComponent(typeof(ParticleSystem))]
     public class JetParticleEffect : MonoBehaviour
     {
         // this script controls the jet's exhaust particle system, controlling the
@@ -35,11 +35,11 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
         // Update is called once per frame
         private void Update()
         {
-			ParticleSystem.MainModule mainModule = m_System.main;
-			// update the particle system based on the jets throttle
-			mainModule.startLifetime = Mathf.Lerp(0.0f, m_OriginalLifetime, m_Jet.Throttle);
-			mainModule.startSize = Mathf.Lerp(m_OriginalStartSize*.3f, m_OriginalStartSize, m_Jet.Throttle);
-			mainModule.startColor = Color.Lerp(minColour, m_OriginalStartColor, m_Jet.Throttle);
+            ParticleSystem.MainModule mainModule = m_System.main;
+            // update the particle system based on the jets throttle
+            mainModule.startLifetime = Mathf.Lerp(0.0f, m_OriginalLifetime, m_Jet.Throttle);
+            mainModule.startSize = Mathf.Lerp(m_OriginalStartSize * .3f, m_OriginalStartSize, m_Jet.Throttle);
+            mainModule.startColor = Color.Lerp(minColour, m_OriginalStartColor, m_Jet.Throttle);
         }
 
 
