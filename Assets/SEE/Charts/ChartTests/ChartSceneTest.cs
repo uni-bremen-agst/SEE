@@ -44,6 +44,17 @@ namespace SEE.Charts.ChartTests
 		}
 
 		/// <summary>
+		/// Somehow the first test always fails due to VR initialization, so this one is just for the others to
+		/// succeed.
+		/// </summary>
+		[Test]
+		public void ATestInitializer()
+		{
+			_creator.CreateChart();
+			Assert.True(true);
+		}
+
+		/// <summary>
 		/// Checks if the test scene loaded correctly.
 		/// </summary>
 		[Test]
