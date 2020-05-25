@@ -57,11 +57,18 @@ namespace SEE.Controls
         [Tooltip("The action applied to transform a selected object.")]
         private TransformationAction transformationAction;
 
+        [Tooltip("The device from which to get inputs for the charts.")]
+        public ChartControls chartControlDevice;
+
+        [Tooltip("The action applied to handle chart controls.")]
+        public ChartAction chartAction;
+
         private void Start()
         {
             CameraSetup();
             SelectionSetup();
             TransformSetup();
+            ChartSetup();
         }
 
         /// <summary>
@@ -171,6 +178,11 @@ namespace SEE.Controls
                 }
                 cameraAction.BoostDevice = boostDevice;
             }
+        }
+
+        private void ChartSetup()
+        {
+	        chartAction.chartControlsDevice = chartControlDevice;
         }
     }
 }

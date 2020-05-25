@@ -75,8 +75,8 @@ MonoBehaviour:
     actionPath: /actions/default/in/MoveChartInOut
     needsReinit: 0
   resetPosition:
-    actionPath: /actions/default/in/GrabGrip
-    needsReinit: 0
+    actionPath: 
+    needsReinit: 1
   chartsPrefab: {fileID: 753839275229978629, guid: 87467f28fd5c34148a88077659a86497,
     type: 3}
   nonVrObjects: []
