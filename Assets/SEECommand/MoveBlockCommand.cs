@@ -16,29 +16,31 @@ namespace SEE.Command
             this.newPosition = newPosition;
         }
 
-        protected override void ExecuteOnServer()
+        protected override bool ExecuteOnServer()
         {
+            return true;
         }
 
-        protected override void ExecuteOnClient()
+        protected override bool ExecuteOnClient()
         {
             foreach (Interactable interactable in Object.FindObjectsOfType<Interactable>())
             {
                 if (interactable.id == id)
                 {
                     interactable.transform.position = newPosition;
-                    return;
+                    return true;
                 }
             }
 
-            Assertions.InvalidCodePath("Only existing objects can be moved!");
+            return false;
         }
 
-        protected override void UndoOnServer()
+        protected override bool UndoOnServer()
         {
+            return true;
         }
 
-        protected override void UndoOnClient()
+        protected override bool UndoOnClient()
         {
             foreach (Interactable interactable in Object.FindObjectsOfType<Interactable>())
             {
@@ -47,20 +49,24 @@ namespace SEE.Command
                     if (interactable.transform.position == newPosition)
                     {
                         interactable.transform.position = originalPosition;
+                        return true;
                     }
-                    return;
+                    return false;
                 }
             }
 
-            Assertions.InvalidCodePath("Only movement of existing objects can be undone!");
+            return false;
         }
 
-        protected override void RedoOnServer()
+        protected override bool RedoOnServer()
         {
+            return true;
         }
 
-        protected override void RedoOnClient()
+        protected override bool RedoOnClient()
         {
+            bool result = ExecuteOnClient();
+            return result;
         }
     }
 

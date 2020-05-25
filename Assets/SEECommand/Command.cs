@@ -13,7 +13,23 @@ namespace SEE.Command
 
         internal static void OnExecute(AbstractCommand command)
         {
+            GameObject prefab = Resources.Load<GameObject>("CommandHistoryElement");
+            prefab.GetComponentInChildren<UnityEngine.UI.Text>().text = command.GetType().Name;
+            Transform parent = UnityEngine.Object.FindObjectOfType<UnityEngine.UI.VerticalLayoutGroup>().transform;
+            GameObject commandHistoryElement = UnityEngine.Object.Instantiate(prefab, parent);
+            commandHistoryElement.GetComponent<CommandHistoryElement>().index = commands.Count;
+
             commands.Add(command);
+        }
+
+        internal static void Undo(int index)
+        {
+            commands[index].Undo();
+        }
+
+        internal static void Redo(int index)
+        {
+            commands[index].Redo();
         }
     }
 
@@ -49,12 +65,10 @@ namespace SEE.Command
         {
             if (!executed)
             {
-                executed = true;
                 if (Net.Network.UseInOfflineMode)
                 {
                     ExecuteOnServerBase();
                     ExecuteOnClientBase();
-                    CommandHistory.OnExecute(this);
                 }
                 else
                 {
@@ -71,11 +85,10 @@ namespace SEE.Command
         {
             if (executed)
             {
-                executed = false;
                 if (Net.Network.UseInOfflineMode)
                 {
-                    UndoOnServer();
-                    UndoOnClient();
+                    UndoOnServerBase();
+                    UndoOnClientBase();
                 }
                 else
                 {
@@ -92,11 +105,10 @@ namespace SEE.Command
         {
             if (!executed)
             {
-                executed = true;
                 if (Net.Network.UseInOfflineMode)
                 {
-                    RedoOnServer();
-                    RedoOnClient();
+                    RedoOnServerBase();
+                    RedoOnClientBase();
                 }
                 else
                 {
@@ -127,10 +139,14 @@ namespace SEE.Command
         {
             try
             {
-                ExecuteOnClient();
-                if (buffer)
+                bool result = ExecuteOnClient();
+                if (result)
                 {
-                    CommandHistory.OnExecute(this);
+                    if (buffer)
+                    {
+                        CommandHistory.OnExecute(this);
+                    }
+                    executed = true;
                 }
             }
             catch (Exception e)
@@ -155,7 +171,11 @@ namespace SEE.Command
         {
             try
             {
-                UndoOnClient();
+                bool result = UndoOnClient();
+                if (result)
+                {
+                    executed = false;
+                }
             }
             catch (Exception e)
             {
@@ -179,7 +199,11 @@ namespace SEE.Command
         {
             try
             {
-                RedoOnClient();
+                bool result = RedoOnClient();
+                if (result)
+                {
+                    executed = true;
+                }
             }
             catch (Exception e)
             {
@@ -189,17 +213,17 @@ namespace SEE.Command
 
 
 
-        protected abstract void ExecuteOnServer();
+        protected abstract bool ExecuteOnServer();
 
-        protected abstract void ExecuteOnClient();
+        protected abstract bool ExecuteOnClient();
 
-        protected abstract void UndoOnServer();
+        protected abstract bool UndoOnServer();
 
-        protected abstract void UndoOnClient();
+        protected abstract bool UndoOnClient();
 
-        protected abstract void RedoOnServer();
+        protected abstract bool RedoOnServer();
 
-        protected abstract void RedoOnClient();
+        protected abstract bool RedoOnClient();
 
 
 

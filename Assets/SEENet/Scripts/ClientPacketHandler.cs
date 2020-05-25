@@ -1,9 +1,5 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
-using SEE.Command;
-using System.Collections.Generic;
-using System.Net;
-using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace SEE.Net.Internal
@@ -44,10 +40,6 @@ namespace SEE.Net.Internal
                 Assert.IsTrue(packet.command.requesterPort != -1);
 
                 packet.command.ExecuteOnClientBase();
-                if (packet.command.buffer)
-                {
-                    CommandHistory.OnExecute(packet.command);
-                }
             }
         }
 

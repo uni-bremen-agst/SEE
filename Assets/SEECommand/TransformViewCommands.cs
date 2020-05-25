@@ -37,33 +37,40 @@ namespace SEE.Command
             this.position = position;
         }
 
-        protected override void ExecuteOnServer()
+        protected override bool ExecuteOnServer()
         {
+            return true;
         }
 
-        protected override void ExecuteOnClient()
+        protected override bool ExecuteOnClient()
         {
             TransformView transformView = TransformViewCommandHelper.AcquireTransformView(id, index);
             if (transformView)
             {
                 transformView.SetNextPosition(position);
+                return true;
             }
+            return false;
         }
 
-        protected override void UndoOnServer()
+        protected override bool UndoOnServer()
         {
+            return false;
         }
 
-        protected override void UndoOnClient()
+        protected override bool UndoOnClient()
         {
+            return false;
         }
 
-        protected override void RedoOnServer()
+        protected override bool RedoOnServer()
         {
+            return false;
         }
 
-        protected override void RedoOnClient()
+        protected override bool RedoOnClient()
         {
+            return false;
         }
     }
 
@@ -80,33 +87,40 @@ namespace SEE.Command
             this.rotation = rotation;
         }
 
-        protected override void ExecuteOnServer()
+        protected override bool ExecuteOnServer()
         {
+            return true;
         }
 
-        protected override void ExecuteOnClient()
+        protected override bool ExecuteOnClient()
         {
             TransformView transformView = TransformViewCommandHelper.AcquireTransformView(id, index);
             if (transformView)
             {
                 transformView.SetNextRotation(rotation);
+                return true;
             }
+            return false;
         }
 
-        protected override void UndoOnServer()
+        protected override bool UndoOnServer()
         {
+            return false;
         }
 
-        protected override void UndoOnClient()
+        protected override bool UndoOnClient()
         {
+            return false;
         }
 
-        protected override void RedoOnServer()
+        protected override bool RedoOnServer()
         {
+            return false;
         }
 
-        protected override void RedoOnClient()
+        protected override bool RedoOnClient()
         {
+            return false;
         }
     }
 
@@ -123,33 +137,40 @@ namespace SEE.Command
             this.scale = scale;
         }
 
-        protected override void ExecuteOnServer()
+        protected override bool ExecuteOnServer()
         {
+            return true;
         }
 
-        protected override void ExecuteOnClient()
+        protected override bool ExecuteOnClient()
         {
             TransformView transformView = TransformViewCommandHelper.AcquireTransformView(id, index);
             if (transformView)
             {
                 transformView.SetNextScale(scale);
+                return true;
             }
+            return false;
         }
 
-        protected override void UndoOnServer()
+        protected override bool UndoOnServer()
         {
+            return false;
         }
 
-        protected override void UndoOnClient()
+        protected override bool UndoOnClient()
         {
+            return false;
         }
 
-        protected override void RedoOnServer()
+        protected override bool RedoOnServer()
         {
+            return false;
         }
 
-        protected override void RedoOnClient()
+        protected override bool RedoOnClient()
         {
+            return false;
         }
     }
 
