@@ -44,7 +44,10 @@ namespace SEE.Net
 
         public void OnDestroy()
         {
-            Assert.IsTrue(viewContainers.Remove(id));
+            if (id != INVALID_ID)
+            {
+                Assert.IsTrue(viewContainers.Remove(id));
+            }
         }
 
         public static ViewContainer GetViewContainerByID(int id)

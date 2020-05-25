@@ -54,13 +54,14 @@ namespace SEE.Net.Internal
 
         internal override string Serialize()
         {
-            string result = CommandSerializer.Serialize(command);
+            string result = command.index.ToString();
             return result;
         }
 
         internal override void Deserialize(string serializedPacket)
         {
-            UndoCommandPacket deserializedPacket = new UndoCommandPacket(CommandSerializer.Deserialize(serializedPacket));
+            int index = int.Parse(serializedPacket);
+            UndoCommandPacket deserializedPacket = new UndoCommandPacket(CommandHistory.commands[index]);
             command = deserializedPacket.command;
         }
     }
@@ -86,13 +87,14 @@ namespace SEE.Net.Internal
 
         internal override string Serialize()
         {
-            string result = CommandSerializer.Serialize(command);
+            string result = command.index.ToString();
             return result;
         }
 
         internal override void Deserialize(string serializedPacket)
         {
-            RedoCommandPacket deserializedPacket = new RedoCommandPacket(CommandSerializer.Deserialize(serializedPacket));
+            int index = int.Parse(serializedPacket);
+            RedoCommandPacket deserializedPacket = new RedoCommandPacket(CommandHistory.commands[index]);
             command = deserializedPacket.command;
         }
     }

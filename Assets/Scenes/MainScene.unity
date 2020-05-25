@@ -195,8 +195,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68cd993404524eb45918638d10b68356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useInOfflineMode: 1
-  hostServer: 1
+  useInOfflineMode: 0
+  hostServer: 0
   serverIPAddress: 192.168.178.22
   localServerPort: 55555
   remoteServerPort: 55555
@@ -2576,7 +2576,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00017514914}
+  m_AnchoredPosition: {x: 0, y: -0.00004985725}
   m_SizeDelta: {x: 0, y: 662.894}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1105050793
