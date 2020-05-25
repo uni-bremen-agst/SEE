@@ -21,6 +21,7 @@ namespace SEE.Charts.Scripts
 		/// 1. A city with multiple buildings
 		/// 2. A city with one building
 		/// 3. A city with zero buildings
+		/// They might have to be regenerated after changes to the software.
 		/// </summary>
 		public GameObject[] cityPrefabs;
 	}
