@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Command
 {
@@ -16,42 +15,49 @@ namespace SEE.Command
             this.position = position;
         }
 
-        protected override void ExecuteOnServer()
+        protected override bool ExecuteOnServer()
         {
             id = ++lastID;
+            return true;
         }
 
-        protected override void ExecuteOnClient()
+        protected override bool ExecuteOnClient()
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
             go.name = "Block " + id;
             go.transform.position = position;
             Interactable interactable = go.AddComponent<Interactable>();
             interactable.id = id;
+            return true;
         }
 
-        protected override void UndoOnServer()
+        protected override bool UndoOnServer()
         {
+            return true;
         }
 
-        protected override void UndoOnClient()
+        protected override bool UndoOnClient()
         {
             foreach (Interactable interactable in Object.FindObjectsOfType<Interactable>())
             {
                 if (interactable.id == id)
                 {
                     Object.Destroy(interactable.gameObject);
+                    break;
                 }
             }
+            return true;
         }
 
-        protected override void RedoOnServer()
+        protected override bool RedoOnServer()
         {
+            return true;
         }
 
-        protected override void RedoOnClient()
+        protected override bool RedoOnClient()
         {
-            ExecuteOnClient();
+            bool result = ExecuteOnClient();
+            return result;
         }
     }
 

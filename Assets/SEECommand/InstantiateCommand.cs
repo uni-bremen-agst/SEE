@@ -39,25 +39,26 @@ namespace SEE.Command
             viewID = -1;
         }
 
-        protected override void ExecuteOnServer()
+        protected override bool ExecuteOnServer()
         {
             viewID = ++lastViewID;
+            return true;
         }
 
-        protected override void ExecuteOnClient()
+        protected override bool ExecuteOnClient()
         {
             GameObject prefab = Resources.Load<GameObject>(prefabPath);
             if (!prefab)
             {
                 Assertions.InvalidCodePath("Prefab of path '" + prefabPath + "' could not be found!");
-                return;
+                return false;
             }
 
             GameObject go = Object.Instantiate(prefab, null, true);
             if (!go)
             {
                 Assertions.InvalidCodePath("Object could not be instantiated with prefab '" + prefab + "'!");
-                return;
+                return false;
             }
 
             if (!Net.Network.UseInOfflineMode)
@@ -67,24 +68,29 @@ namespace SEE.Command
             go.transform.position = position;
             go.transform.rotation = rotation;
             go.transform.localScale = scale;
+            return true;
         }
 
-        protected override void UndoOnServer()
+        protected override bool UndoOnServer()
         {
+            return true;
         }
 
-        protected override void UndoOnClient()
+        protected override bool UndoOnClient()
         {
             Object.Destroy(ViewContainer.GetViewContainerByID(viewID).gameObject);
+            return true;
         }
 
-        protected override void RedoOnServer()
+        protected override bool RedoOnServer()
         {
-            ExecuteOnClient();
+            return true;
         }
 
-        protected override void RedoOnClient()
+        protected override bool RedoOnClient()
         {
+            bool result = ExecuteOnClient();
+            return result;
         }
     }
 

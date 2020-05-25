@@ -1,26 +1,6 @@
 ﻿using SEE.Command;
 using UnityEngine;
 
-public abstract class T0
-{
-    public int i = 0;
-}
-
-public class T1 : T0
-{
-    public int j = 0;
-
-    public T1(int j)
-    {
-        this.j = j;
-    }
-}
-
-public class T2
-{
-    public T0 t0;
-}
-
 public class HistoryTest : MonoBehaviour
 {
     private Transform draggedTransform = null;
@@ -53,6 +33,10 @@ public class HistoryTest : MonoBehaviour
 
         if (dragging)
         {
+            if (!Input.GetMouseButton(0))
+            {
+                int breakhere = 0;
+            }
             new MoveBlockCommand(draggedTransform.gameObject, oldPosition, Camera.main.transform.position + Camera.main.ScreenPointToRay(Input.mousePosition).direction * distanceToCamera, !Input.GetMouseButton(0)).Execute();
             if (!Input.GetMouseButton(0))
             {

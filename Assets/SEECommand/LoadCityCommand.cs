@@ -84,11 +84,12 @@ namespace SEE.Command
             }
         }
 
-        protected override void ExecuteOnServer()
+        protected override bool ExecuteOnServer()
         {
+            return true;
         }
 
-        protected override void ExecuteOnClient()
+        protected override bool ExecuteOnClient()
         {
             GameObject gameObject = new GameObject(type.ToString());
             AbstractSEECity city = null;
@@ -158,24 +159,30 @@ namespace SEE.Command
             {
                 Debug.LogError("Unknown city-type!");
             }
+
+            return true;
         }
 
-        protected override void UndoOnServer()
+        protected override bool UndoOnServer()
         {
+            return true;
         }
 
-        protected override void UndoOnClient()
+        protected override bool UndoOnClient()
         {
             UnityEngine.Object.Destroy(GameObject.Find(type.ToString()));
+            return true;
         }
 
-        protected override void RedoOnServer()
+        protected override bool RedoOnServer()
         {
-            ExecuteOnClient();
+            return true;
         }
 
-        protected override void RedoOnClient()
+        protected override bool RedoOnClient()
         {
+            bool result = ExecuteOnClient();
+            return result;
         }
     }
 

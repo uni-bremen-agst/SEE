@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Net
 {
@@ -17,6 +18,8 @@ namespace SEE.Net
         [SerializeField] private View[] views = new View[1];
         
         private static Dictionary<int, ViewContainer> viewContainers = new Dictionary<int, ViewContainer>();
+
+
 
         public void Initialize(int id, IPEndPoint owner)
         {
@@ -38,6 +41,12 @@ namespace SEE.Net
                 views[i].Initialize(this);
             }
         }
+
+        public void OnDestroy()
+        {
+            Assert.IsTrue(viewContainers.Remove(id));
+        }
+
         public static ViewContainer GetViewContainerByID(int id)
         {
             if (!viewContainers.ContainsKey(id))
@@ -46,6 +55,7 @@ namespace SEE.Net
             }
             return viewContainers[id];
         }
+
         public int GetIndexOf(View view)
         {
             for (int i = 0; i < views.Length; i++)
@@ -61,6 +71,7 @@ namespace SEE.Net
             }
             return -1;
         }
+
         public View GetViewByIndex(int index)
         {
             if (index < 0 || index >= views.Length)
@@ -69,6 +80,7 @@ namespace SEE.Net
             }
             return views[index];
         }
+
         public bool IsOwner()
         {
             bool isOwner = Network.UseInOfflineMode || owner == null || Client.Connection == null;
