@@ -307,9 +307,15 @@ namespace SEE.Charts.Scripts
 		private void GetAllFloats()
 		{
 			foreach (var data in _dataObjects)
-			foreach (var key in data.GetComponent<NodeRef>().node.FloatAttributes.Keys)
-				if (!AllKeys.Contains(key))
-					AllKeys.Add(key);
+			{
+				Debug.Log(data.name);
+				foreach (var key in data.GetComponent<NodeRef>().node.FloatAttributes.Keys)
+				{
+					Debug.Log("Float: " + key);
+					if (!AllKeys.Contains(key))
+						AllKeys.Add(key);
+				}
+			}
 		}
 
 		/// <summary>
@@ -319,9 +325,15 @@ namespace SEE.Charts.Scripts
 		private void GetAllIntegers()
 		{
 			foreach (var data in _dataObjects)
-			foreach (var key in data.GetComponent<NodeRef>().node.IntAttributes.Keys)
-				if (!AllKeys.Contains(key))
-					AllKeys.Add(key);
+			{
+				Debug.Log(data.name);
+				foreach (var key in data.GetComponent<NodeRef>().node.IntAttributes.Keys)
+				{
+					Debug.Log("Integer: " + key);
+					if (!AllKeys.Contains(key))
+						AllKeys.Add(key);
+				}
+			}
 		}
 
 		/// <summary>
