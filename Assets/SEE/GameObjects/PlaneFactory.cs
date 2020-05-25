@@ -30,6 +30,10 @@ namespace SEE.GO
             planeRenderer.sharedMaterial = new Material(planeRenderer.sharedMaterial);
             planeRenderer.sharedMaterial.color = color;
 
+            // Neither casting nor receiving shadows.
+            planeRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            planeRenderer.receiveShadows = false;
+
             // Turn off reflection of plane
             planeRenderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
             planeRenderer.sharedMaterial.EnableKeyword("_GLOSSYREFLECTIONS_OFF");

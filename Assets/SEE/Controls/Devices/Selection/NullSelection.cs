@@ -10,8 +10,20 @@ namespace SEE.Controls.Devices
     {
         public override Vector3 Direction => Vector3.zero;
 
-        public override bool Activated => false;
+        public override bool IsSelecting => false;
 
         public override Vector3 Position => Vector3.zero;
+
+        public override bool IsGrabbing => false;
+
+        public override float Pull => 0;
+
+        public override bool IsCanceling => false;
+
+        public override bool IsZoomingIn => false;
+
+        public override bool IsZoomingOut => false;
+
+        public override bool IsZoomingHome => false;
     }
 }

@@ -8,12 +8,12 @@ public class KeyboardScript : MonoBehaviour
 
     public void alphabetFunction(string alphabet)
     {
-        TextField.text=TextField.text + alphabet;
+        TextField.text = TextField.text + alphabet;
     }
 
     public void BackSpace()
     {
-        if(TextField.text.Length>0) TextField.text= TextField.text.Remove(TextField.text.Length-1);
+        if (TextField.text.Length > 0) TextField.text = TextField.text.Remove(TextField.text.Length - 1);
     }
 
     public void CloseAllLayouts()

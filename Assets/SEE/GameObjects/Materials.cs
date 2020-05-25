@@ -13,7 +13,7 @@ namespace SEE.GO
         /// <summary>
         /// Name of default shader to obtain the default material.
         /// </summary>
-        private const string shaderName = "Diffuse";
+        private const string shaderName = "Standard";
 
         /// <summary>
         /// Creates default numberOfColors materials in the color range from
@@ -64,7 +64,7 @@ namespace SEE.GO
             }
             // Shader to retrieve the default material.
             Shader shader = Shader.Find(shaderName);
-
+           
             Material[] result = new Material[numberOfColors];
 
             if (numberOfColors == 1)
@@ -100,7 +100,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the default material for the given indes (always the identical 
+        /// Returns the default material for the given <paramref name="degree"/> (always the identical 
         /// material, no matter how often this method is called). That means, if 
         /// the caller modifies this material, other objects using it will be affected, too.
         /// 
@@ -115,6 +115,17 @@ namespace SEE.GO
                 throw new Exception("color degree " + degree + " out of range [0," + (numberOfColors - 1) + "]");
             }
             return materials[degree];
+        }
+
+        /// <summary>
+        /// Returns a new material with the given <paramref name="color"/>.
+        /// </summary>
+        /// <param name="color">color for the material</param>
+        /// <returns>new material with given <paramref name="color"/></returns>
+        public static Material NewMaterial(Color color)
+        {
+            Shader shader = Shader.Find(shaderName);
+            return NewMaterial(shader, color);
         }
     }
 }

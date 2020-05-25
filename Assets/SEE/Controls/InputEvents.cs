@@ -42,4 +42,11 @@ namespace SEE.Controls
     public class VectorEvent : UnityEvent<Vector3, float>
     {
     }
+
+    /// <summary>
+    /// Events where a game object is involved.
+    /// </summary>
+    public class GameObjectEvent : UnityEvent<GameObject>
+    {
+    }
 }

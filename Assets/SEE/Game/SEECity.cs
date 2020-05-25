@@ -7,6 +7,7 @@ using SEE.Tools;
 using SEE.DataModel;
 using SEE.DataModel.IO;
 using SEE.GO;
+using SEE.Utils;
 
 namespace SEE.Game
 {
@@ -84,7 +85,7 @@ namespace SEE.Game
                 loadedGraph = LoadGraph(filename);
                 if (loadedGraph != null)
                 {
-                    SetNodeRefs(loadedGraph);
+                    SetNodeRefs(loadedGraph, gameObject);
                 }
             }
         }
@@ -97,9 +98,9 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph giving us the nodes who should be the
         /// target of the NodeRefs</param>
-        protected void SetNodeRefs(Graph graph)
+        protected void SetNodeRefs(Graph graph, GameObject parent)
         {
-            foreach (Transform childTransform in transform)
+            foreach (Transform childTransform in parent.transform)
             {
                 GameObject child = childTransform.gameObject;
                 NodeRef nodeRef = child.GetComponent<NodeRef>();
@@ -111,6 +112,7 @@ namespace SEE.Game
                         Debug.LogWarningFormat("Could not resolve node reference {0}.\n", child.name);
                     }
                 }
+                SetNodeRefs(graph, child);
             }
         }
 

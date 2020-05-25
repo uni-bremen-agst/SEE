@@ -1,8 +1,11 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SEE
+namespace SEE.Utils
 {
+    /// <summary>
+    /// A simple logger for SEE that just logs the messages viar UnityEngine.Debug.
+    /// </summary>
     public class SEELogger : ILogger
     {
         public void LogDebug(string message)

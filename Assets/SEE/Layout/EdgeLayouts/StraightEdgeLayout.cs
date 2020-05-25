@@ -12,8 +12,10 @@ namespace SEE.Layout
         /// Constructor.
         /// </summary>
         /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
-        public StraightEdgeLayout(bool edgesAboveBlocks) 
-            : base(edgesAboveBlocks)
+        /// <param name="scaleFactor">factor by which certain aspects of an edge are scaled;
+        /// here: the offset for the edge line w.r.t. its source and target block</param>
+        public StraightEdgeLayout(bool edgesAboveBlocks, float scaleFactor) 
+            : base(edgesAboveBlocks, scaleFactor)
         {
             name = "Straight";
         }
@@ -32,7 +34,7 @@ namespace SEE.Layout
             // better read the edges.
             // This offset is used to draw the line somewhat below
             // or above the house (depending on the orientation).
-            float offset = 0.2f * maxHeight; // must be positive
+            float offset = 0.2f * maxHeight * scaleFactor; // must be positive
             // The level at which edges are drawn.
             float edgeLevel = edgesAboveBlocks ? maxBlockY + offset : minBlockY - offset;
 

@@ -201,7 +201,7 @@ namespace SEE.GO
         private static GameObject NewBuilding(UnityEngine.Object prefab)
         {
             GameObject building = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
-            building.tag = Tags.Building;
+            building.tag = Tags.Node;
             building.isStatic = true;
 
             CSRooftops csRooftopsModifier = building.GetComponent<CSRooftops>();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -125,7 +126,7 @@ namespace SEE.DataModel
         /// </summary>
         [SerializeField]
         private CallTreeCategories categories;
-        
+
         /// <summary>
         /// The predecessor function call. Can not be serialized due to depth limits of
         /// serialization.
@@ -143,7 +144,7 @@ namespace SEE.DataModel
         /// </summary>
         [SerializeField]
         private string[] attributes;
-        
+
         /// <summary>
         /// The <see cref="GameObject"/>, that represents this function call as a
         /// building.
@@ -469,7 +470,7 @@ namespace SEE.DataModel
                 Parameters = parameters;
                 ReturnValue = returnValue;
             }
-            
+
             /// <summary>
             /// Creates a new <see cref="FunctionInformation"/>-object from given linkage
             /// name as formatted in a GXL-file. <paramref name="linkageName"/> must not
@@ -679,7 +680,7 @@ namespace SEE.DataModel
 
                 return convertedType + addition;
             }
-            
+
             /// <summary>
             /// Converts a type as formatted in a DYN-file to the internal type
             /// representation.
@@ -765,5 +766,4 @@ namespace SEE.DataModel
             }
         }
     }
-
 }

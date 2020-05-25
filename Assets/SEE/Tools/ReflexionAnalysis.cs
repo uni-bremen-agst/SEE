@@ -33,7 +33,7 @@ using UnityEngine;
 
 using SEE.DataModel;
 
-namespace SEE.Tools
+namespace SEE.Tools.Architecture
 {
     /// <summary>
     /// Super class for all exceptions thrown by the architecture analysis.
