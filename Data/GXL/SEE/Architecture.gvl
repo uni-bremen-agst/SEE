@@ -15,40 +15,40 @@
     <Hidden_Edge_Types>
     </Hidden_Edge_Types>
   </Visualization>
-  <Node Id="Lf637a50c-dc7d-4385-8baf-412b9ed17016" X="-1360" Y="-635" W="246" H="147" CS="14.14" Exp="True">
-    <Node Id="Lb77416bc-7c04-4c74-bc39-8748eb637fdb" X="45" Y="97" W="0" H="0" CS="10">
+  <Node Id="LSEE.GO" X="-1360" Y="-635" W="246" H="147" CS="14.14" Exp="True">
+    <Node Id="LSEE.GO.Whiteboard" X="45" Y="97" W="0" H="0" CS="10">
     </Node>
   </Node>
-  <Node Id="Lf94ee527-3249-4710-ae66-ec86c61b0dd9" X="-1286" Y="-318" W="261" H="161.14" CS="14.14" Exp="True">
-    <Node Id="L55b0f05e-def6-4a5f-8557-53356e12517c" X="160" Y="100" W="0" H="0" CS="10">
+  <Node Id="LSEE.Layout" X="-1286" Y="-318" W="261" H="161.14" CS="14.14" Exp="True">
+    <Node Id="LSEE.Layout.RectanglePacking" X="160" Y="100" W="0" H="0" CS="10">
     </Node>
-    <Node Id="Lae18e12f-a43a-4f49-9abe-4901b48dac5e" X="94" Y="122" W="0" H="0" CS="10">
+    <Node Id="LSEE.Layout.CirclePacking" X="94" Y="122" W="0" H="0" CS="10">
     </Node>
-    <Node Id="L956d7423-0d4c-4221-b152-e1c45cbf6eae" X="41" Y="111" W="0" H="0" CS="10">
+    <Node Id="LSEE.Layout.EvoStreets" X="41" Y="111" W="0" H="0" CS="10">
     </Node>
-    <Node Id="L7d40c558-b795-4894-821a-1dc97273c0aa" X="217" Y="102" W="0" H="0" CS="10">
-    </Node>
-  </Node>
-  <Node Id="L8382655d-8d54-4cb4-9ecc-152ac0b2ffb0" X="-838" Y="-752" W="276" H="176" CS="14.14" Exp="True">
-    <Node Id="L09be49ec-e689-4e53-a486-20a23b41f411" X="129" Y="68" W="0" H="0" CS="10">
-    </Node>
-    <Node Id="Laa5dab18-3f81-4d3b-b566-f6ef9db83799" X="195" Y="133" W="0" H="0" CS="10">
+    <Node Id="LSEE.Layout.TreeMap" X="217" Y="102" W="0" H="0" CS="10">
     </Node>
   </Node>
-  <Node Id="Lb5d982ca-5256-4e00-b9bb-8ca51d47e3f6" X="-437" Y="-486" W="229" H="155" CS="14.14" Exp="True">
-    <Node Id="L9f24cc16-a8b5-4a57-884c-8c61a7864be0" X="33" Y="79" W="0" H="0" CS="10">
+  <Node Id="LSEE.Game" X="-838" Y="-752" W="276" H="176" CS="14.14" Exp="True">
+    <Node Id="LSEE.Game.Evolution" X="129" Y="68" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="LSEE.Game.Runtime" X="195" Y="133" W="0" H="0" CS="10">
     </Node>
   </Node>
-  <Node Id="Lcd3fb42d-095f-4195-9f25-e11dbcbf8059" X="-987" Y="-314" W="238" H="159" CS="14.14" Exp="True">
-  </Node>
-  <Node Id="La4fe7f5b-2a9c-41f5-ba32-c807cd42d746" X="-1145" Y="-806" W="40" H="40" CS="14.14">
-  </Node>
-  <Node Id="L75929d73-bb3e-472f-ac2e-250bdf9f5a01" X="-722" Y="-309" W="225" H="141" CS="14.14" Exp="True">
-    <Node Id="Lf3fc52a8-8a06-4002-b854-260c7c9e7db4" X="85" Y="88" W="0" H="0" CS="10">
+  <Node Id="LSEE.Controls" X="-437" Y="-486" W="229" H="155" CS="14.14" Exp="True">
+    <Node Id="LSEE.Controls.Devices" X="33" Y="79" W="0" H="0" CS="10">
     </Node>
   </Node>
-  <Node Id="Lfbd6c463-b5db-4f82-b83b-4c06ba22ce73" X="-1305" Y="-827" W="0" H="0" CS="14.14">
+  <Node Id="LSEE.Utils" X="-987" Y="-314" W="238" H="159" CS="14.14" Exp="True">
   </Node>
-  <Node Id="L2aca3f40-f13b-4ceb-83c0-72efeaef833b" X="-1113" Y="-993" W="0" H="0" CS="14.14">
+  <Node Id="LSEE.Tools" X="-1145" Y="-806" W="40" H="40" CS="14.14">
+  </Node>
+  <Node Id="LSEE.DataModel" X="-722" Y="-309" W="225" H="141" CS="14.14" Exp="True">
+    <Node Id="LSEE.DataModel.IO" X="85" Y="88" W="0" H="0" CS="10">
+    </Node>
+  </Node>
+  <Node Id="LSEE.CameraPaths" X="-1305" Y="-827" W="0" H="0" CS="14.14">
+  </Node>
+  <Node Id="LSEEEditor" X="-1113" Y="-993" W="0" H="0" CS="14.14">
   </Node>
 </Gravis2_Layout>
