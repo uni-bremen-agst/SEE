@@ -27,5 +27,10 @@ namespace SEE.Utils
         {
             Debug.Log(message);
         }
+
+        public void LogWarning(string message)
+        {
+            Debug.LogWarning(message);
+        }
     }
 }
