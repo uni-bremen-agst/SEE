@@ -11,6 +11,7 @@ namespace SEE.Utils
         void LogError(string message);
         void LogException(Exception exception);
         void LogInfo(string message);
+        void LogWarning(string message);
     }
 }
 
