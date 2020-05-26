@@ -27,8 +27,22 @@ namespace SEE.Command
             {
                 if (interactable.id == id)
                 {
-                    interactable.transform.position = newPosition;
-                    return true;
+                    if (!buffer)
+                    {
+                        interactable.lastBufferedPosition = originalPosition;
+                    }
+
+                    if (interactable.lastBufferedPosition == originalPosition)
+                    {
+                        interactable.transform.position = newPosition;
+                        if (buffer)
+                        {
+                            interactable.lastBufferedPosition = newPosition;
+                        }
+                        return true;
+                    }
+
+                    return false;
                 }
             }
 
@@ -46,9 +60,10 @@ namespace SEE.Command
             {
                 if (interactable.id == id)
                 {
-                    if (interactable.transform.position == newPosition)
+                    if (interactable.lastBufferedPosition == newPosition)
                     {
                         interactable.transform.position = originalPosition;
+                        interactable.lastBufferedPosition = originalPosition;
                         return true;
                     }
                     return false;

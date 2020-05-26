@@ -33,26 +33,6 @@ namespace SEE.Command
         {
             commands[index].Redo();
         }
-
-        internal static void Remove(AbstractCommand command)
-        {
-            int index = commands.IndexOf(command);
-            if (index != -1)
-            {
-                commands.RemoveAt(index);
-                for (int i = index; i < commandHistoryElements.Count; i++)
-                {
-                    commandHistoryElements[i].GetComponent<CommandHistoryElement>().index--;
-                }
-                GameObject commandHistoryElement = commandHistoryElements[index];
-                commandHistoryElements.RemoveAt(index);
-                UnityEngine.Object.Destroy(commandHistoryElement);
-            }
-            else
-            {
-                Assertions.InvalidCodePath("A non-existing command should not be removed, as it should not be accessible anymore!");
-            }
-        }
     }
 
     public abstract class AbstractCommand
@@ -209,10 +189,6 @@ namespace SEE.Command
                 {
                     executed = false;
                 }
-                else
-                {
-                    CommandHistory.Remove(this);
-                }
             }
             catch (Exception e)
             {
@@ -240,10 +216,6 @@ namespace SEE.Command
                 if (result)
                 {
                     executed = true;
-                }
-                else
-                {
-                    CommandHistory.Remove(this);
                 }
             }
             catch (Exception e)
