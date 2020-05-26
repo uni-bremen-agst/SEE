@@ -28,6 +28,7 @@ namespace SEE.Command
             go.transform.position = position;
             Interactable interactable = go.AddComponent<Interactable>();
             interactable.id = id;
+            interactable.lastBufferedPosition = go.transform.position;
             return true;
         }
 

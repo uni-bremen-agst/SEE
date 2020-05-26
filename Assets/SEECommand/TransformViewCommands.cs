@@ -26,14 +26,14 @@ namespace SEE.Command
 
     public class TransformViewPositionCommand : AbstractCommand
     {
-        public int id;
-        public int index;
+        public int viewContainerID;
+        public int viewIndex;
         public Vector3 position;
 
         public TransformViewPositionCommand(TransformView transformView, Vector3 position) : base(false)
         {
-            id = transformView.viewContainer.id;
-            index = transformView.viewContainer.GetIndexOf(transformView);
+            viewContainerID = transformView.viewContainer.id;
+            viewIndex = transformView.viewContainer.GetIndexOf(transformView);
             this.position = position;
         }
 
@@ -44,7 +44,7 @@ namespace SEE.Command
 
         protected override bool ExecuteOnClient()
         {
-            TransformView transformView = TransformViewCommandHelper.AcquireTransformView(id, index);
+            TransformView transformView = TransformViewCommandHelper.AcquireTransformView(viewContainerID, viewIndex);
             if (transformView)
             {
                 transformView.SetNextPosition(position);
@@ -76,14 +76,14 @@ namespace SEE.Command
 
     public class TransformViewRotationCommand : AbstractCommand
     {
-        public int id;
-        public int index;
+        public int viewContainerID;
+        public int viewIndex;
         public Quaternion rotation;
 
         public TransformViewRotationCommand(TransformView transformView, Quaternion rotation) : base(false)
         {
-            id = transformView.viewContainer.id;
-            index = transformView.viewContainer.GetIndexOf(transformView);
+            viewContainerID = transformView.viewContainer.id;
+            viewIndex = transformView.viewContainer.GetIndexOf(transformView);
             this.rotation = rotation;
         }
 
@@ -94,7 +94,7 @@ namespace SEE.Command
 
         protected override bool ExecuteOnClient()
         {
-            TransformView transformView = TransformViewCommandHelper.AcquireTransformView(id, index);
+            TransformView transformView = TransformViewCommandHelper.AcquireTransformView(viewContainerID, viewIndex);
             if (transformView)
             {
                 transformView.SetNextRotation(rotation);
@@ -126,14 +126,14 @@ namespace SEE.Command
 
     public class TransformViewScaleCommand : AbstractCommand
     {
-        public int id;
-        public int index;
+        public int viewContainerID;
+        public int viewIndex;
         public Vector3 scale;
 
         public TransformViewScaleCommand(TransformView transformView, Vector3 scale) : base(false)
         {
-            id = transformView.viewContainer.id;
-            index = transformView.viewContainer.GetIndexOf(transformView);
+            viewContainerID = transformView.viewContainer.id;
+            viewIndex = transformView.viewContainer.GetIndexOf(transformView);
             this.scale = scale;
         }
 
@@ -144,7 +144,7 @@ namespace SEE.Command
 
         protected override bool ExecuteOnClient()
         {
-            TransformView transformView = TransformViewCommandHelper.AcquireTransformView(id, index);
+            TransformView transformView = TransformViewCommandHelper.AcquireTransformView(viewContainerID, viewIndex);
             if (transformView)
             {
                 transformView.SetNextScale(scale);
