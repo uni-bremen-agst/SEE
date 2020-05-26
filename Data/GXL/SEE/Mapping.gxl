@@ -170,7 +170,7 @@
         <string>GO</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>f637a50c-dc7d-4385-8baf-412b9ed17016</string>
+        <string>SEE.GO</string>
       </attr>
     </node>
     <node id="N323560">
@@ -179,7 +179,7 @@
         <string>Whiteboard</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>b77416bc-7c04-4c74-bc39-8748eb637fdb</string>
+        <string>SEE.GO.Whiteboard</string>
       </attr>
     </node>
     <node id="N323561">
@@ -188,7 +188,7 @@
         <string>Layout</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>f94ee527-3249-4710-ae66-ec86c61b0dd9</string>
+        <string>SEE.Layout</string>
       </attr>
     </node>
     <node id="N323562">
@@ -197,7 +197,7 @@
         <string>Game</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>8382655d-8d54-4cb4-9ecc-152ac0b2ffb0</string>
+        <string>SEE.Game</string>
       </attr>
     </node>
     <node id="N323563">
@@ -206,7 +206,7 @@
         <string>Controls</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>b5d982ca-5256-4e00-b9bb-8ca51d47e3f6</string>
+        <string>SEE.Controls</string>
       </attr>
     </node>
     <node id="N323564">
@@ -215,7 +215,7 @@
         <string>Utils</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>cd3fb42d-095f-4195-9f25-e11dbcbf8059</string>
+        <string>SEE.Utils</string>
       </attr>
     </node>
     <node id="N323565">
@@ -224,7 +224,7 @@
         <string>Tools</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>a4fe7f5b-2a9c-41f5-ba32-c807cd42d746</string>
+        <string>SEE.Tools</string>
       </attr>
     </node>
     <node id="N323566">
@@ -233,7 +233,7 @@
         <string>DataModel</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>75929d73-bb3e-472f-ac2e-250bdf9f5a01</string>
+        <string>SEE.DataModel</string>
       </attr>
     </node>
     <node id="N323567">
@@ -242,7 +242,7 @@
         <string>Devices</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>9f24cc16-a8b5-4a57-884c-8c61a7864be0</string>
+        <string>SEE.Controls.Devices</string>
       </attr>
     </node>
     <node id="N323568">
@@ -251,7 +251,7 @@
         <string>CameraPaths</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>fbd6c463-b5db-4f82-b83b-4c06ba22ce73</string>
+        <string>SEE.CameraPaths</string>
       </attr>
     </node>
     <node id="N323569">
@@ -260,7 +260,7 @@
         <string>EvoStreets</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>956d7423-0d4c-4221-b152-e1c45cbf6eae</string>
+        <string>SEE.Layout.EvoStreets</string>
       </attr>
     </node>
     <node id="N323570">
@@ -269,7 +269,7 @@
         <string>CirclePacking</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>ae18e12f-a43a-4f49-9abe-4901b48dac5e</string>
+        <string>SEE.Layout.CirclePacking</string>
       </attr>
     </node>
     <node id="N323571">
@@ -278,7 +278,7 @@
         <string>RectanglePacking</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>55b0f05e-def6-4a5f-8557-53356e12517c</string>
+        <string>SEE.Layout.RectanglePacking</string>
       </attr>
     </node>
     <node id="N323572">
@@ -287,7 +287,7 @@
         <string>TreeMap</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>7d40c558-b795-4894-821a-1dc97273c0aa</string>
+        <string>SEE.Layout.TreeMap</string>
       </attr>
     </node>
     <node id="N323573">
@@ -296,7 +296,7 @@
         <string>IO</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>f3fc52a8-8a06-4002-b854-260c7c9e7db4</string>
+        <string>SEE.DataModel.IO</string>
       </attr>
     </node>
     <node id="N323574">
@@ -305,7 +305,7 @@
         <string>Runtime</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>aa5dab18-3f81-4d3b-b566-f6ef9db83799</string>
+        <string>SEE.Game.Runtime</string>
       </attr>
     </node>
     <node id="N323575">
@@ -314,7 +314,7 @@
         <string>Evolution</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>09be49ec-e689-4e53-a486-20a23b41f411</string>
+        <string>SEE.Game.Evolution</string>
       </attr>
     </node>
     <node id="N323576">
@@ -323,7 +323,7 @@
         <string>SEEEditor</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>2aca3f40-f13b-4ceb-83c0-72efeaef833b</string>
+        <string>SEEEditor</string>
       </attr>
     </node>
     <edge id="E1007878" from="N316238" to="N323567">
