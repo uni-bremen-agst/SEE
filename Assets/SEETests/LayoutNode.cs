@@ -4,19 +4,17 @@ using UnityEngine;
 namespace SEE.Layout
 {
     /// <summary>
-    /// A simple implementation of ILayoutNode for testing.
+    /// A simple implementation of ILayoutNode.
     /// </summary>
-    internal class TestGameNode : ILayoutNode
+    internal class LayoutNode : ILayoutNode
     {
-        private readonly int index;
-
-        public TestGameNode(Vector3 initialSize, int index)
+        public LayoutNode(Vector3 initialSize, int index)
         {
             this.scale = initialSize;
             this.id = index.ToString();
         }
 
-        public TestGameNode(string id)
+        public LayoutNode(string id)
         {
             this.scale = Vector3.zero;
             this.id = id;
@@ -47,7 +45,7 @@ namespace SEE.Layout
             return children;
         }
 
-        public void AddChild(TestGameNode node)
+        public void AddChild(LayoutNode node)
         {
             children.Add(node);
             node.Parent = this;
@@ -104,7 +102,7 @@ namespace SEE.Layout
         {
             int howManyNodes = 500;
             Vector3 initialSize = Vector3.one;
-            TestGameNode root = new TestGameNode(initialSize, 0);
+            LayoutNode root = new LayoutNode(initialSize, 0);
 
             ICollection<ILayoutNode> gameObjects = new List<ILayoutNode>();
             gameObjects.Add(root);
@@ -112,7 +110,7 @@ namespace SEE.Layout
             for (int i = 1; i <= howManyNodes; i++)
             {
                 initialSize *= 1.01f;
-                TestGameNode child = new TestGameNode(initialSize, i);
+                LayoutNode child = new LayoutNode(initialSize, i);
                 gameObjects.Add(child);
                 root.AddChild(child);
             }
