@@ -32,6 +32,21 @@ namespace SEE.Game
         public string PathPrefix; // serialized by Unity
 
         /// <summary>
+        /// The relative path for the GVL file containing the node layout information.
+        /// </summary>
+        public string gvlPath = "..\\Data\\GXL\\linux-clones\\net.gvl";
+
+        /// <summary>
+        /// Returns the concatenation of pathPrefix and gvlPath. That is the complete
+        /// absolute path to the GVL file containing the layout information.
+        /// </summary>
+        /// <returns>concatenation of pathPrefix and gvlPath</returns>
+        public string GVLPath()
+        {
+            return PathPrefix + gvlPath;
+        }
+
+        /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
         [OdinSerialize]
@@ -398,6 +413,7 @@ namespace SEE.Game
             Treemap,
             CirclePacking,
             Manhattan,
+            FromFile
         }
 
         /// <summary>
