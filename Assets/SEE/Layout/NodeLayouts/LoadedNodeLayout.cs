@@ -1,0 +1,53 @@
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+
+namespace SEE.Layout
+{
+    /// <summary>
+    /// A layout that is read from a GVL file.
+    /// </summary>
+    public class LoadedNodeLayout : HierarchicalNodeLayout
+    {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
+        /// placed on this level</param>
+        /// <param name="filename">the name of the GVL file from which to read the layout information</param>
+        public LoadedNodeLayout(float groundLevel, string filename)
+          : base(groundLevel)
+        {
+            name = "Loaded Layout";
+            this.filename = filename;
+        }
+
+        /// <summary>
+        /// The name of the GVL file from which to read the layout information.
+        /// </summary>
+        private string filename;
+
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes)
+        {
+            Dictionary<ILayoutNode, NodeTransform> result = new Dictionary<ILayoutNode, NodeTransform>();
+            if (File.Exists(filename))
+            {
+                SEE.Layout.IO.Reader reader = new SEE.Layout.IO.Reader(filename, layoutNodes.Cast<IGameNode>().ToList());
+                foreach (ILayoutNode node in layoutNodes)
+                {
+                    Vector3 position = node.CenterPosition;
+                    Vector3 absoluteScale = node.AbsoluteScale;
+                    // From y center to y ground level:
+                    position.y -= absoluteScale.y / 2.0f + groundLevel;
+                    result[node] = new NodeTransform(position, absoluteScale);
+                }
+            }
+            else
+            {
+                Debug.LogErrorFormat("GVL file {0} does not exist. No layout could be loaded.\n", filename);
+            }
+            return result;
+        }
+    }
+}

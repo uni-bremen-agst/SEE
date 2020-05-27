@@ -320,6 +320,8 @@ namespace SEE.Game
                     return new BalloonNodeLayout(groundLevel);
                 case SEECity.NodeLayouts.CirclePacking:
                     return new CirclePackingNodeLayout(groundLevel);
+                case SEECity.NodeLayouts.FromFile:
+                    return new LoadedNodeLayout(groundLevel, settings.GVLPath());
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }
