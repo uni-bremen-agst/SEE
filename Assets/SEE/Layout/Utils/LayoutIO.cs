@@ -484,12 +484,13 @@ namespace SEE.Layout.IO
             if (!gameNodes.TryGetValue(ID, out IGameNode gameNode))
             {
                 LogWarning(String.Format("Unknown id {0}", ID));
+                Debug.LogError(String.Format("Unknown id {0}", ID));
                 // We create a new game node so that we can continue as normal.
                 gameNode = new LayoutVertex(ID);
                 //throw new SyntaxError(String.Format("Unknown id {0}", ID));
             }
             float X = GetFloat(reader, "X");   // mandatory x co-ordinate
-            float Y = -GetFloat(reader, "Y");   // mandatory y co-ordinate; Gravis's Y is Unity's inverted z axis
+            float Y = GetFloat(reader, "Y");   // mandatory y co-ordinate; Gravis's Y is Unity's inverted z axis
             float W = GetFloat(reader, "W");   // mandatory width
             float H = GetFloat(reader, "H");   // mandatory height
 
@@ -523,24 +524,55 @@ namespace SEE.Layout.IO
             // to their parent node.
             if (parent.gameNode != null)
             {
-                // Node is not at top-level.
-                Vector3 parentPosition = parent.gameNode.CenterPosition; // world space
-                Vector3 parentScale = parent.gameNode.AbsoluteScale;     // world space
-                                                                         // Transform parent's center position to left upper corner.
+                // Node is a nested node, that is, not at top-level.
+                // (X, Y) denote the offset of the nested node to its parent's left upper corner
+                Vector3 parentPosition = parent.gameNode.CenterPosition; // world space in Unity
+                Vector3 parentScale = parent.gameNode.AbsoluteScale;     // world space in Unity
+                //Debug.LogFormat("parent {0} center position={1} absolute scale={2}\n", parent.gameNode.ID, parentPosition, parentScale);
+                // Transform parent's center position to its left upper corner.
                 parentPosition.x -= parentScale.x / 2.0f;
                 parentPosition.z += parentScale.z / 2.0f;
+                Debug.LogFormat("parent {0} left upper corner={1} absolute scale={2}\n", parent.gameNode.ID, parentPosition, parentScale);
+                // Calculate left upper corner of node.
+                position.x = parentPosition.x + X;
+                position.z = parentPosition.z - Y; // Gravis's Y axis is inverse to Unity's z axis
 
-                X += parentPosition.x;
-                Y += parentPosition.z;
+                //Debug.LogFormat("child {0}'s left upper corner ({1}, {2}) where X={3} Y={4})\n",
+                //                ID, position.x, position.z, X, Y);
+                // position must refer to the center of the node.
+                position.x += scale.x / 2.0f;
+                position.z -= scale.z / 2.0f;
+                //Debug.LogFormat("child {0}'s center position ({1}, {2})\n", ID, position.x, position.z);
             }
-            // assert: (X, Y) relates to absolute world space
-            // Transform to center position for Unity.
-            position.x = X + scale.x / 2.0f;
-            position.z = Y + scale.z / 2.0f; // Gravis's Y is Unity's inverted z axis
+            else
+            {
+                // Node is a root node.
+                // assert: (X, Y) relates to absolute world space of the left upper corner
+                // Transform to center position for Unity.
+                position.x = X + scale.x / 2.0f;
+                // Gravis's Y is Unity's inverted z axis, i.e., we need to mirror Y
+                // as follows: z = -Y. By mirroring Y, the left upper corner of a node
+                // becomes its left lower corner.
+                position.z = -Y - scale.z / 2.0f;
 
-            gameNode.CenterPosition = position;
+                //Debug.LogFormat("root {0}'s center position ({1}, {2}) with size {3} where X={4} Y={5}\n", 
+                //                ID, position.x, position.z, scale, X, Y);
+            }            
+            // Although we assign the local scale here, the node is not yet contained in any
+            // other node, in which case local scale and world-space scale are the same.
+            // Nodes will be nested later by the client of this layout.
             gameNode.LocalScale = scale;
+            gameNode.CenterPosition = position;
 
+            //Debug.LogFormat("result for node {0} center={1} left upper corner={2} scale={3}\n", 
+            //                gameNode.ID, gameNode.CenterPosition, ToLeftUpperCorner(gameNode.CenterPosition, gameNode.LocalScale), gameNode.LocalScale);
+        }
+
+        private static Vector3 ToLeftUpperCorner(Vector3 position, Vector3 scale)
+        {
+            position.x -= scale.x / 2.0f;
+            position.z += scale.z / 2.0f;
+            return position;
         }
 
         /// <summary>
