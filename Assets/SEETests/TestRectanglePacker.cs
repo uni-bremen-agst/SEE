@@ -204,7 +204,7 @@ namespace SEE.Layout.RectanglePacking
         [Test]
         public void TestLayout()
         {
-            ICollection<ILayoutNode> gameObjects = TestGameNode.CreateNodes();
+            ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
 
             RectanglePackingNodeLayout packer = new RectanglePackingNodeLayout(0.0f, 1.0f);
 

@@ -30,7 +30,7 @@ namespace SEE.Layout
         [Test]
         public void TestWriteRead()
         {
-            ICollection<ILayoutNode> gameObjects = TestGameNode.CreateNodes();
+            ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
             //SEE.Layout.IO.Reader reader 
             //    = new SEE.Layout.IO.Reader(Application.dataPath + "/../Data/GXL/SEE/Architecture.gvl", 
             //                               gameObjects.Cast<IGameNode>().ToList());
@@ -86,7 +86,7 @@ namespace SEE.Layout
         private ILayoutNode ToTestGameNode(GameObject go)
         {
             NodeRef nodeRef = go.GetComponent<NodeRef>();
-            return new TestGameNode(nodeRef.node.ID);
+            return new LayoutVertex(nodeRef.node.ID);
         }
     }
 }
