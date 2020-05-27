@@ -2,11 +2,11 @@
 <!DOCTYPE Gravis2_Layout>
 <Gravis2_Layout W="Hierarchy" V="Architecture">
   <Visualization>
-    <Zoom Factor="1" Center_X="-535" Center_Y="-398"/>
+    <Zoom Factor="1" Center_X="-748.5" Center_Y="-594"/>
     <Option Name="Mute_Edges" Value="False"/>
     <Option Name="Semi_Transparent_Edges" Value="False"/>
     <Option Name="Edges_Behind_Nodes" Value="False"/>
-    <Option Name="Show_Lifted_Edges" Value="True"/>
+    <Option Name="Show_Lifted_Edges" Value="False"/>
     <Option Name="Semi_Transparent_Backgrounds" Value="True"/>
     <Option Name="Show_Node_Names" Value="True"/>
     <Option Name="Show_Attributes" Value="True"/>
@@ -22,21 +22,33 @@
   <Node Id="LSEE.Layout" X="-1286" Y="-318" W="261" H="161.14" CS="14.14" Exp="True">
     <Node Id="LSEE.Layout.RectanglePacking" X="160" Y="100" W="0" H="0" CS="10">
     </Node>
-    <Node Id="LSEE.Layout.CirclePacking" X="94" Y="122" W="0" H="0" CS="10">
+    <Node Id="LSEE.Layout.TreeMap" X="217" Y="102" W="0" H="0" CS="10">
     </Node>
     <Node Id="LSEE.Layout.EvoStreets" X="41" Y="111" W="0" H="0" CS="10">
     </Node>
-    <Node Id="LSEE.Layout.TreeMap" X="217" Y="102" W="0" H="0" CS="10">
+    <Node Id="LSEE.Layout.CirclePacking" X="94" Y="122" W="0" H="0" CS="10">
     </Node>
   </Node>
   <Node Id="LSEE.Game" X="-838" Y="-752" W="276" H="176" CS="14.14" Exp="True">
-    <Node Id="LSEE.Game.Evolution" X="129" Y="68" W="0" H="0" CS="10">
-    </Node>
     <Node Id="LSEE.Game.Runtime" X="195" Y="133" W="0" H="0" CS="10">
     </Node>
+    <Node Id="LSEE.Game.Evolution" X="129" Y="68" W="0" H="0" CS="10">
+    </Node>
   </Node>
-  <Node Id="LSEE.Controls" X="-437" Y="-486" W="229" H="155" CS="14.14" Exp="True">
-    <Node Id="LSEE.Controls.Devices" X="33" Y="79" W="0" H="0" CS="10">
+  <Node Id="LSEE.Controls" X="-485" Y="-573" W="212" H="253" CS="14.14" Exp="True">
+    <Node Id="LSEE.Controls.Devices" X="26" Y="39" W="165" H="191" CS="10" Exp="True">
+      <Node Id="LSEE.Controls.Devices.Viewpoint" X="124" Y="136" W="0" H="0" CS="10">
+      </Node>
+      <Node Id="LSEE.Controls.Devices.Transformation" X="120" Y="74" W="0" H="0" CS="10">
+      </Node>
+      <Node Id="LSEE.Controls.Devices.Throttle" X="117" Y="19" W="0" H="0" CS="10">
+      </Node>
+      <Node Id="LSEE.Controls.Devices.Selection" X="34" Y="133" W="0" H="0" CS="10">
+      </Node>
+      <Node Id="LSEE.Controls.Devices.Direction" X="27" Y="71" W="0" H="0" CS="10">
+      </Node>
+      <Node Id="LSEE.Controls.Devices.Boost" X="24" Y="22" W="0" H="0" CS="10">
+      </Node>
     </Node>
   </Node>
   <Node Id="LSEE.Utils" X="-987" Y="-314" W="238" H="159" CS="14.14" Exp="True">
