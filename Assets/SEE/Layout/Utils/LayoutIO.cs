@@ -14,7 +14,11 @@ namespace SEE.Layout.IO
         /// <summary>
         /// Reads layout information from given GVL file with given <paramref name="filename"/>.
         /// The given position and scale of the <paramref name="gameNodes"/> are updated 
-        /// according to the layout data contained therein. 
+        /// according to the layout data contained therein. The x and z co-ordinates will
+        /// be set according to the layout information contained in the GVL file; the
+        /// y co-ordinate will be zero (that information is not contained in the GVL file).
+        /// 
+        /// TODO: We need to extend GVL for a third dimension.
         /// 
         /// Precondition: <paramref name="filename"/> must exist and its content conform to GVL.
         /// </summary>
@@ -429,7 +433,12 @@ namespace SEE.Layout.IO
             //
             // Gravis has a two-dimensional canvas. The two axes are 
             // named X (horizontal) and Y (vertical), respectively.
-            // 
+            // While Gravis's X axis increases from left to right, 
+            // Gravis's Y axis increases from top to bottom. That is,
+            // the orientation of Gravis's and Unity's x axes conform
+            // to each other, Gravis's Y axis and the corresponding 
+            // Z axis in Unity are inverse to each other.
+            //
             // All nodes are logical rectangles with respect to the 
             // layout. That is, they have two co-ordinates and a
             // width and height.
@@ -472,63 +481,66 @@ namespace SEE.Layout.IO
 
             string ID = GetID(reader); // mandatory
 
-            if (gameNodes.TryGetValue(ID, out IGameNode gameNode))
+            if (!gameNodes.TryGetValue(ID, out IGameNode gameNode))
             {
-                float X = GetFloat(reader, "X");   // mandatory x co-ordinate
-                float Y = GetFloat(reader, "Y");   // mandatory y co-ordinate
-                float W = GetFloat(reader, "W");   // mandatory width
-                float H = GetFloat(reader, "H");   // mandatory height
-                ParentNode parent = nodes.Peek();
-                float CS = parent.CS;        // icon size for this node
-                {
-                    float thisCS = GetFloat(reader, "CS"); // mandatory icon size for the children
-                    nodes.Push(new ParentNode(thisCS, gameNode));
-                }
-                bool Exp = reader.GetAttribute("Exp") == "True"; // optional expansion
+                LogWarning(String.Format("Unknown id {0}", ID));
+                // We create a new game node so that we can continue as normal.
+                gameNode = new LayoutVertex(ID);
+                //throw new SyntaxError(String.Format("Unknown id {0}", ID));
+            }
+            float X = GetFloat(reader, "X");   // mandatory x co-ordinate
+            float Y = -GetFloat(reader, "Y");   // mandatory y co-ordinate; Gravis's Y is Unity's inverted z axis
+            float W = GetFloat(reader, "W");   // mandatory width
+            float H = GetFloat(reader, "H");   // mandatory height
 
-                // The resulting scale of the node; the y co-ordinate remains zero.
-                Vector3 scale = Vector3.zero;
-                if (Exp && W != 0 && H != 0)
-                {
-                    scale.x = W;
-                    scale.z = H; // Gravis's height is Unity's z axis
-                }
-                else
-                {
-                    scale.x = CS;
-                    scale.z = CS;
-                }
+            // Note: (X, Y) is now mirrored along the x axis, thus, denotes the left lower corner.
+            ParentNode parent = nodes.Peek();
+            float CS = parent.CS; // icon size for this node
+            {
+                float thisCS = GetFloat(reader, "CS"); // mandatory icon size for the children
+                nodes.Push(new ParentNode(thisCS, gameNode));
+            }
+            bool Exp = reader.GetAttribute("Exp") == "True"; // optional expansion
 
-                // The resulting position of the node; the y co-ordinate remains zero.
-                Vector3 position = Vector3.zero;
-                // (X, Y) define the left upper corner. In Unity, we use the center of a node.
-                // If this node is a root, (X, Y) relates to a common reference point on 
-                // the canvas. If this node is contained in another node, they are an offset
-                // to their parent node.
-                if (parent.gameNode != null)
-                {
-                    // Node is not at top-level-
-                    Vector3 parentPosition = parent.gameNode.CenterPosition; // world space
-                    Vector3 parentScale = parent.gameNode.AbsoluteScale;     // world space
-                    // Transform parent's center position to left upper corner.
-                    parentPosition.x -= parentScale.x / 2.0f;
-                    parentPosition.z += parentScale.z / 2.0f;
-
-                    X += parentPosition.x;
-                    Y += parentPosition.z;
-                }
-                // assert: (X, Y) relates to absolute world space
-                // Transform to center position for Unity.
-                position.x = X + scale.x / 2.0f;
-                position.z = Y - scale.z / 2.0f; // Gravis's Y is Unity's z axis
-
-                gameNode.CenterPosition = position;
-                gameNode.LocalScale = scale;
+            // The resulting scale of the node; the y co-ordinate remains zero.
+            Vector3 scale = Vector3.zero;
+            if (Exp && W != 0 && H != 0)
+            {
+                scale.x = W;
+                scale.z = H; // Gravis's height is Unity's z axis
             }
             else
             {
-                LogWarning(String.Format("Unknown id {0}", ID));
+                scale.x = CS;
+                scale.z = CS;
             }
+
+            // The resulting position of the node; the y co-ordinate remains zero.
+            Vector3 position = Vector3.zero;
+            // (X, Y) define the left upper corner. In Unity, we use the center of a node.
+            // If this node is a root, (X, Y) relates to a common reference point on 
+            // the canvas. If this node is contained in another node, they are an offset
+            // to their parent node.
+            if (parent.gameNode != null)
+            {
+                // Node is not at top-level.
+                Vector3 parentPosition = parent.gameNode.CenterPosition; // world space
+                Vector3 parentScale = parent.gameNode.AbsoluteScale;     // world space
+                                                                         // Transform parent's center position to left upper corner.
+                parentPosition.x -= parentScale.x / 2.0f;
+                parentPosition.z += parentScale.z / 2.0f;
+
+                X += parentPosition.x;
+                Y += parentPosition.z;
+            }
+            // assert: (X, Y) relates to absolute world space
+            // Transform to center position for Unity.
+            position.x = X + scale.x / 2.0f;
+            position.z = Y + scale.z / 2.0f; // Gravis's Y is Unity's inverted z axis
+
+            gameNode.CenterPosition = position;
+            gameNode.LocalScale = scale;
+
         }
 
         /// <summary>
