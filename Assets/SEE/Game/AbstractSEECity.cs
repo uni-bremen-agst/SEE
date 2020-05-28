@@ -534,7 +534,10 @@ namespace SEE.Game
         /// </summary>
         public Dictionary<NodeLayouts, string> SubLayoutsLeafNodes = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
 
-
+        /// <summary>
+        /// Saves all data needed for the listing of the dirs in gui in cosegraphSettings
+        /// </summary>
+        /// <param name="graph"></param>
         public void LoadDataForGraphListing(Graph graph)
         {
             if (NodeLayout == NodeLayouts.CompoundSpringEmbedder)

@@ -287,13 +287,6 @@ namespace SEE.Layout
             return new Tuple<bool, double[]>(false, result);
         }
 
-        /// <summary>
-        /// TODO
-        /// </summary>
-        /// <param name="slope"></param>
-        /// <param name="slopePrime"></param>
-        /// <param name="line"></param>
-        /// <returns></returns>
         private static int GetCardinalDirection(double slope, double slopePrime, int line)
         {
             if (slope > slopePrime)

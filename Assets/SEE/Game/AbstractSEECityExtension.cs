@@ -7,14 +7,44 @@ using static SEE.Game.AbstractSEECity;
 
 namespace SEE.Game
 {
+    /// <summary>
+    /// class with properties for a nodelayout
+    /// </summary>
     public class NodelayoutModel
     {
+        /// <summary>
+        /// true if the nodelayout only visualize leaf nodes
+        /// </summary>
         public readonly bool OnlyLeaves;
+
+        /// <summary>
+        /// true if the nodelayout can handle sublayouts
+        /// </summary>
         public readonly bool CanApplySublayouts;
+
+        /// <summary>
+        /// true if the inner nodes enclose the leaf nodes
+        /// </summary>
         public readonly bool InnerNodesEncloseLeafNodes;
+
+        /// <summary>
+        /// true if the layout is a circular layout
+        /// </summary>
         public readonly bool IsCircular;
+
+        /// <summary>
+        /// true if the layout displays the hierarchie of the graph
+        /// </summary>
         public readonly bool IsHierarchical;
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="OnlyLeaves">true if the nodelayout only visualize leaf nodes</param>
+        /// <param name="CanApplySublayouts">true if the nodelayout can handle sublayouts</param>
+        /// <param name="InnerNodesEncloseLeafNodes">true if the inner nodes enclose the leaf nodes</param>
+        /// <param name="IsCircular"> true if the layout is a circular layout</param>
+        /// <param name="isHierarchical">true if the layout displays the hierarchie of the graph</param>
         public NodelayoutModel(bool OnlyLeaves, bool CanApplySublayouts, bool InnerNodesEncloseLeafNodes, bool IsCircular, bool isHierarchical)
         {
             this.OnlyLeaves = OnlyLeaves;
@@ -25,11 +55,26 @@ namespace SEE.Game
         }
     }
 
+    /// <summary>
+    /// class with properties for inner node kind
+    /// </summary>
     public class InnerNodeKindsModel
     {
+        /// <summary>
+        /// true if the inner node kind has a circluar shape
+        /// </summary>
         public readonly bool IsCircular;
+
+        /// <summary>
+        /// true if the inner node kind has a rectangular shape
+        /// </summary>
         public readonly bool IsRectangular;
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="IsCircular">true if the inner node kind has a circluar shape</param>
+        /// <param name="IsRectangular"> true if the inner node kind has a rectangular shape</param>
         public InnerNodeKindsModel(bool IsCircular, bool IsRectangular)
         {
             this.IsCircular = IsCircular;
@@ -37,8 +82,16 @@ namespace SEE.Game
         }
     }
 
+    /// <summary>
+    /// Extension class for abstractSeeCity
+    /// </summary>
     public static class AbstractSEECityExtension
     {
+        /// <summary>
+        /// Returns a model for the given nodelayout
+        /// </summary>
+        /// <param name="nodeLayout">the nodelayout</param>
+        /// <returns>the model</returns>
         public static NodelayoutModel GetModel(this NodeLayouts nodeLayout)
         {
             switch (nodeLayout)
@@ -62,7 +115,11 @@ namespace SEE.Game
             }
         }
 
-
+        /// <summary>
+        /// Returns the possible inner node kinds for a layout
+        /// </summary>
+        /// <param name="nodeLayout">the nodelayout</param>
+        /// <returns>the inner node kinds</returns>
         public static List<InnerNodeKinds> GetInnerNodeKinds(this NodeLayouts nodeLayout)
         {
             List<InnerNodeKinds> values = Enum.GetValues(typeof(InnerNodeKinds)).Cast<InnerNodeKinds>().ToList();
@@ -73,6 +130,11 @@ namespace SEE.Game
             return list;
         }
 
+        /// <summary>
+        /// Returns all nodelayout wich are possible sublayouts for the given nodelayout
+        /// </summary>
+        /// <param name="nodeLayout">the given nodelayout</param>
+        /// <returns>a list of possible sublayout</returns>
         public static List<NodeLayouts> GetPossibleSublayouts(this NodeLayouts nodeLayout)
         {
             List<NodeLayouts> values = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().ToList();
@@ -85,6 +147,11 @@ namespace SEE.Game
             return values; //nodeLayout.IsCircular() ? values.Where(layout => layout.IsCircular()).ToList() : values.Where(layout => !layout.IsCircular()).ToList();
         }
 
+        /// <summary>
+        /// Return the model for a inner node kind
+        /// </summary>
+        /// <param name="innerNodeKind">the inner ndode kind</param>
+        /// <returns>the innernodeKindModel</returns>
         public static InnerNodeKindsModel GetModel(this InnerNodeKinds innerNodeKind)
         {
             switch (innerNodeKind)

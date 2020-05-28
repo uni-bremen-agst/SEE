@@ -39,12 +39,12 @@ namespace SEE.Layout
         /// <summary>
         /// maximum number of graphs 
         /// </summary>
-        private readonly int maxNumberOfGraphs = 500;
+        private readonly int maxNumberOfGraphs = 1000;
 
         /// <summary>
         /// the current number of graph 
         /// </summary>
-        int totalNumberOfGraphs = 0;
+        int totalNumberOfGraphs = 126;
 
         /// <summary>
         /// number of leaf nodes
@@ -121,7 +121,7 @@ namespace SEE.Layout
                     NodeLayout.Move(layoutNodes.Cast<ILayoutNode>().ToList(), settings.origin);
 
                     EdgeDistCalculation(graph, layoutNodes);
-
+                    
                     BoundingBox(layoutNodes, out Vector2 FrontCorner, out Vector2 BackCorner);
                     Measurements measurements = new Measurements(layoutNodes, graph, FrontCorner, BackCorner);
 
@@ -299,6 +299,13 @@ namespace SEE.Layout
             int edgeLengthIndex = 0;
 
             var linesToKeep = File.ReadLines(path).ToList();
+            if (File.Exists(path))
+            {
+                linesToKeep = File.ReadLines(path).ToList();
+            } else
+            {
+                linesToKeep = new List<string>();
+            }
 
             if (linesToKeep.Count < 1)
             {
@@ -586,6 +593,11 @@ namespace SEE.Layout
                 //SetupFile(path: globalPath);
                 path = pathPrefix + totalNumberOfGraphs + ".txt";
                 SetupFile(path: path);
+
+                using (var stream = File.CreateText(path))
+                {
+
+                }
             }
 
 
