@@ -69,6 +69,10 @@
       "type": "vector2"
     },
     {
+      "name": "/actions/default/in/MoveChart",
+      "type": "vector2"
+    },
+    {
       "name": "/actions/default/out/Haptic",
       "type": "vibration"
     }
@@ -135,7 +139,8 @@
       "/actions/default/in/Cancel": "Cancel",
       "/actions/default/in/Move": "Move",
       "/actions/default/in/Home": "Home",
-      "/actions/default/in/Zoom": "Zoom"
+      "/actions/default/in/Zoom": "Zoom",
+      "/actions/default/in/MoveChart": "Move Chart"
     }
   ]
 }

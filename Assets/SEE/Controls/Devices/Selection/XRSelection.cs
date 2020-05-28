@@ -19,25 +19,25 @@ namespace SEE.Controls.Devices
         [Tooltip("The VR controller for pointing")]
         public Hand PointingHand;
 
-        private SteamVR_Action_Vector2 PullAction = SteamVR_Input.GetVector2Action(defaultActionSet, "Move");
+        private SteamVR_Action_Vector2 PullAction = SteamVR_Input.GetVector2Action(DefaultActionSet, "Move");
 
-        private SteamVR_Action_Vector2 ZoomAction = SteamVR_Input.GetVector2Action(defaultActionSet, "Zoom");
+        private SteamVR_Action_Vector2 ZoomAction = SteamVR_Input.GetVector2Action(DefaultActionSet, "Zoom");
 
-        private SteamVR_Action_Single GrabAction = SteamVR_Input.GetSingleAction(defaultActionSet, "Grab");
+        private SteamVR_Action_Single GrabAction = SteamVR_Input.GetSingleAction(DefaultActionSet, "Grab");
 
-        private SteamVR_Action_Boolean HomeButton = SteamVR_Input.GetBooleanAction(defaultActionSet, "Home");
+        private SteamVR_Action_Boolean HomeButton = SteamVR_Input.GetBooleanAction(DefaultActionSet, "Home");
 
         /// <summary>
         /// The default assignment of the grab button in SteamVR is the B button,
         /// but it may be re-assigned by the user.
         /// </summary>
-        private SteamVR_Action_Boolean CancelButton = SteamVR_Input.GetBooleanAction(defaultActionSet, "Cancel");
+        private SteamVR_Action_Boolean CancelButton = SteamVR_Input.GetBooleanAction(DefaultActionSet, "Cancel");
 
         /// <summary>
         /// The default assignment of the selection button in SteamVR is the A button,
         /// but it may be re-assigned by the user.
         /// </summary>
-        private SteamVR_Action_Boolean SelectionButton = SteamVR_Input.GetBooleanAction(defaultActionSet, "Select");
+        private SteamVR_Action_Boolean SelectionButton = SteamVR_Input.GetBooleanAction(DefaultActionSet, "Select");
 
         /// <summary>
         /// The direction the PointingHand points to.

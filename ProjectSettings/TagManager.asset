@@ -24,6 +24,8 @@ TagManager:
   - Runtime
   - Function Call
   - TestHelper
+  - Building
+  - PlayerSettings
   layers:
   - Default
   - TransparentFX

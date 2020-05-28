@@ -11,5 +11,7 @@ namespace SEE.Controls.Devices
 
 		public override bool Select =>
 			Input.GetKeyDown(SelectionKey) || Input.GetKeyUp(SelectionKey);
+
+		public override Vector2 Move => Vector2.zero;
 	}
 }

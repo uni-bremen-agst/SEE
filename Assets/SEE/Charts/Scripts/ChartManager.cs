@@ -1,6 +1,6 @@
-﻿using SEE.GO;
+﻿using SEE.Controls;
+using SEE.GO;
 using UnityEngine;
-using UnityEngine.XR;
 using Valve.VR;
 
 namespace SEE.Charts.Scripts
@@ -192,7 +192,9 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void Start()
 		{
-			_isVirtualReality = XRDevice.isPresent;
+			_isVirtualReality =
+				GameObject.FindGameObjectWithTag("PlayerSettings").GetComponent<PlayerSettings>()
+					.playerInputType == PlayerSettings.PlayerInputType.VR;
 			if (!_isVirtualReality)
 			{
 				foreach (var vrObject in vrObjects) Destroy(vrObject);
