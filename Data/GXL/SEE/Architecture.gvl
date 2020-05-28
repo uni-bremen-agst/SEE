@@ -16,38 +16,38 @@
     </Hidden_Edge_Types>
   </Visualization>
   <Node Id="LSEE.GO" X="-987" Y="-578" W="197" H="252" CS="14.14" Exp="True">
-    <Node Id="LSEE.GO.Whiteboard" X="45" Y="97" W="0" H="0" CS="10">
+    <Node Id="LSEE.GO.Whiteboard" X="45" Y="54" W="132" H="141" CS="10" Exp="True">
     </Node>
   </Node>
-  <Node Id="LSEE.Layout" X="-1259" Y="-313" W="260" H="147" CS="14.14" Exp="True">
-    <Node Id="LSEE.Layout.RectanglePacking" X="155" Y="80" W="0" H="0" CS="10">
+  <Node Id="LSEE.Layout" X="-1259" Y="-313" W="260" H="150.28" CS="14.14" Exp="True">
+    <Node Id="LSEE.Layout.RectanglePacking" X="144" Y="81" W="38" H="51" CS="10" Exp="True">
     </Node>
-    <Node Id="LSEE.Layout.TreeMap" X="216" Y="39" W="0" H="0" CS="10">
+    <Node Id="LSEE.Layout.TreeMap" X="196" Y="80" W="37" H="51" CS="10" Exp="True">
     </Node>
-    <Node Id="LSEE.Layout.EvoStreets" X="36" Y="97" W="0" H="0" CS="10">
+    <Node Id="LSEE.Layout.EvoStreets" X="38" Y="81" W="37" H="52" CS="10" Exp="True">
     </Node>
-    <Node Id="LSEE.Layout.CirclePacking" X="90" Y="107" W="0" H="0" CS="10">
+    <Node Id="LSEE.Layout.CirclePacking" X="90" Y="82" W="39" H="50" CS="10" Exp="True">
     </Node>
   </Node>
   <Node Id="LSEE.Game" X="-962" Y="-770" W="390" H="181" CS="14.14" Exp="True">
-    <Node Id="LSEE.Game.Runtime" X="227" Y="72" W="0" H="0" CS="10">
+    <Node Id="LSEE.Game.Runtime" X="211" Y="51" W="119" H="91" CS="10" Exp="True">
     </Node>
-    <Node Id="LSEE.Game.Evolution" X="108" Y="61" W="0" H="0" CS="10">
+    <Node Id="LSEE.Game.Evolution" X="67" Y="47" W="106" H="100" CS="10" Exp="True">
     </Node>
   </Node>
   <Node Id="LSEE.Controls" X="-781" Y="-580" W="212" H="253" CS="14.14" Exp="True">
-    <Node Id="LSEE.Controls.Devices" X="26" Y="39" W="165" H="191" CS="10" Exp="True">
-      <Node Id="LSEE.Controls.Devices.Viewpoint" X="124" Y="136" W="0" H="0" CS="10">
+    <Node Id="LSEE.Controls.Devices" X="26" Y="39" W="165" H="193" CS="10" Exp="True">
+      <Node Id="LSEE.Controls.Devices.Viewpoint" X="93" Y="134" W="35" H="44" CS="10" Exp="True">
       </Node>
-      <Node Id="LSEE.Controls.Devices.Transformation" X="120" Y="74" W="0" H="0" CS="10">
+      <Node Id="LSEE.Controls.Devices.Transformation" X="91" Y="77" W="36" H="49" CS="10" Exp="True">
       </Node>
-      <Node Id="LSEE.Controls.Devices.Throttle" X="117" Y="19" W="0" H="0" CS="10">
+      <Node Id="LSEE.Controls.Devices.Throttle" X="90" Y="20" W="35" H="47" CS="10" Exp="True">
       </Node>
-      <Node Id="LSEE.Controls.Devices.Selection" X="34" Y="133" W="0" H="0" CS="10">
+      <Node Id="LSEE.Controls.Devices.Selection" X="25" Y="128" W="38" H="47" CS="10" Exp="True">
       </Node>
-      <Node Id="LSEE.Controls.Devices.Direction" X="27" Y="71" W="0" H="0" CS="10">
+      <Node Id="LSEE.Controls.Devices.Direction" X="25" Y="77" W="39" H="45" CS="10" Exp="True">
       </Node>
-      <Node Id="LSEE.Controls.Devices.Boost" X="24" Y="22" W="0" H="0" CS="10">
+      <Node Id="LSEE.Controls.Devices.Boost" X="24" Y="22" W="39" H="44" CS="10" Exp="True">
       </Node>
     </Node>
   </Node>
@@ -56,7 +56,7 @@
   <Node Id="LSEE.Tools" X="-785" Y="-321" W="216" H="155" CS="14.14" Exp="True">
   </Node>
   <Node Id="LSEE.DataModel" X="-991" Y="-316" W="200" H="148" CS="14.14" Exp="True">
-    <Node Id="LSEE.DataModel.IO" X="85" Y="88" W="0" H="0" CS="10">
+    <Node Id="LSEE.DataModel.IO" X="45" Y="27" W="126" H="99" CS="10" Exp="True">
     </Node>
   </Node>
   <Node Id="LSEE.CameraPaths" X="-1161" Y="-750" W="114" H="105" CS="14.14" Exp="True">
