@@ -11,7 +11,7 @@ namespace SEE.Command
         public string type;
 
         // AbstractSEECity
-        public string pathPrefix;
+        public string gameObjectName;
         public Vector3 origin;
         public string innerDonutMetric;
         public string innerNodeStyleMetric;
@@ -45,7 +45,7 @@ namespace SEE.Command
         {
             type = city.GetType().ToString();
 
-            pathPrefix = city.PathPrefix;
+            gameObjectName = city.gameObject.name;
             origin = city.origin;
             innerDonutMetric = city.InnerDonutMetric;
             innerNodeStyleMetric = city.InnerNodeStyleMetric;
@@ -122,8 +122,8 @@ namespace SEE.Command
             }
 
             Assert.IsNotNull(city);
-
-            city.PathPrefix = pathPrefix;
+            
+            city.PathPrefix = GameObject.Find(gameObjectName).GetComponent<AbstractSEECity>().PathPrefix;
             city.origin = origin;
             city.InnerDonutMetric = innerDonutMetric;
             city.InnerNodeStyleMetric = innerNodeStyleMetric;
