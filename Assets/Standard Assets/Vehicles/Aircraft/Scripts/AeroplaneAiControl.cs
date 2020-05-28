@@ -1,10 +1,9 @@
-using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace UnityStandardAssets.Vehicles.Aeroplane
 {
-    [RequireComponent(typeof (AeroplaneController))]
+    [RequireComponent(typeof(AeroplaneController))]
     public class AeroplaneAiControl : MonoBehaviour
     {
         // This script represents an AI 'pilot' capable of flying the plane towards a designated target.
@@ -49,8 +48,8 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
             {
                 // make the plane wander from the path, useful for making the AI seem more human, less robotic.
                 Vector3 targetPos = m_Target.position +
-                                    transform.right*
-                                    (Mathf.PerlinNoise(Time.time*m_LateralWanderSpeed, m_RandomPerlin)*2 - 1)*
+                                    transform.right *
+                                    (Mathf.PerlinNoise(Time.time * m_LateralWanderSpeed, m_RandomPerlin) * 2 - 1) *
                                     m_LateralWanderDistance;
 
                 // adjust the yaw and pitch towards the target
@@ -60,8 +59,8 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
 
 
                 // Set the target for the planes pitch, we check later that this has not passed the maximum threshold
-                targetAnglePitch = Mathf.Clamp(targetAnglePitch, -m_MaxClimbAngle*Mathf.Deg2Rad,
-                                               m_MaxClimbAngle*Mathf.Deg2Rad);
+                targetAnglePitch = Mathf.Clamp(targetAnglePitch, -m_MaxClimbAngle * Mathf.Deg2Rad,
+                                               m_MaxClimbAngle * Mathf.Deg2Rad);
 
                 // calculate the difference between current pitch and desired pitch
                 float changePitch = targetAnglePitch - m_AeroplaneController.PitchAngle;
@@ -70,10 +69,10 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
                 const float throttleInput = 0.5f;
 
                 // AI applies elevator control (pitch, rotation around x) to reach the target angle
-                float pitchInput = changePitch*m_PitchSensitivity;
+                float pitchInput = changePitch * m_PitchSensitivity;
 
                 // clamp the planes roll
-                float desiredRoll = Mathf.Clamp(targetAngleYaw, -m_MaxRollAngle*Mathf.Deg2Rad, m_MaxRollAngle*Mathf.Deg2Rad);
+                float desiredRoll = Mathf.Clamp(targetAngleYaw, -m_MaxRollAngle * Mathf.Deg2Rad, m_MaxRollAngle * Mathf.Deg2Rad);
                 float yawInput = 0;
                 float rollInput = 0;
                 if (!m_TakenOff)
@@ -88,11 +87,11 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
                 {
                     // now we have taken off to a safe height, we can use the rudder and ailerons to yaw and roll
                     yawInput = targetAngleYaw;
-                    rollInput = -(m_AeroplaneController.RollAngle - desiredRoll)*m_RollSensitivity;
+                    rollInput = -(m_AeroplaneController.RollAngle - desiredRoll) * m_RollSensitivity;
                 }
 
                 // adjust how fast the AI is changing the controls based on the speed. Faster speed = faster on the controls.
-                float currentSpeedEffect = 1 + (m_AeroplaneController.ForwardSpeed*m_SpeedEffect);
+                float currentSpeedEffect = 1 + (m_AeroplaneController.ForwardSpeed * m_SpeedEffect);
                 rollInput *= currentSpeedEffect;
                 pitchInput *= currentSpeedEffect;
                 yawInput *= currentSpeedEffect;

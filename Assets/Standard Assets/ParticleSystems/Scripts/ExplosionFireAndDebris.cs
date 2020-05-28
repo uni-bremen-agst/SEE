@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -17,10 +16,10 @@ namespace UnityStandardAssets.Effects
         {
             float multiplier = GetComponent<ParticleSystemMultiplier>().multiplier;
 
-            for (int n = 0; n < numDebrisPieces*multiplier; ++n)
+            for (int n = 0; n < numDebrisPieces * multiplier; ++n)
             {
                 var prefab = debrisPrefabs[Random.Range(0, debrisPrefabs.Length)];
-                Vector3 pos = transform.position + Random.insideUnitSphere*3*multiplier;
+                Vector3 pos = transform.position + Random.insideUnitSphere * 3 * multiplier;
                 Quaternion rot = Random.rotation;
                 Instantiate(prefab, pos, rot);
             }
@@ -28,7 +27,7 @@ namespace UnityStandardAssets.Effects
             // wait one frame so these new objects can be picked up in the overlapsphere function
             yield return null;
 
-            float r = 10*multiplier;
+            float r = 10 * multiplier;
             var cols = Physics.OverlapSphere(transform.position, r);
             foreach (var col in cols)
             {
@@ -54,15 +53,15 @@ namespace UnityStandardAssets.Effects
                     AddFire(null, fireHit.point, fireHit.normal);
                     numFires--;
                 }
-                testR += r*.1f;
+                testR += r * .1f;
             }
         }
 
 
         private void AddFire(Transform t, Vector3 pos, Vector3 normal)
         {
-            pos += normal*0.5f;
-            Transform fire = (Transform) Instantiate(firePrefab, pos, Quaternion.identity);
+            pos += normal * 0.5f;
+            Transform fire = (Transform)Instantiate(firePrefab, pos, Quaternion.identity);
             fire.parent = t;
         }
     }

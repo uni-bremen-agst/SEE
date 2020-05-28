@@ -11,7 +11,7 @@ ScriptedImporter:
   svgType: 0
   texturedSpriteMeshType: 0
   svgPixelsPerUnit: 100
-  gradientResolution: 128
+  gradientResolution: 64
   alignment: 0
   customPivot: {x: 0, y: 0}
   generatePhysicsShape: 0
@@ -38,17 +38,17 @@ ScriptedImporter:
   spriteData:
     TessellationDetail: 0
     SpriteRect:
-      name: architectureSprite
+      name: 
       originalName: 
-      pivot: {x: 0.49974573, y: 0.5001147}
+      pivot: {x: 0, y: 0}
       alignment: 0
       border: {x: 0, y: 0, z: 0, w: 0}
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 747
-        height: 741
-      spriteID: 52a84562d8309eb449e8cbc1cd460bfe
+        width: 0
+        height: 0
+      spriteID: 9f1fd98b3c57dc24a9559563037f56da
       internalID: 0
     PhysicsOutlines: []

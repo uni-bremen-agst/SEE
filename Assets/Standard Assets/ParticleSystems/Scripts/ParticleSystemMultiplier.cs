@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace UnityStandardAssets.Effects
@@ -15,8 +14,8 @@ namespace UnityStandardAssets.Effects
             var systems = GetComponentsInChildren<ParticleSystem>();
             foreach (ParticleSystem system in systems)
             {
-				ParticleSystem.MainModule mainModule = system.main;
-				mainModule.startSizeMultiplier *= multiplier;
+                ParticleSystem.MainModule mainModule = system.main;
+                mainModule.startSizeMultiplier *= multiplier;
                 mainModule.startSpeedMultiplier *= multiplier;
                 mainModule.startLifetimeMultiplier *= Mathf.Lerp(multiplier, 1, 0.5f);
                 system.Clear();

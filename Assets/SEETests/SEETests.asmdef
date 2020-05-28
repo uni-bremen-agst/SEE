@@ -1,0 +1,10 @@
+﻿{
+    "name": "SEETests",
+    "references": ["SEE"],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ]
+}

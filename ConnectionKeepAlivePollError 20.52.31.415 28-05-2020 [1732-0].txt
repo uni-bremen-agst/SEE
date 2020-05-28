@@ -1,0 +1,16 @@
+Base Exception Type: System.Threading.ThreadAbortException
+  at (wrapper managed-to-native) System.Threading.WaitHandle.Wait_internal(intptr*,int,bool,int)
+  at System.Threading.WaitHandle.WaitOneNative (System.Runtime.InteropServices.SafeHandle waitableSafeHandle, System.UInt32 millisecondsTimeout, System.Boolean hasThreadAffinity, System.Boolean exitContext) [0x00019] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.WaitHandle.InternalWaitOne (System.Runtime.InteropServices.SafeHandle waitableSafeHandle, System.Int64 millisecondsTimeout, System.Boolean hasThreadAffinity, System.Boolean exitContext) [0x00014] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.WaitHandle.WaitOne (System.Int64 timeout, System.Boolean exitContext) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.WaitHandle.WaitOne (System.Int32 millisecondsTimeout, System.Boolean exitContext) [0x00019] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.WaitHandle.WaitOne (System.Int32 millisecondsTimeout) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at NetworkCommsDotNet.Connections.Connection.ConnectionKeepAliveWorker () [0x00048] in <cb31c347b8f54d1cba65a12b31b5dfce>:0 
+
+Stack Trace:   at (wrapper managed-to-native) System.Threading.WaitHandle.Wait_internal(intptr*,int,bool,int)
+  at System.Threading.WaitHandle.WaitOneNative (System.Runtime.InteropServices.SafeHandle waitableSafeHandle, System.UInt32 millisecondsTimeout, System.Boolean hasThreadAffinity, System.Boolean exitContext) [0x00019] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.WaitHandle.InternalWaitOne (System.Runtime.InteropServices.SafeHandle waitableSafeHandle, System.Int64 millisecondsTimeout, System.Boolean hasThreadAffinity, System.Boolean exitContext) [0x00014] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.WaitHandle.WaitOne (System.Int64 timeout, System.Boolean exitContext) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.WaitHandle.WaitOne (System.Int32 millisecondsTimeout, System.Boolean exitContext) [0x00019] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.WaitHandle.WaitOne (System.Int32 millisecondsTimeout) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at NetworkCommsDotNet.Connections.Connection.ConnectionKeepAliveWorker () [0x00048] in <cb31c347b8f54d1cba65a12b31b5dfce>:0 
