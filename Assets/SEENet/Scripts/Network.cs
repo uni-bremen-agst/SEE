@@ -158,22 +158,26 @@ namespace SEE.Net
                 {
                     foreach (Connection connection in submittedSerializedPackets.Keys)
                     {
-                        ulong id = ulong.MaxValue;
-                        if (Server.Connections.Contains(connection))
-                        {
-                            id = Server.outgoingPacketSequenceIDs[connection]++;
-                        }
-                        else if (Client.Connection.Equals(connection))
-                        {
-                            id = Client.outgoingPacketID++;
-                        }
-                        Assert.IsTrue(id != ulong.MaxValue);
-
                         List<string> serializedObjects = submittedSerializedPackets[connection];
-                        PacketSequencePacket packet = new PacketSequencePacket(id, serializedObjects.ToArray());
-                        Send(connection, PacketSerializer.Serialize(packet));
+
+                        if (serializedObjects.Count != 0)
+                        {
+                            ulong id = ulong.MaxValue;
+                            if (Server.Connections.Contains(connection))
+                            {
+                                id = Server.outgoingPacketSequenceIDs[connection]++;
+                            }
+                            else if (Client.Connection.Equals(connection))
+                            {
+                                id = Client.outgoingPacketID++;
+                            }
+                            Assert.IsTrue(id != ulong.MaxValue);
+
+                            PacketSequencePacket packet = new PacketSequencePacket(id, serializedObjects.ToArray());
+                            Send(connection, PacketSerializer.Serialize(packet));
+                            serializedObjects.Clear();
+                        }
                     }
-                    submittedSerializedPackets.Clear();
                 }
             }
         }
