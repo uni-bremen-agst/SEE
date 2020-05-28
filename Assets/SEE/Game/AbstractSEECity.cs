@@ -444,7 +444,7 @@ namespace SEE.Game
         public bool ZScoreScale = true; // serialized by Unity
 
         /// <summary>
-        /// The width of the line representing edges.
+        /// The width of the line representing edges in world space.
         /// </summary>
         public float EdgeWidth = 0.3f; // serialized by Unity
 
