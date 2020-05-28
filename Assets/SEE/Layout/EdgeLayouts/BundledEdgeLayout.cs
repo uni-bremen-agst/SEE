@@ -27,24 +27,24 @@ namespace SEE.Layout
         /// of zero has no effect.
         /// </summary>
         /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
-        /// <param name="scaleFactor">factor by which certain aspects of an edge are scaled; here: the distance
-        /// between hierarchical levels for the bundling</param>
+        /// <param name="minLevelDistance">the minimal distance between different edge levels</param>
         /// <param name="tension">strength of the tension for bundling edges; must be in the range [0,1]</param>
         /// <param name="rdp">epsilon parameter of the Ramer–Douglas–Peucker algorithm</param>
-        public BundledEdgeLayout(bool edgesAboveBlocks, float scaleFactor, float tension = 0.85f, float rdp = 0.0f)
-            : base(edgesAboveBlocks, scaleFactor)
+        public BundledEdgeLayout(bool edgesAboveBlocks, float minLevelDistance, float tension = 0.85f, float rdp = 0.0f)
+            : base(edgesAboveBlocks, minLevelDistance)
         {
             name = "Hierarchically Bundled";
             Debug.Assert(0.0f <= tension && tension <= 1.0f);
             this.tension = tension;
             this.rdp = rdp;
+            this.levelDistance = minLevelDistance;
         }
 
         /// <summary>
         /// Determines the strength of the tension for bundling edges. This value may
         /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
         /// </summary>
-        private float tension = 0.85f; // 0.85 is the value recommended by Holten
+        private readonly float tension = 0.85f; // 0.85 is the value recommended by Holten
 
         /// <summary>
         /// Determines to which extent the polylines of the generated splines are simplified.
@@ -54,7 +54,26 @@ namespace SEE.Layout
         /// value close to zero results in a line with little to no reduction. A negative value 
         /// is treated as 0. A value of zero has no effect.
         /// </summary>
-        private float rdp = 0.0f; // 0.0f means no simplification
+        private readonly float rdp = 0.0f; // 0.0f means no simplification
+
+        /// <summary>
+        /// The number of Unity units per level of the hierarchy for the height of control points.
+        /// Its value must be greater than zero. It will be set relative to the maximal height
+        /// of the nodes whose edges are to be laid out (in Create()). The value set in the
+        /// constructor is the initial minimum value.
+        /// </summary>
+        private float levelDistance;
+
+        /// <summary>
+        /// The minimal/maximal y co-ordinate for all hierarchical control points at level 2 and above.
+        /// Control points at level 0 (self loops) will be handled separately: self loops will be
+        /// drawn from corner to corner on the roof or ground, respectively, depending upon 
+        /// edgesAboveBlocks. Likewise, edges for nodes that are siblings in the hierarchy will be
+        /// drawn as simple splines from roof to roof or ground to ground of the two blocks, respectively,
+        /// on their shortest path. The y co-ordinate of inner control points of all other edges will be 
+        /// at levelOffset or above/below. See GetLevelHeight() for more details.
+        /// </summary>
+        private float levelOffset = 0.0f;
 
         /// <summary>
         /// Returns hierarchically bundled splines for all edges among the given <paramref name="layoutNodes"/>.
@@ -70,9 +89,9 @@ namespace SEE.Layout
             maxLevel = GetMaxLevel(roots, -1);
 
             MinMaxBlockY(layoutNodes, out float minY, out float maxY, out float maxHeight);
-            levelDistance = Math.Max(levelDistance * scaleFactor, maxHeight / 5.0f);
+            levelDistance = Math.Max(levelDistance, maxHeight / 5.0f);
             levelOffset = edgesAboveBlocks ? maxY + levelDistance : minY - levelDistance;
-            //Debug.LogFormat("scaleFactor {0} levelDistance {1} levelOffset {2} maxHeight {3}\n", scaleFactor, levelDistance, levelOffset, maxHeight);
+            //Debug.LogFormat("levelDistance {0} levelOffset {1} maxHeight {2}\n", levelDistance, levelOffset, maxHeight);
 
             LCAFinder<ILayoutNode> lca = new LCAFinder<ILayoutNode>(roots);
 
@@ -290,25 +309,6 @@ namespace SEE.Layout
             middle.y = yLevel;
             return LinePoints.SplineLinePoints(start, middle, end);
         }
-
-        /// <summary>
-        /// The number of Unity units per level of the hierarchy for the height of control points.
-        /// Its value must be greater than zero. It will be set relative to the maximal height
-        /// of the nodes whose edges are to be laid out (in Create()). The value set here is the 
-        /// initial minimum value.
-        /// </summary>
-        private float levelDistance = 1.0f;
-
-        /// <summary>
-        /// The minimal/maximal y co-ordinate for all hierarchical control points at level 2 and above.
-        /// Control points at level 0 (self loops) will be handled separately: self loops will be
-        /// drawn from corner to corner on the roof or ground, respectively, depending upon 
-        /// edgesAboveBlocks. Likewise, edges for nodes that are siblings in the hierarchy will be
-        /// drawn as simple splines from roof to roof or ground to ground of the two blocks, respectively,
-        /// on their shortest path. The y co-ordinate of inner control points of all other edges will be 
-        /// at levelOffset or above/below. See GetLevelHeight() for more details.
-        /// </summary>
-        private float levelOffset = 0.0f;
 
         /// <summary>
         /// Returns the y co-ordinate for control points of nodes at the given <paramref name="level"/>
