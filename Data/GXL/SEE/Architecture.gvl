@@ -2,7 +2,7 @@
 <!DOCTYPE Gravis2_Layout>
 <Gravis2_Layout W="Hierarchy" V="Architecture">
   <Visualization>
-    <Zoom Factor="1" Center_X="-748.5" Center_Y="-594"/>
+    <Zoom Factor="1" Center_X="-883" Center_Y="-404.5"/>
     <Option Name="Mute_Edges" Value="False"/>
     <Option Name="Semi_Transparent_Edges" Value="False"/>
     <Option Name="Edges_Behind_Nodes" Value="False"/>
@@ -15,27 +15,27 @@
     <Hidden_Edge_Types>
     </Hidden_Edge_Types>
   </Visualization>
-  <Node Id="LSEE.GO" X="-1360" Y="-635" W="246" H="147" CS="14.14" Exp="True">
+  <Node Id="LSEE.GO" X="-987" Y="-578" W="197" H="252" CS="14.14" Exp="True">
     <Node Id="LSEE.GO.Whiteboard" X="45" Y="97" W="0" H="0" CS="10">
     </Node>
   </Node>
-  <Node Id="LSEE.Layout" X="-1286" Y="-318" W="261" H="161.14" CS="14.14" Exp="True">
-    <Node Id="LSEE.Layout.RectanglePacking" X="160" Y="100" W="0" H="0" CS="10">
+  <Node Id="LSEE.Layout" X="-1259" Y="-313" W="260" H="147" CS="14.14" Exp="True">
+    <Node Id="LSEE.Layout.RectanglePacking" X="155" Y="80" W="0" H="0" CS="10">
     </Node>
-    <Node Id="LSEE.Layout.TreeMap" X="217" Y="102" W="0" H="0" CS="10">
+    <Node Id="LSEE.Layout.TreeMap" X="216" Y="39" W="0" H="0" CS="10">
     </Node>
-    <Node Id="LSEE.Layout.EvoStreets" X="41" Y="111" W="0" H="0" CS="10">
+    <Node Id="LSEE.Layout.EvoStreets" X="36" Y="97" W="0" H="0" CS="10">
     </Node>
-    <Node Id="LSEE.Layout.CirclePacking" X="94" Y="122" W="0" H="0" CS="10">
-    </Node>
-  </Node>
-  <Node Id="LSEE.Game" X="-838" Y="-752" W="276" H="176" CS="14.14" Exp="True">
-    <Node Id="LSEE.Game.Runtime" X="195" Y="133" W="0" H="0" CS="10">
-    </Node>
-    <Node Id="LSEE.Game.Evolution" X="129" Y="68" W="0" H="0" CS="10">
+    <Node Id="LSEE.Layout.CirclePacking" X="90" Y="107" W="0" H="0" CS="10">
     </Node>
   </Node>
-  <Node Id="LSEE.Controls" X="-485" Y="-573" W="212" H="253" CS="14.14" Exp="True">
+  <Node Id="LSEE.Game" X="-962" Y="-770" W="390" H="181" CS="14.14" Exp="True">
+    <Node Id="LSEE.Game.Runtime" X="227" Y="72" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="LSEE.Game.Evolution" X="108" Y="61" W="0" H="0" CS="10">
+    </Node>
+  </Node>
+  <Node Id="LSEE.Controls" X="-781" Y="-580" W="212" H="253" CS="14.14" Exp="True">
     <Node Id="LSEE.Controls.Devices" X="26" Y="39" W="165" H="191" CS="10" Exp="True">
       <Node Id="LSEE.Controls.Devices.Viewpoint" X="124" Y="136" W="0" H="0" CS="10">
       </Node>
@@ -51,16 +51,16 @@
       </Node>
     </Node>
   </Node>
-  <Node Id="LSEE.Utils" X="-987" Y="-314" W="238" H="159" CS="14.14" Exp="True">
+  <Node Id="LSEE.Utils" X="-1449" Y="-156" W="882" H="54" CS="14.14" Exp="True">
   </Node>
-  <Node Id="LSEE.Tools" X="-1145" Y="-806" W="40" H="40" CS="14.14">
+  <Node Id="LSEE.Tools" X="-785" Y="-321" W="216" H="155" CS="14.14" Exp="True">
   </Node>
-  <Node Id="LSEE.DataModel" X="-722" Y="-309" W="225" H="141" CS="14.14" Exp="True">
+  <Node Id="LSEE.DataModel" X="-991" Y="-316" W="200" H="148" CS="14.14" Exp="True">
     <Node Id="LSEE.DataModel.IO" X="85" Y="88" W="0" H="0" CS="10">
     </Node>
   </Node>
-  <Node Id="LSEE.CameraPaths" X="-1305" Y="-827" W="0" H="0" CS="14.14">
+  <Node Id="LSEE.CameraPaths" X="-1161" Y="-750" W="114" H="105" CS="14.14" Exp="True">
   </Node>
-  <Node Id="LSEEEditor" X="-1113" Y="-993" W="0" H="0" CS="14.14">
+  <Node Id="LSEEEditor" X="-1446" Y="-758" W="185" H="424" CS="14.14" Exp="True">
   </Node>
 </Gravis2_Layout>
