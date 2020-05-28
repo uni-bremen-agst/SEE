@@ -87,7 +87,7 @@ namespace SEE.Game
         private Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
 
         /// <summary>
-        /// TODO
+        /// the groundlevel of the nodes
         /// </summary>
         protected float groundLevel = 0.0f;
 
@@ -304,24 +304,13 @@ namespace SEE.Game
             
         }
 
-       /* private ICollection<Edge> GetEdges()
-        {
-            foreach (ILayoutNode source in layoutNodes)
-            {
-                foreach (ILayoutNode target in source.Successors)
-                {
-                }
-            }
-        }*/
-
-
         /// <summary>
-        /// TODO
+        /// Calculates the distance for each edge
         /// </summary>
-        /// <param name="gameNodes"></param>
+        /// <param name="layoutNodes">the layoutnodes</param>
+        /// <param name="graph">the graph</param>
         protected void EdgeDistCalculation(Graph graph, ICollection<ILayoutNode> layoutNodes)
         {
-
             foreach (Edge edge in graph.Edges())
             {
                 Vector3 sourcePosition = layoutNodes.Where(node => node.ID == edge.Source.ID).First().CenterPosition;
@@ -334,11 +323,11 @@ namespace SEE.Game
 
 
         /// <summary>
-        /// TODo
+        /// Adds the decoration to the sublayout
         /// </summary>
-        /// <param name="layoutNodes"></param>
-        /// <param name="sublayoutLayoutNodes"></param>
-        /// <param name="parent"></param>
+        /// <param name="layoutNodes">the layoutnodes</param>
+        /// <param name="sublayoutLayoutNodes">the sublayout nodes</param>
+        /// <param name="parent">the parent gameobject</param>
         private void AddDecorationsForSublayouts(ICollection<ILayoutNode> layoutNodes, List<SublayoutLayoutNode> sublayoutLayoutNodes, GameObject parent)
         {
             List<ILayoutNode> remainingLayoutNodes = layoutNodes.ToList();
@@ -363,14 +352,14 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// TODO
+        /// Creates Sublayout and Adds the innerNodes for the sublayouts
         /// </summary>
-        /// <param name="nodeMap"></param>
-        /// <param name="nodes"></param>
-        /// <returns></returns>
+        /// <param name="nodeMap">a map between a node and its gameobject</param>
+        /// <param name="nodes">a list with nodes</param>
+        /// <returns>the sublayouts</returns>
         private List<SublayoutNode> AddInnerNodesForSublayouts(Dictionary<Node, GameObject> nodeMap, List<Node> nodes)
         {
-            List<SublayoutNode> coseSublayoutNodes = CreateCoseSublayoutNodes(nodes);
+            List<SublayoutNode> coseSublayoutNodes = CreateSublayoutNodes(nodes);
 
             if (coseSublayoutNodes.Count > 0)
             {
@@ -395,11 +384,11 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// TODO
+        /// Creates the sublayoutnodes for a given set of nodes 
         /// </summary>
-        /// <param name="nodes"></param>
-        /// <returns></returns>
-        private List<SublayoutNode> CreateCoseSublayoutNodes(List<Node> nodes)
+        /// <param name="nodes">the nodes, which should be layouted as sublayouts</param>
+        /// <returns>a list with sublayout nodes</returns>
+        private List<SublayoutNode> CreateSublayoutNodes(List<Node> nodes)
         {
             List<SublayoutNode> coseSublayoutNodes = new List<SublayoutNode>();
             foreach (KeyValuePair<string, bool> dir in settings.CoseGraphSettings.ListDirToggle)
@@ -421,19 +410,19 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// TODO
+        /// Calculate the child/ removed nodes for each sublayout
         /// </summary>
-        /// <param name="coseSublayoutNodes"></param>
-        private void CalculateNodesSublayout(List<SublayoutNode> coseSublayoutNodes)
+        /// <param name="sublayoutNodes">the sublayout nodes</param>
+        private void CalculateNodesSublayout(List<SublayoutNode> sublayoutNodes)
         {
-            foreach (SublayoutNode sublayoutNode in coseSublayoutNodes)
+            foreach (SublayoutNode sublayoutNode in sublayoutNodes)
             {
                 List<Node> children = WithAllChildren(sublayoutNode.Node);
                 List<Node> childrenToRemove = new List<Node>();
 
                 foreach (Node child in children)
                 {
-                    SublayoutNode sublayout = CoseHelper.CheckIfNodeIsSublayouRoot(coseSublayoutNodes, child.ID);
+                    SublayoutNode sublayout = CoseHelper.CheckIfNodeIsSublayouRoot(sublayoutNodes, child.ID);
 
                     if (sublayout != null)
                     {
@@ -505,7 +494,7 @@ namespace SEE.Game
 
 
         /// <summary>
-        /// TODO
+        /// Calculates a list with all children for a specific node
         /// </summary>
         /// <param name="root"></param>
         /// <returns></returns>
@@ -562,9 +551,11 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// TODO
+        /// Returns a new plane for a vector describing the left front corner position and a vector describing the right bar position
         /// </summary>
-        /// <returns></returns>
+        /// <param name="leftFrontCorner">the left front corner</param>
+        /// <param name="rightBackCorner">the right back corner</param>
+        /// <returns>a new plane</returns>
         public GameObject NewPlane(Vector2 leftFrontCorner, Vector2 rightBackCorner)
         {
             return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, settings.origin.y - 0.5f, Color.gray);
@@ -623,7 +614,11 @@ namespace SEE.Game
             }
         }
 
-
+        /// <summary>
+        /// draws Decoration for the given List of gameNodes with the global settings for inner node kinds and nodelayout
+        /// </summary>
+        /// <param name="gameNodes"> a list with gamenode objects</param>
+        /// <returns>a list with gamennode objects</returns>
         protected ICollection<GameObject> AddDecorations(ICollection<GameObject> gameNodes)
         {
             return AddDecorations(gameNodes, settings.InnerNodeObjects, settings.NodeLayout);
@@ -708,6 +703,12 @@ namespace SEE.Game
             return ToLayoutNodes(gameObjects, leafNodeFactory, innerNodeFactory);
         }
 
+        /// <summary>
+        /// Converts the given nodes and sublayoutsnodes to a List with ILayoutNodes
+        /// </summary>
+        /// <param name="nodeMap">mapping between nodes and gameobjects</param>
+        /// <param name="sublayoutNodes">a collection with sublayoutNodes</param>
+        /// <returns></returns>
         private ICollection<ILayoutNode> ToLayoutNodes(Dictionary<Node, GameObject> nodeMap, ICollection<SublayoutNode> sublayoutNodes)
         {
             List<ILayoutNode> layoutNodes = new List<ILayoutNode>();
@@ -1101,6 +1102,7 @@ namespace SEE.Game
         /// hierarchy.
         /// </summary>
         /// <param name="node">graph node for which to create the game node</param>
+        /// <param name="innerNodeFactory">the inner node factory, if the innerNodeFactory is null the global innernnodeFactory is used</param>
         /// <returns>new game object for the inner node</returns>
         public GameObject NewInnerNode(Node node, InnerNodeFactory innerNodeFactory = null)
         {
@@ -1198,11 +1200,11 @@ namespace SEE.Game
         }
 
        /// <summary>
-       /// TODO
+       /// calculates the left lower corner position and the right uppr corner position for a given list of ILayoutNodes
        /// </summary>
-       /// <param name="layoutNodes"></param>
-       /// <param name="leftLowerCorner"></param>
-       /// <param name="rightUpperCorner"></param>
+       /// <param name="layoutNodes">the layout nodes</param>
+       /// <param name="leftLowerCorner">the left lower corner</param>
+       /// <param name="rightUpperCorner">the right upper corner</param>
         public void BoundingBox(ICollection<ILayoutNode> layoutNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
         {
             if (layoutNodes.Count == 0)
