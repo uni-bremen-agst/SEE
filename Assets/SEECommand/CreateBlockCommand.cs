@@ -57,6 +57,13 @@ namespace SEE.Command
 
         protected override bool RedoOnClient()
         {
+            foreach (Interactable interactable in Object.FindObjectsOfType<Interactable>())
+            {
+                if (interactable.id == id)
+                {
+                    return false;
+                }
+            }
             bool result = ExecuteOnClient();
             return result;
         }

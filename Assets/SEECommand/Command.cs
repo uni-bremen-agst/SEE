@@ -68,61 +68,52 @@ namespace SEE.Command
 
         public void Execute()
         {
-            if (!executed)
+            if (Net.Network.UseInOfflineMode)
             {
-                if (Net.Network.UseInOfflineMode)
-                {
-                    ExecuteOnServerBase();
-                    ExecuteOnClientBase();
-                }
-                else
-                {
+                ExecuteOnServerBase();
+                ExecuteOnClientBase();
+            }
+            else
+            {
 #if UNITY_EDITOR
-                    DebugAssertCanBeSerialized();
+                DebugAssertCanBeSerialized();
 #endif
-                    ExecuteCommandPacket packet = new ExecuteCommandPacket(this);
-                    Net.Network.SubmitPacket(Client.Connection, packet);
-                }
+                ExecuteCommandPacket packet = new ExecuteCommandPacket(this);
+                Net.Network.SubmitPacket(Client.Connection, packet);
             }
         }
 
         public void Undo()
         {
-            if (executed)
+            if (Net.Network.UseInOfflineMode)
             {
-                if (Net.Network.UseInOfflineMode)
-                {
-                    UndoOnServerBase();
-                    UndoOnClientBase();
-                }
-                else
-                {
+                UndoOnServerBase();
+                UndoOnClientBase();
+            }
+            else
+            {
 #if UNITY_EDITOR
-                    DebugAssertCanBeSerialized();
+                DebugAssertCanBeSerialized();
 #endif
-                    UndoCommandPacket packet = new UndoCommandPacket(this);
-                    Net.Network.SubmitPacket(Client.Connection, packet);
-                }
+                UndoCommandPacket packet = new UndoCommandPacket(this);
+                Net.Network.SubmitPacket(Client.Connection, packet);
             }
         }
 
         public void Redo()
         {
-            if (!executed)
+            if (Net.Network.UseInOfflineMode)
             {
-                if (Net.Network.UseInOfflineMode)
-                {
-                    RedoOnServerBase();
-                    RedoOnClientBase();
-                }
-                else
-                {
+                RedoOnServerBase();
+                RedoOnClientBase();
+            }
+            else
+            {
 #if UNITY_EDITOR
-                    DebugAssertCanBeSerialized();
+                DebugAssertCanBeSerialized();
 #endif
-                    RedoCommandPacket packet = new RedoCommandPacket(this);
-                    Net.Network.SubmitPacket(Client.Connection, packet);
-                }
+                RedoCommandPacket packet = new RedoCommandPacket(this);
+                Net.Network.SubmitPacket(Client.Connection, packet);
             }
         }
 
@@ -159,7 +150,6 @@ namespace SEE.Command
                     {
                         CommandHistory.OnExecute(this);
                     }
-                    executed = true;
                 }
             }
             catch (Exception e)
@@ -185,10 +175,6 @@ namespace SEE.Command
             try
             {
                 bool result = UndoOnClient();
-                if (result)
-                {
-                    executed = false;
-                }
             }
             catch (Exception e)
             {
@@ -213,10 +199,6 @@ namespace SEE.Command
             try
             {
                 bool result = RedoOnClient();
-                if (result)
-                {
-                    executed = true;
-                }
             }
             catch (Exception e)
             {
