@@ -122,37 +122,36 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Apply the edge layout according to the the user's choice (settings).
+        /// Applies the edge layout according to the the user's choice (settings).
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
-        /// <param name="scaleFactor">factor by which to scale settings.EdgeWidth</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes, float scaleFactor)
+        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
         {
-            return EdgeLayout(graph, ToLayoutNodes(gameNodes), scaleFactor);
+            return EdgeLayout(graph, ToLayoutNodes(gameNodes));
         }
 
         /// <summary>
-        /// Apply the edge layout according to the the user's choice (settings).
+        /// Applies the edge layout according to the the user's choice (settings).
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="layoutNodes">the subset of layout nodes for which to draw the edges</param>
-        /// <param name="scaleFactor">factor by which to scale settings.EdgeWidth</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<ILayoutNode> layoutNodes, float scaleFactor)
+        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<ILayoutNode> layoutNodes)
         {
+            float minimalEdgeLevelDistance = 1.5f * settings.EdgeWidth;
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
             {
                 case SEECity.EdgeLayouts.Straight:
-                    layout = new StraightEdgeLayout(settings.EdgesAboveBlocks, scaleFactor);
+                    layout = new StraightEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance);
                     break;
                 case SEECity.EdgeLayouts.Spline:
-                    layout = new SplineEdgeLayout(settings.EdgesAboveBlocks, scaleFactor, settings.RDP);
+                    layout = new SplineEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.RDP);
                     break;
                 case SEECity.EdgeLayouts.Bundling:
-                    layout = new BundledEdgeLayout(settings.EdgesAboveBlocks, scaleFactor, settings.Tension, settings.RDP);
+                    layout = new BundledEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.Tension, settings.RDP);
                     break;
                 case SEECity.EdgeLayouts.None:
                     // nothing to be done
@@ -161,7 +160,7 @@ namespace SEE.Game
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
             }
             Performance p = Performance.Begin("edge layout " + layout.Name);
-            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth * scaleFactor);
+            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
             ICollection<GameObject> result = edgeFactory.DrawEdges(layoutNodes);
             p.End();
             return result;
@@ -215,7 +214,7 @@ namespace SEE.Game
                 AddDecorations(nodeMap.Values);
 
                 // create the game objects for the laid out edges
-                ICollection<GameObject> edges = EdgeLayout(graph, layoutNodes, scaleFactor);
+                ICollection<GameObject> edges = EdgeLayout(graph, layoutNodes);
                 AddToParent(edges, parent);
             }
             finally

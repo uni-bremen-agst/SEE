@@ -12,11 +12,11 @@ namespace SEE.Layout
         /// Constructor.
         /// </summary>
         /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
-        /// <param name="scaleFactor">factor by which certain aspects of an edge are scaled</param>
-        public IEdgeLayout(bool edgesAboveBlocks, float scaleFactor)
+        /// <param name="minLevelDistance">the minimal distance between different edge levels</param>
+        public IEdgeLayout(bool edgesAboveBlocks, float minLevelDistance)
         {
             this.edgesAboveBlocks = edgesAboveBlocks;
-            this.scaleFactor = scaleFactor;
+            this.minLevelDistance = minLevelDistance;
         }
 
         /// <summary>
@@ -47,10 +47,9 @@ namespace SEE.Layout
         protected readonly bool edgesAboveBlocks;
 
         /// <summary>
-        /// The factor by which certain aspects of an edge are scaled (e.g., line width, level distances 
-        /// for hierarchically bundled edges, etc.). The exact interpretation is done by the subclasses.
+        /// The minimal distance between different edge levels.
         /// </summary>
-        protected readonly float scaleFactor;
+        protected readonly float minLevelDistance;
 
         /// <summary>
         /// Yields the greatest and smallest y co-ordinate and the maximal height (all in
