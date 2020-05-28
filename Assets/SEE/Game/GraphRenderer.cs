@@ -251,7 +251,14 @@ namespace SEE.Game
                 else
                 {
                     // node is a child of another game node
-                    AddToParent(entry.Value, nodeMap[parent]);
+                    try
+                    {
+                        AddToParent(entry.Value, nodeMap[parent]);
+                    } 
+                    catch (Exception e)
+                    {
+                        Debug.LogErrorFormat("Exception raised for {0}: {1}\n", parent.ID, e);
+                    }
                 }
             }
         }
@@ -822,9 +829,7 @@ namespace SEE.Game
                 if (node.IsLeaf())
                 {
                     // Scaled metric values for the three dimensions.
-                    Vector3 scale = new Vector3(scaler.GetNormalizedValue(settings.WidthMetric, node),
-                                                scaler.GetNormalizedValue(settings.HeightMetric, node),
-                                                scaler.GetNormalizedValue(settings.DepthMetric, node));
+                    Vector3 scale = GetScale(node);
 
                     // Scale according to the metrics.
                     if (settings.NodeLayout == SEECity.NodeLayouts.Treemap)
@@ -846,6 +851,39 @@ namespace SEE.Game
                 {
                     throw new Exception("Game object " + gameNode.name + " is not a leaf.");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Returns the scale of the given <paramref name="node"/> as requested by the user's 
+        /// settings, i.e., what the use specified for the width, height, and depth of nodes.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns>requested absolute scale in world space</returns>
+        private Vector3 GetScale(Node node)
+        {
+            return new Vector3(GetMetricValue(node, settings.WidthMetric),
+                               GetMetricValue(node, settings.HeightMetric),
+                               GetMetricValue(node, settings.DepthMetric));
+        }
+
+        /// <summary>
+        /// If <paramref name="metricName"/> is the name of a metric, the corresponding
+        /// normalized value for <paramref name="node"/> is returned. If <paramref name="metricName"/>
+        /// can be parsed as a number instead, the parsed number is returned.
+        /// </summary>
+        /// <param name="node">node whose metric is to be returned</param>
+        /// <param name="metricName">the name of a node metric or a number</param>
+        /// <returns></returns>
+        private float GetMetricValue(Node node, string metricName)
+        {
+            if (TryGetFloat(metricName, out float value))
+            {
+                return value;
+            }
+            else
+            {
+                return scaler.GetNormalizedValue(metricName, node);
             }
         }
 
