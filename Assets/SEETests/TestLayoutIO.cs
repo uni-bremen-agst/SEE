@@ -56,7 +56,8 @@ namespace SEE.Layout
             // The game-object hierarchy for the nodes in graph are children of go.
             ICollection<ILayoutNode> gameObjects = GetGameObjects(go);
             SEE.Layout.IO.Reader reader = new SEE.Layout.IO.Reader(Application.dataPath + "/../Data/GXL/SEE/Architecture.gvl", 
-                                                                   gameObjects.Cast<IGameNode>().ToList());
+                                                                   gameObjects.Cast<IGameNode>().ToList(),
+                                                                   0.0f);
             Dump(gameObjects);
         }
 
