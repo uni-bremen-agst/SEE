@@ -29,24 +29,20 @@ namespace SEE.Layout
         /// </summary>
         private string filename;
 
-        private const float MinimalHeight = 1.0f;
-
         public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes)
         {
             Dictionary<ILayoutNode, NodeTransform> result = new Dictionary<ILayoutNode, NodeTransform>();
             if (File.Exists(filename))
             {
                 SEE.Layout.IO.Reader reader 
-                    = new SEE.Layout.IO.Reader(filename, layoutNodes.Cast<IGameNode>().ToList(), new SEELogger());
+                    = new SEE.Layout.IO.Reader(filename, layoutNodes.Cast<IGameNode>().ToList(), groundLevel, new SEELogger());
                 foreach (ILayoutNode node in layoutNodes)
                 {
                     Vector3 position = node.CenterPosition;
                     Vector3 absoluteScale = node.AbsoluteScale;
-                    // The layout might not contain any height information. Then we will
-                    // use MinimalHeight.
-                    absoluteScale.y = Mathf.Max(MinimalHeight, absoluteScale.y);
-                    // From y center to y ground level:
-                    position.y -= absoluteScale.y / 2.0f + groundLevel;
+                    // Note: The node transform's y co-ordinate of the position is interpreted as the ground of the object.
+                    // We need to adjust it accordingly.
+                    position.y -= absoluteScale.y / 2.0f;
                     result[node] = new NodeTransform(position, absoluteScale);
                 }
             }

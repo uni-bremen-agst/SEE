@@ -24,11 +24,14 @@ namespace SEE.Layout.IO
         /// </summary>
         /// <param name="filename">name of GVL file</param>
         /// <param name="gameNodes">the game nodes whose position and scale are to be updated</param>
+        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
+        /// placed on this level</param>
         /// <param name="logger">logger used to emit errors, warnings, etc.</param>
-        public Reader(string filename, ICollection<IGameNode> gameNodes, SEE.Utils.ILogger logger = null)
+        public Reader(string filename, ICollection<IGameNode> gameNodes, float groundLevel, SEE.Utils.ILogger logger = null)
         {
             this.filename = filename;
             this.logger = logger;
+            this.groundLevel = groundLevel;
             this.reader = new XmlTextReader(filename)
             {
                 WhitespaceHandling = WhitespaceHandling.None
@@ -43,6 +46,16 @@ namespace SEE.Layout.IO
             nodes.Push(new ParentNode(14.14f, null));
             Load();
         }
+
+        /// <summary>
+        /// The y co-ordinate setting the ground level; all nodes will be placed on this level.
+        /// </summary>
+        private readonly float groundLevel;
+
+        /// <summary>
+        /// The minimal height for a loaded game object.
+        /// </summary>
+        private const float MinimalHeight = 0.2f;
 
         /// <summary>
         /// Returns a mapping from the IDs of all <paramref name="gameNodes"/> onto
@@ -505,6 +518,7 @@ namespace SEE.Layout.IO
 
             // The resulting scale of the node; the y co-ordinate remains zero.
             Vector3 scale = Vector3.zero;
+            scale.y = gameNode.AbsoluteScale.y; // We maintain the original height of the node.
             if (Exp && W != 0 && H != 0)
             {
                 scale.x = W;
@@ -532,7 +546,7 @@ namespace SEE.Layout.IO
                 // Transform parent's center position to its left upper corner.
                 parentPosition.x -= parentScale.x / 2.0f;
                 parentPosition.z += parentScale.z / 2.0f;
-                Debug.LogFormat("parent {0} left upper corner={1} absolute scale={2}\n", parent.gameNode.ID, parentPosition, parentScale);
+                //Debug.LogFormat("parent {0} left upper corner={1} absolute scale={2}\n", parent.gameNode.ID, parentPosition, parentScale);
                 // Calculate left upper corner of node.
                 position.x = parentPosition.x + X;
                 position.z = parentPosition.z - Y; // Gravis's Y axis is inverse to Unity's z axis
@@ -541,8 +555,12 @@ namespace SEE.Layout.IO
                 //                ID, position.x, position.z, X, Y);
                 // position must refer to the center of the node.
                 position.x += scale.x / 2.0f;
+                //position.y =  scale.y / 2.0f; // lift y center so that the node stants on ground zero
                 position.z -= scale.z / 2.0f;
                 //Debug.LogFormat("child {0}'s center position ({1}, {2})\n", ID, position.x, position.z);
+
+                // Lift y center so that the node stands on its parent's roof.
+                position.y = (parentPosition.y + parentScale.y / 2.0f) + Mathf.Max(MinimalHeight, scale.y) / 2.0f;
             }
             else
             {
@@ -550,6 +568,8 @@ namespace SEE.Layout.IO
                 // assert: (X, Y) relates to absolute world space of the left upper corner
                 // Transform to center position for Unity.
                 position.x = X + scale.x / 2.0f;
+                // Lift y center so that the node stands on ground zero.
+                position.y = groundLevel + Mathf.Max(MinimalHeight, scale.y) / 2.0f; 
                 // Gravis's Y is Unity's inverted z axis, i.e., we need to mirror Y
                 // as follows: z = -Y. By mirroring Y, the left upper corner of a node
                 // becomes its left lower corner.
@@ -557,7 +577,8 @@ namespace SEE.Layout.IO
 
                 //Debug.LogFormat("root {0}'s center position ({1}, {2}) with size {3} where X={4} Y={5}\n", 
                 //                ID, position.x, position.z, scale, X, Y);
-            }            
+            }
+
             // Although we assign the local scale here, the node is not yet contained in any
             // other node, in which case local scale and world-space scale are the same.
             // Nodes will be nested later by the client of this layout.
