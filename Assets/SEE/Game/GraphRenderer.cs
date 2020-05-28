@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using SEE.Controls;
 using SEE.DataModel;
@@ -644,8 +645,7 @@ namespace SEE.Game
         /// <returns>game object representing given <paramref name="node"/></returns>
         public GameObject NewLeafNode(Node node)
         {
-            int style = SelectStyle(node);
-            GameObject block = leafNodeFactory.NewBlock(style);
+            GameObject block = leafNodeFactory.NewBlock(SelectStyle(node));
             block.name = node.ID;
             AttachNode(block, node);
             AdjustScaleOfLeaf(block);
@@ -656,22 +656,63 @@ namespace SEE.Game
         /// Returns a style index as a linear interpolation of X for range [0..M-1]
         /// where M is the number of available styles of the leafNodeFactory (if
         /// the node is a leaf) or innerNodeFactory (if it is an inner node)
-        /// and X = C / metricMaximum and C is the normalized metric value of 
+        /// and X = C / metricMaximum and C is as follows:
+        /// Let M be the metric selected for the style metric (the style metric
+        /// for leaves if <paramref name="node"/> is a leaf or for an inner node
+        /// otherwise). M can be either the name of a node metric or a number.
+        /// If M is the name of a node metric, C is the normalized metric value of 
         /// <paramref name="node"/> for the attribute chosen for the style
-        /// and metricMaximum is the maximal value of the style metric.
+        /// and metricMaximum is the maximal value of the style metric. If M is
+        /// instead a number, C is that value -- clamped into [0, S] where S is 
+        /// the maximal number of styles available) and metricMaximum is S.
         /// </summary>
         /// <param name="node">node for which to determine the style index</param>
         /// <returns>style index</returns>
         private int SelectStyle(Node node)
         {
             bool isLeaf = node.IsLeaf();
-            int style = isLeaf ? leafNodeFactory.NumberOfStyles() : innerNodeFactory.NumberOfStyles();
             string styleMetric = isLeaf ? settings.LeafStyleMetric : settings.InnerNodeStyleMetric;
-            float metricMaximum = scaler.GetNormalizedMaximum(styleMetric);
+            int numberOfStyles = isLeaf ? leafNodeFactory.NumberOfStyles() : innerNodeFactory.NumberOfStyles();
+            float metricMaximum;
+
+            if (TryGetFloat(styleMetric, out float value))
+            {
+                // The styleMetric name is actually a number.
+                metricMaximum = numberOfStyles;
+                value = Mathf.Clamp(value, 0, metricMaximum);
+
+            }
+            else
+            {
+                metricMaximum = scaler.GetNormalizedMaximum(styleMetric);
+                value = scaler.GetNormalizedValue(styleMetric, node);
+            }
             return Mathf.RoundToInt(Mathf.Lerp(0.0f,
-                                               (float)(style - 1),
-                                                scaler.GetNormalizedValue(styleMetric, node)
-                                                         / metricMaximum));
+                                               (float)(numberOfStyles - 1),
+                                               value / metricMaximum));
+        }
+
+        /// <summary>
+        /// Tries to parse <paramref name="floatString"/> as a floating point number.
+        /// Upon success, its value is return in <paramref name="value"/> and true
+        /// is returned. Otherwise false is returned and <paramref name="value"/>
+        /// is undefined.
+        /// </summary>
+        /// <param name="floatString">string to be parsed for a floating point number</param>
+        /// <param name="value">parsed floating point value; defined only if this method returns true</param>
+        /// <returns>true if a floating point number could be parsed successfully</returns>
+        private bool TryGetFloat(string floatString, out float value)
+        {
+            try
+            {
+                value = float.Parse(floatString, CultureInfo.InvariantCulture.NumberFormat);
+                return true;
+            }
+            catch (FormatException _)
+            {
+                value = 0.0f;
+                return false;
+            }
         }
 
         /// <summary>
