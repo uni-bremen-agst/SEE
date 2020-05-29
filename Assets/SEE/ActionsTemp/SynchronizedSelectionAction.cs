@@ -26,6 +26,7 @@ namespace SEE.Controls
                 if (hoverableObject.id == id)
                 {
                     hitObject = hoverableObject.gameObject;
+                    break;
                 }
             }
             Assert.IsNotNull(hitObject);

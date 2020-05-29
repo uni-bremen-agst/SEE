@@ -55,7 +55,7 @@ namespace SEE.Controls
         /// * that NodeRef refers to a valid graph node with a valid information that can
         ///    be retrieved and shown when the user hovers over the object
         /// </summary>
-        protected virtual void Start()
+        protected virtual void Awake()
         {
             NodeRef nodeRef = gameObject.GetComponent<NodeRef>();
             if (nodeRef != null)

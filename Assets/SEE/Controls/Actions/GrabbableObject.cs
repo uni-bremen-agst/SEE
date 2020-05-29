@@ -22,9 +22,9 @@ namespace SEE.Controls
         /// </summary>
         private MaterialChanger grabbingMaterial;
 
-        protected override void Start()
+        protected override void Awake()
         {
-            base.Start();
+            base.Awake();
             grabbingMaterial = new MaterialChanger(gameObject, Materials.NewMaterial(GrabbingColor));
         }
 
