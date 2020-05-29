@@ -11,6 +11,10 @@ namespace SEE.Controls
     [RequireComponent(typeof(Interactable))]
     public abstract class InteractableObject : MonoBehaviour
     {
+        /// <summary>
+        /// The unique id of the interactable object.
+        /// </summary>
+        public uint id;
 
         // Tutorial on grabbing objects:
         // https://www.youtube.com/watch?v=MKOc8J877tI&t=15s
