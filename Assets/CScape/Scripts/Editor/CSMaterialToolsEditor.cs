@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+
+#if UNITY_EDITOR
+
 namespace CScape
 {
     [CustomEditor(typeof(CSMaterialTools))]
@@ -32,7 +35,7 @@ namespace CScape
             options = EditorGUILayout.Foldout(options, "compiler options", false);
             if (options)
             {
-                
+
                 mt.TextureFolder = EditorGUILayout.TextField("TextureFolder", mt.TextureFolder);
                 mt.size = EditorGUILayout.IntField("Shape texture size", mt.size);
                 mt.surfaceSize = EditorGUILayout.IntField("Surface texture size", mt.surfaceSize);
@@ -48,27 +51,29 @@ namespace CScape
             }
 
             if (GUILayout.Button("Compile only styles"))
-                {
-                    mt.CreateStyleShapes();
-                }
+            {
+                mt.CreateStyleShapes();
+            }
 
-                if (GUILayout.Button("Compile all textures"))
-                {
-                    mt.CreateStyleShapes();
-                    mt.CreateMaterialsNew();
-                    mt.CreateBlinds();
-                    mt.CreateStreets();
-                    mt.CreateDirt();
-                    mt.CreateInt();
-                    mt.CreateShops();
-                    mt.CreateStreetDecalls();
-                }
-            
+            if (GUILayout.Button("Compile all textures"))
+            {
+                mt.CreateStyleShapes();
+                mt.CreateMaterialsNew();
+                mt.CreateBlinds();
+                mt.CreateStreets();
+                mt.CreateDirt();
+                mt.CreateInt();
+                mt.CreateShops();
+                mt.CreateStreetDecalls();
+            }
+
 
 
 
         }
-            // Use this for initialization
+        // Use this for initialization
 
     }
 }
+
+#endif

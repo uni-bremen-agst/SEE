@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+
+using UnityEngine;
 using UnityEditor;
 using SEE.Game;
-using System.Collections.Generic;
 
 namespace SEEEditor
 {
@@ -98,3 +99,5 @@ namespace SEEEditor
         }
     }
 }
+
+#endif

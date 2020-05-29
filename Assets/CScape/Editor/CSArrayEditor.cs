@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+
+#if UNITY_EDITOR
+
 using UnityEditor;
 using System.Collections;
 using UnityEditor.SceneManagement;
@@ -61,19 +64,19 @@ namespace CScape
                 bm.instancesZ = EditorGUILayout.IntField("Max number of horizontal instances", bm.instancesZ);
                 bm.randomSeed = EditorGUILayout.IntField("Random seed", bm.randomSeed);
                 bm.upStart[x] = EditorGUILayout.IntField("Top offset start", bm.upStart[x]);
-                
+
                 bm.leftSideStart[x] = EditorGUILayout.IntField("Left offset start", bm.leftSideStart[x]);
                 bm.rightSideStart[x] = EditorGUILayout.IntField("Right offset start", bm.rightSideStart[x]);
-                
+
                 bm.downStart[x] = EditorGUILayout.IntField("Down Offset start", bm.downStart[x]);
-                
+
                 bm.skipX[x] = EditorGUILayout.IntSlider("Skip Columns", bm.skipX[x], 1, 5);
                 bm.skipY[x] = EditorGUILayout.IntSlider("Skip Rows", bm.skipY[x], 1, 5);
                 bm.sparseRemove[x] = EditorGUILayout.Toggle("Sparse Remove", bm.sparseRemove[x]);
                 bm.sparseRandom[x] = EditorGUILayout.IntField("Sparse remove seed", bm.sparseRandom[x]);
                 bm.greebleMat[x] = EditorGUILayout.ObjectField("Rooftop Material", bm.greebleMat[x], typeof(Material), true) as Material;
                 bm.placingDepth[x] = EditorGUILayout.FloatField("Z Depth", bm.placingDepth[x]);
-                
+
 
 
 
@@ -82,37 +85,38 @@ namespace CScape
 
                 bm.rooftopElements[x] = EditorGUILayout.ObjectField(bm.rooftopElements[x], typeof(GameObject), true) as GameObject;
                 EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                
+
             }
 
-            
+
             GUILayout.EndVertical();
 
-                GUILayout.EndVertical();
+            GUILayout.EndVertical();
 
-                GUILayout.BeginHorizontal("Box");
-                if (GUILayout.Button("-", "Label", GUILayout.Width(20), GUILayout.Height(15)))
-                {
-                    bm.numberOfModifiers --;
-                }
-                if (GUILayout.Button("+", "Label", GUILayout.Width(20), GUILayout.Height(15)))
-                {
-                    bm.numberOfModifiers ++;
-                }
+            GUILayout.BeginHorizontal("Box");
+            if (GUILayout.Button("-", "Label", GUILayout.Width(20), GUILayout.Height(15)))
+            {
+                bm.numberOfModifiers--;
+            }
+            if (GUILayout.Button("+", "Label", GUILayout.Width(20), GUILayout.Height(15)))
+            {
+                bm.numberOfModifiers++;
+            }
 
-                GUILayout.EndHorizontal();
-
-
+            GUILayout.EndHorizontal();
 
 
-                if (GUI.changed)
-                {
-                    bm.AwakeMe();
-                    bm.UpdateElements();
-                    EditorUtility.SetDirty(bm);
 
-                }
+
+            if (GUI.changed)
+            {
+                bm.AwakeMe();
+                bm.UpdateElements();
+                EditorUtility.SetDirty(bm);
+
             }
         }
     }
+}
 
+#endif

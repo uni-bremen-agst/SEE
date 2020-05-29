@@ -1,6 +1,9 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
 
-namespace SEE.Net.Internal
+using SEE.Net;
+using UnityEditor;
+
+namespace SEEEditor
 {
 
     [CustomEditor(typeof(ViewContainer))]
@@ -46,3 +49,5 @@ namespace SEE.Net.Internal
     }
 
 }
+
+#endif
