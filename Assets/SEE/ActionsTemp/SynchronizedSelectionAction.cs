@@ -4,65 +4,84 @@ using UnityEngine.Assertions;
 namespace SEE.Controls
 {
 
-    // TODO: SelectionAction and SelectAction should be combined somehow
     public class SynchronizedSelectionAction : AbstractAction
     {
-        public uint id;
+        public uint oldID;
+        public uint newID;
 
 
 
-        public SynchronizedSelectionAction(HoverableObject hoverableObject) : base(true)
+        public SynchronizedSelectionAction(HoverableObject oldHoverableObject, HoverableObject newHoverableObject) : base(true)
         {
-            id = hoverableObject.id;
+            Assert.IsTrue(oldHoverableObject != newHoverableObject);
+            Assert.IsTrue(oldHoverableObject != null || newHoverableObject != null);
+
+            oldID = oldHoverableObject ? oldHoverableObject.id : uint.MaxValue;
+            newID = newHoverableObject ? newHoverableObject.id : uint.MaxValue;
         }
 
 
-
-        protected override bool ExecuteOnClient()
-        {
-            GameObject hitObject = null;
-            foreach (HoverableObject hoverableObject in Object.FindObjectsOfType<HoverableObject>())
-            {
-                if (hoverableObject.id == id)
-                {
-                    hitObject = hoverableObject.gameObject;
-                    break;
-                }
-            }
-            Assert.IsNotNull(hitObject);
-
-            Actor actor = Object.FindObjectOfType<Actor>();
-            Assert.IsNotNull(actor);
-
-            SelectionAction selectAction = actor.selectionAction;
-            selectAction.Select(hitObject);
-
-            return true;
-        }
 
         protected override bool ExecuteOnServer()
         {
             return true;
         }
 
-        protected override bool RedoOnClient()
+        protected override bool ExecuteOnClient()
         {
-            return false;
-        }
+            HoverableObject oldHoverableObject = null;
+            HoverableObject newHoverableObject = null;
 
-        protected override bool RedoOnServer()
-        {
-            return false;
-        }
+            foreach (HoverableObject o in Object.FindObjectsOfType<HoverableObject>()) // TODO(torben): save them in a faster way!
+            {
+                if (o.id == oldID)
+                {
+                    oldHoverableObject = o;
+                }
+                else if (o.id == newID)
+                {
+                    newHoverableObject = o;
+                }
 
-        protected override bool UndoOnClient()
-        {
-            return false;
+                if (oldHoverableObject != null && newHoverableObject != null)
+                {
+                    break;
+                }
+            }
+
+            Assert.IsTrue(oldHoverableObject != null || newHoverableObject != null);
+
+            if (oldHoverableObject)
+            {
+                oldHoverableObject.Unhovered();
+            }
+
+            if (newHoverableObject)
+            {
+                newHoverableObject.Hovered(IsRequester());
+            }
+
+            return true;
         }
 
         protected override bool UndoOnServer()
         {
-            return false;
+            throw new System.NotImplementedException();
+        }
+
+        protected override bool UndoOnClient()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override bool RedoOnServer()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override bool RedoOnClient()
+        {
+            throw new System.NotImplementedException();
         }
     }
 
