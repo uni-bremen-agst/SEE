@@ -66,6 +66,7 @@ namespace SEE.Controls
         private enum ObjectState
         {
             None,
+            IsSelecting,
             IsSelected,
             IsGrabbed
         }
@@ -81,7 +82,7 @@ namespace SEE.Controls
         /// </summary>
         private void Update()
         {
-            if (Animation.IsOn())
+            if (Animation.IsOn() || objectState == ObjectState.IsSelecting)
             {
                 return;
             }
@@ -137,12 +138,8 @@ namespace SEE.Controls
                 {
                     // assert: !isGrabbing && isSelecting && hitObject != null && hitObject != handledObject
                     // The user is selecting, not grabbing, and hit a new object.
-                    if (handledObject != null)
-                    {
-                        UnhoverObject(handledObject);
-                    }
-                    handledObject = hitObject;
-                    HoverObject(handledObject);
+                    objectState = ObjectState.IsSelecting;
+                    new SynchronizedSelectionAction(hitObject.GetComponent<HoverableObject>()).Execute();
                 }
             }
             else if (objectState == ObjectState.IsGrabbed)
@@ -152,14 +149,29 @@ namespace SEE.Controls
                 ReleaseObject(handledObject, true);
             }
 
-            if (objectState == ObjectState.IsSelected)
-            {
-                AllowZooming();
-            }
+            //if (objectState == ObjectState.IsSelected)
+            //{
+            //    AllowZooming();
+            //}
 
             if (!isGrabbing && !isSelecting)
             {
                 HideHoveringFeedback();
+            }
+        }
+
+        public void Select(GameObject hitObject)
+        {
+            if (handledObject != null)
+            {
+                UnhoverObject(handledObject);
+            }
+            handledObject = hitObject;
+            HoverObject(handledObject);
+
+            if (objectState == ObjectState.IsSelected)
+            {
+                AllowZooming();
             }
         }
 
@@ -283,7 +295,7 @@ namespace SEE.Controls
         /// Called when an object is being hovered over (passed as parameter <paramref name="selectedObject"/>).
         /// </summary>
         /// <param name="selectedObject">the selected object</param>
-        protected virtual void HoverObject(GameObject selectedObject)
+        protected virtual void HoverObject(GameObject selectedObject) // TODO: function name is misleading! function is called upon selection and not on hover
         {
             //Debug.LogFormat("HoverObject {0}\n", selectedObject.name);
             HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
