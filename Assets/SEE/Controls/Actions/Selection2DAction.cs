@@ -62,7 +62,7 @@ namespace SEE.Controls
         /// player to <paramref name="heldObject"/>.
         /// </summary>
         /// <param name="heldObject">the object selected or null if none was selected</param>
-        protected override void ShowGrabbingFeedback(GameObject heldObject)
+        public override void ShowGrabbingFeedback(GameObject heldObject)
         {
             if (grabLine == null)
             {

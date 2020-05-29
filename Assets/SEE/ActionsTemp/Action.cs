@@ -66,6 +66,20 @@ namespace SEE.Controls
 
 
 
+        protected bool IsRequester()
+        {
+            if (Net.Network.UseInOfflineMode)
+            {
+                return true;
+            }
+
+            IPEndPoint requesterEndPoint = new IPEndPoint(IPAddress.Parse(requesterIPAddress), requesterPort);
+            bool result = Client.LocalEndPoint.Equals(requesterEndPoint);
+            return result;
+        }
+
+
+
         public void Execute()
         {
             if (Net.Network.UseInOfflineMode)

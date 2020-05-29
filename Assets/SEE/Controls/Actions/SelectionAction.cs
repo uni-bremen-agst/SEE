@@ -47,7 +47,7 @@ namespace SEE.Controls
         /// <summary>
         /// The object currently grabbed or hovered over. May be null.
         /// </summary>
-        private GameObject handledObject;
+        public GameObject handledObject;
 
         /// <summary>
         /// The memento of the state of handledObject just before it was grabbed.
@@ -66,7 +66,6 @@ namespace SEE.Controls
         private enum ObjectState
         {
             None,
-            IsSelecting,
             IsSelected,
             IsGrabbed
         }
@@ -82,12 +81,12 @@ namespace SEE.Controls
         /// </summary>
         private void Update()
         {
-            if (Animation.IsOn() || objectState == ObjectState.IsSelecting)
+            if (Animation.IsOn())
             {
                 return;
             }
-            // The user could be doing everything together selecting, canceling, grabbing,
-            // and zooming. 
+            // The user could be doing everything together selecting, canceling,
+            // grabbing, and zooming. 
             // We are using the following priorities:
             // Canceling is possible only when an object is selected or grabbed.
             // Zooming is possible only when an object is selected but not grabbed.
@@ -107,9 +106,13 @@ namespace SEE.Controls
                     }
                     else if (objectState == ObjectState.IsSelected)
                     {
-                        UnhoverObject(handledObject);
-                    }                    
-                    handledObject = null;
+                        // TODO: as we are still pressing the left mouse button, it is
+                        // possible to re-grab the object right after cancelling. this
+                        // effect is not as obvious if the animation is enabled.
+                        new SynchronizedSelectionAction(handledObject.GetComponent<HoverableObject>(), null).Execute();
+                        handledObject = null;
+                        objectState = ObjectState.None;
+                    }
                 }
             }
             else if (isGrabbing || isSelecting)
@@ -125,12 +128,15 @@ namespace SEE.Controls
                         // but is not yet grabbed.
                         if (objectState == ObjectState.IsSelected)
                         {
-                            GrabObject(handledObject);
+                            if (handledObject == hitObject) // TODO: this if-statement can be removed if above TODO is fixed!
+                            {
+                                GrabObject(handledObject);
+                            }
                         }
                         else
                         {
                             // The user continues grabbing while an object was already grabbed.
-                            HoldObject(handledObject);
+                            new MoveAction(handledObject.GetComponent<GrabbableObject>(), handledObjectMemento.Position, TipOfGrabbingRay(handledObject)).Execute();
                         }
                     }
                 }
@@ -138,8 +144,21 @@ namespace SEE.Controls
                 {
                     // assert: !isGrabbing && isSelecting && hitObject != null && hitObject != handledObject
                     // The user is selecting, not grabbing, and hit a new object.
-                    objectState = ObjectState.IsSelecting;
-                    new SynchronizedSelectionAction(hitObject.GetComponent<HoverableObject>()).Execute();
+
+                    HoverableObject newHoverableObject = hitObject ? hitObject.GetComponent<HoverableObject>() : null;
+                    if (newHoverableObject != null && !newHoverableObject.IsHovered)
+                    {
+                        HoverableObject oldHoverableObject = handledObject ? handledObject.GetComponent<HoverableObject>() : null;
+                        new SynchronizedSelectionAction(oldHoverableObject, newHoverableObject).Execute();
+                        objectState = ObjectState.IsSelected;
+                        handledObject = hitObject;
+                    }
+                }
+                else if ((hitObject == null || hitObject.GetComponent<HoverableObject>() == null) && handledObject != null)
+                {
+                    new SynchronizedSelectionAction(handledObject.GetComponent<HoverableObject>(), null).Execute();
+                    handledObject = null;
+                    objectState = ObjectState.None;
                 }
             }
             else if (objectState == ObjectState.IsGrabbed)
@@ -149,29 +168,14 @@ namespace SEE.Controls
                 ReleaseObject(handledObject, true);
             }
 
-            //if (objectState == ObjectState.IsSelected)
-            //{
-            //    AllowZooming();
-            //}
+            if (objectState == ObjectState.IsSelected)
+            {
+                AllowZooming();
+            }
 
             if (!isGrabbing && !isSelecting)
             {
                 HideHoveringFeedback();
-            }
-        }
-
-        public void Select(GameObject hitObject)
-        {
-            if (handledObject != null)
-            {
-                UnhoverObject(handledObject);
-            }
-            handledObject = hitObject;
-            HoverObject(handledObject);
-
-            if (objectState == ObjectState.IsSelected)
-            {
-                AllowZooming();
             }
         }
 
@@ -276,7 +280,7 @@ namespace SEE.Controls
         /// Gives visual feedback when an object was grabbed.
         /// </summary>
         /// <param name="heldObject">the object selected or null if none was selected</param>
-        protected virtual void ShowGrabbingFeedback(GameObject heldObject)
+        public virtual void ShowGrabbingFeedback(GameObject heldObject)
         {
         }
 
@@ -288,91 +292,33 @@ namespace SEE.Controls
         }
 
         //-----------------------------------------------------------------------
-        // Hovering actions
-        //-----------------------------------------------------------------------
-
-        /// <summary>
-        /// Called when an object is being hovered over (passed as parameter <paramref name="selectedObject"/>).
-        /// </summary>
-        /// <param name="selectedObject">the selected object</param>
-        protected virtual void HoverObject(GameObject selectedObject) // TODO: function name is misleading! function is called upon selection and not on hover
-        {
-            //Debug.LogFormat("HoverObject {0}\n", selectedObject.name);
-            HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
-            hoverComponent?.Hovered();
-            objectState = ObjectState.IsSelected;
-        }
-
-        /// <summary>
-        /// Called when an object is no longer being hovered over (passed as parameter <paramref name="selectedObject"/>).
-        /// </summary>
-        /// <param name="selectedObject">the selected object</param>
-        protected virtual void UnhoverObject(GameObject selectedObject)
-        {
-            //Debug.LogFormat("UnhoverObject {0}\n", selectedObject.name);
-            HoverableObject hoverComponent = selectedObject.GetComponent<HoverableObject>();
-            hoverComponent?.Unhovered();
-            objectState = ObjectState.None;
-        }
-
-        //-----------------------------------------------------------------------
         // Grabbing actions
         //-----------------------------------------------------------------------
 
         /// <summary>
-        /// Called when an object is grabbed (passed as parameter <paramref name="selectedObject"/>).
-        /// </summary>
-        /// <param name="selectedObject">the selected object</param>
-        protected virtual void GrabObject(GameObject selectedObject)
-        {
-            //Debug.LogFormat("GrabObject {0}\n", selectedObject.name);
-            GrabbableObject grabbingComponent = selectedObject.GetComponent<GrabbableObject>();
-            grabbingComponent?.Grab(gameObject);
-            objectState = ObjectState.IsGrabbed;
-            handledObjectMemento = new ObjectMemento(selectedObject);
-            OnObjectGrabbed.Invoke(selectedObject);           
-        }
-
-        /// <summary>
-        /// Called while an object is being grabbed (passed as parameter <paramref name="grabbedObject"/>).
-        /// This method is called on every Update().
+        /// Called when an object is grabbed (passed as parameter <paramref name="grabbedObject"/>).
         /// </summary>
         /// <param name="grabbedObject">the grabbed object</param>
-        protected virtual void HoldObject(GameObject grabbedObject)
+        protected virtual void GrabObject(GameObject grabbedObject)
         {
-            GrabbableObject grabbingComponent = grabbedObject.GetComponent<GrabbableObject>();
-            if (grabbingComponent != null)
-            {
-                ShowGrabbingFeedback(grabbedObject);
-                grabbingComponent.Continue(TipOfGrabbingRay(grabbedObject));
-            }
+            handledObjectMemento = new ObjectMemento(grabbedObject);
+            handledObject = grabbedObject;
+            objectState = ObjectState.IsGrabbed;
+            OnObjectGrabbed.Invoke(grabbedObject);
+            new SynchronizedGrabAction(grabbedObject.GetComponent<GrabbableObject>(), handledObjectMemento.Position, true).Execute();
         }
 
         /// <summary>
         /// Called when an object is released, i.e., no longer grabbed (passed as parameter <paramref name="grabbedObject"/>).
         /// </summary>
-        /// <param name="grabbedObject">the selected object</param>
+        /// <param name="grabbedObject">the grabbed object</param>
         /// <param name="actionFinalized">if true, the object should be released at its final destination; otherwise
         /// the movement should be canceled and its original position be restored</param>
         protected virtual void ReleaseObject(GameObject grabbedObject, bool actionFinalized)
         {
-            //Debug.LogFormat("ReleaseObject {0} {1}\n", grabbedObject.name, actionFinalized);
-            GrabbableObject grabbingComponent = grabbedObject.GetComponent<GrabbableObject>();
-            grabbingComponent?.Release();
-            HideGrabbingFeedback();
-            if (!actionFinalized)
-            {
-                // assert: selectedObject == handledObject.gameObject
-                Animation.Start();
-                iTween.MoveTo(handledObject.gameObject,
-                              iTween.Hash("position", handledObjectMemento.Position,
-                                          "time", 0.75f,
-                                          "oncompletetarget", gameObject,
-                                          "oncomplete", "ResetCompleted"
-               ));
-            }
-            OnObjectGrabbed.Invoke(null);
             objectState = ObjectState.IsSelected;
+            OnObjectGrabbed.Invoke(null);
+            new SynchronizedGrabAction(grabbedObject.GetComponent<GrabbableObject>(), handledObjectMemento.Position, false, actionFinalized).Execute();
         }
 
         /// <summary>
@@ -451,7 +397,7 @@ namespace SEE.Controls
         /// <summary>
         /// Animation mode with a time out.
         /// </summary>
-        private static class Animation
+        public static class Animation
         {
             /// <summary>
             /// Whether any animation is currently running.

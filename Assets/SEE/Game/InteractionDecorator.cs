@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls
@@ -13,6 +14,7 @@ namespace SEE.Controls
             go.isStatic = false; // we want to move the object during the game
             go.AddComponent<Interactable>(); // enable interactions
             GrabbableObject grabbableObject = go.AddComponent<GrabbableObject>(); // our customized reactions to hovering and grabbing events
+            Assert.IsTrue(nextInteractableObjectID != uint.MaxValue);
             grabbableObject.id = nextInteractableObjectID++;
             //go.AddComponent<Rigidbody>(); // so the object follows the laws of physics
         }

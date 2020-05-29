@@ -9,59 +9,45 @@ namespace SEE.Controls
     /// </summary>
     public class GrabbableObject : HoverableObject
     {
-        [Tooltip("The color to be used when the object is grabbed.")]
-        public Color GrabbingColor = Color.blue;
+        [Tooltip("The color to be used when the object is grabbed by client.")]
+        public Color LocalGrabbingColor = new Color(0.0f, 0.0f, 1.0f);
+
+        [Tooltip("The color to be used when the object is grabbed by some other client.")]
+        public Color RemoteGrabbingColor = new Color(0.8f, 0.2f, 1.0f);
 
         /// <summary>
         /// True if the object is currently grabbed.
         /// </summary>
-        private bool isGrabbed = false;
+        public bool isGrabbed = false;
 
         /// <summary>
         /// For highlighting the gameObject while it is being hovered over.
         /// </summary>
-        private MaterialChanger grabbingMaterial;
+        public MaterialChanger GrabbingMaterialChanger { get; private set; }
 
         protected override void Awake()
         {
             base.Awake();
-            grabbingMaterial = new MaterialChanger(gameObject, Materials.NewMaterial(GrabbingColor));
+            GrabbingMaterialChanger = new MaterialChanger(gameObject, Materials.NewMaterial(LocalGrabbingColor), Materials.NewMaterial(RemoteGrabbingColor));
         }
-
-        /// <summary>
-        /// Action to be run when given <paramref name="grabber"/> grabs the gameObject.
-        /// 
-        /// Saves the position of gameObject and moves it toward <paramref name="grabber"/>
-        /// using some animation.
-        /// </summary>
-        /// <param name="grabber">the object grabbing gameObject</param>
-        public void Grab(GameObject grabber)
+        
+        public void Grab(GameObject grabber, bool isOwner)
         {
-            if (isHovered)
+            if (IsHovered)
             {
-                base.Unhovered();
+                HighlightMaterialChanger.ResetMaterial();
             }
-            //Debug.LogFormat("OnGrabbed({0})\n", graphNode.ID);
             isGrabbed = true;
-            grabbingMaterial.UseSpecialMaterial();
-            //SaveCurrentPosition();
+            GrabbingMaterialChanger.UseSpecialMaterial(isOwner);
         }
-
-        /// <summary>
-        /// Action to be run when the grabbing object released this 
-        /// grabbed object. 
-        /// 
-        /// The grabbed object is reset to its original position.
-        /// </summary>
-        public void Release()
+        
+        public void Release(bool isOwner)
         {
-            //Debug.LogFormat("OnReleased({0})\n", graphNode.ID);
             isGrabbed = false;
-            //ResetToSavedPosition();
-            grabbingMaterial.ResetMaterial();
-            if (isHovered)
+            GrabbingMaterialChanger.ResetMaterial();
+            if (IsHovered)
             {
-                base.Hovered();
+                HighlightMaterialChanger.UseSpecialMaterial(isOwner);
             }
         }
 
@@ -109,7 +95,8 @@ namespace SEE.Controls
             if (interactable.attachedToHand == null && startingGrabType != GrabTypes.None)
             {
                 // The hand is grabbing the object
-                Grab(hand.gameObject);
+                // TODO: fill back in
+                Grab(hand.gameObject, true);
 
                 // Call this to continue receiving HandHoverUpdate messages,
                 // and prevent the hand from hovering over anything else
