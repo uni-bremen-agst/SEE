@@ -61,9 +61,9 @@ namespace SEE.Controls
         /// </summary>
         private MaterialChanger hightlight;
 
-        protected override void Start()
+        protected override void Awake()
         {
-            base.Start();
+            base.Awake();
             hightlight = new MaterialChanger(gameObject, Materials.NewMaterial(HightlightColor));
         }
 

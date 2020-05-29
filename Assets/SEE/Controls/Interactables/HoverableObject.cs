@@ -11,9 +11,9 @@ namespace SEE.Controls
     /// </summary>
     public class HoverableObject : HighlightableObject
     {
-        protected override void Start()
+        protected override void Awake()
         {
-            base.Start();
+            base.Awake();
             if (textOnPaperPrefab == null)
             {
                 // Filename of the prefab for the text on paper excluding its file extension .prefab
