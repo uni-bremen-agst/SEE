@@ -28,9 +28,24 @@ namespace SEE.Controls
 		protected const string ThrottleActionName = "Throttle";
 
 		/// <summary>
+		/// Name of the reset charts action defined by VR Steam Input
+		/// </summary>
+		protected const string ResetChartsName = "ResetCharts";
+
+		/// <summary>
+		/// Name of the create chart action defined by VR Steam Input.
+		/// </summary>
+		protected const string CreateChartActionName = "CreateChart";
+
+		/// <summary>
+		/// Name of the create chart action defined by VR Steam Input.
+		/// </summary>
+		protected const string ClickActionName = "InteractUI";
+
+		/// <summary>
 		/// Name of the move chart action defined by VR Steam Input.
 		/// </summary>
-		protected const string MoveActionName = "MoveChart";
+		protected const string MoveActionName = "Move";
 
 		/// <summary>
 		/// Name of the mouse X axis as defined in the Unity Input Manager.

@@ -69,8 +69,12 @@
       "type": "vector2"
     },
     {
-      "name": "/actions/default/in/MoveChart",
-      "type": "vector2"
+      "name": "/actions/default/in/ResetCharts",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/CreateChart",
+      "type": "boolean"
     },
     {
       "name": "/actions/default/out/Haptic",
@@ -80,7 +84,7 @@
   "action_sets": [
     {
       "name": "/actions/default",
-      "usage": "single"
+      "usage": "leftright"
     }
   ],
   "default_bindings": [
@@ -140,7 +144,8 @@
       "/actions/default/in/Move": "Move",
       "/actions/default/in/Home": "Home",
       "/actions/default/in/Zoom": "Zoom",
-      "/actions/default/in/MoveChart": "Move Chart"
+      "/actions/default/in/ResetCharts": "Reset Charts",
+      "/actions/default/in/CreateChart": "Create Chart"
     }
   ]
 }

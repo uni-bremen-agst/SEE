@@ -1,7 +1,5 @@
 ﻿using SEE.Controls;
-using SEE.GO;
 using UnityEngine;
-using Valve.VR;
 
 namespace SEE.Charts.Scripts
 {
@@ -110,50 +108,25 @@ namespace SEE.Charts.Scripts
 		public float distanceThreshold = 0.5f;
 
 		/// <summary>
-		/// The left controller input source.
-		/// </summary>
-		public SteamVR_Input_Sources source = SteamVR_Input_Sources.RightHand;
-
-		/// <summary>
-		/// The right controller input source.
-		/// </summary>
-		public SteamVR_Input_Sources movementSource = SteamVR_Input_Sources.LeftHand;
-
-		/// <summary>
-		/// The controller axis for movement.
-		/// </summary>
-		public SteamVR_Action_Single movement;
-
-		/// <summary>
-		/// The action boolean assigned to interacting with canvases in VR.
-		/// </summary>
-		public SteamVR_Action_Boolean click;
-
-		/// <summary>
-		/// Contains the scrolling information for moving charts in or out.
-		/// </summary>
-		public SteamVR_Action_Vector2 moveInOut;
-
-		/// <summary>
-		/// Controller button to reset the charts positions.
-		/// </summary>
-		[SerializeField] private SteamVR_Action_Boolean resetPosition;
-
-		/// <summary>
 		/// The canvas setup for charts that is used in non VR.
 		/// </summary>
 		[Header("Prefabs"), SerializeField] private GameObject chartsPrefab;
+
+		/// <summary>
+		/// The prefab of a new chart when in VR.
+		/// </summary>
+		[SerializeField] private GameObject chartPrefabVr;
+
+		/// <summary>
+		/// The parent Transform of new charts in VR.
+		/// </summary>
+		[SerializeField] private Transform chartsParentVr;
 
 		/// <summary>
 		/// All objects in the scene that are used by the non VR representation of charts before the game
 		/// starts.
 		/// </summary>
 		[SerializeField] private GameObject[] nonVrObjects;
-
-		/// <summary>
-		/// All objects in the scene that are used by the VR representation of charts before the game starts.
-		/// </summary>
-		[SerializeField] private GameObject[] vrObjects;
 
 		/// <summary>
 		/// The sprite for the drag button when the chart is maximized.
@@ -193,19 +166,15 @@ namespace SEE.Charts.Scripts
 		private void Start()
 		{
 			_isVirtualReality =
-				GameObject.FindGameObjectWithTag("PlayerSettings").GetComponent<PlayerSettings>()
-					.playerInputType == PlayerSettings.PlayerInputType.VR;
+				GameObject.Find("Player Settings").GetComponent<PlayerSettings>().playerInputType ==
+				PlayerSettings.PlayerInputType.VR;
 			if (!_isVirtualReality)
-			{
-				foreach (var vrObject in vrObjects) Destroy(vrObject);
 				_chartsOpen = GameObject.Find("ChartCanvas") != null
 					? GameObject.Find("ChartCanvas").transform.Find("ChartsOpen").gameObject
 					: Instantiate(chartsPrefab).transform.Find("ChartsOpen").gameObject;
-			}
 			else
-			{
-				foreach (var nonVrObject in nonVrObjects) Destroy(nonVrObject);
-			}
+				foreach (var nonVrObject in nonVrObjects)
+					Destroy(nonVrObject);
 		}
 
 		/// <summary>
@@ -214,25 +183,6 @@ namespace SEE.Charts.Scripts
 		private void Update()
 		{
 			AnimateHighlight();
-			if (_isVirtualReality)
-			{
-				if (resetPosition.GetChanged(source)) ResetPosition();
-			}
-			else
-			{
-				if (Input.GetMouseButtonDown(0))
-				{
-					var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-					if (Physics.Raycast(ray, out var hit, 100f) &&
-					    hit.transform.gameObject.TryGetComponent(out NodeRef _))
-						HighlightObject(hit.transform.gameObject);
-				}
-
-				//if (Input.GetButtonDown("SelectionMode")) selectionMode = true;
-
-				//if (Input.GetButtonUp("SelectionMode")) selectionMode = false; TODO: Fix
-			}
 		}
 
 		/// <summary>
@@ -247,7 +197,7 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// Sets the positions of all charts to be in front of the player in VR.
 		/// </summary>
-		private void ResetPosition()
+		public static void ResetPosition()
 		{
 			var cameraPosition = Camera.main.transform;
 			var charts = GameObject.FindGameObjectsWithTag("ChartContainer");
@@ -264,9 +214,9 @@ namespace SEE.Charts.Scripts
 		/// Highlights an object and all markers associated with it.
 		/// </summary>
 		/// <param name="highlight"></param>
-		public void HighlightObject(GameObject highlight)
+		public static void HighlightObject(GameObject highlight)
 		{
-			GameObject[] charts = GameObject.FindGameObjectsWithTag("Chart");
+			var charts = GameObject.FindGameObjectsWithTag("Chart");
 			foreach (var chart in charts)
 				chart.GetComponent<ChartContent>().HighlightCorrespondingMarker(highlight);
 		}
@@ -275,7 +225,7 @@ namespace SEE.Charts.Scripts
 		/// Accentuates an object and all markers associated with it.
 		/// </summary>
 		/// <param name="highlight"></param>
-		public void Accentuate(GameObject highlight)
+		public static void Accentuate(GameObject highlight)
 		{
 			var charts = GameObject.FindGameObjectsWithTag("Chart");
 			foreach (var chart in charts)
@@ -305,9 +255,23 @@ namespace SEE.Charts.Scripts
 			_chartsOpen.SetActive(!_chartsOpen.activeInHierarchy);
 		}
 
+		/// <summary>
+		/// Toggles the selection mode (Objects stay highlighted).
+		/// </summary>
 		public void ToggleSelectionMode()
 		{
 			selectionMode = !selectionMode;
+		}
+
+		/// <summary>
+		/// Initializes a new chart in front of the player in VR.
+		/// </summary>
+		public void CreateChartVr()
+		{
+			var cameraPosition = Camera.main.transform;
+
+			Instantiate(chartPrefabVr, cameraPosition.position + 2 * cameraPosition.forward,
+				Quaternion.identity, chartsParentVr);
 		}
 
 		/// <summary>

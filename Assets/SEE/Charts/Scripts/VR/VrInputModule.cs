@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using SEE.Controls;
+using UnityEngine;
 using UnityEngine.EventSystems;
-using Valve.VR;
 
 namespace SEE.Charts.Scripts.VR
 {
@@ -20,14 +20,9 @@ namespace SEE.Charts.Scripts.VR
 		private VrPointer _pointer;
 
 		/// <summary>
-		/// The input source for controlling charts in VR.
+		/// Contains the users clicking information.
 		/// </summary>
-		private SteamVR_Input_Sources _source;
-
-		/// <summary>
-		/// The action boolean assigned to interacting with canvases in VR.
-		/// </summary>
-		private SteamVR_Action_Boolean _click;
+		private ChartAction _chartAction;
 
 		public PointerEventData EventData { get; private set; }
 
@@ -48,8 +43,7 @@ namespace SEE.Charts.Scripts.VR
 		{
 			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
-			_source = _chartManager.source;
-			_click = _chartManager.click;
+			_chartAction = GameObject.Find("VRPlayer").GetComponent<Actor>().chartAction;
 		}
 
 		/// <summary>
@@ -90,16 +84,16 @@ namespace SEE.Charts.Scripts.VR
 		{
 			HandlePointerExitAndEnter(EventData, hitData.transform.gameObject);
 			ExecuteEvents.Execute(EventData.pointerDrag, EventData, ExecuteEvents.dragHandler);
-			if (_click.GetStateDown(_source)) Press(hitData.transform.gameObject);
-			if (_click.GetStateUp(_source)) Release(hitData.transform.gameObject);
+			if (_chartAction.clickDown) Press(hitData.transform.gameObject);
+			if (_chartAction.clickUp) Release(hitData.transform.gameObject);
 		}
 
 		private void ExecuteCanvas()
 		{
 			HandlePointerExitAndEnter(EventData, EventData.pointerCurrentRaycast.gameObject);
 			ExecuteEvents.Execute(EventData.pointerDrag, EventData, ExecuteEvents.dragHandler);
-			if (_click.GetStateDown(_source)) Press(EventData.pointerCurrentRaycast.gameObject);
-			if (_click.GetStateUp(_source)) Release(EventData.pointerCurrentRaycast.gameObject);
+			if (_chartAction.clickDown) Press(EventData.pointerCurrentRaycast.gameObject);
+			if (_chartAction.clickUp) Release(EventData.pointerCurrentRaycast.gameObject);
 		}
 
 		/// <summary>

@@ -145,11 +145,19 @@ namespace Valve.VR
             }
         }
         
-        public virtual SteamVR_Action_Vector2 MoveChart
+        public virtual SteamVR_Action_Boolean ResetCharts
         {
             get
             {
-                return SteamVR_Actions.default_MoveChart;
+                return SteamVR_Actions.default_ResetCharts;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean CreateChart
+        {
+            get
+            {
+                return SteamVR_Actions.default_CreateChart;
             }
         }
         

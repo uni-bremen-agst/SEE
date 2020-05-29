@@ -950,6 +950,8 @@ MonoBehaviour:
   transformationDevice: {fileID: 844925791}
   cameraAction: {fileID: 844925786}
   selectionAction: {fileID: 844925784}
+  chartControlDevice: {fileID: 0}
+  chartAction: {fileID: 0}
 --- !u!143 &844925789
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1589,8 +1591,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcc1cedcf0a20b04ca3d2bb78035f3cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInputType: 0
-  HideVRControllers: 1
+  playerInputType: 2
+  HideVRControllers: 0
   ShowControllerHints: 0
 --- !u!4 &1510433995
 Transform:
@@ -1929,6 +1931,8 @@ MonoBehaviour:
   transformationDevice: {fileID: 1566173690}
   cameraAction: {fileID: 1566173687}
   selectionAction: {fileID: 1566173680}
+  chartControlDevice: {fileID: 0}
+  chartAction: {fileID: 0}
 --- !u!4 &1566173689
 Transform:
   m_ObjectHideFlags: 0
@@ -2143,6 +2147,8 @@ MonoBehaviour:
   transformationDevice: {fileID: 1607891512}
   cameraAction: {fileID: 1607891507}
   selectionAction: {fileID: 1607891503}
+  chartControlDevice: {fileID: 0}
+  chartAction: {fileID: 0}
 --- !u!81 &1607891509
 AudioListener:
   m_ObjectHideFlags: 0
@@ -2307,7 +2313,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636335451}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.450734, y: -4, z: 0}
+  m_LocalPosition: {x: -9.010638, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -2415,7 +2421,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776319858}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.450734, y: -4, z: 0}
+  m_LocalPosition: {x: 9.010638, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}

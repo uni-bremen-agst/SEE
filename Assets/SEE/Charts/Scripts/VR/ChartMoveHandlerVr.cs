@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using SEE.Controls;
+using UnityEngine;
 using UnityEngine.EventSystems;
-using Valve.VR;
 
 namespace SEE.Charts.Scripts.VR
 {
@@ -26,19 +26,14 @@ namespace SEE.Charts.Scripts.VR
 		private Camera _mainCamera;
 
 		/// <summary>
-		/// The source of which to take the inputs for scrolling with <see cref="_moveInOut" /> from.
+		/// Contains information about scrolling input.
 		/// </summary>
-		private SteamVR_Input_Sources _source;
-
-		/// <summary>
-		/// Contains the scrolling information for moving charts in or out.
-		/// </summary>
-		private SteamVR_Action_Vector2 _moveInOut;
+		private ChartAction _chartAction;
 
 		/// <summary>
 		/// The minimum distance from the controller to the chart.
 		/// </summary>
-		private const float MinimumDistance = 1f;
+		private float _minimumDistance;
 
 		/// <summary>
 		/// The maximum distance from the controller to the chart.
@@ -66,6 +61,11 @@ namespace SEE.Charts.Scripts.VR
 		private GameObject _physicalClosed;
 
 		/// <summary>
+		/// Contains position Data of the object this script is attached to
+		/// </summary>
+		private RectTransform _rectTransform;
+
+		/// <summary>
 		/// The offset of the <see cref="Canvas" /> to <see cref="_physicalOpen" /> so the two don't clip.
 		/// </summary>
 		private readonly Vector3 _chartOffset = new Vector3(0, 0, -0.03f);
@@ -83,6 +83,7 @@ namespace SEE.Charts.Scripts.VR
 			_chartContent = parent.GetComponent<ChartContentVr>();
 			_physicalOpen = _chartContent.physicalOpen;
 			_physicalClosed = _chartContent.physicalClosed;
+			_rectTransform = GetComponent<RectTransform>();
 		}
 
 		/// <summary>
@@ -92,10 +93,9 @@ namespace SEE.Charts.Scripts.VR
 		{
 			base.GetSettingData();
 			_chartScrollSpeed = chartManager.chartScrollSpeed;
-			_source = chartManager.source;
-			_moveInOut = chartManager.moveInOut;
-			//TODO: minDist
+			_minimumDistance = chartManager.distanceThreshold;
 			_maximumDistance = chartManager.pointerLength;
+			_chartAction = GameObject.Find("VRPlayer").GetComponent<Actor>().chartAction;
 		}
 
 		/// <summary>
@@ -115,13 +115,12 @@ namespace SEE.Charts.Scripts.VR
 		/// </summary>
 		private void ScrollInOut()
 		{
-			if (!pointerDown || !_moveInOut.GetChanged(_source)) return;
-			var direction = _pointerCamera.transform.position -
-			                GetComponent<RectTransform>().position;
-			var moveBy = _moveInOut.GetAxis(_source).y * _chartScrollSpeed * Time.deltaTime;
-			if (!(_moveInOut.GetAxis(_source).y < 0 &&
-			      direction.magnitude < MinimumDistance + moveBy ||
-			      _moveInOut.GetAxis(_source).y > 0 &&
+			if (!pointerDown || _chartAction.move.Equals(0)) return;
+			var direction = _pointerCamera.transform.position - _rectTransform.position;
+			var moveBy = _chartAction.move * _chartScrollSpeed * Time.deltaTime;
+			if (!(_chartAction.move < 0 &&
+			      direction.magnitude < _minimumDistance + moveBy ||
+			      _chartAction.move > 0 &&
 			      direction.magnitude > _maximumDistance - moveBy))
 				_parent.position -= direction * moveBy;
 		}

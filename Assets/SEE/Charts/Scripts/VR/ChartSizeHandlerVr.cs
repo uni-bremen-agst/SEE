@@ -43,7 +43,7 @@ namespace SEE.Charts.Scripts.VR
 		{
 			base.Awake();
 			_chartContentVr = transform.parent.GetComponent<ChartContentVr>();
-			_virtualRealityCanvas = chart.parent.GetComponent<RectTransform>();
+			_virtualRealityCanvas = Chart.parent.GetComponent<RectTransform>();
 			_physicalOpen = _chartContentVr.physicalOpen;
 			_physicalClosed = _chartContentVr.physicalClosed;
 		}
@@ -54,17 +54,15 @@ namespace SEE.Charts.Scripts.VR
 		/// <param name="eventData">Contains position data of the pointer.</param>
 		public override void OnDrag(PointerEventData eventData)
 		{
-			if (eventData.pointerCurrentRaycast.worldPosition != Vector3.zero)
-			{
-				var pos = GetComponent<RectTransform>();
-				var oldPos = pos.position;
-				pos.position = eventData.pointerCurrentRaycast.worldPosition;
-				pos.anchoredPosition3D =
-					new Vector3(pos.anchoredPosition.x, pos.anchoredPosition.y, 0);
-				if (pos.anchoredPosition.x < minimumSize || pos.anchoredPosition.y < minimumSize)
-					pos.position = oldPos;
-				ChangeSize(pos.anchoredPosition.x, pos.anchoredPosition.y);
-			}
+			if (eventData.pointerCurrentRaycast.worldPosition == Vector3.zero) return;
+			var pos = GetComponent<RectTransform>();
+			var oldPos = pos.position;
+			pos.position = eventData.pointerCurrentRaycast.worldPosition;
+			pos.anchoredPosition3D =
+				new Vector3(pos.anchoredPosition.x, pos.anchoredPosition.y, 0);
+			if (pos.anchoredPosition.x < MinimumSize || pos.anchoredPosition.y < MinimumSize)
+				pos.position = oldPos;
+			ChangeSize(pos.anchoredPosition.x, pos.anchoredPosition.y);
 		}
 
 		/// <summary>

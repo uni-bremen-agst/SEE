@@ -169,7 +169,7 @@ namespace SEE.Charts.Scripts
 		{
 			if (_chartManager == null || LinkedObject == null) return;
 			_pointedOn = true;
-			_chartManager.HighlightObject(LinkedObject.gameObject);
+			ChartManager.HighlightObject(LinkedObject.gameObject);
 		}
 
 		/// <summary>
@@ -179,7 +179,7 @@ namespace SEE.Charts.Scripts
 		public void OnPointerExit(PointerEventData eventData)
 		{
 			if (!_pointedOn) return;
-			_chartManager.HighlightObject(LinkedObject.gameObject);
+			ChartManager.HighlightObject(LinkedObject.gameObject);
 			SetHighlighted(false);
 			_pointedOn = false;
 		}
@@ -191,7 +191,7 @@ namespace SEE.Charts.Scripts
 		private void OnDestroy()
 		{
 			if (_pointedOn && LinkedObject != null)
-				_chartManager.HighlightObject(LinkedObject.gameObject);
+				ChartManager.HighlightObject(LinkedObject.gameObject);
 		}
 	}
 }
