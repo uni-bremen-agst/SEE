@@ -1,7 +1,10 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+
+using SEE.Net;
+using System;
 using UnityEditor;
 
-namespace SEE.Net.Internal
+namespace SEEEditor
 {
 
     [CustomEditor(typeof(TransformView))]
@@ -58,3 +61,5 @@ namespace SEE.Net.Internal
     }
 
 }
+
+#endif

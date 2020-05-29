@@ -1,10 +1,12 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+
+using UnityEditor;
 using UnityEngine;
 
-namespace SEE.Net.Internal
+namespace SEEEditor
 {
 
-    [CustomEditor(typeof(Network))]
+    [CustomEditor(typeof(SEE.Net.Network))]
     public class NetworkEditor : Editor
     {
         private bool showInfos = true;
@@ -29,7 +31,7 @@ namespace SEE.Net.Internal
             {
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    System.Net.IPAddress[] ipAddresses = Network.LookupLocalIPAddresses();
+                    System.Net.IPAddress[] ipAddresses = SEE.Net.Network.LookupLocalIPAddresses();
                     foreach (System.Net.IPAddress ipAddress in ipAddresses)
                     {
                         EditorGUILayout.LabelField(ipAddress.AddressFamily.ToString(), ipAddress.ToString());
@@ -107,3 +109,5 @@ namespace SEE.Net.Internal
     }
 
 }
+
+#endif
