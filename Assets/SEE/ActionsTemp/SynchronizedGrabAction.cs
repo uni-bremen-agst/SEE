@@ -7,6 +7,7 @@ namespace SEE.Controls
     {
         public uint id;
         public Vector3 startPosition;
+        public Vector3 endPosition;
         public bool grab;
         public bool actionFinalized;
 
@@ -16,6 +17,7 @@ namespace SEE.Controls
         {
             id = grabbableObject.id;
             this.startPosition = startPosition;
+            endPosition = grabbableObject.transform.position;
             this.grab = grab;
             this.actionFinalized = actionFinalized;
         }
@@ -39,6 +41,7 @@ namespace SEE.Controls
                     }
                     else
                     {
+                        grabbableObject.transform.position = endPosition;
                         grabbableObject.Release(IsRequester());
                     }
                     if (!grab && !actionFinalized)
