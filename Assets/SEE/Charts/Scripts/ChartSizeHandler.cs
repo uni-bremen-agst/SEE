@@ -21,7 +21,7 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// The minimum size a chart can have for width and height.
 		/// </summary>
-		protected int minimumSize;
+		protected int MinimumSize;
 
 		/// <summary>
 		/// The objects that have to be moved individually when resizing the chart.
@@ -72,7 +72,7 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// Contains the size of the chart.
 		/// </summary>
-		protected RectTransform chart;
+		protected RectTransform Chart;
 
 		/// <summary>
 		/// Initializes some attributes.
@@ -82,7 +82,7 @@ namespace SEE.Charts.Scripts
 			GetSettingData();
 			var parent = transform.parent;
 			_chartContent = parent.GetComponent<ChartContent>();
-			chart = parent.GetComponent<RectTransform>();
+			Chart = parent.GetComponent<RectTransform>();
 		}
 
 		/// <summary>
@@ -92,7 +92,7 @@ namespace SEE.Charts.Scripts
 		{
 			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
-			minimumSize = _chartManager.minimumSize;
+			MinimumSize = _chartManager.minimumSize;
 		}
 
 		/// <summary>
@@ -106,8 +106,8 @@ namespace SEE.Charts.Scripts
 			Vector2 oldPos = pos.position;
 			pos.position = eventData.position;
 			var anchoredPos = pos.anchoredPosition;
-			if (anchoredPos.x / pos.lossyScale.x < minimumSize ||
-			    anchoredPos.y / pos.lossyScale.y < minimumSize) pos.position = oldPos;
+			if (anchoredPos.x / pos.lossyScale.x < MinimumSize ||
+			    anchoredPos.y / pos.lossyScale.y < MinimumSize) pos.position = oldPos;
 			anchoredPos = pos.anchoredPosition;
 			ChangeSize(anchoredPos.x, anchoredPos.y);
 		}
@@ -132,7 +132,7 @@ namespace SEE.Charts.Scripts
 			var yDropdown = _chartContent.axisDropdownY.GetComponent<RectTransform>();
 			yDropdown.anchoredPosition = new Vector2(yDropdown.anchoredPosition.x, height / 2);
 			yDropdown.sizeDelta = new Vector2(height / 2, yDropdown.sizeDelta.y);
-			chart.sizeDelta = new Vector2(width, height);
+			Chart.sizeDelta = new Vector2(width, height);
 			topRight.localPosition = new Vector2(width / 2, height / 2);
 			topLeft.localPosition = new Vector2(-width / 2, height / 2);
 			bottomRight.localPosition = new Vector2(width / 2, -height / 2);

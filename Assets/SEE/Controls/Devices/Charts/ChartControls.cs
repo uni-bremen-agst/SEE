@@ -9,5 +9,11 @@ namespace SEE.Controls.Devices
 		public abstract bool Select { get; }
 
 		public abstract Vector2 Move { get; }
+
+		public abstract bool ResetCharts { get; }
+
+		public abstract bool Click { get; }
+
+		public abstract bool Create { get; }
 	}
 }

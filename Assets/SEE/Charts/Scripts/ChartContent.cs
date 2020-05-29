@@ -236,7 +236,7 @@ namespace SEE.Charts.Scripts
 				var rootToggle = tempObject.GetComponent<ScrollViewToggle>();
 				var highlights = inScene.GetComponent<NodeHighlights>();
 				rootToggle.LinkedObject = highlights;
-				highlights.ScrollViewToggle = rootToggle;
+				highlights.scrollViewToggle = rootToggle;
 				rootToggle.SetLabel(root.SourceName);
 				tempObject.transform.localPosition =
 					headerOffset + new Vector2(0f, _yGap) * index;
@@ -267,7 +267,7 @@ namespace SEE.Charts.Scripts
 			toggle.Parent = parentToggle;
 			var highlights = dataObject.GetComponent<NodeHighlights>();
 			toggle.LinkedObject = highlights;
-			highlights.ScrollViewToggle = toggle;
+			highlights.scrollViewToggle = toggle;
 			toggle.SetLabel(dataObject.name);
 			tempObject.transform.localPosition = childOffset + new Vector2(0f, gap) * index;
 			toggle.Initialize(this);
@@ -289,7 +289,7 @@ namespace SEE.Charts.Scripts
 				toggle.Parent = parentToggle;
 				var highlights = inScene.GetComponent<NodeHighlights>();
 				toggle.LinkedObject = highlights;
-				highlights.ScrollViewToggle = toggle;
+				highlights.scrollViewToggle = toggle;
 				toggle.SetLabel(child.SourceName);
 				tempObject.transform.localPosition =
 					childOffset + new Vector2(_xGap, 0f) * hierarchy +
@@ -540,7 +540,7 @@ namespace SEE.Charts.Scripts
 				marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
 				var script = marker.GetComponent<ChartMarker>();
 				script.linkedObject = data;
-				script.ScrollViewToggle = data.GetComponent<NodeHighlights>().ScrollViewToggle;
+				script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
 				var node = data.GetComponent<NodeRef>().node;
 				node.TryGetNumeric(axisDropdownX.Value, out var valueX);
 				node.TryGetNumeric(axisDropdownY.Value, out var valueY);
@@ -590,7 +590,7 @@ namespace SEE.Charts.Scripts
 					marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
 					var script = marker.GetComponent<ChartMarker>();
 					script.linkedObject = data;
-					script.ScrollViewToggle = data.GetComponent<NodeHighlights>().ScrollViewToggle;
+					script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
 					var node = data.GetComponent<NodeRef>().node;
 					node.TryGetNumeric(metric, out var value);
 					var type = node.IsLeaf() ? "Building" : "Node";
@@ -634,7 +634,7 @@ namespace SEE.Charts.Scripts
 				marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
 				var script = marker.GetComponent<ChartMarker>();
 				script.linkedObject = data;
-				script.ScrollViewToggle = data.GetComponent<NodeHighlights>().ScrollViewToggle;
+				script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
 				var node = data.GetComponent<NodeRef>().node;
 				node.TryGetNumeric(axisDropdownX.Value, out var valueX);
 				node.TryGetNumeric(axisDropdownY.Value, out var valueY);
@@ -663,7 +663,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		/// <param name="marker">The marker to check.</param>
 		/// <param name="updatedMarkers">The already active new markers.</param>
-		private void CheckOverlapping(GameObject marker, GameObject[] updatedMarkers)
+		private static void CheckOverlapping(GameObject marker, GameObject[] updatedMarkers)
 		{
 			var image = marker.GetComponent<Image>();
 			if (updatedMarkers.Length > 10)
@@ -671,14 +671,13 @@ namespace SEE.Charts.Scripts
 				{
 					var updatedMarker = updatedMarkers[i];
 					if (Vector3.Distance(marker.transform.position,
-							updatedMarker.transform.position)
-						.CompareTo(MarkerOverlapDistance * marker.transform.lossyScale.x) < 0)
-						if (image.color.g - 0.1f >= 0)
-						{
-							var oldColor = image.color;
-							image.color = new Color(oldColor.r, oldColor.g - 0.1f,
-								oldColor.b - 0.1f);
-						}
+							    updatedMarker.transform.position)
+						    .CompareTo(MarkerOverlapDistance * marker.transform.lossyScale.x) >=
+					    0) return;
+					if (image.color.g - 0.1f < 0) return;
+					var oldColor = image.color;
+					image.color = new Color(oldColor.r, oldColor.g - 0.1f,
+						oldColor.b - 0.1f);
 				}
 			else
 				foreach (var updatedMarker in updatedMarkers)

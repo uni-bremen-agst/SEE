@@ -10,6 +10,18 @@ namespace SEE.Controls
 
 		[HideInInspector] public ChartControls chartControlsDevice;
 
+		[HideInInspector] public float move;
+
+		/// <summary>
+		/// Click was false in the last update and true in this update.
+		/// </summary>
+		[HideInInspector] public bool clickDown;
+
+		/// <summary>
+		/// Click was true in the last update and false in this update.
+		/// </summary>
+		[HideInInspector] public bool clickUp;
+
 		private void Start()
 		{
 			ChartManager = GameObject.FindGameObjectWithTag("ChartManager")

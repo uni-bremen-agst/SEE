@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using UnityEngine;
-using Valve.VR;
 
 namespace SEE.Charts.Scripts.VR
 {
@@ -13,16 +12,6 @@ namespace SEE.Charts.Scripts.VR
 		/// Contains settings used in this script.
 		/// </summary>
 		private ChartManager _chartManager;
-
-		/// <summary>
-		/// The controller to activate movement with.
-		/// </summary>
-		private SteamVR_Input_Sources _movementSource;
-
-		/// <summary>
-		/// The axis containing the amount the player wants to move.
-		/// </summary>
-		private SteamVR_Action_Single _movement;
 
 		/// <summary>
 		/// A multiplier to adjust movement speed, if it is not right.
@@ -59,21 +48,19 @@ namespace SEE.Charts.Scripts.VR
 		{
 			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
-			_movementSource = _chartManager.movementSource;
-			_movement = _chartManager.movement;
 		}
 
-		/// <summary>
-		/// Checks if the player triggered movement and translates him.
-		/// </summary>
-		private void Update()
-		{
-			var axis = _movement.GetAxis(_movementSource);
-			if (axis.Equals(0)) return;
-			if (_chartsDeactivated != null) StopCoroutine(_chartsDeactivated);
-			_chartsDeactivated = StartCoroutine(DeactivateCharts());
-			transform.Translate(hand.forward * axis * MovementSpeed);
-		}
+		///// <summary>
+		///// Checks if the player triggered movement and translates him.
+		///// </summary>
+		//private void Update()
+		//{
+		//	var axis = _movement.GetAxis(_movementSource);
+		//	if (axis.Equals(0)) return;
+		//	if (_chartsDeactivated != null) StopCoroutine(_chartsDeactivated);
+		//	_chartsDeactivated = StartCoroutine(DeactivateCharts());
+		//	transform.Translate(MovementSpeed * axis * hand.forward);
+		//} TODO: Merge with existing movement system
 
 		/// <summary>
 		/// Deactivates all charts for a short time to not distract while moving in VR.

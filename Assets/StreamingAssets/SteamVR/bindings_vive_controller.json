@@ -14,15 +14,40 @@
          "chords" : [],
          "haptics" : [
             {
-               "output" : "/actions/default/out/haptic",
+               "output" : "none",
                "path" : "/user/hand/left/output/haptic"
             },
             {
-               "output" : "/actions/default/out/haptic",
+               "output" : "none",
                "path" : "/user/hand/right/output/haptic"
             }
          ],
-         "poses" : [],
+         "poses" : [
+            {
+               "output" : "none",
+               "path" : "/user/hand/left/pose/base"
+            },
+            {
+               "output" : "none",
+               "path" : "/user/hand/right/pose/base"
+            },
+            {
+               "output" : "none",
+               "path" : "/user/hand/left/pose/front"
+            },
+            {
+               "output" : "none",
+               "path" : "/user/hand/right/pose/front"
+            },
+            {
+               "output" : "/actions/default/in/pose",
+               "path" : "/user/hand/left/pose/gdc2015"
+            },
+            {
+               "output" : "/actions/default/in/pose",
+               "path" : "/user/hand/right/pose/gdc2015"
+            }
+         ],
          "skeleton" : [
             {
                "output" : "/actions/default/in/skeletonlefthand",
@@ -50,7 +75,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/default/in/teleport"
+                     "output" : "/actions/default/in/interactui"
                   }
                },
                "mode" : "trackpad",
@@ -68,10 +93,13 @@
             {
                "inputs" : {
                   "scroll" : {
-                     "output" : "/actions/default/in/movechart"
+                     "output" : "/actions/default/in/zoom"
                   }
                },
                "mode" : "scroll",
+               "parameters" : {
+                  "scroll_mode" : "smooth"
+               },
                "path" : "/user/hand/left/input/trackpad"
             },
             {
@@ -82,6 +110,12 @@
             {
                "inputs" : {
                   "click" : {
+                     "output" : "/actions/default/in/select"
+                  },
+                  "double" : {
+                     "output" : "/actions/default/in/createchart"
+                  },
+                  "long" : {
                      "output" : "/actions/default/in/home"
                   }
                },
@@ -91,6 +125,12 @@
             {
                "inputs" : {
                   "click" : {
+                     "output" : "/actions/default/in/cancel"
+                  },
+                  "double" : {
+                     "output" : "/actions/default/in/resetcharts"
+                  },
+                  "long" : {
                      "output" : "/actions/default/in/home"
                   }
                },
@@ -123,16 +163,22 @@
             {
                "inputs" : {
                   "scroll" : {
-                     "output" : "/actions/default/in/movechart"
+                     "output" : "/actions/default/in/move"
                   }
                },
                "mode" : "scroll",
+               "parameters" : {
+                  "scroll_mode" : "smooth"
+               },
                "path" : "/user/hand/right/input/trackpad"
             },
             {
                "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/grabpinch"
+                  },
                   "pull" : {
-                     "output" : "/actions/default/in/throttle"
+                     "output" : "/actions/default/in/grab"
                   }
                },
                "mode" : "trigger",

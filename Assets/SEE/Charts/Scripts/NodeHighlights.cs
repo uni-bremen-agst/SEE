@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 namespace SEE.Charts.Scripts
 {
@@ -12,11 +13,6 @@ namespace SEE.Charts.Scripts
 		IPointerClickHandler
 	{
 		/// <summary>
-		/// Contains some settings used in this script.
-		/// </summary>
-		private ChartManager _chartManager;
-
-		/// <summary>
 		/// Determines if this objects node will be displayed in charts.
 		/// </summary>
 		public IDictionary showInChart = new Dictionary<ChartContent, bool>();
@@ -24,16 +20,8 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// A toggle linked to this object.
 		/// </summary>
-		public ScrollViewToggle ScrollViewToggle;
-
-		/// <summary>
-		/// Initializes some variables.
-		/// </summary>
-		private void Awake()
-		{
-			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
-				.GetComponent<ChartManager>();
-		}
+		[FormerlySerializedAs("ScrollViewToggle")]
+		public ScrollViewToggle scrollViewToggle;
 
 		/// <summary>
 		/// Accentuates this object and all linked markers when the user starts hovering over it if it was
@@ -45,7 +33,7 @@ namespace SEE.Charts.Scripts
 			for (var i = 0; i < transform.childCount; i++)
 				if (transform.GetChild(i).gameObject.name.Equals(gameObject.name + "(Clone)"))
 				{
-					_chartManager.Accentuate(gameObject);
+					ChartManager.Accentuate(gameObject);
 					return;
 				}
 		}
@@ -60,7 +48,7 @@ namespace SEE.Charts.Scripts
 			for (var i = 0; i < transform.childCount; i++)
 				if (transform.GetChild(i).gameObject.name.Equals(gameObject.name + "(Clone)"))
 				{
-					_chartManager.Accentuate(gameObject);
+					ChartManager.Accentuate(gameObject);
 					return;
 				}
 		}
@@ -71,7 +59,7 @@ namespace SEE.Charts.Scripts
 		/// <param name="eventData"></param>
 		public void OnPointerClick(PointerEventData eventData)
 		{
-			_chartManager.HighlightObject(gameObject);
+			ChartManager.HighlightObject(gameObject);
 			StartCoroutine(Accentuate());
 		}
 
@@ -82,7 +70,7 @@ namespace SEE.Charts.Scripts
 		private IEnumerator Accentuate()
 		{
 			yield return new WaitForEndOfFrame();
-			_chartManager.Accentuate(gameObject);
+			ChartManager.Accentuate(gameObject);
 		}
 	}
 }

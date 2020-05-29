@@ -182,7 +182,7 @@ namespace SEE.Charts.Scripts
 			yield return new WaitForSeconds(_clickDelay);
 			if (_waiting)
 			{
-				_chartManager.HighlightObject(linkedObject);
+				ChartManager.HighlightObject(linkedObject);
 			}
 			else
 			{
@@ -218,7 +218,7 @@ namespace SEE.Charts.Scripts
 						.GetComponent<LineRenderer>();
 					var linePos = _highlightCopy.transform.localPosition;
 					line.SetPositions(new[]
-						{linePos, linePos + new Vector3(0f, _highlightLineLength)});
+						{linePos, linePos + new Vector3(0f, _highlightLineLength)}); //TODO: Fix Position
 				}
 			}
 			else
@@ -390,7 +390,7 @@ namespace SEE.Charts.Scripts
 		public void OnPointerEnter(PointerEventData eventData)
 		{
 			infoText.gameObject.SetActive(true);
-			if (TimedHighlight != null) _chartManager.Accentuate(linkedObject);
+			if (TimedHighlight != null) ChartManager.Accentuate(linkedObject);
 		}
 
 		/// <summary>
@@ -400,7 +400,7 @@ namespace SEE.Charts.Scripts
 		public void OnPointerExit(PointerEventData eventData)
 		{
 			infoText.gameObject.SetActive(false);
-			if (_accentuated) _chartManager.Accentuate(linkedObject);
+			if (_accentuated) ChartManager.Accentuate(linkedObject);
 		}
 
 		/// <summary>
