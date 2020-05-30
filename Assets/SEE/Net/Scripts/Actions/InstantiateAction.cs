@@ -1,10 +1,8 @@
-﻿using SEE.Net;
-using SEE.Net.Internal;
-using SEE.Utils;
+﻿using SEE.Utils;
 using System.Net;
 using UnityEngine;
 
-namespace SEE.Controls
+namespace SEE.Net
 {
 
     public class InstantiateAction : AbstractAction
@@ -32,8 +30,8 @@ namespace SEE.Controls
         private void Initialize(string prefabPath, Vector3 position, Quaternion rotation, Vector3 scale)
         {
             this.prefabPath = prefabPath;
-            ownerIpAddress = Net.Network.UseInOfflineMode ? null : Client.LocalEndPoint.Address.ToString();
-            ownerPort = Net.Network.UseInOfflineMode ? -1 : Client.LocalEndPoint.Port;
+            ownerIpAddress = Network.UseInOfflineMode ? null : Client.LocalEndPoint.Address.ToString();
+            ownerPort = Network.UseInOfflineMode ? -1 : Client.LocalEndPoint.Port;
             this.position = position;
             this.rotation = rotation;
             this.scale = scale;
@@ -62,7 +60,7 @@ namespace SEE.Controls
                 return false;
             }
 
-            if (!Net.Network.UseInOfflineMode)
+            if (!Network.UseInOfflineMode)
             {
                 go.GetComponent<ViewContainer>().Initialize(viewID, new IPEndPoint(IPAddress.Parse(ownerIpAddress), ownerPort));
             }

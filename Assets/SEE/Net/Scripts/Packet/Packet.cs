@@ -1,7 +1,6 @@
 ﻿using System;
-using UnityEngine;
 
-namespace SEE.Net.Internal
+namespace SEE.Net
 {
 
     internal abstract class AbstractPacket

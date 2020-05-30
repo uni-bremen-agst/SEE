@@ -1,17 +1,18 @@
-﻿using UnityEngine;
+﻿using SEE.Controls;
+using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.Controls
+namespace SEE.Net
 {
 
-    public class SynchronizedSelectionAction : AbstractAction
+    public class SelectionAction : AbstractAction
     {
         public uint oldID;
         public uint newID;
 
 
 
-        public SynchronizedSelectionAction(HoverableObject oldHoverableObject, HoverableObject newHoverableObject) : base(true)
+        public SelectionAction(HoverableObject oldHoverableObject, HoverableObject newHoverableObject) : base(true)
         {
             Assert.IsTrue(oldHoverableObject != newHoverableObject);
             Assert.IsTrue(oldHoverableObject != null || newHoverableObject != null);

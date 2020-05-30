@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.Controls
+namespace SEE.Net
 {
 
     public class LoadCityAction : AbstractAction

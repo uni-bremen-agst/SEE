@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
-namespace SEE.Net.Internal
+namespace SEE.Net
 {
 
     public static class Client
