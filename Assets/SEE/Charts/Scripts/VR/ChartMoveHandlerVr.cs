@@ -92,9 +92,9 @@ namespace SEE.Charts.Scripts.VR
 		protected override void GetSettingData()
 		{
 			base.GetSettingData();
-			_chartScrollSpeed = chartManager.chartScrollSpeed;
-			_minimumDistance = chartManager.distanceThreshold;
-			_maximumDistance = chartManager.pointerLength;
+			_chartScrollSpeed = ChartManager.chartScrollSpeed;
+			_minimumDistance = ChartManager.distanceThreshold;
+			_maximumDistance = ChartManager.pointerLength;
 			_chartAction = GameObject.Find("VRPlayer").GetComponent<Actor>().chartAction;
 		}
 
@@ -115,7 +115,7 @@ namespace SEE.Charts.Scripts.VR
 		/// </summary>
 		private void ScrollInOut()
 		{
-			if (!pointerDown || _chartAction.move.Equals(0)) return;
+			if (!PointerDown || _chartAction.move.Equals(0)) return;
 			var direction = _pointerCamera.transform.position - _rectTransform.position;
 			var moveBy = _chartAction.move * _chartScrollSpeed * Time.deltaTime;
 			if (!(_chartAction.move < 0 &&
@@ -142,8 +142,8 @@ namespace SEE.Charts.Scripts.VR
 		/// </summary>
 		protected override void ToggleMinimize()
 		{
-			_physicalOpen.SetActive(minimized);
-			_physicalClosed.SetActive(!minimized);
+			_physicalOpen.SetActive(Minimized);
+			_physicalClosed.SetActive(!Minimized);
 			base.ToggleMinimize();
 		}
 	}

@@ -24,5 +24,13 @@ namespace SEE.Charts.Scripts
 		{
 			Instantiate(chartPrefab, chartsCanvas).GetComponent<ChartContent>();
 		}
+
+		/// <summary>
+		/// Deactivates the chart canvas.
+		/// </summary>
+		public void CloseCharts()
+		{
+			gameObject.SetActive(false);
+		}
 	}
 }

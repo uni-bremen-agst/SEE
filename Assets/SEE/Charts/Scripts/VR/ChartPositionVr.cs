@@ -29,6 +29,8 @@ namespace SEE.Charts.Scripts.VR
 		/// </summary>
 		private Coroutine _movingChart;
 
+		private const float ChartSpeed = 2f; //TODO: Move to manager
+
 		/// <summary>
 		/// Calls methods for initialization.
 		/// </summary>
@@ -71,7 +73,7 @@ namespace SEE.Charts.Scripts.VR
 		private IEnumerator MoveChart()
 		{
 			var startPosition = transform.position;
-			for (var time = 0f; time < 1f; time += Time.deltaTime)
+			for (var time = 0f; time < 1f; time += Time.deltaTime * ChartSpeed)
 			{
 				transform.position = Vector3.Lerp(startPosition, cameraTransform.position, time);
 				yield return new WaitForEndOfFrame();
