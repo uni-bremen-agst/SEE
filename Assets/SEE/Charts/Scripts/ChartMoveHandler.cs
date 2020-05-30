@@ -14,7 +14,7 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// Contains some settings used in this script.
 		/// </summary>
-		protected ChartManager chartManager;
+		protected ChartManager ChartManager;
 
 		/// <summary>
 		/// Contains the position of the chart on the <see cref="Canvas" />.
@@ -40,12 +40,12 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// If the pointer is currently down or not.
 		/// </summary>
-		protected bool pointerDown;
+		protected bool PointerDown;
 
 		/// <summary>
 		/// If the chart is currently minimized or not.
 		/// </summary>
-		protected bool minimized;
+		protected bool Minimized;
 
 		/// <summary>
 		/// The sprite for the drag button when the chart is maximized.
@@ -73,7 +73,7 @@ namespace SEE.Charts.Scripts
 		[SerializeField] private GameObject contentSelection;
 
 		/// <summary>
-		/// Links the <see cref="ChartManager" /> and initializes attributes.
+		/// Links the <see cref="Scripts.ChartManager" /> and initializes attributes.
 		/// </summary>
 		protected virtual void Awake()
 		{
@@ -83,15 +83,15 @@ namespace SEE.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Links the <see cref="ChartManager" /> and gets its setting data.
+		/// Links the <see cref="Scripts.ChartManager" /> and gets its setting data.
 		/// </summary>
 		protected virtual void GetSettingData()
 		{
-			chartManager = GameObject.FindGameObjectWithTag("ChartManager")
+			ChartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
-			_dragDelay = chartManager.dragDelay;
-			_maximizedSprite = chartManager.maximizedSprite;
-			_minimizedSprite = chartManager.minimizedSprite;
+			_dragDelay = ChartManager.dragDelay;
+			_maximizedSprite = ChartManager.maximizedSprite;
+			_minimizedSprite = ChartManager.minimizedSprite;
 		}
 
 		/// <summary>
@@ -99,7 +99,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		protected virtual void Update()
 		{
-			if (pointerDown) _timer += Time.deltaTime;
+			if (PointerDown) _timer += Time.deltaTime;
 		}
 
 		/// <summary>
@@ -125,7 +125,7 @@ namespace SEE.Charts.Scripts
 		public void OnPointerDown(PointerEventData eventData)
 		{
 			_timer = 0f;
-			pointerDown = true;
+			PointerDown = true;
 			chartInfo.SetActive(false);
 		}
 
@@ -135,9 +135,9 @@ namespace SEE.Charts.Scripts
 		/// <param name="eventData">Event payload associated with pointer (mouse / touch) events.</param>
 		public void OnPointerUp(PointerEventData eventData)
 		{
-			pointerDown = false;
+			PointerDown = false;
 			if (_timer < _dragDelay) ToggleMinimize();
-			if (minimized) chartInfo.SetActive(true);
+			if (Minimized) chartInfo.SetActive(true);
 		}
 
 		/// <summary>
@@ -146,7 +146,7 @@ namespace SEE.Charts.Scripts
 		/// <param name="eventData"></param>
 		public void OnPointerEnter(PointerEventData eventData)
 		{
-			if (minimized && !pointerDown) chartInfo.SetActive(true);
+			if (Minimized && !PointerDown) chartInfo.SetActive(true);
 		}
 
 		/// <summary>
@@ -173,12 +173,12 @@ namespace SEE.Charts.Scripts
 		protected virtual void ToggleMinimize()
 		{
 			var chart = _chart.GetComponent<ChartContent>();
-			chart.labelsPanel.gameObject.SetActive(minimized);
-			chart.dataPanel.gameObject.SetActive(minimized);
-			sizeButton.SetActive(minimized);
-			contentSelection.SetActive(minimized);
-			GetComponent<Image>().sprite = minimized ? _maximizedSprite : _minimizedSprite;
-			minimized = !minimized;
+			chart.labelsPanel.gameObject.SetActive(Minimized);
+			chart.dataPanel.gameObject.SetActive(Minimized);
+			sizeButton.SetActive(Minimized);
+			contentSelection.SetActive(Minimized);
+			GetComponent<Image>().sprite = Minimized ? _maximizedSprite : _minimizedSprite;
+			Minimized = !Minimized;
 		}
 	}
 }

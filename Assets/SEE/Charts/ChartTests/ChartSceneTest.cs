@@ -214,8 +214,6 @@ namespace SEE.Charts.ChartTests
 		}
 
 		//Test Highlights
-
-		//Test 
 	}
 
 	/// <summary>

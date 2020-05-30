@@ -118,11 +118,6 @@ namespace SEE.Charts.Scripts
 		[SerializeField] private GameObject chartPrefabVr;
 
 		/// <summary>
-		/// The parent Transform of new charts in VR.
-		/// </summary>
-		[SerializeField] private Transform chartsParentVr;
-
-		/// <summary>
 		/// All objects in the scene that are used by the non VR representation of charts before the game
 		/// starts.
 		/// </summary>
@@ -271,7 +266,7 @@ namespace SEE.Charts.Scripts
 			var cameraPosition = Camera.main.transform;
 
 			Instantiate(chartPrefabVr, cameraPosition.position + 2 * cameraPosition.forward,
-				Quaternion.identity, chartsParentVr);
+				Quaternion.identity, transform.GetChild(0));
 		}
 
 		/// <summary>
