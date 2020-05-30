@@ -183,18 +183,15 @@ namespace SEE.Controls
             // notified via a call to OnZoomingComplete().
             if (selectionDevice.IsZoomingIn)
             {
-                Animation.Start();
-                Transformer.ZoomInto(gameObject, handledObject);
+                new Net.ZoomIntoAction(handledObject.GetComponent<HoverableObject>()).Execute();
             }
             else if (selectionDevice.IsZoomingOut)
             {
-                Animation.Start();
-                Transformer.ZoomOutOf(gameObject, handledObject);
+                new Net.ZoomOutOfAction(handledObject.GetComponent<HoverableObject>()).Execute();
             }
             else if (selectionDevice.IsZoomingHome)
             {
-                Animation.Start();
-                Transformer.ZoomRoot(gameObject, handledObject);
+                new Net.ZoomRootAction(handledObject.GetComponent<HoverableObject>()).Execute();
             }
         }
 

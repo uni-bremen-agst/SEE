@@ -38,7 +38,7 @@ namespace SEE.Net
 
         protected bool IsRequester()
         {
-            if (Net.Network.UseInOfflineMode)
+            if (Network.UseInOfflineMode)
             {
                 return true;
             }
