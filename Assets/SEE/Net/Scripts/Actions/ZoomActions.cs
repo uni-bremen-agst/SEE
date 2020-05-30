@@ -6,6 +6,11 @@ using UnityEngine.Assertions;
 namespace SEE.Net
 {
 
+    // TODO(torben): having multiple zoom levels at the same time does not work for
+    // buffered packets! For very old packets, we want the GameObject to simply jump to
+    // the target. If one is currently active - which must be detectable somehow - we
+    // want 'jump' into the middle of the animation somehow and finish the remaining
+    // part of the animation
     public class ZoomIntoAction : AbstractAction
     {
         public uint id;
@@ -27,15 +32,13 @@ namespace SEE.Net
 
         protected override bool ExecuteOnClient()
         {
-            foreach (HoverableObject hoverableObject in Object.FindObjectsOfType<HoverableObject>()) // TODO(torben): faster acquisition
+            HoverableObject hoverableObject = (HoverableObject)InteractableObject.Get(id);
+            if (hoverableObject)
             {
-                if (hoverableObject.id == id)
-                {
-                    Controls.SelectionAction selectionAction = Object.FindObjectOfType<Controls.SelectionAction>();
-                    Controls.SelectionAction.Animation.Start();
-                    Transformer.ZoomInto(selectionAction.gameObject, hoverableObject.gameObject);
-                    return true;
-                }
+                Controls.SelectionAction selectionAction = Object.FindObjectOfType<Controls.SelectionAction>();
+                Controls.SelectionAction.Animation.Start();
+                Transformer.ZoomInto(selectionAction.gameObject, hoverableObject.gameObject);
+                return true;
             }
             return false;
         }
@@ -82,15 +85,13 @@ namespace SEE.Net
 
         protected override bool ExecuteOnClient()
         {
-            foreach (HoverableObject hoverableObject in Object.FindObjectsOfType<HoverableObject>()) // TODO(torben): faster acquisition
+            HoverableObject hoverableObject = (HoverableObject)InteractableObject.Get(id);
+            if (hoverableObject)
             {
-                if (hoverableObject.id == id)
-                {
-                    Controls.SelectionAction selectionAction = Object.FindObjectOfType<Controls.SelectionAction>();
-                    Controls.SelectionAction.Animation.Start();
-                    Transformer.ZoomOutOf(selectionAction.gameObject, hoverableObject.gameObject);
-                    return true;
-                }
+                Controls.SelectionAction selectionAction = Object.FindObjectOfType<Controls.SelectionAction>();
+                Controls.SelectionAction.Animation.Start();
+                Transformer.ZoomOutOf(selectionAction.gameObject, hoverableObject.gameObject);
+                return true;
             }
             return false;
         }
@@ -137,15 +138,13 @@ namespace SEE.Net
 
         protected override bool ExecuteOnClient()
         {
-            foreach (HoverableObject hoverableObject in Object.FindObjectsOfType<HoverableObject>()) // TODO(torben): faster acquisition
+            HoverableObject hoverableObject = (HoverableObject)InteractableObject.Get(id);
+            if (hoverableObject)
             {
-                if (hoverableObject.id == id)
-                {
-                    Controls.SelectionAction selectionAction = Object.FindObjectOfType<Controls.SelectionAction>();
-                    Controls.SelectionAction.Animation.Start();
-                    Transformer.ZoomRoot(selectionAction.gameObject, hoverableObject.gameObject);
-                    return true;
-                }
+                Controls.SelectionAction selectionAction = Object.FindObjectOfType<Controls.SelectionAction>();
+                Controls.SelectionAction.Animation.Start();
+                Transformer.ZoomRoot(selectionAction.gameObject, hoverableObject.gameObject);
+                return true;
             }
             return false;
         }

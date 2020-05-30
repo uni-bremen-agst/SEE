@@ -32,36 +32,33 @@ namespace SEE.Net
 
         protected override bool ExecuteOnClient()
         {
-            foreach (GrabbableObject grabbableObject in Object.FindObjectsOfType<GrabbableObject>()) // TODO(torben): save them in a faster way!
+            GrabbableObject grabbableObject = (GrabbableObject)InteractableObject.Get(id);
+            if (grabbableObject)
             {
-                if (grabbableObject.id == id)
+                if (grab)
                 {
-                    if (grab)
-                    {
-                        grabbableObject.Grab(null, IsRequester());
-                    }
-                    else
-                    {
-                        grabbableObject.transform.position = endPosition;
-                        grabbableObject.Release(IsRequester());
-                    }
-                    if (!grab && !actionFinalized)
-                    {
-                        Controls.SelectionAction selectionAction = Object.FindObjectOfType<Controls.SelectionAction>();
-                        Controls.SelectionAction.Animation.Start();
-                        iTween.MoveTo(grabbableObject.gameObject,
-                            iTween.Hash(
-                                "position", startPosition,
-                                "time", 0.75f,
-                                "oncompletetarget", selectionAction.gameObject,
-                                "oncomplete", "ResetCompleted"
-                            )
-                        );
-                    }
-                    return true;
+                    grabbableObject.Grab(null, IsRequester());
                 }
+                else
+                {
+                    grabbableObject.transform.position = endPosition;
+                    grabbableObject.Release(IsRequester());
+                }
+                if (!grab && !actionFinalized)
+                {
+                    Controls.SelectionAction selectionAction = Object.FindObjectOfType<Controls.SelectionAction>();
+                    Controls.SelectionAction.Animation.Start();
+                    iTween.MoveTo(grabbableObject.gameObject,
+                        iTween.Hash(
+                            "position", startPosition,
+                            "time", 0.75f,
+                            "oncompletetarget", selectionAction.gameObject,
+                            "oncomplete", "ResetCompleted"
+                        )
+                    );
+                }
+                return true;
             }
-
             return false;
         }
 
