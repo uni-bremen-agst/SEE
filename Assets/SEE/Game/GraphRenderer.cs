@@ -140,7 +140,7 @@ namespace SEE.Game
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<ILayoutNode> layoutNodes)
         {
-            float minimalEdgeLevelDistance = 1.5f * settings.EdgeWidth;
+            float minimalEdgeLevelDistance = 2.5f * settings.EdgeWidth;
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
             {
