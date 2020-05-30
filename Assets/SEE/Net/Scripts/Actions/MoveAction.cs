@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using SEE.Controls;
+using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.Controls
+namespace SEE.Net
 {
 
     public class MoveAction : AbstractAction

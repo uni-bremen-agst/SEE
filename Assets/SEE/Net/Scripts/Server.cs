@@ -6,7 +6,7 @@ using System.Linq;
 using System.Net;
 using UnityEngine;
 
-namespace SEE.Net.Internal
+namespace SEE.Net
 {
 
     public static class Server

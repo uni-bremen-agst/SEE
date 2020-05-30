@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 
-namespace SEE.Net.Internal
+namespace SEE.Net
 {
 
-    public class SEENetPlayer : MonoBehaviour
+    public class Player : MonoBehaviour
     {
         Transform cameraTransform;
 

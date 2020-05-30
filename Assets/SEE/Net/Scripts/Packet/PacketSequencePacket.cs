@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.Net.Internal
+namespace SEE.Net
 {
 
     internal class PacketSequencePacket : AbstractPacket

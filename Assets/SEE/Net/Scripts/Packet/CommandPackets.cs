@@ -1,6 +1,4 @@
-﻿using SEE.Controls;
-
-namespace SEE.Net.Internal
+﻿namespace SEE.Net
 {
 
     internal class ExecuteActionPacket : AbstractPacket

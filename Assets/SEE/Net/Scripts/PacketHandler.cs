@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine.Assertions;
 
-namespace SEE.Net.Internal
+namespace SEE.Net
 {
 
     public abstract class PacketHandler

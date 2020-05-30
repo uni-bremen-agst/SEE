@@ -1,7 +1,6 @@
-﻿using SEE.Net;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace SEE.Controls
+namespace SEE.Net
 {
 
     internal static class TransformViewActionHelper

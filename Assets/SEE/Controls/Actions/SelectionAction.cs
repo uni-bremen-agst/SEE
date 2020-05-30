@@ -106,7 +106,7 @@ namespace SEE.Controls
                     }
                     else if (objectState == ObjectState.IsSelected)
                     {
-                        new SynchronizedSelectionAction(handledObject.GetComponent<HoverableObject>(), null).Execute();
+                        new Net.SelectionAction(handledObject.GetComponent<HoverableObject>(), null).Execute();
                         handledObject = null;
                         objectState = ObjectState.None;
                     }
@@ -133,7 +133,7 @@ namespace SEE.Controls
                         else
                         {
                             // The user continues grabbing while an object was already grabbed.
-                            new MoveAction(handledObject.GetComponent<GrabbableObject>(), handledObjectMemento.Position, TipOfGrabbingRay(handledObject)).Execute();
+                            new Net.MoveAction(handledObject.GetComponent<GrabbableObject>(), handledObjectMemento.Position, TipOfGrabbingRay(handledObject)).Execute();
                         }
                     }
                 }
@@ -146,14 +146,14 @@ namespace SEE.Controls
                     if (newHoverableObject != null && !newHoverableObject.IsHovered)
                     {
                         HoverableObject oldHoverableObject = handledObject ? handledObject.GetComponent<HoverableObject>() : null;
-                        new SynchronizedSelectionAction(oldHoverableObject, newHoverableObject).Execute();
+                        new Net.SelectionAction(oldHoverableObject, newHoverableObject).Execute();
                         objectState = ObjectState.IsSelected;
                         handledObject = hitObject;
                     }
                 }
                 else if ((hitObject == null || hitObject.GetComponent<HoverableObject>() == null) && handledObject != null)
                 {
-                    new SynchronizedSelectionAction(handledObject.GetComponent<HoverableObject>(), null).Execute();
+                    new Net.SelectionAction(handledObject.GetComponent<HoverableObject>(), null).Execute();
                     handledObject = null;
                     objectState = ObjectState.None;
                 }
@@ -302,7 +302,7 @@ namespace SEE.Controls
             handledObject = grabbedObject;
             objectState = ObjectState.IsGrabbed;
             OnObjectGrabbed.Invoke(grabbedObject);
-            new SynchronizedGrabAction(grabbedObject.GetComponent<GrabbableObject>(), handledObjectMemento.Position, true).Execute();
+            new Net.GrabAction(grabbedObject.GetComponent<GrabbableObject>(), handledObjectMemento.Position, true).Execute();
         }
 
         /// <summary>
@@ -315,7 +315,7 @@ namespace SEE.Controls
         {
             objectState = ObjectState.IsSelected;
             OnObjectGrabbed.Invoke(null);
-            new SynchronizedGrabAction(grabbedObject.GetComponent<GrabbableObject>(), handledObjectMemento.Position, false, actionFinalized).Execute();
+            new Net.GrabAction(grabbedObject.GetComponent<GrabbableObject>(), handledObjectMemento.Position, false, actionFinalized).Execute();
         }
 
         /// <summary>

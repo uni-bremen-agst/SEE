@@ -1,8 +1,6 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
-using SEE.Controls;
 using SEE.Game;
-using SEE.Net.Internal;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,7 +15,7 @@ namespace SEE.Net
 
     public class Network : MonoBehaviour
     {
-        private const Internal.Logger.Severity DEFAULT_SEVERITY = Internal.Logger.Severity.High;
+        private const Logger.Severity DEFAULT_SEVERITY = Logger.Severity.High;
         private static Network instance;
 
         [SerializeField] private bool useInOfflineMode = true;
@@ -30,7 +28,7 @@ namespace SEE.Net
 
 #if UNITY_EDITOR
         [SerializeField] private bool nativeLoggingEnabled = false;
-        [SerializeField] private Internal.Logger.Severity minimalSeverity = DEFAULT_SEVERITY;
+        [SerializeField] private Logger.Severity minimalSeverity = DEFAULT_SEVERITY;
 #endif
 
         private Dictionary<Connection, List<string>> submittedSerializedPackets = new Dictionary<Connection, List<string>>();
@@ -69,7 +67,7 @@ namespace SEE.Net
 #if UNITY_EDITOR
                 if (nativeLoggingEnabled)
                 {
-                    NetworkComms.EnableLogging(new Internal.Logger(minimalSeverity));
+                    NetworkComms.EnableLogging(new Logger(minimalSeverity));
                 }
                 else
                 {
@@ -113,7 +111,8 @@ namespace SEE.Net
                 }
             }
 
-            new InstantiateAction("Prefabs/SEENetPlayer").Execute();
+            // TODO: not sure if this should be the job of the networking script
+            new InstantiateAction("Player").Execute();
 
             GameObject rig = GameObject.Find("Player Rig");
             if (rig)
@@ -129,9 +128,9 @@ namespace SEE.Net
 #endif
                 if (mode.ViveController)
                 {
-                    new InstantiateCommand("Prefabs/SEENetViveControllerLeft").Execute();
-                    new InstantiateCommand("Prefabs/SEENetViveControllerRight").Execute();
-                    new InstantiateCommand("Prefabs/SEENetViveControllerRay").Execute();
+                    new InstantiateCommand("SEENetViveControllerLeft").Execute();
+                    new InstantiateCommand("SEENetViveControllerRight").Execute();
+                    new InstantiateCommand("SEENetViveControllerRay").Execute();
                 }
                 else if (mode.LeapMotion)
                 {

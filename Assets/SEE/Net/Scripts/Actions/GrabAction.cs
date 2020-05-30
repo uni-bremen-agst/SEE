@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using SEE.Controls;
+using UnityEngine;
 
-namespace SEE.Controls
+namespace SEE.Net
 {
 
-    public class SynchronizedGrabAction : AbstractAction
+    public class GrabAction : AbstractAction
     {
         public uint id;
         public Vector3 startPosition;
@@ -13,7 +14,7 @@ namespace SEE.Controls
 
 
 
-        public SynchronizedGrabAction(GrabbableObject grabbableObject, Vector3 startPosition, bool grab, bool actionFinalized = true) : base(true)
+        public GrabAction(GrabbableObject grabbableObject, Vector3 startPosition, bool grab, bool actionFinalized = true) : base(true)
         {
             id = grabbableObject.id;
             this.startPosition = startPosition;
@@ -46,8 +47,8 @@ namespace SEE.Controls
                     }
                     if (!grab && !actionFinalized)
                     {
-                        SelectionAction selectionAction = Object.FindObjectOfType<SelectionAction>();
-                        SelectionAction.Animation.Start();
+                        Controls.SelectionAction selectionAction = Object.FindObjectOfType<Controls.SelectionAction>();
+                        Controls.SelectionAction.Animation.Start();
                         iTween.MoveTo(grabbableObject.gameObject,
                             iTween.Hash(
                                 "position", startPosition,

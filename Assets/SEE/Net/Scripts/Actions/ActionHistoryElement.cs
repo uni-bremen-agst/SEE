@@ -6,11 +6,11 @@ public class ActionHistoryElement : MonoBehaviour
 
     public void OnUndo()
     {
-        SEE.Controls.ActionHistory.Undo(index);
+        SEE.Net.ActionHistory.Undo(index);
     }
 
     public void OnRedo()
     {
-        SEE.Controls.ActionHistory.Redo(index);
+        SEE.Net.ActionHistory.Redo(index);
     }
 }

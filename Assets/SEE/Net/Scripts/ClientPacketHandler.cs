@@ -2,7 +2,7 @@
 using NetworkCommsDotNet.Connections;
 using UnityEngine.Assertions;
 
-namespace SEE.Net.Internal
+namespace SEE.Net
 {
 
     public class ClientPacketHandler : PacketHandler

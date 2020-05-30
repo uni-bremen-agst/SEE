@@ -2,7 +2,7 @@
 using NetworkCommsDotNet.Connections;
 using System.Collections.Generic;
 
-namespace SEE.Net.Internal
+namespace SEE.Net
 {
 
     public class ServerPacketHandler : PacketHandler
