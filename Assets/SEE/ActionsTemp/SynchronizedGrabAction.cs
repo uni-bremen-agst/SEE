@@ -46,20 +46,16 @@ namespace SEE.Controls
                     }
                     if (!grab && !actionFinalized)
                     {
-                        // TODO: tween
-                        //if (IsRequester())
-                        //{
-                        //    SelectionAction.Animation.Start(); // TODO: this should be possible for each client!
-                        //    iTween.MoveTo(grabbableObject.gameObject,
-                        //        iTween.Hash(
-                        //            "position", startPosition,
-                        //            "time", 0.75f,
-                        //            "oncompletetarget", actor.gameObject,
-                        //            "oncomplete", "ResetCompleted"
-                        //        )
-                        //    );
-                        //}
-                        grabbableObject.transform.position = startPosition;
+                        SelectionAction selectionAction = Object.FindObjectOfType<SelectionAction>();
+                        SelectionAction.Animation.Start();
+                        iTween.MoveTo(grabbableObject.gameObject,
+                            iTween.Hash(
+                                "position", startPosition,
+                                "time", 0.75f,
+                                "oncompletetarget", selectionAction.gameObject,
+                                "oncomplete", "ResetCompleted"
+                            )
+                        );
                     }
                     return true;
                 }
