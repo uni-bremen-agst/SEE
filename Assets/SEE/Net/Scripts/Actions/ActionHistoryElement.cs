@@ -1,16 +1,21 @@
 ﻿using UnityEngine;
 
-public class ActionHistoryElement : MonoBehaviour
+namespace SEE.Net
 {
-    public int index;
 
-    public void OnUndo()
+    public class ActionHistoryElement : MonoBehaviour
     {
-        SEE.Net.ActionHistory.Undo(index);
+        public int index;
+
+        public void OnUndo()
+        {
+            ActionHistory.Undo(index);
+        }
+
+        public void OnRedo()
+        {
+            ActionHistory.Redo(index);
+        }
     }
 
-    public void OnRedo()
-    {
-        SEE.Net.ActionHistory.Redo(index);
-    }
 }
