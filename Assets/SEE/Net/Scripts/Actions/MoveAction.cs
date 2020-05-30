@@ -29,16 +29,13 @@ namespace SEE.Net
 
         protected override bool ExecuteOnClient()
         {
-            foreach (GrabbableObject grabbableObject in Object.FindObjectsOfType<GrabbableObject>())
+            GrabbableObject grabbableObject = (GrabbableObject)InteractableObject.Get(id);
+            if (grabbableObject)
             {
-                if (grabbableObject.id == id)
-                {
-                    Assert.IsTrue(grabbableObject.isGrabbed);
-                    grabbableObject.transform.position = endPosition;
-                    return true;
-                }
+                Assert.IsTrue(grabbableObject.isGrabbed);
+                grabbableObject.transform.position = endPosition;
+                return true;
             }
-
             return false;
         }
 

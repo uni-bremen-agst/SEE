@@ -1,6 +1,8 @@
 ﻿using SEE.DataModel;
 using SEE.GO;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls
@@ -11,6 +13,16 @@ namespace SEE.Controls
     [RequireComponent(typeof(Interactable))]
     public abstract class InteractableObject : MonoBehaviour
     {
+        /// <summary>
+        /// The next available ID to be assigned.
+        /// </summary>
+        private static uint nextID = 0;
+
+        /// <summary>
+        /// The interactable objects.
+        /// </summary>
+        private static readonly Dictionary<uint, InteractableObject> interactableObjects = new Dictionary<uint, InteractableObject>();
+
         /// <summary>
         /// The unique id of the interactable object.
         /// </summary>
@@ -75,6 +87,36 @@ namespace SEE.Controls
             {
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
+        }
+
+        /// <summary>
+        /// Resets all interactableObjects.
+        /// </summary>
+        public static void ResetAllObjects()
+        {
+            nextID = 0;
+            interactableObjects.Clear();
+        }
+
+        /// <summary>
+        /// Initializes the interactable object with a unique id;
+        /// </summary>
+        public void Initialize()
+        {
+            id = nextID++;
+            interactableObjects.Add(id, this);
+        }
+
+        /// <summary>
+        /// Returns the interactable object of given id or <code>null</code>, if it does
+        /// not exist.
+        /// </summary>
+        /// <param name="id">The id of the interactable object.</param>
+        /// <returns></returns>
+        public static InteractableObject Get(uint id)
+        {
+            bool result = interactableObjects.TryGetValue(id, out InteractableObject interactableObject);
+            return interactableObject;
         }
 
         //---------------------------------------------------------

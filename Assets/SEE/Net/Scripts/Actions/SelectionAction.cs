@@ -30,25 +30,8 @@ namespace SEE.Net
 
         protected override bool ExecuteOnClient()
         {
-            HoverableObject oldHoverableObject = null;
-            HoverableObject newHoverableObject = null;
-
-            foreach (HoverableObject o in Object.FindObjectsOfType<HoverableObject>()) // TODO(torben): save them in a faster way!
-            {
-                if (o.id == oldID)
-                {
-                    oldHoverableObject = o;
-                }
-                else if (o.id == newID)
-                {
-                    newHoverableObject = o;
-                }
-
-                if (oldHoverableObject != null && newHoverableObject != null)
-                {
-                    break;
-                }
-            }
+            HoverableObject oldHoverableObject = (HoverableObject)InteractableObject.Get(oldID);
+            HoverableObject newHoverableObject = (HoverableObject)InteractableObject.Get(newID);
 
             Assert.IsTrue(oldHoverableObject != null || newHoverableObject != null);
 
