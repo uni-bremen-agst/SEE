@@ -106,9 +106,6 @@ namespace SEE.Controls
                     }
                     else if (objectState == ObjectState.IsSelected)
                     {
-                        // TODO: as we are still pressing the left mouse button, it is
-                        // possible to re-grab the object right after cancelling. this
-                        // effect is not as obvious if the animation is enabled.
                         new SynchronizedSelectionAction(handledObject.GetComponent<HoverableObject>(), null).Execute();
                         handledObject = null;
                         objectState = ObjectState.None;
