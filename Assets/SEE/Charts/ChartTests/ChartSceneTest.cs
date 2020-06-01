@@ -199,16 +199,16 @@ namespace SEE.Charts.ChartTests
 			var parent = scrollView.GetChild(0).GetComponent<ScrollViewToggle>();
 			var child = scrollView.GetChild(1).GetComponent<ScrollViewToggle>();
 			Assert.AreEqual(2, entries.childCount);
-			parent.Toggle(false);
+			parent.Toggle(false, true);
 			yield return new WaitForSeconds(3f);
 			Assert.AreEqual(0, entries.childCount);
-			parent.Toggle(true);
+			parent.Toggle(true, true);
 			yield return new WaitForSeconds(3f);
 			Assert.AreEqual(2, entries.childCount);
-			child.Toggle(false);
+			child.Toggle(false, true);
 			yield return new WaitForSeconds(3f);
 			Assert.AreEqual(1, entries.childCount);
-			child.Toggle(true);
+			child.Toggle(true, true);
 			yield return new WaitForSeconds(3f);
 			Assert.AreEqual(2, entries.childCount);
 		}

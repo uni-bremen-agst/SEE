@@ -67,7 +67,7 @@ namespace SEE.Charts.Scripts
 			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
 			_chartContent = script;
-			toggle.isOn = Parent == null || (bool) LinkedObject.showInChart[_chartContent];
+			toggle.isOn = !Parent || (bool) LinkedObject.showInChart[_chartContent];
 		}
 
 		/// <summary>
@@ -87,13 +87,16 @@ namespace SEE.Charts.Scripts
 		{
 			if (Parent == null)
 			{
+				Debug.Log("Parent trigger: " + LinkedObject);
 				if (StatusUpdate != null) return;
 				var active = toggle.isOn;
-				foreach (var child in _children) child.Toggle(active);
+				foreach (var child in _children) child.Toggle(active, true);
 			}
 			else
 			{
 				LinkedObject.showInChart[_chartContent] = toggle.isOn;
+				Debug.Log("Child Trigger: " + LinkedObject);
+				Debug.Log(_chartContent);
 				if (Parent.StatusUpdate == null)
 					Parent.StatusUpdate = StartCoroutine(Parent.UpdateStatus());
 				if (_chartContent.drawing == null)
@@ -105,9 +108,13 @@ namespace SEE.Charts.Scripts
 		/// Activates or deactivates a marker in the linked chart.
 		/// </summary>
 		/// <param name="active">If the marker will be activated</param>
-		public void Toggle(bool active)
+		/// <param name="initial"></param>
+		public void Toggle(bool active, bool initial)
 		{
 			toggle.isOn = active;
+
+			if (!initial || _children.Count <= 0) return;
+			foreach (var child in _children) child.Toggle(active, true);
 		}
 
 		/// <summary>
@@ -121,12 +128,12 @@ namespace SEE.Charts.Scripts
 			foreach (var child in _children)
 				if (!child.GetStatus())
 				{
-					Toggle(false);
+					Toggle(false, false);
 					active = false;
 					break;
 				}
 
-			if (active) Toggle(true);
+			if (active) Toggle(true, true);
 
 			StatusUpdate = null;
 		}

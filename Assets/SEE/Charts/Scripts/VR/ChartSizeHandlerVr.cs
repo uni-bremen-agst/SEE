@@ -33,8 +33,9 @@ namespace SEE.Charts.Scripts.VR
 		/// </summary>
 		[SerializeField] private GameObject contentSelectionBackground;
 
+		private const float OriginalSize = 600f;
 		private const float DropdownThickness = 100f;
-		private const float PhysicalClosedPosition = 0.4575f * 600f;
+		private const float PhysicalClosedPosition = 0.4575f;
 
 		/// <summary>
 		/// Initializes some attributes.
@@ -75,9 +76,11 @@ namespace SEE.Charts.Scripts.VR
 			base.ChangeSize(width, height);
 			_virtualRealityCanvas.sizeDelta =
 				new Vector2(width + DropdownThickness, height + DropdownThickness);
-			_physicalOpen.transform.localScale = new Vector2(width / 600f, height / 600f);
-			_physicalClosed.transform.localPosition = new Vector2(width / PhysicalClosedPosition,
-				-(height / PhysicalClosedPosition));
+			_physicalOpen.transform.localScale =
+				new Vector2(width / OriginalSize, height / OriginalSize);
+			_physicalClosed.transform.localPosition = new Vector2(
+				width / OriginalSize * PhysicalClosedPosition,
+				-(height / OriginalSize * PhysicalClosedPosition));
 			contentSelectionBackground.transform.localScale =
 				new Vector2(contentSelectionBackground.transform.localScale.x, height);
 		}
