@@ -159,7 +159,7 @@ namespace SEE.Charts.ChartTests
 			Assert.AreEqual(1, entries.childCount);
 			var marker = entries.Find("Marker(Clone)").GetComponent<ChartMarker>();
 			Assert.NotNull(marker);
-			Assert.AreEqual("a1_b.cpp",
+			Assert.AreEqual("a1_a.cpp",
 				marker.linkedObject.GetComponent<NodeRef>().node.SourceName);
 		}
 

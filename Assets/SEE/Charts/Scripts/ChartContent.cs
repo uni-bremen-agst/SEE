@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel;
@@ -194,7 +193,7 @@ namespace SEE.Charts.Scripts
 
 			var index = 0;
 			foreach (var dataObject in _dataObjects)
-				if (dataObject.CompareTag("Building"))
+				if (dataObject.GetComponent<NodeRef>().node.IsLeaf())
 					CreateChildToggle(dataObject, parentToggle, index++, _yGap);
 
 			tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
@@ -204,7 +203,7 @@ namespace SEE.Charts.Scripts
 			parentToggle.Initialize(this);
 
 			foreach (var dataObject in _dataObjects)
-				if (dataObject.CompareTag("Node"))
+				if (!dataObject.GetComponent<NodeRef>().node.IsLeaf())
 					CreateChildToggle(dataObject, parentToggle, index++, _yGap);
 
 			scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(
@@ -284,7 +283,7 @@ namespace SEE.Charts.Scripts
 			foreach (var child in root.Children())
 			{
 				var inScene = _dataObjects.First(entry =>
-					entry.GetComponent<NodeRef>().node.ID.Equals(root.ID));
+					entry.GetComponent<NodeRef>().node.ID.Equals(child.ID));
 				var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
 				var toggle = tempObject.GetComponent<ScrollViewToggle>();
 				toggle.Parent = parentToggle;
@@ -309,15 +308,9 @@ namespace SEE.Charts.Scripts
 		private void GetAllFloats()
 		{
 			foreach (var data in _dataObjects)
-			{
-				Debug.Log(data.name);
-				foreach (var key in data.GetComponent<NodeRef>().node.FloatAttributes.Keys)
-				{
-					Debug.Log("Float: " + key);
-					if (!AllKeys.Contains(key))
-						AllKeys.Add(key);
-				}
-			}
+			foreach (var key in data.GetComponent<NodeRef>().node.FloatAttributes.Keys)
+				if (!AllKeys.Contains(key))
+					AllKeys.Add(key);
 		}
 
 		/// <summary>
@@ -327,15 +320,9 @@ namespace SEE.Charts.Scripts
 		private void GetAllIntegers()
 		{
 			foreach (var data in _dataObjects)
-			{
-				Debug.Log(data.name);
-				foreach (var key in data.GetComponent<NodeRef>().node.IntAttributes.Keys)
-				{
-					Debug.Log("Integer: " + key);
-					if (!AllKeys.Contains(key))
-						AllKeys.Add(key);
-				}
-			}
+			foreach (var key in data.GetComponent<NodeRef>().node.IntAttributes.Keys)
+				if (!AllKeys.Contains(key))
+					AllKeys.Add(key);
 		}
 
 		/// <summary>
@@ -343,13 +330,8 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void FindDataObjects()
 		{
-			var buildings = GameObject.FindGameObjectsWithTag("Building");
-			var nodes = GameObject.FindGameObjectsWithTag("Node");
-			var combined = new GameObject[buildings.Length + nodes.Length];
-			Array.Copy(buildings, combined, buildings.Length);
-			Array.Copy(nodes, 0, combined, buildings.Length, nodes.Length);
-			_dataObjects = combined;
-			foreach (var entry in combined)
+			_dataObjects = GameObject.FindGameObjectsWithTag("Node");
+			foreach (var entry in _dataObjects)
 				if (!entry.GetComponent<NodeHighlights>().showInChart.Contains(this))
 					entry.GetComponent<NodeHighlights>().showInChart.Add(this, true);
 			citySize = _dataObjects.Length;
@@ -389,12 +371,10 @@ namespace SEE.Charts.Scripts
 		{
 			if (needData) FindDataObjects();
 			noDataWarning.SetActive(false);
-
 			if (axisDropdownX.Value.Equals(axisDropdownY.Value))
 				DrawOneAxis();
 			else
 				DrawTwoAxes();
-
 			if (ActiveMarkers.Count == 0) noDataWarning.SetActive(true);
 		}
 
@@ -405,31 +385,41 @@ namespace SEE.Charts.Scripts
 		private void DrawTwoAxes()
 		{
 			var i = 0;
-			var node = _dataObjects[i].GetComponent<NodeRef>().node;
-			var contained = node.TryGetNumeric(axisDropdownX.Value, out var minX);
+			var nodeRef = _dataObjects[i].GetComponent<NodeRef>();
+			var node = nodeRef.node;
+			var showInChart = (bool) nodeRef.highlights.showInChart[this];
+			var contained = node.TryGetNumeric(axisDropdownX.Value, out var minX) && showInChart;
 			while (!contained)
 			{
 				i++;
-				node = _dataObjects[i].GetComponent<NodeRef>().node;
-				contained = node.TryGetNumeric(axisDropdownX.Value, out minX);
+				nodeRef = _dataObjects[i].GetComponent<NodeRef>();
+				node = nodeRef.node;
+				showInChart = (bool) nodeRef.highlights.showInChart[this];
+				contained = showInChart && node.TryGetNumeric(axisDropdownX.Value, out minX);
 			}
 
 			var maxX = minX;
 			i = 0;
-			node = _dataObjects[i].GetComponent<NodeRef>().node;
-			contained = node.TryGetNumeric(axisDropdownY.Value, out var minY);
+			nodeRef = _dataObjects[i].GetComponent<NodeRef>();
+			node = nodeRef.node;
+			showInChart = (bool) nodeRef.highlights.showInChart[this];
+			contained = node.TryGetNumeric(axisDropdownY.Value, out var minY) && showInChart;
 			while (!contained)
 			{
 				i++;
-				node = _dataObjects[i].GetComponent<NodeRef>().node;
-				contained = node.TryGetNumeric(axisDropdownY.Value, out minY);
+				nodeRef = _dataObjects[i].GetComponent<NodeRef>();
+				node = nodeRef.node;
+				showInChart = (bool) nodeRef.highlights.showInChart[this];
+				contained = showInChart && node.TryGetNumeric(axisDropdownY.Value, out minY);
 			}
 
 			var maxY = minY;
 			var toDraw = new List<GameObject>();
 			foreach (var data in _dataObjects)
 			{
-				node = data.GetComponent<NodeRef>().node;
+				nodeRef = data.GetComponent<NodeRef>();
+				node = nodeRef.node;
+				showInChart = (bool) nodeRef.highlights.showInChart[this];
 				var inX = false;
 				var inY = false;
 				if (node.TryGetNumeric(axisDropdownX.Value, out var tempX))
@@ -446,7 +436,7 @@ namespace SEE.Charts.Scripts
 					inY = true;
 				}
 
-				if (inX && inY && (bool) data.GetComponent<NodeHighlights>().showInChart[this])
+				if (inX && inY && showInChart)
 					toDraw.Add(data);
 			}
 
