@@ -246,9 +246,10 @@ namespace SEE.Charts.Scripts
 				CreateChildToggles(root, rootToggle, ref index, ref hierarchy);
 			}
 
+			if (hierarchy > maxHierarchy) maxHierarchy = hierarchy;
 			scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(
 				scrollContent.GetComponent<RectTransform>().sizeDelta.x,
-				index * Mathf.Abs(_yGap) + 40);
+				index * Mathf.Abs(_yGap) + 40); //TODO: Max hierarchy
 		}
 
 		/// <summary>
@@ -296,7 +297,8 @@ namespace SEE.Charts.Scripts
 					new Vector2(0f, _yGap) * index++;
 				toggle.Initialize(this);
 				parentToggle.AddChild(toggle);
-				CreateChildToggles(child, toggle, ref index, ref hierarchy);
+				var tempHierarchy = hierarchy;
+				CreateChildToggles(child, toggle, ref index, ref tempHierarchy);
 			}
 		}
 

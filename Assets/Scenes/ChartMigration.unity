@@ -97,7 +97,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: 45c4f05cc327f8c4bb3416791981a734,
+    type: 2}
   m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
@@ -7139,7 +7140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerInputType: 2
   HideVRControllers: 0
-  ShowControllerHints: 1
+  ShowControllerHints: 0
 --- !u!4 &1036587972
 Transform:
   m_ObjectHideFlags: 0
