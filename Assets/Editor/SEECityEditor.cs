@@ -45,6 +45,10 @@ namespace SEEEditor
             {
                 Reset(city);
             }
+            if (GUILayout.Button("Save Layout"))
+            {
+                SaveLayout(city);
+            }
             EditorGUILayout.EndHorizontal();
         }
 
@@ -96,5 +100,13 @@ namespace SEEEditor
         {
             city.Reset();   
         }
+
+        /// <summary>
+        /// Saves the current layout of the given <paramref name="city"/>.
+        /// </summary>
+        private void SaveLayout(SEECity city)
+        {
+            city.SaveLayout();
+        }        
     }
 }
