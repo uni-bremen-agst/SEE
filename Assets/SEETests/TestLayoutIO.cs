@@ -16,7 +16,7 @@ namespace SEE.Layout
     {
         private static Graph LoadGraph(string filename)
         {
-            GraphReader graphReader = new GraphReader(filename, new HashSet<string>() { hierarchicalEdgeType });
+            GraphReader graphReader = new GraphReader(filename, new HashSet<string>() { hierarchicalEdgeType, "Belongs_To" });
             graphReader.Load();
             return graphReader.GetGraph();
         }
@@ -34,14 +34,14 @@ namespace SEE.Layout
             string graphName = "architecture";
             string filename = Application.dataPath + "/../Temp/layout.gvl";
 
-            ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
+            ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes(1);
 
             // Layout the nodes.
             RectanglePackingNodeLayout packer = new RectanglePackingNodeLayout(0.0f, 1.0f);
             Dictionary<ILayoutNode, NodeTransform> savedLayout = packer.Layout(gameObjects);
+
             // Apply the layout.
             Dictionary<string, NodeTransform> layoutMap = new Dictionary<string, NodeTransform>(savedLayout.Count);
-
             foreach (var entry in savedLayout)
             {
                 ILayoutNode node = entry.Key;
@@ -55,7 +55,7 @@ namespace SEE.Layout
             }
             // Save the layout.
             SEE.Layout.IO.Writer.Save(filename, graphName, gameObjects);
-            Dump(gameObjects, 20);
+            Dump(gameObjects, 10);
 
             // Clear the scale.x, scale.z and position of all gameObjects so that we can be sure
             // that they are actually read. Note that the GVL does not contain scale.y,
@@ -69,7 +69,7 @@ namespace SEE.Layout
             // Read the saved layout. 
             Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(0, filename).Layout(gameObjects);
 
-            Dump(readLayout, 20);
+            Dump(readLayout, 10);
 
             // Now savedLayout and readLayout should be the same except for  
             // scale.y and, thus, position.y (none of those are stored in GVL).
@@ -141,43 +141,97 @@ namespace SEE.Layout
         [Test]
         public void TestRead()
         {
-            GameObject go = new GameObject();
-            SEECity city = go.AddComponent<SEECity>();
-            city.NodeLayout = AbstractSEECity.NodeLayouts.Manhattan;
-            city.EdgeLayout = AbstractSEECity.EdgeLayouts.None;
-            city.LeafObjects = AbstractSEECity.LeafNodeKinds.Blocks;
-            city.InnerNodeObjects = AbstractSEECity.InnerNodeKinds.Blocks;
+            // The path to the GXL and GVL files.
+            string path = Application.dataPath + "/../Data/GXL/SEE/";
 
-            Graph graph = LoadGraph(Application.dataPath + "/../Data/GXL/SEE/Architecture.gxl");
-            GraphRenderer graphRenderer = new GraphRenderer(city);
-            graphRenderer.Draw(graph, go);
-            // The game-object hierarchy for the nodes in graph are children of go.
-            ICollection<ILayoutNode> gameObjects = GetGameObjects(go);
-            SEE.Layout.IO.Reader reader = new SEE.Layout.IO.Reader(Application.dataPath + "/../Data/GXL/SEE/Architecture.gvl", 
-                                                                   gameObjects.Cast<IGameNode>().ToList(),
-                                                                   0.0f);
-            Dump(gameObjects);
+            // Loading the underlying graph.
+            Graph graph = LoadGraph(path + "Architecture.gxl");
+            //graph.DumpTree();
+
+            // Setting up the node layout so that it is read from the GVL file.
+            GameObject seeCity = new GameObject();
+            seeCity.name = "SEECity";
+            seeCity.transform.position = Vector3.zero; // new Vector3(-1012.38f, 0.0f, 581.414f);
+            seeCity.transform.localScale = Vector3.one * 100 * 18.91f;
+            SEECity seeCityComponent = seeCity.AddComponent<SEECity>();
+            seeCityComponent.NodeLayout = AbstractSEECity.NodeLayouts.FromFile;
+            seeCityComponent.EdgeLayout = AbstractSEECity.EdgeLayouts.None;
+            seeCityComponent.LeafObjects = AbstractSEECity.LeafNodeKinds.Blocks;
+            seeCityComponent.InnerNodeObjects = AbstractSEECity.InnerNodeKinds.Blocks;
+            seeCityComponent.gvlPath = path + "Architecture.gvl";
+
+            // Render the city. This will create all game objects as well as their
+            // layout. As stated before, the layout does not interest us.
+            GraphRenderer graphRenderer = new GraphRenderer(seeCityComponent);
+            graphRenderer.Draw(graph, seeCity);
+
+            // Now we have the game objects whose layout information was read
+            // from the GVL file.
+
+            // The game-object hierarchy for the nodes in graph are children of seeCity.
+            ICollection<ILayoutNode> gameObjects = graphRenderer.ToLayoutNodes(GetGameObjects(seeCity));
+
+            //SEE.Layout.IO.Reader reader = new SEE.Layout.IO.Reader(path + "Architecture.gvl", 
+            //                                                       gameObjects.Cast<IGameNode>().ToList(),
+            //                                                       0.0f);
+            DumpTree(gameObjects);
+            // Save the layout.
+            SEE.Layout.IO.Writer.Save(path + "Architecture-saved.gvl", "architecture", gameObjects);
         }
 
-        private ICollection<ILayoutNode> GetGameObjects(GameObject go)
+        private ICollection<GameObject> GetGameObjects(GameObject go)
         {
-            List <ILayoutNode>  result = new List<ILayoutNode>();
+            List <GameObject>  result = new List<GameObject>();
             if (go.tag == Tags.Node)
             {
-                result.Add(ToTestGameNode(go));
+                result.Add(go);
             }
             foreach (Transform child in go.transform)
             {
-                ICollection<ILayoutNode> ascendants = GetGameObjects(child.gameObject);
+                ICollection<GameObject> ascendants = GetGameObjects(child.gameObject);
                 result.AddRange(ascendants);
             }
             return result;
         }
 
-        private ILayoutNode ToTestGameNode(GameObject go)
+        //private ILayoutNode ToTestGameNode(GameObject go)
+        //{
+        //    NodeRef nodeRef = go.GetComponent<NodeRef>();
+        //    return new LayoutGameObject(nodeRef.node.ID);
+        //}
+
+        public void DumpTree(ICollection<ILayoutNode> gameObjects)
         {
-            NodeRef nodeRef = go.GetComponent<NodeRef>();
-            return new LayoutVertex(nodeRef.node.ID);
+            foreach (ILayoutNode root in ILayoutNodeHierarchy.Roots(gameObjects))
+            {
+                DumpTree(root);
+            }
+        }
+
+        /// <summary>
+        /// Dumps the hierarchy for given root. Used for debugging.
+        /// </summary>
+        internal void DumpTree(ILayoutNode root)
+        {
+            DumpTree(root, 0);
+        }
+
+        /// <summary>
+        /// Dumps the hierarchy for given root by adding level many - 
+        /// as indentation followed by the layout information. Used for debugging.
+        /// </summary>
+        private void DumpTree(ILayoutNode root, int level)
+        {
+            string indentation = "";
+            for (int i = 0; i < level; i++)
+            {
+                indentation += "-";
+            }
+            Debug.LogFormat("{0}{1}: position={2} worldscale={3} rotation={4}.\n", indentation, root.ID, root.CenterPosition, root.AbsoluteScale, root.Rotation);            
+            foreach (ILayoutNode child in root.Children())
+            {
+                DumpTree(child, level + 1);
+            }
         }
     }
 }
