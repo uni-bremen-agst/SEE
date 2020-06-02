@@ -28,7 +28,7 @@ namespace SEEEditor
             city.LeafObjects = (SEECity.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
             city.InnerNodeObjects = (SEECity.InnerNodeKinds)EditorGUILayout.EnumPopup("Inner nodes", city.InnerNodeObjects);
             city.NodeLayout = (SEECity.NodeLayouts)EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
-            city.gvlPath = EditorGUILayout.TextField("CSV file", city.gvlPath);
+            city.gvlPath = EditorGUILayout.TextField("GVL file", city.gvlPath);
 
             city.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", city.ZScoreScale);
             city.ShowErosions = EditorGUILayout.Toggle("Show erosions", city.ShowErosions);
