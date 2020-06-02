@@ -293,6 +293,14 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Saves the current layout of the city as GVL in a file name GVLPath.
+        /// </summary>
+        public void SaveLayout()
+        {
+            SEE.Layout.IO.Writer.Save(GVLPath(), loadedGraph.Name, AllNodeDescendants(gameObject));
+        }
+
+        /// <summary>
         /// Resets everything that is specific to a given graph. Here: the node types,
         /// the underlying graph, and all game objects visualizing information about it.
         /// </summary>
@@ -333,6 +341,27 @@ namespace SEE.Game
             foreach (Transform child in transform)
             {
                 result.Add(child.gameObject);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns all (transitive) descendants of <paramref name="go"/> that are tagged
+        /// by Tags.Node (including <paramref name="go"/> if it is tagged by Tags.Node).
+        /// </summary>
+        /// <param name="go">game objects whose node descendants are required</param>
+        /// <returns>all node descendants of <paramref name="go"/></returns>
+        private static ICollection<GameObject> AllNodeDescendants(GameObject go)
+        {
+            List<GameObject> result = new List<GameObject>();
+            if (go.tag == Tags.Node)
+            {
+                result.Add(go);
+            }
+            foreach (Transform child in go.transform)
+            {
+                ICollection<GameObject> ascendants = AllNodeDescendants(child.gameObject);
+                result.AddRange(ascendants);
             }
             return result;
         }
