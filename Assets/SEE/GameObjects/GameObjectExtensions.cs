@@ -27,12 +27,12 @@ namespace SEE.GO
                 }
                 else
                 {
-                    return "edge '" + edgeRef.edge.ID + "'";
+                    return edgeRef.edge.ID;
                 }
             }
             else
             {
-                return "node '" + nodeRef.node.ID + "'"; 
+                return nodeRef.node.ID; 
             }
         }
 
