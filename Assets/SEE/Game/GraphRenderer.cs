@@ -196,12 +196,14 @@ namespace SEE.Game
                 }
 
                 // calculate and apply the node layout
-                ICollection<GameObject> gameNodes = nodeMap.Values;
-                ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(gameNodes);
+                ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(nodeMap.Values);
                 nodeLayout.Apply(layoutNodes);                
-                float scaleFactor = NodeLayout.Scale(layoutNodes, parent.transform.localScale.x);
+                NodeLayout.Scale(layoutNodes, parent.transform.localScale.x);
                 NodeLayout.Move(layoutNodes, parent.transform.position);
 
+                RemoveRootIfNecessary(ref root, graph, nodeMap);
+
+                ICollection<GameObject> gameNodes = nodeMap.Values;
                 // add the plane surrounding all game objects for nodes
                 GameObject plane = NewPlane(gameNodes, parent.transform.position.y);
                 AddToParent(plane, parent);
@@ -211,20 +213,18 @@ namespace SEE.Game
 
                 // Decorations must be applied after the blocks have been placed, so that
                 // we also know their positions.
-                AddDecorations(nodeMap.Values);
+                AddDecorations(gameNodes);
 
                 // create the game objects for the laid out edges
                 ICollection<GameObject> edges = EdgeLayout(graph, layoutNodes);
                 AddToParent(edges, parent);
             }
-            finally
+            catch(Exception e)
             {
                 // If we added an artifical root node to the graph, we must remove it again
                 // from the graph when we are done.
-                if (root != null)
-                {
-                    graph.RemoveNode(root);
-                }
+                RemoveRootIfNecessary(ref root, graph, nodeMap);
+                throw e;
             }
         }
 
@@ -268,9 +268,10 @@ namespace SEE.Game
         /// and <paramref name="nodeMap"/> (and there mapped onto a newly created game 
         /// object for inner nodes). All true roots of <paramref name="graph"/> will
         /// become children of this artificial root.
+        /// Note: This method is the counterpart to RemoveRootIfNecessary.
         /// </summary>
         /// <param name="graph">graph where a unique root node should be added</param>
-        /// <param name="nodeMap">mapping of nodes onto game object, which will be updated
+        /// <param name="nodeMap">mapping of nodes onto game objects, which will be updated
         /// when a new artifical root is added</param>
         /// <returns>the new artifical root or null if <paramref name="graph"/> has
         /// already a single root</returns>
@@ -302,6 +303,29 @@ namespace SEE.Game
             else
             {
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// If <paramref name="root"/> is null, nothing happens. Otherwise <paramref name="root"/> will
+        /// be removed from <paramref name="graph"/> and <paramref name="nodeMap"/>. The value of
+        /// <paramref name="root"/> will be null afterward.
+        /// Note: This method is the counterpart to AddRootIfNecessary.
+        /// </summary>
+        /// <param name="root">artifical root node to be removed (created by AddRootIfNecessary) or null;
+        /// will be null afterward</param>
+        /// <param name="graph">graph where <paramref name="root"/> should be removed/param>
+        /// <param name="nodeMap">mapping of nodes onto game objects from which to remove 
+        /// <paramref name="root"/></param>
+        private void RemoveRootIfNecessary(ref Node root, Graph graph, Dictionary<Node, GameObject> nodeMap)
+        {
+            if (root != null)
+            {
+                GameObject go = nodeMap[root];
+                Destroyer.DestroyGameObject(go);
+                graph.RemoveNode(root);
+                nodeMap.Remove(root);
+                root = null;
             }
         }
 
@@ -459,7 +483,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        private ICollection<ILayoutNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
+        public ICollection<ILayoutNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
         {
             return ToLayoutNodes(gameObjects, leafNodeFactory, innerNodeFactory);
         }
