@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using SEE.Game;
-using System.Collections.Generic;
 
 namespace SEEEditor
 {
