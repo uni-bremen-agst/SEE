@@ -212,18 +212,20 @@ namespace SEE.Charts.Scripts
 				{
 					_highlightCopy = Instantiate(linkedObject, linkedObject.transform);
 					_highlightCopy.tag = "Untagged";
+					_highlightCopy.transform.localScale = Vector3.one;
+					_highlightCopy.transform.localPosition = Vector3.zero;
 					if (_highlightCopy.TryGetComponent<Renderer>(out var render))
 						render.material = _buildingHighlightMaterial;
-					var line = Instantiate(highlightLine, _highlightCopy.transform)
-						.GetComponent<LineRenderer>();
+					Instantiate(highlightLine, _highlightCopy.transform)
+						.TryGetComponent<LineRenderer>(out var line);
 					var linePos = _highlightCopy.transform.localPosition;
 					line.SetPositions(new[]
-						{linePos, linePos + new Vector3(0f, _highlightLineLength)}); //TODO: Fix Position
+						{linePos, linePos + new Vector3(0f, _highlightLineLength)});
 				}
 			}
 			else
 			{
-				if (_highlightCopy != null) Destroy(_highlightCopy);
+				if (_highlightCopy) Destroy(_highlightCopy);
 				_accentuated = false;
 			}
 

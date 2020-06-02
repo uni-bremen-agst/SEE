@@ -105,7 +105,7 @@ namespace SEE.Charts.Scripts
 		/// The minimum distance between the players head and the <see cref="GameObject" /> the charts are
 		/// attached to to trigger it to follow the players head.
 		/// </summary>
-		public float distanceThreshold = 0.5f;
+		public float distanceThreshold = 1f;
 
 		/// <summary>
 		/// The canvas setup for charts that is used in non VR.
