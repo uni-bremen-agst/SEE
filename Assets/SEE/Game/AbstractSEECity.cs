@@ -502,7 +502,7 @@ namespace SEE.Game
                 if (File.Exists(filename))
                 {
                     SEE.Utils.Performance p = SEE.Utils.Performance.Begin("loading graph data from " + filename);
-                    GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "ROOT", new SEELogger());
+                    GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "", new SEELogger());
                     graphCreator.Load();
                     Graph graph = graphCreator.GetGraph();
                     p.End();
