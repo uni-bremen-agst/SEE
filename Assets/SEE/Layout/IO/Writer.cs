@@ -2,7 +2,9 @@
 using System.Globalization;
 using System.Xml;
 using System.Collections.Generic;
-using System;
+using SEE.DataModel;
+using SEE.Utils;
+using SEE.GO;
 
 namespace SEE.Layout.IO
 {
@@ -17,41 +19,52 @@ namespace SEE.Layout.IO
         /// <paramref name="graphName"/> is used as the value for attribute V of the layout (the 
         /// graph view).
         /// 
+        /// Note: This method is equivalent to Save(string, string, ICollection<GameObject>)
+        /// but intended for ILayoutNodes rather than GameObjects.
         /// </summary>
-        /// <param name="filename"></param>
-        /// <param name="graphName"></param>
-        /// <param name="gameNodes"></param>
+        /// <param name="filename">name of the GVL file</param>
+        /// <param name="graphName">name of the graph</param>
+        /// <param name="gameNodes">the nodes whose layout is to be stored</param>
         public static void Save(string filename, string graphName, ICollection<ILayoutNode> gameNodes)
         {
-            XmlDocument doc = new XmlDocument();
-            AppendXMLVersion(doc);
-            AppendDOCType(doc);
-            XmlElement layout = AppendLayout(doc, graphName);
-            AppendVisualization(doc, layout);
-            ICollection<ILayoutNode> roots = Roots(gameNodes);
-            foreach (ILayoutNode root in roots)
+            Header(graphName, out XmlDocument doc, out XmlElement layoutElement);
+            foreach (ILayoutNode root in ILayoutNodeHierarchy.Roots(gameNodes))
             {
-                AppendNode(doc, layout, root);
+                AppendNode(doc, layoutElement, root);
             }
             doc.Save(filename);
         }
 
         /// <summary>
-        /// Returns all nodes in <paramref name="gameNodes"/> that do not have a parent.
+        /// Writes the layout information of all <paramref name="graphName"/> and their descendants tagged
+        /// by Tags.Node to a new file named <paramref name="filename"/> in GVL format, where 
+        /// <paramref name="graphName"/> is used as the value for attribute V of the layout (the 
+        /// graph view).
+        /// 
+        /// Note: This method is equivalent to Save(string, string, ICollection<ILayoutNode>)
+        /// but intended for GameObjects rather than ILayoutNodes.
         /// </summary>
-        /// <param name="gameNodes">nodes to be queried</param>
-        /// <returns>all root nodes in <paramref name="gameNodes"/></returns>
-        private static ICollection<ILayoutNode> Roots(ICollection<ILayoutNode> gameNodes)
+        /// <param name="filename">name of the GVL file</param>
+        /// <param name="graphName">name of the graph</param>
+        /// <param name="gameNodes">the nodes whose layout is to be stored</param>
+        public static void Save(string filename, string graphName, ICollection<GameObject> gameNodes)
         {
-            ICollection<ILayoutNode> result = new List<ILayoutNode>();
-            foreach (ILayoutNode node in gameNodes)
+            Header(graphName, out XmlDocument doc, out XmlElement layoutElement);
+
+            foreach (GameObject root in GameObjectHierarchy.Roots(gameNodes, Tags.Node))
             {
-                if (node.Parent == null)
-                {
-                    result.Add(node);
-                }
+                AppendNode(doc, layoutElement, root);
             }
-            return result;
+            doc.Save(filename);
+        }
+
+        private static void Header(string graphName, out XmlDocument doc, out XmlElement layoutElement)
+        {
+            doc = new XmlDocument();
+            AppendXMLVersion(doc);
+            AppendDOCType(doc);
+            layoutElement = AppendLayout(doc, graphName);
+            AppendVisualization(doc, layoutElement);
         }
 
         /// <summary>
@@ -183,44 +196,126 @@ namespace SEE.Layout.IO
         /// <param name="node">node whose layout information is to be emitted</param>
         private static void AppendNode(XmlDocument doc, XmlElement xmlParent, ILayoutNode node)
         {
-            Vector3 centerPosition = node.CenterPosition;
-            Vector3 absoluteScale = node.AbsoluteScale;
-            // absolute positions
-            float x = centerPosition.x - absoluteScale.x / 2.0f;
-            float y = centerPosition.z + absoluteScale.z / 2.0f;
-
-            XmlElement xmlNode = doc.CreateElement(null, "Node", null);
-            xmlNode.SetAttribute("Id", "L" + node.ID);
-
+            string ID = node.ID;
             ILayoutNode parent = node.Parent;
-            if (parent != null)
-            {
-                // adjust positions relative to parent
-                Vector3 parentPosition = parent.CenterPosition;
-                Vector3 parentScale = parent.AbsoluteScale;
-
-                float parentX = parentPosition.x - parentScale.x / 2.0f;
-                float parentY = parentPosition.z + parentScale.z / 2.0f;
-
-                x = x - parentX;
-                y = parentY - y;
-
-            }
-            xmlNode.SetAttribute("X", FloatToString(x));
-            xmlNode.SetAttribute("Y", FloatToString(y));
-
-            xmlNode.SetAttribute("W", FloatToString(absoluteScale.x));
-            xmlNode.SetAttribute("H", FloatToString(absoluteScale.z));
-
-            xmlNode.SetAttribute("CS", FloatToString(14.4f));
-            xmlNode.SetAttribute("Exp", "True");
+            bool isRoot = parent == null;
+            Vector3 parentPosition = isRoot ? Vector3.zero : parent.CenterPosition;
+            Vector3 parentScale = isRoot ? Vector3.zero : parent.AbsoluteScale;
+            XmlElement xmlNode = AppendNode(doc, xmlParent, 
+                                            ID, node.CenterPosition, node.AbsoluteScale, 
+                                            isRoot, parentPosition, parentScale);
 
             foreach (ILayoutNode child in node.Children())
             {
                 AppendNode(doc, xmlNode, child);
             }
+        }
 
+        /// <summary>
+        /// Appends
+        ///   <Node Id="L*NAME*" X="*X*" Y="*Y*" W="*W* H="*H*" CS="14.14" Exp="True">
+        ///     .... 
+        ///   </Node>
+        ///   where 
+        ///     ... contains all descendants of <paramref name="node"/> tagged by Tag.Node
+        ///     *NAME* is node.ID
+        ///     *X* is the x co-ordinate of the left upper corner of the rectangle containing node
+        ///     *Y* is the z co-ordinate of the left upper corner of the rectangle containing node
+        ///     *W* is the width (x axis) of the rectangle containing node
+        ///     *H* is the depth (z axis) of the rectangle containing node
+        ///     and all emitted measures are in world space. If <paramref name="parent"/> = null, 
+        ///     *X* and *Y* are the original values of <paramref name="node"/>; otherwise those values
+        ///     are relative offsets to the left upper corner of <paramref name="parent"/>.
+        /// </summary>
+        /// <param name="doc">the XML document in which to create the XML node</param>
+        /// <param name="xmlParent">the containing XML element</param>
+        /// <param name="node">node whose layout information is to be emitted</param>
+        private static void AppendNode(XmlDocument doc, XmlElement xmlParent, GameObject node)
+        {
+            string ID = node.ID();
+            GameObject parent = GameObjectHierarchy.Parent(node, Tags.Node);
+            bool isRoot = parent == null;
+            Vector3 parentPosition = isRoot ? Vector3.zero : parent.transform.position;
+            Vector3 parentScale = isRoot ? Vector3.zero : parent.transform.lossyScale;
+            XmlElement xmlNode = AppendNode(doc, xmlParent,
+                                            ID, node.transform.position, node.transform.lossyScale,
+                                            isRoot, parentPosition, parentScale);
+
+            foreach (GameObject child in GameObjectHierarchy.Children(node, Tags.Node))
+            {
+                AppendNode(doc, xmlNode, child);
+            }
+        }
+
+        /// <summary>
+        /// Appends
+        ///   <Node Id="L*NAME*" X="*X*" Y="*Y*" W="*W* H="*H*" CS="14.14" Exp="True" />
+        ///   where 
+        ///     *NAME* is <paramref name="ID"/>
+        ///     *X* is the x co-ordinate of the left upper corner of the rectangle containing node
+        ///     *Y* is the z co-ordinate of the left upper corner of the rectangle containing node
+        ///     *W* is the width (x axis) of the rectangle containing node
+        ///     *H* is the depth (z axis) of the rectangle containing node
+        ///     and all emitted measures are in world space. If not <paramref name="isRoot"/>, 
+        ///     *X* and *Y* are absolute values for the rectangle defined by 
+        ///     <paramref name="nodeCenterPosition"/> and <paramref name="nodeAbsoluteScale"/>. 
+        ///     Otherwise those values are relative offsets to the left upper corner of the 
+        ///     rectangle defined by <paramref name="parentCenterPosition"/> and 
+        ///     <paramref name="parentAbsoluteScale"/>.
+        /// </summary>
+        /// <param name="doc">the XML document in which to create the XML node</param>
+        /// <param name="xmlParent">the containing XML element</param>
+        /// <param name="ID">the unique identifier of the node</param>
+        /// <param name="nodeCenterPosition">the center position of the node in world space</param>
+        /// <param name="nodeAbsoluteScale">the scale of the node in world space</param>
+        /// <param name="isRoot">whether the node is a root node, that is, has no parent</param>
+        /// <param name="parentCenterPosition">the center position of the node's parent in world space;
+        /// defined only if not <paramref name="isRoot"/></param>
+        /// <param name="parentAbsoluteScale">the scale of the node's parent in world space;
+        /// defined only if not <paramref name="isRoot"/></param>
+        private static XmlElement AppendNode
+            (XmlDocument doc,
+            XmlElement xmlParent,
+            string ID,
+            Vector3 nodeCenterPosition,
+            Vector3 nodeAbsoluteScale,
+            bool isRoot,
+            Vector3 parentCenterPosition,
+            Vector3 parentAbsoluteScale)
+        {
+            // absolute positions of left upper corner
+            float x = nodeCenterPosition.x - nodeAbsoluteScale.x / 2.0f;
+            float z = nodeCenterPosition.z + nodeAbsoluteScale.z / 2.0f;
+
+            XmlElement xmlNode = doc.CreateElement(null, "Node", null);
             xmlParent.AppendChild(xmlNode);
+            xmlNode.SetAttribute("Id", "L" + ID);
+
+            if (isRoot)
+            {
+                xmlNode.SetAttribute("X", FloatToString(x));
+                // Note: Gravix Y axis is inverted to Unity's z axis
+                xmlNode.SetAttribute("Y", FloatToString(-z));
+            }
+            else
+            {
+                // adjust positions as relative offset to parent
+                float parentX = parentCenterPosition.x - parentAbsoluteScale.x / 2.0f;
+                float parentZ = parentCenterPosition.z + parentAbsoluteScale.z / 2.0f;
+
+                x = x - parentX;
+                z = parentZ - z;
+
+                xmlNode.SetAttribute("X", FloatToString(x));
+                xmlNode.SetAttribute("Y", FloatToString(z));
+
+            }
+            xmlNode.SetAttribute("W", FloatToString(nodeAbsoluteScale.x));
+            xmlNode.SetAttribute("H", FloatToString(nodeAbsoluteScale.z));
+
+            xmlNode.SetAttribute("CS", FloatToString(14.4f));
+            xmlNode.SetAttribute("Exp", "True");
+            return xmlNode;
         }
 
 
@@ -234,6 +329,5 @@ namespace SEE.Layout.IO
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
-
     }
 }
