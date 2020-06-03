@@ -156,7 +156,7 @@ namespace SEE.Layout
 
                 foreach (ILayoutNode go in layoutNodes)
                 {
-                    Vector3 extent = go.LocalScale;
+                    Vector3 extent = go.AbsoluteScale / 2.0f;
                     // Note: position denotes the center of the object
                     Vector3 position = go.CenterPosition;
                     {
