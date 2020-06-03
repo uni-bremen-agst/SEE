@@ -198,7 +198,7 @@ namespace SEE.Game
                 // calculate and apply the node layout
                 ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(nodeMap.Values);
                 nodeLayout.Apply(layoutNodes);                
-                NodeLayout.Scale(layoutNodes, parent.transform.localScale.x);
+                NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x);
                 NodeLayout.Move(layoutNodes, parent.transform.position);
 
                 RemoveRootIfNecessary(ref root, graph, nodeMap);
