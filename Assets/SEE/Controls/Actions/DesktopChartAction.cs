@@ -14,7 +14,7 @@ namespace SEE.Controls
 			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			if (Physics.Raycast(ray, out var hit, 100f) &&
 			    hit.transform.gameObject.TryGetComponent(out NodeRef _))
-				ChartManager.HighlightObject(hit.transform.gameObject);
+				ChartManager.HighlightObject(hit.transform.gameObject, false);
 		}
 	}
 }

@@ -47,7 +47,7 @@ namespace SEE.Charts.Scripts.VR
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y &&
 					    markerPos.y < max.y)
 						ChartManager.HighlightObject(
-							marker.GetComponent<ChartMarker>().linkedObject);
+							marker.GetComponent<ChartMarker>().linkedObject, false);
 				}
 			else
 				foreach (var marker in ActiveMarkers)
@@ -56,7 +56,7 @@ namespace SEE.Charts.Scripts.VR
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y &&
 					    markerPos.y > max.y)
 						ChartManager.HighlightObject(
-							marker.GetComponent<ChartMarker>().linkedObject);
+							marker.GetComponent<ChartMarker>().linkedObject, false);
 				}
 		}
 

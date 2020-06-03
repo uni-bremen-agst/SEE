@@ -59,7 +59,7 @@ namespace SEE.Charts.Scripts
 		/// <param name="eventData"></param>
 		public void OnPointerClick(PointerEventData eventData)
 		{
-			ChartManager.HighlightObject(gameObject);
+			ChartManager.HighlightObject(gameObject, false);
 			StartCoroutine(Accentuate());
 		}
 

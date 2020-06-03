@@ -13,11 +13,6 @@ namespace SEE.Charts.Scripts
 	public class ScrollViewToggle : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	{
 		/// <summary>
-		/// Contains methods to highlight objects.
-		/// </summary>
-		private ChartManager _chartManager;
-
-		/// <summary>
 		/// The linked chart. Also contains methods to refresh the chart.
 		/// </summary>
 		private ChartContent _chartContent;
@@ -64,8 +59,6 @@ namespace SEE.Charts.Scripts
 		/// <param name="script">The script to link.</param>
 		public void Initialize(ChartContent script)
 		{
-			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
-				.GetComponent<ChartManager>();
 			_chartContent = script;
 			toggle.isOn = !Parent || (bool) LinkedObject.showInChart[_chartContent];
 		}
@@ -87,7 +80,6 @@ namespace SEE.Charts.Scripts
 		{
 			if (Parent == null)
 			{
-				Debug.Log("Parent trigger: " + LinkedObject);
 				if (StatusUpdate != null) return;
 				var active = toggle.isOn;
 				foreach (var child in _children) child.Toggle(active, true);
@@ -95,8 +87,6 @@ namespace SEE.Charts.Scripts
 			else
 			{
 				LinkedObject.showInChart[_chartContent] = toggle.isOn;
-				Debug.Log("Child Trigger: " + LinkedObject);
-				Debug.Log(_chartContent);
 				if (Parent.StatusUpdate == null)
 					Parent.StatusUpdate = StartCoroutine(Parent.UpdateStatus());
 				if (_chartContent.drawing == null)
@@ -162,7 +152,7 @@ namespace SEE.Charts.Scripts
 		/// <param name="highlighted">Highlight on or off.</param>
 		public void SetHighlighted(bool highlighted)
 		{
-			var highlightToggle = GetComponent<Toggle>();
+			TryGetComponent<Toggle>(out var highlightToggle);
 			var colors = highlightToggle.colors;
 			colors.normalColor = highlighted ? Color.yellow : Color.white;
 			highlightToggle.colors = colors;
@@ -174,9 +164,9 @@ namespace SEE.Charts.Scripts
 		/// <param name="eventData"></param>
 		public void OnPointerEnter(PointerEventData eventData)
 		{
-			if (_chartManager == null || LinkedObject == null) return;
+			if (LinkedObject == null) return;
 			_pointedOn = true;
-			ChartManager.HighlightObject(LinkedObject.gameObject);
+			ChartManager.HighlightObject(LinkedObject.gameObject, true);
 		}
 
 		/// <summary>
@@ -186,8 +176,7 @@ namespace SEE.Charts.Scripts
 		public void OnPointerExit(PointerEventData eventData)
 		{
 			if (!_pointedOn) return;
-			ChartManager.HighlightObject(LinkedObject.gameObject);
-			SetHighlighted(false);
+			ChartManager.HighlightObject(LinkedObject.gameObject, true);
 			_pointedOn = false;
 		}
 
@@ -198,7 +187,8 @@ namespace SEE.Charts.Scripts
 		private void OnDestroy()
 		{
 			if (_pointedOn && LinkedObject != null)
-				ChartManager.HighlightObject(LinkedObject.gameObject);
+				ChartManager.HighlightObject(LinkedObject.gameObject, true);
+			StopAllCoroutines();
 		}
 	}
 }

@@ -186,7 +186,7 @@ namespace SEE.Charts.Scripts
 			foreach (Transform child in scrollContent.transform) Destroy(child.gameObject);
 
 			var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-			var parentToggle = tempObject.GetComponent<ScrollViewToggle>();
+			tempObject.TryGetComponent<ScrollViewToggle>(out var parentToggle);
 			parentToggle.SetLabel("Buildings");
 			tempObject.transform.localPosition = headerOffset;
 			parentToggle.Initialize(this);
@@ -197,7 +197,7 @@ namespace SEE.Charts.Scripts
 					CreateChildToggle(dataObject, parentToggle, index++, _yGap);
 
 			tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-			parentToggle = tempObject.GetComponent<ScrollViewToggle>();
+			tempObject.TryGetComponent(out parentToggle);
 			parentToggle.SetLabel("Nodes");
 			tempObject.transform.localPosition = headerOffset + new Vector2(0, _yGap) * ++index;
 			parentToggle.Initialize(this);
@@ -206,9 +206,8 @@ namespace SEE.Charts.Scripts
 				if (!dataObject.GetComponent<NodeRef>().node.IsLeaf())
 					CreateChildToggle(dataObject, parentToggle, index++, _yGap);
 
-			scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(
-				scrollContent.GetComponent<RectTransform>().sizeDelta.x,
-				index * Mathf.Abs(_yGap) + 40);
+			scrollContent.TryGetComponent<RectTransform>(out var rect);
+			rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
 		}
 
 		private void FillScrollView(bool tree)
@@ -221,7 +220,8 @@ namespace SEE.Charts.Scripts
 				return;
 			}
 
-			var graph = _dataObjects[0].GetComponent<NodeRef>().node.ItsGraph;
+			_dataObjects[0].TryGetComponent<NodeRef>(out var node);
+			var graph = node.node.ItsGraph;
 			var roots = graph.GetRoots();
 			var index = 0;
 			var hierarchy = 0;
@@ -230,10 +230,13 @@ namespace SEE.Charts.Scripts
 			foreach (var root in roots)
 			{
 				var inScene = _dataObjects.First(entry =>
-					entry.GetComponent<NodeRef>().node.ID.Equals(root.ID));
+				{
+					entry.TryGetComponent<NodeRef>(out var nodeRef);
+					return nodeRef.node.ID.Equals(root.ID);
+				});
 				var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-				var rootToggle = tempObject.GetComponent<ScrollViewToggle>();
-				var highlights = inScene.GetComponent<NodeHighlights>();
+				tempObject.TryGetComponent<ScrollViewToggle>(out var rootToggle);
+				inScene.TryGetComponent<NodeHighlights>(out var highlights);
 				rootToggle.LinkedObject = highlights;
 				highlights.scrollViewToggle = rootToggle;
 				rootToggle.SetLabel(root.SourceName);
@@ -245,10 +248,9 @@ namespace SEE.Charts.Scripts
 				CreateChildToggles(root, rootToggle, ref index, ref hierarchy);
 			}
 
-			if (hierarchy > maxHierarchy) maxHierarchy = hierarchy;
-			scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(
-				scrollContent.GetComponent<RectTransform>().sizeDelta.x,
-				index * Mathf.Abs(_yGap) + 40); //TODO: Max hierarchy
+			if (hierarchy > maxHierarchy) maxHierarchy = hierarchy; //TODO: Use this...
+			scrollContent.TryGetComponent<RectTransform>(out var rect);
+			rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
 		}
 
 		/// <summary>
@@ -263,9 +265,9 @@ namespace SEE.Charts.Scripts
 			float gap)
 		{
 			var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-			var toggle = tempObject.GetComponent<ScrollViewToggle>();
+			tempObject.TryGetComponent<ScrollViewToggle>(out var toggle);
 			toggle.Parent = parentToggle;
-			var highlights = dataObject.GetComponent<NodeHighlights>();
+			dataObject.TryGetComponent<NodeHighlights>(out var highlights);
 			toggle.LinkedObject = highlights;
 			highlights.scrollViewToggle = toggle;
 			toggle.SetLabel(dataObject.name);
@@ -283,11 +285,14 @@ namespace SEE.Charts.Scripts
 			foreach (var child in root.Children())
 			{
 				var inScene = _dataObjects.First(entry =>
-					entry.GetComponent<NodeRef>().node.ID.Equals(child.ID));
+				{
+					entry.TryGetComponent<NodeRef>(out var nodeRef);
+					return nodeRef.node.ID.Equals(child.ID);
+				});
 				var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-				var toggle = tempObject.GetComponent<ScrollViewToggle>();
+				tempObject.TryGetComponent<ScrollViewToggle>(out var toggle);
 				toggle.Parent = parentToggle;
-				var highlights = inScene.GetComponent<NodeHighlights>();
+				inScene.TryGetComponent<NodeHighlights>(out var highlights);
 				toggle.LinkedObject = highlights;
 				highlights.scrollViewToggle = toggle;
 				toggle.SetLabel(child.SourceName);
@@ -332,10 +337,12 @@ namespace SEE.Charts.Scripts
 		{
 			_dataObjects = GameObject.FindGameObjectsWithTag("Node");
 			foreach (var entry in _dataObjects)
-				if (!entry.GetComponent<NodeHighlights>().showInChart.Contains(this))
-					entry.GetComponent<NodeHighlights>().showInChart.Add(this, true);
-			citySize = _dataObjects.Length;
+			{
+				entry.TryGetComponent<NodeHighlights>(out var highlights);
+				if (!highlights.showInChart.Contains(this)) highlights.showInChart.Add(this, true);
+			}
 
+			citySize = _dataObjects.Length;
 			FillScrollView(_displayAsTree);
 		}
 
@@ -354,10 +361,8 @@ namespace SEE.Charts.Scripts
 		/// <returns></returns>
 		public IEnumerator QueueDraw()
 		{
-			if (citySize > 50)
-				yield return new WaitForSeconds(5f);
-			else
-				yield return new WaitForSeconds(0.5f);
+			if (citySize > 50) yield return new WaitForSeconds(5f);
+			else yield return new WaitForSeconds(0.5f);
 
 			DrawData(false);
 			drawing = null;
@@ -385,14 +390,14 @@ namespace SEE.Charts.Scripts
 		private void DrawTwoAxes()
 		{
 			var i = 0;
-			var nodeRef = _dataObjects[i].GetComponent<NodeRef>();
+			_dataObjects[i].TryGetComponent<NodeRef>(out var nodeRef);
 			var node = nodeRef.node;
 			var showInChart = (bool) nodeRef.highlights.showInChart[this];
 			var contained = node.TryGetNumeric(axisDropdownX.Value, out var minX) && showInChart;
 			while (!contained)
 			{
 				i++;
-				nodeRef = _dataObjects[i].GetComponent<NodeRef>();
+				_dataObjects[i].TryGetComponent(out nodeRef);
 				node = nodeRef.node;
 				showInChart = (bool) nodeRef.highlights.showInChart[this];
 				contained = showInChart && node.TryGetNumeric(axisDropdownX.Value, out minX);
@@ -400,14 +405,14 @@ namespace SEE.Charts.Scripts
 
 			var maxX = minX;
 			i = 0;
-			nodeRef = _dataObjects[i].GetComponent<NodeRef>();
+			_dataObjects[i].TryGetComponent(out nodeRef);
 			node = nodeRef.node;
 			showInChart = (bool) nodeRef.highlights.showInChart[this];
 			contained = node.TryGetNumeric(axisDropdownY.Value, out var minY) && showInChart;
 			while (!contained)
 			{
 				i++;
-				nodeRef = _dataObjects[i].GetComponent<NodeRef>();
+				_dataObjects[i].TryGetComponent(out nodeRef);
 				node = nodeRef.node;
 				showInChart = (bool) nodeRef.highlights.showInChart[this];
 				contained = showInChart && node.TryGetNumeric(axisDropdownY.Value, out minY);
@@ -417,7 +422,7 @@ namespace SEE.Charts.Scripts
 			var toDraw = new List<GameObject>();
 			foreach (var data in _dataObjects)
 			{
-				nodeRef = data.GetComponent<NodeRef>();
+				data.TryGetComponent(out nodeRef);
 				node = nodeRef.node;
 				showInChart = (bool) nodeRef.highlights.showInChart[this];
 				var inX = false;
@@ -530,7 +535,7 @@ namespace SEE.Charts.Scripts
 			{
 				var marker = Instantiate(markerPrefab, entries.transform);
 				marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
-				var script = marker.GetComponent<ChartMarker>();
+				marker.TryGetComponent<ChartMarker>(out var script);
 				script.linkedObject = data;
 				script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
 				var node = data.GetComponent<NodeRef>().node;
@@ -546,8 +551,8 @@ namespace SEE.Charts.Scripts
 
 				var highlightTimeLeft = CheckOldMarkers(data);
 				if (highlightTimeLeft > 0f)
-					script.TriggerTimedHighlight(ChartManager.highlightDuration -
-					                             highlightTimeLeft, true);
+					script.TriggerTimedHighlight(ChartManager.highlightDuration - highlightTimeLeft,
+						true, false);
 			}
 
 			foreach (var marker in ActiveMarkers) Destroy(marker);
@@ -580,7 +585,7 @@ namespace SEE.Charts.Scripts
 				{
 					var marker = Instantiate(markerPrefab, entries.transform);
 					marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
-					var script = marker.GetComponent<ChartMarker>();
+					marker.TryGetComponent<ChartMarker>(out var script);
 					script.linkedObject = data;
 					script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
 					var node = data.GetComponent<NodeRef>().node;
@@ -598,7 +603,7 @@ namespace SEE.Charts.Scripts
 					var highlightTimeLeft = CheckOldMarkers(data);
 					if (highlightTimeLeft > 0f)
 						script.TriggerTimedHighlight(
-							ChartManager.highlightDuration - highlightTimeLeft, true);
+							ChartManager.highlightDuration - highlightTimeLeft, true, false);
 				}
 
 				foreach (var marker in ActiveMarkers) Destroy(marker);
@@ -623,18 +628,21 @@ namespace SEE.Charts.Scripts
 			foreach (var data in toDraw)
 			{
 				var marker = Instantiate(markerPrefab, entries.transform);
-				marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
-				var script = marker.GetComponent<ChartMarker>();
+				marker.TryGetComponent<SortingGroup>(out var group);
+				group.sortingOrder = positionInLayer++;
+				marker.TryGetComponent<ChartMarker>(out var script);
 				script.linkedObject = data;
-				script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
-				var node = data.GetComponent<NodeRef>().node;
+				data.TryGetComponent<NodeHighlights>(out var highlights);
+				script.ScrollViewToggle = highlights.scrollViewToggle;
+				data.TryGetComponent<NodeRef>(out var nodeRef);
+				var node = nodeRef.node;
 				node.TryGetNumeric(axisDropdownX.Value, out var valueX);
 				node.TryGetNumeric(axisDropdownY.Value, out var valueY);
 				var type = node.IsLeaf() ? "Building" : "Node";
 				script.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
 				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("N"));
-				marker.GetComponent<RectTransform>().anchoredPosition =
-					new Vector2(x++ * width, y++ * height);
+				marker.TryGetComponent<RectTransform>(out var anchoredPos);
+				anchoredPos.anchoredPosition = new Vector2(x++ * width, y++ * height);
 				CheckOverlapping(marker, updatedMarkers.ToArray());
 				updatedMarkers.Add(marker);
 
@@ -642,7 +650,7 @@ namespace SEE.Charts.Scripts
 				var highlightTimeLeft = CheckOldMarkers(data);
 				if (highlightTimeLeft > 0f)
 					script.TriggerTimedHighlight(ChartManager.highlightDuration - highlightTimeLeft,
-						true);
+						true, false);
 			}
 
 			foreach (var marker in ActiveMarkers) Destroy(marker);
@@ -657,7 +665,7 @@ namespace SEE.Charts.Scripts
 		/// <param name="updatedMarkers">The already active new markers.</param>
 		private static void CheckOverlapping(GameObject marker, GameObject[] updatedMarkers)
 		{
-			var image = marker.GetComponent<Image>();
+			marker.TryGetComponent<Image>(out var image);
 			if (updatedMarkers.Length > 10)
 				for (var i = updatedMarkers.Length - 10; i < updatedMarkers.Length; i++)
 				{
@@ -727,7 +735,7 @@ namespace SEE.Charts.Scripts
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y &&
 					    markerPos.y < max.y)
 						ChartManager.HighlightObject(
-							marker.GetComponent<ChartMarker>().linkedObject);
+							marker.GetComponent<ChartMarker>().linkedObject, false);
 				}
 			else
 				foreach (var marker in ActiveMarkers)
@@ -736,7 +744,7 @@ namespace SEE.Charts.Scripts
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y &&
 					    markerPos.y > max.y)
 						ChartManager.HighlightObject(
-							marker.GetComponent<ChartMarker>().linkedObject);
+							marker.GetComponent<ChartMarker>().linkedObject, false);
 				}
 		}
 
@@ -754,6 +762,11 @@ namespace SEE.Charts.Scripts
 				                        axisDropdownY.Value);
 		}
 
+		/// <summary>
+		/// Sets if the scroll view will display the original tree of the file structure or the more convenient
+		/// grouping into buildings and nodes.
+		/// </summary>
+		/// <param name="displayAsTree"></param>
 		public void SetDisplayAsTree(bool displayAsTree)
 		{
 			_displayAsTree = displayAsTree;
@@ -765,14 +778,15 @@ namespace SEE.Charts.Scripts
 		/// across all charts.
 		/// </summary>
 		/// <param name="highlight">The object the marker will refer to.</param>
-		public void HighlightCorrespondingMarker(GameObject highlight)
+		/// <param name="scrollView">If this is triggered by a <see cref="ScrollViewToggle" /> or not.</param>
+		public void HighlightCorrespondingMarker(GameObject highlight, bool scrollView)
 		{
 			foreach (var activeMarker in ActiveMarkers)
-				if (!activeMarker.Equals(null))
+				if (activeMarker)
 				{
-					var script = activeMarker.GetComponent<ChartMarker>();
+					activeMarker.TryGetComponent<ChartMarker>(out var script);
 					if (!script.linkedObject.Equals(highlight)) continue;
-					script.TriggerTimedHighlight(ChartManager.highlightDuration, false);
+					script.TriggerTimedHighlight(ChartManager.highlightDuration, false, scrollView);
 					break;
 				}
 		}
@@ -786,7 +800,7 @@ namespace SEE.Charts.Scripts
 		{
 			foreach (var activeMarker in ActiveMarkers)
 			{
-				var script = activeMarker.GetComponent<ChartMarker>();
+				activeMarker.TryGetComponent<ChartMarker>(out var script);
 				if (!script.linkedObject.Equals(highlight)) continue;
 				script.Accentuate();
 				break;
