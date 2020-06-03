@@ -283,6 +283,8 @@ namespace SEE.Layout.IO
             Vector3 parentCenterPosition,
             Vector3 parentAbsoluteScale)
         {
+            Debug.LogFormat("ID={0} nodeCenterPosition={1} nodeAbsoluteScale={2} isRoot={3} parentCenterPosition={4} parentAbsoluteScale={5}\n", 
+                            ID, nodeCenterPosition, nodeAbsoluteScale, isRoot, parentCenterPosition, parentAbsoluteScale);
             // absolute positions of left upper corner
             float x = nodeCenterPosition.x - nodeAbsoluteScale.x / 2.0f;
             float z = nodeCenterPosition.z + nodeAbsoluteScale.z / 2.0f;
