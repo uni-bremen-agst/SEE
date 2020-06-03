@@ -297,7 +297,7 @@ namespace SEE.Game
             // must be later applied when render a city. Here, we only store the layout for later use.
             nodeLayout.Apply(layoutNodes);
             NodeLayout.Move(layoutNodes, gameObject.transform.position);
-            NodeLayout.Scale(layoutNodes, gameObject.transform.position.x);
+            NodeLayout.Scale(layoutNodes, gameObject.transform.lossyScale.x);
             return ToNodeIDLayout(layoutNodes);
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to 
