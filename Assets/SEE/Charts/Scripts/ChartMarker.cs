@@ -147,7 +147,7 @@ namespace SEE.Charts.Scripts
 			{
 				var child = linkedObject.transform.GetChild(i);
 				if (!child.name.Equals(linkedObject.name + "(Clone)")) continue;
-				TriggerTimedHighlight(_chartManager.highlightDuration, false);
+				TriggerTimedHighlight(_chartManager.highlightDuration, false, false);
 				break;
 			}
 		}
@@ -182,7 +182,7 @@ namespace SEE.Charts.Scripts
 			yield return new WaitForSeconds(_clickDelay);
 			if (_waiting)
 			{
-				ChartManager.HighlightObject(linkedObject);
+				ChartManager.HighlightObject(linkedObject, false);
 			}
 			else
 			{
@@ -220,7 +220,11 @@ namespace SEE.Charts.Scripts
 						.TryGetComponent<LineRenderer>(out var line);
 					var linePos = _highlightCopy.transform.localPosition;
 					line.SetPositions(new[]
-						{linePos, linePos + new Vector3(0f, _highlightLineLength)});
+					{
+						linePos,
+						linePos + new Vector3(0f, _highlightLineLength) /
+						_highlightCopy.transform.lossyScale.y
+					});
 				}
 			}
 			else
@@ -230,7 +234,7 @@ namespace SEE.Charts.Scripts
 			}
 
 			markerHighlight.SetActive(highlight);
-			ScrollViewToggle.SetHighlighted(highlight);
+			if (ScrollViewToggle) ScrollViewToggle.SetHighlighted(highlight);
 		}
 
 		/// <summary>
@@ -242,23 +246,32 @@ namespace SEE.Charts.Scripts
 		/// Overwrites the selection mode to reactivate the highlight after
 		/// deactivation.
 		/// </param>
-		public void TriggerTimedHighlight(float time, bool reenable)
+		/// <param name="scrollView">If this is triggered by a <see cref="ScrollViewToggle" /> or not.</param>
+		public void TriggerTimedHighlight(float time, bool reenable, bool scrollView)
 		{
-			var reactivate = false;
-
-			if (TimedHighlight != null)
+			if (scrollView)
 			{
-				StopCoroutine(TimedHighlight);
-				HighlightLinkedObjectToggle(false);
-				TimedHighlight = null;
-				if (_chartManager.selectionMode || reenable) reactivate = true;
+				if (TimedHighlight != null) return;
+				HighlightLinkedObjectToggle(!_highlightCopy);
 			}
 			else
 			{
-				reactivate = true;
-			}
+				var reactivate = false;
 
-			if (reactivate) TimedHighlight = StartCoroutine(TimedHighlightRoutine(time));
+				if (TimedHighlight != null)
+				{
+					StopCoroutine(TimedHighlight);
+					HighlightLinkedObjectToggle(false);
+					TimedHighlight = null;
+					if (_chartManager.selectionMode || reenable) reactivate = true;
+				}
+				else
+				{
+					reactivate = true;
+				}
+
+				if (reactivate) TimedHighlight = StartCoroutine(TimedHighlightRoutine(time));
+			}
 		}
 
 		/// <summary>
@@ -366,12 +379,14 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		public void Accentuate()
 		{
-			markerHighlight.GetComponent<Image>().color = _accentuated
+			markerHighlight.TryGetComponent<Image>(out var image);
+			image.color = _accentuated
 				? _chartManager.standardColor
 				: _chartManager.accentuationColor;
 			_accentuated = !_accentuated;
-			if (_highlightCopy == null) return;
-			_highlightCopy.GetComponent<Renderer>().material = _accentuated
+			if (!_highlightCopy) return;
+			_highlightCopy.TryGetComponent<Renderer>(out var render);
+			render.material = _accentuated
 				? _buildingHighlightMaterialAccentuated
 				: _buildingHighlightMaterial;
 		}
@@ -420,7 +435,7 @@ namespace SEE.Charts.Scripts
 		private void OnEnable()
 		{
 			if (!_reactivateHighlight) return;
-			TriggerTimedHighlight(_highlightDuration - HighlightTime, true);
+			TriggerTimedHighlight(_highlightDuration - HighlightTime, true, false);
 			_reactivateHighlight = false;
 		}
 
@@ -430,6 +445,7 @@ namespace SEE.Charts.Scripts
 		private void OnDestroy()
 		{
 			if (_highlightCopy != null) Destroy(_highlightCopy);
+			StopAllCoroutines();
 		}
 	}
 }

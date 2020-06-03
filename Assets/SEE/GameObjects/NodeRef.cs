@@ -3,7 +3,6 @@ using OdinSerializer;
 using SEE.Charts.Scripts;
 using SEE.DataModel;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SEE.GO
 {
@@ -21,8 +20,7 @@ namespace SEE.GO
 		/// </summary>
 		[NonSerialized] public Node node;
 
-		[FormerlySerializedAs("Highlights"), HideInInspector]
-		public NodeHighlights highlights;
+		[HideInInspector] public NodeHighlights highlights;
 
 		public void Awake()
 		{
