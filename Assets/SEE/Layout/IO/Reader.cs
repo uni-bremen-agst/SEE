@@ -55,7 +55,7 @@ namespace SEE.Layout.IO
         /// <summary>
         /// The minimal height for a loaded game object.
         /// </summary>
-        private const float MinimalHeight = 0.2f;
+        private const float MinimalHeight = 0.00001f;
 
         /// <summary>
         /// Returns a mapping from the IDs of all <paramref name="gameNodes"/> onto
@@ -500,14 +500,12 @@ namespace SEE.Layout.IO
                 Debug.LogError(String.Format("Unknown id {0}", ID));
                 // We create a new game node so that we can continue as normal.
                 gameNode = new LayoutVertex(ID);
-                //throw new SyntaxError(String.Format("Unknown id {0}", ID));
             }
             float X = GetFloat(reader, "X");   // mandatory x co-ordinate
             float Y = GetFloat(reader, "Y");   // mandatory y co-ordinate; Gravis's Y is Unity's inverted z axis
             float W = GetFloat(reader, "W");   // mandatory width
             float H = GetFloat(reader, "H");   // mandatory height
 
-            // Note: (X, Y) is now mirrored along the x axis, thus, denotes the left lower corner.
             ParentNode parent = nodes.Peek();
             float CS = parent.CS; // icon size for this node
             {
