@@ -35,6 +35,11 @@ namespace SEE.GO
         /// </summary>
         protected Materials materials;
 
+        /// <summary>
+        /// The default height of a inner node in world space Unity unit.
+        /// </summary>
+        protected const float DefaultHeight = 0.000001f;
+
         public override int NumberOfStyles()
         {
             return materials.NumberOfMaterials();
