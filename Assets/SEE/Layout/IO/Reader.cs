@@ -287,9 +287,10 @@ namespace SEE.Layout.IO
                                 State state = ToState(reader.Name);
                                 if (!reader.IsEmptyElement)
                                 {
-                                    // This is a self-closing (empty) element, e.g., <enum/>. 
+                                    // This is not a self-closing (empty) element, e.g., <item/>. 
                                     // Note: A corresponding EndElement node is not generated for empty elements. 
-                                    // That is why we must not push an expected EndElement onto the context stack.
+                                    // That is why we must push an expected EndElement onto the context stack
+                                    // only if the element is not self-closing.
                                     context.Push(state);
                                 }
                                 switch (state)
@@ -508,9 +509,13 @@ namespace SEE.Layout.IO
 
             ParentNode parent = nodes.Peek();
             float CS = parent.CS; // icon size for this node
+            if (!reader.IsEmptyElement)
             {
-                float thisCS = GetFloat(reader, "CS"); // mandatory icon size for the children
-                nodes.Push(new ParentNode(thisCS, gameNode));
+                // push current gameNode along with the mandatory icon size for its children
+                // onto the nodes stack but only if this XML element is not self-closing.
+                // For a self-closing element <Node .... />, no corresponding EndNode()
+                // will be called to pop off this element.
+                nodes.Push(new ParentNode(GetFloat(reader, "CS"), gameNode));
             }
             bool Exp = reader.GetAttribute("Exp") == "True"; // optional expansion
 
