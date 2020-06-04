@@ -175,9 +175,10 @@ namespace SEE.Utils
                                 State state = ToState(reader.Name);
                                 if (!reader.IsEmptyElement)
                                 {
-                                    // This is a self-closing (empty) element, e.g., <enum/>. 
+                                    // This is not a self-closing (empty) element, e.g., <item/>. 
                                     // Note: A corresponding EndElement node is not generated for empty elements. 
-                                    // That is why we must not push an expected EndElement onto the context stack.
+                                    // That is why we must push an expected EndElement onto the context stack
+                                    // only if the element is not self-closing.
                                     context.Push(state);
                                 }
                                 switch (state)
