@@ -350,10 +350,16 @@ namespace SEE.Game
         //-----------------------------------
         // Visual attributes of an inner node
         //-----------------------------------
+
+        /// <summary>
+        /// The attribute name of the metric to be used for determining the height of inner nodes.
+        /// </summary>
+        public string InnerNodeHeightMetric = "";
         /// <summary>
         /// The attribute name of the metric to be used for determining the style of inner nodes.
         /// </summary>
         public string InnerNodeStyleMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
+
 
         //--------------------------------------
         // Other visual attributes of leaf nodes

@@ -802,6 +802,28 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Adjusts the height (y axis) of the given <paramref name="gameNode"/> according
+        /// to the InnerNodeHeightMetric.
+        /// 
+        /// Precondition: <paramref name="gameNode"/> must denote an inner node created
+        /// by innerNodeFactory.
+        /// </summary>
+        /// <param name="gameNode">inner node whose height is to be set</param>
+        private void AdjustHeightOfInnerNode(GameObject gameNode)
+        {            
+            NodeRef noderef = gameNode.GetComponent<NodeRef>();
+            if (noderef == null)
+            {
+                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
+            }
+            else
+            {
+                float value = GetMetricValue(noderef.node, settings.InnerNodeHeightMetric);
+                innerNodeFactory.SetHeight(gameNode, value);
+            }
+        }
+
+        /// <summary>
         /// Adjusts the style of the given <paramref name="gameNode"/> according
         /// to the metric value of the graph node attached to <paramref name="gameNode"/>
         /// chosen to determine style.
@@ -913,8 +935,10 @@ namespace SEE.Game
         /// <summary>
         /// Creates a new game object for an inner node using innerNodeFactory.
         /// The inner <paramref name="node"/> is attached to that new game object
-        /// via a NodeRef component. The style of resulting game object is adjusted
-        /// according to the selected InnerNodeStyleMetric but not its scale.
+        /// via a NodeRef component. The style and height of the resulting game 
+        /// object are adjusted according to the selected InnerNodeStyleMetric 
+        /// and InnerNodeHeightMetric, respectively. The other scale dimensions
+        /// are not changed.
         /// 
         /// Precondition: <paramref name="node"/> must be an inner node of the node
         /// hierarchy.
@@ -928,6 +952,7 @@ namespace SEE.Game
             innerGameObject.tag = Tags.Node;
             AttachNode(innerGameObject, node);
             AdjustStyle(innerGameObject);
+            AdjustHeightOfInnerNode(innerGameObject);
             return innerGameObject;
         }
 
