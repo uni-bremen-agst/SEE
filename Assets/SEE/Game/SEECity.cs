@@ -244,6 +244,31 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Saves the graph data to the GXL file with GXLPath().
+        /// </summary>
+        public virtual void SaveData()
+        {
+            if (string.IsNullOrEmpty(GXLPath()))
+            {
+                Debug.LogError("Empty graph path.\n");
+            }
+            else
+            {
+                if (LoadedGraph != null)
+                {
+                    // This loop runs only once for the first hierarchical edge type
+                    // we encounter. There is no simple method to retrieve an 
+                    // arbitrary element from a HashSet (the type of HierarchicalEdges).
+                    foreach (string hierarchicalEdge in HierarchicalEdges)
+                    {
+                        GraphWriter.Save(GXLPath(), LoadedGraph, hierarchicalEdge);
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Re-draws the graph without deleting the underlying loaded graph.
         /// Only the game objects generated for the nodes are deleted first.
         /// Precondition: The graph and its metrics have been loaded.
