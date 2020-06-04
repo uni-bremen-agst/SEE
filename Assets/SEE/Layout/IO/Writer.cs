@@ -284,10 +284,8 @@ namespace SEE.Layout.IO
             Vector3 parentAbsoluteScale)
         {
             Debug.LogFormat("ID={0} nodeCenterPosition={1} nodeAbsoluteScale={2} isRoot={3} parentCenterPosition={4} parentAbsoluteScale={5}\n", 
-                            ID, nodeCenterPosition, nodeAbsoluteScale, isRoot, parentCenterPosition, parentAbsoluteScale);
-            // absolute positions of left upper corner
-            float x = nodeCenterPosition.x - nodeAbsoluteScale.x / 2.0f;
-            float z = nodeCenterPosition.z + nodeAbsoluteScale.z / 2.0f;
+                            ID, nodeCenterPosition.ToString("F4"), nodeAbsoluteScale.ToString("F4"), isRoot, parentCenterPosition.ToString("F4"), parentAbsoluteScale.ToString("F4"));
+
 
             XmlElement xmlNode = doc.CreateElement(null, "Node", null);
             xmlParent.AppendChild(xmlNode);
@@ -295,21 +293,41 @@ namespace SEE.Layout.IO
 
             if (isRoot)
             {
-                xmlNode.SetAttribute("X", FloatToString(x));
-                // Note: Gravix Y axis is inverted to Unity's z axis
-                xmlNode.SetAttribute("Y", FloatToString(-z));
+                // Node is a root node.
+                // assert: (X, Y) in GVL relates to absolute world space of the left upper corner,
+                // whereas (nodeCenterPosition.x, nodeCenterPosition.z) relates to the center within the x/z plane.
+                // Transform from center position of Unity to (X, Y) co-ordinate system in GVL.
+                float X = nodeCenterPosition.x - nodeAbsoluteScale.x / 2.0f;
+
+                // Gravis's Y is Unity's inverted z axis, i.e., we need to mirror Unity's z
+                // as follows: Y = -z. By mirroring z, the left upper corner of a node
+                // becomes its left lower corner.
+                float Y = -nodeCenterPosition.z - nodeAbsoluteScale.z / 2.0f;
+
+                xmlNode.SetAttribute("X", FloatToString(X));
+                xmlNode.SetAttribute("Y", FloatToString(Y));
             }
             else
             {
-                // adjust positions as relative offset to parent
-                float parentX = parentCenterPosition.x - parentAbsoluteScale.x / 2.0f;
-                float parentZ = parentCenterPosition.z + parentAbsoluteScale.z / 2.0f;
+                // Node is a nested node, that is, not at top-level.
+                // (X, Y) must denote the offset of the nested node to its parent's left upper corner
 
-                x = x - parentX;
-                z = parentZ - z;
+                // Transform parent's center position to its left upper corner in Unity's co-ordinates.
+                Vector3 parentCornerPosition = parentCenterPosition; // world space in Unity
+                parentCornerPosition.x -= parentAbsoluteScale.x / 2.0f;
+                parentCornerPosition.z += parentAbsoluteScale.z / 2.0f;
 
-                xmlNode.SetAttribute("X", FloatToString(x));
-                xmlNode.SetAttribute("Y", FloatToString(z));
+                // Transform node's center position to its left upper corner in Unity's co-ordinates.
+                Vector3 nodeCornerPosition = nodeCenterPosition;
+                nodeCornerPosition.x -= nodeAbsoluteScale.x / 2.0f;
+                nodeCornerPosition.z += nodeAbsoluteScale.z / 2.0f;
+
+                // Calculate the offset between the two corners.
+                float X = nodeCornerPosition.x - parentCornerPosition.x;
+                float Y = parentCornerPosition.z - nodeCornerPosition.z;
+
+                xmlNode.SetAttribute("X", FloatToString(X));
+                xmlNode.SetAttribute("Y", FloatToString(Y));
 
             }
             xmlNode.SetAttribute("W", FloatToString(nodeAbsoluteScale.x));
@@ -329,7 +347,7 @@ namespace SEE.Layout.IO
         /// <returns>value as a string</returns>
         private static string FloatToString(float value)
         {
-            return value.ToString(CultureInfo.InvariantCulture);
+            return value.ToString(CultureInfo.InvariantCulture.NumberFormat);
         }
     }
 }
