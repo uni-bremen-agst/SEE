@@ -22,6 +22,7 @@ namespace SEEEditor
             city.LeafStyleMetric = EditorGUILayout.TextField("Style", city.LeafStyleMetric);
 
             GUILayout.Label("Attributes of inner nodes", EditorStyles.boldLabel);
+            city.InnerNodeHeightMetric = EditorGUILayout.TextField("Height", city.InnerNodeHeightMetric);
             city.InnerNodeStyleMetric = EditorGUILayout.TextField("Style", city.InnerNodeStyleMetric);
 
             GUILayout.Label("Nodes and Node Layout", EditorStyles.boldLabel);
