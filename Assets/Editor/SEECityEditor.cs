@@ -28,10 +28,21 @@ namespace SEEEditor
         {
             SEECity city = target as SEECity;
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Load"))
+            if (GUILayout.Button("Load Graph"))
             {
                 Load(city);
             }
+            if (GUILayout.Button("Delete Graph"))
+            {
+                Reset(city);
+            }
+            if (GUILayout.Button("Save Graph"))
+            {
+                Save(city);
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Draw"))
             {
                 Draw(city);
@@ -40,10 +51,7 @@ namespace SEEEditor
             {
                 ReDraw(city);
             }
-            if (GUILayout.Button("Delete"))
-            {
-                Reset(city);
-            }
+
             if (GUILayout.Button("Save Layout"))
             {
                 SaveLayout(city);
@@ -98,6 +106,14 @@ namespace SEEEditor
         private void Reset(SEECity city)
         {
             city.Reset();   
+        }
+
+        /// <summary>
+        /// Saves the underlying graph of the current city.
+        /// </summary>
+        private void Save(SEECity city)
+        {
+            city.SaveData();
         }
 
         /// <summary>
