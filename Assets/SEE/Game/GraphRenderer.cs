@@ -185,23 +185,24 @@ namespace SEE.Game
             Dictionary<Node, GameObject> nodeMap = CreateBlocks(nodes);
             // the layout to be applied
             NodeLayout nodeLayout = GetLayout();
-            // for a hierarchical layout, we need to add the game objects for inner nodes
-            Node root = null;
+            Node artificalRoot = null;
+            ICollection<ILayoutNode> layoutNodes = null;
             try
-            {
+            {                                
                 if (nodeLayout.IsHierarchical())
                 {
+                    // for a hierarchical layout, we need to add the game objects for inner nodes
                     AddInnerNodes(nodeMap, nodes);
-                    root = AddRootIfNecessary(graph, nodeMap);
+                    artificalRoot = AddRootIfNecessary(graph, nodeMap);
                 }
 
                 // calculate and apply the node layout
-                ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(nodeMap.Values);
+                layoutNodes = ToLayoutNodes(nodeMap.Values);
+                RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, layoutNodes);
+
                 nodeLayout.Apply(layoutNodes);                
                 NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x);
-                NodeLayout.Move(layoutNodes, parent.transform.position);
-
-                RemoveRootIfNecessary(ref root, graph, nodeMap);
+                NodeLayout.MoveTo(layoutNodes, parent.transform.position);                
 
                 ICollection<GameObject> gameNodes = nodeMap.Values;
                 // add the plane surrounding all game objects for nodes
@@ -219,12 +220,11 @@ namespace SEE.Game
                 ICollection<GameObject> edges = EdgeLayout(graph, layoutNodes);
                 AddToParent(edges, parent);
             }
-            catch(Exception e)
+            finally
             {
                 // If we added an artifical root node to the graph, we must remove it again
                 // from the graph when we are done.
-                RemoveRootIfNecessary(ref root, graph, nodeMap);
-                throw e;
+                RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, layoutNodes);
             }
         }
 
@@ -317,14 +317,31 @@ namespace SEE.Game
         /// <param name="graph">graph where <paramref name="root"/> should be removed/param>
         /// <param name="nodeMap">mapping of nodes onto game objects from which to remove 
         /// <paramref name="root"/></param>
-        private void RemoveRootIfNecessary(ref Node root, Graph graph, Dictionary<Node, GameObject> nodeMap)
+        private void RemoveRootIfNecessary(ref Node root, Graph graph, Dictionary<Node, GameObject> nodeMap, ICollection<ILayoutNode> layoutNodes)
         {
-            if (root != null)
-            {
+            if (!ReferenceEquals(root, null))
+            {                
+                if (layoutNodes != null)
+                {
+                    // Remove from layout
+                    ILayoutNode toBeRemoved = null;
+                    foreach (ILayoutNode layoutNode in layoutNodes)
+                    {
+                        if (layoutNode.ID.Equals(root.ID))
+                        {
+                            toBeRemoved = layoutNode;
+                            break;
+                        }
+                    }
+                    if (toBeRemoved != null)
+                    {
+                        layoutNodes.Remove(toBeRemoved);
+                    }
+                }
                 GameObject go = nodeMap[root];
-                Destroyer.DestroyGameObject(go);
-                graph.RemoveNode(root);
                 nodeMap.Remove(root);
+                graph.RemoveNode(root);                                
+                Destroyer.DestroyGameObject(go);
                 root = null;
             }
         }
