@@ -79,7 +79,7 @@ namespace SEE.Layout
         /// <summary>
         /// Indicates whether is smart repulsion range calculation is used
         /// </summary>
-        public static bool Use_Smart_Repulsion_Range_Calculation = true;
+        public static bool Use_Smart_Repulsion_Range_Calculation = false;
 
         /// <summary>
         /// the check period interval for the grid calculation (multilevel scaling)
@@ -119,7 +119,7 @@ namespace SEE.Layout
         /// <summary>
         /// Indicates whether multilevel scaling is used
         /// </summary>
-        public static bool Multilevel_Scaling = true;
+        public static bool Multilevel_Scaling = false;
 
         /// <summary>
         /// the cooling adjuster
@@ -129,7 +129,7 @@ namespace SEE.Layout
         /// <summary>
         /// true if the parameter edgeLength/ repulsionStrength should be calculated automatically 
         /// </summary>
-        public static bool Automatic_Parameter_Calculation = false;
+        public static bool Automatic_Parameter_Calculation = true;
 
         /// <summary>
         /// true if the layout process continues until a "good" layout is found

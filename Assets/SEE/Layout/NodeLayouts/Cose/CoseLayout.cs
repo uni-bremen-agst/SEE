@@ -202,11 +202,15 @@ namespace SEE.Layout
         /// </summary>
         public void GetGoodParameter()
         {
-            int countNode = layoutNodes.Count;
+            int countNode = layoutNodes.Where(node => !node.IsSublayoutNode || node.IsSublayoutRoot).ToList().Count;
             int countMax = CountDepthMax(layoutNodes);
 
-            int edgeLength = CoseHelper.GetGoodEgdeLength(countNode, countMax);
-            int repulsionStrength = CoseHelper.GetGoodRepulsionRange(countMax, edges.Count);
+            var leafNodesCount = layoutNodes.Where(node => node.IsLeaf && (!node.IsSublayoutNode || node.IsSublayoutRoot)).ToList().Count;
+
+            var edgesCount = edges.Where(edge => edge.Source.Children().Count > 0 && edge.Target.Children().Count > 0).ToList().Count;
+
+            int edgeLength = CoseHelper.GetGoodEgdeLength(countNode, countMax, leafNodesCount, edgesCount);
+            int repulsionStrength = CoseHelper.GetGoodRepulsionRange(countMax, countNode, edgesCount);
 
             settings.CoseGraphSettings.RepulsionStrength = repulsionStrength;
             settings.CoseGraphSettings.EdgeLength = edgeLength;
@@ -322,7 +326,6 @@ namespace SEE.Layout
             CoseLayoutSettings.Edge_Length = settings.EdgeLength;
             CoseLayoutSettings.Use_Smart_Ideal_Edge_Calculation = settings.UseSmartIdealEdgeCalculation;
             CoseLayoutSettings.Per_Level_Ideal_Edge_Length_Factor = settings.PerLevelIdealEdgeLengthFactor;
-            CoseLayoutSettings.Incremental = settings.Incremental;
             CoseLayoutSettings.Use_Smart_Repulsion_Range_Calculation = settings.UseSmartRepulsionRangeCalculation;
             CoseLayoutSettings.Gravity_Strength = settings.GravityStrength;
             CoseLayoutSettings.Compound_Gravity_Strength = settings.CompoundGravityStrength;

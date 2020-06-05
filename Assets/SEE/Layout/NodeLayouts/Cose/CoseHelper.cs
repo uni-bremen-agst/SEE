@@ -125,13 +125,16 @@ namespace SEE.Layout
         /// <param name="countNodes">the number of nodes</param>
         /// <param name="maxDepth">the maximal depth</param>
         /// <returns>edge length</returns>
-        public static int GetGoodEgdeLength(int countNodes, int maxDepth)
+        public static int GetGoodEgdeLength(int countNodes, int maxDepth, int leafNodesCount, int countEdges)
         {
-            float constant = -5.882f;
-            float countNodesConstant = 0.153f;
-            float countMaxDepthConstant = 2.392f;
+            float constant = -5.055f;
+            float countNodesConstant = 0.206f;
+            float countMaxDepthConstant = 2.279f;
+            float edgeDensityConstant = -57.829f;
 
-            float edgeLength = countNodesConstant * countNodes + countMaxDepthConstant * maxDepth + constant;
+            float edgeDensity = countEdges / (leafNodesCount * (leafNodesCount - 1));
+
+            float edgeLength = countNodesConstant * countNodes + countMaxDepthConstant * maxDepth + edgeDensityConstant* edgeDensity + constant;
             return Math.Max((int)Math.Ceiling(edgeLength), 2);
         }
 
@@ -141,13 +144,18 @@ namespace SEE.Layout
         /// <param name="countNodes">the number of nodes</param>
         /// <param name="maxDepth">the maximal depth</param>
         /// <returns>repulsion strength</returns>
-        public static int GetGoodRepulsionRange(int maxDepth, int countEdges)
+        public static int GetGoodRepulsionRange(int maxDepth, int leafNodesCount, int countEdges)
         {
-            float constant = 0.537f;
-            float countMaxDepthConstant = 0.958f;
-            float countEdgeConstant = 0.372f;
+            float constant = -1.995f;
+            float countMaxDepthConstant = 1.107f;
+            float countNodesConstant = 0.209f;
 
-            float repulsionStrength = countMaxDepthConstant * maxDepth + countEdgeConstant * countEdges + constant;
+            float edgeDensityConstant = 91.799f;
+
+            float edgeDensity = countEdges / (leafNodesCount * (leafNodesCount - 1));
+
+
+            float repulsionStrength = countMaxDepthConstant * maxDepth + leafNodesCount * countNodesConstant + edgeDensity * edgeDensityConstant + constant;
             return Math.Max((int)Math.Ceiling(repulsionStrength), 2);
         }
 
