@@ -39,12 +39,12 @@ namespace SEE.Layout
         /// <summary>
         /// maximum number of graphs 
         /// </summary>
-        private readonly int maxNumberOfGraphs = 1000;
+        private readonly int maxNumberOfGraphs = 900;
 
         /// <summary>
         /// the current number of graph 
         /// </summary>
-        int totalNumberOfGraphs = 126;
+        int totalNumberOfGraphs = 600;
 
         /// <summary>
         /// number of leaf nodes
@@ -79,7 +79,7 @@ namespace SEE.Layout
         /// <summary>
         /// the path to the file for comparing the node layouts with each other 
         /// </summary>
-        private readonly string compareNodeLayoutsPath = "Assets/Resources/compareNodelayouts.txt";
+        private readonly string compareNodeLayoutsPath = "Assets/Resources/compareNodelayouts4.txt";
 
         /// <summary>
         /// the parent gameobject
@@ -195,13 +195,48 @@ namespace SEE.Layout
         /// </summary>
         public void CalcLayoutForNodelayouts()
         {
-            foreach (NodeLayouts nodeLayout in Enum.GetValues(typeof(NodeLayouts)))
+            NodeLayouts nodeLayout = GetNodeLayoutForIteration();
+            CalcLayout(nodeLayout); 
+
+            /*foreach (NodeLayouts nodeLayout in Enum.GetValues(typeof(NodeLayouts)))
             {
                 if (nodeLayout.GetModel().IsHierarchical)
                 {
                     CalcLayout(nodeLayout);
                 }
+            }*/
+        }
+
+        public NodeLayouts GetNodeLayoutForIteration()
+        {
+            int mod = totalNumberOfGraphs % 6;
+            NodeLayouts nodeLayout; 
+
+            switch(mod)
+            {
+                case 0:
+                    nodeLayout = NodeLayouts.CompoundSpringEmbedder;
+                    break;
+                case 1:
+                    nodeLayout = NodeLayouts.EvoStreets;
+                    break;
+                case 2:
+                    nodeLayout = NodeLayouts.Balloon;
+                    break;
+                case 3:
+                    nodeLayout = NodeLayouts.RectanglePacking;
+                    break;
+                case 4:
+                    nodeLayout = NodeLayouts.Treemap;
+                    break;
+                case 5:
+                    nodeLayout = NodeLayouts.CirclePacking;
+                    break;
+                default:
+                    nodeLayout = NodeLayouts.CompoundSpringEmbedder;
+                    break;
             }
+            return nodeLayout;
         }
 
         /// <summary>
@@ -216,7 +251,7 @@ namespace SEE.Layout
 
             var name = nodeLayout.ToString();
 
-            //line += "graphID; nodeLayout;  countNodes; CountEdges; CountDepth; CountDepthAvg; CountDensityAvg; CountLeafNodes; CountInnderNodes; EdgeDensityLeafNode; Area; NodesOverlapping; NumberEdgeCrossings; EdgeAvg; EdgeAvgArea; EdgeMax; EdgeMaxArea; EdgeMin; EdgeMinArea; EdgeStandardDeviation; EdgeStandardDeviationArea; EdgeLengthTotal; EdgeLengthTotalArea; EdgeVariance; EdgeVarianceArea; NodePerformance; ";
+            //line += "graphID; nodeLayout;  countNodes; CountEdges; CountDepth; CountDepthAvg; CountDensityAvg; CountLeafNodes; CountInnderNodes; EdgeDensityLeafNode; Area; NodesOverlapping; NumberEdgeCrossings; EdgeAvg; EdgeAvgArea; EdgeMax; EdgeMaxArea; EdgeMin; EdgeMinArea; EdgeStandardDeviation; EdgeStandardDeviationArea; EdgeLengthTotal; EdgeLengthTotalArea; EdgeVariance; EdgeVarianceArea; NodePerformance; NodePerformanceInMilli; ";
             line += totalNumberOfGraphs + ";";
             line += name + ";";
             line += CountNodes(graph) + ";";
@@ -234,6 +269,8 @@ namespace SEE.Layout
             {
                 line += kvp.Value + ";";
             }
+
+            line += measurements.NodePerformanceInMilliSeconds.ToString();
 
             writer.WriteLine(line);
             writer.Close();
@@ -298,7 +335,7 @@ namespace SEE.Layout
             int areaIndex = 3;
             int edgeLengthIndex = 0;
 
-            var linesToKeep = File.ReadLines(path).ToList();
+            var linesToKeep = new List<string>();
             if (File.Exists(path))
             {
                 linesToKeep = File.ReadLines(path).ToList();
@@ -581,7 +618,7 @@ namespace SEE.Layout
                 StreamWriter writer = new StreamWriter(compareNodeLayoutsPath, true);
                 string line = "";
 
-                line += "graphID; nodeLayout;  countNodes; CountEdges; CountDepth; CountDepthAvg; CountDensityAvg; CountLeafNodes; CountInnderNodes; EdgeDensityLeafNode; Area; NodesOverlapping; NumberEdgeCrossings; EdgeAvg; EdgeAvgArea; EdgeMax; EdgeMaxArea; EdgeMin; EdgeMinArea; EdgeStandardDeviation; EdgeStandardDeviationArea; EdgeLengthTotal; EdgeLengthTotalArea; EdgeVariance; EdgeVarianceArea; NodePerformance; ";
+                line += "graphID; nodeLayout;  countNodes; CountEdges; CountDepth; CountDepthAvg; CountDensityAvg; CountLeafNodes; CountInnderNodes; EdgeDensityLeafNode; Area; NodesOverlapping; NumberEdgeCrossings; EdgeAvg; EdgeAvgArea; EdgeMax; EdgeMaxArea; EdgeMin; EdgeMinArea; EdgeStandardDeviation; EdgeStandardDeviationArea; EdgeLengthTotal; EdgeLengthTotalArea; EdgeVariance; EdgeVarianceArea; NodePerformance;  NodePerformanceInMilli;";
                 writer.WriteLine(line);
                 writer.Close();
 

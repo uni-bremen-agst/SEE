@@ -99,7 +99,7 @@ namespace SEE.DataModel
         /// <summary>
         /// is true the parameter edgeLength and repulsion strength are calculated automatically
         /// </summary>
-        public bool useCalculationParameter = false;
+        public bool useCalculationParameter = true;
 
         /// <summary>
         /// is true the parameter edgeLength and repulsion strength are calculated automatically and are iteratily changed till a goog layout is found

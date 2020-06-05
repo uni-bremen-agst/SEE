@@ -162,6 +162,11 @@ namespace SEE
             get => GetNodesPerformance();
         }
 
+        public double NodePerformanceInMilliSeconds
+        {
+            get => GetNodePerformanceInMilliseconds();
+        }
+
 
         /// <summary>
         /// the constructor
@@ -204,6 +209,19 @@ namespace SEE
         }
 
         /// <summary>
+        /// Gets the time needed gfor the calculation of the node layout 
+        /// </summary>
+        /// <returns>time in milliseconds</returns>
+        public double GetNodePerformanceInMilliseconds()
+        {
+            if (nodePerformance != null)
+            {
+                return nodePerformance.GetTimeInMilliSeconds();
+            }
+            return 0.0;
+        }
+
+        /// <summary>
         /// Transforms all measurements to a string dictinary containing the measurements with it values
         /// </summary>
         /// <returns>string dictinary with measurements</returns>
@@ -214,23 +232,24 @@ namespace SEE
                 return measurementsDict;
             }
 
+            var edgeMeasure = EdgesMeasurements;
             SortedDictionary<string, string> measurements = new SortedDictionary<string, string>
             {
                 { "Area", Math.Round (Area, 2).ToString() },
                 { "Nodes overlapping", OverlappingGameNodes.ToString() },
                 { "Number of edge crossings", EdgeCrossings.ToString() },
-                { "Straight Edge length max", Math.Round(EdgesMeasurements.lengthMax, 2).ToString() },
-                { "Straight Edge length min", Math.Round(EdgesMeasurements.lengthMin, 2).ToString() },
-                { "Straight Edge length total", Math.Round(EdgesMeasurements.lengthTotal, 2).ToString() },
-                { "Straight Edge length max (area)", Math.Round(EdgesMeasurements.lengthMaxArea, 2).ToString() },
-                { "Straight Edge length min (area)", Math.Round(EdgesMeasurements.lengthMinArea, 2).ToString() },
-                { "Straight Edge length total (area)", Math.Round(EdgesMeasurements.lengthTotalArea, 2).ToString() },
-                { "Straight Edge length average", Math.Round(EdgesMeasurements.lengthAverage, 2).ToString() },
-                { "Straight Edge length average (area)", Math.Round(EdgesMeasurements.lengthAverageArea, 2).ToString() },
-                { "Straight Edge length variance", Math.Round(EdgesMeasurements.lengthVariance, 2).ToString() },
-                { "Straight Edge length standard deviation", Math.Round(EdgesMeasurements.lengthStandardDeviation, 2).ToString() },
-                { "Straight Edge length variance (area)", Math.Round(EdgesMeasurements.lengthVarianceArea, 2).ToString() },
-                { "Straight Edge length standard deviation (area)", Math.Round(EdgesMeasurements.lengthStandardDeviationArea, 2).ToString() },
+                { "Straight Edge length max", Math.Round(edgeMeasure.lengthMax, 2).ToString() },
+                { "Straight Edge length min", Math.Round(edgeMeasure.lengthMin, 2).ToString() },
+                { "Straight Edge length total", Math.Round(edgeMeasure.lengthTotal, 2).ToString() },
+                { "Straight Edge length max (area)", Math.Round(edgeMeasure.lengthMaxArea, 2).ToString() },
+                { "Straight Edge length min (area)", Math.Round(edgeMeasure.lengthMinArea, 2).ToString() },
+                { "Straight Edge length total (area)", Math.Round(edgeMeasure.lengthTotalArea, 2).ToString() },
+                { "Straight Edge length average", Math.Round(edgeMeasure.lengthAverage, 2).ToString() },
+                { "Straight Edge length average (area)", Math.Round(edgeMeasure.lengthAverageArea, 2).ToString() },
+                { "Straight Edge length variance", Math.Round(edgeMeasure.lengthVariance, 2).ToString() },
+                { "Straight Edge length standard deviation", Math.Round(edgeMeasure.lengthStandardDeviation, 2).ToString() },
+                { "Straight Edge length variance (area)", Math.Round(edgeMeasure.lengthVarianceArea, 2).ToString() },
+                { "Straight Edge length standard deviation (area)", Math.Round(edgeMeasure.lengthStandardDeviationArea, 2).ToString() },
             };
 
             string nodePerformance = NodesPerformance;
@@ -381,7 +400,13 @@ namespace SEE
                 {
                     variance += (edge.dist - averageDistEdge) * (edge.dist - averageDistEdge);
                 }
-                varianceDistEdge = variance / (edges.Count - 1);
+                if (edges.Count == 1)
+                {
+                    varianceDistEdge = 0;
+                } else
+                {
+                    varianceDistEdge = variance / (edges.Count - 1);
+                }
             }
             standardDeviation = Mathf.Sqrt(varianceDistEdge);
 
@@ -396,7 +421,14 @@ namespace SEE
                     var edgeDistRelative = edge.dist / areaLength;
                     varianceRelative += (edgeDistRelative - relationAvgDist) * (edgeDistRelative - relationAvgDist);
                 }
-                relativeVarianceDistEdge = varianceRelative / (edges.Count - 1);
+                if (edges.Count == 1)
+                {
+                    relativeVarianceDistEdge = 0;
+                } else
+                {
+                    relativeVarianceDistEdge = varianceRelative / (edges.Count - 1);
+                }
+               
             }
             relativeStandardDeviation = Mathf.Sqrt(relativeVarianceDistEdge);
 
