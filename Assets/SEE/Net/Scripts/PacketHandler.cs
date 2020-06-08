@@ -8,8 +8,14 @@ using UnityEngine.Assertions;
 namespace SEE.Net
 {
 
+    /// <summary>
+    /// Handles incoming packets for server and/or client.
+    /// </summary>
     public class PacketHandler
     {
+        /// <summary>
+        /// Contains info of packets that are still pending.
+        /// </summary>
         private struct SerializedPendingPacket
         {
             internal PacketHeader packetHeader;
@@ -17,6 +23,10 @@ namespace SEE.Net
             internal string serializedPacket;
         }
 
+        /// <summary>
+        /// A translated is a pending packet, where the string was deserialized to a
+        /// packet.
+        /// </summary>
         private struct TranslatedPendingPacket : IComparable<TranslatedPendingPacket>
         {
             internal PacketHeader packetHeader;
@@ -32,12 +42,28 @@ namespace SEE.Net
 
 
 
+        /// <summary>
+        /// Whether this is a packet hander of a server or a client.
+        /// </summary>
         private readonly bool isServer;
+
+        /// <summary>
+        /// List of all serialized pending packets.
+        /// </summary>
         private List<SerializedPendingPacket> serializedPendingPackets = new List<SerializedPendingPacket>();
+
+        /// <summary>
+        /// List of all translated pending packets.
+        /// </summary>
         private List<TranslatedPendingPacket> translatedPendingPackets = new List<TranslatedPendingPacket>();
 
 
 
+        /// <summary>
+        /// Creates a new packet handler for either the server of the client.
+        /// </summary>
+        /// <param name="isServer">Whether this packet handler handles packets for the
+        /// server.</param>
         public PacketHandler(bool isServer)
         {
             this.isServer = isServer;
@@ -45,6 +71,14 @@ namespace SEE.Net
 
 
 
+        /// <summary>
+        /// Pushed a serialized packets for handling. Packets arrive via different
+        /// threads, which is why they are not yet deserialized and only saved as a
+        /// string.
+        /// </summary>
+        /// <param name="packetHeader">The packet header of the incoming packet.</param>
+        /// <param name="connection">The connection of the incoming packet.</param>
+        /// <param name="serializedPacket">The serialized packet.</param>
         internal void Push(PacketHeader packetHeader, Connection connection, string serializedPacket)
         {
             lock (serializedPendingPackets)
@@ -60,6 +94,11 @@ namespace SEE.Net
             }
         }
 
+        /// <summary>
+        /// Processes pending packets. Packets are translated, sorted by packet id and
+        /// then executed. Packets can be executed as server or as client, depending on
+        /// <see cref="isServer"/>.
+        /// </summary>
         internal void HandlePendingPackets()
         {
             lock (serializedPendingPackets)
