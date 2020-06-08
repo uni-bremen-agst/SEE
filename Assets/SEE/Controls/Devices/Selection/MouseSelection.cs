@@ -97,6 +97,17 @@ namespace SEE.Controls.Devices
         public override bool IsZoomingHome => Input.GetKeyDown(KeyCode.R);
 
         /// <summary>
+        /// Resets the grabbing timer, so the InputDevice will not start grabbing.
+        /// </summary>
+        public void ResetSelectionTimer()
+        {
+            if (state == State.Selecting)
+            {
+                timeButtonHeld = Time.realtimeSinceStartup;
+            }
+        }
+
+        /// <summary>
         /// True if the first click of an expected double click happened.
         /// </summary>
         private bool oneClick = false;
