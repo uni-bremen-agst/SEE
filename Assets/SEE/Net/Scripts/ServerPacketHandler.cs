@@ -1,5 +1,6 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
+using SEE.Utils;
 using System.Collections.Generic;
 
 namespace SEE.Net
@@ -65,6 +66,11 @@ namespace SEE.Net
                     Network.SubmitPacket(co, packet);
                 }
             }
+        }
+
+        internal override void HandlePacket(PacketHeader packetHeader, Connection connection, GameStatePacket packet)
+        {
+            Assertions.InvalidCodePath();
         }
 
         internal override void HandlePacket(PacketHeader packetHeader, Connection connection, RedoActionPacket packet)

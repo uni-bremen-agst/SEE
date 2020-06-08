@@ -104,6 +104,10 @@ namespace SEE.Net
             {
                 HandlePacket(packetHeader, connection, (ExecuteActionPacket)packet);
             }
+            else if (packet.GetType() == typeof(GameStatePacket))
+            {
+                HandlePacket(packetHeader, connection, (GameStatePacket)packet);
+            }
             else if (packet.GetType() == typeof(RedoActionPacket))
             {
                 HandlePacket(packetHeader, connection, (RedoActionPacket)packet);
@@ -116,6 +120,7 @@ namespace SEE.Net
 
         internal abstract bool TryHandlePacketSequence(PacketHeader packetHeader, Connection connection, PacketSequencePacket packetSequence);
         internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, ExecuteActionPacket packet);
+        internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, GameStatePacket packet);
         internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, RedoActionPacket packet);
         internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, UndoActionPacket packet);
     }

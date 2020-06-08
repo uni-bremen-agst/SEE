@@ -83,6 +83,11 @@ namespace SEE.Net
                     incomingPacketSequenceIDs.Add(connection, 0);
                     outgoingPacketSequenceIDs.Add(connection, 0);
                     packetHandler.OnConnectionEstablished(connection);
+                    if (ZoomStack.stack.Count != 0)
+                    {
+                        GameStatePacket packet = new GameStatePacket(ZoomStack.stack.ToArray());
+                        Network.SubmitPacket(connection, packet);
+                    }
                 }
                 else
                 {

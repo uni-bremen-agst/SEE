@@ -1,23 +1,28 @@
 ﻿using SEE.Controls;
 using SEE.Game;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace SEE.Net
 {
+    
+    public static class ZoomStack
+    {
+        public static readonly Stack<uint> stack = new Stack<uint>();
+        
+        public static void Push(uint id) => stack.Push(id);
+        public static void Pop() => stack.Pop();
+        public static void Clear() => stack.Clear();
+    }
 
-    // TODO(torben): having multiple zoom levels at the same time does not work for
-    // buffered packets! For very old packets, we want the GameObject to simply jump to
-    // the target. If one is currently active - which must be detectable somehow - we
-    // want 'jump' into the middle of the animation somehow and finish the remaining
-    // part of the animation
     public class ZoomIntoAction : AbstractAction
     {
         public uint id;
 
 
 
-        public ZoomIntoAction(HoverableObject hoverableObject) : base(true)
+        public ZoomIntoAction(HoverableObject hoverableObject) : base(false)
         {
             Assert.IsNotNull(hoverableObject);
             id = hoverableObject.id;
@@ -27,6 +32,7 @@ namespace SEE.Net
 
         protected override bool ExecuteOnServer()
         {
+            ZoomStack.Push(id);
             return true;
         }
 
@@ -70,7 +76,7 @@ namespace SEE.Net
 
 
 
-        public ZoomOutOfAction(HoverableObject hoverableObject) : base(true)
+        public ZoomOutOfAction(HoverableObject hoverableObject) : base(false)
         {
             Assert.IsNotNull(hoverableObject);
             id = hoverableObject.id;
@@ -80,6 +86,7 @@ namespace SEE.Net
 
         protected override bool ExecuteOnServer()
         {
+            ZoomStack.Pop();
             return true;
         }
 
@@ -123,7 +130,7 @@ namespace SEE.Net
 
 
 
-        public ZoomRootAction(HoverableObject hoverableObject) : base(true)
+        public ZoomRootAction(HoverableObject hoverableObject) : base(false)
         {
             Assert.IsNotNull(hoverableObject);
             id = hoverableObject.id;
@@ -133,6 +140,7 @@ namespace SEE.Net
 
         protected override bool ExecuteOnServer()
         {
+            ZoomStack.Clear();
             return true;
         }
 

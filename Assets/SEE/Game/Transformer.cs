@@ -184,6 +184,44 @@ namespace SEE.Game
             Unhide(GameObjectHierarchy.Descendants(newFocus));
             focus = newFocus;
         }
+        
+        /// <summary>
+        /// Sets the initial state. This can only be called, if no zooming is currently
+        /// active!
+        /// </summary>
+        /// <param name="gameObjects">The GameObjects to be zoomed into</param>
+        public static void SetInitialState(GameObject[] gameObjects)
+        {
+            foreach (GameObject gameObject in gameObjects)
+            {
+                Transformer transformer = GetTransformer(gameObject);
+                if (transformer != null)
+                {
+                    transformer.activeAscendants.Push(new ObjectMemento(gameObject));
+                    HashSet<GameObject> currentlyVisible = GameObjectHierarchy.Descendants(transformer.focus);
+                    HashSet<GameObject> newlyVisible = GameObjectHierarchy.Descendants(gameObject);
+                    currentlyVisible.ExceptWith(newlyVisible);
+                    transformer.Hide(currentlyVisible);
+                    transformer.focus = gameObject;
+
+                    BoundingBox.Get(
+                        GameObjectHierarchy.Descendants(gameObject, Tags.Node),
+                        out Vector2 leftLowerCorner, out Vector2 rightUpperCorner
+                    );
+                    float scaleFactor = Mathf.Min(
+                        (transformer.initialRightUpperCorner.x - transformer.initialLeftLowerCorner.x) / (rightUpperCorner.x - leftLowerCorner.x),
+                        (transformer.initialRightUpperCorner.y - transformer.initialLeftLowerCorner.y) / (rightUpperCorner.y - leftLowerCorner.y)
+                    );
+                    Vector3 newPosition = gameObject.transform.position;
+                    Vector2 center = transformer.CenterPoint;
+                    newPosition.x = center.x;
+                    newPosition.z = center.y;
+                    Vector3 newScale = gameObject.transform.localScale * scaleFactor;
+                    gameObject.transform.position = newPosition;
+                    gameObject.transform.localScale = newScale;
+                }
+            }
+        }
 
         /// <summary>
         /// Returns a Transformer instance responsible for the given <paramref name="gameObject"/>.
@@ -271,12 +309,12 @@ namespace SEE.Game
         /// <summary>
         /// The left lower corner of the initial bounding box of the gameObject in world space (x/z plane).
         /// </summary>
-        private Vector2 initialLeftLowerCorner;
+        private readonly Vector2 initialLeftLowerCorner;
         /// <summary>
         /// The right upper corner of the initial bounding box of the gameObject in world space (x/z plane).
         /// </summary>
-        private Vector2 initialRightUpperCorner;
-
+        private readonly Vector2 initialRightUpperCorner;
+        
         /// <summary>
         /// The center point of the rectangle defined by initalLeftLowerCorner and initialRightUpperCorner 
         /// in world space.
@@ -376,7 +414,7 @@ namespace SEE.Game
                 activeAscendants.Pop();
             }
             focus = activeAscendants.Peek().Node;
-            caller.SendMessage(OnZoomingComplete);
+            caller?.SendMessage(OnZoomingComplete);
         }
 
         /// ----------------------------------------------------------------------------------------------
