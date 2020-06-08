@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using NetworkCommsDotNet.Connections;
+using SEE.Controls;
+using SEE.Game;
+using UnityEngine;
 
 namespace SEE.Net
 {
@@ -30,6 +33,27 @@ namespace SEE.Net
             GameStatePacket packet = JsonUtility.FromJson<GameStatePacket>(serializedPacket);
             zoomStack = packet.zoomStack;
             selectedGameObjects = packet.selectedGameObjects;
+        }
+
+        internal override bool ExecuteOnServer(Connection connection)
+        {
+            return true;
+        }
+
+        internal override bool ExecuteOnClient(Connection connection)
+        {
+            GameObject[] gameObjects = new GameObject[zoomStack.Length];
+            for (int i = 0; i < zoomStack.Length; i++)
+            {
+                gameObjects[zoomStack.Length - 1 - i] = InteractableObject.Get(zoomStack[i]).gameObject;
+            }
+            Transformer.SetInitialState(gameObjects);
+
+            foreach (uint id in selectedGameObjects)
+            {
+                ((HoverableObject)InteractableObject.Get(id)).Hovered(false);
+            }
+            return true;
         }
     }
 

@@ -7,8 +7,6 @@ namespace SEE.Net
 
     public class SelectionAction : AbstractAction
     {
-        public static List<uint> selectedGameObjects = new List<uint>();
-
         public uint oldID;
         public uint newID;
 
@@ -29,11 +27,11 @@ namespace SEE.Net
         {
             if (oldID != uint.MaxValue)
             {
-                selectedGameObjects.Remove(oldID);
+                Server.gameState.selectedGameObjects.Remove(oldID);
             }
             if (newID != uint.MaxValue)
             {
-                selectedGameObjects.Add(newID);
+                Server.gameState.selectedGameObjects.Add(newID);
             }
             return true;
         }

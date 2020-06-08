@@ -245,7 +245,7 @@ namespace SEE.Net
 
         private void Send(Connection connection, string serializedPacket)
         {
-            string packetType = Client.Connection.Equals(connection) ? Server.PACKET_TYPE : Client.PACKET_TYPE;
+            string packetType = Client.Connection.Equals(connection) ? Server.PacketType : Client.PacketType;
 
             try
             {

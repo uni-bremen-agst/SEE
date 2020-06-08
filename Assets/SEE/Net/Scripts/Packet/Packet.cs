@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetworkCommsDotNet.Connections;
+using System;
 
 namespace SEE.Net
 {
@@ -21,6 +22,9 @@ namespace SEE.Net
         internal virtual void Deserialize(string serializedPacket)
         {
         }
+
+        internal abstract bool ExecuteOnServer(Connection connection);
+        internal abstract bool ExecuteOnClient(Connection connection);
     }
 
     internal static class PacketSerializer

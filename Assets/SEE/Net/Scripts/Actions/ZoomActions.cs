@@ -6,15 +6,6 @@ using UnityEngine.Assertions;
 
 namespace SEE.Net
 {
-    
-    public static class ZoomStack
-    {
-        public static readonly Stack<uint> stack = new Stack<uint>();
-        
-        public static void Push(uint id) => stack.Push(id);
-        public static void Pop() => stack.Pop();
-        public static void Clear() => stack.Clear();
-    }
 
     public class ZoomIntoAction : AbstractAction
     {
@@ -32,7 +23,7 @@ namespace SEE.Net
 
         protected override bool ExecuteOnServer()
         {
-            ZoomStack.Push(id);
+            Server.gameState.zoomIDStack.Push(id);
             return true;
         }
 
@@ -86,7 +77,7 @@ namespace SEE.Net
 
         protected override bool ExecuteOnServer()
         {
-            ZoomStack.Pop();
+            Server.gameState.zoomIDStack.Pop();
             return true;
         }
 
@@ -140,7 +131,7 @@ namespace SEE.Net
 
         protected override bool ExecuteOnServer()
         {
-            ZoomStack.Clear();
+            Server.gameState.zoomIDStack.Clear();
             return true;
         }
 
