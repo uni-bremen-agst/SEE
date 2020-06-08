@@ -101,7 +101,10 @@ namespace SEE.Controls
         /// </summary>
         private void HideInformation()
         {
-            textOnPaper.SetActive(false);
+            if (textOnPaper)
+            {
+                textOnPaper.SetActive(false);
+            }
             // We keep textOnPaper for later use. Chances are that an object is hovered
             // over again when it was hovered once.
         }

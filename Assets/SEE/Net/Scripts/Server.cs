@@ -101,11 +101,7 @@ namespace SEE.Net
                     {
                         Network.SubmitPacket(connection, PacketSerializer.Serialize(bufferedPacket));
                     }
-                    if (gameState.zoomIDStack.Count != 0)
-                    {
-                        GameStatePacket packet = new GameStatePacket(gameState);
-                        Network.SubmitPacket(connection, packet);
-                    }
+                    Network.SubmitPacket(connection, new GameStatePacket(gameState));
                 }
                 else
                 {

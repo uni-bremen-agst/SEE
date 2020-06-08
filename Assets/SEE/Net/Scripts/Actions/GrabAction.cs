@@ -28,6 +28,14 @@ namespace SEE.Net
 
         protected override bool ExecuteOnServer()
         {
+            if (grab)
+            {
+                Server.gameState.selectedGameObjectIDs.Remove(id);
+            }
+            else
+            {
+                Server.gameState.selectedGameObjectIDs.Add(id);
+            }
             return true;
         }
 
@@ -44,20 +52,20 @@ namespace SEE.Net
                 {
                     grabbableObject.transform.localPosition = endLocalPosition;
                     grabbableObject.Release(IsRequester());
-                }
-                if (!grab && !actionFinalized)
-                {
-                    Controls.SelectionAction selectionAction = Object.FindObjectOfType<Controls.SelectionAction>();
-                    Controls.SelectionAction.Animation.Start();
-                    iTween.MoveTo(grabbableObject.gameObject,
-                        iTween.Hash(
-                            "position", startLocalPosition,
-                            "time", 0.75f,
-                            "oncompletetarget", selectionAction.gameObject,
-                            "oncomplete", "ResetCompleted",
-                            "islocal", true
-                        )
-                    );
+                    if (!actionFinalized)
+                    {
+                        Controls.SelectionAction selectionAction = Object.FindObjectOfType<Controls.SelectionAction>();
+                        Controls.SelectionAction.Animation.Start();
+                        iTween.MoveTo(grabbableObject.gameObject,
+                            iTween.Hash(
+                                "position", startLocalPosition,
+                                "time", 0.75f,
+                                "oncompletetarget", selectionAction.gameObject,
+                                "oncomplete", "ResetCompleted",
+                                "islocal", true
+                            )
+                        );
+                    }
                 }
                 return true;
             }

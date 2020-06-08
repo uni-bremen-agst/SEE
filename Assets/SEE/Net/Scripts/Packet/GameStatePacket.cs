@@ -13,7 +13,6 @@ namespace SEE.Net
 
         public GameStatePacket()
         {
-
         }
 
         public GameStatePacket(GameState gameState)
