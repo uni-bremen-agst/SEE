@@ -1,5 +1,8 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
+using SEE.Controls;
+using SEE.Game;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace SEE.Net
@@ -40,6 +43,19 @@ namespace SEE.Net
                 Assert.IsTrue(packet.action.requesterPort != -1);
 
                 packet.action.ExecuteOnClientBase();
+            }
+        }
+
+        internal override void HandlePacket(PacketHeader packetHeader, Connection connection, GameStatePacket packet)
+        {
+            if (packet != null)
+            {
+                GameObject[] gameObjects = new GameObject[packet.zoomStack.Length];
+                for (int i = 0; i < packet.zoomStack.Length; i++)
+                {
+                    gameObjects[packet.zoomStack.Length - 1 - i] = InteractableObject.Get(packet.zoomStack[i]).gameObject;
+                }
+                Transformer.SetInitialState(gameObjects);
             }
         }
 
