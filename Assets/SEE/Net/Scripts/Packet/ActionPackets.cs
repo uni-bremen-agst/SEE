@@ -4,16 +4,29 @@ using UnityEngine.Assertions;
 namespace SEE.Net
 {
 
+    /// <summary>
+    /// This packet can execute various actions.
+    /// </summary>
     internal class ExecuteActionPacket : AbstractPacket
     {
+        /// <summary>
+        /// The action to be executed.
+        /// </summary>
         public AbstractAction action;
 
 
 
+        /// <summary>
+        /// Empty constructor is necessary for JsonUtility-serialization.
+        /// </summary>
         public ExecuteActionPacket()
         {
         }
 
+        /// <summary>
+        /// Constructs a packet with given action.
+        /// </summary>
+        /// <param name="action">The action to be executed.</param>
         public ExecuteActionPacket(AbstractAction action)
         {
             this.action = action;
@@ -33,6 +46,12 @@ namespace SEE.Net
             action = deserializedPacket.action;
         }
 
+        /// <summary>
+        /// Executes the action of this packet as a server, potentially buffers packet on
+        /// server and broadcasts packet to all connections.
+        /// </summary>
+        /// <param name="connection">The connection of this packet.</param>
+        /// <returns></returns>
         internal override bool ExecuteOnServer(Connection connection)
         {
             Assert.IsNotNull(connection);
@@ -51,6 +70,11 @@ namespace SEE.Net
             return true;
         }
 
+        /// <summary>
+        /// Executes the action of this packet as a client.
+        /// </summary>
+        /// <param name="connection">The connecting of the packet.</param>
+        /// <returns><c>true</c>.</returns>
         internal override bool ExecuteOnClient(Connection connection)
         {
             Assert.IsNotNull(connection);
@@ -64,16 +88,29 @@ namespace SEE.Net
 
 
 
+    /// <summary>
+    /// Can undo an action.
+    /// </summary>
     internal class UndoActionPacket : AbstractPacket
     {
+        /// <summary>
+        /// The action to undo.
+        /// </summary>
         public AbstractAction action;
 
 
 
+        /// <summary>
+        /// Empty constructor is necessary for JsonUtility-serialization.
+        /// </summary>
         public UndoActionPacket()
         {
         }
 
+        /// <summary>
+        /// Constructs a packet with given action.
+        /// </summary>
+        /// <param name="action">The action to undo.</param>
         public UndoActionPacket(AbstractAction action)
         {
             this.action = action;
@@ -94,6 +131,11 @@ namespace SEE.Net
             action = deserializedPacket.action;
         }
 
+        /// <summary>
+        /// Buffers this packet and redos the action of this packet as a server.
+        /// </summary>
+        /// <param name="connection">The connection of this packet.</param>
+        /// <returns><c>true</c>.</returns>
         internal override bool ExecuteOnServer(Connection connection)
         {
             Assert.IsNotNull(connection);
@@ -108,6 +150,11 @@ namespace SEE.Net
             return true;
         }
 
+        /// <summary>
+        /// Undos the action of this packet as a client.
+        /// </summary>
+        /// <param name="connection">The connection of this packet.</param>
+        /// <returns><c>true</c>.</returns>
         internal override bool ExecuteOnClient(Connection connection)
         {
             Assert.IsNotNull(connection);
@@ -119,16 +166,29 @@ namespace SEE.Net
 
 
 
+    /// <summary>
+    /// Can redo an action.
+    /// </summary>
     internal class RedoActionPacket : AbstractPacket
     {
+        /// <summary>
+        /// The action to redo.
+        /// </summary>
         public AbstractAction action;
 
 
 
+        /// <summary>
+        /// Empty constructor is necessary for JsonUtility-serialization.
+        /// </summary>
         public RedoActionPacket()
         {
         }
 
+        /// <summary>
+        /// Constructs a packet with given action.
+        /// </summary>
+        /// <param name="action">The action to redo.</param>
         public RedoActionPacket(AbstractAction action)
         {
             this.action = action;
@@ -149,6 +209,11 @@ namespace SEE.Net
             action = deserializedPacket.action;
         }
 
+        /// <summary>
+        /// Buffers this packet and redos the action of this packet as a server.
+        /// </summary>
+        /// <param name="connection">The connection of this packet.</param>
+        /// <returns><c>true</c>.</returns>
         internal override bool ExecuteOnServer(Connection connection)
         {
             Assert.IsNotNull(connection);
@@ -163,6 +228,11 @@ namespace SEE.Net
             return true;
         }
 
+        /// <summary>
+        /// Redos the action of this packet as a client.
+        /// </summary>
+        /// <param name="connection">The connection of this packet.</param>
+        /// <returns><c>true</c>.</returns>
         internal override bool ExecuteOnClient(Connection connection)
         {
             Assert.IsNotNull(connection);

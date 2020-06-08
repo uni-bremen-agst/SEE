@@ -4,7 +4,8 @@ namespace SEE
 {
 
     /// <summary>
-    /// The current gamestate of the game. This will be sent to newly connecting clients.
+    /// The current game state of the game. This will be sent to newly connecting
+    /// clients.
     /// </summary>
     public class GameState
     {

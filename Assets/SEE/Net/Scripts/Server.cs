@@ -54,7 +54,7 @@ namespace SEE.Net
         private static Stack<Connection> pendingClosedConnections = new Stack<Connection>();
 
         /// <summary>
-        /// The gamestate will be sent to newly connecting clients.
+        /// The game state will be sent to newly connecting clients.
         /// </summary>
         public static GameState gameState = new GameState();
 
@@ -142,7 +142,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Handles established connection. Sends gamestate and buffered packets to new
+        /// Handles established connection. Sends game state and buffered packets to new
         /// client.
         /// </summary>
         /// <param name="connection">The established connection.</param>

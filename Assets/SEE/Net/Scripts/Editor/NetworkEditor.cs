@@ -9,8 +9,19 @@ namespace SEEEditor
     [CustomEditor(typeof(SEE.Net.Network))]
     public class NetworkEditor : Editor
     {
-        private bool showInfos = true;
-        private bool showSettings = true;
+        /// <summary>
+        /// Whether infos should be displayed.
+        /// </summary>
+        public bool showInfos = true;
+
+        /// <summary>
+        /// Whether setting should be displayed.
+        /// </summary>
+        public bool showSettings = true;
+
+        /// <summary>
+        /// Whether editor-only info should be displayed.
+        /// </summary>
         private bool showDebug = true;
 
         public override void OnInspectorGUI()
