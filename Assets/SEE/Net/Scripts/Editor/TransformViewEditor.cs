@@ -7,10 +7,20 @@ using UnityEditor;
 namespace SEEEditor
 {
 
+    /// <summary>
+    /// Custom editor for a <see cref="TransformView"/>.
+    /// </summary>
     [CustomEditor(typeof(TransformView))]
     public class TransformViewEditor : Editor
     {
+        /// <summary>
+        /// Whether infos should be displayed.
+        /// </summary>
         public bool showInfos = true;
+
+        /// <summary>
+        /// Whether setting should be displayed.
+        /// </summary>
         public bool showSettings = true;
 
         public override void OnInspectorGUI()

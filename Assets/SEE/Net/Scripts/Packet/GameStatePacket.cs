@@ -6,15 +6,28 @@ using UnityEngine;
 namespace SEE.Net
 {
 
+    /// <summary>
+    /// Used for sending the <see cref="GameState"/> to a newly connected client.
+    /// </summary>
     internal class GameStatePacket : AbstractPacket
     {
+        // <see cref="GameState"/>
         public uint[] zoomIDStack;
+
+        // <see cref="GameState"/>
         public uint[] selectedGameObjectIDs;
 
+        /// <summary>
+        /// Empty constructor is necessary for JsonUtility-serialization.
+        /// </summary>
         public GameStatePacket()
         {
         }
 
+        /// <summary>
+        /// Constructs a packet with given game state.
+        /// </summary>
+        /// <param name="gameState">The game state.</param>
         public GameStatePacket(GameState gameState)
         {
             zoomIDStack = gameState.zoomIDStack.ToArray();
@@ -39,6 +52,11 @@ namespace SEE.Net
             return true;
         }
 
+        /// <summary>
+        /// Initializes the game with given game state.
+        /// </summary>
+        /// <param name="connection">The connection of the packet.</param>
+        /// <returns></returns>
         internal override bool ExecuteOnClient(Connection connection)
         {
             GameObject[] gameObjects = new GameObject[zoomIDStack.Length];

@@ -102,12 +102,10 @@ namespace SEE.Controls
                 {
                     if (objectState == ObjectState.IsGrabbed)
                     {
-                        Debug.Log("Cancel grab");
                         ReleaseObject(handledObject, false);
                     }
                     else if (objectState == ObjectState.IsSelected)
                     {
-                        Debug.Log("Cancel selection");
                         new Net.SelectionAction(handledObject.GetComponent<HoverableObject>(), null).Execute();
                         handledObject = null;
                         objectState = ObjectState.None;
@@ -129,13 +127,11 @@ namespace SEE.Controls
                         {
                             if (handledObject == hitObject) // TODO: this if-statement can be removed if above TODO is fixed!
                             {
-                                Debug.Log("Grab");
                                 GrabObject(handledObject);
                             }
                         }
                         else
                         {
-                            Debug.Log("Move");
                             // The user continues grabbing while an object was already grabbed.
                             new Net.MoveAction(handledObject.GetComponent<GrabbableObject>(), TipOfGrabbingRay(handledObject)).Execute();
                         }
@@ -148,7 +144,6 @@ namespace SEE.Controls
                     HoverableObject newHoverableObject = hitObject.GetComponent<HoverableObject>();
                     if (newHoverableObject != null && !newHoverableObject.IsHovered)
                     {
-                        Debug.Log("Select");
                         if (selectionDevice is MouseSelection)
                         {
                             // TODO: This could possibly also be interesting for other devices
@@ -162,7 +157,6 @@ namespace SEE.Controls
                 }
                 else if ((hitObject == null || hitObject.GetComponent<HoverableObject>() == null) && handledObject != null && objectState == ObjectState.IsSelected)
                 {
-                    Debug.Log("Void Click");
                     new Net.SelectionAction(handledObject.GetComponent<HoverableObject>(), null).Execute();
                     handledObject = null;
                     objectState = ObjectState.None;
@@ -170,7 +164,6 @@ namespace SEE.Controls
             }
             else if (objectState == ObjectState.IsGrabbed)
             {
-                Debug.Log("Releasing");
                 // assert: !isCanceling && !isGrabbing && !isSelecting && objectState == ObjectState.IsGrabbed
                 // Grabbed object is released and the action was not canceled.
                 ReleaseObject(handledObject, true);
@@ -194,7 +187,6 @@ namespace SEE.Controls
             // notified via a call to OnZoomingComplete().
             if (selectionDevice.IsZoomingIn && Transformer.CanZoomInto(handledObject))
             {
-                Debug.Log("Zooming");
                 new Net.ZoomIntoAction(handledObject.GetComponent<HoverableObject>()).Execute();
             }
             else if (selectionDevice.IsZoomingOut && Transformer.CanZoomOutOf(handledObject))

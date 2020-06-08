@@ -6,12 +6,21 @@ using UnityEditor;
 namespace SEEEditor
 {
 
+    /// <summary>
+    /// Custom editor for a <see cref="ViewContainer"/>.
+    /// </summary>
     [CustomEditor(typeof(ViewContainer))]
     public class ViewContainerEditor : Editor
     {
+        /// <summary>
+        /// Whether infos should be displayed.
+        /// </summary>
         public bool showInfos = true;
+
+        /// <summary>
+        /// Whether setting should be displayed.
+        /// </summary>
         public bool showSettings = true;
-        public bool isFocused = false;
 
         public override void OnInspectorGUI()
         {
