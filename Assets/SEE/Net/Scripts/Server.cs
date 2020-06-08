@@ -103,7 +103,7 @@ namespace SEE.Net
                     }
                     if (gameState.zoomIDStack.Count != 0)
                     {
-                        GameStatePacket packet = new GameStatePacket(gameState.zoomIDStack.ToArray(), gameState.selectedGameObjects.ToArray());
+                        GameStatePacket packet = new GameStatePacket(gameState);
                         Network.SubmitPacket(connection, packet);
                     }
                 }

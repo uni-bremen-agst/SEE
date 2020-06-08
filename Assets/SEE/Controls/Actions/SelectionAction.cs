@@ -133,7 +133,7 @@ namespace SEE.Controls
                         else
                         {
                             // The user continues grabbing while an object was already grabbed.
-                            new Net.MoveAction(handledObject.GetComponent<GrabbableObject>(), handledObjectMemento.Position, TipOfGrabbingRay(handledObject)).Execute();
+                            new Net.MoveAction(handledObject.GetComponent<GrabbableObject>(), TipOfGrabbingRay(handledObject)).Execute();
                         }
                     }
                 }
@@ -299,7 +299,7 @@ namespace SEE.Controls
             handledObject = grabbedObject;
             objectState = ObjectState.IsGrabbed;
             OnObjectGrabbed.Invoke(grabbedObject);
-            new Net.GrabAction(grabbedObject.GetComponent<GrabbableObject>(), handledObjectMemento.Position, true).Execute();
+            new Net.GrabAction(grabbedObject.GetComponent<GrabbableObject>(), handledObjectMemento.LocalPosition, true).Execute();
         }
 
         /// <summary>
@@ -312,7 +312,7 @@ namespace SEE.Controls
         {
             objectState = ObjectState.IsSelected;
             OnObjectGrabbed.Invoke(null);
-            new Net.GrabAction(grabbedObject.GetComponent<GrabbableObject>(), handledObjectMemento.Position, false, actionFinalized).Execute();
+            new Net.GrabAction(grabbedObject.GetComponent<GrabbableObject>(), handledObjectMemento.LocalPosition, false, actionFinalized).Execute();
         }
 
         /// <summary>

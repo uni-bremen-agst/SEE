@@ -1,5 +1,6 @@
 ﻿using SEE.Controls;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Net
 {
@@ -7,18 +8,18 @@ namespace SEE.Net
     public class GrabAction : AbstractAction
     {
         public uint id;
-        public Vector3 startPosition;
-        public Vector3 endPosition;
+        public Vector3 startLocalPosition;
+        public Vector3 endLocalPosition;
         public bool grab;
         public bool actionFinalized;
 
 
 
-        public GrabAction(GrabbableObject grabbableObject, Vector3 startPosition, bool grab, bool actionFinalized = true) : base(true)
+        public GrabAction(GrabbableObject grabbableObject, Vector3 startLocalPosition, bool grab, bool actionFinalized = true) : base(!grab && actionFinalized)
         {
             id = grabbableObject.id;
-            this.startPosition = startPosition;
-            endPosition = grabbableObject.transform.position;
+            this.startLocalPosition = startLocalPosition;
+            endLocalPosition = grabbableObject.transform.localPosition;
             this.grab = grab;
             this.actionFinalized = actionFinalized;
         }
@@ -41,7 +42,7 @@ namespace SEE.Net
                 }
                 else
                 {
-                    grabbableObject.transform.position = endPosition;
+                    grabbableObject.transform.localPosition = endLocalPosition;
                     grabbableObject.Release(IsRequester());
                 }
                 if (!grab && !actionFinalized)
@@ -50,10 +51,11 @@ namespace SEE.Net
                     Controls.SelectionAction.Animation.Start();
                     iTween.MoveTo(grabbableObject.gameObject,
                         iTween.Hash(
-                            "position", startPosition,
+                            "position", startLocalPosition,
                             "time", 0.75f,
                             "oncompletetarget", selectionAction.gameObject,
-                            "oncomplete", "ResetCompleted"
+                            "oncomplete", "ResetCompleted",
+                            "islocal", true
                         )
                     );
                 }
@@ -64,22 +66,25 @@ namespace SEE.Net
 
         protected override bool UndoOnServer()
         {
-            throw new System.NotImplementedException();
+            return true;
         }
 
         protected override bool UndoOnClient()
         {
-            throw new System.NotImplementedException();
+            GrabbableObject grabbableObject = (GrabbableObject)InteractableObject.Get(id);
+            Assert.IsNotNull(grabbableObject);
+            grabbableObject.transform.localPosition = startLocalPosition;
+            return true;
         }
 
         protected override bool RedoOnServer()
         {
-            throw new System.NotImplementedException();
+            return ExecuteOnServer();
         }
 
         protected override bool RedoOnClient()
         {
-            throw new System.NotImplementedException();
+            return ExecuteOnClient();
         }
     }
 

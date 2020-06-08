@@ -478,17 +478,22 @@ namespace SEE.Game
             Vector3 newScale = parent.transform.localScale * scaleFactor;
 
             // Adjust position and scale by some animation.
-            iTween.MoveTo(parent, iTween.Hash(
-                                          "position", newPosition,
-                                          "time", 1.5f
-                ));
-            iTween.ScaleTo(parent, iTween.Hash(
-                              "scale", newScale,
-                              //"delay", 0.75f,
-                              "time", 1.5f,
-                              "oncompletetarget", caller,
-                              "oncomplete", OnZoomingComplete
-                ));
+            iTween.MoveTo(
+                parent,
+                iTween.Hash(
+                    "position", newPosition,
+                    "time", 1.5f
+                )
+            );
+            iTween.ScaleTo(
+                parent,
+                iTween.Hash(
+                    "scale", newScale,
+                    "time", 1.5f,
+                    "oncompletetarget", caller,
+                    "oncomplete", OnZoomingComplete
+                )
+            );
             return scaleFactor;
         }
 
@@ -519,7 +524,7 @@ namespace SEE.Game
                                            "time", 1.5f
                                ));
                 iTween.MoveTo(focus, 
-                              iTween.Hash("position", memento.Position,
+                              iTween.Hash("position", memento.LocalPosition,
                                           "time", 1.5f,
                                           //"delay", 0.6f,
                                           "oncompletetarget", caller,

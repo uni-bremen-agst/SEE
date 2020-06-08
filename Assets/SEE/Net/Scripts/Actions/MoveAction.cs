@@ -8,16 +8,14 @@ namespace SEE.Net
     public class MoveAction : AbstractAction
     {
         public uint id;
-        public Vector3 startPosition;
-        public Vector3 endPosition;
+        public Vector3 position;
 
 
 
-        public MoveAction(GrabbableObject grabbableObject, Vector3 startPosition, Vector3 endPosition) : base(false)
+        public MoveAction(GrabbableObject grabbableObject, Vector3 position) : base(false)
         {
             id = grabbableObject.id;
-            this.startPosition = startPosition;
-            this.endPosition = endPosition;
+            this.position = position;
         }
 
 
@@ -33,7 +31,7 @@ namespace SEE.Net
             if (grabbableObject)
             {
                 Assert.IsTrue(grabbableObject.isGrabbed);
-                grabbableObject.transform.position = endPosition;
+                grabbableObject.transform.position = position;
                 return true;
             }
             return false;

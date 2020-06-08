@@ -8,18 +8,18 @@ namespace SEE.Net
 
     internal class GameStatePacket : AbstractPacket
     {
-        public uint[] zoomStack;
-        public uint[] selectedGameObjects;
+        public uint[] zoomIDStack;
+        public uint[] selectedGameObjectIDs;
 
         public GameStatePacket()
         {
 
         }
 
-        public GameStatePacket(uint[] zoomStack, uint[] selectedGameObjects)
+        public GameStatePacket(GameState gameState)
         {
-            this.zoomStack = zoomStack;
-            this.selectedGameObjects = selectedGameObjects;
+            zoomIDStack = gameState.zoomIDStack.ToArray();
+            selectedGameObjectIDs = gameState.selectedGameObjectIDs.ToArray();
         }
 
         internal override string Serialize()
@@ -31,8 +31,8 @@ namespace SEE.Net
         internal override void Deserialize(string serializedPacket)
         {
             GameStatePacket packet = JsonUtility.FromJson<GameStatePacket>(serializedPacket);
-            zoomStack = packet.zoomStack;
-            selectedGameObjects = packet.selectedGameObjects;
+            zoomIDStack = packet.zoomIDStack;
+            selectedGameObjectIDs = packet.selectedGameObjectIDs;
         }
 
         internal override bool ExecuteOnServer(Connection connection)
@@ -42,14 +42,14 @@ namespace SEE.Net
 
         internal override bool ExecuteOnClient(Connection connection)
         {
-            GameObject[] gameObjects = new GameObject[zoomStack.Length];
-            for (int i = 0; i < zoomStack.Length; i++)
+            GameObject[] gameObjects = new GameObject[zoomIDStack.Length];
+            for (int i = 0; i < zoomIDStack.Length; i++)
             {
-                gameObjects[zoomStack.Length - 1 - i] = InteractableObject.Get(zoomStack[i]).gameObject;
+                gameObjects[zoomIDStack.Length - 1 - i] = InteractableObject.Get(zoomIDStack[i]).gameObject;
             }
             Transformer.SetInitialState(gameObjects);
 
-            foreach (uint id in selectedGameObjects)
+            foreach (uint id in selectedGameObjectIDs)
             {
                 ((HoverableObject)InteractableObject.Get(id)).Hovered(false);
             }
