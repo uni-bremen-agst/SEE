@@ -181,15 +181,15 @@ namespace SEE.Controls
             // assert: !isCanceling && !isGrabbing && !isSelecting && objectState == ObjectState.IsSelected
             // Zooming uses animation. When the animation is complete, we will
             // notified via a call to OnZoomingComplete().
-            if (selectionDevice.IsZoomingIn)
+            if (selectionDevice.IsZoomingIn && Transformer.CanZoomInto(handledObject))
             {
                 new Net.ZoomIntoAction(handledObject.GetComponent<HoverableObject>()).Execute();
             }
-            else if (selectionDevice.IsZoomingOut)
+            else if (selectionDevice.IsZoomingOut && Transformer.CanZoomOutOf(handledObject))
             {
                 new Net.ZoomOutOfAction(handledObject.GetComponent<HoverableObject>()).Execute();
             }
-            else if (selectionDevice.IsZoomingHome)
+            else if (selectionDevice.IsZoomingHome && Transformer.CanZoomRoot(handledObject))
             {
                 new Net.ZoomRootAction(handledObject.GetComponent<HoverableObject>()).Execute();
             }

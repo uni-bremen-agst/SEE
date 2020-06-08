@@ -38,6 +38,46 @@ namespace SEE.Game
         private const string OnZoomingOutComplete = "OnZoomingOutComplete";
 
         /// <summary>
+        /// Checks, whether it is possible to zoom out of the given
+        /// <paramref name="enteredNode"/>.
+        /// 
+        /// See <see cref="ZoomOutOf(GameObject, GameObject)"/> for further details.
+        /// </summary>
+        /// <param name="enteredNode">the object to be zoomed out of</param>
+        /// <returns><c>true</c>, if zooming is possible, <c>false</c> otherwise</returns>
+        public static bool CanZoomOutOf(GameObject enteredNode)
+        {
+            Transformer transformer = GetTransformer(enteredNode);
+            return transformer != null && transformer.activeAscendants.Count > 1;
+        }
+
+        /// <summary>
+        /// Checks, whether it is possible to zoom back to the root from given
+        /// <paramref name="enteredNode"/>.
+        /// </summary>
+        /// <param name="enteredNode">the object to be zoomed out of</param>
+        /// <returns><c>true</c>, if zooming is possible, <c>false</c> otherwise</returns>
+        public static bool CanZoomRoot(GameObject enteredNode)
+        {
+            return GetTransformer(enteredNode) != null;
+        }
+
+        /// <summary>
+        /// Checks, whether it is possible to zoom into the given
+        /// <paramref name="enteredNode"/>.
+        /// </summary>
+        /// <param name="enteredNode">the object to be zoomed into</param>
+        /// <returns><c>true</c>, if zooming is possible, <c>false</c> otherwise</returns>
+        public static bool CanZoomInto(GameObject enteredNode)
+        {
+            Transformer transformer = GetTransformer(enteredNode);
+            return transformer != null
+                && enteredNode != null
+                && enteredNode.tag == Tags.Node
+                && transformer.activeAscendants.Peek().Node != enteredNode;
+        }
+
+        /// <summary>
         /// Zooms into the given <paramref name="gameObject"/>, that is, all ascendants
         /// and their respective descendants are hidden and <paramref name="gameObject"/>
         /// and its descendants are scaled up and relocated so that they occupy the
@@ -50,7 +90,6 @@ namespace SEE.Game
         /// <param name="gameObject">the object to be zoomed into</param>
         public static void ZoomInto(GameObject caller, GameObject gameObject)
         {
-
             Transformer transformer = GetTransformer(gameObject);
             if (transformer != null)
             {
@@ -345,7 +384,7 @@ namespace SEE.Game
         /// ----------------------------------------------------------------------------------------------
         private void ZoomIn(GameObject caller, GameObject enteredNode)
         {
-            if (enteredNode != null 
+            if (enteredNode != null
                 && enteredNode.tag == Tags.Node
                 && activeAscendants.Peek().Node != enteredNode)
             {                
