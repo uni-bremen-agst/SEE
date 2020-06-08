@@ -28,6 +28,8 @@ namespace SEE.Net
 
         public static void Initialize()
         {
+            NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => Network.SwitchToOfflineMode());
+
             void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => PacketHandler.Push(packetHeader, connection, data);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PacketType, OnIncomingPacket);
 

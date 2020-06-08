@@ -63,7 +63,6 @@ namespace SEE.Net
 
         public static ViewContainer[] GetViewContainersByOwner(IPEndPoint owner)
         {
-            // TODO(torben): make this query more efficient
             List<ViewContainer> result = new List<ViewContainer>();
             foreach (ViewContainer viewContainer in viewContainers.Values)
             {
