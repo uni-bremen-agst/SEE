@@ -27,11 +27,11 @@ namespace SEE.Net
         {
             if (oldID != uint.MaxValue)
             {
-                Server.gameState.selectedGameObjects.Remove(oldID);
+                Server.gameState.selectedGameObjectIDs.Remove(oldID);
             }
             if (newID != uint.MaxValue)
             {
-                Server.gameState.selectedGameObjects.Add(newID);
+                Server.gameState.selectedGameObjectIDs.Add(newID);
             }
             return true;
         }
