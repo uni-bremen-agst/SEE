@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using NetworkCommsDotNet.Connections;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace SEE.Net
@@ -32,6 +33,42 @@ namespace SEE.Net
             PacketSequencePacket packet = JsonUtility.FromJson<PacketSequencePacket>(serializedPacket);
             id = packet.id;
             serializedPackets = packet.serializedPackets;
+        }
+
+        internal override bool ExecuteOnServer(Connection connection)
+        {
+            Assert.IsNotNull(connection);
+
+            bool result = Server.incomingPacketSequenceIDs.TryGetValue(connection, out ulong nextID);
+            if (result && id == nextID)
+            {
+                Server.incomingPacketSequenceIDs[connection] = ++nextID;
+                foreach (string serializedPacket in serializedPackets)
+                {
+                    AbstractPacket packet = PacketSerializer.Deserialize(serializedPacket);
+                    packet.ExecuteOnServer(connection);
+                }
+                return true;
+            }
+
+            return false;
+        }
+
+        internal override bool ExecuteOnClient(Connection connection)
+        {
+            Assert.IsNotNull(connection);
+
+            if (id == Client.incomingPacketID)
+            {
+                Client.incomingPacketID++;
+                foreach (string serializedPacket in serializedPackets)
+                {
+                    AbstractPacket packet = PacketSerializer.Deserialize(serializedPacket);
+                    packet.ExecuteOnClient(connection);
+                }
+                return true;
+            }
+            return false;
         }
     }
 

@@ -8,7 +8,7 @@ using UnityEngine.Assertions;
 namespace SEE.Net
 {
 
-    public abstract class PacketHandler
+    public class PacketHandler
     {
         private struct SerializedPendingPacket
         {
@@ -32,17 +32,15 @@ namespace SEE.Net
 
 
 
-        protected string packetTypePrefix;
+        private readonly bool isServer;
         private List<SerializedPendingPacket> serializedPendingPackets = new List<SerializedPendingPacket>();
         private List<TranslatedPendingPacket> translatedPendingPackets = new List<TranslatedPendingPacket>();
 
 
 
-        public PacketHandler(string packetTypePrefix)
+        public PacketHandler(bool isServer)
         {
-            Assert.IsNotNull(packetTypePrefix);
-
-            this.packetTypePrefix = packetTypePrefix;
+            this.isServer = isServer;
         }
 
 
@@ -85,7 +83,9 @@ namespace SEE.Net
                 for (int i = 0; i < translatedPendingPackets.Count; i++)
                 {
                     TranslatedPendingPacket translatedPendingPacket = translatedPendingPackets[i];
-                    bool result = TryHandlePacketSequence(translatedPendingPacket.packetHeader, translatedPendingPacket.connection, translatedPendingPacket.packet);
+                    bool result = isServer ?
+                        translatedPendingPacket.packet.ExecuteOnServer(translatedPendingPackets[i].connection) :
+                        translatedPendingPacket.packet.ExecuteOnClient(translatedPendingPackets[i].connection);
                     if (result)
                     {
                         translatedPendingPackets.RemoveAt(i--);
@@ -97,32 +97,6 @@ namespace SEE.Net
                 }
             }
         }
-
-        internal void HandlePacket(PacketHeader packetHeader, Connection connection, AbstractPacket packet)
-        {
-            if (packet.GetType() == typeof(ExecuteActionPacket))
-            {
-                HandlePacket(packetHeader, connection, (ExecuteActionPacket)packet);
-            }
-            else if (packet.GetType() == typeof(GameStatePacket))
-            {
-                HandlePacket(packetHeader, connection, (GameStatePacket)packet);
-            }
-            else if (packet.GetType() == typeof(RedoActionPacket))
-            {
-                HandlePacket(packetHeader, connection, (RedoActionPacket)packet);
-            }
-            else if (packet.GetType() == typeof(UndoActionPacket))
-            {
-                HandlePacket(packetHeader, connection, (UndoActionPacket)packet);
-            };
-        }
-
-        internal abstract bool TryHandlePacketSequence(PacketHeader packetHeader, Connection connection, PacketSequencePacket packetSequence);
-        internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, ExecuteActionPacket packet);
-        internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, GameStatePacket packet);
-        internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, RedoActionPacket packet);
-        internal abstract void HandlePacket(PacketHeader packetHeader, Connection connection, UndoActionPacket packet);
     }
 
 }

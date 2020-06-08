@@ -11,14 +11,24 @@ namespace SEE.Net
 
     public static class Server
     {
-        public static readonly string PACKET_TYPE = "Server.";
+        public static readonly string PacketType = "Server";
+
         public static List<Connection> Connections { get; private set; } = new List<Connection>();
+
         public static List<ConnectionListenerBase> ConnectionListeners { get; private set; } = new List<ConnectionListenerBase>();
-        private static ServerPacketHandler packetHandler = new ServerPacketHandler(PACKET_TYPE);
+
+        private static List<AbstractPacket> bufferedPackets = new List<AbstractPacket>();
+
+        private static PacketHandler packetHandler = new PacketHandler(true);
+
         private static Stack<Connection> pendingEstablishedConnections = new Stack<Connection>();
+
         private static Stack<Connection> pendingClosedConnections = new Stack<Connection>();
 
+        public static GameState gameState = new GameState();
+
         public static Dictionary<Connection, ulong> incomingPacketSequenceIDs = new Dictionary<Connection, ulong>();
+
         public static Dictionary<Connection, ulong> outgoingPacketSequenceIDs = new Dictionary<Connection, ulong>();
 
 
@@ -29,8 +39,8 @@ namespace SEE.Net
             NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => pendingClosedConnections.Push(c));
 
             void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => packetHandler.Push(packetHeader, connection, data);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PACKET_TYPE, OnIncomingPacket);
-            
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PacketType, OnIncomingPacket);
+
             try
             {
                 ConnectionListeners.AddRange(Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.LocalServerPort), false));
@@ -72,6 +82,11 @@ namespace SEE.Net
             }
         }
 
+        internal static void BufferPacket(AbstractPacket packet)
+        {
+            bufferedPackets.Add(packet);
+        }
+
         private static void OnConnectionEstablished(Connection connection)
         {
             if ((from connectionListener in ConnectionListeners select connectionListener.LocalListenEndPoint).Contains(connection.ConnectionInfo.LocalEndPoint))
@@ -82,10 +97,13 @@ namespace SEE.Net
                     Connections.Add(connection);
                     incomingPacketSequenceIDs.Add(connection, 0);
                     outgoingPacketSequenceIDs.Add(connection, 0);
-                    packetHandler.OnConnectionEstablished(connection);
-                    if (ZoomStack.stack.Count != 0)
+                    foreach (AbstractPacket bufferedPacket in bufferedPackets)
                     {
-                        GameStatePacket packet = new GameStatePacket(ZoomStack.stack.ToArray(), SelectionAction.selectedGameObjects.ToArray());
+                        Network.SubmitPacket(connection, PacketSerializer.Serialize(bufferedPacket));
+                    }
+                    if (gameState.zoomIDStack.Count != 0)
+                    {
+                        GameStatePacket packet = new GameStatePacket(gameState.zoomIDStack.ToArray(), gameState.selectedGameObjects.ToArray());
                         Network.SubmitPacket(connection, packet);
                     }
                 }
@@ -102,7 +120,6 @@ namespace SEE.Net
             {
                 Debug.Log("Connection closed: " + connection.ToString());
                 Connections.Remove(connection);
-                packetHandler.OnConnectionClosed(connection);
                 incomingPacketSequenceIDs.Remove(connection);
                 outgoingPacketSequenceIDs.Remove(connection);
             }
