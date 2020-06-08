@@ -6,15 +6,17 @@ namespace SEE.Net
     internal class GameStatePacket : AbstractPacket
     {
         public uint[] zoomStack;
+        public uint[] selectedGameObjects;
 
         public GameStatePacket()
         {
 
         }
 
-        public GameStatePacket(uint[] zoomStack)
+        public GameStatePacket(uint[] zoomStack, uint[] selectedGameObjects)
         {
             this.zoomStack = zoomStack;
+            this.selectedGameObjects = selectedGameObjects;
         }
 
         internal override string Serialize()
@@ -27,6 +29,7 @@ namespace SEE.Net
         {
             GameStatePacket packet = JsonUtility.FromJson<GameStatePacket>(serializedPacket);
             zoomStack = packet.zoomStack;
+            selectedGameObjects = packet.selectedGameObjects;
         }
     }
 

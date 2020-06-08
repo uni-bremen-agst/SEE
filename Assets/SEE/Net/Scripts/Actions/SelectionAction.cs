@@ -1,5 +1,5 @@
 ﻿using SEE.Controls;
-using UnityEngine;
+using System.Collections.Generic;
 using UnityEngine.Assertions;
 
 namespace SEE.Net
@@ -7,12 +7,14 @@ namespace SEE.Net
 
     public class SelectionAction : AbstractAction
     {
+        public static List<uint> selectedGameObjects = new List<uint>();
+
         public uint oldID;
         public uint newID;
 
 
 
-        public SelectionAction(HoverableObject oldHoverableObject, HoverableObject newHoverableObject) : base(true)
+        public SelectionAction(HoverableObject oldHoverableObject, HoverableObject newHoverableObject) : base(false)
         {
             Assert.IsTrue(oldHoverableObject != newHoverableObject);
             Assert.IsTrue(oldHoverableObject != null || newHoverableObject != null);
@@ -25,6 +27,14 @@ namespace SEE.Net
 
         protected override bool ExecuteOnServer()
         {
+            if (oldID != uint.MaxValue)
+            {
+                selectedGameObjects.Remove(oldID);
+            }
+            if (newID != uint.MaxValue)
+            {
+                selectedGameObjects.Add(newID);
+            }
             return true;
         }
 

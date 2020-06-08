@@ -56,6 +56,11 @@ namespace SEE.Net
                     gameObjects[packet.zoomStack.Length - 1 - i] = InteractableObject.Get(packet.zoomStack[i]).gameObject;
                 }
                 Transformer.SetInitialState(gameObjects);
+
+                foreach (uint id in packet.selectedGameObjects)
+                {
+                    ((HoverableObject)InteractableObject.Get(id)).Hovered(false);
+                }
             }
         }
 
