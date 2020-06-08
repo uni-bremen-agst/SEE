@@ -118,6 +118,11 @@ namespace SEE.Net
                 Connections.Remove(connection);
                 incomingPacketSequenceIDs.Remove(connection);
                 outgoingPacketSequenceIDs.Remove(connection);
+                ViewContainer[] viewContainers = ViewContainer.GetViewContainersByOwner((IPEndPoint)connection.ConnectionInfo.RemoteEndPoint);
+                foreach (ViewContainer viewContainer in viewContainers)
+                {
+                    new DestroyAction(viewContainer).Execute();
+                }
             }
         }
     }
