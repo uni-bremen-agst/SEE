@@ -85,7 +85,7 @@ namespace SEE.Net
                     packetHandler.OnConnectionEstablished(connection);
                     if (ZoomStack.stack.Count != 0)
                     {
-                        GameStatePacket packet = new GameStatePacket(ZoomStack.stack.ToArray());
+                        GameStatePacket packet = new GameStatePacket(ZoomStack.stack.ToArray(), SelectionAction.selectedGameObjects.ToArray());
                         Network.SubmitPacket(connection, packet);
                     }
                 }
