@@ -40,7 +40,10 @@ namespace SEE.Controls
             public void UseSpecialMaterial(bool isOwner)
             {
                 Renderer renderer = gameObject.GetComponent<Renderer>();
-                oldMaterial = renderer.sharedMaterial;
+                if (!oldMaterial)
+                {
+                    oldMaterial = renderer.sharedMaterial;
+                }
                 if (isOwner)
                 {
                     renderer.sharedMaterial = localSpecialMaterial;
@@ -56,7 +59,11 @@ namespace SEE.Controls
             /// </summary>
             public void ResetMaterial()
             {
-                gameObject.GetComponent<Renderer>().sharedMaterial = oldMaterial;
+                if (oldMaterial)
+                {
+                    gameObject.GetComponent<Renderer>().sharedMaterial = oldMaterial;
+                }
+                oldMaterial = null;
             }
         }
 
