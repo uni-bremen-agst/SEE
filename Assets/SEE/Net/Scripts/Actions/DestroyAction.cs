@@ -14,7 +14,7 @@ namespace SEE.Net
         public Vector3 position;
         public Quaternion rotation;
         public Vector3 scale;
-        public int viewContainerID;
+        public uint viewContainerID;
 
         public DestroyAction(ViewContainer viewContainer) : base(true)
         {

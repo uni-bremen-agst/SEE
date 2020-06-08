@@ -7,7 +7,7 @@ namespace SEE.Net
 
     public class InstantiateAction : AbstractAction
     {
-        private static int lastViewID = -1;
+        private static uint nextViewID = 0;
 
         public string prefabPath;
         public string ownerIpAddress;
@@ -15,7 +15,7 @@ namespace SEE.Net
         public Vector3 position;
         public Quaternion rotation;
         public Vector3 scale;
-        public int viewContainerID;
+        public uint viewContainerID;
 
         public InstantiateAction(string prefabPath) : base(true)
         {
@@ -35,12 +35,12 @@ namespace SEE.Net
             this.position = position;
             this.rotation = rotation;
             this.scale = scale;
-            viewContainerID = -1;
+            viewContainerID = ViewContainer.InvalidID;
         }
 
         protected override bool ExecuteOnServer()
         {
-            viewContainerID = ++lastViewID;
+            viewContainerID = nextViewID++;
             return true;
         }
 

@@ -5,7 +5,7 @@ namespace SEE.Net
 
     internal static class TransformViewActionHelper
     {
-        internal static TransformView AcquireTransformView(int id, int index)
+        internal static TransformView AcquireTransformView(uint id, int index)
         {
             TransformView result = null;
 
@@ -25,7 +25,7 @@ namespace SEE.Net
 
     public class TransformViewPositionCommand : AbstractAction
     {
-        public int viewContainerID;
+        public uint viewContainerID;
         public int viewIndex;
         public Vector3 position;
 
@@ -79,7 +79,7 @@ namespace SEE.Net
 
     public class TransformViewRotationCommand : AbstractAction
     {
-        public int viewContainerID;
+        public uint viewContainerID;
         public int viewIndex;
         public Quaternion rotation;
 
@@ -133,7 +133,7 @@ namespace SEE.Net
 
     public class TransformViewScaleCommand : AbstractAction
     {
-        public int viewContainerID;
+        public uint viewContainerID;
         public int viewIndex;
         public Vector3 scale;
 

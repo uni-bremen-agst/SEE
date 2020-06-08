@@ -10,19 +10,18 @@ namespace SEE.Net
     [DisallowMultipleComponent]
     public class ViewContainer : MonoBehaviour
     {
-        // TODO(torben): InvalidID could be uint.MaxValue and thus we could use uint for greater range
-        public const int InvalidID = -1;
+        public const uint InvalidID = uint.MaxValue;
 
-        [SerializeField] public int id = InvalidID;
+        [SerializeField] public uint id = InvalidID;
         [SerializeField] public IPEndPoint owner;
         [SerializeField] public string prefabPath;
         [SerializeField] private View[] views = new View[1];
         
-        private static Dictionary<int, ViewContainer> viewContainers = new Dictionary<int, ViewContainer>();
+        private static Dictionary<uint, ViewContainer> viewContainers = new Dictionary<uint, ViewContainer>();
 
 
 
-        public void Initialize(int id, IPEndPoint owner, string prefabPath)
+        public void Initialize(uint id, IPEndPoint owner, string prefabPath)
         {
 #if UNITY_EDITOR
             if (owner == null || owner.Address == null)
@@ -48,11 +47,12 @@ namespace SEE.Net
         {
             if (id != InvalidID)
             {
-                Assert.IsTrue(viewContainers.Remove(id));
+                bool result = viewContainers.Remove(id);
+                Assert.IsTrue(result);
             }
         }
 
-        public static ViewContainer GetViewContainerByID(int id)
+        public static ViewContainer GetViewContainerByID(uint id)
         {
             if (!viewContainers.ContainsKey(id))
             {
