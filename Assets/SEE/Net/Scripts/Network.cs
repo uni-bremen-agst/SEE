@@ -13,44 +13,118 @@ using UnityEngine.Assertions;
 namespace SEE.Net
 {
 
+    /// <summary>
+    /// Handles the most general parts of networking.
+    /// </summary>
     public class Network : MonoBehaviour
     {
-        private const Logger.Severity DEFAULT_SEVERITY = Logger.Severity.High;
+        /// <summary>
+        /// The default severity of the native logger of <see cref="NetworkCommsDotNet"/>.
+        /// </summary>
+        private const Logger.Severity DefaultSeverity = Logger.Severity.High;
+
+        /// <summary>
+        /// The instance of the network.
+        /// </summary>
         private static Network instance;
 
+        /// <summary>
+        /// Whether the game is used in offline mode.
+        /// </summary>
         [SerializeField] private bool useInOfflineMode = true;
+
+        /// <summary>
+        /// Whether this clients hosts the server. Is ignored in offline mode.
+        /// </summary>
         [SerializeField] private bool hostServer = false;
+
+        /// <summary>
+        /// The IP-address of the server.
+        /// </summary>
         [SerializeField] private string serverIPAddress = string.Empty;
+
+        /// <summary>
+        /// The port of the server. Is ignored, if this host does not host the server.
+        /// </summary>
         [SerializeField] private int localServerPort = 55555;
+
+        /// <summary>
+        /// The port of the remote server. Is ignored, if this client hosts the server.
+        /// </summary>
         [SerializeField] private int remoteServerPort = 0;
+
+        /// <summary>
+        /// Whether the city should be loaded on start up. Is ignored, if this client
+        /// does not host the server.
+        /// </summary>
         [SerializeField] private bool loadCityOnStart = false;
+
+        /// <summary>
+        /// The <see cref="GameObject"/> containing the <see cref="SEECity"/>-Script. Is
+        /// ignored, if city can not be loaded on start.
+        /// </summary>
         [SerializeField] private GameObject loadCityGameObject = null;
 
 #if UNITY_EDITOR
+        /// <summary>
+        /// Whether native logging should be enabled.
+        /// </summary>
         [SerializeField] private bool nativeLoggingEnabled = false;
-        [SerializeField] private Logger.Severity minimalSeverity = DEFAULT_SEVERITY;
+
+        /// <summary>
+        /// The minimal logged severity.
+        /// </summary>
+        [SerializeField] private Logger.Severity minimalSeverity = DefaultSeverity;
 #endif
 
+        /// <summary>
+        /// Submitted packets, that will be sent in the next <see cref="LateUpdate"/>.
+        /// </summary>
         private Dictionary<Connection, List<string>> submittedSerializedPackets = new Dictionary<Connection, List<string>>();
 
 
 
+        /// <summary>
+        /// <see cref="useInOfflineMode"/>
+        /// </summary>
         public static bool UseInOfflineMode { get => instance ? instance.useInOfflineMode : true; }
 
+        /// <summary>
+        /// <see cref="hostServer"/>
+        /// </summary>
         public static bool HostServer { get => instance ? instance.hostServer : false; }
 
+        /// <summary>
+        /// <see cref="serverIPAddress"/>
+        /// </summary>
         public static string ServerIPAddress { get => instance ? instance.serverIPAddress : ""; }
 
+        /// <summary>
+        /// <see cref="localServerPort"/>
+        /// </summary>
         public static int LocalServerPort { get => instance ? instance.localServerPort : -1; }
 
+        /// <summary>
+        /// <see cref="remoteServerPort"/>
+        /// </summary>
         public static int RemoteServerPort { get => instance ? instance.remoteServerPort : -1; }
 
+        /// <summary>
+        /// Contains the main thread of the application.
+        /// </summary>
         public static Thread MainThread { get; private set; } = Thread.CurrentThread;
 
+        /// <summary>
+        /// List of dead connections. Is packets can not be sent, this list is searched
+        /// to reduce the frequency of warning messages.
+        /// </summary>
         private static List<Connection> deadConnections = new List<Connection>();
 
 
 
+        /// <summary>
+        /// Initializes the server, client and game.
+        /// </summary>
         private void Awake()
         {
             if (instance)
@@ -96,6 +170,9 @@ namespace SEE.Net
             InitializeGame();
         }
 
+        /// <summary>
+        /// Initializes the game.
+        /// </summary>
         private void InitializeGame()
         {
             if ((useInOfflineMode || hostServer) && loadCityOnStart && loadCityGameObject != null)
@@ -146,6 +223,9 @@ namespace SEE.Net
             }
         }
         
+        /// <summary>
+        /// Sends all pending packets.
+        /// </summary>
         private void LateUpdate()
         {
             if (hostServer && !useInOfflineMode)
@@ -184,6 +264,9 @@ namespace SEE.Net
             }
         }
 
+        /// <summary>
+        /// Shuts down the server and the client.
+        /// </summary>
         private void OnDestroy()
         {
             if (!useInOfflineMode)
@@ -224,6 +307,9 @@ namespace SEE.Net
 
 
 
+        /// <summary>
+        /// Switches to offline mode.
+        /// </summary>
         internal static void SwitchToOfflineMode()
         {
             if (instance)
@@ -252,6 +338,12 @@ namespace SEE.Net
             }
         }
 
+        /// <summary>
+        /// Submits a packet for dispatch.
+        /// </summary>
+        /// <param name="connection">The connecting, the packet should be sent through.
+        /// </param>
+        /// <param name="packet">The packet to be sent.</param>
         internal static void SubmitPacket(Connection connection, AbstractPacket packet)
         {
             Assert.IsNotNull(connection);
@@ -260,6 +352,12 @@ namespace SEE.Net
             SubmitPacket(connection, PacketSerializer.Serialize(packet));
         }
 
+        /// <summary>
+        /// Submits a packet for dispatch.
+        /// </summary>
+        /// <param name="connection">The connecting, the packet should be sent through.
+        /// </param>
+        /// <param name="packet">The serialized packet to be sent.</param>
         internal static void SubmitPacket(Connection connection, string serializedPacket)
         {
             bool result = instance.submittedSerializedPackets.TryGetValue(connection, out List<string> serializedPackets);
@@ -271,6 +369,11 @@ namespace SEE.Net
             serializedPackets.Add(serializedPacket);
         }
 
+        /// <summary>
+        /// Sends a serialized packet via given connection.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="serializedPacket">The serialized packet to be sent.</param>
         private void Send(Connection connection, string serializedPacket)
         {
             string packetType = Client.Connection.Equals(connection) ? Server.PacketType : Client.PacketType;
@@ -298,7 +401,11 @@ namespace SEE.Net
             }
         }
 
-
+        /// <summary>
+        /// Checks, whether the given IP-address is local.
+        /// </summary>
+        /// <param name="ipAddress">The IP-address.</param>
+        /// <returns><c>true</c> if given IP-address is local, <c>false</c> otherwise.</returns>
         public static bool IsLocalIPAddress(IPAddress ipAddress)
         {
             if (ipAddress == null)
@@ -310,6 +417,10 @@ namespace SEE.Net
             return localIPAddresses.Contains(ipAddress);
         }
 
+        /// <summary>
+        /// Returns an array of all local IP-Addresses.
+        /// </summary>
+        /// <returns>An array of all local IP-Addresses.</returns>
         public static IPAddress[] LookupLocalIPAddresses()
         {
             string hostName = Dns.GetHostName(); ;
