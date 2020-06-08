@@ -80,6 +80,7 @@ namespace SEE.Net
                 }
                 Connections.Clear();
             }
+
         }
 
         internal static void BufferPacket(AbstractPacket packet)

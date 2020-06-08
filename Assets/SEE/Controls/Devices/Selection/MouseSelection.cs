@@ -97,7 +97,7 @@ namespace SEE.Controls.Devices
         public override bool IsZoomingHome => Input.GetKeyDown(KeyCode.R);
 
         /// <summary>
-        /// Resets the grabbing timer, so the InputDevice will not start grabbing.
+        /// Resets the selection timer, so the start of grabbing is delayed.
         /// </summary>
         public void ResetSelectionTimer()
         {

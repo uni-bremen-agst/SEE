@@ -224,6 +224,34 @@ namespace SEE.Net
 
 
 
+        internal static void SwitchToOfflineMode()
+        {
+            if (instance)
+            {
+                foreach (ViewContainer viewContainer in FindObjectsOfType<ViewContainer>())
+                {
+                    if (!viewContainer.IsOwner())
+                    {
+                        Destroy(viewContainer.gameObject);
+                    }
+                }
+
+                instance.useInOfflineMode = true;
+                try
+                {
+                    if (instance.hostServer)
+                    {
+                        Server.Shutdown();
+                    }
+                    Client.Shutdown();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
+            }
+        }
+
         internal static void SubmitPacket(Connection connection, AbstractPacket packet)
         {
             Assert.IsNotNull(connection);
@@ -264,7 +292,7 @@ namespace SEE.Net
                             connection.ConnectionInfo.RemoteEndPoint.ToString() +
                             "'! Destination may not be listening or connection timed out. Closing connection!"
                         );
-                        // TODO(torben): close connection. also, look at exception above
+                        SwitchToOfflineMode();
                     }
                 }
             }
