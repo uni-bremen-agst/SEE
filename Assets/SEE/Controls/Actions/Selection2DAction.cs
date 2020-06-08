@@ -1,4 +1,5 @@
 ﻿using SEE.GO;
+using System;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -27,10 +28,23 @@ namespace SEE.Controls
         /// method returns true</param>
         /// <returns>true if an object was hit</returns>
         protected override bool Detect(out RaycastHit hitInfo)
-        {            
+        {
             Ray ray = GetRay();
             Debug.DrawRay(ray.origin, ray.direction);
-            return Physics.Raycast(ray, out hitInfo, Physics.IgnoreRaycastLayer);
+
+            // TODO: currently, only the 2D selection ignored not rendered GameObjects!
+            RaycastHit[] hits = Physics.RaycastAll(ray);
+            Array.Sort(hits, (h0, h1) => h0.distance.CompareTo(h1.distance));
+            foreach (RaycastHit hit in hits)
+            {
+                if (hit.collider.gameObject.GetComponent<Renderer>().enabled)
+                {
+                    hitInfo = hit;
+                    return true;
+                }
+            }
+            hitInfo = new RaycastHit();
+            return false;
         }
 
         protected Vector3 GrabbingRayStart()
