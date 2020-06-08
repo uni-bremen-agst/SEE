@@ -10,17 +10,19 @@ namespace SEE.Net
     [DisallowMultipleComponent]
     public class ViewContainer : MonoBehaviour
     {
-        public const int INVALID_ID = -1;
+        // TODO(torben): InvalidID could be uint.MaxValue and thus we could use uint for greater range
+        public const int InvalidID = -1;
 
-        [SerializeField] public int id = INVALID_ID;
+        [SerializeField] public int id = InvalidID;
         [SerializeField] public IPEndPoint owner;
+        [SerializeField] public string prefabPath;
         [SerializeField] private View[] views = new View[1];
         
         private static Dictionary<int, ViewContainer> viewContainers = new Dictionary<int, ViewContainer>();
 
 
 
-        public void Initialize(int id, IPEndPoint owner)
+        public void Initialize(int id, IPEndPoint owner, string prefabPath)
         {
 #if UNITY_EDITOR
             if (owner == null || owner.Address == null)
@@ -34,6 +36,7 @@ namespace SEE.Net
 #endif
             this.id = id;
             this.owner = owner;
+            this.prefabPath = prefabPath;
             viewContainers.Add(id, this);
             for (int i = 0; i < views.Length; i++)
             {
@@ -43,7 +46,7 @@ namespace SEE.Net
 
         public void OnDestroy()
         {
-            if (id != INVALID_ID)
+            if (id != InvalidID)
             {
                 Assert.IsTrue(viewContainers.Remove(id));
             }
@@ -56,6 +59,20 @@ namespace SEE.Net
                 return null;
             }
             return viewContainers[id];
+        }
+
+        public static ViewContainer[] GetViewContainersByOwner(IPEndPoint owner)
+        {
+            // TODO(torben): make this query more efficient
+            List<ViewContainer> result = new List<ViewContainer>();
+            foreach (ViewContainer viewContainer in viewContainers.Values)
+            {
+                if (viewContainer.owner.Equals(owner))
+                {
+                    result.Add(viewContainer);
+                }
+            }
+            return result.ToArray();
         }
 
         public int GetIndexOf(View view)

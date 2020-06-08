@@ -57,7 +57,7 @@ namespace SEE.Net
             PacketHandler.HandlePendingPackets();
         }
 
-        public static void Shutdown() // TODO(torben): send message to server
+        public static void Shutdown()
         {
             Connection?.CloseConnection(false);
             Connection = null;

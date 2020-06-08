@@ -25,7 +25,7 @@ namespace SEEEditor
                     bool useInOfflineMode = Network.UseInOfflineMode;
                     string defaultMessage = useInOfflineMode ? "Unset in offline mode" : "Set at runtime";
 
-                    EditorGUILayout.LabelField("ID", useInOfflineMode || viewContainer.id == ViewContainer.INVALID_ID ? defaultMessage : viewContainer.id.ToString());
+                    EditorGUILayout.LabelField("ID", useInOfflineMode || viewContainer.id == ViewContainer.InvalidID ? defaultMessage : viewContainer.id.ToString());
                     EditorGUILayout.Space();
                     EditorGUILayout.LabelField("Owner IPV6-Address", useInOfflineMode || viewContainer.owner == null ? defaultMessage : viewContainer.owner.Address.ToString());
                     EditorGUILayout.LabelField("Owner Port", useInOfflineMode || viewContainer.owner == null ? defaultMessage : viewContainer.owner.Port.ToString());

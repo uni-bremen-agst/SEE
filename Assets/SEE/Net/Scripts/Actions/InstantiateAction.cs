@@ -15,7 +15,7 @@ namespace SEE.Net
         public Vector3 position;
         public Quaternion rotation;
         public Vector3 scale;
-        public int viewID;
+        public int viewContainerID;
 
         public InstantiateAction(string prefabPath) : base(true)
         {
@@ -35,12 +35,12 @@ namespace SEE.Net
             this.position = position;
             this.rotation = rotation;
             this.scale = scale;
-            viewID = -1;
+            viewContainerID = -1;
         }
 
         protected override bool ExecuteOnServer()
         {
-            viewID = ++lastViewID;
+            viewContainerID = ++lastViewID;
             return true;
         }
 
@@ -62,7 +62,7 @@ namespace SEE.Net
 
             if (!Network.UseInOfflineMode)
             {
-                go.GetComponent<ViewContainer>().Initialize(viewID, new IPEndPoint(IPAddress.Parse(ownerIpAddress), ownerPort));
+                go.GetComponent<ViewContainer>().Initialize(viewContainerID, new IPEndPoint(IPAddress.Parse(ownerIpAddress), ownerPort), prefabPath);
             }
             go.transform.position = position;
             go.transform.rotation = rotation;
@@ -77,7 +77,7 @@ namespace SEE.Net
 
         protected override bool UndoOnClient()
         {
-            Object.Destroy(ViewContainer.GetViewContainerByID(viewID).gameObject);
+            Object.Destroy(ViewContainer.GetViewContainerByID(viewContainerID).gameObject);
             return true;
         }
 
@@ -88,8 +88,7 @@ namespace SEE.Net
 
         protected override bool RedoOnClient()
         {
-            bool result = ExecuteOnClient();
-            return result;
+            return ExecuteOnClient();
         }
     }
 
