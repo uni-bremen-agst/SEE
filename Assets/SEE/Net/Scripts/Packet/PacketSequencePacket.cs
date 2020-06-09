@@ -66,7 +66,7 @@ namespace SEE.Net
         /// Executes every packet in this packet sequence one after another as a server.
         /// </summary>
         /// <param name="connection">The connecting of the packet.</param>
-        /// <returns><c>true</c> if each of the packets could be executed, <c>false</c>
+        /// <returns><code>true</code> if each of the packets could be executed, <code>false</code>
         /// otherwise.</returns>
         internal override bool ExecuteOnServer(Connection connection)
         {
@@ -91,7 +91,7 @@ namespace SEE.Net
         /// Executes every packet in this packet sequence one after another as a client.
         /// </summary>
         /// <param name="connection">The connecting of the packet.</param>
-        /// <returns><c>true</c> if each of the packets could be executed, <c>false</c>
+        /// <returns><code>true</code> if each of the packets could be executed, <code>false</code>
         /// otherwise.</returns>
         internal override bool ExecuteOnClient(Connection connection)
         {

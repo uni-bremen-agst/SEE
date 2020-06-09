@@ -74,7 +74,7 @@ namespace SEE.Net
         /// Executes the action of this packet as a client.
         /// </summary>
         /// <param name="connection">The connecting of the packet.</param>
-        /// <returns><c>true</c>.</returns>
+        /// <returns><code>true</code>.</returns>
         internal override bool ExecuteOnClient(Connection connection)
         {
             Assert.IsNotNull(connection);
@@ -135,7 +135,7 @@ namespace SEE.Net
         /// Buffers this packet and redos the action of this packet as a server.
         /// </summary>
         /// <param name="connection">The connection of this packet.</param>
-        /// <returns><c>true</c>.</returns>
+        /// <returns><code>true</code>.</returns>
         internal override bool ExecuteOnServer(Connection connection)
         {
             Assert.IsNotNull(connection);
@@ -154,7 +154,7 @@ namespace SEE.Net
         /// Undos the action of this packet as a client.
         /// </summary>
         /// <param name="connection">The connection of this packet.</param>
-        /// <returns><c>true</c>.</returns>
+        /// <returns><code>true</code>.</returns>
         internal override bool ExecuteOnClient(Connection connection)
         {
             Assert.IsNotNull(connection);
@@ -213,7 +213,7 @@ namespace SEE.Net
         /// Buffers this packet and redos the action of this packet as a server.
         /// </summary>
         /// <param name="connection">The connection of this packet.</param>
-        /// <returns><c>true</c>.</returns>
+        /// <returns><code>true</code>.</returns>
         internal override bool ExecuteOnServer(Connection connection)
         {
             Assert.IsNotNull(connection);
@@ -232,7 +232,7 @@ namespace SEE.Net
         /// Redos the action of this packet as a client.
         /// </summary>
         /// <param name="connection">The connection of this packet.</param>
-        /// <returns><c>true</c>.</returns>
+        /// <returns><code>true</code>.</returns>
         internal override bool ExecuteOnClient(Connection connection)
         {
             Assert.IsNotNull(connection);
