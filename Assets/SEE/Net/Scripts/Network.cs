@@ -405,7 +405,7 @@ namespace SEE.Net
         /// Checks, whether the given IP-address is local.
         /// </summary>
         /// <param name="ipAddress">The IP-address.</param>
-        /// <returns><c>true</c> if given IP-address is local, <c>false</c> otherwise.</returns>
+        /// <returns><code>true</code> if given IP-address is local, <code>false</code> otherwise.</returns>
         public static bool IsLocalIPAddress(IPAddress ipAddress)
         {
             if (ipAddress == null)

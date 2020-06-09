@@ -5,16 +5,50 @@ using UnityEngine.Assertions;
 namespace SEE.Net
 {
 
+    /// <summary>
+    /// Action for grabbing/releasing grabbable objects.
+    /// </summary>
     public class GrabAction : AbstractAction
     {
+        /// <summary>
+        /// The unique ID of the grabbable object.
+        /// </summary>
         public uint id;
+
+        /// <summary>
+        /// The local start location of the object, when it was first grabbed.
+        /// </summary>
         public Vector3 startLocalPosition;
+
+        /// <summary>
+        /// The local end position of the object for when it is released. Is ignored, if
+        /// <see cref="grab"/> is <code>false</code>.
+        /// </summary>
         public Vector3 endLocalPosition;
+
+        /// <summary>
+        /// Whether the object is now grabbed. If <code>false</code>, the object is released.
+        /// </summary>
         public bool grab;
+
+        /// <summary>
+        /// Whether the object was released successfully without canceling. Is ignored,
+        /// if <see cref="grab"/> is false.
+        /// </summary>
         public bool actionFinalized;
 
 
 
+        /// <summary>
+        /// Constructs a new grab action.
+        /// </summary>
+        /// <param name="grabbableObject">The grabbable object to grab/release.</param>
+        /// <param name="startLocalPosition">The start location for grabbing the object.
+        /// </param>
+        /// <param name="grab">Whether the object is now grabbed. If <code>false</code>, the
+        /// object is released.</param>
+        /// <param name="actionFinalized">Whether the object was released successfully
+        /// without canceling. Is ignored, if <see cref="grab"/> is false.</param>
         public GrabAction(GrabbableObject grabbableObject, Vector3 startLocalPosition, bool grab, bool actionFinalized = true) : base(!grab && actionFinalized)
         {
             id = grabbableObject.id;
@@ -26,6 +60,10 @@ namespace SEE.Net
 
         
 
+        /// <summary>
+        /// Updates the game state for future clients.
+        /// </summary>
+        /// <returns><code>true</code>.</returns>
         protected override bool ExecuteOnServer()
         {
             if (grab)
@@ -39,6 +77,12 @@ namespace SEE.Net
             return true;
         }
 
+        /// <summary>
+        /// Grabs/releases the grabbable object. If <see cref="grab"/> and
+        /// <see cref="actionFinalized"/> are <code>false</code>, the object is smoothly
+        /// moved back to its original position.
+        /// </summary>
+        /// <returns><code>true</code>.</returns>
         protected override bool ExecuteOnClient()
         {
             GrabbableObject grabbableObject = (GrabbableObject)InteractableObject.Get(id);
@@ -76,7 +120,7 @@ namespace SEE.Net
         {
             return true;
         }
-
+        
         protected override bool UndoOnClient()
         {
             GrabbableObject grabbableObject = (GrabbableObject)InteractableObject.Get(id);

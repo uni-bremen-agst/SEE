@@ -5,15 +5,33 @@ using UnityEngine.Assertions;
 namespace SEE.Net
 {
 
+    /// <summary>
+    /// Moves a grabbable object to new position for every client.
+    /// </summary>
     public class MoveAction : AbstractAction
     {
+        /// <summary>
+        /// The unique ID of the object to move.
+        /// </summary>
         public uint id;
+
+        /// <summary>
+        /// The new position of the object.
+        /// </summary>
         public Vector3 position;
 
 
 
+        /// <summary>
+        /// Constructs a move action for given grabbable object and position.
+        /// 
+        /// <paramref name="grabbableObject"/> must not be <code>null</code>.
+        /// </summary>
+        /// <param name="grabbableObject">The grabbable object to move.</param>
+        /// <param name="position">The new position of the grabbable object.</param>
         public MoveAction(GrabbableObject grabbableObject, Vector3 position) : base(false)
         {
+            Assert.IsNotNull(grabbableObject);
             id = grabbableObject.id;
             this.position = position;
         }
@@ -25,6 +43,10 @@ namespace SEE.Net
             return true;
         }
 
+        /// <summary>
+        /// Updates the position of the grabbable object.
+        /// </summary>
+        /// <returns><code>true</code> if position could be updated, <code>false</code> otherwise.</returns>
         protected override bool ExecuteOnClient()
         {
             GrabbableObject grabbableObject = (GrabbableObject)InteractableObject.Get(id);

@@ -44,7 +44,7 @@ namespace SEE.Game
         /// See <see cref="ZoomOutOf(GameObject, GameObject)"/> for further details.
         /// </summary>
         /// <param name="enteredNode">the object to be zoomed out of</param>
-        /// <returns><c>true</c>, if zooming is possible, <c>false</c> otherwise</returns>
+        /// <returns><code>true</code>, if zooming is possible, <code>false</code> otherwise</returns>
         public static bool CanZoomOutOf(GameObject enteredNode)
         {
             Transformer transformer = GetTransformer(enteredNode);
@@ -56,7 +56,7 @@ namespace SEE.Game
         /// <paramref name="enteredNode"/>.
         /// </summary>
         /// <param name="enteredNode">the object to be zoomed out of</param>
-        /// <returns><c>true</c>, if zooming is possible, <c>false</c> otherwise</returns>
+        /// <returns><code>true</code>, if zooming is possible, <code>false</code> otherwise</returns>
         public static bool CanZoomRoot(GameObject enteredNode)
         {
             return GetTransformer(enteredNode) != null;
@@ -67,7 +67,7 @@ namespace SEE.Game
         /// <paramref name="enteredNode"/>.
         /// </summary>
         /// <param name="enteredNode">the object to be zoomed into</param>
-        /// <returns><c>true</c>, if zooming is possible, <c>false</c> otherwise</returns>
+        /// <returns><code>true</code>, if zooming is possible, <code>false</code> otherwise</returns>
         public static bool CanZoomInto(GameObject enteredNode)
         {
             Transformer transformer = GetTransformer(enteredNode);

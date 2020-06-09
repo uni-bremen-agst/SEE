@@ -6,16 +6,41 @@ using UnityEngine.Assertions;
 namespace SEE.Net
 {
 
+    /// <summary>
+    /// Loads a city with the attributes defined in object with name
+    /// <see cref="gameObjectName"/> for every client.
+    /// </summary>
     public class LoadCityAction : AbstractAction
     {
+        /// <summary>
+        /// The name of the game object defining the loading details.
+        /// </summary>
         public static readonly string gameObjectName = "Implementation";
 
+        /// <summary>
+        /// The type of the city as string.
+        /// </summary>
         public string type;
+
+        /// <summary>
+        /// The global position of the city.
+        /// </summary>
         public Vector3 position;
+
+        /// <summary>
+        /// The global rotation of the city.
+        /// </summary>
         public Quaternion rotation;
+
+        /// <summary>
+        /// The global scale of the city.
+        /// </summary>
         public Vector3 scale;
 
+        //-----------------------------------------------------------------------
         // AbstractSEECity
+        //-----------------------------------------------------------------------
+
         // TODO: HierarchicalEdges
         // TODO: nodeTypes
         public string WidthMetric;
@@ -59,22 +84,38 @@ namespace SEE.Net
         public float Tension;
         public float RDP;
 
+        //-----------------------------------------------------------------------
         // SEECity
+        //-----------------------------------------------------------------------
+
         public string gxlPath;
         public string csvPath;
 
+        //-----------------------------------------------------------------------
         // SEECityEvolution
+        //-----------------------------------------------------------------------
+
         public int maxRevisionsToLoad;
 
+        //-----------------------------------------------------------------------
         // SEECityDyn
+        //-----------------------------------------------------------------------
+
         public string dynPath;
 
+        //-----------------------------------------------------------------------
         // SEECityRandom
+        //-----------------------------------------------------------------------
+
         public Tools.Constraint leafConstraint;
         public Tools.Constraint innerNodeConstraint;
 
 
 
+        /// <summary>
+        /// Constructs a an action to load the given city for every client.
+        /// </summary>
+        /// <param name="city">The city to load.</param>
         public LoadCityAction(AbstractSEECity city) : base(true)
         {
             type = city.GetType().ToString();
@@ -153,6 +194,10 @@ namespace SEE.Net
             return true;
         }
 
+        /// <summary>
+        /// Loads the city of given attributes.
+        /// </summary>
+        /// <returns><code>true</code>.</returns>
         protected override bool ExecuteOnClient()
         {
             GameObject gameObject = GameObject.Find(gameObjectName);
@@ -263,6 +308,10 @@ namespace SEE.Net
             return true;
         }
 
+        /// <summary>
+        /// Destroys the city.
+        /// </summary>
+        /// <returns><code>true</code>.</returns>
         protected override bool UndoOnClient()
         {
             AbstractSEECity city = GameObject.Find(gameObjectName).GetComponent<AbstractSEECity>();
@@ -275,10 +324,13 @@ namespace SEE.Net
             return true;
         }
 
+        /// <summary>
+        /// Rebuilds the city.
+        /// </summary>
+        /// <returns>The result of <see cref="ExecuteOnClient"/>.</returns>
         protected override bool RedoOnClient()
         {
-            bool result = ExecuteOnClient();
-            return result;
+            return ExecuteOnClient();
         }
     }
 

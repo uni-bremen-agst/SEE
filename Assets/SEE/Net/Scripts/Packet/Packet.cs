@@ -38,14 +38,14 @@ namespace SEE.Net
         /// Executes this packet as a server.
         /// </summary>
         /// <param name="connection">The connection of this packet.</param>
-        /// <returns><c>true</c> if the packet could be executed, <c>false</c> otherwise.</returns>
+        /// <returns><code>true</code> if the packet could be executed, <code>false</code> otherwise.</returns>
         internal abstract bool ExecuteOnServer(Connection connection);
 
         /// <summary>
         /// Executes this packet as a client.
         /// </summary>
         /// <param name="connection">The connection of this packet.</param>
-        /// <returns><c>true</c> if the packet could be executed, <c>false</c> otherwise.</returns>
+        /// <returns><code>true</code> if the packet could be executed, <code>false</code> otherwise.</returns>
         internal abstract bool ExecuteOnClient(Connection connection);
     }
 
