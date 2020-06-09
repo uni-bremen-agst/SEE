@@ -205,9 +205,9 @@ namespace SEE.Net
 #endif
                 if (mode.ViveController)
                 {
-                    new InstantiateCommand("SEENetViveControllerLeft").Execute();
-                    new InstantiateCommand("SEENetViveControllerRight").Execute();
-                    new InstantiateCommand("SEENetViveControllerRay").Execute();
+                    new InstantiateAction("SEENetViveControllerLeft").Execute();
+                    new InstantiateAction("SEENetViveControllerRight").Execute();
+                    new InstantiateAction("SEENetViveControllerRay").Execute();
                 }
                 else if (mode.LeapMotion)
                 {

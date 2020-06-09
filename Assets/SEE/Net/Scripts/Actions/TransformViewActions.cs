@@ -4,7 +4,7 @@ namespace SEE.Net
 {
 
     /// <summary>
-    /// Supplies utility functionality for transform view commands.
+    /// Supplies utility functionality for transform view actions.
     /// </summary>
     internal static class TransformViewActionHelper
     {
@@ -37,7 +37,7 @@ namespace SEE.Net
     /// <summary>
     /// Synchronizes positions between Clients.
     /// </summary>
-    public class TransformViewPositionCommand : AbstractAction
+    public class TransformViewPositionAction : AbstractAction
     {
         /// <summary>
         /// The unique ID of the view container containing the transform view.
@@ -57,11 +57,11 @@ namespace SEE.Net
 
 
         /// <summary>
-        /// Constructs a command for given transform view and position.
+        /// Constructs an action for given transform view and position.
         /// </summary>
         /// <param name="transformView">The transform view to synchronize.</param>
         /// <param name="position">The new position.</param>
-        public TransformViewPositionCommand(TransformView transformView, Vector3 position) : base(false)
+        public TransformViewPositionAction(TransformView transformView, Vector3 position) : base(false)
         {
             viewContainerID = transformView.viewContainer.id;
             viewIndex = transformView.viewContainer.GetIndexOf(transformView);
@@ -116,7 +116,7 @@ namespace SEE.Net
     /// <summary>
     /// Synchronizes rotations between Clients.
     /// </summary>
-    public class TransformViewRotationCommand : AbstractAction
+    public class TransformViewRotationAction : AbstractAction
     {
         /// <summary>
         /// The unique ID of the view container containing the transform view.
@@ -136,11 +136,11 @@ namespace SEE.Net
 
 
         /// <summary>
-        /// Constructs a command for given transform view and rotation.
+        /// Constructs an action for given transform view and rotation.
         /// </summary>
         /// <param name="transformView">The transform view to synchronize.</param>
         /// <param name="rotation">The new rotation.</param>
-        public TransformViewRotationCommand(TransformView transformView, Quaternion rotation) : base(false)
+        public TransformViewRotationAction(TransformView transformView, Quaternion rotation) : base(false)
         {
             viewContainerID = transformView.viewContainer.id;
             viewIndex = transformView.viewContainer.GetIndexOf(transformView);
@@ -195,7 +195,7 @@ namespace SEE.Net
     /// <summary>
     /// Synchronizes cale between Clients.
     /// </summary>
-    public class TransformViewScaleCommand : AbstractAction
+    public class TransformViewScaleAction : AbstractAction
     {
         /// <summary>
         /// The unique ID of the view container containing the transform view.
@@ -215,11 +215,11 @@ namespace SEE.Net
 
 
         /// <summary>
-        /// Constructs a command for given transform view and scale.
+        /// Constructs an action for given transform view and scale.
         /// </summary>
         /// <param name="transformView">The transform view to synchronize.</param>
         /// <param name="scale">The new scale.</param>
-        public TransformViewScaleCommand(TransformView transformView, Vector3 scale) : base(false)
+        public TransformViewScaleAction(TransformView transformView, Vector3 scale) : base(false)
         {
             viewContainerID = transformView.viewContainer.id;
             viewIndex = transformView.viewContainer.GetIndexOf(transformView);

@@ -38,8 +38,8 @@ namespace SEEEditor
             {
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    EditorGUILayout.LabelField("Update Start Time Offset", TimeSpan.FromSeconds(TransformView.UPDATE_TIME_START_OFFSET).ToString(@"ss\.ffff") + " s");
-                    EditorGUILayout.LabelField("Update Frequency", TimeSpan.FromSeconds(TransformView.UPDATE_TIME_VALUE).ToString(@"ss\.ffff") + " s");
+                    EditorGUILayout.LabelField("Update Start Time Offset", TimeSpan.FromSeconds(TransformView.UpdateTimeStartDelay).ToString(@"ss\.ffff") + " s");
+                    EditorGUILayout.LabelField("Update Frequency", TimeSpan.FromSeconds(TransformView.UpdateRepeatRate).ToString(@"ss\.ffff") + " s");
                 }
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
