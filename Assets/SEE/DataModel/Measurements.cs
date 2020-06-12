@@ -226,10 +226,9 @@ namespace SEE
         /// Transforms all measurements to a string dictinary containing the measurements with it values
         /// </summary>
         /// <returns>string dictinary with measurements</returns>
-        public SortedDictionary<string, string> ToStringDictionary()
+        public SortedDictionary<string, string> ToStringDictionary(bool calcualteNew = false)
         {
-            if (measurementsDict.Count > 0)
-            {
+            if (!calcualteNew && measurementsDict.Count > 0) {
                 return measurementsDict;
             }
 
