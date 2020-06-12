@@ -19,26 +19,34 @@ namespace SEE.Controls
         private GameObject lineHolder;
 
         /// <summary>
-        /// The default width of the ray line.
+        /// The width of the ray line.
         /// </summary>
-        const float defaultWidth = 0.1f;
+        [Tooltip("The width of the selection ray line")]
+        public float rayWidth = 0.005f;
 
         /// <summary>
         /// The maximal length the casted ray can reach.
         /// </summary>
-        const float RayDistance = 1000.0f;
+        [Tooltip("The maximal length the selection ray can reach.")]
+        public float RayDistance = 5.0f;
 
-        [Tooltip("The color used when an object was hit.")]
-        public Color colorOnHit = Color.green;
-        [Tooltip("The color used when no object was hit.")]
-        public Color defaultColor = Color.red;
+        [Tooltip("The color of the selection ray used when an object was hit.")]
+        public Color colorOnSelectionHit = Color.green;
+        [Tooltip("The color of the selection ray used when no object was hit.")]
+        public Color colorOnSelectionMissed = Color.red;
+        [Tooltip("The color of the grabbing ray used when an object was hit.")]
+        public Color colorOnGrabbingHit = Color.blue;
+        [Tooltip("The color of the grabbing ray used when no object was hit.")]
+        public Color colorOnGrabbingMissed = Color.yellow;
 
         /// <summary>
         /// Sets up the object holding the line renderer for the shown ray
         /// and other parameters of the line.
         /// </summary>
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
+
             // We create game object holding the line renderer for the ray.
             // This game object will be added to the game object this component
             // is attached to.
@@ -53,8 +61,8 @@ namespace SEE.Controls
             line.receiveShadows = false;
             line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
-            line.startWidth = defaultWidth;
-            line.endWidth = defaultWidth;
+            line.startWidth = rayWidth;
+            line.endWidth = rayWidth;
         }
 
         /// <summary>
@@ -66,7 +74,7 @@ namespace SEE.Controls
         /// <param name="selectedObject">the object selected or null</param>
         /// <param name="hitInfo">information about the hit (used only if <paramref name="selectedObject"/>
         /// is not null)</param>
-        protected override void ShowFeedback(GameObject selectedObject, RaycastHit hitInfo)
+        protected override void ShowHoveringFeedback(GameObject selectedObject, RaycastHit hitInfo)
         {
             Vector3 origin = selectionDevice.Position;
             line.SetPosition(0, origin);
@@ -74,11 +82,25 @@ namespace SEE.Controls
             if (selectedObject != null)
             {
                 line.SetPosition(1, hitInfo.point);
-                line.material.color = colorOnHit;
+                if (selectionDevice.IsGrabbing)
+                {
+                    line.material.color = colorOnGrabbingHit;
+                }
+                else
+                {
+                    line.material.color = colorOnSelectionHit;
+                }
             }
             else
             {
-                line.material.color = defaultColor;
+                if (selectionDevice.IsGrabbing)
+                {
+                    line.material.color = colorOnGrabbingMissed;
+                }
+                else
+                {
+                    line.material.color = colorOnSelectionMissed;
+                }
                 line.SetPosition(1, origin + RayDistance * selectionDevice.Direction.normalized);
             }
         }
@@ -86,7 +108,7 @@ namespace SEE.Controls
         /// <summary>
         /// Resets the ray line so that it becomes invisible again.
         /// </summary>
-        protected override void HideFeedback()
+        protected override void HideHoveringFeedback()
         {
             Vector3 origin = selectionDevice.Position;
             line.SetPosition(0, origin);
@@ -102,7 +124,20 @@ namespace SEE.Controls
         /// <returns>true if an object was hit</returns>
         protected override bool Detect(out RaycastHit hitInfo)
         {
-            return Physics.Raycast(selectionDevice.Position, selectionDevice.Direction, out hitInfo, RayDistance);
+            return Physics.Raycast(origin: selectionDevice.Position,
+                                   direction: selectionDevice.Direction,
+                                   hitInfo: out hitInfo,
+                                   maxDistance: RayDistance);
+        }
+
+        /// <summary>
+        /// Returns a ray going from the position of the selection device through the pointing direction of 
+        /// the selection device.
+        /// </summary>
+        /// <returns>ray from selection device through selectionDevice.Direction</returns>
+        protected override Ray GetRay()
+        {
+            return new Ray(selectionDevice.Position, selectionDevice.Direction);
         }
     }
 }

@@ -11,9 +11,22 @@ namespace SEE.Layout
         string ID { get; }
 
         /// <summary>
-        /// Scale of a node.
+        /// The local scale of a node (i.e., scale relative to its parent).
         /// </summary>
-        Vector3 Scale { get; set; }
+        Vector3 LocalScale { get; set; }
+
+        /// <summary>
+        /// The absolute scale of a node in world co-ordinates.
+        /// 
+        /// Note: This value may be meaningful only if the node is not skewed.
+        /// </summary>
+        Vector3 AbsoluteScale { get; }
+
+        /// <summary>
+        /// Scales the node by the given <paramref name="factor"/>.
+        /// </summary>
+        /// <param name="factor">factory by which to scale the node</param>
+        void ScaleBy(float factor);
 
         /// <summary>
         /// Center position of a node in world space.
@@ -81,5 +94,26 @@ namespace SEE.Layout
     /// </summary>
     public interface ILayoutNode : IGameNode, IGraphNode<ILayoutNode>, IHierarchyNode<ILayoutNode>, ISublayoutNode<ILayoutNode>
     {
+    }
+
+    public static class ILayoutNodeHierarchy
+    {
+        /// <summary>
+        /// Returns all nodes in <paramref name="layoutNodes"/> that do not have a parent.
+        /// </summary>
+        /// <param name="layoutNodes">nodes to be queried</param>
+        /// <returns>all root nodes in <paramref name="layoutNodes"/></returns>
+        public static ICollection<ILayoutNode> Roots(ICollection<ILayoutNode> layoutNodes)
+        {
+            ICollection<ILayoutNode> result = new List<ILayoutNode>();
+            foreach (ILayoutNode node in layoutNodes)
+            {
+                if (node.Parent == null)
+                {
+                    result.Add(node);
+                }
+            }
+            return result;
+        }
     }
 }

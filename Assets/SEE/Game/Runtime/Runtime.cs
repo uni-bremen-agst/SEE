@@ -62,7 +62,7 @@ namespace SEE.Game.Runtime
             
             // The buildings representing function calls are all tagged with these tags.
             // Currently, these are solely Tags.Building.
-            string[] tags = new string[] { Tags.Building };
+            string[] tags = new string[] { Tags.Node };
 
             // Generates non serializable parts of call tree.
             callTree.GenerateTree();

@@ -1,9 +1,8 @@
-using System;
 using UnityEngine;
 
 namespace UnityStandardAssets.Vehicles.Aeroplane
 {
-    [RequireComponent(typeof (Rigidbody))]
+    [RequireComponent(typeof(Rigidbody))]
     public class AeroplaneController : MonoBehaviour
     {
         [SerializeField] private float m_MaxEnginePower = 40f;        // The maximum output of the engine.
@@ -26,7 +25,7 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
         public bool AirBrakes { get; private set; }                     // Whether or not the air brakes are being applied.
         public float ForwardSpeed { get; private set; }                 // How fast the aeroplane is traveling in it's forward direction.
         public float EnginePower { get; private set; }                  // How much power the engine is being given.
-        public float MaxEnginePower{ get { return m_MaxEnginePower; }}    // The maximum output of the engine.
+        public float MaxEnginePower { get { return m_MaxEnginePower; } }    // The maximum output of the engine.
         public float RollAngle { get; private set; }
         public float PitchAngle { get; private set; }
         public float RollInput { get; private set; }
@@ -40,7 +39,7 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
         private bool m_Immobilized = false;   // used for making the plane uncontrollable, i.e. if it has been hit or crashed.
         private float m_BankedTurnAmount;
         private Rigidbody m_Rigidbody;
-	    WheelCollider[] m_WheelColliders;
+        WheelCollider[] m_WheelColliders;
 
 
         private void Start()
@@ -50,13 +49,13 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
             m_OriginalDrag = m_Rigidbody.drag;
             m_OriginalAngularDrag = m_Rigidbody.angularDrag;
 
-			for (int i = 0; i < transform.childCount; i++ )
-			{
-				foreach (var componentsInChild in transform.GetChild(i).GetComponentsInChildren<WheelCollider>())
-				{
-					componentsInChild.motorTorque = 0.18f;
-				}
-			}
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                foreach (var componentsInChild in transform.GetChild(i).GetComponentsInChildren<WheelCollider>())
+                {
+                    componentsInChild.motorTorque = 0.18f;
+                }
+            }
         }
 
 
@@ -131,13 +130,13 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
             // auto level roll, if there's no roll input:
             if (RollInput == 0f)
             {
-                RollInput = -RollAngle*m_AutoRollLevel;
+                RollInput = -RollAngle * m_AutoRollLevel;
             }
             // auto correct pitch, if no pitch input (but also apply the banked turn amount)
             if (PitchInput == 0f)
             {
-                PitchInput = -PitchAngle*m_AutoPitchLevel;
-                PitchInput -= Mathf.Abs(m_BankedTurnAmount*m_BankedTurnAmount*m_AutoTurnPitch);
+                PitchInput = -PitchAngle * m_AutoPitchLevel;
+                PitchInput -= Mathf.Abs(m_BankedTurnAmount * m_BankedTurnAmount * m_AutoTurnPitch);
             }
         }
 
@@ -159,21 +158,21 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
             }
 
             // Adjust throttle based on throttle input (or immobilized state)
-            Throttle = Mathf.Clamp01(Throttle + ThrottleInput*Time.deltaTime*m_ThrottleChangeSpeed);
+            Throttle = Mathf.Clamp01(Throttle + ThrottleInput * Time.deltaTime * m_ThrottleChangeSpeed);
 
             // current engine power is just:
-            EnginePower = Throttle*m_MaxEnginePower;
+            EnginePower = Throttle * m_MaxEnginePower;
         }
 
 
         private void CalculateDrag()
         {
             // increase the drag based on speed, since a constant drag doesn't seem "Real" (tm) enough
-            float extraDrag = m_Rigidbody.velocity.magnitude*m_DragIncreaseFactor;
+            float extraDrag = m_Rigidbody.velocity.magnitude * m_DragIncreaseFactor;
             // Air brakes work by directly modifying drag. This part is actually pretty realistic!
-            m_Rigidbody.drag = (AirBrakes ? (m_OriginalDrag + extraDrag)*m_AirBrakesEffect : m_OriginalDrag + extraDrag);
+            m_Rigidbody.drag = (AirBrakes ? (m_OriginalDrag + extraDrag) * m_AirBrakesEffect : m_OriginalDrag + extraDrag);
             // Forward speed affects angular drag - at high forward speed, it's much harder for the plane to spin
-            m_Rigidbody.angularDrag = m_OriginalAngularDrag*ForwardSpeed;
+            m_Rigidbody.angularDrag = m_OriginalAngularDrag * ForwardSpeed;
         }
 
 
@@ -190,15 +189,15 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
                 m_AeroFactor *= m_AeroFactor;
                 // Finally we calculate a new velocity by bending the current velocity direction towards
                 // the the direction the plane is facing, by an amount based on this aeroFactor
-                var newVelocity = Vector3.Lerp(m_Rigidbody.velocity, transform.forward*ForwardSpeed,
-                                               m_AeroFactor*ForwardSpeed*m_AerodynamicEffect*Time.deltaTime);
+                var newVelocity = Vector3.Lerp(m_Rigidbody.velocity, transform.forward * ForwardSpeed,
+                                               m_AeroFactor * ForwardSpeed * m_AerodynamicEffect * Time.deltaTime);
                 m_Rigidbody.velocity = newVelocity;
 
                 // also rotate the plane towards the direction of movement - this should be a very small effect, but means the plane ends up
                 // pointing downwards in a stall
                 m_Rigidbody.rotation = Quaternion.Slerp(m_Rigidbody.rotation,
                                                       Quaternion.LookRotation(m_Rigidbody.velocity, transform.up),
-                                                      m_AerodynamicEffect*Time.deltaTime);
+                                                      m_AerodynamicEffect * Time.deltaTime);
             }
         }
 
@@ -209,7 +208,7 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
             // we accumulate forces into this variable:
             var forces = Vector3.zero;
             // Add the engine power in the forward direction
-            forces += EnginePower*transform.forward;
+            forces += EnginePower * transform.forward;
             // The direction that the lift force is applied is at right angles to the plane's velocity (usually, this is 'up'!)
             var liftDirection = Vector3.Cross(m_Rigidbody.velocity, transform.right).normalized;
             // The amount of lift drops off as the plane increases speed - in reality this occurs as the pilot retracts the flaps
@@ -217,8 +216,8 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
             // a simple way of doing it automatically:
             var zeroLiftFactor = Mathf.InverseLerp(m_ZeroLiftSpeed, 0, ForwardSpeed);
             // Calculate and add the lift power
-            var liftPower = ForwardSpeed*ForwardSpeed*m_Lift*zeroLiftFactor*m_AeroFactor;
-            forces += liftPower*liftDirection;
+            var liftPower = ForwardSpeed * ForwardSpeed * m_Lift * zeroLiftFactor * m_AeroFactor;
+            forces += liftPower * liftDirection;
             // Apply the calculated forces to the the Rigidbody
             m_Rigidbody.AddForce(forces);
         }
@@ -229,17 +228,17 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
             // We accumulate torque forces into this variable:
             var torque = Vector3.zero;
             // Add torque for the pitch based on the pitch input.
-            torque += PitchInput*m_PitchEffect*transform.right;
+            torque += PitchInput * m_PitchEffect * transform.right;
             // Add torque for the yaw based on the yaw input.
-            torque += YawInput*m_YawEffect*transform.up;
+            torque += YawInput * m_YawEffect * transform.up;
             // Add torque for the roll based on the roll input.
-            torque += -RollInput*m_RollEffect*transform.forward;
+            torque += -RollInput * m_RollEffect * transform.forward;
             // Add torque for banked turning.
-            torque += m_BankedTurnAmount*m_BankedTurnEffect*transform.up;
+            torque += m_BankedTurnAmount * m_BankedTurnEffect * transform.up;
             // The total torque is multiplied by the forward speed, so the controls have more effect at high speed,
             // and little effect at low speed, or when not moving in the direction of the nose of the plane
             // (i.e. falling while stalled)
-            m_Rigidbody.AddTorque(torque*ForwardSpeed*m_AeroFactor);
+            m_Rigidbody.AddTorque(torque * ForwardSpeed * m_AeroFactor);
         }
 
 
@@ -247,7 +246,7 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
         {
             // Altitude calculations - we raycast downwards from the aeroplane
             // starting a safe distance below the plane to avoid colliding with any of the plane's own colliders
-            var ray = new Ray(transform.position - Vector3.up*10, -Vector3.up);
+            var ray = new Ray(transform.position - Vector3.up * 10, -Vector3.up);
             RaycastHit hit;
             Altitude = Physics.Raycast(ray, out hit) ? hit.distance + 10 : transform.position.y;
         }

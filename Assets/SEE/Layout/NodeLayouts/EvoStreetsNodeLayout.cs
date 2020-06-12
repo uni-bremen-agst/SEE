@@ -30,10 +30,11 @@ namespace SEE.Layout
         private readonly float OffsetBetweenBuildings = 1.0f;
 
         /// <summary>
-        /// The street width that will be adjusted by the "depth" of the street.
+        /// The base street width that will be adjusted by the "depth" of the street
+        /// (<see cref="RelativeStreetWidth"/>).
         /// The actual value used will be multiplied by leafNodeFactory.Unit.
         /// </summary>
-        private readonly float StreetWidth = 2.0f;
+        private readonly float StreetWidth = 10.0f;
 
         /// <summary>
         /// The height (y co-ordinate) of game objects (inner tree nodes) represented by streets.
@@ -57,7 +58,7 @@ namespace SEE.Layout
                 ILayoutNode singleNode = gameNodes.FirstOrDefault();
                 Dictionary<ILayoutNode, NodeTransform> layout_result = new Dictionary<ILayoutNode, NodeTransform>
                 {
-                    [singleNode] = new NodeTransform(Vector3.zero, singleNode.Scale)
+                    [singleNode] = new NodeTransform(Vector3.zero, singleNode.LocalScale)
                 };
                 return layout_result;
             }
@@ -308,7 +309,7 @@ namespace SEE.Layout
         private void SetHouseScale(ENode node)
         {
             // Scaled metric values for the dimensions.
-            Vector3 size = node.GraphNode.Scale;
+            Vector3 size = node.GraphNode.LocalScale;
             node.Scale = new Vector3(size.x, size.y, size.z);
         }
 

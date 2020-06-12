@@ -34,11 +34,11 @@ namespace UnityStandardAssets.Utility
         {
             public Entry[] entries;
         }
-        
-        
+
+
         public Entries entries = new Entries();
 
-        
+
         private void Awake()
         {
             foreach (Entry entry in entries.entries)
@@ -89,7 +89,7 @@ namespace UnityStandardAssets.Utility
 namespace UnityStandardAssets.Utility.Inspector
 {
 #if UNITY_EDITOR
-    [CustomPropertyDrawer(typeof (TimedObjectActivator.Entries))]
+    [CustomPropertyDrawer(typeof(TimedObjectActivator.Entries))]
     public class EntriesDrawer : PropertyDrawer
     {
         private const float k_LineHeight = 18;
@@ -115,10 +115,10 @@ namespace UnityStandardAssets.Utility.Inspector
 
             if (entries.arraySize > 0)
             {
-                float actionWidth = .25f*width;
-                float targetWidth = .6f*width;
-                float delayWidth = .1f*width;
-                float buttonWidth = .05f*width;
+                float actionWidth = .25f * width;
+                float targetWidth = .6f * width;
+                float delayWidth = .1f * width;
+                float buttonWidth = .05f * width;
 
                 for (int i = 0; i < entries.arraySize; ++i)
                 {
@@ -144,7 +144,7 @@ namespace UnityStandardAssets.Utility.Inspector
                     // Draw fields - passs GUIContent.none to each so they are drawn without labels
 
                     if (entry.FindPropertyRelative("action").enumValueIndex !=
-                        (int) TimedObjectActivator.Action.ReloadLevel)
+                        (int)TimedObjectActivator.Action.ReloadLevel)
                     {
                         EditorGUI.PropertyField(actionRect, entry.FindPropertyRelative("action"), GUIContent.none);
                         EditorGUI.PropertyField(targetRect, entry.FindPropertyRelative("target"), GUIContent.none);
@@ -163,7 +163,7 @@ namespace UnityStandardAssets.Utility.Inspector
                     }
                 }
             }
-            
+
             // add & sort buttons
             y += k_LineHeight + k_Spacing;
 
@@ -209,7 +209,7 @@ namespace UnityStandardAssets.Utility.Inspector
         {
             SerializedProperty entries = property.FindPropertyRelative("entries");
             float lineAndSpace = k_LineHeight + k_Spacing;
-            return 40 + (entries.arraySize*lineAndSpace) + lineAndSpace;
+            return 40 + (entries.arraySize * lineAndSpace) + lineAndSpace;
         }
     }
 #endif

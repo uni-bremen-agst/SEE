@@ -58,7 +58,7 @@ namespace SEE.Layout
             {
                 ILayoutNode gameNode = layoutNodes.GetEnumerator().Current;
                 layout_result[gameNode] = new NodeTransform(Vector3.zero, 
-                                                            new Vector3(width, gameNode.Scale.y, depth));
+                                                            new Vector3(width, gameNode.LocalScale.y, depth));
             }
             else
             {
@@ -81,7 +81,7 @@ namespace SEE.Layout
             {
                 ILayoutNode root = roots[0];
                 layout_result[root] = new NodeTransform(Vector3.zero, 
-                                                        new Vector3(width, root.Scale.y, depth));
+                                                        new Vector3(width, root.LocalScale.y, depth));
                 CalculateLayout(root.Children(), -width / 2.0f, -depth / 2.0f, width, depth);
             }
             else
@@ -158,7 +158,7 @@ namespace SEE.Layout
             if (node.IsLeaf)
             {
                 // a leaf      
-                Vector3 size = node.Scale;
+                Vector3 size = node.LocalScale;
                 // x and z lenghts may differ; we need to consider the larger value
                 float result = Mathf.Max(size.x, size.z);
                 sizes[node] = new RectangleTiling.NodeSize(node, result);
@@ -210,7 +210,7 @@ namespace SEE.Layout
             {
                 ILayoutNode o = nodes[i].gameNode;
                 Vector3 position = new Vector3(rect.x + rect.width / 2.0f, groundLevel, rect.z + rect.depth / 2.0f);
-                Vector3 scale = new Vector3(rect.width, o.Scale.y, rect.depth);
+                Vector3 scale = new Vector3(rect.width, o.LocalScale.y, rect.depth);
                 layout_result[o] = new NodeTransform(position, scale);
                 i++;
             }

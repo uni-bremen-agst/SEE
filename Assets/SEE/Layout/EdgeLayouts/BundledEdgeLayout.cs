@@ -27,22 +27,24 @@ namespace SEE.Layout
         /// of zero has no effect.
         /// </summary>
         /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
+        /// <param name="minLevelDistance">the minimal distance between different edge levels</param>
         /// <param name="tension">strength of the tension for bundling edges; must be in the range [0,1]</param>
         /// <param name="rdp">epsilon parameter of the Ramer–Douglas–Peucker algorithm</param>
-        public BundledEdgeLayout(bool edgesAboveBlocks, float tension = 0.85f, float rdp = 0.0f)
-            : base(edgesAboveBlocks)
+        public BundledEdgeLayout(bool edgesAboveBlocks, float minLevelDistance, float tension = 0.85f, float rdp = 0.0f)
+            : base(edgesAboveBlocks, minLevelDistance)
         {
             name = "Hierarchically Bundled";
             Debug.Assert(0.0f <= tension && tension <= 1.0f);
             this.tension = tension;
             this.rdp = rdp;
+            this.levelDistance = minLevelDistance;
         }
 
         /// <summary>
         /// Determines the strength of the tension for bundling edges. This value may
         /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
         /// </summary>
-        private float tension = 0.85f; // 0.85 is the value recommended by Holten
+        private readonly float tension = 0.85f; // 0.85 is the value recommended by Holten
 
         /// <summary>
         /// Determines to which extent the polylines of the generated splines are simplified.
@@ -52,7 +54,26 @@ namespace SEE.Layout
         /// value close to zero results in a line with little to no reduction. A negative value 
         /// is treated as 0. A value of zero has no effect.
         /// </summary>
-        private float rdp = 0.0f; // 0.0f means no simplification
+        private readonly float rdp = 0.0f; // 0.0f means no simplification
+
+        /// <summary>
+        /// The number of Unity units per level of the hierarchy for the height of control points.
+        /// Its value must be greater than zero. It will be set relative to the maximal height
+        /// of the nodes whose edges are to be laid out (in Create()). The value set in the
+        /// constructor is the initial minimum value.
+        /// </summary>
+        private float levelDistance;
+
+        /// <summary>
+        /// The minimal/maximal y co-ordinate for all hierarchical control points at level 2 and above.
+        /// Control points at level 0 (self loops) will be handled separately: self loops will be
+        /// drawn from corner to corner on the roof or ground, respectively, depending upon 
+        /// edgesAboveBlocks. Likewise, edges for nodes that are siblings in the hierarchy will be
+        /// drawn as simple splines from roof to roof or ground to ground of the two blocks, respectively,
+        /// on their shortest path. The y co-ordinate of inner control points of all other edges will be 
+        /// at levelOffset or above/below. See GetLevelHeight() for more details.
+        /// </summary>
+        private float levelOffset = 0.0f;
 
         /// <summary>
         /// Returns hierarchically bundled splines for all edges among the given <paramref name="layoutNodes"/>.
@@ -69,7 +90,8 @@ namespace SEE.Layout
 
             MinMaxBlockY(layoutNodes, out float minY, out float maxY, out float maxHeight);
             levelDistance = Math.Max(levelDistance, maxHeight / 5.0f);
-            minimalDistanceToGround = (edgesAboveBlocks ? maxY : minY) + levelDistance;            
+            levelOffset = edgesAboveBlocks ? maxY + levelDistance : minY - levelDistance;
+            //Debug.LogFormat("levelDistance {0} levelOffset {1} maxHeight {2}\n", levelDistance, levelOffset, maxHeight);
 
             LCAFinder<ILayoutNode> lca = new LCAFinder<ILayoutNode>(roots);
 
@@ -205,7 +227,7 @@ namespace SEE.Layout
                 {
                     // The edge is along a node hierarchy path.
                     // We will create a direct spline from source to target at the lowest level.
-                    return DirectSpline(source, target, GetLevelHeight(maxLevel));
+                    return DirectSpline(source, target, levelOffset);
                 }
                 else
                 {
@@ -229,7 +251,7 @@ namespace SEE.Layout
                         // between siblings were led over one single control point, they would often take 
                         // a detour even though the nodes are close by. The detour would make it difficult 
                         // to follow the edges visually.
-                        return DirectSpline(source, target, GetLevelHeight(maxLevel));
+                        return DirectSpline(source, target, levelOffset);
                     }
                     else
                     {
@@ -246,7 +268,6 @@ namespace SEE.Layout
                         // Calculate control points along the node hierarchy 
                         Vector3[] controlPoints = new Vector3[fullPath.Length];
                         controlPoints[0] = edgesAboveBlocks ? source.Roof : source.Ground;
-                        Vector3 direction = edgesAboveBlocks ? Vector3.up : Vector3.down;
                         for (int i = 1; i < fullPath.Length - 1; i++)
                         {
                             // We consider the height of intermediate nodes.
@@ -254,8 +275,10 @@ namespace SEE.Layout
                             // the childrens' depth. That is why we need to choose the height
                             // as a measure relative to maxLevel.
                             // TODO: Do we really want the center position here?
-                            controlPoints[i] = fullPath[i].CenterPosition
-                                               + GetLevelHeight(fullPath[i].Level) * direction;
+                            controlPoints[i] = new Vector3(fullPath[i].CenterPosition.x,
+                                                           GetLevelHeight(fullPath[i].Level),
+                                                           fullPath[i].CenterPosition.z);
+
                         }
                         controlPoints[controlPoints.Length - 1] = edgesAboveBlocks ? target.Roof : target.Ground;
                         return Simplify(LinePoints.BSplineLinePoints(controlPoints, tension), rdp);
@@ -269,15 +292,13 @@ namespace SEE.Layout
         /// The first point is the center of the roof/ground of <paramref name="source"/> and the last
         /// point the center of the roof/ground of <paramref name="target"/>. The middle peak point
         /// is the position in between <paramref name="source"/> and <paramref name="target"/> where
-        /// the y co-ordinate is specified by <paramref name="yLevel"/>. If edges should be drawn below
-        /// blocks, we use the negative value of <paramref name="yLevel"/> for the y co-ordinate.
-        /// 
+        /// the y co-ordinate is specified by <paramref name="yLevel"/>. 
         /// That means, an edge between the nodes is drawn as a direct spline on the shortest path 
         /// between the two nodes from roof/ground to roof/ground. Thus, no hierarchical bundling is applied.
         /// </summary>
         /// <param name="source">the node where to start the edge</param>
         /// <param name="target">the node where to end the edge</param>
-        /// <param name="yLevel">the y co-ordinate of the two middle control points; must be positive</param>
+        /// <param name="yLevel">the y co-ordinate of the two middle control points</param>
         /// <returns>control points for a direct spline between the two nodes</returns>
         private Vector3[] DirectSpline(ILayoutNode source, ILayoutNode target, float yLevel)
         {
@@ -285,29 +306,9 @@ namespace SEE.Layout
             Vector3 end   = edgesAboveBlocks ? target.Roof : target.Ground;
             // position in between start and end
             Vector3 middle = Vector3.Lerp(start, end, 0.5f);
-            middle.y = edgesAboveBlocks ? yLevel : -yLevel;
+            middle.y = yLevel;
             return LinePoints.SplineLinePoints(start, middle, end);
         }
-
-        /// <summary>
-        /// The number of Unity units per level of the hierarchy for the height of control points.
-        /// Its value must be greater than zero. It will be set relative to the maximal height
-        /// of the nodes whose edge are to be laid out (in Create()). The value set here is the minimum value.
-        /// </summary>
-        private float levelDistance = 1.0f;
-
-        /// <summary>
-        /// The minimal y co-ordinate for all hierarchical control points at level 2 and above.
-        /// Control points at level 0 (self loops) will be handled separately: self loops will be
-        /// drawn from corner to corner on the roof or ground, respectively, depending upon 
-        /// edgesAboveBlocks. Likewise, edges for nodes that are siblings in the hierarchy will be
-        /// drawn as simple splines from roof to roof or ground to ground of the two blocks, respectively,
-        /// on their shortest path. The y co-ordinate of inner control points of all other edges will be 
-        /// at minimalDistanceToGround or above with respect to the ground. See GetLevelHeight() for 
-        /// more details.
-        /// Its value is never negative. It will be set in Create().
-        /// </summary>
-        private float minimalDistanceToGround = 0.0f;
 
         /// <summary>
         /// Returns the y co-ordinate for control points of nodes at the given <paramref name="level"/>
@@ -316,15 +317,24 @@ namespace SEE.Layout
         /// of nodes in different trees does not exist and -1 will be passed as <paramref name="level"/>,
         /// which is perfectly acceptable. In such cases, the returned value will be just one levelDistance 
         /// above those for normal root nodes: 
-        ///     minimalDistanceToGround + (maxLevel + 1) * levelDistance
-        /// If level = maxLevel, minimalDistanceToGround will be returned.
-        /// In all other cases the returned value is guaranteed to be greater than minimalDistanceToGround.
+        ///     levelOffset +/- (maxLevel + 1) * levelDistance  (+ if edgesAboveBlocks; otherwise -)
+        /// If level = maxLevel, levelOffset will be returned.
+        /// In all other cases the returned value is guaranteed to be greater (or smaller if edges
+        /// are to be drawn below blocks, respectively) than levelOffset.
         /// </summary>
         /// <param name="level">node hierarchy level</param>
-        /// <returns>y co-ordinate for control points; always >= 0</returns>
+        /// <returns>y co-ordinate for control points</returns>
         private float GetLevelHeight(int level)
         {
-            return minimalDistanceToGround + (maxLevel - level) * levelDistance;
+            float relativeLevelDistance = (maxLevel - level) * levelDistance;
+            if (edgesAboveBlocks)
+            {
+                return levelOffset + relativeLevelDistance;
+            }
+            else
+            {
+                return levelOffset - relativeLevelDistance;
+            }
         }
 
         /// <summary>
@@ -336,12 +346,12 @@ namespace SEE.Layout
         /// is levelDistance above the roof or below the ground, respectively.
         /// </summary>
         /// <param name="node">node whose self loop line points are required</param>
-        /// <returns>line points forming a self loop above <paramref name="node"/></returns>
+        /// <returns>line points forming a self loop above/below <paramref name="node"/></returns>
         private Vector3[] SelfLoop(ILayoutNode node)
         {
             // center area (roof or ground)
             Vector3 center = edgesAboveBlocks ? node.Roof : node.Ground;
-            Vector3 extent = node.Scale / 2.0f;
+            Vector3 extent = node.LocalScale / 2.0f;
             // left front corner of center area
             Vector3 start = new Vector3(center.x - extent.x, center.y, center.z - extent.z);
             // right back corner of center area

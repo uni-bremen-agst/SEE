@@ -1,10 +1,9 @@
-using System;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 
 namespace UnityStandardAssets.Vehicles.Aeroplane
 {
-    [RequireComponent(typeof (AeroplaneController))]
+    [RequireComponent(typeof(AeroplaneController))]
     public class AeroplaneUserControl2Axis : MonoBehaviour
     {
         // these max angles are only used on mobile, due to the way pitch and roll input are handled
@@ -49,13 +48,13 @@ namespace UnityStandardAssets.Vehicles.Aeroplane
             // and the roll input is calculated to achieve that.
             // whereas on non-mobile, the input directly controls the roll of the aeroplane.
 
-            float intendedRollAngle = roll*maxRollAngle*Mathf.Deg2Rad;
-            float intendedPitchAngle = pitch*maxPitchAngle*Mathf.Deg2Rad;
+            float intendedRollAngle = roll * maxRollAngle * Mathf.Deg2Rad;
+            float intendedPitchAngle = pitch * maxPitchAngle * Mathf.Deg2Rad;
             roll = Mathf.Clamp((intendedRollAngle - m_Aeroplane.RollAngle), -1, 1);
             pitch = Mathf.Clamp((intendedPitchAngle - m_Aeroplane.PitchAngle), -1, 1);
 
             // similarly, the throttle axis input is considered to be the desired absolute value, not a relative change to current throttle.
-            float intendedThrottle = throttle*0.5f + 0.5f;
+            float intendedThrottle = throttle * 0.5f + 0.5f;
             throttle = Mathf.Clamp(intendedThrottle - m_Aeroplane.Throttle, -1, 1);
         }
     }

@@ -1,6 +1,7 @@
 ﻿using SEE.DataModel;
 using SEE.Game;
 using SEE.Layout;
+using SEE.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -564,8 +565,8 @@ namespace SEE
         /// <returns></returns>
         private bool CheckOverlapping(ILayoutNode node1, ILayoutNode node2)
         {
-            Bounds bounds1 = new Bounds(node1.CenterPosition, node1.Scale);
-            Bounds bounds2 = new Bounds(node2.CenterPosition, node2.Scale);
+            Bounds bounds1 = new Bounds(node1.CenterPosition, node1.LocalScale);
+            Bounds bounds2 = new Bounds(node2.CenterPosition, node2.LocalScale);
 
             bool intersect = IntersectBounds(bounds1, bounds2);
 

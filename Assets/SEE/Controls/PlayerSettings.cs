@@ -27,8 +27,12 @@ namespace SEE.Controls
         [OdinSerialize]
         public PlayerInputType playerInputType = PlayerInputType.Desktop;
 
-        [Tooltip("Whether the VR controllers should be hidden (relevant only for VR players).")]
+        [Header("VR specific settings (relevant only for VR players)")]
+        [Tooltip("Whether the VR controllers should be hidden.")]
         public bool HideVRControllers = false;
+
+        [Tooltip("Whether hints should be shown for controllers.")]
+        public bool ShowControllerHints = false;
 
         /// <summary>
         /// Depending on the user's selection, turns VR mode on or off and activates/deactivates
@@ -42,6 +46,7 @@ namespace SEE.Controls
             try
             {
                 XRSettings.enabled = playerInputType == PlayerInputType.VR;
+                Debug.LogFormat("VR enabled: {0}\n", XRSettings.enabled);
             }
             catch (Exception e)
             {
@@ -51,6 +56,20 @@ namespace SEE.Controls
             SetActive("VRPlayer",      playerInputType == PlayerInputType.VR);
             SetActive("GamepadPlayer", playerInputType == PlayerInputType.TouchGamepad);
             SetActive("InControl",     playerInputType == PlayerInputType.TouchGamepad);
+
+            // Turn off controller hints if requested in the user settings.
+            if (!ShowControllerHints)
+            {
+                foreach (Valve.VR.InteractionSystem.Hand hand in Player.instance.hands)
+                {
+                    ControllerButtonHints.HideAllButtonHints(hand);
+                    ControllerButtonHints.HideAllTextHints(hand);
+                }
+                if (Teleport.instance != null)
+                {
+                    Teleport.instance.CancelTeleportHint();
+                }
+            }
         }
 
         /// <summary>

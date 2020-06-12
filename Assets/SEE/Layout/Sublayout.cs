@@ -179,7 +179,7 @@ namespace SEE.Layout
 
                 sublayoutNode.RelativePosition = position; 
                 sublayoutNode.CenterPosition = position;
-                sublayoutNode.Scale = scale;
+                sublayoutNode.LocalScale = scale;
                 sublayoutNode.Rotation = transform.rotation;
 
                 if (sublayoutNode.IsSublayoutRoot)
@@ -224,14 +224,14 @@ namespace SEE.Layout
 
                     leftLowerCornerNode = new Vector2()
                     {
-                        x = sublayoutNode.CenterPosition.x - sublayoutNode.Scale.x / 2,
-                        y = sublayoutNode.CenterPosition.z + sublayoutNode.Scale.z / 2,
+                        x = sublayoutNode.CenterPosition.x - sublayoutNode.LocalScale.x / 2,
+                        y = sublayoutNode.CenterPosition.z + sublayoutNode.LocalScale.z / 2,
                     };
 
                     rightUpperCornerNode = new Vector2()
                     {
-                        x = sublayoutNode.CenterPosition.x + sublayoutNode.Scale.x / 2,
-                        y = sublayoutNode.CenterPosition.z - sublayoutNode.Scale.z / 2,
+                        x = sublayoutNode.CenterPosition.x + sublayoutNode.LocalScale.x / 2,
+                        y = sublayoutNode.CenterPosition.z - sublayoutNode.LocalScale.z / 2,
                     };
 
 
@@ -272,11 +272,11 @@ namespace SEE.Layout
 
                 if (!nodeLayout.GetModel().OnlyLeaves)
                 {
-                   rootNodeRealScale = new Vector3(sublayout.Node.Scale.x, innerNodeHeight, sublayout.Node.Scale.z);
+                   rootNodeRealScale = new Vector3(sublayout.Node.LocalScale.x, innerNodeHeight, sublayout.Node.LocalScale.z);
                    LayoutOffset = position - sublayout.Node.CenterPosition;
                 }
 
-                sublayout.Node.Scale = scale;
+                sublayout.Node.LocalScale = scale;
                 sublayout.Node.CenterPosition = position;
                 sublayout.Node.IsSublayoutNode = true;
             }
@@ -326,7 +326,7 @@ namespace SEE.Layout
 
             foreach (ILayoutNode layoutNode in sublayoutNodes)
             {
-                Vector3 extent = layoutNode.Scale / 2.0f;
+                Vector3 extent = layoutNode.LocalScale / 2.0f;
                 // Note: position denotes the center of the object
                 Vector3 position = layoutNode.CenterPosition;
                 {

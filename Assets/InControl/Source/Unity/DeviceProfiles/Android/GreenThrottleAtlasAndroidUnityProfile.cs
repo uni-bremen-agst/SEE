@@ -19,7 +19,7 @@ namespace InControl.UnityDeviceProfiles
 
 			IncludePlatforms = new[]
 			{
-				"Android",
+				"Android"
 			};
 
 			Matchers = new[] { new InputDeviceMatcher { NameLiteral = "Green Throttle Atlas" } };
@@ -103,13 +103,13 @@ namespace InControl.UnityDeviceProfiles
 				{
 					Name = "Left Trigger",
 					Target = InputControlType.LeftTrigger,
-					Source = Analog( 12 ),
+					Source = Analog( 12 )
 				},
 				new InputControlMapping
 				{
 					Name = "Right Trigger",
 					Target = InputControlType.RightTrigger,
-					Source = Analog( 11 ),
+					Source = Analog( 11 )
 				}
 			};
 		}

@@ -11,6 +11,7 @@ using SEE.GO;
 using SEE.Tools;
 using OdinSerializer.Utilities;
 using static SEE.Game.AbstractSEECity;
+using SEE.Utils;
 
 namespace SEE.Layout
 {
@@ -134,7 +135,8 @@ namespace SEE.Layout
                     NodeLayout nodeLayout = new CoseLayout(groundLevel, settings);
 
                     nodeLayout.Apply(layoutNodes.Cast<ILayoutNode>().ToList(), graph.Edges(), new List<SublayoutLayoutNode>());
-                    NodeLayout.Move(layoutNodes.Cast<ILayoutNode>().ToList(), settings.origin);
+                    NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x);
+                    NodeLayout.MoveTo(layoutNodes, parent.transform.position);
 
                     EdgeDistCalculation(graph, layoutNodes);
                     
@@ -149,7 +151,7 @@ namespace SEE.Layout
 
                     foreach (GameNode layoutNode in layoutNodes)
                     {
-                        layoutNode.Scale = mapGameObjectOriginalSize[layoutNode];
+                        layoutNode.LocalScale = mapGameObjectOriginalSize[layoutNode];
                         layoutNode.CenterPosition = new Vector3(0, 0, 0);
                     }
 
@@ -201,7 +203,7 @@ namespace SEE.Layout
 
             foreach (GameNode layoutNode in layoutNodes)
             {
-                layoutNode.Scale = mapGameObjectOriginalSize[layoutNode];
+                layoutNode.LocalScale = mapGameObjectOriginalSize[layoutNode];
                 layoutNode.CenterPosition = new Vector3(0, 0, 0);
             }
         }
@@ -583,7 +585,7 @@ namespace SEE.Layout
 
             foreach (ILayoutNode gameNode in layoutNodes)
             {
-                Vector3 scale = gameNode.Scale;
+                Vector3 scale = gameNode.LocalScale;
                 mapGameObjectOriginalSize.Add(gameNode, new Vector3(scale.x, scale.y, scale.z));
             }
 

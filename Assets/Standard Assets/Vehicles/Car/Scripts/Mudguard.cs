@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace UnityStandardAssets.Vehicles.Car
@@ -21,7 +20,7 @@ namespace UnityStandardAssets.Vehicles.Car
 
         private void Update()
         {
-            transform.localRotation = m_OriginalRotation*Quaternion.Euler(0, carController.CurrentSteerAngle, 0);
+            transform.localRotation = m_OriginalRotation * Quaternion.Euler(0, carController.CurrentSteerAngle, 0);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace SEE.Layout
         /// <summary>
         /// the scale
         /// </summary>
-        public Vector3 Scale { get => node.Scale ; set => node.Scale = value; }
+        public Vector3 LocalScale { get => node.LocalScale ; set => node.LocalScale = value; }
 
         /// <summary>
         /// the center position
@@ -99,6 +99,8 @@ namespace SEE.Layout
         /// </summary>
         public ILayoutNode SublayoutRoot { get; set; }
 
+        public Vector3 AbsoluteScale => throw new System.NotImplementedException();
+
         /// <summary>
         /// the child nodes
         /// </summary>
@@ -139,13 +141,13 @@ namespace SEE.Layout
         /// </summary>
         private readonly Dictionary<ILayoutNode, ILayoutSublayoutNode> ILayout_to_CoseSublayoutNode;
 
-        public ILayoutSublayoutNode(ILayoutNode node, ICollection<ILayoutNode> children, bool isLeaf, ILayoutNode parent, Vector3 scale, Dictionary<ILayoutNode, ILayoutSublayoutNode> ILayout_to_CoseSublayoutNode)
+        public ILayoutSublayoutNode(ILayoutNode node, ICollection<ILayoutNode> children, bool isLeaf, ILayoutNode parent, Vector3 localScale, Dictionary<ILayoutNode, ILayoutSublayoutNode> ILayout_to_CoseSublayoutNode)
         {
             this.node = node; 
             this.isLeaf = isLeaf;
             this.temporaryChildren = children;
             this.temporaryParent = parent;
-            node.Scale = scale;
+            node.LocalScale = localScale;
             this.ILayout_to_CoseSublayoutNode = ILayout_to_CoseSublayoutNode;
             ILayout_to_CoseSublayoutNode[node] = this; 
         }
@@ -156,7 +158,7 @@ namespace SEE.Layout
             this.isLeaf = node.IsLeaf;
             this.temporaryChildren = node.Children();
             this.temporaryParent = node.Parent;
-            node.Scale = node.Scale;
+            node.LocalScale = node.LocalScale;
             this.ILayout_to_CoseSublayoutNode = ILayout_to_CoseSublayoutNode;
             ILayout_to_CoseSublayoutNode[node] = this;
         }
@@ -214,6 +216,11 @@ namespace SEE.Layout
         }
 
         public void SetRelative(ILayoutNode node)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void ScaleBy(float factor)
         {
             throw new System.NotImplementedException();
         }

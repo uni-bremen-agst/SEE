@@ -171,7 +171,7 @@ namespace SEE.Layout
             if (node.IsLeaf)
             {
                 // Necessary size of the block independent of the parent
-                Vector3 size = node.Scale;
+                Vector3 size = node.LocalScale;
 
                 // The outer radius of an inner-most node is determined by the ground
                 // rectangle of the block to be drawn for the node.
@@ -244,7 +244,7 @@ namespace SEE.Layout
             {
                 // leaf
                 // leaves will only be positioned; we maintain their original scale
-                layout_result[node] = new NodeTransform(position, node.Scale);
+                layout_result[node] = new NodeTransform(position, node.LocalScale);
             }
             else
             {

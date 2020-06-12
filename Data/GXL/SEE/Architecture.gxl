@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="Architecture" edgeids="true">
+    <node id="N1">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>GO</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.GO</string>
+      </attr>
+    </node>
+    <node id="N2">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Whiteboard</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.GO.Whiteboard</string>
+      </attr>
+    </node>
+    <node id="N3">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Layout</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Layout</string>
+      </attr>
+    </node>
+    <node id="N4">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Game</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Game</string>
+      </attr>
+    </node>
+    <node id="N5">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Controls</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Controls</string>
+      </attr>
+    </node>
+    <node id="N6">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Utils</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Utils</string>
+      </attr>
+    </node>
+    <node id="N7">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Tools</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Tools</string>
+      </attr>
+    </node>
+    <node id="N8">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>DataModel</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.DataModel</string>
+      </attr>
+    </node>
+    <node id="N9">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Devices</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Controls.Devices</string>
+      </attr>
+    </node>
+    <node id="N10">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>CameraPaths</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.CameraPaths</string>
+      </attr>
+    </node>
+    <node id="N11">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>EvoStreets</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Layout.EvoStreets</string>
+      </attr>
+    </node>
+    <node id="N12">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>CirclePacking</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Layout.CirclePacking</string>
+      </attr>
+    </node>
+    <node id="N13">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>RectanglePacking</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Layout.RectanglePacking</string>
+      </attr>
+    </node>
+    <node id="N14">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>TreeMap</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Layout.TreeMap</string>
+      </attr>
+    </node>
+    <node id="N15">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>IO</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.DataModel.IO</string>
+      </attr>
+    </node>
+    <node id="N16">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Runtime</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Game.Runtime</string>
+      </attr>
+    </node>
+    <node id="N17">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Evolution</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Game.Evolution</string>
+      </attr>
+    </node>
+    <node id="N18">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>SEEEditor</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEEEditor</string>
+      </attr>
+    </node>
+    <node id="N3288">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Boost</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Controls.Devices.Boost</string>
+      </attr>
+    </node>
+    <node id="N3289">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Direction</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Controls.Devices.Direction</string>
+      </attr>
+    </node>
+    <node id="N3290">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Selection</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Controls.Devices.Selection</string>
+      </attr>
+    </node>
+    <node id="N3291">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Throttle</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Controls.Devices.Throttle</string>
+      </attr>
+    </node>
+    <node id="N3292">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Transformation</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Controls.Devices.Transformation</string>
+      </attr>
+    </node>
+    <node id="N3293">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Viewpoint</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Controls.Devices.Viewpoint</string>
+      </attr>
+    </node>
+    <edge id="E1" from="N2" to="N1">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E2" from="N9" to="N5">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E3" from="N11" to="N3">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E4" from="N12" to="N3">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E5" from="N13" to="N3">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E6" from="N14" to="N3">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E7" from="N15" to="N8">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E8" from="N16" to="N4">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E9" from="N17" to="N4">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E10" from="N8" to="N6">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E11" from="N10" to="N1">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E12" from="N1" to="N8">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E13" from="N16" to="N1">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E14" from="N1" to="N3">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E15" from="N18" to="N7">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E16" from="N18" to="N10">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E17" from="N18" to="N6">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E18" from="N18" to="N1">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E19" from="N10" to="N8">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E20" from="N7" to="N6">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E21" from="N16" to="N8">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E22" from="N5" to="N8">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E23" from="N3" to="N14">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E24" from="N3" to="N13">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E25" from="N3" to="N12">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E26" from="N3" to="N11">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E27" from="N5" to="N9">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E28" from="N5" to="N1">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E29" from="N4" to="N16">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E30" from="N4" to="N17">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E31" from="N4" to="N8">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E32" from="N4" to="N7">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E33" from="N4" to="N6">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E34" from="N4" to="N5">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E35" from="N4" to="N1">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E36" from="N4" to="N3">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E37" from="N7" to="N8">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E38" from="N18" to="N4">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E39" from="N18" to="N8">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E10460" from="N3288" to="N9">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E10461" from="N3289" to="N9">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E10462" from="N3290" to="N9">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E10463" from="N3291" to="N9">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E10464" from="N3292" to="N9">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E10465" from="N3293" to="N9">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+  </graph>
+</gxl>

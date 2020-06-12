@@ -19,11 +19,20 @@ namespace SEE.DataModel
         private List<Edge> edges = new List<Edge>();
 
         // The (view) name of the graph.
-        private string viewName = "";
+        private string name = "";
 
         // The path of the file from which this graph was loaded. Could be the
         /// empty string if the graph was not created by loading it from disk.
         private string path = "";
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="name">name of the graph</param>
+        public Graph(string name = "") : base()
+        {
+            this.name = name;
+        }
 
         /// Adds a node to the graph. 
         /// Preconditions:
@@ -89,8 +98,8 @@ namespace SEE.DataModel
             {
                 if (nodes.Remove(node.ID))
                 {
-                    // the edges of node are stored in the node's data structure as well as
-                    // in the node's neighbor's data structure
+                    // The edges of node are stored in the node's data structure as well as
+                    // in the node's neighbor's data structure.
                     foreach (Edge outgoing in node.Outgoings)
                     {
                         Node successor = outgoing.Target;
@@ -104,6 +113,33 @@ namespace SEE.DataModel
                         edges.Remove(incoming);
                     }
                     node.RemoveAllEdges();
+                    // Adjust the node hierarchy.
+                    if (node.NumberOfChildren() > 0)
+                    {
+                        if (node.Parent == null)
+                        {
+                            // All children of node become roots now.
+                            foreach (Node child in node.Children())
+                            {
+                                child.Parent = null;
+                            }
+                        }
+                        else
+                        {
+                            // The father of node now becomes the father of all children of node.
+                            foreach (Node child in node.Children())
+                            {
+                                child.Parent = null;
+                                node.Parent.AddChild(child);
+                            }
+                        }
+                        // Because the node hierarchy has changed, we need to re-calcuate
+                        // the levels. Note: We could do that incrementally if we wanted to
+                        // by traversing only the children of node instead of all nodes in 
+                        // the graph.
+                        CalculateLevels();
+                    }
+                    node.ItsGraph = null;
                 }
                 else
                 {
@@ -248,8 +284,8 @@ namespace SEE.DataModel
         /// </summary>
         public string Name
         {
-            get => viewName;
-            set => viewName = value;
+            get => name;
+            set => name = value;
         }
 
         /// <summary>
@@ -313,7 +349,7 @@ namespace SEE.DataModel
         /// <summary>
         /// Dumps the hierarchy for each root. Used for debugging.
         /// </summary>
-        internal void DumpTree()
+        public void DumpTree()
         {
             foreach (Node root in GetRoots())
             {
@@ -330,7 +366,7 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// Dumps the hierarchy for given root by adding level many blanks 
+        /// Dumps the hierarchy for given root by adding level many - 
         /// as indentation. Used for debugging.
         /// </summary>
         private void DumpTree(Node root, int level)
@@ -466,7 +502,7 @@ namespace SEE.DataModel
         {
             string result = "{\n";
             result += " \"kind\": graph,\n";
-            result += " \"name\": \"" + viewName + "\",\n";
+            result += " \"name\": \"" + name + "\",\n";
             // its own attributes
             result += base.ToString();
             // its nodes
@@ -507,7 +543,7 @@ namespace SEE.DataModel
         {
             base.HandleCloned(clone);
             Graph target = (Graph)clone;
-            target.viewName = this.viewName;
+            target.name = this.name;
             target.path = this.path;
             CopyNodesTo(target);
             CopyEdgesTo(target);
@@ -837,7 +873,7 @@ namespace SEE.DataModel
                 Graph otherNode = other as Graph;
                 if (other != null)
                 {
-                    Report("Graphs " + viewName + " " + otherNode.viewName + " have differences");
+                    Report("Graphs " + name + " " + otherNode.name + " have differences");
                 }
                 return false;
             }
@@ -849,7 +885,7 @@ namespace SEE.DataModel
                     Report("Graph paths are different");
                     return false;
                 }
-                else if (this.viewName != otherGraph.viewName)
+                else if (this.name != otherGraph.name)
                 {
                     Report("Graph names are different");
                     return false;
@@ -901,7 +937,7 @@ namespace SEE.DataModel
         public override int GetHashCode()
         {
             // we are using the viewName which is intended to be unique
-            return viewName.GetHashCode();
+            return name.GetHashCode();
         }
 
     }

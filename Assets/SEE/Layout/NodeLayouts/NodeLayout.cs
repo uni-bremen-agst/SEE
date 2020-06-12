@@ -118,15 +118,116 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Adds the given <paramref name="offset"/> to every node in <paramref name="layoutNodes"/>.
+        /// Adds the given <paramref name="target"/> to every node in <paramref name="layoutNodes"/>.
         /// </summary>
         /// <param name="layoutNodes">layout nodes to be adjusted</param>
-        /// <param name="offset">offset to be added</param>
-        public static void Move(ICollection<ILayoutNode> layoutNodes, Vector3 offset)
+        /// <param name="target">offset to be added</param>
+        public static void MoveTo(ICollection<ILayoutNode> layoutNodes, Vector3 target)
         {
+            Bounding3DBox(layoutNodes, out Vector3 left, out Vector3 right);
+            // The center of the bounding 3D box enclosing all layoutNodes
+            Vector3 centerPosition = (right + left) / 2.0f;
+            Vector3 offset = target - centerPosition;
             foreach (ILayoutNode layoutNode in layoutNodes)
             {
                 layoutNode.CenterPosition += offset;
+            }
+        }
+
+        /// <summary>
+        /// Scales all nodes in <paramref name="layoutNodes"/> so that the total width
+        /// of the layout (along the x axis) equals <paramref name="width"/>.
+        /// The aspect ratio of every node is maintained.
+        /// </summary>
+        /// <param name="layoutNodes">layout nodes to be scaled</param>
+        /// <param name="width">the absolute width (x axis) the required space for the laid out nodes must have</param>
+        /// <returns>the factor by which the scale of edge node was multiplied</returns>
+        public static float Scale(ICollection<ILayoutNode> layoutNodes, float width)
+        {
+            Bounding3DBox(layoutNodes, out Vector3 left, out Vector3 right);
+            float currentWidth = right.x - left.x;
+            float scaleFactor = width / currentWidth;
+            foreach (ILayoutNode layoutNode in layoutNodes)
+            {
+                layoutNode.ScaleBy(scaleFactor);
+                // The x/z co-ordinates must be adjusted after scaling
+                Vector3 newPosition = layoutNode.CenterPosition * scaleFactor;
+                layoutNode.CenterPosition = newPosition;
+            }
+            return scaleFactor;
+        }
+
+        /// <summary>
+        /// Returns the bounding 3D box enclosing all given <paramref name="layoutNodes"/>.
+        /// </summary>
+        /// <param name="layoutNodes">the list of layout nodes that are enclosed in the resulting bounding 3D box</param>
+        /// <param name="left">the left lower front corner of the bounding box</param>
+        /// <param name="right">the right upper back corner of the bounding box</param>
+        private static void Bounding3DBox(ICollection<ILayoutNode> layoutNodes, out Vector3 left, out Vector3 right)
+        {
+            if (layoutNodes.Count == 0)
+            {
+                left = Vector3.zero;
+                right = Vector3.zero;
+            }
+            else
+            {
+                left = new Vector3(Mathf.Infinity, Mathf.Infinity, Mathf.Infinity);
+                right = new Vector3(Mathf.NegativeInfinity, Mathf.NegativeInfinity, Mathf.NegativeInfinity);
+
+                foreach (ILayoutNode go in layoutNodes)
+                {
+                    Vector3 extent = go.AbsoluteScale / 2.0f;
+                    // Note: position denotes the center of the object
+                    Vector3 position = go.CenterPosition;
+                    {
+                        // left x co-ordinate of go
+                        float x = position.x - extent.x;
+                        if (x < left.x)
+                        {
+                            left.x = x;
+                        }
+                    }
+                    {   // right x co-ordinate of go
+                        float x = position.x + extent.x;
+                        if (x > right.x)
+                        {
+                            right.x = x;
+                        }
+                    }
+                    {
+                        // lower y co-ordinate of go
+                        float y = position.y - extent.y;
+                        if (y < left.y)
+                        {
+                            left.y = y;
+                        }
+                    }
+                    {
+                        // upper y co-ordinate of go
+                        float y = position.y + extent.y;
+                        if (y > right.y)
+                        {
+                            right.y = y;
+                        }
+                    }
+                    {
+                        // front z co-ordinate of go
+                        float z = position.z - extent.z;
+                        if (z < left.z)
+                        {
+                            left.z = z;
+                        }
+                    }
+                    {
+                        // back z co-ordinate of go
+                        float z = position.z + extent.z;
+                        if (z > right.z)
+                        {
+                            right.z = z;
+                        }
+                    }
+                }
             }
         }
 
@@ -181,7 +282,7 @@ namespace SEE.Layout
                 Vector3 position = transform.position;
                 position.y += transform.scale.y / 2.0f;
                 node.CenterPosition = position;
-                node.Scale = transform.scale;
+                node.LocalScale = transform.scale;
                 node.Rotation = transform.rotation;
             }
         }

@@ -44,7 +44,7 @@ namespace SEE.Layout
             if (layoutNodes.Count == 1)
             {
                 ILayoutNode layoutNode = layoutNodes.FirstOrDefault();
-                layout_result[layoutNode] = new NodeTransform(Vector3.zero, layoutNode.Scale);
+                layout_result[layoutNode] = new NodeTransform(Vector3.zero, layoutNode.LocalScale);
                 return layout_result;
             }
 
@@ -59,7 +59,7 @@ namespace SEE.Layout
                         // their sizes are already set in layout_result.
                         // We add the padding upfront. Padding is added on both sides.
                         // The padding will later be removed again.
-                        Vector3 scale = node.Scale;
+                        Vector3 scale = node.LocalScale;
                         scale.x += 2.0f * padding; 
                         scale.z += 2.0f * padding;
                         layout_result[node] = new NodeTransform(Vector3.zero, scale);
@@ -90,7 +90,7 @@ namespace SEE.Layout
                 Vector2 area = PlaceNodes(layout_result, root);
                 Vector3 position = new Vector3(0.0f, groundLevel, 0.0f);
                 // Maintain the original height of all inner nodes (and root is an inner node).
-                layout_result[root] = new NodeTransform(position, new Vector3(area.x, root.Scale.y, area.y));
+                layout_result[root] = new NodeTransform(position, new Vector3(area.x, root.LocalScale.y, area.y));
                 RemovePadding(layout_result, padding);
                 /// Pack() distributes the rectangles starting at the origin (0, 0) in the x/z plane
                 /// for each node hierarchy level anew. That is why we need to adjust the layout so
@@ -175,7 +175,7 @@ namespace SEE.Layout
                 // Leaves maintain their scale, which was already set initially. The position will 
                 // be adjusted later at a higher level of the node hierarchy when Pack() is 
                 // applied to this leaf and all its siblings.
-                return new Vector2(node.Scale.x, node.Scale.z);
+                return new Vector2(node.LocalScale.x, node.LocalScale.z);
             }
             else
             {
@@ -210,7 +210,7 @@ namespace SEE.Layout
                 {
                     // Can we ever arrive here? That would mean that node is not a leaf
                     // and does not have children.
-                    return new Vector2(node.Scale.x, node.Scale.z);
+                    return new Vector2(node.LocalScale.x, node.LocalScale.z);
                 }
             }
         }

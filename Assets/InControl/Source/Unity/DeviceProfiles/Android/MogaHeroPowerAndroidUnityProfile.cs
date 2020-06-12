@@ -79,7 +79,7 @@ namespace InControl.UnityDeviceProfiles
 					Name = "Right Stick Button",
 					Target = InputControlType.RightStickButton,
 					Source = Button( 9 )
-				},
+				}
 			};
 
 			AnalogMappings = new[]

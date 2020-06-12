@@ -8,6 +8,8 @@ using SEE.DataModel;
 using SEE.DataModel.IO;
 using SEE.GO;
 using SEE.Layout;
+using SEE.Utils;
+
 
 namespace SEE.Game
 {
@@ -87,7 +89,7 @@ namespace SEE.Game
                 loadedGraph = LoadGraph(filename);
                 if (loadedGraph != null)
                 {
-                    SetNodeRefs(loadedGraph);
+                    SetNodeRefs(loadedGraph, gameObject);
                 }
             }
         }
@@ -100,9 +102,9 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph giving us the nodes who should be the
         /// target of the NodeRefs</param>
-        protected void SetNodeRefs(Graph graph)
+        protected void SetNodeRefs(Graph graph, GameObject parent)
         {
-            foreach (Transform childTransform in transform)
+            foreach (Transform childTransform in parent.transform)
             {
                 GameObject child = childTransform.gameObject;
                 NodeRef nodeRef = child.GetComponent<NodeRef>();
@@ -114,6 +116,7 @@ namespace SEE.Game
                         Debug.LogWarningFormat("Could not resolve node reference {0}.\n", child.name);
                     }
                 }
+                SetNodeRefs(graph, child);
             }
         }
 
@@ -245,6 +248,31 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Saves the graph data to the GXL file with GXLPath().
+        /// </summary>
+        public virtual void SaveData()
+        {
+            if (string.IsNullOrEmpty(GXLPath()))
+            {
+                Debug.LogError("Empty graph path.\n");
+            }
+            else
+            {
+                if (LoadedGraph != null)
+                {
+                    // This loop runs only once for the first hierarchical edge type
+                    // we encounter. There is no simple method to retrieve an 
+                    // arbitrary element from a HashSet (the type of HierarchicalEdges).
+                    foreach (string hierarchicalEdge in HierarchicalEdges)
+                    {
+                        GraphWriter.Save(GXLPath(), LoadedGraph, hierarchicalEdge);
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Re-draws the graph without deleting the underlying loaded graph.
         /// Only the game objects generated for the nodes are deleted first.
         /// Precondition: The graph and its metrics have been loaded.
@@ -294,6 +322,14 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Saves the current layout of the city as GVL in a file name GVLPath.
+        /// </summary>
+        public void SaveLayout()
+        {
+            SEE.Layout.IO.Writer.Save(GVLPath(), loadedGraph.Name, AllNodeDescendants(gameObject));
+        }
+
+        /// <summary>
         /// Resets everything that is specific to a given graph. Here: the node types,
         /// the underlying graph, and all game objects visualizing information about it.
         /// </summary>
@@ -336,6 +372,27 @@ namespace SEE.Game
             foreach (Transform child in transform)
             {
                 result.Add(child.gameObject);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns all (transitive) descendants of <paramref name="go"/> that are tagged
+        /// by Tags.Node (including <paramref name="go"/> if it is tagged by Tags.Node).
+        /// </summary>
+        /// <param name="go">game objects whose node descendants are required</param>
+        /// <returns>all node descendants of <paramref name="go"/></returns>
+        private static ICollection<GameObject> AllNodeDescendants(GameObject go)
+        {
+            List<GameObject> result = new List<GameObject>();
+            if (go.tag == Tags.Node)
+            {
+                result.Add(go);
+            }
+            foreach (Transform child in go.transform)
+            {
+                ICollection<GameObject> ascendants = AllNodeDescendants(child.gameObject);
+                result.AddRange(ascendants);
             }
             return result;
         }

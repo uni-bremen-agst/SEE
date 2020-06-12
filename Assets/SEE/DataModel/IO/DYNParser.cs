@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -48,7 +49,7 @@ namespace SEE.DataModel.IO
         }
 
         #region Logging
-        
+
         protected virtual void LogDebug(string message)
         {
             logger?.LogDebug(message);

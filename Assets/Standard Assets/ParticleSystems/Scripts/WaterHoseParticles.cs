@@ -1,6 +1,5 @@
-using System;
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace UnityStandardAssets.Effects
 {
@@ -37,7 +36,7 @@ namespace UnityStandardAssets.Effects
                 if (attachedRigidbody != null)
                 {
                     Vector3 vel = m_CollisionEvents[i].velocity;
-                    attachedRigidbody.AddForce(vel*force, ForceMode.Impulse);
+                    attachedRigidbody.AddForce(vel * force, ForceMode.Impulse);
                 }
 
                 other.BroadcastMessage("Extinguish", SendMessageOptions.DontRequireReceiver);

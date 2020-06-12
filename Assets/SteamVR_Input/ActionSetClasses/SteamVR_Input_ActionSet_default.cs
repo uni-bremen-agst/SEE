@@ -17,35 +17,19 @@ namespace Valve.VR
     public class SteamVR_Input_ActionSet_default : Valve.VR.SteamVR_ActionSet
     {
         
-        public virtual SteamVR_Action_Boolean GrabPinch1
+        public virtual SteamVR_Action_Boolean GrabPinch
         {
             get
             {
-                return SteamVR_Actions.default_GrabPinch1;
+                return SteamVR_Actions.default_GrabPinch;
             }
         }
         
-        public virtual SteamVR_Action_Boolean GrabPinch2
+        public virtual SteamVR_Action_Boolean GrabGrip
         {
             get
             {
-                return SteamVR_Actions.default_GrabPinch2;
-            }
-        }
-        
-        public virtual SteamVR_Action_Boolean GrabGrip1
-        {
-            get
-            {
-                return SteamVR_Actions.default_GrabGrip1;
-            }
-        }
-        
-        public virtual SteamVR_Action_Boolean GrabGrip2
-        {
-            get
-            {
-                return SteamVR_Actions.default_GrabGrip2;
+                return SteamVR_Actions.default_GrabGrip;
             }
         }
         
@@ -73,19 +57,11 @@ namespace Valve.VR
             }
         }
         
-        public virtual SteamVR_Action_Single Squeeze1
+        public virtual SteamVR_Action_Single Squeeze
         {
             get
             {
-                return SteamVR_Actions.default_Squeeze1;
-            }
-        }
-        
-        public virtual SteamVR_Action_Single Squeeze2
-        {
-            get
-            {
-                return SteamVR_Actions.default_Squeeze2;
+                return SteamVR_Actions.default_Squeeze;
             }
         }
         
@@ -105,11 +81,67 @@ namespace Valve.VR
             }
         }
         
-        public virtual SteamVR_Action_Single Trigger
+        public virtual SteamVR_Action_Single Grab
         {
             get
             {
-                return SteamVR_Actions.default_Trigger;
+                return SteamVR_Actions.default_Grab;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean InteractUI
+        {
+            get
+            {
+                return SteamVR_Actions.default_InteractUI;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean Teleport
+        {
+            get
+            {
+                return SteamVR_Actions.default_Teleport;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean Select
+        {
+            get
+            {
+                return SteamVR_Actions.default_Select;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean Cancel
+        {
+            get
+            {
+                return SteamVR_Actions.default_Cancel;
+            }
+        }
+        
+        public virtual SteamVR_Action_Vector2 Move
+        {
+            get
+            {
+                return SteamVR_Actions.default_Move;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean Home
+        {
+            get
+            {
+                return SteamVR_Actions.default_Home;
+            }
+        }
+        
+        public virtual SteamVR_Action_Vector2 Zoom
+        {
+            get
+            {
+                return SteamVR_Actions.default_Zoom;
             }
         }
         

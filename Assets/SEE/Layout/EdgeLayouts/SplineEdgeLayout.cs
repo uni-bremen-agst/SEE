@@ -21,8 +21,10 @@ namespace SEE.Layout
         /// of zero has no effect.
         /// </summary>
         /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
+        /// <param name="minLevelDistance">the minimal distance between different edge levels</param>
         /// <param name="rdp">epsilon parameter of the Ramer–Douglas–Peucker algorithm</param>
-        public SplineEdgeLayout(bool edgesAboveBlocks, float rdp = 0.0f) : base(edgesAboveBlocks)
+        public SplineEdgeLayout(bool edgesAboveBlocks, float minLevelDistance, float rdp = 0.0f) 
+            : base(edgesAboveBlocks, minLevelDistance)
         {
             name = "Splines";
             this.rdp = rdp;
@@ -54,7 +56,7 @@ namespace SEE.Layout
                         end = target.Ground;
                     }
                     layout.Add(new LayoutEdge(source, target,
-                               Simplify(LinePoints.SplineLinePoints(start, end, edgesAboveBlocks), rdp)));
+                               Simplify(LinePoints.SplineLinePoints(start, end, edgesAboveBlocks, minLevelDistance), rdp)));
                 }
             }
             return layout;

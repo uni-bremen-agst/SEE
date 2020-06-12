@@ -19,7 +19,7 @@ namespace InControl.UnityDeviceProfiles
 
 			IncludePlatforms = new[]
 			{
-				"Android",
+				"Android"
 			};
 
 			Matchers = new[] { new InputDeviceMatcher { NameLiteral = "Gamesir-G3s" } };
@@ -97,7 +97,7 @@ namespace InControl.UnityDeviceProfiles
 					Name = "Right Stick Button",
 					Target = InputControlType.RightStickButton,
 					Source = Button( 9 )
-				},
+				}
 			};
 
 			AnalogMappings = new[]

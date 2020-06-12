@@ -11,6 +11,13 @@ namespace SEE.Layout
     /// </summary>
     public class ManhattanLayout : FlatNodeLayout
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
+        /// placed on this level</param>
+        /// <param name="Unit">the factor to be multiplied with the default distance between buildings;
+        /// if game objects are 'naturally' larger, the distances between them should be larger, too.</param>
         public ManhattanLayout(float groundLevel, float Unit)
             : base(groundLevel)
         {
@@ -18,6 +25,10 @@ namespace SEE.Layout
             this.Unit = Unit;
         }
 
+        /// <summary>
+        /// The factor to be multiplied with the default distance between buildings.
+        /// If game objects are 'naturally' larger, the distances between them should be larger, too.
+        /// </summary>
         private readonly float Unit;
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes)
@@ -47,7 +58,7 @@ namespace SEE.Layout
                     maxZ = 0.0f;
                     positionX = 0.0f;
                 }
-                Vector3 size = gameNode.Scale;
+                Vector3 size = gameNode.LocalScale;
                 if (size.z > maxZ)
                 {
                     maxZ = size.z;

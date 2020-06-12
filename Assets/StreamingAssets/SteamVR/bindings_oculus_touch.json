@@ -11,16 +11,7 @@
     "/actions/default": {
       "chords": [],
       "poses": [],
-      "haptics": [
-        {
-          "output": "/actions/default/out/haptic",
-          "path": "/user/hand/left/output/haptic"
-        },
-        {
-          "output": "/actions/default/out/haptic",
-          "path": "/user/hand/right/output/haptic"
-        }
-      ],
+      "haptics": [],
       "sources": [],
       "skeleton": [
         {

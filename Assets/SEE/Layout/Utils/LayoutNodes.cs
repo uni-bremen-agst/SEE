@@ -5,7 +5,7 @@ namespace SEE.Layout
     public static class LayoutNodes
     {
         /// <summary>
-        /// Sets the level of each node (node.Level) in <paramref name="layoutNodes"/>. A root has level 1,
+        /// Sets the level of each node (node.Level) in <paramref name="layoutNodes"/>. A root has level 0,
         /// for every other node the level is its distance to its root.
         /// </summary>
         /// <param name="layoutNodes">nodes whose level is to be set</param>

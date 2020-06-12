@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using SEE.Game;
-using System.Collections.Generic;
 
 namespace SEEEditor
 {
@@ -29,23 +28,33 @@ namespace SEEEditor
         {
             SEECity city = target as SEECity;
             EditorGUILayout.BeginHorizontal();
-
-            if (GUILayout.Button("Load", GUILayout.Height(30)))
+            if (GUILayout.Button("Load Graph"))
             {
                 Load(city);
             }
+            if (GUILayout.Button("Delete Graph"))
+            {
+                Reset(city);
+            }
+            if (GUILayout.Button("Save Graph"))
+            {
+                Save(city);
+            }
+            EditorGUILayout.EndHorizontal();
 
-            if (GUILayout.Button("Draw", GUILayout.Height(30)))
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Draw"))
             {
                 Draw(city);
             }
-            if (GUILayout.Button("Re-Draw", GUILayout.Height(30)))
+            if (GUILayout.Button("Re-Draw"))
             {
                 ReDraw(city);
             }
-            if (GUILayout.Button("Delete", GUILayout.Height(30)))
+
+            if (GUILayout.Button("Save Layout"))
             {
-                Reset(city);
+                SaveLayout(city);
             }
             EditorGUILayout.EndHorizontal();
         }
@@ -98,5 +107,21 @@ namespace SEEEditor
         {
             city.Reset();   
         }
+
+        /// <summary>
+        /// Saves the underlying graph of the current city.
+        /// </summary>
+        private void Save(SEECity city)
+        {
+            city.SaveData();
+        }
+
+        /// <summary>
+        /// Saves the current layout of the given <paramref name="city"/>.
+        /// </summary>
+        private void SaveLayout(SEECity city)
+        {
+            city.SaveLayout();
+        }        
     }
 }
