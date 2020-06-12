@@ -11,6 +11,7 @@ using SEE.DataModel.IO;
 using SEE.GO;
 using static SEE.Game.AbstractSEECity;
 using System.IO;
+using SEE.Utils;
 
 
 namespace SEE.Game
@@ -35,9 +36,19 @@ namespace SEE.Game
         public string PathPrefix; // serialized by Unity
 
         /// <summary>
-        /// The center origin where the graph should be placed in the world scene.
+        /// The relative path for the GVL file containing the node layout information.
         /// </summary>
-        public Vector3 origin = Vector3.zero; // serialized by Unity
+        public string gvlPath = "..\\Data\\GXL\\linux-clones\\net.gvl";
+
+        /// <summary>
+        /// Returns the concatenation of pathPrefix and gvlPath. That is the complete
+        /// absolute path to the GVL file containing the layout information.
+        /// </summary>
+        /// <returns>concatenation of pathPrefix and gvlPath</returns>
+        public string GVLPath()
+        {
+            return PathPrefix + gvlPath;
+        }
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
@@ -343,10 +354,16 @@ namespace SEE.Game
         //-----------------------------------
         // Visual attributes of an inner node
         //-----------------------------------
+
+        /// <summary>
+        /// The attribute name of the metric to be used for determining the height of inner nodes.
+        /// </summary>
+        public string InnerNodeHeightMetric = "";
         /// <summary>
         /// The attribute name of the metric to be used for determining the style of inner nodes.
         /// </summary>
         public string InnerNodeStyleMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
+
 
         //--------------------------------------
         // Other visual attributes of leaf nodes
@@ -407,6 +424,7 @@ namespace SEE.Game
             Treemap,
             CirclePacking,
             Manhattan,
+            FromFile
         }
 
         /// <summary>
@@ -437,7 +455,7 @@ namespace SEE.Game
         public bool ZScoreScale = true; // serialized by Unity
 
         /// <summary>
-        /// The width of the line representing edges.
+        /// The width of the line representing edges in world space.
         /// </summary>
         public float EdgeWidth = 0.3f; // serialized by Unity
 
@@ -445,6 +463,11 @@ namespace SEE.Game
         /// Whether erosions should be visible above blocks.
         /// </summary>
         public bool ShowErosions = false; // serialized by Unity
+
+        /// <summary>
+        /// The maximal absolute width of a sprite representing an erosion in world-space Unity units.
+        /// </summary>
+        public float MaxErosionWidth = 1.0f; // serialized by Unity
 
         /// <summary>
         /// Orientation of the edges; 
@@ -489,8 +512,8 @@ namespace SEE.Game
             {
                 if (File.Exists(filename))
                 {
-                    SEE.Performance p = SEE.Performance.Begin("loading graph data from " + filename);
-                    GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "ROOT", new SEELogger());
+                    SEE.Utils.Performance p = SEE.Utils.Performance.Begin("loading graph data from " + filename);
+                    GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "", new SEELogger());
                     graphCreator.Load();
                     Graph graph = graphCreator.GetGraph();
                     p.End();

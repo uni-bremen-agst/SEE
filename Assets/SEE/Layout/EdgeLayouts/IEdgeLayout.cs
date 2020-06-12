@@ -12,9 +12,11 @@ namespace SEE.Layout
         /// Constructor.
         /// </summary>
         /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
-        public IEdgeLayout(bool edgesAboveBlocks)
+        /// <param name="minLevelDistance">the minimal distance between different edge levels</param>
+        public IEdgeLayout(bool edgesAboveBlocks, float minLevelDistance)
         {
             this.edgesAboveBlocks = edgesAboveBlocks;
+            this.minLevelDistance = minLevelDistance;
         }
 
         /// <summary>
@@ -45,14 +47,20 @@ namespace SEE.Layout
         protected readonly bool edgesAboveBlocks;
 
         /// <summary>
-        /// Yields the greatest and smallest y co-ordinate and the maximal height of all <paramref name="nodes"/> given.
+        /// The minimal distance between different edge levels.
+        /// </summary>
+        protected readonly float minLevelDistance;
+
+        /// <summary>
+        /// Yields the greatest and smallest y co-ordinate and the maximal height (all in
+        /// world space) of all given <paramref name="nodes"/>. 
         /// 
         /// Precondition: <paramref name="nodes"/> is not empty.
         /// </summary>
         /// <param name="nodes">list of nodes whose greatest and smallest y co-ordinate is required</param>
-        /// <param name="minY">smallest y co-ordinate</param>
-        /// <param name="maxY">largest y co-ordinate</param>
-        /// <param name="maxHeight">maximal height of nodes</param>
+        /// <param name="minY">smallest y world co-ordinate</param>
+        /// <param name="maxY">largest y world co-ordinate</param>
+        /// <param name="maxHeight">maximal height of nodes in world scale</param>
         protected void MinMaxBlockY(ICollection<ILayoutNode> nodes, out float minY, out float maxY, out float maxHeight)
         {
             maxY = Mathf.NegativeInfinity;
@@ -61,7 +69,7 @@ namespace SEE.Layout
             foreach (ILayoutNode node in nodes)
             {
                 float cy = node.CenterPosition.y;
-                float height = node.Scale.y;
+                float height = node.AbsoluteScale.y;
                 {
                     float roof = cy + height / 2.0f;
                     if (roof > maxY)

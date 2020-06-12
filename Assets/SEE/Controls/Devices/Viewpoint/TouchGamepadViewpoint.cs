@@ -32,9 +32,9 @@ namespace SEE.Controls.Devices
         {
             // Use last device which provided input.
             InControl.InputDevice inputDevice = InputManager.ActiveDevice;
-
             Vector2 value = inputDevice.RightStick.Value;
-            return new Vector2(Discretize(value.x), Discretize(value.y));
+            return value;
+            //return new Vector2(Discretize(value.x), Discretize(value.y));
         }
 
         /// <summary>

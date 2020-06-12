@@ -151,7 +151,7 @@
             {
                "inputs" : {
                   "grab" : {
-                     "output" : "/actions/default/in/grabgrip1"
+                     "output" : "/actions/default/in/grabgrip"
                   }
                },
                "mode" : "grab",
@@ -177,7 +177,7 @@
             {
                "inputs" : {
                   "grab" : {
-                     "output" : "/actions/default/in/grabpinch1"
+                     "output" : "/actions/default/in/grabpinch"
                   }
                },
                "mode" : "grab",
@@ -190,7 +190,7 @@
             {
                "inputs" : {
                   "grab" : {
-                     "output" : "/actions/default/in/grabpinch2"
+                     "output" : "/actions/default/in/grabpinch"
                   }
                },
                "mode" : "grab",
@@ -210,13 +210,24 @@
                "path" : "/user/hand/left/input/trigger"
             },
             {
-               "inputs" : {},
-               "mode" : "none",
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/home"
+                  },
+                  "position" : {
+                     "output" : "/actions/default/in/zoom"
+                  }
+               },
+               "mode" : "joystick",
                "path" : "/user/hand/left/input/thumbstick"
             },
             {
-               "inputs" : {},
-               "mode" : "none",
+               "inputs" : {
+                  "position" : {
+                     "output" : "/actions/default/in/move"
+                  }
+               },
+               "mode" : "joystick",
                "path" : "/user/hand/right/input/thumbstick"
             },
             {
@@ -230,13 +241,21 @@
                "path" : "/user/hand/right/input/system"
             },
             {
-               "inputs" : {},
-               "mode" : "none",
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/interactui"
+                  }
+               },
+               "mode" : "button",
                "path" : "/user/hand/left/input/b"
             },
             {
-               "inputs" : {},
-               "mode" : "none",
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/cancel"
+                  }
+               },
+               "mode" : "button",
                "path" : "/user/hand/right/input/b"
             },
             {
@@ -250,19 +269,27 @@
                "path" : "/user/hand/right/input/skeleton/left"
             },
             {
-               "inputs" : {},
-               "mode" : "none",
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/select"
+                  }
+               },
+               "mode" : "button",
                "path" : "/user/hand/left/input/a"
             },
             {
-               "inputs" : {},
-               "mode" : "none",
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/select"
+                  }
+               },
+               "mode" : "button",
                "path" : "/user/hand/right/input/a"
             },
             {
                "inputs" : {
                   "pull" : {
-                     "output" : "/actions/default/in/trigger"
+                     "output" : "/actions/default/in/grab"
                   }
                },
                "mode" : "trigger",

@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 
-namespace SEE
+namespace SEE.Utils
 {
     /// <summary>
     /// Allows us to measure and emit the elapsed time for long-running actions.

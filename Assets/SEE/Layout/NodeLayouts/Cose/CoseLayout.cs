@@ -273,7 +273,7 @@ namespace SEE.Layout
                 Vector3 position = transform.position;
                 position.y += transform.scale.y / 2.0f;
                 node.CenterPosition = position;
-                node.Scale = transform.scale;
+                node.LocalScale = transform.scale;
                 node.Rotation = transform.rotation;
             }
         }
@@ -367,7 +367,7 @@ namespace SEE.Layout
                     float rotation = applyRotation ? node.NodeObject.Rotation : 0.0f;
 
                     Vector3 position = new Vector3(node.CenterPosition.x - relativePositionRootGraph.x, node.CenterPosition.y, node.CenterPosition.z - relativePositionRootGraph.z);
-                    NodeTransform transform = new NodeTransform(position, node.NodeObject.Scale, rotation);
+                    NodeTransform transform = new NodeTransform(position, node.NodeObject.LocalScale, rotation);
                     layout_result[nNode] = transform;
                 }
 
@@ -534,10 +534,10 @@ namespace SEE.Layout
 
             if (node.SublayoutValues.IsSubLayoutNode)
             {
-                node.SublayoutValues.RelativeScale = new Vector3(node.NodeObject.Scale.x, node.NodeObject.Scale.y, node.NodeObject.Scale.z);
+                node.SublayoutValues.RelativeScale = new Vector3(node.NodeObject.LocalScale.x, node.NodeObject.LocalScale.y, node.NodeObject.LocalScale.z);
                 node.SublayoutValues.RelativeCenterPosition = new Vector3(node.NodeObject.CenterPosition.x, node.NodeObject.CenterPosition.y, node.NodeObject.CenterPosition.z);
 
-                node.Scale = new Vector3(node.NodeObject.Scale.x, node.NodeObject.Scale.y, node.NodeObject.Scale.z);
+                node.Scale = new Vector3(node.NodeObject.LocalScale.x, node.NodeObject.LocalScale.y, node.NodeObject.LocalScale.z);
                 node.CenterPosition = new Vector3(node.NodeObject.CenterPosition.x, node.NodeObject.CenterPosition.y, node.NodeObject.CenterPosition.z);
 
                 if (!node.SublayoutValues.IsSubLayoutRoot)
@@ -1187,7 +1187,7 @@ namespace SEE.Layout
             }
             else
             {
-                Vector3 size = node.Scale;
+                Vector3 size = node.LocalScale;
                 cNode.SetWidth(size.x);
                 cNode.SetHeight(size.z);
             }

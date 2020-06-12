@@ -27,13 +27,24 @@ namespace SEE.GO
                 }
                 else
                 {
-                    return "edge '" + edgeRef.edge.ID + "'";
+                    return edgeRef.edge.ID;
                 }
             }
             else
             {
-                return "node '" + nodeRef.node.ID + "'"; 
+                return nodeRef.node.ID; 
             }
+        }
+
+        /// <summary>
+        /// Returns the size of the given <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <returns>size of given <paramref name="gameObject"/></returns>
+        public static Vector3 Size(this GameObject gameObject)
+        {
+            Renderer renderer = gameObject.GetComponent<Renderer>();
+            return renderer.bounds.size;
         }
     }
 }

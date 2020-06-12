@@ -26,9 +26,6 @@ namespace SEEEditor
         {
             city = target as AbstractSEECity;
 
-            GUILayout.Label("Graph", EditorStyles.boldLabel);
-            city.origin = EditorGUILayout.Vector3Field("Origin", city.origin);
-
             GUILayout.Label("Attributes of leaf nodes", EditorStyles.boldLabel);
             city.WidthMetric = EditorGUILayout.TextField("Width", city.WidthMetric);
             city.HeightMetric = EditorGUILayout.TextField("Height", city.HeightMetric);
@@ -36,11 +33,13 @@ namespace SEEEditor
             city.LeafStyleMetric = EditorGUILayout.TextField("Style", city.LeafStyleMetric);
 
             GUILayout.Label("Attributes of inner nodes", EditorStyles.boldLabel);
+            city.InnerNodeHeightMetric = EditorGUILayout.TextField("Height", city.InnerNodeHeightMetric);
             city.InnerNodeStyleMetric = EditorGUILayout.TextField("Style", city.InnerNodeStyleMetric);
 
             GUILayout.Label("Nodes and Node Layout", EditorStyles.boldLabel);
             city.LeafObjects = (SEECity.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
             city.NodeLayout = (SEECity.NodeLayouts)EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
+            city.gvlPath = EditorGUILayout.TextField("GVL file", city.gvlPath);
 
             GUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Inner nodes");
@@ -58,6 +57,7 @@ namespace SEEEditor
 
             city.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", city.ZScoreScale);
             city.ShowErosions = EditorGUILayout.Toggle("Show erosions", city.ShowErosions);
+            city.MaxErosionWidth = EditorGUILayout.FloatField("Max. width of erosion icon", city.MaxErosionWidth);
 
             if (city.NodeLayout == AbstractSEECity.NodeLayouts.CompoundSpringEmbedder)
             {
@@ -143,22 +143,7 @@ namespace SEEEditor
                 // constructor. That is why we need to set it here if it is not yet defined.
                 city.PathPrefix = UnityProject.GetPath();
             }
-            EditorGUILayout.BeginHorizontal();
-            {
-                city.PathPrefix = EditorGUILayout.TextField("Data path prefix", Filenames.OnCurrentPlatform(city.PathPrefix));
-                //EditorGUILayout.LabelField("Data path prefix", GUILayout.Width(EditorGUIUtility.labelWidth));
-                //EditorGUILayout.SelectableLabel(city.PathPrefix, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
-                if (GUILayout.Button("Select"))
-                {
-                    city.PathPrefix = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select GXL graph data directory", city.PathPrefix, ""));
-                }
-                // city.PathPrefix must end with a directory separator
-                if (city.PathPrefix.Length > 0 && city.PathPrefix[city.PathPrefix.Length - 1] != Path.DirectorySeparatorChar)
-                {
-                    city.PathPrefix = city.PathPrefix + Path.DirectorySeparatorChar;
-                }
-            }
-            EditorGUILayout.EndHorizontal();
+            
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
             // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
 
