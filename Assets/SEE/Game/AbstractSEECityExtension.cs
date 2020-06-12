@@ -138,6 +138,7 @@ namespace SEE.Game
         public static List<NodeLayouts> GetPossibleSublayouts(this NodeLayouts nodeLayout)
         {
             List<NodeLayouts> values = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().ToList();
+            values.Remove(NodeLayouts.FromFile);
 
             if (nodeLayout == NodeLayouts.EvoStreets)
             {

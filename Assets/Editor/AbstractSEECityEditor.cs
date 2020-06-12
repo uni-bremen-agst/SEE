@@ -71,11 +71,11 @@ namespace SEEEditor
                 city.CoseGraphSettings.RepulsionStrength = EditorGUILayout.FloatField("Repulsion Strength", city.CoseGraphSettings.RepulsionStrength);
                 city.CoseGraphSettings.GravityStrength = EditorGUILayout.FloatField("Gravity", city.CoseGraphSettings.GravityStrength);
                 city.CoseGraphSettings.CompoundGravityStrength = EditorGUILayout.FloatField("Compound gravity", city.CoseGraphSettings.CompoundGravityStrength);
-                city.CoseGraphSettings.useOptAlgorithm = EditorGUILayout.Toggle("Use Opt-Algorithm", city.CoseGraphSettings.useOptAlgorithm);
+                /*city.CoseGraphSettings.useOptAlgorithm = EditorGUILayout.Toggle("Use Opt-Algorithm", city.CoseGraphSettings.useOptAlgorithm);
                 if (city.CoseGraphSettings.useOptAlgorithm)
                 {
                     //city.CoseGraphSettings.useCalculationParameter = false; 
-                }
+                }*/
                 city.CoseGraphSettings.useCalculationParameter = EditorGUILayout.Toggle("Calc parameters automatically", city.CoseGraphSettings.useCalculationParameter);
                 city.CoseGraphSettings.useItertivCalclation = EditorGUILayout.Toggle("Find parameters iteratively", city.CoseGraphSettings.useItertivCalclation);
                 if (city.CoseGraphSettings.useCalculationParameter || city.CoseGraphSettings.useItertivCalclation)

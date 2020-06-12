@@ -255,11 +255,12 @@ namespace SEE.Game
                         AddDecorationsForSublayouts(layoutNodes, sublayoutLayoutNodes, parent);
                     }
 
+                    EdgeDistCalculation(graph, layoutNodes);
                     Measurements measurements = new Measurements(layoutNodes, graph, leftFrontCorner, rightBackCorner, p);
 
                     if (settings.calculateMeasurements)
                     {
-                        settings.Measurements = measurements.ToStringDictionary();
+                        settings.Measurements = measurements.ToStringDictionary(true);
                     }
                     else
                     {
@@ -315,7 +316,6 @@ namespace SEE.Game
                 }
             }
 
-            EdgeDistCalculation(graph, layoutNodes);
             // create the laid out edges
             AddToParent(EdgeLayout(graph, layoutNodes), parent);
         }
