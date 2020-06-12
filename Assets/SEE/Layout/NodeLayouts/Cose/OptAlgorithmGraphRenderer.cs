@@ -29,7 +29,7 @@ namespace SEE.Layout
         /// <summary>
         /// the type of the optimization
         /// </summary>
-        private readonly OptTypes type = OptTypes.FindGoodParameter;
+        private readonly OptTypes type = OptTypes.CompareNodeLayouts;
 
         /// <summary>
         /// A dictionary holding layoutNodes with there inital size
@@ -39,12 +39,22 @@ namespace SEE.Layout
         /// <summary>
         /// maximum number of graphs 
         /// </summary>
-        private readonly int maxNumberOfGraphs = 900;
+        private readonly int maxNumberOfGraphs = 250;
 
         /// <summary>
         /// the current number of graph 
         /// </summary>
-        int totalNumberOfGraphs = 600;
+        int totalNumberOfGraphs = 0;
+
+        /// <summary>
+        /// the total number of repetitions
+        /// </summary>
+        private readonly int totalReps = 1;
+
+        /// <summary>
+        /// the current number repetitions
+        /// </summary>
+        int currentReps = 0;
 
         /// <summary>
         /// number of leaf nodes
@@ -79,7 +89,13 @@ namespace SEE.Layout
         /// <summary>
         /// the path to the file for comparing the node layouts with each other 
         /// </summary>
-        private readonly string compareNodeLayoutsPath = "Assets/Resources/compareNodelayouts4.txt";
+        private string CompareNodeLayoutsPath
+        {
+            get
+            {
+                return "Assets/Resources/compareNodelayouts" + currentReps + ".txt";
+            }
+        } 
 
         /// <summary>
         /// the parent gameobject
@@ -212,7 +228,9 @@ namespace SEE.Layout
             int mod = totalNumberOfGraphs % 6;
             NodeLayouts nodeLayout; 
 
-            switch(mod)
+            return NodeLayouts.CirclePacking;
+
+            switch (mod)
             {
                 case 0:
                     nodeLayout = NodeLayouts.CompoundSpringEmbedder;
@@ -246,7 +264,7 @@ namespace SEE.Layout
         /// <param name="nodeLayout"></param>
         public void WriteResultsToFile(Measurements measurements, NodeLayouts nodeLayout)
         {
-            StreamWriter writer = new StreamWriter(compareNodeLayoutsPath, true);
+            StreamWriter writer = new StreamWriter(CompareNodeLayoutsPath, true);
             string line = "";
 
             var name = nodeLayout.ToString();
@@ -592,9 +610,19 @@ namespace SEE.Layout
                 graph.Destroy();
             }
 
+            to_layout_node = new Dictionary<Node, ILayoutNode>();
+
             if (totalNumberOfGraphs != maxNumberOfGraphs)
             {
                 Draw();
+            } else
+            {
+                currentReps++;
+                if (currentReps != totalReps)
+                {
+                    totalNumberOfGraphs = 0;
+                    Draw();
+                }
             }
         }
 
@@ -613,9 +641,9 @@ namespace SEE.Layout
 
             if (type == OptTypes.CompareNodeLayouts)
             {
-                SetupFile(compareNodeLayoutsPath);
+                SetupFile(CompareNodeLayoutsPath);
 
-                StreamWriter writer = new StreamWriter(compareNodeLayoutsPath, true);
+                StreamWriter writer = new StreamWriter(CompareNodeLayoutsPath, true);
                 string line = "";
 
                 line += "graphID; nodeLayout;  countNodes; CountEdges; CountDepth; CountDepthAvg; CountDensityAvg; CountLeafNodes; CountInnderNodes; EdgeDensityLeafNode; Area; NodesOverlapping; NumberEdgeCrossings; EdgeAvg; EdgeAvgArea; EdgeMax; EdgeMaxArea; EdgeMin; EdgeMinArea; EdgeStandardDeviation; EdgeStandardDeviationArea; EdgeLengthTotal; EdgeLengthTotalArea; EdgeVariance; EdgeVarianceArea; NodePerformance;  NodePerformanceInMilli;";

@@ -84,7 +84,7 @@ namespace SEE.Game
         /// <summary>
         /// mapping from node to ilayoutNode
         /// </summary>
-        private Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+        protected Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
 
         /// <summary>
         /// the groundlevel of the nodes

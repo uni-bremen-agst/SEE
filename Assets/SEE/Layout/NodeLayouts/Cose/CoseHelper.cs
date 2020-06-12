@@ -131,8 +131,16 @@ namespace SEE.Layout
             float countNodesConstant = 0.206f;
             float countMaxDepthConstant = 2.279f;
             float edgeDensityConstant = -57.829f;
+           
+            float edgeDensity;
 
-            float edgeDensity = countEdges / (leafNodesCount * (leafNodesCount - 1));
+            if (leafNodesCount == 0 || countEdges == 0) {
+                edgeDensity = 0;
+            } else
+            {
+                float leafNodeCountMinus = leafNodesCount > 1 ? leafNodesCount - 1 : 1;
+                edgeDensity = countEdges / (leafNodesCount * leafNodeCountMinus);
+            }
 
             float edgeLength = countNodesConstant * countNodes + countMaxDepthConstant * maxDepth + edgeDensityConstant* edgeDensity + constant;
             return Math.Max((int)Math.Ceiling(edgeLength), 2);
@@ -152,7 +160,17 @@ namespace SEE.Layout
 
             float edgeDensityConstant = 91.799f;
 
-            float edgeDensity = countEdges / (leafNodesCount * (leafNodesCount - 1));
+            float edgeDensity;
+
+            if (leafNodesCount == 0 || countEdges == 0)
+            {
+                edgeDensity = 0;
+            }
+            else
+            {
+                float leafNodeCountMinus = leafNodesCount > 1 ? leafNodesCount - 1 : 1;
+                edgeDensity = countEdges / (leafNodesCount * leafNodeCountMinus);
+            }
 
 
             float repulsionStrength = countMaxDepthConstant * maxDepth + leafNodesCount * countNodesConstant + edgeDensity * edgeDensityConstant + constant;
