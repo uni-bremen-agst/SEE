@@ -1070,6 +1070,7 @@ MonoBehaviour:
       Entry: 8
       Data: 
   PathPrefix: F:\develop\SEE\Data\GXL\reflexion\minilax\
+  gvlPath: ..\Data\GXL\linux-clones\net.gvl
   WidthMetric: Metric.Number_of_Tokens
   HeightMetric: Metric.Clone_Rate
   DepthMetric: Metric.LOC
@@ -1089,6 +1090,7 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeHeightMetric: 
   InnerNodeStyleMetric: Metric.IssuesTotal
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
@@ -1276,6 +1278,7 @@ MonoBehaviour:
       Entry: 8
       Data: 
   PathPrefix: C:\Users\Torben\dev\SEE\Assets\
+  gvlPath: ..\Data\GXL\linux-clones\net.gvl
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
@@ -1295,12 +1298,13 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeHeightMetric: 
   InnerNodeStyleMetric: Metric.IssuesTotal
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
   InnerNodeObjects: 5
-  NodeLayout: 4
+  NodeLayout: 1
   EdgeLayout: 0
   ZScoreScale: 0
   EdgeWidth: 1
@@ -1465,6 +1469,7 @@ MonoBehaviour:
       Entry: 8
       Data: 
   PathPrefix: F:\develop\SEE\Data\GXL\random\
+  gvlPath: ..\Data\GXL\linux-clones\net.gvl
   WidthMetric: Metric.Number_of_Tokens
   HeightMetric: Metric.Clone_Rate
   DepthMetric: Metric.LOC
@@ -1484,6 +1489,7 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeHeightMetric: 
   InnerNodeStyleMetric: Metric.IssuesTotal
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
@@ -2346,7 +2352,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636335451}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.666667, y: -4, z: 0}
+  m_LocalPosition: {x: -7.8888893, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -2454,7 +2460,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776319858}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.666667, y: -4, z: 0}
+  m_LocalPosition: {x: 7.8888893, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -3222,7 +3228,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1331066161349888543}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.9624502
+  m_Size: 0.9999971
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
