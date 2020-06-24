@@ -117,13 +117,14 @@ namespace SEE.Layout
         /// <param name="start">starting point</param>
         /// <param name="end">ending point</param>
         /// <param name="above">whether middle point of the spline should be above <paramref name="start"/>
-        /// and <paramref name="end"/></param>
+        /// <param name="minOffset">the minimal y offset for the point in between <paramref name="start"/>
+        /// and <paramref name="end"/> through which the spline should pass</param>
         /// <returns>points of the spline</returns>
-        public static Vector3[] SplineLinePoints(Vector3 start, Vector3 end, bool above)
+        public static Vector3[] SplineLinePoints(Vector3 start, Vector3 end, bool above, float minOffset)
         {
             // This offset is used to draw the line somewhat below
             // or above the house (depending on the orientation).
-            float offset = 0.5f * Vector3.Distance(start, end); // must be positive
+            float offset = Mathf.Max(minOffset, 0.5f * Vector3.Distance(start, end)); // must be positive
             // The level at which edges are drawn.
             float edgeLevel = above ? Mathf.Max(start.y, end.y) + offset
                                     : Mathf.Min(start.y, end.y) - offset;

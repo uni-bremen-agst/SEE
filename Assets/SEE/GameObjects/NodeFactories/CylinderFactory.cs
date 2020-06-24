@@ -15,6 +15,7 @@ namespace SEE.GO
         public override GameObject NewBlock(int index = 0)
 		{
 			GameObject result = CreateCylinder();
+			SetHeight(result, DefaultHeight);
 			result.AddComponent<MeshCollider>();
 			result.isStatic = true;
 

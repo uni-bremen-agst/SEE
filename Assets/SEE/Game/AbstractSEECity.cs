@@ -32,6 +32,21 @@ namespace SEE.Game
         public string PathPrefix; // serialized by Unity
 
         /// <summary>
+        /// The relative path for the GVL file containing the node layout information.
+        /// </summary>
+        public string gvlPath = "..\\Data\\GXL\\linux-clones\\net.gvl";
+
+        /// <summary>
+        /// Returns the concatenation of pathPrefix and gvlPath. That is the complete
+        /// absolute path to the GVL file containing the layout information.
+        /// </summary>
+        /// <returns>concatenation of pathPrefix and gvlPath</returns>
+        public string GVLPath()
+        {
+            return PathPrefix + gvlPath;
+        }
+
+        /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
         [OdinSerialize]
@@ -335,10 +350,16 @@ namespace SEE.Game
         //-----------------------------------
         // Visual attributes of an inner node
         //-----------------------------------
+
+        /// <summary>
+        /// The attribute name of the metric to be used for determining the height of inner nodes.
+        /// </summary>
+        public string InnerNodeHeightMetric = "";
         /// <summary>
         /// The attribute name of the metric to be used for determining the style of inner nodes.
         /// </summary>
         public string InnerNodeStyleMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
+
 
         //--------------------------------------
         // Other visual attributes of leaf nodes
@@ -398,6 +419,7 @@ namespace SEE.Game
             Treemap,
             CirclePacking,
             Manhattan,
+            FromFile
         }
 
         /// <summary>
@@ -428,7 +450,7 @@ namespace SEE.Game
         public bool ZScoreScale = true; // serialized by Unity
 
         /// <summary>
-        /// The width of the line representing edges.
+        /// The width of the line representing edges in world space.
         /// </summary>
         public float EdgeWidth = 0.3f; // serialized by Unity
 
@@ -486,7 +508,7 @@ namespace SEE.Game
                 if (File.Exists(filename))
                 {
                     SEE.Utils.Performance p = SEE.Utils.Performance.Begin("loading graph data from " + filename);
-                    GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "ROOT", new SEELogger());
+                    GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "", new SEELogger());
                     graphCreator.Load();
                     Graph graph = graphCreator.GetGraph();
                     p.End();

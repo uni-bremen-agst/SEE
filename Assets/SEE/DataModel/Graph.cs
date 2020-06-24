@@ -97,8 +97,8 @@ namespace SEE.DataModel
             {
                 if (nodes.Remove(node.ID))
                 {
-                    // the edges of node are stored in the node's data structure as well as
-                    // in the node's neighbor's data structure
+                    // The edges of node are stored in the node's data structure as well as
+                    // in the node's neighbor's data structure.
                     foreach (Edge outgoing in node.Outgoings)
                     {
                         Node successor = outgoing.Target;
@@ -112,6 +112,33 @@ namespace SEE.DataModel
                         edges.Remove(incoming);
                     }
                     node.RemoveAllEdges();
+                    // Adjust the node hierarchy.
+                    if (node.NumberOfChildren() > 0)
+                    {
+                        if (node.Parent == null)
+                        {
+                            // All children of node become roots now.
+                            foreach (Node child in node.Children())
+                            {
+                                child.Parent = null;
+                            }
+                        }
+                        else
+                        {
+                            // The father of node now becomes the father of all children of node.
+                            foreach (Node child in node.Children())
+                            {
+                                child.Parent = null;
+                                node.Parent.AddChild(child);
+                            }
+                        }
+                        // Because the node hierarchy has changed, we need to re-calcuate
+                        // the levels. Note: We could do that incrementally if we wanted to
+                        // by traversing only the children of node instead of all nodes in 
+                        // the graph.
+                        CalculateLevels();
+                    }
+                    node.ItsGraph = null;
                 }
                 else
                 {
@@ -321,7 +348,7 @@ namespace SEE.DataModel
         /// <summary>
         /// Dumps the hierarchy for each root. Used for debugging.
         /// </summary>
-        internal void DumpTree()
+        public void DumpTree()
         {
             foreach (Node root in GetRoots())
             {
@@ -338,7 +365,7 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// Dumps the hierarchy for given root by adding level many blanks 
+        /// Dumps the hierarchy for given root by adding level many - 
         /// as indentation. Used for debugging.
         /// </summary>
         private void DumpTree(Node root, int level)
