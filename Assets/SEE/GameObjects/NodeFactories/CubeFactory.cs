@@ -16,6 +16,8 @@ namespace SEE.GO
         {
             // Note: An appropriate box collider is already attached to the cube.
             GameObject result = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            SetHeight(result, DefaultHeight);
+
             result.tag = Tags.Node;
             Renderer renderer = result.GetComponent<Renderer>();
             // Object should not cast shadows: too expensive and may hide information,

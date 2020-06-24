@@ -199,117 +199,16 @@ namespace SEE.Layout.RectanglePacking
         }
 
         /// <summary>
-        /// Let's us explore performance issues. Just adjust parameter howManyNodes.
+        /// Let's us explore performance issues.
         /// </summary>
         [Test]
         public void TestLayout()
         {
-            int howManyNodes = 500;
-            Vector3 initialSize = Vector3.one;
-            MyGameNode root = new MyGameNode(initialSize, 0);
-            CubeFactory factory = new CubeFactory();
-
-            ICollection<ILayoutNode> gameObjects = new List<ILayoutNode>();
-            gameObjects.Add(root);
-
-            for (int i = 1; i <= howManyNodes; i++)
-            {
-                initialSize *= 1.01f;
-                MyGameNode child = new MyGameNode(initialSize, i);
-                gameObjects.Add(child);
-                root.AddChild(child);
-            }
+            ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
 
             RectanglePackingNodeLayout packer = new RectanglePackingNodeLayout(0.0f, 1.0f);
 
             Dictionary<ILayoutNode, NodeTransform> layout = packer.Layout(gameObjects);
-        }
-
-        private class MyGameNode : ILayoutNode
-        {
-            private readonly int index;
-
-            public MyGameNode(Vector3 initialSize, int index)
-            {
-                this.scale = initialSize;
-                this.index = index;
-            }
-
-            private ILayoutNode parent;
-
-            public ILayoutNode Parent
-            {
-                get => parent;
-                set => parent = value;
-            }
-
-            private int level = 0;
-
-            public int Level
-            {
-                get => level;
-                set => level = value;
-            }
-
-            private List<ILayoutNode> children = new List<ILayoutNode>();
-
-            public ICollection<ILayoutNode> Children()
-            {
-                return children;
-            }
-
-            public void AddChild(MyGameNode node)
-            {
-                children.Add(node);
-                node.Parent = this;
-            }
-
-            private Vector3 scale;
-
-            public Vector3 LocalScale
-            {
-                get => scale;
-                set => scale = value;
-            }
-
-            public void ScaleBy(float factor)
-            {
-                scale *= factor;
-            }
-
-            private Vector3 centerPosition;
-
-            public Vector3 CenterPosition
-            {
-                get => centerPosition;
-                set => centerPosition = value;
-            }
-
-            public Vector3 Roof
-            {
-                get => centerPosition + Vector3.up * 0.5f * scale.y;
-            }
-
-            public Vector3 Ground
-            {
-                get => centerPosition - Vector3.up * 0.5f * scale.y;
-            }
-
-            public bool IsLeaf => children.Count == 0;
-
-            public string ID { get => index.ToString(); }
-
-            private float rotation;
-
-            public float Rotation
-            {
-                get => rotation;
-                set => rotation = value;
-            }
-
-            public ICollection<ILayoutNode> Successors => new List<ILayoutNode>();
-
-            public Vector3 AbsoluteScale => scale;
         }
     }
 }
