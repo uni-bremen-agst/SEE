@@ -25,13 +25,36 @@ namespace SEE.Net
         /// Saves the executed action and creates a UI-element for it.
         /// </summary>
         /// <param name="action">The executed action.</param>
-        internal static void OnExecute(AbstractAction action)
+        internal static void DebugOnExecute(AbstractAction action)
         {
-            GameObject prefab = Resources.Load<GameObject>("ActionHistoryElement");
+            GameObject prefab = Resources.Load<GameObject>("DebugActionHistoryElement");
             prefab.GetComponentInChildren<UnityEngine.UI.Text>().text = action.GetType().Name;
-            Transform parent = UnityEngine.Object.FindObjectOfType<UnityEngine.UI.VerticalLayoutGroup>().transform;
+
+            GameObject canvas = UnityEngine.Object.FindObjectOfType<Canvas>().gameObject;
+            Transform parent = null;
+            for (int i = 0; i < canvas.transform.childCount; i++)
+            {
+                GameObject child = canvas.transform.GetChild(i).gameObject;
+                if (child.name.Equals("Scroll View"))
+                {
+                    for (int j = 0; j < child.transform.childCount; j++)
+                    {
+                        UnityEngine.UI.VerticalLayoutGroup verticalLayoutGroup = child.GetComponentInChildren<UnityEngine.UI.VerticalLayoutGroup>();
+                        if (verticalLayoutGroup != null)
+                        {
+                            parent = verticalLayoutGroup.transform;
+                            break;
+                        }
+                    }
+
+                    if (parent != null)
+                    {
+                        break;
+                    }
+                }
+            }
             GameObject actionHistoryElement = UnityEngine.Object.Instantiate(prefab, parent);
-            actionHistoryElement.GetComponent<ActionHistoryElement>().index = actions.Count;
+            actionHistoryElement.GetComponent<DebugActionHistoryElement>().index = actions.Count;
 
             actions.Add(action);
             actionHistoryElements.Add(actionHistoryElement);

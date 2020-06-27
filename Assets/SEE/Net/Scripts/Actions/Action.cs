@@ -197,7 +197,7 @@ namespace SEE.Net
                 {
                     if (buffer)
                     {
-                        ActionHistory.OnExecute(this);
+                        ActionHistory.DebugOnExecute(this);
                     }
                 }
             }
