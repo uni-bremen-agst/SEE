@@ -2745,7 +2745,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useInOfflineMode: 0
-  hostServer: 1
+  hostServer: 0
   serverIPAddress: 192.168.178.22
   localServerPort: 55555
   remoteServerPort: 55555
