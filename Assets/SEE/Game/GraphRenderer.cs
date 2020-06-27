@@ -205,9 +205,11 @@ namespace SEE.Game
                 NodeLayout.MoveTo(layoutNodes, parent.transform.position);                
 
                 ICollection<GameObject> gameNodes = nodeMap.Values;
+
+                // TODO: will a plane ever be needed again or can everything concerning planes be removed?
                 // add the plane surrounding all game objects for nodes
-                GameObject plane = NewPlane(gameNodes, parent.transform.position.y);
-                AddToParent(plane, parent);
+                //GameObject plane = NewPlane(gameNodes, parent.transform.position.y);
+                //AddToParent(plane, parent);
 
                 CreateObjectHierarchy(nodeMap, parent);
                 InteractionDecorator.PrepareForInteraction(gameNodes);

@@ -38,6 +38,46 @@ namespace SEE.Game
         private const string OnZoomingOutComplete = "OnZoomingOutComplete";
 
         /// <summary>
+        /// Checks, whether it is possible to zoom out of the given
+        /// <paramref name="enteredNode"/>.
+        /// 
+        /// See <see cref="ZoomOutOf(GameObject, GameObject)"/> for further details.
+        /// </summary>
+        /// <param name="enteredNode">the object to be zoomed out of</param>
+        /// <returns><code>true</code>, if zooming is possible, <code>false</code> otherwise</returns>
+        public static bool CanZoomOutOf(GameObject enteredNode)
+        {
+            Transformer transformer = GetTransformer(enteredNode);
+            return transformer != null && transformer.activeAscendants.Count > 1;
+        }
+
+        /// <summary>
+        /// Checks, whether it is possible to zoom back to the root from given
+        /// <paramref name="enteredNode"/>.
+        /// </summary>
+        /// <param name="enteredNode">the object to be zoomed out of</param>
+        /// <returns><code>true</code>, if zooming is possible, <code>false</code> otherwise</returns>
+        public static bool CanZoomRoot(GameObject enteredNode)
+        {
+            return GetTransformer(enteredNode) != null;
+        }
+
+        /// <summary>
+        /// Checks, whether it is possible to zoom into the given
+        /// <paramref name="enteredNode"/>.
+        /// </summary>
+        /// <param name="enteredNode">the object to be zoomed into</param>
+        /// <returns><code>true</code>, if zooming is possible, <code>false</code> otherwise</returns>
+        public static bool CanZoomInto(GameObject enteredNode)
+        {
+            Transformer transformer = GetTransformer(enteredNode);
+            return transformer != null
+                && enteredNode != null
+                && enteredNode.tag == Tags.Node
+                && transformer.activeAscendants.Peek().Node != enteredNode;
+        }
+
+        /// <summary>
         /// Zooms into the given <paramref name="gameObject"/>, that is, all ascendants
         /// and their respective descendants are hidden and <paramref name="gameObject"/>
         /// and its descendants are scaled up and relocated so that they occupy the
@@ -50,7 +90,6 @@ namespace SEE.Game
         /// <param name="gameObject">the object to be zoomed into</param>
         public static void ZoomInto(GameObject caller, GameObject gameObject)
         {
-
             Transformer transformer = GetTransformer(gameObject);
             if (transformer != null)
             {
@@ -145,6 +184,44 @@ namespace SEE.Game
             Unhide(GameObjectHierarchy.Descendants(newFocus));
             focus = newFocus;
         }
+        
+        /// <summary>
+        /// Sets the initial state. This can only be called, if no zooming is currently
+        /// active!
+        /// </summary>
+        /// <param name="gameObjects">The GameObjects to be zoomed into</param>
+        public static void SetInitialState(GameObject[] gameObjects)
+        {
+            foreach (GameObject gameObject in gameObjects)
+            {
+                Transformer transformer = GetTransformer(gameObject);
+                if (transformer != null)
+                {
+                    transformer.activeAscendants.Push(new ObjectMemento(gameObject));
+                    HashSet<GameObject> currentlyVisible = GameObjectHierarchy.Descendants(transformer.focus);
+                    HashSet<GameObject> newlyVisible = GameObjectHierarchy.Descendants(gameObject);
+                    currentlyVisible.ExceptWith(newlyVisible);
+                    transformer.Hide(currentlyVisible);
+                    transformer.focus = gameObject;
+
+                    BoundingBox.Get(
+                        GameObjectHierarchy.Descendants(gameObject, Tags.Node),
+                        out Vector2 leftLowerCorner, out Vector2 rightUpperCorner
+                    );
+                    float scaleFactor = Mathf.Min(
+                        (transformer.initialRightUpperCorner.x - transformer.initialLeftLowerCorner.x) / (rightUpperCorner.x - leftLowerCorner.x),
+                        (transformer.initialRightUpperCorner.y - transformer.initialLeftLowerCorner.y) / (rightUpperCorner.y - leftLowerCorner.y)
+                    );
+                    Vector3 newPosition = gameObject.transform.position;
+                    Vector2 center = transformer.CenterPoint;
+                    newPosition.x = center.x;
+                    newPosition.z = center.y;
+                    Vector3 newScale = gameObject.transform.localScale * scaleFactor;
+                    gameObject.transform.position = newPosition;
+                    gameObject.transform.localScale = newScale;
+                }
+            }
+        }
 
         /// <summary>
         /// Returns a Transformer instance responsible for the given <paramref name="gameObject"/>.
@@ -232,12 +309,12 @@ namespace SEE.Game
         /// <summary>
         /// The left lower corner of the initial bounding box of the gameObject in world space (x/z plane).
         /// </summary>
-        private Vector2 initialLeftLowerCorner;
+        private readonly Vector2 initialLeftLowerCorner;
         /// <summary>
         /// The right upper corner of the initial bounding box of the gameObject in world space (x/z plane).
         /// </summary>
-        private Vector2 initialRightUpperCorner;
-
+        private readonly Vector2 initialRightUpperCorner;
+        
         /// <summary>
         /// The center point of the rectangle defined by initalLeftLowerCorner and initialRightUpperCorner 
         /// in world space.
@@ -337,7 +414,7 @@ namespace SEE.Game
                 activeAscendants.Pop();
             }
             focus = activeAscendants.Peek().Node;
-            caller.SendMessage(OnZoomingComplete);
+            caller?.SendMessage(OnZoomingComplete);
         }
 
         /// ----------------------------------------------------------------------------------------------
@@ -345,7 +422,7 @@ namespace SEE.Game
         /// ----------------------------------------------------------------------------------------------
         private void ZoomIn(GameObject caller, GameObject enteredNode)
         {
-            if (enteredNode != null 
+            if (enteredNode != null
                 && enteredNode.tag == Tags.Node
                 && activeAscendants.Peek().Node != enteredNode)
             {                
@@ -401,17 +478,22 @@ namespace SEE.Game
             Vector3 newScale = parent.transform.localScale * scaleFactor;
 
             // Adjust position and scale by some animation.
-            iTween.MoveTo(parent, iTween.Hash(
-                                          "position", newPosition,
-                                          "time", 1.5f
-                ));
-            iTween.ScaleTo(parent, iTween.Hash(
-                              "scale", newScale,
-                              //"delay", 0.75f,
-                              "time", 1.5f,
-                              "oncompletetarget", caller,
-                              "oncomplete", OnZoomingComplete
-                ));
+            iTween.MoveTo(
+                parent,
+                iTween.Hash(
+                    "position", newPosition,
+                    "time", 1.5f
+                )
+            );
+            iTween.ScaleTo(
+                parent,
+                iTween.Hash(
+                    "scale", newScale,
+                    "time", 1.5f,
+                    "oncompletetarget", caller,
+                    "oncomplete", OnZoomingComplete
+                )
+            );
             return scaleFactor;
         }
 
@@ -442,7 +524,7 @@ namespace SEE.Game
                                            "time", 1.5f
                                ));
                 iTween.MoveTo(focus, 
-                              iTween.Hash("position", memento.Position,
+                              iTween.Hash("position", memento.LocalPosition,
                                           "time", 1.5f,
                                           //"delay", 0.6f,
                                           "oncompletetarget", caller,

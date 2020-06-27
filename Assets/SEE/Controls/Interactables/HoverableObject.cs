@@ -1,7 +1,6 @@
 ﻿using SEE.DataModel;
 using SEE.GO;
 using SEE.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -11,9 +10,9 @@ namespace SEE.Controls
     /// </summary>
     public class HoverableObject : HighlightableObject
     {
-        protected override void Start()
+        protected override void Awake()
         {
-            base.Start();
+            base.Awake();
             if (textOnPaperPrefab == null)
             {
                 // Filename of the prefab for the text on paper excluding its file extension .prefab
@@ -30,9 +29,9 @@ namespace SEE.Controls
         // Public actions when the object is hovered.
         //-------------------------------------------
 
-        public override void Hovered()
+        public override void Hovered(bool isOwner)
         {
-            base.Hovered();
+            base.Hovered(isOwner);
             ShowInformation();
         }
 
@@ -102,7 +101,10 @@ namespace SEE.Controls
         /// </summary>
         private void HideInformation()
         {
-            textOnPaper.SetActive(false);
+            if (textOnPaper)
+            {
+                textOnPaper.SetActive(false);
+            }
             // We keep textOnPaper for later use. Chances are that an object is hovered
             // over again when it was hovered once.
         }
@@ -123,27 +125,6 @@ namespace SEE.Controls
                 return gameObject.name;
             }
             return graphNode.ID;
-            //string result = "";
-            //result += "ID" + graphNode.ID + "\n";
-            //result += "Type" + graphNode.Type + "\n";
-
-            //foreach (var entry in graphNode.StringAttributes)
-            //{
-            //    result += string.Format("{0}: {1}\n", entry.Key, entry.Value);
-            //}
-            //foreach (var entry in graphNode.FloatAttributes)
-            //{
-            //    result += string.Format("{0}: {1}\n", entry.Key, entry.Value);
-            //}
-            //foreach (var entry in graphNode.IntAttributes)
-            //{
-            //    result += string.Format("{0}: {1}\n", entry.Key, entry.Value);
-            //}
-            //foreach (var entry in graphNode.ToggleAttributes)
-            //{
-            //    result += entry + "\n";
-            //}
-            //return result;
         }
     }
 }

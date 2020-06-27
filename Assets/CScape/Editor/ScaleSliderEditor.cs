@@ -2,6 +2,8 @@
 using UnityEngine;
 using UnityEditor;
 
+#if UNITY_EDITOR
+
 [CustomEditor(typeof(ScaleSlider))]
 [CanEditMultipleObjects]
 public class ScaleSliderEditor : Editor
@@ -20,3 +22,5 @@ public class ScaleSliderEditor : Editor
         }
     }
 }
+
+#endif

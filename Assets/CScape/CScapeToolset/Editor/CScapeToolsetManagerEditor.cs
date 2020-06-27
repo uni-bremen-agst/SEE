@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using CSToolset;
 
+#if UNITY_EDITOR
 
 namespace CScape
 {
@@ -60,3 +61,5 @@ namespace CScape
         }
     }
 }
+
+#endif

@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+
+using UnityEditor;
 using SEE.GO;
 using UnityEngine;
 
@@ -49,3 +51,5 @@ namespace SEEEditor
         }
     }
 }
+
+#endif

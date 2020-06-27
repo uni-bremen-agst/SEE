@@ -4,6 +4,8 @@ using UnityEngine;
 using CScape;
 using UnityEditor;
 
+#if UNITY_EDITOR
+
 namespace CScape
 {
     [CustomEditor(typeof(CSAdvertisingPanels))]
@@ -49,3 +51,5 @@ namespace CScape
     }
 
 }
+
+#endif

@@ -1,12 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
+﻿#if UNITY_EDITOR
+
 using System;
+using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEngine;
 using UnityEngine.SceneManagement;
-using CScape;
-//using UnityEditor;
 
 namespace CScape
 {
@@ -96,3 +94,5 @@ namespace CScape
 
     }
 }
+
+#endif

@@ -4,6 +4,8 @@ using UnityEngine;
 using CScape;
 using UnityEditor;
 
+#if UNITY_EDITOR
+
 namespace CScape
 {
     [CustomEditor(typeof(StreetGenerator))]
@@ -31,3 +33,5 @@ namespace CScape
         }
     }
 }
+
+#endif
