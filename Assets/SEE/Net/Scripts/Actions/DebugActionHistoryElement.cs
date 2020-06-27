@@ -6,7 +6,7 @@ namespace SEE.Net
     /// <summary>
     /// A buffered action history element with a unique index.
     /// </summary>
-    public class ActionHistoryElement : MonoBehaviour
+    public class DebugActionHistoryElement : MonoBehaviour
     {
         /// <summary>
         /// The unique index of the action. The index can be used to determine execution
