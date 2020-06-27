@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+
+using UnityEditor;
 using SEE.Game;
 
 namespace SEEEditor
@@ -22,3 +24,5 @@ namespace SEEEditor
         }
     }
 }
+
+#endif

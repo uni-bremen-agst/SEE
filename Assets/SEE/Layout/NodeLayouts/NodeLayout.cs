@@ -110,6 +110,8 @@ namespace SEE.Layout
             // The center of the bounding 3D box enclosing all layoutNodes
             Vector3 centerPosition = (right + left) / 2.0f;
             Vector3 offset = target - centerPosition;
+            // It is assumed that target.y is the lowest point of the city.
+            offset.y = target.y;
             foreach (ILayoutNode layoutNode in layoutNodes)
             {
                 layoutNode.CenterPosition += offset;

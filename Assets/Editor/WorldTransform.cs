@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
+#if UNITY_EDITOR
+
 namespace SEEEditor
 {
     /// <summary>
@@ -23,3 +25,5 @@ namespace SEEEditor
         }
     }
 }
+
+#endif
