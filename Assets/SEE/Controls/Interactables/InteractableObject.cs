@@ -87,6 +87,8 @@ namespace SEE.Controls
             {
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
+            id = nextID++;
+            interactableObjects.Add(id, this);
         }
 
         /// <summary>
@@ -96,15 +98,6 @@ namespace SEE.Controls
         {
             nextID = 0;
             interactableObjects.Clear();
-        }
-
-        /// <summary>
-        /// Initializes the interactable object with a unique id;
-        /// </summary>
-        public void Initialize()
-        {
-            id = nextID++;
-            interactableObjects.Add(id, this);
         }
 
         /// <summary>
