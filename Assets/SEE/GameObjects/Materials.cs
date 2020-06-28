@@ -13,7 +13,7 @@ namespace SEE.GO
         /// <summary>
         /// Name of default shader to obtain the default material.
         /// </summary>
-        private const string shaderName = "Standard";
+        private const string shaderName = "Custom/PortalShader";
 
         /// <summary>
         /// Creates default numberOfColors materials in the color range from
@@ -62,9 +62,12 @@ namespace SEE.GO
             {
                 throw new Exception("Number of colors must be greater than 0.");
             }
+
+            Shader.SetGlobalVector("portalMin", new Vector4(-1.0f, -0.5f));
+            Shader.SetGlobalVector("portalMax", new Vector4(1.0f, 0.5f));
             // Shader to retrieve the default material.
             Shader shader = Shader.Find(shaderName);
-           
+
             Material[] result = new Material[numberOfColors];
 
             if (numberOfColors == 1)
