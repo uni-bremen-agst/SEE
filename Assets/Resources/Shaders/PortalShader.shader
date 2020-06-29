@@ -2,10 +2,10 @@
 {
 	Properties
 	{
-		_Color("Color", Color) = (1,1,1,1)
-		_Glossiness("Smoothness", Range(0,1)) = 0.5
-		_Metallic("Metallic", Range(0,1)) = 0.0
-		_Cutoff("Cutoff", Range(0,1)) = 0.5
+		_Color("Color", Color) = (1, 1, 1, 1)
+		_Glossiness("Smoothness", Range(0, 1)) = 0.5
+		_Metallic("Metallic", Range(0, 1)) = 0.0
+		_Cutoff("Cutoff", Range(0, 1)) = 0.5
 	}
 		SubShader
 	{
