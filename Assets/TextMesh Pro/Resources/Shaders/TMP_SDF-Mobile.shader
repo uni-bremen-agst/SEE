@@ -50,6 +50,8 @@ Properties {
 	_StencilReadMask	("Stencil Read Mask", Float) = 255
 	
 	_ColorMask			("Color Mask", Float) = 15
+	
+	_Cutoff             ("Cutoff", Range(0, 1)) = 0.5
 }
 
 SubShader {
@@ -92,6 +94,9 @@ SubShader {
 		#include "UnityUI.cginc"
 		#include "TMPro_Properties.cginc"
 
+		uniform float2 portalMin;
+		uniform float2 portalMax;
+
 		struct vertex_t {
 			UNITY_VERTEX_INPUT_INSTANCE_ID
 			float4	vertex			: POSITION;
@@ -114,6 +119,8 @@ SubShader {
 			float4	texcoord1		: TEXCOORD3;			// Texture UV, alpha, reserved
 			half2	underlayParam	: TEXCOORD4;			// Scale(x), Bias(y)
 			#endif
+
+			float3  v               : TEXCOORD5;
 		};
 
 
@@ -187,6 +194,8 @@ SubShader {
 			output.underlayParam = half2(layerScale, layerBias);
 			#endif
 
+			output.v = mul(unity_ObjectToWorld, input.vertex);
+
 			return output;
 		}
 
@@ -228,6 +237,13 @@ SubShader {
 			#if UNITY_UI_ALPHACLIP
 			clip(c.a - 0.001);
 			#endif
+
+			if (input.v.x < portalMin.x || input.v.z < portalMin.y ||
+				input.v.x > portalMax.x || input.v.z > portalMax.y
+				)
+			{
+				c = fixed4(0.0f, 0.0f, 0.0f, 0.0f);
+			}
 
 			return c;
 		}
