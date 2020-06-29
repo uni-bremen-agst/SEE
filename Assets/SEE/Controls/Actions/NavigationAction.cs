@@ -20,6 +20,28 @@ namespace SEE.Controls
 
     public class NavigationAction : MonoBehaviour
     {
+        // TODO: put these somewhere else? Materials.cs is using this as well
+        public const float TableMinX = -1.0f;
+        public const float TableMaxX = 1.0f;
+        public const float TableCenterX = (TableMinX + TableMaxX) / 2;
+
+        public const float TableMinZ = -0.5f;
+        public const float TableMaxZ = 0.5f;
+        public const float TableCenterZ = (TableMinZ + TableMaxZ) / 2;
+
+        public const float TableWidth = TableMaxX - TableMinX;
+        public const float TableDepth = TableMaxZ - TableMinZ;
+
+
+
+        private const float MaxVelocity = 10.0f;
+        private const float MaxSqrVelocity = MaxVelocity * MaxVelocity;
+
+        private const float MaxDistanceX = 1.2f * TableWidth;
+        private const float MaxSqrDistanceX = MaxDistanceX * MaxDistanceX;
+        private const float MaxDistanceZ = 1.2f * TableDepth;
+        private const float MaxSqrDistanceZ = MaxDistanceZ * MaxDistanceZ;
+
         private const float DragFrictionFactor = 16.0f;
         private const float ZoomDuration = 0.2f;
         private const float ZoomMaxSteps = 4.0f;
@@ -28,6 +50,7 @@ namespace SEE.Controls
 
 
         private Transform cityTransform;
+        private Bounds cityBounds;
         private Plane raycastPlane;
 
         private bool dragging;
@@ -46,6 +69,7 @@ namespace SEE.Controls
         private void Start()
         {
             cityTransform = GameObject.Find("Implementation").transform.GetChild(0).transform; // TODO: find it some more robust way
+            cityBounds = cityTransform.GetComponent<MeshCollider>().bounds;
             raycastPlane = new Plane(Vector3.up, cityTransform.position);
 
             dragging = false;
@@ -82,7 +106,7 @@ namespace SEE.Controls
                         dragCanonicalOffset = scaledDragOffset.DividePairwise(cityTransform.localScale);
                         dragVelocity = Vector3.zero;
                     }
-                    else
+                    else if (dragging)
                     {
                         dragVelocity = (planeHitPoint - cityTransform.position - Vector3.Scale(dragCanonicalOffset, cityTransform.localScale)) / Time.deltaTime;
                     }
@@ -92,12 +116,52 @@ namespace SEE.Controls
             {
                 dragging = false;
             }
+
             if (!dragging)
             {
-                Vector3 acceleration = DragFrictionFactor * -dragVelocity;
+                Vector3 acceleration = Vector3.zero;
+
+                // TODO: this whole thing currently assumes the shape of a quad!
+                // therefore, circular cities can be lost in corners of the table!
+                float cityMinX = cityTransform.position.x + (cityTransform.localScale.x * cityBounds.min.x);
+                float cityMaxX = cityTransform.position.x + (cityTransform.localScale.x * cityBounds.max.x);
+                float cityMinZ = cityTransform.position.z + (cityTransform.localScale.z * cityBounds.min.z);
+                float cityMaxZ = cityTransform.position.z + (cityTransform.localScale.z * cityBounds.max.z);
+
+                if (cityMaxX < TableMinX || cityMaxZ < TableMinZ || cityMinX > TableMaxX || cityMinZ > TableMaxZ)
+                {
+                    float toTableCenterX = TableCenterX - cityTransform.position.x;
+                    float toTableCenterZ = TableCenterZ - cityTransform.position.z;
+                    float length = Mathf.Sqrt(toTableCenterX * toTableCenterX + toTableCenterZ * toTableCenterZ);
+                    toTableCenterX /= length;
+                    toTableCenterZ /= length;
+                    acceleration = new Vector3(32.0f * toTableCenterX, 0.0f, 32.0f * toTableCenterZ);
+                }
+                else
+                {
+                    acceleration = DragFrictionFactor * -dragVelocity;
+                }
                 dragVelocity += acceleration * Time.deltaTime;
+
+                float dragVelocitySqrMag = dragVelocity.sqrMagnitude;
+                if (dragVelocitySqrMag > MaxSqrVelocity)
+                {
+                    dragVelocity = dragVelocity / Mathf.Sqrt(dragVelocitySqrMag) * MaxVelocity;
+                }
             }
             cityTransform.position += dragVelocity * Time.deltaTime;
+
+            // TODO: similar TODO as above with circular cities!
+            float toCityCenterX = cityTransform.position.x - TableCenterX;
+            float toCityCenterZ = cityTransform.position.z - TableCenterZ;
+            float distance = Mathf.Sqrt(toCityCenterX * toCityCenterX + toCityCenterZ * toCityCenterZ);
+            float maxDistance = Mathf.Max(cityTransform.localScale.x * MaxDistanceX, cityTransform.localScale.z * MaxDistanceZ);
+            if (distance > maxDistance)
+            {
+                float offsetX = toCityCenterX / distance * maxDistance;
+                float offsetZ = toCityCenterZ / distance * maxDistance;
+                cityTransform.position = new Vector3(TableCenterX + offsetX, cityTransform.position.y, TableCenterZ + offsetZ);
+            }
 
 
             

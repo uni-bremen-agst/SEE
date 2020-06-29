@@ -63,8 +63,8 @@ namespace SEE.GO
                 throw new Exception("Number of colors must be greater than 0.");
             }
 
-            Shader.SetGlobalVector("portalMin", new Vector4(-1.0f, -0.5f));
-            Shader.SetGlobalVector("portalMax", new Vector4(1.0f, 0.5f));
+            Shader.SetGlobalVector("portalMin", new Vector4(Controls.NavigationAction.TableMinX, Controls.NavigationAction.TableMinZ));
+            Shader.SetGlobalVector("portalMax", new Vector4(Controls.NavigationAction.TableMaxX, Controls.NavigationAction.TableMaxZ));
             // Shader to retrieve the default material.
             Shader shader = Shader.Find(shaderName);
 
