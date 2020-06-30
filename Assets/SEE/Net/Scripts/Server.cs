@@ -70,6 +70,8 @@ namespace SEE.Net
         /// </summary>
         public static Dictionary<Connection, ulong> outgoingPacketSequenceIDs = new Dictionary<Connection, ulong>();
 
+        private static bool initialized = false;
+
 
 
         /// <summary>
@@ -95,6 +97,7 @@ namespace SEE.Net
             {
                 Debug.LogException(e);
             }
+            initialized = true;
         }
 
         /// <summary>
@@ -102,14 +105,17 @@ namespace SEE.Net
         /// </summary>
         public static void Update()
         {
-            packetHandler.HandlePendingPackets();
-            while (pendingEstablishedConnections.Count != 0)
+            if (initialized)
             {
-                OnConnectionEstablished(pendingEstablishedConnections.Pop());
-            }
-            while (pendingClosedConnections.Count != 0)
-            {
-                OnConnectionClosed(pendingClosedConnections.Pop());
+                packetHandler.HandlePendingPackets();
+                while (pendingEstablishedConnections.Count != 0)
+                {
+                    OnConnectionEstablished(pendingEstablishedConnections.Pop());
+                }
+                while (pendingClosedConnections.Count != 0)
+                {
+                    OnConnectionClosed(pendingClosedConnections.Pop());
+                }
             }
         }
 
@@ -119,17 +125,19 @@ namespace SEE.Net
         /// </summary>
         public static void Shutdown()
         {
-            lock (Connections)
+            if (initialized)
             {
-                Connection.StopListening(ConnectionListeners);
-                ConnectionListeners.Clear();
-                for (int i = 0; i < Connections.Count; i++)
+                lock (Connections)
                 {
-                    Connections[i].CloseConnection(false);
+                    Connection.StopListening(ConnectionListeners);
+                    ConnectionListeners.Clear();
+                    for (int i = 0; i < Connections.Count; i++)
+                    {
+                        Connections[i].CloseConnection(false);
+                    }
+                    Connections.Clear();
                 }
-                Connections.Clear();
             }
-
         }
 
         /// <summary>

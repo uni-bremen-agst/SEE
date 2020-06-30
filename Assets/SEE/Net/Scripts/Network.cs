@@ -3,6 +3,7 @@ using NetworkCommsDotNet.Connections;
 using SEE.Game;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -39,9 +40,10 @@ namespace SEE.Net
         [SerializeField] private bool hostServer = false;
 
         /// <summary>
-        /// The IP-address of the server.
+        /// The remote IP-address of the server. Is empty, if this client hosts the
+        /// server.
         /// </summary>
-        [SerializeField] private string serverIPAddress = string.Empty;
+        [SerializeField] private string remoteServerIPAddress = string.Empty;
 
         /// <summary>
         /// The port of the server. Is ignored, if this host does not host the server.
@@ -95,9 +97,9 @@ namespace SEE.Net
         public static bool HostServer { get => instance ? instance.hostServer : false; }
 
         /// <summary>
-        /// <see cref="serverIPAddress"/>
+        /// <see cref="remoteServerIPAddress"/>
         /// </summary>
-        public static string ServerIPAddress { get => instance ? instance.serverIPAddress : ""; }
+        public static string RemoteServerIPAddress { get => instance ? instance.remoteServerIPAddress : string.Empty; }
 
         /// <summary>
         /// <see cref="localServerPort"/>
@@ -158,6 +160,7 @@ namespace SEE.Net
                         Server.Initialize();
                     }
                     Client.Initialize();
+                    VivoxInitialize();
                 }
                 catch (Exception e)
                 {
@@ -297,7 +300,6 @@ namespace SEE.Net
                 {
                     if (fileName.Contains(prefixes[j]))
                     {
-                        Debug.Log("Deleting file: '" + fileInfo.FullName + "'!");
                         fileInfo.Delete();
                         break;
                     }
@@ -427,6 +429,144 @@ namespace SEE.Net
             IPHostEntry hostEntry = Dns.GetHostEntry(hostName);
             return hostEntry.AddressList;
         }
+
+        #region Vivox
+
+        public const string VivoxIssuer = "torben9605-se19-dev";
+        public const string VivoxDomain = "vdx5.vivox.com";
+        public const string VivoxSecretKey = "kick271";
+        public static readonly TimeSpan VivoxExpirationDuration = new TimeSpan(365, 0, 0, 0);
+
+        public static VivoxUnity.Client VivoxClient { get; private set; } = null;
+        public static VivoxUnity.AccountId VivoxAccountID { get; private set; } = null;
+        public static VivoxUnity.ILoginSession VivoxLoginSession { get; private set; } = null;
+        public static VivoxUnity.IChannelSession VivoxChannelSession { get; private set; } = null;
+
+        [SerializeField] private string vivoxChannelName = string.Empty;
+        public static string VivoxChannelName { get => instance ? instance.vivoxChannelName : string.Empty; }
+
+        private static void VivoxInitialize()
+        {
+            VivoxUnity.VivoxConfig config = new VivoxUnity.VivoxConfig { InitialLogLevel = vx_log_level.log_debug };
+            VivoxClient = new VivoxUnity.Client();
+            VivoxClient.Initialize(config);
+
+            string userName = "u-" + Client.LocalEndPoint.Address.ToString().Replace(':', '.') + '-' + Client.LocalEndPoint.Port;
+            VivoxAccountID = new VivoxUnity.AccountId(VivoxIssuer, userName, VivoxDomain);
+            VivoxLoginSession = VivoxClient.GetLoginSession(VivoxAccountID);
+            VivoxLoginSession.PropertyChanged += VivoxOnLoginSessionPropertyChanged;
+            VivoxLoginSession.BeginLogin(new Uri("https://vdx5.www.vivox.com/api2"), VivoxLoginSession.GetLoginToken(VivoxSecretKey, VivoxExpirationDuration), ar0 =>
+            {
+                VivoxLoginSession.EndLogin(ar0);
+
+                string channelName = channelName = "c-" + VivoxChannelName;
+                VivoxUnity.ChannelId channelID = new VivoxUnity.ChannelId(VivoxIssuer, channelName, VivoxDomain, VivoxUnity.ChannelType.NonPositional);
+
+                // NOTE(torben): GetChannelSession() creates a new channel, if it does
+                // not exist yet. Thus, a client, that is not the server could
+                // potentially create the voice channel. To make sure this does not
+                // happen, VivoxInitialize() must always be called AFTER the server
+                // and client were initialized, because if this client tries to connect
+                // to a server and can not connect, it will go to offline mode and not
+                // initialize Vivox.
+                VivoxChannelSession = VivoxLoginSession.GetChannelSession(channelID);
+                VivoxChannelSession.PropertyChanged += VivoxOnChannelPropertyChanged;
+                VivoxChannelSession.MessageLog.AfterItemAdded += VivoxOnChannelMessageReceived;
+                VivoxChannelSession.BeginConnect(true, true, true, VivoxChannelSession.GetConnectToken(VivoxSecretKey, VivoxExpirationDuration), ar1 =>
+                {
+                    VivoxChannelSession.EndConnect(ar1);
+                    if (HostServer && VivoxChannelSession.Participants.Count != 0)
+                    {
+                        // TODO: this channel already exists and the name is unavailable!
+                        Debug.Log("Channel with given name already exists. Select differend name!");
+                        VivoxChannelSession.Disconnect();
+                        VivoxLoginSession.DeleteChannelSession(channelID);
+                    }
+                });
+            });
+        }
+
+        private static void SendGroupMessage()
+        {
+            string channelName = VivoxChannelSession.Channel.Name;
+            string senderName = VivoxAccountID.Name;
+            string message = "Hello World!";
+
+            VivoxChannelSession.BeginSendText(message, ar =>
+            {
+                try
+                {
+                    VivoxChannelSession.EndSendText(ar);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
+            });
+        }
+
+        private static void VivoxOnLoginSessionPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+        {
+            if (propertyChangedEventArgs.PropertyName == "State")
+            {
+                switch ((sender as VivoxUnity.ILoginSession).State)
+                {
+                    case VivoxUnity.LoginState.LoggingIn:
+                        break;
+
+                    case VivoxUnity.LoginState.LoggedIn:
+                        break;
+
+                    case VivoxUnity.LoginState.LoggedOut:
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private static void VivoxOnChannelPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+        {
+            VivoxUnity.IChannelSession channelSession = (VivoxUnity.IChannelSession)sender;
+
+            if (propertyChangedEventArgs.PropertyName == "AudioState")
+            {
+                switch (channelSession.AudioState)
+                {
+                    case VivoxUnity.ConnectionState.Connected:    Debug.Log("Audio connected in "    + channelSession.Key.Name); break;
+                    case VivoxUnity.ConnectionState.Disconnected: Debug.Log("Audio disconnected in " + channelSession.Key.Name); break;
+                }
+            }
+            else if (propertyChangedEventArgs.PropertyName == "TextState")
+            {
+                switch (channelSession.TextState)
+                {
+                    case VivoxUnity.ConnectionState.Connected:
+                        Debug.Log("Text connected in " + channelSession.Key.Name);
+                        SendGroupMessage();
+                        break;
+                    case VivoxUnity.ConnectionState.Disconnected:
+                        Debug.Log("Text disconnected in " + channelSession.Key.Name);
+                        break;
+                }
+            }
+        }
+
+        private static void VivoxOnChannelMessageReceived(object sender, VivoxUnity.QueueItemAddedEventArgs<VivoxUnity.IChannelTextMessage> queueItemAddedEventArgs)
+        {
+            string channelName = queueItemAddedEventArgs.Value.ChannelSession.Channel.Name;
+            string senderName = queueItemAddedEventArgs.Value.Sender.Name;
+            string message = queueItemAddedEventArgs.Value.Message;
+
+            Debug.Log(channelName + ": " + senderName + ": " + message);
+        }
+
+        private void OnApplicationQuit()
+        {
+            VivoxClient.Uninitialize();
+        }
+
+        #endregion
     }
 
 }
