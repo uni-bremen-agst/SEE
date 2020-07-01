@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+
+using UnityEngine;
 using UnityEditor;
 using SEE.Game;
 
@@ -105,7 +107,7 @@ namespace SEEEditor
         /// </summary>
         private void Reset(SEECity city)
         {
-            city.Reset();   
+            city.Reset();
         }
 
         /// <summary>
@@ -125,3 +127,5 @@ namespace SEEEditor
         }        
     }
 }
+
+#endif

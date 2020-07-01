@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEditor;
 using CScape;
 
+#if UNITY_EDITOR
+
 [CustomEditor(typeof(BuildingEditorOrganizer))]
 public class BuildingEditorOrganizerEditor : Editor
 {
@@ -52,3 +54,5 @@ public class BuildingEditorOrganizerEditor : Editor
         // Update is called once per frame
 
 }
+
+#endif

@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEditor;
 using CScape;
 
+#if UNITY_EDITOR
+
 [CustomEditor(typeof(MeshMerger))]
 public class MeshMergerEditor : Editor
 {
@@ -51,3 +53,4 @@ public class MeshMergerEditor : Editor
 
 }
 
+#endif

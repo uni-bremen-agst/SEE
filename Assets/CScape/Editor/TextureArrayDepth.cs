@@ -4,6 +4,8 @@
 using UnityEngine;
 using UnityEditor;
 
+#if UNITY_EDITOR
+
 public class TextureArrayDepth : MonoBehaviour
 {
 
@@ -39,3 +41,5 @@ public class TextureArrayDepth : MonoBehaviour
 }
 
 // After this, you will have a Texture Array asset which you can assign to the shader's Tex attribute!
+
+#endif
