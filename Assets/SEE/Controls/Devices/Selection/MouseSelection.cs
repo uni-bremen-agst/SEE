@@ -41,12 +41,13 @@ namespace SEE.Controls.Devices
                 state = State.Selecting;
                 timeButtonHeld = Time.realtimeSinceStartup;
             }
-            if (Input.GetMouseButton(SelectionMouseButton) 
+            if (state == State.Selecting
+                && Input.GetMouseButton(SelectionMouseButton) 
                 && Time.realtimeSinceStartup - timeButtonHeld >= ButtonDurationThreshold)
             {
                 state = State.Grabbing;
             }
-            if (Input.GetMouseButtonUp(SelectionMouseButton))
+            if (Input.GetMouseButtonUp(SelectionMouseButton) || IsCanceling)
             {
                 state = State.Idle;
                 timeButtonHeld = float.PositiveInfinity;
@@ -94,6 +95,17 @@ namespace SEE.Controls.Devices
         public override bool IsZoomingOut => Input.GetKeyDown(KeyCode.O);
 
         public override bool IsZoomingHome => Input.GetKeyDown(KeyCode.R);
+
+        /// <summary>
+        /// Resets the selection timer, so the start of grabbing is delayed.
+        /// </summary>
+        public void ResetSelectionTimer()
+        {
+            if (state == State.Selecting)
+            {
+                timeButtonHeld = Time.realtimeSinceStartup;
+            }
+        }
 
         /// <summary>
         /// True if the first click of an expected double click happened.
