@@ -196,8 +196,8 @@
    },
    "category" : "steamvr_input",
    "controller_type" : "vive_controller",
-   "description" : "Default Bindings",
-   "name" : "vive_controller",
+   "description" : "",
+   "name" : "Default Configuration",
    "options" : {},
    "simulated_actions" : []
 }
