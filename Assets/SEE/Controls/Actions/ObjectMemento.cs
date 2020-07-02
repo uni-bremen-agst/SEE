@@ -7,19 +7,20 @@ namespace SEE.GO
     /// </summary>
     internal struct ObjectMemento
     {
+        private readonly GameObject go;
+        private Vector3 localPosition;
+        private Vector3 localScale;
+
         public ObjectMemento(GameObject go)
         {
             this.go = go;
-            this.position = go.transform.position;
-            this.localScale = go.transform.localScale;
+            localPosition = go.transform.localPosition;
+            localScale = go.transform.localScale;
         }
-        private readonly GameObject go;
-        private Vector3 position;
-        private Vector3 localScale;
 
         public void Reset()
         {
-            go.transform.position = position;
+            go.transform.localPosition = localPosition;
             go.transform.localScale = localScale;
 
         }
@@ -30,9 +31,9 @@ namespace SEE.GO
         /// <summary>
         /// Original world space position.
         /// </summary>
-        public Vector3 Position
+        public Vector3 LocalPosition
         {
-            get => position;
+            get => localPosition;
         }
         /// <summary>
         /// Original world space scale (lossy scale).
@@ -45,7 +46,7 @@ namespace SEE.GO
         public override string ToString()
         {
             return go.name
-                + " position=" + position
+                + " localPosition=" + localPosition
                 + " localScale=" + localScale
                 + " worldSize=" + go.Size();
         }

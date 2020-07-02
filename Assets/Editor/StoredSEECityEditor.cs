@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+
+using UnityEditor;
 using SEE.Game;
 using UnityEngine;
 using System.IO;
@@ -24,11 +26,10 @@ namespace SEEEditor
             EditorGUILayout.BeginHorizontal();
             {
                 city.PathPrefix = EditorGUILayout.TextField("Data path prefix", Filenames.OnCurrentPlatform(city.PathPrefix));
-                //EditorGUILayout.LabelField("Data path prefix", GUILayout.Width(EditorGUIUtility.labelWidth));
-                //EditorGUILayout.SelectableLabel(city.PathPrefix, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
                 if (GUILayout.Button("Select"))
                 {
                     city.PathPrefix = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select GXL graph data directory", city.PathPrefix, ""));
+                    GUIUtility.ExitGUI(); // This call is to avoid the error "EndLayoutGroup: BeginLayoutGroup must be called first."
                 }
                 // city.PathPrefix must end with a directory separator
                 if (city.PathPrefix.Length > 0 && city.PathPrefix[city.PathPrefix.Length - 1] != Path.DirectorySeparatorChar)
@@ -55,3 +56,5 @@ namespace SEEEditor
         }
     }
 }
+
+#endif

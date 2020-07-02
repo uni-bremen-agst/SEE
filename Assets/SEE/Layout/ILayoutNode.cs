@@ -61,6 +61,27 @@ namespace SEE.Layout
     ///  Defines the methods for all nodes to be laid out.
     /// </summary>
     public interface ILayoutNode : IGameNode, IGraphNode<ILayoutNode>, IHierarchyNode<ILayoutNode>
-    {     
+    {
+    }
+
+    public static class ILayoutNodeHierarchy
+    {
+        /// <summary>
+        /// Returns all nodes in <paramref name="layoutNodes"/> that do not have a parent.
+        /// </summary>
+        /// <param name="layoutNodes">nodes to be queried</param>
+        /// <returns>all root nodes in <paramref name="layoutNodes"/></returns>
+        public static ICollection<ILayoutNode> Roots(ICollection<ILayoutNode> layoutNodes)
+        {
+            ICollection<ILayoutNode> result = new List<ILayoutNode>();
+            foreach (ILayoutNode node in layoutNodes)
+            {
+                if (node.Parent == null)
+                {
+                    result.Add(node);
+                }
+            }
+            return result;
+        }
     }
 }
