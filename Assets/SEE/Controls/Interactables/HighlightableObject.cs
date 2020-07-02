@@ -6,23 +6,25 @@ namespace SEE.Controls
 {
     public class HighlightableObject : InteractableObject
     {
-        [Tooltip("The color to be used when the object is to be highlighted.")]
-        public Color HightlightColor = Color.green;
+        [Tooltip("The color to be used when the object is to be highlighted by this client.")]
+        public Color LocalHightlightColor = new Color(0.0f, 1.0f, 0.0f);
 
-        protected class MaterialChanger
+        [Tooltip("The color to be used when the object is to be highlighted some other client.")]
+        public Color RemoteHightlightColor = new Color(0.8f, 1.0f, 0.2f);
+
+        public class MaterialChanger
         {
-            public MaterialChanger(GameObject gameObject, Material special)
+            public MaterialChanger(GameObject gameObject, Material localSpecialMaterial, Material remoteSpecialMaterial)
             {
                 this.gameObject = gameObject;
-                this.specialMaterial = special;
+                this.localSpecialMaterial = localSpecialMaterial;
+                this.remoteSpecialMaterial = remoteSpecialMaterial;
             }
 
             private readonly GameObject gameObject;
 
-            /// <summary>
-            /// This material will be used for gameObject when .
-            /// </summary>
-            private Material specialMaterial;
+            private Material localSpecialMaterial;
+            private Material remoteSpecialMaterial;
 
             /// <summary>
             /// The material before the object was hovered so that it can be restored
@@ -35,11 +37,21 @@ namespace SEE.Controls
             /// Assigns the special material to the gameObject and stores the original 
             /// material in oldMaterial.
             /// </summary>
-            public void UseSpecialMaterial()
+            public void UseSpecialMaterial(bool isOwner)
             {
                 Renderer renderer = gameObject.GetComponent<Renderer>();
-                oldMaterial = renderer.sharedMaterial;
-                renderer.sharedMaterial = specialMaterial;
+                if (!oldMaterial)
+                {
+                    oldMaterial = renderer.sharedMaterial;
+                }
+                if (isOwner)
+                {
+                    renderer.sharedMaterial = localSpecialMaterial;
+                }
+                else
+                {
+                    renderer.sharedMaterial = remoteSpecialMaterial;
+                }
             }
 
             /// <summary>
@@ -47,36 +59,40 @@ namespace SEE.Controls
             /// </summary>
             public void ResetMaterial()
             {
-                gameObject.GetComponent<Renderer>().sharedMaterial = oldMaterial;
+                if (oldMaterial)
+                {
+                    gameObject.GetComponent<Renderer>().sharedMaterial = oldMaterial;
+                }
+                oldMaterial = null;
             }
         }
 
         /// <summary>
         /// True if the object is currently being hovered over.
         /// </summary>
-        protected bool isHovered = false;
+        public bool IsHovered { get; private set; } = false;
 
         /// <summary>
         /// For highlighting the gameObject while it is being hovered over.
         /// </summary>
-        private MaterialChanger hightlight;
+        public MaterialChanger HighlightMaterialChanger { get; private set; }
 
-        protected override void Start()
+        protected override void Awake()
         {
-            base.Start();
-            hightlight = new MaterialChanger(gameObject, Materials.NewMaterial(HightlightColor));
+            base.Awake();
+            HighlightMaterialChanger = new MaterialChanger(gameObject, Materials.NewMaterial(LocalHightlightColor), Materials.NewMaterial(RemoteHightlightColor));
         }
 
-        public virtual void Hovered()
+        public virtual void Hovered(bool isOwner)
         {
-            isHovered = true;
-            hightlight.UseSpecialMaterial();
+            IsHovered = true;
+            HighlightMaterialChanger.UseSpecialMaterial(isOwner);
         }
 
         public virtual void Unhovered()
         {
-            isHovered = false;
-            hightlight.ResetMaterial();
+            IsHovered = false;
+            HighlightMaterialChanger.ResetMaterial();
         }
 
         //----------------------------------------------------------------
@@ -93,7 +109,8 @@ namespace SEE.Controls
         /// <param name="hand">the hand hovering over the object</param>
         private void OnHandHoverBegin(Hand hand)
         {
-            Hovered();
+            // TODO: multiplayersupport
+            //Hovered(true);
         }
 
         /// <summary>
@@ -104,7 +121,8 @@ namespace SEE.Controls
         /// <param name="hand">the hand hovering over the object</param>
         private void OnHandHoverEnd(Hand hand)
         {
-            Unhovered();
+            // TODO: multiplayersupport
+            //Unhovered();
         }
     }
 }

@@ -12,9 +12,7 @@ namespace SEE.GO
         /// <summary>
         /// Path to the material used for edges.
         /// </summary>
-        protected const string materialPath = "Legacy Shaders/Particles/Additive";
-        // protected const string materialPath = "BrickTextures/BricksTexture13/BricksTexture13";
-        // protected const string materialPath = "Particles/Standard Surface";
+        protected const string materialPath = "Hidden/Internal-Colored";
 
         /// <summary>
         /// The material used for lines.

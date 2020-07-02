@@ -100,12 +100,16 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Adds the given <paramref name="offset"/> to every node in <paramref name="layoutNodes"/>.
+        /// Adds the given <paramref name="target"/> to every node in <paramref name="layoutNodes"/>.
         /// </summary>
         /// <param name="layoutNodes">layout nodes to be adjusted</param>
-        /// <param name="offset">offset to be added</param>
-        public static void Move(ICollection<ILayoutNode> layoutNodes, Vector3 offset)
+        /// <param name="target">offset to be added</param>
+        public static void MoveTo(ICollection<ILayoutNode> layoutNodes, Vector3 target)
         {
+            Bounding3DBox(layoutNodes, out Vector3 left, out Vector3 right);
+            // The center of the bounding 3D box enclosing all layoutNodes
+            Vector3 centerPosition = (right + left) / 2.0f;
+            Vector3 offset = target - centerPosition;
             foreach (ILayoutNode layoutNode in layoutNodes)
             {
                 layoutNode.CenterPosition += offset;
@@ -122,72 +126,87 @@ namespace SEE.Layout
         /// <returns>the factor by which the scale of edge node was multiplied</returns>
         public static float Scale(ICollection<ILayoutNode> layoutNodes, float width)
         {
-            BoundingBox(layoutNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner);
-            float currentWidth = rightUpperCorner.x - leftLowerCorner.x;
+            Bounding3DBox(layoutNodes, out Vector3 left, out Vector3 right);
+            float currentWidth = right.x - left.x;
             float scaleFactor = width / currentWidth;
             foreach (ILayoutNode layoutNode in layoutNodes)
             {
                 layoutNode.ScaleBy(scaleFactor);
-                // The x/z co-ordinates must be adjusted after scaling, but we do maintain the height
+                // The x/z co-ordinates must be adjusted after scaling
                 Vector3 newPosition = layoutNode.CenterPosition * scaleFactor;
-                //newPosition.y = layoutNode.CenterPosition.y;
                 layoutNode.CenterPosition = newPosition;
             }
             return scaleFactor;
         }
 
         /// <summary>
-        /// Returns the bounding box (2D rectangle) enclosing all given <paramref name="layoutNodes"/>.
+        /// Returns the bounding 3D box enclosing all given <paramref name="layoutNodes"/>.
         /// </summary>
-        /// <param name="layoutNodes">the list of layout nodes that are enclosed in the resulting bounding box</param>
-        /// <param name="leftLowerCorner">the left lower front corner (x axis in 3D space) of the bounding box</param>
-        /// <param name="rightUpperCorner">the right lower back corner (z axis in 3D space) of the bounding box</param>
-        public static void BoundingBox(ICollection<ILayoutNode> layoutNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
+        /// <param name="layoutNodes">the list of layout nodes that are enclosed in the resulting bounding 3D box</param>
+        /// <param name="left">the left lower front corner of the bounding box</param>
+        /// <param name="right">the right upper back corner of the bounding box</param>
+        private static void Bounding3DBox(ICollection<ILayoutNode> layoutNodes, out Vector3 left, out Vector3 right)
         {
             if (layoutNodes.Count == 0)
             {
-                leftLowerCorner = Vector2.zero;
-                rightUpperCorner = Vector2.zero;
+                left = Vector3.zero;
+                right = Vector3.zero;
             }
             else
             {
-                leftLowerCorner = new Vector2(Mathf.Infinity, Mathf.Infinity);
-                rightUpperCorner = new Vector2(Mathf.NegativeInfinity, Mathf.NegativeInfinity);
+                left = new Vector3(Mathf.Infinity, Mathf.Infinity, Mathf.Infinity);
+                right = new Vector3(Mathf.NegativeInfinity, Mathf.NegativeInfinity, Mathf.NegativeInfinity);
 
                 foreach (ILayoutNode go in layoutNodes)
                 {
-                    Vector3 extent = go.LocalScale;
+                    Vector3 extent = go.AbsoluteScale / 2.0f;
                     // Note: position denotes the center of the object
                     Vector3 position = go.CenterPosition;
                     {
-                        // x co-ordinate of lower left corner
+                        // left x co-ordinate of go
                         float x = position.x - extent.x;
-                        if (x < leftLowerCorner.x)
+                        if (x < left.x)
                         {
-                            leftLowerCorner.x = x;
+                            left.x = x;
                         }
                     }
-                    {
-                        // z co-ordinate of lower left corner
-                        float z = position.z - extent.z;
-                        if (z < leftLowerCorner.y)
-                        {
-                            leftLowerCorner.y = z;
-                        }
-                    }
-                    {   // x co-ordinate of upper right corner
+                    {   // right x co-ordinate of go
                         float x = position.x + extent.x;
-                        if (x > rightUpperCorner.x)
+                        if (x > right.x)
                         {
-                            rightUpperCorner.x = x;
+                            right.x = x;
                         }
                     }
                     {
-                        // z co-ordinate of upper right corner
-                        float z = position.z + extent.z;
-                        if (z > rightUpperCorner.y)
+                        // lower y co-ordinate of go
+                        float y = position.y - extent.y;
+                        if (y < left.y)
                         {
-                            rightUpperCorner.y = z;
+                            left.y = y;
+                        }
+                    }
+                    {
+                        // upper y co-ordinate of go
+                        float y = position.y + extent.y;
+                        if (y > right.y)
+                        {
+                            right.y = y;
+                        }
+                    }
+                    {
+                        // front z co-ordinate of go
+                        float z = position.z - extent.z;
+                        if (z < left.z)
+                        {
+                            left.z = z;
+                        }
+                    }
+                    {
+                        // back z co-ordinate of go
+                        float z = position.z + extent.z;
+                        if (z > right.z)
+                        {
+                            right.z = z;
                         }
                     }
                 }

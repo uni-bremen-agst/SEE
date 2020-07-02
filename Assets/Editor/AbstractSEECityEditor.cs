@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+
+using UnityEngine;
 using UnityEditor;
 using SEE.Game;
 
@@ -22,12 +24,14 @@ namespace SEEEditor
             city.LeafStyleMetric = EditorGUILayout.TextField("Style", city.LeafStyleMetric);
 
             GUILayout.Label("Attributes of inner nodes", EditorStyles.boldLabel);
+            city.InnerNodeHeightMetric = EditorGUILayout.TextField("Height", city.InnerNodeHeightMetric);
             city.InnerNodeStyleMetric = EditorGUILayout.TextField("Style", city.InnerNodeStyleMetric);
 
             GUILayout.Label("Nodes and Node Layout", EditorStyles.boldLabel);
             city.LeafObjects = (SEECity.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
             city.InnerNodeObjects = (SEECity.InnerNodeKinds)EditorGUILayout.EnumPopup("Inner nodes", city.InnerNodeObjects);
             city.NodeLayout = (SEECity.NodeLayouts)EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
+            city.gvlPath = EditorGUILayout.TextField("GVL file", city.gvlPath);
 
             city.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", city.ZScoreScale);
             city.ShowErosions = EditorGUILayout.Toggle("Show erosions", city.ShowErosions);
@@ -61,3 +65,5 @@ namespace SEEEditor
         }
     }
 }
+
+#endif

@@ -4,6 +4,8 @@ using System.Collections;
 using CScape;
 //using UnityEditor;
 
+#if UNITY_EDITOR
+
 namespace CScape
 {
 
@@ -48,3 +50,4 @@ namespace CScape
     }
 }
 
+#endif

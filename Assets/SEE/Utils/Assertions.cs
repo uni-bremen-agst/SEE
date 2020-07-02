@@ -17,6 +17,9 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System;
+using System.Diagnostics;
+
 namespace SEE.Utils
 {
     /// <summary>
@@ -25,6 +28,27 @@ namespace SEE.Utils
     /// </summary>
     public static class Assertions
     {
+        /// <summary>
+        /// This exception will be thrown, if an invalid code path is executed.
+        /// </summary>
+        private class InvalidCodePathException : Exception
+        {
+            /// <summary>
+            /// Exception for invalid code path without custom message.
+            /// </summary>
+            internal InvalidCodePathException()
+            {
+            }
+
+            /// <summary>
+            /// Exception for invalid code path with custom message.
+            /// </summary>
+            /// <param name="message"></param>
+            internal InvalidCodePathException(string message) : base(message)
+            {
+            }
+        }
+
         /// <summary>
         /// Checks whether <paramref name="obj"/> is null and throws a System.Exception
         /// containing the <paramref name="paramName"/> if so.
@@ -57,6 +81,33 @@ namespace SEE.Utils
                 throw new System.Exception(paramName + " must not be empty");
             }
             return obj;
+        }
+
+        /// <summary>
+        /// Throws an exception, if called. If the debugger is currently attached, the debugger
+        /// will break before throwing the exception.
+        /// </summary>
+        public static void InvalidCodePath()
+        {
+            if (Debugger.IsAttached)
+            {
+                Debugger.Break();
+            }
+            throw new InvalidCodePathException();
+        }
+
+        /// <summary>
+        /// Throws an exception with given <paramref name="message"/>, if called. If the debugger
+        /// is currently attached, the debugger will break before throwing the exception.
+        /// </summary>
+        /// <param name="message"></param>
+        public static void InvalidCodePath(string message)
+        {
+            if (Debugger.IsAttached)
+            {
+                Debugger.Break();
+            }
+            throw new InvalidCodePathException(message);
         }
     }
 }

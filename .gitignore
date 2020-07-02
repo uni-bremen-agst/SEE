@@ -98,3 +98,10 @@ $RECYCLE.BIN/
 /Assets/Resources/Sand textures pack.meta
 /Assets/Resources/Ground materials FD.meta
 /Assets/GoogleVR.meta
+
+# NetworkComms.Net
+CompleteIncomingItemTaskError*.txt
+ConnectionKeepAlivePollError*.txt
+Error*.txt
+ManagedThreadPoolCallBackError*.txt
+PacketHandlerErrorGlobal*.txt

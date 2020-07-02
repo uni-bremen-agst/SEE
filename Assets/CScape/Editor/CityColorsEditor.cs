@@ -1,6 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+
+#if UNITY_EDITOR
+
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
@@ -140,3 +141,5 @@ public class CityColorsEditor : Editor
 
 
 }
+
+#endif

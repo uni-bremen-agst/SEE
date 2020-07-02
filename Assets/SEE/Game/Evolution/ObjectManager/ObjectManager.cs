@@ -232,7 +232,7 @@ namespace SEE.Game.Evolution
         {
             ClearEdges();
             // FIXME: Provide meaningful values for scaleFactor.
-            edges = _graphRenderer.EdgeLayout(graph, nodes.Values, 1.0f); 
+            edges = _graphRenderer.EdgeLayout(graph, nodes.Values); 
         }
 
         /// <summary>

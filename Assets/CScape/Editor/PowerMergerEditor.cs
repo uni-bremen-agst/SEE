@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEditor;
 using CScape;
 
+#if UNITY_EDITOR
+
 [CustomEditor(typeof(PowerMerger))]
 public class PowerMergerEditor : Editor
 {
@@ -51,3 +53,5 @@ public class PowerMergerEditor : Editor
     // Update is called once per frame
 
 }
+
+#endif
