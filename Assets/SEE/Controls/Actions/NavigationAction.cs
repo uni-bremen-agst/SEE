@@ -49,8 +49,8 @@ namespace SEE.Controls
     public class NavigationAction : MonoBehaviour
     {
         // TODO: put these somewhere else? Materials.cs is using this as well
-        public const float TableMinX = -1.0f;
-        public const float TableMaxX = 1.0f;
+        public const float TableMinX = -0.8f;
+        public const float TableMaxX = 0.8f;
         public const float TableCenterX = (TableMinX + TableMaxX) / 2;
 
         public const float TableMinZ = -0.5f;
@@ -73,8 +73,8 @@ namespace SEE.Controls
         private const float DragFrictionFactor = 16.0f;
 
         private const float ZoomDuration = 0.1f;
-        private const uint ZoomMaxSteps = 16;
-        [Range(0.5f, 16.0f)] private const float ZoomFactor = 4.0f;
+        private const uint ZoomMaxSteps = 32;
+        private const float ZoomFactor = 0.5f;
 
 
 
@@ -88,7 +88,7 @@ namespace SEE.Controls
         private Vector3 dragVelocity;
 
         private List<ZoomCommand> zoomCommands;
-        private int zoomStepsInProgress;
+        private uint zoomStepsInProgress;
 
 
 
@@ -191,14 +191,15 @@ namespace SEE.Controls
 
             // Zoom into city
             int steps = Mathf.RoundToInt(Mathf.Clamp(Input.mouseScrollDelta.y, -1.0f, 1.0f));
-            if (steps != 0 && Mathf.Abs(zoomStepsInProgress + steps) <= ZoomMaxSteps)
+            int newZoomStepsInProgress = (int)zoomStepsInProgress + steps;
+            if (steps != 0 && newZoomStepsInProgress >= 0 && newZoomStepsInProgress <= ZoomMaxSteps)
             {
                 zoomCommands.Add(new ZoomCommand(steps, ZoomDuration));
-                zoomStepsInProgress += steps;
+                zoomStepsInProgress = (uint)newZoomStepsInProgress;
             }
             if (zoomCommands.Count != 0)
             {
-                float currentZoomSteps = (float)zoomStepsInProgress; // (-ZoomMaxSteps, ZoomMaxSteps)
+                float currentZoomSteps = (float)zoomStepsInProgress;
                 for (int i = 0; i < zoomCommands.Count; i++)
                 {
                     if (zoomCommands[i].IsFinished())
@@ -210,16 +211,13 @@ namespace SEE.Controls
                         currentZoomSteps = currentZoomSteps - zoomCommands[i].targetZoomSteps + zoomCommands[i].CurrentDeltaScale();
                     }
                 }
-                float x = (float)currentZoomSteps / ZoomMaxSteps; // (-1, 1)
-
-                float Square(float f) => f * f;
-                float y = Square(Square(x + 1.0f)) * (1.0f - (0.5f / ZoomFactor)) + (0.5f / ZoomFactor);
 
                 Vector3 offset = planeHitPoint - cityTransform.position;
                 Vector3 canonicalOffset = offset.DividePairwise(cityTransform.localScale);
+                float f = Mathf.Pow(2, currentZoomSteps * ZoomFactor);
 
                 cityTransform.position += offset;
-                cityTransform.localScale = y * originalScale;
+                cityTransform.localScale = f * originalScale;
                 cityTransform.position -= Vector3.Scale(canonicalOffset, cityTransform.localScale);
             }
         }
