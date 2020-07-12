@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace UnityEngine
 {
@@ -17,6 +18,33 @@ namespace UnityEngine
 
 namespace SEE.Controls
 {
+    internal class ZoomCommand
+    {
+        internal int targetZoomSteps;
+        internal float duration;
+        internal float startTime;
+
+        internal ZoomCommand(int targetZoomSteps, float duration)
+        {
+            this.targetZoomSteps = targetZoomSteps;
+            this.duration = duration;
+            startTime = Time.realtimeSinceStartup;
+        }
+
+        internal bool IsFinished()
+        {
+            bool result = Time.realtimeSinceStartup - startTime >= duration;
+            return result;
+        }
+
+        internal float CurrentDeltaScale()
+        {
+            float x = Mathf.Min((Time.realtimeSinceStartup - startTime) / duration, 1.0f);
+            float t = 0.5f - 0.5f * Mathf.Cos(x * Mathf.PI);
+            float result = t * (float)targetZoomSteps;
+            return result;
+        }
+    }
 
     public class NavigationAction : MonoBehaviour
     {
@@ -43,13 +71,15 @@ namespace SEE.Controls
         private const float MaxSqrDistanceZ = MaxDistanceZ * MaxDistanceZ;
 
         private const float DragFrictionFactor = 16.0f;
-        private const float ZoomDuration = 0.2f;
-        private const float ZoomMaxSteps = 4.0f;
-        private const float ZoomSpeed = 1.0f;
+
+        private const float ZoomDuration = 0.1f;
+        private const uint ZoomMaxSteps = 16;
+        [Range(0.5f, 16.0f)] private const float ZoomFactor = 4.0f;
 
 
 
         private Transform cityTransform;
+        private Vector3 originalScale;
         private Bounds cityBounds;
         private Plane raycastPlane;
 
@@ -57,18 +87,15 @@ namespace SEE.Controls
         private Vector3 dragCanonicalOffset;
         private Vector3 dragVelocity;
 
-        private bool zooming;
-        private Vector3 zoomCanonicalOffset;
-        private float zoomStartTime;
-        private Vector3 zoomStartScale;
-        private Vector3 zoomTargetScale;
-        private float zoomSteps;
+        private List<ZoomCommand> zoomCommands;
+        private int zoomStepsInProgress;
 
 
 
         private void Start()
         {
             cityTransform = GameObject.Find("Implementation").transform.GetChild(0).transform; // TODO: find it some more robust way
+            originalScale = cityTransform.localScale;
             cityBounds = cityTransform.GetComponent<MeshCollider>().bounds;
             raycastPlane = new Plane(Vector3.up, cityTransform.position);
 
@@ -76,11 +103,8 @@ namespace SEE.Controls
             dragCanonicalOffset = Vector3.zero;
             dragVelocity = Vector3.zero;
 
-            zooming = false;
-            zoomStartTime = float.MinValue;
-            zoomStartScale = cityTransform.localScale;
-            zoomTargetScale = cityTransform.localScale;
-            zoomSteps = 0.0f;
+            zoomCommands = new List<ZoomCommand>(16);
+            zoomStepsInProgress = 0;
         }
 
         private void Update()
@@ -164,42 +188,39 @@ namespace SEE.Controls
             }
 
 
-            
+
             // Zoom into city
-            float delta = Mathf.Clamp(Input.mouseScrollDelta.y, -1.0f, 1.0f);
-            if (delta != 0.0f && Mathf.Abs(zoomSteps + delta) < ZoomMaxSteps)
+            int steps = Mathf.RoundToInt(Mathf.Clamp(Input.mouseScrollDelta.y, -1.0f, 1.0f));
+            if (steps != 0 && Mathf.Abs(zoomStepsInProgress + steps) <= ZoomMaxSteps)
             {
-                zooming = true;
-
-                Vector3 scaledOffset = planeHitPoint - cityTransform.position;
-                zoomCanonicalOffset = scaledOffset.DividePairwise(cityTransform.localScale);
-
-                zoomStartTime = Time.realtimeSinceStartup;
-
-                zoomStartScale = zoomTargetScale;
-                float zoomInFactor = 2.0f * ZoomSpeed;
-                float zoomOutFactor = 1.0f / zoomInFactor;
-                float normalizedDelta = delta * 0.5f + 0.5f;
-                float zoomFactor = normalizedDelta * (zoomInFactor - zoomOutFactor) + zoomOutFactor;
-                zoomTargetScale = zoomTargetScale * zoomFactor;
-
-                zoomSteps += delta;
+                zoomCommands.Add(new ZoomCommand(steps, ZoomDuration));
+                zoomStepsInProgress += steps;
             }
-            if (zooming)
+            if (zoomCommands.Count != 0)
             {
-                float deltaTime = Time.realtimeSinceStartup - zoomStartTime;
-                float x = Mathf.Min(1.0f, deltaTime / ZoomDuration);
-                float xMinusOne = x - 1.0f;
-                float t = -(xMinusOne * xMinusOne) + 1.0f;
-
-                cityTransform.position += Vector3.Scale(zoomCanonicalOffset, cityTransform.localScale);
-                cityTransform.localScale = Vector3.Lerp(zoomStartScale, zoomTargetScale, t);
-                cityTransform.position -= Vector3.Scale(zoomCanonicalOffset, cityTransform.localScale);
-
-                if (t == 1.0f)
+                float currentZoomSteps = (float)zoomStepsInProgress; // (-ZoomMaxSteps, ZoomMaxSteps)
+                for (int i = 0; i < zoomCommands.Count; i++)
                 {
-                    zooming = false;
+                    if (zoomCommands[i].IsFinished())
+                    {
+                        zoomCommands.RemoveAt(i--);
+                    }
+                    else
+                    {
+                        currentZoomSteps = currentZoomSteps - zoomCommands[i].targetZoomSteps + zoomCommands[i].CurrentDeltaScale();
+                    }
                 }
+                float x = (float)currentZoomSteps / ZoomMaxSteps; // (-1, 1)
+
+                float Square(float f) => f * f;
+                float y = Square(Square(x + 1.0f)) * (1.0f - (0.5f / ZoomFactor)) + (0.5f / ZoomFactor);
+
+                Vector3 offset = planeHitPoint - cityTransform.position;
+                Vector3 canonicalOffset = offset.DividePairwise(cityTransform.localScale);
+
+                cityTransform.position += offset;
+                cityTransform.localScale = y * originalScale;
+                cityTransform.position -= Vector3.Scale(canonicalOffset, cityTransform.localScale);
             }
         }
     }
