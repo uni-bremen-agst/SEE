@@ -5,7 +5,6 @@ using SEE.GO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
 
@@ -95,6 +94,23 @@ namespace SEE.Charts.ChartTests
             Assert.AreEqual(3, _charts.transform.childCount);
             closeButton.onClick.Invoke();
             Assert.False(_charts.activeInHierarchy);
+        }
+
+        /// <summary>
+        ///     Checks if charts are being closed properly.
+        /// </summary>
+        /// <returns></returns>
+        [UnityTest]
+        public IEnumerator TestCloseChart()
+        {
+            _creator.CreateChart();
+            yield return new WaitForSeconds(0.2f);
+            var chart = _charts.transform.Find(ChartString);
+            var closeButton = chart.Find("LabelsPanel").Find("TopLeft").Find("DestroyButton").GetComponent<Button>();
+            closeButton.onClick.Invoke();
+            yield return new WaitForSeconds(0.2f);
+            bool destroyed = chart == null;
+            Assert.True(destroyed);
         }
 
         /// <summary>
