@@ -1232,15 +1232,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e2dc5e7bd0d4c74cb96ba1c5b4a4207, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 1231061945}
-  creator: {fileID: 1782732144}
   charts: {fileID: 1782732146}
-  closeChartsButton: {fileID: 1782732145}
-  createChartButton: {fileID: 1782732143}
   cityPrefabs:
   - {fileID: 8830010584019066110, guid: a4ad75f8bacc52a48ba96a8aef57fb48, type: 3}
   - {fileID: 1819370718149348451, guid: 4835a344b67d982439782c86357d5a7e, type: 3}
   - {fileID: 1819370718149348451, guid: d7718ff12ef01c44bbcec5dfc151bb2f, type: 3}
+  closeChartsButton: {fileID: 1782732145}
+  createChartButton: {fileID: 1782732143}
+  creator: {fileID: 1782732144}
+  manager: {fileID: 1231061945}
 --- !u!4 &597498210
 Transform:
   m_ObjectHideFlags: 0
@@ -3154,6 +3154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4876b4728ca1a1f4d9867dcdd2920755, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  handledObject: {fileID: 0}
   PullSpeed: 10
   MoveSensitivity: 0.01
 --- !u!114 &1333151384
@@ -3542,6 +3543,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4876b4728ca1a1f4d9867dcdd2920755, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  handledObject: {fileID: 0}
   PullSpeed: 10
   MoveSensitivity: 0.01
 --- !u!20 &1431838115
