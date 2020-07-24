@@ -46,6 +46,7 @@ namespace SEE.Controls
         }
     }
 
+#if false
     internal class DragPivot
     {
         private const float GoldenRatio = 1.618034f;
@@ -103,6 +104,39 @@ namespace SEE.Controls
             main.GetComponent<MeshRenderer>().sharedMaterial.color = color;
         }
     }
+#else
+    internal class DragPivot
+    {
+        private float size;
+        private GameObject pivot;
+
+        internal DragPivot(float size)
+        {
+            this.size = size;
+
+            pivot = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            pivot.transform.position = Vector3.zero;
+            pivot.transform.localScale = new Vector3(size, size, size);
+            pivot.SetActive(false);
+        }
+
+        internal void Enable(bool enable)
+        {
+            pivot.SetActive(enable);
+        }
+
+        internal void SetPositions(Vector3 startPoint, Vector3 endPoint)
+        {
+            pivot.transform.position = startPoint;
+
+            Vector3 startToEnd = endPoint - startPoint;
+            Vector3 startToEndMapped = startToEnd.normalized * 0.5f + new Vector3(0.5f, 0.5f, 0.5f);
+            Color color = new Color(startToEndMapped.x, startToEndMapped.y, startToEndMapped.z);
+
+            pivot.GetComponent<MeshRenderer>().sharedMaterial.color = color;
+        }
+    }
+#endif
 
     public class NavigationAction : MonoBehaviour
     {
@@ -128,7 +162,7 @@ namespace SEE.Controls
         private const float MaxDistanceZ = 1.2f * TableDepth;
         private const float MaxSqrDistanceZ = MaxDistanceZ * MaxDistanceZ;
 
-        private const float DragFrictionFactor = 16.0f;
+        private const float DragFrictionFactor = 32.0f;
 
         private const float ZoomDuration = 0.1f;
         private const uint ZoomMaxSteps = 32;
@@ -142,6 +176,7 @@ namespace SEE.Controls
         private Plane raycastPlane;
 
         private bool dragging;
+        private bool lockAxis;
         private Vector3 dragStartTransformPosition;
         private Vector3 dragStartOffset;
         private Vector3 dragCanonicalOffset;
@@ -204,14 +239,14 @@ namespace SEE.Controls
                     if (dragging)
                     {
                         Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
-            
+
                         Vector3 axisMask = Vector3.one;
                         if (Input.GetKey(KeyCode.LeftAlt))
                         {
                             float absX = Mathf.Abs(totalDragOffsetFromStart.x);
                             float absY = Mathf.Abs(totalDragOffsetFromStart.y);
                             float absZ = Mathf.Abs(totalDragOffsetFromStart.z);
-            
+
                             if (absX < absY || absX < absZ)
                             {
                                 axisMask.x = 0.0f;
@@ -225,10 +260,10 @@ namespace SEE.Controls
                                 axisMask.z = 0.0f;
                             }
                         }
-            
+
                         Vector3 oldPosition = cityTransform.position;
                         Vector3 newPosition = dragStartTransformPosition + Vector3.Scale(totalDragOffsetFromStart, axisMask);
-            
+
                         dragVelocity = (newPosition - oldPosition) / Time.deltaTime;
                         cityTransform.position = newPosition;
                         dragPivot.SetPositions(dragStartTransformPosition + dragStartOffset, cityTransform.position + Vector3.Scale(dragCanonicalOffset, cityTransform.localScale));
@@ -240,7 +275,7 @@ namespace SEE.Controls
                 dragging = false;
                 dragPivot.Enable(false);
             }
-            
+
             if (!dragging)
             {
                 Vector3 acceleration = Vector3.zero;
@@ -251,7 +286,7 @@ namespace SEE.Controls
                 float cityMaxX = cityTransform.position.x + (cityTransform.localScale.x * cityBounds.max.x);
                 float cityMinZ = cityTransform.position.z + (cityTransform.localScale.z * cityBounds.min.z);
                 float cityMaxZ = cityTransform.position.z + (cityTransform.localScale.z * cityBounds.max.z);
-            
+
                 if (cityMaxX < TableMinX || cityMaxZ < TableMinZ || cityMinX > TableMaxX || cityMinZ > TableMaxZ)
                 {
                     float toTableCenterX = TableCenterX - cityTransform.position.x;
@@ -266,7 +301,7 @@ namespace SEE.Controls
                     acceleration = DragFrictionFactor * -dragVelocity;
                 }
                 dragVelocity += acceleration * Time.deltaTime;
-            
+
                 float dragVelocitySqrMag = dragVelocity.sqrMagnitude;
                 if (dragVelocitySqrMag > MaxSqrVelocity)
                 {
@@ -274,7 +309,7 @@ namespace SEE.Controls
                 }
                 cityTransform.position += dragVelocity * Time.deltaTime;
             }
-            
+
             if (!dragging && zoomCommands.Count == 0)
             {
                 // TODO(torben): similar TODO as above with circular cities!
