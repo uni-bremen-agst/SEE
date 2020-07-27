@@ -107,33 +107,59 @@ namespace SEE.Controls
 #else
     internal class DragPivot
     {
-        private float size;
-        private GameObject pivot;
+        // TODO: this could be used elsewhere
+        private const string ShaderNameFG = "Unlit/3DUIShaderFG";
+        private const string ShaderNameBG = "Unlit/3DUIShaderBG";
+        private const float Alpha = 0.5f;
+
+        private readonly float size;
+        private GameObject[] pivots;
 
         internal DragPivot(float size)
         {
             this.size = size;
 
-            pivot = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            pivot.transform.position = Vector3.zero;
-            pivot.transform.localScale = new Vector3(size, size, size);
-            pivot.SetActive(false);
+            Shader[] shaders = new Shader[2]
+            {
+                Shader.Find(ShaderNameFG),
+                Shader.Find(ShaderNameBG)
+            };
+
+            pivots = new GameObject[2];
+            for (int i = 0; i < shaders.Length; i++)
+            {
+                Material material = new Material(shaders[i]);
+                pivots[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                pivots[i].GetComponent<MeshRenderer>().sharedMaterial = material;
+                pivots[i].transform.position = Vector3.zero;
+                pivots[i].transform.localScale = new Vector3(size, size, size);
+                pivots[i].SetActive(false);
+            }
         }
 
         internal void Enable(bool enable)
         {
-            pivot.SetActive(enable);
+            foreach (GameObject pivot in pivots)
+            {
+                pivot.SetActive(enable);
+            }
         }
 
         internal void SetPositions(Vector3 startPoint, Vector3 endPoint)
         {
-            pivot.transform.position = startPoint;
+            foreach (GameObject pivot in pivots)
+            {
+                pivot.transform.position = startPoint;
+            }
 
             Vector3 startToEnd = endPoint - startPoint;
             Vector3 startToEndMapped = startToEnd.normalized * 0.5f + new Vector3(0.5f, 0.5f, 0.5f);
-            Color color = new Color(startToEndMapped.x, startToEndMapped.y, startToEndMapped.z);
+            Color color = new Color(startToEndMapped.x, startToEndMapped.y, startToEndMapped.z, Alpha);
+            pivots[0].GetComponent<MeshRenderer>().sharedMaterial.color = color;
 
-            pivot.GetComponent<MeshRenderer>().sharedMaterial.color = color;
+            Color.RGBToHSV(color, out float h, out float s, out float v);
+            Color complementary = Color.HSVToRGB((h + 0.5f) % 1.0f, s, v);
+            pivots[1].GetComponent<MeshRenderer>().sharedMaterial.color = complementary;
         }
     }
 #endif
