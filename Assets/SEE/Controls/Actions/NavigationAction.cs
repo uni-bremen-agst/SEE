@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace UnityEngine
 {
@@ -46,123 +47,175 @@ namespace SEE.Controls
         }
     }
 
-#if false
-    internal class DragPivot
+    internal abstract class PivotBase
+    {
+        protected const string DefaultShaderName = "Unlit/3DUIShader";
+        protected const float DefaultPrimaryAlpha = 0.5f;
+        protected const float DefaultSecondaryAlpha = 0.5f * DefaultPrimaryAlpha;
+
+        protected readonly float scale;
+
+        protected PivotBase(float scale)
+        {
+            this.scale = scale;
+        }
+
+        internal abstract void Enable(bool enable);
+        internal abstract void SetPositions(Vector3 startPoint, Vector3 endPoint);
+
+        protected Material CreateDefaultMaterial(bool primary)
+        {
+            Shader shader = Shader.Find(DefaultShaderName);
+            Material material = null;
+            if (shader)
+            {
+                material = new Material(shader);
+                material.SetInt("_ZTest", (int)(primary ? UnityEngine.Rendering.CompareFunction.Greater : UnityEngine.Rendering.CompareFunction.LessEqual));
+            }
+            else
+            {
+                Debug.LogWarning("Shader could not be found!");
+            }
+            return material;
+        }
+
+        protected Color CreateDefaultColor(Vector3 startToEnd, bool primary)
+        {
+            float length = startToEnd.magnitude;
+            float f = Mathf.Clamp(length / (0.5f * scale), 0.0f, 1.0f);
+            Vector3 startToEndMapped = ((length == 0 ? Vector3.zero : startToEnd / length) * 0.5f + new Vector3(0.5f, 0.5f, 0.5f)) * f;
+            Color color = new Color(startToEndMapped.x, startToEndMapped.y, startToEndMapped.z, primary ? DefaultPrimaryAlpha : DefaultSecondaryAlpha);
+            return color;
+        }
+    }
+    
+    internal class LinePivot : PivotBase
     {
         private const float GoldenRatio = 1.618034f;
 
-        private float size;
-        private GameObject start;
-        private GameObject end;
-        private GameObject main;
+        private readonly GameObject[] starts;
+        private readonly GameObject[] ends;
+        private readonly GameObject[] mains;
 
-        internal DragPivot(float size)
+        internal LinePivot(float scale) : base(scale)
         {
-            this.size = size;
+            starts = new GameObject[2]
+            {
+                GameObject.CreatePrimitive(PrimitiveType.Sphere),
+                GameObject.CreatePrimitive(PrimitiveType.Sphere)
+            };
+            ends = new GameObject[2]
+            {
+                GameObject.CreatePrimitive(PrimitiveType.Sphere),
+                GameObject.CreatePrimitive(PrimitiveType.Sphere)
+            };
+            mains = new GameObject[2]
+            {
+                GameObject.CreatePrimitive(PrimitiveType.Cylinder),
+                GameObject.CreatePrimitive(PrimitiveType.Cylinder)
+            };
 
-            start = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            end = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            main = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            Material[] materials = new Material[2]
+            {
+                CreateDefaultMaterial(true),
+                CreateDefaultMaterial(false)
+            };
 
-            start.transform.position = Vector3.zero;
-            end.transform.position = Vector3.zero;
-            main.transform.position = Vector3.zero;
+            for (int i = 0; i < 2; i++)
+            {
+                starts[i].GetComponent<MeshRenderer>().sharedMaterial = materials[i];
+                ends[i].GetComponent<MeshRenderer>().sharedMaterial = materials[i];
+                mains[i].GetComponent<MeshRenderer>().sharedMaterial = materials[i];
 
-            start.transform.localScale = new Vector3(size, size, size);
-            end.transform.localScale = new Vector3(size, size, size);
-            main.transform.localScale = new Vector3(size, size, size) / GoldenRatio;
+                starts[i].transform.position = Vector3.zero;
+                ends[i].transform.position = Vector3.zero;
+                mains[i].transform.position = Vector3.zero;
 
-            start.SetActive(false);
-            end.SetActive(false);
-            main.SetActive(false);
+                starts[i].transform.localScale = new Vector3(scale, scale, scale);
+                ends[i].transform.localScale = new Vector3(scale, scale, scale);
+                mains[i].transform.localScale = new Vector3(scale, scale, scale) / GoldenRatio;
+
+                starts[i].SetActive(false);
+                ends[i].SetActive(false);
+                mains[i].SetActive(false);
+            }
         }
 
-        internal void Enable(bool enable)
+        internal override void Enable(bool enable)
         {
-            start.SetActive(enable);
-            end.SetActive(enable);
-            main.SetActive(enable);
+            for (int i = 0; i < 2; i++)
+            {
+                starts[i].SetActive(enable);
+                ends[i].SetActive(enable);
+                mains[i].SetActive(enable);
+            }
         }
 
-        internal void SetPositions(Vector3 startPoint, Vector3 endPoint)
+        internal override void SetPositions(Vector3 startPoint, Vector3 endPoint)
         {
             Vector3 startToEnd = endPoint - startPoint;
-            start.transform.up = startToEnd;
-            end.transform.up = startToEnd;
-            main.transform.up = startToEnd;
+            Color color0 = CreateDefaultColor(startToEnd, true);
+            Color color1 = CreateDefaultColor(startToEnd, false);
 
-            start.transform.position = startPoint;
-            end.transform.position = endPoint;
-            main.transform.position = (startPoint + endPoint) / 2.0f;
-            main.transform.localScale = new Vector3(size / GoldenRatio, 0.5f * startToEnd.magnitude, size / GoldenRatio);
+            for (int i = 0; i < 2; i++)
+            {
+                starts[i].transform.up = startToEnd;
+                ends[i].transform.up = startToEnd;
+                mains[i].transform.up = startToEnd;
 
-            Vector3 startToEndMapped = startToEnd.normalized * 0.5f + new Vector3(0.5f, 0.5f, 0.5f);
-            Color color = new Color(startToEndMapped.x, startToEndMapped.y, startToEndMapped.z);
+                starts[i].transform.position = startPoint;
+                ends[i].transform.position = endPoint;
+                mains[i].transform.position = (startPoint + endPoint) / 2.0f;
+                mains[i].transform.localScale = new Vector3(scale / GoldenRatio, 0.5f * startToEnd.magnitude, scale / GoldenRatio);
+            }
 
-            start.GetComponent<MeshRenderer>().sharedMaterial.color = color;
-            end.GetComponent<MeshRenderer>().sharedMaterial.color = color;
-            main.GetComponent<MeshRenderer>().sharedMaterial.color = color;
+            starts[0].GetComponent<MeshRenderer>().sharedMaterial.color = color0;
+            ends[0].GetComponent<MeshRenderer>().sharedMaterial.color = color0;
+            mains[0].GetComponent<MeshRenderer>().sharedMaterial.color = color0;
+            starts[1].GetComponent<MeshRenderer>().sharedMaterial.color = color1;
+            ends[1].GetComponent<MeshRenderer>().sharedMaterial.color = color1;
+            mains[1].GetComponent<MeshRenderer>().sharedMaterial.color = color1;
         }
     }
-#else
-    internal class DragPivot
+
+    internal class PointPivot : PivotBase
     {
-        // TODO: this could be used elsewhere
-        private const string ShaderNameFG = "Unlit/3DUIShaderFG";
-        private const string ShaderNameBG = "Unlit/3DUIShaderBG";
-        private const float Alpha = 0.5f;
+        private readonly GameObject[] pivots;
 
-        private readonly float size;
-        private GameObject[] pivots;
-
-        internal DragPivot(float size)
+        internal PointPivot(float scale) : base(scale)
         {
-            this.size = size;
-
-            Shader[] shaders = new Shader[2]
+            Material[] materials = new Material[2]
             {
-                Shader.Find(ShaderNameFG),
-                Shader.Find(ShaderNameBG)
+                CreateDefaultMaterial(true),
+                CreateDefaultMaterial(false)
             };
 
             pivots = new GameObject[2];
-            for (int i = 0; i < shaders.Length; i++)
+            for (int i = 0; i < 2; i++)
             {
-                Material material = new Material(shaders[i]);
                 pivots[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                pivots[i].GetComponent<MeshRenderer>().sharedMaterial = material;
+                pivots[i].GetComponent<MeshRenderer>().sharedMaterial = materials[i];
                 pivots[i].transform.position = Vector3.zero;
-                pivots[i].transform.localScale = new Vector3(size, size, size);
+                pivots[i].transform.localScale = new Vector3(scale, scale, scale);
                 pivots[i].SetActive(false);
             }
         }
 
-        internal void Enable(bool enable)
+        internal override void Enable(bool enable)
         {
-            foreach (GameObject pivot in pivots)
-            {
-                pivot.SetActive(enable);
-            }
+            pivots[0].SetActive(enable);
+            pivots[1].SetActive(enable);
         }
 
-        internal void SetPositions(Vector3 startPoint, Vector3 endPoint)
+        internal override void SetPositions(Vector3 startPoint, Vector3 endPoint)
         {
-            foreach (GameObject pivot in pivots)
-            {
-                pivot.transform.position = startPoint;
-            }
-
+            pivots[0].transform.position = startPoint;
+            pivots[1].transform.position = startPoint;
             Vector3 startToEnd = endPoint - startPoint;
-            Vector3 startToEndMapped = startToEnd.normalized * 0.5f + new Vector3(0.5f, 0.5f, 0.5f);
-            Color color = new Color(startToEndMapped.x, startToEndMapped.y, startToEndMapped.z, Alpha);
-            pivots[0].GetComponent<MeshRenderer>().sharedMaterial.color = color;
-
-            Color.RGBToHSV(color, out float h, out float s, out float v);
-            Color complementary = Color.HSVToRGB((h + 0.5f) % 1.0f, s, v);
-            pivots[1].GetComponent<MeshRenderer>().sharedMaterial.color = complementary;
+            pivots[0].GetComponent<MeshRenderer>().sharedMaterial.color = CreateDefaultColor(startToEnd, true);
+            pivots[1].GetComponent<MeshRenderer>().sharedMaterial.color = CreateDefaultColor(startToEnd, false);
         }
     }
-#endif
 
     public class NavigationAction : MonoBehaviour
     {
@@ -207,7 +260,7 @@ namespace SEE.Controls
         private Vector3 dragStartOffset;
         private Vector3 dragCanonicalOffset;
         private Vector3 dragVelocity;
-        private DragPivot dragPivot;
+        private PivotBase pivot;
 
         private List<ZoomCommand> zoomCommands;
         private uint zoomStepsInProgress;
@@ -225,7 +278,7 @@ namespace SEE.Controls
             dragStartTransformPosition = cityTransform.position;
             dragCanonicalOffset = Vector3.zero;
             dragVelocity = Vector3.zero;
-            dragPivot = new DragPivot(0.008f * (TableWidth < TableDepth ? TableWidth : TableDepth));
+            pivot = new LinePivot(0.008f * (TableWidth < TableDepth ? TableWidth : TableDepth));
 
             zoomCommands = new List<ZoomCommand>((int)ZoomMaxSteps);
             zoomStepsInProgress = 0;
@@ -246,7 +299,7 @@ namespace SEE.Controls
             {
                 dragging = false;
                 dragVelocity = Vector3.zero;
-                dragPivot.Enable(false);
+                pivot.Enable(false);
                 cityTransform.position = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, cityTransform.localScale);
             }
             else if (Input.GetMouseButton(2))
@@ -260,7 +313,7 @@ namespace SEE.Controls
                         dragStartOffset = planeHitPoint - cityTransform.position;
                         dragCanonicalOffset = dragStartOffset.DividePairwise(cityTransform.localScale);
                         dragVelocity = Vector3.zero;
-                        dragPivot.Enable(true);
+                        pivot.Enable(true);
                     }
                     if (dragging)
                     {
@@ -292,14 +345,14 @@ namespace SEE.Controls
 
                         dragVelocity = (newPosition - oldPosition) / Time.deltaTime;
                         cityTransform.position = newPosition;
-                        dragPivot.SetPositions(dragStartTransformPosition + dragStartOffset, cityTransform.position + Vector3.Scale(dragCanonicalOffset, cityTransform.localScale));
+                        pivot.SetPositions(dragStartTransformPosition + dragStartOffset, cityTransform.position + Vector3.Scale(dragCanonicalOffset, cityTransform.localScale));
                     }
                 }
             }
             else if (dragging)
             {
                 dragging = false;
-                dragPivot.Enable(false);
+                pivot.Enable(false);
             }
 
             if (!dragging)
