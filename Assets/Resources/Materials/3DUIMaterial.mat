@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 3DUIMaterialFG
-  m_Shader: {fileID: 4800000, guid: 123edeb8036cbd6449cae6ab4d03d04c, type: 3}
+  m_Name: 3DUIMaterial
+  m_Shader: {fileID: 4800000, guid: aa95ab394630b864c86324815e342ffd, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -73,5 +73,5 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0, g: 0.7641752, b: 1, a: 0.5019608}
+    - _Color: {r: 0, g: 1, b: 1, a: 0.5019608}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
