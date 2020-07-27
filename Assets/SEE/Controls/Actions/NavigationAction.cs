@@ -49,8 +49,8 @@ namespace SEE.Controls
         private const float MaxDistanceZ = 1.2f * Table.Depth;
         private const float MaxSqrDistanceZ = MaxDistanceZ * MaxDistanceZ;
 
-        private const float LockedStepCount = 7;
-        private const float LockedStepAngle = 360.0f / LockedStepCount;
+        private const float SnapStepCount = 7;
+        private const float SnapStepAngle = 360.0f / SnapStepCount;
         private const float DragFrictionFactor = 32.0f;
 
         private const float ZoomDuration = 0.1f;
@@ -68,7 +68,7 @@ namespace SEE.Controls
         private bool startDrag;
         private bool drag;
         private bool cancel;
-        private bool lockAxisButton;
+        private bool snapButton;
         private Vector3 mousePosition;
         private float mouseScrollDelta;
 
@@ -78,7 +78,8 @@ namespace SEE.Controls
         private Vector3 dragStartOffset;
         private Vector3 dragCanonicalOffset;
         private Vector3 moveVelocity;
-        private PivotBase pivot;
+        private MovePivotBase movePivot;
+        private RotatePivot rotatePivot;
 
         private float startAngleDeg;
 
@@ -98,7 +99,8 @@ namespace SEE.Controls
             dragStartTransformPosition = cityTransform.position;
             dragCanonicalOffset = Vector3.zero;
             moveVelocity = Vector3.zero;
-            pivot = new LinePivot(0.008f * Table.MinDimXZ);
+            movePivot = new LineMovePivot(0.008f * Table.MinDimXZ);
+            rotatePivot = new RotatePivot(1024);
 
             zoomCommands = new List<ZoomCommand>((int)ZoomMaxSteps);
             zoomStepsInProgress = 0;
@@ -107,11 +109,10 @@ namespace SEE.Controls
         private void Update()
         {
             // Input MUST NOT be inquired in FixedUpdate()!
-
             startDrag |= Input.GetMouseButtonDown(2);
             drag = Input.GetMouseButton(2);
             cancel |= Input.GetKeyDown(KeyCode.Escape);
-            lockAxisButton = Input.GetKey(KeyCode.LeftAlt);
+            snapButton = Input.GetKey(KeyCode.LeftAlt);
             mouseScrollDelta = Input.mouseScrollDelta.y;
             mousePosition = Input.mousePosition;
 
@@ -119,14 +120,16 @@ namespace SEE.Controls
             {
                 mode = NavigationMode.Move;
                 movingOrRotating = false;
-                pivot.Enable(false);
+                movePivot.Enable(false);
             }
             else if (Input.GetKeyDown(KeyCode.R))
             {
                 mode = NavigationMode.Rotate;
                 movingOrRotating = false;
-                pivot.Enable(false);
+                movePivot.Enable(false);
             }
+
+            rotatePivot.Radius = 0.8f * (Camera.main.transform.position - rotatePivot.Center).magnitude; // TODO(torben): make this smaller and increase thickness of circle
         }
 
         private void FixedUpdate()
@@ -146,7 +149,7 @@ namespace SEE.Controls
                     {
                         movingOrRotating = false;
                         moveVelocity = Vector3.zero;
-                        pivot.Enable(false);
+                        movePivot.Enable(false);
                         cityTransform.position = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, cityTransform.localScale);
                     }
                 }
@@ -162,21 +165,15 @@ namespace SEE.Controls
                             dragStartOffset = planeHitPoint - cityTransform.position;
                             dragCanonicalOffset = dragStartOffset.DividePairwise(cityTransform.localScale);
                             moveVelocity = Vector3.zero;
-                            pivot.Enable(true);
+                            movePivot.Enable(true);
                         }
                         if (movingOrRotating)
                         {
                             Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
 
-                            if (lockAxisButton)
+                            if (snapButton)
                             {
-                                Vector2 totalDragOffsetFromStart2 = new Vector2(totalDragOffsetFromStart.x, totalDragOffsetFromStart.z);
-                                float angleDeg = totalDragOffsetFromStart2.Angle360();
-                                float lockedAngleDeg = Mathf.Round(angleDeg / LockedStepAngle) * LockedStepAngle;
-                                float lockedAngleRad = Mathf.Deg2Rad * lockedAngleDeg;
-                                Vector2 axis = new Vector2(Mathf.Cos(lockedAngleRad), Mathf.Sin(-lockedAngleRad));
-                                Vector2 proj = axis * Vector2.Dot(totalDragOffsetFromStart2, axis);
-                                totalDragOffsetFromStart = new Vector3(proj.x, totalDragOffsetFromStart.y, proj.y);
+                                totalDragOffsetFromStart = Project(totalDragOffsetFromStart);
                             }
 
                             Vector3 oldPosition = cityTransform.position;
@@ -184,19 +181,23 @@ namespace SEE.Controls
 
                             moveVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime;
                             cityTransform.position = newPosition;
-                            pivot.SetPositions(dragStartTransformPosition + dragStartOffset, cityTransform.position + Vector3.Scale(dragCanonicalOffset, cityTransform.localScale));
+                            movePivot.SetPositions(dragStartTransformPosition + dragStartOffset, cityTransform.position + Vector3.Scale(dragCanonicalOffset, cityTransform.localScale));
                         }
                     }
                 }
                 else if (movingOrRotating)
                 {
                     movingOrRotating = false;
-                    pivot.Enable(false);
+                    movePivot.Enable(false);
                 }
             }
             else // mode = Mode.Rotate
             {
-                if (drag)
+                if (cancel)
+                {
+
+                }
+                else if (drag)
                 {
                     Vector2 toHit = new Vector2(planeHitPoint.x - cityTransform.position.x, planeHitPoint.z - cityTransform.position.z);
                     if (startDrag)
@@ -204,17 +205,25 @@ namespace SEE.Controls
                         startDrag = false;
                         movingOrRotating = true;
                         startAngleDeg = cityTransform.rotation.eulerAngles.y - toHit.Angle360();
+                        rotatePivot.Center = cityTransform.position;
+                        rotatePivot.Enable(true);
                     }
                     float angle = startAngleDeg + toHit.Angle360();
-                    if (lockAxisButton)
+                    
+                    //Vector3 pivotEndPoint = planeHitPoint;
+                    if (snapButton)
                     {
-                        angle = Mathf.Round(angle / LockedStepAngle) * LockedStepAngle;
+                        angle = Mathf.Round(angle / SnapStepAngle) * SnapStepAngle;
+                        //pivotEndPoint = cityTransform.position + Project(planeHitPoint - cityTransform.position);
                     }
+                    //movePivot.SetPositions(cityTransform.position, pivotEndPoint);
+                    
                     cityTransform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
                 }
                 else if (movingOrRotating)
                 {
                     movingOrRotating = false;
+                    rotatePivot.Enable(false);
                 }
             }
 
@@ -308,6 +317,18 @@ namespace SEE.Controls
                 dragStartOffset = Vector3.Scale(dragCanonicalOffset, cityTransform.localScale);
                 dragStartTransformPosition -= dragStartOffset;
             }
+        }
+
+        private Vector3 Project(Vector3 offset)
+        {
+            Vector2 point2 = new Vector2(offset.x, offset.z);
+            float angleDeg = point2.Angle360();
+            float snappedAngleDeg = Mathf.Round(angleDeg / SnapStepAngle) * SnapStepAngle;
+            float snappedAngleRad = Mathf.Deg2Rad * snappedAngleDeg;
+            Vector2 dir = new Vector2(Mathf.Cos(snappedAngleRad), Mathf.Sin(-snappedAngleRad));
+            Vector2 proj = dir * Vector2.Dot(point2, dir);
+            Vector3 result = new Vector3(proj.x, offset.y, proj.y);
+            return result;
         }
     }
 }
