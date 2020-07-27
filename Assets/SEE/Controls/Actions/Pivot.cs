@@ -184,8 +184,10 @@ namespace SEE.Controls
 
         internal RotatePivot(int textureResolution)
         {
-            // TODO(torben): this does not support an odd resolution right now
-            Texture2D texture = CreateCircleOutlineTexture(textureResolution / 2);
+            int outer = textureResolution / 2;
+            int inner = Mathf.RoundToInt((float)outer * 0.98f);
+            Texture2D texture = CreateCircleOutlineTexture(outer, inner);
+            texture.filterMode = FilterMode.Point; // TODO(torben): remove!
             circle = GameObject.CreatePrimitive(PrimitiveType.Quad);
             circle.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
             circle.transform.position = new Vector3(0.0f, 1.0f, 0.0f);
@@ -201,56 +203,86 @@ namespace SEE.Controls
             circle.SetActive(enable);
         }
 
-        private Texture2D CreateCircleOutlineTexture(int radiusInPixels)
+        private Texture2D CreateCircleOutlineTexture(int outer, int inner)
         {
-            Texture2D result = new Texture2D(2 * radiusInPixels, 2 * radiusInPixels, TextureFormat.R8, false);
+            int size = 2 * outer + 1;
+            Texture2D result = new Texture2D(size, size, TextureFormat.R8, false);
 
             Color pixelColor = new Color(DefaultPrimaryAlpha, 0.0f, 0.0f, 0.0f);
             Color noPixelColor = new Color(0.0f, 0.0f, 0.0f, 0.0f);
-            Color[] colors = new Color[4 * radiusInPixels * radiusInPixels];
+            Color[] colors = new Color[size * size];
             for (int i = 0; i < colors.Length; i++)
             {
                 colors[i] = noPixelColor;
             }
             result.SetPixels(colors);
 
-            int rSqr = radiusInPixels * radiusInPixels;
-            int x0 = radiusInPixels;
-            int y0 = 0;
-            int x = x0;
-            int y = y0;
+            int xc = outer;
+            int yc = outer;
+            int xo = outer;
+            int xi = inner;
+            int y = 0;
+            int erro = 1 - xo;
+            int erri = 1 - xi;
 
-            int SquaredRadiusError(int xi, int yi)
+            void XLine(Texture2D _tex, int _x1, int _x2, int _y, Color _color)
             {
-                int radiusError = xi * xi + yi * yi - rSqr;
-                return radiusError * radiusError;
-            }
-
-            void Draw(int xi, int yi)
-            {
-                // octants are drawn counter-clockwise
-                result.SetPixel(radiusInPixels - 1 + xi, radiusInPixels - 1 + yi, pixelColor);
-                result.SetPixel(radiusInPixels - 1 + yi, radiusInPixels - 1 + xi, pixelColor);
-                result.SetPixel(radiusInPixels - yi, radiusInPixels - 1 + xi, pixelColor);
-                result.SetPixel(radiusInPixels - xi, radiusInPixels - 1 + yi, pixelColor);
-                result.SetPixel(radiusInPixels - xi, radiusInPixels - yi, pixelColor);
-                result.SetPixel(radiusInPixels - yi, radiusInPixels - xi, pixelColor);
-                result.SetPixel(radiusInPixels - 1 + yi, radiusInPixels - xi, pixelColor);
-                result.SetPixel(radiusInPixels - 1 + xi, radiusInPixels - yi, pixelColor);
-            }
-
-            while (x > y)
-            {
-                Draw(x, y);
-                if (SquaredRadiusError(x - 1, y + 1) < SquaredRadiusError(x, y + 1))
+                while (_x1 <= _x2)
                 {
-                    x--;
+                    _tex.SetPixel(_x1++, _y, _color);
                 }
-                y++;
             }
-            Draw(x, y);
-            result.Apply(true, true);
 
+            void YLine(Texture2D _tex, int _x, int _y1, int _y2, Color _color)
+            {
+                while (_y1 <= _y2)
+                {
+                    _tex.SetPixel(_x, _y1++, _color);
+                }
+            }
+
+            while (xo >= y)
+            {
+                XLine(result, xc + xi, xc + xo, yc + y, pixelColor);
+                YLine(result, xc + y, yc + xi, yc + xo, pixelColor);
+                XLine(result, xc - xo, xc - xi, yc + y, pixelColor);
+                YLine(result, xc - y, yc + xi, yc + xo, pixelColor);
+                XLine(result, xc - xo, xc - xi, yc - y, pixelColor);
+                YLine(result, xc - y, yc - xo, yc - xi, pixelColor);
+                XLine(result, xc + xi, xc + xo, yc - y, pixelColor);
+                YLine(result, xc + y, yc - xo, yc - xi, pixelColor);
+
+                y++;
+
+                if (erro < 0)
+                {
+                    erro += 2 * y + 1;
+                }
+                else
+                {
+                    xo--;
+                    erro += 2 * (y - xo + 1);
+                }
+
+                if (y > inner)
+                {
+                    xi = y;
+                }
+                else
+                {
+                    if (erri < 0)
+                    {
+                        erri += 2 * y + 1;
+                    }
+                    else
+                    {
+                        xi--;
+                        erri += 2 * (y - xi + 1);
+                    }
+                }
+            }
+
+            result.Apply(true, true);
             return result;
         }
     }

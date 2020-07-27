@@ -129,7 +129,7 @@ namespace SEE.Controls
                 movePivot.Enable(false);
             }
 
-            rotatePivot.Radius = 0.8f * (Camera.main.transform.position - rotatePivot.Center).magnitude; // TODO(torben): make this smaller and increase thickness of circle
+            rotatePivot.Radius = 0.2f * (Camera.main.transform.position - rotatePivot.Center).magnitude;
         }
 
         private void FixedUpdate()
