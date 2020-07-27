@@ -6,7 +6,7 @@ namespace SEE.Controls
 
     public class NavigationAction : MonoBehaviour
     {
-        private enum Mode
+        private enum NavigationMode
         {
             Move = 0,
             Rotate
@@ -41,26 +41,12 @@ namespace SEE.Controls
             }
         }
 
-        // TODO(torben): put these somewhere else? Materials.cs is using this as well
-        public const float TableMinX = -0.8f;
-        public const float TableMaxX = 0.8f;
-        public const float TableCenterX = (TableMinX + TableMaxX) / 2;
-
-        public const float TableMinZ = -0.5f;
-        public const float TableMaxZ = 0.5f;
-        public const float TableCenterZ = (TableMinZ + TableMaxZ) / 2;
-
-        public const float TableWidth = TableMaxX - TableMinX;
-        public const float TableDepth = TableMaxZ - TableMinZ;
-
-
-
         private const float MaxVelocity = 10.0f;
         private const float MaxSqrVelocity = MaxVelocity * MaxVelocity;
 
-        private const float MaxDistanceX = 1.2f * TableWidth;
+        private const float MaxDistanceX = 1.2f * Table.Width;
         private const float MaxSqrDistanceX = MaxDistanceX * MaxDistanceX;
-        private const float MaxDistanceZ = 1.2f * TableDepth;
+        private const float MaxDistanceZ = 1.2f * Table.Depth;
         private const float MaxSqrDistanceZ = MaxDistanceZ * MaxDistanceZ;
 
         private const float DragFrictionFactor = 32.0f;
@@ -77,20 +63,19 @@ namespace SEE.Controls
         private Plane raycastPlane;
 
         // Buttons
-        private bool dragButtonDown;
-        private bool dragButton;
-        private bool cancelButtonDown;
-        private bool cancelButton;
+        private bool startDrag;
+        private bool drag;
+        private bool cancel;
         private bool lockAxisButton;
         private Vector3 mousePosition;
         private float mouseScrollDelta;
 
-        private Mode mode;
-        private bool dragging;
+        private NavigationMode mode;
+        private bool movingOrRotating;
         private Vector3 dragStartTransformPosition;
         private Vector3 dragStartOffset;
         private Vector3 dragCanonicalOffset;
-        private Vector3 dragVelocity;
+        private Vector3 moveVelocity;
         private PivotBase pivot;
 
         private float startAngleDeg;
@@ -107,11 +92,11 @@ namespace SEE.Controls
             cityBounds = cityTransform.GetComponent<MeshCollider>().bounds;
             raycastPlane = new Plane(Vector3.up, cityTransform.position);
 
-            dragging = false;
+            movingOrRotating = false;
             dragStartTransformPosition = cityTransform.position;
             dragCanonicalOffset = Vector3.zero;
-            dragVelocity = Vector3.zero;
-            pivot = new LinePivot(0.008f * (TableWidth < TableDepth ? TableWidth : TableDepth));
+            moveVelocity = Vector3.zero;
+            pivot = new LinePivot(0.008f * Table.MinDimXZ);
 
             zoomCommands = new List<ZoomCommand>((int)ZoomMaxSteps);
             zoomStepsInProgress = 0;
@@ -121,24 +106,23 @@ namespace SEE.Controls
         {
             // Input MUST NOT be inquired in FixedUpdate()!
 
-            dragButtonDown |= Input.GetMouseButtonDown(2);
-            dragButton = Input.GetMouseButton(2);
-            cancelButtonDown |= Input.GetKeyDown(KeyCode.Escape);
-            cancelButton = Input.GetKey(KeyCode.Escape);
+            startDrag |= Input.GetMouseButtonDown(2);
+            drag = Input.GetMouseButton(2);
+            cancel |= Input.GetKeyDown(KeyCode.Escape);
             lockAxisButton = Input.GetKey(KeyCode.LeftAlt);
             mouseScrollDelta = Input.mouseScrollDelta.y;
             mousePosition = Input.mousePosition;
 
             if (Input.GetKeyDown(KeyCode.M))
             {
-                mode = Mode.Move;
-                dragging = false;
+                mode = NavigationMode.Move;
+                movingOrRotating = false;
                 pivot.Enable(false);
             }
             else if (Input.GetKeyDown(KeyCode.R))
             {
-                mode = Mode.Rotate;
-                dragging = false;
+                mode = NavigationMode.Rotate;
+                movingOrRotating = false;
                 pivot.Enable(false);
             }
         }
@@ -151,34 +135,34 @@ namespace SEE.Controls
             bool raycastResult = raycastPlane.Raycast(ray, out float enter);
             Vector3 planeHitPoint = ray.GetPoint(enter);
 
-            if (mode == Mode.Move)
+            if (mode == NavigationMode.Move)
             {
-                if (cancelButtonDown)
+                if (cancel)
                 {
-                    cancelButtonDown = false;
-                    if (dragging)
+                    cancel = false;
+                    if (movingOrRotating)
                     {
-                        dragging = false;
-                        dragVelocity = Vector3.zero;
+                        movingOrRotating = false;
+                        moveVelocity = Vector3.zero;
                         pivot.Enable(false);
                         cityTransform.position = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, cityTransform.localScale);
                     }
                 }
-                else if (dragButton)
+                else if (drag)
                 {
                     if (raycastResult)
                     {
-                        if (!dragging && dragButtonDown)
+                        if (!movingOrRotating && startDrag)
                         {
-                            dragButtonDown = false;
-                            dragging = true;
+                            startDrag = false;
+                            movingOrRotating = true;
                             dragStartTransformPosition = cityTransform.position;
                             dragStartOffset = planeHitPoint - cityTransform.position;
                             dragCanonicalOffset = dragStartOffset.DividePairwise(cityTransform.localScale);
-                            dragVelocity = Vector3.zero;
+                            moveVelocity = Vector3.zero;
                             pivot.Enable(true);
                         }
-                        if (dragging)
+                        if (movingOrRotating)
                         {
                             Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
 
@@ -206,38 +190,43 @@ namespace SEE.Controls
                             Vector3 oldPosition = cityTransform.position;
                             Vector3 newPosition = dragStartTransformPosition + Vector3.Scale(totalDragOffsetFromStart, axisMask);
 
-                            dragVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime;
+                            moveVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime;
                             cityTransform.position = newPosition;
                             pivot.SetPositions(dragStartTransformPosition + dragStartOffset, cityTransform.position + Vector3.Scale(dragCanonicalOffset, cityTransform.localScale));
                         }
                     }
                 }
-                else if (dragging)
+                else if (movingOrRotating)
                 {
-                    dragging = false;
+                    movingOrRotating = false;
                     pivot.Enable(false);
                 }
             }
             else // mode = Mode.Rotate
             {
-                if (dragButton)
+                if (drag)
                 {
                     Vector2 toHit = new Vector2(planeHitPoint.x - cityTransform.position.x, planeHitPoint.z - cityTransform.position.z);
-                    if (dragButtonDown)
+                    if (startDrag)
                     {
-                        dragButtonDown = false;
-                        dragging = true;
+                        startDrag = false;
+                        movingOrRotating = true;
                         startAngleDeg = cityTransform.rotation.eulerAngles.y - toHit.Angle360();
                     }
-                    cityTransform.rotation = Quaternion.Euler(0.0f, startAngleDeg + toHit.Angle360(), 0.0f);
+                    float angle = startAngleDeg + toHit.Angle360();
+                    if (lockAxisButton)
+                    {
+                        angle = Mathf.Round(angle / 90.0f) * 90.0f;
+                    }
+                    cityTransform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
                 }
-                else if (dragging)
+                else if (movingOrRotating)
                 {
-                    dragging = false;
+                    movingOrRotating = false;
                 }
             }
 
-            if (!dragging)
+            if (!movingOrRotating)
             {
                 Vector3 acceleration = Vector3.zero;
 
@@ -248,10 +237,10 @@ namespace SEE.Controls
                 float cityMinZ = cityTransform.position.z + (cityTransform.localScale.z * cityBounds.min.z);
                 float cityMaxZ = cityTransform.position.z + (cityTransform.localScale.z * cityBounds.max.z);
 
-                if (cityMaxX < TableMinX || cityMaxZ < TableMinZ || cityMinX > TableMaxX || cityMinZ > TableMaxZ)
+                if (cityMaxX < Table.MinX || cityMaxZ < Table.MinZ || cityMinX > Table.MaxX || cityMinZ > Table.MaxZ)
                 {
-                    float toTableCenterX = TableCenterX - cityTransform.position.x;
-                    float toTableCenterZ = TableCenterZ - cityTransform.position.z;
+                    float toTableCenterX = Table.CenterX - cityTransform.position.x;
+                    float toTableCenterZ = Table.CenterZ - cityTransform.position.z;
                     float length = Mathf.Sqrt(toTableCenterX * toTableCenterX + toTableCenterZ * toTableCenterZ);
                     toTableCenterX /= length;
                     toTableCenterZ /= length;
@@ -259,30 +248,30 @@ namespace SEE.Controls
                 }
                 else
                 {
-                    acceleration = DragFrictionFactor * -dragVelocity;
+                    acceleration = DragFrictionFactor * -moveVelocity;
                 }
-                dragVelocity += acceleration * Time.fixedDeltaTime;
+                moveVelocity += acceleration * Time.fixedDeltaTime;
 
-                float dragVelocitySqrMag = dragVelocity.sqrMagnitude;
+                float dragVelocitySqrMag = moveVelocity.sqrMagnitude;
                 if (dragVelocitySqrMag > MaxSqrVelocity)
                 {
-                    dragVelocity = dragVelocity / Mathf.Sqrt(dragVelocitySqrMag) * MaxVelocity;
+                    moveVelocity = moveVelocity / Mathf.Sqrt(dragVelocitySqrMag) * MaxVelocity;
                 }
-                cityTransform.position += dragVelocity * Time.fixedDeltaTime;
+                cityTransform.position += moveVelocity * Time.fixedDeltaTime;
             }
 
-            if (!dragging && zoomCommands.Count == 0)
+            if (!movingOrRotating && zoomCommands.Count == 0)
             {
                 // TODO(torben): similar TODO as above with circular cities!
-                float tableToCityCenterX = cityTransform.position.x - TableCenterX;
-                float tableToCityCenterZ = cityTransform.position.z - TableCenterZ;
+                float tableToCityCenterX = cityTransform.position.x - Table.CenterX;
+                float tableToCityCenterZ = cityTransform.position.z - Table.CenterZ;
                 float distance = Mathf.Sqrt(tableToCityCenterX * tableToCityCenterX + tableToCityCenterZ * tableToCityCenterZ);
                 float maxDistance = Mathf.Max(cityTransform.localScale.x * MaxDistanceX, cityTransform.localScale.z * MaxDistanceZ);
                 if (distance > maxDistance)
                 {
                     float offsetX = tableToCityCenterX / distance * maxDistance;
                     float offsetZ = tableToCityCenterZ / distance * maxDistance;
-                    cityTransform.position = new Vector3(TableCenterX + offsetX, cityTransform.position.y, TableCenterZ + offsetZ);
+                    cityTransform.position = new Vector3(Table.CenterX + offsetX, cityTransform.position.y, Table.CenterZ + offsetZ);
                 }
             }
 
