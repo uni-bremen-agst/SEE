@@ -32,9 +32,9 @@
         ///      '       |       '
         ///     '        |        '
         /// 180 +--------+--------+ 0
-        ///     ,        |        ,
-        ///      ,       |       ,
-        ///  y     -, _  |  _ ,-
+        ///     .        |        .
+        ///      .       |       .
+        ///  y     -. _  |  _ .-
         ///  ^           90
         ///  |
         ///  +---> x
@@ -44,7 +44,7 @@
         /// <returns>The angle of given vector.</returns>
         public static float Angle360(this Vector2 a)
         {
-            float result = (Mathf.Atan2(-a.y, a.x) / Mathf.PI * 180f);
+            float result = Mathf.Atan2(-a.y, a.x) / Mathf.PI * 180f;
             if (result < 0.0f)
             {
                 result += 360.0f;

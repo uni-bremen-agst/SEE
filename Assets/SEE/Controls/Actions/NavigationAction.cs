@@ -49,6 +49,8 @@ namespace SEE.Controls
         private const float MaxDistanceZ = 1.2f * Table.Depth;
         private const float MaxSqrDistanceZ = MaxDistanceZ * MaxDistanceZ;
 
+        private const float LockedStepCount = 7;
+        private const float LockedStepAngle = 360.0f / LockedStepCount;
         private const float DragFrictionFactor = 32.0f;
 
         private const float ZoomDuration = 0.1f;
@@ -166,29 +168,19 @@ namespace SEE.Controls
                         {
                             Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
 
-                            Vector3 axisMask = Vector3.one;
                             if (lockAxisButton)
                             {
-                                float absX = Mathf.Abs(totalDragOffsetFromStart.x);
-                                float absY = Mathf.Abs(totalDragOffsetFromStart.y);
-                                float absZ = Mathf.Abs(totalDragOffsetFromStart.z);
-
-                                if (absX < absY || absX < absZ)
-                                {
-                                    axisMask.x = 0.0f;
-                                }
-                                if (absY < absX || absY < absZ)
-                                {
-                                    axisMask.y = 0.0f;
-                                }
-                                if (absZ < absX || absZ < absY)
-                                {
-                                    axisMask.z = 0.0f;
-                                }
+                                Vector2 totalDragOffsetFromStart2 = new Vector2(totalDragOffsetFromStart.x, totalDragOffsetFromStart.z);
+                                float angleDeg = totalDragOffsetFromStart2.Angle360();
+                                float lockedAngleDeg = Mathf.Round(angleDeg / LockedStepAngle) * LockedStepAngle;
+                                float lockedAngleRad = Mathf.Deg2Rad * lockedAngleDeg;
+                                Vector2 axis = new Vector2(Mathf.Cos(lockedAngleRad), Mathf.Sin(-lockedAngleRad));
+                                Vector2 proj = axis * Vector2.Dot(totalDragOffsetFromStart2, axis);
+                                totalDragOffsetFromStart = new Vector3(proj.x, totalDragOffsetFromStart.y, proj.y);
                             }
 
                             Vector3 oldPosition = cityTransform.position;
-                            Vector3 newPosition = dragStartTransformPosition + Vector3.Scale(totalDragOffsetFromStart, axisMask);
+                            Vector3 newPosition = dragStartTransformPosition + totalDragOffsetFromStart;
 
                             moveVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime;
                             cityTransform.position = newPosition;
@@ -216,7 +208,7 @@ namespace SEE.Controls
                     float angle = startAngleDeg + toHit.Angle360();
                     if (lockAxisButton)
                     {
-                        angle = Mathf.Round(angle / 90.0f) * 90.0f;
+                        angle = Mathf.Round(angle / LockedStepAngle) * LockedStepAngle;
                     }
                     cityTransform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
                 }
