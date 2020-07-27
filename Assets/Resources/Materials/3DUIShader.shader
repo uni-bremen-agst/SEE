@@ -1,4 +1,4 @@
-﻿Shader "Unlit/3DUIShaderBG"
+﻿Shader "Unlit/3DUIShader"
 {
     Properties
     {
@@ -13,7 +13,7 @@
 			"RenderType" = "Transparent"
 		}
 
-		ZTest Greater
+		ZTest[_ZTest]
 		ZWrite Off
 		Blend SrcAlpha OneMinusSrcAlpha
 
