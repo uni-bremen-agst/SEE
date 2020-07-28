@@ -60,29 +60,38 @@
             {
 				const float PI = 3.14159274;
 
-				float alpha = tex2D(_MainTex, i.uv).r;
-				fixed4 col = fixed4(_Color.r, _Color.g, _Color.b, alpha);
+				fixed4 color = fixed4(_Color.r, _Color.g, _Color.b, tex2D(_MainTex, i.uv).r);
+				float2 dir = (i.uv - 0.5);
 
-				float2 uv = (i.uv - 0.5);
-				float2 dir = uv - float2(0.0, 0.0);
-				float angle = atan2(-dir.y, dir.x);
-				angle += angle < 0.0 ? 2.0 * PI : 0.0;
-
-				if (_MaxAngle < _MinAngle)
+				if (dot(dir, dir) < 0.25)
 				{
-					if (angle < _MaxAngle)
+					while (_MaxAngle < 0.0)
+						_MaxAngle += 4.0 * PI;
+
+					float angle = atan2(-dir.y, dir.x);
+					float delta = _MaxAngle - _MinAngle;
+					bool invert = abs(delta) % (4.0 * PI) > 2.0 * PI;
+
+					while (_MaxAngle >= 2.0 * PI && _MaxAngle - 2.0 * PI > _MinAngle)
+						_MaxAngle -= 2.0 * PI;
+
+					if (_MaxAngle < _MinAngle)
 					{
-						angle += 360.0f;
+						float temp = _MinAngle;
+						_MinAngle = _MaxAngle;
+						_MaxAngle = temp;
 					}
-					_MaxAngle += 360.0f;
+					while (angle < _MinAngle)
+						angle += 2.0 * PI;
+
+					bool cond = angle >= _MinAngle && angle <= _MaxAngle;
+					if ((!invert && cond) || (invert && !cond))
+					{
+						color = fixed4(_Color.r, _Color.g, _Color.b, _Alpha);
+					}
 				}
 
-				if (dot(uv, uv) < 0.25 && angle >= _MinAngle && angle <= _MaxAngle)
-				{
-					col = fixed4(_Color.r, _Color.g, _Color.b, _Alpha);
-				}
-
-                return col;
+                return color;
             }
             ENDCG
         }
