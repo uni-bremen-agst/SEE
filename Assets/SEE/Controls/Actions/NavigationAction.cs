@@ -41,6 +41,13 @@ namespace SEE.Controls
             }
         }
 
+        private struct CameraState
+        {
+            public float distance;
+            public float yaw;
+            public float pitch;
+        }
+
         private const float MaxVelocity = 10.0f;
         private const float MaxSqrVelocity = MaxVelocity * MaxVelocity;
 
@@ -87,7 +94,8 @@ namespace SEE.Controls
         private List<ZoomCommand> zoomCommands;
         private uint zoomStepsInProgress;
 
-
+        // Camera
+        CameraState cameraState;
 
         private void Start()
         {
@@ -104,6 +112,13 @@ namespace SEE.Controls
 
             zoomCommands = new List<ZoomCommand>((int)ZoomMaxSteps);
             zoomStepsInProgress = 0;
+
+            Camera.main.transform.position = Table.TableTopCenter;
+            cameraState.distance = 1.0f;
+            cameraState.yaw = 0.0f;
+            cameraState.pitch = 30.0f;
+            Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
+            Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
         }
 
         private void Update()
@@ -116,13 +131,13 @@ namespace SEE.Controls
             mouseScrollDelta += Input.mouseScrollDelta.y;
             mousePosition = Input.mousePosition;
 
-            if (Input.GetKeyDown(KeyCode.M))
+            if (Input.GetKeyDown(KeyCode.Alpha1))
             {
                 mode = NavigationMode.Move;
                 movingOrRotating = false;
                 rotatePivot.Enable(false);
             }
-            else if (Input.GetKeyDown(KeyCode.R))
+            else if (Input.GetKeyDown(KeyCode.Alpha2))
             {
                 mode = NavigationMode.Rotate;
                 movingOrRotating = false;
@@ -130,6 +145,27 @@ namespace SEE.Controls
             }
 
             rotatePivot.Radius = 0.2f * (Camera.main.transform.position - rotatePivot.Center).magnitude;
+
+            // Camera
+            const float Speed = 2.0f; // TODO(torben): this is arbitrary
+            if (Input.GetKey(KeyCode.W))
+            {
+                cameraState.distance -= Speed * Time.deltaTime;
+            }
+            if (Input.GetKey(KeyCode.S))
+            {
+                cameraState.distance += Speed * Time.deltaTime;
+            }
+            if (Input.GetMouseButton(1))
+            {
+                float x = Input.GetAxis("mouse x");
+                float y = Input.GetAxis("mouse y");
+                cameraState.yaw += x;
+                cameraState.pitch -= y;
+            }
+            Camera.main.transform.position = Table.TableTopCenter;
+            Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
+            Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
         }
 
         // This logic is in FixedUpdate(), so that the behaviour is framerate-
