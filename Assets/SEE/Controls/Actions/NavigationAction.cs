@@ -81,6 +81,7 @@ namespace SEE.Controls
         private MovePivotBase movePivot;
         private RotatePivot rotatePivot;
 
+        private float originalEulerAngleY;
         private float startAngle;
 
         private List<ZoomCommand> zoomCommands;
@@ -112,7 +113,7 @@ namespace SEE.Controls
             drag = Input.GetMouseButton(2);
             cancel |= Input.GetKeyDown(KeyCode.Escape);
             snapButton = Input.GetKey(KeyCode.LeftAlt);
-            mouseScrollDelta = Input.mouseScrollDelta.y;
+            mouseScrollDelta += Input.mouseScrollDelta.y;
             mousePosition = Input.mousePosition;
 
             if (Input.GetKeyDown(KeyCode.M))
@@ -131,7 +132,7 @@ namespace SEE.Controls
             rotatePivot.Radius = 0.2f * (Camera.main.transform.position - rotatePivot.Center).magnitude;
         }
 
-        // This logik is in FixedUpdate(), so that the behaviour is framerate-
+        // This logic is in FixedUpdate(), so that the behaviour is framerate-
         // 'independent'.
         private void FixedUpdate()
         {
@@ -203,6 +204,8 @@ namespace SEE.Controls
                     {
                         movingOrRotating = false;
                         rotatePivot.Enable(false);
+
+                        cityTransform.rotation = Quaternion.Euler(0.0f, originalEulerAngleY, 0.0f);
                     }
                 }
                 else if (drag) // start or continue rotation
@@ -218,6 +221,7 @@ namespace SEE.Controls
                             movingOrRotating = true;
                             rotatePivot.Enable(true);
 
+                            originalEulerAngleY = cityTransform.rotation.eulerAngles.y;
                             startAngle = AngleMod(cityTransform.rotation.eulerAngles.y - toHitAngle);
                             rotatePivot.SetMinAngle(Mathf.Deg2Rad * toHitAngle);
                             rotatePivot.SetMaxAngle(Mathf.Deg2Rad * toHitAngle);
@@ -318,7 +322,8 @@ namespace SEE.Controls
 
 
             // Zoom into city
-            int zoomSteps = Mathf.RoundToInt(Mathf.Clamp(mouseScrollDelta, -1.0f, 1.0f)); // TODO(torben): this does not work in fixed
+            int zoomSteps = Mathf.RoundToInt(mouseScrollDelta);
+            mouseScrollDelta = 0.0f;
             int newZoomStepsInProgress = (int)zoomStepsInProgress + zoomSteps;
 
             if (zoomSteps != 0 && newZoomStepsInProgress >= 0 && newZoomStepsInProgress <= ZoomMaxSteps)
