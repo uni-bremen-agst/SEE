@@ -81,7 +81,7 @@ namespace SEE.Controls
         private MovePivotBase movePivot;
         private RotatePivot rotatePivot;
 
-        private float startAngleDeg;
+        private float startAngle;
 
         private List<ZoomCommand> zoomCommands;
         private uint zoomStepsInProgress;
@@ -210,7 +210,7 @@ namespace SEE.Controls
                     if (raycastResult)
                     {
                         Vector2 toHit = new Vector2(planeHitPoint.x - cityTransform.position.x, planeHitPoint.z - cityTransform.position.z);
-                        float toHitAngleDeg = toHit.Angle360();
+                        float toHitAngle = toHit.Angle360();
 
                         if (startDrag) // start rotation
                         {
@@ -218,35 +218,39 @@ namespace SEE.Controls
                             movingOrRotating = true;
                             rotatePivot.Enable(true);
 
-                            startAngleDeg = AngleMod(cityTransform.rotation.eulerAngles.y - toHitAngleDeg);
-                            rotatePivot.SetMinAngle(Mathf.Deg2Rad * toHitAngleDeg);
-                            rotatePivot.SetMaxAngle(Mathf.Deg2Rad * toHitAngleDeg);
+                            startAngle = AngleMod(cityTransform.rotation.eulerAngles.y - toHitAngle);
+                            rotatePivot.SetMinAngle(Mathf.Deg2Rad * toHitAngle);
+                            rotatePivot.SetMaxAngle(Mathf.Deg2Rad * toHitAngle);
                         }
 
                         if (movingOrRotating) // continue rotation
                         {
-                            float angleDeg = AngleMod(startAngleDeg + toHitAngleDeg);
+                            float angle = AngleMod(startAngle + toHitAngle);
                     
                             if (snapButton)
                             {
-                                angleDeg = AngleMod(Mathf.Round(angleDeg / SnapStepAngle) * SnapStepAngle);
+                                angle = AngleMod(Mathf.Round(angle / SnapStepAngle) * SnapStepAngle);
                             }
-                            cityTransform.rotation = Quaternion.Euler(0.0f, angleDeg, 0.0f);
+                            cityTransform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
 
+                            float prevAngle = Mathf.Rad2Deg * rotatePivot.GetMaxAngle();
+                            float currAngle = toHitAngle;
+
+                            while (Mathf.Abs(currAngle + 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
+                            {
+                                currAngle += 360.0f;
+                            }
+                            while (Mathf.Abs(currAngle - 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
+                            {
+                                currAngle -= 360.0f;
+                            }
+                            if (snapButton)
+                            {
+                                currAngle = Mathf.Round((currAngle + startAngle) / (SnapStepAngle)) * (SnapStepAngle) - startAngle;
+                            }
+
+                            rotatePivot.SetMaxAngle(Mathf.Deg2Rad * currAngle);
                             rotatePivot.Center = cityTransform.position;
-
-                            const float TwoPI = 2.0f * Mathf.PI;
-                            float prevAngleRad = rotatePivot.GetMaxAngle();
-                            float currAngleRad = Mathf.Deg2Rad * toHitAngleDeg;
-                            while (Mathf.Abs(currAngleRad + TwoPI - prevAngleRad) < Mathf.Abs(currAngleRad - prevAngleRad))
-                            {
-                                currAngleRad += TwoPI;
-                            }
-                            while (Mathf.Abs(currAngleRad - TwoPI - prevAngleRad) < Mathf.Abs(currAngleRad - prevAngleRad))
-                            {
-                                currAngleRad -= TwoPI;
-                            }
-                            rotatePivot.SetMaxAngle(currAngleRad);
                         }
                     }
                 }
