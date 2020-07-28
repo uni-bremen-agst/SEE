@@ -187,13 +187,13 @@ namespace SEE.Controls
         {
             int outer = textureResolution / 2;
             int inner = Mathf.RoundToInt((float)outer * 0.98f);
-            Texture2D texture = CreateCircleOutlineTexture(outer, inner);
+            Texture2D texture = Tools.TextureGenerator.CreateCircleOutlineTexture(outer, inner, new Color(DefaultPrimaryAlpha, 0.0f, 0.0f, 0.0f), new Color(0.0f, 0.0f, 0.0f, 0.0f));
             texture.filterMode = FilterMode.Point; // TODO(torben): remove!
             circle = GameObject.CreatePrimitive(PrimitiveType.Quad);
             circle.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
             circle.transform.position = new Vector3(0.0f, 1.0f, 0.0f);
             material = new Material(Shader.Find("Unlit/CircleShader"));
-            //circleMaterial.SetInt("_ZTest", (int)UnityEngine.Rendering.CompareFunction.Greater); // TODO(torben): make this different when occluded similar to MovePivots
+            //circleMaterial.SetInt("_ZTest", (int)UnityEngine.Rendering.CompareFunction.Greater); // TODO(torben): make this different when occluded similar to MovePivots?
             material.SetTexture("_MainTex", texture);
             material.SetFloat("_Alpha", DefaultPrimaryAlpha);
             circle.GetComponent<MeshRenderer>().sharedMaterial = material;
@@ -224,89 +224,6 @@ namespace SEE.Controls
         {
             material.SetFloat("_MaxAngle", maxAngleRadians);
             material.SetColor("_Color", new Color(Mathf.Cos(maxAngleRadians), 1.0f, Mathf.Sin(-maxAngleRadians), DefaultPrimaryAlpha));
-        }
-
-        private Texture2D CreateCircleOutlineTexture(int outer, int inner)
-        {
-            int size = 2 * outer + 1;
-            Texture2D result = new Texture2D(size, size, TextureFormat.R8, false);
-
-            Color pixelColor = new Color(DefaultPrimaryAlpha, 0.0f, 0.0f, 0.0f);
-            Color noPixelColor = new Color(0.0f, 0.0f, 0.0f, 0.0f);
-            Color[] colors = new Color[size * size];
-            for (int i = 0; i < colors.Length; i++)
-            {
-                colors[i] = noPixelColor;
-            }
-            result.SetPixels(colors);
-
-            int xc = outer;
-            int yc = outer;
-            int xo = outer;
-            int xi = inner;
-            int y = 0;
-            int erro = 1 - xo;
-            int erri = 1 - xi;
-
-            void XLine(Texture2D _tex, int _x1, int _x2, int _y, Color _color)
-            {
-                while (_x1 <= _x2)
-                {
-                    _tex.SetPixel(_x1++, _y, _color);
-                }
-            }
-
-            void YLine(Texture2D _tex, int _x, int _y1, int _y2, Color _color)
-            {
-                while (_y1 <= _y2)
-                {
-                    _tex.SetPixel(_x, _y1++, _color);
-                }
-            }
-
-            while (xo >= y)
-            {
-                XLine(result, xc + xi, xc + xo, yc + y, pixelColor);
-                YLine(result, xc + y, yc + xi, yc + xo, pixelColor);
-                XLine(result, xc - xo, xc - xi, yc + y, pixelColor);
-                YLine(result, xc - y, yc + xi, yc + xo, pixelColor);
-                XLine(result, xc - xo, xc - xi, yc - y, pixelColor);
-                YLine(result, xc - y, yc - xo, yc - xi, pixelColor);
-                XLine(result, xc + xi, xc + xo, yc - y, pixelColor);
-                YLine(result, xc + y, yc - xo, yc - xi, pixelColor);
-
-                y++;
-
-                if (erro < 0)
-                {
-                    erro += 2 * y + 1;
-                }
-                else
-                {
-                    xo--;
-                    erro += 2 * (y - xo + 1);
-                }
-
-                if (y > inner)
-                {
-                    xi = y;
-                }
-                else
-                {
-                    if (erri < 0)
-                    {
-                        erri += 2 * y + 1;
-                    }
-                    else
-                    {
-                        xi--;
-                        erri += 2 * (y - xi + 1);
-                    }
-                }
-            }
-
-            result.Apply(true, true);
-            return result;
         }
     }
 }

@@ -92,6 +92,7 @@ namespace SEE
         /// </summary>
         public static Table Instance { get; private set; }
         public static Vector3 TableTopCenter { get => Instance.transform.position + new Vector3(0.0f, MaxY, 0.0f); }
+        public static Vector3 TableTopCenterEpsilon { get => Instance.transform.position + new Vector3(0.0f, MaxY + float.Epsilon, 0.0f); }
 
         private void Awake()
         {
