@@ -8,7 +8,7 @@
     {
 		Tags
 		{
-			"Queue" = "Transparent"
+			"Queue" = "Overlay"
 			"IgnoreProjector" = "True"
 			"RenderType" = "Transparent"
 		}
