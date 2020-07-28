@@ -210,6 +210,7 @@ namespace SEE.Controls
                     if (raycastResult)
                     {
                         Vector2 toHit = new Vector2(planeHitPoint.x - cityTransform.position.x, planeHitPoint.z - cityTransform.position.z);
+                        float toHitAngleDeg = toHit.Angle360();
 
                         if (startDrag) // start rotation
                         {
@@ -217,29 +218,22 @@ namespace SEE.Controls
                             movingOrRotating = true;
                             rotatePivot.Enable(true);
 
-                            startAngleDeg = cityTransform.rotation.eulerAngles.y - toHit.Angle360();
+                            startAngleDeg = AngleMod(cityTransform.rotation.eulerAngles.y - toHitAngleDeg);
+                            rotatePivot.SetMinAngle(Mathf.Deg2Rad * toHitAngleDeg);
                         }
 
                         if (movingOrRotating) // continue rotation
                         {
-                            float angle = startAngleDeg + toHit.Angle360();
-                            while (angle >= 360.0f)
-                            {
-                                angle -= 360.0f;
-                            }
+                            float angleDeg = AngleMod(startAngleDeg + toHitAngleDeg);
                     
                             if (snapButton)
                             {
-                                angle = Mathf.Round(angle / SnapStepAngle) * SnapStepAngle;
-                                if (angle == 360.0f)
-                                {
-                                    angle = 0.0f;
-                                }
+                                angleDeg = AngleMod(Mathf.Round(angleDeg / SnapStepAngle) * SnapStepAngle);
                             }
-                            cityTransform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
+                            cityTransform.rotation = Quaternion.Euler(0.0f, angleDeg, 0.0f);
 
                             rotatePivot.Center = cityTransform.position;
-                            rotatePivot.SetMaxAngle(Mathf.Deg2Rad * angle);
+                            rotatePivot.SetMaxAngle(Mathf.Deg2Rad * toHitAngleDeg);
                         }
                     }
                 }
@@ -358,5 +352,7 @@ namespace SEE.Controls
             Vector3 result = new Vector3(proj.x, offset.y, proj.y);
             return result;
         }
+
+        private float AngleMod(float degrees) => ((degrees % 360.0f) + 360.0f) % 360.0f;
     }
 }

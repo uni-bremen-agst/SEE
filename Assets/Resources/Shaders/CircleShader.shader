@@ -4,7 +4,9 @@
     {
         _MainTex("Texture", 2D) = "white" {}
 		_Color("Color", Color) = (0,1,0,0)
+		_MinAngle("MinAngle", Float) = 0.0
 		_MaxAngle("MaxAngle", Float) = 0.0
+		_Alpha("Alpha", Float) = 1.0
     }
     SubShader
     {
@@ -42,7 +44,9 @@
             sampler2D _MainTex;
             float4 _MainTex_ST;
 			float4 _Color;
+			float _MinAngle;
 			float _MaxAngle;
+			float _Alpha;
 
             v2f vert (appdata v)
             {
@@ -64,9 +68,18 @@
 				float angle = atan2(-dir.y, dir.x);
 				angle += angle < 0.0 ? 2.0 * PI : 0.0;
 
-				if (dot(uv, uv) < 0.25 && angle < _MaxAngle)
+				if (_MaxAngle < _MinAngle)
 				{
-					col = fixed4(_Color.r, _Color.g, _Color.b, 0.8); // TODO(torben): alpha as uniform?
+					if (angle < _MaxAngle)
+					{
+						angle += 360.0f;
+					}
+					_MaxAngle += 360.0f;
+				}
+
+				if (dot(uv, uv) < 0.25 && angle >= _MinAngle && angle <= _MaxAngle)
+				{
+					col = fixed4(_Color.r, _Color.g, _Color.b, _Alpha);
 				}
 
                 return col;
