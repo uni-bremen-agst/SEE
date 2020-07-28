@@ -220,6 +220,7 @@ namespace SEE.Controls
 
                             startAngleDeg = AngleMod(cityTransform.rotation.eulerAngles.y - toHitAngleDeg);
                             rotatePivot.SetMinAngle(Mathf.Deg2Rad * toHitAngleDeg);
+                            rotatePivot.SetMaxAngle(Mathf.Deg2Rad * toHitAngleDeg);
                         }
 
                         if (movingOrRotating) // continue rotation
@@ -233,7 +234,19 @@ namespace SEE.Controls
                             cityTransform.rotation = Quaternion.Euler(0.0f, angleDeg, 0.0f);
 
                             rotatePivot.Center = cityTransform.position;
-                            rotatePivot.SetMaxAngle(Mathf.Deg2Rad * toHitAngleDeg);
+
+                            const float TwoPI = 2.0f * Mathf.PI;
+                            float prevAngleRad = rotatePivot.GetMaxAngle();
+                            float currAngleRad = Mathf.Deg2Rad * toHitAngleDeg;
+                            while (Mathf.Abs(currAngleRad + TwoPI - prevAngleRad) < Mathf.Abs(currAngleRad - prevAngleRad))
+                            {
+                                currAngleRad += TwoPI;
+                            }
+                            while (Mathf.Abs(currAngleRad - TwoPI - prevAngleRad) < Mathf.Abs(currAngleRad - prevAngleRad))
+                            {
+                                currAngleRad -= TwoPI;
+                            }
+                            rotatePivot.SetMaxAngle(currAngleRad);
                         }
                     }
                 }

@@ -193,7 +193,7 @@ namespace SEE.Controls
             circle.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
             circle.transform.position = new Vector3(0.0f, 1.0f, 0.0f);
             material = new Material(Shader.Find("Unlit/CircleShader"));
-            //circleMaterial.SetInt("_ZTest", (int)UnityEngine.Rendering.CompareFunction.Greater); // TODO(torben): make this different when occluded as the MovePivots
+            //circleMaterial.SetInt("_ZTest", (int)UnityEngine.Rendering.CompareFunction.Greater); // TODO(torben): make this different when occluded similar to MovePivots
             material.SetTexture("_MainTex", texture);
             material.SetFloat("_Alpha", DefaultPrimaryAlpha);
             circle.GetComponent<MeshRenderer>().sharedMaterial = material;
@@ -203,6 +203,16 @@ namespace SEE.Controls
         internal void Enable(bool enable)
         {
             circle.SetActive(enable);
+        }
+
+        internal float GetMinAngle()
+        {
+            return material.GetFloat("_MinAngle"); // TODO(torben): this might have a performance impact. cache on cpu?
+        }
+
+        internal float GetMaxAngle()
+        {
+            return material.GetFloat("_MaxAngle"); // TODO(torben): this might have a performance impact. cache on cpu?
         }
         
         internal void SetMinAngle(float minAngleRadians)
