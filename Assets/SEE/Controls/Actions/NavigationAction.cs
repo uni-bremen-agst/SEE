@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -96,6 +97,7 @@ namespace SEE.Controls
         private uint zoomStepsInProgress;
 
         private GameObject cursor;
+        private Transform cursorFocus;
 
         // Camera
         CameraState cameraState;
@@ -121,6 +123,7 @@ namespace SEE.Controls
             material.SetTexture("_MainTex", Tools.TextureGenerator.CreateCircleOutlineTexture(64, 60, new Color(1.0f, 0.0f, 0.0f, 0.0f), new Color(0.0f, 0.0f, 0.0f, 0.0f)));
             cursor.GetComponent<MeshRenderer>().sharedMaterial = material;
             cursor.transform.position = Table.TableTopCenterEpsilon;
+            cursorFocus = cityTransform;
 
             Camera.main.transform.position = Table.TableTopCenterEpsilon;
             cameraState.distance = 1.0f;
@@ -155,6 +158,23 @@ namespace SEE.Controls
             }
 
             rotatePivot.Radius = 0.2f * (Camera.main.transform.position - rotatePivot.Center).magnitude;
+
+            if (Input.GetMouseButton(0))
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit[] hits = Physics.RaycastAll(ray);
+                Array.Sort(hits, (h0, h1) => h0.distance.CompareTo(h1.distance));
+                foreach (RaycastHit hit in hits)
+                {
+                    if (hit.transform.gameObject.GetComponent<GO.NodeRef>() != null)
+                    {
+                        cursorFocus = hit.transform;
+                        break;
+                    }
+                }
+            }
+            cursor.transform.position = cursorFocus.position;
+            rotatePivot.Center = cursor.transform.position;
 
             // Camera
             const float Speed = 2.0f; // TODO(torben): this is arbitrary
@@ -275,7 +295,7 @@ namespace SEE.Controls
                 {
                     if (raycastResult)
                     {
-                        Vector2 toHit = new Vector2(planeHitPoint.x - cityTransform.position.x, planeHitPoint.z - cityTransform.position.z);
+                        Vector2 toHit = new Vector2(planeHitPoint.x - rotatePivot.Center.x, planeHitPoint.z - rotatePivot.Center.z);
                         float toHitAngle = toHit.Angle360();
 
                         if (startDrag) // start rotation
@@ -298,7 +318,11 @@ namespace SEE.Controls
                             {
                                 angle = AngleMod(Mathf.Round(angle / SnapStepAngle) * SnapStepAngle);
                             }
+
+                            Vector3 pre = cursorFocus.position;
                             cityTransform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
+                            Vector3 post = cursorFocus.position;
+                            cityTransform.position += pre - post;
 
                             float prevAngle = Mathf.Rad2Deg * rotatePivot.GetMaxAngle();
                             float currAngle = toHitAngle;
@@ -422,9 +446,6 @@ namespace SEE.Controls
                 dragStartOffset = Vector3.Scale(dragCanonicalOffset, cityTransform.localScale);
                 dragStartTransformPosition -= dragStartOffset;
             }
-
-
-            rotatePivot.Center = cityTransform.position;
         }
 
         private Vector3 Project(Vector3 offset)
