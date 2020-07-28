@@ -94,8 +94,7 @@ namespace SEE.Controls
             originalScale = cityTransform.localScale;
             cityBounds = cityTransform.GetComponent<MeshCollider>().bounds;
             raycastPlane = new Plane(Vector3.up, cityTransform.position);
-
-            movingOrRotating = false;
+            
             dragStartTransformPosition = cityTransform.position;
             dragCanonicalOffset = Vector3.zero;
             moveVelocity = Vector3.zero;
@@ -120,7 +119,7 @@ namespace SEE.Controls
             {
                 mode = NavigationMode.Move;
                 movingOrRotating = false;
-                movePivot.Enable(false);
+                rotatePivot.Enable(false);
             }
             else if (Input.GetKeyDown(KeyCode.R))
             {
@@ -132,6 +131,8 @@ namespace SEE.Controls
             rotatePivot.Radius = 0.2f * (Camera.main.transform.position - rotatePivot.Center).magnitude;
         }
 
+        // This logik is in FixedUpdate(), so that the behaviour is framerate-
+        // 'independent'.
         private void FixedUpdate()
         {
             // TODO(torben): abstract mouse away!
@@ -142,32 +143,34 @@ namespace SEE.Controls
 
             if (mode == NavigationMode.Move)
             {
-                if (cancel)
+                if (cancel) // cancel movement
                 {
                     cancel = false;
                     if (movingOrRotating)
                     {
                         movingOrRotating = false;
-                        moveVelocity = Vector3.zero;
                         movePivot.Enable(false);
+
+                        moveVelocity = Vector3.zero;
                         cityTransform.position = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, cityTransform.localScale);
                     }
                 }
-                else if (drag)
+                else if (drag) // start or continue movement
                 {
                     if (raycastResult)
                     {
-                        if (!movingOrRotating && startDrag)
+                        if (startDrag) // start movement
                         {
                             startDrag = false;
                             movingOrRotating = true;
+                            movePivot.Enable(true);
+
                             dragStartTransformPosition = cityTransform.position;
                             dragStartOffset = planeHitPoint - cityTransform.position;
                             dragCanonicalOffset = dragStartOffset.DividePairwise(cityTransform.localScale);
                             moveVelocity = Vector3.zero;
-                            movePivot.Enable(true);
                         }
-                        if (movingOrRotating)
+                        if (movingOrRotating) // continue movement
                         {
                             Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
 
@@ -185,42 +188,62 @@ namespace SEE.Controls
                         }
                     }
                 }
-                else if (movingOrRotating)
+                else if (movingOrRotating) // finalize movement
                 {
                     movingOrRotating = false;
                     movePivot.Enable(false);
                 }
             }
-            else // mode = Mode.Rotate
+            else // mode == NavigationMode.Rotate
             {
-                if (cancel)
+                if (cancel) // cancel rotation
                 {
+                    cancel = false;
+                    if (movingOrRotating)
+                    {
+                        movingOrRotating = false;
+                        rotatePivot.Enable(false);
+                    }
+                }
+                else if (drag) // start or continue rotation
+                {
+                    if (raycastResult)
+                    {
+                        Vector2 toHit = new Vector2(planeHitPoint.x - cityTransform.position.x, planeHitPoint.z - cityTransform.position.z);
 
-                }
-                else if (drag)
-                {
-                    Vector2 toHit = new Vector2(planeHitPoint.x - cityTransform.position.x, planeHitPoint.z - cityTransform.position.z);
-                    if (startDrag)
-                    {
-                        startDrag = false;
-                        movingOrRotating = true;
-                        startAngleDeg = cityTransform.rotation.eulerAngles.y - toHit.Angle360();
-                        rotatePivot.Center = cityTransform.position;
-                        rotatePivot.Enable(true);
-                    }
-                    float angle = startAngleDeg + toHit.Angle360();
+                        if (startDrag) // start rotation
+                        {
+                            startDrag = false;
+                            movingOrRotating = true;
+                            rotatePivot.Enable(true);
+
+                            startAngleDeg = cityTransform.rotation.eulerAngles.y - toHit.Angle360();
+                        }
+
+                        if (movingOrRotating) // continue rotation
+                        {
+                            float angle = startAngleDeg + toHit.Angle360();
+                            while (angle >= 360.0f)
+                            {
+                                angle -= 360.0f;
+                            }
                     
-                    //Vector3 pivotEndPoint = planeHitPoint;
-                    if (snapButton)
-                    {
-                        angle = Mathf.Round(angle / SnapStepAngle) * SnapStepAngle;
-                        //pivotEndPoint = cityTransform.position + Project(planeHitPoint - cityTransform.position);
+                            if (snapButton)
+                            {
+                                angle = Mathf.Round(angle / SnapStepAngle) * SnapStepAngle;
+                                if (angle == 360.0f)
+                                {
+                                    angle = 0.0f;
+                                }
+                            }
+                            cityTransform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
+
+                            rotatePivot.Center = cityTransform.position;
+                            rotatePivot.SetMaxAngle(Mathf.Deg2Rad * angle);
+                        }
                     }
-                    //movePivot.SetPositions(cityTransform.position, pivotEndPoint);
-                    
-                    cityTransform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
                 }
-                else if (movingOrRotating)
+                else if (movingOrRotating) // finalize rotation
                 {
                     movingOrRotating = false;
                     rotatePivot.Enable(false);
@@ -261,6 +284,11 @@ namespace SEE.Controls
                 cityTransform.position += moveVelocity * Time.fixedDeltaTime;
             }
 
+            // Keep city close to table
+
+            // TODO(torben): is it possible for the city to temporarily move very far
+            // away, such that floating-point-errors may occur? that would happen above
+            // where the city is initially moved.
             if (!movingOrRotating && zoomCommands.Count == 0)
             {
                 // TODO(torben): similar TODO as above with circular cities!

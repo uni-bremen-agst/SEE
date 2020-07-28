@@ -202,6 +202,13 @@ namespace SEE.Controls
         {
             circle.SetActive(enable);
         }
+        
+        internal void SetMaxAngle(float maxAngleRadians)
+        {
+            Material material = circle.GetComponent<MeshRenderer>().sharedMaterial;
+            material.SetFloat("_MaxAngle", maxAngleRadians);
+            material.SetColor("_Color", new Color(Mathf.Cos(maxAngleRadians), 0.0f, Mathf.Sin(-maxAngleRadians), DefaultPrimaryAlpha));
+        }
 
         private Texture2D CreateCircleOutlineTexture(int outer, int inner)
         {
