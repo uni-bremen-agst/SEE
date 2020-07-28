@@ -181,6 +181,7 @@ namespace SEE.Controls
         public float Radius { get => circle.transform.localScale.x; set => circle.transform.localScale = new Vector3(value, value, value); }
 
         private GameObject circle;
+        private Material material;
 
         internal RotatePivot(int textureResolution)
         {
@@ -191,10 +192,11 @@ namespace SEE.Controls
             circle = GameObject.CreatePrimitive(PrimitiveType.Quad);
             circle.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
             circle.transform.position = new Vector3(0.0f, 1.0f, 0.0f);
-            Material circleMaterial = new Material(Shader.Find("Unlit/CircleShader"));
+            material = new Material(Shader.Find("Unlit/CircleShader"));
             //circleMaterial.SetInt("_ZTest", (int)UnityEngine.Rendering.CompareFunction.Greater); // TODO(torben): make this different when occluded as the MovePivots
-            circleMaterial.SetTexture("_MainTex", texture);
-            circle.GetComponent<MeshRenderer>().sharedMaterial = circleMaterial;
+            material.SetTexture("_MainTex", texture);
+            material.SetFloat("_Alpha", DefaultPrimaryAlpha);
+            circle.GetComponent<MeshRenderer>().sharedMaterial = material;
             circle.SetActive(false);
         }
 
@@ -203,11 +205,15 @@ namespace SEE.Controls
             circle.SetActive(enable);
         }
         
+        internal void SetMinAngle(float minAngleRadians)
+        {
+            material.SetFloat("_MinAngle", minAngleRadians);
+        }
+
         internal void SetMaxAngle(float maxAngleRadians)
         {
-            Material material = circle.GetComponent<MeshRenderer>().sharedMaterial;
             material.SetFloat("_MaxAngle", maxAngleRadians);
-            material.SetColor("_Color", new Color(Mathf.Cos(maxAngleRadians), 0.0f, Mathf.Sin(-maxAngleRadians), DefaultPrimaryAlpha));
+            material.SetColor("_Color", new Color(Mathf.Cos(maxAngleRadians), 1.0f, Mathf.Sin(-maxAngleRadians), DefaultPrimaryAlpha));
         }
 
         private Texture2D CreateCircleOutlineTexture(int outer, int inner)
