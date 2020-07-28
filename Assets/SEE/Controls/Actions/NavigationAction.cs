@@ -56,7 +56,7 @@ namespace SEE.Controls
         private const float MaxDistanceZ = 1.2f * Table.Depth;
         private const float MaxSqrDistanceZ = MaxDistanceZ * MaxDistanceZ;
 
-        private const float SnapStepCount = 7;
+        private const float SnapStepCount = 8;
         private const float SnapStepAngle = 360.0f / SnapStepCount;
         private const float DragFrictionFactor = 32.0f;
 
@@ -75,7 +75,8 @@ namespace SEE.Controls
         private bool startDrag;
         private bool drag;
         private bool cancel;
-        private bool snapButton;
+        private bool snap;
+        private bool reset;
         private Vector3 mousePosition;
         private float mouseScrollDelta;
 
@@ -93,6 +94,8 @@ namespace SEE.Controls
 
         private List<ZoomCommand> zoomCommands;
         private uint zoomStepsInProgress;
+
+        private GameObject cursor;
 
         // Camera
         CameraState cameraState;
@@ -113,7 +116,13 @@ namespace SEE.Controls
             zoomCommands = new List<ZoomCommand>((int)ZoomMaxSteps);
             zoomStepsInProgress = 0;
 
-            Camera.main.transform.position = Table.TableTopCenter;
+            cursor = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            Material material = new Material(Shader.Find("Unlit/CursorShader"));
+            material.SetTexture("_MainTex", Tools.TextureGenerator.CreateCircleOutlineTexture(64, 60, new Color(1.0f, 0.0f, 0.0f, 0.0f), new Color(0.0f, 0.0f, 0.0f, 0.0f)));
+            cursor.GetComponent<MeshRenderer>().sharedMaterial = material;
+            cursor.transform.position = Table.TableTopCenterEpsilon;
+
+            Camera.main.transform.position = Table.TableTopCenterEpsilon;
             cameraState.distance = 1.0f;
             cameraState.yaw = 0.0f;
             cameraState.pitch = 30.0f;
@@ -127,7 +136,8 @@ namespace SEE.Controls
             startDrag |= Input.GetMouseButtonDown(2);
             drag = Input.GetMouseButton(2);
             cancel |= Input.GetKeyDown(KeyCode.Escape);
-            snapButton = Input.GetKey(KeyCode.LeftAlt);
+            snap = Input.GetKey(KeyCode.LeftAlt);
+            reset |= Input.GetKey(KeyCode.R);
             mouseScrollDelta += Input.mouseScrollDelta.y;
             mousePosition = Input.mousePosition;
 
@@ -148,13 +158,14 @@ namespace SEE.Controls
 
             // Camera
             const float Speed = 2.0f; // TODO(torben): this is arbitrary
+            float speed = Input.GetKey(KeyCode.LeftShift) ? 4.0f * Speed : Speed;
             if (Input.GetKey(KeyCode.W))
             {
-                cameraState.distance -= Speed * Time.deltaTime;
+                cameraState.distance -= speed * Time.deltaTime;
             }
             if (Input.GetKey(KeyCode.S))
             {
-                cameraState.distance += Speed * Time.deltaTime;
+                cameraState.distance += speed * Time.deltaTime;
             }
             if (Input.GetMouseButton(1))
             {
@@ -163,7 +174,7 @@ namespace SEE.Controls
                 cameraState.yaw += x;
                 cameraState.pitch -= y;
             }
-            Camera.main.transform.position = Table.TableTopCenter;
+            Camera.main.transform.position = Table.TableTopCenterEpsilon;
             Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
         }
@@ -180,7 +191,15 @@ namespace SEE.Controls
 
             if (mode == NavigationMode.Move)
             {
-                if (cancel) // cancel movement
+                if (reset) // reset to center of table
+                {
+                    reset = false;
+                    movingOrRotating = false;
+                    movePivot.Enable(false);
+
+                    cityTransform.position = Table.TableTopCenterEpsilon;
+                }
+                else if (cancel) // cancel movement
                 {
                     cancel = false;
                     if (movingOrRotating)
@@ -211,7 +230,7 @@ namespace SEE.Controls
                         {
                             Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
 
-                            if (snapButton)
+                            if (snap)
                             {
                                 totalDragOffsetFromStart = Project(totalDragOffsetFromStart);
                             }
@@ -233,7 +252,15 @@ namespace SEE.Controls
             }
             else // mode == NavigationMode.Rotate
             {
-                if (cancel) // cancel rotation
+                if (reset) // reset rotation to identity();
+                {
+                    reset = false;
+                    movingOrRotating = false;
+                    rotatePivot.Enable(false);
+
+                    cityTransform.rotation = Quaternion.identity;
+                }
+                else if (cancel) // cancel rotation
                 {
                     cancel = false;
                     if (movingOrRotating)
@@ -267,7 +294,7 @@ namespace SEE.Controls
                         {
                             float angle = AngleMod(startAngle + toHitAngle);
                     
-                            if (snapButton)
+                            if (snap)
                             {
                                 angle = AngleMod(Mathf.Round(angle / SnapStepAngle) * SnapStepAngle);
                             }
@@ -284,13 +311,12 @@ namespace SEE.Controls
                             {
                                 currAngle -= 360.0f;
                             }
-                            if (snapButton)
+                            if (snap)
                             {
                                 currAngle = Mathf.Round((currAngle + startAngle) / (SnapStepAngle)) * (SnapStepAngle) - startAngle;
                             }
 
                             rotatePivot.SetMaxAngle(Mathf.Deg2Rad * currAngle);
-                            rotatePivot.Center = cityTransform.position;
                         }
                     }
                 }
@@ -388,7 +414,6 @@ namespace SEE.Controls
                 Vector3 cityCenterToHitPoint = planeHitPoint - cityTransform.position;
                 Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(cityTransform.localScale);
 
-
                 cityTransform.position += cityCenterToHitPoint;
                 cityTransform.localScale = f * originalScale;
                 cityTransform.position -= Vector3.Scale(cityCenterToHitPointUnscaled, cityTransform.localScale);
@@ -397,6 +422,9 @@ namespace SEE.Controls
                 dragStartOffset = Vector3.Scale(dragCanonicalOffset, cityTransform.localScale);
                 dragStartTransformPosition -= dragStartOffset;
             }
+
+
+            rotatePivot.Center = cityTransform.position;
         }
 
         private Vector3 Project(Vector3 offset)
