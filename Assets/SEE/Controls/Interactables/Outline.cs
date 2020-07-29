@@ -95,7 +95,7 @@ namespace SEE.Controls
         void Awake()
         {
             // Cache renderers
-            renderers = GetComponentsInChildren<Renderer>();
+            renderers = GetComponents<Renderer>();
 
             // Instantiate outline materials
             outlineMaskMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineMask"));
@@ -115,7 +115,6 @@ namespace SEE.Controls
         {
             foreach (var renderer in renderers)
             {
-
                 // Append outline shaders
                 var materials = renderer.sharedMaterials.ToList();
 
@@ -159,7 +158,6 @@ namespace SEE.Controls
         {
             foreach (var renderer in renderers)
             {
-
                 // Remove outline shaders
                 var materials = renderer.sharedMaterials.ToList();
 
@@ -184,7 +182,6 @@ namespace SEE.Controls
 
             foreach (var meshFilter in GetComponentsInChildren<MeshFilter>())
             {
-
                 // Skip duplicates
                 if (!bakedMeshes.Add(meshFilter.sharedMesh))
                 {
@@ -204,7 +201,6 @@ namespace SEE.Controls
             // Retrieve or generate smooth normals
             foreach (var meshFilter in GetComponentsInChildren<MeshFilter>())
             {
-
                 // Skip if smooth normals have already been adopted
                 if (!registeredMeshes.Add(meshFilter.sharedMesh))
                 {
@@ -240,7 +236,6 @@ namespace SEE.Controls
             // Average normals for grouped vertices
             foreach (var group in groups)
             {
-
                 // Skip single vertices
                 if (group.Count() == 1)
                 {
