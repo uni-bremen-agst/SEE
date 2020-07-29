@@ -266,6 +266,677 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &247103488
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 247103490}
+  - component: {fileID: 247103489}
+  m_Layer: 0
+  m_Name: RandomGraph
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &247103489
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 247103488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f60d2c87bfa2964d933dee0c2b9342e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: nodeTypes
+      Entry: 7
+      Data: 1|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 2|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CoseGraphSettings
+      Entry: 7
+      Data: 3|SEE.DataModel.CoseGraphSettings, SEE
+    - Name: EdgeLength
+      Entry: 3
+      Data: 101
+    - Name: UseSmartIdealEdgeCalculation
+      Entry: 5
+      Data: false
+    - Name: UseSmartMultilevelScaling
+      Entry: 5
+      Data: false
+    - Name: PerLevelIdealEdgeLengthFactor
+      Entry: 4
+      Data: 0.1
+    - Name: UseSmartRepulsionRangeCalculation
+      Entry: 5
+      Data: false
+    - Name: GravityStrength
+      Entry: 4
+      Data: 0.8
+    - Name: CompoundGravityStrength
+      Entry: 4
+      Data: 1.5
+    - Name: RepulsionStrength
+      Entry: 4
+      Data: 104
+    - Name: multiLevelScaling
+      Entry: 5
+      Data: false
+    - Name: ListDirToggle
+      Entry: 7
+      Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Inner~1
+    - Name: $v
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: DirNodeLayout
+      Entry: 7
+      Data: 6|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+NodeLayouts,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 5
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Inner~1
+    - Name: $v
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: DirShape
+      Entry: 7
+      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 5
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Inner~1
+    - Name: $v
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: rootDirs
+      Entry: 7
+      Data: 8|System.Collections.Generic.List`1[[SEE.DataModel.Node, SEE]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 9|SEE.DataModel.Node, SEE
+    - Name: floatAttributes
+      Entry: 7
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Single,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 5
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: intAttributes
+      Entry: 7
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Int32,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 5
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: depth
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: show
+      Entry: 7
+      Data: 12|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 5
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Inner~1
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: useOptAlgorithm
+      Entry: 5
+      Data: false
+    - Name: showGraphListing
+      Entry: 5
+      Data: false
+    - Name: loadedForNodeTypes
+      Entry: 7
+      Data: 13|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 5
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Class
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Package
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: useCalculationParameter
+      Entry: 5
+      Data: true
+    - Name: useItertivCalclation
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Measurements
+      Entry: 7
+      Data: 14|System.Collections.Generic.SortedDictionary`2[[System.String, mscorlib],[System.String,
+        mscorlib]], System
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SubLayoutsInnerNodes
+      Entry: 7
+      Data: 15|System.Collections.Generic.Dictionary`2[[SEE.Game.AbstractSEECity+NodeLayouts,
+        SEE],[System.String, mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 16|System.Collections.Generic.EnumEqualityComparer`1[[SEE.Game.AbstractSEECity+NodeLayouts,
+        SEE]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 7
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 1
+      Data: Balloon
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 5
+    - Name: $v
+      Entry: 1
+      Data: CirclePacking
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 0
+    - Name: $v
+      Entry: 1
+      Data: CompoundSpringEmbedder
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 1
+      Data: EvoStreets
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 7
+    - Name: $v
+      Entry: 1
+      Data: FromFile
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 3
+    - Name: $v
+      Entry: 1
+      Data: RectanglePacking
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 4
+    - Name: $v
+      Entry: 1
+      Data: Treemap
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SubLayoutsLeafNodes
+      Entry: 7
+      Data: 17|System.Collections.Generic.Dictionary`2[[SEE.Game.AbstractSEECity+NodeLayouts,
+        SEE],[System.String, mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 16
+    - Name: 
+      Entry: 12
+      Data: 8
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 1
+      Data: Balloon
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 5
+    - Name: $v
+      Entry: 1
+      Data: CirclePacking
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 0
+    - Name: $v
+      Entry: 1
+      Data: CompoundSpringEmbedder
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 1
+      Data: EvoStreets
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 7
+    - Name: $v
+      Entry: 1
+      Data: FromFile
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 6
+    - Name: $v
+      Entry: 1
+      Data: Manhattan
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 3
+    - Name: $v
+      Entry: 1
+      Data: RectanglePacking
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 4
+    - Name: $v
+      Entry: 1
+      Data: Treemap
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  PathPrefix: C:\Users\raine\develop\SEECity\Data\GXL\random\
+  gvlPath: random.gvl
+  WidthMetric: Metric.Number_of_Tokens
+  HeightMetric: Metric.Clone_Rate
+  DepthMetric: Metric.LOC
+  LeafStyleMetric: Metric.Complexity
+  ArchitectureIssue: Metric.Architecture_Violations
+  CloneIssue: Metric.Clone
+  CycleIssue: Metric.Cycle
+  Dead_CodeIssue: Metric.Dead_Code
+  MetricIssue: Metric.Metric
+  StyleIssue: Metric.Style
+  UniversalIssue: Metric.Universal
+  ArchitectureIssue_SUM: Metric.Architecture_Violations_SUM
+  CloneIssue_SUM: Metric.Clone_SUM
+  CycleIssue_SUM: Metric.Cycle_SUM
+  Dead_CodeIssue_SUM: Metric.Dead_Code_SUM
+  MetricIssue_SUM: Metric.Metric_SUM
+  StyleIssue_SUM: Metric.Style_SUM
+  UniversalIssue_SUM: Metric.Universal_SUM
+  InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeHeightMetric: 
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 1
+  NodeLayout: 0
+  EdgeLayout: 1
+  ZScoreScale: 1
+  EdgeWidth: 0.003
+  ShowErosions: 0
+  MaxErosionWidth: 1
+  EdgesAboveBlocks: 1
+  Tension: 0.85
+  RDP: 0.001
+  calculateMeasurements: 0
+  gxlPath: random.gxl
+  csvPath: random.csv
+  LeafConstraint:
+    NodeType: Class
+    EdgeType: calls
+    NodeNumber: 100
+    EdgeDensity: 0.01
+  InnerNodeConstraint:
+    NodeType: Package
+    EdgeType: uses
+    NodeNumber: 10
+    EdgeDensity: 0.005
+  LeafAttributes:
+  - Name: Metric.Number_of_Tokens
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Clone_Rate
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.LOC
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Complexity
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Architecture_Violations
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Clone
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Cycle
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Dead_Code
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Metric
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Style
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Universal
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.IssuesTotal
+    Mean: 10
+    StandardDeviation: 3
+--- !u!4 &247103490
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 247103488}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.0030109882, y: 1.038, z: 0.007}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 16
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &606009709
 GameObject:
   m_ObjectHideFlags: 0
@@ -1062,7 +1733,19 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Cluster
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -1074,7 +1757,7 @@ MonoBehaviour:
       Data: 3|SEE.DataModel.CoseGraphSettings, SEE
     - Name: EdgeLength
       Entry: 3
-      Data: 20
+      Data: 6
     - Name: UseSmartIdealEdgeCalculation
       Entry: 5
       Data: false
@@ -1095,7 +1778,7 @@ MonoBehaviour:
       Data: 1.5
     - Name: RepulsionStrength
       Entry: 4
-      Data: 50
+      Data: 8
     - Name: multiLevelScaling
       Entry: 5
       Data: false
@@ -1104,11 +1787,87 @@ MonoBehaviour:
       Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 9
-      Data: 2
+      Entry: 7
+      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 6
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.GO
+    - Name: $v
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Layout
+    - Name: $v
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Game
+    - Name: $v
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Controls
+    - Name: $v
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.DataModel
+    - Name: $v
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Controls.Devices
+    - Name: $v
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -1117,14 +1876,86 @@ MonoBehaviour:
       Data: 
     - Name: DirNodeLayout
       Entry: 7
-      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+NodeLayouts,
+      Data: 6|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+NodeLayouts,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 2
+      Data: 5
     - Name: 
       Entry: 12
+      Data: 6
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.GO
+    - Name: $v
+      Entry: 3
       Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Layout
+    - Name: $v
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Game
+    - Name: $v
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Controls
+    - Name: $v
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.DataModel
+    - Name: $v
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Controls.Devices
+    - Name: $v
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -1133,14 +1964,86 @@ MonoBehaviour:
       Data: 
     - Name: DirShape
       Entry: 7
-      Data: 6|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
+      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 2
+      Data: 5
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 6
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.GO
+    - Name: $v
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Layout
+    - Name: $v
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Game
+    - Name: $v
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Controls
+    - Name: $v
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.DataModel
+    - Name: $v
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Controls.Devices
+    - Name: $v
+      Entry: 3
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -1149,7 +2052,20 @@ MonoBehaviour:
       Data: 
     - Name: rootDirs
       Entry: 7
-      Data: 7|System.Collections.Generic.List`1[[SEE.DataModel.Node, SEE]], mscorlib
+      Data: 8|System.Collections.Generic.List`1[[SEE.DataModel.Node, SEE]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 9
+    - Name: 
+      Entry: 7
+      Data: 9|SEE.DataModel.Node, SEE
+    - Name: floatAttributes
+      Entry: 7
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Single,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
     - Name: 
       Entry: 12
       Data: 0
@@ -1159,9 +2075,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: show
+    - Name: intAttributes
       Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Int32,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
@@ -1169,6 +2085,434 @@ MonoBehaviour:
     - Name: 
       Entry: 12
       Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: depth
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 12|SEE.DataModel.Node, SEE
+    - Name: floatAttributes
+      Entry: 7
+      Data: 13|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Single,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: intAttributes
+      Entry: 7
+      Data: 14|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Int32,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: depth
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 15|SEE.DataModel.Node, SEE
+    - Name: floatAttributes
+      Entry: 7
+      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Single,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: intAttributes
+      Entry: 7
+      Data: 17|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Int32,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: depth
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 18|SEE.DataModel.Node, SEE
+    - Name: floatAttributes
+      Entry: 7
+      Data: 19|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Single,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: intAttributes
+      Entry: 7
+      Data: 20|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Int32,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: depth
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 21|SEE.DataModel.Node, SEE
+    - Name: floatAttributes
+      Entry: 7
+      Data: 22|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Single,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: intAttributes
+      Entry: 7
+      Data: 23|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Int32,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: depth
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 24|SEE.DataModel.Node, SEE
+    - Name: floatAttributes
+      Entry: 7
+      Data: 25|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Single,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: intAttributes
+      Entry: 7
+      Data: 26|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Int32,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: depth
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 27|SEE.DataModel.Node, SEE
+    - Name: floatAttributes
+      Entry: 7
+      Data: 28|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Single,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: intAttributes
+      Entry: 7
+      Data: 29|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Int32,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: depth
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 30|SEE.DataModel.Node, SEE
+    - Name: floatAttributes
+      Entry: 7
+      Data: 31|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Single,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: intAttributes
+      Entry: 7
+      Data: 32|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Int32,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: depth
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 33|SEE.DataModel.Node, SEE
+    - Name: floatAttributes
+      Entry: 7
+      Data: 34|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Single,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: intAttributes
+      Entry: 7
+      Data: 35|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Int32,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: depth
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: show
+      Entry: 7
+      Data: 36|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 2
+    - Name: 
+      Entry: 12
+      Data: 6
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.GO
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Layout
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Game
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Controls
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.Controls.Devices
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: SEE.DataModel
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -1183,14 +2527,26 @@ MonoBehaviour:
       Data: true
     - Name: loadedForNodeTypes
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 37|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
       Data: 2
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Cluster
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -1208,7 +2564,7 @@ MonoBehaviour:
       Data: 
     - Name: Measurements
       Entry: 7
-      Data: 10|System.Collections.Generic.SortedDictionary`2[[System.String, mscorlib],[System.String,
+      Data: 38|System.Collections.Generic.SortedDictionary`2[[System.String, mscorlib],[System.String,
         mscorlib]], System
     - Name: 
       Entry: 12
@@ -1221,11 +2577,11 @@ MonoBehaviour:
       Data: 
     - Name: SubLayoutsInnerNodes
       Entry: 7
-      Data: 11|System.Collections.Generic.Dictionary`2[[SEE.Game.AbstractSEECity+NodeLayouts,
+      Data: 39|System.Collections.Generic.Dictionary`2[[SEE.Game.AbstractSEECity+NodeLayouts,
         SEE],[System.String, mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 12|System.Collections.Generic.EnumEqualityComparer`1[[SEE.Game.AbstractSEECity+NodeLayouts,
+      Data: 40|System.Collections.Generic.EnumEqualityComparer`1[[SEE.Game.AbstractSEECity+NodeLayouts,
         SEE]], mscorlib
     - Name: 
       Entry: 12
@@ -1331,11 +2687,11 @@ MonoBehaviour:
       Data: 
     - Name: SubLayoutsLeafNodes
       Entry: 7
-      Data: 13|System.Collections.Generic.Dictionary`2[[SEE.Game.AbstractSEECity+NodeLayouts,
+      Data: 41|System.Collections.Generic.Dictionary`2[[SEE.Game.AbstractSEECity+NodeLayouts,
         SEE],[System.String, mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 12
+      Data: 40
     - Name: 
       Entry: 12
       Data: 8
@@ -1441,12 +2797,12 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  PathPrefix: C:\Users\raine\develop\SEECity\Assets\
-  gvlPath: ..\Data\GXL\linux-clones\net.gvl
-  WidthMetric: Metric.Number_of_Tokens
-  HeightMetric: Metric.Clone_Rate
-  DepthMetric: Metric.LOC
-  LeafStyleMetric: Metric.Complexity
+  PathPrefix: C:\Users\raine\develop\SEECity\Data\GXL\SEE\
+  gvlPath: Architecture.gvl
+  WidthMetric: 0.3
+  HeightMetric: 0.1
+  DepthMetric: 0.3
+  LeafStyleMetric: 0.1
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -1462,12 +2818,12 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
-  InnerNodeHeightMetric: 
-  InnerNodeStyleMetric: Metric.IssuesTotal
+  InnerNodeHeightMetric: 0.01
+  InnerNodeStyleMetric: 0.1
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
-  InnerNodeObjects: 0
+  InnerNodeObjects: 1
   NodeLayout: 0
   EdgeLayout: 0
   ZScoreScale: 1
@@ -1478,8 +2834,8 @@ MonoBehaviour:
   Tension: 0.85
   RDP: 0.05
   calculateMeasurements: 0
-  gxlPath: ..\Data\GXL\minimal_clones.gxl
-  csvPath: ..\Data\GXL\minimal_clones.csv
+  gxlPath: Architecture.gxl
+  csvPath: Architecture.csv
 --- !u!4 &916716866
 Transform:
   m_ObjectHideFlags: 0
@@ -3524,7 +4880,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636335451}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.4196243, y: -4, z: 0}
+  m_LocalPosition: {x: -4.9131737, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -3632,7 +4988,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776319858}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.4196243, y: -4, z: 0}
+  m_LocalPosition: {x: 4.9131737, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
