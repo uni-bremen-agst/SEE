@@ -6,6 +6,27 @@
     public static class MathExtensions
     {
         /// <summary>
+        /// Creates and returns a copy of the x- and y-components of given 3d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 XY(this Vector3 a) => new Vector2(a.x, a.y);
+
+        /// <summary>
+        /// Creates and returns a copy of the x- and z-components of given 3d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 XZ(this Vector3 a) => new Vector2(a.x, a.z);
+
+        /// <summary>
+        /// Creates and returns a copy of the y- and z-components of given 3d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 YZ(this Vector3 a) => new Vector2(a.y, a.z);
+
+        /// <summary>
         /// Divides the components of <paramref name="a"/> by the components of
         /// <paramref name="b"/> and returns the result.
         /// </summary>
