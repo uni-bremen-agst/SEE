@@ -2,12 +2,12 @@
 # Reads a GXL file and creates a CSV file for it containing additional metrics.
 ###############################################################################
 
-library(sets)
+library(sets)  # install.packages("sets")
 library(data.table) # install.packages("data.table")
 library(hash) # install.packages("hash")
-library(xml2)
-library(purrr)
-library(dplyr)
+library(xml2)  # install.packages("xml2")
+library(purrr)  # install.packages("purrr")
+library(dplyr)  # install.packages("dplyr")
 # For data.tree, see https://cran.r-project.org/web/packages/data.tree/vignettes/data.tree.html
 library(data.tree) # install.packages("data.tree")
 library(DiagrammeR) # install.packages("DiagrammeR") # to plot a tree
