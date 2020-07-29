@@ -41,13 +41,13 @@ namespace SEE.Controls
             // Hide and lock cursor while looking.
             if (looking)
             {
-                Cursor.lockState = CursorLockMode.Locked;
+                UnityEngine.Cursor.lockState = CursorLockMode.Locked;
             }
             else
             {
                 // Unlock and show cursor when no longer looking.
-                Cursor.visible = true;
-                Cursor.lockState = CursorLockMode.None;
+                UnityEngine.Cursor.visible = true;
+                UnityEngine.Cursor.lockState = CursorLockMode.None;
             }
         }
 

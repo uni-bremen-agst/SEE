@@ -1,6 +1,4 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-Shader "Unlit/CursorShader"
+﻿Shader "Unlit/CursorOutlineShader"
 {
     Properties
     {

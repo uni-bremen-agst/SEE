@@ -7,14 +7,22 @@ namespace SEE.Tools
     /// </summary>
     public static class TextureGenerator
     {
-        public static Texture2D CreateColoredTextureR8(int width, int height, Color color)
+        /// <summary>
+        /// Creates a texture of given color with a single 8-bit color channel.
+        /// </summary>
+        /// <param name="width">The width of the texture.</param>
+        /// <param name="height">The height of the texture.</param>
+        /// <param name="color">The color of the 8-bit channel of the texture.</param>
+        /// <returns>The created texture.</returns>
+        public static Texture2D CreateColoredTextureR8(int width, int height, float color)
         {
             Texture2D result = new Texture2D(width, height, TextureFormat.R8, false);
+            Color c = new Color(color, 0.0f, 0.0f, 0.0f);
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    result.SetPixel(x, y, color);
+                    result.SetPixel(x, y, c);
                 }
             }
             result.Apply();
@@ -22,18 +30,27 @@ namespace SEE.Tools
         }
 
         /// <summary>
+        /// Creates a texture of given dimensions with a single 8-bit color channel. A
+        /// line from <paramref name="p0"/> to <paramref name="p1"/> with
+        /// <paramref name="thickness"/> thickness is drawn into the texture.
+        /// 
+        /// The algorithm is based on 'Murphy's Modified Bresenham Line Algorithm' and
+        /// the implementation is based on:
         /// <see cref="https://github.com/danbar/murphy_line_draw/blob/master/murphy_line_draw.m"/>
         /// </summary>
-        /// <param name="textureWidth"></param>
-        /// <param name="textureHeight"></param>
-        /// <param name="p0"></param>
-        /// <param name="p1"></param>
-        /// <param name="thickness"></param>
-        /// <param name="lineColor"></param>
-        /// <param name="backgroundColor"></param>
+        /// <param name="textureWidth">The width of the texture.</param>
+        /// <param name="textureHeight">The height of the texture.</param>
+        /// <param name="p0">The start point of the line.</param>
+        /// <param name="p1">The end point of the line.</param>
+        /// <param name="thickness">The thickness of the line.</param>
+        /// <param name="lineColor">The color of the line.</param>
+        /// <param name="backgroundColor">The color of the background.</param>
         /// <returns></returns>
-        public static Texture2D CreateLineTexture(int textureWidth, int textureHeight, Vector2Int p0, Vector2Int p1, float thickness, Color lineColor, Color backgroundColor)
+        public static Texture2D CreateLineTextureR8(int textureWidth, int textureHeight, Vector2Int p0, Vector2Int p1, float thickness, float lineColor, float backgroundColor)
         {
+            Color c0 = new Color(lineColor, 0.0f, 0.0f, 0.0f);
+            Color c1 = new Color(backgroundColor, 0.0f, 0.0f, 0.0f);
+
             Texture2D result = CreateColoredTextureR8(textureWidth, textureHeight, backgroundColor);
 
             int dx = p1.x - p0.x;
@@ -144,7 +161,7 @@ namespace SEE.Tools
             {
                 for (int p = 0; p < len; p++)
                 {
-                    result.SetPixel(_p0.x, _p0.y, lineColor);
+                    result.SetPixel(_p0.x, _p0.y, c0);
 
                     if (_d1 <= kt)
                     {
@@ -168,18 +185,21 @@ namespace SEE.Tools
         }
 
         /// <summary>
-        /// Creates a texture of a circle outline with width and height of
-        /// (<paramref name="outerRadius"/> + 1).
+        /// Creates a texture with a single 8-bit color channel and width and height of
+        /// (<paramref name="outerRadius"/> + 1). A circle is drawn into the texture.
         /// </summary>
         /// <param name="outerRadius">The outer radius of the circle. The texture will
         /// have width and height of this parameter plus one.</param>
         /// <param name="innerRadius">The inner radius of the circle.</param>
-        /// <param name="circleColor">The color of the circle outline</param>
+        /// <param name="circleColor">The color of the circle outline.</param>
         /// <param name="backgroundColor">The color of the background of the texture.
         /// </param>
         /// <returns>The created circle outline texture.</returns>
-        public static Texture2D CreateCircleOutlineTexture(int outerRadius, int innerRadius, Color circleColor, Color backgroundColor)
+        public static Texture2D CreateCircleOutlineTextureR8(int outerRadius, int innerRadius, float circleColor, float backgroundColor)
         {
+            Color c0 = new Color(circleColor, 0.0f, 0.0f, 0.0f);
+            Color c1 = new Color(backgroundColor, 0.0f, 0.0f, 0.0f);
+
             int size = 2 * outerRadius + 1;
             Texture2D result = CreateColoredTextureR8(size + 1, size + 1, backgroundColor);
 
@@ -209,14 +229,14 @@ namespace SEE.Tools
 
             while (xo >= y)
             {
-                XLine(result, xc + xi, xc + xo, yc + y, circleColor);
-                YLine(result, xc + y, yc + xi, yc + xo, circleColor);
-                XLine(result, xc - xo, xc - xi, yc + y, circleColor);
-                YLine(result, xc - y, yc + xi, yc + xo, circleColor);
-                XLine(result, xc - xo, xc - xi, yc - y, circleColor);
-                YLine(result, xc - y, yc - xo, yc - xi, circleColor);
-                XLine(result, xc + xi, xc + xo, yc - y, circleColor);
-                YLine(result, xc + y, yc - xo, yc - xi, circleColor);
+                XLine(result, xc + xi, xc + xo, yc + y, c0);
+                YLine(result, xc + y, yc + xi, yc + xo, c0);
+                XLine(result, xc - xo, xc - xi, yc + y, c0);
+                YLine(result, xc - y, yc + xi, yc + xo, c0);
+                XLine(result, xc - xo, xc - xi, yc - y, c0);
+                YLine(result, xc - y, yc - xo, yc - xi, c0);
+                XLine(result, xc + xi, xc + xo, yc - y, c0);
+                YLine(result, xc + y, yc - xo, yc - xi, c0);
 
                 y++;
 

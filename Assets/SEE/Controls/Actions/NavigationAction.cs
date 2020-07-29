@@ -96,8 +96,7 @@ namespace SEE.Controls
         private List<ZoomCommand> zoomCommands;
         private uint zoomStepsInProgress;
 
-        private GameObject cursor;
-        private Transform cursorFocus;
+        private Cursor cursor;
 
         // Camera
         CameraState cameraState;
@@ -120,23 +119,7 @@ namespace SEE.Controls
 
 
 
-
-            // TODO(torben): abstract
-            cursor = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            Material material = new Material(Shader.Find("Unlit/CursorShader"));
-            material.SetTexture("_MainTex", Tools.TextureGenerator.CreateCircleOutlineTexture(64, 60, new Color(1.0f, 0.0f, 0.0f, 0.0f), new Color(0.0f, 0.0f, 0.0f, 0.0f)));
-            cursor.GetComponent<MeshRenderer>().sharedMaterial = material;
-            cursor.transform.position = Table.TableTopCenterEpsilon;
-            cursorFocus = cityTransform;
-
-            GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            quad.transform.position = Table.TableTopCenterEpsilon;
-            Material m = new Material(Shader.Find("Unlit/CursorShader"));
-            Texture2D tex = Tools.TextureGenerator.CreateLineTexture(64, 64, new Vector2Int(7, 1), new Vector2Int(45, 60), 1.1f, new Color(1.0f, 0.0f, 0.0f, 0.0f), new Color(0.0f, 0.0f, 0.0f, 0.0f));
-            tex.filterMode = FilterMode.Point;
-            m.SetTexture("_MainTex", tex);
-            quad.GetComponent<MeshRenderer>().sharedMaterial = m;
-
+            cursor = Cursor.Create(cityTransform);
 
 
 
@@ -186,12 +169,12 @@ namespace SEE.Controls
                 {
                     if (hit.transform.gameObject.GetComponent<GO.NodeRef>() != null)
                     {
-                        cursorFocus = hit.transform;
+                        cursor.Focus = hit.transform;
                         break;
                     }
                 }
             }
-            cursor.transform.position = cursorFocus.position;
+            cursor.transform.position = cursor.Focus.position;
             rotatePivot.Center = cursor.transform.position;
 
             // Camera
@@ -337,9 +320,9 @@ namespace SEE.Controls
                                 angle = AngleMod(Mathf.Round(angle / SnapStepAngle) * SnapStepAngle);
                             }
 
-                            Vector3 pre = cursorFocus.position;
+                            Vector3 pre = cursor.Focus.position;
                             cityTransform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
-                            Vector3 post = cursorFocus.position;
+                            Vector3 post = cursor.Focus.position;
                             cityTransform.position += pre - post;
 
                             float prevAngle = Mathf.Rad2Deg * rotatePivot.GetMaxAngle();

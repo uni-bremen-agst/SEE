@@ -187,7 +187,7 @@ namespace SEE.Controls
         {
             int outer = textureResolution / 2;
             int inner = Mathf.RoundToInt((float)outer * 0.98f);
-            Texture2D texture = Tools.TextureGenerator.CreateCircleOutlineTexture(outer, inner, new Color(DefaultPrimaryAlpha, 0.0f, 0.0f, 0.0f), new Color(0.0f, 0.0f, 0.0f, 0.0f));
+            Texture2D texture = Tools.TextureGenerator.CreateCircleOutlineTextureR8(outer, inner, DefaultPrimaryAlpha, 0.0f);
             texture.filterMode = FilterMode.Point; // TODO(torben): remove!
             circle = GameObject.CreatePrimitive(PrimitiveType.Quad);
             circle.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
