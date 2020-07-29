@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using SEE.DataModel;
 using System.Linq;
 using System;
 using SEE.Game;
 using static SEE.Game.AbstractSEECity;
-using SEE.GO;
+using SEE.Utils;
 
 namespace SEE.Layout
 {
@@ -88,7 +87,7 @@ namespace SEE.Layout
         /// <param name="coseSublayoutNodes">the sublayouts</param>
         /// <returns></returns>
         public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> coseSublayoutNodes)
-        {
+        {            
             this.edges = edges;
             this.SublayoutNodes = coseSublayoutNodes.ToList();
 
@@ -573,7 +572,7 @@ namespace SEE.Layout
 
                     // based on www.btluke.com/simanf1.html, schedule 3
                     coseLayoutSettings.CoolingFactor = Mathf.Max(coseLayoutSettings.InitialCoolingFactor - Mathf.Pow(coseLayoutSettings.Coolingcycle, Mathf.Log(100 * (coseLayoutSettings.InitialCoolingFactor - coseLayoutSettings.FinalTemperature)) / Mathf.Log(coseLayoutSettings.MaxCoolingCycle)) / 100 , coseLayoutSettings.FinalTemperature);
-                    Debug.Log(coseLayoutSettings.CoolingFactor);
+                    //Debug.LogFormat("cooling factor: {0}\n", coseLayoutSettings.CoolingFactor);
                 }
 
                 coseLayoutSettings.TotalDisplacement = 0;
@@ -1218,7 +1217,8 @@ namespace SEE.Layout
         /// <param name="edge">the new edge </param>
         private void CreateEdge(Edge edge)
         {
-            CoseEdge cEdge = new CoseEdge(nodeToCoseNode[CoseHelper.GetLayoutNodeFromLinkname(edge.Source.ID, layoutNodes)], nodeToCoseNode[CoseHelper.GetLayoutNodeFromLinkname(edge.Target.ID, layoutNodes)]);
+            CoseEdge cEdge = new CoseEdge(nodeToCoseNode[CoseHelper.GetLayoutNodeFromLinkname(edge.Source.ID, layoutNodes)], 
+                                          nodeToCoseNode[CoseHelper.GetLayoutNodeFromLinkname(edge.Target.ID, layoutNodes)]);
 
             graphManager.Add(cEdge, cEdge.Source, cEdge.Target);
         }
