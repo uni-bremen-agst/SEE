@@ -44,7 +44,7 @@
             {
                 v2f o;
 				
-				float scale = 0.05 * length(_WorldSpaceCameraPos - unity_ObjectToWorld._m03_m13_m23);
+				float scale = 0.03 * length(_WorldSpaceCameraPos - unity_ObjectToWorld._m03_m13_m23);
 				o.vertex = mul(UNITY_MATRIX_P, mul(UNITY_MATRIX_V, float4(unity_ObjectToWorld._m03_m13_m23, 1.0)) + float4(v.vertex.x * scale, v.vertex.y * scale, 0.0, 1.0));
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 
@@ -53,7 +53,7 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-				fixed4 color = fixed4(1.0, 0.25, 0.0, 0.8 * tex2D(_MainTex, i.uv).r);
+				fixed4 color = fixed4(1.0, 0.25, 0.0, 1.0 * tex2D(_MainTex, i.uv).r);
                 return color;
             }
             ENDCG
