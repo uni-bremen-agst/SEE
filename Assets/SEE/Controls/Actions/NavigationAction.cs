@@ -117,14 +117,8 @@ namespace SEE.Controls
             zoomCommands = new List<ZoomCommand>((int)ZoomMaxSteps);
             zoomStepsInProgress = 0;
 
-
-
-            cursor = Cursor.Create(cityTransform);
-
-
-
-
-
+            cursor = Cursor.Create();
+            Select(cityTransform.gameObject);
 
             Camera.main.transform.position = Table.TableTopCenterEpsilon;
             cameraState.distance = 1.0f;
@@ -132,6 +126,22 @@ namespace SEE.Controls
             cameraState.pitch = 30.0f;
             Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
+        }
+
+        private void Select(GameObject go)
+        {
+            if (go != null && go.transform != cursor.Focus)
+            {
+                if (cursor.Focus)
+                {
+                    Destroy(cursor.Focus.gameObject.GetComponent<Outline>());
+                }
+                cursor.Focus = go.transform;
+                Outline outline = go.transform.gameObject.AddComponent<Outline>();
+                outline.OutlineMode = Outline.Mode.OutlineAll;
+                outline.OutlineColor = new Color(1.0f, 0.25f, 0.0f, 1.0f);
+                outline.OutlineWidth = 4.0f;
+            }
         }
 
         private void Update()
@@ -169,7 +179,7 @@ namespace SEE.Controls
                 {
                     if (hit.transform.gameObject.GetComponent<GO.NodeRef>() != null)
                     {
-                        cursor.Focus = hit.transform;
+                        Select(hit.transform.gameObject);
                         break;
                     }
                 }

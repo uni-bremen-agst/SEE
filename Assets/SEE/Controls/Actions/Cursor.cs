@@ -27,8 +27,7 @@ namespace SEE.Controls
                 Focus = Table.Instance.transform;
             }
             transform.position = Focus.position;
-
-            axisHalfLength = 0.02f * (Camera.main.transform.position - transform.position).magnitude;
+            axisHalfLength = 0.01f * (Camera.main.transform.position - transform.position).magnitude;
         }
 
         private void OnRenderObject()
@@ -55,19 +54,17 @@ namespace SEE.Controls
             }
         }
 
-        internal static Cursor Create(Transform focus)
+        internal static Cursor Create()
         {
             GameObject go = new GameObject("Cursor");
             Cursor c = go.AddComponent<Cursor>();
-            c.focus = focus ?? throw new System.ArgumentNullException("Focus of cursor must not be null!");
-            go.transform.position = focus.position;
 
             c.outline = GameObject.CreatePrimitive(PrimitiveType.Quad);
             c.outline.transform.parent = go.transform;
             c.outline.transform.localPosition = Vector3.zero;
             c.outline.transform.localScale = Vector3.one;
             c.outlineMaterial = new Material(Shader.Find(OutlineShaderName));
-            c.outlineMaterial.SetTexture("_MainTex", Tools.TextureGenerator.CreateCircleOutlineTextureR8(64, 60, 1.0f, 0.0f));
+            c.outlineMaterial.SetTexture("_MainTex", Tools.TextureGenerator.CreateCircleOutlineTextureR8(32, 31, 1.0f, 0.0f));
             c.outline.GetComponent<MeshRenderer>().sharedMaterial = c.outlineMaterial;
 
             c.axisMaterial = new Material(Shader.Find(AxisShaderName));
