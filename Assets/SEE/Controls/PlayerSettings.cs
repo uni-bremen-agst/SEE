@@ -52,6 +52,7 @@ namespace SEE.Controls
             {
                 Debug.LogWarningFormat("VR enabling/disabling issue: {0}\n", e);
             }
+
             SetActive("DesktopPlayer", playerInputType == PlayerInputType.Desktop);
             SetActive("VRPlayer",      playerInputType == PlayerInputType.VR);
             SetActive("GamepadPlayer", playerInputType == PlayerInputType.TouchGamepad);

@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+
+#if UNITY_EDITOR
+
 using UnityEditor;
 using System.Collections;
 using UnityEditor.SceneManagement;
@@ -60,3 +63,5 @@ namespace CScape
         }
     }
 }
+
+#endif

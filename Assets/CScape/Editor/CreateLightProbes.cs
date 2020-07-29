@@ -2,6 +2,8 @@
 using UnityEditor;
 using System.Collections.Generic;
 
+#if UNITY_EDITOR
+
 public class CreateLightProbes : EditorWindow
 {
 
@@ -29,3 +31,5 @@ public class CreateLightProbes : EditorWindow
        // LPGroup.probePositions = ProbePos;
     }
 }
+
+#endif

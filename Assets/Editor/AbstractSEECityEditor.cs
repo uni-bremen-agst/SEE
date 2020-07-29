@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+
+using UnityEngine;
 using UnityEditor;
 using SEE.Game;
 using System.IO;
@@ -380,3 +382,5 @@ namespace SEEEditor
         }
     }
 }
+
+#endif
