@@ -58,6 +58,21 @@ namespace SEE
 
 
 
+        public static readonly Vector3 Min = new Vector3(MinX, MinY, MinZ);
+        public static readonly Vector2 MinXY = new Vector2(MinX, MinY);
+        public static readonly Vector2 MinXZ = new Vector2(MinX, MinZ);
+        public static readonly Vector2 MinYZ = new Vector2(MinY, MinZ);
+        public static readonly Vector3 Max = new Vector3(MaxX, MaxY, MaxZ);
+        public static readonly Vector2 MaxXY = new Vector2(MaxX, MaxY);
+        public static readonly Vector2 MaxXZ = new Vector2(MaxX, MaxZ);
+        public static readonly Vector2 MaxYZ = new Vector2(MaxY, MaxZ);
+        public static readonly Vector3 Center = new Vector3(CenterX, CenterY, CenterZ);
+        public static readonly Vector2 CenterXY = new Vector2(CenterX, CenterY);
+        public static readonly Vector2 CenterXZ = new Vector2(CenterX, CenterZ);
+        public static readonly Vector2 CenterYZ = new Vector2(CenterY, CenterZ);
+
+
+
         /// <summary>
         /// The width of the table (x-axis).
         /// </summary>

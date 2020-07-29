@@ -42,34 +42,54 @@ namespace SEE.Controls
             }
         }
 
-        private struct CameraState
+        private struct MoveState
         {
-            public float distance;
-            public float yaw;
-            public float pitch;
+            internal const float MaxVelocity = 10.0f;
+            internal const float MaxSqrVelocity = MaxVelocity * MaxVelocity;
+            internal const float SnapStepCount = 8;
+            internal const float SnapStepAngle = 360.0f / SnapStepCount;
+            internal const float DragFrictionFactor = 32.0f;
+
+            internal MovePivotBase movePivot;
+            internal Bounds cityBounds;
+            internal Vector3 dragStartTransformPosition;
+            internal Vector3 dragStartOffset;
+            internal Vector3 dragCanonicalOffset;
+            internal Vector3 moveVelocity;
         }
 
-        private const float MaxVelocity = 10.0f;
-        private const float MaxSqrVelocity = MaxVelocity * MaxVelocity;
+        private struct RotateState
+        {
+            internal const float SnapStepCount = 8;
+            internal const float SnapStepAngle = 360.0f / SnapStepCount;
 
-        private const float MaxDistanceX = 1.2f * Table.Width;
-        private const float MaxSqrDistanceX = MaxDistanceX * MaxDistanceX;
-        private const float MaxDistanceZ = 1.2f * Table.Depth;
-        private const float MaxSqrDistanceZ = MaxDistanceZ * MaxDistanceZ;
+            internal RotatePivot rotatePivot;
+            internal float originalEulerAngleY;
+            internal Vector3 originalPosition;
+            internal float startAngle;
+        }
 
-        private const float SnapStepCount = 8;
-        private const float SnapStepAngle = 360.0f / SnapStepCount;
-        private const float DragFrictionFactor = 32.0f;
+        private struct ZoomState
+        {
+            internal const float ZoomDuration = 0.1f;
+            internal const uint ZoomMaxSteps = 32;
+            internal const float ZoomFactor = 0.5f;
 
-        private const float ZoomDuration = 0.1f;
-        private const uint ZoomMaxSteps = 32;
-        private const float ZoomFactor = 0.5f;
+            internal Vector3 originalScale;
+            internal List<ZoomCommand> zoomCommands;
+            internal uint zoomStepsInProgress;
+        }
+
+        private struct CameraState
+        {
+            internal float distance;
+            internal float yaw;
+            internal float pitch;
+        }
 
 
 
         private Transform cityTransform;
-        private Vector3 originalScale;
-        private Bounds cityBounds;
         private Plane raycastPlane;
 
         // Buttons
@@ -83,39 +103,28 @@ namespace SEE.Controls
 
         private NavigationMode mode;
         private bool movingOrRotating;
-        private Vector3 dragStartTransformPosition;
-        private Vector3 dragStartOffset;
-        private Vector3 dragCanonicalOffset;
-        private Vector3 moveVelocity;
-        private MovePivotBase movePivot;
-        private RotatePivot rotatePivot;
-
-        private float originalEulerAngleY;
-        private float startAngle;
-
-        private List<ZoomCommand> zoomCommands;
-        private uint zoomStepsInProgress;
-
         private Cursor cursor;
 
-        // Camera
+        MoveState moveState;
+        RotateState rotateState;
+        ZoomState zoomState;
         CameraState cameraState;
 
         private void Start()
         {
             cityTransform = GameObject.Find("Implementation").transform.GetChild(0).transform; // TODO(torben): find it some more robust way
-            originalScale = cityTransform.localScale;
-            cityBounds = cityTransform.GetComponent<MeshCollider>().bounds;
+            zoomState.originalScale = cityTransform.localScale;
+            moveState.cityBounds = cityTransform.GetComponent<MeshCollider>().bounds;
             raycastPlane = new Plane(Vector3.up, cityTransform.position);
             
-            dragStartTransformPosition = cityTransform.position;
-            dragCanonicalOffset = Vector3.zero;
-            moveVelocity = Vector3.zero;
-            movePivot = new LineMovePivot(0.008f * Table.MinDimXZ);
-            rotatePivot = new RotatePivot(1024);
+            moveState.dragStartTransformPosition = cityTransform.position;
+            moveState.dragCanonicalOffset = Vector3.zero;
+            moveState.moveVelocity = Vector3.zero;
+            moveState.movePivot = new LineMovePivot(0.008f * Table.MinDimXZ);
+            rotateState.rotatePivot = new RotatePivot(1024);
 
-            zoomCommands = new List<ZoomCommand>((int)ZoomMaxSteps);
-            zoomStepsInProgress = 0;
+            zoomState.zoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps);
+            zoomState.zoomStepsInProgress = 0;
 
             cursor = Cursor.Create();
             Select(cityTransform.gameObject);
@@ -159,16 +168,16 @@ namespace SEE.Controls
             {
                 mode = NavigationMode.Move;
                 movingOrRotating = false;
-                rotatePivot.Enable(false);
+                rotateState.rotatePivot.Enable(false);
             }
             else if (Input.GetKeyDown(KeyCode.Alpha2))
             {
                 mode = NavigationMode.Rotate;
                 movingOrRotating = false;
-                movePivot.Enable(false);
+                moveState.movePivot.Enable(false);
             }
 
-            rotatePivot.Radius = 0.2f * (Camera.main.transform.position - rotatePivot.Center).magnitude;
+            rotateState.rotatePivot.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotatePivot.Center).magnitude;
 
             if (Input.GetMouseButton(0))
             {
@@ -185,7 +194,7 @@ namespace SEE.Controls
                 }
             }
             cursor.transform.position = cursor.Focus.position;
-            rotatePivot.Center = cursor.transform.position;
+            rotateState.rotatePivot.Center = cursor.transform.position;
 
             // Camera
             const float Speed = 2.0f; // TODO(torben): this is arbitrary
@@ -226,7 +235,7 @@ namespace SEE.Controls
                 {
                     reset = false;
                     movingOrRotating = false;
-                    movePivot.Enable(false);
+                    moveState.movePivot.Enable(false);
 
                     cityTransform.position = Table.TableTopCenterEpsilon;
                 }
@@ -236,10 +245,10 @@ namespace SEE.Controls
                     if (movingOrRotating)
                     {
                         movingOrRotating = false;
-                        movePivot.Enable(false);
+                        moveState.movePivot.Enable(false);
 
-                        moveVelocity = Vector3.zero;
-                        cityTransform.position = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, cityTransform.localScale);
+                        moveState.moveVelocity = Vector3.zero;
+                        cityTransform.position = moveState.dragStartTransformPosition + moveState.dragStartOffset - Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
                     }
                 }
                 else if (drag) // start or continue movement
@@ -250,16 +259,16 @@ namespace SEE.Controls
                         {
                             startDrag = false;
                             movingOrRotating = true;
-                            movePivot.Enable(true);
+                            moveState.movePivot.Enable(true);
 
-                            dragStartTransformPosition = cityTransform.position;
-                            dragStartOffset = planeHitPoint - cityTransform.position;
-                            dragCanonicalOffset = dragStartOffset.DividePairwise(cityTransform.localScale);
-                            moveVelocity = Vector3.zero;
+                            moveState.dragStartTransformPosition = cityTransform.position;
+                            moveState.dragStartOffset = planeHitPoint - cityTransform.position;
+                            moveState.dragCanonicalOffset = moveState.dragStartOffset.DividePairwise(cityTransform.localScale);
+                            moveState.moveVelocity = Vector3.zero;
                         }
                         if (movingOrRotating) // continue movement
                         {
-                            Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
+                            Vector3 totalDragOffsetFromStart = planeHitPoint - (moveState.dragStartTransformPosition + moveState.dragStartOffset);
 
                             if (snap)
                             {
@@ -267,18 +276,18 @@ namespace SEE.Controls
                             }
 
                             Vector3 oldPosition = cityTransform.position;
-                            Vector3 newPosition = dragStartTransformPosition + totalDragOffsetFromStart;
+                            Vector3 newPosition = moveState.dragStartTransformPosition + totalDragOffsetFromStart;
 
-                            moveVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime;
+                            moveState.moveVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime;
                             cityTransform.position = newPosition;
-                            movePivot.SetPositions(dragStartTransformPosition + dragStartOffset, cityTransform.position + Vector3.Scale(dragCanonicalOffset, cityTransform.localScale));
+                            moveState.movePivot.SetPositions(moveState.dragStartTransformPosition + moveState.dragStartOffset, cityTransform.position + Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale));
                         }
                     }
                 }
                 else if (movingOrRotating) // finalize movement
                 {
                     movingOrRotating = false;
-                    movePivot.Enable(false);
+                    moveState.movePivot.Enable(false);
                 }
             }
             else // mode == NavigationMode.Rotate
@@ -287,9 +296,9 @@ namespace SEE.Controls
                 {
                     reset = false;
                     movingOrRotating = false;
-                    rotatePivot.Enable(false);
+                    rotateState.rotatePivot.Enable(false);
 
-                    cityTransform.rotation = Quaternion.identity;
+                    cityTransform.RotateAround(rotateState.rotatePivot.Center, Vector3.up, -cityTransform.rotation.eulerAngles.y);
                 }
                 else if (cancel) // cancel rotation
                 {
@@ -297,45 +306,42 @@ namespace SEE.Controls
                     if (movingOrRotating)
                     {
                         movingOrRotating = false;
-                        rotatePivot.Enable(false);
+                        rotateState.rotatePivot.Enable(false);
 
-                        cityTransform.rotation = Quaternion.Euler(0.0f, originalEulerAngleY, 0.0f);
+                        cityTransform.rotation = Quaternion.Euler(0.0f, rotateState.originalEulerAngleY, 0.0f);
+                        cityTransform.position = rotateState.originalPosition;
                     }
                 }
                 else if (drag) // start or continue rotation
                 {
                     if (raycastResult)
                     {
-                        Vector2 toHit = new Vector2(planeHitPoint.x - rotatePivot.Center.x, planeHitPoint.z - rotatePivot.Center.z);
+                        Vector2 toHit = new Vector2(planeHitPoint.x - rotateState.rotatePivot.Center.x, planeHitPoint.z - rotateState.rotatePivot.Center.z);
                         float toHitAngle = toHit.Angle360();
 
                         if (startDrag) // start rotation
                         {
                             startDrag = false;
                             movingOrRotating = true;
-                            rotatePivot.Enable(true);
+                            rotateState.rotatePivot.Enable(true);
 
-                            originalEulerAngleY = cityTransform.rotation.eulerAngles.y;
-                            startAngle = AngleMod(cityTransform.rotation.eulerAngles.y - toHitAngle);
-                            rotatePivot.SetMinAngle(Mathf.Deg2Rad * toHitAngle);
-                            rotatePivot.SetMaxAngle(Mathf.Deg2Rad * toHitAngle);
+                            rotateState.originalEulerAngleY = cityTransform.rotation.eulerAngles.y;
+                            rotateState.originalPosition = cityTransform.position;
+                            rotateState.startAngle = AngleMod(cityTransform.rotation.eulerAngles.y - toHitAngle);
+                            rotateState.rotatePivot.SetMinAngle(Mathf.Deg2Rad * toHitAngle);
+                            rotateState.rotatePivot.SetMaxAngle(Mathf.Deg2Rad * toHitAngle);
                         }
 
                         if (movingOrRotating) // continue rotation
                         {
-                            float angle = AngleMod(startAngle + toHitAngle);
-                    
+                            float angle = AngleMod(rotateState.startAngle + toHitAngle);
                             if (snap)
                             {
-                                angle = AngleMod(Mathf.Round(angle / SnapStepAngle) * SnapStepAngle);
+                                angle = AngleMod(Mathf.Round(angle / RotateState.SnapStepAngle) * RotateState.SnapStepAngle);
                             }
+                            cityTransform.RotateAround(cursor.Focus.position, Vector3.up, angle - cityTransform.rotation.eulerAngles.y);
 
-                            Vector3 pre = cursor.Focus.position;
-                            cityTransform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
-                            Vector3 post = cursor.Focus.position;
-                            cityTransform.position += pre - post;
-
-                            float prevAngle = Mathf.Rad2Deg * rotatePivot.GetMaxAngle();
+                            float prevAngle = Mathf.Rad2Deg * rotateState.rotatePivot.GetMaxAngle();
                             float currAngle = toHitAngle;
 
                             while (Mathf.Abs(currAngle + 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
@@ -348,71 +354,61 @@ namespace SEE.Controls
                             }
                             if (snap)
                             {
-                                currAngle = Mathf.Round((currAngle + startAngle) / (SnapStepAngle)) * (SnapStepAngle) - startAngle;
+                                currAngle = Mathf.Round((currAngle + rotateState.startAngle) / (RotateState.SnapStepAngle)) * (RotateState.SnapStepAngle) - rotateState.startAngle;
                             }
 
-                            rotatePivot.SetMaxAngle(Mathf.Deg2Rad * currAngle);
+                            rotateState.rotatePivot.SetMaxAngle(Mathf.Deg2Rad * currAngle);
                         }
                     }
                 }
                 else if (movingOrRotating) // finalize rotation
                 {
                     movingOrRotating = false;
-                    rotatePivot.Enable(false);
+                    rotateState.rotatePivot.Enable(false);
                 }
             }
-
-            if (!movingOrRotating)
-            {
-                Vector3 acceleration = Vector3.zero;
-
-                // TODO(torben): this whole thing currently assumes the shape of a quad!
-                // therefore, circular cities can be lost in corners of the table!
-                float cityMinX = cityTransform.position.x + (cityTransform.localScale.x * cityBounds.min.x);
-                float cityMaxX = cityTransform.position.x + (cityTransform.localScale.x * cityBounds.max.x);
-                float cityMinZ = cityTransform.position.z + (cityTransform.localScale.z * cityBounds.min.z);
-                float cityMaxZ = cityTransform.position.z + (cityTransform.localScale.z * cityBounds.max.z);
-
-                if (cityMaxX < Table.MinX || cityMaxZ < Table.MinZ || cityMinX > Table.MaxX || cityMinZ > Table.MaxZ)
-                {
-                    float toTableCenterX = Table.CenterX - cityTransform.position.x;
-                    float toTableCenterZ = Table.CenterZ - cityTransform.position.z;
-                    float length = Mathf.Sqrt(toTableCenterX * toTableCenterX + toTableCenterZ * toTableCenterZ);
-                    toTableCenterX /= length;
-                    toTableCenterZ /= length;
-                    acceleration = new Vector3(32.0f * toTableCenterX, 0.0f, 32.0f * toTableCenterZ);
-                }
-                else
-                {
-                    acceleration = DragFrictionFactor * -moveVelocity;
-                }
-                moveVelocity += acceleration * Time.fixedDeltaTime;
-
-                float dragVelocitySqrMag = moveVelocity.sqrMagnitude;
-                if (dragVelocitySqrMag > MaxSqrVelocity)
-                {
-                    moveVelocity = moveVelocity / Mathf.Sqrt(dragVelocitySqrMag) * MaxVelocity;
-                }
-                cityTransform.position += moveVelocity * Time.fixedDeltaTime;
-            }
-
-            // Keep city close to table
 
             // TODO(torben): is it possible for the city to temporarily move very far
             // away, such that floating-point-errors may occur? that would happen above
             // where the city is initially moved.
-            if (!movingOrRotating && zoomCommands.Count == 0)
+
+            if (!movingOrRotating)
             {
-                // TODO(torben): similar TODO as above with circular cities!
-                float tableToCityCenterX = cityTransform.position.x - Table.CenterX;
-                float tableToCityCenterZ = cityTransform.position.z - Table.CenterZ;
-                float distance = Mathf.Sqrt(tableToCityCenterX * tableToCityCenterX + tableToCityCenterZ * tableToCityCenterZ);
-                float maxDistance = Mathf.Max(cityTransform.localScale.x * MaxDistanceX, cityTransform.localScale.z * MaxDistanceZ);
-                if (distance > maxDistance)
+                float sqrMag = moveState.moveVelocity.sqrMagnitude;
+                if (sqrMag > MoveState.MaxSqrVelocity)
                 {
-                    float offsetX = tableToCityCenterX / distance * maxDistance;
-                    float offsetZ = tableToCityCenterZ / distance * maxDistance;
-                    cityTransform.position = new Vector3(Table.CenterX + offsetX, cityTransform.position.y, Table.CenterZ + offsetZ);
+                    moveState.moveVelocity = moveState.moveVelocity / Mathf.Sqrt(sqrMag) * MoveState.MaxVelocity;
+                }
+                cityTransform.position += moveState.moveVelocity * Time.fixedDeltaTime;
+
+                float radius = 0.5f * cityTransform.lossyScale.x;
+                bool outside = !TestCircleRect(cityTransform.position.XZ(), radius, Table.MinXZ, Table.MaxXZ, out float sqrDistance);
+
+                if (outside) // Keep city on visible area of the table
+                {
+                    moveState.moveVelocity = (Table.TableTopCenterEpsilon - cityTransform.position).normalized * MoveState.MaxVelocity;
+
+                    if (zoomState.zoomCommands.Count == 0) // TODO(torben): why is this condition necessary?
+                    {
+                        Vector2 toCenter = (Table.CenterXZ - cityTransform.position.XZ()).normalized;
+                        Vector2 dirX = new Vector2(1.0f, 0.0f); float dotX = Mathf.Abs(Vector2.Dot(dirX, toCenter));
+                        Vector2 dirZ = new Vector2(0.0f, 1.0f); float dotZ = Mathf.Abs(Vector2.Dot(dirZ, toCenter));
+                        float f = 1.0f;
+                        if (dotX > dotZ)
+                        {
+                            f = (Mathf.Sqrt(sqrDistance) - radius) / dotX;
+                        }
+                        else
+                        {
+                            f = (Mathf.Sqrt(sqrDistance) - radius) / dotZ;
+                        }
+                        cityTransform.position += f * new Vector3(toCenter.x, 0.0f, toCenter.y);
+                    }
+                }
+                else // Decelerate by adding friction
+                {
+                    Vector3 acceleration = MoveState.DragFrictionFactor * -moveState.moveVelocity;
+                    moveState.moveVelocity += acceleration * Time.fixedDeltaTime;
                 }
             }
 
@@ -421,41 +417,41 @@ namespace SEE.Controls
             // Zoom into city
             int zoomSteps = Mathf.RoundToInt(mouseScrollDelta);
             mouseScrollDelta = 0.0f;
-            int newZoomStepsInProgress = (int)zoomStepsInProgress + zoomSteps;
+            int newZoomStepsInProgress = (int)zoomState.zoomStepsInProgress + zoomSteps;
 
-            if (zoomSteps != 0 && newZoomStepsInProgress >= 0 && newZoomStepsInProgress <= ZoomMaxSteps)
+            if (zoomSteps != 0 && newZoomStepsInProgress >= 0 && newZoomStepsInProgress <= ZoomState.ZoomMaxSteps)
             {
-                zoomCommands.Add(new ZoomCommand(zoomSteps, ZoomDuration));
-                zoomStepsInProgress = (uint)newZoomStepsInProgress;
+                zoomState.zoomCommands.Add(new ZoomCommand(zoomSteps, ZoomState.ZoomDuration));
+                zoomState.zoomStepsInProgress = (uint)newZoomStepsInProgress;
             }
 
-            if (zoomCommands.Count != 0)
+            if (zoomState.zoomCommands.Count != 0)
             {
-                float currentZoomSteps = (float)zoomStepsInProgress;
+                float currentZoomSteps = (float)zoomState.zoomStepsInProgress;
 
-                for (int i = 0; i < zoomCommands.Count; i++)
+                for (int i = 0; i < zoomState.zoomCommands.Count; i++)
                 {
-                    if (zoomCommands[i].IsFinished())
+                    if (zoomState.zoomCommands[i].IsFinished())
                     {
-                        zoomCommands.RemoveAt(i--);
+                        zoomState.zoomCommands.RemoveAt(i--);
                     }
                     else
                     {
-                        currentZoomSteps = currentZoomSteps - zoomCommands[i].targetZoomSteps + zoomCommands[i].CurrentDeltaScale();
+                        currentZoomSteps = currentZoomSteps - zoomState.zoomCommands[i].targetZoomSteps + zoomState.zoomCommands[i].CurrentDeltaScale();
                     }
                 }
 
-                float f = Mathf.Pow(2, currentZoomSteps * ZoomFactor);
+                float f = Mathf.Pow(2, currentZoomSteps * ZoomState.ZoomFactor);
                 Vector3 cityCenterToHitPoint = planeHitPoint - cityTransform.position;
                 Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(cityTransform.localScale);
 
                 cityTransform.position += cityCenterToHitPoint;
-                cityTransform.localScale = f * originalScale;
+                cityTransform.localScale = f * zoomState.originalScale;
                 cityTransform.position -= Vector3.Scale(cityCenterToHitPointUnscaled, cityTransform.localScale);
 
-                dragStartTransformPosition += dragStartOffset;
-                dragStartOffset = Vector3.Scale(dragCanonicalOffset, cityTransform.localScale);
-                dragStartTransformPosition -= dragStartOffset;
+                moveState.dragStartTransformPosition += moveState.dragStartOffset;
+                moveState.dragStartOffset = Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
+                moveState.dragStartTransformPosition -= moveState.dragStartOffset;
             }
         }
 
@@ -463,12 +459,29 @@ namespace SEE.Controls
         {
             Vector2 point2 = new Vector2(offset.x, offset.z);
             float angleDeg = point2.Angle360();
-            float snappedAngleDeg = Mathf.Round(angleDeg / SnapStepAngle) * SnapStepAngle;
+            float snappedAngleDeg = Mathf.Round(angleDeg / MoveState.SnapStepAngle) * MoveState.SnapStepAngle;
             float snappedAngleRad = Mathf.Deg2Rad * snappedAngleDeg;
             Vector2 dir = new Vector2(Mathf.Cos(snappedAngleRad), Mathf.Sin(-snappedAngleRad));
             Vector2 proj = dir * Vector2.Dot(point2, dir);
             Vector3 result = new Vector3(proj.x, offset.y, proj.y);
             return result;
+        }
+
+        private bool TestCircleRect(Vector2 center, float radius, Vector2 min, Vector2 max, out float sqrDistance)
+        {
+            float SquaredDistanceVector2Rect()
+            {
+                float sqDist = 0.0f;
+                for (int i = 0; i < 2; i++)
+                {
+                    float v = center[i];
+                    if (v < min[i]) sqDist += (min[i] - v) * (min[i] - v);
+                    if (v > max[i]) sqDist += (v - max[i]) * (v - max[i]);
+                }
+                return sqDist;
+            }
+            sqrDistance = SquaredDistanceVector2Rect();
+            return sqrDistance <= radius * radius;
         }
 
         private float AngleMod(float degrees) => ((degrees % 360.0f) + 360.0f) % 360.0f;
