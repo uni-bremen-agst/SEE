@@ -1,9 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using SEE.DataModel;
-
-namespace SEE.Layout
+﻿namespace SEE.Layout
 {
     public class CoseCoarsenNode : CoseNode
     {

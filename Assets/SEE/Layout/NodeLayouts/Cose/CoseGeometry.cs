@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 
 namespace SEE.Layout
@@ -14,9 +12,7 @@ namespace SEE.Layout
         /// <param name="rectB">the second rectangle</param>
         /// <param name="result">the result values</param>
         /// <returns>a tuple(intersect, result), intersect indictates if they intersect and result contains the resulting values</returns>
-        public static Tuple<bool, double[]> GetIntersection(Rect rectA,
-        Rect rectB,
-        double[] result)
+        public static Tuple<bool, double[]> GetIntersection(Rect rectA, Rect rectB, double[] result)
         {
             //result[0-1] will contain clipPoint of rectA, result[2-3] will contain clipPoint of rectB
 
