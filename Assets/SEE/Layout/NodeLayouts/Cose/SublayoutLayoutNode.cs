@@ -1,9 +1,4 @@
-﻿using SEE.Game;
-using SEE.Layout;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using static SEE.Game.AbstractSEECity;
+﻿using static SEE.Game.AbstractSEECity;
 
 namespace SEE.Layout
 {

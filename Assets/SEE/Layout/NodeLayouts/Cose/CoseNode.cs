@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using SEE.DataModel;
 using System;
-using System.Linq;
 
 namespace SEE.Layout
 {

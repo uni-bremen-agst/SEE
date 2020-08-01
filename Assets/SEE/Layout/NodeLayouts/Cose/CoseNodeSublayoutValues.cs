@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using SEE.DataModel;
-using SEE;
+﻿using UnityEngine;
 
 namespace SEE.Layout
 {

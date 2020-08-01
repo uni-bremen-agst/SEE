@@ -5,7 +5,6 @@ using System.Linq;
 using System;
 using SEE.Game;
 using static SEE.Game.AbstractSEECity;
-using SEE.Utils;
 
 namespace SEE.Layout
 {
