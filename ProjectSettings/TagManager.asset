@@ -18,6 +18,8 @@ TagManager:
   - FxTemporaire
   - Runtime
   - Function Call
+  - Building
+  - JLG Visualisation
   layers:
   - Default
   - TransparentFX
