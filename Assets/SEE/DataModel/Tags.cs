@@ -18,10 +18,11 @@ namespace SEE.DataModel
         public const string Path = "Path"; // for camera paths
         public const string Runtime = "Runtime";
         public const string FunctionCall = "Function Call";
+        public const string JLGVisualisation = "JLG Visualisation";
 
         /// <summary>
         /// All existing tags in one.
         /// </summary>
-        public static readonly string[] All = new string[] { Graph, Node, Edge, NodePrefab, Text, Erosion, Decoration, Path, Runtime, FunctionCall };
+        public static readonly string[] All = new string[] { Graph, Node, Edge, NodePrefab, Text, Erosion, Decoration, Path, Runtime, FunctionCall, JLGVisualisation };
     }
 }
