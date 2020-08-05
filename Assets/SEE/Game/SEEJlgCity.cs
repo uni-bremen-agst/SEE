@@ -22,7 +22,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// 
+        /// Loads the data from the given jlg file into a parsedJLG object and gives the object to a GameObject, that has a component to visualize it in the running game.
         /// </summary>
         private void LoadJLG()
         {
