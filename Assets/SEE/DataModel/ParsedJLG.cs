@@ -46,6 +46,15 @@ namespace Assets.SEE.DataModel
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="i">index of the Java statement in List allStatements</param>
+        /// <returns>The Location String from LocationLookupTable</returns>
+        public string GetStatementLocationString(int i) {
+            return locationLookupTable[int.Parse(allStatements[i].Location)];
+        }
+
+        /// <summary>
         /// getter for the fields of a ParsedJLG
         /// </summary>
         public List<string> FilesOfProject { get => filesOfProject; }
