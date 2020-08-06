@@ -63,7 +63,27 @@ namespace SEE.DataModel
         /// <summary>
         /// the length of the edge
         /// </summary>
-        public float dist;
+        private float length = -1.0f;
+
+        /// <summary>
+        /// The length of the edge, that is, the distance between the two laid
+        /// out nodes this edge connects.
+        /// </summary>
+        public float Length
+        {
+            get
+            {
+                if (length == -1.0f)
+                {
+                    throw new Exception("undefined edge length");
+                }
+                else
+                {
+                    return length;
+                }
+            }
+            set => length = value;
+        }
 
         /// <summary>
         /// The target of the edge.
