@@ -447,42 +447,12 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// Returns all edges of graph whose source and target is contained in selectedNodes.
+        /// Returns the maximal depth of the node hierarchy among the given <paramref name="nodes"/>
+        /// plus the given <paramref name="currentDepth"/>.
         /// </summary>
-        /// <param name="selectedNodes"></param>
-        /// <returns>all edges of graph whose source and target is contained in selectedNodes</returns>
-        public IList<Edge> ConnectingEdges(ICollection<ILayoutNode> selectedNodes)
-        {
-            IList<Edge> result = new List<Edge>();
-
-            foreach (Edge edge in this.Edges())
-            {
-                if (FilterListForLayoutNode(edge.Source.ID, selectedNodes) && FilterListForLayoutNode(edge.Target.ID, selectedNodes))
-                {
-                    result.Add(edge);
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Returns true if the node with the given linkname is contained in layoutNodes
-        /// </summary>
-        /// <param name="ID"></param>
-        /// <param name="layoutNodes"></param>
-        /// <returns>true if the node with the given linkname is contained in layoutNodes</returns>
-        private bool FilterListForLayoutNode(String ID, ICollection<ILayoutNode> layoutNodes)
-        {
-            foreach (ILayoutNode gameNode in layoutNodes)
-            {
-                if (gameNode.ID == ID)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
+        /// <param name="nodes">nodes for which to determine the depth</param>
+        /// <param name="currentDepth">the current depth of the given <paramref name="nodes"/></param>
+        /// <returns></returns>
         private int GetMaxDepth(List<Node> nodes, int currentDepth)
         {
             int max = currentDepth + 1;
