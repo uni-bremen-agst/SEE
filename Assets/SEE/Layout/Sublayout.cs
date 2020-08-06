@@ -314,58 +314,6 @@ namespace SEE.Layout
                 return layout.Layout(sublayoutNodes);
             }
         }
-
-        /// <summary>
-        /// evalutates the sublayout 
-        /// </summary>
-        /// <returns></returns>
-        private bool EvaluateSublayout()
-        {
-            Vector2 leftLowerCorner = new Vector2(Mathf.Infinity, Mathf.Infinity);
-            Vector2 rightUpperCorner = new Vector2(Mathf.NegativeInfinity, Mathf.NegativeInfinity);
-
-            foreach (ILayoutNode layoutNode in sublayoutNodes)
-            {
-                Vector3 extent = layoutNode.LocalScale / 2.0f;
-                // Note: position denotes the center of the object
-                Vector3 position = layoutNode.CenterPosition;
-                {
-                    // x co-ordinate of lower left corner
-                    float x = position.x - extent.x;
-                    if (x < leftLowerCorner.x)
-                    {
-                        leftLowerCorner.x = x;
-                    }
-                }
-                {
-                    // z co-ordinate of lower left corner
-                    float z = position.z - extent.z;
-                    if (z < leftLowerCorner.y)
-                    {
-                        leftLowerCorner.y = z;
-                    }
-                }
-                {   // x co-ordinate of upper right corner
-                    float x = position.x + extent.x;
-                    if (x > rightUpperCorner.x)
-                    {
-                        rightUpperCorner.x = x;
-                    }
-                }
-                {
-                    // z co-ordinate of upper right corner
-                    float z = position.z + extent.z;
-                    if (z > rightUpperCorner.y)
-                    {
-                        rightUpperCorner.y = z;
-                    }
-                }
-            }
-
-            Measurements _ = new Measurements(sublayoutNodes, graph: graph, leftFrontCorner: leftLowerCorner, rightBackCorner: rightUpperCorner);
-
-            return true; 
-        }
     }
 }
 
