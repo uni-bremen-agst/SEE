@@ -255,11 +255,10 @@ namespace SEE.Game
                         AddDecorationsForSublayouts(layoutNodes, sublayoutLayoutNodes, parent);
                     }
 
-                    EdgeDistCalculation(graph, layoutNodes);
-                    Measurements measurements = new Measurements(layoutNodes, graph, leftFrontCorner, rightBackCorner, p);
-
+                    EdgeDistCalculation(graph, layoutNodes);                    
                     if (settings.calculateMeasurements)
                     {
+                        Measurements measurements = new Measurements(layoutNodes, graph, leftFrontCorner, rightBackCorner, p);
                         settings.Measurements = measurements.ToStringDictionary(true);
                     }
                     else
@@ -367,7 +366,7 @@ namespace SEE.Game
 
                 Vector3 targetPosition = layoutNodes.Where(node => node.ID == edge.Target.ID).First().CenterPosition;
 
-                edge.dist = Vector3.Distance(sourcePosition, targetPosition);
+                edge.Length = Vector3.Distance(sourcePosition, targetPosition);
             }
         }
 

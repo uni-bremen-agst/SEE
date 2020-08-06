@@ -365,22 +365,22 @@ namespace SEE
 
             if (edges.Count > 0)
             {
-                minDistEdge = edges[0].dist;
-                maxDistEdge = edges[0].dist;
+                minDistEdge = edges[0].Length;
+                maxDistEdge = edges[0].Length;
             }
 
             foreach (Edge edge in edges)
             {
-                totalDist += edge.dist;
+                totalDist += edge.Length;
 
-                if (edge.dist < minDistEdge)
+                if (edge.Length < minDistEdge)
                 {
-                    minDistEdge = edge.dist;
+                    minDistEdge = edge.Length;
                 }
 
-                if (edge.dist > maxDistEdge)
+                if (edge.Length > maxDistEdge)
                 {
-                    maxDistEdge = edge.dist;
+                    maxDistEdge = edge.Length;
                 }
             }
 
@@ -398,7 +398,7 @@ namespace SEE
 
                 foreach (Edge edge in edges)
                 {
-                    variance += (edge.dist - averageDistEdge) * (edge.dist - averageDistEdge);
+                    variance += (edge.Length - averageDistEdge) * (edge.Length - averageDistEdge);
                 }
                 if (edges.Count == 1)
                 {
@@ -418,7 +418,7 @@ namespace SEE
 
                 foreach (Edge edge in edges)
                 {
-                    var edgeDistRelative = edge.dist / areaLength;
+                    var edgeDistRelative = edge.Length / areaLength;
                     varianceRelative += (edgeDistRelative - relationAvgDist) * (edgeDistRelative - relationAvgDist);
                 }
                 if (edges.Count == 1)
