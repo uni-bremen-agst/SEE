@@ -15,13 +15,11 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Collections;
+using SEE.DataModel;
 using System.Collections.Generic;
-using UnityEngine;
-using SEE.Layout;
 using static SEE.Game.AbstractSEECity;
 
-namespace SEE.DataModel
+namespace SEE.Layout
 {
     /// <summary>
     /// This class holds all settings for the cose layout
