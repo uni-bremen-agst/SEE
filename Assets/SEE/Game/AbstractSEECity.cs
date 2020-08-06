@@ -6,9 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using OdinSerializer;
-using SEE.DataModel;
 using SEE.DataModel.IO;
-using SEE.GO;
 using static SEE.Game.AbstractSEECity;
 using System.IO;
 using SEE.Utils;
@@ -416,14 +414,14 @@ namespace SEE.Game
         /// The kinds of node layouts available.
         /// </summary>
         public enum NodeLayouts
-        {
-            CompoundSpringEmbedder,
+        {            
             EvoStreets,
             Balloon,
             RectanglePacking,
             Treemap,
             CirclePacking,
             Manhattan,
+            CompoundSpringEmbedder,
             FromFile
         }
 
