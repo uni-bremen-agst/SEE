@@ -168,22 +168,24 @@ namespace SEE
             get => GetNodePerformanceInMilliseconds();
         }
 
-
         /// <summary>
-        /// the constructor
+        /// The constructor which will also always calculate the length of the edges.
         /// </summary>
         /// <param name="graph"> the graph displayed by the layout</param>
         /// <param name="leftFrontCorner">2D co-ordinate of the left front corner</param>
         /// <param name="rightBackCorner">2D co-ordinate of the right back corner</param>
         /// <param name="layoutNodes">the layoutNodes</param>
         /// <param name="performance">nodes performance</param>
-        public Measurements(ICollection<ILayoutNode> layoutNodes, Graph graph, Vector2 leftFrontCorner, Vector2 rightBackCorner, Performance performance = null)
+        public Measurements(ICollection<ILayoutNode> layoutNodes, Graph graph,
+                            Vector2 leftFrontCorner, Vector2 rightBackCorner,
+                            Performance performance = null)
         {
             this.width = Distance(leftFrontCorner.x, rightBackCorner.x);
             this.height = Distance(leftFrontCorner.y, rightBackCorner.y);
             this.layoutNodes = new List<ILayoutNode>(layoutNodes);
             this.edges = graph.ConnectingEdges(layoutNodes);
             this.nodePerformance = performance;
+            EdgeDistCalculation(graph, layoutNodes);
         }
 
         /// <summary>
@@ -195,6 +197,24 @@ namespace SEE
         {
             this.layoutNodes = new List<ILayoutNode>(layoutNodes);
             this.edges = edges; 
+        }
+
+        private Dictionary<Edge, float> edgeLengths;
+
+        /// <summary>
+        /// Calculates the distance for each edge
+        /// </summary>
+        /// <param name="layoutNodes">the layoutnodes</param>
+        /// <param name="graph">the graph</param>
+        private void EdgeDistCalculation(Graph graph, ICollection<ILayoutNode> layoutNodes)
+        {
+            edgeLengths = new Dictionary<Edge, float>();
+            foreach (Edge edge in graph.Edges())
+            {
+                Vector3 sourcePosition = layoutNodes.Where(node => node.ID == edge.Source.ID).First().CenterPosition;
+                Vector3 targetPosition = layoutNodes.Where(node => node.ID == edge.Target.ID).First().CenterPosition;
+                edgeLengths[edge] = Vector3.Distance(sourcePosition, targetPosition);
+            }
         }
 
         /// <summary>
@@ -365,22 +385,23 @@ namespace SEE
 
             if (edges.Count > 0)
             {
-                minDistEdge = edges[0].Length;
-                maxDistEdge = edges[0].Length;
+                minDistEdge = edgeLengths[edges[0]];
+                maxDistEdge = edgeLengths[edges[0]];
             }
 
             foreach (Edge edge in edges)
             {
-                totalDist += edge.Length;
+                float length = edgeLengths[edge];
+                totalDist += length;
 
-                if (edge.Length < minDistEdge)
+                if (length < minDistEdge)
                 {
-                    minDistEdge = edge.Length;
+                    minDistEdge = length;
                 }
 
-                if (edge.Length > maxDistEdge)
+                if (length > maxDistEdge)
                 {
-                    maxDistEdge = edge.Length;
+                    maxDistEdge = length;
                 }
             }
 
@@ -389,8 +410,6 @@ namespace SEE
             relationMinDistEdge = minDistEdge / areaLength;
             relationTotalDist = totalDist / areaLength;
 
-            
-
             if (edges.Count > 0)
             {
                 averageDistEdge = totalDist / edges.Count;
@@ -398,7 +417,8 @@ namespace SEE
 
                 foreach (Edge edge in edges)
                 {
-                    variance += (edge.Length - averageDistEdge) * (edge.Length - averageDistEdge);
+                    float length = edgeLengths[edge];
+                    variance += (length - averageDistEdge) * (length - averageDistEdge);
                 }
                 if (edges.Count == 1)
                 {
@@ -410,7 +430,6 @@ namespace SEE
             }
             standardDeviation = Mathf.Sqrt(varianceDistEdge);
 
-
             relationAvgDist = averageDistEdge / areaLength;
             if (edges.Count > 0)
             {
@@ -418,7 +437,7 @@ namespace SEE
 
                 foreach (Edge edge in edges)
                 {
-                    var edgeDistRelative = edge.Length / areaLength;
+                    var edgeDistRelative = edgeLengths[edge] / areaLength;
                     varianceRelative += (edgeDistRelative - relationAvgDist) * (edgeDistRelative - relationAvgDist);
                 }
                 if (edges.Count == 1)
@@ -428,24 +447,21 @@ namespace SEE
                 {
                     relativeVarianceDistEdge = varianceRelative / (edges.Count - 1);
                 }
-               
             }
             relativeStandardDeviation = Mathf.Sqrt(relativeVarianceDistEdge);
 
-            EdgesMeasurements edgesMeasurements = new EdgesMeasurements(lengthMax: maxDistEdge, 
-                                                                        lengthMin: minDistEdge, 
-                                                                        lengthTotal:  totalDist,
-                                                                        lengthMaxArea: relationMaxDistEdge,
-                                                                        lengthMinArea: relationMinDistEdge,
-                                                                        lengthTotalArea: relationTotalDist,
-                                                                        lengthAverage: averageDistEdge,
-                                                                        lengthAverageArea: relationAvgDist,
-                                                                        lengthVariance: varianceDistEdge,
-                                                                        lengthStandardDeviation: standardDeviation, 
-                                                                        lengthVarianceArea: relativeVarianceDistEdge, 
-                                                                        lengthStandardDeviationArea: relativeStandardDeviation);
-
-            return edgesMeasurements;
+            return new EdgesMeasurements(lengthMax: maxDistEdge, 
+                                         lengthMin: minDistEdge, 
+                                         lengthTotal:  totalDist,
+                                         lengthMaxArea: relationMaxDistEdge,
+                                         lengthMinArea: relationMinDistEdge,
+                                         lengthTotalArea: relationTotalDist,
+                                         lengthAverage: averageDistEdge,
+                                         lengthAverageArea: relationAvgDist,
+                                         lengthVariance: varianceDistEdge,
+                                         lengthStandardDeviation: standardDeviation, 
+                                         lengthVarianceArea: relativeVarianceDistEdge, 
+                                         lengthStandardDeviationArea: relativeStandardDeviation);
         }
 
         /// <summary>

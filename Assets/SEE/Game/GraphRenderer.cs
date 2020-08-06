@@ -254,8 +254,7 @@ namespace SEE.Game
                     {
                         AddDecorationsForSublayouts(layoutNodes, sublayoutLayoutNodes, parent);
                     }
-
-                    EdgeDistCalculation(graph, layoutNodes);                    
+                                     
                     if (settings.calculateMeasurements)
                     {
                         Measurements measurements = new Measurements(layoutNodes, graph, leftFrontCorner, rightBackCorner, p);
@@ -352,24 +351,6 @@ namespace SEE.Game
                 }
             }
         }
-
-        /// <summary>
-        /// Calculates the distance for each edge
-        /// </summary>
-        /// <param name="layoutNodes">the layoutnodes</param>
-        /// <param name="graph">the graph</param>
-        protected void EdgeDistCalculation(Graph graph, ICollection<ILayoutNode> layoutNodes)
-        {
-            foreach (Edge edge in graph.Edges())
-            {
-                Vector3 sourcePosition = layoutNodes.Where(node => node.ID == edge.Source.ID).First().CenterPosition;
-
-                Vector3 targetPosition = layoutNodes.Where(node => node.ID == edge.Target.ID).First().CenterPosition;
-
-                edge.Length = Vector3.Distance(sourcePosition, targetPosition);
-            }
-        }
-
 
         /// <summary>
         /// Adds the decoration to the sublayout

@@ -151,8 +151,6 @@ namespace SEE.Layout
                     nodeLayout.Apply(layoutNodes.Cast<ILayoutNode>().ToList(), graph.Edges(), new List<SublayoutLayoutNode>());
                     NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x);
                     NodeLayout.MoveTo(layoutNodes, parent.transform.position);
-
-                    EdgeDistCalculation(graph, layoutNodes);
                     
                     BoundingBox(layoutNodes, out Vector2 FrontCorner, out Vector2 BackCorner);
                     Measurements measurements = new Measurements(layoutNodes, graph, FrontCorner, BackCorner);
@@ -207,8 +205,6 @@ namespace SEE.Layout
                 layout.Apply(layoutNodes.Cast<ILayoutNode>().ToList());
             }
             p.End();
-
-            EdgeDistCalculation(graph, layoutNodes);
 
             BoundingBox(layoutNodes, out Vector2 FrontCorner, out Vector2 BackCorner);
             Measurements measurements = new Measurements(layoutNodes, graph, FrontCorner, BackCorner, p);
