@@ -146,7 +146,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 141690887}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.99999994, y: -4.5, z: 0}
+  m_LocalPosition: {x: -0.80089813, y: -4.5995507, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -181,7 +181,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 7, y: 7}
     lockAspectRatio: 1
-    worldSize: {x: 0.6999999, y: 0.6999999}
+    worldSize: {x: 0.5606287, y: 0.5606287}
 --- !u!1 &186778472
 GameObject:
   m_ObjectHideFlags: 0
@@ -350,7 +350,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 3|SEE.DataModel.CoseGraphSettings, SEE
+      Data: 3|SEE.Layout.CoseGraphSettings, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 101
@@ -858,7 +858,7 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
-  InnerNodeHeightMetric: 
+  InnerNodeHeightMetric: 0.01
   InnerNodeStyleMetric: Metric.IssuesTotal
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
@@ -1742,7 +1742,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 3|SEE.DataModel.CoseGraphSettings, SEE
+      Data: 3|SEE.Layout.CoseGraphSettings, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 6
@@ -3169,7 +3169,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 3|SEE.DataModel.CoseGraphSettings, SEE
+      Data: 3|SEE.Layout.CoseGraphSettings, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 269
@@ -27286,7 +27286,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 3|SEE.DataModel.CoseGraphSettings, SEE
+      Data: 3|SEE.Layout.CoseGraphSettings, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -28484,7 +28484,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1626562202}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.99999994, y: -4, z: 0}
+  m_LocalPosition: {x: 0.80089813, y: -4.199102, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -28519,7 +28519,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 7, y: 7}
     lockAspectRatio: 1
-    worldSize: {x: 0.6999999, y: 0.6999999}
+    worldSize: {x: 0.5606287, y: 0.5606287}
 --- !u!1 &1636335451
 GameObject:
   m_ObjectHideFlags: 0
@@ -28545,7 +28545,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636335451}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.9131737, y: -4, z: 0}
+  m_LocalPosition: {x: -3.2035928, y: -4.199102, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -28616,7 +28616,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 20, y: 20}
     lockAspectRatio: 1
-    worldSize: {x: 1.9999999, y: 1.9999999}
+    worldSize: {x: 1.6017963, y: 1.6017963}
   knob:
     idleSprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
     busySprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
@@ -28626,7 +28626,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 10, y: 10}
     lockAspectRatio: 1
-    worldSize: {x: 0.99999994, y: 0.99999994}
+    worldSize: {x: 0.80089813, y: 0.80089813}
   knobRange: 7.5
 --- !u!1 &1776319858
 GameObject:
@@ -28653,7 +28653,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776319858}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.9131737, y: -4, z: 0}
+  m_LocalPosition: {x: 3.2035928, y: -4.199102, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -28724,7 +28724,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 20, y: 20}
     lockAspectRatio: 1
-    worldSize: {x: 1.9999999, y: 1.9999999}
+    worldSize: {x: 1.6017963, y: 1.6017963}
   knob:
     idleSprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
     busySprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
@@ -28734,7 +28734,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 10, y: 10}
     lockAspectRatio: 1
-    worldSize: {x: 0.99999994, y: 0.99999994}
+    worldSize: {x: 0.80089813, y: 0.80089813}
   knobRange: 7.5
 --- !u!1001 &1856647769
 PrefabInstance:
