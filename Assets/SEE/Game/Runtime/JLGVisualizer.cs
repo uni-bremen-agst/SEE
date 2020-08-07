@@ -2,6 +2,8 @@
 using OdinSerializer;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using TMPro;
 using UnityEngine;
 
 namespace SEE.Game.Runtime
@@ -40,9 +42,16 @@ namespace SEE.Game.Runtime
         private Boolean playDirection = true;
 
         /// <summary>
+        /// 
+        /// </summary>
+        public GameObject textPrefab;
+
+        private Stack<GameObject> textWindows = new Stack<GameObject>();
+
+        /// <summary>
         /// The GameObject that represents the class, to which the current statement belongs to. 
         /// </summary>
-        public GameObject currentGO;
+        private GameObject currentGO;
 
         /// <summary>
         /// A list of all active GameObjects that are tagged with 'Node'.
@@ -61,6 +70,10 @@ namespace SEE.Game.Runtime
             {
                 throw new Exception("There are no Nodes");
             }
+            if (textPrefab == null)
+            {
+                throw new Exception("Please drag a Textprefab into the scripts field.");
+            }
             currentGO = GetNodeForStatement(statementCount);
         }
 
@@ -74,7 +87,11 @@ namespace SEE.Game.Runtime
                     if (!NodeRepresentsStatementLocation(statementCount, currentGO))
                     {
                         currentGO = GetNodeForStatement(statementCount);
-                        //Hier Textfeld generator einsetzen
+                        Debug.Log("hallo?");
+                        if (! textWindowForNodeExists(currentGO))
+                        {
+                            GenerateScrollableTextWindow();
+                        }
                     }
                     if (playDirection)
                     {
@@ -108,6 +125,60 @@ namespace SEE.Game.Runtime
                     SlowDown();
                 }
             }
+        }
+
+        private bool textWindowForNodeExists(GameObject node)
+        {
+            bool exists = false;
+            if (! (textWindows.Count == 0))
+            {
+                foreach (GameObject go in textWindows)
+                {
+                    if (go.name.Equals(node.name + " filecontent"))
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+            }
+            return exists;
+        }
+
+        /// <summary>
+        /// This Method generates a new ScrollableTextMeshProWindow above the middle of the currentGO Node. Also it fills the Textfield with the code saved in the classfile,
+        /// that belongs to this node.
+        /// </summary>
+        private void GenerateScrollableTextWindow()
+        {
+            Vector3 v = currentGO.transform.position;
+            //v.y = currentGO.GetComponent<Renderer>().bounds.size.y; das hier funktioniert nicht, siehe nodefactory. Rainer fragen wie ich am besten die Windowsize dynamisch mache.
+            GameObject go = Instantiate(textPrefab,v,currentGO.transform.rotation,this.gameObject.transform.parent);
+            go.name = currentGO.name + " filecontent";
+            ///set canvas order in layer to textwindows.count damit die fenster voreinander gerendered werden
+            go.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = GetFileContentForNode(currentGO);
+            textWindows.Push(go);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="go"></param>
+        /// <returns></returns>
+        private string GetFileContentForNode(GameObject go)
+        {
+            string classname = go.name;
+            if (classname.Contains(".")) {
+                classname = classname.Substring(classname.LastIndexOf(".") + 1);
+            }
+            classname = classname + ".java";
+            foreach (string p in parsedJLG.FilesOfProject)
+            {
+                if (p.EndsWith(classname))
+                {
+                    return File.ReadAllText(p);
+                }
+            }
+            return null;
         }
 
         /// <summary>
