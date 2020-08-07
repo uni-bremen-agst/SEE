@@ -48,12 +48,14 @@ namespace SEEEditor
             city.RDP = EditorGUILayout.FloatField("RDP", city.RDP);
 
             GUILayout.Label("Data", EditorStyles.boldLabel);
-            if (city.PathPrefix == null)
-            {
-                // Application.dataPath (used within ProjectPath()) must not be called in a 
-                // constructor. That is why we need to set it here if it is not yet defined.
-                city.PathPrefix = UnityProject.GetPath();
-            }
+
+            // FIXME: Do want to set PathPrefix here?
+            //if (city.PathPrefix == null)
+            //{
+            //    // Application.dataPath (used within ProjectPath()) must not be called in a 
+            //    // constructor. That is why we need to set it here if it is not yet defined.
+            //    city.PathPrefix = UnityProject.GetPath();
+            //}
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
             // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
 

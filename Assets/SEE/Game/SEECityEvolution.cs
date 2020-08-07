@@ -64,11 +64,6 @@ namespace SEE.Game
         /// </summary>
         private List<Graph> LoadData()
         {
-            if (String.IsNullOrEmpty(PathPrefix))
-            {
-                PathPrefix = UnityProject.GetPath() + "..\\Data\\GXL\\animation-clones\\";
-                Debug.LogErrorFormat("Path prefix not set. Using default: {0}.\n", PathPrefix);
-            }
             GraphsReader graphsReader = new GraphsReader();
             // Load all GXL graphs in directory PathPrefix but not more than maxRevisionsToLoad many.
             graphsReader.Load(this.PathPrefix, this.HierarchicalEdges, maxRevisionsToLoad);
@@ -88,11 +83,6 @@ namespace SEE.Game
         /// <returns>the loaded graph or null if none could be found</returns>
         public Graph LoadFirstGraph()
         {
-            if (String.IsNullOrEmpty(PathPrefix))
-            {
-                PathPrefix = UnityProject.GetPath() + "..\\Data\\GXL\\animation-clones\\";
-                Debug.LogErrorFormat("Path prefix not set. Using default: {0}.\n", PathPrefix);
-            }
             GraphReader graphReader = new GraphReader(FirstFilename(this.PathPrefix), this.HierarchicalEdges);
             graphReader.Load();
             return graphReader.GetGraph();

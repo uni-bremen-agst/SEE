@@ -22,14 +22,45 @@ namespace SEE.Game
     public abstract class AbstractSEECity : SerializedMonoBehaviour
     {
         /// <summary>
-        /// The prefix of the absolute paths for the GXL and CSV data; that is,
-        /// the directory where these data are located in.
-        /// Note: This attribute will be set in the SEECityEditor. 
-        /// Application.dataPath (used within ProjectPath()) must not be called in a 
-        /// constructor. That is why we need to defer its definition to the 
-        /// SEECityEditor.
+        /// The internal representation of property PathPrefix.
+        /// The internal representation of this path is always in the Unix style
+        /// (or also Unity style), independent from the operating system we are currently
+        /// running on.
         /// </summary>        
-        public string PathPrefix; // serialized by Unity
+        private string pathPrefix = null; // serialized by Unity
+
+        /// <summary>
+        /// The prefix of the absolute paths for the GXL, CSV, GVL data; that is,
+        /// the directory where these data files are located in.
+        /// 
+        /// The style of this path prefix is always the one of the current operating
+        /// system we are running on, that is, the directory separator will be \
+        /// on Windows and / on all other platforms.
+        /// 
+        /// If the path prefix has never been set or was set to the empty string, the path 
+        /// prefix is the path to the Unity project.
+        /// 
+        /// The last character will always be the directory separator of the current platform.
+        /// </summary>
+        public string PathPrefix
+        {
+            set
+            {
+                pathPrefix = Filenames.ToInternalRepresentation(value);
+                // pathPrefix must end with a directory separator /
+                if (pathPrefix.Length > 0 && pathPrefix[pathPrefix.Length - 1] != Filenames.UnixDirectorySeparator)
+                {
+                    pathPrefix += Filenames.UnixDirectorySeparator;
+                }
+            }
+
+            get
+            {
+                return string.IsNullOrEmpty(pathPrefix) ? 
+                    UnityProject.GetPath() 
+                    : Filenames.OnCurrentPlatform(pathPrefix);
+            }
+        }
 
         /// <summary>
         /// The relative path for the GVL file containing the node layout information.
