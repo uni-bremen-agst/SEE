@@ -114,6 +114,16 @@ namespace SEE.Layout
             scale *= factor;
         }
 
+        public void SetOrigin()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SetRelative(ILayoutNode node)
+        {
+            throw new System.NotImplementedException();
+        }
+
         /// <summary>
         /// The center position of the node.
         /// </summary>
@@ -178,5 +188,11 @@ namespace SEE.Layout
         /// independent of its parent.
         /// </summary>
         public Vector3 AbsoluteScale => scale;
+
+        public Vector3 RelativePosition { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public bool IsSublayoutNode { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public bool IsSublayoutRoot { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public Sublayout Sublayout { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public ILayoutNode SublayoutRoot { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SEE.DataModel;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -74,6 +75,16 @@ namespace SEE.Layout
                 positionX += size.x / 2.0f + distanceBetweenBuildings;
             }
             return result;
+        }
+
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool UsesEdgesAndSublayoutNodes()
+        {
+            return false; 
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SEE.Utils;
+﻿using SEE.DataModel;
+using SEE.Utils;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -51,6 +52,16 @@ namespace SEE.Layout
                 Debug.LogErrorFormat("GVL file {0} does not exist. No layout could be loaded.\n", filename);
             }
             return result;
+        }
+
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool UsesEdgesAndSublayoutNodes()
+        {
+            return false;
         }
     }
 }

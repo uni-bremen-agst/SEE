@@ -57,10 +57,42 @@ namespace SEE.Layout
         ICollection<T> Successors { get; }
     }
 
+    public interface ISublayoutNode<T>
+    {
+        /// <summary>
+        /// the relative position from a sublayoutNode to its sublayoutRoot node
+        /// </summary>
+        Vector3 RelativePosition { get; set; }
+
+        /// <summary>
+        /// true if node is a sublayouNode
+        /// </summary>
+        bool IsSublayoutNode { get; set; }
+
+        /// <summary>
+        /// true if node is a root node of a sublayout
+        /// </summary>
+        bool IsSublayoutRoot { get; set; }
+
+        /// <summary>
+        /// if the node is a sublayout root, this is the sublayout 
+        /// </summary>
+        Sublayout Sublayout { get; set; }
+
+        /// <summary>
+        /// the sublayout root node
+        /// </summary>
+        T SublayoutRoot { get; set; }
+
+        void SetOrigin();
+
+        void SetRelative(T node);
+    }
+
     /// <summary>
     ///  Defines the methods for all nodes to be laid out.
     /// </summary>
-    public interface ILayoutNode : IGameNode, IGraphNode<ILayoutNode>, IHierarchyNode<ILayoutNode>
+    public interface ILayoutNode : IGameNode, IGraphNode<ILayoutNode>, IHierarchyNode<ILayoutNode>, ISublayoutNode<ILayoutNode>
     {
     }
 

@@ -445,6 +445,13 @@ namespace SEE.DataModel
             return result;
         }
 
+        /// <summary>
+        /// Returns the maximal depth of the node hierarchy among the given <paramref name="nodes"/>
+        /// plus the given <paramref name="currentDepth"/>.
+        /// </summary>
+        /// <param name="nodes">nodes for which to determine the depth</param>
+        /// <param name="currentDepth">the current depth of the given <paramref name="nodes"/></param>
+        /// <returns></returns>
         private int GetMaxDepth(List<Node> nodes, int currentDepth)
         {
             int max = currentDepth + 1;

@@ -23,5 +23,10 @@
         {
             return false;
         }
+
+        public override bool UsesEdgesAndSublayoutNodes()
+        {
+            return false; 
+        }
     }
 }
