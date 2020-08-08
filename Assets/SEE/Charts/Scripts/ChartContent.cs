@@ -156,7 +156,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void Awake()
 		{
-			ChartManager = GameObject.FindGameObjectWithTag("ChartManager")
+			ChartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerName)
 				.GetComponent<ChartManager>();
 			_xGap = childOffset.x - headerOffset.x;
 			_yGap = childOffset.y - headerOffset.y;

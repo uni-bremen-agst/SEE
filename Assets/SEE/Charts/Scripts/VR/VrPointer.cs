@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.GO;
+using UnityEngine;
 
 namespace SEE.Charts.Scripts.VR
 {
@@ -62,7 +63,7 @@ namespace SEE.Charts.Scripts.VR
 		/// </summary>
 		private void GetSettingData()
 		{
-			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
+			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerName)
 				.GetComponent<ChartManager>();
 			_pointerLength = _chartManager.pointerLength;
 		}

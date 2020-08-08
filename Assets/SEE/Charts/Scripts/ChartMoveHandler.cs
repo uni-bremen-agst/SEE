@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using SEE.GO;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -87,7 +88,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		protected virtual void GetSettingData()
 		{
-			ChartManager = GameObject.FindGameObjectWithTag("ChartManager")
+			ChartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerName)
 				.GetComponent<ChartManager>();
 			_dragDelay = ChartManager.dragDelay;
 			_maximizedSprite = ChartManager.maximizedSprite;

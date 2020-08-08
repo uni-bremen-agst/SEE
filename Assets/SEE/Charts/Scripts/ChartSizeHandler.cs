@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.GO;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace SEE.Charts.Scripts
@@ -90,7 +91,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void GetSettingData()
 		{
-			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
+			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerName)
 				.GetComponent<ChartManager>();
 			MinimumSize = _chartManager.minimumSize;
 		}
