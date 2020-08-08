@@ -48,6 +48,9 @@ namespace SEE.Controls
         [Tooltip("The device from which to read input for transforming a selected object.")]
         public Transformation transformationDevice;
 
+        [Tooltip("The device from which to get inputs for the charts.")]
+        public ChartControls chartControlDevice;
+
         [Tooltip("The action applied to move the camera.")]
         public CameraAction cameraAction;
 
@@ -57,11 +60,19 @@ namespace SEE.Controls
         [Tooltip("The action applied to transform a selected object.")]
         private TransformationAction transformationAction;
 
-        [Tooltip("The device from which to get inputs for the charts.")]
-        public ChartControls chartControlDevice;
-
+        // This action is declared private because at present there is only one
+        // such action that is independent from the environment. Hence, there is
+        // no need to let the user configure it. That would just be a burden.
         [Tooltip("The action applied to handle chart controls.")]
-        public ChartAction chartAction;
+        private ChartAction chartAction;
+
+        /// <summary>
+        /// The chart action applied to handle chart controls.
+        /// </summary>
+        public ChartAction ChartAction
+        {
+            get => chartAction;
+        }
 
         private void Start()
         {
@@ -180,9 +191,27 @@ namespace SEE.Controls
             }
         }
 
+        /// <summary>
+        /// Sets up the chart control device and action. The chart action is created
+        /// if there is currently none set. The chart control device must be set by
+        /// the user in the inspector because it depends upon the environment
+        /// (VR, desktop, gamepad).
+        /// </summary>
         private void ChartSetup()
         {
-	        chartAction.chartControlsDevice = chartControlDevice;
+            if (chartControlDevice == null)
+            {
+                Debug.LogError("Chart control device must be set.\n");
+            }
+            else
+            {
+                chartAction = gameObject.GetComponent<ChartAction>();
+                if (chartAction == null)
+                {
+                    chartAction = gameObject.AddComponent<ChartAction>();
+                }
+                chartAction.chartControlsDevice = chartControlDevice;
+            }
         }
     }
 }

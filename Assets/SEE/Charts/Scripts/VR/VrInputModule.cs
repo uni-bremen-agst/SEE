@@ -43,7 +43,7 @@ namespace SEE.Charts.Scripts.VR
 		{
 			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
 				.GetComponent<ChartManager>();
-			_chartAction = GameObject.Find("VRPlayer").GetComponent<Actor>().chartAction;
+			_chartAction = GameObject.Find("VRPlayer").GetComponent<Actor>().ChartAction;
 		}
 
 		/// <summary>

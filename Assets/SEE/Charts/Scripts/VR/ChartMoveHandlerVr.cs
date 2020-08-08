@@ -95,7 +95,7 @@ namespace SEE.Charts.Scripts.VR
 			_chartScrollSpeed = ChartManager.chartScrollSpeed;
 			_minimumDistance = ChartManager.distanceThreshold;
 			_maximumDistance = ChartManager.pointerLength;
-			_chartAction = GameObject.Find("VRPlayer").GetComponent<Actor>().chartAction;
+			_chartAction = GameObject.Find("VRPlayer").GetComponent<Actor>().ChartAction;
 		}
 
 		/// <summary>
