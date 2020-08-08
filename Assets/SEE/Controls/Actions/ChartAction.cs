@@ -1,12 +1,13 @@
 ﻿using SEE.Charts.Scripts;
 using SEE.Controls.Devices;
+using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Controls
 {
 	public class ChartAction : MonoBehaviour
 	{
-		protected ChartManager ChartManager;
+        protected ChartManager ChartManager;
 
 		[HideInInspector] public ChartControls chartControlsDevice;
 
@@ -24,8 +25,16 @@ namespace SEE.Controls
 
 		private void Start()
 		{
-			ChartManager = GameObject.FindGameObjectWithTag("ChartManager")
-				.GetComponent<ChartManager>();
+            GameObject chartManagerObject = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerName);
+			if (chartManagerObject == null)
+			{
+				Debug.LogErrorFormat("There is no chart manager named {0} in the scene\n",
+					GlobalGameObjectNames.ChartManagerName);
+			}
+			else
+			{
+				ChartManager = chartManagerObject.GetComponent<ChartManager>();
+			}
 		}
 	}
 }

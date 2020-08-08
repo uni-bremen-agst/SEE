@@ -1,4 +1,5 @@
 ﻿using SEE.Controls;
+using SEE.GO;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -41,7 +42,7 @@ namespace SEE.Charts.Scripts.VR
 		/// </summary>
 		private void GetSettingData()
 		{
-			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
+			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerName)
 				.GetComponent<ChartManager>();
 			_chartAction = GameObject.Find("VRPlayer").GetComponent<Actor>().ChartAction;
 		}

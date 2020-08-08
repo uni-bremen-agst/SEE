@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using SEE.GO;
+using System.Collections;
 using UnityEngine;
 
 namespace SEE.Charts.Scripts.VR
@@ -44,7 +45,7 @@ namespace SEE.Charts.Scripts.VR
 		/// </summary>
 		private void GetSettingData()
 		{
-			_chartManager = GameObject.FindGameObjectWithTag("ChartManager")
+			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerName)
 				.GetComponent<ChartManager>();
 			_distanceThreshold = _chartManager.distanceThreshold;
 		}
