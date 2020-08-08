@@ -1,5 +1,4 @@
-﻿using SEE.GO;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 namespace SEE.Charts.Scripts.VR
@@ -9,11 +8,6 @@ namespace SEE.Charts.Scripts.VR
 	/// </summary>
 	public class ChartPositionVr : MonoBehaviour
 	{
-		/// <summary>
-		/// Contains some settings used in this script.
-		/// </summary>
-		private ChartManager _chartManager;
-
 		/// <summary>
 		/// Contains position data of the assigned camera.
 		/// </summary>
@@ -45,9 +39,7 @@ namespace SEE.Charts.Scripts.VR
 		/// </summary>
 		private void GetSettingData()
 		{
-			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerTag)
-				.GetComponent<ChartManager>();
-			_distanceThreshold = _chartManager.distanceThreshold;
+			_distanceThreshold = ChartManager.Instance.distanceThreshold;
 		}
 
 		/// <summary>

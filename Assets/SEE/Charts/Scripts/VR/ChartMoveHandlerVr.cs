@@ -92,9 +92,9 @@ namespace SEE.Charts.Scripts.VR
 		protected override void GetSettingData()
 		{
 			base.GetSettingData();
-			_chartScrollSpeed = ChartManager.chartScrollSpeed;
-			_minimumDistance = ChartManager.distanceThreshold;
-			_maximumDistance = ChartManager.pointerLength;
+			_chartScrollSpeed = ChartManager.Instance.chartScrollSpeed;
+			_minimumDistance = ChartManager.Instance.distanceThreshold;
+			_maximumDistance = ChartManager.Instance.pointerLength;
 			_chartAction = GameObject.Find("VRPlayer").GetComponent<Actor>().ChartAction;
 		}
 

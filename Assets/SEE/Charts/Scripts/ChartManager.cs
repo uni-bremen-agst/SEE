@@ -14,6 +14,43 @@ namespace SEE.Charts.Scripts
 		private static ChartManager _instance;
 
 		/// <summary>
+		/// Tag of a game object having a ChartManager as a component.
+		/// </summary>
+		private const string ChartManagerTag = "ChartManager";
+
+		/// <summary>
+		/// Returns the unique chart manager component in the scene.
+		/// 
+		/// Precondition: There must be at least one game object tagged by ChartManagerTag
+		/// holding a ChartManager component. If there is more than one such object, an error
+		/// will be logged and the first game object will be used. If there is no such object,
+		/// an exception is raised.
+		/// </summary>
+		public static ChartManager Instance
+        {
+			get
+            {
+				if (_instance == null)
+				{
+					GameObject[] chartManagers = GameObject.FindGameObjectsWithTag(ChartManagerTag);
+					if (chartManagers.Length == 0)
+					{
+						Debug.LogErrorFormat("There is no chart manager tagged by {0} in the scene.\n",
+											 ChartManagerTag);
+						throw new System.Exception("No chart manager in the scene");
+					}
+					else if (chartManagers.Length > 1)
+					{
+						Debug.LogErrorFormat("There are multiple chart managers named {0} in the scene.\n",
+											 ChartManagerTag);
+					}
+					_instance = chartManagers[0].GetComponent<ChartManager>();
+				}
+				return _instance;
+			}
+        }
+
+		/// <summary>
 		/// If true, highlighted objects will stay highlighted until this is deactivated.
 		/// </summary>
 		[HideInInspector] public bool selectionMode;
@@ -151,8 +188,14 @@ namespace SEE.Charts.Scripts
 		private void Awake()
 		{
 			if (_instance == null)
+			{
 				_instance = this;
-			else if (_instance == this) Destroy(gameObject);
+			}
+			else if (_instance == this)
+			{
+				// FIXME: What does this mean?
+				Destroy(gameObject);
+			}
 		}
 
 		/// <summary>
@@ -161,15 +204,21 @@ namespace SEE.Charts.Scripts
 		private void Start()
 		{
 			_isVirtualReality =
-				GameObject.Find("Player Settings").GetComponent<PlayerSettings>().playerInputType ==
-				PlayerSettings.PlayerInputType.VR;
+				GameObject.Find("Player Settings").GetComponent<PlayerSettings>().playerInputType
+				 == PlayerSettings.PlayerInputType.VR;
 			if (!_isVirtualReality)
+			{
 				_chartsOpen = GameObject.Find("ChartCanvas") != null
 					? GameObject.Find("ChartCanvas").transform.Find("ChartsOpen").gameObject
 					: Instantiate(chartsPrefab).transform.Find("ChartsOpen").gameObject;
+			}
 			else
+			{
 				foreach (var nonVrObject in nonVrObjects)
+				{
 					Destroy(nonVrObject);
+				}
+			}
 		}
 
 		/// <summary>

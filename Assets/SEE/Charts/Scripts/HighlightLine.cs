@@ -1,5 +1,4 @@
-﻿using SEE.GO;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Charts.Scripts
 {
@@ -8,11 +7,6 @@ namespace SEE.Charts.Scripts
 	/// </summary>
 	public class HighlightLine : MonoBehaviour
 	{
-		/// <summary>
-		/// Contains some settings used in this script.
-		/// </summary>
-		private ChartManager _chartManager;
-
 		/// <summary>
 		/// The color of the line for normal highlights.
 		/// </summary>
@@ -46,10 +40,8 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void GetSettingData()
 		{
-			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerTag)
-				.GetComponent<ChartManager>();
-			_standardColor = _chartManager.standardColor;
-			_accentuationColor = _chartManager.accentuationColor;
+			_standardColor = ChartManager.Instance.standardColor;
+			_accentuationColor = ChartManager.Instance.accentuationColor;
 		}
 
 		/// <summary>

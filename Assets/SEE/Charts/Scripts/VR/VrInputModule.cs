@@ -1,5 +1,4 @@
 ﻿using SEE.Controls;
-using SEE.GO;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -10,11 +9,6 @@ namespace SEE.Charts.Scripts.VR
 	/// </summary>
 	public class VrInputModule : BaseInputModule
 	{
-		/// <summary>
-		/// Contains some settings used in this script.
-		/// </summary>
-		private ChartManager _chartManager;
-
 		/// <summary>
 		/// Manages the VR pointer used to interact with canvases.
 		/// </summary>
@@ -42,8 +36,6 @@ namespace SEE.Charts.Scripts.VR
 		/// </summary>
 		private void GetSettingData()
 		{
-			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerTag)
-				.GetComponent<ChartManager>();
 			_chartAction = GameObject.Find("VRPlayer").GetComponent<Actor>().ChartAction;
 		}
 
@@ -67,12 +59,12 @@ namespace SEE.Charts.Scripts.VR
 			eventSystem.RaycastAll(EventData, m_RaycastResultCache);
 			EventData.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
 			var ray = new Ray(_pointer.transform.position, _pointer.transform.forward);
-			Physics.Raycast(ray, out var hitData, _chartManager.pointerLength);
+			Physics.Raycast(ray, out var hitData, ChartManager.Instance.pointerLength);
 			var colliderDistance = hitData.distance.Equals(0f)
-				? _chartManager.pointerLength
+				? ChartManager.Instance.pointerLength
 				: hitData.distance;
 			var canvasDistance = EventData.pointerCurrentRaycast.distance.Equals(0f)
-				? _chartManager.pointerLength
+				? ChartManager.Instance.pointerLength
 				: EventData.pointerCurrentRaycast.distance;
 
 			if (colliderDistance.CompareTo(canvasDistance) < 0)
