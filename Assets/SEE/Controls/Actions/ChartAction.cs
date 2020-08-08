@@ -1,11 +1,12 @@
-﻿using SEE.Charts.Scripts;
-using SEE.Controls.Devices;
-using SEE.GO;
+﻿using SEE.Controls.Devices;
 using UnityEngine;
 
 namespace SEE.Controls
 {
-	public class ChartAction : MonoBehaviour
+	/// <summary>
+	/// Abstract super class of the actions applied to metric charts.
+	/// </summary>
+	public abstract class ChartAction : MonoBehaviour
 	{
 		[HideInInspector] public ChartControls chartControlsDevice;
 

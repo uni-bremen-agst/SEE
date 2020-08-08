@@ -60,11 +60,8 @@ namespace SEE.Controls
         [Tooltip("The action applied to transform a selected object.")]
         private TransformationAction transformationAction;
 
-        // This action is declared private because at present there is only one
-        // such action that is independent from the environment. Hence, there is
-        // no need to let the user configure it. That would just be a burden.
         [Tooltip("The action applied to handle chart controls.")]
-        private ChartAction chartAction;
+        public ChartAction chartAction;
 
         /// <summary>
         /// The chart action applied to handle chart controls.
@@ -201,15 +198,17 @@ namespace SEE.Controls
         {
             if (chartControlDevice == null)
             {
-                Debug.LogErrorFormat("Chart control device must be set in actor of {}.\n", 
+                Debug.LogErrorFormat("A chart control device must be set in actor of {}.\n", 
                                      gameObject.name);
             }
-            else
+            else 
             {
-                chartAction = gameObject.GetComponent<ChartAction>();
                 if (chartAction == null)
                 {
-                    chartAction = gameObject.AddComponent<ChartAction>();
+                    Debug.LogErrorFormat("A chart action must be set in actor of {}.\n",
+                                         gameObject.name);
+                    // We will add a stub, which allows us to continue.
+                    chartAction = gameObject.AddComponent<NullChartAction>();
                 }
                 chartAction.chartControlsDevice = chartControlDevice;
             }
