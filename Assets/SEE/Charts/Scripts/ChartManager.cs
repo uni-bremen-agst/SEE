@@ -45,6 +45,12 @@ namespace SEE.Charts.Scripts
 											 ChartManagerTag);
 					}
 					_instance = chartManagers[0].GetComponent<ChartManager>();
+					if (_instance == null)
+                    {
+						Debug.LogWarningFormat("The game object named {0} does not have a ChartManager component. Will be added.\n",
+					                           ChartManagerTag);
+						_instance = chartManagers[0].AddComponent<ChartManager>();
+					}
 				}
 				return _instance;
 			}
@@ -185,18 +191,19 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// Enforces the singleton pattern.
 		/// </summary>
-		private void Awake()
-		{
-			if (_instance == null)
-			{
-				_instance = this;
-			}
-			else if (_instance == this)
-			{
-				// FIXME: What does this mean?
-				Destroy(gameObject);
-			}
-		}
+		//private void Awake()
+		//{
+		//	if (_instance == null)
+		//	{
+		//		_instance = this;
+		//	}
+		//	else if (_instance == this)
+		//	{
+		//		// FIXME: What does this mean?
+		//		Debug.LogFormat("ChartManager.Awake(): Destroying game object {0} holding a chart manager component.\n", gameObject.name);
+		//		Destroy(gameObject);
+		//	}
+		//}
 
 		/// <summary>
 		/// Checks if the scene is started in VR and initializes it accordingly.
