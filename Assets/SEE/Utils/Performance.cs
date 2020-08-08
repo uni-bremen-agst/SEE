@@ -27,6 +27,10 @@ namespace SEE.Utils
 
         private readonly string action;
 
+        private string elapsedTime = "00:00:00:00";
+
+        private double totalTimeInMilliSeconds = 0.0;
+
         /// <summary>
         /// Returns a new performance time stamp and emits given action.
         /// </summary>
@@ -49,9 +53,28 @@ namespace SEE.Utils
         {
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
+            totalTimeInMilliSeconds = ts.TotalMilliseconds;
             string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
                 ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-            Debug.Log("End of " + action + " (" + elapsedTime + ").\n");
+            this.elapsedTime = elapsedTime;
+            try
+            {
+                Debug.Log("End of " + action + " (" + elapsedTime + ").\n");
+            } catch(Exception e)
+            {
+                Debug.Log(e);
+            }
+            
+        }
+
+        public string GetElapsedTime()
+        {
+            return elapsedTime;
+        }
+
+        public double GetTimeInMilliSeconds()
+        {
+            return totalTimeInMilliSeconds;
         }
     }
 }

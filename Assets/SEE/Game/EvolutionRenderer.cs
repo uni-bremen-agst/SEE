@@ -973,7 +973,27 @@ namespace SEE.Game
 
             public ICollection<ILayoutNode> Successors => throw new NotImplementedException();
 
+            public Vector3 RelativePosition { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public bool IsSublayoutNode { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public bool IsSublayoutRoot { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public Sublayout Sublayout { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public ILayoutNode SublayoutRoot { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
             public ICollection<ILayoutNode> Children()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetOrigin()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetRelative(ILayoutNode node)
             {
                 throw new NotImplementedException();
             }
