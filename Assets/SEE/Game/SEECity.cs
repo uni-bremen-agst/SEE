@@ -7,7 +7,9 @@ using SEE.Tools;
 using SEE.DataModel;
 using SEE.DataModel.IO;
 using SEE.GO;
+using SEE.Layout;
 using SEE.Utils;
+
 
 namespace SEE.Game
 {
@@ -67,7 +69,9 @@ namespace SEE.Game
                 } 
                 else
                 {
-                    return RelevantGraph(loadedGraph);
+                    var graph = RelevantGraph(loadedGraph);
+                    LoadDataForGraphListing(graph: graph);
+                    return graph;
                 }
             }
         }
@@ -146,11 +150,11 @@ namespace SEE.Game
         /// <summary>
         /// The relative path for the GXL file containing the graph data.
         /// </summary>
-        public string gxlPath = "..\\Data\\GXL\\linux-clones\\net.gxl";
+        public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
         /// <summary>
         /// The relative path for the CSV file containing the node metrics.
         /// </summary>
-        public string csvPath = "..\\Data\\GXL\\linux-clones\\net.csv";
+        public string csvPath = "..\\Data\\GXL\\minimal_clones.csv";
 
         // Larger clone graph with single root (Linux directory "drivers"): 16.920 nodes, 10583 edges.
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\drivers.gxl";
@@ -305,7 +309,7 @@ namespace SEE.Game
                 }
                 else
                 {
-                    GraphRenderer renderer = new GraphRenderer(this);
+                    GraphRenderer renderer = CoseGraphSettings.useOptAlgorithm ? new OptAlgorithmGraphRenderer(this):  new GraphRenderer(this);
                     // We assume here that this SEECity instance was added to a game object as
                     // a component. The inherited attribute gameObject identifies this game object.
                     renderer.Draw(visualizedSubGraph, gameObject);
@@ -339,6 +343,8 @@ namespace SEE.Game
                 loadedGraph.Destroy();
             }
             LoadedGraph = null;
+
+            Measurements = new SortedDictionary<string, string>();
         }
 
         /// <summary>

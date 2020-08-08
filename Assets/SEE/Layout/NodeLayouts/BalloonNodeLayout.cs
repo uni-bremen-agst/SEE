@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SEE.DataModel;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -355,6 +356,16 @@ namespace SEE.Layout
                     }
                 }
             }
+        }
+
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool UsesEdgesAndSublayoutNodes()
+        {
+            return false; 
         }
     }
 }

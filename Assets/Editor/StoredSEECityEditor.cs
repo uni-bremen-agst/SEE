@@ -42,10 +42,47 @@ namespace SEEEditor
             GUILayout.Label("Node types:", EditorStyles.boldLabel);
             // Make a copy to loop over the dictionary while making changes.
             Dictionary<string, bool> selection = new Dictionary<string, bool>(city.SelectedNodeTypes);
+
+            var countSelected = 0;
             foreach (var entry in selection)
             {
                 city.SelectedNodeTypes[entry.Key] = EditorGUILayout.Toggle("  " + entry.Key, entry.Value);
+
+                if (city.SelectedNodeTypes[entry.Key])
+                {
+                    countSelected++;
+                }
             }
+
+            if (city.CoseGraphSettings.loadedForNodeTypes.Count == 0)
+            {
+                city.CoseGraphSettings.showGraphListing = true;
+                return;
+            }
+
+            bool allTypes = true;
+            foreach (KeyValuePair<string, bool> kvp in city.CoseGraphSettings.loadedForNodeTypes)
+            {
+                if (city.SelectedNodeTypes.ContainsKey(kvp.Key))
+                {
+                    allTypes = allTypes && city.SelectedNodeTypes[kvp.Key];
+                }
+                else
+                {
+                    allTypes = false;
+                }
+               
+            }
+
+            if (allTypes)
+            {
+                if (countSelected != city.CoseGraphSettings.loadedForNodeTypes.Count )
+                {
+                    allTypes = false;
+                }
+            }
+
+            city.CoseGraphSettings.showGraphListing = allTypes;
         }
     }
 }
