@@ -45,7 +45,7 @@ namespace SEE.Charts.Scripts.VR
 		/// </summary>
 		private void GetSettingData()
 		{
-			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerName)
+			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerTag)
 				.GetComponent<ChartManager>();
 			_distanceThreshold = _chartManager.distanceThreshold;
 		}

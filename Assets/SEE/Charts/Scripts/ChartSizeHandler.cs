@@ -91,7 +91,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void GetSettingData()
 		{
-			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerName)
+			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerTag)
 				.GetComponent<ChartManager>();
 			MinimumSize = _chartManager.minimumSize;
 		}

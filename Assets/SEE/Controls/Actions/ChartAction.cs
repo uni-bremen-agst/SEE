@@ -25,11 +25,11 @@ namespace SEE.Controls
 
 		private void Start()
 		{
-            GameObject chartManagerObject = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerName);
+            GameObject chartManagerObject = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerTag);
 			if (chartManagerObject == null)
 			{
 				Debug.LogErrorFormat("There is no chart manager named {0} in the scene\n",
-					GlobalGameObjectNames.ChartManagerName);
+					GlobalGameObjectNames.ChartManagerTag);
 			}
 			else
 			{

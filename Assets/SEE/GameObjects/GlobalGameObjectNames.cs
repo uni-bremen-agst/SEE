@@ -6,6 +6,9 @@
     /// </summary>
     public static class GlobalGameObjectNames
     {
-        public const string ChartManagerName = "ChartManager";
+        /// <summary>
+        /// The tag of the chart manager in the scene handling interactions with charts.
+        /// </summary>
+        public const string ChartManagerTag = "ChartManager";
     }
 }

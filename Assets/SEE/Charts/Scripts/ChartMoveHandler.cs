@@ -88,7 +88,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		protected virtual void GetSettingData()
 		{
-			ChartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerName)
+			ChartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerTag)
 				.GetComponent<ChartManager>();
 			_dragDelay = ChartManager.dragDelay;
 			_maximizedSprite = ChartManager.maximizedSprite;
