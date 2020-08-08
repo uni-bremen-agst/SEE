@@ -90,7 +90,7 @@ namespace SEE.Net
                 ConnectionListeners.AddRange(Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.LocalServerPort), false));
                 foreach (EndPoint localListenEndPoint in from connectionListenerBase in ConnectionListeners select connectionListenerBase.LocalListenEndPoint)
                 {
-                    Debug.Log("Listening on: '" + localListenEndPoint.ToString() + "'.");
+                    Debug.Log("Listening on: '" + localListenEndPoint.ToString() + "'.\n");
                 }
             }
             catch (Exception e)
@@ -160,7 +160,7 @@ namespace SEE.Net
             {
                 if (!Connections.Contains(connection))
                 {
-                    Debug.Log("Connection established: " + connection.ToString());
+                    Debug.LogFormat("Connection established: {0}\n", connection.ToString());
                     Connections.Add(connection);
                     incomingPacketSequenceIDs.Add(connection, 0);
                     outgoingPacketSequenceIDs.Add(connection, 0);

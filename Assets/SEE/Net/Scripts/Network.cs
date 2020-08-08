@@ -478,7 +478,7 @@ namespace SEE.Net
                     if (HostServer && VivoxChannelSession.Participants.Count != 0)
                     {
                         // TODO: this channel already exists and the name is unavailable!
-                        Debug.Log("Channel with given name already exists. Select differend name!");
+                        Debug.Log("Channel with given name already exists. Select differend name!\n");
                         VivoxChannelSession.Disconnect();
                         VivoxLoginSession.DeleteChannelSession(channelID);
                     }
@@ -533,8 +533,8 @@ namespace SEE.Net
             {
                 switch (channelSession.AudioState)
                 {
-                    case VivoxUnity.ConnectionState.Connected:    Debug.Log("Audio connected in "    + channelSession.Key.Name); break;
-                    case VivoxUnity.ConnectionState.Disconnected: Debug.Log("Audio disconnected in " + channelSession.Key.Name); break;
+                    case VivoxUnity.ConnectionState.Connected:    Debug.LogFormat("Audio connected in {0}\n", channelSession.Key.Name); break;
+                    case VivoxUnity.ConnectionState.Disconnected: Debug.LogFormat("Audio disconnected in {0}\n", channelSession.Key.Name); break;
                 }
             }
             else if (propertyChangedEventArgs.PropertyName == "TextState")
@@ -542,11 +542,11 @@ namespace SEE.Net
                 switch (channelSession.TextState)
                 {
                     case VivoxUnity.ConnectionState.Connected:
-                        Debug.Log("Text connected in " + channelSession.Key.Name);
+                        Debug.LogFormat("Text connected in {0}\n", channelSession.Key.Name);
                         SendGroupMessage();
                         break;
                     case VivoxUnity.ConnectionState.Disconnected:
-                        Debug.Log("Text disconnected in " + channelSession.Key.Name);
+                        Debug.LogFormat("Text disconnected in {0}\n", channelSession.Key.Name);
                         break;
                 }
             }
@@ -558,7 +558,7 @@ namespace SEE.Net
             string senderName = queueItemAddedEventArgs.Value.Sender.Name;
             string message = queueItemAddedEventArgs.Value.Message;
 
-            Debug.Log(channelName + ": " + senderName + ": " + message);
+            Debug.Log(channelName + ": " + senderName + ": " + message + "\n");
         }
 
         private void OnApplicationQuit()
