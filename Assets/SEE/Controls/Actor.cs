@@ -48,7 +48,7 @@ namespace SEE.Controls
         [Tooltip("The device from which to read input for transforming a selected object.")]
         public Transformation transformationDevice;
 
-        [Tooltip("The device from which to get inputs for the charts.")]
+        [Tooltip("The device from which to get inputs for the chart actions.")]
         public ChartControls chartControlDevice;
 
         [Tooltip("The action applied to move the camera.")]
@@ -201,7 +201,8 @@ namespace SEE.Controls
         {
             if (chartControlDevice == null)
             {
-                Debug.LogError("Chart control device must be set.\n");
+                Debug.LogErrorFormat("Chart control device must be set in actor of {}.\n", 
+                                     gameObject.name);
             }
             else
             {
