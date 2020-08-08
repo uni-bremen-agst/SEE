@@ -1,5 +1,4 @@
-﻿using SEE.GO;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace SEE.Charts.Scripts
@@ -9,11 +8,6 @@ namespace SEE.Charts.Scripts
 	/// </summary>
 	public class ChartSizeHandler : MonoBehaviour, IDragHandler
 	{
-		/// <summary>
-		/// Contains some settings used in this script.
-		/// </summary>
-		private ChartManager _chartManager;
-
 		/// <summary>
 		/// The script attached to the chart.
 		/// </summary>
@@ -91,9 +85,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void GetSettingData()
 		{
-			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerTag)
-				.GetComponent<ChartManager>();
-			MinimumSize = _chartManager.minimumSize;
+			MinimumSize = ChartManager.Instance.minimumSize;
 		}
 
 		/// <summary>

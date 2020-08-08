@@ -1,5 +1,4 @@
-﻿using SEE.GO;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -12,11 +11,6 @@ namespace SEE.Charts.Scripts
 	public class ChartMoveHandler : MonoBehaviour, IDragHandler, IPointerDownHandler,
 		IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
 	{
-		/// <summary>
-		/// Contains some settings used in this script.
-		/// </summary>
-		protected ChartManager ChartManager;
-
 		/// <summary>
 		/// Contains the position of the chart on the <see cref="Canvas" />.
 		/// </summary>
@@ -88,11 +82,9 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		protected virtual void GetSettingData()
 		{
-			ChartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerTag)
-				.GetComponent<ChartManager>();
-			_dragDelay = ChartManager.dragDelay;
-			_maximizedSprite = ChartManager.maximizedSprite;
-			_minimizedSprite = ChartManager.minimizedSprite;
+			_dragDelay = ChartManager.Instance.dragDelay;
+			_maximizedSprite = ChartManager.Instance.maximizedSprite;
+			_minimizedSprite = ChartManager.Instance.minimizedSprite;
 		}
 
 		/// <summary>

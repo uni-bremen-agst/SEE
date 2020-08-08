@@ -1,5 +1,4 @@
-﻿using SEE.GO;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Charts.Scripts.VR
 {
@@ -8,11 +7,6 @@ namespace SEE.Charts.Scripts.VR
 	/// </summary>
 	public class VrPointer : MonoBehaviour
 	{
-		/// <summary>
-		/// Contains some settings used in this script.
-		/// </summary>
-		private ChartManager _chartManager;
-
 		/// <summary>
 		/// The length of the pointer attached to the controller.
 		/// </summary>
@@ -63,9 +57,7 @@ namespace SEE.Charts.Scripts.VR
 		/// </summary>
 		private void GetSettingData()
 		{
-			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerTag)
-				.GetComponent<ChartManager>();
-			_pointerLength = _chartManager.pointerLength;
+			_pointerLength = ChartManager.Instance.pointerLength;
 		}
 
 		/// <summary>

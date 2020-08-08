@@ -10,7 +10,7 @@ namespace SEE.Controls
 		{
 			if (chartControlsDevice.ResetCharts) ChartManager.ResetPosition();
 			if (!chartControlsDevice.Move.y.Equals(0)) move = chartControlsDevice.Move.y;
-			if (chartControlsDevice.Create) ChartManager.CreateChartVr();
+			if (chartControlsDevice.Create) ChartManager.Instance.CreateChartVr();
 			clickDown = false;
 			clickUp = false;
 			if (!_lastClick && chartControlsDevice.Click) clickDown = true;

@@ -65,7 +65,7 @@ namespace SEE.Charts.Scripts.VR
 		/// </summary>
 		public void SetSelectionMode()
 		{
-			ChartManager.selectionMode = selectionToggle.isOn;
+			ChartManager.Instance.selectionMode = selectionToggle.isOn;
 		}
 	}
 }

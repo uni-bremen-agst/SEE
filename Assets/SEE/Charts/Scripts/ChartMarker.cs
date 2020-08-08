@@ -12,11 +12,6 @@ namespace SEE.Charts.Scripts
 	/// </summary>
 	public class ChartMarker : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	{
-		/// <summary>
-		/// Contains some settings used in this script.
-		/// </summary>
-		private ChartManager _chartManager;
-
 		//User Variables from ChartManager
 		private float _cameraDistance;
 		private bool _moveWithRotation;
@@ -125,17 +120,15 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void GetSettingData()
 		{
-			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerTag)
-				.GetComponent<ChartManager>();
-			_cameraDistance = _chartManager.cameraDistance;
-			_moveWithRotation = _chartManager.moveWithRotation;
-			_cameraFlightTime = _chartManager.cameraFlightTime;
-			_clickDelay = _chartManager.clickDelay;
-			_highlightDuration = _chartManager.highlightDuration;
-			_buildingHighlightMaterial = _chartManager.buildingHighlightMaterial;
-			_buildingHighlightMaterialAccentuated =
-				_chartManager.buildingHighlightMaterialAccentuated;
-			_highlightLineLength = _chartManager.highlightLineLength;
+			ChartManager chartManager             = ChartManager.Instance;
+			_cameraDistance                       = chartManager.cameraDistance;
+			_moveWithRotation                     = chartManager.moveWithRotation;
+			_cameraFlightTime                     = chartManager.cameraFlightTime;
+			_clickDelay                           = chartManager.clickDelay;
+			_highlightDuration                    = chartManager.highlightDuration;
+			_buildingHighlightMaterial            = chartManager.buildingHighlightMaterial;
+			_buildingHighlightMaterialAccentuated = chartManager.buildingHighlightMaterialAccentuated;
+			_highlightLineLength                  = chartManager.highlightLineLength;
 		}
 
 		/// <summary>
@@ -148,7 +141,7 @@ namespace SEE.Charts.Scripts
 			{
 				var child = linkedObject.transform.GetChild(i);
 				if (!child.name.Equals(linkedObject.name + "(Clone)")) continue;
-				TriggerTimedHighlight(_chartManager.highlightDuration, false, false);
+				TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, false);
 				break;
 			}
 		}
@@ -264,7 +257,7 @@ namespace SEE.Charts.Scripts
 					StopCoroutine(TimedHighlight);
 					HighlightLinkedObjectToggle(false);
 					TimedHighlight = null;
-					if (_chartManager.selectionMode || reenable) reactivate = true;
+					if (ChartManager.Instance.selectionMode || reenable) reactivate = true;
 				}
 				else
 				{
@@ -289,7 +282,7 @@ namespace SEE.Charts.Scripts
 
 			HighlightLinkedObjectToggle(true);
 			yield return new WaitForSeconds(time);
-			while (_chartManager.selectionMode) yield return new WaitForEndOfFrame();
+			while (ChartManager.Instance.selectionMode) yield return new WaitForEndOfFrame();
 			HighlightLinkedObjectToggle(false);
 			TimedHighlight = null;
 		}
@@ -382,8 +375,8 @@ namespace SEE.Charts.Scripts
 		{
 			markerHighlight.TryGetComponent<Image>(out var image);
 			image.color = _accentuated
-				? _chartManager.standardColor
-				: _chartManager.accentuationColor;
+				? ChartManager.Instance.standardColor
+				: ChartManager.Instance.accentuationColor;
 			_accentuated = !_accentuated;
 			if (!_highlightCopy) return;
 			_highlightCopy.TryGetComponent<Renderer>(out var render);

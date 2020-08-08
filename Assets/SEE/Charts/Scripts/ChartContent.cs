@@ -16,11 +16,6 @@ namespace SEE.Charts.Scripts
 	public class ChartContent : MonoBehaviour
 	{
 		/// <summary>
-		/// Contains some settings used in this script.
-		/// </summary>
-		protected ChartManager ChartManager;
-
-		/// <summary>
 		/// The distance to another marker to recognize it as overlapping.
 		/// </summary>
 		private const float MarkerOverlapDistance = 22;
@@ -156,8 +151,6 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void Awake()
 		{
-			ChartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerTag)
-				.GetComponent<ChartManager>();
 			_xGap = childOffset.x - headerOffset.x;
 			_yGap = childOffset.y - headerOffset.y;
 			FindDataObjects();
@@ -551,7 +544,7 @@ namespace SEE.Charts.Scripts
 
 				var highlightTimeLeft = CheckOldMarkers(data);
 				if (highlightTimeLeft > 0f)
-					script.TriggerTimedHighlight(ChartManager.highlightDuration - highlightTimeLeft,
+					script.TriggerTimedHighlight(ChartManager.Instance.highlightDuration - highlightTimeLeft,
 						true, false);
 			}
 
@@ -603,7 +596,7 @@ namespace SEE.Charts.Scripts
 					var highlightTimeLeft = CheckOldMarkers(data);
 					if (highlightTimeLeft > 0f)
 						script.TriggerTimedHighlight(
-							ChartManager.highlightDuration - highlightTimeLeft, true, false);
+							ChartManager.Instance.highlightDuration - highlightTimeLeft, true, false);
 				}
 
 				foreach (var marker in ActiveMarkers) Destroy(marker);
@@ -649,7 +642,7 @@ namespace SEE.Charts.Scripts
 				if (ActiveMarkers.Count <= 0) break;
 				var highlightTimeLeft = CheckOldMarkers(data);
 				if (highlightTimeLeft > 0f)
-					script.TriggerTimedHighlight(ChartManager.highlightDuration - highlightTimeLeft,
+					script.TriggerTimedHighlight(ChartManager.Instance.highlightDuration - highlightTimeLeft,
 						true, false);
 			}
 
@@ -786,7 +779,7 @@ namespace SEE.Charts.Scripts
 				{
 					activeMarker.TryGetComponent<ChartMarker>(out var script);
 					if (!script.linkedObject.Equals(highlight)) continue;
-					script.TriggerTimedHighlight(ChartManager.highlightDuration, false, scrollView);
+					script.TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, scrollView);
 					break;
 				}
 		}

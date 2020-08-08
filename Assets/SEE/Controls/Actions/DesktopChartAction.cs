@@ -8,8 +8,8 @@ namespace SEE.Controls
 	{
 		private void Update()
 		{
-			if (chartControlsDevice.Toggle) ChartManager.ToggleCharts();
-			if (chartControlsDevice.Select) ChartManager.ToggleSelectionMode();
+			if (chartControlsDevice.Toggle) ChartManager.Instance.ToggleCharts();
+			if (chartControlsDevice.Select) ChartManager.Instance.ToggleSelectionMode();
 			if (!chartControlsDevice.Click) return;
 			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			if (Physics.Raycast(ray, out var hit, 100f) &&
