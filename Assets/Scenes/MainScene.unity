@@ -777,6 +777,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
+--- !u!4 &844925776 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 429506, guid: dc06161b6d97feb419f45f03b62e14b9,
+    type: 3}
+  m_PrefabInstance: {fileID: 844925775}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &844925780
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -919,10 +925,10 @@ MonoBehaviour:
   viewpointDevice: {fileID: 844925783}
   selectionDevice: {fileID: 844925787}
   transformationDevice: {fileID: 844925791}
+  chartControlDevice: {fileID: 844967654}
   cameraAction: {fileID: 844925786}
   selectionAction: {fileID: 844925784}
-  chartControlDevice: {fileID: 0}
-  chartAction: {fileID: 0}
+  chartAction: {fileID: 844967657}
 --- !u!143 &844925789
 CharacterController:
   m_ObjectHideFlags: 0
@@ -965,6 +971,35 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 844925775}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &844967654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844967653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55a13ec4efbd1fa40b76935ac035d0bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: VR Chart Controller
+--- !u!114 &844967657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844967653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fd6f3a80ab0268498c6c59eda182342, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chartControlsDevice: {fileID: 0}
+  move: 0
+  clickDown: 0
+  clickUp: 0
 --- !u!114 &854686745 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 11401046, guid: dc06161b6d97feb419f45f03b62e14b9,
@@ -1071,7 +1106,6 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  PathPrefix: F:\develop\SEE\Data\GXL\reflexion\minilax\
   gvlPath: ..\Data\GXL\linux-clones\net.gvl
   WidthMetric: Metric.Number_of_Tokens
   HeightMetric: Metric.Clone_Rate
@@ -1328,7 +1362,6 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  PathPrefix: C:\Users\Torben\dev\SEE\Assets\
   gvlPath: ..\Data\GXL\linux-clones\net.gvl
   WidthMetric: Metric.LOC
   HeightMetric: Metric.Number_of_Tokens
@@ -1374,7 +1407,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1206385284}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.25, y: 1, z: 0}
+  m_LocalPosition: {x: -0.25, y: 1.031, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1437,6 +1470,80 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7a135b1a2cb9c8f488d4dd00c55ab283, type: 3}
+--- !u!1001 &1252201664
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 834244243420936600, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: cameraTransform
+      value: 
+      objectReference: {fileID: 844925776}
+    - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2342395875013397702, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: m_Name
+      value: ChartManager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 51821f11a04e1ab4d9151f06c2366bbc, type: 3}
 --- !u!1 &1352653018
 GameObject:
   m_ObjectHideFlags: 0
@@ -1519,7 +1626,6 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  PathPrefix: F:\develop\SEE\Data\GXL\random\
   gvlPath: ..\Data\GXL\linux-clones\net.gvl
   WidthMetric: Metric.Number_of_Tokens
   HeightMetric: Metric.Clone_Rate
@@ -1647,7 +1753,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcc1cedcf0a20b04ca3d2bb78035f3cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInputType: 2
+  playerInputType: 0
   HideVRControllers: 0
   ShowControllerHints: 0
 --- !u!4 &1510433995
@@ -1794,6 +1900,8 @@ GameObject:
   - component: {fileID: 1566173685}
   - component: {fileID: 1566173692}
   - component: {fileID: 1566173691}
+  - component: {fileID: 1566173693}
+  - component: {fileID: 1566173694}
   m_Layer: 0
   m_Name: DesktopPlayer
   m_TagString: MainCamera
@@ -1988,10 +2096,10 @@ MonoBehaviour:
   viewpointDevice: {fileID: 1566173684}
   selectionDevice: {fileID: 1566173682}
   transformationDevice: {fileID: 1566173690}
+  chartControlDevice: {fileID: 1566173693}
   cameraAction: {fileID: 1566173687}
   selectionAction: {fileID: 1566173680}
-  chartControlDevice: {fileID: 0}
-  chartAction: {fileID: 0}
+  chartAction: {fileID: 1566173694}
 --- !u!4 &1566173689
 Transform:
   m_ObjectHideFlags: 0
@@ -2053,6 +2161,35 @@ MonoBehaviour:
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
+--- !u!114 &1566173693
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566173679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0bd271072e6d184d9e0d924fa6c2f6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Keyboard Chart Controller
+--- !u!114 &1566173694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566173679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49626a155a935004f985ad777a29244b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chartControlsDevice: {fileID: 0}
+  move: 0
+  clickDown: 0
+  clickUp: 0
 --- !u!1 &1607891499
 GameObject:
   m_ObjectHideFlags: 0
@@ -2074,6 +2211,8 @@ GameObject:
   - component: {fileID: 1607891512}
   - component: {fileID: 1607891505}
   - component: {fileID: 1607891502}
+  - component: {fileID: 1607891513}
+  - component: {fileID: 1607891514}
   m_Layer: 0
   m_Name: GamepadPlayer
   m_TagString: MainCamera
@@ -2239,10 +2378,10 @@ MonoBehaviour:
   viewpointDevice: {fileID: 1607891500}
   selectionDevice: {fileID: 1607891502}
   transformationDevice: {fileID: 1607891512}
+  chartControlDevice: {fileID: 1607891513}
   cameraAction: {fileID: 1607891507}
   selectionAction: {fileID: 1607891503}
-  chartControlDevice: {fileID: 0}
-  chartAction: {fileID: 0}
+  chartAction: {fileID: 1607891514}
 --- !u!81 &1607891509
 AudioListener:
   m_ObjectHideFlags: 0
@@ -2321,6 +2460,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Name: 
+--- !u!114 &1607891513
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1607891499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0bd271072e6d184d9e0d924fa6c2f6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Keyboard Chart Controller for Gamepad
+--- !u!114 &1607891514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1607891499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49626a155a935004f985ad777a29244b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chartControlsDevice: {fileID: 0}
+  move: 0
+  clickDown: 0
+  clickUp: 0
 --- !u!1 &1626562202
 GameObject:
   m_ObjectHideFlags: 0
@@ -2407,7 +2575,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636335451}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -7.8888893, y: -4, z: 0}
+  m_LocalPosition: {x: -6.6795583, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -2515,7 +2683,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776319858}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.8888893, y: -4, z: 0}
+  m_LocalPosition: {x: 6.6795583, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
