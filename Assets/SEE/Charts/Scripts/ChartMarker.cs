@@ -125,7 +125,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void GetSettingData()
 		{
-			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerName)
+			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerTag)
 				.GetComponent<ChartManager>();
 			_cameraDistance = _chartManager.cameraDistance;
 			_moveWithRotation = _chartManager.moveWithRotation;

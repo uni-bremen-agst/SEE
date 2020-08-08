@@ -46,7 +46,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void GetSettingData()
 		{
-			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerName)
+			_chartManager = GameObject.FindGameObjectWithTag(GlobalGameObjectNames.ChartManagerTag)
 				.GetComponent<ChartManager>();
 			_standardColor = _chartManager.standardColor;
 			_accentuationColor = _chartManager.accentuationColor;
