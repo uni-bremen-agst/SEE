@@ -62,5 +62,32 @@ namespace Assets.SEE.DataModel
         public List<string> FieldLookupTable { get => fieldLookupTable; }
         public List<JavaStatement> AllStatements { get => allStatements; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="statementCounter"></param>
+        /// <returns></returns>
+        internal string CreateStatementInfoString(int statementCounter)
+        {
+            JavaStatement js = allStatements[statementCounter];
+            string info = "Line number " + js.Line + Environment.NewLine;
+            if (js.LocalVariables.Count != 0)
+            {
+                info = info + "Local variables accessible at this line:";
+                foreach (string s in js.LocalVariables)
+                {
+                    info = info + Environment.NewLine + s;
+                }
+            }
+            if (js.FieldChanges.Count != 0)
+            {
+                info = info + Environment.NewLine + "Field Changes at this line:";
+                foreach (string s in js.FieldChanges)
+                {
+                    info = info + Environment.NewLine + s;
+                }
+            }
+            return info;
+        }
     }
 }

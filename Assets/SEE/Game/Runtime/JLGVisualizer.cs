@@ -19,7 +19,7 @@ namespace SEE.Game.Runtime
         /// Int value the represents the index of the current active statement. All indices can be found in this.parsedJLG.allStatements.
         /// The total number of indices is this.parsedJLG.allStatements.Count.
         /// </summary>
-        private int statementCount = 0;
+        private int statementCounter = 0;
 
         /// <summary>
         /// Time value in seconds. At this point in time(running time) the next or previous statement will be visualized, depending on the playing direction.
@@ -34,7 +34,7 @@ namespace SEE.Game.Runtime
         /// <summary>
         /// true, when visualisation is running. false, when its paused. (Pause visualization by pressing 'p')
         /// </summary>
-        private Boolean running = true;
+        private Boolean running = false;
 
         /// <summary>
         /// Describes the direction, in which the visualisation is running. True for forward, false for backwards.
@@ -44,9 +44,7 @@ namespace SEE.Game.Runtime
         /// <summary>
         /// 
         /// </summary>
-        public GameObject textPrefab;
-
-        private Stack<GameObject> textWindows = new Stack<GameObject>();
+        private Boolean windowsToggled = true;  
 
         /// <summary>
         /// The GameObject that represents the class, to which the current statement belongs to. 
@@ -57,6 +55,11 @@ namespace SEE.Game.Runtime
         /// A list of all active GameObjects that are tagged with 'Node'.
         /// </summary>
         private GameObject[] nodesGOs;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private Stack<GameObject> textWindows = new Stack<GameObject>();
 
         /// Start is called before the first frame update
         void Start()
@@ -70,11 +73,8 @@ namespace SEE.Game.Runtime
             {
                 throw new Exception("There are no Nodes");
             }
-            if (textPrefab == null)
-            {
-                throw new Exception("Please drag a Textprefab into the scripts field.");
-            }
-            currentGO = GetNodeForStatement(statementCount);
+            currentGO = GetNodeForStatement(statementCounter);
+            GenerateScrollableTextWindow();
         }
 
         /// Update is called once per frame
@@ -84,14 +84,15 @@ namespace SEE.Game.Runtime
             {
                if (running)
                {
-                    if (!NodeRepresentsStatementLocation(statementCount, currentGO))
+                    ///Check if currentGo is not GO of current Statement. If true change currentGO and generate TextWindow.
+                    if (!NodeRepresentsStatementLocation(statementCounter, currentGO))
                     {
-                        currentGO = GetNodeForStatement(statementCount);
-                        Debug.Log("hallo?");
+                        currentGO = GetNodeForStatement(statementCounter);
                         if (! textWindowForNodeExists(currentGO))
                         {
                             GenerateScrollableTextWindow();
                         }
+                        ToggleTextWindows();
                     }
                     if (playDirection)
                     {
@@ -114,6 +115,12 @@ namespace SEE.Game.Runtime
                 updateIntervall = 1;
                 playDirection = !playDirection;
             }
+            if (Input.GetKeyDown(KeyCode.J))
+            {
+                windowsToggled = !windowsToggled;
+                Debug.Log(windowsToggled);
+                ToggleTextWindows();
+            }
             if (running)
             {
                 if (Input.GetKeyDown(KeyCode.L))
@@ -134,7 +141,7 @@ namespace SEE.Game.Runtime
             {
                 foreach (GameObject go in textWindows)
                 {
-                    if (go.name.Equals(node.name + " filecontent"))
+                    if (go.name.Equals(node.name + "FileContent"))
                     {
                         exists = true;
                         break;
@@ -152,11 +159,14 @@ namespace SEE.Game.Runtime
         {
             Vector3 v = currentGO.transform.position;
             //v.y = currentGO.GetComponent<Renderer>().bounds.size.y; das hier funktioniert nicht, siehe nodefactory. Rainer fragen wie ich am besten die Windowsize dynamisch mache.
-            GameObject go = Instantiate(textPrefab,v,currentGO.transform.rotation,this.gameObject.transform.parent);
-            go.name = currentGO.name + " filecontent";
+            GameObject go = Instantiate((GameObject)Resources.Load("ScrollableTextWindow"),v,currentGO.transform.rotation,this.gameObject.transform.parent);
+            go.name = currentGO.name + "FileContent";
             ///set canvas order in layer to textwindows.count damit die fenster voreinander gerendered werden
             go.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = GetFileContentForNode(currentGO);
+            //go.transform.Find("ScrollContainer").Find("TextContainer").Find("Text(TMP)").GetComponent<TextMeshProUGUI>().text = GetFileContentForNode(currentGO);
             textWindows.Push(go);
+            Debug.Log(go.transform.GetChild(1).name);
+            
         }
 
         /// <summary>
@@ -182,10 +192,11 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// Gets a GameObject tagged with Node from this objects list of Node GameObjects that matches the location of the Statement represented by i.
+        /// Gets a GameObject tagged with Node from this objects list of GameObjects that matches the location of the Statement represented by i.
+        /// A Node matches the location of a statement, when the classname of the location equals the nodes name.
         /// </summary>
         /// <param name="i">the index of the statement in this parsedJLG.allstatements</param>
-        /// <returns></returns>
+        /// <returns>Node for Statement, if exists, else null.</returns>
         private GameObject GetNodeForStatement(int i) {
             foreach (GameObject go in nodesGOs)
             {
@@ -209,13 +220,15 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// Visualizes the current statement and then increases statementCount by 1.
+        /// Visualizes the current statement and then increases statementCounter by 1.
         /// </summary>
         private void NextStatement() {
-            Debug.Log(parsedJLG.AllStatements[statementCount].Line + " " + parsedJLG.GetStatementLocationString(statementCount)+" CurrentGo:"+ currentGO.name);
-            if (statementCount < parsedJLG.AllStatements.Count-1)
+            Debug.Log(parsedJLG.AllStatements[statementCounter].Line + " " + parsedJLG.GetStatementLocationString(statementCounter)+" CurrentGo:"+ currentGO.name);
+            GameObject fileContent = GameObject.Find(currentGO.name + "FileContent");
+            fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = parsedJLG.CreateStatementInfoString(statementCounter);
+            if (statementCounter < parsedJLG.AllStatements.Count-1)
             {
-                statementCount++;
+                statementCounter++;
             }
             else
             {
@@ -226,19 +239,37 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// Visualizes the current statement and then decreases the statementCount by 1.
+        /// Visualizes the current statement and then decreases the statementCounter by 1.
         /// </summary>
         private void PreviousStatement() {
-            Debug.Log(parsedJLG.AllStatements[statementCount].Line+ " "+parsedJLG.GetStatementLocationString(statementCount) + " CurrentGo:" + currentGO.name);
-            if (statementCount > 0)
+            Debug.Log(parsedJLG.AllStatements[statementCounter].Line+ " "+parsedJLG.GetStatementLocationString(statementCounter) + " CurrentGo:" + currentGO.name);
+            GameObject fileContent = GameObject.Find(currentGO.name + "FileContent");
+            fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = parsedJLG.CreateStatementInfoString(statementCounter);
+            if (statementCounter > 0)
             {
-                statementCount--;
+                statementCounter--;
             }
             else
             {
                 Debug.Log("Start of JLG reached. Press 'P' to start.");
                 running = false;
                 playDirection = true;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ToggleTextWindows() {
+            foreach (GameObject go in textWindows) {
+                ///Textwindow of currentGO is always active
+                if (go.name == currentGO.name+"FileContent") {
+                    go.SetActive(true);
+                }
+                else
+                {
+                    go.SetActive(windowsToggled);
+                }
             }
         }
 
