@@ -77,7 +77,7 @@ namespace SEE.Charts.Scripts
 		private float _yGap;
 
 		/// <summary>
-		/// If a draw is queued, this wont be null.
+		/// If a draw is queued, this will not be null.
 		/// </summary>
 		[HideInInspector] public Coroutine drawing;
 
@@ -165,7 +165,7 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// Contains all keys contained in any <see cref="GameObject" /> of <see cref="_dataObjects" />.
 		/// </summary>
-		public List<string> AllKeys { get; } = new List<string>();
+		public HashSet<string> AllKeys { get; } = new HashSet<string>();
 
 		/// <summary>
 		/// Calls methods to initialize a chart.
@@ -175,8 +175,7 @@ namespace SEE.Charts.Scripts
 			_xGap = childOffset.x - headerOffset.x;
 			_yGap = childOffset.y - headerOffset.y;
 			FindDataObjects();
-			GetAllFloats();
-			GetAllIntegers();
+			GetAllNumericAttributes();
 		}
 
 		/// <summary>
@@ -185,6 +184,8 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		protected virtual void Start()
 		{
+			// The time in seconds to wait until CallDrawData is called.
+			// FIXME: Why is this waiting time needed?
 			var time = citySize > 50 ? 5f : 0.2f;
 			axisDropdownX.SetOther(axisDropdownY);
 			axisDropdownY.SetOther(axisDropdownX);
@@ -324,24 +325,20 @@ namespace SEE.Charts.Scripts
 		/// Gets all keys for <see cref="float" /> values contained in the <see cref="NodeRef" /> of each
 		/// <see cref="GameObject" /> in <see cref="_dataObjects" />.
 		/// </summary>
-		private void GetAllFloats()
+		private void GetAllNumericAttributes()
 		{
 			foreach (var data in _dataObjects)
-			foreach (var key in data.GetComponent<NodeRef>().node.FloatAttributes.Keys)
-				if (!AllKeys.Contains(key))
+			{
+                Node node = data.GetComponent<NodeRef>().node;
+                foreach (var key in node.FloatAttributes.Keys)
+				{
 					AllKeys.Add(key);
-		}
-
-		/// <summary>
-		/// Gets all keys for <see cref="int" /> values contained in the <see cref="NodeRef" /> of each
-		/// <see cref="GameObject" /> in <see cref="_dataObjects" />.
-		/// </summary>
-		private void GetAllIntegers()
-		{
-			foreach (var data in _dataObjects)
-			foreach (var key in data.GetComponent<NodeRef>().node.IntAttributes.Keys)
-				if (!AllKeys.Contains(key))
+				}
+				foreach (var key in node.IntAttributes.Keys)
+				{
 					AllKeys.Add(key);
+				}
+			}
 		}
 
 		/// <summary>
@@ -361,7 +358,7 @@ namespace SEE.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Since <see cref="MonoBehaviour.Invoke" /> does not support calls with parameter, it calls this
+		/// Since <see cref="MonoBehaviour.Invoke" /> does not support calls with parameters, it calls this
 		/// method to do the work.
 		/// </summary>
 		private void CallDrawData()
@@ -388,13 +385,24 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		public void DrawData(bool needData)
 		{
-			if (needData) FindDataObjects();
+			if (needData)
+			{
+				FindDataObjects();
+			}
 			noDataWarning.SetActive(false);
 			if (axisDropdownX.Value.Equals(axisDropdownY.Value))
+			{
 				DrawOneAxis();
+			}
 			else
+			{
 				DrawTwoAxes();
-			if (ActiveMarkers.Count == 0) noDataWarning.SetActive(true);
+			}
+			if (ActiveMarkers.Count == 0)
+			{ 
+				noDataWarning.SetActive(true); 
+			}
+
 		}
 
 		/// <summary>
