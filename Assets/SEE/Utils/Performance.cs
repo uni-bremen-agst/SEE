@@ -59,7 +59,7 @@ namespace SEE.Utils
             this.elapsedTime = elapsedTime;
             try
             {
-                Debug.Log("End of " + action + " (" + elapsedTime + ").\n");
+                Debug.Log("End of " + action + " (" + elapsedTime + " [h:m:s:ms] elapsed time).\n");
             } catch(Exception e)
             {
                 Debug.Log(e);

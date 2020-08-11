@@ -1,5 +1,6 @@
 ﻿using SEE.Controls.Devices;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SEE.Controls
 {
@@ -47,6 +48,9 @@ namespace SEE.Controls
         [Tooltip("The device from which to read input for transforming a selected object.")]
         public Transformation transformationDevice;
 
+        [Tooltip("The device from which to get inputs for the chart actions.")]
+        public ChartControls chartControlDevice;
+
         [Tooltip("The action applied to move the camera.")]
         public CameraAction cameraAction;
 
@@ -56,11 +60,23 @@ namespace SEE.Controls
         [Tooltip("The action applied to transform a selected object.")]
         private TransformationAction transformationAction;
 
+        [Tooltip("The action applied to handle chart controls.")]
+        public ChartAction chartAction;
+
+        /// <summary>
+        /// The chart action applied to handle chart controls.
+        /// </summary>
+        public ChartAction ChartAction
+        {
+            get => chartAction;
+        }
+
         private void Start()
         {
             CameraSetup();
             SelectionSetup();
             TransformSetup();
+            ChartSetup();
         }
 
         /// <summary>
@@ -169,6 +185,32 @@ namespace SEE.Controls
                     cameraAction.BoostDevice = gameObject.AddComponent<NullBoost>();
                 }
                 cameraAction.BoostDevice = boostDevice;
+            }
+        }
+
+        /// <summary>
+        /// Sets up the chart control device and action. The chart action is created
+        /// if there is currently none set. The chart control device must be set by
+        /// the user in the inspector because it depends upon the environment
+        /// (VR, desktop, gamepad).
+        /// </summary>
+        private void ChartSetup()
+        {
+            if (chartControlDevice == null)
+            {
+                Debug.LogErrorFormat("A chart control device must be set in actor of {}.\n", 
+                                     gameObject.name);
+            }
+            else 
+            {
+                if (chartAction == null)
+                {
+                    Debug.LogErrorFormat("A chart action must be set in actor of {}.\n",
+                                         gameObject.name);
+                    // We will add a stub, which allows us to continue.
+                    chartAction = gameObject.AddComponent<NullChartAction>();
+                }
+                chartAction.chartControlsDevice = chartControlDevice;
             }
         }
     }

@@ -41,21 +41,8 @@ namespace SEE.DataModel
         /// </summary>
         public string Type
         {
-            get
-            {
-                return type;
-            }
-            set
-            {
-                if (!string.IsNullOrEmpty(value))
-                {
-                    type = value;
-                }
-                else
-                {
-                    type = "Unknown";
-                }
-            }
+	        get => type;
+            set => type = !string.IsNullOrEmpty(value) ? value : "Unknown";
         }
 
         /// <summary>
