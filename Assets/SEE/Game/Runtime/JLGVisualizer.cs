@@ -96,10 +96,25 @@ namespace SEE.Game.Runtime
                     }
                     if (playDirection)
                     {
+                        ///If previous statement exitted a class, metaphorically remove the class from the callstack by destroying its textwindow.
+                        if (statementCounter > 0 
+                            && parsedJLG.AllStatements[statementCounter - 1].StatementType.Equals("exit") 
+                            && currentGO != GetNodeForStatement(statementCounter - 1))
+                        {
+                            GameObject.Destroy(textWindows.Pop());
+                        }
                         NextStatement();
                     }
                     else
-                    {                        
+                    {
+                        ///If previous statement exitted a class, metaphorically remove the class from the callstack by destroying its textwindow.
+                        ///Looking for an "entrystatement", because the visualisation is running backwards.
+                        if (statementCounter < parsedJLG.AllStatements.Count
+                            && parsedJLG.AllStatements[statementCounter + 1].StatementType.Equals("entry")
+                            && currentGO != GetNodeForStatement(statementCounter + 1))
+                        {
+                            GameObject.Destroy(textWindows.Pop());
+                        }
                         PreviousStatement();
                     }
                }
@@ -118,7 +133,6 @@ namespace SEE.Game.Runtime
             if (Input.GetKeyDown(KeyCode.J))
             {
                 windowsToggled = !windowsToggled;
-                Debug.Log(windowsToggled);
                 ToggleTextWindows();
             }
             if (running)
@@ -158,15 +172,12 @@ namespace SEE.Game.Runtime
         private void GenerateScrollableTextWindow()
         {
             Vector3 v = currentGO.transform.position;
-            //v.y = currentGO.GetComponent<Renderer>().bounds.size.y; das hier funktioniert nicht, siehe nodefactory. Rainer fragen wie ich am besten die Windowsize dynamisch mache.
             GameObject go = Instantiate((GameObject)Resources.Load("ScrollableTextWindow"),v,currentGO.transform.rotation,this.gameObject.transform.parent);
             go.name = currentGO.name + "FileContent";
             ///set canvas order in layer to textwindows.count damit die fenster voreinander gerendered werden
             go.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = GetFileContentForNode(currentGO);
             //go.transform.Find("ScrollContainer").Find("TextContainer").Find("Text(TMP)").GetComponent<TextMeshProUGUI>().text = GetFileContentForNode(currentGO);
-            textWindows.Push(go);
-            Debug.Log(go.transform.GetChild(1).name);
-            
+            textWindows.Push(go);            
         }
 
         /// <summary>
@@ -224,8 +235,12 @@ namespace SEE.Game.Runtime
         /// </summary>
         private void NextStatement() {
             Debug.Log(parsedJLG.AllStatements[statementCounter].Line + " " + parsedJLG.GetStatementLocationString(statementCounter)+" CurrentGo:"+ currentGO.name);
+
+            HighlightCurrentLineFadePrevious();
+
             GameObject fileContent = GameObject.Find(currentGO.name + "FileContent");
             fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = parsedJLG.CreateStatementInfoString(statementCounter);
+
             if (statementCounter < parsedJLG.AllStatements.Count-1)
             {
                 statementCounter++;
@@ -271,6 +286,23 @@ namespace SEE.Game.Runtime
                     go.SetActive(windowsToggled);
                 }
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void HighlightCurrentLineFadePrevious()
+        {
+            GameObject currentFileContentGO = textWindows.Peek();
+            string fileContent = currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text;
+            string[] lines = fileContent.Split(new string[]{ Environment.NewLine }, StringSplitOptions.None);
+
+            ///highlight currentline, LineAsInt -1, because lines array starts counting at 0 and Classlines start at 1.
+            lines[parsedJLG.AllStatements[statementCounter].LineAsInt()-1] = "<color=\"red\">" + lines[parsedJLG.AllStatements[statementCounter].LineAsInt()-1] + "</color>";
+
+            ///return lines array back to a single string and then save the new highlighted string in the GameObject.
+            fileContent = string.Join(Environment.NewLine, lines);
+            currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = fileContent;
         }
 
         /// <summary>

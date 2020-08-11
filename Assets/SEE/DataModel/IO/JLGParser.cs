@@ -63,19 +63,19 @@ namespace Assets.SEE.DataModel.IO
                 if (line.StartsWith("-/"))
                 {
                     ParseNewLine(line, true);
-                    javaStatement.setTypeEntry();
+                    javaStatement.SetTypeEntry();
                 }
                 //normal line
                 else if (line.StartsWith("-"))
                 {
                     ParseNewLine(line, false);
-                    javaStatement.setTypeNormal();
+                    javaStatement.SetTypeNormal();
                 }
                 //exit line
                 else if (line.StartsWith("/-"))
                 {
                     ParseNewLine(line, false);
-                    javaStatement.setTypeExit();
+                    javaStatement.SetTypeExit();
                 }
                 //field change
                 else if (line.StartsWith("#"))
