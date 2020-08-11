@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel;
 using SEE.GO;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -42,9 +43,22 @@ namespace SEE.Charts.Scripts
 		private const float MarkerOverlapDistance = 22;
 
 		/// <summary>
-		/// Contains one <see cref="scrollEntryPrefab" /> for each <see cref="Node" /> in the scene.
+		/// The number of nodes at which a city is considered large.
 		/// </summary>
-		[SerializeField] private GameObject scrollContent;
+		private const int BigCityThreshold = 50;
+		/// <summary>
+		/// The number of seconds to be waited until drawing the charts for large cities.
+		/// </summary>
+		private const float LongDrawWaitingTime = 0.2f;
+		/// <summary>
+		/// The number of seconds to be waited until drawing the charts for small cities.
+		/// </summary>
+		private const float ShortDrawWaitingTime = 0.2f;
+        
+        /// <summary>
+        /// Contains one <see cref="scrollEntryPrefab" /> for each <see cref="Node" /> in the scene.
+        /// </summary>
+        [SerializeField] private GameObject scrollContent;
 
 		/// <summary>
 		/// A checkbox associated to a <see cref="Node" /> in the scene to activate it in the chart.
@@ -186,9 +200,11 @@ namespace SEE.Charts.Scripts
 		{
 			// The time in seconds to wait until CallDrawData is called.
 			// FIXME: Why is this waiting time needed?
-			var time = citySize > 50 ? 5f : 0.2f;
+			var time = citySize > BigCityThreshold ? LongDrawWaitingTime : ShortDrawWaitingTime;
 			axisDropdownX.SetOther(axisDropdownY);
 			axisDropdownY.SetOther(axisDropdownX);
+			// FIXME: Why is this delayed call needed and what consequences does
+			// it have? It seems as if this slows down the completion of drawing the objects.
 			Invoke(nameof(CallDrawData), time);
 		}
 
@@ -198,6 +214,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void FillScrollView()
 		{
+			Performance p = Performance.Begin("FillScrollView()");
 			foreach (Transform child in scrollContent.transform) Destroy(child.gameObject);
 
 			var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
@@ -223,15 +240,18 @@ namespace SEE.Charts.Scripts
 
 			scrollContent.TryGetComponent<RectTransform>(out var rect);
 			rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
+			p.End();
 		}
 
 		private void FillScrollView(bool tree)
 		{
+			Performance p = Performance.Begin("FillScrollView(bool)");
 			foreach (Transform child in scrollContent.transform) Destroy(child.gameObject);
 
 			if (!tree)
 			{
 				FillScrollView();
+				p.End();
 				return;
 			}
 
@@ -266,6 +286,7 @@ namespace SEE.Charts.Scripts
 			if (hierarchy > maxHierarchy) maxHierarchy = hierarchy; //TODO: Use this...
 			scrollContent.TryGetComponent<RectTransform>(out var rect);
 			rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
+			p.End();
 		}
 
 		/// <summary>
@@ -327,6 +348,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void GetAllNumericAttributes()
 		{
+			Performance p = Performance.Begin("GetAllNumericAttributes");
 			foreach (var data in _dataObjects)
 			{
                 Node node = data.GetComponent<NodeRef>().node;
@@ -339,6 +361,7 @@ namespace SEE.Charts.Scripts
 					AllKeys.Add(key);
 				}
 			}
+			p.End();
 		}
 
 		/// <summary>
@@ -346,15 +369,23 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void FindDataObjects()
 		{
+			Performance p = Performance.Begin("FindDataObjects: Find nodes");
 			_dataObjects = GameObject.FindGameObjectsWithTag("Node");
+			p.End();
+
+			p = Performance.Begin("FindDataObjects: Node highlights");
 			foreach (var entry in _dataObjects)
 			{
 				entry.TryGetComponent<NodeHighlights>(out var highlights);
-				if (!highlights.showInChart.Contains(this)) highlights.showInChart.Add(this, true);
+				highlights.showInChart[this] = true;
+				//if (!highlights.showInChart.Contains(this)) highlights.showInChart.Add(this, true);
 			}
+			p.End();
 
+			p = Performance.Begin("FindDataObjects: Fill scroll view");
 			citySize = _dataObjects.Length;
 			FillScrollView(_displayAsTree);
+			p.End();
 		}
 
 		/// <summary>
@@ -363,7 +394,9 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void CallDrawData()
 		{
+			Performance p = Performance.Begin("CallDrawData");
 			DrawData(true);
+			p.End();
 		}
 
 		/// <summary>
@@ -372,7 +405,7 @@ namespace SEE.Charts.Scripts
 		/// <returns></returns>
 		public IEnumerator QueueDraw()
 		{
-			if (citySize > 50) yield return new WaitForSeconds(5f);
+			if (citySize > BigCityThreshold) yield return new WaitForSeconds(LongDrawWaitingTime);
 			else yield return new WaitForSeconds(0.5f);
 
 			DrawData(false);
@@ -385,6 +418,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		public void DrawData(bool needData)
 		{
+			Performance p = Performance.Begin("DrawData");
 			if (needData)
 			{
 				FindDataObjects();
@@ -402,7 +436,7 @@ namespace SEE.Charts.Scripts
 			{ 
 				noDataWarning.SetActive(true); 
 			}
-
+			p.End();
 		}
 
 		/// <summary>
@@ -411,6 +445,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void DrawTwoAxes()
 		{
+			Performance p = Performance.Begin("DrawTwoAxes");
 			var i = 0;
 			_dataObjects[i].TryGetComponent<NodeRef>(out var nodeRef);
 			var node = nodeRef.node;
@@ -494,6 +529,7 @@ namespace SEE.Charts.Scripts
 				foreach (var activeMarker in ActiveMarkers) Destroy(activeMarker);
 				noDataWarning.SetActive(true);
 			}
+			p.End();
 		}
 
 		/// <summary>
@@ -503,6 +539,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void DrawOneAxis()
 		{
+			Performance p = Performance.Begin("DrawOneAxis");
 			var toDraw = new List<GameObject>();
 			var metric = axisDropdownY.Value;
 
@@ -534,6 +571,7 @@ namespace SEE.Charts.Scripts
 				foreach (var activeMarker in ActiveMarkers) Destroy(activeMarker);
 				noDataWarning.SetActive(true);
 			}
+			p.End();
 		}
 
 		/// <summary>
@@ -547,6 +585,7 @@ namespace SEE.Charts.Scripts
 		private void AddMarkers(IEnumerable<GameObject> toDraw, float minX, float maxX, float minY,
 			float maxY)
 		{
+			Performance p = Performance.Begin("AddMarkers(IEnumerable, float, float, float)");
 			var updatedMarkers = new List<GameObject>();
 			var dataRect = dataPanel.rect;
 			var width = dataRect.width / (maxX - minX);
@@ -579,6 +618,7 @@ namespace SEE.Charts.Scripts
 
 			foreach (var marker in ActiveMarkers) Destroy(marker);
 			ActiveMarkers = updatedMarkers;
+			p.End();
 		}
 
 		/// <summary>
@@ -589,6 +629,7 @@ namespace SEE.Charts.Scripts
 		/// <param name="max">The maximum value of the metric.</param>
 		private void AddMarkers(List<GameObject> toDraw, float min, float max)
 		{
+			Performance p = Performance.Begin("AddMarkers(List, float, float)");
 			if (min.Equals(max))
 			{
 				AddMarkers(toDraw);
@@ -631,6 +672,7 @@ namespace SEE.Charts.Scripts
 				foreach (var marker in ActiveMarkers) Destroy(marker);
 				ActiveMarkers = updatedMarkers;
 			}
+			p.End();
 		}
 
 		/// <summary>
@@ -639,6 +681,7 @@ namespace SEE.Charts.Scripts
 		/// <param name="toDraw">The markers to add to the chart.</param>
 		private void AddMarkers(List<GameObject> toDraw)
 		{
+			Performance p = Performance.Begin("AddMarkers(List)");
 			var updatedMarkers = new List<GameObject>();
 			var dataRect = dataPanel.rect;
 			var width = dataRect.width / toDraw.Count;
@@ -677,6 +720,7 @@ namespace SEE.Charts.Scripts
 
 			foreach (var marker in ActiveMarkers) Destroy(marker);
 			ActiveMarkers = updatedMarkers;
+			p.End();
 		}
 
 		/// <summary>
