@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEE.Game.Runtime
 {
@@ -109,7 +110,7 @@ namespace SEE.Game.Runtime
                     {
                         ///If previous statement exitted a class, metaphorically remove the class from the callstack by destroying its textwindow.
                         ///Looking for an "entrystatement", because the visualisation is running backwards.
-                        if (statementCounter < parsedJLG.AllStatements.Count
+                        if (statementCounter < parsedJLG.AllStatements.Count-1
                             && parsedJLG.AllStatements[statementCounter + 1].StatementType.Equals("entry")
                             && currentGO != GetNodeForStatement(statementCounter + 1))
                         {
@@ -176,7 +177,6 @@ namespace SEE.Game.Runtime
             go.name = currentGO.name + "FileContent";
             ///set canvas order in layer to textwindows.count damit die fenster voreinander gerendered werden
             go.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = GetFileContentForNode(currentGO);
-            //go.transform.Find("ScrollContainer").Find("TextContainer").Find("Text(TMP)").GetComponent<TextMeshProUGUI>().text = GetFileContentForNode(currentGO);
             textWindows.Push(go);            
         }
 
@@ -297,12 +297,59 @@ namespace SEE.Game.Runtime
             string fileContent = currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text;
             string[] lines = fileContent.Split(new string[]{ Environment.NewLine }, StringSplitOptions.None);
 
+            lines = FadePreviousLines(lines);
+
+            string currentLineString = lines[parsedJLG.AllStatements[statementCounter].LineAsInt() - 1];
+
+            ///strip currentline of previous highlighting, if it has it
+            if (currentLineString.StartsWith("<color=#"))
+            {
+                ///remove color tag at start
+                currentLineString = currentLineString.Substring(currentLineString.IndexOf('>')+1);
+                ///remove color tag at end
+                currentLineString = currentLineString.Remove(currentLineString.LastIndexOf('<'));
+            }
             ///highlight currentline, LineAsInt -1, because lines array starts counting at 0 and Classlines start at 1.
-            lines[parsedJLG.AllStatements[statementCounter].LineAsInt()-1] = "<color=\"red\">" + lines[parsedJLG.AllStatements[statementCounter].LineAsInt()-1] + "</color>";
+            lines[parsedJLG.AllStatements[statementCounter].LineAsInt()-1] = "<color=#5ACD5A>" + currentLineString + "</color>";
 
             ///return lines array back to a single string and then save the new highlighted string in the GameObject.
             fileContent = string.Join(Environment.NewLine, lines);
             currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = fileContent;
+
+            ///Scroll the Scroll rect so the current line is in the middle.
+            currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - ((float)parsedJLG.AllStatements[statementCounter].LineAsInt() / (float)lines.Length);
+        }
+
+        private string[] FadePreviousLines(string[] lines)
+        {
+            for(int i = 0; i<lines.Length;i++)
+            {
+                if (lines[i].StartsWith("<color="))
+                {                  
+                    if (lines[i].StartsWith("<color=#5ACD5A>"))
+                    {
+                        lines[i] = lines[i].Replace("<color=#5ACD5A>", "<color=#78CD78>");
+                    }
+                    else if (lines[i].StartsWith("<color=#78CD78>"))
+                    {
+                        lines[i] = lines[i].Replace("<color=#78CD78>", "<color=#96CD96>");
+                    }
+                    else if (lines[i].StartsWith("<color=#96CD96>"))
+                    {
+                        lines[i] = lines[i].Replace("<color=#96CD96>", "<color=#B4CDB4>");
+                    }
+                    else if (lines[i].StartsWith("<color=#B4CDB4>"))
+                    {
+                       lines[i] = lines[i].Replace("<color=#B4CDB4>", "<color=#C8D7C8>");
+                    }
+                    else
+                    {
+                        lines[i] = lines[i].Replace("<color=#C8D7C8>", "");
+                        lines[i] = lines[i].Replace("</color>", "");
+                    }
+                }
+            }
+            return lines;
         }
 
         /// <summary>
