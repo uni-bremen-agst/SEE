@@ -52,7 +52,7 @@ namespace Assets.SEE.DataModel
         /// <summary>
         /// Sets the Statement Type to entry.
         /// </summary>
-        public void setTypeEntry()
+        public void SetTypeEntry()
         {
             this.StatementType = "entry";
         }
@@ -60,7 +60,7 @@ namespace Assets.SEE.DataModel
         /// <summary>
         /// Sets the Statement Type to normal.
         /// </summary>
-        public void setTypeNormal()
+        public void SetTypeNormal()
         {
             this.StatementType = "normal";
         }
@@ -68,9 +68,13 @@ namespace Assets.SEE.DataModel
         /// <summary>
         /// Sets the Statement Type to exit.
         /// </summary>
-        public void setTypeExit()
+        public void SetTypeExit()
         {
             this.StatementType = "exit";
+        }
+
+        public int LineAsInt() {
+            return int.Parse(Line);
         }
 
 
