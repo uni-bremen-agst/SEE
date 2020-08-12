@@ -79,26 +79,32 @@ namespace SEE.Game.Runtime
             {
                 throw new Exception("There are no Nodes");
             }
+            if (GetNodeForStatement(statementCounter) == null) {
+                throw new Exception("Node is missing. Check, if the correct gxl is loaded.");
+            }
             currentGO = GetNodeForStatement(statementCounter);
+            currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
             GenerateScrollableTextWindow();
         }
 
         /// Update is called once per frame
         void Update()
-        {            
+        {   
+            ///this is true every updateintervall time.
             if (Time.time >= nextUpdateTime)
             {
                if (running)
                {
-                    ///Check if currentGo is not GO of current Statement. If true change currentGO and generate TextWindow.
+                    ///Check if currentGo is not GO of current Statement. If true change currentGO and generate FunctionCall to new class and new TextWindow.
                     if (!NodeRepresentsStatementLocation(statementCounter, currentGO))
                     {
                         if (playDirection && statementCounter > 0 && parsedJLG.AllStatements[statementCounter].StatementType.Equals("entry"))
                         {
                             CreateFunctionCall(currentGO, GetNodeForStatement(statementCounter));
                         }
-
+                        currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
                         currentGO = GetNodeForStatement(statementCounter);
+                        currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
 
                         if (! textWindowForNodeExists(currentGO))
                         {
@@ -252,7 +258,7 @@ namespace SEE.Game.Runtime
                     return output;
                 }
             }
-            return null;
+            throw new Exception("File could not be loaded.");
         }
 
         /// <summary>
