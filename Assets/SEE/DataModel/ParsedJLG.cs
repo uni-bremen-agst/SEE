@@ -70,7 +70,7 @@ namespace Assets.SEE.DataModel
         internal string CreateStatementInfoString(int statementCounter)
         {
             JavaStatement js = allStatements[statementCounter];
-            string info = "Line number " + js.Line + Environment.NewLine;
+            string info = "Line " + js.Line + Environment.NewLine;
             if (js.LocalVariables.Count != 0)
             {
                 info = info + "Local variables accessible at this line:";
