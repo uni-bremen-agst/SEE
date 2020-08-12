@@ -1,5 +1,6 @@
 ﻿using Assets.SEE.DataModel;
 using OdinSerializer;
+using SEE.DataModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -62,6 +63,10 @@ namespace SEE.Game.Runtime
         /// </summary>
         private Stack<GameObject> textWindows = new Stack<GameObject>();
 
+        private float currentTimeInLoop = 0.0f;
+
+        private Stack<FunctionCallSimulator> functionCalls = new Stack<FunctionCallSimulator>();
+
         /// Start is called before the first frame update
         void Start()
         {
@@ -88,33 +93,51 @@ namespace SEE.Game.Runtime
                     ///Check if currentGo is not GO of current Statement. If true change currentGO and generate TextWindow.
                     if (!NodeRepresentsStatementLocation(statementCounter, currentGO))
                     {
+                        if (playDirection && statementCounter > 0 && parsedJLG.AllStatements[statementCounter].StatementType.Equals("entry"))
+                        {
+                            CreateFunctionCall(currentGO, GetNodeForStatement(statementCounter));
+                        }
+
                         currentGO = GetNodeForStatement(statementCounter);
+
                         if (! textWindowForNodeExists(currentGO))
                         {
                             GenerateScrollableTextWindow();
                         }
                         ToggleTextWindows();
                     }
+
                     if (playDirection)
                     {
-                        ///If previous statement exitted a class, metaphorically remove the class from the callstack by destroying its textwindow.
+                        ///If previous statement exitted a class, metaphorically remove the class from the callstack by destroying its textwindow and its functionCallSimulator.
                         if (statementCounter > 0 
                             && parsedJLG.AllStatements[statementCounter - 1].StatementType.Equals("exit") 
                             && currentGO != GetNodeForStatement(statementCounter - 1))
                         {
+                            functionCalls.Pop().Shutdown();
                             GameObject.Destroy(textWindows.Pop());
                         }
                         NextStatement();
                     }
                     else
                     {
-                        ///If previous statement exitted a class, metaphorically remove the class from the callstack by destroying its textwindow.
+                        ///If previous statement entered a class, metaphorically remove the class from the callstack by destroying its textwindow and its FunctionCallSimulator.
                         ///Looking for an "entrystatement", because the visualisation is running backwards.
                         if (statementCounter < parsedJLG.AllStatements.Count-1
                             && parsedJLG.AllStatements[statementCounter + 1].StatementType.Equals("entry")
                             && currentGO != GetNodeForStatement(statementCounter + 1))
                         {
-                            GameObject.Destroy(textWindows.Pop());
+                            if (functionCalls.Count > 0 && 
+                                functionCalls.Peek().name.Equals("FunctionCall: " + currentGO.name + " call " + GetNodeForStatement(statementCounter + 1).name))
+                            {
+                                functionCalls.Pop().Shutdown();
+                            }
+                            ///Also Check, if textWindow for the statement+1 exists. (Special Case: Direction changes at statement and statement+1 is entry but was never executed =>
+                            /// => textwindow for statement+1 doesn't exist yet and the wrong textwindow is popped.)
+                            if (textWindows.Peek().name.StartsWith(GetNodeForStatement(statementCounter + 1).name))
+                            {
+                                GameObject.Destroy(textWindows.Pop());
+                            }
                         }
                         PreviousStatement();
                     }
@@ -122,6 +145,7 @@ namespace SEE.Game.Runtime
                nextUpdateTime += updateIntervall;               
             }            
 
+            ///Controls
             if (Input.GetKeyDown(KeyCode.P))
             {
                 running = !running;
@@ -147,8 +171,30 @@ namespace SEE.Game.Runtime
                     SlowDown();
                 }
             }
+
+            //functionCalls.ForEach(e => e.UpdateSimulation(currentTimeInLoop / 1.0f));
+            foreach (FunctionCallSimulator f in functionCalls) {
+                f.UpdateSpheres();
+            }
+            currentTimeInLoop = (currentTimeInLoop + Time.deltaTime) % 1.0f;
         }
 
+        private void CreateFunctionCall(GameObject currentGO, GameObject destination)
+        {
+            GameObject fCGO = new GameObject("FunctionCall: " + currentGO.name +" call "+ destination.name, typeof(FunctionCallSimulator))
+            {
+                tag = Tags.FunctionCall
+            };
+            FunctionCallSimulator sim = fCGO.GetComponent<FunctionCallSimulator>();
+            sim.Initialize(currentGO, destination, currentTimeInLoop);
+            functionCalls.Push(sim);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         private bool textWindowForNodeExists(GameObject node)
         {
             bool exists = false;
@@ -196,7 +242,14 @@ namespace SEE.Game.Runtime
             {
                 if (p.EndsWith(classname))
                 {
-                    return File.ReadAllText(p);
+                    int i = 1;
+                    string output = "";
+                    foreach (string line in File.ReadLines(p))
+                    {
+                        output = output + i + ". " + line + Environment.NewLine;
+                        i++;
+                    }
+                    return output;
                 }
             }
             return null;
@@ -258,6 +311,9 @@ namespace SEE.Game.Runtime
         /// </summary>
         private void PreviousStatement() {
             Debug.Log(parsedJLG.AllStatements[statementCounter].Line+ " "+parsedJLG.GetStatementLocationString(statementCounter) + " CurrentGo:" + currentGO.name);
+
+            HighlightCurrentLineFadePreviousReverse();
+
             GameObject fileContent = GameObject.Find(currentGO.name + "FileContent");
             fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = parsedJLG.CreateStatementInfoString(statementCounter);
             if (statementCounter > 0)
@@ -289,7 +345,8 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// 
+        /// Highlights the currentline and fades the previous five lines bit by bit back to white.
+        /// This is calle when playdirection is forwards/true.
         /// </summary>
         private void HighlightCurrentLineFadePrevious()
         {
@@ -320,6 +377,72 @@ namespace SEE.Game.Runtime
             currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - ((float)parsedJLG.AllStatements[statementCounter].LineAsInt() / (float)lines.Length);
         }
 
+        /// <summary>
+        /// Highlights the currentline and unfades previously faded lines back to white. Can only actively highlight the current line.
+        /// This is called when playdirection is backwards/false.
+        /// </summary>
+        private void HighlightCurrentLineFadePreviousReverse()
+        {
+            GameObject currentFileContentGO = textWindows.Peek();
+            string fileContent = currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text;
+            string[] lines = fileContent.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+
+            lines = UnfadePreviousLines(lines);
+
+            lines[parsedJLG.AllStatements[statementCounter].LineAsInt() - 1] = "<color=#5ACD5A>" + lines[parsedJLG.AllStatements[statementCounter].LineAsInt() - 1] + "</color>";
+
+            fileContent = string.Join(Environment.NewLine, lines);
+            currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = fileContent;
+
+            currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - ((float)parsedJLG.AllStatements[statementCounter].LineAsInt() / (float)lines.Length);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <returns></returns>
+        private string[] UnfadePreviousLines(string[] lines)
+        {
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (lines[i].StartsWith("<color="))
+                {
+                    if (lines[i].StartsWith("<color=#5ACD5A>"))
+                    {
+                        lines[i] = lines[i].Replace("<color=#5ACD5A>", "");
+                        lines[i] = lines[i].Replace("</color>", "");
+                    }
+                    else if (lines[i].StartsWith("<color=#A5CDA5>"))
+                    {
+                        lines[i] = lines[i].Replace("<color=#A5CDA5>", "");
+                        lines[i] = lines[i].Replace("</color>", "");
+                    }
+                    else if (lines[i].StartsWith("<color=#78CD78>"))
+                    {
+                        lines[i] = lines[i].Replace("<color=#78CD78>", "");
+                        lines[i] = lines[i].Replace("</color>", "");
+                    }
+                    else if (lines[i].StartsWith("<color=#96CD96>"))
+                    {
+                        lines[i] = lines[i].Replace("<color=#96CD96>", "");
+                        lines[i] = lines[i].Replace("</color>", "");
+                    }
+                    else if (lines[i].StartsWith("<color=#B4CDB4>"))
+                    {
+                        lines[i] = lines[i].Replace("<color=#B4CDB4>", "");
+                        lines[i] = lines[i].Replace("</color>", "");
+                    }
+                }
+            }
+            return lines;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <returns></returns>
         private string[] FadePreviousLines(string[] lines)
         {
             for(int i = 0; i<lines.Length;i++)
@@ -336,15 +459,15 @@ namespace SEE.Game.Runtime
                     }
                     else if (lines[i].StartsWith("<color=#96CD96>"))
                     {
-                        lines[i] = lines[i].Replace("<color=#96CD96>", "<color=#B4CDB4>");
+                        lines[i] = lines[i].Replace("<color=#96CD96>", "<color=#A5CDA5>");
                     }
-                    else if (lines[i].StartsWith("<color=#B4CDB4>"))
+                    else if (lines[i].StartsWith("<color=#A5CDA5>"))
                     {
-                       lines[i] = lines[i].Replace("<color=#B4CDB4>", "<color=#C8D7C8>");
+                       lines[i] = lines[i].Replace("<color=#A5CDA5>", "<color=#B4CDB4>");
                     }
                     else
                     {
-                        lines[i] = lines[i].Replace("<color=#C8D7C8>", "");
+                        lines[i] = lines[i].Replace("<color=#B4CDB4>", "");
                         lines[i] = lines[i].Replace("</color>", "");
                     }
                 }

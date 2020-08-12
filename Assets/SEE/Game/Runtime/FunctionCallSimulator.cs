@@ -180,7 +180,7 @@ namespace SEE.Game.Runtime
         /// <summary>
         /// Updates the position and color of the spheres.
         /// </summary>
-        private void UpdateSpheres()
+        public void UpdateSpheres()
         {
             Vector3 srcPos = src.transform.position;
             Vector3 dstPos = dst.transform.position;
