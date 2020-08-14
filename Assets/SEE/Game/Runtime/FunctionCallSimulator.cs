@@ -59,12 +59,12 @@ namespace SEE.Game.Runtime
         /// <summary>
         /// The source of the function call.
         /// </summary>
-        private GameObject src;
+        internal GameObject src;
 
         /// <summary>
         /// The destination of the function call.
         /// </summary>
-        private GameObject dst;
+        internal GameObject dst;
 
         /// <summary>
         /// The original scale of the source building.

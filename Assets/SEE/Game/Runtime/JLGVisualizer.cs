@@ -4,6 +4,7 @@ using SEE.DataModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -63,9 +64,7 @@ namespace SEE.Game.Runtime
         /// </summary>
         private Stack<GameObject> textWindows = new Stack<GameObject>();
 
-        private float currentTimeInLoop = 0.0f;
-
-        private Stack<FunctionCallSimulator> functionCalls = new Stack<FunctionCallSimulator>();
+        private Stack<GameObject> functionCalls = new Stack<GameObject>();
 
         /// Start is called before the first frame update
         void Start()
@@ -102,7 +101,7 @@ namespace SEE.Game.Runtime
                         {
                             CreateFunctionCall(currentGO, GetNodeForStatement(statementCounter));
                         }
-                        currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
+                        currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.530f, 0.637f, 0.858f, 1f);
                         currentGO = GetNodeForStatement(statementCounter);
                         currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
 
@@ -113,38 +112,14 @@ namespace SEE.Game.Runtime
                         ToggleTextWindows();
                     }
 
+                    updateStacks();
+
                     if (playDirection)
                     {
-                        ///If previous statement exitted a class, metaphorically remove the class from the callstack by destroying its textwindow and its functionCallSimulator.
-                        if (statementCounter > 0 
-                            && parsedJLG.AllStatements[statementCounter - 1].StatementType.Equals("exit") 
-                            && currentGO != GetNodeForStatement(statementCounter - 1))
-                        {
-                            functionCalls.Pop().Shutdown();
-                            GameObject.Destroy(textWindows.Pop());
-                        }
                         NextStatement();
                     }
                     else
                     {
-                        ///If previous statement entered a class, metaphorically remove the class from the callstack by destroying its textwindow and its FunctionCallSimulator.
-                        ///Looking for an "entrystatement", because the visualisation is running backwards.
-                        if (statementCounter < parsedJLG.AllStatements.Count-1
-                            && parsedJLG.AllStatements[statementCounter + 1].StatementType.Equals("entry")
-                            && currentGO != GetNodeForStatement(statementCounter + 1))
-                        {
-                            if (functionCalls.Count > 0 && 
-                                functionCalls.Peek().name.Equals("FunctionCall: " + currentGO.name + " call " + GetNodeForStatement(statementCounter + 1).name))
-                            {
-                                functionCalls.Pop().Shutdown();
-                            }
-                            ///Also Check, if textWindow for the statement+1 exists. (Special Case: Direction changes at statement and statement+1 is entry but was never executed =>
-                            /// => textwindow for statement+1 doesn't exist yet and the wrong textwindow is popped.)
-                            if (textWindows.Peek().name.StartsWith(GetNodeForStatement(statementCounter + 1).name))
-                            {
-                                GameObject.Destroy(textWindows.Pop());
-                            }
-                        }
                         PreviousStatement();
                     }
                }
@@ -161,10 +136,12 @@ namespace SEE.Game.Runtime
                 updateIntervall = 1;
                 playDirection = !playDirection;
             }
+
+            ///not needed in current visualisation
             if (Input.GetKeyDown(KeyCode.J))
             {
-                windowsToggled = !windowsToggled;
-                ToggleTextWindows();
+                //windowsToggled = !windowsToggled;
+                //ToggleTextWindows();
             }
             if (running)
             {
@@ -178,13 +155,19 @@ namespace SEE.Game.Runtime
                 }
             }
 
-            //functionCalls.ForEach(e => e.UpdateSimulation(currentTimeInLoop / 1.0f));
-            foreach (FunctionCallSimulator f in functionCalls) {
-                f.UpdateSpheres();
+            ///Only Update the Spheres cause this visualization uses its own highlighting for the buildings.
+            foreach (GameObject f in functionCalls) {
+                f.GetComponent<FunctionCallSimulator>().UpdateSpheres();
             }
-            currentTimeInLoop = (currentTimeInLoop + Time.deltaTime) % 1.0f;
         }
 
+
+        /// <summary>
+        /// Using the GenerateFunctionCalls method from Runtime.cs but with some adjustments so it better works in this Visualization. Only using the spheres 
+        /// and saving the complete FunctionCall Gameobject instead of just the actual FunctionCallSimulator component.
+        /// </summary>
+        /// <param name="currentGO"></param>
+        /// <param name="destination"></param>
         private void CreateFunctionCall(GameObject currentGO, GameObject destination)
         {
             GameObject fCGO = new GameObject("FunctionCall: " + currentGO.name +" call "+ destination.name, typeof(FunctionCallSimulator))
@@ -192,12 +175,12 @@ namespace SEE.Game.Runtime
                 tag = Tags.FunctionCall
             };
             FunctionCallSimulator sim = fCGO.GetComponent<FunctionCallSimulator>();
-            sim.Initialize(currentGO, destination, currentTimeInLoop);
-            functionCalls.Push(sim);
+            sim.Initialize(currentGO, destination, 1f);
+            functionCalls.Push(fCGO);
         }
 
         /// <summary>
-        /// 
+        /// Checks, if there is an exisiting scrollable Textwindow for a given GameObject.
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
@@ -219,6 +202,23 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
+        /// Returns the first active GameObject in a stack. Null if there is none.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        private GameObject findFirstActiveGOinStack(Stack<GameObject> s)
+        {
+            var clonedStack = new Stack<GameObject>(s.Reverse());
+            foreach(GameObject g in clonedStack)
+            {
+                if (g.activeSelf) {
+                    return g;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
         /// This Method generates a new ScrollableTextMeshProWindow above the middle of the currentGO Node. Also it fills the Textfield with the code saved in the classfile,
         /// that belongs to this node.
         /// </summary>
@@ -233,7 +233,7 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// 
+        /// This Method finds the path to the file of a given node and returns the content of the file.
         /// </summary>
         /// <param name="go"></param>
         /// <returns></returns>
@@ -295,7 +295,7 @@ namespace SEE.Game.Runtime
         private void NextStatement() {
             Debug.Log(parsedJLG.AllStatements[statementCounter].Line + " " + parsedJLG.GetStatementLocationString(statementCounter)+" CurrentGo:"+ currentGO.name);
 
-            HighlightCurrentLineFadePrevious();
+                HighlightCurrentLineFadePrevious();           
 
             GameObject fileContent = GameObject.Find(currentGO.name + "FileContent");
             fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = parsedJLG.CreateStatementInfoString(statementCounter);
@@ -317,8 +317,8 @@ namespace SEE.Game.Runtime
         /// </summary>
         private void PreviousStatement() {
             Debug.Log(parsedJLG.AllStatements[statementCounter].Line+ " "+parsedJLG.GetStatementLocationString(statementCounter) + " CurrentGo:" + currentGO.name);
-
-            HighlightCurrentLineFadePreviousReverse();
+                      
+                HighlightCurrentLineFadePreviousReverse();            
 
             GameObject fileContent = GameObject.Find(currentGO.name + "FileContent");
             fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = parsedJLG.CreateStatementInfoString(statementCounter);
@@ -348,6 +348,65 @@ namespace SEE.Game.Runtime
                     go.SetActive(windowsToggled);
                 }
             }
+        }
+
+        private void updateStacks() {
+            if (playDirection)
+            {
+                ///If previous statement exitted a class, metaphorically remove the statements class from the callstack 
+                ///by destroying its textwindow, its functionCallSimulator and coloring it back to normal. 
+                if (statementCounter > 0
+                        && parsedJLG.AllStatements[statementCounter - 1].StatementType.Equals("exit")
+                        && currentGO != GetNodeForStatement(statementCounter - 1))
+                {
+                    GetNodeForStatement(statementCounter - 1).GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
+                    findFirstActiveGOinStack(functionCalls).SetActive(false); // hier nur disablen
+                    GameObject.Destroy(textWindows.Pop());
+                }
+            }
+            else
+            {
+                if (parsedJLG.AllStatements[statementCounter].StatementType.Equals("exit") && currentGO != GetNodeForStatement(statementCounter+1)) {
+                    findFunctionCallForGameObjects(currentGO, GetNodeForStatement(statementCounter + 1)).SetActive(true);
+                }
+                ///If previous statement entered a class, metaphorically remove the class from the callstack by destroying its textwindow and its FunctionCallSimulator.
+                ///Looking for an "entrystatement", because the visualisation is running backwards.
+                else if (statementCounter < parsedJLG.AllStatements.Count - 1
+                    && parsedJLG.AllStatements[statementCounter + 1].StatementType.Equals("entry")
+                    && currentGO != GetNodeForStatement(statementCounter + 1))
+                {
+                    GetNodeForStatement(statementCounter + 1).GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
+                    if (functionCalls.Count > 0 &&
+                        functionCalls.Peek().name.Equals("FunctionCall: " + currentGO.name + " call " + GetNodeForStatement(statementCounter + 1).name))
+                    {
+                        GameObject.Destroy(functionCalls.Pop());
+                    }
+                    ///Also Check, if textWindow for the statement+1 exists. (Special Case: Direction changes at statement and statement+1 is entry but was never executed =>
+                    /// => textwindow for statement+1 doesn't exist yet and the wrong textwindow is popped.)
+                    if (textWindows.Peek().name.StartsWith(GetNodeForStatement(statementCounter + 1).name))
+                    {
+                        GameObject.Destroy(textWindows.Pop());
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currentGO"></param>
+        /// <param name="gameObject"></param>
+        /// <returns></returns>
+        private GameObject findFunctionCallForGameObjects(GameObject currentGO, GameObject gameObject)
+        {
+            var clonedStack = new Stack<GameObject>(functionCalls.Reverse());
+            foreach (GameObject go in clonedStack) {
+                if (!go.activeSelf && go.GetComponent<FunctionCallSimulator>().src == gameObject
+                    && go.GetComponent<FunctionCallSimulator>().dst == currentGO) {
+                    return go;
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -404,7 +463,7 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// 
+        /// This Method reverses the highlighting of lines by coloring them all white again.
         /// </summary>
         /// <param name="lines"></param>
         /// <returns></returns>
@@ -445,7 +504,7 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// 
+        /// This Method fades highlighted lines in 5 steps back to white.
         /// </summary>
         /// <param name="lines"></param>
         /// <returns></returns>
