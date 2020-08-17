@@ -54,6 +54,11 @@ namespace Assets.SEE.DataModel
             return locationLookupTable[int.Parse(allStatements[i].Location)];
         }
 
+        private string LookupFieldLocation(string s) {
+            int i = s.IndexOf('=');
+            return fieldLookupTable[int.Parse(s.Substring(0, i))] + s.Substring(i); 
+        }
+
         /// <summary>
         /// getter for the fields of a ParsedJLG
         /// </summary>
@@ -84,7 +89,7 @@ namespace Assets.SEE.DataModel
                 info = info + Environment.NewLine + "Field Changes at this line:";
                 foreach (string s in js.FieldChanges)
                 {
-                    info = info + Environment.NewLine + s;
+                    info = info + Environment.NewLine + LookupFieldLocation(s);
                 }
             }
             return info;
