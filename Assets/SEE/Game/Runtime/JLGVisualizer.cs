@@ -47,7 +47,7 @@ namespace SEE.Game.Runtime
         /// <summary>
         /// 
         /// </summary>
-        private Boolean windowsToggled = true;  
+        private Boolean windowsToggled = false;  
 
         /// <summary>
         /// The GameObject that represents the class, to which the current statement belongs to. 
@@ -224,7 +224,9 @@ namespace SEE.Game.Runtime
         /// </summary>
         private void GenerateScrollableTextWindow()
         {
-            Vector3 v = currentGO.transform.position;
+            ///spawn textwindow in middle of map
+            Vector3 v = gameObject.transform.parent.position;
+            v.y = v.y + 1.5f*gameObject.transform.parent.localScale.y;
             GameObject go = Instantiate((GameObject)Resources.Load("ScrollableTextWindow"),v,currentGO.transform.rotation,this.gameObject.transform.parent);
             go.name = currentGO.name + "FileContent";
             ///set canvas order in layer to textwindows.count damit die fenster voreinander gerendered werden
@@ -360,13 +362,18 @@ namespace SEE.Game.Runtime
                         && currentGO != GetNodeForStatement(statementCounter - 1))
                 {
                     GetNodeForStatement(statementCounter - 1).GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
-                    findFirstActiveGOinStack(functionCalls).SetActive(false); // hier nur disablen
+                    if (findFirstActiveGOinStack(functionCalls) != null)
+                    {
+                        findFirstActiveGOinStack(functionCalls).SetActive(false); // hier nur disablen
+                    }
                     GameObject.Destroy(textWindows.Pop());
                 }
             }
             else
             {
-                if (parsedJLG.AllStatements[statementCounter].StatementType.Equals("exit") && currentGO != GetNodeForStatement(statementCounter+1)) {
+                if (parsedJLG.AllStatements[statementCounter].StatementType.Equals("exit") && currentGO != GetNodeForStatement(statementCounter+1)
+                    && findFunctionCallForGameObjects(currentGO, GetNodeForStatement(statementCounter + 1))!= null)//Check for null because sometimes, this can break if the playdirection is changed a lot.
+                {
                     findFunctionCallForGameObjects(currentGO, GetNodeForStatement(statementCounter + 1)).SetActive(true);
                 }
                 ///If previous statement entered a class, metaphorically remove the class from the callstack by destroying its textwindow and its FunctionCallSimulator.
@@ -421,25 +428,29 @@ namespace SEE.Game.Runtime
 
             lines = FadePreviousLines(lines);
 
-            string currentLineString = lines[parsedJLG.AllStatements[statementCounter].LineAsInt() - 1];
 
-            ///strip currentline of previous highlighting, if it has it
-            if (currentLineString.StartsWith("<color=#"))
+            ///For some Reason this is sometimes false and it would throw an error.
+            if (lines.Length - 1 > parsedJLG.AllStatements[statementCounter].LineAsInt())
             {
-                ///remove color tag at start
-                currentLineString = currentLineString.Substring(currentLineString.IndexOf('>')+1);
-                ///remove color tag at end
-                currentLineString = currentLineString.Remove(currentLineString.LastIndexOf('<'));
+                string currentLineString = lines[parsedJLG.AllStatements[statementCounter].LineAsInt() - 1];
+                ///strip currentline of previous highlighting, if it has it
+                if (currentLineString.StartsWith("<color=#"))
+                {
+                    ///remove color tag at start
+                    currentLineString = currentLineString.Substring(currentLineString.IndexOf('>') + 1);
+                    ///remove color tag at end
+                    currentLineString = currentLineString.Remove(currentLineString.LastIndexOf('<'));
+                }
+                ///highlight currentline, LineAsInt -1, because lines array starts counting at 0 and Classlines start at 1.
+                lines[parsedJLG.AllStatements[statementCounter].LineAsInt() - 1] = "<color=#5ACD5A>" + currentLineString + "</color>";
+
+                ///return lines array back to a single string and then save the new highlighted string in the GameObject.
+                fileContent = string.Join(Environment.NewLine, lines);
+                currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = fileContent;
+
+                ///Scroll the Scroll rect so the current line is in the middle.
+                currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - ((float)parsedJLG.AllStatements[statementCounter].LineAsInt() / (float)lines.Length);
             }
-            ///highlight currentline, LineAsInt -1, because lines array starts counting at 0 and Classlines start at 1.
-            lines[parsedJLG.AllStatements[statementCounter].LineAsInt()-1] = "<color=#5ACD5A>" + currentLineString + "</color>";
-
-            ///return lines array back to a single string and then save the new highlighted string in the GameObject.
-            fileContent = string.Join(Environment.NewLine, lines);
-            currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = fileContent;
-
-            ///Scroll the Scroll rect so the current line is in the middle.
-            currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - ((float)parsedJLG.AllStatements[statementCounter].LineAsInt() / (float)lines.Length);
         }
 
         /// <summary>
@@ -454,12 +465,16 @@ namespace SEE.Game.Runtime
 
             lines = UnfadePreviousLines(lines);
 
-            lines[parsedJLG.AllStatements[statementCounter].LineAsInt() - 1] = "<color=#5ACD5A>" + lines[parsedJLG.AllStatements[statementCounter].LineAsInt() - 1] + "</color>";
+            ///For some Reason this is sometimes false and it would throw an error.
+            if (lines.Length - 1 > parsedJLG.AllStatements[statementCounter].LineAsInt())
+            {
+                lines[parsedJLG.AllStatements[statementCounter].LineAsInt() - 1] = "<color=#5ACD5A>" + lines[parsedJLG.AllStatements[statementCounter].LineAsInt() - 1] + "</color>";
 
-            fileContent = string.Join(Environment.NewLine, lines);
-            currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = fileContent;
+                fileContent = string.Join(Environment.NewLine, lines);
+                currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = fileContent;
 
-            currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - ((float)parsedJLG.AllStatements[statementCounter].LineAsInt() / (float)lines.Length);
+                currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - ((float)parsedJLG.AllStatements[statementCounter].LineAsInt() / (float)lines.Length);
+            }
         }
 
         /// <summary>
