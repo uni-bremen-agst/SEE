@@ -24,10 +24,14 @@ namespace SEE.Game.Runtime
         /// </summary>
         private int statementCounter = 0;
 
+        private string labelText = "";
+
         /// <summary>
         /// Time value in seconds. At this point in time(running time) the next or previous statement will be visualized, depending on the playing direction.
         /// </summary>
         private float nextUpdateTime = 1.0f;
+
+        private float showLabelUntil = 0f;
 
         /// <summary>
         /// Seconds per statement.
@@ -130,11 +134,29 @@ namespace SEE.Game.Runtime
             if (Input.GetKeyDown(KeyCode.P))
             {
                 running = !running;
+                showLabelUntil = Time.time + 1f;
+                if (running)
+                {
+                    labelText = "Play";
+                }
+                else
+                {
+                    labelText = "Pause";
+                }
             }
             if (Input.GetKeyDown(KeyCode.O))
             {
                 updateIntervall = 1;
                 playDirection = !playDirection;
+                showLabelUntil = Time.time + 1f;
+                if (playDirection)
+                {
+                    labelText = "Forward";
+                }
+                else
+                {
+                    labelText = "Rewind";
+                }
             }
 
             ///not needed in current visualisation
@@ -148,16 +170,30 @@ namespace SEE.Game.Runtime
                 if (Input.GetKeyDown(KeyCode.L))
                 {
                     SpeedUp();
+                    showLabelUntil = Time.time + 1f;
+                    labelText = "Speed x" + 1f / updateIntervall;
                 }
                 if (Input.GetKeyDown(KeyCode.K))
                 {
                     SlowDown();
+                    showLabelUntil = Time.time + 1f;
+                    labelText = "Speed x" + 1f / updateIntervall;
                 }
             }
 
             ///Only Update the Spheres cause this visualization uses its own highlighting for the buildings.
             foreach (GameObject f in functionCalls) {
                 f.GetComponent<FunctionCallSimulator>().UpdateSpheres();
+            }
+        }
+
+        /// <summary>
+        /// Responsible for displaying small log messages, that indicate what button was pressed and its effect.
+        /// </summary>
+        void OnGUI()
+        {
+            if (Time.time < showLabelUntil) {
+                GUI.Label(new Rect(Screen.width / 96, Screen.height / 96, Screen.width / 24, Screen.height / 24), labelText);
             }
         }
 
@@ -219,19 +255,35 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// This Method generates a new ScrollableTextMeshProWindow above the middle of the currentGO Node. Also it fills the Textfield with the code saved in the classfile,
-        /// that belongs to this node.
+        /// This Method generates a new ScrollableTextMeshProWindow above the middle of the currentGO Node. Also it fills the Textfield with the code saved in the file,
+        /// that belongs to this node aka the "FileContent". Also creates a line between the Textwindow and the node Gameobject.
         /// </summary>
         private void GenerateScrollableTextWindow()
         {
             ///spawn textwindow in middle of map
             Vector3 v = gameObject.transform.parent.position;
-            v.y = v.y + 1.5f*gameObject.transform.parent.localScale.y;
+            v.y = v.y + 2f*gameObject.transform.parent.localScale.y;
             GameObject go = Instantiate((GameObject)Resources.Load("ScrollableTextWindow"),v,currentGO.transform.rotation,this.gameObject.transform.parent);
             go.name = currentGO.name + "FileContent";
             ///set canvas order in layer to textwindows.count damit die fenster voreinander gerendered werden
             go.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = GetFileContentForNode(currentGO);
-            textWindows.Push(go);            
+            textWindows.Push(go);
+
+            ///add line between Class and FileContentWindow
+            LineRenderer line = new GameObject(currentGO.name + "FileContentConnector").AddComponent<LineRenderer>();
+            line.positionCount = 2;
+            line.material= new Material(Shader.Find("Sprites/Default"));
+            line.material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
+            line.startWidth = 0.2f;
+            line.endWidth = 0.2f;
+            line.useWorldSpace = true;
+            float heightOfTextObject = go.GetComponent<RectTransform>().rect.height * go.transform.parent.localScale.y;
+            Debug.Log("height:" + heightOfTextObject);
+            Vector3 goPoint = go.transform.position;
+            goPoint.y = goPoint.y - heightOfTextObject / 2;
+            line.SetPosition(0, goPoint);
+            line.SetPosition(1, currentGO.transform.position);
+            line.gameObject.transform.parent = go.transform;
         }
 
         /// <summary>
