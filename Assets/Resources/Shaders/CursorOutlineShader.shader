@@ -3,6 +3,7 @@
     Properties
     {
         _MainTex("Texture", 2D) = "white" {}
+		_Color("Color", Color) = (1,0,1,1)
     }
     SubShader
     {
@@ -13,9 +14,10 @@
 			"RenderType" = "Transparent"
 		}
 
+		Blend SrcAlpha OneMinusSrcAlpha
+		Cull Off
 		ZTest Off
 		ZWrite Off
-		Blend SrcAlpha OneMinusSrcAlpha
 
         Pass
         {
@@ -39,6 +41,7 @@
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
+			float4 _Color;
 
             v2f vert (appdata v)
             {
@@ -53,7 +56,7 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-				fixed4 color = fixed4(1.0, 0.25, 0.0, 1.0 * tex2D(_MainTex, i.uv).r);
+				fixed4 color = fixed4(_Color.r, _Color.g, _Color.b, _Color.a * tex2D(_MainTex, i.uv).r);
                 return color;
             }
             ENDCG

@@ -37,6 +37,7 @@ namespace SEE.UI3D
             c.outline.transform.localScale = Vector3.one;
             c.outlineMaterial = new Material(Shader.Find(OutlineShaderName));
             c.outlineMaterial.SetTexture("_MainTex", Tools.TextureGenerator.CreateCircleOutlineTextureR8(32, 31, 1.0f, 0.0f));
+            c.outlineMaterial.SetColor("_Color", UI3DProperties.DefaultColor);
             c.outline.GetComponent<MeshRenderer>().sharedMaterial = c.outlineMaterial;
 
             c.axisMaterial = new Material(Shader.Find(PlainColorShaderName));
@@ -83,8 +84,9 @@ namespace SEE.UI3D
         private Vector3 start;
         private Vector3 end;
 
-        private Material lineMaterial;
+        private Material planeMaterial;
         private Material axisMaterial;
+        private Material lineMaterial;
 
         internal static MoveGizmo Create(float scale)
         {
@@ -96,16 +98,28 @@ namespace SEE.UI3D
             p.end = Vector3.zero;
 
             Shader shader = Shader.Find(PlainColorShaderName);
-            p.lineMaterial = new Material(shader);
+            p.planeMaterial = new Material(shader);
             p.axisMaterial = new Material(shader);
-            p.lineMaterial.SetColor("_Color", UI3DProperties.DefaultColor);
+            p.lineMaterial = new Material(shader);
+            p.planeMaterial.SetColor("_Color", new Color(0.5f, 0.5f, 0.5f, 0.2f * UI3DProperties.DefaultAlpha));
             p.axisMaterial.SetColor("_Color", new Color(0.0f, 0.0f, 0.0f, 0.5f * UI3DProperties.DefaultAlpha));
+            p.lineMaterial.SetColor("_Color", UI3DProperties.DefaultColor);
 
             return p;
         }
 
         private void OnRenderObject()
         {
+            planeMaterial.SetPass(0);
+            GL.Begin(GL.QUADS);
+            {
+                GL.Vertex(start);
+                GL.Vertex(new Vector3(end.x, end.y, start.z));
+                GL.Vertex(end);
+                GL.Vertex(new Vector3(start.x, end.y, end.z));
+            }
+            GL.End();
+
             axisMaterial.SetPass(0);
             GL.Begin(GL.LINES);
             {
@@ -139,7 +153,7 @@ namespace SEE.UI3D
 
     internal class RotateGizmo : MonoBehaviour
     {
-        private const string PivotOutlineShaderName = "Unlit/PivotOutlineShader";
+        private const string PivotOutlineShaderName = "Unlit/RotationGizmoShader";
         private const float Alpha = 0.5f;
 
         public Vector3 Center { get => transform.position; set => transform.position = value; }
