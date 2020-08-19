@@ -1,4 +1,4 @@
-﻿Shader "Unlit/CircleShader"
+﻿Shader "Unlit/PivotOutlineShader"
 {
     Properties
     {

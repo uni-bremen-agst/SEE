@@ -50,7 +50,7 @@ namespace SEE.Controls
             internal const float SnapStepAngle = 360.0f / SnapStepCount;
             internal const float DragFrictionFactor = 32.0f;
 
-            internal MovePivotBase movePivot;
+            internal UI3D.MoveGizmo moveGizmo;
             internal Bounds cityBounds;
             internal Vector3 dragStartTransformPosition;
             internal Vector3 dragStartOffset;
@@ -63,7 +63,7 @@ namespace SEE.Controls
             internal const float SnapStepCount = 8;
             internal const float SnapStepAngle = 360.0f / SnapStepCount;
 
-            internal RotatePivot rotatePivot;
+            internal UI3D.RotateGizmo rotateGizmo;
             internal float originalEulerAngleY;
             internal Vector3 originalPosition;
             internal float startAngle;
@@ -106,7 +106,7 @@ namespace SEE.Controls
 
         private NavigationMode mode;
         private bool movingOrRotating;
-        private Cursor cursor;
+        private UI3D.Cursor cursor;
 
         MoveState moveState;
         RotateState rotateState;
@@ -124,13 +124,13 @@ namespace SEE.Controls
             moveState.dragStartTransformPosition = cityTransform.position;
             moveState.dragCanonicalOffset = Vector3.zero;
             moveState.moveVelocity = Vector3.zero;
-            moveState.movePivot = new LineMovePivot(0.008f * Table.MinDimXZ);
-            rotateState.rotatePivot = new RotatePivot(1024);
+            moveState.moveGizmo = UI3D.MoveGizmo.Create(0.008f * Table.MinDimXZ);
+            rotateState.rotateGizmo = UI3D.RotateGizmo.Create(1024);
 
             zoomState.zoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps);
             zoomState.zoomStepsInProgress = 0;
 
-            cursor = Cursor.Create();
+            cursor = UI3D.Cursor.Create();
             Select(cityTransform.gameObject);
 
             Camera.main.transform.position = Table.TableTopCenterEpsilon;
@@ -159,16 +159,16 @@ namespace SEE.Controls
             {
                 mode = NavigationMode.Move;
                 movingOrRotating = false;
-                rotateState.rotatePivot.Enable(false);
+                rotateState.rotateGizmo.gameObject.SetActive(false);
             }
             else if (Input.GetKeyDown(KeyCode.Alpha2))
             {
                 mode = NavigationMode.Rotate;
                 movingOrRotating = false;
-                moveState.movePivot.Enable(false);
+                moveState.moveGizmo.gameObject.SetActive(false);
             }
 
-            rotateState.rotatePivot.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotatePivot.Center).magnitude;
+            rotateState.rotateGizmo.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotateGizmo.Center).magnitude;
 
             if (!actionState.drag && Input.GetMouseButton(0))
             {
@@ -185,7 +185,7 @@ namespace SEE.Controls
                 }
             }
             cursor.transform.position = cursor.Focus.position;
-            rotateState.rotatePivot.Center = cursor.transform.position;
+            rotateState.rotateGizmo.Center = cursor.transform.position;
 
             // Camera
             const float Speed = 2.0f; // TODO(torben): this is arbitrary
@@ -226,7 +226,7 @@ namespace SEE.Controls
                 {
                     actionState.reset = false;
                     movingOrRotating = false;
-                    moveState.movePivot.Enable(false);
+                    moveState.moveGizmo.gameObject.SetActive(false);
 
                     cityTransform.position = Table.TableTopCenterEpsilon;
                 }
@@ -236,7 +236,7 @@ namespace SEE.Controls
                     if (movingOrRotating)
                     {
                         movingOrRotating = false;
-                        moveState.movePivot.Enable(false);
+                        moveState.moveGizmo.gameObject.SetActive(false);
 
                         moveState.moveVelocity = Vector3.zero;
                         cityTransform.position = moveState.dragStartTransformPosition + moveState.dragStartOffset - Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
@@ -250,7 +250,7 @@ namespace SEE.Controls
                         {
                             actionState.startDrag = false;
                             movingOrRotating = true;
-                            moveState.movePivot.Enable(true);
+                            moveState.moveGizmo.gameObject.SetActive(true);
 
                             moveState.dragStartTransformPosition = cityTransform.position;
                             moveState.dragStartOffset = planeHitPoint - cityTransform.position;
@@ -271,14 +271,14 @@ namespace SEE.Controls
 
                             moveState.moveVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime;
                             cityTransform.position = newPosition;
-                            moveState.movePivot.SetPositions(moveState.dragStartTransformPosition + moveState.dragStartOffset, cityTransform.position + Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale));
+                            moveState.moveGizmo.SetPositions(moveState.dragStartTransformPosition + moveState.dragStartOffset, cityTransform.position + Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale));
                         }
                     }
                 }
                 else if (movingOrRotating) // finalize movement
                 {
                     movingOrRotating = false;
-                    moveState.movePivot.Enable(false);
+                    moveState.moveGizmo.gameObject.SetActive(false);
                 }
             }
             else // mode == NavigationMode.Rotate
@@ -287,9 +287,9 @@ namespace SEE.Controls
                 {
                     actionState.reset = false;
                     movingOrRotating = false;
-                    rotateState.rotatePivot.Enable(false);
+                    rotateState.rotateGizmo.gameObject.SetActive(false);
 
-                    cityTransform.RotateAround(rotateState.rotatePivot.Center, Vector3.up, -cityTransform.rotation.eulerAngles.y);
+                    cityTransform.RotateAround(rotateState.rotateGizmo.Center, Vector3.up, -cityTransform.rotation.eulerAngles.y);
                 }
                 else if (actionState.cancel) // cancel rotation
                 {
@@ -297,7 +297,7 @@ namespace SEE.Controls
                     if (movingOrRotating)
                     {
                         movingOrRotating = false;
-                        rotateState.rotatePivot.Enable(false);
+                        rotateState.rotateGizmo.gameObject.SetActive(false);
 
                         cityTransform.rotation = Quaternion.Euler(0.0f, rotateState.originalEulerAngleY, 0.0f);
                         cityTransform.position = rotateState.originalPosition;
@@ -307,20 +307,20 @@ namespace SEE.Controls
                 {
                     if (raycastResult)
                     {
-                        Vector2 toHit = new Vector2(planeHitPoint.x - rotateState.rotatePivot.Center.x, planeHitPoint.z - rotateState.rotatePivot.Center.z);
+                        Vector2 toHit = new Vector2(planeHitPoint.x - rotateState.rotateGizmo.Center.x, planeHitPoint.z - rotateState.rotateGizmo.Center.z);
                         float toHitAngle = toHit.Angle360();
 
                         if (actionState.startDrag) // start rotation
                         {
                             actionState.startDrag = false;
                             movingOrRotating = true;
-                            rotateState.rotatePivot.Enable(true);
+                            rotateState.rotateGizmo.gameObject.SetActive(true);
 
                             rotateState.originalEulerAngleY = cityTransform.rotation.eulerAngles.y;
                             rotateState.originalPosition = cityTransform.position;
                             rotateState.startAngle = AngleMod(cityTransform.rotation.eulerAngles.y - toHitAngle);
-                            rotateState.rotatePivot.SetMinAngle(Mathf.Deg2Rad * toHitAngle);
-                            rotateState.rotatePivot.SetMaxAngle(Mathf.Deg2Rad * toHitAngle);
+                            rotateState.rotateGizmo.SetMinAngle(Mathf.Deg2Rad * toHitAngle);
+                            rotateState.rotateGizmo.SetMaxAngle(Mathf.Deg2Rad * toHitAngle);
                         }
 
                         if (movingOrRotating) // continue rotation
@@ -332,7 +332,7 @@ namespace SEE.Controls
                             }
                             cityTransform.RotateAround(cursor.Focus.position, Vector3.up, angle - cityTransform.rotation.eulerAngles.y);
 
-                            float prevAngle = Mathf.Rad2Deg * rotateState.rotatePivot.GetMaxAngle();
+                            float prevAngle = Mathf.Rad2Deg * rotateState.rotateGizmo.GetMaxAngle();
                             float currAngle = toHitAngle;
 
                             while (Mathf.Abs(currAngle + 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
@@ -348,14 +348,14 @@ namespace SEE.Controls
                                 currAngle = Mathf.Round((currAngle + rotateState.startAngle) / (RotateState.SnapStepAngle)) * (RotateState.SnapStepAngle) - rotateState.startAngle;
                             }
 
-                            rotateState.rotatePivot.SetMaxAngle(Mathf.Deg2Rad * currAngle);
+                            rotateState.rotateGizmo.SetMaxAngle(Mathf.Deg2Rad * currAngle);
                         }
                     }
                 }
                 else if (movingOrRotating) // finalize rotation
                 {
                     movingOrRotating = false;
-                    rotateState.rotatePivot.Enable(false);
+                    rotateState.rotateGizmo.gameObject.SetActive(false);
                 }
             }
 
@@ -477,7 +477,7 @@ namespace SEE.Controls
                 cursor.Focus = go.transform;
                 Outline outline = go.transform.gameObject.AddComponent<Outline>();
                 outline.OutlineMode = Outline.Mode.OutlineAll;
-                outline.OutlineColor = new Color(1.0f, 0.25f, 0.0f, 1.0f);
+                outline.OutlineColor = UI3D.UI3DProperties.DefaultColor;
                 outline.OutlineWidth = 4.0f;
             }
         }

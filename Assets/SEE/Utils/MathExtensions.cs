@@ -6,6 +6,11 @@
     public static class MathExtensions
     {
         /// <summary>
+        /// The golden ratio.
+        /// </summary>
+        public const float GoldenRatio = 1.618034f;
+
+        /// <summary>
         /// Creates and returns a copy of the x- and y-components of given 3d-vector.
         /// </summary>
         /// <param name="a">The vector.</param>
