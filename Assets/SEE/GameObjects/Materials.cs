@@ -63,6 +63,9 @@ namespace SEE.GO
                 throw new Exception("Number of colors must be greater than 0.");
             }
 
+            // TODO(torben): Uniforms are not serialized. Therefore, it is necessary to
+            // set those on engine startup or game startup, if the city should be
+            // serializable.
             Shader.SetGlobalVector("portalMin", new Vector4(Table.MinX, Table.MinZ));
             Shader.SetGlobalVector("portalMax", new Vector4(Table.MaxX, Table.MaxZ));
             // Shader to retrieve the default material.
