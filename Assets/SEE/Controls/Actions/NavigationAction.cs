@@ -15,14 +15,13 @@ namespace SEE.Controls
 
         private class ZoomCommand
         {
-            internal readonly int targetZoomSteps;
-
+            public readonly int TargetZoomSteps;
             private readonly float duration;
             private readonly float startTime;
 
             internal ZoomCommand(int targetZoomSteps, float duration)
             {
-                this.targetZoomSteps = targetZoomSteps;
+                TargetZoomSteps = targetZoomSteps;
                 this.duration = duration;
                 startTime = Time.realtimeSinceStartup;
             }
@@ -37,7 +36,7 @@ namespace SEE.Controls
             {
                 float x = Mathf.Min((Time.realtimeSinceStartup - startTime) / duration, 1.0f);
                 float t = 0.5f - 0.5f * Mathf.Cos(x * Mathf.PI);
-                float result = t * (float)targetZoomSteps;
+                float result = t * (float)TargetZoomSteps;
                 return result;
             }
         }
@@ -77,7 +76,7 @@ namespace SEE.Controls
 
             internal Vector3 originalScale;
             internal List<ZoomCommand> zoomCommands;
-            internal uint zoomStepsInProgress;
+            internal uint currentTargetZoomSteps;
             internal float currentZoomFactor;
         }
 
@@ -97,6 +96,7 @@ namespace SEE.Controls
             internal bool reset;
             internal Vector3 mousePosition; // TODO(torben): this needs to be abstracted for other modalities
             internal float zoomStepsDelta;
+            internal bool zoomToggleToObject;
         }
 
 
@@ -128,7 +128,8 @@ namespace SEE.Controls
             rotateState.rotateGizmo = UI3D.RotateGizmo.Create(1024);
 
             zoomState.zoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps);
-            zoomState.zoomStepsInProgress = 0;
+            zoomState.currentTargetZoomSteps = 0;
+            zoomState.currentZoomFactor = 1.0f;
 
             cursor = UI3D.Cursor.Create();
             Select(cityTransform.gameObject);
@@ -149,11 +150,12 @@ namespace SEE.Controls
             actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
             actionState.snap = Input.GetKey(KeyCode.LeftAlt);
             actionState.reset |= Input.GetKey(KeyCode.R);
+            actionState.mousePosition = Input.mousePosition;
             if (!actionState.drag)
             {
                 actionState.zoomStepsDelta += Input.mouseScrollDelta.y;
+                actionState.zoomToggleToObject |= Input.GetKeyDown(KeyCode.F);
             }
-            actionState.mousePosition = Input.mousePosition;
 
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
@@ -220,6 +222,8 @@ namespace SEE.Controls
             bool raycastResult = raycastPlane.Raycast(ray, out float enter);
             Vector3 planeHitPoint = ray.GetPoint(enter);
 
+            #region Move
+
             if (mode == NavigationMode.Move)
             {
                 if (actionState.reset) // reset to center of table
@@ -281,6 +285,11 @@ namespace SEE.Controls
                     moveState.moveGizmo.gameObject.SetActive(false);
                 }
             }
+
+            #endregion
+
+            #region Rotate
+
             else // mode == NavigationMode.Rotate
             {
                 if (actionState.reset) // reset rotation to identity();
@@ -359,10 +368,13 @@ namespace SEE.Controls
                 }
             }
 
+            #endregion
+
             // TODO(torben): is it possible for the city to temporarily move very far
             // away, such that floating-point-errors may occur? that would happen above
             // where the city is initially moved.
 
+            #region ApplyVelocityAndConstraints
             if (!movingOrRotating)
             {
                 float sqrMag = moveState.moveVelocity.sqrMagnitude;
@@ -403,25 +415,34 @@ namespace SEE.Controls
                 }
             }
 
+            #endregion
 
+            #region Zoom
 
-            // Zoom into city
-            int zoomSteps = Mathf.RoundToInt(actionState.zoomStepsDelta);
-
-            if (zoomSteps != 0)
+            if (actionState.zoomToggleToObject)
             {
-                actionState.zoomStepsDelta = 0.0f;
-                int newZoomStepsInProgress = (int)zoomState.zoomStepsInProgress + zoomSteps;
-                if (newZoomStepsInProgress >= 0 && newZoomStepsInProgress <= ZoomState.ZoomMaxSteps)
+                actionState.zoomToggleToObject = false;
+                if (cursor.Focus != null)
                 {
-                    zoomState.zoomCommands.Add(new ZoomCommand(zoomSteps, ZoomState.ZoomDuration));
-                    zoomState.zoomStepsInProgress = (uint)newZoomStepsInProgress;
+                    float optimalZoomFactor = Table.MinDimXZ / (cursor.Focus.lossyScale.x / zoomState.currentZoomFactor);
+                    float optimalZoomSteps = ConvertZoomFactorToZoomSteps(optimalZoomFactor);
+                    int flooredZoomSteps = Mathf.FloorToInt(optimalZoomSteps);
+                    int zoomSteps = flooredZoomSteps - (int)zoomState.currentTargetZoomSteps;
+                    PushZoomCommand(zoomSteps != 0 ? zoomSteps : -(int)zoomState.currentTargetZoomSteps, 2.0f * ZoomState.ZoomDuration);
                 }
+            }
+
+            if (Mathf.Abs(actionState.zoomStepsDelta) >= 1.0f)
+            {
+                float fZoomSteps = actionState.zoomStepsDelta >= 0.0f ? Mathf.Floor(actionState.zoomStepsDelta) : Mathf.Ceil(actionState.zoomStepsDelta);
+                actionState.zoomStepsDelta -= fZoomSteps;
+                int zoomSteps = Mathf.Clamp((int)fZoomSteps, -(int)zoomState.currentTargetZoomSteps, (int)ZoomState.ZoomMaxSteps - (int)zoomState.currentTargetZoomSteps);
+                PushZoomCommand(zoomSteps);
             }
 
             if (zoomState.zoomCommands.Count != 0)
             {
-                zoomState.currentZoomFactor = (float)zoomState.zoomStepsInProgress;
+                float zoomSteps = (float)zoomState.currentTargetZoomSteps;
 
                 for (int i = 0; i < zoomState.zoomCommands.Count; i++)
                 {
@@ -431,11 +452,11 @@ namespace SEE.Controls
                     }
                     else
                     {
-                        zoomState.currentZoomFactor = zoomState.currentZoomFactor - zoomState.zoomCommands[i].targetZoomSteps + zoomState.zoomCommands[i].CurrentDeltaScale();
+                        zoomSteps -= zoomState.zoomCommands[i].TargetZoomSteps - zoomState.zoomCommands[i].CurrentDeltaScale();
                     }
                 }
 
-                zoomState.currentZoomFactor = Mathf.Pow(2, zoomState.currentZoomFactor * ZoomState.ZoomFactor);
+                zoomState.currentZoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
                 Vector3 cityCenterToHitPoint = planeHitPoint - cityTransform.position;
                 Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(cityTransform.localScale);
 
@@ -447,11 +468,39 @@ namespace SEE.Controls
                 moveState.dragStartOffset = Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
                 moveState.dragStartTransformPosition -= moveState.dragStartOffset;
             }
+
+            #endregion
+        }
+
+        private float ConvertZoomStepsToZoomFactor(float zoomSteps)
+        {
+            float result = Mathf.Pow(2, zoomSteps * ZoomState.ZoomFactor);
+            return result;
+        }
+
+        private float ConvertZoomFactorToZoomSteps(float zoomFactor)
+        {
+            float result = Mathf.Log(zoomFactor, 2) / ZoomState.ZoomFactor;
+            return result;
+        }
+
+        private void PushZoomCommand(int zoomSteps = 1, float duration = ZoomState.ZoomDuration)
+        {
+            if (zoomSteps != 0)
+            {
+                uint newZoomStepsInProgress = (uint)((int)zoomState.currentTargetZoomSteps + zoomSteps);
+                if (duration != 0)
+                {
+                    zoomState.zoomCommands.Add(new ZoomCommand(zoomSteps, duration));
+                }
+                zoomState.currentTargetZoomSteps = newZoomStepsInProgress;
+            }
         }
 
         private float AngleMod(float degrees)
         {
-            return ((degrees % 360.0f) + 360.0f) % 360.0f;
+            float result = ((degrees % 360.0f) + 360.0f) % 360.0f;
+            return result;
         }
 
         private Vector3 Project(Vector3 offset)
@@ -496,7 +545,8 @@ namespace SEE.Controls
                 return sqDist;
             }
             sqrDistance = SquaredDistanceVector2Rect();
-            return sqrDistance <= radius * radius;
+            bool result = sqrDistance <= radius * radius;
+            return result;
         }
     }
 }
