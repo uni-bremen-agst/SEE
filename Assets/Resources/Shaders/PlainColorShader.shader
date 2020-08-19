@@ -1,8 +1,8 @@
-﻿Shader "Unlit/3DUIShader"
+﻿Shader "Unlit/PlainColorShader"
 {
     Properties
     {
-		_Color("Color", Color) = (1,1,1,1)
+		_Color("Color", Color) = (0,1,0,0)
     }
     SubShader
     {
@@ -13,7 +13,7 @@
 			"RenderType" = "Transparent"
 		}
 
-		ZTest[_ZTest]
+		ZTest Off
 		ZWrite Off
 		Blend SrcAlpha OneMinusSrcAlpha
 
@@ -21,14 +21,13 @@
         {
             CGPROGRAM
             #pragma vertex vert
-            #pragma fragment frag alpha:fade
+            #pragma fragment frag
 
             #include "UnityCG.cginc"
 
             struct appdata
             {
                 float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
             };
 
             struct v2f
@@ -36,7 +35,7 @@
                 float4 vertex : SV_POSITION;
             };
 
-            float4 _Color;
+			float4 _Color;
 
             v2f vert (appdata v)
             {
@@ -47,8 +46,6 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-				float depth = (i.vertex.xyz / i.vertex.w).z;
-				
                 fixed4 col = _Color;
                 return col;
             }
