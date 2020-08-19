@@ -27,8 +27,67 @@
         public static Vector2 YZ(this Vector3 a) => new Vector2(a.y, a.z);
 
         /// <summary>
+        /// Divides the components of <paramref name="a"/> by <paramref name="f"/> and
+        /// returns the result. If <paramref name="f"/> is <code>0</code>,
+        /// <see cref="Vector2.zero"/> is returned.
+        /// </summary>
+        /// <param name="a">The numerator.</param>
+        /// <param name="f">The denominator.</param>
+        /// <returns>The pairwise divided vector.</returns>
+        public static Vector2 Divide(this Vector2 a, float f)
+        {
+            if (f == 0)
+            {
+                return Vector2.zero;
+            }
+            else
+            {
+                return new Vector2(a.x / f, a.y / f);
+            }
+        }
+
+        /// <summary>
+        /// Divides the components of <paramref name="a"/> by <paramref name="f"/> and
+        /// returns the result. If <paramref name="f"/> is <code>0</code>,
+        /// <see cref="Vector3.zero"/> is returned.
+        /// </summary>
+        /// <param name="a">The numerator.</param>
+        /// <param name="f">The denominator.</param>
+        /// <returns>The pairwise divided vector.</returns>
+        public static Vector3 Divide(this Vector3 a, float f)
+        {
+            if (f == 0)
+            {
+                return Vector3.zero;
+            }
+            else
+            {
+                return new Vector3(a.x / f, a.y / f, a.z / f);
+            }
+        }
+
+        /// <summary>
         /// Divides the components of <paramref name="a"/> by the components of
-        /// <paramref name="b"/> and returns the result.
+        /// <paramref name="b"/> and returns the result. If one component of
+        /// <paramref name="b"/> is <code>0</code>, the corresponding component of the resulting
+        /// vector is set to <code>0</code> as well.
+        /// </summary>
+        /// <param name="a">The numerator.</param>
+        /// <param name="b">The denominator.</param>
+        /// <returns>The pairwise divided vector.</returns>
+        public static Vector2 DividePairwise(this Vector2 a, Vector2 b)
+        {
+            return new Vector2(
+                b.x == 0.0f ? 0.0f : a.x / b.x,
+                b.y == 0.0f ? 0.0f : a.y / b.y
+            );
+        }
+
+        /// <summary>
+        /// Divides the components of <paramref name="a"/> by the components of
+        /// <paramref name="b"/> and returns the result. If one component of
+        /// <paramref name="b"/> is <code>0</code>, the corresponding component of the resulting
+        /// vector is set to <code>0</code> as well.
         /// </summary>
         /// <param name="a">The numerator.</param>
         /// <param name="b">The denominator.</param>

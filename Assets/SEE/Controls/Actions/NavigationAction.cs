@@ -78,6 +78,7 @@ namespace SEE.Controls
             internal Vector3 originalScale;
             internal List<ZoomCommand> zoomCommands;
             internal uint zoomStepsInProgress;
+            internal float currentZoomFactor;
         }
 
         private struct CameraState
@@ -87,19 +88,21 @@ namespace SEE.Controls
             internal float pitch;
         }
 
+        private struct ActionState
+        {
+            internal bool startDrag;
+            internal bool drag;
+            internal bool cancel;
+            internal bool snap;
+            internal bool reset;
+            internal Vector3 mousePosition; // TODO(torben): this needs to be abstracted for other modalities
+            internal float zoomStepsDelta;
+        }
+
 
 
         private Transform cityTransform;
         private Plane raycastPlane;
-
-        // Buttons
-        private bool startDrag;
-        private bool drag;
-        private bool cancel;
-        private bool snap;
-        private bool reset;
-        private Vector3 mousePosition;
-        private float mouseScrollDelta;
 
         private NavigationMode mode;
         private bool movingOrRotating;
@@ -109,6 +112,7 @@ namespace SEE.Controls
         RotateState rotateState;
         ZoomState zoomState;
         CameraState cameraState;
+        ActionState actionState;
 
         private void Start()
         {
@@ -137,32 +141,19 @@ namespace SEE.Controls
             Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
         }
 
-        private void Select(GameObject go)
-        {
-            if (go != null && go.transform != cursor.Focus)
-            {
-                if (cursor.Focus)
-                {
-                    Destroy(cursor.Focus.gameObject.GetComponent<Outline>());
-                }
-                cursor.Focus = go.transform;
-                Outline outline = go.transform.gameObject.AddComponent<Outline>();
-                outline.OutlineMode = Outline.Mode.OutlineAll;
-                outline.OutlineColor = new Color(1.0f, 0.25f, 0.0f, 1.0f);
-                outline.OutlineWidth = 4.0f;
-            }
-        }
-
         private void Update()
         {
             // Input MUST NOT be inquired in FixedUpdate()!
-            startDrag |= Input.GetMouseButtonDown(2);
-            drag = Input.GetMouseButton(2);
-            cancel |= Input.GetKeyDown(KeyCode.Escape);
-            snap = Input.GetKey(KeyCode.LeftAlt);
-            reset |= Input.GetKey(KeyCode.R);
-            mouseScrollDelta += Input.mouseScrollDelta.y;
-            mousePosition = Input.mousePosition;
+            actionState.startDrag |= Input.GetMouseButtonDown(2);
+            actionState.drag = Input.GetMouseButton(2);
+            actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
+            actionState.snap = Input.GetKey(KeyCode.LeftAlt);
+            actionState.reset |= Input.GetKey(KeyCode.R);
+            if (!actionState.drag)
+            {
+                actionState.zoomStepsDelta += Input.mouseScrollDelta.y;
+            }
+            actionState.mousePosition = Input.mousePosition;
 
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
@@ -179,7 +170,7 @@ namespace SEE.Controls
 
             rotateState.rotatePivot.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotatePivot.Center).magnitude;
 
-            if (Input.GetMouseButton(0))
+            if (!actionState.drag && Input.GetMouseButton(0))
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit[] hits = Physics.RaycastAll(ray);
@@ -225,23 +216,23 @@ namespace SEE.Controls
         {
             // TODO(torben): abstract mouse away!
 
-            Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+            Ray ray = Camera.main.ScreenPointToRay(actionState.mousePosition);
             bool raycastResult = raycastPlane.Raycast(ray, out float enter);
             Vector3 planeHitPoint = ray.GetPoint(enter);
 
             if (mode == NavigationMode.Move)
             {
-                if (reset) // reset to center of table
+                if (actionState.reset) // reset to center of table
                 {
-                    reset = false;
+                    actionState.reset = false;
                     movingOrRotating = false;
                     moveState.movePivot.Enable(false);
 
                     cityTransform.position = Table.TableTopCenterEpsilon;
                 }
-                else if (cancel) // cancel movement
+                else if (actionState.cancel) // cancel movement
                 {
-                    cancel = false;
+                    actionState.cancel = false;
                     if (movingOrRotating)
                     {
                         movingOrRotating = false;
@@ -251,13 +242,13 @@ namespace SEE.Controls
                         cityTransform.position = moveState.dragStartTransformPosition + moveState.dragStartOffset - Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
                     }
                 }
-                else if (drag) // start or continue movement
+                else if (actionState.drag) // start or continue movement
                 {
                     if (raycastResult)
                     {
-                        if (startDrag) // start movement
+                        if (actionState.startDrag) // start movement
                         {
-                            startDrag = false;
+                            actionState.startDrag = false;
                             movingOrRotating = true;
                             moveState.movePivot.Enable(true);
 
@@ -270,7 +261,7 @@ namespace SEE.Controls
                         {
                             Vector3 totalDragOffsetFromStart = planeHitPoint - (moveState.dragStartTransformPosition + moveState.dragStartOffset);
 
-                            if (snap)
+                            if (actionState.snap)
                             {
                                 totalDragOffsetFromStart = Project(totalDragOffsetFromStart);
                             }
@@ -292,17 +283,17 @@ namespace SEE.Controls
             }
             else // mode == NavigationMode.Rotate
             {
-                if (reset) // reset rotation to identity();
+                if (actionState.reset) // reset rotation to identity();
                 {
-                    reset = false;
+                    actionState.reset = false;
                     movingOrRotating = false;
                     rotateState.rotatePivot.Enable(false);
 
                     cityTransform.RotateAround(rotateState.rotatePivot.Center, Vector3.up, -cityTransform.rotation.eulerAngles.y);
                 }
-                else if (cancel) // cancel rotation
+                else if (actionState.cancel) // cancel rotation
                 {
-                    cancel = false;
+                    actionState.cancel = false;
                     if (movingOrRotating)
                     {
                         movingOrRotating = false;
@@ -312,16 +303,16 @@ namespace SEE.Controls
                         cityTransform.position = rotateState.originalPosition;
                     }
                 }
-                else if (drag) // start or continue rotation
+                else if (actionState.drag) // start or continue rotation
                 {
                     if (raycastResult)
                     {
                         Vector2 toHit = new Vector2(planeHitPoint.x - rotateState.rotatePivot.Center.x, planeHitPoint.z - rotateState.rotatePivot.Center.z);
                         float toHitAngle = toHit.Angle360();
 
-                        if (startDrag) // start rotation
+                        if (actionState.startDrag) // start rotation
                         {
-                            startDrag = false;
+                            actionState.startDrag = false;
                             movingOrRotating = true;
                             rotateState.rotatePivot.Enable(true);
 
@@ -335,7 +326,7 @@ namespace SEE.Controls
                         if (movingOrRotating) // continue rotation
                         {
                             float angle = AngleMod(rotateState.startAngle + toHitAngle);
-                            if (snap)
+                            if (actionState.snap)
                             {
                                 angle = AngleMod(Mathf.Round(angle / RotateState.SnapStepAngle) * RotateState.SnapStepAngle);
                             }
@@ -352,7 +343,7 @@ namespace SEE.Controls
                             {
                                 currAngle -= 360.0f;
                             }
-                            if (snap)
+                            if (actionState.snap)
                             {
                                 currAngle = Mathf.Round((currAngle + rotateState.startAngle) / (RotateState.SnapStepAngle)) * (RotateState.SnapStepAngle) - rotateState.startAngle;
                             }
@@ -415,19 +406,22 @@ namespace SEE.Controls
 
 
             // Zoom into city
-            int zoomSteps = Mathf.RoundToInt(mouseScrollDelta);
-            mouseScrollDelta = 0.0f;
-            int newZoomStepsInProgress = (int)zoomState.zoomStepsInProgress + zoomSteps;
+            int zoomSteps = Mathf.RoundToInt(actionState.zoomStepsDelta);
 
-            if (zoomSteps != 0 && newZoomStepsInProgress >= 0 && newZoomStepsInProgress <= ZoomState.ZoomMaxSteps)
+            if (zoomSteps != 0)
             {
-                zoomState.zoomCommands.Add(new ZoomCommand(zoomSteps, ZoomState.ZoomDuration));
-                zoomState.zoomStepsInProgress = (uint)newZoomStepsInProgress;
+                actionState.zoomStepsDelta = 0.0f;
+                int newZoomStepsInProgress = (int)zoomState.zoomStepsInProgress + zoomSteps;
+                if (newZoomStepsInProgress >= 0 && newZoomStepsInProgress <= ZoomState.ZoomMaxSteps)
+                {
+                    zoomState.zoomCommands.Add(new ZoomCommand(zoomSteps, ZoomState.ZoomDuration));
+                    zoomState.zoomStepsInProgress = (uint)newZoomStepsInProgress;
+                }
             }
 
             if (zoomState.zoomCommands.Count != 0)
             {
-                float currentZoomSteps = (float)zoomState.zoomStepsInProgress;
+                zoomState.currentZoomFactor = (float)zoomState.zoomStepsInProgress;
 
                 for (int i = 0; i < zoomState.zoomCommands.Count; i++)
                 {
@@ -437,22 +431,27 @@ namespace SEE.Controls
                     }
                     else
                     {
-                        currentZoomSteps = currentZoomSteps - zoomState.zoomCommands[i].targetZoomSteps + zoomState.zoomCommands[i].CurrentDeltaScale();
+                        zoomState.currentZoomFactor = zoomState.currentZoomFactor - zoomState.zoomCommands[i].targetZoomSteps + zoomState.zoomCommands[i].CurrentDeltaScale();
                     }
                 }
 
-                float f = Mathf.Pow(2, currentZoomSteps * ZoomState.ZoomFactor);
+                zoomState.currentZoomFactor = Mathf.Pow(2, zoomState.currentZoomFactor * ZoomState.ZoomFactor);
                 Vector3 cityCenterToHitPoint = planeHitPoint - cityTransform.position;
                 Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(cityTransform.localScale);
 
                 cityTransform.position += cityCenterToHitPoint;
-                cityTransform.localScale = f * zoomState.originalScale;
+                cityTransform.localScale = zoomState.currentZoomFactor * zoomState.originalScale;
                 cityTransform.position -= Vector3.Scale(cityCenterToHitPointUnscaled, cityTransform.localScale);
 
                 moveState.dragStartTransformPosition += moveState.dragStartOffset;
                 moveState.dragStartOffset = Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
                 moveState.dragStartTransformPosition -= moveState.dragStartOffset;
             }
+        }
+
+        private float AngleMod(float degrees)
+        {
+            return ((degrees % 360.0f) + 360.0f) % 360.0f;
         }
 
         private Vector3 Project(Vector3 offset)
@@ -465,6 +464,22 @@ namespace SEE.Controls
             Vector2 proj = dir * Vector2.Dot(point2, dir);
             Vector3 result = new Vector3(proj.x, offset.y, proj.y);
             return result;
+        }
+
+        private void Select(GameObject go)
+        {
+            if (go != null && go.transform != cursor.Focus)
+            {
+                if (cursor.Focus)
+                {
+                    Destroy(cursor.Focus.gameObject.GetComponent<Outline>());
+                }
+                cursor.Focus = go.transform;
+                Outline outline = go.transform.gameObject.AddComponent<Outline>();
+                outline.OutlineMode = Outline.Mode.OutlineAll;
+                outline.OutlineColor = new Color(1.0f, 0.25f, 0.0f, 1.0f);
+                outline.OutlineWidth = 4.0f;
+            }
         }
 
         private bool TestCircleRect(Vector2 center, float radius, Vector2 min, Vector2 max, out float sqrDistance)
@@ -483,7 +498,5 @@ namespace SEE.Controls
             sqrDistance = SquaredDistanceVector2Rect();
             return sqrDistance <= radius * radius;
         }
-
-        private float AngleMod(float degrees) => ((degrees % 360.0f) + 360.0f) % 360.0f;
     }
 }
