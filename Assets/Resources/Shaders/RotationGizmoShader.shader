@@ -1,9 +1,9 @@
-﻿Shader "Unlit/PivotOutlineShader"
+﻿Shader "Unlit/RotationGizmoShader"
 {
     Properties
     {
         _MainTex("Texture", 2D) = "white" {}
-		_Color("Color", Color) = (0,1,0,0)
+		_Color("Color", Color) = (1,0,1,1)
 		_MinAngle("MinAngle", Float) = 0.0
 		_MaxAngle("MaxAngle", Float) = 0.0
 		_Alpha("Alpha", Float) = 1.0
@@ -17,9 +17,10 @@
 			"RenderType" = "Transparent"
 		}
 
+		Blend SrcAlpha OneMinusSrcAlpha
+		Cull Off
 		ZTest Off
 		ZWrite Off
-		Blend SrcAlpha OneMinusSrcAlpha
 
         Pass
         {
