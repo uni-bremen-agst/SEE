@@ -138,10 +138,26 @@ namespace SEE.Game.Runtime
                 if (running)
                 {
                     labelText = "Play";
+                    ToggleTextWindows();
                 }
                 else
                 {
                     labelText = "Pause";
+                }
+            }
+            if (Input.GetMouseButtonDown(0))
+            {
+                GameObject clickedGO = MouseClickHitActiveNode();
+                if (clickedGO != null)
+                {
+                    if (running)
+                    {
+                        running = false;
+                        showLabelUntil = Time.time + 1f;
+                        labelText = "Paused";
+                    }
+                    ActivateNodeTextWindow(clickedGO);
+                    Debug.Log("Hit Detected :" + clickedGO);
                 }
             }
             if (Input.GetKeyDown(KeyCode.O))
@@ -192,11 +208,43 @@ namespace SEE.Game.Runtime
         /// </summary>
         void OnGUI()
         {
-            if (Time.time < showLabelUntil) {
+            if (Time.time < showLabelUntil)
+            {
                 GUI.Label(new Rect(Screen.width / 96, Screen.height / 96, Screen.width / 24, Screen.height / 24), labelText);
             }
         }
 
+        private void ActivateNodeTextWindow(GameObject gameObject)
+        {
+            if (textWindows.Count != 0) {
+                foreach (GameObject go in textWindows) {
+                    if (go.name == gameObject.name+"FileContent")
+                    {
+                        go.SetActive(true);
+                    }
+                    else {
+                        go.SetActive(false);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private GameObject MouseClickHitActiveNode()
+        {
+            RaycastHit hit;
+            Ray camerMouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if(Physics.Raycast(camerMouseRay, out hit))
+            {
+                if (hit.transform && textWindowForNodeExists(hit.transform.gameObject)) {
+                    return hit.transform.gameObject;
+                }
+            }
+            return null;
+        }
 
         /// <summary>
         /// Using the GenerateFunctionCalls method from Runtime.cs but with some adjustments so it better works in this Visualization. Only using the spheres 
@@ -223,7 +271,7 @@ namespace SEE.Game.Runtime
         private bool textWindowForNodeExists(GameObject node)
         {
             bool exists = false;
-            if (! (textWindows.Count == 0))
+            if (textWindows.Count != 0)
             {
                 foreach (GameObject go in textWindows)
                 {
