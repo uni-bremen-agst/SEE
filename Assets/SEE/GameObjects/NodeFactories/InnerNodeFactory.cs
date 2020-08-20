@@ -42,7 +42,7 @@ namespace SEE.GO
 
         public override int NumberOfStyles()
         {
-            return materials.NumberOfMaterials();
+            return materials.NumberOfMaterials;
         }
 
         public override void SetStyle(GameObject block, int style)

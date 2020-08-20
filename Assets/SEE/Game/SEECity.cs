@@ -88,6 +88,9 @@ namespace SEE.Game
                     SetNodeRefs(loadedGraph, gameObject);
                 }
             }
+
+            Materials.SetGlobalUniforms();
+            UpdateMaterialProperties(gameObject);
         }
 
         /// <summary>
@@ -113,6 +116,19 @@ namespace SEE.Game
                     }
                 }
                 SetNodeRefs(graph, child);
+            }
+        }
+
+        protected void UpdateMaterialProperties(GameObject parent)
+        {
+            foreach (Transform childTransform in parent.transform)
+            {
+                GameObject child = childTransform.gameObject;
+                if (child.tag.Equals(Tags.Node))
+                {
+                    Materials.SetProperties(child.GetComponent<MeshRenderer>().material);
+                }
+                UpdateMaterialProperties(child);
             }
         }
 
