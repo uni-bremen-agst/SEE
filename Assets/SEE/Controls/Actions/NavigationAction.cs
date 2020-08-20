@@ -70,7 +70,7 @@ namespace SEE.Controls
 
         private struct ZoomState
         {
-            internal const float ZoomDuration = 0.1f;
+            internal const float DefaultZoomDuration = 0.1f;
             internal const uint ZoomMaxSteps = 32;
             internal const float ZoomFactor = 0.5f;
 
@@ -428,7 +428,7 @@ namespace SEE.Controls
                     float optimalZoomSteps = ConvertZoomFactorToZoomSteps(optimalZoomFactor);
                     int flooredZoomSteps = Mathf.FloorToInt(optimalZoomSteps);
                     int zoomSteps = flooredZoomSteps - (int)zoomState.currentTargetZoomSteps;
-                    PushZoomCommand(zoomSteps != 0 ? zoomSteps : -(int)zoomState.currentTargetZoomSteps, 2.0f * ZoomState.ZoomDuration);
+                    PushZoomCommand(zoomSteps != 0 ? zoomSteps : -(int)zoomState.currentTargetZoomSteps, 2.0f * ZoomState.DefaultZoomDuration);
                 }
             }
 
@@ -484,7 +484,7 @@ namespace SEE.Controls
             return result;
         }
 
-        private void PushZoomCommand(int zoomSteps = 1, float duration = ZoomState.ZoomDuration)
+        private void PushZoomCommand(int zoomSteps = 1, float duration = ZoomState.DefaultZoomDuration)
         {
             if (zoomSteps != 0)
             {
