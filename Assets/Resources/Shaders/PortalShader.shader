@@ -14,7 +14,8 @@
 
 		CGPROGRAM
 
-		#pragma surface surf Standard fullforwardshadows alphatest:_Cutoff addshadow
+		//#pragma surface surf Standard fullforwardshadows alphatest:_Cutoff addshadow
+		#pragma surface surf Standard fullforwardshadows alpha:blend addshadow
 		#pragma target 3.0
 
 		uniform float2 portalMin;

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define SEE_MANUAL_RENDERING
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -91,7 +93,178 @@ namespace SEE.Game
 
             Materials.SetGlobalUniforms();
             UpdateMaterialProperties(gameObject);
+
+#if SEE_MANUAL_RENDERING
+
+            if (transform.childCount != 0)
+            {
+                DisableAllMeshRenderersOfNodes(gameObject);
+
+                // Prepare all directories
+                Transform rootTransform = transform.GetChild(0);
+                int maxDirectoryLevel = GetMaxDirectoryLevel(rootTransform);
+
+                RenderCommand rootRenderCommand;
+                rootRenderCommand.transform = rootTransform;
+                rootRenderCommand.mesh = rootTransform.GetComponent<MeshFilter>().mesh;
+                rootRenderCommand.material = rootTransform.GetComponent<MeshRenderer>().material;
+
+                directoryRenderCommandsPerLevel = new List<List<RenderCommand>>(maxDirectoryLevel)
+                {
+                    new List<RenderCommand>(1) { rootRenderCommand }
+                };
+
+                Color rootColor = rootRenderCommand.material.GetColor("_Color");
+                rootColor.a = 0.5f;
+                rootRenderCommand.material.SetColor("_Color", rootColor);
+                
+                for (int i = 1; i < maxDirectoryLevel; i++)
+                {
+                    List<RenderCommand> directoryRenderCommands = new List<RenderCommand>();
+                    foreach (RenderCommand lastDirectory in directoryRenderCommandsPerLevel[i - 1])
+                    {
+                        Transform lastDirectoryTransform = lastDirectory.transform;
+                        for (int j = 0; j < lastDirectoryTransform.childCount; j++)
+                        {
+                            Transform directoryTransform = lastDirectoryTransform.GetChild(j);
+                            NodeRef nodeRef = directoryTransform.GetComponent<NodeRef>();
+                            if (nodeRef != null && nodeRef.node != null && nodeRef.node.Type.Equals("Directory"))
+                            {
+                                RenderCommand directoryRenderCommand;
+                                directoryRenderCommand.transform = directoryTransform;
+                                directoryRenderCommand.mesh = directoryTransform.GetComponent<MeshFilter>().mesh;
+                                directoryRenderCommand.material = directoryTransform.GetComponent<MeshRenderer>().material;
+                                
+                                Color color = directoryRenderCommand.material.GetColor("_Color");
+                                color.a = 0.5f;
+                                directoryRenderCommand.material.SetColor("_Color", color);
+
+                                directoryRenderCommands.Add(directoryRenderCommand);
+                            }
+                        }
+                    }
+                    directoryRenderCommandsPerLevel.Add(directoryRenderCommands);
+                }
+
+                // Prepare all files
+                fileRenderCommands = new List<RenderCommand>();
+                foreach (NodeRef nodeRef in FindObjectsOfType<NodeRef>())
+                {
+                    if (nodeRef.node != null && nodeRef.node.Type.Equals("File"))
+                    {
+                        RenderCommand fileRenderCommand;
+                        fileRenderCommand.transform = nodeRef.transform;
+                        fileRenderCommand.mesh = nodeRef.GetComponent<MeshFilter>().mesh;
+                        fileRenderCommand.material = nodeRef.GetComponent<MeshRenderer>().material;
+                        
+                        Color color = fileRenderCommand.material.GetColor("_Color");
+                        color.a = 0.5f;
+                        fileRenderCommand.material.SetColor("_Color", color);
+
+                        fileRenderCommands.Add(fileRenderCommand);
+                    }
+                }
+
+                lastMaterial = null;
+            }
+
+#endif
         }
+
+#if SEE_MANUAL_RENDERING
+
+        private struct RenderCommand
+        {
+            internal Transform transform;
+            internal Mesh mesh;
+            internal Material material;
+        }
+
+        private List<List<RenderCommand>> directoryRenderCommandsPerLevel;
+        private List<RenderCommand> fileRenderCommands;
+        private Material lastMaterial;
+        
+        private void OnRenderObject()
+        {
+            if (transform.childCount != 0)
+            {
+                // Render all directories
+                for (int i = 0; i < directoryRenderCommandsPerLevel.Count; i++)
+                {
+                    List<RenderCommand> directories = directoryRenderCommandsPerLevel[i];
+
+                    for (int j = 0; j < directories.Count; j++)
+                    {
+                        if (directories[j].material != lastMaterial)
+                        {
+                            lastMaterial = directories[j].material;
+                            directories[j].material.SetPass(0);
+                        }
+                        Graphics.DrawMeshNow(directories[j].mesh, directories[j].transform.localToWorldMatrix);
+                    }
+                }
+
+                // Render all files
+                Vector3 cameraPosition = Camera.main.transform.position;
+                fileRenderCommands.Sort(delegate (RenderCommand rc0, RenderCommand rc1)
+                {
+                    return (rc1.transform.position - cameraPosition).sqrMagnitude.CompareTo((rc0.transform.position - cameraPosition).sqrMagnitude);
+                });
+                for (int i = 0; i < fileRenderCommands.Count; i++)
+                {
+                    if (fileRenderCommands[i].material != lastMaterial)
+                    {
+                        lastMaterial = fileRenderCommands[i].material;
+                        fileRenderCommands[i].material.SetPass(0);
+                    }
+                    Graphics.DrawMeshNow(fileRenderCommands[i].mesh, fileRenderCommands[i].transform.localToWorldMatrix);
+                }
+
+                lastMaterial = null;
+            }
+        }
+
+        private void DisableAllMeshRenderersOfNodes(GameObject go)
+        {
+            if (go.tag.Equals(Tags.Node))
+            {
+                NodeRef nodeRef = go.GetComponent<NodeRef>();
+                if (nodeRef != null)
+                {
+                    MeshRenderer meshRenderer = go.GetComponent<MeshRenderer>();
+                    if (meshRenderer)
+                    {
+                        meshRenderer.enabled = false;
+                    }
+                }
+            }
+            for (int i = 0; i < go.transform.childCount; i++)
+            {
+                DisableAllMeshRenderersOfNodes(go.transform.GetChild(i).gameObject);
+            }
+        }
+
+        private int GetMaxDirectoryLevel(Transform t)
+        {
+            int maxLevel = 0;
+
+            NodeRef nodeRef = t.GetComponent<NodeRef>();
+            if (nodeRef != null)
+            {
+                for (int i = 0; i < t.childCount; i++)
+                {
+                    int level = 1 + GetMaxDirectoryLevel(t.GetChild(i));
+                    if (level > maxLevel)
+                    {
+                        maxLevel = level;
+                    }
+                }
+            }
+
+            return maxLevel;
+        }
+
+#endif
 
         /// <summary>
         /// Sets all NodeRefs for this city to the nodes they correspond to.
