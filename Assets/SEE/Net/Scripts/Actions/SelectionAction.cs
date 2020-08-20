@@ -73,12 +73,18 @@ namespace SEE.Net
 
             if (oldHoverableObject)
             {
-                oldHoverableObject.Unhovered();
+                UnityEngine.Object.Destroy(oldHoverableObject.GetComponent<Outline>());
             }
 
             if (newHoverableObject)
             {
-                newHoverableObject.Hovered(IsRequester());
+                if (newHoverableObject.GetComponent<Outline>() == null)
+                {
+                    Outline outline = newHoverableObject.gameObject.AddComponent<Outline>();
+                    outline.OutlineMode = Outline.Mode.OutlineAll;
+                    outline.OutlineColor = UI3D.UI3DProperties.DefaultColorSecondary;
+                    outline.OutlineWidth = 4.0f;
+                }
             }
 
             return true;
