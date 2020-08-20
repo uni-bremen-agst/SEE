@@ -385,7 +385,7 @@ namespace SEE.Controls
                 cityTransform.position += moveState.moveVelocity * Time.fixedDeltaTime;
 
                 float radius = 0.5f * cityTransform.lossyScale.x;
-                bool outside = !TestCircleRect(cityTransform.position.XZ(), radius, Table.MinXZ, Table.MaxXZ, out float sqrDistance);
+                bool outside = !MathExtensions.TestCircleRect(cityTransform.position.XZ(), radius, Table.MinXZ, Table.MaxXZ, out float sqrDistance);
 
                 if (outside) // Keep city on visible area of the table
                 {
@@ -529,24 +529,6 @@ namespace SEE.Controls
                 outline.OutlineColor = UI3D.UI3DProperties.DefaultColor;
                 outline.OutlineWidth = 4.0f;
             }
-        }
-
-        private bool TestCircleRect(Vector2 center, float radius, Vector2 min, Vector2 max, out float sqrDistance)
-        {
-            float SquaredDistanceVector2Rect()
-            {
-                float sqDist = 0.0f;
-                for (int i = 0; i < 2; i++)
-                {
-                    float v = center[i];
-                    if (v < min[i]) sqDist += (min[i] - v) * (min[i] - v);
-                    if (v > max[i]) sqDist += (v - max[i]) * (v - max[i]);
-                }
-                return sqDist;
-            }
-            sqrDistance = SquaredDistanceVector2Rect();
-            bool result = sqrDistance <= radius * radius;
-            return result;
         }
     }
 }

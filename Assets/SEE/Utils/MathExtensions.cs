@@ -171,6 +171,32 @@
             float result = Mathf.Atan2(-a.y, a.x) / Mathf.PI * 180f;
             return result;
         }
+
+        /// <summary>
+        /// Tests collision between a circle of given center and radius and a rectangle
+        /// of given min and max. If they do not collide, <paramref name="sqrDistance"/>
+        /// is set to the squared distance between the two shapes. Otherwise, it is set
+        /// to zero. The return value states whether the two shapes collide.
+        /// </summary>
+        /// <param name="center">The center of the circle.</param>
+        /// <param name="radius">The radius of the circle.</param>
+        /// <param name="min">The min corner of the rectangle.</param>
+        /// <param name="max">The max corner of the rectangle.</param>
+        /// <param name="sqrDistance">The squared distance between the two shapes or
+        /// zero, if they collide.</param>
+        /// <returns></returns>
+        public static bool TestCircleRect(Vector2 center, float radius, Vector2 min, Vector2 max, out float sqrDistance)
+        {
+            sqrDistance = 0.0f;
+            for (int i = 0; i < 2; i++)
+            {
+                float v = center[i];
+                if (v < min[i]) sqrDistance += (min[i] - v) * (min[i] - v);
+                if (v > max[i]) sqrDistance += (v - max[i]) * (v - max[i]);
+            }
+            bool result = sqrDistance <= radius * radius;
+            return result;
+        }
     }
 }
 
