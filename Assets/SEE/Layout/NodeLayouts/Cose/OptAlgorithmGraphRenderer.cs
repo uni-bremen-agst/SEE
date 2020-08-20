@@ -225,48 +225,40 @@ namespace SEE.Layout
         {
             NodeLayouts nodeLayout = GetNodeLayoutForIteration();
             CalcLayout(nodeLayout); 
-
-            /*foreach (NodeLayouts nodeLayout in Enum.GetValues(typeof(NodeLayouts)))
-            {
-                if (nodeLayout.GetModel().IsHierarchical)
-                {
-                    CalcLayout(nodeLayout);
-                }
-            }*/
         }
 
         public NodeLayouts GetNodeLayoutForIteration()
         {
-            int mod = totalNumberOfGraphs % 6;
-            NodeLayouts nodeLayout; 
-
             return NodeLayouts.CirclePacking;
 
-            switch (mod)
-            {
-                case 0:
-                    nodeLayout = NodeLayouts.CompoundSpringEmbedder;
-                    break;
-                case 1:
-                    nodeLayout = NodeLayouts.EvoStreets;
-                    break;
-                case 2:
-                    nodeLayout = NodeLayouts.Balloon;
-                    break;
-                case 3:
-                    nodeLayout = NodeLayouts.RectanglePacking;
-                    break;
-                case 4:
-                    nodeLayout = NodeLayouts.Treemap;
-                    break;
-                case 5:
-                    nodeLayout = NodeLayouts.CirclePacking;
-                    break;
-                default:
-                    nodeLayout = NodeLayouts.CompoundSpringEmbedder;
-                    break;
-            }
-            return nodeLayout;
+            //int mod = totalNumberOfGraphs % 6;
+            //NodeLayouts nodeLayout;
+            //
+            //switch (mod)
+            //{
+            //    case 0:
+            //        nodeLayout = NodeLayouts.CompoundSpringEmbedder;
+            //        break;
+            //    case 1:
+            //        nodeLayout = NodeLayouts.EvoStreets;
+            //        break;
+            //    case 2:
+            //        nodeLayout = NodeLayouts.Balloon;
+            //        break;
+            //    case 3:
+            //        nodeLayout = NodeLayouts.RectanglePacking;
+            //        break;
+            //    case 4:
+            //        nodeLayout = NodeLayouts.Treemap;
+            //        break;
+            //    case 5:
+            //        nodeLayout = NodeLayouts.CirclePacking;
+            //        break;
+            //    default:
+            //        nodeLayout = NodeLayouts.CompoundSpringEmbedder;
+            //        break;
+            //}
+            //return nodeLayout;
         }
 
         /// <summary>
