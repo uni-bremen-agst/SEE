@@ -11,6 +11,64 @@
         public const float GoldenRatio = 1.618034f;
 
         /// <summary>
+        /// Returns the angle of <paramref name="a"/> in range [-180, 180) in degrees. The
+        /// rotation starts with vector (1.0f, 0.0f) at an angle of zero and is assumed
+        /// to be clockwise.
+        /// 
+        ///              -90
+        ///            _  _  _
+        ///         -'    |    '-
+        ///       '       |       '
+        ///      '        |        '
+        /// -180 +--------+--------+ 0
+        ///      .        |        .
+        ///       .       |       .
+        ///  y      -. _  |  _ .-
+        ///  ^           90
+        ///  |
+        ///  +---> x
+        /// 
+        /// </summary>
+        /// <param name="a">The vector of which the angle is to be determined.</param>
+        /// <returns>The angle of given vector.</returns>
+        public static float Angle180(this Vector2 a)
+        {
+            float result = Mathf.Atan2(-a.y, a.x) / Mathf.PI * 180f;
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the angle of <paramref name="a"/> in range [0, 360) in degrees. The
+        /// rotation starts with vector (1.0f, 0.0f) at an angle of zero and is assumed
+        /// to be clockwise.
+        /// 
+        ///              270
+        ///            _  _  _
+        ///         -'    |    '-
+        ///       '       |       '
+        ///      '        |        '
+        ///  180 +--------+--------+ 0
+        ///      .        |        .
+        ///       .       |       .
+        ///  y      -. _  |  _ .-
+        ///  ^           90
+        ///  |
+        ///  +---> x
+        /// 
+        /// </summary>
+        /// <param name="a">The vector of which the angle is to be determined.</param>
+        /// <returns>The angle of given vector.</returns>
+        public static float Angle360(this Vector2 a)
+        {
+            float result = Mathf.Atan2(-a.y, a.x) / Mathf.PI * 180f;
+            if (result < 0.0f)
+            {
+                result += 360.0f;
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Divides the components of <paramref name="a"/> by <paramref name="f"/> and
         /// returns the result. If <paramref name="f"/> is <code>0</code>,
         /// <see cref="Vector2.zero"/> is returned.
@@ -48,33 +106,26 @@
         }
 
         /// <summary>
-        /// Creates and returns a copy of the x- and y-components of given 3d-vector.
+        /// Returns the largest component of given vector.
         /// </summary>
         /// <param name="a">The vector.</param>
-        /// <returns>The copied components as a 2d-vector.</returns>
-        public static Vector2 XY(this Vector3 a) => new Vector2(a.x, a.y);
+        /// <returns>The largest component of given vector.</returns>
+        public static float MaxComponent(this Vector2 a)
+        {
+            float result = Mathf.Max(a.x, a.y);
+            return result;
+        }
 
         /// <summary>
-        /// Creates and returns a copy of the x- and z-components of given 3d-vector.
+        /// Returns the smallest component of given vector.
         /// </summary>
         /// <param name="a">The vector.</param>
-        /// <returns>The copied components as a 2d-vector.</returns>
-        public static Vector2 XZ(this Vector3 a) => new Vector2(a.x, a.z);
-
-        /// <summary>
-        /// Creates and returns a copy of the y- and z-components of given 3d-vector.
-        /// </summary>
-        /// <param name="a">The vector.</param>
-        /// <returns>The copied components as a 2d-vector.</returns>
-        public static Vector2 YZ(this Vector3 a) => new Vector2(a.y, a.z);
-
-        /// <summary>
-        /// Floors the components of given vector to an integer vector and returns the
-        /// result.
-        /// </summary>
-        /// <param name="a">The vector.</param>
-        /// <returns>The floored vector.</returns>
-        public static Vector3Int FloorToInt(this Vector3 a) => new Vector3Int(Mathf.FloorToInt(a.x), Mathf.FloorToInt(a.y), Mathf.FloorToInt(a.z));
+        /// <returns>The smallest component of given vector.</returns>
+        public static float MinComponent(this Vector2 a)
+        {
+            float result = Mathf.Min(a.x, a.y);
+            return result;
+        }
 
         /// <summary>
         /// Divides the components of <paramref name="a"/> by <paramref name="f"/> and
@@ -115,60 +166,36 @@
         }
 
         /// <summary>
-        /// Returns the angle of <paramref name="a"/> in range [0, 360) in degrees. The
-        /// rotation starts with vector (1.0f, 0.0f) at an angle of zero and is assumed
-        /// to be clockwise.
-        /// 
-        ///              270
-        ///            _  _  _
-        ///         -'    |    '-
-        ///       '       |       '
-        ///      '        |        '
-        ///  180 +--------+--------+ 0
-        ///      .        |        .
-        ///       .       |       .
-        ///  y      -. _  |  _ .-
-        ///  ^           90
-        ///  |
-        ///  +---> x
-        /// 
+        /// Floors the components of given vector to an integer vector and returns the
+        /// result.
         /// </summary>
-        /// <param name="a">The vector of which the angle is to be determined.</param>
-        /// <returns>The angle of given vector.</returns>
-        public static float Angle360(this Vector2 a)
+        /// <param name="a">The vector.</param>
+        /// <returns>The floored vector.</returns>
+        public static Vector3Int FloorToInt(this Vector3 a)
         {
-            float result = Mathf.Atan2(-a.y, a.x) / Mathf.PI * 180f;
-            if (result < 0.0f)
-            {
-                result += 360.0f;
-            }
+            Vector3Int result = new Vector3Int(Mathf.FloorToInt(a.x), Mathf.FloorToInt(a.y), Mathf.FloorToInt(a.z));
             return result;
         }
 
         /// <summary>
-        /// Returns the angle of <paramref name="a"/> in range [-180, 180) in degrees. The
-        /// rotation starts with vector (1.0f, 0.0f) at an angle of zero and is assumed
-        /// to be clockwise.
-        /// 
-        ///              -90
-        ///            _  _  _
-        ///         -'    |    '-
-        ///       '       |       '
-        ///      '        |        '
-        /// -180 +--------+--------+ 0
-        ///      .        |        .
-        ///       .       |       .
-        ///  y      -. _  |  _ .-
-        ///  ^           90
-        ///  |
-        ///  +---> x
-        /// 
+        /// Returns the largest component of given vector.
         /// </summary>
-        /// <param name="a">The vector of which the angle is to be determined.</param>
-        /// <returns>The angle of given vector.</returns>
-        public static float Angle180(this Vector2 a)
+        /// <param name="a">The vector.</param>
+        /// <returns>The largest component of given vector.</returns>
+        public static float MaxComponent(this Vector3 a)
         {
-            float result = Mathf.Atan2(-a.y, a.x) / Mathf.PI * 180f;
+            float result = Mathf.Max(a.x, a.y, a.z);
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the smallest component of given vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The smallest component of given vector.</returns>
+        public static float MinComponent(this Vector3 a)
+        {
+            float result = Mathf.Min(a.x, a.y, a.z);
             return result;
         }
 
@@ -240,6 +267,27 @@
                 }
             }
         }
+
+        /// <summary>
+        /// Creates and returns a copy of the x- and y-components of given 3d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 XY(this Vector3 a) => new Vector2(a.x, a.y);
+
+        /// <summary>
+        /// Creates and returns a copy of the x- and z-components of given 3d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 XZ(this Vector3 a) => new Vector2(a.x, a.z);
+
+        /// <summary>
+        /// Creates and returns a copy of the y- and z-components of given 3d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 YZ(this Vector3 a) => new Vector2(a.y, a.z);
 
         /// <summary>
         /// Performs a collision test between a point and a circle. The distance and a
