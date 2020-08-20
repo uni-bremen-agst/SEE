@@ -1065,7 +1065,7 @@ namespace SEE.Game
                 value = float.Parse(floatString, CultureInfo.InvariantCulture.NumberFormat);
                 return true;
             }
-            catch (FormatException _)
+            catch (FormatException)
             {
                 value = 0.0f;
                 return false;
