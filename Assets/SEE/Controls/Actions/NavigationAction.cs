@@ -370,53 +370,6 @@ namespace SEE.Controls
 
             #endregion
 
-            // TODO(torben): is it possible for the city to temporarily move very far
-            // away, such that floating-point-errors may occur? that would happen above
-            // where the city is initially moved.
-
-            #region ApplyVelocityAndConstraints
-            if (!movingOrRotating)
-            {
-                float sqrMag = moveState.moveVelocity.sqrMagnitude;
-                if (sqrMag > MoveState.MaxSqrVelocity)
-                {
-                    moveState.moveVelocity = moveState.moveVelocity / Mathf.Sqrt(sqrMag) * MoveState.MaxVelocity;
-                }
-                cityTransform.position += moveState.moveVelocity * Time.fixedDeltaTime;
-
-                float radius = 0.5f * cityTransform.lossyScale.x;
-                bool outside = !MathExtensions.TestCircleRect(cityTransform.position.XZ(), radius, Table.MinXZ, Table.MaxXZ, out float sqrDistance);
-
-                if (outside) // Keep city on visible area of the table
-                {
-                    moveState.moveVelocity = (Table.TableTopCenterEpsilon - cityTransform.position).normalized * MoveState.MaxVelocity;
-
-                    if (zoomState.zoomCommands.Count == 0) // TODO(torben): why is this condition necessary?
-                    {
-                        Vector2 toCenter = (Table.CenterXZ - cityTransform.position.XZ()).normalized;
-                        Vector2 dirX = new Vector2(1.0f, 0.0f); float dotX = Mathf.Abs(Vector2.Dot(dirX, toCenter));
-                        Vector2 dirZ = new Vector2(0.0f, 1.0f); float dotZ = Mathf.Abs(Vector2.Dot(dirZ, toCenter));
-                        float f = 1.0f;
-                        if (dotX > dotZ)
-                        {
-                            f = (Mathf.Sqrt(sqrDistance) - radius) / dotX;
-                        }
-                        else
-                        {
-                            f = (Mathf.Sqrt(sqrDistance) - radius) / dotZ;
-                        }
-                        cityTransform.position += f * new Vector3(toCenter.x, 0.0f, toCenter.y);
-                    }
-                }
-                else // Decelerate by adding friction
-                {
-                    Vector3 acceleration = MoveState.DragFrictionFactor * -moveState.moveVelocity;
-                    moveState.moveVelocity += acceleration * Time.fixedDeltaTime;
-                }
-            }
-
-            #endregion
-
             #region Zoom
 
             if (actionState.zoomToggleToObject)
@@ -467,6 +420,42 @@ namespace SEE.Controls
                 moveState.dragStartTransformPosition += moveState.dragStartOffset;
                 moveState.dragStartOffset = Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
                 moveState.dragStartTransformPosition -= moveState.dragStartOffset;
+            }
+
+            #endregion
+
+            // TODO(torben): is it possible for the city to temporarily move very far
+            // away, such that floating-point-errors may occur? that would happen above
+            // where the city is initially moved.
+
+            #region ApplyVelocityAndConstraints
+
+            if (!movingOrRotating)
+            {
+                // Clamp velocity
+                float sqrMag = moveState.moveVelocity.sqrMagnitude;
+                if (sqrMag > MoveState.MaxSqrVelocity)
+                {
+                    moveState.moveVelocity = moveState.moveVelocity / Mathf.Sqrt(sqrMag) * MoveState.MaxVelocity;
+                }
+
+                // Apply velocity to city position
+                cityTransform.position += moveState.moveVelocity * Time.fixedDeltaTime;
+
+                // Apply friction to velocity
+                Vector3 acceleration = MoveState.DragFrictionFactor * -moveState.moveVelocity;
+                moveState.moveVelocity += acceleration * Time.fixedDeltaTime;
+            }
+
+            // Keep city constrained to table
+            float radius = 0.5f * cityTransform.lossyScale.x;
+            MathExtensions.TestCircleAABB(cityTransform.position.XZ(), radius, Table.MinXZ, Table.MaxXZ, out float distance, out Vector2 normalizedToSurfaceDirection);
+
+            if (distance > 0.0f)
+            {
+                MathExtensions.TestCircleAABB(cityTransform.position.XZ(), radius, Table.MinXZ, Table.MaxXZ, out float distance2, out Vector2 normalizedToSurfaceDirection2);
+                Vector2 toSurfaceDirection = distance * normalizedToSurfaceDirection;
+                cityTransform.position += new Vector3(toSurfaceDirection.x, 0.0f, toSurfaceDirection.y);
             }
 
             #endregion

@@ -173,29 +173,168 @@
         }
 
         /// <summary>
-        /// Tests collision between a circle of given center and radius and a rectangle
-        /// of given min and max. If they do not collide, <paramref name="sqrDistance"/>
-        /// is set to the squared distance between the two shapes. Otherwise, it is set
-        /// to zero. The return value states whether the two shapes collide.
+        /// Performs a collision test between a circle and an axis-aligned bounding box.
+        /// The distance and a normal pointing from the circle towards to the surface of
+        /// the AABB are returned. If the circle lies inside of the AABB, the distance is
+        /// negative. If the circle just touches the surface of the AABB, the distance
+        /// and the magnitude of the normal are zero.
+        /// 
+        /// This method uses the idea of the minkowski sum to convert a collision test
+        /// between a circle and an AABB into a test with a single point against four
+        /// circles and two rectangles.
         /// </summary>
         /// <param name="center">The center of the circle.</param>
         /// <param name="radius">The radius of the circle.</param>
-        /// <param name="min">The min corner of the rectangle.</param>
-        /// <param name="max">The max corner of the rectangle.</param>
-        /// <param name="sqrDistance">The squared distance between the two shapes or
-        /// zero, if they collide.</param>
-        /// <returns></returns>
-        public static bool TestCircleRect(Vector2 center, float radius, Vector2 min, Vector2 max, out float sqrDistance)
+        /// <param name="min">The min corner of the AABB.</param>
+        /// <param name="max">The max corner of the AABB.</param>
+        /// <param name="distance">The distance betweem the circle and the surface of the
+        /// AABB.</param>
+        /// <param name="normalizedToSurfaceDirection">The normalized direction from the
+        /// circle towards the closest point on the AABB. If the circle just touches the
+        /// surface, the magnitude is zero.
+        /// </param>
+        public static void TestCircleAABB(Vector2 center, float radius, Vector2 min, Vector2 max, out float distance, out Vector2 normalizedToSurfaceDirection)
         {
-            sqrDistance = 0.0f;
+            Vector2 point = center;
+
+            distance = float.MaxValue;
+            normalizedToSurfaceDirection = Vector2.zero;
+
+            Vector2[] centers = new Vector2[]
+            {
+                min,
+                new Vector2(max.x, min.y),
+                new Vector2(min.x, max.y),
+                max
+            };
+
+            for (int i = 0; i < 4; i++)
+            {
+                TestPointCircle(point, centers[i], radius, out float dist, out Vector2 dir);
+                if (dist < distance)
+                {
+                    distance = dist;
+                    normalizedToSurfaceDirection = dir;
+                }
+            }
+
+            Vector2[] aabbMins = new Vector2[]
+            {
+                new Vector2(min.x - radius, min.y),
+                new Vector2(min.x, min.y - radius)
+            };
+
+            Vector2[] aabbMaxs = new Vector2[]
+            {
+                new Vector2(max.x + radius, max.y),
+                new Vector2(max.x, max.y + radius)
+            };
+
             for (int i = 0; i < 2; i++)
             {
-                float v = center[i];
-                if (v < min[i]) sqrDistance += (min[i] - v) * (min[i] - v);
-                if (v > max[i]) sqrDistance += (v - max[i]) * (v - max[i]);
+                TestPointAABB(point, aabbMins[i], aabbMaxs[i], out float dist, out Vector2 dir);
+                if (dist < distance)
+                {
+                    distance = dist;
+                    normalizedToSurfaceDirection = dir;
+                }
             }
-            bool result = sqrDistance <= radius * radius;
-            return result;
+        }
+
+        /// <summary>
+        /// Performs a collision test between a point and a circle. The distance and a
+        /// normal pointing from the point towards to the surface of the circle are
+        /// returned. If the point lies inside of the AABB, the distance is negative. If
+        /// the point lies exactly on the surface, the distance and the magnitude of the
+        /// normal are zero.
+        /// </summary>
+        /// <param name="point">The position of the point.</param>
+        /// <param name="center">The center of the circle.</param>
+        /// <param name="radius">The radius of the circle.</param>
+        /// <param name="distance">The distance between the point and the surface of the
+        /// circle.</param>
+        /// <param name="normalizedToSurfaceDirection">The normalized direction from the
+        /// point towards the closest point on the circle. If the point lies exactly on
+        /// the surface, the magnitude is zero.</param>
+        public static void TestPointCircle(Vector2 point, Vector2 center, float radius, out float distance, out Vector2 normalizedToSurfaceDirection)
+        {
+            Vector2 pointToCenter = center - point;
+            float magnitude = pointToCenter.magnitude;
+
+            distance = magnitude - radius;
+            normalizedToSurfaceDirection = magnitude == 0.0f ? Vector2.zero : pointToCenter / magnitude;
+
+            if (distance < 0.0f)
+            {
+                normalizedToSurfaceDirection *= -1.0f;
+            }
+        }
+
+        /// <summary>
+        /// Performs a collision test between a point and an axis-aligned bounding box.
+        /// The distance and a normal pointing from the point towards to the surface of
+        /// the AABB are returned. If the point lies inside of the AABB, the distance is
+        /// negative. If the point lies exactly on the surface, the distance and the
+        /// magnitude of the normal are zero.
+        /// </summary>
+        /// <param name="point">The position of the point.</param>
+        /// <param name="min">The min corner of the AABB.</param>
+        /// <param name="max">The max corner of the AABB.</param>
+        /// <param name="distance">The distance betweem the point and the surface of the
+        /// AABB.</param>
+        /// <param name="normalizedToSurfaceDirection">The normalized direction from the
+        /// point towards the closest point on the AABB. If the point lies exactly on the
+        /// surface, the magnitude is zero.
+        /// </param>
+        public static void TestPointAABB(Vector2 point, Vector2 min, Vector2 max, out float distance, out Vector2 normalizedToSurfaceDirection)
+        {
+            float x0 = min.x - point.x;
+            float x1 = point.x - max.x;
+            float y0 = min.y - point.y;
+            float y1 = point.y - max.y;
+
+            if (point.y > min.y && point.y < max.y)
+            {
+                if (x0 > x1)
+                {
+                    distance = x0;
+                    normalizedToSurfaceDirection = new Vector2(x0 > 0.0f ? 1.0f : 0.0f, 0.0f);
+                }
+                else if (x1 > x0)
+                {
+                    distance = x1;
+                    normalizedToSurfaceDirection = new Vector2(x1 > 0.0f ? -1.0f : 0.0f, 0.0f);
+                }
+                else
+                {
+                    distance = 0.0f;
+                    normalizedToSurfaceDirection = Vector2.zero;
+                }
+            }
+            else if (point.x > min.x && point.x < max.x)
+            {
+                if (y0 > y1)
+                {
+                    distance = y0;
+                    normalizedToSurfaceDirection = new Vector2(0.0f, y0 > 0.0f ? 1.0f : -1.0f);
+                }
+                else if (y1 > y0)
+                {
+                    distance = y1;
+                    normalizedToSurfaceDirection = new Vector2(0.0f, y1 > 0.0f ? -1.0f : 1.0f);
+                }
+                else
+                {
+                    distance = 0.0f;
+                    normalizedToSurfaceDirection = Vector2.zero;
+                }
+            }
+            else
+            {
+                normalizedToSurfaceDirection = new Vector2(x0 > x1 ? x0 : -x1, y0 > y1 ? y0 : -y1);
+                distance = normalizedToSurfaceDirection.magnitude;
+                normalizedToSurfaceDirection /= distance;
+            }
         }
     }
 }
