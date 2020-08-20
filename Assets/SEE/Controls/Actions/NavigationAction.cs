@@ -172,7 +172,7 @@ namespace SEE.Controls
 
             rotateState.rotateGizmo.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotateGizmo.Center).magnitude;
 
-            if (!actionState.drag && Input.GetMouseButton(0))
+            if (!actionState.drag && Input.GetMouseButtonDown(0))
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit[] hits = Physics.RaycastAll(ray);
@@ -424,10 +424,6 @@ namespace SEE.Controls
 
             #endregion
 
-            // TODO(torben): is it possible for the city to temporarily move very far
-            // away, such that floating-point-errors may occur? that would happen above
-            // where the city is initially moved.
-
             #region ApplyVelocityAndConstraints
 
             if (!movingOrRotating)
@@ -506,17 +502,22 @@ namespace SEE.Controls
 
         private void Select(GameObject go)
         {
-            if (go != null && go.transform != cursor.Focus)
+            if (go != null)
             {
-                if (cursor.Focus)
+                Outline outline = go.GetComponent<Outline>();
+                if (outline == null)
                 {
-                    Destroy(cursor.Focus.gameObject.GetComponent<Outline>());
+                    HoverableObject oldGO = cursor.Focus ? cursor.Focus.GetComponent<HoverableObject>() : null;
+                    HoverableObject newGO = go ? go.GetComponent<HoverableObject>() : null;
+
+                    cursor.Focus = go.transform;
+                    outline = go.AddComponent<Outline>();
+                    outline.OutlineMode = Outline.Mode.OutlineAll;
+                    outline.OutlineColor = UI3D.UI3DProperties.DefaultColor;
+                    outline.OutlineWidth = 4.0f;
+
+                    new Net.SelectionAction(oldGO, newGO).Execute();
                 }
-                cursor.Focus = go.transform;
-                Outline outline = go.transform.gameObject.AddComponent<Outline>();
-                outline.OutlineMode = Outline.Mode.OutlineAll;
-                outline.OutlineColor = UI3D.UI3DProperties.DefaultColor;
-                outline.OutlineWidth = 4.0f;
             }
         }
     }

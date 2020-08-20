@@ -6,6 +6,8 @@ namespace SEE.UI3D
     {
         public const float DefaultAlpha = 0.5f;
         public static readonly Color DefaultColor = new Color(1.0f, 0.25f, 0.0f, DefaultAlpha);
+        public static readonly Color DefaultColorSecondary = new Color(1.0f, 0.75f, 0.0f, DefaultAlpha);
+        public static readonly Color DefaultColorTertiary = new Color(1.0f, 0.0f, 0.5f, DefaultAlpha);
     }
 
     internal class Cursor : MonoBehaviour
