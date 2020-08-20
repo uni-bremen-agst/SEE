@@ -22,11 +22,6 @@ public class TransformationAction : MonoBehaviour
     /// </summary>
     protected Transformation.Kind previousTransformation = Transformation.Kind.None;
 
-    /// <summary>
-    /// Whether a transformation request other than None has already been detected at the last request.
-    /// </summary>
-    private bool isContinued = false;
-
     void Start()
     {
         if (TranformationDevice == null)
