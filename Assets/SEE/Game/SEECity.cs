@@ -245,6 +245,8 @@ namespace SEE.Game
 
                 lastMaterial = null;
             }
+
+            // TODO(torben): if this solution is desired, the UI3D-elements must be rendered AFTER all of this!
         }
 
         private void DisableAllMeshRenderersOfNodes(GameObject go)
