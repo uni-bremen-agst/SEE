@@ -12,10 +12,94 @@ namespace SEE.GO
     /// </summary>
     public class CubeFactory : InnerNodeFactory
     {
+        private Mesh cubeMesh;
+
+        public CubeFactory()
+        {
+            cubeMesh = new Mesh();
+
+            // For correct rendering of transparency, the faces are defined in the order:
+            // z+, x-, x+, y+, z-
+            // The bottom face is never seen and thus excluded.
+
+            Vector3[] vertices = new Vector3[20]
+            {
+                new Vector3( 0.5f, -0.5f,  0.5f),
+                new Vector3(-0.5f, -0.5f,  0.5f),
+                new Vector3(-0.5f,  0.5f,  0.5f),
+                new Vector3( 0.5f,  0.5f,  0.5f),
+                
+                new Vector3(-0.5f, -0.5f,  0.5f),
+                new Vector3(-0.5f, -0.5f, -0.5f),
+                new Vector3(-0.5f,  0.5f, -0.5f),
+                new Vector3(-0.5f,  0.5f,  0.5f),
+                
+                new Vector3( 0.5f, -0.5f, -0.5f),
+                new Vector3( 0.5f, -0.5f,  0.5f),
+                new Vector3( 0.5f,  0.5f,  0.5f),
+                new Vector3( 0.5f,  0.5f, -0.5f),
+                
+                new Vector3(-0.5f,  0.5f, -0.5f),
+                new Vector3( 0.5f,  0.5f, -0.5f),
+                new Vector3( 0.5f,  0.5f,  0.5f),
+                new Vector3(-0.5f,  0.5f,  0.5f),
+                
+                new Vector3(-0.5f, -0.5f, -0.5f),
+                new Vector3( 0.5f, -0.5f, -0.5f),
+                new Vector3( 0.5f,  0.5f, -0.5f),
+                new Vector3(-0.5f,  0.5f, -0.5f)
+            };
+
+            Vector3[] normals = new Vector3[20]
+            {
+                new Vector3( 0.0f,  0.0f,  1.0f),
+                new Vector3( 0.0f,  0.0f,  1.0f),
+                new Vector3( 0.0f,  0.0f,  1.0f),
+                new Vector3( 0.0f,  0.0f,  1.0f),
+
+                new Vector3(-1.0f,  0.0f,  0.0f),
+                new Vector3(-1.0f,  0.0f,  0.0f),
+                new Vector3(-1.0f,  0.0f,  0.0f),
+                new Vector3(-1.0f,  0.0f,  0.0f),
+                
+                new Vector3( 1.0f,  0.0f,  0.0f),
+                new Vector3( 1.0f,  0.0f,  0.0f),
+                new Vector3( 1.0f,  0.0f,  0.0f),
+                new Vector3( 1.0f,  0.0f,  0.0f),
+                
+                new Vector3( 0.0f,  1.0f,  0.0f),
+                new Vector3( 0.0f,  1.0f,  0.0f),
+                new Vector3( 0.0f,  1.0f,  0.0f),
+                new Vector3( 0.0f,  1.0f,  0.0f),
+                
+                new Vector3( 0.0f,  0.0f, -1.0f),
+                new Vector3( 0.0f,  0.0f, -1.0f),
+                new Vector3( 0.0f,  0.0f, -1.0f),
+                new Vector3( 0.0f,  0.0f, -1.0f)
+            };
+
+            // Note: Winding order in unity is clockwise
+            int[] indices = new int[30]
+            {
+                 0,  3,  2,  2,  1,  0,
+                 4,  7,  6,  6,  5,  4,
+                 8, 11, 10, 10,  9,  8,
+                12, 15, 14, 14, 13, 12,
+                16, 19, 18, 18, 17, 16
+            };
+
+            cubeMesh.SetVertices(vertices);
+            cubeMesh.SetNormals(normals);
+            cubeMesh.SetIndices(indices, MeshTopology.Triangles, 0);
+        }
+
         public override GameObject NewBlock(int style)
         {
-            // Note: An appropriate box collider is already attached to the cube.
-            GameObject result = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            GameObject result = new GameObject("Cube");
+            result.AddComponent<MeshFilter>().mesh = cubeMesh;
+            result.AddComponent<BoxCollider>();
+            result.AddComponent<MeshRenderer>();
+
             SetHeight(result, DefaultHeight);
 
             result.tag = Tags.Node;

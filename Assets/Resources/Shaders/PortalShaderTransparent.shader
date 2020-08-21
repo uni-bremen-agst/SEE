@@ -1,4 +1,4 @@
-﻿Shader "Custom/PortalShader"
+﻿Shader "Custom/PortalShaderTransparent"
 {
 	Properties
 	{
@@ -12,41 +12,40 @@
 		Tags { "Queue" = "Geometry" "RenderType" = "Opaque" "ForceNoShadowCasting" = "True" }
 		LOD 200
 
-		Cull Back
-
 		CGPROGRAM
 
-		#pragma surface surf Standard fullforwardshadows alphatest:_Cutoff addshadow
+		//#pragma surface surf Standard fullforwardshadows alphatest:_Cutoff addshadow
+		#pragma surface surf Standard fullforwardshadows alpha:blend addshadow
 		#pragma target 3.0
 
 		uniform float2 portalMin;
 		uniform float2 portalMax;
 
-        struct Input
-        {
+		struct Input
+		{
 			float3 worldPos;
-            float2 uv_MainTex;
-        };
+			float2 uv_MainTex;
+		};
 
-        half _Glossiness;
-        half _Metallic;
-        fixed4 _Color;
+		half _Glossiness;
+		half _Metallic;
+		fixed4 _Color;
 
-        void surf (Input IN, inout SurfaceOutputStandard o)
-        {
-            fixed4 c = _Color;
+		void surf(Input IN, inout SurfaceOutputStandard o)
+		{
+			fixed4 c = _Color;
 			if (IN.worldPos.x < portalMin.x || IN.worldPos.z < portalMin.y ||
 				IN.worldPos.x > portalMax.x || IN.worldPos.z > portalMax.y
 			)
 			{
 				c = _Color.a = 0.0f;
 			}
-            o.Albedo = c.rgb;
-            o.Metallic = _Metallic;
-            o.Smoothness = _Glossiness;
-            o.Alpha = c.a;
-        }
-        ENDCG
-    }
-    FallBack "Diffuse"
+			o.Albedo = c.rgb;
+			o.Metallic = _Metallic;
+			o.Smoothness = _Glossiness;
+			o.Alpha = c.a;
+		}
+		ENDCG
+	}
+		FallBack "Diffuse"
 }

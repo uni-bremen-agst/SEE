@@ -1,22 +1,21 @@
-﻿Shader "Custom/PortalShader"
+﻿Shader "Custom/PortalShaderTransparentWithBackFaces"
 {
 	Properties
 	{
 		_Color("Color", Color) = (1, 1, 1, 1)
 		_Glossiness("Smoothness", Range(0, 1)) = 0.5
 		_Metallic("Metallic", Range(0, 1)) = 0.0
-		_Cutoff("Cutoff", Range(0, 1)) = 0.5
 	}
 		SubShader
 	{
 		Tags { "Queue" = "Geometry" "RenderType" = "Opaque" "ForceNoShadowCasting" = "True" }
 		LOD 200
 
-		Cull Back
+		Cull[_Cull]
 
 		CGPROGRAM
 
-		#pragma surface surf Standard fullforwardshadows alphatest:_Cutoff addshadow
+		#pragma surface surf Standard alpha:blend
 		#pragma target 3.0
 
 		uniform float2 portalMin;
