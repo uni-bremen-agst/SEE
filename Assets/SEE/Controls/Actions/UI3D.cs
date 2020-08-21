@@ -107,6 +107,8 @@ namespace SEE.UI3D
             p.axisMaterial.SetColor("_Color", new Color(0.0f, 0.0f, 0.0f, 0.5f * UI3DProperties.DefaultAlpha));
             p.lineMaterial.SetColor("_Color", UI3DProperties.DefaultColor);
 
+            go.SetActive(false);
+
             return p;
         }
 

@@ -115,13 +115,27 @@ namespace SEE.Controls
         {
             foreach (var renderer in renderers)
             {
-                // Append outline shaders
-                var materials = renderer.sharedMaterials.ToList();
+                if (renderer.enabled)
+                {
+                    // Append outline shaders
+                    var materials = renderer.sharedMaterials.ToList();
 
-                materials.Add(outlineMaskMaterial);
-                materials.Add(outlineFillMaterial);
+                    materials.Add(outlineMaskMaterial);
+                    materials.Add(outlineFillMaterial);
 
-                renderer.materials = materials.ToArray();
+                    renderer.materials = materials.ToArray();
+                }
+                else
+                {
+                    renderer.enabled = true;
+
+                    Material[] materials = new Material[2] {
+                        outlineMaskMaterial,
+                        outlineFillMaterial
+                    };
+
+                    renderer.materials = materials;
+                }
             }
         }
 
@@ -158,13 +172,21 @@ namespace SEE.Controls
         {
             foreach (var renderer in renderers)
             {
-                // Remove outline shaders
-                var materials = renderer.sharedMaterials.ToList();
+                if (renderer.sharedMaterials.Length > 2)
+                {
+                    // Remove outline shaders
+                    var materials = renderer.sharedMaterials.ToList();
 
-                materials.Remove(outlineMaskMaterial);
-                materials.Remove(outlineFillMaterial);
+                    materials.Remove(outlineMaskMaterial);
+                    materials.Remove(outlineFillMaterial);
 
-                renderer.materials = materials.ToArray();
+                    renderer.materials = materials.ToArray();
+                }
+                else
+                {
+                    renderer.enabled = false;
+                    renderer.materials = new Material[0];
+                }
             }
         }
 

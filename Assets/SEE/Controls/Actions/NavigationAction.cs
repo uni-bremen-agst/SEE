@@ -445,11 +445,10 @@ namespace SEE.Controls
 
             // Keep city constrained to table
             float radius = 0.5f * cityTransform.lossyScale.x;
-            MathExtensions.TestCircleAABB(cityTransform.position.XZ(), radius, Table.MinXZ, Table.MaxXZ, out float distance, out Vector2 normalizedToSurfaceDirection);
+            MathExtensions.TestCircleAABB(cityTransform.position.XZ(), 0.9f * radius, Table.MinXZ, Table.MaxXZ, out float distance, out Vector2 normalizedToSurfaceDirection);
 
             if (distance > 0.0f)
             {
-                MathExtensions.TestCircleAABB(cityTransform.position.XZ(), radius, Table.MinXZ, Table.MaxXZ, out float distance2, out Vector2 normalizedToSurfaceDirection2);
                 Vector2 toSurfaceDirection = distance * normalizedToSurfaceDirection;
                 cityTransform.position += new Vector3(toSurfaceDirection.x, 0.0f, toSurfaceDirection.y);
             }
