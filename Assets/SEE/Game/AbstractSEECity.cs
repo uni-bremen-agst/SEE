@@ -355,6 +355,7 @@ namespace SEE.Game
         public List<string> AllMetricAttributes()
         {
             List<string> nodeMetrics = new List<string>(AllLeafMetrics());
+            nodeMetrics.AddRange(AllInnerNodeMetrics());
             nodeMetrics.AddRange(AllLeafIssues());
             nodeMetrics.AddRange(AllInnerNodeIssues());
             nodeMetrics.Add(InnerDonutMetric);
@@ -393,6 +394,17 @@ namespace SEE.Game
         /// </summary>
         public string InnerNodeStyleMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
 
+
+        /// <summary>
+        /// All metrics used for visual attributes of inner nodes (InnerNodeStyleMetric
+        /// and InnerNodeHeightMetric).
+        /// Note: A metric name occurs only once (i.e., duplicate names are removed).
+        /// </summary>
+        /// <returns>all metrics used for visual attributes of an inner node</returns>
+        public ICollection<string> AllInnerNodeMetrics()
+        {
+            return new HashSet<string> { InnerNodeStyleMetric, InnerNodeHeightMetric };
+        }
 
         //--------------------------------------
         // Other visual attributes of leaf nodes
