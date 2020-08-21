@@ -12,10 +12,11 @@
 		Tags { "Queue" = "Geometry" "RenderType" = "Opaque" "ForceNoShadowCasting" = "True" }
 		LOD 200
 
+		Cull Back
+
 		CGPROGRAM
 
-		//#pragma surface surf Standard fullforwardshadows alphatest:_Cutoff addshadow
-		#pragma surface surf Standard fullforwardshadows alpha:blend addshadow
+		#pragma surface surf Standard fullforwardshadows alphatest:_Cutoff addshadow
 		#pragma target 3.0
 
 		uniform float2 portalMin;

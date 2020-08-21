@@ -1,4 +1,5 @@
 ﻿#define SEE_MANUAL_RENDERING
+//#define SEE_RENDER_BACKFACES
 
 using System;
 using System.Collections.Generic;
@@ -212,12 +213,21 @@ namespace SEE.Game
                 });
                 for (int i = 0; i < fileRenderCommands.Count; i++)
                 {
+#if SEE_RENDER_BACKFACES
+                    fileRenderCommands[i].material.SetPass(0);
+                    fileRenderCommands[i].material.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Front);
+                    Graphics.DrawMeshNow(fileRenderCommands[i].mesh, fileRenderCommands[i].transform.localToWorldMatrix);
+                    fileRenderCommands[i].material.SetPass(0);
+                    fileRenderCommands[i].material.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Back);
+                    Graphics.DrawMeshNow(fileRenderCommands[i].mesh, fileRenderCommands[i].transform.localToWorldMatrix);
+#else
                     if (fileRenderCommands[i].material != lastMaterial)
                     {
                         lastMaterial = fileRenderCommands[i].material;
                         fileRenderCommands[i].material.SetPass(0);
                     }
                     Graphics.DrawMeshNow(fileRenderCommands[i].mesh, fileRenderCommands[i].transform.localToWorldMatrix);
+#endif
                 }
 
                 lastMaterial = null;

@@ -14,7 +14,9 @@ namespace SEE.GO
         /// <summary>
         /// Name of default shader to obtain the default material.
         /// </summary>
-        private const string ShaderName = "Custom/PortalShader";
+        //private const string ShaderName = "Custom/PortalShader";
+        private const string ShaderName = "Custom/PortalShaderTransparent";
+        //private const string ShaderName = "Custom/PortalShaderTransparentWithBackFaces";
 
         /// <summary>
         /// Creates default numberOfColors materials in the color range from
