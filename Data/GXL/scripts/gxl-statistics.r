@@ -25,7 +25,8 @@ library(stringr)
 # the following files have no clone data
 has.clone.data = FALSE
 # the basename of the GXL file excluding its extension .gxl
-filename = "../SEE/CodeFacts"
+#filename = "../SEE/CodeFacts"
+filename = "../SEE/Architecture"
 
 # The GXL file to be read; must exist.
 gxlfile = paste(filename, ".gxl", sep="")
@@ -132,7 +133,7 @@ node.map = to.map(nodes)
 # Returns all types of the GXL elements in the given mapping of 
 # IDs onto GXL elements
 get.types = function(element.map) {
-  unique(sapply(values(element.map), FUN=function(l) l$type))  
+  unique(sapply(values(element.map, simplify = FALSE), FUN=function(l) l$type))  
 }
 
 # All node types in the graph
@@ -151,18 +152,18 @@ get.metric.names = function(element.map) {
   unique(unlist(sapply(values(element.map), FUN=get.metric.names.of.element)))
 }
 
-# All node metrics in the graph.
+# All node metrics in the graph. Could be NULL, if there are no metrics.
 node.metrics = get.metric.names(node.map)
 
 # Data frame for edges. The columns are: id, from (node id), to (node id), and
 # all other edge attributes.
-edge.df = data.table::rbindlist(values(edge.map), fill=TRUE)
+edge.df = data.table::rbindlist(values(edge.map, simplify = FALSE), fill=TRUE)
 
 # Yields a mapping, parent, of GXL node ids onto GXL node ids 
 # where parent(id) denotes the parent GXL node id of the given id.
 # A mapping exists only if there is a hierarchical edge in edge.df that
 # has the id as a source. The result would then be the target id of that edge.
-get.parent = function(node.map, edge.df, hierarchical.edges = c("Enclosing")) {
+get.parent = function(node.map, edge.df, hierarchical.edges = c("Enclosing", "Belongs_To", "Part_Of")) {
   parent = hash()
   apply(X = edge.df[edge.df$type %in% hierarchical.edges, ], MARGIN = 1, 
         FUN = function(e) { from = e[["from"]]
@@ -304,8 +305,9 @@ for (root in node.tree)
 # we added.
 all.metrics = c(node.metrics, sapply(node.types, FUN = number.of.type.metric.name), list(number.of.descendants.metric))
 
-# Turn the metrics of the tree nodes into a data frame
-df = setNames(data.frame(matrix(ncol = 1 + length(all.metrics), nrow = number.of.tree.nodes)), c("Linkage.Name", all.metrics))
+# Turn the metrics of the tree nodes into a data frame.
+# Note: The column identifying a node in the CSV file is named 'ID'.
+df = setNames(data.frame(matrix(ncol = 1 + length(all.metrics), nrow = number.of.tree.nodes)), c("ID", all.metrics))
 row.index = 0 # the row index in df where the next values will be added by add.metrics()
 add.metrics = function(node) {
   row.index <<- row.index + 1 # row.index is a global variable
