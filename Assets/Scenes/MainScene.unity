@@ -146,7 +146,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 141690887}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.99999994, y: -4.5, z: 0}
+  m_LocalPosition: {x: -0.624355, y: -4.6878223, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -181,7 +181,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 7, y: 7}
     lockAspectRatio: 1
-    worldSize: {x: 0.6999999, y: 0.6999999}
+    worldSize: {x: 0.4370485, y: 0.4370485}
 --- !u!1 &186778472
 GameObject:
   m_ObjectHideFlags: 0
@@ -452,6 +452,36 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &749657775
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 749657776}
+  m_Layer: 0
+  m_Name: Architecture
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &749657776
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 749657775}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.4605453, y: 1.267746, z: -0.2615639}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 15
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &843199879 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 2014920, guid: dc06161b6d97feb419f45f03b62e14b9,
@@ -1994,7 +2024,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1626562202}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.99999994, y: -4, z: 0}
+  m_LocalPosition: {x: 0.624355, y: -4.375645, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -2029,7 +2059,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 7, y: 7}
     lockAspectRatio: 1
-    worldSize: {x: 0.6999999, y: 0.6999999}
+    worldSize: {x: 0.4370485, y: 0.4370485}
 --- !u!1 &1636335451
 GameObject:
   m_ObjectHideFlags: 0
@@ -2055,7 +2085,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636335451}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -6.890947, y: -4, z: 0}
+  m_LocalPosition: {x: -2.49742, y: -4.375645, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -2126,7 +2156,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 20, y: 20}
     lockAspectRatio: 1
-    worldSize: {x: 1.9999999, y: 1.9999999}
+    worldSize: {x: 1.24871, y: 1.24871}
   knob:
     idleSprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
     busySprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
@@ -2136,7 +2166,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 10, y: 10}
     lockAspectRatio: 1
-    worldSize: {x: 0.99999994, y: 0.99999994}
+    worldSize: {x: 0.624355, y: 0.624355}
   knobRange: 7.5
 --- !u!1001 &1691752130
 PrefabInstance:
@@ -2237,7 +2267,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776319858}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.890947, y: -4, z: 0}
+  m_LocalPosition: {x: 2.49742, y: -4.375645, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -2308,7 +2338,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 20, y: 20}
     lockAspectRatio: 1
-    worldSize: {x: 1.9999999, y: 1.9999999}
+    worldSize: {x: 1.24871, y: 1.24871}
   knob:
     idleSprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
     busySprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
@@ -2318,7 +2348,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 10, y: 10}
     lockAspectRatio: 1
-    worldSize: {x: 0.99999994, y: 0.99999994}
+    worldSize: {x: 0.624355, y: 0.624355}
   knobRange: 7.5
 --- !u!1 &1778613927
 GameObject:
@@ -2331,7 +2361,7 @@ GameObject:
   - component: {fileID: 1778613929}
   - component: {fileID: 1778613928}
   m_Layer: 0
-  m_Name: City
+  m_Name: Implementation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2437,8 +2467,12 @@ MonoBehaviour:
       Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 9
-      Data: 2
+      Entry: 7
+      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -2450,11 +2484,11 @@ MonoBehaviour:
       Data: 
     - Name: DirNodeLayout
       Entry: 7
-      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+NodeLayouts,
+      Data: 6|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+NodeLayouts,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 2
+      Data: 5
     - Name: 
       Entry: 12
       Data: 0
@@ -2466,11 +2500,11 @@ MonoBehaviour:
       Data: 
     - Name: DirShape
       Entry: 7
-      Data: 6|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
+      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 2
+      Data: 5
     - Name: 
       Entry: 12
       Data: 0
@@ -2482,7 +2516,7 @@ MonoBehaviour:
       Data: 
     - Name: rootDirs
       Entry: 7
-      Data: 7|System.Collections.Generic.List`1[[SEE.DataModel.Node, SEE]], mscorlib
+      Data: 8|System.Collections.Generic.List`1[[SEE.DataModel.Node, SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -2494,11 +2528,11 @@ MonoBehaviour:
       Data: 
     - Name: show
       Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 2
+      Data: 5
     - Name: 
       Entry: 12
       Data: 0
@@ -2516,11 +2550,11 @@ MonoBehaviour:
       Data: true
     - Name: loadedForNodeTypes
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 2
+      Data: 5
     - Name: 
       Entry: 12
       Data: 0
@@ -2541,7 +2575,7 @@ MonoBehaviour:
       Data: 
     - Name: Measurements
       Entry: 7
-      Data: 10|System.Collections.Generic.SortedDictionary`2[[System.String, mscorlib],[System.String,
+      Data: 11|System.Collections.Generic.SortedDictionary`2[[System.String, mscorlib],[System.String,
         mscorlib]], System
     - Name: 
       Entry: 12
@@ -2554,11 +2588,11 @@ MonoBehaviour:
       Data: 
     - Name: SubLayoutsInnerNodes
       Entry: 7
-      Data: 11|System.Collections.Generic.Dictionary`2[[SEE.Game.AbstractSEECity+NodeLayouts,
+      Data: 12|System.Collections.Generic.Dictionary`2[[SEE.Game.AbstractSEECity+NodeLayouts,
         SEE],[System.String, mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 12|System.Collections.Generic.EnumEqualityComparer`1[[SEE.Game.AbstractSEECity+NodeLayouts,
+      Data: 13|System.Collections.Generic.EnumEqualityComparer`1[[SEE.Game.AbstractSEECity+NodeLayouts,
         SEE]], mscorlib
     - Name: 
       Entry: 12
@@ -2664,11 +2698,11 @@ MonoBehaviour:
       Data: 
     - Name: SubLayoutsLeafNodes
       Entry: 7
-      Data: 13|System.Collections.Generic.Dictionary`2[[SEE.Game.AbstractSEECity+NodeLayouts,
+      Data: 14|System.Collections.Generic.Dictionary`2[[SEE.Game.AbstractSEECity+NodeLayouts,
         SEE],[System.String, mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 12
+      Data: 13
     - Name: 
       Entry: 12
       Data: 8
@@ -2774,11 +2808,11 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  gvlPath: ..\Data\GXL\linux-clones\net.gvl
-  WidthMetric: Metric.Number_of_Tokens
-  HeightMetric: Metric.Clone_Rate
-  DepthMetric: Metric.LOC
-  LeafStyleMetric: Metric.Complexity
+  gvlPath: CodeFacts.gvl
+  WidthMetric: Metric.Number_Of_Methods
+  HeightMetric: Metric.Lines.LOC
+  DepthMetric: Metric.Number_Of_Members
+  LeafStyleMetric: Metric.McCabe_Complexity
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -2794,24 +2828,24 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
-  InnerNodeHeightMetric: 
-  InnerNodeStyleMetric: Metric.IssuesTotal
+  InnerNodeHeightMetric: 0.001
+  InnerNodeStyleMetric: Metric.Number_Of_Descendants
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
   InnerNodeObjects: 0
   NodeLayout: 0
-  EdgeLayout: 0
+  EdgeLayout: 3
   ZScoreScale: 1
-  EdgeWidth: 0.3
+  EdgeWidth: 0.001
   ShowErosions: 0
   MaxErosionWidth: 1
   EdgesAboveBlocks: 1
   Tension: 0.85
-  RDP: 0.05
+  RDP: 0.0005
   calculateMeasurements: 0
-  gxlPath: ..\Data\GXL\linux-clones\net.gxl
-  csvPath: ..\Data\GXL\linux-clones\net.csv
+  gxlPath: CodeFacts.gxl
+  csvPath: CodeFacts.csv
 --- !u!4 &1778613929
 Transform:
   m_ObjectHideFlags: 0
@@ -2820,7 +2854,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1778613927}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.04481314, y: 1.002, z: 0.054}
+  m_LocalPosition: {x: -0.294, y: 1.002, z: 0.054}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
