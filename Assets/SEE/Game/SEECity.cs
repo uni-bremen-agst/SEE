@@ -62,12 +62,12 @@ namespace SEE.Game
         /// </summary>
         public Graph VisualizedSubGraph
         {
-            get 
+            get
             {
                 if (loadedGraph == null)
                 {
                     return loadedGraph;
-                } 
+                }
                 else
                 {
                     return RelevantGraph(loadedGraph);
@@ -84,7 +84,7 @@ namespace SEE.Game
         {
             string filename = GXLPath();
             if (loadedGraph == null && !string.IsNullOrEmpty(filename))
-            {                
+            {
                 loadedGraph = LoadGraph(filename);
                 if (loadedGraph != null)
                 {
@@ -103,68 +103,79 @@ namespace SEE.Game
 
                 // Prepare all directories
                 Transform rootTransform = transform.GetChild(0);
-                int maxDirectoryLevel = GetMaxDirectoryLevel(rootTransform);
+                int maxDirLevel = GetMaxDirectoryLevel(rootTransform);
 
-                RenderCommand rootRenderCommand;
-                rootRenderCommand.transform = rootTransform;
-                rootRenderCommand.mesh = rootTransform.GetComponent<MeshFilter>().mesh;
-                rootRenderCommand.material = rootTransform.GetComponent<MeshRenderer>().material;
+                RenderCommand rootCommand;
+                rootCommand.transform = rootTransform;
+                rootCommand.mesh = rootTransform.GetComponent<MeshFilter>().mesh;
+                rootCommand.material = rootTransform.GetComponent<MeshRenderer>().material;
 
-                directoryRenderCommandsPerLevel = new List<List<RenderCommand>>(maxDirectoryLevel)
+                List<RenderCommand[]> dirCommandsList = new List<RenderCommand[]>(maxDirLevel)
                 {
-                    new List<RenderCommand>(1) { rootRenderCommand }
+                    new RenderCommand[1] { rootCommand }
                 };
 
-                Color rootColor = rootRenderCommand.material.GetColor("_Color");
+                Color rootColor = rootCommand.material.GetColor("_Color");
                 rootColor.a = 0.5f;
-                rootRenderCommand.material.SetColor("_Color", rootColor);
-                
-                for (int i = 1; i < maxDirectoryLevel; i++)
+                rootCommand.material.SetColor("_Color", rootColor);
+
+                for (int i = 1; i < maxDirLevel; i++)
                 {
-                    List<RenderCommand> directoryRenderCommands = new List<RenderCommand>();
-                    foreach (RenderCommand lastDirectory in directoryRenderCommandsPerLevel[i - 1])
+                    List<RenderCommand> commands = new List<RenderCommand>();
+                    foreach (RenderCommand lastDir in dirCommandsList[i - 1])
                     {
-                        Transform lastDirectoryTransform = lastDirectory.transform;
-                        for (int j = 0; j < lastDirectoryTransform.childCount; j++)
+                        Transform lastDirTransform = lastDir.transform;
+                        for (int j = 0; j < lastDirTransform.childCount; j++)
                         {
-                            Transform directoryTransform = lastDirectoryTransform.GetChild(j);
-                            NodeRef nodeRef = directoryTransform.GetComponent<NodeRef>();
+                            Transform dirTransform = lastDirTransform.GetChild(j);
+                            NodeRef nodeRef = dirTransform.GetComponent<NodeRef>();
                             if (nodeRef != null && nodeRef.node != null && nodeRef.node.Type.Equals("Directory"))
                             {
-                                RenderCommand directoryRenderCommand;
-                                directoryRenderCommand.transform = directoryTransform;
-                                directoryRenderCommand.mesh = directoryTransform.GetComponent<MeshFilter>().mesh;
-                                directoryRenderCommand.material = directoryTransform.GetComponent<MeshRenderer>().material;
-                                
-                                Color color = directoryRenderCommand.material.GetColor("_Color");
-                                color.a = 0.5f;
-                                directoryRenderCommand.material.SetColor("_Color", color);
+                                RenderCommand command;
+                                command.transform = dirTransform;
+                                command.mesh = dirTransform.GetComponent<MeshFilter>().mesh;
+                                command.material = dirTransform.GetComponent<MeshRenderer>().material;
 
-                                directoryRenderCommands.Add(directoryRenderCommand);
+                                Color color = command.material.GetColor("_Color");
+                                color.a = 0.5f;
+                                command.material.SetColor("_Color", color);
+
+                                commands.Add(command);
                             }
                         }
                     }
-                    directoryRenderCommandsPerLevel.Add(directoryRenderCommands);
+                    dirCommandsList.Add(commands.ToArray());
                 }
+                dirCommands = dirCommandsList.ToArray();
 
                 // Prepare all files
-                fileRenderCommands = new List<RenderCommand>();
-                foreach (NodeRef nodeRef in FindObjectsOfType<NodeRef>())
+                List<RenderCommand> fileCommandsList = new List<RenderCommand>();
+                List<short> fileIndicesList = new List<short>();
+
+                NodeRef[] nodeRefs = FindObjectsOfType<NodeRef>();
+
+                for (int i = 0; i < nodeRefs.Length; i++)
                 {
+                    NodeRef nodeRef = nodeRefs[i];
                     if (nodeRef.node != null && nodeRef.node.Type.Equals("File"))
                     {
-                        RenderCommand fileRenderCommand;
-                        fileRenderCommand.transform = nodeRef.transform;
-                        fileRenderCommand.mesh = nodeRef.GetComponent<MeshFilter>().mesh;
-                        fileRenderCommand.material = nodeRef.GetComponent<MeshRenderer>().material;
-                        
-                        Color color = fileRenderCommand.material.GetColor("_Color");
-                        color.a = 0.5f;
-                        fileRenderCommand.material.SetColor("_Color", color);
+                        UnityEngine.Assertions.Assert.IsTrue(i <= short.MaxValue);
+                        fileIndicesList.Add((short)fileIndicesList.Count);
 
-                        fileRenderCommands.Add(fileRenderCommand);
+                        RenderCommand command;
+                        command.transform = nodeRef.transform;
+                        command.mesh = nodeRef.GetComponent<MeshFilter>().mesh;
+                        command.material = nodeRef.GetComponent<MeshRenderer>().material;
+
+                        Color color = command.material.GetColor("_Color");
+                        color.a = 0.5f;
+                        command.material.SetColor("_Color", color);
+
+                        fileCommandsList.Add(command);
                     }
                 }
+                fileCommands = fileCommandsList.ToArray();
+                fileIndices = fileIndicesList.ToArray();
 
                 lastMaterial = null;
             }
@@ -181,52 +192,54 @@ namespace SEE.Game
             internal Material material;
         }
 
-        private List<List<RenderCommand>> directoryRenderCommandsPerLevel;
-        private List<RenderCommand> fileRenderCommands;
+        private RenderCommand[][] dirCommands;
+        private short[] fileIndices;
+        private RenderCommand[] fileCommands;
         private Material lastMaterial;
-        
+
         private void OnRenderObject()
         {
             if (transform.childCount != 0)
             {
                 // Render all directories
-                for (int i = 0; i < directoryRenderCommandsPerLevel.Count; i++)
+                for (int i = 0; i < dirCommands.Length; i++)
                 {
-                    List<RenderCommand> directories = directoryRenderCommandsPerLevel[i];
+                    RenderCommand[] dirComms = dirCommands[i];
 
-                    for (int j = 0; j < directories.Count; j++)
+                    for (int j = 0; j < dirComms.Length; j++)
                     {
-                        if (directories[j].material != lastMaterial)
+                        if (dirComms[j].material != lastMaterial)
                         {
-                            lastMaterial = directories[j].material;
-                            directories[j].material.SetPass(0);
+                            lastMaterial = dirComms[j].material;
+                            dirComms[j].material.SetPass(0);
                         }
-                        Graphics.DrawMeshNow(directories[j].mesh, directories[j].transform.localToWorldMatrix);
+                        Graphics.DrawMeshNow(dirComms[j].mesh, dirComms[j].transform.localToWorldMatrix);
                     }
                 }
 
                 // Render all files
                 Vector3 cameraPosition = Camera.main.transform.position;
-                fileRenderCommands.Sort(delegate (RenderCommand rc0, RenderCommand rc1)
+                int CompareRenderCommandIndices(short i0, short i1)
                 {
-                    return (rc1.transform.position - cameraPosition).sqrMagnitude.CompareTo((rc0.transform.position - cameraPosition).sqrMagnitude);
-                });
-                for (int i = 0; i < fileRenderCommands.Count; i++)
+                    return (fileCommands[i1].transform.position - cameraPosition).sqrMagnitude.CompareTo((fileCommands[i0].transform.position - cameraPosition).sqrMagnitude);
+                }
+                Array.Sort(fileIndices, CompareRenderCommandIndices);
+                for (int i = 0; i < fileIndices.Length; i++)
                 {
 #if SEE_RENDER_BACKFACES
-                    fileRenderCommands[i].material.SetPass(0);
-                    fileRenderCommands[i].material.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Front);
-                    Graphics.DrawMeshNow(fileRenderCommands[i].mesh, fileRenderCommands[i].transform.localToWorldMatrix);
-                    fileRenderCommands[i].material.SetPass(0);
-                    fileRenderCommands[i].material.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Back);
-                    Graphics.DrawMeshNow(fileRenderCommands[i].mesh, fileRenderCommands[i].transform.localToWorldMatrix);
+                    fileRenderCommands[fileRenderCommandIndices[i]].material.SetPass(0);
+                    fileRenderCommands[fileRenderCommandIndices[i]].material.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Front);
+                    Graphics.DrawMeshNow(fileRenderCommands[fileRenderCommandIndices[i]].mesh, fileRenderCommands[fileRenderCommandIndices[i]].transform.localToWorldMatrix);
+                    fileRenderCommands[fileRenderCommandIndices[i]].material.SetPass(0);
+                    fileRenderCommands[fileRenderCommandIndices[i]].material.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Back);
+                    Graphics.DrawMeshNow(fileRenderCommands[fileRenderCommandIndices[i]].mesh, fileRenderCommands[fileRenderCommandIndices[i]].transform.localToWorldMatrix);
 #else
-                    if (fileRenderCommands[i].material != lastMaterial)
+                    if (fileCommands[fileIndices[i]].material != lastMaterial)
                     {
-                        lastMaterial = fileRenderCommands[i].material;
-                        fileRenderCommands[i].material.SetPass(0);
+                        lastMaterial = fileCommands[fileIndices[i]].material;
+                        fileCommands[fileIndices[i]].material.SetPass(0);
                     }
-                    Graphics.DrawMeshNow(fileRenderCommands[i].mesh, fileRenderCommands[i].transform.localToWorldMatrix);
+                    Graphics.DrawMeshNow(fileCommands[fileIndices[i]].mesh, fileCommands[fileIndices[i]].transform.localToWorldMatrix);
 #endif
                 }
 
@@ -358,7 +371,7 @@ namespace SEE.Game
         // Medium size include graph with single root (OpenSSL).
         //public string gxlPath = "..\\Data\\GXL\\OpenSSL\\openssl-include.gxl";
         //public string csvPath = "..\\Data\\GXL\\OpenSSL\\openssl-include.csv";
-        
+
         // Examples for dynamic call graphs
         //public string gxlPath = "..\\Data\\GXL\\dynamic-tests\\example_02.gxl";
         //public string csvPath = "..\\Data\\GXL\\dynamic-tests\\empty.csv";
