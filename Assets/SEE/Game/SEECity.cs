@@ -195,10 +195,12 @@ namespace SEE.Game
         /// </summary>
         private void LoadMetrics()
         {
-            int numberOfErrors = MetricImporter.Load(LoadedGraph, CSVPath());
+            string filename = CSVPath();
+            Performance p = Performance.Begin("loading metric data data from CSV file " + filename);            
+            int numberOfErrors = MetricImporter.Load(LoadedGraph, filename);
             if (numberOfErrors > 0)
             {
-                Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", CSVPath(), numberOfErrors);
+                Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", filename, numberOfErrors);
             }
             {
                 MetricAggregator.AggregateSum(LoadedGraph, AllLeafIssues().ToArray<string>());
@@ -211,6 +213,7 @@ namespace SEE.Game
                 // FIXME: We need a better solution. This is a kind of hack.
                 MetricAggregator.DeriveSum(LoadedGraph, AllInnerNodeIssues().ToArray<string>(), InnerDonutMetric, true);
             }
+            p.End();
         }
 
         /// <summary>
