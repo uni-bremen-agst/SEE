@@ -50,7 +50,7 @@ namespace SEE.GO
             Renderer renderer = block.GetComponent<Renderer>();
             if (renderer != null)
             {
-                renderer.sharedMaterial = materials.DefaultMaterial(Mathf.Clamp(style, 0, NumberOfStyles() - 1));
+                renderer.sharedMaterial = materials.DefaultMaterial(0, Mathf.Clamp(style, 0, NumberOfStyles() - 1));
             }
         }
     }

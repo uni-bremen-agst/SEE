@@ -17,7 +17,7 @@ namespace SEE.GO
             : base(unit)
         {
             materials = new Materials(1, DefaultColor, DefaultColor);
-            material = new Material(materials.DefaultMaterial(0));
+            material = new Material(materials.DefaultMaterial(0, 0));
             material.color = DefaultColor;
         }
 
@@ -36,7 +36,7 @@ namespace SEE.GO
         /// </summary>
         private const float defaultRadius = 0.5f;
 
-        public override GameObject NewBlock(int index = 0)
+        public override GameObject NewBlock(int index = 0, int level = 0)
         {
             GameObject result = new GameObject();
             result.isStatic = true;

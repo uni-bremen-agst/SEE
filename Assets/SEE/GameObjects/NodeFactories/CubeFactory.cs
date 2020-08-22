@@ -93,7 +93,7 @@ namespace SEE.GO
             cubeMesh.SetIndices(indices, MeshTopology.Triangles, 0);
         }
 
-        public override GameObject NewBlock(int style)
+        public override GameObject NewBlock(int style, int level = 0)
         {
             GameObject result = new GameObject("Cube");
             result.AddComponent<MeshFilter>().mesh = cubeMesh;
@@ -109,7 +109,7 @@ namespace SEE.GO
             renderer.receiveShadows = false;
 
             // Assigns a material to the object.
-            renderer.sharedMaterial = materials.DefaultMaterial(Mathf.Clamp(style, 0, NumberOfStyles()-1));
+            renderer.sharedMaterial = materials.DefaultMaterial(level, Mathf.Clamp(style, 0, NumberOfStyles() - 1)); ;
 
             // Object should be static so that we save rendering time at run-time.
             result.isStatic = true;

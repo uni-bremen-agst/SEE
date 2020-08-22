@@ -9,7 +9,7 @@
 	}
 		SubShader
 	{
-		Tags { "Queue" = "Geometry" "RenderType" = "Opaque" "ForceNoShadowCasting" = "True" }
+		Tags { "Queue" = "Transparent" "RenderType" = "Transparent" "ForceNoShadowCasting" = "True" }
 		LOD 200
 
 		CGPROGRAM
