@@ -10,13 +10,13 @@ namespace SEE.Net
         public Quaternion rotation;
         public Vector3 localScale;
 
-        public SynchronizeAction(GameObject gameObject) : base(false)
+        public SynchronizeAction(GameObject gameObject, bool syncScale) : base(false)
         {
             Assert.IsNotNull(gameObject);
             uniqueGameObjectName = gameObject.name;
             position = gameObject.transform.position;
             rotation = gameObject.transform.rotation;
-            localScale = gameObject.transform.localScale;
+            localScale = syncScale ? gameObject.transform.localScale : Vector3.zero;
         }
 
         protected override bool ExecuteOnClient()
@@ -36,7 +36,10 @@ namespace SEE.Net
                     result = true;
                     gameObject.transform.position = position;
                     gameObject.transform.rotation = rotation;
-                    gameObject.transform.localScale = localScale;
+                    if (localScale.sqrMagnitude != 0.0f)
+                    {
+                        gameObject.transform.localScale = localScale;
+                    }
                 }
             }
 
@@ -48,12 +51,7 @@ namespace SEE.Net
             return true;
         }
 
-        protected override bool RedoOnClient()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        protected override bool RedoOnServer()
+        protected override bool UndoOnServer()
         {
             throw new System.NotImplementedException();
         }
@@ -63,7 +61,12 @@ namespace SEE.Net
             throw new System.NotImplementedException();
         }
 
-        protected override bool UndoOnServer()
+        protected override bool RedoOnServer()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override bool RedoOnClient()
         {
             throw new System.NotImplementedException();
         }
