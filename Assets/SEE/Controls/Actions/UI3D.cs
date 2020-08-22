@@ -16,7 +16,6 @@ namespace SEE.UI3D
         private const string PlainColorShaderName = "Unlit/PlainColorShader";
 
         private Transform focus;
-        public Transform Focus { get => focus; set { if (value != null) { focus = value; } } }
 
         private GameObject outline;
         private Material outlineMaterial;
@@ -45,36 +44,51 @@ namespace SEE.UI3D
             c.axisMaterial = new Material(Shader.Find(PlainColorShaderName));
             c.axisMaterial.SetColor("_Color", Color.black);
 
+            c.gameObject.SetActive(false);
+
             return c;
         }
 
         private void Update()
         {
-            if (Focus == null)
+            if (focus != null)
             {
-                Focus = Table.Instance.transform;
+                transform.position = focus.position;
+                axisHalfLength = 0.01f * (Camera.main.transform.position - transform.position).magnitude;
             }
-            transform.position = Focus.position;
-            axisHalfLength = 0.01f * (Camera.main.transform.position - transform.position).magnitude;
         }
 
         private void OnRenderObject()
         {
-            if (axisHalfLength > 0.0f)
+            if (focus)
             {
-                axisMaterial.SetPass(0);
-                GL.Begin(GL.LINES);
+                if (axisHalfLength > 0.0f)
                 {
-                    Vector3 c = focus.transform.position;
-                    GL.Vertex(new Vector3(c.x - axisHalfLength, c.y, c.z));
-                    GL.Vertex(new Vector3(c.x + axisHalfLength, c.y, c.z));
-                    GL.Vertex(new Vector3(c.x, c.y - axisHalfLength, c.z));
-                    GL.Vertex(new Vector3(c.x, c.y + axisHalfLength, c.z));
-                    GL.Vertex(new Vector3(c.x, c.y, c.z - axisHalfLength));
-                    GL.Vertex(new Vector3(c.x, c.y, c.z + axisHalfLength));
+                    axisMaterial.SetPass(0);
+                    GL.Begin(GL.LINES);
+                    {
+                        Vector3 c = focus.transform.position;
+                        GL.Vertex(new Vector3(c.x - axisHalfLength, c.y, c.z));
+                        GL.Vertex(new Vector3(c.x + axisHalfLength, c.y, c.z));
+                        GL.Vertex(new Vector3(c.x, c.y - axisHalfLength, c.z));
+                        GL.Vertex(new Vector3(c.x, c.y + axisHalfLength, c.z));
+                        GL.Vertex(new Vector3(c.x, c.y, c.z - axisHalfLength));
+                        GL.Vertex(new Vector3(c.x, c.y, c.z + axisHalfLength));
+                    }
+                    GL.End();
                 }
-                GL.End();
             }
+        }
+
+        public Transform GetFocus()
+        {
+            return focus;
+        }
+
+        public void SetFocus(Transform focus)
+        {
+            this.focus = focus;
+            gameObject.SetActive(focus != null);
         }
     }
 
@@ -172,7 +186,7 @@ namespace SEE.UI3D
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
             go.name = "RotatePivot";
             go.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
-            go.transform.position = new Vector3(0.0f, 1.0f, 0.0f);
+            go.transform.position = Table.TableTopCenterEpsilon;
 
             RotateGizmo p = go.AddComponent<RotateGizmo>();
 

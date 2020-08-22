@@ -132,7 +132,6 @@ namespace SEE.Controls
             zoomState.currentZoomFactor = 1.0f;
 
             cursor = UI3D.Cursor.Create();
-            Select(cityTransform.gameObject);
 
             Camera.main.transform.position = Table.TableTopCenterEpsilon;
             cameraState.distance = 1.0f;
@@ -145,6 +144,7 @@ namespace SEE.Controls
         private void Update()
         {
             // Input MUST NOT be inquired in FixedUpdate()!
+
             actionState.startDrag |= Input.GetMouseButtonDown(2);
             actionState.drag = Input.GetMouseButton(2);
             actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
@@ -177,17 +177,25 @@ namespace SEE.Controls
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit[] hits = Physics.RaycastAll(ray);
                 Array.Sort(hits, (h0, h1) => h0.distance.CompareTo(h1.distance));
+                bool selected = false;
                 foreach (RaycastHit hit in hits)
                 {
                     if (hit.transform.gameObject.GetComponent<GO.NodeRef>() != null)
                     {
                         Select(hit.transform.gameObject);
+                        selected = true;
                         break;
                     }
                 }
+                if (!selected)
+                {
+                    Select(null);
+                }
             }
-            cursor.transform.position = cursor.Focus.position;
-            rotateState.rotateGizmo.Center = cursor.transform.position;
+            if (cursor.GetFocus())
+            {
+                rotateState.rotateGizmo.Center = cursor.GetFocus().position;
+            }
 
             // Camera
             const float Speed = 2.0f; // TODO(torben): this is arbitrary
@@ -221,6 +229,11 @@ namespace SEE.Controls
             Ray ray = Camera.main.ScreenPointToRay(actionState.mousePosition);
             bool raycastResult = raycastPlane.Raycast(ray, out float enter);
             Vector3 planeHitPoint = ray.GetPoint(enter);
+
+            if (actionState.cancel && !movingOrRotating)
+            {
+                Select(null);
+            }
 
             #region Move
 
@@ -292,79 +305,82 @@ namespace SEE.Controls
 
             else // mode == NavigationMode.Rotate
             {
-                if (actionState.reset) // reset rotation to identity();
+                if (cursor.GetFocus())
                 {
-                    actionState.reset = false;
-                    movingOrRotating = false;
-                    rotateState.rotateGizmo.gameObject.SetActive(false);
-
-                    cityTransform.RotateAround(rotateState.rotateGizmo.Center, Vector3.up, -cityTransform.rotation.eulerAngles.y);
-                }
-                else if (actionState.cancel) // cancel rotation
-                {
-                    actionState.cancel = false;
-                    if (movingOrRotating)
+                    if (actionState.reset) // reset rotation to identity();
                     {
+                        actionState.reset = false;
                         movingOrRotating = false;
                         rotateState.rotateGizmo.gameObject.SetActive(false);
 
-                        cityTransform.rotation = Quaternion.Euler(0.0f, rotateState.originalEulerAngleY, 0.0f);
-                        cityTransform.position = rotateState.originalPosition;
+                        cityTransform.RotateAround(rotateState.rotateGizmo.Center, Vector3.up, -cityTransform.rotation.eulerAngles.y);
                     }
-                }
-                else if (actionState.drag) // start or continue rotation
-                {
-                    if (raycastResult)
+                    else if (actionState.cancel) // cancel rotation
                     {
-                        Vector2 toHit = new Vector2(planeHitPoint.x - rotateState.rotateGizmo.Center.x, planeHitPoint.z - rotateState.rotateGizmo.Center.z);
-                        float toHitAngle = toHit.Angle360();
-
-                        if (actionState.startDrag) // start rotation
+                        actionState.cancel = false;
+                        if (movingOrRotating)
                         {
-                            actionState.startDrag = false;
-                            movingOrRotating = true;
-                            rotateState.rotateGizmo.gameObject.SetActive(true);
+                            movingOrRotating = false;
+                            rotateState.rotateGizmo.gameObject.SetActive(false);
 
-                            rotateState.originalEulerAngleY = cityTransform.rotation.eulerAngles.y;
-                            rotateState.originalPosition = cityTransform.position;
-                            rotateState.startAngle = AngleMod(cityTransform.rotation.eulerAngles.y - toHitAngle);
-                            rotateState.rotateGizmo.SetMinAngle(Mathf.Deg2Rad * toHitAngle);
-                            rotateState.rotateGizmo.SetMaxAngle(Mathf.Deg2Rad * toHitAngle);
-                        }
-
-                        if (movingOrRotating) // continue rotation
-                        {
-                            float angle = AngleMod(rotateState.startAngle + toHitAngle);
-                            if (actionState.snap)
-                            {
-                                angle = AngleMod(Mathf.Round(angle / RotateState.SnapStepAngle) * RotateState.SnapStepAngle);
-                            }
-                            cityTransform.RotateAround(cursor.Focus.position, Vector3.up, angle - cityTransform.rotation.eulerAngles.y);
-
-                            float prevAngle = Mathf.Rad2Deg * rotateState.rotateGizmo.GetMaxAngle();
-                            float currAngle = toHitAngle;
-
-                            while (Mathf.Abs(currAngle + 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
-                            {
-                                currAngle += 360.0f;
-                            }
-                            while (Mathf.Abs(currAngle - 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
-                            {
-                                currAngle -= 360.0f;
-                            }
-                            if (actionState.snap)
-                            {
-                                currAngle = Mathf.Round((currAngle + rotateState.startAngle) / (RotateState.SnapStepAngle)) * (RotateState.SnapStepAngle) - rotateState.startAngle;
-                            }
-
-                            rotateState.rotateGizmo.SetMaxAngle(Mathf.Deg2Rad * currAngle);
+                            cityTransform.rotation = Quaternion.Euler(0.0f, rotateState.originalEulerAngleY, 0.0f);
+                            cityTransform.position = rotateState.originalPosition;
                         }
                     }
-                }
-                else if (movingOrRotating) // finalize rotation
-                {
-                    movingOrRotating = false;
-                    rotateState.rotateGizmo.gameObject.SetActive(false);
+                    else if (actionState.drag) // start or continue rotation
+                    {
+                        if (raycastResult)
+                        {
+                            Vector2 toHit = new Vector2(planeHitPoint.x - rotateState.rotateGizmo.Center.x, planeHitPoint.z - rotateState.rotateGizmo.Center.z);
+                            float toHitAngle = toHit.Angle360();
+
+                            if (actionState.startDrag) // start rotation
+                            {
+                                actionState.startDrag = false;
+                                movingOrRotating = true;
+                                rotateState.rotateGizmo.gameObject.SetActive(true);
+
+                                rotateState.originalEulerAngleY = cityTransform.rotation.eulerAngles.y;
+                                rotateState.originalPosition = cityTransform.position;
+                                rotateState.startAngle = AngleMod(cityTransform.rotation.eulerAngles.y - toHitAngle);
+                                rotateState.rotateGizmo.SetMinAngle(Mathf.Deg2Rad * toHitAngle);
+                                rotateState.rotateGizmo.SetMaxAngle(Mathf.Deg2Rad * toHitAngle);
+                            }
+
+                            if (movingOrRotating) // continue rotation
+                            {
+                                float angle = AngleMod(rotateState.startAngle + toHitAngle);
+                                if (actionState.snap)
+                                {
+                                    angle = AngleMod(Mathf.Round(angle / RotateState.SnapStepAngle) * RotateState.SnapStepAngle);
+                                }
+                                cityTransform.RotateAround(cursor.GetFocus().position, Vector3.up, angle - cityTransform.rotation.eulerAngles.y);
+
+                                float prevAngle = Mathf.Rad2Deg * rotateState.rotateGizmo.GetMaxAngle();
+                                float currAngle = toHitAngle;
+
+                                while (Mathf.Abs(currAngle + 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
+                                {
+                                    currAngle += 360.0f;
+                                }
+                                while (Mathf.Abs(currAngle - 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
+                                {
+                                    currAngle -= 360.0f;
+                                }
+                                if (actionState.snap)
+                                {
+                                    currAngle = Mathf.Round((currAngle + rotateState.startAngle) / (RotateState.SnapStepAngle)) * (RotateState.SnapStepAngle) - rotateState.startAngle;
+                                }
+
+                                rotateState.rotateGizmo.SetMaxAngle(Mathf.Deg2Rad * currAngle);
+                            }
+                        }
+                    }
+                    else if (movingOrRotating) // finalize rotation
+                    {
+                        movingOrRotating = false;
+                        rotateState.rotateGizmo.gameObject.SetActive(false);
+                    }
                 }
             }
 
@@ -375,9 +391,9 @@ namespace SEE.Controls
             if (actionState.zoomToggleToObject)
             {
                 actionState.zoomToggleToObject = false;
-                if (cursor.Focus != null)
+                if (cursor.GetFocus() != null)
                 {
-                    float optimalZoomFactor = Table.MinDimXZ / (cursor.Focus.lossyScale.x / zoomState.currentZoomFactor);
+                    float optimalZoomFactor = Table.MinDimXZ / (cursor.GetFocus().lossyScale.x / zoomState.currentZoomFactor);
                     float optimalZoomSteps = ConvertZoomFactorToZoomSteps(optimalZoomFactor);
                     int flooredZoomSteps = Mathf.FloorToInt(optimalZoomSteps);
                     int zoomSteps = flooredZoomSteps - (int)zoomState.currentTargetZoomSteps;
@@ -501,22 +517,38 @@ namespace SEE.Controls
 
         private void Select(GameObject go)
         {
-            if (go != null)
+            Transform oldT = cursor.GetFocus();
+            Transform newT = go ? go.transform : null;
+            bool updateServer = false;
+
+            if (oldT != newT)
             {
-                Outline outline = go.GetComponent<Outline>();
-                if (outline == null)
+                if (oldT)
                 {
-                    HoverableObject oldGO = cursor.Focus ? cursor.Focus.GetComponent<HoverableObject>() : null;
-                    HoverableObject newGO = go ? go.GetComponent<HoverableObject>() : null;
-
-                    cursor.Focus = go.transform;
-                    outline = go.AddComponent<Outline>();
-                    outline.OutlineMode = Outline.Mode.OutlineAll;
-                    outline.OutlineColor = UI3D.UI3DProperties.DefaultColor;
-                    outline.OutlineWidth = 4.0f;
-
-                    new Net.SelectionAction(oldGO, newGO).Execute();
+                    Outline outline = oldT.GetComponent<Outline>();
+                    if (outline)
+                    {
+                        updateServer = true;
+                        Destroy(outline);
+                        cursor.SetFocus(null);
+                    }
                 }
+                if (newT)
+                {
+                    if (newT.GetComponent<Outline>() == null)
+                    {
+                        updateServer = true;
+                        Outline.Create(newT.gameObject);
+                        cursor.SetFocus(newT);
+                    }
+                }
+            }
+
+            if (updateServer)
+            {
+                HoverableObject oldH = oldT ? oldT.GetComponent<HoverableObject>() : null;
+                HoverableObject newH = newT ? newT.GetComponent<HoverableObject>() : null;
+                new Net.SelectionAction(oldH, newH).Execute();
             }
         }
     }

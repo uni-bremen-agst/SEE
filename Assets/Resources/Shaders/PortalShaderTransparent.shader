@@ -3,19 +3,17 @@
 	Properties
 	{
 		_Color("Color", Color) = (1, 1, 1, 1)
-		_Glossiness("Smoothness", Range(0, 1)) = 0.5
+		_Smoothness("Smoothness", Range(0, 1)) = 0.5
 		_Metallic("Metallic", Range(0, 1)) = 0.0
-		_Cutoff("Cutoff", Range(0, 1)) = 0.5
 	}
-		SubShader
+
+	SubShader
 	{
-		Tags { "Queue" = "Transparent" "RenderType" = "Transparent" "ForceNoShadowCasting" = "True" }
-		LOD 200
+		Tags { "Queue" = "Transparent" "RenderType" = "Transparent" "ForceNoShadowCasting" = "False" }
 
 		CGPROGRAM
 
-		//#pragma surface surf Standard fullforwardshadows alphatest:_Cutoff addshadow
-		#pragma surface surf Standard fullforwardshadows alpha:blend addshadow
+		#pragma surface main Standard alpha:blend
 		#pragma target 3.0
 
 		uniform float2 portalMin;
@@ -24,14 +22,13 @@
 		struct Input
 		{
 			float3 worldPos;
-			float2 uv_MainTex;
 		};
 
-		half _Glossiness;
+		half _Smoothness;
 		half _Metallic;
 		fixed4 _Color;
 
-		void surf(Input IN, inout SurfaceOutputStandard o)
+		void main(Input IN, inout SurfaceOutputStandard o)
 		{
 			fixed4 c = _Color;
 			if (IN.worldPos.x < portalMin.x || IN.worldPos.z < portalMin.y ||
@@ -40,12 +37,13 @@
 			{
 				c = _Color.a = 0.0f;
 			}
+
 			o.Albedo = c.rgb;
 			o.Metallic = _Metallic;
-			o.Smoothness = _Glossiness;
+			o.Smoothness = _Smoothness;
 			o.Alpha = c.a;
 		}
 		ENDCG
 	}
-		FallBack "Diffuse"
+	FallBack "Diffuse"
 }

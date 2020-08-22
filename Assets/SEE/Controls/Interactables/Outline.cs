@@ -8,6 +8,9 @@
 // https://assetstore.unity.com/packages/tools/particles-effects/quick-outline-115488
 //
 
+using SEE.DataModel;
+using SEE.GO;
+using SEE.UI3D;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -91,6 +94,40 @@ namespace SEE.Controls
         private Material outlineFillMaterial;
 
         private bool needsUpdate;
+
+        public static Outline Create(GameObject go, bool primaryColor = true)
+        {
+            Outline outline = go.AddComponent<Outline>();
+            outline.OutlineMode = Mode.OutlineAll;
+            outline.OutlineColor = primaryColor ? UI3DProperties.DefaultColor : UI3DProperties.DefaultColorSecondary;
+            outline.OutlineWidth = 4.0f;
+
+            NodeRef nodeRef = go.GetComponent<NodeRef>();
+            if (nodeRef && nodeRef.node != null)
+            {
+                Node node = nodeRef.node;
+                Graph graph = node.ItsGraph;
+                int maxDepth = graph.GetMaxDepth();
+
+                int inverseRenderQueueOffset = node.Level;
+                if (nodeRef.node.Type.Equals("Directory"))
+                {
+                    inverseRenderQueueOffset += maxDepth;
+                }
+                int renderQueueOffset = 2 * maxDepth - inverseRenderQueueOffset;
+
+                outline.outlineMaskMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset;
+                outline.outlineFillMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset + 1;
+            }
+#if UNITY_EDITOR
+            else
+            {
+                Debug.LogWarning("Outline could not be created for '" + go.name + "'! The NodeRef seems to not be set.");
+            }
+#endif
+
+            return outline;
+        }
 
         void Awake()
         {

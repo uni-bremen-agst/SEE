@@ -1,7 +1,4 @@
-﻿//#define SEE_MANUAL_RENDERING
-//#define SEE_RENDER_BACKFACES
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -93,93 +90,8 @@ namespace SEE.Game
             }
 
             Materials.SetGlobalUniforms();
-            UpdateMaterialProperties(gameObject);
 
-#if SEE_MANUAL_RENDERING
-
-            if (transform.childCount != 0)
-            {
-                DisableAllMeshRenderersOfNodes(gameObject);
-
-                // Prepare all directories
-                Transform rootTransform = transform.GetChild(0);
-                int maxDirLevel = GetMaxDirectoryLevel(rootTransform);
-
-                RenderCommand rootCommand;
-                rootCommand.transform = rootTransform;
-                rootCommand.mesh = rootTransform.GetComponent<MeshFilter>().mesh;
-                rootCommand.material = rootTransform.GetComponent<MeshRenderer>().material;
-
-                List<RenderCommand[]> dirCommandsList = new List<RenderCommand[]>(maxDirLevel)
-                {
-                    new RenderCommand[1] { rootCommand }
-                };
-
-                Color rootColor = rootCommand.material.GetColor("_Color");
-                rootColor.a = 0.5f;
-                rootCommand.material.SetColor("_Color", rootColor);
-
-                for (int i = 1; i < maxDirLevel; i++)
-                {
-                    List<RenderCommand> commands = new List<RenderCommand>();
-                    foreach (RenderCommand lastDir in dirCommandsList[i - 1])
-                    {
-                        Transform lastDirTransform = lastDir.transform;
-                        for (int j = 0; j < lastDirTransform.childCount; j++)
-                        {
-                            Transform dirTransform = lastDirTransform.GetChild(j);
-                            NodeRef nodeRef = dirTransform.GetComponent<NodeRef>();
-                            if (nodeRef != null && nodeRef.node != null && nodeRef.node.Type.Equals("Directory"))
-                            {
-                                RenderCommand command;
-                                command.transform = dirTransform;
-                                command.mesh = dirTransform.GetComponent<MeshFilter>().mesh;
-                                command.material = dirTransform.GetComponent<MeshRenderer>().material;
-
-                                Color color = command.material.GetColor("_Color");
-                                color.a = 0.5f;
-                                command.material.SetColor("_Color", color);
-
-                                commands.Add(command);
-                            }
-                        }
-                    }
-                    dirCommandsList.Add(commands.ToArray());
-                }
-                dirCommands = dirCommandsList.ToArray();
-
-                // Prepare all files
-                List<RenderCommand> fileCommandsList = new List<RenderCommand>();
-                List<short> fileIndicesList = new List<short>();
-
-                NodeRef[] nodeRefs = FindObjectsOfType<NodeRef>();
-
-                for (int i = 0; i < nodeRefs.Length; i++)
-                {
-                    NodeRef nodeRef = nodeRefs[i];
-                    if (nodeRef.node != null && nodeRef.node.Type.Equals("File"))
-                    {
-                        UnityEngine.Assertions.Assert.IsTrue(i <= short.MaxValue);
-                        fileIndicesList.Add((short)fileIndicesList.Count);
-
-                        RenderCommand command;
-                        command.transform = nodeRef.transform;
-                        command.mesh = nodeRef.GetComponent<MeshFilter>().mesh;
-                        command.material = nodeRef.GetComponent<MeshRenderer>().material;
-
-                        Color color = command.material.GetColor("_Color");
-                        color.a = 0.5f;
-                        command.material.SetColor("_Color", color);
-
-                        fileCommandsList.Add(command);
-                    }
-                }
-                fileCommands = fileCommandsList.ToArray();
-                fileIndices = fileIndicesList.ToArray();
-
-                lastMaterial = null;
-            }
-#else
+#if true
             foreach (NodeRef nodeRef in FindObjectsOfType<NodeRef>())
             {
                 Material material = nodeRef.gameObject.GetComponent<MeshRenderer>().material;
@@ -189,114 +101,6 @@ namespace SEE.Game
             }
 #endif
         }
-
-#if SEE_MANUAL_RENDERING
-
-        private struct RenderCommand
-        {
-            internal Transform transform;
-            internal Mesh mesh;
-            internal Material material;
-        }
-
-        private RenderCommand[][] dirCommands;
-        private short[] fileIndices;
-        private RenderCommand[] fileCommands;
-        private Material lastMaterial;
-
-        private void OnRenderObject()
-        {
-            if (transform.childCount != 0)
-            {
-                // Render all directories
-                for (int i = 0; i < dirCommands.Length; i++)
-                {
-                    RenderCommand[] dirComms = dirCommands[i];
-
-                    for (int j = 0; j < dirComms.Length; j++)
-                    {
-                        if (dirComms[j].material != lastMaterial)
-                        {
-                            lastMaterial = dirComms[j].material;
-                            dirComms[j].material.SetPass(0);
-                        }
-                        Graphics.DrawMeshNow(dirComms[j].mesh, dirComms[j].transform.localToWorldMatrix);
-                    }
-                }
-
-                // Render all files
-                Vector3 cameraPosition = Camera.main.transform.position;
-                int CompareRenderCommandIndices(short i0, short i1)
-                {
-                    return (fileCommands[i1].transform.position - cameraPosition).sqrMagnitude.CompareTo((fileCommands[i0].transform.position - cameraPosition).sqrMagnitude);
-                }
-                Array.Sort(fileIndices, CompareRenderCommandIndices);
-                for (int i = 0; i < fileIndices.Length; i++)
-                {
-#if SEE_RENDER_BACKFACES
-                    fileRenderCommands[fileRenderCommandIndices[i]].material.SetPass(0);
-                    fileRenderCommands[fileRenderCommandIndices[i]].material.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Front);
-                    Graphics.DrawMeshNow(fileRenderCommands[fileRenderCommandIndices[i]].mesh, fileRenderCommands[fileRenderCommandIndices[i]].transform.localToWorldMatrix);
-                    fileRenderCommands[fileRenderCommandIndices[i]].material.SetPass(0);
-                    fileRenderCommands[fileRenderCommandIndices[i]].material.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Back);
-                    Graphics.DrawMeshNow(fileRenderCommands[fileRenderCommandIndices[i]].mesh, fileRenderCommands[fileRenderCommandIndices[i]].transform.localToWorldMatrix);
-#else
-                    if (fileCommands[fileIndices[i]].material != lastMaterial)
-                    {
-                        lastMaterial = fileCommands[fileIndices[i]].material;
-                        fileCommands[fileIndices[i]].material.SetPass(0);
-                    }
-                    Graphics.DrawMeshNow(fileCommands[fileIndices[i]].mesh, fileCommands[fileIndices[i]].transform.localToWorldMatrix);
-#endif
-                }
-
-                lastMaterial = null;
-            }
-
-            // TODO(torben): if this solution is desired, the UI3D-elements must be rendered AFTER all of this!
-        }
-
-        private void DisableAllMeshRenderersOfNodes(GameObject go)
-        {
-            if (go.tag.Equals(Tags.Node))
-            {
-                NodeRef nodeRef = go.GetComponent<NodeRef>();
-                if (nodeRef != null)
-                {
-                    MeshRenderer meshRenderer = go.GetComponent<MeshRenderer>();
-                    if (meshRenderer)
-                    {
-                        meshRenderer.enabled = false;
-                    }
-                }
-            }
-            for (int i = 0; i < go.transform.childCount; i++)
-            {
-                DisableAllMeshRenderersOfNodes(go.transform.GetChild(i).gameObject);
-            }
-        }
-
-        private int GetMaxDirectoryLevel(Transform t)
-        {
-            int maxLevel = 0;
-
-            NodeRef nodeRef = t.GetComponent<NodeRef>();
-            if (nodeRef != null)
-            {
-                for (int i = 0; i < t.childCount; i++)
-                {
-                    int level = 1 + GetMaxDirectoryLevel(t.GetChild(i));
-                    if (level > maxLevel)
-                    {
-                        maxLevel = level;
-                    }
-                }
-            }
-
-            return maxLevel;
-        }
-
-#endif
 
         /// <summary>
         /// Sets all NodeRefs for this city to the nodes they correspond to.
@@ -321,19 +125,6 @@ namespace SEE.Game
                     }
                 }
                 SetNodeRefs(graph, child);
-            }
-        }
-
-        protected void UpdateMaterialProperties(GameObject parent)
-        {
-            foreach (Transform childTransform in parent.transform)
-            {
-                GameObject child = childTransform.gameObject;
-                if (child.tag.Equals(Tags.Node))
-                {
-                    Materials.SetProperties(child.GetComponent<MeshRenderer>().material);
-                }
-                UpdateMaterialProperties(child);
             }
         }
 

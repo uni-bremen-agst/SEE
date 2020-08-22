@@ -68,7 +68,7 @@ namespace SEE.Net
 
             foreach (uint id in selectedGameObjectIDs)
             {
-                ((HoverableObject)InteractableObject.Get(id)).Hovered(false);
+                Outline.Create(InteractableObject.Get(id).gameObject);
             }
             return true;
         }
