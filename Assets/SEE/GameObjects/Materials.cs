@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -28,7 +29,9 @@ namespace SEE.GO
         public Materials(int numberOfColors, Color lower, Color higher)
         {
             NumberOfMaterials = numberOfColors;
-            materials = Init(numberOfColors, lower, higher);
+            Lower = lower;
+            Higher = higher;
+            materials = new List<Material[]>() { Init(numberOfColors, lower, higher, 0) };
         }
 
         /// <summary>
@@ -38,10 +41,20 @@ namespace SEE.GO
         public readonly int NumberOfMaterials;
 
         /// <summary>
+        /// The color at the lower end of the color spectrum.
+        /// </summary>
+        public readonly Color Lower;
+
+        /// <summary>
+        /// The color at the higher end of the color spectrum.
+        /// </summary>
+        public readonly Color Higher;
+
+        /// <summary>
         /// The different materials. They are all alike except for the color.
         /// We will use a color gradient and one material for each color.
         /// </summary>
-        private readonly Material[] materials;
+        private readonly List<Material[]> materials;
 
         /// <summary>
         /// Returns the default material for the given <paramref name="degree"/> (always the identical 
@@ -50,15 +63,24 @@ namespace SEE.GO
         /// 
         /// Precondition: 0 <= degree <= numberOfColors-1; otherwise an exception is thrown
         /// </summary>
+        /// <param name="renderQueueOffset">The offset of the render queue for rendering.
+        /// The larger the offset, the later the object will be rendered.</param>
         /// <param name="degree">index of the material (color) in the range [0, numberOfColors-1]</param>
         /// <returns>default material</returns>
-        public Material DefaultMaterial(int degree = 0)
+        public Material DefaultMaterial(int renderQueueOffset, int degree)
         {
             if (degree < 0 || degree >= NumberOfMaterials)
             {
                 throw new Exception("Color degree " + degree + " out of range [0," + (NumberOfMaterials - 1) + "]");
             }
-            return materials[degree];
+            if (renderQueueOffset >= materials.Count)
+            {
+                for (int i = materials.Count; i <= renderQueueOffset; i++)
+                {
+                    materials.Add(Init(NumberOfMaterials, Lower, Higher, i));
+                }
+            }
+            return materials[renderQueueOffset][degree];
         }
 
         /// <summary>
@@ -69,7 +91,7 @@ namespace SEE.GO
         public static Material NewMaterial(Color color)
         {
             Shader shader = Shader.Find(ShaderName);
-            return NewMaterial(shader, color);
+            return NewMaterial(shader, color, 0);
         }
 
         public static void SetGlobalUniforms()
@@ -78,6 +100,7 @@ namespace SEE.GO
             Shader.SetGlobalVector("portalMax", new Vector4(Table.MaxX, Table.MaxZ));
         }
 
+        // TODO(torben): make sure this can be removed by specifying these in the shader of this material
         public static void SetProperties(Material material)
         {
             Assert.IsNotNull(material);
@@ -95,9 +118,10 @@ namespace SEE.GO
         /// </summary>
         /// <param name="numberOfColors">the number of materials with different colors to be created</param>
         /// <param name="lower">the color at the lower end of the color spectrum</param>
-        /// <param name="higher">the color at the higher end of the color spectrum</param>       
+        /// <param name="higher">the color at the higher end of the color spectrum</param>
+        /// <param name="renderQueueOffset">the offset of the render queue</param>
         /// <returns>materials</returns>
-        private static Material[] Init(int numberOfColors, Color lower, Color higher)
+        private static Material[] Init(int numberOfColors, Color lower, Color higher, int renderQueueOffset)
         {
             if (numberOfColors < 1)
             {
@@ -112,13 +136,13 @@ namespace SEE.GO
 
             if (numberOfColors == 1)
             {
-                result[0] = NewMaterial(shader, lower);
+                result[0] = NewMaterial(shader, lower, renderQueueOffset);
             }
             else
             {
                 for (int i = 0; i < result.Length; i++)
                 {
-                    result[i] = NewMaterial(shader, Color.Lerp(lower, higher, (float)i / (float)(numberOfColors - 1)));
+                    result[i] = NewMaterial(shader, Color.Lerp(lower, higher, (float)i / (float)(numberOfColors - 1)), renderQueueOffset);
                 }
             }
             return result;
@@ -130,12 +154,14 @@ namespace SEE.GO
         /// </summary>
         /// <param name="shader">shader to be used to create the material</param>
         /// <param name="color">requested color of the new material</param>
+        /// <param name="renderQueueOffset">the offset of the render queue</param>
         /// <returns>new material</returns>
-        private static Material NewMaterial(Shader shader, Color color)
+        private static Material NewMaterial(Shader shader, Color color, int renderQueueOffset)
         {
             Material material = new Material(shader);
             SetProperties(material);
             material.color = color;
+            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + renderQueueOffset;
             return material;
         }
     }

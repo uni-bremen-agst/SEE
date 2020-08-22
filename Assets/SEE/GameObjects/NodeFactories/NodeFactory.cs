@@ -34,7 +34,11 @@ namespace SEE.GO
         /// <param name="style">specifies an additional visual style parameter of 
         /// the object</param>
         /// <returns>new block representation</returns>
-        public abstract GameObject NewBlock(int style = 0);
+        /// <param name="level">specifies the level of the node inside of it's
+        /// graph. This parameter will be used in case of transparency rendering,
+        /// where the inner nodes must be rendered before the leafes to ensure
+        /// correct sorting.</param>
+        public abstract GameObject NewBlock(int style = 0, int level = 0);
 
         /// <summary>
         /// The number of styles offered. A style index must be in the range

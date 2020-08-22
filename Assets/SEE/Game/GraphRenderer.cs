@@ -694,7 +694,7 @@ namespace SEE.Game
         /// <returns>game object representing given <paramref name="node"/></returns>
         public GameObject NewLeafNode(Node node)
         {
-            GameObject block = leafNodeFactory.NewBlock(SelectStyle(node));
+            GameObject block = leafNodeFactory.NewBlock(SelectStyle(node), node.ItsGraph.GetMaxDepth() + node.Level);
             block.name = node.ID;
             AttachNode(block, node);
             AdjustScaleOfLeaf(block);
@@ -966,7 +966,7 @@ namespace SEE.Game
         /// <returns>new game object for the inner node</returns>
         public GameObject NewInnerNode(Node node)
         {
-            GameObject innerGameObject = innerNodeFactory.NewBlock();
+            GameObject innerGameObject = innerNodeFactory.NewBlock(0, node.Level);
             innerGameObject.name = node.ID;
             innerGameObject.tag = Tags.Node;
             AttachNode(innerGameObject, node);

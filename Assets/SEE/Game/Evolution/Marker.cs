@@ -58,7 +58,7 @@ namespace SEE.Game.Evolution
             // Object should not cast shadows: too expensive and may hide information,
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
-            renderer.sharedMaterial = material.DefaultMaterial();
+            renderer.sharedMaterial = material.DefaultMaterial(0, 0);
             Vector3 position = graphRenderer.GetRoof(block);
             position.y += postScale.y / 2.0f;
             post.transform.position = position;

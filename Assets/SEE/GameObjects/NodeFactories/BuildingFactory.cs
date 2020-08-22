@@ -153,7 +153,7 @@ namespace SEE.GO
         /// </summary>
         private const bool createDifferentBuildingTypes = true;
 
-        public override GameObject NewBlock(int style = 0)
+        public override GameObject NewBlock(int style = 0, int level = 0)
         {
             if (createDifferentBuildingTypes)
             {
