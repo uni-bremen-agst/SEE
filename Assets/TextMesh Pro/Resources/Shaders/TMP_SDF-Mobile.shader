@@ -82,6 +82,9 @@ SubShader {
 
 	Pass {
 		CGPROGRAM
+
+		#define SEE_TEXT_FACING_CAMERA
+
 		#pragma vertex VertShader
 		#pragma fragment PixShader
 		#pragma shader_feature __ OUTLINE_ON
@@ -146,6 +149,10 @@ SubShader {
 			float scale = rsqrt(dot(pixelSize, pixelSize));
 			scale *= abs(input.texcoord1.y) * _GradientScale * (_Sharpness + 1);
 			if(UNITY_MATRIX_P[3][3] == 0) scale = lerp(abs(scale) * (1 - _PerspectiveFilter), scale, abs(dot(UnityObjectToWorldNormal(input.normal.xyz), normalize(WorldSpaceViewDir(vert)))));
+
+#ifdef SEE_TEXT_FACING_CAMERA
+			vPosition = mul(UNITY_MATRIX_P, float4(UnityObjectToViewPos(float3(0.0, 0.0, 0.0)), 1.0) + float4(input.vertex.x, input.vertex.y, 0.0, 0.0) * float4(_ScaleX, _ScaleY, 1.0, 1.0));
+#endif
 
 			float weight = lerp(_WeightNormal, _WeightBold, bold) / 4.0;
 			weight = (weight + _FaceDilate) * _ScaleRatioA * 0.5;
