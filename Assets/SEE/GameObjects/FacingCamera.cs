@@ -6,6 +6,7 @@ namespace SEE.GO
     /// Rotates the game object this component is attachted to so that it always looks 
     /// to the main camera such that it can be seen from all angles.
     /// </summary>
+    [System.Obsolete("This functionality is now realised inside the TMP_SDF-Mobile.shader. Look for the SEE_TEXT_FACING_CAMERA define.")]
     public class FacingCamera : MonoBehaviour
     {
         // The time in seconds until the game object is updated again.
