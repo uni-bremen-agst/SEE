@@ -73,17 +73,18 @@ namespace SEE.Net
 
             if (oldHoverableObject)
             {
-                UnityEngine.Object.Destroy(oldHoverableObject.GetComponent<Outline>());
+                Outline outline = oldHoverableObject.GetComponent<Outline>();
+                if (outline)
+                {
+                    UnityEngine.Object.Destroy(outline);
+                }
             }
 
             if (newHoverableObject)
             {
                 if (newHoverableObject.GetComponent<Outline>() == null)
                 {
-                    Outline outline = newHoverableObject.gameObject.AddComponent<Outline>();
-                    outline.OutlineMode = Outline.Mode.OutlineAll;
-                    outline.OutlineColor = UI3D.UI3DProperties.DefaultColorSecondary;
-                    outline.OutlineWidth = 4.0f;
+                    Outline.Create(newHoverableObject.gameObject, false);
                 }
             }
 
@@ -92,22 +93,26 @@ namespace SEE.Net
 
         protected override bool UndoOnServer()
         {
-            throw new System.NotImplementedException();
+            Utils.Assertions.InvalidCodePath();
+            return false;
         }
 
         protected override bool UndoOnClient()
         {
-            throw new System.NotImplementedException();
+            Utils.Assertions.InvalidCodePath();
+            return false;
         }
 
         protected override bool RedoOnServer()
         {
-            throw new System.NotImplementedException();
+            Utils.Assertions.InvalidCodePath();
+            return false;
         }
 
         protected override bool RedoOnClient()
         {
-            throw new System.NotImplementedException();
+            Utils.Assertions.InvalidCodePath();
+            return false;
         }
     }
 

@@ -17,7 +17,6 @@ namespace SEE.GO
         /// </summary>
         //private const string ShaderName = "Custom/PortalShader";
         private const string ShaderName = "Custom/PortalShaderTransparent";
-        //private const string ShaderName = "Custom/PortalShaderTransparentWithBackFaces";
 
         /// <summary>
         /// Creates default numberOfColors materials in the color range from
@@ -100,19 +99,6 @@ namespace SEE.GO
             Shader.SetGlobalVector("portalMax", new Vector4(Table.MaxX, Table.MaxZ));
         }
 
-        // TODO(torben): make sure this can be removed by specifying these in the shader of this material
-        public static void SetProperties(Material material)
-        {
-            Assert.IsNotNull(material);
-            Assert.IsTrue(material.shader.name.Equals(ShaderName));
-
-            // TODO(torben): we could potentially write a custom surface shader, so we
-            // wouldn't have to set these and possibly get more performance out of it...
-            material.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
-            material.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
-            material.SetFloat("_SpecularHighlights", 0.0f);
-        }
-
         /// <summary>
         /// Creates and returns the materials, one for each different color.
         /// </summary>
@@ -159,9 +145,8 @@ namespace SEE.GO
         private static Material NewMaterial(Shader shader, Color color, int renderQueueOffset)
         {
             Material material = new Material(shader);
-            SetProperties(material);
-            material.color = color;
             material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + renderQueueOffset;
+            material.color = color;
             return material;
         }
     }
