@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SEE.GO;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -41,6 +42,13 @@ namespace SEE.Controls
                 float result = t * (float)TargetZoomSteps;
                 return result;
             }
+        }
+
+        private struct GrabState
+        {
+            internal Transform transform;        // The transform of the grabbed object or null, if no object is currently grabbed
+            internal Vector3 startPlaneHitPoint; // The point, where the screen raycast hit the table when the grabbing of the object began
+            internal Vector3 offset;             // The offset between 'startPlaneHitPoint' and 'transform'
         }
 
         private struct MoveState
@@ -91,12 +99,13 @@ namespace SEE.Controls
 
         private struct ActionState
         {
-            internal bool startDrag;
-            internal bool drag;
+            internal bool toggleGrab;        // grab element of city
+            internal bool startDrag;         // drag entire city
+            internal bool drag;              // drag entire city
             internal bool cancel;
             internal bool snap;
             internal bool reset;
-            internal Vector3 mousePosition; // TODO(torben): this needs to be abstracted for other modalities
+            internal Vector3 mousePosition;  // TODO(torben): this needs to be abstracted for other modalities
             internal float zoomStepsDelta;
             internal bool zoomToggleToObject;
         }
@@ -110,6 +119,7 @@ namespace SEE.Controls
         private bool movingOrRotating;
         private UI3D.Cursor cursor;
 
+        GrabState grabState;
         MoveState moveState;
         RotateState rotateState;
         ZoomState zoomState;
@@ -145,13 +155,14 @@ namespace SEE.Controls
 
         private void Update()
         {
-            // Input MUST NOT be inquired in FixedUpdate()!
+            // Note: Input MUST NOT be inquired in FixedUpdate() for the input to feel responsive!
 
+            actionState.toggleGrab |= Input.GetKeyDown(KeyCode.G);
             actionState.startDrag |= Input.GetMouseButtonDown(2);
             actionState.drag = Input.GetMouseButton(2);
             actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
             actionState.snap = Input.GetKey(KeyCode.LeftAlt);
-            actionState.reset |= Input.GetKey(KeyCode.R);
+            actionState.reset |= Input.GetKeyDown(KeyCode.R);
             actionState.mousePosition = Input.mousePosition;
             if (!actionState.drag)
             {
@@ -182,7 +193,7 @@ namespace SEE.Controls
                 bool selected = false;
                 foreach (RaycastHit hit in hits)
                 {
-                    if (hit.transform.gameObject.GetComponent<GO.NodeRef>() != null)
+                    if (hit.transform.gameObject.GetComponent<NodeRef>() != null)
                     {
                         Select(hit.transform.gameObject);
                         selected = true;
@@ -237,9 +248,73 @@ namespace SEE.Controls
                 Select(null);
             }
 
-            #region Move
+            #region Grab Part Of City
 
-            if (mode == NavigationMode.Move)
+            if (actionState.toggleGrab)
+            {
+                actionState.toggleGrab = false;
+
+                if (grabState.transform == null)
+                {
+                    RaycastHit[] raycastHits = Physics.RaycastAll(ray);
+                    int compareRaycastHits(RaycastHit h0, RaycastHit h1)
+                    {
+                        return h0.distance.CompareTo(h1.distance);
+                    };
+                    Array.Sort(raycastHits, compareRaycastHits);
+                    NodeRef nodeRef = null;
+                    foreach (RaycastHit raycastHit in raycastHits)
+                    {
+                        nodeRef = raycastHit.transform.GetComponent<NodeRef>();
+                        if (nodeRef != null && nodeRef.node != null)
+                        {
+                            CollisionEventHandler collisionEventHandler = raycastHit.transform.gameObject.AddComponent<CollisionEventHandler>();
+                            collisionEventHandler.onCollisionEnter += OnGrabbedObjectCollisionEnter;
+                            collisionEventHandler.onCollisionExit += OnGrabbedObjectCollisionExit;
+                            collisionEventHandler.onCollisionStay += OnGrabbedObjectCollisionStay;
+                            collisionEventHandler.onTriggerEnter += OnGrabbedObjectTriggerEnter;
+                            collisionEventHandler.onTriggerExit += OnGrabbedObjectTriggerExit;
+                            collisionEventHandler.onTriggerStay += OnGrabbedObjectTriggerStay;
+
+                            grabState.transform = raycastHit.transform;
+                            grabState.startPlaneHitPoint = planeHitPoint;
+                            grabState.offset = raycastHit.transform.position - planeHitPoint;
+                            break;
+                        }
+                    }
+                    actionState.toggleGrab = false;
+                    OnStartGrabbing(grabState.transform);
+                }
+                else
+                {
+                    Transform tf = grabState.transform;
+                    Destroy(grabState.transform.GetComponent<CollisionEventHandler>());
+                    grabState.transform = null;
+                    OnFinalizeGrabbing(tf);
+                }
+            }
+            else if (grabState.transform != null)
+            {
+                if (actionState.cancel)
+                {
+                    actionState.cancel = false;
+                    grabState.transform.position = grabState.startPlaneHitPoint + grabState.offset;
+                    Destroy(grabState.transform.GetComponent<CollisionEventHandler>());
+                    Transform tf = grabState.transform;
+                    grabState.transform = null;
+                    OnCancelGrabbing(tf);
+                }
+                else
+                {
+                    grabState.transform.position = planeHitPoint + grabState.offset;
+                }
+            }
+
+            #endregion
+
+            #region Move City
+
+            else if (mode == NavigationMode.Move)
             {
                 if (actionState.reset) // reset to center of table
                 {
@@ -575,5 +650,93 @@ namespace SEE.Controls
                 new Net.SelectionAction(oldH, newH).Execute();
             }
         }
+
+        /// <summary>
+        /// Is called, if an element of the city is grabbed.
+        /// </summary>
+        /// <param name="grabbedTransform">The transform of the grabbed object.</param>
+        private void OnStartGrabbing(Transform grabbedTransform)
+        {
+            Debug.Log("Start grabbing '" + grabbedTransform.name + "'!");
+        }
+
+        /// <summary>
+        /// Is called, if the grabbed element of the city is released.
+        /// </summary>
+        /// <param name="grabbedTransform">The transform of the released object.</param>
+        private void OnFinalizeGrabbing(Transform grabbedTransform)
+        {
+            Debug.Log("Finalized grabbing '" + grabbedTransform.name + "'!");
+        }
+
+        /// <summary>
+        /// Is called, if grabbing of an object is cancelled.
+        /// </summary>
+        /// <param name="grabbedTransform">The transform of the cancelled object.</param>
+        private void OnCancelGrabbing(Transform grabbedTransform)
+        {
+            Debug.Log("Cancelled grabbing '" + grabbedTransform.name + "'!");
+        }
+
+        /// <summary>
+        /// Is called, if the grabbed object enters collision with an object.
+        /// </summary>
+        /// <param name="collider">The collider of the grabbed object.</param>
+        /// <param name="collision">The collision.</param>
+        private void OnGrabbedObjectCollisionEnter(CollisionEventHandler collider, Collision collision)
+        {
+            Debug.Log("'" + collider.name + "' entered the collider of '" + collision.gameObject.name + "'!");
+        }
+
+        /// <summary>
+        /// Is called, if the grabbed object exits collision with an object.
+        /// </summary>
+        /// <param name="collider">The collider of the grabbed object.</param>
+        /// <param name="collision">The collision.</param>
+        private void OnGrabbedObjectCollisionExit(CollisionEventHandler collider, Collision collision)
+        {
+            Debug.Log("'" + collider.name + "' exited the collider of '" + collision.gameObject.name + "'!");
+        }
+
+        /// <summary>
+        /// Is called, if the grabbed object stays in collision with an object.
+        /// </summary>
+        /// <param name="collider">The collider of the grabbed object.</param>
+        /// <param name="collision">The collision.</param>
+        private void OnGrabbedObjectCollisionStay(CollisionEventHandler collider, Collision collision)
+        {
+            Debug.Log("'" + collider.name + "' stayed in the collider of '" + collision.gameObject.name + "'!");
+        }
+
+        /// <summary>
+        /// Is called, if the grabbed object enters a trigger of an object.
+        /// </summary>
+        /// <param name="collider">The collider of the grabbed object.</param>
+        /// <param name="collision">The other collider.</param>
+        private void OnGrabbedObjectTriggerEnter(CollisionEventHandler collider, Collider other)
+        {
+            Debug.Log("'" + collider.name + "' entered the trigger of '" + other.name + "'!");
+        }
+
+        /// <summary>
+        /// Is called, if the grabbed object exits a trigger of an object.
+        /// </summary>
+        /// <param name="collider">The collider of the grabbed object.</param>
+        /// <param name="collision">The other collider.</param>
+        private void OnGrabbedObjectTriggerExit(CollisionEventHandler collider, Collider other)
+        {
+            Debug.Log("'" + collider.name + "' exited the trigger of '" + other.name + "'!");
+        }
+
+        /// <summary>
+        /// Is called, if the grabbed object stays in a trigger of an object.
+        /// </summary>
+        /// <param name="collider">The collider of the grabbed object.</param>
+        /// <param name="collider">The other collider.</param>
+        private void OnGrabbedObjectTriggerStay(CollisionEventHandler collider, Collider other)
+        {
+            Debug.Log("'" + collider.name + "' stayed in trigger of '" + other.name + "'!");
+        }
+
     }
 }
