@@ -98,10 +98,14 @@ namespace SEE.Game
 #if true
             foreach (NodeRef nodeRef in FindObjectsOfType<NodeRef>())
             {
-                Material material = nodeRef.gameObject.GetComponent<MeshRenderer>().material;
-                Color color = material.GetColor("_Color");
-                color.a = 0.5f;
-                material.SetColor("_Color", color);
+                MeshRenderer meshRenderer = nodeRef.gameObject.GetComponent<MeshRenderer>();
+                if (meshRenderer)
+                {
+                    Material material = meshRenderer.material;
+                    Color color = material.GetColor("_Color");
+                    color.a = 0.5f;
+                    material.SetColor("_Color", color);
+                }
             }
 #endif
         }

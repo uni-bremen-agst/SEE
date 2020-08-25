@@ -266,8 +266,15 @@ namespace SEE.Controls
                     foreach (RaycastHit raycastHit in raycastHits)
                     {
                         nodeRef = raycastHit.transform.GetComponent<NodeRef>();
-                        if (nodeRef != null && nodeRef.node != null)
+                        if (nodeRef != null)
                         {
+#if UNITY_EDITOR
+                            if (nodeRef.node != null)
+                            {
+                                Debug.LogWarning("The node-ref of the grabbed object is not set!");
+                            }
+#endif
+
                             CollisionEventHandler collisionEventHandler = raycastHit.transform.gameObject.AddComponent<CollisionEventHandler>();
                             collisionEventHandler.onCollisionEnter += OnGrabbedObjectCollisionEnter;
                             collisionEventHandler.onCollisionExit += OnGrabbedObjectCollisionExit;
