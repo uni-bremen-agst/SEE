@@ -4,80 +4,11 @@
    "app_key" : "application.generated.unity.seecity.exe",
    "bindings" : {
       "/actions/buggy" : {
-         "sources" : [
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/buggy/in/steering"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/left/input/thumbstick"
-            },
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/buggy/in/steering"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/right/input/thumbstick"
-            },
-            {
-               "inputs" : {
-                  "pull" : {
-                     "output" : "/actions/buggy/in/throttle"
-                  }
-               },
-               "mode" : "trigger",
-               "path" : "/user/hand/left/input/trigger"
-            },
-            {
-               "inputs" : {
-                  "pull" : {
-                     "output" : "/actions/buggy/in/throttle"
-                  }
-               },
-               "mode" : "trigger",
-               "path" : "/user/hand/right/input/trigger"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/buggy/in/brake"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/a"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/buggy/in/brake"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/a"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/buggy/in/reset"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/b"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/buggy/in/reset"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/b"
-            }
-         ]
+         "chords" : [],
+         "haptics" : [],
+         "poses" : [],
+         "skeleton" : [],
+         "sources" : []
       },
       "/actions/default" : {
          "chords" : [],
@@ -114,24 +45,6 @@
          "sources" : [
             {
                "inputs" : {
-                  "force" : {
-                     "output" : "/actions/default/in/squeeze1"
-                  }
-               },
-               "mode" : "force_sensor",
-               "path" : "/user/hand/left/input/grip"
-            },
-            {
-               "inputs" : {
-                  "force" : {
-                     "output" : "/actions/default/in/squeeze2"
-                  }
-               },
-               "mode" : "force_sensor",
-               "path" : "/user/hand/right/input/grip"
-            },
-            {
-               "inputs" : {
                   "click" : {
                      "output" : "/actions/default/in/teleport"
                   }
@@ -160,19 +73,6 @@
                   "force_release_threshold" : "0.01"
                },
                "path" : "/user/hand/left/input/grip"
-            },
-            {
-               "inputs" : {
-                  "grab" : {
-                     "output" : "/actions/default/in/grabgrip2"
-                  }
-               },
-               "mode" : "grab",
-               "parameters" : {
-                  "force_hold_threshold" : "0.02",
-                  "force_release_threshold" : "0.01"
-               },
-               "path" : "/user/hand/right/input/grip"
             },
             {
                "inputs" : {
@@ -231,19 +131,12 @@
                "path" : "/user/hand/right/input/thumbstick"
             },
             {
-               "inputs" : {},
-               "mode" : "none",
-               "path" : "/user/hand/left/input/system"
-            },
-            {
-               "inputs" : {},
-               "mode" : "none",
-               "path" : "/user/hand/right/input/system"
-            },
-            {
                "inputs" : {
                   "click" : {
                      "output" : "/actions/default/in/interactui"
+                  },
+                  "double" : {
+                     "output" : "/actions/default/in/createchart"
                   }
                },
                "mode" : "button",
@@ -259,19 +152,12 @@
                "path" : "/user/hand/right/input/b"
             },
             {
-               "inputs" : {},
-               "mode" : "none",
-               "path" : "/user/hand/left/input/skeleton/left"
-            },
-            {
-               "inputs" : {},
-               "mode" : "none",
-               "path" : "/user/hand/right/input/skeleton/left"
-            },
-            {
                "inputs" : {
                   "click" : {
                      "output" : "/actions/default/in/select"
+                  },
+                  "double" : {
+                     "output" : "/actions/default/in/resetcharts"
                   }
                },
                "mode" : "button",
@@ -298,60 +184,17 @@
          ]
       },
       "/actions/platformer" : {
-         "sources" : [
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/platformer/in/move"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/left/input/thumbstick"
-            },
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/platformer/in/move"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/right/input/thumbstick"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/platformer/in/jump"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/trigger"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/platformer/in/jump"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/trigger"
-            },
-            {
-               "inputs" : {},
-               "mode" : "none",
-               "path" : "/user/hand/left/input/system"
-            },
-            {
-               "inputs" : {},
-               "mode" : "none",
-               "path" : "/user/hand/right/input/system"
-            }
-         ]
+         "chords" : [],
+         "haptics" : [],
+         "poses" : [],
+         "skeleton" : [],
+         "sources" : []
       }
    },
    "category" : "steamvr_input",
    "controller_type" : "knuckles",
    "description" : "",
-   "name" : "Meine SEECity [Testing] Konfiguration für Index Controller",
+   "name" : "Default Configuration",
    "options" : {},
    "simulated_actions" : []
 }

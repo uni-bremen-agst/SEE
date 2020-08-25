@@ -13,11 +13,18 @@ TagManager:
   - Fire
   - Decoration
   - Path
+  - Pointer
+  - ChartManager
+  - VREventSystem
+  - Chart
+  - ChartContainer
   - CCAnimation
   - projectile
   - FxTemporaire
   - Runtime
   - Function Call
+  - TestHelper
+  - Building
   layers:
   - Default
   - TransparentFX
@@ -54,4 +61,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Markers
+    uniqueID: 2549648541
+    locked: 0
+  - name: Chart
+    uniqueID: 2193984551
     locked: 0

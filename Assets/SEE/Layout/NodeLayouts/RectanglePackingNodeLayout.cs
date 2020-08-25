@@ -1,4 +1,5 @@
-﻿using SEE.Layout.RectanglePacking;
+﻿using SEE.DataModel;
+using SEE.Layout.RectanglePacking;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -406,6 +407,16 @@ namespace SEE.Layout
 
             }
             return covrec;
+        }
+
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool UsesEdgesAndSublayoutNodes()
+        {
+            return false; 
         }
     }
 }

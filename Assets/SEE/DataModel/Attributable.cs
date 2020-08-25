@@ -193,14 +193,14 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="other">to be compared to</param>
         /// <returns>true if equal</returns>
-        public override bool Equals(Object other)
+        public override bool Equals(object other)
         {
             if (other == null)
             {
                 Report("other is null");
                 return false;
             }
-            else if (this.GetType() != other.GetType())
+            else if (GetType() != other.GetType())
             {
                 Report("other has different C# type");
                 return false;

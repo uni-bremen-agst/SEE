@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using SEE.Layout.TreeMap;
+using SEE.DataModel;
 
 namespace SEE.Layout
 {
@@ -213,6 +214,16 @@ namespace SEE.Layout
                 layout_result[o] = new NodeTransform(position, scale);
                 i++;
             }
+        }
+
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool UsesEdgesAndSublayoutNodes()
+        {
+            return false; 
         }
     }
 }

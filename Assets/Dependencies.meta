@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD:Assets/Dependencies.meta
 guid: 15c2ea8ec25b79b4682d9f723610ae0e
+=======
+guid: fb21df1ff65c7ca479f097c3034c820d
+>>>>>>> origin/master:Assets/Prefabs/Charts.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

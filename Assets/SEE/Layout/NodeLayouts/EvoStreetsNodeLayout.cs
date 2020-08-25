@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Linq;
 
 using SEE.Layout.EvoStreets;
+using SEE.DataModel;
 
 namespace SEE.Layout
 {
@@ -451,6 +452,16 @@ namespace SEE.Layout
         private float RelativeStreetWidth(ENode node)
         {
             return StreetWidth * ((maximalDepth + 1) - node.Depth) / (maximalDepth + 1);
+        }
+
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool UsesEdgesAndSublayoutNodes()
+        {
+            return false; 
         }
     }
 }

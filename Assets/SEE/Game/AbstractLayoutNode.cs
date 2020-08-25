@@ -116,6 +116,18 @@ namespace SEE.Game
             return children;
         }
 
+        public void SetOrigin()
+        {
+            CenterPosition = relativePosition + sublayoutRoot.CenterPosition;
+        }
+
+        public void SetRelative(ILayoutNode node)
+        {
+            relativePosition.x -= node.CenterPosition.x;
+            relativePosition.z -= node.CenterPosition.z;
+            sublayoutRoot = node; 
+        }
+
         public ICollection<ILayoutNode> Successors
         {
             get
@@ -139,6 +151,18 @@ namespace SEE.Game
         public abstract Vector3 Roof { get; }
         public abstract Vector3 Ground { get; }
 
+        private Vector3 relativePosition;
+        private bool isSublayoutNode = false;
+        private bool isSublayoutRoot = false;
+        private Sublayout sublayout;
+        private ILayoutNode sublayoutRoot;
+
+        public Vector3 RelativePosition { get => relativePosition; set => relativePosition = value; }
+        public bool IsSublayoutNode { get => isSublayoutNode; set => isSublayoutNode = value; }
+        public bool IsSublayoutRoot { get => isSublayoutRoot; set => isSublayoutRoot = value ; }
+        public Sublayout Sublayout { get => sublayout; set => sublayout = value; }
+        public ILayoutNode SublayoutRoot { get => sublayoutRoot; set => sublayoutRoot = value; }
+
         public override string ToString()
         {
             string result = base.ToString();
@@ -146,5 +170,6 @@ namespace SEE.Game
                 + " Parent=" + (Parent != null ? Parent.ID : "<NO PARENT>");
             return result;
         }
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SEE.DataModel;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -35,6 +36,10 @@ namespace SEE.Layout
         /// The y co-ordinate of the ground where blocks are placed.
         /// </summary>
         protected readonly float groundLevel;
+
+        public float Groundlevel {get => groundLevel; }
+
+        public float InnerNodeHeight { get => innerNodeHeight; }
 
         /// <summary>
         /// The height of inner nodes (y co-ordinate).
@@ -80,6 +85,19 @@ namespace SEE.Layout
         /// <returns>node layout</returns>
         /// 
         public abstract Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes);
+
+        /// <summary>
+        /// Yields the layout for all given <paramref name="layoutNodes"/>.
+        /// For every node n in <paramref name="layoutNodes"/>: result[n] is the node transform,
+        /// i.e., the game object's position, scale, and rotation.
+        /// 
+        /// <paramref name="edges"/> contains all edges of the overlying graph and <paramref name="sublayouts"/> contains all sublayouts 
+        /// </summary>
+        /// <param name="layoutNodes"></param>
+        /// <param name="edges"></param>
+        /// <param name="sublayouts"></param>
+        /// <returns></returns>
+        public abstract Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts);
 
         /// <summary>
         /// Adds the given <paramref name="offset"/> to every node position in the given <paramref name="layout"/>.
@@ -223,12 +241,41 @@ namespace SEE.Layout
         public abstract bool IsHierarchical();
 
         /// <summary>
+        /// If true, the layout needs the edges to calculate the Layout
+        /// </summary>
+        /// <returns></returns>
+        public abstract bool UsesEdgesAndSublayoutNodes();
+
+        /// <summary>
         /// Calculates and applies the layout to the given <paramref name="layoutNodes"/>.
         /// </summary>
         /// <param name="layoutNodes">nodes for which to apply the layout</param>
         public void Apply(ICollection<ILayoutNode> layoutNodes)
         {
             Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes);
+
+            ApplyLayoutNodeTransform(layout);
+        }
+
+        /// <summary>
+        /// Calculates and applies the layout to the given <paramref name="layoutNodes"/>.
+        /// </summary>
+        /// <param name="layoutNodes">nodes for which to apply the layout</param>
+        /// <param name="edges">edges of the underlying graph</param>
+        /// <param name="sublayouts">the sublayouts for the layout</param>
+        public void Apply(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
+        {
+            Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes, edges, sublayouts);
+
+            ApplyLayoutNodeTransform(layout);
+        }
+
+        /// <summary>
+        /// Applys the Nodetransfrom values to its corresponding layoutNode
+        /// </summary>
+        /// <param name="layout">the calculated layout</param>
+        private void ApplyLayoutNodeTransform(Dictionary<ILayoutNode, NodeTransform> layout)
+        {
             foreach (var entry in layout)
             {
                 ILayoutNode node = entry.Key;

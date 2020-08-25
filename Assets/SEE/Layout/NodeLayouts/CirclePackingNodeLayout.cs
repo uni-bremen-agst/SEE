@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 using SEE.Layout.CirclePacking;
+using SEE.DataModel;
 
 namespace SEE.Layout
 {
@@ -161,6 +162,16 @@ namespace SEE.Layout
         {
             Vector3 extent = block.LocalScale / 2.0f;
             return Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);
+        }
+
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool UsesEdgesAndSublayoutNodes()
+        {
+            return false;
         }
     }
 }
