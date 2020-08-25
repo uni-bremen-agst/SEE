@@ -558,7 +558,10 @@ namespace SEE.Net
 
         private void OnApplicationQuit()
         {
-            VivoxClient.Uninitialize();
+            if (VivoxClient != null)
+            {
+                VivoxClient.Uninitialize();
+            }
         }
 
         #endregion
