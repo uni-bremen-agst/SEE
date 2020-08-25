@@ -26,7 +26,7 @@ namespace SEEEditor
 
         public override void OnInspectorGUI()
         {
-            SerializedProperty serverIPAddress = serializedObject.FindProperty("serverIPAddress");
+            SerializedProperty remoteServerIPAddress = serializedObject.FindProperty("remoteServerIPAddress");
             SerializedProperty localServerPort = serializedObject.FindProperty("localServerPort");
             SerializedProperty remoteServerPort = serializedObject.FindProperty("remoteServerPort");
             SerializedProperty loadCityOnStart = serializedObject.FindProperty("loadCityOnStart");
@@ -86,12 +86,21 @@ namespace SEEEditor
 
                         EditorGUI.BeginDisabledGroup(hostServer.boolValue);
                         {
-                            EditorGUILayout.PropertyField(serverIPAddress, new GUIContent("Remote IP-Address", "The IP-Address of the remote server."));
+                            EditorGUILayout.PropertyField(remoteServerIPAddress, new GUIContent("Remote IP-Address", "The IP-Address of the remote server."));
                             EditorGUILayout.PropertyField(remoteServerPort, new GUIContent("Remote Server Port", "The Port of the remote server."));
                         }
                         EditorGUI.EndDisabledGroup();
                     }
                     EditorGUI.EndDisabledGroup();
+
+                    #region Vivox
+                    EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
+                    {
+                        SerializedProperty vivoxChannelName = serializedObject.FindProperty("vivoxChannelName");
+                        EditorGUILayout.PropertyField(vivoxChannelName, new GUIContent("Voice Channel Name", "The name of the voice channel."));
+                    }
+                    EditorGUI.EndDisabledGroup();
+                    #endregion
                 }
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
