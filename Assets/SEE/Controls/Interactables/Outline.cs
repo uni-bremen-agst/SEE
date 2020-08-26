@@ -122,7 +122,7 @@ namespace SEE.Controls
 #if UNITY_EDITOR
             else
             {
-                Debug.LogWarning("Outline could not be created for '" + go.name + "'! The NodeRef seems to not be set.");
+                Debug.LogWarningFormat("Outline could not be created for '{0}'! The NodeRef seems to not be set.\n", go.name);
             }
 #endif
 
