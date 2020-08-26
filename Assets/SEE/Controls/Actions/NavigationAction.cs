@@ -1,4 +1,5 @@
-﻿using SEE.GO;
+﻿using SEE.DataModel;
+using SEE.GO;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -110,8 +111,8 @@ namespace SEE.Controls
             internal bool zoomToggleToObject;
         }
 
-
-
+        private const int RightMouseButton = 1;
+        
         private Transform cityTransform;
         private Plane raycastPlane;
 
@@ -126,9 +127,37 @@ namespace SEE.Controls
         CameraState cameraState;
         ActionState actionState;
 
+        private const string CityObjectName = "Implementation";
+
+        private static Transform GetCity()
+        {
+            // FIXME: We must not rely on this particular name for the game object.
+
+            GameObject seeCity = GameObject.Find(CityObjectName);
+            if (seeCity == null)
+            {
+                Debug.LogErrorFormat("There is no game object named {0}.\n", CityObjectName);
+                return null;
+            }
+            else
+            {
+                foreach (Transform child in seeCity.transform)
+                {
+                    if (child.tag == Tags.Node)
+                    {
+                        return child.transform;
+                    }
+                }
+                Debug.LogErrorFormat("Game object named {0} has no child tagged by {1}.\n", CityObjectName, Tags.Node);
+                return null;
+            }
+        }
+
         private void Start()
         {
-            cityTransform = GameObject.Find("Implementation").transform.GetChild(0).transform; // TODO(torben): find it some more robust way
+            cityTransform = GetCity();
+            Debug.LogFormat("City object is {0}\n", cityTransform.name);
+
             zoomState.originalScale = cityTransform.localScale;
             moveState.cityBounds = cityTransform.GetComponent<MeshCollider>().bounds;
             raycastPlane = new Plane(Vector3.up, cityTransform.position);
@@ -221,7 +250,7 @@ namespace SEE.Controls
             {
                 cameraState.distance += speed * Time.deltaTime;
             }
-            if (Input.GetMouseButton(1))
+            if (Input.GetMouseButton(RightMouseButton))
             {
                 float x = Input.GetAxis("mouse x");
                 float y = Input.GetAxis("mouse y");
