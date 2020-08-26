@@ -17,7 +17,6 @@ namespace SEE.GO
 			GameObject result = CreateCylinder();
 			SetHeight(result, DefaultHeight);
 			result.AddComponent<MeshCollider>();
-			result.isStatic = true;
 
 			MeshRenderer renderer = result.AddComponent<MeshRenderer>();
 			// Re-use default material for all cylinders.

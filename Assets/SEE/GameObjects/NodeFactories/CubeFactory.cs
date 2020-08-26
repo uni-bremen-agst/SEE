@@ -110,9 +110,6 @@ namespace SEE.GO
 
             // Assigns a material to the object.
             renderer.sharedMaterial = materials.DefaultMaterial(level, Mathf.Clamp(style, 0, NumberOfStyles() - 1)); ;
-
-            // Object should be static so that we save rendering time at run-time.
-            result.isStatic = true;
             return result;
         }
     }
