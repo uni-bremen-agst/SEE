@@ -106,7 +106,6 @@ namespace SEE.GO
             foreach (Transform child in parent.transform)
             {
                 GameObject kid = child.gameObject;
-                kid.isStatic = true;
                 NoShadows(kid);
                 // disable colliders
                 Collider collider = kid.GetComponent<Collider>();
@@ -202,7 +201,6 @@ namespace SEE.GO
         {
             GameObject building = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
             building.tag = Tags.Node;
-            building.isStatic = true;
 
             CSRooftops csRooftopsModifier = building.GetComponent<CSRooftops>();
             if (csRooftopsModifier != null)

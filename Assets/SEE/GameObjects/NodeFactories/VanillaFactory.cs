@@ -14,7 +14,6 @@ namespace SEE.GO
         public override GameObject NewBlock(int index = 0, int level = 0)
         {
             GameObject gameObject = new GameObject();
-            gameObject.isStatic = true;
             return gameObject;
         }
 

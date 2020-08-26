@@ -37,7 +37,6 @@ namespace SEE.GO
         public override GameObject NewBlock(int index = 0, int level = 0)
         {
             GameObject result = new GameObject();
-            result.isStatic = true;
             AttachLine(result, defaultLength, defaultLineWidth * Unit, DefaultColor);
             return result;
         }
