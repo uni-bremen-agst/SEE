@@ -113,7 +113,7 @@ namespace SEE
         {
             if (Instance != null)
             {
-                Debug.LogWarning("There is more than one table!");
+                Debug.LogWarning("There is more than one table!\n");
             }
             Instance = this;
         }
