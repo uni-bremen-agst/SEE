@@ -86,9 +86,11 @@ namespace SEE.Game
             string filename = GXLPath();
             if (loadedGraph == null && !string.IsNullOrEmpty(filename))
             {                
+
                 loadedGraph = LoadGraph(filename);
                 if (loadedGraph != null)
                 {
+                    LoadMetrics();
                     SetNodeRefs(loadedGraph, gameObject);
                 }
             }
