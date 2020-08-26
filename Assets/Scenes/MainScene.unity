@@ -468,7 +468,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &749657776
 Transform:
   m_ObjectHideFlags: 0
@@ -924,7 +924,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  gvlPath: Architecture.gvl
+  gvlPath: ..\Data\GXL\SEE\Architecture.gvl
   WidthMetric: Metric.Number_Of_Descendants
   HeightMetric: 0.001
   DepthMetric: Metric.Number_Of_Descendants
@@ -960,8 +960,8 @@ MonoBehaviour:
   Tension: 0.85
   RDP: 0.0005
   calculateMeasurements: 0
-  gxlPath: Architecture.gxl
-  csvPath: Architecture.csv
+  gxlPath: ..\Data\GXL\SEE\Architecture.gxl
+  csvPath: ..\Data\GXL\SEE\Architecture.csv
 --- !u!20 &843199879 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 2014920, guid: dc06161b6d97feb419f45f03b62e14b9,
@@ -2565,7 +2565,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636335451}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.505676, y: -4, z: 0}
+  m_LocalPosition: {x: -5.5679264, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -2747,7 +2747,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776319858}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.505676, y: -4, z: 0}
+  m_LocalPosition: {x: 5.5679264, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -3313,8 +3313,8 @@ MonoBehaviour:
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
-  InnerNodeObjects: 0
-  NodeLayout: 0
+  InnerNodeObjects: 3
+  NodeLayout: 4
   EdgeLayout: 3
   ZScoreScale: 1
   EdgeWidth: 0.001
@@ -3324,8 +3324,8 @@ MonoBehaviour:
   Tension: 0.85
   RDP: 0.0005
   calculateMeasurements: 0
-  gxlPath: CodeFacts.gxl
-  csvPath: CodeFacts.csv
+  gxlPath: ..\Data\GXL\SEE\CodeFacts.gxl
+  csvPath: ..\Data\GXL\SEE\CodeFacts.csv
 --- !u!4 &1778613929
 Transform:
   m_ObjectHideFlags: 0
