@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls
