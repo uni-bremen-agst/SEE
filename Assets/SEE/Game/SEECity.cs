@@ -84,15 +84,26 @@ namespace SEE.Game
         protected void Awake()
         {
             string filename = GXLPath();
-            if (loadedGraph == null && !string.IsNullOrEmpty(filename))
+            if (loadedGraph != null)
+            {
+                Debug.Log("SEECity.Awake: graph is already loaded.\n");
+            }
+            else if (!string.IsNullOrEmpty(filename))
             {
                 loadedGraph = LoadGraph(filename);
                 if (loadedGraph != null)
                 {
                     SetNodeRefs(loadedGraph, gameObject);
                 }
+                else
+                {
+                    Debug.LogErrorFormat("SEECity.Awake: Could not load GXL file {0}.\n", filename);
+                }
             }
-
+            else
+            {
+                Debug.LogError("SEECity.Awake: GXL file is undefined.\n");
+            }
             Materials.SetGlobalUniforms();
 
 #if true
