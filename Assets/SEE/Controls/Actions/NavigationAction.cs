@@ -159,7 +159,7 @@ namespace SEE.Controls
             Debug.LogFormat("City object is {0}\n", cityTransform.name);
 
             zoomState.originalScale = cityTransform.localScale;
-            moveState.cityBounds = cityTransform.GetComponent<MeshCollider>().bounds;
+            moveState.cityBounds = cityTransform.GetComponent<Collider>().bounds;
             raycastPlane = new Plane(Vector3.up, cityTransform.position);
             
             moveState.dragStartTransformPosition = cityTransform.position;
