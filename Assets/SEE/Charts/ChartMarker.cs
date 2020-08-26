@@ -19,6 +19,7 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.Game;
 using SEE.GO;
 using System.Collections;
 using TMPro;
@@ -49,11 +50,6 @@ namespace SEE.Charts.Scripts
 		/// The <see cref="Material" /> making the object look accentuated.
 		/// </summary>
 		private Material _buildingHighlightMaterialAccentuated;
-
-		/// <summary>
-		/// Copy of the <see cref="linkedObject" /> with different material to make it look highlighted.
-		/// </summary>
-		private GameObject _highlightCopy;
 
 		/// <summary>
 		/// The <see cref="GameObject" /> in the code city that is connected with this button.
@@ -216,40 +212,91 @@ namespace SEE.Charts.Scripts
 		{
 			if (highlight)
 			{
-				var highlighted = false;
-
-				for (var i = 0; i < linkedObject.transform.childCount; i++)
-					if (linkedObject.transform.GetChild(i).gameObject.name
-						.Equals(linkedObject.name + "(Clone)"))
-						highlighted = true;
-
-				if (!highlighted)
-				{
-					_highlightCopy = Instantiate(linkedObject, linkedObject.transform);
-					_highlightCopy.tag = "Untagged";
-					_highlightCopy.transform.localScale = Vector3.one;
-					_highlightCopy.transform.localPosition = Vector3.zero;
-					if (_highlightCopy.TryGetComponent<Renderer>(out var render))
-						render.material = _buildingHighlightMaterial;
-					Instantiate(highlightLine, _highlightCopy.transform)
-						.TryGetComponent<LineRenderer>(out var line);
-					var linePos = _highlightCopy.transform.localPosition;
-					line.SetPositions(new[]
-					{
-						linePos,
-						linePos + new Vector3(0f, _highlightLineLength) /
-						_highlightCopy.transform.lossyScale.y
-					});
-				}
+				HighlightNode(linkedObject);
 			}
 			else
 			{
-				if (_highlightCopy) Destroy(_highlightCopy);
+				UnhighlightNode(linkedObject);
 				_accentuated = false;
 			}
 
 			markerHighlight.SetActive(highlight);
-			if (ScrollViewToggle) ScrollViewToggle.SetHighlighted(highlight);
+			if (ScrollViewToggle)
+			{
+				ScrollViewToggle.SetHighlighted(highlight);
+			}
+		}
+
+		/// <summary>
+		/// Copy of the <see cref="linkedObject" /> with different material to make it look highlighted.
+		/// </summary>
+		private GameObject _highlightCopy;
+
+		private void HighlightNode(GameObject linkedObject)
+        {
+			Debug.LogErrorFormat("Highlighting {0}\n", linkedObject.name);
+
+			//bool highlighted = false;
+
+			//// Is any of linkedObject's children a result of Instantiate (can be detected by
+			//// the additional name extension "(Clone)".
+			//for (var i = 0; i < linkedObject.transform.childCount; i++)
+			//{
+			//	if (linkedObject.transform.GetChild(i).gameObject.name
+			//		.Equals(linkedObject.name + "(Clone)"))
+			//	{
+			//		highlighted = true;
+			//		break;
+			//	}
+			//}
+
+			//// None of linkedObject's children is highlighted
+			//if (!highlighted)
+			//{
+			//	// FIXME: This will clone the linkedObject and, hence, create yet another
+			//	// game object tagged by Tags.Node, which will eventually be added to 
+			//	// the charts. This will blow up the charts with unnecessary confusing nodes.
+			//	_highlightCopy = Instantiate(linkedObject, linkedObject.transform);
+			//	_highlightCopy.tag = "Untagged";
+			//	_highlightCopy.transform.localScale = Vector3.one;
+			//	_highlightCopy.transform.localPosition = Vector3.zero;
+			//	if (_highlightCopy.TryGetComponent<Renderer>(out var render))
+			//	{
+			//		render.material = _buildingHighlightMaterial;
+			//	}
+
+			//	Debug.LogFormat("highlightLine={0}\n", highlightLine);
+			//	GameObject copyOfHighlightLine = Instantiate(highlightLine, _highlightCopy.transform);
+
+			//	// FIXME: This code relies on the fact that a node has a line renderer.
+			//	// The node factories were extended to add such line renderers to their
+			//	// game nodes.
+			//	// What if it has two (as for circles) or none?
+			//	copyOfHighlightLine.TryGetComponent<LineRenderer>(out var line);
+			//	Vector3 linePos = _highlightCopy.transform.localPosition;
+			//	line.SetPositions(new[]
+			//	{
+			//			linePos,
+			//			linePos + new Vector3(0f, _highlightLineLength) /
+			//			_highlightCopy.transform.lossyScale.y
+			//		});
+			//}
+		}
+
+		private void UnhighlightNode(GameObject linkedObject)
+        {
+			if (_highlightCopy) Destroy(_highlightCopy);
+		}
+
+		private void AccentuateNode(GameObject linkedObject)
+		{
+			if (_highlightCopy != null)
+			{
+				_highlightCopy.TryGetComponent<Renderer>(out var render);
+				render.material = _accentuated
+					? _buildingHighlightMaterialAccentuated
+					: _buildingHighlightMaterial;
+			}
 		}
 
 		/// <summary>
@@ -393,18 +440,14 @@ namespace SEE.Charts.Scripts
 		/// Changes the color of the marker and the <see cref="linkedObject" /> to the accentuation color.
 		/// </summary>
 		public void Accentuate()
-		{
-			markerHighlight.TryGetComponent<Image>(out var image);
-			image.color = _accentuated
-				? ChartManager.Instance.standardColor
-				: ChartManager.Instance.accentuationColor;
-			_accentuated = !_accentuated;
-			if (!_highlightCopy) return;
-			_highlightCopy.TryGetComponent<Renderer>(out var render);
-			render.material = _accentuated
-				? _buildingHighlightMaterialAccentuated
-				: _buildingHighlightMaterial;
-		}
+        {
+            markerHighlight.TryGetComponent<Image>(out var image);
+            image.color = _accentuated
+                ? ChartManager.Instance.standardColor
+                : ChartManager.Instance.accentuationColor;
+            _accentuated = !_accentuated;
+            AccentuateNode(linkedObject);
+        }
 
 		/// <summary>
 		/// Changes the <see cref="infoText" /> of this marker.
@@ -455,7 +498,7 @@ namespace SEE.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Destroys the <see cref="_highlightCopy" /> if it exists.
+		/// Stops all co-routines and destroys the <see cref="_highlightCopy" /> if it exists.
 		/// </summary>
 		private void OnDestroy()
 		{
