@@ -52,6 +52,8 @@ namespace SEE.Controls.Devices
         /// </summary>
         public abstract bool IsCanceling { get; }
 
+        public abstract bool IsAnnotating { get;}
+
         /// <summary>
         /// True if the user wants to zoom into details.
         /// This event is a non-persistent one-time event, meaning, the value is returned only

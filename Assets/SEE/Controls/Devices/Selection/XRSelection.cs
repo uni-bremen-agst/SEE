@@ -60,6 +60,8 @@ namespace SEE.Controls.Devices
         /// </summary>
         public override bool IsSelecting => selectionButton.State;
 
+        public override bool IsAnnotating => selectionButton.State;
+
         /// <summary>
         /// True if the user presses the grabbing button ("Grab" in SteamVR) deeply enough.
         /// </summary>

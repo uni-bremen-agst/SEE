@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SEE.Controls.Devices
 {
@@ -7,7 +8,7 @@ namespace SEE.Controls.Devices
     /// for selected points on the screen. A user can hit the selection mouse button
     /// or touch the screen with a finger or pen.
     /// </summary>
-    public class MouseSelection: Selection
+    public class MouseSelection : Selection
     {
         [Tooltip("The index of the mouse button needed to be pressed to change the viewpoint (0 = left, 1 = right).")]
         public int SelectionMouseButton = 0;
@@ -36,13 +37,13 @@ namespace SEE.Controls.Devices
 
         private void Update()
         {
-            if (Input.GetMouseButtonDown(SelectionMouseButton))
+            if (Input.GetMouseButtonDown(SelectionMouseButton)) 
             {
                 state = State.Selecting;
                 timeButtonHeld = Time.realtimeSinceStartup;
             }
             if (state == State.Selecting
-                && Input.GetMouseButton(SelectionMouseButton) 
+                && Input.GetMouseButton(SelectionMouseButton)
                 && Time.realtimeSinceStartup - timeButtonHeld >= ButtonDurationThreshold)
             {
                 state = State.Grabbing;
@@ -96,6 +97,9 @@ namespace SEE.Controls.Devices
 
         public override bool IsZoomingHome => Input.GetKeyDown(KeyCode.R);
 
+        public override bool IsAnnotating => Input.GetKeyDown(KeyCode.N);
+      
+
         /// <summary>
         /// Resets the selection timer, so the start of grabbing is delayed.
         /// </summary>
@@ -130,7 +134,7 @@ namespace SEE.Controls.Devices
         {
             if (Input.GetMouseButtonDown(SelectionMouseButton))
             {
-                if (!oneClick) 
+                if (!oneClick)
                 {
                     // This is the first click.
                     oneClick = true;

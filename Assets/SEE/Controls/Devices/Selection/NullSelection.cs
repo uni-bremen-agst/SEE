@@ -25,5 +25,7 @@ namespace SEE.Controls.Devices
         public override bool IsZoomingOut => false;
 
         public override bool IsZoomingHome => false;
+
+        public override bool IsAnnotating => false;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using SEE.GO;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
 
@@ -30,7 +31,7 @@ namespace SEE.Controls
             base.Awake();
             GrabbingMaterialChanger = new MaterialChanger(gameObject, Materials.NewMaterial(LocalGrabbingColor), Materials.NewMaterial(RemoteGrabbingColor));
         }
-        
+
         public void Grab(GameObject grabber, bool isOwner)
         {
             if (IsHovered)
@@ -40,7 +41,7 @@ namespace SEE.Controls
             isGrabbed = true;
             GrabbingMaterialChanger.UseSpecialMaterial(isOwner);
         }
-        
+
         public void Release(bool isOwner)
         {
             isGrabbed = false;
@@ -66,7 +67,7 @@ namespace SEE.Controls
             }
             else
             {
-                Debug.LogErrorFormat("Continue called for object {0} not grabbed.\n", 
+                Debug.LogErrorFormat("Continue called for object {0} not grabbed.\n",
                                      gameObject.name);
             }
         }
@@ -170,7 +171,7 @@ namespace SEE.Controls
                                           //"islocal", true,
                                           //"rotation", oldRotation,
                                           "time", ResetAnimationTime
-                ));            
+                ));
         }
     }
 }

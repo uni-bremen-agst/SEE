@@ -11,7 +11,9 @@ namespace SEE.Controls
         {
             go.isStatic = false; // we want to move the object during the game
             go.AddComponent<Interactable>(); // enable interactions
-            GrabbableObject grabbableObject = go.AddComponent<GrabbableObject>(); // our customized reactions to hovering and grabbing events
+/*            GrabbableObject grabbableObject = go.AddComponent<GrabbableObject>(); // our customized reactions to hovering and grabbing events*/
+            AnnotatableObject annotableObject = go.AddComponent<AnnotatableObject>();
+            MarkScript markScript = go.AddComponent<MarkScript>();
             //go.AddComponent<Rigidbody>(); // so the object follows the laws of physics
         }
 

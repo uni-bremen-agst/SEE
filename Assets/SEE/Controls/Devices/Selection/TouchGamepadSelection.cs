@@ -59,5 +59,7 @@ namespace SEE.Controls.Devices
         public override bool IsZoomingOut => InputManager.ActiveDevice.DPadLeft.WasPressed && !InputManager.ActiveDevice.DPadRight.WasPressed;
 
         public override bool IsZoomingHome => InputManager.ActiveDevice.LeftBumper.WasPressed;
+
+        public override bool IsAnnotating => InputManager.ActiveDevice.Action2.WasPressed;
     }
 }

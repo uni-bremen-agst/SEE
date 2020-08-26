@@ -1,6 +1,8 @@
 ﻿using SEE.Controls.Devices;
 using SEE.Game;
 using SEE.GO;
+using System.ComponentModel;
+using System.Net.NetworkInformation;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -67,7 +69,8 @@ namespace SEE.Controls
         {
             None,
             IsSelected,
-            IsGrabbed
+            IsGrabbed,
+            IsAnnotating
         }
 
         private ObjectState objectState = ObjectState.None;
@@ -95,6 +98,9 @@ namespace SEE.Controls
             bool isCanceling = selectionDevice.IsCanceling;
             bool isGrabbing = selectionDevice.IsGrabbing;
             bool isSelecting = selectionDevice.IsSelecting;
+            bool startAnnotating = selectionDevice.IsAnnotating;
+
+
 
             if (isCanceling)
             {
@@ -110,7 +116,29 @@ namespace SEE.Controls
                         handledObject = null;
                         objectState = ObjectState.None;
                     }
+                     else if (objectState == ObjectState.IsAnnotating)
+                     {
+                         objectState = ObjectState.IsSelected;
+                         handledObject.GetComponent<AnnotatableObject>().CloseAnnotationEditor();
+                     }
                 }
+            }
+            else if (objectState == ObjectState.IsAnnotating)
+            {
+                if (handledObject.GetComponent<AnnotatableObject>().GetEditorState() == false)
+                {
+                    objectState = ObjectState.IsSelected;
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else if (startAnnotating)
+            {
+                handledObject.GetComponent<AnnotatableObject>().SetEditorState(true);
+                handledObject.GetComponent<AnnotatableObject>().OpenAnnotationEditor();
+                objectState = ObjectState.IsAnnotating;
             }
             else if (isGrabbing || isSelecting)
             {
@@ -173,6 +201,7 @@ namespace SEE.Controls
             {
                 AllowZooming();
             }
+
 
             if (!isGrabbing && !isSelecting)
             {

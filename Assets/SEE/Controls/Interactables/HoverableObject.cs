@@ -55,7 +55,9 @@ namespace SEE.Controls
         /// is being hovered over. It is an instantiation of the textOnPaperPrefab.
         /// It will be activated during hovering and deactived when hovering ends.
         /// </summary>
-        GameObject textOnPaper = null;
+        public GameObject textOnPaper = null;
+
+       /// GameObject textOnPaperInteractable = null;
 
         /// <summary>
         /// The prefab used to instantiate text-on-paper objects. It is the same for every one,
@@ -68,7 +70,7 @@ namespace SEE.Controls
         /// If the textOnPaper does not exist, it will be instantiated from textOnPaperPrefab
         /// first. If it already existed, it will just be activated again.
         /// </summary>
-        private void ShowInformation()
+        public virtual void ShowInformation()
         {
             if (textOnPaper == null)
             {
@@ -99,7 +101,7 @@ namespace SEE.Controls
         /// <summary>
         /// Deactivates textOnPaper.
         /// </summary>
-        private void HideInformation()
+        public virtual void HideInformation()
         {
             if (textOnPaper)
             {
