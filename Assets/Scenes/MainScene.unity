@@ -3319,7 +3319,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  gvlPath: ..\Data\GXL\linux-clones\net.gvl
+  gvlPath: ..\Data\GXL\linux-clones\net\CodeFacts.gvl
   WidthMetric: Metric.Number_Of_Methods
   HeightMetric: Metric.Lines.LOC
   DepthMetric: Metric.Number_Of_Members
@@ -3355,8 +3355,8 @@ MonoBehaviour:
   Tension: 0.85
   RDP: 0.0005
   calculateMeasurements: 0
-  gxlPath: ..\Data\GXL\linux-clones\net.gxl
-  csvPath: ..\Data\GXL\linux-clones\net.csv
+  gxlPath: ..\Data\GXL\linux-clones\net\CodeFacts.gxl
+  csvPath: ..\Data\GXL\linux-clones\net\CodeFacts.csv
 --- !u!4 &1778613929
 Transform:
   m_ObjectHideFlags: 0
