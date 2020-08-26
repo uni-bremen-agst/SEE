@@ -28,7 +28,7 @@ namespace SEE.GO
             Material material = new Material(Shader.Find(materialPath));
             if (material == null)
             {
-                Debug.LogError("Could not find material " + materialPath + "\n");
+                Debug.LogErrorFormat("SEE.Go.LineFactory: Could not find material {0} for lines.\n", materialPath);
             }
             return material;
         }
