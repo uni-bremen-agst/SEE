@@ -349,17 +349,37 @@ namespace SEE.Charts.Scripts
 		private void GetAllNumericAttributes()
 		{
 			Performance p = Performance.Begin("GetAllNumericAttributes");
-			foreach (var data in _dataObjects)
+			AllKeys.Clear();
+			if (_dataObjects.Length == 0)
+            {
+				Debug.LogWarning("There are no nodes for showing metrics.\n");
+            }
+			else
 			{
-                Node node = data.GetComponent<NodeRef>().node;
-                foreach (var key in node.FloatAttributes.Keys)
+				foreach (var data in _dataObjects)
 				{
-					AllKeys.Add(key);
+					
+					Node node = data.GetComponent<NodeRef>().node;
+					foreach (var key in node.FloatAttributes.Keys)
+					{
+						AllKeys.Add(key);
+					}
+					foreach (var key in node.IntAttributes.Keys)
+					{
+						AllKeys.Add(key);
+					}
 				}
-				foreach (var key in node.IntAttributes.Keys)
+				if (AllKeys.Count > 0)
 				{
-					AllKeys.Add(key);
+					foreach (string metric in AllKeys)
+					{
+						Debug.LogFormat("Available metric: {0}\n", metric);
+					}
 				}
+				else
+                {
+					Debug.LogWarning("No metrics available for charts.\n");
+                }
 			}
 			p.End();
 		}
@@ -371,6 +391,7 @@ namespace SEE.Charts.Scripts
 		{
 			Performance p = Performance.Begin("FindDataObjects: Find nodes");
 			_dataObjects = GameObject.FindGameObjectsWithTag("Node");
+			Debug.LogFormat("ChartContent.FindDataObjects: found {0} nodes.\n", _dataObjects.Length);
 			p.End();
 
 			p = Performance.Begin("FindDataObjects: Node highlights");
