@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -157,6 +158,64 @@ namespace SEE.Layout
                 layoutNode.CenterPosition = newPosition;
             }
             return scaleFactor;
+        }
+
+        /// <summary>
+        /// Stacks all <paramref name="layoutNodes"/> onto each other with <paramref name="levelDelta"/> 
+        /// in between parent and children (children are on top of their parent) where the initial 
+        /// y co-ordinate ground position of the roof nodes is specified by <paramref name="groundLevel"/>.
+        /// The x and z co-ordinates of the <paramref name="layoutNodes"/> are not changed.
+        /// </summary>
+        /// <param name="layoutNodes">the nodes to be stacked onto each other</param>
+        /// <param name="groundLevel">y co-ordinate ground position of the roof nodes</param>
+        /// <param name="levelDelta">the y distance between parents and their children</param>
+        public static void Stack(ICollection<ILayoutNode> layoutNodes, float groundLevel, float levelDelta = 0.001f)
+        {
+            // position all root nodes at groundLevel
+            foreach (ILayoutNode layoutNode in layoutNodes)
+            {
+                if (layoutNode.Parent == null)
+                {
+                    float newRoofY = PutOn(layoutNode, groundLevel);
+                    // Continue with the children
+                    foreach (ILayoutNode child in layoutNode.Children())
+                    {
+                        Stack(child, newRoofY + levelDelta, levelDelta);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Positions the ground of <paramref name="layoutNode"/> on <paramref name="groundLevel"/>
+        /// and then stacks its children onto <paramref name="layoutNode"/> with <paramref name="levelDelta"/>
+        /// space along the y axis in between. Recurses to its children. Children are put on top of
+        /// <paramref name="layoutNode"/>.
+        /// <param name="layoutNode">the node to be positioned</param>
+        /// <param name="groundLevel">the target y co-ordinate ground position of <paramref name="layoutNode"/></param>
+        /// <param name="levelDelta">the y distance between <paramref name="layoutNode"/> and its children</param>
+        private static void Stack(ILayoutNode layoutNode, float groundLevel, float levelDelta = 0.001f)
+        {
+            float newRoofY = PutOn(layoutNode, groundLevel);
+            foreach (ILayoutNode child in layoutNode.Children())
+            {
+                Stack(child, newRoofY + levelDelta, levelDelta);
+            }
+        }
+
+        /// <summary>
+        /// Puts the ground of <paramref name="layoutNode"/> on <paramref name="groundLevel"/> (y axis).
+        /// </summary>
+        /// <param name="layoutNode">the layout node to be positioned</param>
+        /// <param name="groundLevel">the y-coordinate of the ground of <paramref name="layoutNode"/> to be positioned</param>
+        /// <returns>the y co-ordinate of the roof of the <paramref name="groundLevel"/> after it was moved along the y-axis</returns>
+        private static float PutOn(ILayoutNode layoutNode, float groundLevel)
+        {
+            Vector3 centerPosition = layoutNode.CenterPosition;
+            float yExtent = layoutNode.AbsoluteScale.y / 2.0f;
+            centerPosition.y = groundLevel + yExtent;
+            layoutNode.CenterPosition = centerPosition;
+            return centerPosition.y + yExtent;
         }
 
         /// <summary>
