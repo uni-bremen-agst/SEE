@@ -19,6 +19,7 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.Controls;
 using SEE.Game;
 using SEE.GO;
 using System.Collections;
@@ -232,74 +233,34 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private GameObject _highlightCopy;
 
-		private void HighlightNode(GameObject linkedObject)
-        {
-			Debug.LogFormat("Highlighting {0}\n", linkedObject.name);
+		private void SetHighlighting(GameObject highLightedNode, bool highlight)
+        {			
+			HighlightableObject highlightableObject = highLightedNode.GetComponent<HighlightableObject>();
+			if (highlightableObject == null)
+			{
+				highlightableObject = highLightedNode.AddComponent<HighlightableObject>();
+			}
 
-			// FIXME: highlighting a node must be done differently. This code causes
-			// nodes to be duplicated, which then end up in a chart, too, where they
-			// can be selected and then will be duplicated again...
-            bool highlighted = false;
-
-            // Is any of linkedObject's children a result of Instantiate (can be detected by
-            // the additional name extension "(Clone)".
-            for (var i = 0; i < linkedObject.transform.childCount; i++)
+			if (highlight && !highlightableObject.IsHovered)
             {
-                if (linkedObject.transform.GetChild(i).gameObject.name
-                    .Equals(linkedObject.name + "(Clone)"))
-                {
-                    highlighted = true;
-                    break;
-                }
-            }
-
-            // None of linkedObject's children is highlighted
-            if (!highlighted)
+				// should be highlighted but is currently not
+				highlightableObject.Hovered(isOwner: true);
+			}
+			else if (!highlight && highlightableObject.IsHovered)
             {
-                // FIXME: This will clone the linkedObject and, hence, create yet another
-                // game object tagged by Tags.Node, which will eventually be added to 
-                // the charts. This will blow up the charts with unnecessary confusing nodes.
-                _highlightCopy = Instantiate(linkedObject, linkedObject.transform);
-                _highlightCopy.tag = "Untagged";
-                _highlightCopy.transform.localScale = Vector3.one;
-                _highlightCopy.transform.localPosition = Vector3.zero;
-                if (_highlightCopy.TryGetComponent<Renderer>(out var render))
-                {
-                    render.material = _buildingHighlightMaterial;
-                }
-
-                Debug.LogFormat("highlightLine={0}\n", highlightLine);
-                GameObject copyOfHighlightLine = Instantiate(highlightLine, _highlightCopy.transform);
-
-                // FIXME: This code relies on the fact that a node has a line renderer.
-                // The node factories were extended to add such line renderers to their
-                // game nodes.
-                // What if it has two (as for circles) or none?
-                copyOfHighlightLine.TryGetComponent<LineRenderer>(out var line);
-                Vector3 linePos = _highlightCopy.transform.localPosition;
-                line.SetPositions(new[]
-                {
-                        linePos,
-                        linePos + new Vector3(0f, _highlightLineLength) /
-                        _highlightCopy.transform.lossyScale.y
-                    });
-            }
-        }
-
-		private void UnhighlightNode(GameObject linkedObject)
-        {
-			if (_highlightCopy) Destroy(_highlightCopy);
+				// should not be highlighted, but is currently highlighted
+				highlightableObject.Unhovered();
+			}
 		}
 
-		private void AccentuateNode(GameObject linkedObject)
-		{
-			if (_highlightCopy != null)
-			{
-				_highlightCopy.TryGetComponent<Renderer>(out var render);
-				render.material = _accentuated
-					? _buildingHighlightMaterialAccentuated
-					: _buildingHighlightMaterial;
-			}
+		private void HighlightNode(GameObject highLightedNode)
+        {
+			SetHighlighting(highLightedNode, true);
+        }
+
+		private void UnhighlightNode(GameObject highLightedNode)
+        {
+			SetHighlighting(highLightedNode, false);
 		}
 
 		/// <summary>
@@ -440,16 +401,14 @@ namespace SEE.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Changes the color of the marker and the <see cref="linkedObject" /> to the accentuation color.
+		/// Changes the color of the marker to the accentuation color.
 		/// </summary>
 		public void Accentuate()
         {
-            markerHighlight.TryGetComponent<Image>(out var image);
-            image.color = _accentuated
-                ? ChartManager.Instance.standardColor
-                : ChartManager.Instance.accentuationColor;
-            _accentuated = !_accentuated;
-            AccentuateNode(linkedObject);
+            markerHighlight.TryGetComponent<Image>(out var image);			
+            image.color = _accentuated ? ChartManager.Instance.standardColor
+                                       : ChartManager.Instance.accentuationColor;
+			_accentuated = !_accentuated;
         }
 
 		/// <summary>
