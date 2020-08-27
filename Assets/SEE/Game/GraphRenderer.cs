@@ -234,15 +234,13 @@ namespace SEE.Game
                     }
                     p.End();
 
-                    NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x);
-                    NodeLayout.MoveTo(layoutNodes, parent.transform.position);
+                    Fit(parent, layoutNodes);
 
                     gameNodes = nodeMap.Values;
 
                     // add the plane surrounding all game objects for nodes
                     BoundingBox(layoutNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-                    GameObject plane = NewPlane(leftFrontCorner, rightBackCorner, parent.transform.position.y);
-                    AddToParent(plane, parent);
+                    AddToParent(NewPlane(leftFrontCorner, rightBackCorner, parent.transform.position.y), parent);
 
                     CreateObjectHierarchy(nodeMap, parent);
                     InteractionDecorator.PrepareForInteraction(gameNodes);
@@ -256,7 +254,8 @@ namespace SEE.Game
                     {
                         AddDecorationsForSublayouts(layoutNodes, sublayoutLayoutNodes, parent);
                     }
-                                     
+
+                    // Gather the layout quality measurements.
                     if (settings.calculateMeasurements)
                     {
                         Measurements measurements = new Measurements(layoutNodes, graph, leftFrontCorner, rightBackCorner, p);
@@ -266,7 +265,8 @@ namespace SEE.Game
                     {
                         settings.Measurements = new SortedDictionary<string, string>();
                     }
-                } finally
+                }
+                finally
                 {
                     // If we added an artifical root node to the graph, we must remove it again
                     // from the graph when we are done.
@@ -293,13 +293,11 @@ namespace SEE.Game
                     nodeLayout.Apply(layoutNodes);
                     p.End();
 
-                    NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x);
-                    NodeLayout.MoveTo(layoutNodes, parent.transform.position);
+                    Fit(parent, layoutNodes);
 
                     gameNodes = nodeMap.Values;
                     // add the plane surrounding all game objects for nodes
-                    GameObject plane = NewPlane(gameNodes, parent.transform.position.y);
-                    AddToParent(plane, parent);
+                    AddToParent(NewPlane(gameNodes, parent.transform.position.y), parent);
 
                     CreateObjectHierarchy(nodeMap, parent);
                     InteractionDecorator.PrepareForInteraction(gameNodes);
@@ -318,6 +316,19 @@ namespace SEE.Game
 
             // create the laid out edges
             AddToParent(EdgeLayout(graph, layoutNodes), parent);
+        }
+
+        /// <summary>
+        /// Scales and moves the <paramref name="layoutNodes"/> so that they fit into the <paramref name="parent"/>.
+        /// </summary>
+        /// <param name="parent">the parent in which to fit the <paramref name="layoutNodes"/></param>
+        /// <param name="layoutNodes">the nodes to be fitted into the <paramref name="parent"/></param>
+        private static void Fit(GameObject parent, ICollection<ILayoutNode> layoutNodes)
+        {
+            NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x);
+            NodeLayout.MoveTo(layoutNodes, parent.transform.position);
+            // The layouNodes are put at the center of the parent w.r.t. the y axis.
+            NodeLayout.Stack(layoutNodes, parent.transform.position.y);
         }
 
         /// <summary>
