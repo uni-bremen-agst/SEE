@@ -109,6 +109,9 @@ namespace SEE.Controls
             internal Vector3 mousePosition;  // TODO(torben): this needs to be abstracted for other modalities
             internal float zoomStepsDelta;
             internal bool zoomToggleToObject;
+            internal bool copy;              // copy selected object (i.e., start mapping)
+            internal bool paste;             // paste (map) copied object
+            internal bool clearClipboard;    // whether the clipboard of copied nodes has been cleared
         }
 
         private const int RightMouseButton = 1;
@@ -190,6 +193,29 @@ namespace SEE.Controls
             Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
         }
 
+        /// <summary>
+        /// Whether the left control key was pressed.
+        /// </summary>
+        /// <returns>true if the left control key was pressed</returns>
+        private static bool LeftControlPressed()
+        {
+            // Control key capturing does not really work well in the editor.
+            bool leftControl = false;
+#if UNITY_EDITOR
+            leftControl = true;
+#else
+            if (Input.GetKeyDown(KeyCode.LeftControl))
+            {
+                leftControl = true;
+            }
+            if (Input.GetKeyUp(KeyCode.LeftControl))
+            {
+                leftControl = false;
+            }
+#endif
+            return leftControl;
+        }
+
         private void Update()
         {
             // Note: Input MUST NOT be inquired in FixedUpdate() for the input to feel responsive!
@@ -201,6 +227,12 @@ namespace SEE.Controls
             actionState.snap = Input.GetKey(KeyCode.LeftAlt);
             actionState.reset |= Input.GetKeyDown(KeyCode.R);
             actionState.mousePosition = Input.mousePosition;
+            bool leftControl = LeftControlPressed();
+
+            actionState.copy = leftControl && Input.GetKeyDown(KeyCode.C);
+            actionState.paste = leftControl && Input.GetKeyDown(KeyCode.V);
+            actionState.clearClipboard = leftControl && Input.GetKeyDown(KeyCode.X);
+
             if (!actionState.drag)
             {
                 actionState.zoomStepsDelta += Input.mouseScrollDelta.y;
@@ -222,6 +254,8 @@ namespace SEE.Controls
 
             rotateState.rotateGizmo.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotateGizmo.Center).magnitude;
 
+            // selection with left mouse button
+            GameObject selectedObject = null;
             if (!actionState.drag && Input.GetMouseButtonDown(0))
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -232,7 +266,8 @@ namespace SEE.Controls
                 {
                     if (hit.transform.gameObject.GetComponent<NodeRef>() != null)
                     {
-                        Select(hit.transform.gameObject);
+                        selectedObject = hit.transform.gameObject;
+                        Select(selectedObject);
                         selected = true;
                         break;
                     }
@@ -268,7 +303,44 @@ namespace SEE.Controls
             Camera.main.transform.position = Table.TableTopCenterEpsilon;
             Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
+
+            // TODO: distinguish whether selectedObjects refers to a node of
+            // the architecture, implementation, or mapping.
+            Debug.LogFormat("copy={0} paste={1} clearClipboard={2} selectedObject={3}\n",
+                            actionState.copy, actionState.paste, actionState.clearClipboard,
+                            selectedObject != null ? selectedObject.name : "NONE");
+            if (actionState.copy && selectedObject != null)
+            {
+                if (objectsInClipboard.Contains(selectedObject))
+                {
+                    Debug.LogFormat("Removing node {0} from clipboard\n");
+                    objectsInClipboard.Remove(selectedObject);
+                }
+                else
+                {
+                    Debug.LogFormat("Copying node {0} to clipboard\n");
+                    objectsInClipboard.Add(selectedObject);
+                }
+            }
+            if (actionState.clearClipboard)
+            {
+                Debug.Log("Node clipboard has been cleared.\n");
+                objectsInClipboard.Clear();
+            }
+            if (actionState.paste && selectedObject != null)
+            {
+                foreach (GameObject implementation in objectsInClipboard)
+                {
+                    Debug.LogFormat("Mapping {0} -> {1}.\n", implementation.name, selectedObject.name);
+                }
+                objectsInClipboard.Clear();
+            }
         }
+
+        /// <summary>
+        /// The game objects that have been copied to the clipboard via Ctrl-C.
+        /// </summary>
+        private HashSet<GameObject> objectsInClipboard = new HashSet<GameObject>();
 
         // This logic is in FixedUpdate(), so that the behaviour is framerate-
         // 'independent'.
@@ -285,7 +357,7 @@ namespace SEE.Controls
                 Select(null);
             }
 
-            #region Grab Part Of City
+#region Grab Part Of City
 
             if (actionState.toggleGrab)
             {
@@ -354,9 +426,9 @@ namespace SEE.Controls
                 }
             }
 
-            #endregion
+#endregion
 
-            #region Move City
+#region Move City
 
             else if (mode == NavigationMode.Move)
             {
@@ -420,9 +492,9 @@ namespace SEE.Controls
                 }
             }
 
-            #endregion
+#endregion
 
-            #region Rotate
+#region Rotate
 
             else // mode == NavigationMode.Rotate
             {
@@ -505,9 +577,9 @@ namespace SEE.Controls
                 }
             }
 
-            #endregion
+#endregion
 
-            #region Zoom
+#region Zoom
 
             if (actionState.zoomToggleToObject)
             {
@@ -580,9 +652,9 @@ namespace SEE.Controls
                 moveState.dragStartTransformPosition -= moveState.dragStartOffset;
             }
 
-            #endregion
+#endregion
 
-            #region ApplyVelocityAndConstraints
+#region ApplyVelocityAndConstraints
 
             if (!movingOrRotating)
             {
@@ -611,7 +683,7 @@ namespace SEE.Controls
                 cityTransform.position += new Vector3(toSurfaceDirection.x, 0.0f, toSurfaceDirection.y);
             }
 
-            #endregion
+#endregion
         }
 
         private float ConvertZoomStepsToZoomFactor(float zoomSteps)
