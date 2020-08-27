@@ -69,11 +69,18 @@ namespace SEE.Charts.Scripts
             _chartContent = transform.parent.parent.GetComponent<ChartContent>();
             _dropdown = GetComponent<TMP_Dropdown>();
             GetKeys();
-            Value = "Metric." + _dropdown.options[0].text;
-            _chartContent.SetInfoText();
-            var noneText = "(NONE) " + _dropdown.options[0].text;
-            _dropdown.options[0].text = noneText;
-            _dropdown.captionText.text = noneText;
+            if (_dropdown.options.Count > 0)
+            {
+                Value = "Metric." + _dropdown.options[0].text;
+                _chartContent.SetInfoText();
+                var noneText = "(NONE) " + _dropdown.options[0].text;
+                _dropdown.options[0].text = noneText;
+                _dropdown.captionText.text = noneText;
+            }
+            else
+            {
+                Debug.LogWarning("There are no metrics for the charts.\n");
+            }
         }
 
         /// <summary>

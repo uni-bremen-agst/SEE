@@ -349,17 +349,37 @@ namespace SEE.Charts.Scripts
 		private void GetAllNumericAttributes()
 		{
 			Performance p = Performance.Begin("GetAllNumericAttributes");
-			foreach (var data in _dataObjects)
+			AllKeys.Clear();
+			if (_dataObjects.Length == 0)
+            {
+				Debug.LogWarning("There are no nodes for showing metrics.\n");
+            }
+			else
 			{
-                Node node = data.GetComponent<NodeRef>().node;
-                foreach (var key in node.FloatAttributes.Keys)
+				foreach (var data in _dataObjects)
 				{
-					AllKeys.Add(key);
+					
+					Node node = data.GetComponent<NodeRef>().node;
+					foreach (var key in node.FloatAttributes.Keys)
+					{
+						AllKeys.Add(key);
+					}
+					foreach (var key in node.IntAttributes.Keys)
+					{
+						AllKeys.Add(key);
+					}
 				}
-				foreach (var key in node.IntAttributes.Keys)
+				if (AllKeys.Count > 0)
 				{
-					AllKeys.Add(key);
+					foreach (string metric in AllKeys)
+					{
+						Debug.LogFormat("Available metric: {0}\n", metric);
+					}
 				}
+				else
+                {
+					Debug.LogWarning("No metrics available for charts.\n");
+                }
 			}
 			p.End();
 		}
@@ -371,13 +391,16 @@ namespace SEE.Charts.Scripts
 		{
 			Performance p = Performance.Begin("FindDataObjects: Find nodes");
 			_dataObjects = GameObject.FindGameObjectsWithTag("Node");
+			Debug.LogFormat("ChartContent.FindDataObjects: found {0} nodes.\n", _dataObjects.Length);
 			p.End();
 
 			p = Performance.Begin("FindDataObjects: Node highlights");
 			foreach (var entry in _dataObjects)
 			{
-				entry.TryGetComponent<NodeHighlights>(out var highlights);
-				highlights.showInChart[this] = true;
+				if (entry.TryGetComponent<NodeHighlights>(out NodeHighlights highlights))
+				{
+					highlights.showInChart[this] = true;
+				}
 				//if (!highlights.showInChart.Contains(this)) highlights.showInChart.Add(this, true);
 			}
 			p.End();
@@ -596,14 +619,14 @@ namespace SEE.Charts.Scripts
 			{
 				var marker = Instantiate(markerPrefab, entries.transform);
 				marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
-				marker.TryGetComponent<ChartMarker>(out var script);
-				script.linkedObject = data;
-				script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
+				marker.TryGetComponent<ChartMarker>(out ChartMarker chartMarker);
+				chartMarker.linkedObject = data;
+				chartMarker.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
 				var node = data.GetComponent<NodeRef>().node;
 				node.TryGetNumeric(axisDropdownX.Value, out var valueX);
 				node.TryGetNumeric(axisDropdownY.Value, out var valueY);
 				var type = node.IsLeaf() ? "Building" : "Node";
-				script.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
+				chartMarker.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
 				                   valueX.ToString("N") + ", Y: " + valueY.ToString("N"));
 				marker.GetComponent<RectTransform>().anchoredPosition =
 					new Vector2((valueX - minX) * width, (valueY - minY) * height);
@@ -612,7 +635,7 @@ namespace SEE.Charts.Scripts
 
 				var highlightTimeLeft = CheckOldMarkers(data);
 				if (highlightTimeLeft > 0f)
-					script.TriggerTimedHighlight(ChartManager.Instance.highlightDuration - highlightTimeLeft,
+					chartMarker.TriggerTimedHighlight(ChartManager.Instance.highlightDuration - highlightTimeLeft,
 						true, false);
 			}
 
@@ -866,9 +889,9 @@ namespace SEE.Charts.Scripts
 		{
 			foreach (var activeMarker in ActiveMarkers)
 			{
-				activeMarker.TryGetComponent<ChartMarker>(out var script);
-				if (!script.linkedObject.Equals(highlight)) continue;
-				script.Accentuate();
+				activeMarker.TryGetComponent<ChartMarker>(out ChartMarker marker);
+				if (!marker.linkedObject.Equals(highlight)) continue;
+				marker.Accentuate();
 				break;
 			}
 		}

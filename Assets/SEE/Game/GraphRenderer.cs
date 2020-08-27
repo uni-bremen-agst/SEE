@@ -734,9 +734,15 @@ namespace SEE.Game
                     break;
                 case SEECity.InnerNodeKinds.Circles:
                     {
-                        CircleDecorator decorator = new CircleDecorator(innerNodeFactory, Color.white);
-                        // the circle decorator does not create new game objects; it justs adds a line
-                        // renderer to the list of nodes; that is why we do not add the result to decorations.
+                        // We want to adjust the size and the line width of the circle line created by the CircleFactory.
+                        CircleDecorator decorator = new CircleDecorator(innerNodeFactory, Color.white);                        
+                        decorator.Add(InnerNodes(gameNodes));
+                    }
+                    break;
+                case SEECity.InnerNodeKinds.Rectangles:
+                    {
+                        // We want to adjust the line width of the rectangle line created by the RectangleFactory.
+                        RectangleDecorator decorator = new RectangleDecorator(innerNodeFactory, Color.white);
                         decorator.Add(InnerNodes(gameNodes));
                     }
                     break;
@@ -750,11 +756,6 @@ namespace SEE.Game
                     }
                     break;
                 case SEECity.InnerNodeKinds.Cylinders:
-                case SEECity.InnerNodeKinds.Rectangles:
-                    {
-                        RectangleDecorator decorator = new RectangleDecorator(innerNodeFactory, Color.white);
-                        decorator.Add(InnerNodes(gameNodes));
-                    }
                     break;
                 case SEECity.InnerNodeKinds.Blocks:
                     // TODO
@@ -1292,7 +1293,6 @@ namespace SEE.Game
             AttachHighlighter(innerGameObject);
             AdjustStyle(innerGameObject);
             AdjustHeightOfInnerNode(innerGameObject);
-
             return innerGameObject;
         }
 
