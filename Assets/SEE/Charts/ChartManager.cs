@@ -133,12 +133,12 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// The color highlighted objects will have.
 		/// </summary>
-		public Color standardColor;
+		public Color standardColor = Color.white;
 
 		/// <summary>
 		/// The color accentuated highlighted objects will have.
 		/// </summary>
-		public Color accentuationColor;
+		public Color accentuationColor = Color.red;
 
 		/// <summary>
 		/// The length of the beam appearing above highlighted objects.
