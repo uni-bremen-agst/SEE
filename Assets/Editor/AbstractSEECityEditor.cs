@@ -3,8 +3,6 @@
 using UnityEngine;
 using UnityEditor;
 using SEE.Game;
-using System.IO;
-using SEE;
 using SEE.DataModel;
 using System.Collections.Generic;
 using System.Linq;
