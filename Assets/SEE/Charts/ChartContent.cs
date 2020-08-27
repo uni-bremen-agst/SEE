@@ -397,8 +397,10 @@ namespace SEE.Charts.Scripts
 			p = Performance.Begin("FindDataObjects: Node highlights");
 			foreach (var entry in _dataObjects)
 			{
-				entry.TryGetComponent<NodeHighlights>(out var highlights);
-				highlights.showInChart[this] = true;
+				if (entry.TryGetComponent<NodeHighlights>(out NodeHighlights highlights))
+				{
+					highlights.showInChart[this] = true;
+				}
 				//if (!highlights.showInChart.Contains(this)) highlights.showInChart.Add(this, true);
 			}
 			p.End();
