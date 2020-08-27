@@ -619,14 +619,14 @@ namespace SEE.Charts.Scripts
 			{
 				var marker = Instantiate(markerPrefab, entries.transform);
 				marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
-				marker.TryGetComponent<ChartMarker>(out var script);
-				script.linkedObject = data;
-				script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
+				marker.TryGetComponent<ChartMarker>(out ChartMarker chartMarker);
+				chartMarker.linkedObject = data;
+				chartMarker.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
 				var node = data.GetComponent<NodeRef>().node;
 				node.TryGetNumeric(axisDropdownX.Value, out var valueX);
 				node.TryGetNumeric(axisDropdownY.Value, out var valueY);
 				var type = node.IsLeaf() ? "Building" : "Node";
-				script.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
+				chartMarker.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
 				                   valueX.ToString("N") + ", Y: " + valueY.ToString("N"));
 				marker.GetComponent<RectTransform>().anchoredPosition =
 					new Vector2((valueX - minX) * width, (valueY - minY) * height);
@@ -635,7 +635,7 @@ namespace SEE.Charts.Scripts
 
 				var highlightTimeLeft = CheckOldMarkers(data);
 				if (highlightTimeLeft > 0f)
-					script.TriggerTimedHighlight(ChartManager.Instance.highlightDuration - highlightTimeLeft,
+					chartMarker.TriggerTimedHighlight(ChartManager.Instance.highlightDuration - highlightTimeLeft,
 						true, false);
 			}
 
@@ -889,9 +889,9 @@ namespace SEE.Charts.Scripts
 		{
 			foreach (var activeMarker in ActiveMarkers)
 			{
-				activeMarker.TryGetComponent<ChartMarker>(out var script);
-				if (!script.linkedObject.Equals(highlight)) continue;
-				script.Accentuate();
+				activeMarker.TryGetComponent<ChartMarker>(out ChartMarker marker);
+				if (!marker.linkedObject.Equals(highlight)) continue;
+				marker.Accentuate();
 				break;
 			}
 		}
