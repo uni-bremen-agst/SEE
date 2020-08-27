@@ -10,7 +10,7 @@ namespace SEE
         /// <summary>
         /// The min surface position of the table on the x-axis.
         /// </summary>
-        public const float MinX = -0.8f;
+        public const float MinX = -1.8f;
 
         /// <summary>
         /// The max surface position of the table on the x-axis.
@@ -21,8 +21,6 @@ namespace SEE
         /// The center of the table on the x-axis.
         /// </summary>
         public const float CenterX = (MinX + MaxX) / 2;
-
-
 
         /// <summary>
         /// The min surface position of the table on the y-axis.
@@ -39,8 +37,6 @@ namespace SEE
         /// </summary>
         public const float CenterY = (MinY + MaxY) / 2;
 
-
-
         /// <summary>
         /// The min surface position of the table on the z-axis.
         /// </summary>
@@ -56,8 +52,6 @@ namespace SEE
         /// </summary>
         public const float CenterZ = (MinZ + MaxZ) / 2;
 
-
-
         public static readonly Vector3 Min = new Vector3(MinX, MinY, MinZ);
         public static readonly Vector2 MinXY = new Vector2(MinX, MinY);
         public static readonly Vector2 MinXZ = new Vector2(MinX, MinZ);
@@ -70,8 +64,6 @@ namespace SEE
         public static readonly Vector2 CenterXY = new Vector2(CenterX, CenterY);
         public static readonly Vector2 CenterXZ = new Vector2(CenterX, CenterZ);
         public static readonly Vector2 CenterYZ = new Vector2(CenterY, CenterZ);
-
-
 
         /// <summary>
         /// The width of the table (x-axis).
@@ -87,8 +79,6 @@ namespace SEE
         /// The depth of the table (z-axis).
         /// </summary>
         public const float Depth = MaxZ - MinZ;
-
-
 
         /// <summary>
         /// The max size of the table in either x or z direction.
