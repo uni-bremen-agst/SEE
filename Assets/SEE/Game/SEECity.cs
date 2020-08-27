@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -93,6 +93,7 @@ namespace SEE.Game
                 loadedGraph = LoadGraph(filename);
                 if (loadedGraph != null)
                 {
+                    LoadMetrics();
                     SetNodeRefs(loadedGraph, gameObject);
                 }
                 else
@@ -223,7 +224,7 @@ namespace SEE.Game
         private void LoadMetrics()
         {
             string filename = CSVPath();
-            Performance p = Performance.Begin("loading metric data data from CSV file " + filename);            
+            Performance p = Performance.Begin("loading metric data data from CSV file " + filename);
             int numberOfErrors = MetricImporter.Load(LoadedGraph, filename);
             if (numberOfErrors > 0)
             {
@@ -339,7 +340,7 @@ namespace SEE.Game
                 }
                 else
                 {
-                    GraphRenderer renderer = CoseGraphSettings.useOptAlgorithm ? new OptAlgorithmGraphRenderer(this):  new GraphRenderer(this);
+                    GraphRenderer renderer = CoseGraphSettings.useOptAlgorithm ? new OptAlgorithmGraphRenderer(this) : new GraphRenderer(this);
                     // We assume here that this SEECity instance was added to a game object as
                     // a component. The inherited attribute gameObject identifies this game object.
                     renderer.Draw(visualizedSubGraph, gameObject);
