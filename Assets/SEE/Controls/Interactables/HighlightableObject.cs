@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using SEE.GO;
 using Valve.VR.InteractionSystem;
+using SEE.Game;
 
 namespace SEE.Controls
 {
@@ -12,61 +13,7 @@ namespace SEE.Controls
         [Tooltip("The color to be used when the object is to be highlighted some other client.")]
         public Color RemoteHightlightColor = new Color(0.8f, 1.0f, 0.2f);
 
-        public class MaterialChanger
-        {
-            public MaterialChanger(GameObject gameObject, Material localSpecialMaterial, Material remoteSpecialMaterial)
-            {
-                this.gameObject = gameObject;
-                this.localSpecialMaterial = localSpecialMaterial;
-                this.remoteSpecialMaterial = remoteSpecialMaterial;
-            }
-
-            private readonly GameObject gameObject;
-
-            private Material localSpecialMaterial;
-            private Material remoteSpecialMaterial;
-
-            /// <summary>
-            /// The material before the object was hovered so that it can be restored
-            /// when the object is no longer hovered. While hovering, a highlighting
-            /// material will be used.
-            /// </summary>
-            private Material oldMaterial;
-
-            /// <summary>
-            /// Assigns the special material to the gameObject and stores the original 
-            /// material in oldMaterial.
-            /// </summary>
-            public void UseSpecialMaterial(bool isOwner)
-            {
-                Renderer renderer = gameObject.GetComponent<Renderer>();
-                if (!oldMaterial)
-                {
-                    oldMaterial = renderer.sharedMaterial;
-                }
-                if (isOwner)
-                {
-                    renderer.sharedMaterial = localSpecialMaterial;
-                }
-                else
-                {
-                    renderer.sharedMaterial = remoteSpecialMaterial;
-                }
-            }
-
-            /// <summary>
-            /// Resets the original material of gameObject using the material stored in oldMaterial.
-            /// </summary>
-            public void ResetMaterial()
-            {
-                if (oldMaterial)
-                {
-                    gameObject.GetComponent<Renderer>().sharedMaterial = oldMaterial;
-                }
-                oldMaterial = null;
-            }
-        }
-
+        
         /// <summary>
         /// True if the object is currently being hovered over.
         /// </summary>
