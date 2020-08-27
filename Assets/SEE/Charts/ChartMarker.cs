@@ -234,54 +234,57 @@ namespace SEE.Charts.Scripts
 
 		private void HighlightNode(GameObject linkedObject)
         {
-			Debug.LogErrorFormat("Highlighting {0}\n", linkedObject.name);
+			Debug.LogFormat("Highlighting {0}\n", linkedObject.name);
 
-			//bool highlighted = false;
+			// FIXME: highlighting a node must be done differently. This code causes
+			// nodes to be duplicated, which then end up in a chart, too, where they
+			// can be selected and then will be duplicated again...
+            bool highlighted = false;
 
-			//// Is any of linkedObject's children a result of Instantiate (can be detected by
-			//// the additional name extension "(Clone)".
-			//for (var i = 0; i < linkedObject.transform.childCount; i++)
-			//{
-			//	if (linkedObject.transform.GetChild(i).gameObject.name
-			//		.Equals(linkedObject.name + "(Clone)"))
-			//	{
-			//		highlighted = true;
-			//		break;
-			//	}
-			//}
+            // Is any of linkedObject's children a result of Instantiate (can be detected by
+            // the additional name extension "(Clone)".
+            for (var i = 0; i < linkedObject.transform.childCount; i++)
+            {
+                if (linkedObject.transform.GetChild(i).gameObject.name
+                    .Equals(linkedObject.name + "(Clone)"))
+                {
+                    highlighted = true;
+                    break;
+                }
+            }
 
-			//// None of linkedObject's children is highlighted
-			//if (!highlighted)
-			//{
-			//	// FIXME: This will clone the linkedObject and, hence, create yet another
-			//	// game object tagged by Tags.Node, which will eventually be added to 
-			//	// the charts. This will blow up the charts with unnecessary confusing nodes.
-			//	_highlightCopy = Instantiate(linkedObject, linkedObject.transform);
-			//	_highlightCopy.tag = "Untagged";
-			//	_highlightCopy.transform.localScale = Vector3.one;
-			//	_highlightCopy.transform.localPosition = Vector3.zero;
-			//	if (_highlightCopy.TryGetComponent<Renderer>(out var render))
-			//	{
-			//		render.material = _buildingHighlightMaterial;
-			//	}
+            // None of linkedObject's children is highlighted
+            if (!highlighted)
+            {
+                // FIXME: This will clone the linkedObject and, hence, create yet another
+                // game object tagged by Tags.Node, which will eventually be added to 
+                // the charts. This will blow up the charts with unnecessary confusing nodes.
+                _highlightCopy = Instantiate(linkedObject, linkedObject.transform);
+                _highlightCopy.tag = "Untagged";
+                _highlightCopy.transform.localScale = Vector3.one;
+                _highlightCopy.transform.localPosition = Vector3.zero;
+                if (_highlightCopy.TryGetComponent<Renderer>(out var render))
+                {
+                    render.material = _buildingHighlightMaterial;
+                }
 
-			//	Debug.LogFormat("highlightLine={0}\n", highlightLine);
-			//	GameObject copyOfHighlightLine = Instantiate(highlightLine, _highlightCopy.transform);
+                Debug.LogFormat("highlightLine={0}\n", highlightLine);
+                GameObject copyOfHighlightLine = Instantiate(highlightLine, _highlightCopy.transform);
 
-			//	// FIXME: This code relies on the fact that a node has a line renderer.
-			//	// The node factories were extended to add such line renderers to their
-			//	// game nodes.
-			//	// What if it has two (as for circles) or none?
-			//	copyOfHighlightLine.TryGetComponent<LineRenderer>(out var line);
-			//	Vector3 linePos = _highlightCopy.transform.localPosition;
-			//	line.SetPositions(new[]
-			//	{
-			//			linePos,
-			//			linePos + new Vector3(0f, _highlightLineLength) /
-			//			_highlightCopy.transform.lossyScale.y
-			//		});
-			//}
-		}
+                // FIXME: This code relies on the fact that a node has a line renderer.
+                // The node factories were extended to add such line renderers to their
+                // game nodes.
+                // What if it has two (as for circles) or none?
+                copyOfHighlightLine.TryGetComponent<LineRenderer>(out var line);
+                Vector3 linePos = _highlightCopy.transform.localPosition;
+                line.SetPositions(new[]
+                {
+                        linePos,
+                        linePos + new Vector3(0f, _highlightLineLength) /
+                        _highlightCopy.transform.lossyScale.y
+                    });
+            }
+        }
 
 		private void UnhighlightNode(GameObject linkedObject)
         {
