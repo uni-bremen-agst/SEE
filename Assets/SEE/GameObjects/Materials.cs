@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.GO
 {
@@ -95,9 +94,9 @@ namespace SEE.GO
 
         public static void SetGlobalUniforms()
         {
-            Vector2 leftFront = Plane.LeftFrontCorner;
+            Vector2 leftFront = Plane.Instance.LeftFrontCorner;
             Shader.SetGlobalVector("portalMin", new Vector4(leftFront.x, leftFront.y));
-            Vector2 rightFront = Plane.RightBackCorner;
+            Vector2 rightFront = Plane.Instance.RightBackCorner;
             Shader.SetGlobalVector("portalMax", new Vector4(rightFront.x, rightFront.y));
         }
 
