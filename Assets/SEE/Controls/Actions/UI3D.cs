@@ -186,7 +186,7 @@ namespace SEE.UI3D
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
             go.name = "RotatePivot";
             go.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
-            go.transform.position = Table.TableTopCenterEpsilon;
+            go.transform.position = Plane.CenterTop;
 
             RotateGizmo p = go.AddComponent<RotateGizmo>();
 
