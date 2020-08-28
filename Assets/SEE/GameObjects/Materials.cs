@@ -95,8 +95,10 @@ namespace SEE.GO
 
         public static void SetGlobalUniforms()
         {
-            Shader.SetGlobalVector("portalMin", new Vector4(Table.MinX, Table.MinZ));
-            Shader.SetGlobalVector("portalMax", new Vector4(Table.MaxX, Table.MaxZ));
+            Vector2 leftFront = Plane.LeftFrontCorner;
+            Shader.SetGlobalVector("portalMin", new Vector4(leftFront.x, leftFront.y));
+            Vector2 rightFront = Plane.RightBackCorner;
+            Shader.SetGlobalVector("portalMax", new Vector4(rightFront.x, rightFront.y));
         }
 
         /// <summary>
