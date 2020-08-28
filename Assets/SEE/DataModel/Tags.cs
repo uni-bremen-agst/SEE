@@ -1,6 +1,4 @@
-﻿using UnityEngine.PlayerLoop;
-
-namespace SEE.DataModel
+﻿namespace SEE.DataModel
 {
     /// <summary>
     /// The Unity tags for the graph entities represented by the GameObjects.
@@ -18,6 +16,7 @@ namespace SEE.DataModel
         public const string Path = "Path"; // for camera paths
         public const string Runtime = "Runtime";
         public const string FunctionCall = "Function Call";
+        public const string CullingPlane = "CullingPlane"; // for a plane where code cities can be put on and be moved around with culling
 
         /// <summary>
         /// All existing tags in one.
