@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.DataModel;
+using UnityEngine;
 
 namespace SEE
 {
@@ -15,7 +16,7 @@ namespace SEE
         /// The left front corner of the plane.
         /// Note: the y co-ordinate of the resulting Vector2 denotes a value in the z axis.
         /// </summary>
-        public static Vector2 LeftFrontCorner
+        public Vector2 LeftFrontCorner
         {
             get
             {
@@ -31,7 +32,7 @@ namespace SEE
         /// The right back corner of the plane.
         /// Note: the y co-ordinate of the resulting Vector2 denotes a value in the z axis.
         /// </summary>
-        public static Vector2 RightBackCorner
+        public Vector2 RightBackCorner
         {
             get
             {
@@ -46,7 +47,7 @@ namespace SEE
         /// <summary>
         /// The center point of the plane in the x/z plane.
         /// </summary>
-        public static Vector2 CenterXZ
+        public Vector2 CenterXZ
         {
             get
             {
@@ -58,7 +59,7 @@ namespace SEE
         /// <summary>
         /// The min length of the plane in either x or z direction.
         /// </summary>
-        public static float MinLengthXZ
+        public float MinLengthXZ
         {
             get
             {
@@ -66,31 +67,68 @@ namespace SEE
                 return scale.x < scale.z ? scale.x : scale.z;
             }
         }
-        
+
+        /// <summary>
+        /// The unique instance of a plane.
+        /// FIXME: We need to support an arbitrary number of planes.
+        /// </summary>
+        private static Plane instance = null;
+
         /// <summary>
         /// The instance of the plane.
         /// </summary>
-        public static Plane Instance { get; private set; }
+        public static Plane Instance 
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    // FIXME: We are iterating over all objects. There should be a better way
+                    // to obtain the Plane object. Moreover, we should allow multiple such
+                    // objects anyhow.
+                    foreach (GameObject plane in GameObject.FindGameObjectsWithTag(Tags.CullingPlane))
+                    {
+                        if (instance != null)
+                        {
+                            Debug.LogErrorFormat("There is yet another game object tagged by named {0}.\n", Tags.CullingPlane, plane.name);                            
+                        }
+                        else
+                        {
+                            instance = plane.GetComponent<Plane>();
+                            // Note: this will also handle the case in which the plane
+                            // has no component Plane. Then we will simply continue
+                            // and try the next game object tagged accordingly.
+
+                            if (instance != null)
+                            {
+                                Debug.LogFormat("plane {0} size={1}\n", plane.name, plane.transform.lossyScale);
+                            }
+                        }
+                    }
+                    if (instance == null)
+                    {
+                        throw new System.Exception("There is no game object tagged by " + Tags.CullingPlane
+                            + " with a component Plane");
+                    }
+                }
+                return instance;
+            }
+            private set
+            {
+                instance = value;
+            }
+        }
 
         /// <summary>
         /// The center of the plane's roof (plus some very small y delta).
         /// </summary>
-        public static Vector3 CenterTop
+        public Vector3 CenterTop
         {
             get
             {
                 Vector3 scale = Instance.transform.lossyScale;
                 return Instance.transform.position + new Vector3(0.0f, scale.y / 2.0f + float.Epsilon, 0.0f);
             }
-        }
-
-        private void Awake()
-        {
-            if (Instance != null)
-            {
-                Debug.LogWarning("There is more than one plane!\n");
-            }
-            Instance = this;
         }
     }
 }

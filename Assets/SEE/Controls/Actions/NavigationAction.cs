@@ -159,7 +159,6 @@ namespace SEE.Controls
         private void Start()
         {
             cityTransform = GetCity();
-            Debug.LogFormat("City object is {0}\n", cityTransform.name);
 
             zoomState.originalScale = cityTransform.localScale;
             Collider collider = cityTransform.GetComponent<Collider>();
@@ -176,7 +175,7 @@ namespace SEE.Controls
             moveState.dragStartTransformPosition = cityTransform.position;
             moveState.dragCanonicalOffset = Vector3.zero;
             moveState.moveVelocity = Vector3.zero;
-            moveState.moveGizmo = UI3D.MoveGizmo.Create(0.008f * Plane.MinLengthXZ);
+            moveState.moveGizmo = UI3D.MoveGizmo.Create(0.008f * Plane.Instance.MinLengthXZ);
             rotateState.rotateGizmo = UI3D.RotateGizmo.Create(1024);
 
             zoomState.zoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps);
@@ -185,7 +184,7 @@ namespace SEE.Controls
 
             cursor = UI3D.Cursor.Create();
 
-            Camera.main.transform.position = Plane.CenterTop;
+            Camera.main.transform.position = Plane.Instance.CenterTop;
             cameraState.distance = 1.0f;
             cameraState.yaw = 0.0f;
             cameraState.pitch = 30.0f;
@@ -300,15 +299,15 @@ namespace SEE.Controls
                 cameraState.yaw += x;
                 cameraState.pitch -= y;
             }
-            Camera.main.transform.position = Plane.CenterTop;
+            Camera.main.transform.position = Plane.Instance.CenterTop;
             Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
 
             // TODO: distinguish whether selectedObjects refers to a node of
             // the architecture, implementation, or mapping.
-            Debug.LogFormat("copy={0} paste={1} clearClipboard={2} selectedObject={3}\n",
-                            actionState.copy, actionState.paste, actionState.clearClipboard,
-                            selectedObject != null ? selectedObject.name : "NONE");
+            //Debug.LogFormat("copy={0} paste={1} clearClipboard={2} selectedObject={3}\n",
+            //                actionState.copy, actionState.paste, actionState.clearClipboard,
+            //                selectedObject != null ? selectedObject.name : "NONE");
             if (actionState.copy && selectedObject != null)
             {
                 if (objectsInClipboard.Contains(selectedObject))
@@ -438,7 +437,7 @@ namespace SEE.Controls
                     movingOrRotating = false;
                     moveState.moveGizmo.gameObject.SetActive(false);
 
-                    cityTransform.position = Plane.CenterTop;
+                    cityTransform.position = Plane.Instance.CenterTop;
                 }
                 else if (actionState.cancel) // cancel movement
                 {
@@ -586,7 +585,7 @@ namespace SEE.Controls
                 actionState.zoomToggleToObject = false;
                 if (cursor.GetFocus() != null)
                 {
-                    float optimalTargetZoomFactor = Plane.MinLengthXZ / (cursor.GetFocus().lossyScale.x / zoomState.currentZoomFactor);
+                    float optimalTargetZoomFactor = Plane.Instance.MinLengthXZ / (cursor.GetFocus().lossyScale.x / zoomState.currentZoomFactor);
                     float optimalTargetZoomSteps = ConvertZoomFactorToZoomSteps(optimalTargetZoomFactor);
                     int actualTargetZoomSteps = Mathf.FloorToInt(optimalTargetZoomSteps);
                     float actualTargetZoomFactor = ConvertZoomStepsToZoomFactor(actualTargetZoomSteps);
@@ -602,8 +601,8 @@ namespace SEE.Controls
                     {
                         float zoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
                         Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.currentTargetZoomSteps ? cityTransform.position.XZ() : cursor.GetFocus().position.XZ();
-                        Vector2 toCenterOfTable = Plane.CenterXZ - centerOfTableAfterZoom;
-                        Vector2 zoomCenter = Plane.CenterXZ - (toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f)));
+                        Vector2 toCenterOfTable = Plane.Instance.CenterXZ - centerOfTableAfterZoom;
+                        Vector2 zoomCenter = Plane.Instance.CenterXZ - (toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f)));
                         float duration = 2.0f * ZoomState.DefaultZoomDuration;
                         new Net.ZoomCommandAction(zoomCenter, zoomSteps, duration).Execute();
                     }
@@ -675,7 +674,12 @@ namespace SEE.Controls
 
             // Keep city constrained to table
             float radius = 0.5f * cityTransform.lossyScale.x;
-            MathExtensions.TestCircleAABB(cityTransform.position.XZ(), 0.9f * radius, Plane.LeftFrontCorner, Plane.RightBackCorner, out float distance, out Vector2 normalizedToSurfaceDirection);
+            MathExtensions.TestCircleAABB(cityTransform.position.XZ(), 
+                                          0.9f * radius, 
+                                          Plane.Instance.LeftFrontCorner, 
+                                          Plane.Instance.RightBackCorner, 
+                                          out float distance, 
+                                          out Vector2 normalizedToSurfaceDirection);
 
             if (distance > 0.0f)
             {
