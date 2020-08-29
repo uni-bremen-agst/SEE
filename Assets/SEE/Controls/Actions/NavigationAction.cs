@@ -91,13 +91,6 @@ namespace SEE.Controls
             internal float currentZoomFactor;
         }
 
-        private struct CameraState
-        {
-            internal float distance;
-            internal float yaw;
-            internal float pitch;
-        }
-
         private struct ActionState
         {
             internal bool toggleGrab;        // grab element of city
@@ -113,10 +106,8 @@ namespace SEE.Controls
             internal bool paste;             // paste (map) copied object
             internal bool clearClipboard;    // whether the clipboard of copied nodes has been cleared
         }
-
-        private const int RightMouseButton = 1;
         
-        private Transform cityTransform;
+        private Transform cityRootTransform;
         private UnityEngine.Plane raycastPlane;
 
         private NavigationMode mode;
@@ -127,52 +118,77 @@ namespace SEE.Controls
         MoveState moveState;
         RotateState rotateState;
         ZoomState zoomState;
-        CameraState cameraState;
         ActionState actionState;
 
-        private const string CityObjectName = "Implementation";
-
-        private static Transform GetCity()
+        /// <summary>
+        /// Returns the game object representing the root of the graph.
+        /// 
+        /// Precondition: This NavigationAction is attached to an object that has exactly 
+        /// one child with a game object tagged by Tags.Node. This child object is 
+        /// returned.
+        /// </summary>
+        /// <returns>game object representing the root of the graph or null if there is none</returns>
+        private Transform GetCityRootNode()
         {
-            // FIXME: We must not rely on this particular name for the game object.
-
-            GameObject seeCity = GameObject.Find(CityObjectName);
-            if (seeCity == null)
+            foreach (Transform child in gameObject.transform)
             {
-                Debug.LogErrorFormat("There is no game object named {0}.\n", CityObjectName);
-                return null;
-            }
-            else
-            {
-                foreach (Transform child in seeCity.transform)
+                if (child.tag == Tags.Node)
                 {
-                    if (child.tag == Tags.Node)
-                    {
-                        return child.transform;
-                    }
+                    return child.transform;
                 }
-                Debug.LogErrorFormat("Game object named {0} has no child tagged by {1}.\n", CityObjectName, Tags.Node);
-                return null;
             }
+            Debug.LogErrorFormat("Game object named {0} has no child tagged by {1}.\n", CityObjectName, Tags.Node);
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the first transform towards the root of the game-object hierarchy
+        /// that is tagged by Tags.CodeCity. If none can be found, null is returned.
+        /// 
+        /// Precondition: The given <paramref name="transform"/> is part of a
+        /// game-object tree and either this <paramref name="transform"/> (in which
+        /// case <paramref name="transform"/> itself is returned) or any
+        /// of its ascendants is tagged by Tags.CodeCity.
+        /// </summary>
+        /// <param name="transform">transform at which to start the search</param>
+        /// <returns>first ascending transform tagged by Tags.CodeCity or null</returns>
+        private Transform GetHitCity(Transform transform)
+        {
+            Transform cursor = transform;
+            while (cursor != null)
+            {
+                if (cursor.tag == Tags.CodeCity)
+                {
+                    return cursor;
+                }
+                cursor = cursor.parent;
+            }
+            return cursor;            
         }
 
         private void Start()
         {
-            cityTransform = GetCity();
+            cityRootTransform = GetCityRootNode();
+            if (cityRootTransform == null)
+            {
+                throw new Exception("This NavigationAction is not attached to a code city.");
+            }
 
-            zoomState.originalScale = cityTransform.localScale;
-            Collider collider = cityTransform.GetComponent<Collider>();
+            Debug.LogFormat("NavigationAction controls {0}.\n", cityRootTransform.name);
+
+            zoomState.originalScale = cityRootTransform.localScale;
+            Collider collider = cityRootTransform.GetComponent<Collider>();
             if (collider == null)
             {
-                Debug.LogErrorFormat("The city object {0} has no collider attached to it.\n", cityTransform.name);
+                Debug.LogErrorFormat("The city object {0} has no collider attached to it.\n", cityRootTransform.name);
             }
             else
             {
                 moveState.cityBounds = collider.bounds;
             }
-            raycastPlane = new UnityEngine.Plane(Vector3.up, cityTransform.position);
+            raycastPlane = new UnityEngine.Plane(Vector3.up, cityRootTransform.position);
             
-            moveState.dragStartTransformPosition = cityTransform.position;
+            moveState.dragStartTransformPosition = cityRootTransform.position;
             moveState.dragCanonicalOffset = Vector3.zero;
             moveState.moveVelocity = Vector3.zero;
             moveState.moveGizmo = UI3D.MoveGizmo.Create(0.008f * Plane.Instance.MinLengthXZ);
@@ -184,12 +200,6 @@ namespace SEE.Controls
 
             cursor = UI3D.Cursor.Create();
 
-            Camera.main.transform.position = Plane.Instance.CenterTop;
-            cameraState.distance = 1.0f;
-            cameraState.yaw = 0.0f;
-            cameraState.pitch = 30.0f;
-            Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
-            Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
         }
 
         /// <summary>
@@ -215,13 +225,32 @@ namespace SEE.Controls
             return leftControl;
         }
 
+        private static RaycastHit[] SortedHits()
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit[] hits = Physics.RaycastAll(ray);
+            Array.Sort(hits, (h0, h1) => h0.distance.CompareTo(h1.distance));
+            return hits;
+        }
+
         private void Update()
         {
             // Note: Input MUST NOT be inquired in FixedUpdate() for the input to feel responsive!
 
+            actionState.drag = Input.GetMouseButton(2);
+
+            // We check whether we are focusing on the code city this NavigationAction is attached to.
+            RaycastHit[] hits = SortedHits();
+            // If we don't hit anything or if we hit anything (including an other code city 
+            // that is different from the code city this NavigationAction is attached to,
+            // we will not process any user input unless the user is currently dragging.
+            if ((hits.Length == 0 || GetHitCity(hits[0].transform) != cityRootTransform.parent) && !actionState.drag)
+            {
+                return;
+            }
+
             actionState.toggleGrab |= Input.GetKeyDown(KeyCode.G);
             actionState.startDrag |= Input.GetMouseButtonDown(2);
-            actionState.drag = Input.GetMouseButton(2);
             actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
             actionState.snap = Input.GetKey(KeyCode.LeftAlt);
             actionState.reset |= Input.GetKeyDown(KeyCode.R);
@@ -257,9 +286,6 @@ namespace SEE.Controls
             GameObject selectedObject = null;
             if (!actionState.drag && Input.GetMouseButtonDown(0))
             {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                RaycastHit[] hits = Physics.RaycastAll(ray);
-                Array.Sort(hits, (h0, h1) => h0.distance.CompareTo(h1.distance));
                 bool selected = false;
                 foreach (RaycastHit hit in hits)
                 {
@@ -280,28 +306,6 @@ namespace SEE.Controls
             {
                 rotateState.rotateGizmo.Center = cursor.GetFocus().position;
             }
-
-            // Camera
-            const float Speed = 2.0f; // TODO(torben): this is arbitrary
-            float speed = Input.GetKey(KeyCode.LeftShift) ? 4.0f * Speed : Speed;
-            if (Input.GetKey(KeyCode.W))
-            {
-                cameraState.distance -= speed * Time.deltaTime;
-            }
-            if (Input.GetKey(KeyCode.S))
-            {
-                cameraState.distance += speed * Time.deltaTime;
-            }
-            if (Input.GetMouseButton(RightMouseButton))
-            {
-                float x = Input.GetAxis("mouse x");
-                float y = Input.GetAxis("mouse y");
-                cameraState.yaw += x;
-                cameraState.pitch -= y;
-            }
-            Camera.main.transform.position = Plane.Instance.CenterTop;
-            Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
-            Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
 
             // TODO: distinguish whether selectedObjects refers to a node of
             // the architecture, implementation, or mapping.
@@ -437,7 +441,7 @@ namespace SEE.Controls
                     movingOrRotating = false;
                     moveState.moveGizmo.gameObject.SetActive(false);
 
-                    cityTransform.position = Plane.Instance.CenterTop;
+                    cityRootTransform.position = Plane.Instance.CenterTop;
                 }
                 else if (actionState.cancel) // cancel movement
                 {
@@ -448,7 +452,7 @@ namespace SEE.Controls
                         moveState.moveGizmo.gameObject.SetActive(false);
 
                         moveState.moveVelocity = Vector3.zero;
-                        cityTransform.position = moveState.dragStartTransformPosition + moveState.dragStartOffset - Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
+                        cityRootTransform.position = moveState.dragStartTransformPosition + moveState.dragStartOffset - Vector3.Scale(moveState.dragCanonicalOffset, cityRootTransform.localScale);
                     }
                 }
                 else if (actionState.drag) // start or continue movement
@@ -461,9 +465,9 @@ namespace SEE.Controls
                             movingOrRotating = true;
                             moveState.moveGizmo.gameObject.SetActive(true);
 
-                            moveState.dragStartTransformPosition = cityTransform.position;
-                            moveState.dragStartOffset = planeHitPoint - cityTransform.position;
-                            moveState.dragCanonicalOffset = moveState.dragStartOffset.DividePairwise(cityTransform.localScale);
+                            moveState.dragStartTransformPosition = cityRootTransform.position;
+                            moveState.dragStartOffset = planeHitPoint - cityRootTransform.position;
+                            moveState.dragCanonicalOffset = moveState.dragStartOffset.DividePairwise(cityRootTransform.localScale);
                             moveState.moveVelocity = Vector3.zero;
                         }
                         if (movingOrRotating) // continue movement
@@ -475,12 +479,12 @@ namespace SEE.Controls
                                 totalDragOffsetFromStart = Project(totalDragOffsetFromStart);
                             }
 
-                            Vector3 oldPosition = cityTransform.position;
+                            Vector3 oldPosition = cityRootTransform.position;
                             Vector3 newPosition = moveState.dragStartTransformPosition + totalDragOffsetFromStart;
 
                             moveState.moveVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime;
-                            cityTransform.position = newPosition;
-                            moveState.moveGizmo.SetPositions(moveState.dragStartTransformPosition + moveState.dragStartOffset, cityTransform.position + Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale));
+                            cityRootTransform.position = newPosition;
+                            moveState.moveGizmo.SetPositions(moveState.dragStartTransformPosition + moveState.dragStartOffset, cityRootTransform.position + Vector3.Scale(moveState.dragCanonicalOffset, cityRootTransform.localScale));
                         }
                     }
                 }
@@ -505,7 +509,7 @@ namespace SEE.Controls
                         movingOrRotating = false;
                         rotateState.rotateGizmo.gameObject.SetActive(false);
 
-                        cityTransform.RotateAround(rotateState.rotateGizmo.Center, Vector3.up, -cityTransform.rotation.eulerAngles.y);
+                        cityRootTransform.RotateAround(rotateState.rotateGizmo.Center, Vector3.up, -cityRootTransform.rotation.eulerAngles.y);
                     }
                     else if (actionState.cancel) // cancel rotation
                     {
@@ -515,8 +519,8 @@ namespace SEE.Controls
                             movingOrRotating = false;
                             rotateState.rotateGizmo.gameObject.SetActive(false);
 
-                            cityTransform.rotation = Quaternion.Euler(0.0f, rotateState.originalEulerAngleY, 0.0f);
-                            cityTransform.position = rotateState.originalPosition;
+                            cityRootTransform.rotation = Quaternion.Euler(0.0f, rotateState.originalEulerAngleY, 0.0f);
+                            cityRootTransform.position = rotateState.originalPosition;
                         }
                     }
                     else if (actionState.drag) // start or continue rotation
@@ -532,9 +536,9 @@ namespace SEE.Controls
                                 movingOrRotating = true;
                                 rotateState.rotateGizmo.gameObject.SetActive(true);
 
-                                rotateState.originalEulerAngleY = cityTransform.rotation.eulerAngles.y;
-                                rotateState.originalPosition = cityTransform.position;
-                                rotateState.startAngle = AngleMod(cityTransform.rotation.eulerAngles.y - toHitAngle);
+                                rotateState.originalEulerAngleY = cityRootTransform.rotation.eulerAngles.y;
+                                rotateState.originalPosition = cityRootTransform.position;
+                                rotateState.startAngle = AngleMod(cityRootTransform.rotation.eulerAngles.y - toHitAngle);
                                 rotateState.rotateGizmo.SetMinAngle(Mathf.Deg2Rad * toHitAngle);
                                 rotateState.rotateGizmo.SetMaxAngle(Mathf.Deg2Rad * toHitAngle);
                             }
@@ -546,7 +550,7 @@ namespace SEE.Controls
                                 {
                                     angle = AngleMod(Mathf.Round(angle / RotateState.SnapStepAngle) * RotateState.SnapStepAngle);
                                 }
-                                cityTransform.RotateAround(cursor.GetFocus().position, Vector3.up, angle - cityTransform.rotation.eulerAngles.y);
+                                cityRootTransform.RotateAround(cursor.GetFocus().position, Vector3.up, angle - cityRootTransform.rotation.eulerAngles.y);
 
                                 float prevAngle = Mathf.Rad2Deg * rotateState.rotateGizmo.GetMaxAngle();
                                 float currAngle = toHitAngle;
@@ -600,11 +604,11 @@ namespace SEE.Controls
                     if (zoomSteps != 0)
                     {
                         float zoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
-                        Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.currentTargetZoomSteps ? cityTransform.position.XZ() : cursor.GetFocus().position.XZ();
+                        Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.currentTargetZoomSteps ? cityRootTransform.position.XZ() : cursor.GetFocus().position.XZ();
                         Vector2 toCenterOfTable = Plane.Instance.CenterXZ - centerOfTableAfterZoom;
                         Vector2 zoomCenter = Plane.Instance.CenterXZ - (toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f)));
                         float duration = 2.0f * ZoomState.DefaultZoomDuration;
-                        new Net.ZoomCommandAction(zoomCenter, zoomSteps, duration).Execute();
+                        new Net.ZoomCommandAction(this, zoomCenter, zoomSteps, duration).Execute();
                     }
                 }
             }
@@ -614,7 +618,7 @@ namespace SEE.Controls
                 float fZoomSteps = actionState.zoomStepsDelta >= 0.0f ? Mathf.Floor(actionState.zoomStepsDelta) : Mathf.Ceil(actionState.zoomStepsDelta);
                 actionState.zoomStepsDelta -= fZoomSteps;
                 int zoomSteps = Mathf.Clamp((int)fZoomSteps, -(int)zoomState.currentTargetZoomSteps, (int)ZoomState.ZoomMaxSteps - (int)zoomState.currentTargetZoomSteps);
-                new Net.ZoomCommandAction(planeHitPoint.XZ(), zoomSteps, ZoomState.DefaultZoomDuration).Execute();
+                new Net.ZoomCommandAction(this, planeHitPoint.XZ(), zoomSteps, ZoomState.DefaultZoomDuration).Execute();
             }
 
             if (zoomState.zoomCommands.Count != 0)
@@ -636,18 +640,18 @@ namespace SEE.Controls
                         zoomSteps -= zoomState.zoomCommands[i].TargetZoomSteps - zoomState.zoomCommands[i].CurrentDeltaScale();
                     }
                 }
-                Vector3 averagePosition = new Vector3(positionSum.x / positionCount, cityTransform.position.y, positionSum.y / positionCount);
+                Vector3 averagePosition = new Vector3(positionSum.x / positionCount, cityRootTransform.position.y, positionSum.y / positionCount);
 
                 zoomState.currentZoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
-                Vector3 cityCenterToHitPoint = averagePosition - cityTransform.position;
-                Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(cityTransform.localScale);
+                Vector3 cityCenterToHitPoint = averagePosition - cityRootTransform.position;
+                Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(cityRootTransform.localScale);
 
-                cityTransform.position += cityCenterToHitPoint;
-                cityTransform.localScale = zoomState.currentZoomFactor * zoomState.originalScale;
-                cityTransform.position -= Vector3.Scale(cityCenterToHitPointUnscaled, cityTransform.localScale);
+                cityRootTransform.position += cityCenterToHitPoint;
+                cityRootTransform.localScale = zoomState.currentZoomFactor * zoomState.originalScale;
+                cityRootTransform.position -= Vector3.Scale(cityCenterToHitPointUnscaled, cityRootTransform.localScale);
 
                 moveState.dragStartTransformPosition += moveState.dragStartOffset;
-                moveState.dragStartOffset = Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
+                moveState.dragStartOffset = Vector3.Scale(moveState.dragCanonicalOffset, cityRootTransform.localScale);
                 moveState.dragStartTransformPosition -= moveState.dragStartOffset;
             }
 
@@ -665,7 +669,7 @@ namespace SEE.Controls
                 }
 
                 // Apply velocity to city position
-                cityTransform.position += moveState.moveVelocity * Time.fixedDeltaTime;
+                cityRootTransform.position += moveState.moveVelocity * Time.fixedDeltaTime;
 
                 // Apply friction to velocity
                 Vector3 acceleration = MoveState.DragFrictionFactor * -moveState.moveVelocity;
@@ -673,8 +677,8 @@ namespace SEE.Controls
             }
 
             // Keep city constrained to table
-            float radius = 0.5f * cityTransform.lossyScale.x;
-            MathExtensions.TestCircleAABB(cityTransform.position.XZ(), 
+            float radius = 0.5f * cityRootTransform.lossyScale.x;
+            MathExtensions.TestCircleAABB(cityRootTransform.position.XZ(), 
                                           0.9f * radius, 
                                           Plane.Instance.LeftFrontCorner, 
                                           Plane.Instance.RightBackCorner, 
@@ -684,7 +688,7 @@ namespace SEE.Controls
             if (distance > 0.0f)
             {
                 Vector2 toSurfaceDirection = distance * normalizedToSurfaceDirection;
-                cityTransform.position += new Vector3(toSurfaceDirection.x, 0.0f, toSurfaceDirection.y);
+                cityRootTransform.position += new Vector3(toSurfaceDirection.x, 0.0f, toSurfaceDirection.y);
             }
 
 #endregion
