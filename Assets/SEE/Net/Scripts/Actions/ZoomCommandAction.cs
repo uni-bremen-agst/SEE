@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Controls;
+using UnityEngine;
 
 namespace SEE.Net
 {
@@ -8,8 +9,11 @@ namespace SEE.Net
         public int zoomSteps;
         public float duration;
 
-        public ZoomCommandAction(Vector2 zoomCenter, int zoomSteps, float duration) : base(false)
+        private readonly NavigationAction navigationAction;
+
+        public ZoomCommandAction(NavigationAction navigationAction, Vector2 zoomCenter, int zoomSteps, float duration) : base(false)
         {
+            this.navigationAction = navigationAction;
             this.zoomCenter = zoomCenter;
             this.zoomSteps = zoomSteps;
             this.duration = duration;
@@ -22,25 +26,16 @@ namespace SEE.Net
 
         protected override bool ExecuteOnClient()
         {
-            GameObject gameObject = GameObject.FindGameObjectWithTag("MainCamera");
             bool result = false;
 
-            if (gameObject)
+            if (navigationAction)
             {
-                Controls.NavigationAction navigationAction = gameObject.GetComponent<Controls.NavigationAction>();
-                if (navigationAction)
-                {
-                    navigationAction.PushZoomCommand(zoomCenter, zoomSteps, duration);
-                    result = true;
-                }
-                else
-                {
-                    Debug.LogError("ZoomAction could not be executed! NavigationAction was null!");
-                }
+                navigationAction.PushZoomCommand(zoomCenter, zoomSteps, duration);
+                result = true;
             }
             else
             {
-                Debug.LogError("ZoomAction could not be executed! GameObject with tag 'MainCamera' was null!");
+                Debug.LogError("ZoomAction could not be executed! NavigationAction was null!");
             }
 
             return result;
