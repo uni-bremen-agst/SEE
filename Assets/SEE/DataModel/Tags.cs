@@ -6,6 +6,7 @@
     public class Tags
     {
         public const string None = ""; // pseudo tag whenever a value for no tag is needed
+        public const string CodeCity = "Code City"; // for objects representing a code city hosting objects tagged by Node and Edge tags.
         public const string Graph = "Graph";
         public const string Node = "Node"; // for logical graph nodes (not their visual representation such as Blocks and Buildings)
         public const string Edge = "Edge";
