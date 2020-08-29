@@ -26,6 +26,7 @@ TagManager:
   - TestHelper
   - Building
   - CullingPlane
+  - Code City
   layers:
   - Default
   - TransparentFX
