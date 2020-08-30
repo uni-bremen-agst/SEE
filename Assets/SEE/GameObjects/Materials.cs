@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SEE.DataModel;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -94,10 +95,29 @@ namespace SEE.GO
 
         public static void SetGlobalUniforms()
         {
-            Vector2 leftFront = Plane.Instance.LeftFrontCorner;
-            Shader.SetGlobalVector("portalMin", new Vector4(leftFront.x, leftFront.y));
-            Vector2 rightFront = Plane.Instance.RightBackCorner;
-            Shader.SetGlobalVector("portalMax", new Vector4(rightFront.x, rightFront.y));
+            // FIXME: We need to support multiple culling planes.
+            GameObject table = GameObject.FindGameObjectWithTag(Tags.CullingPlane);
+            if (table != null)
+            {
+                Plane plane = table.GetComponent<Plane>();
+                if (plane != null)
+                {
+                    //Vector2 leftFront = Plane.Instance.LeftFrontCorner;
+                    Vector2 leftFront = plane.LeftFrontCorner;
+                    Shader.SetGlobalVector("portalMin", new Vector4(leftFront.x, leftFront.y));
+                    //Vector2 rightFront = Plane.Instance.RightBackCorner;
+                    Vector2 rightFront = plane.RightBackCorner;
+                    Shader.SetGlobalVector("portalMax", new Vector4(rightFront.x, rightFront.y));
+                }
+                else
+                {
+                    Debug.LogErrorFormat("No plane attached to culling plane {0}.\n", table.name);
+                }
+            }
+            else
+            {
+                Debug.LogErrorFormat("No game object tagged by {0} (serving as culling plane).\n", Tags.CullingPlane);
+            }
         }
 
         /// <summary>
@@ -116,7 +136,8 @@ namespace SEE.GO
             }
             
             // Shader to retrieve the default material.
-            Shader shader = Shader.Find(ShaderName);
+            Shader shader = (Shader)GameObject.Instantiate(Resources.Load(ShaderName));
+            //Shader shader = Shader.Find(ShaderName);
             SetGlobalUniforms();
 
             Material[] result = new Material[numberOfColors];
