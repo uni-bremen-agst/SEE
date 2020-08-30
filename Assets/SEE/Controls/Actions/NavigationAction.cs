@@ -137,7 +137,7 @@ namespace SEE.Controls
                     return child.transform;
                 }
             }
-            Debug.LogErrorFormat("Game object named {0} has no child tagged by {1}.\n", CityObjectName, Tags.Node);
+            Debug.LogErrorFormat("Game object named {0} has no child tagged by {1}.\n", gameObject.name, Tags.Node);
             return null;
         }
 
@@ -191,8 +191,8 @@ namespace SEE.Controls
             moveState.dragStartTransformPosition = cityRootTransform.position;
             moveState.dragCanonicalOffset = Vector3.zero;
             moveState.moveVelocity = Vector3.zero;
-            moveState.moveGizmo = UI3D.MoveGizmo.Create(0.008f * Plane.Instance.MinLengthXZ);
-            rotateState.rotateGizmo = UI3D.RotateGizmo.Create(1024);
+            moveState.moveGizmo = UI3D.MoveGizmo.Create(0.008f * cullingPlane.MinLengthXZ);
+            rotateState.rotateGizmo = UI3D.RotateGizmo.Create(cullingPlane, 1024);
 
             zoomState.zoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps);
             zoomState.currentTargetZoomSteps = 0;
@@ -201,6 +201,9 @@ namespace SEE.Controls
             cursor = UI3D.Cursor.Create();
 
         }
+
+        [Tooltip("The area in which to draw the code city")]
+        public Plane cullingPlane;
 
         /// <summary>
         /// Whether the left control key was pressed.
@@ -441,7 +444,7 @@ namespace SEE.Controls
                     movingOrRotating = false;
                     moveState.moveGizmo.gameObject.SetActive(false);
 
-                    cityRootTransform.position = Plane.Instance.CenterTop;
+                    cityRootTransform.position = cullingPlane.CenterTop;
                 }
                 else if (actionState.cancel) // cancel movement
                 {
@@ -589,7 +592,7 @@ namespace SEE.Controls
                 actionState.zoomToggleToObject = false;
                 if (cursor.GetFocus() != null)
                 {
-                    float optimalTargetZoomFactor = Plane.Instance.MinLengthXZ / (cursor.GetFocus().lossyScale.x / zoomState.currentZoomFactor);
+                    float optimalTargetZoomFactor = cullingPlane.MinLengthXZ / (cursor.GetFocus().lossyScale.x / zoomState.currentZoomFactor);
                     float optimalTargetZoomSteps = ConvertZoomFactorToZoomSteps(optimalTargetZoomFactor);
                     int actualTargetZoomSteps = Mathf.FloorToInt(optimalTargetZoomSteps);
                     float actualTargetZoomFactor = ConvertZoomStepsToZoomFactor(actualTargetZoomSteps);
@@ -605,8 +608,8 @@ namespace SEE.Controls
                     {
                         float zoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
                         Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.currentTargetZoomSteps ? cityRootTransform.position.XZ() : cursor.GetFocus().position.XZ();
-                        Vector2 toCenterOfTable = Plane.Instance.CenterXZ - centerOfTableAfterZoom;
-                        Vector2 zoomCenter = Plane.Instance.CenterXZ - (toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f)));
+                        Vector2 toCenterOfTable = cullingPlane.CenterXZ - centerOfTableAfterZoom;
+                        Vector2 zoomCenter = cullingPlane.CenterXZ - (toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f)));
                         float duration = 2.0f * ZoomState.DefaultZoomDuration;
                         new Net.ZoomCommandAction(this, zoomCenter, zoomSteps, duration).Execute();
                     }
@@ -679,9 +682,9 @@ namespace SEE.Controls
             // Keep city constrained to table
             float radius = 0.5f * cityRootTransform.lossyScale.x;
             MathExtensions.TestCircleAABB(cityRootTransform.position.XZ(), 
-                                          0.9f * radius, 
-                                          Plane.Instance.LeftFrontCorner, 
-                                          Plane.Instance.RightBackCorner, 
+                                          0.9f * radius,
+                                          cullingPlane.LeftFrontCorner,
+                                          cullingPlane.RightBackCorner, 
                                           out float distance, 
                                           out Vector2 normalizedToSurfaceDirection);
 
