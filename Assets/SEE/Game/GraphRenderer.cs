@@ -479,6 +479,36 @@ namespace SEE.Game
             }
         }
 
+        private List<SublayoutLayoutNode> ConvertSublayoutToLayoutNodes(List<SublayoutNode> sublayouts)
+        {
+            List<SublayoutLayoutNode> sublayoutLayoutNodes = new List<SublayoutLayoutNode>();
+            sublayouts.ForEach(sublayoutNode => {
+
+                SublayoutLayoutNode sublayout = new SublayoutLayoutNode(to_layout_node[sublayoutNode.Node], sublayoutNode.InnerNodeKind, sublayoutNode.NodeLayout);
+                sublayoutNode.Nodes.ForEach(n => sublayout.Nodes.Add(to_layout_node[n]));
+                sublayoutNode.RemovedChildren.ForEach(n => sublayout.RemovedChildren.Add(to_layout_node[n]));
+                sublayoutLayoutNodes.Add(sublayout);
+            });
+            return sublayoutLayoutNodes;
+        }
+
+
+        /// <summary>
+        /// Calculates a list with all children for a specific node
+        /// </summary>
+        /// <param name="root"></param>
+        /// <returns></returns>
+        private List<Node> WithAllChildren(Node root)
+        {
+            List<Node> allNodes = new List<Node> { root };
+            foreach (Node node in root.Children())
+            {
+                allNodes.AddRange(WithAllChildren(node));
+            }
+
+            return allNodes;
+        }
+
         /// <summary>
         /// If <paramref name="graph"/> has a single root, nothing is done. Otherwise
         /// an artifical root is created and added to both the <paramref name="graph"/>
@@ -523,37 +553,6 @@ namespace SEE.Game
             }
         }
 
-        private List<SublayoutLayoutNode> ConvertSublayoutToLayoutNodes(List<SublayoutNode> sublayouts)
-        {
-            List<SublayoutLayoutNode> sublayoutLayoutNodes = new List<SublayoutLayoutNode>();
-            sublayouts.ForEach(sublayoutNode => {
-
-                SublayoutLayoutNode sublayout = new SublayoutLayoutNode(to_layout_node[sublayoutNode.Node], sublayoutNode.InnerNodeKind, sublayoutNode.NodeLayout);
-                sublayoutNode.Nodes.ForEach(n => sublayout.Nodes.Add(to_layout_node[n]));
-                sublayoutNode.RemovedChildren.ForEach(n => sublayout.RemovedChildren.Add(to_layout_node[n]));
-                sublayoutLayoutNodes.Add(sublayout);
-            });
-            return sublayoutLayoutNodes;
-        }
-
-
-        /// <summary>
-        /// Calculates a list with all children for a specific node
-        /// </summary>
-        /// <param name="root"></param>
-        /// <returns></returns>
-        private List<Node> WithAllChildren(Node root)
-        {
-            List<Node> allNodes = new List<Node> { root };
-            foreach (Node node in root.Children())
-            {
-                allNodes.AddRange(WithAllChildren(node));
-            }
-
-            return allNodes;
-        }
-
-
         /// <summary>
         /// If <paramref name="root"/> is null, nothing happens. Otherwise <paramref name="root"/> will
         /// be removed from <paramref name="graph"/> and <paramref name="nodeMap"/>. The value of
@@ -567,7 +566,11 @@ namespace SEE.Game
         /// <paramref name="root"/></param>
         private void RemoveRootIfNecessary(ref Node root, Graph graph, Dictionary<Node, GameObject> nodeMap, ICollection<ILayoutNode> layoutNodes)
         {
-            if (!ReferenceEquals(root, null))
+            return; // FIXME: temporarily disabled because the current implementation of the 
+                    // custom shader for culling all city objects falling off the plane assumes 
+                    // that there is exactly one root node of the graph.
+
+            if (root is object)
             {                
                 if (layoutNodes != null)
                 {
