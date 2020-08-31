@@ -23,7 +23,7 @@ namespace SEE.Net
 
         protected override bool ExecuteOnClient()
         {
-            AnnotatableObject annotatableObject = (AnnotatableObject)InteractableObject.Get(id);
+            AnnotatableObject annotatableObject = InteractableObject.Get(id) as AnnotatableObject;
             annotatableObject.Annotate(annotation);
             return true;
         }
