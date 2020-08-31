@@ -45,7 +45,7 @@ namespace SEE.GO
         /// [0, NumberOfStyles()-1].
         /// </summary>
         /// <returns>number of materials offered</returns>
-        public abstract int NumberOfStyles();
+        public abstract uint NumberOfStyles();
 
         /// <summary>
         /// The length unit of a block representation in Unity measures.

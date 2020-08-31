@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Game;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -7,10 +8,14 @@ namespace SEE.GO
     /// </summary>
     public class CylinderFactory : InnerNodeFactory
     {
-        public CylinderFactory()
-        {
-            materials = new Materials(10, Color.white, Color.yellow);
-        }
+		/// <summary>
+		/// Constructor.
+		/// </summary>
+		/// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
+		/// <param name="colorRange">the color range of the created objects</param>
+		public CylinderFactory(Shader shader, ColorRange colorRange)
+			: base(shader, colorRange)
+        { }
 
         public override GameObject NewBlock(int index = 0, int level = 0)
 		{

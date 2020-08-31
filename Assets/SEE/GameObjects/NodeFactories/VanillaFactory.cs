@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Game;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -7,6 +8,15 @@ namespace SEE.GO
     /// </summary>
     internal class VanillaFactory : InnerNodeFactory
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
+        /// <param name="colorRange">the color range of the created objects</param>
+        public VanillaFactory(Shader shader, ColorRange colorRange)
+            : base(shader, colorRange)
+        { }
+
         /// <summary>
         /// Returns a new empty plain game object with an ordinary Renderer component.
         /// </summary>

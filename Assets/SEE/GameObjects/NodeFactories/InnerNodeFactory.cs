@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Game;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -13,11 +14,13 @@ namespace SEE.GO
     public abstract class InnerNodeFactory : NodeFactory
     {
         /// <summary>
-        /// Constructor setting the available styles.
+        /// Constructor.
         /// </summary>
-        public InnerNodeFactory()
+        /// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
+        /// <param name="colorRange">the color range of the created objects</param>
+        public InnerNodeFactory(Shader shader, ColorRange colorRange)
         {
-            materials = new Materials(10, Color.white, Color.red);
+            materials = new Materials(shader, colorRange);
         }
 
         /// <summary>
@@ -40,7 +43,7 @@ namespace SEE.GO
         /// </summary>
         protected const float DefaultHeight = 0.000001f;
 
-        public override int NumberOfStyles()
+        public override uint NumberOfStyles()
         {
             return materials.NumberOfMaterials;
         }
@@ -50,7 +53,7 @@ namespace SEE.GO
             Renderer renderer = block.GetComponent<Renderer>();
             if (renderer != null)
             {
-                renderer.sharedMaterial = materials.DefaultMaterial(0, Mathf.Clamp(style, 0, NumberOfStyles() - 1));
+                renderer.sharedMaterial = materials.DefaultMaterial(0, Mathf.Clamp(style, 0, (int)NumberOfStyles() - 1));
             }
         }
     }

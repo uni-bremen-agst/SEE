@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel;
+using SEE.Game;
 using UnityEngine;
 
 namespace SEE.GO
@@ -14,7 +15,13 @@ namespace SEE.GO
     {
         private Mesh cubeMesh;
 
-        public CubeFactory()
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
+        /// <param name="colorRange">the color range of the created objects</param>
+        public CubeFactory(Shader shader, ColorRange colorRange)
+            : base(shader, colorRange)
         {
             cubeMesh = new Mesh();
 
@@ -109,7 +116,7 @@ namespace SEE.GO
             renderer.receiveShadows = false;
 
             // Assigns a material to the object.
-            renderer.sharedMaterial = materials.DefaultMaterial(level, Mathf.Clamp(style, 0, NumberOfStyles() - 1)); ;
+            renderer.sharedMaterial = materials.DefaultMaterial(level, Mathf.Clamp(style, 0, (int)NumberOfStyles() - 1)); ;
             return result;
         }
     }

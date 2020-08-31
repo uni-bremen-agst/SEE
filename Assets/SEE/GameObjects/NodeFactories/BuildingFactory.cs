@@ -18,9 +18,9 @@ namespace SEE.GO
         /// The number of building types offered.
         /// </summary>
         /// <returns>number of building types offered</returns>
-        public override int NumberOfStyles()
+        public override uint NumberOfStyles()
         {
-            return prefabFiles.Length;
+            return (uint)prefabFiles.Length;
         }
 
         /// <summary>

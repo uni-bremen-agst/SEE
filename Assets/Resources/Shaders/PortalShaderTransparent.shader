@@ -5,6 +5,8 @@
 		_Color("Color", Color) = (1, 1, 1, 1)
 		_Smoothness("Smoothness", Range(0, 1)) = 0.5
 		_Metallic("Metallic", Range(0, 1)) = 0.0
+		portalMin("Portal Left Front Corner", vector) = (-10, -10, 0, 0)
+		portalMax("Portal Right Back Corner", vector) = (10, 10, 0, 0)
 	}
 
 	SubShader
@@ -16,8 +18,8 @@
 		#pragma surface main Standard alpha:blend
 		#pragma target 3.0
 
-		uniform float2 portalMin;
-		uniform float2 portalMax;
+		float2 portalMin;
+		float2 portalMax;
 
 		struct Input
 		{

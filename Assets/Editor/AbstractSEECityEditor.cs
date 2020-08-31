@@ -31,10 +31,16 @@ namespace SEEEditor
             city.HeightMetric = EditorGUILayout.TextField("Height", city.HeightMetric);
             city.DepthMetric = EditorGUILayout.TextField("Depth", city.DepthMetric);
             city.LeafStyleMetric = EditorGUILayout.TextField("Style", city.LeafStyleMetric);
+            city.LeafNodeColorRange.lower = EditorGUILayout.ColorField("Lower Color", city.LeafNodeColorRange.lower);
+            city.LeafNodeColorRange.upper = EditorGUILayout.ColorField("Upper Color", city.LeafNodeColorRange.upper);
+            city.LeafNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.LeafNodeColorRange.NumberOfColors, 1, 15);
 
             GUILayout.Label("Attributes of inner nodes", EditorStyles.boldLabel);
             city.InnerNodeHeightMetric = EditorGUILayout.TextField("Height", city.InnerNodeHeightMetric);
             city.InnerNodeStyleMetric = EditorGUILayout.TextField("Style", city.InnerNodeStyleMetric);
+            city.InnerNodeColorRange.lower = EditorGUILayout.ColorField("Lower Color", city.InnerNodeColorRange.lower);
+            city.InnerNodeColorRange.upper = EditorGUILayout.ColorField("Upper Color", city.InnerNodeColorRange.upper);
+            city.InnerNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.InnerNodeColorRange.NumberOfColors, 1, 15);
 
             GUILayout.Label("Nodes and Node Layout", EditorStyles.boldLabel);
             city.LeafObjects = (SEECity.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);

@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel;
+using SEE.Game;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,25 +20,52 @@ namespace SEE.GO
         private const string ShaderName = "Custom/PortalShaderTransparent";
 
         /// <summary>
+        /// Returns the standard shader for transparent materials that can be culled
+        /// if they leave a certain area (portal).
+        /// </summary>
+        /// <returns>standard portal shader for transparent objects</returns>
+        public static Shader PortalShader()
+        {
+            return Shader.Find(ShaderName);
+        }
+
+        /// <summary>
+        /// Returns a new instance of the standard shader for transparent materials that can be culled
+        /// if they leave a certain area (portal). Changes to this instance will not affect the
+        /// standard portal shared retrieved by PortalShader().
+        /// </summary>
+        /// <returns>new instance of standard portal shader for transparent objects</returns>
+        public static Shader NewPortalShader()
+        {
+            return (Shader)GameObject.Instantiate(PortalShader());
+        }        
+
+        /// <summary>
         /// Creates default numberOfColors materials in the color range from
         /// lower to higher color (linear interpolation).
         /// </summary>
         /// <param name="numberOfColors">the number of materials with different colors to be created</param>
         /// <param name="lower">the color at the lower end of the color spectrum</param>
         /// <param name="higher">the color at the higher end of the color spectrum</param>
-        public Materials(int numberOfColors, Color lower, Color higher)
+        public Materials(Shader shader, ColorRange colorRange)
         {
-            NumberOfMaterials = numberOfColors;
-            Lower = lower;
-            Higher = higher;
-            materials = new List<Material[]>() { Init(numberOfColors, lower, higher, 0) };
+            this.shader = shader;
+            NumberOfMaterials = colorRange.NumberOfColors;
+            Lower = colorRange.lower;
+            Higher = colorRange.upper;
+            materials = new List<Material[]>() { Init(shader, colorRange.NumberOfColors, colorRange.lower, colorRange.upper, 0) };
         }
+
+        /// <summary>
+        /// The shader to be used for all materials created here.
+        /// </summary>
+        private readonly Shader shader;
 
         /// <summary>
         /// The number of different colors and, thus, the number of
         /// different materials we create: one material for each color.
         /// </summary>
-        public readonly int NumberOfMaterials;
+        public readonly uint NumberOfMaterials;
 
         /// <summary>
         /// The color at the lower end of the color spectrum.
@@ -76,7 +104,7 @@ namespace SEE.GO
             {
                 for (int i = materials.Count; i <= renderQueueOffset; i++)
                 {
-                    materials.Add(Init(NumberOfMaterials, Lower, Higher, i));
+                    materials.Add(Init(shader, NumberOfMaterials, Lower, Higher, i));
                 }
             }
             return materials[renderQueueOffset][degree];
@@ -87,38 +115,38 @@ namespace SEE.GO
         /// </summary>
         /// <param name="color">color for the material</param>
         /// <returns>new material with given <paramref name="color"/></returns>
-        public static Material NewMaterial(Color color)
+        public static Material NewMaterial(Shader shader, Color color)
         {
-            Shader shader = Shader.Find(ShaderName);
+            // Shader shader = Shader.Find(ShaderName);
             return NewMaterial(shader, color, 0);
         }
 
-        public static void SetGlobalUniforms()
-        {
-            // FIXME: We need to support multiple culling planes.
-            GameObject table = GameObject.FindGameObjectWithTag(Tags.CullingPlane);
-            if (table != null)
-            {
-                Plane plane = table.GetComponent<Plane>();
-                if (plane != null)
-                {
-                    //Vector2 leftFront = Plane.Instance.LeftFrontCorner;
-                    Vector2 leftFront = plane.LeftFrontCorner;
-                    Shader.SetGlobalVector("portalMin", new Vector4(leftFront.x, leftFront.y));
-                    //Vector2 rightFront = Plane.Instance.RightBackCorner;
-                    Vector2 rightFront = plane.RightBackCorner;
-                    Shader.SetGlobalVector("portalMax", new Vector4(rightFront.x, rightFront.y));
-                }
-                else
-                {
-                    Debug.LogErrorFormat("No plane attached to culling plane {0}.\n", table.name);
-                }
-            }
-            else
-            {
-                Debug.LogErrorFormat("No game object tagged by {0} (serving as culling plane).\n", Tags.CullingPlane);
-            }
-        }
+        //private static void SetGlobalUniforms()
+        //{
+        //    // FIXME: We need to support multiple culling planes.
+        //    GameObject table = GameObject.FindGameObjectWithTag(Tags.CullingPlane);
+        //    if (table != null)
+        //    {
+        //        Plane plane = table.GetComponent<Plane>();
+        //        if (plane != null)
+        //        {
+        //            //Vector2 leftFront = Plane.Instance.LeftFrontCorner;
+        //            Vector2 leftFront = plane.LeftFrontCorner;
+        //            Shader.SetGlobalVector("portalMin", new Vector4(leftFront.x, leftFront.y));
+        //            //Vector2 rightFront = Plane.Instance.RightBackCorner;
+        //            Vector2 rightFront = plane.RightBackCorner;
+        //            Shader.SetGlobalVector("portalMax", new Vector4(rightFront.x, rightFront.y));
+        //        }
+        //        else
+        //        {
+        //            Debug.LogErrorFormat("No plane attached to culling plane {0}.\n", table.name);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Debug.LogErrorFormat("No game object tagged by {0} (serving as culling plane).\n", Tags.CullingPlane);
+        //    }
+        //}
 
         /// <summary>
         /// Creates and returns the materials, one for each different color.
@@ -128,7 +156,7 @@ namespace SEE.GO
         /// <param name="higher">the color at the higher end of the color spectrum</param>
         /// <param name="renderQueueOffset">the offset of the render queue</param>
         /// <returns>materials</returns>
-        private static Material[] Init(int numberOfColors, Color lower, Color higher, int renderQueueOffset)
+        private static Material[] Init(Shader shader, uint numberOfColors, Color lower, Color higher, int renderQueueOffset)
         {
             if (numberOfColors < 1)
             {
@@ -136,9 +164,9 @@ namespace SEE.GO
             }
             
             // Shader to retrieve the default material.
-            Shader shader = (Shader)GameObject.Instantiate(Resources.Load(ShaderName));
-            //Shader shader = Shader.Find(ShaderName);
-            SetGlobalUniforms();
+            // Shader shader = (Shader)GameObject.Instantiate(Resources.Load(ShaderName));
+            // Shader shader = Shader.Find(ShaderName);
+            // SetGlobalUniforms();
 
             Material[] result = new Material[numberOfColors];
 
