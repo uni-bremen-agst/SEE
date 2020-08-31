@@ -164,7 +164,7 @@
         <string>SEEEditor</string>
       </attr>
     </node>
-    <node id="N3288">
+    <node id="N19">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Boost</string>
@@ -173,7 +173,7 @@
         <string>SEE.Controls.Devices.Boost</string>
       </attr>
     </node>
-    <node id="N3289">
+    <node id="N20">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Direction</string>
@@ -182,7 +182,7 @@
         <string>SEE.Controls.Devices.Direction</string>
       </attr>
     </node>
-    <node id="N3290">
+    <node id="N21">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Selection</string>
@@ -191,7 +191,7 @@
         <string>SEE.Controls.Devices.Selection</string>
       </attr>
     </node>
-    <node id="N3291">
+    <node id="N22">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Throttle</string>
@@ -200,7 +200,7 @@
         <string>SEE.Controls.Devices.Throttle</string>
       </attr>
     </node>
-    <node id="N3292">
+    <node id="N23">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Transformation</string>
@@ -209,13 +209,22 @@
         <string>SEE.Controls.Devices.Transformation</string>
       </attr>
     </node>
-    <node id="N3293">
+    <node id="N24">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
         <string>Viewpoint</string>
       </attr>
       <attr name="Linkage.Name">
         <string>SEE.Controls.Devices.Viewpoint</string>
+      </attr>
+    </node>
+    <node id="N25">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>SEE</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE</string>
       </attr>
     </node>
     <edge id="E1" from="N2" to="N1">
@@ -335,22 +344,49 @@
     <edge id="E39" from="N18" to="N8">
       <type xlink:href="Source_Dependency"/>
     </edge>
-    <edge id="E10460" from="N3288" to="N9">
+    <edge id="E40" from="N19" to="N9">
       <type xlink:href="Belongs_To"/>
     </edge>
-    <edge id="E10461" from="N3289" to="N9">
+    <edge id="E41" from="N20" to="N9">
       <type xlink:href="Belongs_To"/>
     </edge>
-    <edge id="E10462" from="N3290" to="N9">
+    <edge id="E42" from="N21" to="N9">
       <type xlink:href="Belongs_To"/>
     </edge>
-    <edge id="E10463" from="N3291" to="N9">
+    <edge id="E43" from="N22" to="N9">
       <type xlink:href="Belongs_To"/>
     </edge>
-    <edge id="E10464" from="N3292" to="N9">
+    <edge id="E44" from="N23" to="N9">
       <type xlink:href="Belongs_To"/>
     </edge>
-    <edge id="E10465" from="N3293" to="N9">
+    <edge id="E45" from="N24" to="N9">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E46" from="N18" to="N25">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E47" from="N6" to="N25">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E48" from="N10" to="N25">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E49" from="N4" to="N25">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E50" from="N3" to="N25">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E51" from="N1" to="N25">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E52" from="N8" to="N25">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E53" from="N7" to="N25">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E54" from="N5" to="N25">
       <type xlink:href="Belongs_To"/>
     </edge>
   </graph>
