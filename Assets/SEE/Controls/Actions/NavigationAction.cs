@@ -239,19 +239,18 @@ namespace SEE.Controls
         private void Update()
         {
             // Note: Input MUST NOT be inquired in FixedUpdate() for the input to feel responsive!
-
-            actionState.drag = Input.GetMouseButton(2);
-
+            
             // We check whether we are focusing on the code city this NavigationAction is attached to.
             RaycastHit[] hits = SortedHits();
-            // If we don't hit anything or if we hit anything (including an other code city 
-            // that is different from the code city this NavigationAction is attached to,
-            // we will not process any user input unless the user is currently dragging.
-            if ((hits.Length == 0 || GetHitCity(hits[0].transform) != cityRootTransform.parent) && !actionState.drag)
+            // If we don't hit anything or if we hit anything (including another code city 
+            // that is different from the code city this NavigationAction is attached to),
+            // we will not process any user input.
+            if ((hits.Length == 0 || GetHitCity(hits[0].transform) != cityRootTransform.parent))
             {
                 return;
             }
 
+            actionState.drag = Input.GetMouseButton(2);
             actionState.toggleGrab |= Input.GetKeyDown(KeyCode.G);
             actionState.startDrag |= Input.GetMouseButtonDown(2);
             actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
