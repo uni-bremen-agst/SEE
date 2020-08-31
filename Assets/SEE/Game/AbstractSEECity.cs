@@ -198,6 +198,16 @@ namespace SEE.Game
         }
 
         //---------------------------------
+        // Color range of leaf nodes
+        //---------------------------------
+        public ColorRange LeafNodeColorRange = new ColorRange(Color.white, Color.red, 10);
+
+        //---------------------------------
+        // Color range of inner nodes
+        //---------------------------------
+        public ColorRange InnerNodeColorRange = new ColorRange(Color.white, Color.yellow, 10);
+
+        //---------------------------------
         // Visual attributes of a leaf node
         //---------------------------------
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Game;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -12,13 +13,14 @@ namespace SEE.GO
         /// Every line width passed as a parameter to methods of this class will be multiplied by this factor
         /// for the actual rendering.
         /// </summary>
+        /// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
+        /// <param name="colorRange">the color range of the created objects</param>
         /// <param name="unit">initial unit for the width of all lines</param>
-        public RectangleFactory(float unit)
-            : base(unit)
+        public RectangleFactory(Shader shader, ColorRange colorRange, float unit)
+            : base(shader, colorRange, unit)
         {
-            materials = new Materials(1, DefaultColor, DefaultColor);
             material = new Material(materials.DefaultMaterial(0, 0));
-            material.color = DefaultColor;
+            material.color = colorRange.upper;
         }
 
         /// <summary>
@@ -31,13 +33,10 @@ namespace SEE.GO
         /// </summary>
         private const float defaultLength = 1.0f;
 
-        // The default color for rectangle lines.
-        public static Color DefaultColor = Color.blue;
-
         public override GameObject NewBlock(int index = 0, int level = 0)
         {
             GameObject result = new GameObject();
-            AttachLine(result, defaultLength, defaultLineWidth * Unit, DefaultColor);
+            AttachLine(result, defaultLength, defaultLineWidth * Unit, material.color);
             return result;
         }
 

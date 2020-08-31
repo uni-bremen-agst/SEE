@@ -27,10 +27,12 @@ namespace SEE.Game
         public GraphRenderer(AbstractSEECity settings)
         {
             this.settings = settings;
+            shader = Materials.NewPortalShader();
+            
             switch (this.settings.LeafObjects)
             {
                 case SEECity.LeafNodeKinds.Blocks:
-                    leafNodeFactory = new CubeFactory();
+                    leafNodeFactory = new CubeFactory(shader, this.settings.LeafNodeColorRange);
                     break;
                 case SEECity.LeafNodeKinds.Buildings:
                     leafNodeFactory = new BuildingFactory();
@@ -39,6 +41,19 @@ namespace SEE.Game
                     throw new Exception("Unhandled GraphSettings.LeafNodeKinds");
             }
             innerNodeFactory = GetInnerNodeFactory(this.settings.InnerNodeObjects);
+        }
+
+        /// <summary>
+        /// The shader for all materials used for all objects created by this graph renderer.
+        /// </summary>
+        private readonly Shader shader;
+
+        /// <summary>
+        /// The shader for all materials used for all objects created by this graph renderer.
+        /// </summary>
+        public Shader Shader
+        {
+            get => shader;
         }
 
         /// <summary>
@@ -52,15 +67,15 @@ namespace SEE.Game
             {
                 case AbstractSEECity.InnerNodeKinds.Empty:
                 case AbstractSEECity.InnerNodeKinds.Donuts:
-                    return new VanillaFactory();
+                    return new VanillaFactory(shader, settings.InnerNodeColorRange);
                 case AbstractSEECity.InnerNodeKinds.Circles:
-                    return new CircleFactory(leafNodeFactory.Unit);
+                    return new CircleFactory(shader, settings.InnerNodeColorRange, leafNodeFactory.Unit);
                 case AbstractSEECity.InnerNodeKinds.Cylinders:
-                    return new CylinderFactory();
+                    return new CylinderFactory(shader, settings.InnerNodeColorRange);
                 case AbstractSEECity.InnerNodeKinds.Rectangles:
-                    return new RectangleFactory(leafNodeFactory.Unit);
+                    return new RectangleFactory(shader, settings.InnerNodeColorRange, leafNodeFactory.Unit);
                 case AbstractSEECity.InnerNodeKinds.Blocks:
-                    return new CubeFactory();
+                    return new CubeFactory(shader, settings.InnerNodeColorRange);
                 default:
                     throw new Exception("Unhandled GraphSettings.InnerNodeKinds");
             }
@@ -209,6 +224,7 @@ namespace SEE.Game
             Dictionary<Node, GameObject>.ValueCollection gameNodes;
             ICollection<ILayoutNode> layoutNodes = new List<ILayoutNode>();
             Node artificalRoot  = null;
+            GameObject plane;
 
             Performance p;
             if (settings.NodeLayout.GetModel().CanApplySublayouts && nodeLayout.IsHierarchical())
@@ -240,7 +256,8 @@ namespace SEE.Game
 
                     // add the plane surrounding all game objects for nodes
                     BoundingBox(layoutNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-                    AddToParent(NewPlane(leftFrontCorner, rightBackCorner, parent.transform.position.y), parent);
+                    plane = NewPlane(leftFrontCorner, rightBackCorner, parent.transform.position.y);
+                    AddToParent(plane, parent);
 
                     CreateObjectHierarchy(nodeMap, parent);
                     InteractionDecorator.PrepareForInteraction(gameNodes);
@@ -271,8 +288,7 @@ namespace SEE.Game
                     // If we added an artifical root node to the graph, we must remove it again
                     // from the graph when we are done.
                     RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, layoutNodes);
-                }
-               
+                }               
             }
             else
             {
@@ -297,7 +313,8 @@ namespace SEE.Game
 
                     gameNodes = nodeMap.Values;
                     // add the plane surrounding all game objects for nodes
-                    AddToParent(NewPlane(gameNodes, parent.transform.position.y), parent);
+                    plane = NewPlane(gameNodes, parent.transform.position.y);
+                    AddToParent(plane, parent);
 
                     CreateObjectHierarchy(nodeMap, parent);
                     InteractionDecorator.PrepareForInteraction(gameNodes);
@@ -316,6 +333,43 @@ namespace SEE.Game
 
             // create the laid out edges
             AddToParent(EdgeLayout(graph, layoutNodes), parent);
+            SetPortal(parent);
+        }
+
+        /// <summary>
+        /// Sets the culling area (portal) of all children of <paramref name="parent"/> to the
+        /// complete area of <paramref name="parent"/>.
+        /// </summary>
+        /// <param name="parent">game objects whose children should be culled if they leave 
+        /// the area of the <paramref name="parent"/></param>
+        private void SetPortal(GameObject parent)
+        {
+            Plane cullingPlane = parent.GetComponent<Plane>();
+            Vector2 leftFront = cullingPlane.LeftFrontCorner;
+            Vector2 rightBack = cullingPlane.RightBackCorner;
+            foreach (Transform child in parent.transform)
+            {
+                SetPortal(child, leftFront, rightBack);
+            }
+        }
+
+        /// <summary>
+        /// Recursively sets the culling area (portal) of the <paramref name="transform"/> and all
+        /// its children to the rectangle in the x/z plane defined by the given <paramref name="leftFront"/>
+        /// and <paramref name="rightBack"/> corner.
+        /// </summary>
+        /// <param name="transform">object whose culling area is to be set</param>
+        /// <param name="leftFront">left front corner of the culling area</param>
+        /// <param name="rightBack">right back corner of the culling area</param>
+        private void SetPortal(Transform transform, Vector2 leftFront, Vector2 rightBack)
+        {
+            Material material = transform.GetComponent<Renderer>().sharedMaterial;
+            material.SetVector("portalMin", new Vector4(leftFront.x, leftFront.y));
+            material.SetVector("portalMax", new Vector4(rightBack.x, rightBack.y));
+            foreach (Transform child in transform)
+            {
+                SetPortal(child, leftFront, rightBack);
+            }
         }
 
         /// <summary>
@@ -635,8 +689,7 @@ namespace SEE.Game
         public GameObject NewPlane(ICollection<GameObject> gameNodes, float yLevel)
         {
             BoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-            // Place the plane somewhat under ground level.
-            return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, yLevel - 0.01f, Color.gray);
+            return NewPlane(leftFrontCorner, rightBackCorner, yLevel);
         }
 
         /// <summary>
@@ -647,7 +700,8 @@ namespace SEE.Game
         /// <returns>a new plane</returns>
         public GameObject NewPlane(Vector2 leftFrontCorner, Vector2 rightBackCorner, float yLevel)
         {
-            return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, yLevel - 0.01f, Color.gray);
+            // Place the plane somewhat under ground level.
+            return PlaneFactory.NewPlane(shader, leftFrontCorner, rightBackCorner, yLevel - float.Epsilon, Color.gray);
         }
 
         /// <summary>
@@ -1044,7 +1098,7 @@ namespace SEE.Game
 
             bool isLeaf = node.IsLeaf();
             string styleMetric = isLeaf ? settings.LeafStyleMetric : settings.InnerNodeStyleMetric;
-            int numberOfStyles = isLeaf ? leafNodeFactory.NumberOfStyles() : innerNodeFactory.NumberOfStyles();
+            uint numberOfStyles = isLeaf ? leafNodeFactory.NumberOfStyles() : innerNodeFactory.NumberOfStyles();
             float metricMaximum;
 
             if (TryGetFloat(styleMetric, out float value))

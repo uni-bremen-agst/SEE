@@ -27,7 +27,10 @@ namespace SEE.Controls
         protected override void Awake()
         {
             base.Awake();
-            HighlightMaterialChanger = new MaterialChanger(gameObject, Materials.NewMaterial(LocalHightlightColor), Materials.NewMaterial(RemoteHightlightColor));
+            Shader shader = gameObject.GetComponent<Renderer>().material.shader;
+            HighlightMaterialChanger = new MaterialChanger(gameObject, 
+                                                           Materials.NewMaterial(shader, LocalHightlightColor), 
+                                                           Materials.NewMaterial(shader, RemoteHightlightColor));
         }
 
         public virtual void Hovered(bool isOwner)

@@ -105,7 +105,6 @@ namespace SEE.Game
             {
                 Debug.LogError("SEECity.Awake: GXL file is undefined.\n");
             }
-            Materials.SetGlobalUniforms();
 
 #if true
             foreach (NodeRef nodeRef in FindObjectsOfType<NodeRef>())

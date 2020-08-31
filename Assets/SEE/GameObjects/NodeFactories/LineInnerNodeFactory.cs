@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Game;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -13,8 +14,11 @@ namespace SEE.GO
         /// Every line width passed as a parameter to methods of this class will be multiplied by this factor
         /// for the actual rendering.
         /// </summary>
+        /// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
+        /// <param name="colorRange">the color range of the created objects</param>
         /// <param name="unit">initial unit for the width of all lines</param>
-        public LineInnerNodeFactory(float unit)
+        public LineInnerNodeFactory(Shader shader, ColorRange colorRange, float unit = 1.0f)
+            : base(shader, colorRange)
         {
             this.unit = unit;
         }

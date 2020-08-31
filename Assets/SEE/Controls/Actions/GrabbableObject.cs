@@ -29,7 +29,10 @@ namespace SEE.Controls
         protected override void Awake()
         {
             base.Awake();
-            GrabbingMaterialChanger = new MaterialChanger(gameObject, Materials.NewMaterial(LocalGrabbingColor), Materials.NewMaterial(RemoteGrabbingColor));
+            Shader shader = gameObject.GetComponent<Renderer>().material.shader;
+            GrabbingMaterialChanger = new MaterialChanger(gameObject, 
+                                                          Materials.NewMaterial(shader, LocalGrabbingColor), 
+                                                          Materials.NewMaterial(shader, RemoteGrabbingColor));
         }
         
         public void Grab(GameObject grabber, bool isOwner)
