@@ -16,19 +16,19 @@ namespace SEE.Controls
 
         private const int RightMouseButton = 1;
 
-        [Tooltip("The code city at which the player is hooked.")]
-        public Plane cullingPlane;
+        [Tooltip("The code city which the player is focusing on.")]
+        public Plane focusedObject;
 
         // Start is called before the first frame update
         void Start()
         {
-            if (cullingPlane != null)
+            if (focusedObject != null)
             {
-                Camera.main.transform.position = cullingPlane.CenterTop;
+                Camera.main.transform.position = focusedObject.CenterTop;
             }
             else
             {
-                Debug.LogErrorFormat("Player {0} has no culling plane assigned.\n", name);
+                Debug.LogErrorFormat("Player {0} has no focus object assigned.\n", name);
             }
             cameraState.distance = 1.0f;
             cameraState.yaw = 0.0f;
@@ -59,9 +59,9 @@ namespace SEE.Controls
                 cameraState.yaw += x;
                 cameraState.pitch -= y;
             }
-            if (cullingPlane != null)
+            if (focusedObject != null)
             {
-                Camera.main.transform.position = cullingPlane.CenterTop;
+                Camera.main.transform.position = focusedObject.CenterTop;
             }
             Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
