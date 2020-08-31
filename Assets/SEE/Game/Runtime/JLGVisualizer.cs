@@ -93,39 +93,12 @@ namespace SEE.Game.Runtime
         /// Update is called once per frame
         void Update()
         {   
-            ///this is true every updateintervall time.
+            ///update Visualisation every 'interval' seconds.
             if (Time.time >= nextUpdateTime)
             {
                if (running)
                {
-                    ///Check if currentGo is not GO of current Statement. If true change currentGO and generate FunctionCall to new class and new TextWindow.
-                    if (!NodeRepresentsStatementLocation(statementCounter, currentGO))
-                    {
-                        if (playDirection && statementCounter > 0 && parsedJLG.AllStatements[statementCounter].StatementType.Equals("entry"))
-                        {
-                            CreateFunctionCall(currentGO, GetNodeForStatement(statementCounter));
-                        }
-                        currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.530f, 0.637f, 0.858f, 1f);
-                        currentGO = GetNodeForStatement(statementCounter);
-                        currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
-
-                        if (! textWindowForNodeExists(currentGO))
-                        {
-                            GenerateScrollableTextWindow();
-                        }
-                        ToggleTextWindows();
-                    }
-
-                    updateStacks();
-
-                    if (playDirection)
-                    {
-                        NextStatement();
-                    }
-                    else
-                    {
-                        PreviousStatement();
-                    }
+                    UpdateVisualization();
                }
                nextUpdateTime += updateIntervall;               
             }            
@@ -176,11 +149,11 @@ namespace SEE.Game.Runtime
             }
 
             ///not needed in current visualisation
-            if (Input.GetKeyDown(KeyCode.J))
-            {
+            //if (Input.GetKeyDown(KeyCode.J))
+            //{
                 //windowsToggled = !windowsToggled;
                 //ToggleTextWindows();
-            }
+            //}
             if (running)
             {
                 if (Input.GetKeyDown(KeyCode.L))
@@ -197,6 +170,19 @@ namespace SEE.Game.Runtime
                 }
             }
 
+            if (!running) {
+                if (Input.GetKeyDown(KeyCode.I)) {
+                    JumpToNextClass();
+                    showLabelUntil = Time.time + 1f;
+                    labelText = "Jumped to " + currentGO.name;
+                }
+                if (Input.GetKeyDown(KeyCode.U)) {
+                    JumpToNextMethod();
+                    showLabelUntil = Time.time + 1f;
+                    labelText = "Jumped to " + parsedJLG.GetStatementLocationString(statementCounter);
+                }
+            }
+
             ///Only Update the Spheres cause this visualization uses its own highlighting for the buildings.
             foreach (GameObject f in functionCalls) {
                 f.GetComponent<FunctionCallSimulator>().UpdateSpheres();
@@ -210,10 +196,48 @@ namespace SEE.Game.Runtime
         {
             if (Time.time < showLabelUntil)
             {
-                GUI.Label(new Rect(Screen.width / 96, Screen.height / 96, Screen.width / 24, Screen.height / 24), labelText);
+                GUI.Label(new Rect(Screen.width / 96, Screen.height / 96, Screen.width/3, Screen.height / 16), labelText);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UpdateVisualization() {
+            ///Check if currentGo is not GO of current Statement. If true change currentGO and generate FunctionCall to new class and new TextWindow.
+            if (!NodeRepresentsStatementLocation(statementCounter, currentGO))
+            {
+                if (playDirection && statementCounter > 0 && parsedJLG.AllStatements[statementCounter].StatementType.Equals("entry"))
+                {
+                    CreateFunctionCall(currentGO, GetNodeForStatement(statementCounter));
+                }
+                currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.530f, 0.637f, 0.858f, 1f);
+                currentGO = GetNodeForStatement(statementCounter);
+                currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
+
+                if (!textWindowForNodeExists(currentGO))
+                {
+                    GenerateScrollableTextWindow();
+                }
+                ToggleTextWindows();
+            }
+
+            updateStacks();
+
+            if (playDirection)
+            {
+                NextStatement();
+            }
+            else
+            {
+                PreviousStatement();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gameObject"></param>
         private void ActivateNodeTextWindow(GameObject gameObject)
         {
             if (textWindows.Count != 0) {
@@ -326,7 +350,6 @@ namespace SEE.Game.Runtime
             line.endWidth = 0.2f;
             line.useWorldSpace = true;
             float heightOfTextObject = go.GetComponent<RectTransform>().rect.height * go.transform.parent.localScale.y;
-            Debug.Log("height:" + heightOfTextObject);
             Vector3 goPoint = go.transform.position;
             goPoint.y = goPoint.y - heightOfTextObject / 2;
             line.SetPosition(0, goPoint);
@@ -389,6 +412,22 @@ namespace SEE.Game.Runtime
         private Boolean NodeRepresentsStatementLocation(int i, GameObject go)
         {
             return parsedJLG.GetStatementLocationString(i).StartsWith(go.name)&&go.tag.Equals("Node");
+        }
+
+        private void JumpToNextClass() {
+            GameObject classToBeJumped = currentGO;
+            while (classToBeJumped == currentGO) {
+                UpdateVisualization();
+            }
+        }
+
+        private void JumpToNextMethod()
+        {
+            String currentMethod = parsedJLG.AllStatements[statementCounter].Location;
+            while (currentMethod == parsedJLG.AllStatements[statementCounter].Location) {
+                UpdateVisualization();
+            }
+            UpdateVisualization(); //Call once more so it jumps into the method too.
         }
 
         /// <summary>
@@ -464,7 +503,7 @@ namespace SEE.Game.Runtime
                     GetNodeForStatement(statementCounter - 1).GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
                     if (findFirstActiveGOinStack(functionCalls) != null)
                     {
-                        findFirstActiveGOinStack(functionCalls).SetActive(false); // hier nur disablen
+                        findFirstActiveGOinStack(functionCalls).SetActive(false); // only disable, so it can be enable when the visualization is running backwards
                     }
                     GameObject.Destroy(textWindows.Pop());
                 }
