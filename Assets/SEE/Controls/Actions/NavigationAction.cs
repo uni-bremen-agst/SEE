@@ -171,6 +171,7 @@ namespace SEE.Controls
             cityRootTransform = GetCityRootNode();
             if (cityRootTransform == null)
             {
+                this.enabled = false; // deactivate this component as it cannot work
                 throw new Exception("This NavigationAction is not attached to a code city.");
             }
 
