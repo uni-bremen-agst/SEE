@@ -169,7 +169,7 @@ namespace SEE.Layout
         /// <param name="layoutNodes">the nodes to be stacked onto each other</param>
         /// <param name="groundLevel">y co-ordinate ground position of the roof nodes</param>
         /// <param name="levelDelta">the y distance between parents and their children</param>
-        public static void Stack(ICollection<ILayoutNode> layoutNodes, float groundLevel, float levelDelta = 0.001f)
+        public static void Stack(ICollection<ILayoutNode> layoutNodes, float groundLevel, float levelDelta = 0.0001f)
         {
             // position all root nodes at groundLevel
             foreach (ILayoutNode layoutNode in layoutNodes)
@@ -194,7 +194,7 @@ namespace SEE.Layout
         /// <param name="layoutNode">the node to be positioned</param>
         /// <param name="groundLevel">the target y co-ordinate ground position of <paramref name="layoutNode"/></param>
         /// <param name="levelDelta">the y distance between <paramref name="layoutNode"/> and its children</param>
-        private static void Stack(ILayoutNode layoutNode, float groundLevel, float levelDelta = 0.001f)
+        private static void Stack(ILayoutNode layoutNode, float groundLevel, float levelDelta = 0.0001f)
         {
             float newRoofY = PutOn(layoutNode, groundLevel);
             foreach (ILayoutNode child in layoutNode.Children())
