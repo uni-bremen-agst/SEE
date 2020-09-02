@@ -52,10 +52,10 @@ namespace SEE.GO
             GameObject gameEdge = new GameObject
             {
                 tag = Tags.Edge,
-                isStatic = true,
+                isStatic = false,
                 name = "(" + layoutEdge.Source.ID + ", " + layoutEdge.Target.ID + ")"
             };
-            // FIXME: gameEdge.AddComponent<EdgeRef>().edge = edge;
+            //gameEdge.AddComponent<EdgeRef>().edge = layoutEdge.; // FIXME
             return gameEdge;
         }
 
@@ -81,7 +81,7 @@ namespace SEE.GO
                 // If enabled, the lines are defined in world space.
                 // This means the object's position is ignored, and the lines are rendered around 
                 // world origin.
-                line.useWorldSpace = true;
+                line.useWorldSpace = false;
 
                 Vector3[] points = layoutEdge.Points;
                 line.positionCount = points.Length; // number of vertices
