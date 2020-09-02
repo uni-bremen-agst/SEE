@@ -81,9 +81,9 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="layoutNodes">nodes whose connecting edges are to be drawn</param>
         /// <returns>hierarchically bundled splines</returns>
-        public override ICollection<LayoutEdge> Create(ICollection<ILayoutNode> layoutNodes)
+        public override ICollection<ILayoutEdge> Create(ICollection<ILayoutNode> layoutNodes)
         {
-            ICollection<LayoutEdge> layout = new List<LayoutEdge>();
+            ICollection<ILayoutEdge> layout = new List<ILayoutEdge>();
 
             ICollection<ILayoutNode> roots = GetRoots(layoutNodes);
             maxLevel = GetMaxLevel(roots, -1);
@@ -99,7 +99,7 @@ namespace SEE.Layout
             {
                 foreach (ILayoutNode target in source.Successors)
                 {
-                    layout.Add(new LayoutEdge(source, target, GetLinePoints(source, target, lca, maxLevel)));
+                    layout.Add(new ILayoutEdge(source, target, GetLinePoints(source, target, lca, maxLevel)));
                 }
             }
             return layout;
