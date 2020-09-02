@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel;
 using SEE.GO;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine;
 namespace SEE.Controls
 {
 
-    public class NavigationAction : MonoBehaviour
+    public class NavigationAction : CityAction
     {
         private enum NavigationMode
         {
@@ -102,9 +103,6 @@ namespace SEE.Controls
             internal Vector3 mousePosition;  // TODO(torben): this needs to be abstracted for other modalities
             internal float zoomStepsDelta;
             internal bool zoomToggleToObject;
-            internal bool copy;              // copy selected object (i.e., start mapping)
-            internal bool paste;             // paste (map) copied object
-            internal bool clearClipboard;    // whether the clipboard of copied nodes has been cleared
         }
         
         private Transform cityRootTransform;
@@ -120,55 +118,9 @@ namespace SEE.Controls
         ZoomState zoomState;
         ActionState actionState;
 
-        /// <summary>
-        /// Returns the game object representing the root of the graph.
-        /// 
-        /// Precondition: This NavigationAction is attached to an object that has exactly 
-        /// one child with a game object tagged by Tags.Node. This child object is 
-        /// returned.
-        /// </summary>
-        /// <returns>game object representing the root of the graph or null if there is none</returns>
-        private Transform GetCityRootNode()
-        {
-            foreach (Transform child in gameObject.transform)
-            {
-                if (child.tag == Tags.Node)
-                {
-                    return child.transform;
-                }
-            }
-            Debug.LogErrorFormat("Game object named {0} has no child tagged by {1}.\n", gameObject.name, Tags.Node);
-            return null;
-        }
-
-        /// <summary>
-        /// Returns the first transform towards the root of the game-object hierarchy
-        /// that is tagged by Tags.CodeCity. If none can be found, null is returned.
-        /// 
-        /// Precondition: The given <paramref name="transform"/> is part of a
-        /// game-object tree and either this <paramref name="transform"/> (in which
-        /// case <paramref name="transform"/> itself is returned) or any
-        /// of its ascendants is tagged by Tags.CodeCity.
-        /// </summary>
-        /// <param name="transform">transform at which to start the search</param>
-        /// <returns>first ascending transform tagged by Tags.CodeCity or null</returns>
-        private Transform GetHitCity(Transform transform)
-        {
-            Transform cursor = transform;
-            while (cursor != null)
-            {
-                if (cursor.tag == Tags.CodeCity)
-                {
-                    return cursor;
-                }
-                cursor = cursor.parent;
-            }
-            return cursor;            
-        }
-
         private void Start()
         {
-            cityRootTransform = GetCityRootNode();
+            cityRootTransform = GetCityRootNode(gameObject);
             if (cityRootTransform == null)
             {
                 this.enabled = false; // deactivate this component as it cannot work
@@ -206,43 +158,12 @@ namespace SEE.Controls
         [Tooltip("The area in which to draw the code city")]
         public Plane cullingPlane;
 
-        /// <summary>
-        /// Whether the left control key was pressed.
-        /// </summary>
-        /// <returns>true if the left control key was pressed</returns>
-        private static bool LeftControlPressed()
-        {
-            // Control key capturing does not really work well in the editor.
-            bool leftControl = false;
-#if UNITY_EDITOR
-            leftControl = true;
-#else
-            if (Input.GetKeyDown(KeyCode.LeftControl))
-            {
-                leftControl = true;
-            }
-            if (Input.GetKeyUp(KeyCode.LeftControl))
-            {
-                leftControl = false;
-            }
-#endif
-            return leftControl;
-        }
-
-        private static RaycastHit[] SortedHits()
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit[] hits = Physics.RaycastAll(ray);
-            Array.Sort(hits, (h0, h1) => h0.distance.CompareTo(h1.distance));
-            return hits;
-        }
-
         private void Update()
         {
             // Note: Input MUST NOT be inquired in FixedUpdate() for the input to feel responsive!
             
             // We check whether we are focusing on the code city this NavigationAction is attached to.
-            RaycastHit[] hits = SortedHits();
+            RaycastHit[] hits = Raycasting.SortedHits();
             // If we don't hit anything or if we hit anything (including another code city 
             // that is different from the code city this NavigationAction is attached to),
             // we will not process any user input.
@@ -258,11 +179,6 @@ namespace SEE.Controls
             actionState.snap = Input.GetKey(KeyCode.LeftAlt);
             actionState.reset |= Input.GetKeyDown(KeyCode.R);
             actionState.mousePosition = Input.mousePosition;
-            bool leftControl = LeftControlPressed();
-
-            actionState.copy = leftControl && Input.GetKeyDown(KeyCode.C);
-            actionState.paste = leftControl && Input.GetKeyDown(KeyCode.V);
-            actionState.clearClipboard = leftControl && Input.GetKeyDown(KeyCode.X);
 
             if (!actionState.drag)
             {
@@ -285,8 +201,7 @@ namespace SEE.Controls
 
             rotateState.rotateGizmo.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotateGizmo.Center).magnitude;
 
-            // selection with left mouse button
-            GameObject selectedObject = null;
+            // selection with left mouse button           
             if (!actionState.drag && Input.GetMouseButtonDown(0))
             {
                 bool selected = false;
@@ -294,7 +209,7 @@ namespace SEE.Controls
                 {
                     if (hit.transform.gameObject.GetComponent<NodeRef>() != null)
                     {
-                        selectedObject = hit.transform.gameObject;
+                        GameObject selectedObject = hit.transform.gameObject;
                         Select(selectedObject);
                         selected = true;
                         break;
@@ -309,44 +224,7 @@ namespace SEE.Controls
             {
                 rotateState.rotateGizmo.Center = cursor.GetFocus().position;
             }
-
-            // TODO: distinguish whether selectedObjects refers to a node of
-            // the architecture, implementation, or mapping.
-            //Debug.LogFormat("copy={0} paste={1} clearClipboard={2} selectedObject={3}\n",
-            //                actionState.copy, actionState.paste, actionState.clearClipboard,
-            //                selectedObject != null ? selectedObject.name : "NONE");
-            if (actionState.copy && selectedObject != null)
-            {
-                if (objectsInClipboard.Contains(selectedObject))
-                {
-                    Debug.LogFormat("Removing node {0} from clipboard\n");
-                    objectsInClipboard.Remove(selectedObject);
-                }
-                else
-                {
-                    Debug.LogFormat("Copying node {0} to clipboard\n");
-                    objectsInClipboard.Add(selectedObject);
-                }
-            }
-            if (actionState.clearClipboard)
-            {
-                Debug.Log("Node clipboard has been cleared.\n");
-                objectsInClipboard.Clear();
-            }
-            if (actionState.paste && selectedObject != null)
-            {
-                foreach (GameObject implementation in objectsInClipboard)
-                {
-                    Debug.LogFormat("Mapping {0} -> {1}.\n", implementation.name, selectedObject.name);
-                }
-                objectsInClipboard.Clear();
-            }
         }
-
-        /// <summary>
-        /// The game objects that have been copied to the clipboard via Ctrl-C.
-        /// </summary>
-        private HashSet<GameObject> objectsInClipboard = new HashSet<GameObject>();
 
         // This logic is in FixedUpdate(), so that the behaviour is framerate-
         // 'independent'.
