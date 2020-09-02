@@ -59,6 +59,17 @@ namespace SEEEditor
                 SaveLayout(city);
             }
             EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("SaveLayoutAndAnnotations"))
+            {
+                SaveLayoutAnnotations(city);
+            }
+            if (GUILayout.Button("LoadLayoutAndAnnotations"))
+            {
+                LoadLayoutAnnotations(city);
+            }
+            EditorGUILayout.EndHorizontal();
         }
 
         /// <summary>
@@ -71,6 +82,7 @@ namespace SEEEditor
             SEECity city = target as SEECity;
             city.gxlPath = EditorGUILayout.TextField("GXL file", city.gxlPath);
             city.csvPath = EditorGUILayout.TextField("CSV file", city.csvPath);
+            city.seePath = EditorGUILayout.TextField("SEE file", city.seePath);
         }
 
         /// <summary>
@@ -124,7 +136,17 @@ namespace SEEEditor
         private void SaveLayout(SEECity city)
         {
             city.SaveLayout();
-        }        
+        }
+
+        private void SaveLayoutAnnotations(SEECity city)
+        {
+            city.Save();
+        }
+
+        private void LoadLayoutAnnotations(SEECity city)
+        {
+            city.Load();
+        }
     }
 }
 

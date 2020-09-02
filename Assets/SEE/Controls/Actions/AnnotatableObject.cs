@@ -21,8 +21,6 @@ namespace SEE.Controls
 
         private static GameObject annotationEditorPrefab;
 
-        private static GameObject annotationOnPaperPrefab;
-
         private bool editorOpen = false;
 
         private GameObject annotationToEdit;
@@ -36,16 +34,6 @@ namespace SEE.Controls
                 string path = "Prefabs/AnnotationEditor3D";
                 annotationEditorPrefab = Resources.Load<GameObject>(path);
                 if (annotationEditorPrefab == null)
-                {
-                    Debug.LogErrorFormat("Prefab {0} not found.\n", path);
-                }
-            }
-            if (annotationOnPaperPrefab == null)
-            {
-                // Filename of the prefab for the text on paper excluding its file extension .prefab
-                string path = "Prefabs/TextOnPaper";
-                annotationOnPaperPrefab = Resources.Load<GameObject>(path);
-                if (annotationOnPaperPrefab == null)
                 {
                     Debug.LogErrorFormat("Prefab {0} not found.\n", path);
                 }
@@ -94,7 +82,7 @@ namespace SEE.Controls
 
         public void Annotate(string annotation)
         {
-            GameObject annotationOnPaper = Instantiate(annotationOnPaperPrefab, Vector3.zero, Quaternion.identity);
+            GameObject annotationOnPaper = Instantiate(textOnPaperPrefab, Vector3.zero, Quaternion.identity);
             annotationOnPaper.name = "Annotation";
             annotationOnPaper.GetComponent<TextGUIAndPaperResizer>().Text = ResizeAnnotation(annotation);
 
@@ -157,6 +145,40 @@ namespace SEE.Controls
             annotationEditor.SetActive(true);
         }
 
+        public void RemoveAnnotation(GameObject annotation)
+        {
+            GameObject.Destroy(annotation.gameObject);
+            annotations.Remove(annotation);
+            List<string> annotationsCopy = new List<string>();
+            if (annotations.Count > 0)
+            {
+                foreach (GameObject game in annotations)
+                {
+                    annotationsCopy.Add(game.GetComponent<TextGUIAndPaperResizer>().Text.Replace(System.Environment.NewLine, " "));
+                    GameObject.Destroy(game.gameObject);
+                }
+                annotations.Clear();
+                foreach (string anno in annotationsCopy)
+                {
+                    Annotate(anno);
+                }
+            }
+            else
+            {
+                isAnnotated = false;
+            }
+            CloseAnnotationEditor();
+        }
+
+        public void RemoveAllAnnotations()
+        {
+            foreach(GameObject annotation in annotations)
+            {
+                GameObject.Destroy(annotation);
+            }
+            annotations.Clear();
+        }
+
         public void MakeAnnotationsClickable(bool delete)
         {
             ShowInformation();
@@ -182,31 +204,6 @@ namespace SEE.Controls
                 GetComponentInChildren<Clickable>().enabled = false;
                 GetComponentInChildren<BoxCollider2D>().enabled = false;
             }
-        }
-
-        public void RemoveAnnotation(GameObject annotation)
-        {
-            GameObject.Destroy(annotation.gameObject);
-            annotations.Remove(annotation);
-            List<string> annotationsCopy = new List<string>();
-            if (annotations.Count > 0)
-            {
-                foreach (GameObject game in annotations)
-                {
-                    annotationsCopy.Add(game.GetComponent<TextGUIAndPaperResizer>().Text.Replace(System.Environment.NewLine, " "));
-                    GameObject.Destroy(game.gameObject);
-                }
-                annotations.Clear();
-                foreach (string anno in annotationsCopy)
-                {
-                    Annotate(anno);
-                }
-            }
-            else
-            {
-                isAnnotated = false;
-            }
-            CloseAnnotationEditor();
         }
 
         public override void ShowInformation()
@@ -306,7 +303,6 @@ namespace SEE.Controls
                     annotationNewLine = annotationNewLine.Remove(indexLastSpace, 1).Insert(indexLastSpace, System.Environment.NewLine);
                 }
             }
-            Debug.Log(annotationNewLine);
             return annotationNewLine;
         }
     }

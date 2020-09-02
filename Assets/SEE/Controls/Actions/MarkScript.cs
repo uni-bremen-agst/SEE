@@ -29,6 +29,8 @@ namespace SEE.Controls
             if (annotatableObject.isAnnotated == true && !annotatableObject.GetEditorState())
             {
                 mark.enabled = true;
+                mark.SetPosition(0, this.transform.position);
+                mark.SetPosition(1, this.transform.position + new Vector3(0, 0.1f, 0));
             }
             else
             {

@@ -63,7 +63,7 @@ namespace SEE.Controls
         /// The prefab used to instantiate text-on-paper objects. It is the same for every one,
         /// hence, the attribute is declared static.
         /// </summary>
-        private static GameObject textOnPaperPrefab;
+        protected static GameObject textOnPaperPrefab;
 
         /// <summary>
         /// Shows information about the currently grabbed object using textOnPaper.

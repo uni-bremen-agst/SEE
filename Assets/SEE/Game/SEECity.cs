@@ -9,6 +9,7 @@ using SEE.DataModel.IO;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Utils;
+using SEE.Controls;
 
 
 namespace SEE.Game
@@ -61,12 +62,12 @@ namespace SEE.Game
         /// </summary>
         public Graph VisualizedSubGraph
         {
-            get 
+            get
             {
                 if (loadedGraph == null)
                 {
                     return loadedGraph;
-                } 
+                }
                 else
                 {
                     var graph = RelevantGraph(loadedGraph);
@@ -85,7 +86,7 @@ namespace SEE.Game
         {
             string filename = GXLPath();
             if (loadedGraph == null && !string.IsNullOrEmpty(filename))
-            {                
+            {
                 loadedGraph = LoadGraph(filename);
                 if (loadedGraph != null)
                 {
@@ -156,6 +157,8 @@ namespace SEE.Game
         /// </summary>
         public string csvPath = "..\\Data\\GXL\\minimal_clones.csv";
 
+        public string seePath = "..\\Data\\GXL\\minimal_clones.see";
+
         // Larger clone graph with single root (Linux directory "drivers"): 16.920 nodes, 10583 edges.
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\drivers.gxl";
         //public string csvPath = "..\\Data\\GXL\\linux-clones\\drivers.csv";
@@ -163,7 +166,7 @@ namespace SEE.Game
         // Medium size include graph with single root (OpenSSL).
         //public string gxlPath = "..\\Data\\GXL\\OpenSSL\\openssl-include.gxl";
         //public string csvPath = "..\\Data\\GXL\\OpenSSL\\openssl-include.csv";
-        
+
         // Examples for dynamic call graphs
         //public string gxlPath = "..\\Data\\GXL\\dynamic-tests\\example_02.gxl";
         //public string csvPath = "..\\Data\\GXL\\dynamic-tests\\empty.csv";
@@ -189,6 +192,10 @@ namespace SEE.Game
             return PathPrefix + csvPath;
         }
 
+        public string SEEPath()
+        {
+            return PathPrefix + seePath;
+        }
         /// <summary>
         /// Loads the metrics from CSVPath() and aggregates and adds them to the graph.
         /// Precondition: graph must have been loaded before.
@@ -309,7 +316,7 @@ namespace SEE.Game
                 }
                 else
                 {
-                    GraphRenderer renderer = CoseGraphSettings.useOptAlgorithm ? new OptAlgorithmGraphRenderer(this):  new GraphRenderer(this);
+                    GraphRenderer renderer = CoseGraphSettings.useOptAlgorithm ? new OptAlgorithmGraphRenderer(this) : new GraphRenderer(this);
                     // We assume here that this SEECity instance was added to a game object as
                     // a component. The inherited attribute gameObject identifies this game object.
                     renderer.Draw(visualizedSubGraph, gameObject);
@@ -395,6 +402,61 @@ namespace SEE.Game
                 result.AddRange(ascendants);
             }
             return result;
+        }
+
+        private GameObject FindGameObject(uint id, List<GameObject> gameObjects)
+        {
+            foreach (GameObject gameObject in gameObjects)
+            {
+                if (gameObject.GetComponent<AnnotatableObject>().id == id)
+                {
+                    return gameObject;
+                }
+            }
+            return null;
+        }
+
+        public void Save()
+        {
+            List<GameObject> gameObjects = SEECity.AllNodeDescendants(gameObject).ToList();
+            List<AnnotatableObjectData> annotatableObjects = new List<AnnotatableObjectData>();
+
+            foreach (GameObject gameObject in gameObjects)
+            {
+                annotatableObjects.Add(new AnnotatableObjectData(gameObject.GetComponent<AnnotatableObject>()));
+            }
+
+            LayoutSaveSystem.SaveAnnotatableObjects(annotatableObjects,SEEPath());
+        }
+
+        public void Load()
+        {
+            List<AnnotatableObjectData> annotatableObjects = LayoutSaveSystem.LoadAnnotatableObjects(SEEPath());
+            List<GameObject> gameObjects = SEECity.AllNodeDescendants(gameObject).ToList();
+
+            foreach (AnnotatableObjectData annotatableObjectData in annotatableObjects)
+            {
+                GameObject gameObject = FindGameObject(Convert.ToUInt32(annotatableObjectData.id), gameObjects);
+
+                if (gameObject != null)
+                {
+                    gameObject.transform.position = new Vector3(annotatableObjectData.position[0], annotatableObjectData.position[1], annotatableObjectData.position[2]);
+                    gameObject.transform.localScale = new Vector3(annotatableObjectData.scale[0], annotatableObjectData.scale[1], annotatableObjectData.scale[2]);
+                    if (!(annotatableObjectData.textOnPaper is null))
+                    {
+                        gameObject.GetComponent<AnnotatableObject>().ShowInformation();
+                        if (!(annotatableObjectData.annotations is null))
+                        {
+                            gameObject.GetComponent<AnnotatableObject>().RemoveAllAnnotations();
+                            foreach (String annotation in annotatableObjectData.annotations)
+                            {
+                                gameObject.GetComponent<AnnotatableObject>().Annotate(annotation);
+                            }
+                        }
+                        gameObject.GetComponent<AnnotatableObject>().HideInformation();
+                    }
+                }
+            }
         }
     }
 }
