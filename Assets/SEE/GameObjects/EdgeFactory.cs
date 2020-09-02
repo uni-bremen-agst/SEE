@@ -47,7 +47,7 @@ namespace SEE.GO
         /// Returns a new game edge.
         /// </summary>
         /// <returns>new game edge</returns>
-        protected GameObject NewGameEdge(LayoutEdge layoutEdge)
+        protected GameObject NewGameEdge(ILayoutEdge layoutEdge)
         {
             GameObject gameEdge = new GameObject
             {
@@ -63,7 +63,7 @@ namespace SEE.GO
         {
             List<GameObject> result = new List<GameObject>();
 
-            foreach (LayoutEdge layoutEdge in layout.Create(layoutNodes))
+            foreach (ILayoutEdge layoutEdge in layout.Create(layoutNodes))
             {
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);

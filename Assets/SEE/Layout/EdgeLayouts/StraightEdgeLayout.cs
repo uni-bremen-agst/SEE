@@ -20,9 +20,9 @@ namespace SEE.Layout
             name = "Straight";
         }
 
-        public override ICollection<LayoutEdge> Create(ICollection<ILayoutNode> layoutNodes)
+        public override ICollection<ILayoutEdge> Create(ICollection<ILayoutNode> layoutNodes)
         {
-            ICollection<LayoutEdge> layout = new List<LayoutEdge>();
+            ICollection<ILayoutEdge> layout = new List<ILayoutEdge>();
 
             MinMaxBlockY(layoutNodes, out float minBlockY, out float maxBlockY, out float maxHeight);
 
@@ -55,7 +55,7 @@ namespace SEE.Layout
                         start = source.Ground;
                         end = target.Ground;
                     }
-                    layout.Add(new LayoutEdge(source, target, LinePoints.StraightLinePoints(start, end, edgeLevel)));
+                    layout.Add(new ILayoutEdge(source, target, LinePoints.StraightLinePoints(start, end, edgeLevel)));
                 }
             }
             return layout;

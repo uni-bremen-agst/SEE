@@ -35,9 +35,9 @@ namespace SEE.Layout
         /// </summary>
         private float rdp = 0.0f; // 0.0f means no simplification
 
-        public override ICollection<LayoutEdge> Create(ICollection<ILayoutNode> layoutNodes)
+        public override ICollection<ILayoutEdge> Create(ICollection<ILayoutNode> layoutNodes)
         {
-            ICollection<LayoutEdge> layout = new List<LayoutEdge>();
+            ICollection<ILayoutEdge> layout = new List<ILayoutEdge>();
             foreach (ILayoutNode source in layoutNodes)
             {
                 foreach (ILayoutNode target in source.Successors)
@@ -55,7 +55,7 @@ namespace SEE.Layout
                         start = source.Ground;
                         end = target.Ground;
                     }
-                    layout.Add(new LayoutEdge(source, target,
+                    layout.Add(new ILayoutEdge(source, target,
                                Simplify(LinePoints.SplineLinePoints(start, end, edgesAboveBlocks, minLevelDistance), rdp)));
                 }
             }

@@ -32,7 +32,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="layoutNodes">the nodes whose connecting edges are to be laid out</param>
         /// <returns>layout edges</returns>
-        public abstract ICollection<LayoutEdge> Create(ICollection<ILayoutNode> layoutNodes);
+        public abstract ICollection<ILayoutEdge> Create(ICollection<ILayoutNode> layoutNodes);
 
         /// <summary>
         /// Name of the layout.
