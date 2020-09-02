@@ -1330,7 +1330,7 @@ namespace SEE.Tools.Architecture
         /// </summary>
         /// <param name="node">implementation node</param>
         /// <returns>true if node is explicitly mapped</returns>
-        private bool Is_Mapper(Node node)
+        public bool Is_Mapper(Node node)
         {
             return _explicit_maps_to_table.ContainsKey(node.ID);
         }
