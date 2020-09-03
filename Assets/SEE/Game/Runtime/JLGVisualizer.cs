@@ -387,7 +387,7 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// Gets a GameObject tagged with Node from this objects list of GameObjects that matches the location of the Statement represented by i.
+        /// Gets a GameObject tagged with Node from this objects list of GameObjects(nodesGos) that matches the location of the Statement represented by i.
         /// A Node matches the location of a statement, when the classname of the location equals the nodes name.
         /// </summary>
         /// <param name="i">the index of the statement in this parsedJLG.allstatements</param>
@@ -414,6 +414,9 @@ namespace SEE.Game.Runtime
             return parsedJLG.GetStatementLocationString(i).StartsWith(go.name)&&go.tag.Equals("Node");
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void JumpToNextClass() {
             GameObject classToBeJumped = currentGO;
             while (classToBeJumped == currentGO) {
@@ -421,6 +424,9 @@ namespace SEE.Game.Runtime
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void JumpToNextMethod()
         {
             String currentMethod = parsedJLG.AllStatements[statementCounter].Location;
@@ -438,6 +444,7 @@ namespace SEE.Game.Runtime
 
                 HighlightCurrentLineFadePrevious();           
 
+            //Generate the info text in the smaller textwindow for the currentstatement. The info text is build in the parsedJLG object and then returned to the TMPro text component.
             GameObject fileContent = GameObject.Find(currentGO.name + "FileContent");
             fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = parsedJLG.CreateStatementInfoString(statementCounter);
 
@@ -459,8 +466,9 @@ namespace SEE.Game.Runtime
         private void PreviousStatement() {
             Debug.Log(parsedJLG.AllStatements[statementCounter].Line+ " "+parsedJLG.GetStatementLocationString(statementCounter) + " CurrentGo:" + currentGO.name);
                       
-                HighlightCurrentLineFadePreviousReverse();            
+                HighlightCurrentLineFadePreviousReverse();
 
+            //Generate the info text in the smaller textwindow for the currentstatement. The info text is build in the parsedJLG object and then returned to the TMPro text component.
             GameObject fileContent = GameObject.Find(currentGO.name + "FileContent");
             fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = parsedJLG.CreateStatementInfoString(statementCounter);
             if (statementCounter > 0)

@@ -85,6 +85,12 @@ namespace Assets.SEE.DataModel.IO
                         javaStatement.FieldChanges.Add(line.TrimStart('#'));
                     }
                 }
+                //check for return value
+                else if (line.StartsWith("=>"))
+                {
+                    int i = line.IndexOf('>');
+                    javaStatement.ReturnValue = line.Substring(i + 1);
+                }
                 //List with filepaths
                 else if (line.StartsWith("$"))
                 {
@@ -135,6 +141,7 @@ namespace Assets.SEE.DataModel.IO
                     }
                 }
             }
+            javaStatements.Add(javaStatement); //make sure the last javastatement is also added, since otherwise a statement is added to the list, when a new one starts.
             ParsedJLG parsed = new ParsedJLG(filesOfProject, locationLookupTable, fieldLookupTable, javaStatements);
             return parsed;
         }
