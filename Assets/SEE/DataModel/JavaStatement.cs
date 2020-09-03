@@ -45,6 +45,12 @@ namespace Assets.SEE.DataModel
         private String statementType;
 
         /// <summary>
+        /// This field contains the return value of a statement, if it has one. Otherwise it is not used.
+        /// </summary>
+        [SerializeField]
+        private String returnValue;
+
+        /// <summary>
         /// Empty Constructor. A new JavaStatement is filled step by step within the JLGParser.
         /// </summary>
         public JavaStatement() { }
@@ -86,6 +92,8 @@ namespace Assets.SEE.DataModel
         public List<string> LocalVariables { get => localVariables; set => localVariables = value; }
 
         public string StatementType { get => statementType; set => statementType = value; }
+
+        public string ReturnValue { get => returnValue; set => returnValue = value; }
 
         public List<string> FieldChanges { get => fieldChanges; set => fieldChanges = value; }
     }

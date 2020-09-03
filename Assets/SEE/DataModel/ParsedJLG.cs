@@ -76,6 +76,8 @@ namespace Assets.SEE.DataModel
         {
             JavaStatement js = allStatements[statementCounter];
             string info = "Line " + js.Line + Environment.NewLine;
+
+            //Add local variables to info string
             if (js.LocalVariables.Count != 0)
             {
                 info = info + "Local variables accessible at this line:";
@@ -84,6 +86,8 @@ namespace Assets.SEE.DataModel
                     info = info + Environment.NewLine + s;
                 }
             }
+
+            //Add field changes to info string
             if (js.FieldChanges.Count != 0)
             {
                 info = info + Environment.NewLine + "Field Changes at this line:";
@@ -91,6 +95,12 @@ namespace Assets.SEE.DataModel
                 {
                     info = info + Environment.NewLine + LookupFieldLocation(s);
                 }
+            }
+
+            //Add the return value of this statement (and its method) to the info string
+            if (js.ReturnValue != null)
+            {
+                info = info + Environment.NewLine +"Returns: "+ js.ReturnValue;
             }
             return info;
         }
