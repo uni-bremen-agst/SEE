@@ -31,6 +31,12 @@ namespace Assets.SEE.DataModel
         private List<JavaStatement> allStatements;
 
         /// <summary>
+        /// This Stack contains all return Values, until the current Point in the Visualization. It is filled and used, when a ParsedJLG object is being visualized by a JLGVisualizer script.
+        /// </summary>
+        [SerializeField]
+        private Stack<String> returnValues = new Stack<string>();
+
+        /// <summary>
         /// Constructs a new ParsedJLG.
         /// </summary>
         /// <param name="filesOfProject"></param>
@@ -66,13 +72,15 @@ namespace Assets.SEE.DataModel
         public List<string> LocationLookupTable { get => locationLookupTable; }
         public List<string> FieldLookupTable { get => fieldLookupTable; }
         public List<JavaStatement> AllStatements { get => allStatements; }
+        public Stack<string> ReturnValues { get => returnValues; set => returnValues = value; }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="statementCounter"></param>
+        /// <param name="AddReturnValueToStack">This should be true when the Visualization is running forward. Only then the return value is put on the stack.</param>
         /// <returns></returns>
-        internal string CreateStatementInfoString(int statementCounter)
+        internal string CreateStatementInfoString(int statementCounter, Boolean AddReturnValueToStack)
         {
             JavaStatement js = allStatements[statementCounter];
             string info = "Line " + js.Line + Environment.NewLine;
@@ -97,10 +105,20 @@ namespace Assets.SEE.DataModel
                 }
             }
 
+            //Add last return Value
+            if (returnValues.Count != 0)
+            {
+                info = info + Environment.NewLine + "Last Return: " + returnValues.Peek();
+            }
+
             //Add the return value of this statement (and its method) to the info string
             if (js.ReturnValue != null)
             {
                 info = info + Environment.NewLine +"Returns: "+ js.ReturnValue;
+                if (AddReturnValueToStack)
+                {
+                    returnValues.Push(js.ReturnValue);
+                }
             }
             return info;
         }
