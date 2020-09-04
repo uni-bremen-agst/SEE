@@ -2,6 +2,9 @@
 
 namespace SEE.Layout
 {
+    /// <summary>
+    /// Utilities for collections of ILayoutNodes (levels and roots).
+    /// </summary>
     public static class LayoutNodes
     {
         /// <summary>
