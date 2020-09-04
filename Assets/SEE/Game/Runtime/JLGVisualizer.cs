@@ -446,7 +446,7 @@ namespace SEE.Game.Runtime
 
             //Generate the info text in the smaller textwindow for the currentstatement. The info text is build in the parsedJLG object and then returned to the TMPro text component.
             GameObject fileContent = GameObject.Find(currentGO.name + "FileContent");
-            fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = parsedJLG.CreateStatementInfoString(statementCounter);
+            fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = parsedJLG.CreateStatementInfoString(statementCounter, true);
 
             if (statementCounter < parsedJLG.AllStatements.Count-1)
             {
@@ -470,7 +470,7 @@ namespace SEE.Game.Runtime
 
             //Generate the info text in the smaller textwindow for the currentstatement. The info text is build in the parsedJLG object and then returned to the TMPro text component.
             GameObject fileContent = GameObject.Find(currentGO.name + "FileContent");
-            fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = parsedJLG.CreateStatementInfoString(statementCounter);
+            fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = parsedJLG.CreateStatementInfoString(statementCounter, false);
             if (statementCounter > 0)
             {
                 statementCounter--;
@@ -499,6 +499,11 @@ namespace SEE.Game.Runtime
             }
         }
 
+        /// <summary>
+        /// This Method updates all stacks that are need for the Visualization, depending on the playdirection.
+        /// The Stacks modified here are: textWindows, functionCalls and parsedJLG.ReturnValues
+        /// The returnValues stack is filled inside the parsedJLG Object when playdirection is true/Forward.
+        /// </summary>
         private void updateStacks() {
             if (playDirection)
             {
@@ -518,8 +523,12 @@ namespace SEE.Game.Runtime
             }
             else
             {
+                if (parsedJLG.AllStatements[statementCounter].StatementType.Equals("exit")) {
+                    parsedJLG.ReturnValues.Pop();//remove returnvalue from stack, that is returned in the exit statement.
+                }
+
                 if (parsedJLG.AllStatements[statementCounter].StatementType.Equals("exit") && currentGO != GetNodeForStatement(statementCounter+1)
-                    && findFunctionCallForGameObjects(currentGO, GetNodeForStatement(statementCounter + 1))!= null)//Check for null because sometimes, this can break if the playdirection is changed a lot.
+                    && findFunctionCallForGameObjects(currentGO, GetNodeForStatement(statementCounter + 1))!= null)//Check for null because sometimes, this can break if the playdirection is changed a lot in a short time.
                 {
                     findFunctionCallForGameObjects(currentGO, GetNodeForStatement(statementCounter + 1)).SetActive(true);
                 }
@@ -540,7 +549,7 @@ namespace SEE.Game.Runtime
                     if (textWindows.Peek().name.StartsWith(GetNodeForStatement(statementCounter + 1).name))
                     {
                         GameObject.Destroy(textWindows.Pop());
-                    }
+                    }                    
                 }
             }
         }
