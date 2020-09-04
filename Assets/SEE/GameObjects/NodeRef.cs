@@ -1,5 +1,4 @@
 ﻿using System;
-using OdinSerializer;
 using SEE.Charts.Scripts;
 using SEE.DataModel;
 using UnityEngine;
@@ -9,7 +8,7 @@ namespace SEE.GO
 	/// <summary>
 	/// A reference to a graph node that can be attached to a game object as a component.
 	/// </summary>
-	public class NodeRef : SerializedMonoBehaviour
+	public class NodeRef : GraphElementRef
 	{
 		/// <summary>
 		/// The graph node this node reference is referring to. It will be set either

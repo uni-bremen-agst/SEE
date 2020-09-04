@@ -56,7 +56,7 @@ namespace SEE.GO
             {
                 tag = Tags.Edge,
                 isStatic = false,
-                name = "(" + layoutEdge.Source.ID + ", " + layoutEdge.Target.ID + ")"
+                name = layoutEdge.ItsEdge.ID
             };
             gameEdge.AddComponent<EdgeRef>().edge = layoutEdge.ItsEdge;
             return gameEdge;
