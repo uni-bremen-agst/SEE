@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Layout
 {
@@ -28,11 +29,16 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Returns the layout edges for all edges connecting nodes in <paramref name="layoutNodes"/>.
+        /// Adds way points to the given <paramref name="edges"/> according to the layout.
+        /// The <paramref name="edges"/> are assumed to be in between pairs of nodes in
+        /// the given set of <paramref name="nodes"/>. For hierarchical edge layouts, 
+        /// <paramref name="nodes"/> must include all ancestors for all nodes that are
+        /// source or target of any edge in the given set of <paramref name="edges"/>.
         /// </summary>
-        /// <param name="layoutNodes">the nodes whose connecting edges are to be laid out</param>
-        /// <returns>layout edges</returns>
-        public abstract ICollection<ILayoutEdge> Create(ICollection<ILayoutNode> layoutNodes);
+        /// <param name="nodes">nodes whose edges are to be drawn or which are 
+        /// ancestors of any nodes whose edges are to be drawn</param>
+        /// <param name="edges">edges for which to add way points</param>
+        public abstract void Create(ICollection<ILayoutNode> nodes, ICollection<ILayoutEdge> edges);
 
         /// <summary>
         /// Name of the layout.

@@ -35,31 +35,51 @@ namespace SEE.Layout
         /// </summary>
         private float rdp = 0.0f; // 0.0f means no simplification
 
-        public override ICollection<ILayoutEdge> Create(ICollection<ILayoutNode> layoutNodes)
+        /// <summary>
+        /// Adds way points to each edge in the given list of<paramref name= "edges" />
+        /// along a spline from its source to each target.
+        /// The <paramref name="edges"/> are assumed to be in between pairs of nodes in
+        /// the given set of <paramref name="nodes"/>. The given <paramref name="nodes"\>
+        /// are used to determine the height at which to draw the edges so that they
+        /// do not pass through any other node and, hence, should include every node that
+        /// may be in between sources and targets of any edge in <paramref name="edges"/>.
+        /// </summary>
+        /// <param name="nodes">nodes whose edges are to be drawn or which are 
+        /// ancestors of any nodes whose edges are to be drawn</param>
+        /// <param name="edges">edges for which to add way points</param>
+        public override void Create(ICollection<ILayoutNode> nodes, ICollection<ILayoutEdge> edges)
         {
-            ICollection<ILayoutEdge> layout = new List<ILayoutEdge>();
-            foreach (ILayoutNode source in layoutNodes)
+            MinMaxBlockY(nodes, out float minBlockY, out float maxBlockY, out float maxHeight);
+
+            // The offset of the edges above or below the ground chosen relative 
+            // to the height of the largest block.
+            // We are using a value relative to the highest node so that edges 
+            // are farther away from the blocks for cities with large blocks and
+            // closer to blocks for cities with small blocks. This may help to 
+            // better read the edges.
+            // This offset is used to draw the line somewhat below
+            // or above the house (depending on the orientation).
+            float offset = Mathf.Max(minLevelDistance, 0.2f * maxHeight); // must be positive
+                                    
+            foreach (ILayoutEdge edge in edges)
             {
-                foreach (ILayoutNode target in source.Successors)
+                ILayoutNode source = edge.Source;
+                ILayoutNode target = edge.Target;
+                // define the points along the line
+                Vector3 start;
+                Vector3 end;
+                if (edgesAboveBlocks)
                 {
-                    // define the points along the line
-                    Vector3 start;
-                    Vector3 end;
-                    if (edgesAboveBlocks)
-                    {
-                        start = source.Roof;
-                        end = target.Roof;
-                    }
-                    else
-                    {
-                        start = source.Ground;
-                        end = target.Ground;
-                    }
-                    layout.Add(new ILayoutEdge(source, target,
-                               Simplify(LinePoints.SplineLinePoints(start, end, edgesAboveBlocks, minLevelDistance), rdp)));
+                    start = source.Roof;
+                    end = target.Roof;
                 }
+                else
+                {
+                    start = source.Ground;
+                    end = target.Ground;
+                }
+                edge.Points = Simplify(LinePoints.SplineLinePoints(start, end, edgesAboveBlocks, offset), rdp);
             }
-            return layout;
         }
     }
 }

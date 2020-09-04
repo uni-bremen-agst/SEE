@@ -169,14 +169,17 @@ namespace SEE.Layout
             // from the GVL file.
 
             // The game-object hierarchy for the nodes in graph are children of seeCity.
-            ICollection<ILayoutNode> gameObjects = graphRenderer.ToLayoutNodes(GetGameObjects(seeCity));
+            ICollection<GameNode> gameNodes = graphRenderer.ToLayoutNodes(GetGameObjects(seeCity));
+            // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
+            // (GameNode implements ILayoutNode).
+            ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
 
             //SEE.Layout.IO.Reader reader = new SEE.Layout.IO.Reader(path + "Architecture.gvl", 
             //                                                       gameObjects.Cast<IGameNode>().ToList(),
             //                                                       0.0f);
-            DumpTree(gameObjects);
+            DumpTree(layoutNodes);
             // Save the layout.
-            SEE.Layout.IO.Writer.Save(path + "Architecture-saved.gvl", "architecture", gameObjects);
+            SEE.Layout.IO.Writer.Save(path + "Architecture-saved.gvl", "architecture", layoutNodes);
         }
 
         private ICollection<GameObject> GetGameObjects(GameObject go)
