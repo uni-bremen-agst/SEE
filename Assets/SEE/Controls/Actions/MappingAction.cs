@@ -166,29 +166,29 @@ namespace SEE.Controls
             GatherEdges(Architecture, architectureEdges);
         }
 
-        private void GatherEdges(GameObject parent, Dictionary<string, GameObject> edges)
+        private void GatherEdges(GameObject gameObject, Dictionary<string, GameObject> edges)
         {
-            if (parent.tag == Tags.Edge)
+            if (gameObject.tag == Tags.Edge)
             {
-                if (parent.TryGetComponent<EdgeRef>(out EdgeRef edgeRef))
+                if (gameObject.TryGetComponent<EdgeRef>(out EdgeRef edgeRef))
                 {
                     Edge edge = edgeRef.edge;
                     if (edge != null)
                     {
-                        Debug.LogFormat("Added edge ID {0} -> game-object edge {1} to edge map: {2}.\n", edge.ID, parent.name, edge);
-                        edges[edge.ID] = parent;
+                        Debug.LogFormat("Added edge ID {0} -> game-object edge {1} to edge map: {2}.\n", edge.ID, gameObject.name, edge);
+                        edges[edge.ID] = gameObject;
                     }
                     else
                     {
-                        Debug.LogErrorFormat("Game-object edge {0} without an invalid graph edge reference.\n", parent.name);
+                        Debug.LogErrorFormat("Game-object edge {0} without an invalid graph edge reference.\n", gameObject.name);
                     }
                 }
                 else
                 {
-                    Debug.LogErrorFormat("Game-object edge {0} without graph edge reference.\n", parent.name);
+                    Debug.LogErrorFormat("Game-object edge {0} without graph edge reference.\n", gameObject.name);
                 }
             }
-            foreach (Transform child in parent.transform)
+            foreach (Transform child in gameObject.transform)
             {
                 GatherEdges(child.gameObject, edges);
             }
