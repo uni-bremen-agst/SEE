@@ -102,7 +102,7 @@ namespace SEE.Game
         private IScale scaler;
 
         /// <summary>
-        /// mapping from node to ilayoutNode
+        /// A mapping from Node to ILayoutNode.
         /// </summary>
         protected Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
 
@@ -155,7 +155,8 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Applies the edge layout according to the the user's choice (settings).
+        /// Applies the edge layout according to the the user's choice (settings) for
+        /// all edges in between nodes in <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
@@ -169,9 +170,9 @@ namespace SEE.Game
         /// Applies the edge layout according to the the user's choice (settings).
         /// </summary>
         /// <param name="graph">graph whose edges are to be drawn</param>
-        /// <param name="layoutNodes">the subset of layout nodes for which to draw the edges</param>
+        /// <param name="gameNodes">the set of layout edges for which to create game objects</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<ILayoutNode> layoutNodes)
+        private ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameNode> gameNodes)
         {
             float minimalEdgeLevelDistance = 2.5f * settings.EdgeWidth;
             IEdgeLayout layout;
@@ -194,9 +195,48 @@ namespace SEE.Game
             }
             Performance p = Performance.Begin("edge layout " + layout.Name);
             EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
-            ICollection<GameObject> result = edgeFactory.DrawEdges(layoutNodes);
+            ICollection<GameObject> result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), ConnectingEdges(gameNodes));
             p.End();
             return result;
+        }
+
+        /// <summary>
+        /// Returns the list of layout edges for all edges in between <paramref name="gameNodes"/>.
+        /// </summary>
+        /// <param name="gameNodes">set of game nodes whose connecting edges are requested</param>
+        /// <returns>list of layout edges/returns>
+        private static ICollection<LayoutEdge> ConnectingEdges(ICollection<GameNode> gameNodes)
+        {
+            ICollection<LayoutEdge> edges = new List<LayoutEdge>();
+            Dictionary<Node, GameNode> map = NodeToGameNodeMap(gameNodes);
+
+            foreach (GameNode source in gameNodes)
+            {
+                Node sourceNode = source.ItsNode;
+
+                foreach (Edge edge in sourceNode.Outgoings)
+                {
+                    Node target = edge.Target;
+                    edges.Add(new LayoutEdge(source, map[target], edge));
+                }
+            }
+            return edges;
+        }
+
+        /// <summary>
+        /// Returns a mapping of each graph Node onto its containing GameNode for every
+        /// element in <paramref name="gameNodes"/>.
+        /// </summary>
+        /// <param name="gameNodes"></param>
+        /// <returns>mapping of graph node onto its corresponding game node</returns>
+        private static Dictionary<Node, GameNode> NodeToGameNodeMap(ICollection<GameNode> gameNodes)
+        {
+            Dictionary<Node, GameNode> map = new Dictionary<Node, GameNode>();
+            foreach (GameNode node in gameNodes)
+            {
+                map[node.ItsNode] = node;
+            }
+            return map;
         }
 
         /// <summary>
@@ -221,8 +261,8 @@ namespace SEE.Game
 
             // for a hierarchical layout, we need to add the game objects for inner nodes
 
-            Dictionary<Node, GameObject>.ValueCollection gameNodes;
-            ICollection<ILayoutNode> layoutNodes = new List<ILayoutNode>();
+            Dictionary<Node, GameObject>.ValueCollection nodeToGameObject;
+            ICollection<GameNode> gameNodes = new List<GameNode>();
             Node artificalRoot  = null;
             GameObject plane;
 
@@ -233,8 +273,8 @@ namespace SEE.Game
                 {
                     ICollection<SublayoutNode> sublayoutNodes = AddInnerNodesForSublayouts(nodeMap, nodes);
                     artificalRoot = AddRootIfNecessary(graph, nodeMap);
-                    layoutNodes = ToLayoutNodes(nodeMap, sublayoutNodes);
-                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, layoutNodes);
+                    gameNodes = ToLayoutNodes(nodeMap, sublayoutNodes);
+                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
 
                     List<SublayoutLayoutNode> sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
                     foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
@@ -243,16 +283,22 @@ namespace SEE.Game
                         sublayout.Layout();
                     }
 
-                    p = Performance.Begin("layout name" + settings.NodeLayout + ", layout of nodes");
+                    p = Performance.Begin("node layout " + settings.NodeLayout + " (with sublayouts)");
+                    // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
+                    // (GameNode implements ILayoutNode).
+                    ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
                     if (nodeLayout.UsesEdgesAndSublayoutNodes())
                     {
-                        nodeLayout.Apply(layoutNodes, graph.ConnectingEdges(layoutNodes), sublayoutLayoutNodes);
+                        // FIXME: Could graph.ConnectingEdges(nodes) be replaced by graph.Edges()?
+                        // The input graph is already a subset graph if not all data of the GXL file
+                        // are to be drawn.
+                        nodeLayout.Apply(layoutNodes, graph.ConnectingEdges(nodes), sublayoutLayoutNodes);
                     }
                     p.End();
 
                     Fit(parent, layoutNodes);
 
-                    gameNodes = nodeMap.Values;
+                    nodeToGameObject = nodeMap.Values;
 
                     // add the plane surrounding all game objects for nodes
                     BoundingBox(layoutNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
@@ -260,12 +306,12 @@ namespace SEE.Game
                     AddToParent(plane, parent);
 
                     CreateObjectHierarchy(nodeMap, parent);
-                    InteractionDecorator.PrepareForInteraction(gameNodes);
+                    InteractionDecorator.PrepareForInteraction(nodeToGameObject);
 
                     // add the decorations, too
                     if (sublayoutLayoutNodes.Count <= 0)
                     {
-                        AddDecorations(gameNodes);
+                        AddDecorations(nodeToGameObject);
                     }
                     else
                     {
@@ -287,7 +333,7 @@ namespace SEE.Game
                 {
                     // If we added an artifical root node to the graph, we must remove it again
                     // from the graph when we are done.
-                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, layoutNodes);
+                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
                 }               
             }
             else
@@ -299,40 +345,47 @@ namespace SEE.Game
                         // for a hierarchical layout, we need to add the game objects for inner nodes
                         AddInnerNodes(nodeMap, nodes);
                         artificalRoot = AddRootIfNecessary(graph, nodeMap);
+                        if (artificalRoot != null)
+                        {
+                            Debug.Log("Artificial unique root was added.\n");
+                        }
                     }
 
                     // calculate and apply the node layout
-                    layoutNodes = ToLayoutNodes(nodeMap.Values);
-                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, layoutNodes);
-
-                    p = Performance.Begin("layout name" + settings.NodeLayout + ", layout of nodes");
+                    gameNodes = ToLayoutNodes(nodeMap.Values);
+                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
+                    
+                    p = Performance.Begin("node layout " + settings.NodeLayout + " for " + gameNodes.Count + " nodes");
+                    // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
+                    // (GameNode implements ILayoutNode).
+                    ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
                     nodeLayout.Apply(layoutNodes);
                     p.End();
 
                     Fit(parent, layoutNodes);
 
-                    gameNodes = nodeMap.Values;
+                    nodeToGameObject = nodeMap.Values;
                     // add the plane surrounding all game objects for nodes
-                    plane = NewPlane(gameNodes, parent.transform.position.y);
+                    plane = NewPlane(nodeToGameObject, parent.transform.position.y);
                     AddToParent(plane, parent);
 
                     CreateObjectHierarchy(nodeMap, parent);
-                    InteractionDecorator.PrepareForInteraction(gameNodes);
+                    InteractionDecorator.PrepareForInteraction(nodeToGameObject);
 
                     // Decorations must be applied after the blocks have been placed, so that
                     // we also know their positions.
-                    AddDecorations(gameNodes);
+                    AddDecorations(nodeToGameObject);
                 }
                 finally
                 {
                     // If we added an artifical root node to the graph, we must remove it again
                     // from the graph when we are done.
-                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, layoutNodes);
+                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
                 }
             }
 
             // create the laid out edges
-            AddToParent(EdgeLayout(graph, layoutNodes), parent);
+            AddToParent(EdgeLayout(graph, gameNodes), parent);
             SetPortal(parent);
         }
 
@@ -618,7 +671,7 @@ namespace SEE.Game
         /// <param name="graph">graph where <paramref name="root"/> should be removed/param>
         /// <param name="nodeMap">mapping of nodes onto game objects from which to remove 
         /// <paramref name="root"/></param>
-        private void RemoveRootIfNecessary(ref Node root, Graph graph, Dictionary<Node, GameObject> nodeMap, ICollection<ILayoutNode> layoutNodes)
+        private void RemoveRootIfNecessary(ref Node root, Graph graph, Dictionary<Node, GameObject> nodeMap, ICollection<GameNode> layoutNodes)
         {
             return; // FIXME: temporarily disabled because the current implementation of the 
                     // custom shader for culling all city objects falling off the plane assumes 
@@ -629,8 +682,8 @@ namespace SEE.Game
                 if (layoutNodes != null)
                 {
                     // Remove from layout
-                    ILayoutNode toBeRemoved = null;
-                    foreach (ILayoutNode layoutNode in layoutNodes)
+                    GameNode toBeRemoved = null;
+                    foreach (GameNode layoutNode in layoutNodes)
                     {
                         if (layoutNode.ID.Equals(root.ID))
                         {
@@ -839,7 +892,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        public ICollection<ILayoutNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
+        public ICollection<GameNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
         {
             return ToLayoutNodes(gameObjects, leafNodeFactory, innerNodeFactory);
         }
@@ -850,9 +903,9 @@ namespace SEE.Game
         /// <param name="nodeMap">mapping between nodes and gameobjects</param>
         /// <param name="sublayoutNodes">a collection with sublayoutNodes</param>
         /// <returns></returns>
-        private ICollection<ILayoutNode> ToLayoutNodes(Dictionary<Node, GameObject> nodeMap, ICollection<SublayoutNode> sublayoutNodes)
+        private ICollection<GameNode> ToLayoutNodes(Dictionary<Node, GameObject> nodeMap, ICollection<SublayoutNode> sublayoutNodes)
         {
-            List<ILayoutNode> layoutNodes = new List<ILayoutNode>();
+            List<GameNode> layoutNodes = new List<GameNode>();
             List<GameObject> remainingGameobjects = nodeMap.Values.ToList();
 
             foreach (SublayoutNode sublayoutNode in sublayoutNodes)
@@ -876,12 +929,12 @@ namespace SEE.Game
         /// <param name="leafNodeFactory">the leaf node factory that created the leaf nodes in <paramref name="gameNodes"/></param>
         /// <param name="innerNodeFactory">the inner node factory that created the inner nodes in <paramref name="gameNodes"/></param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        private ICollection<ILayoutNode> ToLayoutNodes
+        private ICollection<GameNode> ToLayoutNodes
             (ICollection<GameObject> gameNodes, 
             NodeFactory leafNodeFactory,
             NodeFactory innerNodeFactory)
         {
-            IList<ILayoutNode> result = new List<ILayoutNode>();
+            IList<GameNode> result = new List<GameNode>();
 
             foreach (GameObject gameObject in gameNodes)
             {
@@ -895,7 +948,7 @@ namespace SEE.Game
                     result.Add(new GameNode(to_layout_node, gameObject, innerNodeFactory));
                 }
             }
-            LayoutNodes.SetLevels(result);
+            LayoutNodes.SetLevels(result.Cast<ILayoutNode>().ToList());
             return result;
         }
 

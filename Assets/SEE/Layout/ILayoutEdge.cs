@@ -5,7 +5,7 @@ namespace SEE.Layout
     /// <summary>
     /// Layout information about an edge.
     /// </summary>
-    public class ILayoutEdge
+    public abstract class ILayoutEdge
     {
         /// <summary>
         /// Source of the edge.
@@ -25,12 +25,10 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="source">Source of the edge.</param>
         /// <param name="target">Target of the edge.</param>
-        /// <param name="points">The points of the polygone for rendering the edge.</param>
-        public ILayoutEdge(ILayoutNode source, ILayoutNode target, Vector3[] points)
+        public ILayoutEdge(ILayoutNode source, ILayoutNode target)
         {
             this.Source = source;
             this.Target = target;
-            this.Points = points;
         }
     }
 }

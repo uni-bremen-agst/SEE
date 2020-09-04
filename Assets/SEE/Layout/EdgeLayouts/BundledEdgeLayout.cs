@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using System;
+using NUnit.Framework;
 
 namespace SEE.Layout
 {
@@ -76,33 +77,35 @@ namespace SEE.Layout
         private float levelOffset = 0.0f;
 
         /// <summary>
-        /// Returns hierarchically bundled splines for all edges among the given <paramref name="layoutNodes"/>.
-        /// 
+        /// Adds way points to the given <paramref name="edges"/> along hierarchically
+        /// bundled splines.
+        /// The <paramref name="edges"/> are assumed to be in between pairs of nodes in
+        /// the given set of <paramref name="nodes"/>. Because this is a hierarchical edge 
+        /// layout,  <paramref name="nodes"/> must include all ancestors for all nodes that are
+        /// source or target of any edge in the given set of <paramref name="edges"/>.
         /// </summary>
-        /// <param name="layoutNodes">nodes whose connecting edges are to be drawn</param>
-        /// <returns>hierarchically bundled splines</returns>
-        public override ICollection<ILayoutEdge> Create(ICollection<ILayoutNode> layoutNodes)
+        /// <param name="nodes">nodes whose edges are to be drawn or which are 
+        /// ancestors of any nodes whose edges are to be drawn</param>
+        /// <param name="edges">edges for which to add way points</param>
+        public override void Create(ICollection<ILayoutNode> nodes, ICollection<ILayoutEdge> edges)
         {
-            ICollection<ILayoutEdge> layout = new List<ILayoutEdge>();
-
-            ICollection<ILayoutNode> roots = GetRoots(layoutNodes);
-            maxLevel = GetMaxLevel(roots, -1);
-
-            MinMaxBlockY(layoutNodes, out float minY, out float maxY, out float maxHeight);
-            levelDistance = Math.Max(levelDistance, maxHeight / 5.0f);
-            levelOffset = edgesAboveBlocks ? maxY + levelDistance : minY - levelDistance;
-            //Debug.LogFormat("levelDistance {0} levelOffset {1} maxHeight {2}\n", levelDistance, levelOffset, maxHeight);
-
-            LCAFinder<ILayoutNode> lca = new LCAFinder<ILayoutNode>(roots);
-
-            foreach (ILayoutNode source in layoutNodes)
+            if (edges.Count > 0)
             {
-                foreach (ILayoutNode target in source.Successors)
+                ICollection<ILayoutNode> roots = GetRoots(nodes);
+                Assert.AreNotEqual(roots.Count, 0);
+                maxLevel = GetMaxLevel(roots, -1);
+
+                MinMaxBlockY(nodes, out float minY, out float maxY, out float maxHeight);
+                levelDistance = Math.Max(levelDistance, maxHeight / 5.0f);
+                levelOffset = edgesAboveBlocks ? maxY + levelDistance : minY - levelDistance;
+
+                LCAFinder<ILayoutNode> lca = new LCAFinder<ILayoutNode>(roots);
+
+                foreach (ILayoutEdge edge in edges)
                 {
-                    layout.Add(new ILayoutEdge(source, target, GetLinePoints(source, target, lca, maxLevel)));
+                    edge.Points = GetLinePoints(edge.Source, edge.Target, lca, maxLevel);
                 }
             }
-            return layout;
         }
 
         /// <summary>

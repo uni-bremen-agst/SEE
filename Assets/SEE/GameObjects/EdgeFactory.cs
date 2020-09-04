@@ -1,11 +1,15 @@
 ﻿using SEE.DataModel;
+using SEE.Game;
 using SEE.Layout;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.GO
 {
+    /// <summary>
+    /// A factory to create game objects for laid out edges.
+    /// </summary>
     public class EdgeFactory
     {
         public EdgeFactory(IEdgeLayout layout, float edgeWidth)
@@ -38,16 +42,15 @@ namespace SEE.GO
             return material;
         }
 
+        private readonly float edgeWidth;
 
-        protected readonly float edgeWidth;
-
-        protected readonly IEdgeLayout layout;
+        private readonly IEdgeLayout layout;
 
         /// <summary>
         /// Returns a new game edge.
         /// </summary>
         /// <returns>new game edge</returns>
-        protected GameObject NewGameEdge(ILayoutEdge layoutEdge)
+        private GameObject NewGameEdge(LayoutEdge layoutEdge)
         {
             GameObject gameEdge = new GameObject
             {
@@ -55,15 +58,19 @@ namespace SEE.GO
                 isStatic = false,
                 name = "(" + layoutEdge.Source.ID + ", " + layoutEdge.Target.ID + ")"
             };
-            //gameEdge.AddComponent<EdgeRef>().edge = layoutEdge.; // FIXME
+            gameEdge.AddComponent<EdgeRef>().edge = layoutEdge.ItsEdge;
             return gameEdge;
         }
 
-        public ICollection<GameObject> DrawEdges(ICollection<ILayoutNode> layoutNodes)
+        public ICollection<GameObject> DrawEdges(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges)
         {
             List<GameObject> result = new List<GameObject>();
-
-            foreach (ILayoutEdge layoutEdge in layout.Create(layoutNodes))
+            if (edges.Count == 0)
+            {
+                return result;
+            }
+            layout.Create(nodes, edges.Cast<ILayoutEdge>().ToList());
+            foreach (LayoutEdge layoutEdge in edges)
             {
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);
