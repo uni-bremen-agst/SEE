@@ -14,8 +14,8 @@ namespace SEE.DataModel
         // The list of graph nodes indexed by their unique IDs
         private Dictionary<string, Node> nodes = new Dictionary<string, Node>();
 
-        // The list of graph edges.
-        private List<Edge> edges = new List<Edge>();
+        // The list of graph edges indexed by their unique IDs.
+        private Dictionary<string, Edge> edges = new Dictionary<string, Edge>();        
 
         // The (view) name of the graph.
         private string name = "";
@@ -103,13 +103,13 @@ namespace SEE.DataModel
                     {
                         Node successor = outgoing.Target;
                         successor.RemoveIncoming(outgoing);
-                        edges.Remove(outgoing);
+                        edges.Remove(outgoing.ID);
                     }
                     foreach (Edge incoming in node.Incomings)
                     {
                         Node predecessor = incoming.Source;
                         predecessor.RemoveOutgoing(incoming);
-                        edges.Remove(incoming);
+                        edges.Remove(incoming.ID);
                     }
                     node.RemoveAllEdges();
                     // Adjust the node hierarchy.
@@ -192,6 +192,27 @@ namespace SEE.DataModel
         }
 
         /// <summary>
+        /// Returns the edge with the given unique ID if it exists; otherwise null.
+        /// </summary>
+        /// <param name="ID">unique ID</param>
+        /// <returns>edge with the given unique ID if it exists; otherwise null</returns>
+        public Edge GetEdge(string ID)
+        {
+            if (String.IsNullOrEmpty(ID))
+            {
+                throw new System.Exception("ID must neither be null nor empty");
+            }
+            else if (edges.TryGetValue(ID, out Edge edge))
+            {
+                return edge;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Adds a non-hierarchical edge to the graph.
         /// Preconditions: 
         /// (1) edge must not be null.
@@ -221,7 +242,7 @@ namespace SEE.DataModel
                 else
                 {
                     edge.ItsGraph = this;
-                    edges.Add(edge);
+                    edges[edge.ID] = edge;
                     edge.Source.AddOutgoing(edge);
                     edge.Target.AddIncoming(edge);
                 }
@@ -255,7 +276,7 @@ namespace SEE.DataModel
             }
             else
             {
-                if (!edges.Remove(edge))
+                if (!edges.ContainsKey(edge.ID))
                 {
                     throw new Exception("edge " + edge.ToString() + " is not contained in graph " + Name);
                 }
@@ -312,7 +333,7 @@ namespace SEE.DataModel
         /// <returns>all non-hierarchical edges</returns>
         public List<Edge> Edges()
         {
-            return edges;
+            return edges.Values.ToList();
         }
 
         /// <summary>
@@ -479,7 +500,7 @@ namespace SEE.DataModel
             {
                 result += node.ToString() + ",\n";
             }
-            foreach (Edge edge in edges)
+            foreach (Edge edge in edges.Values)
             {
                 result += edge.ToString() + ",\n";
             }
@@ -531,9 +552,10 @@ namespace SEE.DataModel
 
         private void CopyEdgesTo(Graph target)
         {
-            target.edges = new List<Edge>();
-            foreach (Edge edge in this.edges)
+            target.edges = new Dictionary<string, Edge>();
+            foreach (var entry in this.edges)
             {
+                Edge edge = entry.Value;
                 Edge clone = (Edge)edge.Clone();
                 // set corresponding source
                 if (target.TryGetNode(edge.Source.ID, out Node from))
@@ -879,7 +901,7 @@ namespace SEE.DataModel
                 }
                 else
                 {
-                    bool equal = AreEqual(ToDictionary(this.edges), ToDictionary(otherGraph.edges));
+                    bool equal = AreEqual(this.edges, otherGraph.edges);
                     if (!equal)
                     {
                         Report("Graph edges are different");
@@ -887,16 +909,6 @@ namespace SEE.DataModel
                     return true;
                 }
             }
-        }
-
-        private static Dictionary<string, Edge> ToDictionary(IList<Edge> edges)
-        {
-            Dictionary<string, Edge> result = new Dictionary<string, Edge>();
-            foreach (Edge edge in edges)
-            {
-                result[edge.ID] = edge;
-            }
-            return result;
         }
 
         /// <summary>
@@ -908,6 +920,5 @@ namespace SEE.DataModel
             // we are using the viewName which is intended to be unique
             return name.GetHashCode();
         }
-
     }
 }

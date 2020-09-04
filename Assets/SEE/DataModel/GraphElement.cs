@@ -39,7 +39,7 @@ namespace SEE.DataModel
         /// <summary>
         /// The type of this graph element.
         /// </summary>
-        public string Type
+        public virtual string Type
         {
 	        get => type;
             set => type = !string.IsNullOrEmpty(value) ? value : "Unknown";

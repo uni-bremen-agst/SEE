@@ -41,6 +41,16 @@ namespace SEE.DataModel
         /// </summary>
         public const string IsLiftedToggle = "IsLifted";
 
+        public override string Type
+        {
+            get => base.Type;
+            set
+            {
+                base.Type = !string.IsNullOrEmpty(value) ? value : "Unknown";
+                SetID();
+            }
+        }
+
         /// <summary>
         /// The source of the edge.
         /// </summary
@@ -52,7 +62,11 @@ namespace SEE.DataModel
         public Node Source
         {
             get => source;
-            set => source = value;
+            set
+            {
+                source = value;
+                SetID();
+            }
         }
 
         /// <summary>
@@ -66,7 +80,11 @@ namespace SEE.DataModel
         public Node Target
         {
             get => target;
-            set => target = value;
+            set
+            {
+                target = value;
+                SetID();
+            }
         }
 
         /// <summary>
@@ -124,6 +142,7 @@ namespace SEE.DataModel
         {
             base.HandleCloned(clone);
             Edge target = (Edge)clone;
+            target.id     = this.id;
             target.source = this.source;
             target.target = this.target;
         }
@@ -132,11 +151,29 @@ namespace SEE.DataModel
         {
             string result = "{\n";
             result += " \"kind\": edge,\n";
+            result += " \"id\":  \"" + ID + "\",\n";
             result += " \"source\":  \"" + source.ID + "\",\n";
             result += " \"target\": \"" + target.ID + "\",\n";
             result += base.ToString();
             result += "}";
             return result;
+        }
+
+        /// <summary>
+        /// Unique ID of this edge.
+        /// </summary>
+        private string id;
+
+        /// <summary>
+        /// Sets the ID of this edge. Must be called whenever the target, source,
+        /// or type of this edge changes.
+        /// </summary>
+        private void SetID()
+        {
+            if (!string.IsNullOrEmpty(Type) && Source != null && Target != null)
+            {
+                id = Type + "#" + Source.ID + "#" + Target.ID;
+            }
         }
 
         /// <summary>
@@ -148,7 +185,7 @@ namespace SEE.DataModel
         /// <returns>a string from both nodes' ID as follows: Type + "#" + Source.ID + '#' + Target.ID</returns>
         public override string ID
         {
-            get => Type + "#" + Source.ID + "#" + Target.ID;
+            get => id;
             set => throw new NotImplementedException();
         }
     }

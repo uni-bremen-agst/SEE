@@ -94,7 +94,7 @@ namespace SEE.Game
                 if (loadedGraph != null)
                 {
                     LoadMetrics();
-                    SetNodeRefs(loadedGraph, gameObject);
+                    SetNodeEdgeRefs(loadedGraph, gameObject);
                 }
                 else
                 {
@@ -122,20 +122,20 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Sets all NodeRefs for this city to the nodes they correspond to.
-        /// We assume that the game objects with a NodeRef required to be defined to be
-        /// immediate children of this SEECity. Moreover, we assume a child
-        /// game object's name is the ID of the corresponding graph node.
+        /// Sets all NodeRefs and EdgeRefs for this city to the nodes and edges,
+        /// respectively, they correspond to.
+        /// We assume that the game objects with a NodeRef/EdgeRef required to be
+        /// defined to be immediate children of this SEECity. Moreover, we assume a child
+        /// game object's name is the ID of the corresponding graph node/edge.
         /// </summary>
-        /// <param name="graph">graph giving us the nodes who should be the
-        /// target of the NodeRefs</param>
-        protected void SetNodeRefs(Graph graph, GameObject parent)
+        /// <param name="graph">graph giving us the nodes/edges who should be the
+        /// target of the NodeRefs and EdgeRefs, respectively</param>
+        protected void SetNodeEdgeRefs(Graph graph, GameObject parent)
         {
             foreach (Transform childTransform in parent.transform)
             {
                 GameObject child = childTransform.gameObject;
-                NodeRef nodeRef = child.GetComponent<NodeRef>();
-                if (nodeRef != null)
+                if (child.TryGetComponent<NodeRef>(out NodeRef nodeRef))
                 {
                     nodeRef.node = graph.GetNode(child.name);
                     if (nodeRef.node == null)
@@ -143,7 +143,15 @@ namespace SEE.Game
                         Debug.LogWarningFormat("Could not resolve node reference {0}.\n", child.name);
                     }
                 }
-                SetNodeRefs(graph, child);
+                else if (child.TryGetComponent<EdgeRef>(out EdgeRef edgeRef))
+                {
+                    edgeRef.edge = graph.GetEdge(child.name);
+                    if (edgeRef.edge == null)
+                    {
+                        Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);
+                    }
+                }
+                SetNodeEdgeRefs(graph, child);
             }
         }
 
