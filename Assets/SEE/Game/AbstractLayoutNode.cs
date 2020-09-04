@@ -17,6 +17,14 @@ namespace SEE.Game
         protected readonly Node node;
 
         /// <summary>
+        /// The underlying graph node represented by this laid out node.
+        /// </summary>
+        public Node ItsNode 
+        {
+            get => node;
+        }
+
+        /// <summary>
         /// Constructor setting the graph <paramref name="node"/> corresponding to this layout node
         /// and the <paramref name="to_layout_node"/> mapping. The mapping maps all graph nodes to be
         /// laid out onto their corresponding layout node and is shared among all layout nodes.
