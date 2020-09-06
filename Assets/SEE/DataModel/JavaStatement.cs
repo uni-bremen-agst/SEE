@@ -6,7 +6,8 @@ using UnityEngine;
 namespace Assets.SEE.DataModel
 {
     /// <summary>
-    /// A JavaStatement represents a single logged executed line of Java code. It contains the location, which looks like classname.method, its line number in the class,
+    /// A JavaStatement represents a single logged executed line of Java code. It contains the location, which is a numeric value that can be looked up 
+    /// in a lookuptable contained in the ParsedJLG object this object belongs to, its line number in the class,
     /// the local variables available at the line of code and field changes, if it changes a field. The location and field names are coded and can be decoded with
     /// lookuptables in the parsedJLG this statement belongs to.
     /// </summary>

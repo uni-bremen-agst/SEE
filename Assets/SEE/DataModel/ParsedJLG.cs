@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Assets.SEE.DataModel
 {
+    [Serializable]
     public class ParsedJLG
     {
         /// <summary>
@@ -50,6 +51,8 @@ namespace Assets.SEE.DataModel
             this.fieldLookupTable = fieldLookupTable;
             this.allStatements = allStatements;
         }
+
+        public ParsedJLG() { }
 
         /// <summary>
         /// 
@@ -114,10 +117,10 @@ namespace Assets.SEE.DataModel
             //Add the return value of this statement (and its method) to the info string
             if (js.ReturnValue != null)
             {
-                info = info + Environment.NewLine +"Returns: "+ js.ReturnValue;
+                info = info + Environment.NewLine+ locationLookupTable[int.Parse(js.Location)] + " returns: "+ js.ReturnValue;
                 if (AddReturnValueToStack)
                 {
-                    returnValues.Push(js.ReturnValue);
+                    returnValues.Push(locationLookupTable[int.Parse(js.Location)] +  " returned "+js.ReturnValue);
                 }
             }
             return info;
