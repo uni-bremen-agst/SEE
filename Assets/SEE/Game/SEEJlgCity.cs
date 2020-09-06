@@ -43,6 +43,7 @@ namespace SEE.Game
                 jlgVisualisationGameObject.tag = Tags.JLGVisualisation;
 
                 ParsedJLG parsedJLG = jlgParser.Parse();
+                //ParsedJLG parsedJLG = new ParsedJLG();
                 jlgVisualisationGameObject.AddComponent<Runtime.JLGVisualizer>().parsedJLG = parsedJLG;
             }
 
