@@ -12,6 +12,25 @@ namespace SEE
     public class Plane : MonoBehaviour
     {
         /// <summary>
+        /// The scale of the objects may not always be in Unity units (for Unity's
+        /// primitive Cubes they are, but for other objects provided by third parties
+        /// and also by Unity's plane they are not) in which case the scale needs to be
+        /// multiplied by a correction factor to get the value in Unity units.
+        /// </summary>
+        [Tooltip("The correction factor by which to scale to the true lengths in Unity units.")]
+        public float ScaleFactor = 1.0f;
+
+        /// <summary>
+        /// Returns the scale in Unity units by applying the ScaleFactor to the lossy scale
+        /// of the transform.
+        /// </summary>
+        /// <returns>scale in Unity units after correction</returns>
+        private Vector3 GetScale()
+        {
+            return transform.lossyScale * ScaleFactor;
+        }
+
+        /// <summary>
         /// The left front corner of the plane.
         /// Note: the y co-ordinate of the resulting Vector2 denotes a value in the z axis.
         /// </summary>
@@ -20,7 +39,7 @@ namespace SEE
             get
             {
                 Vector3 position = transform.position;
-                Vector3 scale = transform.lossyScale;
+                Vector3 scale = GetScale();
                 float MinX = position.x - scale.x / 2.0f;
                 float MinZ = position.z - scale.z / 2.0f;
                 return new Vector2(MinX, MinZ);
@@ -36,7 +55,7 @@ namespace SEE
             get
             {
                 Vector3 position = transform.position;
-                Vector3 scale = transform.lossyScale;
+                Vector3 scale = GetScale();
                 float MaxX = position.x + scale.x / 2.0f;
                 float MaxZ = position.z + scale.z / 2.0f;
                 return new Vector2(MaxX, MaxZ);
@@ -62,7 +81,7 @@ namespace SEE
         {
             get
             {
-                Vector3 scale = transform.lossyScale;
+                Vector3 scale = GetScale();
                 return scale.x < scale.z ? scale.x : scale.z;
             }
         }
@@ -74,7 +93,7 @@ namespace SEE
         {
             get
             {
-                Vector3 scale = transform.lossyScale;
+                Vector3 scale = GetScale();
                 return transform.position + new Vector3(0.0f, scale.y / 2.0f + float.Epsilon, 0.0f);
             }
         }
