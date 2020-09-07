@@ -43,6 +43,8 @@ namespace SEE.Game
             innerNodeFactory = GetInnerNodeFactory(this.settings.InnerNodeObjects);
         }
 
+        private const float LevelDistance = 0.001f;
+
         /// <summary>
         /// The shader for all materials used for all objects created by this graph renderer.
         /// </summary>
@@ -366,8 +368,12 @@ namespace SEE.Game
 
                     nodeToGameObject = nodeMap.Values;
                     // add the plane surrounding all game objects for nodes
-                    plane = NewPlane(nodeToGameObject, parent.transform.position.y);
+                    plane = NewPlane(nodeToGameObject, parent.transform.position.y + parent.transform.lossyScale.y / 2.0f + LevelDistance);
                     AddToParent(plane, parent);
+
+                    // The layouNodes are put just above the plane w.r.t. the y axis.
+                    // Note: a plane has no height in Unity.
+                    NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
 
                     CreateObjectHierarchy(nodeMap, parent);
                     InteractionDecorator.PrepareForInteraction(nodeToGameObject);
@@ -386,6 +392,7 @@ namespace SEE.Game
 
             // create the laid out edges
             AddToParent(EdgeLayout(graph, gameNodes), parent);
+
             SetPortal(parent);
         }
 
@@ -434,8 +441,6 @@ namespace SEE.Game
         {
             NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x);
             NodeLayout.MoveTo(layoutNodes, parent.transform.position);
-            // The layouNodes are put at the center of the parent w.r.t. the y axis.
-            NodeLayout.Stack(layoutNodes, parent.transform.position.y);
         }
 
         /// <summary>
@@ -753,8 +758,7 @@ namespace SEE.Game
         /// <returns>a new plane</returns>
         public GameObject NewPlane(Vector2 leftFrontCorner, Vector2 rightBackCorner, float yLevel)
         {
-            // Place the plane somewhat under ground level.
-            return PlaneFactory.NewPlane(shader, leftFrontCorner, rightBackCorner, yLevel - float.Epsilon, Color.gray);
+            return PlaneFactory.NewPlane(shader, leftFrontCorner, rightBackCorner, yLevel, Color.gray, LevelDistance);
         }
 
         /// <summary>
