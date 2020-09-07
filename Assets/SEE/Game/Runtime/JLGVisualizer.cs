@@ -1,4 +1,5 @@
 ﻿using Assets.SEE.DataModel;
+using Assets.SEE.DataModel.IO;
 using OdinSerializer;
 using SEE.DataModel;
 using System;
@@ -17,10 +18,21 @@ namespace SEE.Game.Runtime
         /// A ParsedJLG object that contains a parsed JLG file. This object contains all information needed for the visualization of a debugging process.
         /// </summary>
         [NonSerialized, OdinSerialize]
-        public ParsedJLG parsedJLG;
+        private ParsedJLG parsedJLG;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public string jlgFilePath;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string BreakpointMethod = "classname.methodname";
 
+        /// <summary>
+        /// 
+        /// </summary>
         public int BreakpointLine = 0;
 
         /// <summary>
@@ -29,6 +41,9 @@ namespace SEE.Game.Runtime
         /// </summary>
         private int statementCounter = 0;
 
+        /// <summary>
+        /// 
+        /// </summary>
         private string labelText = "";
 
         /// <summary>
@@ -73,11 +88,17 @@ namespace SEE.Game.Runtime
         /// </summary>
         private Stack<GameObject> textWindows = new Stack<GameObject>();
 
+        /// <summary>
+        /// 
+        /// </summary>
         private Stack<GameObject> functionCalls = new Stack<GameObject>();
 
         /// Start is called before the first frame update
         void Start()
         {
+            JLGParser jlgParser = new JLGParser(jlgFilePath);
+            this.parsedJLG = jlgParser.Parse();
+
             if (parsedJLG == null) {
                 throw new Exception("Parsed JLG is null!");
             }
@@ -754,8 +775,9 @@ namespace SEE.Game.Runtime
             }
             JavaStatement js = parsedJLG.AllStatements[statementCounter];
             int count = statementCounter;
-            while (!(js.LineAsInt() == BreakpointLine) && parsedJLG.GetStatementLocationString(count).Contains(BreakpointMethod)) {
+            while (!((js.LineAsInt() == BreakpointLine) && parsedJLG.GetStatementLocationString(count).Contains(BreakpointMethod))) {
                 count++;
+                Debug.Log(count);
                 if (count < parsedJLG.AllStatements.Count)
                 {
                     js = parsedJLG.AllStatements[count];
