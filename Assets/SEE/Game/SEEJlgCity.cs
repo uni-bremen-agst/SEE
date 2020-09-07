@@ -2,7 +2,6 @@
 using Assets.SEE.DataModel;
 using Assets.SEE.DataModel.IO;
 using SEE.DataModel;
-using System;
 using System.IO;
 using UnityEngine;
 
@@ -36,15 +35,12 @@ namespace SEE.Game
             }
             else
             {
-                JLGParser jlgParser = new JLGParser(jlgPath);
                 GameObject jlgVisualisationGameObject = new GameObject();
                 jlgVisualisationGameObject.transform.parent = transform;
                 jlgVisualisationGameObject.name = Tags.JLGVisualisation;
                 jlgVisualisationGameObject.tag = Tags.JLGVisualisation;
 
-                ParsedJLG parsedJLG = jlgParser.Parse();
-                //ParsedJLG parsedJLG = new ParsedJLG();
-                jlgVisualisationGameObject.AddComponent<Runtime.JLGVisualizer>().parsedJLG = parsedJLG;
+                jlgVisualisationGameObject.AddComponent<Runtime.JLGVisualizer>().jlgFilePath = jlgPath;
             }
 
         }
