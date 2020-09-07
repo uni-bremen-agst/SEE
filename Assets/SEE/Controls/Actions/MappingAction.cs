@@ -49,6 +49,16 @@ namespace SEE.Controls
         /// </summary>
         private Reflexion reflexion;
 
+        /// <summary>
+        /// Materials for the decoration of reflexion edges.
+        /// </summary>
+        [Tooltip("Prefab for absencenes")]
+        public GameObject AbsenceMaterial;
+        [Tooltip("Prefab for convergences")]
+        public GameObject ConvergenceMaterial;
+        [Tooltip("Prefab for divergences")]
+        public GameObject DivergenceMaterial;
+
         private struct Selection
         {
             /// <summary>
@@ -148,6 +158,23 @@ namespace SEE.Controls
                     Debug.LogFormat("Mapping successfully loaded from {0}\n", MappingFile);
                 }
             }
+
+            if (AbsenceMaterial == null)
+            {
+                Debug.LogErrorFormat("No material assigned for absences.\n");
+                this.enabled = false;
+            }
+            if (ConvergenceMaterial == null)
+            {
+                Debug.LogErrorFormat("No material assigned for convergences.\n");
+                this.enabled = false;
+            }
+            if (DivergenceMaterial == null)
+            {
+                Debug.LogErrorFormat("No material assigned for divergences.\n");
+                this.enabled = false;
+            }
+
             if (this.enabled)
             {
                 Usage();
@@ -471,7 +498,7 @@ namespace SEE.Controls
                     DecorateAbsence(edgeChange.edge);
                     break;
                 case State.convergent:
-                    DecorateAbsence(edgeChange.edge); // FIXME
+                    DecorateConvergence(edgeChange.edge); 
                     break;
                 default:
                     Debug.LogErrorFormat("UNHANDLED EDGE STATE: {0}\n", edgeChange.newState);
@@ -479,14 +506,50 @@ namespace SEE.Controls
             }
         }
 
-        private void DecorateAbsence(Edge edge)
+        private void DecorateEdge(Edge edge, GameObject prefab, string name)
         {
             GameObject gameEdge = architectureEdges[edge.ID];
             LineRenderer line = gameEdge.GetComponent<LineRenderer>();
-            Vector3 position = (line.GetPosition(0) + line.GetPosition(line.positionCount - 1)) / 2.0f;
-            GameObject dot = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            dot.transform.position = position;
-            dot.transform.localScale = Vector3.one / 100.0f;
+            // Demeter of the spheres to be used as decoration along the line.
+            float demeter = 2 * line.startWidth; // We assume the line has the same width everywhere.
+            // The distance between two subsequent spheres along the line.
+            float distanceBetweenDecorations = 5 * demeter;
+
+            float distance = 0.0f;
+            Vector3 positionOfLastDecoration = line.GetPosition(0);
+            for (int i = 1; i < line.positionCount; i++)
+            {
+                Vector3 currentPosition = line.GetPosition(i);
+                distance += Vector3.Distance(positionOfLastDecoration, currentPosition);
+                if (distance >= distanceBetweenDecorations)
+                {
+                    GameObject decoration = Instantiate(prefab);
+                    Vector3 dotPosition = currentPosition;
+                    decoration.transform.localScale = Vector3.one * demeter;
+                    dotPosition.y += line.startWidth + decoration.transform.lossyScale.y / 2.0f; // above the line
+                    decoration.transform.position = dotPosition;                                        
+                    decoration.tag = Tags.Decoration;
+                    decoration.name = name;
+                    distance = 0;
+                    
+                }
+                positionOfLastDecoration = currentPosition;
+            }            
+        }
+
+        private void DecorateAbsence(Edge edge)
+        {
+            DecorateEdge(edge, AbsenceMaterial, "absence");
+        }
+
+        private void DecorateConvergence(Edge edge)
+        {
+            DecorateEdge(edge, ConvergenceMaterial, "convergence");
+        }
+
+        private void DecorateDivergence(Edge edge)
+        {
+            DecorateEdge(edge, DivergenceMaterial, "divergence");
         }
 
         private void HandlePropagatedEdgeRemoved(PropagatedEdgeRemoved propagatedEdgeRemoved)
