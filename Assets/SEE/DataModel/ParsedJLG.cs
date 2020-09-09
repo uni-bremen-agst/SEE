@@ -60,9 +60,19 @@ namespace Assets.SEE.DataModel
         /// <param name="i">index of the Java statement in List allStatements</param>
         /// <returns>The Location String from LocationLookupTable</returns>
         public string GetStatementLocationString(int i) {
-            return locationLookupTable[int.Parse(allStatements[i].Location)];
+            string location = locationLookupTable[int.Parse(allStatements[i].Location)];
+            int l = location.IndexOf('(');
+            location = location.Substring(0, l + 1);
+            l = location.LastIndexOf('.');
+            location = location.Substring(0, l);
+            return location;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         private string LookupFieldLocation(string s) {
             int i = s.IndexOf('=');
             return fieldLookupTable[int.Parse(s.Substring(0, i))] + s.Substring(i); 
