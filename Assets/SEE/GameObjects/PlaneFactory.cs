@@ -67,15 +67,16 @@ namespace SEE.GO
         /// <param name="shader">the shader to draw the plane</param>
         /// <param name="leftFrontCorner">2D co-ordinate of the left front corner</param>
         /// <param name="rightBackCorner">2D co-ordinate of the right back corner</param>
-        /// <param name="groundLevel">y co-ordinate for the plane</param>
+        /// <param name="groundLevel">y co-ordinate for ground level of the plane; 
+        ///    defines the lower end along the y axis</param>
         /// <param name="color">color of the plane</param>
         /// <param name="height">height (thickness) of the plane</param>
-        public static GameObject NewPlane(Shader shader, Vector2 leftFrontCorner, Vector2 rightBackCorner, float groundLevel, Color color, float height = 0.1f)
+        public static GameObject NewPlane(Shader shader, Vector2 leftFrontCorner, Vector2 rightBackCorner, float groundLevel, Color color, float height = 2 * float.Epsilon)
         {
             float width = Distance(leftFrontCorner.x, rightBackCorner.x);
             float depth = Distance(leftFrontCorner.y, rightBackCorner.y);
 
-            Vector3 centerPosition = new Vector3(leftFrontCorner.x + width / 2.0f, groundLevel, leftFrontCorner.y + depth / 2.0f);
+            Vector3 centerPosition = new Vector3(leftFrontCorner.x + width / 2.0f, groundLevel + height / 2.0f, leftFrontCorner.y + depth / 2.0f);
             return NewPlane(shader, centerPosition, color, width, depth, height);
         }
 

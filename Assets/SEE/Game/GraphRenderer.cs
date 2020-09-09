@@ -304,8 +304,12 @@ namespace SEE.Game
 
                     // add the plane surrounding all game objects for nodes
                     BoundingBox(layoutNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-                    plane = NewPlane(leftFrontCorner, rightBackCorner, parent.transform.position.y);
+                    plane = NewPlane(leftFrontCorner, rightBackCorner, parent.transform.position.y + parent.transform.lossyScale.y / 2.0f + LevelDistance);
                     AddToParent(plane, parent);
+
+                    // The layouNodes are put just above the plane w.r.t. the y axis.
+                    NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
+
 
                     CreateObjectHierarchy(nodeMap, parent);
                     InteractionDecorator.PrepareForInteraction(nodeToGameObject);
@@ -372,7 +376,6 @@ namespace SEE.Game
                     AddToParent(plane, parent);
 
                     // The layouNodes are put just above the plane w.r.t. the y axis.
-                    // Note: a plane has no height in Unity.
                     NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
 
                     CreateObjectHierarchy(nodeMap, parent);
