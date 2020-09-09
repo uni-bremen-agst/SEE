@@ -28,7 +28,7 @@ namespace SEE.Game.Runtime
         /// <summary>
         /// 
         /// </summary>
-        public string BreakpointMethod = "classname.methodname";
+        public string BreakpointClass = "classname";
 
         /// <summary>
         /// 
@@ -166,10 +166,12 @@ namespace SEE.Game.Runtime
                 showLabelUntil = Time.time + 1f;
                 if (playDirection)
                 {
+                    statementCounter = statementCounter + 1; //These need to be called because the statementcounter was increased/decreased in the last UpdateVisualization call already. This prevents bugs.
                     labelText = "Forward";
                 }
                 else
                 {
+                    statementCounter = statementCounter - 1;
                     labelText = "Rewind";
                 }
             }
@@ -224,6 +226,10 @@ namespace SEE.Game.Runtime
                 if (Input.GetKeyDown(KeyCode.Alpha8))
                 {
                     OneStep(false);
+                }
+                if (Input.GetKeyDown(KeyCode.N))
+                {
+                    ResetComplete();
                 }
             }
 
@@ -452,7 +458,7 @@ namespace SEE.Game.Runtime
         /// <returns></returns>
         private Boolean NodeRepresentsStatementLocation(int i, GameObject go)
         {
-            return parsedJLG.GetStatementLocationString(i).StartsWith(go.name)&&go.tag.Equals("Node");
+            return parsedJLG.GetStatementLocationString(i).Equals(go.name)&&go.tag.Equals("Node");
         }
 
         /// <summary>
@@ -531,11 +537,11 @@ namespace SEE.Game.Runtime
                 if (statementCounter > 0
                         && parsedJLG.AllStatements[statementCounter - 1].StatementType.Equals("exit")
                         && currentGO != GetNodeForStatement(statementCounter - 1))
-                {
-                    GetNodeForStatement(statementCounter - 1).GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
+                {                    
                     if (FindFunctionCallForGameObjects(GetNodeForStatement(statementCounter-1), currentGO, true) != null)
                     {
                         FindFunctionCallForGameObjects(GetNodeForStatement(statementCounter - 1), currentGO, true).SetActive(false); // only disable, so it can be enable when the visualization is running backwards
+                        GetNodeForStatement(statementCounter - 1).GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
                     }
                 }
             }
@@ -770,12 +776,12 @@ namespace SEE.Game.Runtime
             if (BreakpointLine <= 0) {
                 return false;
             }
-            if (BreakpointMethod == "" || BreakpointMethod == null) {
+            if (BreakpointClass == "" || BreakpointClass == null) {
                 return false;
             }
             JavaStatement js = parsedJLG.AllStatements[statementCounter];
             int count = statementCounter;
-            while (!((js.LineAsInt() == BreakpointLine) && parsedJLG.GetStatementLocationString(count).Contains(BreakpointMethod))) {
+            while (!((js.LineAsInt() == BreakpointLine) && parsedJLG.GetStatementLocationString(count).Contains(BreakpointClass))) {
                 count++;
                 Debug.Log(count);
                 if (count < parsedJLG.AllStatements.Count)
@@ -849,6 +855,17 @@ namespace SEE.Game.Runtime
             }
             functionCalls = new Stack<GameObject>();
             statementCounter = 0;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ResetComplete() {
+            ResetVisualization();
+            Start();
+            foreach (GameObject go in nodesGOs) {
+                go.GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
+            }
         }
     }
 }
