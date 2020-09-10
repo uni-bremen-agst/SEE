@@ -27,6 +27,7 @@ namespace SEE.Game
         {
             this.settings = settings;
             shader = Materials.NewPortalShader();
+            lineShader = Materials.NewPortalShaderLine();
             
             switch (this.settings.LeafObjects)
             {
@@ -48,6 +49,7 @@ namespace SEE.Game
         /// The shader for all materials used for all objects created by this graph renderer.
         /// </summary>
         private readonly Shader shader;
+        private readonly Shader lineShader;
 
         /// <summary>
         /// The shader for all materials used for all objects created by this graph renderer.
@@ -194,7 +196,7 @@ namespace SEE.Game
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
             }
             Performance p = Performance.Begin("edge layout " + layout.Name);
-            EdgeFactory edgeFactory = new EdgeFactory(shader, layout, settings.EdgeWidth);
+            EdgeFactory edgeFactory = new EdgeFactory(lineShader, layout, settings.EdgeWidth);
             ICollection<GameObject> result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), ConnectingEdges(gameNodes));
             p.End();
             return result;
