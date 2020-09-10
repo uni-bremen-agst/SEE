@@ -186,8 +186,8 @@ namespace SEE.Net
                 }
             }
 
-            // TODO: not sure if this should be the job of the networking script
-            new InstantiateAction("Player").Execute();
+            // TODO(torben): not sure if this should be the job of the networking script
+            new InstantiateAction("PlayerHead", Vector3.zero, Quaternion.identity, new Vector3(0.02f, 0.015f, 0.015f)).Execute();
 
             GameObject rig = GameObject.Find("Player Rig");
             if (rig)
