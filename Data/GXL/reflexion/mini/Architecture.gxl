@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="Architecture" edgeids="true">
+    <node id="N1">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>H1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>H1</string>
+      </attr>
+    </node>
+    <node id="N2">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>H2</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>H2</string>
+      </attr>
+    </node>
+    <node id="N3">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>H3</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>H3</string>
+      </attr>
+    </node>
+    <node id="N8">
+      <type xlink:href="Architecture_Layer"/>
+      <attr name="Source.Name">
+        <string>Architecture</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Architecture</string>
+      </attr>
+    </node>
+    <edge id="E1" from="N2" to="N1">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E2" from="N2" to="N3">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E8" from="N1" to="N8">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E9" from="N2" to="N8">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E10" from="N3" to="N8">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+  </graph>
+</gxl>
