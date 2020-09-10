@@ -351,10 +351,6 @@ namespace SEE.Game
                     // We assume here that this SEECity instance was added to a game object as
                     // a component. The inherited attribute gameObject identifies this game object.
                     renderer.Draw(visualizedSubGraph, gameObject);
-                    // If CScape buildings are used, the scale of the world is larger and, hence, the camera needs to move faster.
-                    // We may have cities with blocks and cities with CScape buildings in the same scene.
-                    // We cannot simply alternate the speed each time when a graph is loaded.
-                    // Cameras.AdjustCameraSpeed(renderer.Unit());
                 }
             }
         }
