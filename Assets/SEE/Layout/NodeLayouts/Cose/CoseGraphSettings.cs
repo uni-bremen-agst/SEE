@@ -97,11 +97,6 @@ namespace SEE.Layout
         public Dictionary<string, bool> show = new Dictionary<string, bool>();
 
         /// <summary>
-        /// if true the potalgorithm is used
-        /// </summary>
-        public bool useOptAlgorithm = false;
-
-        /// <summary>
         /// if true is listing of dirs with posiible nodelayouts and inner node kinds is shown
         /// </summary>
         public bool showGraphListing = true;

@@ -347,7 +347,7 @@ namespace SEE.Game
                 }
                 else
                 {
-                    GraphRenderer renderer = CoseGraphSettings.useOptAlgorithm ? new OptAlgorithmGraphRenderer(this) : new GraphRenderer(this);
+                    GraphRenderer renderer = new GraphRenderer(this);
                     // We assume here that this SEECity instance was added to a game object as
                     // a component. The inherited attribute gameObject identifies this game object.
                     renderer.Draw(visualizedSubGraph, gameObject);
