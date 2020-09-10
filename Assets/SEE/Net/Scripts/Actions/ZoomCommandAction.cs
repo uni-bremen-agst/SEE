@@ -5,15 +5,14 @@ namespace SEE.Net
 {
     public class ZoomCommandAction : AbstractAction
     {
+        public int navigationActionID;
         public Vector2 zoomCenter;
         public int zoomSteps;
         public float duration;
 
-        private readonly NavigationAction navigationAction;
-
         public ZoomCommandAction(NavigationAction navigationAction, Vector2 zoomCenter, int zoomSteps, float duration) : base(false)
         {
-            this.navigationAction = navigationAction;
+            navigationActionID = navigationAction.ID;
             this.zoomCenter = zoomCenter;
             this.zoomSteps = zoomSteps;
             this.duration = duration;
@@ -28,6 +27,7 @@ namespace SEE.Net
         {
             bool result = false;
 
+            NavigationAction navigationAction = NavigationAction.Get(navigationActionID);
             if (navigationAction)
             {
                 navigationAction.PushZoomCommand(zoomCenter, zoomSteps, duration);

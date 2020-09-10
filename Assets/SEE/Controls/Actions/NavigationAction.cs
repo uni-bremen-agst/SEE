@@ -118,8 +118,32 @@ namespace SEE.Controls
         ZoomState zoomState;
         ActionState actionState;
 
+        [Tooltip("The unique ID used for network synchronization. This must be set via inspector to ensure that every client will have the correct ID assigned to the appropriate NavigationAction!")]
+        [SerializeField]
+        private int id;
+        public int ID { get => id; }
+
+        private static readonly Dictionary<int, NavigationAction> navigationActionDict = new Dictionary<int, NavigationAction>(2);
+
+        public static NavigationAction Get(int id)
+        {
+            bool result = navigationActionDict.TryGetValue(id, out NavigationAction value);
+            if (result)
+            {
+                return value;
+            }
+            else
+            {
+                Debug.LogWarning("ID does not match any NavigationAction!");
+                return null;
+            }
+        }
+
         private void Start()
         {
+            UnityEngine.Assertions.Assert.IsTrue(!navigationActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!");
+            navigationActionDict.Add(id, this);
+
             cityRootTransform = GetCityRootNode(gameObject);
             if (cityRootTransform == null)
             {
