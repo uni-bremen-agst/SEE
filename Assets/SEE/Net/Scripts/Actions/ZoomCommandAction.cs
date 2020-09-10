@@ -3,6 +3,10 @@ using UnityEngine;
 
 namespace SEE.Net
 {
+    /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    /// </summary>
     public class ZoomCommandAction : AbstractAction
     {
         public int navigationActionID;
