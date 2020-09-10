@@ -379,7 +379,7 @@ namespace SEE.Layout
             CoseLayoutSettings.Multilevel_Scaling = settings.multiLevelScaling;
             CoseLayoutSettings.Use_Smart_Multilevel_Calculation = settings.UseSmartMultilevelScaling;
             CoseLayoutSettings.Automatic_Parameter_Calculation = settings.useCalculationParameter;
-            CoseLayoutSettings.Iterativ_Parameter_Calculation = settings.useItertivCalclation;
+            CoseLayoutSettings.Iterativ_Parameter_Calculation = settings.useIterativeCalculation;
 
             coseLayoutSettings = new CoseLayoutSettings();
 

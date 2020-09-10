@@ -83,8 +83,8 @@ namespace SEEEditor
                     //city.CoseGraphSettings.useCalculationParameter = false; 
                 }*/
                 city.CoseGraphSettings.useCalculationParameter = EditorGUILayout.Toggle("Calc parameters automatically", city.CoseGraphSettings.useCalculationParameter);
-                city.CoseGraphSettings.useItertivCalclation = EditorGUILayout.Toggle("Find parameters iteratively", city.CoseGraphSettings.useItertivCalclation);
-                if (city.CoseGraphSettings.useCalculationParameter || city.CoseGraphSettings.useItertivCalclation)
+                city.CoseGraphSettings.useIterativeCalculation = EditorGUILayout.Toggle("Find parameters iteratively", city.CoseGraphSettings.useIterativeCalculation);
+                if (city.CoseGraphSettings.useCalculationParameter || city.CoseGraphSettings.useIterativeCalculation)
                 {
                     city.ZScoreScale = true;
 

@@ -114,7 +114,7 @@ namespace SEE.Layout
         /// <summary>
         /// is true the parameter edgeLength and repulsion strength are calculated automatically and are iteratily changed till a goog layout is found
         /// </summary>
-        public bool useItertivCalclation = false; 
+        public bool useIterativeCalculation = false; 
     }
 }
 
