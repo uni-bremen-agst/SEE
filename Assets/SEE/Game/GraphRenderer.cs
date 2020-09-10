@@ -7,7 +7,6 @@ using SEE.Charts.Scripts;
 using SEE.DataModel;
 using SEE.GO;
 using SEE.Layout;
-using SEE.Layout.Utils;
 using SEE.Utils;
 using UnityEngine;
 using static SEE.Game.AbstractSEECity;
@@ -165,16 +164,15 @@ namespace SEE.Game
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
         {
-            return EdgeLayout(graph, ToLayoutNodes(gameNodes));
+            return EdgeLayout(ToLayoutNodes(gameNodes));
         }
 
         /// <summary>
         /// Applies the edge layout according to the the user's choice (settings).
         /// </summary>
-        /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="gameNodes">the set of layout edges for which to create game objects</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameNode> gameNodes)
+        private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes)
         {
             float minimalEdgeLevelDistance = 2.5f * settings.EdgeWidth;
             IEdgeLayout layout;
@@ -196,7 +194,7 @@ namespace SEE.Game
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
             }
             Performance p = Performance.Begin("edge layout " + layout.Name);
-            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
+            EdgeFactory edgeFactory = new EdgeFactory(shader, layout, settings.EdgeWidth);
             ICollection<GameObject> result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), ConnectingEdges(gameNodes));
             p.End();
             return result;
@@ -393,46 +391,11 @@ namespace SEE.Game
                 }
             }
 
-            // create the laid out edges
-            AddToParent(EdgeLayout(graph, gameNodes), parent);
-
-            SetPortal(parent);
-        }
-
-        /// <summary>
-        /// Sets the culling area (portal) of all children of <paramref name="parent"/> to the
-        /// complete area of <paramref name="parent"/>.
-        /// </summary>
-        /// <param name="parent">game objects whose children should be culled if they leave 
-        /// the area of the <paramref name="parent"/></param>
-        private void SetPortal(GameObject parent)
-        {
-            Plane cullingPlane = parent.GetComponent<Plane>();
-            Vector2 leftFront = cullingPlane.LeftFrontCorner;
-            Vector2 rightBack = cullingPlane.RightBackCorner;
-            foreach (Transform child in parent.transform)
-            {
-                SetPortal(child, leftFront, rightBack);
-            }
-        }
-
-        /// <summary>
-        /// Recursively sets the culling area (portal) of the <paramref name="transform"/> and all
-        /// its children to the rectangle in the x/z plane defined by the given <paramref name="leftFront"/>
-        /// and <paramref name="rightBack"/> corner.
-        /// </summary>
-        /// <param name="transform">object whose culling area is to be set</param>
-        /// <param name="leftFront">left front corner of the culling area</param>
-        /// <param name="rightBack">right back corner of the culling area</param>
-        private void SetPortal(Transform transform, Vector2 leftFront, Vector2 rightBack)
-        {
-            Material material = transform.GetComponent<Renderer>().sharedMaterial;
-            material.SetVector("portalMin", new Vector4(leftFront.x, leftFront.y));
-            material.SetVector("portalMax", new Vector4(rightBack.x, rightBack.y));
-            foreach (Transform child in transform)
-            {
-                SetPortal(child, leftFront, rightBack);
-            }
+            // Create the laid out edges; they will be children of the unique root game node
+            // representing the node hierarchy. This way the edges can be moved along with
+            // the nodes.
+            AddToParent(EdgeLayout(gameNodes), RootGameNode(parent));
+            Portal.SetPortal(parent);
         }
 
         /// <summary>
@@ -1559,6 +1522,40 @@ namespace SEE.Game
                         }
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Returns the child object of <paramref name="codeCity"/> tagged by Tags.Node.
+        /// If there is no such child or if there are more than one, an exception will
+        /// be thrown.
+        /// </summary>
+        /// <param name="codeCity">game object representing a code city</param>
+        /// <returns>child object of <paramref name="codeCity"/> tagged by Tags.Node</returns>
+        public static GameObject RootGameNode(GameObject codeCity)
+        {
+            GameObject result = null;
+            foreach (Transform child in codeCity.transform)
+            {
+                if (child.tag == Tags.Node)
+                {
+                    if (result == null)
+                    {
+                        result = child.gameObject;
+                    }
+                    else
+                    {
+                        throw new Exception("Code city " + codeCity.name + " has multiple children tagged by " + Tags.Node);
+                    }
+                }
+            }
+            if (result == null)
+            {
+                throw new Exception("Code city " + codeCity.name + " has no child tagged by " + Tags.Node);
+            }
+            else
+            {
+                return result;
             }
         }
     }
