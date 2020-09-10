@@ -1275,7 +1275,7 @@ namespace SEE.Game
                 }
                 else
                 {
-                    innerNodeFactory.SetStyle(gameNode, style);
+                    innerNodeFactory.SetStyle(gameNode, style); // TODO: for some reason, the material is selected twice. once here and once somewhere earlier (i believe in NewBlock somewhere).
                 }
             }
         }
@@ -1382,7 +1382,7 @@ namespace SEE.Game
                 innerNodeFactory = this.innerNodeFactory;
             }
 
-            GameObject innerGameObject = innerNodeFactory.NewBlock();
+            GameObject innerGameObject = innerNodeFactory.NewBlock(0, node.Level);
             innerGameObject.name = node.ID;
             innerGameObject.tag = Tags.Node;
             AttachNode(innerGameObject, node);

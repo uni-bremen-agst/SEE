@@ -17,7 +17,7 @@ namespace SEE.GO
 			: base(shader, colorRange)
         { }
 
-        public override GameObject NewBlock(int index = 0, int level = 0)
+        public override GameObject NewBlock(int style = 0, int level = 0)
 		{
 			GameObject result = CreateCylinder();
 			SetHeight(result, DefaultHeight);
@@ -25,7 +25,7 @@ namespace SEE.GO
 
 			MeshRenderer renderer = result.AddComponent<MeshRenderer>();
 			// Re-use default material for all cylinders.
-			renderer.sharedMaterial = materials.DefaultMaterial(level, index);
+			renderer.sharedMaterial = materials.DefaultMaterial(level, style);
 
 			// Object should not cast shadows: too expensive and may hide information.
 			renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
