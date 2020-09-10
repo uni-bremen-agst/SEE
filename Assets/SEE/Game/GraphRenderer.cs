@@ -47,11 +47,6 @@ namespace SEE.Game
         /// <summary>
         /// The shader for all materials used for all objects created by this graph renderer.
         /// </summary>
-        private readonly Shader shader;
-
-        /// <summary>
-        /// The shader for all materials used for all objects created by this graph renderer.
-        /// </summary>
         public Shader Shader
         {
             get => shader;
@@ -113,6 +108,11 @@ namespace SEE.Game
         protected float groundLevel = 0.0f;
 
         /// <summary>
+        /// The shader for all materials used for all objects created by this graph renderer.
+        /// </summary>
+        private readonly Shader shader;
+
+        /// <summary>
         /// Draws the graph (nodes and edges and all decorations).
         /// </summary>
         /// <param name="graph">the graph to be drawn</param>
@@ -123,6 +123,7 @@ namespace SEE.Game
             graph.SortHierarchyByName();
             DrawCity(graph, parent);
         }
+
 
         /// <summary>
         /// Sets the scaler to be used to map metric values onto graphical attributes
