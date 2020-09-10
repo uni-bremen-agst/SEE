@@ -18,6 +18,7 @@ namespace SEE.GO
         /// </summary>
         //private const string ShaderName = "Custom/PortalShader";
         private const string ShaderName = "Custom/PortalShaderTransparent";
+        private const string LineShaderName = "Custom/PortalShaderTransparentLine";
 
         /// <summary>
         /// Returns the standard shader for transparent materials that can be culled
@@ -29,6 +30,11 @@ namespace SEE.GO
             return Shader.Find(ShaderName);
         }
 
+        public static Shader PortalLineShader()
+        {
+            return Shader.Find(LineShaderName);
+        }
+
         /// <summary>
         /// Returns a new instance of the standard shader for transparent materials that can be culled
         /// if they leave a certain area (portal). Changes to this instance will not affect the
@@ -38,7 +44,12 @@ namespace SEE.GO
         public static Shader NewPortalShader()
         {
             return (Shader)GameObject.Instantiate(PortalShader());
-        }        
+        }
+
+        public static Shader NewPortalShaderLine()
+        {
+            return (Shader)GameObject.Instantiate(PortalLineShader());
+        }
 
         /// <summary>
         /// Creates default numberOfColors materials in the color range from
