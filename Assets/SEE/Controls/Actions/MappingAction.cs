@@ -204,12 +204,26 @@ namespace SEE.Controls
         /// </summary>
         private Dictionary<string, GameObject> architectureEdges = new Dictionary<string, GameObject>();
 
+        /// <summary>
+        /// Mapping of node IDs onto game objects representing these nodes in the architecture code city.
+        /// </summary>
+        private Dictionary<string, GameObject> architectureNodes = new Dictionary<string, GameObject>();
+
         private void SetupGameObjectMappings()
         {
-            GatherEdges(Architecture, architectureEdges);
+            GatherNodesAndEdges(Architecture, architectureNodes, architectureEdges);
         }
 
-        private void GatherEdges(GameObject gameObject, Dictionary<string, GameObject> edges)
+        /// <summary>
+        /// Adds all game nodes and edges that are reachable by <paramref name="gameObject"/> to
+        /// <paramref name="nodes"/> or <paramref name="edges"/>, respectively, or by any of its
+        /// descendants. Game objects representing either graph nodes or edges are recognized
+        /// by either Tags.Node or Tags.Edge, respectively.
+        /// </summary>
+        /// <param name="gameObject">root object of the object hierarchy</param>
+        /// <param name="nodes">where game objects representing graph nodes are to be added</param>
+        /// <param name="edges">where game objects representing graph edges are to be added</param>
+        private void GatherNodesAndEdges(GameObject gameObject, Dictionary<string, GameObject> nodes, Dictionary<string, GameObject> edges)
         {
             if (gameObject.tag == Tags.Edge)
             {
@@ -218,7 +232,6 @@ namespace SEE.Controls
                     Edge edge = edgeRef.edge;
                     if (edge != null)
                     {
-                        Debug.LogFormat("Added edge ID {0} -> game-object edge {1} to edge map: {2}.\n", edge.ID, gameObject.name, edge);
                         edges[edge.ID] = gameObject;
                     }
                     else
@@ -231,9 +244,28 @@ namespace SEE.Controls
                     Debug.LogErrorFormat("Game-object edge {0} without graph edge reference.\n", gameObject.name);
                 }
             }
+            else if (gameObject.tag == Tags.Node)
+            {
+                if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                {
+                    Node node = nodeRef.node;
+                    if (node != null)
+                    {                        
+                        nodes[node.ID] = gameObject;
+                    }
+                    else
+                    {
+                        Debug.LogErrorFormat("Game-object node {0} without an invalid graph node reference.\n", gameObject.name);
+                    }
+                }
+                else
+                {
+                    Debug.LogErrorFormat("Game-object node {0} without graph node reference.\n", gameObject.name);
+                }
+            }
             foreach (Transform child in gameObject.transform)
             {
-                GatherEdges(child.gameObject, edges);
+                GatherNodesAndEdges(child.gameObject, nodes, edges);
             }
         }
 
@@ -611,6 +643,14 @@ namespace SEE.Controls
         private void HandlePropagatedEdgeAdded(PropagatedEdgeAdded propagatedEdgeAdded)
         {
             Debug.Log(propagatedEdgeAdded.ToString());
+
+            Edge edge = propagatedEdgeAdded.propagatedEdge;
+            GameObject source = architectureNodes[edge.Source.ID];
+            GameObject target = architectureNodes[edge.Target.ID];
+            List<GameObject> nodes = new List<GameObject> { source, target};
+            // FIXME
+            //GraphRenderer graphRenderer;
+            //ICollection<GameObject> edges = graphRenderer.EdgeLayout(nodes);
         }
 
         private void HandleMapsToEdgeAdded(MapsToEdgeAdded mapsToEdgeAdded)
