@@ -471,7 +471,7 @@ namespace SEE.Game
             // Destroy all previous edges and draw all edges of next graph. This can only
             // be done when nodes have reached their final position, that is, at the end
             // of the animation cycle.
-            objectManager.RenderEdges(_currentCity.Graph);
+            objectManager.RenderEdges();
 
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();

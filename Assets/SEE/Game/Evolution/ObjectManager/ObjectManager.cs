@@ -227,12 +227,11 @@ namespace SEE.Game.Evolution
         /// Renders all edges for the nodes in the node cache according to the settings.
         /// If edges for these nodes existed already, their game objects are destroyed first.
         /// </summary>
-        /// <param name="graph">the graph from which to retrieve the edges among the nodes in the node cache</param>
-        public void RenderEdges(Graph graph)
+        public void RenderEdges()
         {
             ClearEdges();
             // FIXME: Provide meaningful values for scaleFactor.
-            edges = _graphRenderer.EdgeLayout(graph, nodes.Values); 
+            edges = _graphRenderer.EdgeLayout(nodes.Values); 
         }
 
         /// <summary>

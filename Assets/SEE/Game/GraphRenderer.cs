@@ -159,10 +159,9 @@ namespace SEE.Game
         /// Applies the edge layout according to the the user's choice (settings) for
         /// all edges in between nodes in <paramref name="gameNodes"/>.
         /// </summary>
-        /// <param name="graph">graph whose edges are to be drawn</param>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(Graph graph, ICollection<GameObject> gameNodes)
+        public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes)
         {
             return EdgeLayout(ToLayoutNodes(gameNodes));
         }
