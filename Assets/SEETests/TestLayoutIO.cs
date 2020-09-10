@@ -162,8 +162,8 @@ namespace SEE.Layout
 
             // Render the city. This will create all game objects as well as their
             // layout. As stated before, the layout does not interest us.
-            GraphRenderer graphRenderer = new GraphRenderer(seeCityComponent);
-            graphRenderer.Draw(graph, seeCity);
+            GraphRenderer graphRenderer = new GraphRenderer(seeCityComponent, graph);
+            graphRenderer.Draw(seeCity);
 
             // Now we have the game objects whose layout information was read
             // from the GVL file.

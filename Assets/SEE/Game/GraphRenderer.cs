@@ -20,10 +20,12 @@ namespace SEE.Game
     public class GraphRenderer
     {
         /// <summary>
-        /// Constructor.
+        /// Constructor. If the <paramref name="graph"/> is null, you need to call
+        /// SetScaler() before you can call Draw().
         /// </summary>
+        /// <param name="graph">the graph to be rendered</param>
         /// <param name="settings">the settings for the visualization</param>
-        public GraphRenderer(AbstractSEECity settings)
+        public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
             this.settings = settings;
             shader = Materials.NewPortalShader();
@@ -40,6 +42,12 @@ namespace SEE.Game
                     throw new Exception("Unhandled GraphSettings.LeafNodeKinds");
             }
             innerNodeFactory = GetInnerNodeFactory(this.settings.InnerNodeObjects);
+            this.graph = graph;
+            if (this.graph != null)
+            {
+                SetScaler(graph);
+                graph.SortHierarchyByName();
+            }
         }
 
         private const float LevelDistance = 0.001f;
@@ -78,14 +86,19 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// The graph to be rendered.
+        /// </summary>
+        private readonly Graph graph;
+
+        /// <summary>
         /// Settings for the visualization.
         /// </summary>
-        protected readonly AbstractSEECity settings;
+        private readonly AbstractSEECity settings;
 
         /// <summary>
         /// The factory used to create blocks for leaves.
         /// </summary>
-        protected readonly NodeFactory leafNodeFactory;
+        private readonly NodeFactory leafNodeFactory;
 
         /// <summary>
         /// The factory used to create game nodes for inner graph nodes.
@@ -100,30 +113,17 @@ namespace SEE.Game
         /// <summary>
         /// A mapping from Node to ILayoutNode.
         /// </summary>
-        protected Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+        private Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
 
         /// <summary>
         /// the groundlevel of the nodes
         /// </summary>
-        protected float groundLevel = 0.0f;
+        private float groundLevel = 0.0f;
 
         /// <summary>
         /// The shader for all materials used for all objects created by this graph renderer.
         /// </summary>
         private readonly Shader shader;
-
-        /// <summary>
-        /// Draws the graph (nodes and edges and all decorations).
-        /// </summary>
-        /// <param name="graph">the graph to be drawn</param>
-        /// <param name="parent">every game object drawn for this graph will be added to this parent</param>
-        public virtual void Draw(Graph graph, GameObject parent)
-        {
-            SetScaler(graph);
-            graph.SortHierarchyByName();
-            DrawCity(graph, parent);
-        }
-
 
         /// <summary>
         /// Sets the scaler to be used to map metric values onto graphical attributes
@@ -240,12 +240,11 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Draws the nodes and edges of the graph by applying the layouts according to the user's
-        /// choice in the settings.
+        /// Draws the nodes and edges of the graph and their decorations by applying the layouts according
+        ///  to the user's choice in the settings.
         /// </summary>
-        /// <param name="graph">graph whose nodes and edges are to be laid out</param>
         /// <param name="parent">every game object drawn for this graph will be added to this parent</param>
-        protected virtual void DrawCity(Graph graph, GameObject parent)
+        public void Draw(GameObject parent)
         {
             // all nodes of the graph
             List<Node> nodes = graph.Nodes();
