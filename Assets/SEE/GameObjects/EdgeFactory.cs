@@ -12,33 +12,34 @@ namespace SEE.GO
     /// </summary>
     public class EdgeFactory
     {
-        public EdgeFactory(IEdgeLayout layout, float edgeWidth)
+        public EdgeFactory(Shader shader, IEdgeLayout layout, float edgeWidth)
         {
             this.layout = layout;
             this.edgeWidth = edgeWidth;
+            this.defaultLineMaterial = LineMaterial(shader);
         }
 
         /// <summary>
         /// Path to the material used for edges.
         /// </summary>
-        protected const string materialPath = "Hidden/Internal-Colored";
+        private const string materialPath = "Hidden/Internal-Colored";
 
         /// <summary>
         /// The material used for edges.
         /// </summary>
-        protected readonly Material defaultLineMaterial = LineMaterial();
+        protected readonly Material defaultLineMaterial;
 
         /// <summary>
         /// Returns the default material for edges using the materialPath.
         /// </summary>
         /// <returns>default material for edges</returns>
-        private static Material LineMaterial()
+        private static Material LineMaterial(Shader shader)
         {
-            Material material = new Material(Shader.Find(materialPath));
-            if (material == null)
-            {
-                Debug.LogError("Could not find material " + materialPath + "\n");
-            }
+            Material material = new Material(shader);
+            //if (material == null)
+            //{
+            //    Debug.LogError("Could not find material " + materialPath + "\n");
+            //}
             return material;
         }
 
