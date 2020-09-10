@@ -559,79 +559,85 @@ namespace SEE.Controls
             //    divergent          => {{allowed, implicitly_allowed}
             //    implicitly_allowed => {allowed, divergent}
 
-            GameObject gameEdge = architectureEdges[edgeChange.edge.ID];
-
-            if (edgeChange.oldState != edgeChange.newState)
+            if (architectureEdges.TryGetValue(edgeChange.edge.ID, out GameObject gameEdge))
             {
-                switch (edgeChange.oldState)
-                {
-                    //--------------------------------------
-                    // Changes for architecture dependencies
-                    //--------------------------------------
-                    case State.specified:
-                        // nothing to be done
-                        break;
-                    case State.absent:
-                        decorator.UndecorateAbsence(gameEdge);
-                        break;
-                    case State.allowed_absent:
-                        decorator.UndecorateAllowedAbsence(gameEdge);
-                        break;
-                    case State.convergent:
-                        decorator.UndecorateConvergence(gameEdge);
-                        break;
 
-                    //-----------------------------------------------------------------------
-                    // changes for implementation dependencies propagated to the architecture
-                    //-----------------------------------------------------------------------
-                    case State.divergent:
-                        decorator.UndecorateDivergence(gameEdge);
-                        break;
-                    case State.allowed:
-                        decorator.UndecorateAllowed(gameEdge);
-                        break;
-                    case State.implicitly_allowed:
-                        decorator.UndecorateImplicitlyAllowed(gameEdge);
-                        break;
-                    default:
-                        Debug.LogErrorFormat("UNHANDLED PREVIOUS EDGE STATE: {0}\n", edgeChange.oldState);
-                        break;
-                }
-               
-                switch (edgeChange.oldState)
+                if (edgeChange.oldState != edgeChange.newState)
                 {
-                    //--------------------------------------
-                    // Changes for architecture dependencies
-                    //--------------------------------------
-                    case State.specified:
-                        // nothing to be done
-                        break;
-                    case State.absent:
-                        decorator.DecorateAbsence(gameEdge);
-                        break;
-                    case State.allowed_absent:
-                        decorator.DecorateAllowedAbsence(gameEdge);
-                        break;
-                    case State.convergent:
-                        decorator.DecorateConvergence(gameEdge);
-                        break;
+                    switch (edgeChange.oldState)
+                    {
+                        //--------------------------------------
+                        // Changes for architecture dependencies
+                        //--------------------------------------
+                        case State.specified:
+                            // nothing to be done
+                            break;
+                        case State.absent:
+                            decorator.UndecorateAbsence(gameEdge);
+                            break;
+                        case State.allowed_absent:
+                            decorator.UndecorateAllowedAbsence(gameEdge);
+                            break;
+                        case State.convergent:
+                            decorator.UndecorateConvergence(gameEdge);
+                            break;
 
-                    //-----------------------------------------------------------------------
-                    // changes for implementation dependencies propagated to the architecture
-                    //-----------------------------------------------------------------------
-                    case State.divergent:
-                        decorator.DecorateDivergence(gameEdge);
-                        break;
-                    case State.allowed:
-                        decorator.DecorateAllowed(gameEdge);
-                        break;
-                    case State.implicitly_allowed:
-                        decorator.DecorateImplicitlyAllowed(gameEdge);
-                        break;
-                    default:
-                        Debug.LogErrorFormat("UNHANDLED NEW EDGE STATE: {0}\n", edgeChange.oldState);
-                        break;
+                        //-----------------------------------------------------------------------
+                        // changes for implementation dependencies propagated to the architecture
+                        //-----------------------------------------------------------------------
+                        case State.divergent:
+                            decorator.UndecorateDivergence(gameEdge);
+                            break;
+                        case State.allowed:
+                            decorator.UndecorateAllowed(gameEdge);
+                            break;
+                        case State.implicitly_allowed:
+                            decorator.UndecorateImplicitlyAllowed(gameEdge);
+                            break;
+                        default:
+                            Debug.LogErrorFormat("UNHANDLED PREVIOUS EDGE STATE: {0}\n", edgeChange.oldState);
+                            break;
+                    }
+
+                    switch (edgeChange.oldState)
+                    {
+                        //--------------------------------------
+                        // Changes for architecture dependencies
+                        //--------------------------------------
+                        case State.specified:
+                            // nothing to be done
+                            break;
+                        case State.absent:
+                            decorator.DecorateAbsence(gameEdge);
+                            break;
+                        case State.allowed_absent:
+                            decorator.DecorateAllowedAbsence(gameEdge);
+                            break;
+                        case State.convergent:
+                            decorator.DecorateConvergence(gameEdge);
+                            break;
+
+                        //-----------------------------------------------------------------------
+                        // changes for implementation dependencies propagated to the architecture
+                        //-----------------------------------------------------------------------
+                        case State.divergent:
+                            decorator.DecorateDivergence(gameEdge);
+                            break;
+                        case State.allowed:
+                            decorator.DecorateAllowed(gameEdge);
+                            break;
+                        case State.implicitly_allowed:
+                            decorator.DecorateImplicitlyAllowed(gameEdge);
+                            break;
+                        default:
+                            Debug.LogErrorFormat("UNHANDLED NEW EDGE STATE: {0}\n", edgeChange.oldState);
+                            break;
+                    }
                 }
+            }
+            else
+            {
+                Debug.LogErrorFormat("Edge {0} is unknown.\n", edgeChange.edge.ID);
             }
         }
        
