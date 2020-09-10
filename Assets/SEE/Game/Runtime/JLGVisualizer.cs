@@ -130,7 +130,7 @@ namespace SEE.Game.Runtime
             }
 
             ///Controls
-            if (Input.GetKeyDown(KeyCode.P))
+            if (Input.GetKeyDown(KeyCode.F))
             {
                 running = !running;
                 showLabelUntil = Time.time + 1f;
@@ -159,19 +159,19 @@ namespace SEE.Game.Runtime
                     Debug.Log("Hit Detected :" + clickedGO);
                 }
             }
-            if (Input.GetKeyDown(KeyCode.O))
+            if (Input.GetKeyDown(KeyCode.R))
             {
                 updateIntervall = 1;
                 playDirection = !playDirection;
                 showLabelUntil = Time.time + 1f;
                 if (playDirection)
                 {
-                    statementCounter = statementCounter + 1; //These need to be called because the statementcounter was increased/decreased in the last UpdateVisualization call already. This prevents bugs.
+                    statementCounter = statementCounter + 2; //These need to be called because the statementcounter was increased/decreased in the last UpdateVisualization call already. This prevents bugs.
                     labelText = "Forward";
                 }
                 else
                 {
-                    statementCounter = statementCounter - 1;
+                    statementCounter = statementCounter - 2;
                     labelText = "Rewind";
                 }
             }
@@ -184,13 +184,13 @@ namespace SEE.Game.Runtime
             //}
             if (running)
             {
-                if (Input.GetKeyDown(KeyCode.L))
+                if (Input.GetKeyDown(KeyCode.Alpha3))
                 {
                     SpeedUp();
                     showLabelUntil = Time.time + 1f;
                     labelText = "Speed x" + 1f / updateIntervall;
                 }
-                if (Input.GetKeyDown(KeyCode.K))
+                if (Input.GetKeyDown(KeyCode.Alpha1))
                 {
                     SlowDown();
                     showLabelUntil = Time.time + 1f;
@@ -210,6 +210,8 @@ namespace SEE.Game.Runtime
                     labelText = "Jumped to " + parsedJLG.GetStatementLocationString(statementCounter);
                 }
                 if (Input.GetKeyDown(KeyCode.B)) {
+                    showLabelUntil = Time.time + 1f;
+                    labelText = "Jumping to Breakpoint...";
                     if (JumpToNextBreakpointHit())
                     {
                         showLabelUntil = Time.time + 1f;
@@ -220,10 +222,10 @@ namespace SEE.Game.Runtime
                         labelText = "Could not find Breakpoint";
                     }
                 }
-                if (Input.GetKeyDown(KeyCode.Alpha9)) {
+                if (Input.GetKeyDown(KeyCode.Alpha3)) {
                     OneStep(true);
                 }
-                if (Input.GetKeyDown(KeyCode.Alpha8))
+                if (Input.GetKeyDown(KeyCode.Alpha1))
                 {
                     OneStep(false);
                 }

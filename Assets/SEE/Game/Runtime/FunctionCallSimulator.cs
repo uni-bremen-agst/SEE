@@ -91,6 +91,8 @@ namespace SEE.Game.Runtime
         /// </summary>
         private GameObject[] spheres;
 
+        private float[] spheresY;
+
         /// <summary>
         /// The actual distance of the spheres. Optimally very close to
         /// <see cref="SPHERE_OPTIMAL_DISTANCE"/>.
@@ -117,14 +119,20 @@ namespace SEE.Game.Runtime
             int sphereCount = 1 + (int)(sourceToTargetLength / SPHERE_OPTIMAL_DISTANCE);
             sphereActualDistance = sourceToTargetLength / sphereCount;
             spheres = new GameObject[sphereCount];
+            spheresY = new float[sphereCount];
             for (int i = 0; i < spheres.Length; i++)
             {
                 spheres[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                spheres[i].transform.position = Vector3.Lerp(sourcePosition, targetPosition, (float)i / (float)spheres.Length);
+                spheres[i].transform.position = Vector3.Lerp(sourcePosition, targetPosition, (float)i / (float)spheres.Length); 
                 spheres[i].transform.rotation = Quaternion.identity;
                 spheres[i].transform.localScale = new Vector3(SPHERE_SCALE, SPHERE_SCALE, SPHERE_SCALE);
                 spheres[i].transform.parent = transform;
             }
+
+            for (int i = 0; i < spheres.Length; i++) {
+                spheresY[i] = spheres[i].transform.position.y;
+            }
+
             sourceOriginalScale = src.transform.localScale;
             targetOriginalScale = dst.transform.localScale;
             sourceOriginalColor = src.GetComponentInChildren<MeshRenderer>().material.color;
@@ -211,7 +219,7 @@ namespace SEE.Game.Runtime
             {
                 fstPosFlat -= srcToDstFlat;
             }
-            spheres[0].transform.position = new Vector3(fstPosFlat.x, 0.0f, fstPosFlat.y);
+            spheres[0].transform.position = new Vector3(fstPosFlat.x, 0f, fstPosFlat.y);
 
             // Align remaining spheres
             Vector2 sphereOffsetFlat = flyDirFlat * sphereActualDistance;
@@ -233,7 +241,7 @@ namespace SEE.Game.Runtime
                 {
                     spherePosFlat -= srcToDstFlat;
                 }
-                spheres[i].transform.position = new Vector3(spherePosFlat.x, 0.0f, spherePosFlat.y);
+                spheres[i].transform.position = new Vector3(spherePosFlat.x, 0f, spherePosFlat.y);
             }
 
             // Adjust colors and heights
@@ -251,7 +259,7 @@ namespace SEE.Game.Runtime
 
                 // Altitude
                 float altitude = SPHERE_MAX_ALTITUDE * Mathf.Sin(t * Mathf.PI);
-                spheres[i].transform.position = new Vector3(spherePosFlat.x, altitude, spherePosFlat.y);
+                spheres[i].transform.position = new Vector3(spherePosFlat.x, spheresY[i]+altitude, spherePosFlat.y);
             }
         }
     }
