@@ -88,7 +88,7 @@ namespace SEE.Game
                 // we need the city argument, which comes only later. Anyhow, whenever we
                 // assign a new city, we also need a new graph renderer for that city.
                 // So in fact this is the perfect place to assign graphRenderer.
-                graphRenderer = new GraphRenderer(value);
+                graphRenderer = new GraphRenderer(value, null);
                 diff = new NumericAttributeDiff(value.AllMetricAttributes());
                 objectManager = new ObjectManager(graphRenderer, gameObject);
                 marker = new Marker(graphRenderer);
