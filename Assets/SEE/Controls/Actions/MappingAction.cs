@@ -1,11 +1,11 @@
 ﻿using SEE.DataModel;
 using SEE.DataModel.IO;
+using SEE.Game;
 using SEE.GO;
 using SEE.Tools.Architecture;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -53,11 +53,11 @@ namespace SEE.Controls
         /// Materials for the decoration of reflexion edges.
         /// </summary>
         [Tooltip("Prefab for absencenes")]
-        public GameObject AbsenceMaterial;
+        public GameObject AbsencePrefab;
         [Tooltip("Prefab for convergences")]
-        public GameObject ConvergenceMaterial;
+        public GameObject ConvergencePrefab;
         [Tooltip("Prefab for divergences")]
-        public GameObject DivergenceMaterial;
+        public GameObject DivergencePrefab;
 
         private struct Selection
         {
@@ -159,17 +159,17 @@ namespace SEE.Controls
                 }
             }
 
-            if (AbsenceMaterial == null)
+            if (AbsencePrefab == null)
             {
                 Debug.LogErrorFormat("No material assigned for absences.\n");
                 this.enabled = false;
             }
-            if (ConvergenceMaterial == null)
+            if (ConvergencePrefab == null)
             {
                 Debug.LogErrorFormat("No material assigned for convergences.\n");
                 this.enabled = false;
             }
-            if (DivergenceMaterial == null)
+            if (DivergencePrefab == null)
             {
                 Debug.LogErrorFormat("No material assigned for divergences.\n");
                 this.enabled = false;
@@ -180,7 +180,23 @@ namespace SEE.Controls
                 Usage();
                 SetupGameObjectMappings();
                 SetupReflexion();
+                SetupReflexionDecorator();
             }
+        }
+
+        /// <summary>
+        /// Used for the visualization and decoration of reflexion edges.
+        /// </summary>
+        private ReflexionDecorator decorator;
+
+        /// <summary>
+        /// Sets up the reflexion decorator.
+        /// </summary>
+        private void SetupReflexionDecorator()
+        {
+            Portal.GetDimensions(Architecture, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+            decorator = new ReflexionDecorator(AbsencePrefab, ConvergencePrefab, DivergencePrefab,
+                                               leftFrontCorner, rightBackCorner);
         }
 
         /// <summary>
@@ -455,7 +471,9 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Called by incremental reflexion for every change in the reflexion model.
+        /// Called by incremental reflexion for every change in the reflexion model
+        /// by way of the observer protocol as a callback. Dispatches the event to
+        /// the approriate handling function.
         /// </summary>
         /// <param name="changeEvent">additional information about the change in the reflexion model</param>
         public void Update(ChangeEvent changeEvent)
@@ -487,71 +505,104 @@ namespace SEE.Controls
             }
         }
 
+        /// <summary>
+        /// Handles every state change of an existing edge.
+        /// </summary>
+        /// <param name="edgeChange"></param>
         private void HandleEdgeChange(EdgeChange edgeChange)
         {
             Debug.LogFormat("edge of type {0} from {1} to {2} changed its state from {3} to {4}.\n",
                             edgeChange.edge.Type, edgeChange.edge.Source.ID, edgeChange.edge.Target.ID,
                             edgeChange.oldState, edgeChange.newState);
-            switch (edgeChange.newState)
+
+            // Possible edge changes:
+            //  for specified architecture dependencies
+            //    specified          => {absent, allowed_absent, convergent}
+            //    absent             => {allowed_absent, convergent}
+            //    allowed_absent     => {allowed, convergent}
+            //    convergent         => {absent, allowed_absent}
+            //  for implementation dependencies propagated to the architecture
+            //    undefined          => {allowed, divergent, implicitly_allowed}
+            //    allowed            => {divergent, implicitly_allowed}
+            //    divergent          => {{allowed, implicitly_allowed}
+            //    implicitly_allowed => {allowed, divergent}
+
+            GameObject gameEdge = architectureEdges[edgeChange.edge.ID];
+
+            if (edgeChange.oldState != edgeChange.newState)
             {
-                case State.absent:
-                    DecorateAbsence(edgeChange.edge);
-                    break;
-                case State.convergent:
-                    DecorateConvergence(edgeChange.edge); 
-                    break;
-                default:
-                    Debug.LogErrorFormat("UNHANDLED EDGE STATE: {0}\n", edgeChange.newState);
-                    break;
+                switch (edgeChange.oldState)
+                {
+                    //--------------------------------------
+                    // Changes for architecture dependencies
+                    //--------------------------------------
+                    case State.specified:
+                        // nothing to be done
+                        break;
+                    case State.absent:
+                        decorator.UndecorateAbsence(gameEdge);
+                        break;
+                    case State.allowed_absent:
+                        decorator.UndecorateAllowedAbsence(gameEdge);
+                        break;
+                    case State.convergent:
+                        decorator.UndecorateConvergence(gameEdge);
+                        break;
+
+                    //-----------------------------------------------------------------------
+                    // changes for implementation dependencies propagated to the architecture
+                    //-----------------------------------------------------------------------
+                    case State.divergent:
+                        decorator.UndecorateDivergence(gameEdge);
+                        break;
+                    case State.allowed:
+                        decorator.UndecorateAllowed(gameEdge);
+                        break;
+                    case State.implicitly_allowed:
+                        decorator.UndecorateImplicitlyAllowed(gameEdge);
+                        break;
+                    default:
+                        Debug.LogErrorFormat("UNHANDLED PREVIOUS EDGE STATE: {0}\n", edgeChange.oldState);
+                        break;
+                }
+               
+                switch (edgeChange.oldState)
+                {
+                    //--------------------------------------
+                    // Changes for architecture dependencies
+                    //--------------------------------------
+                    case State.specified:
+                        // nothing to be done
+                        break;
+                    case State.absent:
+                        decorator.DecorateAbsence(gameEdge);
+                        break;
+                    case State.allowed_absent:
+                        decorator.DecorateAllowedAbsence(gameEdge);
+                        break;
+                    case State.convergent:
+                        decorator.DecorateConvergence(gameEdge);
+                        break;
+
+                    //-----------------------------------------------------------------------
+                    // changes for implementation dependencies propagated to the architecture
+                    //-----------------------------------------------------------------------
+                    case State.divergent:
+                        decorator.DecorateDivergence(gameEdge);
+                        break;
+                    case State.allowed:
+                        decorator.DecorateAllowed(gameEdge);
+                        break;
+                    case State.implicitly_allowed:
+                        decorator.DecorateImplicitlyAllowed(gameEdge);
+                        break;
+                    default:
+                        Debug.LogErrorFormat("UNHANDLED NEW EDGE STATE: {0}\n", edgeChange.oldState);
+                        break;
+                }
             }
         }
-
-        private void DecorateEdge(Edge edge, GameObject prefab, string name)
-        {
-            GameObject gameEdge = architectureEdges[edge.ID];
-            LineRenderer line = gameEdge.GetComponent<LineRenderer>();
-            // Demeter of the spheres to be used as decoration along the line.
-            float demeter = 2 * line.startWidth; // We assume the line has the same width everywhere.
-            // The distance between two subsequent spheres along the line.
-            float distanceBetweenDecorations = 5 * demeter;
-
-            float distance = 0.0f;
-            Vector3 positionOfLastDecoration = line.GetPosition(0);
-            for (int i = 1; i < line.positionCount; i++)
-            {
-                Vector3 currentPosition = line.GetPosition(i);
-                distance += Vector3.Distance(positionOfLastDecoration, currentPosition);
-                if (distance >= distanceBetweenDecorations)
-                {
-                    GameObject decoration = Instantiate(prefab);
-                    Vector3 dotPosition = currentPosition;
-                    decoration.transform.localScale = Vector3.one * demeter;
-                    dotPosition.y += line.startWidth + decoration.transform.lossyScale.y / 2.0f; // above the line
-                    decoration.transform.position = dotPosition;                                        
-                    decoration.tag = Tags.Decoration;
-                    decoration.name = name;
-                    distance = 0;
-                    
-                }
-                positionOfLastDecoration = currentPosition;
-            }            
-        }
-
-        private void DecorateAbsence(Edge edge)
-        {
-            DecorateEdge(edge, AbsenceMaterial, "absence");
-        }
-
-        private void DecorateConvergence(Edge edge)
-        {
-            DecorateEdge(edge, ConvergenceMaterial, "convergence");
-        }
-
-        private void DecorateDivergence(Edge edge)
-        {
-            DecorateEdge(edge, DivergenceMaterial, "divergence");
-        }
-
+       
         private void HandlePropagatedEdgeRemoved(PropagatedEdgeRemoved propagatedEdgeRemoved)
         {
             Debug.Log(propagatedEdgeRemoved.ToString());
@@ -571,6 +622,5 @@ namespace SEE.Controls
         {
             Debug.Log(mapsToEdgeRemoved.ToString());
         }
-
     }
 }
