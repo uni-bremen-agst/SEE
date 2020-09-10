@@ -39,7 +39,7 @@
 				IN.worldPos.x > portalMax.x || IN.worldPos.z > portalMax.y
 			)
 			{
-				c = _Color.a = 0.0f;
+				c.a = 0.0f;
 			}
             o.Albedo = c.rgb;
             o.Metallic = _Metallic;
