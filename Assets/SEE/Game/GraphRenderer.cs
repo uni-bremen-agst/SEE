@@ -29,6 +29,7 @@ namespace SEE.Game
         {
             this.settings = settings;
             shader = Materials.NewPortalShader();
+            lineShader = Materials.NewPortalShaderLine();
             
             switch (this.settings.LeafObjects)
             {
@@ -50,7 +51,7 @@ namespace SEE.Game
             }
         }
 
-        private const float LevelDistance = 0.001f;
+        private const float LevelDistance = 0.001f;        
 
         /// <summary>
         /// The shader for all materials used for all objects created by this graph renderer.
@@ -126,6 +127,11 @@ namespace SEE.Game
         private readonly Shader shader;
 
         /// <summary>
+        /// The shader to draw the lines of the edges.
+        /// </summary>
+        private readonly Shader lineShader;
+
+        /// <summary>
         /// Sets the scaler to be used to map metric values onto graphical attributes
         /// (e.g., width, height, depth, style) across all given <paramref name="graphs"/>
         /// based on the user's choice (settings).
@@ -194,7 +200,7 @@ namespace SEE.Game
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
             }
             Performance p = Performance.Begin("edge layout " + layout.Name);
-            EdgeFactory edgeFactory = new EdgeFactory(shader, layout, settings.EdgeWidth);
+            EdgeFactory edgeFactory = new EdgeFactory(lineShader, layout, settings.EdgeWidth);
             ICollection<GameObject> result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), ConnectingEdges(gameNodes));
             p.End();
             return result;
