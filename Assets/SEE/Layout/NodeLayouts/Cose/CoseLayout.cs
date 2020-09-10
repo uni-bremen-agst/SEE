@@ -25,6 +25,37 @@ using static SEE.Game.AbstractSEECity;
 
 namespace SEE.Layout
 {
+    internal class IterationConstraint
+    {
+        /// <summary>
+        /// the start value
+        /// </summary>
+        public int start;
+
+        /// <summary>
+        /// the end value
+        /// </summary>
+        public int end;
+
+        /// <summary>
+        /// The value by which the parameter value is increased within each iteration
+        /// </summary>
+        public int iterationStep;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="start"> the start value</param>
+        /// <param name="end">the end value</param>
+        /// <param name="iterationStep">The value by which the parameter value is increased within each iteration</param>
+        public IterationConstraint(int start, int end, int iterationStep)
+        {
+            this.start = start;
+            this.end = end;
+            this.iterationStep = iterationStep;
+        }
+    }
+
     public class CoseLayout : NodeLayout
     {
         /// <summary>

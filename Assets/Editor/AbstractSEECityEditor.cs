@@ -86,7 +86,6 @@ namespace SEEEditor
                 city.CoseGraphSettings.useItertivCalclation = EditorGUILayout.Toggle("Find parameters iteratively", city.CoseGraphSettings.useItertivCalclation);
                 if (city.CoseGraphSettings.useCalculationParameter || city.CoseGraphSettings.useItertivCalclation)
                 {
-                    city.CoseGraphSettings.useOptAlgorithm = false;
                     city.ZScoreScale = true;
 
                     city.CoseGraphSettings.multiLevelScaling = false;
