@@ -7,6 +7,9 @@ namespace SEE.Net
 {
 
     /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   
     /// Zooms into a <see cref="HoverableObject"/> for every client.
     /// </summary>
     public class ZoomIntoAction : AbstractAction
@@ -79,6 +82,9 @@ namespace SEE.Net
     }
 
     /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   
     /// Zooms out of a <see cref="HoverableObject"/> for every client.
     /// </summary>
     public class ZoomOutOfAction : AbstractAction
@@ -151,6 +157,9 @@ namespace SEE.Net
     }
 
     /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   
     /// Zooms back to the root for every client.
     /// </summary>
     public class ZoomRootAction : AbstractAction

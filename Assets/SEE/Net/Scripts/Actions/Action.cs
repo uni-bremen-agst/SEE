@@ -6,6 +6,19 @@ namespace SEE.Net
 {
 
     /// <summary>
+    /// !!! IMPORTANT !!!
+    /// 
+    ///   Rules for every deriving class:
+    ///   
+    ///     1. Every field MUST be public!
+    ///     2. Deriving classes MUST NOT have fields of the type GameObjects or
+    ///        MonoBehaviours.
+    ///        
+    ///   These rules are necessary, to allow (de)serialization of the classes for
+    ///   networking.
+    /// 
+    /// 
+    /// 
     /// An abstract networked action. Actions can be completely arbitrary and can be
     /// executed on the server and/or client.
     /// </summary>

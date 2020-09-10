@@ -6,6 +6,9 @@ namespace SEE.Net
 {
 
     /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   
     /// Action for grabbing/releasing grabbable objects.
     /// </summary>
     public class GrabAction : AbstractAction

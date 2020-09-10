@@ -7,6 +7,9 @@ namespace SEE.Net
 {
 
     /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   
     /// Destroys an object that was instantiated by using an
     /// <see cref="InstantiateAction"/>.
     /// </summary>
