@@ -24,8 +24,9 @@ namespace SEE.GO
 			result.AddComponent<MeshCollider>();
 
 			MeshRenderer renderer = result.AddComponent<MeshRenderer>();
-			// Re-use default material for all cylinders.
-			renderer.sharedMaterial = materials.DefaultMaterial(level, style);
+            renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
+            // Re-use default material for all cylinders.
+            renderer.sharedMaterial = materials.DefaultMaterial(level, style);
 
 			// Object should not cast shadows: too expensive and may hide information.
 			renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
