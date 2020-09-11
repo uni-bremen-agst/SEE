@@ -7,7 +7,6 @@ using SEE.Tools;
 using SEE.DataModel;
 using SEE.DataModel.IO;
 using SEE.GO;
-using SEE.Layout;
 using SEE.Utils;
 
 
