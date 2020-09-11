@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Windows.Speech;
 using UnityEngine.UI;
 using SEE.GO;
+using SEE.Game;
 using TMPro;
 
 public class Dictate : MonoBehaviour
@@ -16,26 +17,38 @@ public class Dictate : MonoBehaviour
 
     void Start()
     {
-
-        m_DictationRecognizer = new DictationRecognizer();
-
-        m_DictationRecognizer.DictationResult += (text, confidence) =>
+        if (!SystemInfo.operatingSystem.StartsWith("Windows 10"))
         {
-            Debug.LogFormat("Dictation result: {0}", text);
-            record += text;
-        };
-
-        m_DictationRecognizer.DictationComplete += (completionCause) =>
+            Debug.LogWarning("Dictate funktion is only available under windows 10");
+        }
+        else if (transform.root.gameObject.GetComponent<SEECity>().dictate)
         {
-            if (completionCause != DictationCompletionCause.Complete)
-                Debug.LogErrorFormat("Dictation completed unsuccessfully: {0}.", completionCause);
-        };
+            m_DictationRecognizer = new DictationRecognizer();
 
-        m_DictationRecognizer.DictationError += (error, hresult) =>
+            m_DictationRecognizer.DictationResult += (text, confidence) =>
+            {
+                Debug.LogFormat("Dictation result: {0}", text);
+                record += text;
+            };
+
+            m_DictationRecognizer.DictationComplete += (completionCause) =>
+            {
+                if (completionCause != DictationCompletionCause.Complete)
+                    Debug.LogErrorFormat("Dictation completed unsuccessfully: {0}.", completionCause);
+            };
+
+            m_DictationRecognizer.DictationError += (error, hresult) =>
+            {
+                Debug.LogErrorFormat("Dictation error: {0}; HResult = {1}.", error, hresult);
+            };
+            recording = false;
+        }
+        else
         {
-            Debug.LogErrorFormat("Dictation error: {0}; HResult = {1}.", error, hresult);
-        };
-        recording = false;
+            AnnotationEditor annotationEditor = this.gameObject.GetComponent<AnnotationEditor>();
+            GameObject dictate = annotationEditor.transform.Find("Adding/Dictate").gameObject;
+            dictate.SetActive(false);
+        }
     }
 
     void Update()

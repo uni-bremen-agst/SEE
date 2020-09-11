@@ -82,7 +82,9 @@ namespace SEEEditor
             SEECity city = target as SEECity;
             city.gxlPath = EditorGUILayout.TextField("GXL file", city.gxlPath);
             city.csvPath = EditorGUILayout.TextField("CSV file", city.csvPath);
-            city.seePath = EditorGUILayout.TextField("SEE file", city.seePath);
+            city.seeLoadPath = EditorGUILayout.TextField("SEE load file", city.seeLoadPath);
+            city.seeSavePath = EditorGUILayout.TextField("SEE save file", city.seeSavePath);
+            city.dictate = EditorGUILayout.Toggle("Dictate", city.dictate);
         }
 
         /// <summary>

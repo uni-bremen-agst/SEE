@@ -157,7 +157,11 @@ namespace SEE.Game
         /// </summary>
         public string csvPath = "..\\Data\\GXL\\minimal_clones.csv";
 
-        public string seePath = "..\\Data\\GXL\\minimal_clones.see";
+        public string seeLoadPath = "..\\Data\\GXL\\minimal_clones.see";
+
+        public string seeSavePath = "..\\Data\\GXL\\minimal_clones.see";
+
+        public bool dictate = false;
 
         // Larger clone graph with single root (Linux directory "drivers"): 16.920 nodes, 10583 edges.
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\drivers.gxl";
@@ -192,9 +196,14 @@ namespace SEE.Game
             return PathPrefix + csvPath;
         }
 
-        public string SEEPath()
+        public string SEESavePath()
         {
-            return PathPrefix + seePath;
+            return PathPrefix + seeSavePath;
+        }
+
+        public string SEELoadPath()
+        {
+            return PathPrefix + seeLoadPath;
         }
         /// <summary>
         /// Loads the metrics from CSVPath() and aggregates and adds them to the graph.
@@ -426,12 +435,12 @@ namespace SEE.Game
                 annotatableObjects.Add(new AnnotatableObjectData(gameObject.GetComponent<AnnotatableObject>()));
             }
 
-            LayoutSaveSystem.SaveAnnotatableObjects(annotatableObjects,SEEPath());
+            LayoutSaveSystem.SaveAnnotatableObjects(annotatableObjects,SEESavePath());
         }
 
         public void Load()
         {
-            List<AnnotatableObjectData> annotatableObjects = LayoutSaveSystem.LoadAnnotatableObjects(SEEPath());
+            List<AnnotatableObjectData> annotatableObjects = LayoutSaveSystem.LoadAnnotatableObjects(SEELoadPath());
             List<GameObject> gameObjects = SEECity.AllNodeDescendants(gameObject).ToList();
 
             foreach (AnnotatableObjectData annotatableObjectData in annotatableObjects)

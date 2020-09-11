@@ -11,7 +11,6 @@ public class AnnotatableObjectData
     public float id;
     public string[] annotations;
     public string textOnPaper;
-    //public float[] color;
 
     public AnnotatableObjectData(AnnotatableObject annotatableObject)
     {

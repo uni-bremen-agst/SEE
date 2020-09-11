@@ -177,23 +177,32 @@ namespace SEE.Controls
                 GameObject.Destroy(annotation);
             }
             annotations.Clear();
+            isAnnotated = false;
         }
 
         public void MakeAnnotationsClickable(bool delete)
         {
-            ShowInformation();
-            foreach (GameObject game in annotations)
+            if (isAnnotated)
             {
-                GetComponentInChildren<Clickable>().enabled = true;
-                GetComponentInChildren<BoxCollider2D>().enabled = true;
-                if (delete)
+                ShowInformation();
+                foreach (GameObject game in annotations)
                 {
-                    GetComponentInChildren<Clickable>().SetDelete(true);
+                    GetComponentInChildren<Clickable>().enabled = true;
+                    GetComponentInChildren<BoxCollider2D>().enabled = true;
+                    if (delete)
+                    {
+                        GetComponentInChildren<Clickable>().SetDelete(true);
+                    }
+                    else
+                    {
+                        GetComponentInChildren<Clickable>().SetDelete(false);
+                    }
                 }
-                else
-                {
-                    GetComponentInChildren<Clickable>().SetDelete(false);
-                }
+            }
+            else
+            {
+                Debug.LogWarning("No Annations available");
+                OpenAnnotationEditor();
             }
         }
 

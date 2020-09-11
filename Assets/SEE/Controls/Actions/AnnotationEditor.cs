@@ -25,7 +25,6 @@ namespace SEE.GO
         {
             AnnotatableObject annotatableObject = this.GetComponentInParent(typeof(AnnotatableObject)) as AnnotatableObject;
             annotatableObject.MakeAnnotationsClickable(true);
-            annotatableObject.ShowInformation();
         }
 
         public void StartEditing()
