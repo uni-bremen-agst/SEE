@@ -105,7 +105,7 @@ namespace SEE.GO
             GameObject result = new GameObject("Cube");
             result.AddComponent<MeshFilter>().mesh = cubeMesh;
             result.AddComponent<BoxCollider>();
-            result.AddComponent<MeshRenderer>();
+            result.AddComponent<MeshRenderer>().lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
 
             SetHeight(result, DefaultHeight);
 

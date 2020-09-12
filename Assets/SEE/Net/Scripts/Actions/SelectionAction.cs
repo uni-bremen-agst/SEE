@@ -5,6 +5,9 @@ namespace SEE.Net
 {
 
     /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   
     /// Highlights hoverable objects for all clients, once a client selects an object.
     /// This can also stop highlighting objects on deselection.
     /// </summary>

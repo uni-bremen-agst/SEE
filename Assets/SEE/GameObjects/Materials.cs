@@ -206,7 +206,7 @@ namespace SEE.GO
         private static Material NewMaterial(Shader shader, Color color, int renderQueueOffset)
         {
             Material material = new Material(shader);
-            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + renderQueueOffset;
+            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + renderQueueOffset + 1; //TODO(torben): the + 1 is a hack so the plane is rendered before everything else
             material.color = color;
             return material;
         }

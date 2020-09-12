@@ -3,6 +3,10 @@ using UnityEngine.Assertions;
 
 namespace SEE.Net
 {
+    /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    /// </summary>
     public class SynchronizeAction : AbstractAction
     {
         public string uniqueGameObjectName;
