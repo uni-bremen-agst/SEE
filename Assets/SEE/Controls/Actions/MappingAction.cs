@@ -675,7 +675,8 @@ namespace SEE.Controls
             GameObject source = architectureNodes[edge.Source.ID];
             GameObject target = architectureNodes[edge.Target.ID];
             List<GameObject> nodes = new List<GameObject> { source, target };
-            ICollection<GameObject> edges = architectureGraphRenderer.EdgeLayout(nodes);
+            // FIXME: Continue here.
+            //ICollection<GameObject> edges = architectureGraphRenderer.EdgeLayout(nodes);
         }
 
         private void HandleMapsToEdgeAdded(MapsToEdgeAdded mapsToEdgeAdded)
