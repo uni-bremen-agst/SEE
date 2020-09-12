@@ -1,5 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.GO;
+﻿using SEE.GO;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
