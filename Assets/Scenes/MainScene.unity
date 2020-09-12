@@ -3107,7 +3107,7 @@ MonoBehaviour:
   MaxErosionWidth: 1
   EdgesAboveBlocks: 1
   Tension: 0.85
-  RDP: 0.001
+  RDP: 0.0001
   calculateMeasurements: 0
   gxlPath: ..\Data\GXL\SEE\CodeFacts.gxl
   csvPath: ..\Data\GXL\SEE\CodeFacts.csv
@@ -4180,7 +4180,7 @@ MonoBehaviour:
   MaxErosionWidth: 1
   EdgesAboveBlocks: 1
   Tension: 0.85
-  RDP: 0.01
+  RDP: 0.0001
   calculateMeasurements: 0
   gxlPath: ..\Data\GXL\SEE\Architecture.gxl
   csvPath: ..\Data\GXL\SEE\Architecture.csv
