@@ -3100,7 +3100,7 @@ MonoBehaviour:
   LeafObjects: 0
   InnerNodeObjects: 5
   NodeLayout: 4
-  EdgeLayout: 2
+  EdgeLayout: 3
   ZScoreScale: 0
   EdgeWidth: 0.001
   ShowErosions: 0
@@ -4180,7 +4180,7 @@ MonoBehaviour:
   MaxErosionWidth: 1
   EdgesAboveBlocks: 1
   Tension: 0.85
-  RDP: 0.001
+  RDP: 0.01
   calculateMeasurements: 0
   gxlPath: ..\Data\GXL\SEE\Architecture.gxl
   csvPath: ..\Data\GXL\SEE\Architecture.csv
@@ -4270,7 +4270,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd9537a868ba1214eba7ee3caf4c2e76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 0
+  id: 1
   cullingPlane: {fileID: 1930472489}
 --- !u!114 &1930472489
 MonoBehaviour:
