@@ -24,6 +24,8 @@ namespace SEE.DataModel
         /// empty string if the graph was not created by loading it from disk.
         private string path = "";
 
+        public int MaxDepth { get; private set; } = -1;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -436,15 +438,6 @@ namespace SEE.DataModel
         }
 
         /// <summary>
-        /// Returns the maximal depth of the graph. Precondition: Graph must be tree.
-        /// </summary>
-        /// <returns>The maximal depth of the graph.</returns>
-        public int GetMaxDepth()
-        {
-            return GetMaxDepth(GetRoots(), -1);
-        }
-
-        /// <summary>
         /// Returns all edges of graph whose source and target is contained in 
         /// selectedNodes.
         /// </summary>
@@ -473,12 +466,12 @@ namespace SEE.DataModel
         /// <param name="nodes">nodes for which to determine the depth</param>
         /// <param name="currentDepth">the current depth of the given <paramref name="nodes"/></param>
         /// <returns></returns>
-        private int GetMaxDepth(List<Node> nodes, int currentDepth)
+        private int CalcMaxDepth(List<Node> nodes, int currentDepth)
         {
             int max = currentDepth + 1;
             for (int i = 0; i < nodes.Count; i++)
             {
-                max = Math.Max(max, GetMaxDepth(nodes[i].Children(), currentDepth + 1));
+                max = Math.Max(max, CalcMaxDepth(nodes[i].Children(), currentDepth + 1));
             }
             return max;
         }
@@ -518,6 +511,11 @@ namespace SEE.DataModel
             {
                 root.SetLevel(0);
             }
+        }
+
+        public void FinalizeGraph()
+        {
+            MaxDepth = CalcMaxDepth(GetRoots(), -1);
         }
 
         /// <summary>

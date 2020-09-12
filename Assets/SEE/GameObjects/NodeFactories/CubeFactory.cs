@@ -102,21 +102,18 @@ namespace SEE.GO
 
         public override GameObject NewBlock(int style, int level = 0)
         {
-            GameObject result = new GameObject("Cube");
+            GameObject result = new GameObject("Cube") { tag = Tags.Node };
+            //SetHeight(result, DefaultHeight);
+
             result.AddComponent<MeshFilter>().mesh = cubeMesh;
             result.AddComponent<BoxCollider>();
-            result.AddComponent<MeshRenderer>().lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
 
-            SetHeight(result, DefaultHeight);
-
-            result.tag = Tags.Node;
-            Renderer renderer = result.GetComponent<Renderer>();
-            // Object should not cast shadows: too expensive and may hide information,
+            MeshRenderer renderer = result.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = materials.DefaultMaterial(level, Mathf.Clamp(style, 0, (int)materials.NumberOfMaterials - 1)); ;
+            renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
 
-            // Assigns a material to the object.
-            renderer.sharedMaterial = materials.DefaultMaterial(level, Mathf.Clamp(style, 0, (int)NumberOfStyles() - 1)); ;
             return result;
         }
     }

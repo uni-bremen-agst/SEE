@@ -20,15 +20,11 @@ namespace SEE.GO
         public override GameObject NewBlock(int style = 0, int level = 0)
 		{
 			GameObject result = CreateCylinder();
-			SetHeight(result, DefaultHeight);
 			result.AddComponent<MeshCollider>();
 
 			MeshRenderer renderer = result.AddComponent<MeshRenderer>();
             renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
-            // Re-use default material for all cylinders.
             renderer.sharedMaterial = materials.DefaultMaterial(level, style);
-
-			// Object should not cast shadows: too expensive and may hide information.
 			renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 			renderer.receiveShadows = false;
 

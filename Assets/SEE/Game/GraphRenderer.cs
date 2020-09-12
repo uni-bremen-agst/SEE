@@ -184,16 +184,16 @@ namespace SEE.Game
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
             {
-                case SEECity.EdgeLayouts.Straight:
+                case EdgeLayouts.Straight:
                     layout = new StraightEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance);
                     break;
-                case SEECity.EdgeLayouts.Spline:
+                case EdgeLayouts.Spline:
                     layout = new SplineEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.RDP);
                     break;
-                case SEECity.EdgeLayouts.Bundling:
+                case EdgeLayouts.Bundling:
                     layout = new BundledEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.Tension, settings.RDP);
                     break;
-                case SEECity.EdgeLayouts.None:
+                case EdgeLayouts.None:
                     // nothing to be done
                     return new List<GameObject>();
                 default:
@@ -909,7 +909,7 @@ namespace SEE.Game
             NodeFactory leafNodeFactory,
             NodeFactory innerNodeFactory)
         {
-            IList<GameNode> result = new List<GameNode>();
+            IList<GameNode> result = new List<GameNode>(gameNodes.Count);
 
             foreach (GameObject gameObject in gameNodes)
             {
@@ -1040,41 +1040,20 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Adds a NodeRef component to given game node referencing to given graph node.
-        /// </summary>
-        /// <param name="gameNode"></param>
-        /// <param name="node"></param>
-        protected void AttachNode(GameObject gameNode, Node node)
-        {
-            NodeRef nodeRef = gameNode.AddComponent<NodeRef>();
-            nodeRef.node = node;
-        }
-
-        /// <summary>
-        /// Adds a <see cref="NodeHighlights"/> component to the given game node.
-        /// </summary>
-        /// <param name="gameNode">The given game node.</param>
-        protected void AttachHighlighter(GameObject gameNode)
-        {
-            gameNode.AddComponent<NodeHighlights>();
-        }
-
-        /// <summary>
         /// Creates and scales blocks for all leaf nodes in given list of nodes.
         /// </summary>
         /// <param name="nodes">list of nodes for which to create blocks</param>
         /// <returns>blocks for all leaf nodes in given list of nodes</returns>
         protected Dictionary<Node, GameObject> CreateBlocks(IList<Node> nodes)
         {
-            Dictionary<Node, GameObject> result = new Dictionary<Node, GameObject>();
+            Dictionary<Node, GameObject> result = new Dictionary<Node, GameObject>(nodes.Count);
 
-            foreach (Node node in nodes)
+            for (int i = 0; i < nodes.Count; i++)
             {
                 // We add only leaves.
-                if (node.IsLeaf())
+                if (nodes[i].IsLeaf())
                 {
-                    GameObject block = NewLeafNode(node);
-                    result[node] = block;
+                    result[nodes[i]] = NewLeafNode(nodes[i]);
                 }
             }
             return result;
@@ -1093,10 +1072,10 @@ namespace SEE.Game
         /// <returns>game object representing given <paramref name="node"/></returns>
         public GameObject NewLeafNode(Node node)
         {
-            GameObject block = leafNodeFactory.NewBlock(SelectStyle(node), node.ItsGraph.GetMaxDepth() + node.Level);
+            GameObject block = leafNodeFactory.NewBlock(SelectStyle(node, innerNodeFactory), node.ItsGraph.MaxDepth + node.Level);
             block.name = node.ID;
-            AttachNode(block, node);
-            AttachHighlighter(block);
+            block.AddComponent<NodeRef>().node = node;
+            block.AddComponent<NodeHighlights>();
             AdjustScaleOfLeaf(block);
             return block;
         }
@@ -1117,13 +1096,8 @@ namespace SEE.Game
         /// </summary>
         /// <param name="node">node for which to determine the style index</param>
         /// <returns>style index</returns>
-        private int SelectStyle(Node node, InnerNodeFactory innerNodeFactory = null)
+        private int SelectStyle(Node node, InnerNodeFactory innerNodeFactory)
         {
-            if (innerNodeFactory == null)
-            {
-                innerNodeFactory = this.innerNodeFactory;
-            }
-
             bool isLeaf = node.IsLeaf();
             string styleMetric = isLeaf ? settings.LeafStyleMetric : settings.InnerNodeStyleMetric;
             uint numberOfStyles = isLeaf ? leafNodeFactory.NumberOfStyles() : innerNodeFactory.NumberOfStyles();
@@ -1134,7 +1108,6 @@ namespace SEE.Game
                 // The styleMetric name is actually a number.
                 metricMaximum = numberOfStyles;
                 value = Mathf.Clamp(value, 0, metricMaximum);
-
             }
             else
             {
@@ -1292,14 +1265,14 @@ namespace SEE.Game
         /// <param name="gameNode">the game object whose visual attributes are to be adjusted</param>
         public void AdjustScaleOfLeaf(GameObject gameNode)
         {
-            NodeRef noderef = gameNode.GetComponent<NodeRef>();
-            if (noderef == null)
+            NodeRef nodeRef = gameNode.GetComponent<NodeRef>();
+            if (nodeRef == null)
             {
                 throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
             }
             else
             {
-                Node node = noderef.node;
+                Node node = nodeRef.node;
                 if (node.IsLeaf())
                 {
                     // Scaled metric values for the three dimensions.
@@ -1318,7 +1291,7 @@ namespace SEE.Game
                     }
                     else
                     {
-                        leafNodeFactory.SetSize(gameNode, leafNodeFactory.Unit * scale);
+                        gameNode.transform.localScale = leafNodeFactory.Unit * scale;
                     }
                 }
                 else
@@ -1385,8 +1358,8 @@ namespace SEE.Game
             GameObject innerGameObject = innerNodeFactory.NewBlock(0, node.Level);
             innerGameObject.name = node.ID;
             innerGameObject.tag = Tags.Node;
-            AttachNode(innerGameObject, node);
-            AttachHighlighter(innerGameObject);
+            innerGameObject.AddComponent<NodeRef>().node = node;
+            innerGameObject.AddComponent<NodeHighlights>();
             AdjustStyle(innerGameObject);
             AdjustHeightOfInnerNode(innerGameObject);
             return innerGameObject;
@@ -1401,13 +1374,13 @@ namespace SEE.Game
         /// <param name="innerNodeFactory">the node factory for the inner nodes</param>
         protected void AddInnerNodes(Dictionary<Node, GameObject> nodeMap, IList<Node> nodes, InnerNodeFactory innerNodeFactory = null)
         {
-            foreach (Node node in nodes)
+            for (int i = 0; i < nodes.Count; i++)
             {
                 // We add only inner nodes.
-                if (! node.IsLeaf())
+                if (!nodes[i].IsLeaf())
                 {
-                    GameObject innerGameObject = NewInnerNode(node, innerNodeFactory);
-                    nodeMap[node] = innerGameObject;
+                    GameObject innerGameObject = NewInnerNode(nodes[i], innerNodeFactory);
+                    nodeMap[nodes[i]] = innerGameObject;
                 }
             }
         }
