@@ -70,5 +70,22 @@ namespace SEE.Game
                 Debug.LogErrorFormat("Game object {0} does not have a renderer attached to it. Culling portal cannot be set.\n", transform.name);
             }
         }
+
+        /// <summary>
+        /// Sets the culling area (portal) of <paramref name="go"/> to the rectangle in
+        /// the x/z plane defined by the extends of <paramref name="root"/>.
+        /// </summary>
+        /// <param name="root">object defining the extends of the culling area</param>
+        /// <param name="go">object whose culling area is to be set</param>
+        public static void SetPortal(GameObject root, GameObject go)
+        {
+            Vector2 leftFront, rightBack;
+            GetDimensions(root, out leftFront, out rightBack);
+            foreach (Material material in go.GetComponent<MeshRenderer>().sharedMaterials)
+            {
+                material.SetVector("portalMin", new Vector4(leftFront.x, leftFront.y));
+                material.SetVector("portalMax", new Vector4(rightBack.x, rightBack.y));
+            }
+        }
     }
 }

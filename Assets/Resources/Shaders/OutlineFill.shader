@@ -6,76 +6,100 @@
 //  Copyright © 2018 Chris Nolet. All rights reserved.
 //
 
-Shader "Custom/Outline Fill" {
-  Properties {
-    [Enum(UnityEngine.Rendering.CompareFunction)] _ZTest("ZTest", Float) = 0
+Shader "Custom/Outline Fill"
+{
+	Properties
+	{
+		[Enum(UnityEngine.Rendering.CompareFunction)] _ZTest("ZTest", Float) = 0
+		_OutlineColor("Outline Color", Color) = (1, 1, 1, 1)
+		_OutlineWidth("Outline Width", Range(0, 10)) = 2
+		portalMin("Portal Left Front Corner", vector) = (-10, -10, 0, 0)
+		portalMax("Portal Right Back Corner", vector) = (10, 10, 0, 0)
+	}
+	
+	SubShader
+	{
+		Tags
+		{
+			"Queue" = "Transparent+1"
+			"RenderType" = "Transparent"
+			"DisableBatching" = "True"
+		}
 
-    _OutlineColor("Outline Color", Color) = (1, 1, 1, 1)
-    _OutlineWidth("Outline Width", Range(0, 10)) = 2
-  }
+    Pass
+	{
+		Name "Fill"
+		Cull Off
+		ZTest [_ZTest]
+		ZWrite Off
+		Blend SrcAlpha OneMinusSrcAlpha
+		ColorMask RGB
 
-  SubShader {
-    Tags {
-      "Queue" = "Transparent+1"
-      "RenderType" = "Transparent"
-      "DisableBatching" = "True"
-    }
+		Stencil
+		{
+			Ref 1
+			Comp NotEqual
+		}
 
-    Pass {
-      Name "Fill"
-      Cull Off
-      ZTest [_ZTest]
-      ZWrite Off
-      Blend SrcAlpha OneMinusSrcAlpha
-      ColorMask RGB
+		CGPROGRAM
+		#include "UnityCG.cginc"
 
-      Stencil {
-        Ref 1
-        Comp NotEqual
-      }
+		#pragma vertex vert
+		#pragma fragment frag
 
-      CGPROGRAM
-      #include "UnityCG.cginc"
+		struct appdata
+		{
+			float4 vertex       : POSITION;
+			float3 normal       : NORMAL;
+			float3 smoothNormal : TEXCOORD3;
+			UNITY_VERTEX_INPUT_INSTANCE_ID
+		};
 
-      #pragma vertex vert
-      #pragma fragment frag
+		struct v2f
+		{
+			float4 position : SV_POSITION;
+			float3 worldPos : TEXCOORD1;
+			fixed4 color    : COLOR;
+			UNITY_VERTEX_OUTPUT_STEREO
+		};
 
-      struct appdata {
-        float4 vertex : POSITION;
-        float3 normal : NORMAL;
-        float3 smoothNormal : TEXCOORD3;
-        UNITY_VERTEX_INPUT_INSTANCE_ID
-      };
+		uniform fixed4 _OutlineColor;
+		uniform float _OutlineWidth;
 
-      struct v2f {
-        float4 position : SV_POSITION;
-        fixed4 color : COLOR;
-        UNITY_VERTEX_OUTPUT_STEREO
-      };
+		float2 portalMin;
+		float2 portalMax;
 
-      uniform fixed4 _OutlineColor;
-      uniform float _OutlineWidth;
+		v2f vert(appdata input)
+		{
+			v2f output;
 
-      v2f vert(appdata input) {
-        v2f output;
+			UNITY_SETUP_INSTANCE_ID(input);
+			UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
-        UNITY_SETUP_INSTANCE_ID(input);
-        UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
+			float3 normal = any(input.smoothNormal) ? input.smoothNormal : input.normal;
+			float3 viewPosition = UnityObjectToViewPos(input.vertex);
+			float3 viewNormal = normalize(mul((float3x3)UNITY_MATRIX_IT_MV, normal));
 
-        float3 normal = any(input.smoothNormal) ? input.smoothNormal : input.normal;
-        float3 viewPosition = UnityObjectToViewPos(input.vertex);
-        float3 viewNormal = normalize(mul((float3x3)UNITY_MATRIX_IT_MV, normal));
+			output.position = UnityViewToClipPos(viewPosition + viewNormal * -viewPosition.z * _OutlineWidth / 1000.0);
+			output.worldPos = mul(unity_ObjectToWorld, float4(input.vertex.x, input.vertex.y, input.vertex.z, 1.0)).xyz;
+			output.color = _OutlineColor;
 
-        output.position = UnityViewToClipPos(viewPosition + viewNormal * -viewPosition.z * _OutlineWidth / 1000.0);
-        output.color = _OutlineColor;
+			return output;
+		}
 
-        return output;
-      }
+		fixed4 frag(v2f input) : SV_Target
+		{
+			fixed4 c = input.color;
+			if (input.worldPos.x < portalMin.x || input.worldPos.z < portalMin.y ||
+				input.worldPos.x > portalMax.x || input.worldPos.z > portalMax.y
+			)
+			{
+				c.a = 0.0f;
+			}
+			return c;
+		}
 
-      fixed4 frag(v2f input) : SV_Target {
-        return input.color;
-      }
-      ENDCG
-    }
-  }
+		ENDCG
+		}
+	}
 }

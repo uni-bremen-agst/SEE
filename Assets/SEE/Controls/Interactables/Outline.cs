@@ -97,6 +97,12 @@ namespace SEE.Controls
 
         public static Outline Create(GameObject go, bool primaryColor = true)
         {
+            GameObject root = go;
+            while (root.GetComponent<Plane>() == null)
+            {
+                root = root.transform.parent.gameObject;
+            }
+
             Outline outline = go.AddComponent<Outline>();
             outline.OutlineMode = Mode.OutlineAll;
             outline.OutlineColor = primaryColor ? UI3DProperties.DefaultColor : UI3DProperties.DefaultColorSecondary;
@@ -118,6 +124,8 @@ namespace SEE.Controls
 
                 outline.outlineMaskMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset;
                 outline.outlineFillMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset + 1;
+
+                Game.Portal.SetPortal(root, go);
             }
 #if UNITY_EDITOR
             else
