@@ -4173,7 +4173,7 @@ MonoBehaviour:
   LeafObjects: 0
   InnerNodeObjects: 0
   NodeLayout: 7
-  EdgeLayout: 3
+  EdgeLayout: 2
   ZScoreScale: 0
   EdgeWidth: 0.01
   ShowErosions: 0
