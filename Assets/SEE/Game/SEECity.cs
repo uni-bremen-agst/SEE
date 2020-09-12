@@ -65,12 +65,12 @@ namespace SEE.Game
             {
                 if (loadedGraph == null)
                 {
-                    return loadedGraph;
+                    return null;
                 }
                 else
                 {
-                    var graph = RelevantGraph(loadedGraph);
-                    LoadDataForGraphListing(graph: graph);
+                    Graph graph = RelevantGraph(loadedGraph);
+                    LoadDataForGraphListing(graph);
                     return graph;
                 }
             }
@@ -155,33 +155,6 @@ namespace SEE.Game
             }
         }
 
-        /// Clone graph with one directory and two files contained therein.
-        //public string gxlPath = "..\\Data\\GXL\\two_files.gxl";
-        //public string csvPath = "..\\Data\\GXL\\two_files.csv";
-
-        /// Clone graph with one directory and three files contained therein.
-        //public string gxlPath = "..\\Data\\GXL\\three_files.gxl";
-        //public string csvPath = "..\\Data\\GXL\\three_files.csv";
-
-        /// Very tiny clone graph with single root, one child as a leaf and 
-        /// two more children with two children each to experiment with.
-        //public string gxlPath = "..\\Data\\GXL\\micro_clones.gxl";
-        //public string csvPath = "..\\Data\\GXL\\micro_clones.csv";
-
-        /// Tiny clone graph with single root to experiment with.
-        //public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
-        //public string csvPath = "..\\Data\\GXL\\minimal_clones.csv";
-
-        /// Tiny clone graph with single roots to check edge bundling.
-        //public string gxlPath = "..\\Data\\GXL\\controlPoints.gxl";
-        //public string csvPath = "..\\Data\\GXL\\controlPoints.csv";
-
-        // Smaller clone graph with single root (Linux directory "fs").
-        //public string gxlPath = "..\\Data\\GXL\\linux-clones\\fs.gxl";
-        //public string csvPath = "..\\Data\\GXL\\linux-clones\\fs.csv";
-
-        // Smaller clone graph with single root (Linux directory "net").
-
         /// <summary>
         /// The relative path for the GXL file containing the graph data.
         /// </summary>
@@ -190,19 +163,6 @@ namespace SEE.Game
         /// The relative path for the CSV file containing the node metrics.
         /// </summary>
         public string csvPath = "..\\Data\\GXL\\minimal_clones.csv";
-
-        // Larger clone graph with single root (Linux directory "drivers"): 16.920 nodes, 10583 edges.
-        //public string gxlPath = "..\\Data\\GXL\\linux-clones\\drivers.gxl";
-        //public string csvPath = "..\\Data\\GXL\\linux-clones\\drivers.csv";
-
-        // Medium size include graph with single root (OpenSSL).
-        //public string gxlPath = "..\\Data\\GXL\\OpenSSL\\openssl-include.gxl";
-        //public string csvPath = "..\\Data\\GXL\\OpenSSL\\openssl-include.csv";
-
-        // Examples for dynamic call graphs
-        //public string gxlPath = "..\\Data\\GXL\\dynamic-tests\\example_02.gxl";
-        //public string csvPath = "..\\Data\\GXL\\dynamic-tests\\empty.csv";
-        //public string dynPath = "..\\Data\\DYN\\example_02.dyn";
 
         /// <summary>
         /// Returns the concatenation of pathPrefix and gxlPath. That is the complete
@@ -329,6 +289,11 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// The graph renderer used to draw the city.
+        /// </summary>
+        private GraphRenderer graphRenderer;
+
+        /// <summary>
         /// Draws the graph.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
@@ -347,12 +312,27 @@ namespace SEE.Game
                 }
                 else
                 {
-                    GraphRenderer renderer = new GraphRenderer(this, visualizedSubGraph);
+                    graphRenderer = new GraphRenderer(this, visualizedSubGraph);
                     // We assume here that this SEECity instance was added to a game object as
                     // a component. The inherited attribute gameObject identifies this game object.
-                    renderer.Draw(gameObject);
+                    graphRenderer.Draw(gameObject);
                 }
             }
+        }
+
+        /// <summary>
+        /// Yields a graph renderer that can draw this city.
+        /// </summary>
+        public GraphRenderer Renderer
+        {
+            get
+            {
+                if (graphRenderer == null)
+                {
+                    return new GraphRenderer(this, VisualizedSubGraph);
+                }
+                return graphRenderer;
+            }            
         }
 
         /// <summary>
