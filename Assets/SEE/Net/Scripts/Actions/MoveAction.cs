@@ -6,6 +6,9 @@ namespace SEE.Net
 {
 
     /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   
     /// Moves a grabbable object to new position for every client.
     /// </summary>
     public class MoveAction : AbstractAction

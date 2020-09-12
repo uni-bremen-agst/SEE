@@ -6,6 +6,9 @@ namespace SEE.Net
 {
 
     /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   
     /// Instantiates a prefab for each client. The prefab must contain exactly one
     /// <see cref="ViewContainer"/> in the root object.
     /// </summary>

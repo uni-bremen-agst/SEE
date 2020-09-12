@@ -53,7 +53,10 @@ namespace SEE.GO
             Renderer renderer = block.GetComponent<Renderer>();
             if (renderer != null)
             {
-                renderer.sharedMaterial = materials.DefaultMaterial(0, Mathf.Clamp(style, 0, (int)NumberOfStyles() - 1));
+                UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>());
+                UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>().node);
+                int level = block.GetComponent<NodeRef>().node.Level;
+                renderer.sharedMaterial = materials.DefaultMaterial(level, Mathf.Clamp(style, 0, (int)NumberOfStyles() - 1));
             }
         }
     }

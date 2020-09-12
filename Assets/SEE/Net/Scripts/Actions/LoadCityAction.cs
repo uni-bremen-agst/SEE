@@ -7,6 +7,9 @@ namespace SEE.Net
 {
 
     /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   
     /// Loads a city with the attributes defined in object with name
     /// <see cref="gameObjectName"/> for every client.
     /// </summary>
