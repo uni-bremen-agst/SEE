@@ -16,7 +16,7 @@ namespace SEE.GO
         {
             this.layout = layout;
             this.edgeWidth = edgeWidth;
-            this.defaultLineMaterial = LineMaterial(shader);
+            defaultLineMaterial = LineMaterial(shader);
         }
 
         /// <summary>
@@ -36,10 +36,6 @@ namespace SEE.GO
         private static Material LineMaterial(Shader shader)
         {
             Material material = new Material(shader);
-            //if (material == null)
-            //{
-            //    Debug.LogError("Could not find material " + materialPath + "\n");
-            //}
             return material;
         }
 
@@ -65,7 +61,7 @@ namespace SEE.GO
 
         public ICollection<GameObject> DrawEdges(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges)
         {
-            List<GameObject> result = new List<GameObject>();
+            List<GameObject> result = new List<GameObject>(edges.Count);
             if (edges.Count == 0)
             {
                 return result;

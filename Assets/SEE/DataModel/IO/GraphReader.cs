@@ -74,6 +74,7 @@ namespace SEE.DataModel.IO
             }
             // After having the complete hierarchy, we can calculate the node levels.
             graph.CalculateLevels();
+            graph.FinalizeGraph();
         }
 
         /// <summary>

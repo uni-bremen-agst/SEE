@@ -141,7 +141,7 @@ namespace SEE.Tools
             Debug.LogFormat("Number of inner edges: {0}\n", innerEdgesCount);
             Debug.LogFormat("Inner edge density:    {0}\n", (float)innerEdgesCount / (float)innerNodesCount);
 
-            Debug.LogFormat("Maximal tree depth:    {0}\n", graph.GetMaxDepth());
+            Debug.LogFormat("Maximal tree depth:    {0}\n", graph.MaxDepth);
         }
 
         private void AssignLeaves(Graph graph, ICollection<Node> leaves, IList<Node> innerNodes)

@@ -113,7 +113,7 @@ namespace SEE.Controls
             {
                 Node node = nodeRef.node;
                 Graph graph = node.ItsGraph;
-                int maxDepth = graph.GetMaxDepth();
+                int maxDepth = graph.MaxDepth;
 
                 int inverseRenderQueueOffset = node.Level;
                 if (nodeRef.node.Type.Equals("Directory"))

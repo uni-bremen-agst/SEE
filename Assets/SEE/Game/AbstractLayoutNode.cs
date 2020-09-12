@@ -113,15 +113,21 @@ namespace SEE.Game
         /// <returns>children of this node</returns>
         public ICollection<ILayoutNode> Children()
         {
-            IList<ILayoutNode> children = new List<ILayoutNode>();
+            IList<ILayoutNode> result;
             if (!IsLeaf)
             {
-                foreach (Node node in node.Children())
+                List<Node> children = node.Children();
+                result = new List<ILayoutNode>(children.Count);
+                foreach (Node node in children)
                 {
-                    children.Add(to_layout_node[node]);
+                    result.Add(to_layout_node[node]);
                 }
             }
-            return children;
+            else
+            {
+                result = new List<ILayoutNode>();
+            }
+            return result;
         }
 
         public void SetOrigin()
