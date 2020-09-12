@@ -4,14 +4,15 @@ using SEE.Game;
 using SEE.GO;
 using SEE.Tools.Architecture;
 using SEE.Utils;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls
 {
     /// <summary>
-    /// Implements the architectural mapping for the reflexion analysis.
+    /// Implements the architectural mapping for the reflexion analysis. 
+    /// This action assumes that it is attached to a game object representing
+    /// the reflexion analysis during the game. 
     /// </summary>
     public class MappingAction : CityAction, Observer
     {
@@ -28,6 +29,13 @@ namespace SEE.Controls
 
         [Tooltip("The GXL file containing the mapping from implementation onto architecture entities.")]
         public string MappingFile;
+
+        /// <summary>
+        /// The graph renderer used to draw the city. There must be a component
+        /// SEECity attached to the game object this MappingAction is attached to
+        /// from which we derived its graph renderer.
+        /// </summary>
+        private GraphRenderer architectureGraphRenderer;
 
         /// <summary>
         /// The graph containing the mapping from implementation onto architecture entities.
@@ -174,13 +182,26 @@ namespace SEE.Controls
                 Debug.LogErrorFormat("No material assigned for divergences.\n");
                 this.enabled = false;
             }
-
+            if (Architecture.TryGetComponent<SEECity>(out SEECity city))
+            {
+                architectureGraphRenderer = city.Renderer;
+                if (architectureGraphRenderer == null)
+                {
+                    Debug.LogErrorFormat("The SEECity component attached to the object representing the architecture has no graph renderer.\n");
+                    this.enabled = false;
+                }
+            }
+            else
+            {
+                Debug.LogErrorFormat("The object representing the architecture has no SEECity component attached to it.\n");
+                this.enabled = false;
+            }
             if (this.enabled)
             {
                 Usage();
                 SetupGameObjectMappings();
                 SetupReflexion();
-                SetupReflexionDecorator();
+                SetupReflexionDecorator();                
             }
         }
 
@@ -653,10 +674,8 @@ namespace SEE.Controls
             Edge edge = propagatedEdgeAdded.propagatedEdge;
             GameObject source = architectureNodes[edge.Source.ID];
             GameObject target = architectureNodes[edge.Target.ID];
-            List<GameObject> nodes = new List<GameObject> { source, target};
-            // FIXME
-            //GraphRenderer graphRenderer;
-            //ICollection<GameObject> edges = graphRenderer.EdgeLayout(nodes);
+            List<GameObject> nodes = new List<GameObject> { source, target };
+            ICollection<GameObject> edges = architectureGraphRenderer.EdgeLayout(nodes);
         }
 
         private void HandleMapsToEdgeAdded(MapsToEdgeAdded mapsToEdgeAdded)
