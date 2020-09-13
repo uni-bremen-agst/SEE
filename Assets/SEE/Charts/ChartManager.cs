@@ -87,7 +87,7 @@ namespace SEE.Charts.Scripts
 		/// Whether metrics of inner nodes should be shown in the charts.
 		/// </summary>
 		[Tooltip("Whether the metrics of inner nodes should be shown in the charts")]
-		public bool ShowInnerNodeMetrics = true;
+		public bool ShowInnerNodeMetrics = false;
 
 		/// <summary>
 		/// If true, highlighted objects will stay highlighted until this is deactivated.
@@ -130,27 +130,32 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// The <see cref="Material" /> making the object look highlighted.
 		/// </summary>
-		[Header("Highlights")] public Material buildingHighlightMaterial;
+		[Header("Highlights"), Tooltip("Material for highlighting a selected game node.")] 
+		public Material buildingHighlightMaterial;
 
 		/// <summary>
 		/// The <see cref="Material" /> making the object look accentuated.
 		/// </summary>
+		[Tooltip("Material for highlighting a selected accentuated game node.")] 
 		public Material buildingHighlightMaterialAccentuated;
 
 		/// <summary>
 		/// The thickness of the highlight outline of <see cref="buildingHighlightMaterial" />.
 		/// </summary>
-		[SerializeField] private float highlightOutline = 0.005f;
+		[SerializeField, Tooltip("Width of the line drawn around selected game nodes as an outline")] 
+		private float highlightOutline = 0.1f;
 
 		/// <summary>
 		/// The color highlighted objects will have.
 		/// </summary>
-		public Color standardColor = Color.white;
+		[Tooltip("Color for selected game nodes")] 
+		public Color standardColor = Color.red;
 
 		/// <summary>
 		/// The color accentuated highlighted objects will have.
 		/// </summary>
-		public Color accentuationColor = Color.red;
+		[Tooltip("Color for accentuated selected game nodes")] 
+		public Color accentuationColor = Color.blue;
 
 		/// <summary>
 		/// The length of the beam appearing above highlighted objects.
@@ -298,8 +303,7 @@ namespace SEE.Charts.Scripts
 		/// <param name="highlight"></param>
 		public static void Accentuate(GameObject highlight)
 		{
-			var charts = GameObject.FindGameObjectsWithTag("Chart");
-			foreach (var chart in charts)
+            foreach (var chart in GameObject.FindGameObjectsWithTag("Chart"))
 			{
 				chart.TryGetComponent<ChartContent>(out var content);
 				content.AccentuateCorrespondingMarker(highlight);
