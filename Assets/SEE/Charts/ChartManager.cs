@@ -78,6 +78,18 @@ namespace SEE.Charts.Scripts
         }
 
 		/// <summary>
+		/// Whether metrics of leave nodes should be shown in the charts.
+		/// </summary>
+		[Header("Metric Settings"), Tooltip("Whether the metrics of leaf nodes should be shown in the charts")]
+		public bool ShowLeafMetrics = true;
+
+		/// <summary>
+		/// Whether metrics of inner nodes should be shown in the charts.
+		/// </summary>
+		[Tooltip("Whether the metrics of inner nodes should be shown in the charts")]
+		public bool ShowInnerNodeMetrics = true;
+
+		/// <summary>
 		/// If true, highlighted objects will stay highlighted until this is deactivated.
 		/// </summary>
 		[HideInInspector] public bool selectionMode;
@@ -85,7 +97,7 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// The distance the camera will keep to the <see cref="GameObject" /> to focus on.
 		/// </summary>
-		[Header("Settings"), Header("Camera Controls")]
+		[Header("Camera Settings")]
 		public float cameraDistance = 40f;
 
 		/// <summary>
@@ -208,23 +220,6 @@ namespace SEE.Charts.Scripts
 		/// Contains the chart UI.
 		/// </summary>
 		private GameObject _chartsOpen;
-
-		/// <summary>
-		/// Enforces the singleton pattern.
-		/// </summary>
-		//private void Awake()
-		//{
-		//	if (_instance == null)
-		//	{
-		//		_instance = this;
-		//	}
-		//	else if (_instance == this)
-		//	{
-		//		// FIXME: What does this mean?
-		//		Debug.LogFormat("ChartManager.Awake(): Destroying game object {0} holding a chart manager component.\n", gameObject.name);
-		//		Destroy(gameObject);
-		//	}
-		//}
 
 		/// <summary>
 		/// Checks if the scene is started in VR and initializes it accordingly.
