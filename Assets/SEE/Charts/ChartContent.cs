@@ -217,32 +217,6 @@ namespace SEE.Charts.Scripts
 		}
 
 		/// <summary>
-		/// True if <paramref name="gameNode"/> represents a leaf in the graph.
-		/// 
-		/// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
-		/// that is a valid graph node reference.
-		/// </summary>
-		/// <param name="gameNode"></param>
-		/// <returns>true if <paramref name="gameNode"/> represents a leaf in the graph</returns>
-		private static bool IsLeaf(GameObject gameNode)
-        {
-			return gameNode.GetComponent<NodeRef>().node.IsLeaf();
-		}
-
-		/// <summary>
-		/// True if <paramref name="gameNode"/> represents an inner node in the graph.
-		/// 
-		/// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
-		/// that is a valid graph node reference.
-		/// </summary>
-		/// <param name="gameNode"></param>
-		/// <returns>true if <paramref name="gameNode"/> represents an inner node in the graph</returns>
-		private static bool IsInnerNode(GameObject gameNode)
-		{
-			return !gameNode.GetComponent<NodeRef>().node.IsLeaf();
-		}
-
-		/// <summary>
 		/// Fills the scroll view on the right of the chart with one entry for each node in the scene including
 		/// two headers to toggle all buildings and all nodes.
 		/// </summary>
@@ -260,7 +234,7 @@ namespace SEE.Charts.Scripts
 			var index = 0;
 			foreach (var dataObject in _dataObjects)
 			{
-				if (IsLeaf(dataObject))
+				if (SceneQueries.IsLeaf(dataObject))
                 {
 					CreateChildToggle(dataObject, parentToggle, index++, _yGap);
 				}
@@ -274,7 +248,7 @@ namespace SEE.Charts.Scripts
 
 			foreach (var dataObject in _dataObjects)
 			{
-				if (IsInnerNode(dataObject))
+				if (SceneQueries.IsInnerNode(dataObject))
 				{
 					CreateChildToggle(dataObject, parentToggle, index++, _yGap);
 				}
@@ -444,7 +418,8 @@ namespace SEE.Charts.Scripts
 		private void FindDataObjects()
         {
 			Performance p = Performance.Begin("FindDataObjects: Find nodes");
-			_dataObjects = SceneQueries.AllGameNodesInScene();
+			_dataObjects = SceneQueries.AllGameNodesInScene(ChartManager.Instance.ShowLeafMetrics, 
+				                                            ChartManager.Instance.ShowInnerNodeMetrics);
 			p.End();
 
 			int numberOfDataObjectsWithNodeHightLights = 0;
