@@ -23,6 +23,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel;
+using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
@@ -96,14 +97,12 @@ namespace SEE.Charts.Scripts
 		[HideInInspector] public Coroutine drawing;
 
 		/// <summary>
-		/// All objects to be listed in the chart.
+		/// All game-node objects to be listed in the chart. 
+		/// 
+		/// Invariant: all game objects in _dataObjects are game objects tagged by Tags.Node
+		/// and having a valid graph-node reference.
 		/// </summary>
-		private GameObject[] _dataObjects;
-
-		/// <summary>
-		/// The number of nodes in a scene to determine the performance of graphs.
-		/// </summary>
-		[HideInInspector] public int citySize;
+		private ICollection<GameObject> _dataObjects;
 
 		/// <summary>
 		/// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
@@ -182,9 +181,18 @@ namespace SEE.Charts.Scripts
 		public HashSet<string> AllKeys { get; } = new HashSet<string>();
 
 		/// <summary>
-		/// Calls methods to initialize a chart.
+		/// The number of game objects representing a graph node in the current scene.
+		/// A game object representing a graph node is one that is tagged by Tags.Node
+		/// having a valid NodeRef to a graph node. Note that this number is across
+		/// all current graphs represented in the scene, and not just one particular
+		/// graph.
 		/// </summary>
-		private void Awake()
+        public int TotalNumberOfGraphNodesInTheScene { get => _dataObjects.Count;  }
+
+        /// <summary>
+        /// Calls methods to initialize a chart.
+        /// </summary>
+        private void Awake()
 		{
 			_xGap = childOffset.x - headerOffset.x;
 			_yGap = childOffset.y - headerOffset.y;
@@ -200,12 +208,38 @@ namespace SEE.Charts.Scripts
 		{
 			// The time in seconds to wait until CallDrawData is called.
 			// FIXME: Why is this waiting time needed?
-			var time = citySize > BigCityThreshold ? LongDrawWaitingTime : ShortDrawWaitingTime;
+			var time = _dataObjects.Count > BigCityThreshold ? LongDrawWaitingTime : ShortDrawWaitingTime;
 			axisDropdownX.SetOther(axisDropdownY);
 			axisDropdownY.SetOther(axisDropdownX);
 			// FIXME: Why is this delayed call needed and what consequences does
 			// it have? It seems as if this slows down the completion of drawing the objects.
 			Invoke(nameof(CallDrawData), time);
+		}
+
+		/// <summary>
+		/// True if <paramref name="gameNode"/> represents a leaf in the graph.
+		/// 
+		/// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
+		/// that is a valid graph node reference.
+		/// </summary>
+		/// <param name="gameNode"></param>
+		/// <returns>true if <paramref name="gameNode"/> represents a leaf in the graph</returns>
+		private static bool IsLeaf(GameObject gameNode)
+        {
+			return gameNode.GetComponent<NodeRef>().node.IsLeaf();
+		}
+
+		/// <summary>
+		/// True if <paramref name="gameNode"/> represents an inner node in the graph.
+		/// 
+		/// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
+		/// that is a valid graph node reference.
+		/// </summary>
+		/// <param name="gameNode"></param>
+		/// <returns>true if <paramref name="gameNode"/> represents an inner node in the graph</returns>
+		private static bool IsInnerNode(GameObject gameNode)
+		{
+			return !gameNode.GetComponent<NodeRef>().node.IsLeaf();
 		}
 
 		/// <summary>
@@ -219,24 +253,32 @@ namespace SEE.Charts.Scripts
 
 			var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
 			tempObject.TryGetComponent<ScrollViewToggle>(out var parentToggle);
-			parentToggle.SetLabel("Buildings");
+			parentToggle.SetLabel("Leaves");
 			tempObject.transform.localPosition = headerOffset;
 			parentToggle.Initialize(this);
 
 			var index = 0;
 			foreach (var dataObject in _dataObjects)
-				if (dataObject.GetComponent<NodeRef>().node.IsLeaf())
+			{
+				if (IsLeaf(dataObject))
+                {
 					CreateChildToggle(dataObject, parentToggle, index++, _yGap);
+				}
+			}
 
 			tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
 			tempObject.TryGetComponent(out parentToggle);
-			parentToggle.SetLabel("Nodes");
+			parentToggle.SetLabel("Inner Nodes");
 			tempObject.transform.localPosition = headerOffset + new Vector2(0, _yGap) * ++index;
 			parentToggle.Initialize(this);
 
 			foreach (var dataObject in _dataObjects)
-				if (!dataObject.GetComponent<NodeRef>().node.IsLeaf())
+			{
+				if (IsInnerNode(dataObject))
+				{
 					CreateChildToggle(dataObject, parentToggle, index++, _yGap);
+				}
+			}
 
 			scrollContent.TryGetComponent<RectTransform>(out var rect);
 			rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
@@ -244,59 +286,58 @@ namespace SEE.Charts.Scripts
 		}
 
 		private void FillScrollView(bool tree)
-		{
-			Performance p = Performance.Begin("FillScrollView(bool)");
-			foreach (Transform child in scrollContent.transform) Destroy(child.gameObject);
+        {
+            Performance p = Performance.Begin("FillScrollView(bool)");
+            foreach (Transform child in scrollContent.transform) Destroy(child.gameObject);
 
-			if (!tree)
-			{
-				FillScrollView();
-				p.End();
-				return;
-			}
+            if (!tree)
+            {
+                FillScrollView();
+                p.End();
+                return;
+            }
 
-			_dataObjects[0].TryGetComponent<NodeRef>(out var node);
-			var graph = node.node.ItsGraph;
-			var roots = graph.GetRoots();
-			var index = 0;
-			var hierarchy = 0;
-			var maxHierarchy = 0;
+            var index = 0;
+            var hierarchy = 0;
+            var maxHierarchy = 0;
 
-			foreach (var root in roots)
-			{
-				var inScene = _dataObjects.First(entry =>
-				{
-					entry.TryGetComponent<NodeRef>(out var nodeRef);
-					return nodeRef.node.ID.Equals(root.ID);
-				});
-				var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-				tempObject.TryGetComponent<ScrollViewToggle>(out var rootToggle);
-				inScene.TryGetComponent<NodeHighlights>(out var highlights);
-				rootToggle.LinkedObject = highlights;
-				highlights.scrollViewToggle = rootToggle;
-				rootToggle.SetLabel(root.SourceName);
-				tempObject.transform.localPosition =
-					headerOffset + new Vector2(0f, _yGap) * index;
-				rootToggle.Initialize(this);
-				if (hierarchy > maxHierarchy) maxHierarchy = hierarchy;
-				hierarchy = 0;
-				CreateChildToggles(root, rootToggle, ref index, ref hierarchy);
-			}
+            foreach (var root in SceneQueries.GetRoots(_dataObjects))
+            {
+                var inScene = _dataObjects.First(entry =>
+                {
+                    entry.TryGetComponent<NodeRef>(out var nodeRef);
+                    return nodeRef.node.ID.Equals(root.ID);
+                });
+                var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+                tempObject.TryGetComponent<ScrollViewToggle>(out var rootToggle);
+                inScene.TryGetComponent<NodeHighlights>(out var highlights);
+                rootToggle.LinkedObject = highlights;
+                highlights.scrollViewToggle = rootToggle;
+                rootToggle.SetLabel(root.SourceName);
+                tempObject.transform.localPosition =
+                    headerOffset + new Vector2(0f, _yGap) * index;
+                rootToggle.Initialize(this);
+                if (hierarchy > maxHierarchy) maxHierarchy = hierarchy;
+                hierarchy = 0;
+                CreateChildToggles(root, rootToggle, ref index, ref hierarchy);
+            }
 
-			if (hierarchy > maxHierarchy) maxHierarchy = hierarchy; //TODO: Use this...
-			scrollContent.TryGetComponent<RectTransform>(out var rect);
-			rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
-			p.End();
-		}
+            if (hierarchy > maxHierarchy) maxHierarchy = hierarchy; //TODO: Use this...
+            scrollContent.TryGetComponent<RectTransform>(out var rect);
+            rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
+            p.End();
+        }
 
-		/// <summary>
-		/// Creates a toggle for an object in the scene that is a node.
-		/// </summary>
-		/// <param name="dataObject">The object to be toggled.</param>
-		/// <param name="parentToggle">The toggle that will toggle this one when clicked.</param>
-		/// <param name="index">The position of the toggle in the scrollview.</param>
-		/// <param name="gap">The gap between two toggles in the scrollview.</param>
-		private void CreateChildToggle(GameObject dataObject, ScrollViewToggle parentToggle,
+
+
+        /// <summary>
+        /// Creates a toggle for an object in the scene that is a node.
+        /// </summary>
+        /// <param name="dataObject">The object to be toggled.</param>
+        /// <param name="parentToggle">The toggle that will toggle this one when clicked.</param>
+        /// <param name="index">The position of the toggle in the scrollview.</param>
+        /// <param name="gap">The gap between two toggles in the scrollview.</param>
+        private void CreateChildToggle(GameObject dataObject, ScrollViewToggle parentToggle,
 			int index,
 			float gap)
 		{
@@ -350,24 +391,37 @@ namespace SEE.Charts.Scripts
 		{
 			Performance p = Performance.Begin("GetAllNumericAttributes");
 			AllKeys.Clear();
-			if (_dataObjects.Length == 0)
+			if (_dataObjects.Count == 0)
             {
 				Debug.LogWarning("There are no nodes for showing metrics.\n");
             }
 			else
 			{
-				foreach (var data in _dataObjects)
+				foreach (GameObject data in _dataObjects)
 				{
-					
-					Node node = data.GetComponent<NodeRef>().node;
-					foreach (var key in node.FloatAttributes.Keys)
-					{
-						AllKeys.Add(key);
+					if (data.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                    {
+						Node node = nodeRef.node;
+						if (node != null)
+						{
+							foreach (var key in node.FloatAttributes.Keys)
+							{
+								AllKeys.Add(key);
+							}
+							foreach (var key in node.IntAttributes.Keys)
+							{
+								AllKeys.Add(key);
+							}
+						}
+						else
+                        {
+							Debug.LogWarningFormat("Game node {0} has a null node reference.\n", data.name);
+						}
 					}
-					foreach (var key in node.IntAttributes.Keys)
-					{
-						AllKeys.Add(key);
-					}
+					else
+                    {
+						Debug.LogWarningFormat("Game node {0} without node reference.\n", data.name);
+                    }
 				}
 				if (AllKeys.Count > 0)
 				{
@@ -388,34 +442,35 @@ namespace SEE.Charts.Scripts
 		/// Fills a List with all <see cref="Node" />s that will be in the chart.
 		/// </summary>
 		private void FindDataObjects()
-		{
+        {
 			Performance p = Performance.Begin("FindDataObjects: Find nodes");
-			_dataObjects = GameObject.FindGameObjectsWithTag("Node");
-			Debug.LogFormat("ChartContent.FindDataObjects: found {0} nodes.\n", _dataObjects.Length);
+			_dataObjects = SceneQueries.AllGameNodesInScene();
 			p.End();
 
+			int numberOfDataObjectsWithNodeHightLights = 0;
 			p = Performance.Begin("FindDataObjects: Node highlights");
-			foreach (var entry in _dataObjects)
-			{
-				if (entry.TryGetComponent<NodeHighlights>(out NodeHighlights highlights))
-				{
-					highlights.showInChart[this] = true;
-				}
-				//if (!highlights.showInChart.Contains(this)) highlights.showInChart.Add(this, true);
-			}
-			p.End();
+            foreach (var entry in _dataObjects)
+            {
+                if (entry.TryGetComponent<NodeHighlights>(out NodeHighlights highlights))
+                {
+                    highlights.showInChart[this] = true;
+                    numberOfDataObjectsWithNodeHightLights++;
+                }
+                //if (!highlights.showInChart.Contains(this)) highlights.showInChart.Add(this, true);
+            }
+            p.End();
+            Debug.LogFormat("numberOfDataObjectsWithNodeHightLights: {0}\n", numberOfDataObjectsWithNodeHightLights);
 
-			p = Performance.Begin("FindDataObjects: Fill scroll view");
-			citySize = _dataObjects.Length;
-			FillScrollView(_displayAsTree);
-			p.End();
-		}
+            p = Performance.Begin("FindDataObjects: Fill scroll view");
+            FillScrollView(_displayAsTree);
+            p.End();
+        }
 
-		/// <summary>
-		/// Since <see cref="MonoBehaviour.Invoke" /> does not support calls with parameters, it calls this
-		/// method to do the work.
-		/// </summary>
-		private void CallDrawData()
+        /// <summary>
+        /// Since <see cref="MonoBehaviour.Invoke" /> does not support calls with parameters, it calls this
+        /// method to do the work.
+        /// </summary>
+        private void CallDrawData()
 		{
 			Performance p = Performance.Begin("CallDrawData");
 			DrawData(true);
@@ -428,7 +483,7 @@ namespace SEE.Charts.Scripts
 		/// <returns></returns>
 		public IEnumerator QueueDraw()
 		{
-			if (citySize > BigCityThreshold) yield return new WaitForSeconds(LongDrawWaitingTime);
+			if (_dataObjects.Count > BigCityThreshold) yield return new WaitForSeconds(LongDrawWaitingTime);
 			else yield return new WaitForSeconds(0.5f);
 
 			DrawData(false);
@@ -463,66 +518,47 @@ namespace SEE.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Adds a marker for every <see cref="Node" /> containing the metrics from both axes. It's position
+		/// Adds a marker for every <see cref="Node" /> containing the metrics from both axes. Its position
 		/// depends on the values of those metrics.
 		/// </summary>
 		private void DrawTwoAxes()
 		{
 			Performance p = Performance.Begin("DrawTwoAxes");
-			var i = 0;
-			_dataObjects[i].TryGetComponent<NodeRef>(out var nodeRef);
-			var node = nodeRef.node;
-			var showInChart = (bool) nodeRef.highlights.showInChart[this];
-			var contained = node.TryGetNumeric(axisDropdownX.Value, out var minX) && showInChart;
-			while (!contained)
-			{
-				i++;
-				_dataObjects[i].TryGetComponent(out nodeRef);
-				node = nodeRef.node;
-				showInChart = (bool) nodeRef.highlights.showInChart[this];
-				contained = showInChart && node.TryGetNumeric(axisDropdownX.Value, out minX);
-			}
-
-			var maxX = minX;
-			i = 0;
-			_dataObjects[i].TryGetComponent(out nodeRef);
-			node = nodeRef.node;
-			showInChart = (bool) nodeRef.highlights.showInChart[this];
-			contained = node.TryGetNumeric(axisDropdownY.Value, out var minY) && showInChart;
-			while (!contained)
-			{
-				i++;
-				_dataObjects[i].TryGetComponent(out nodeRef);
-				node = nodeRef.node;
-				showInChart = (bool) nodeRef.highlights.showInChart[this];
-				contained = showInChart && node.TryGetNumeric(axisDropdownY.Value, out minY);
-			}
-
-			var maxY = minY;
-			var toDraw = new List<GameObject>();
+			// Note that we determine the minimal and maximal metric values of the two
+			// axes globally, that is, over all nodes in the scene and not just those
+			// shown in this particular chart. This way, the scale of all charts for the
+			// same metric is comparable.
+			float minX = float.PositiveInfinity; // globally minimal value on X axis
+			float maxX = float.NegativeInfinity; // globally maximal value on X axis
+			float minY = float.PositiveInfinity; // globally minimal value on Y axis
+			float maxY = float.NegativeInfinity; // globally maximal value on Y axis
+			List<GameObject> toDraw = new List<GameObject>(); // nodes to be drawn in the chart
 			foreach (var data in _dataObjects)
 			{
-				data.TryGetComponent(out nodeRef);
-				node = nodeRef.node;
-				showInChart = (bool) nodeRef.highlights.showInChart[this];
-				var inX = false;
-				var inY = false;
-				if (node.TryGetNumeric(axisDropdownX.Value, out var tempX))
+				data.TryGetComponent(out NodeRef nodeRef);
+				Node node = nodeRef.node;
+				bool inX = false;				
+				if (node.TryGetNumeric(axisDropdownX.Value, out float valueX))
 				{
-					if (tempX < minX) minX = tempX;
-					if (tempX > maxX) maxX = tempX;
+					if (valueX < minX) minX = valueX;
+					if (valueX > maxX) maxX = valueX;
 					inX = true;
 				}
-
-				if (node.TryGetNumeric(axisDropdownY.Value, out var tempY))
+				bool inY = false;
+				if (node.TryGetNumeric(axisDropdownY.Value, out float valueY))
 				{
-					if (tempY > maxY) maxY = tempY;
-					if (tempY < minY) minY = tempY;
+					if (valueY > maxY) maxY = valueY;
+					if (valueY < minY) minY = valueY;
 					inY = true;
 				}
-
+				// Is this node shown in this chart at all?
+				bool showInChart = (bool)nodeRef.highlights.showInChart[this];
 				if (inX && inY && showInChart)
+				{
+					// only nodes to be shown in this chart and having values for both
+					// currently selected metrics for the axes will be added to the chart
 					toDraw.Add(data);
+				}
 			}
 
 			if (toDraw.Count > 0)

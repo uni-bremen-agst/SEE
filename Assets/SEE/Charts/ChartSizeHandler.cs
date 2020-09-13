@@ -158,7 +158,7 @@ namespace SEE.Charts.Scripts
 			scrollView.sizeDelta = new Vector2(scrollView.sizeDelta.x, height - 50);
 			contentSelectionHeader.anchoredPosition = new Vector2(0, height / 2 - 20);
 
-			if (_chartContent.citySize > 50)
+			if (_chartContent.TotalNumberOfGraphNodesInTheScene > 50)
 			{
 				if (_chartContent.drawing == null)
 					_chartContent.drawing = StartCoroutine(_chartContent.QueueDraw());
