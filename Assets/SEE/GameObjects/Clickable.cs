@@ -8,11 +8,6 @@ namespace SEE.GO
 {
     public class Clickable : MonoBehaviour
     {
-        private bool delete;
-        void Awake()
-        {
-            delete = false;
-        }
         // Update is called once per frame
         void Update()
         {
@@ -23,22 +18,11 @@ namespace SEE.GO
             {
                 if (Physics.Raycast(ray, out Hit))
                 {
+
                     AnnotatableObject annotatableObject = this.GetComponentInParent(typeof(AnnotatableObject)) as AnnotatableObject;
-                    if (delete == true)
-                    {
-                        new Net.RemoveAnnotationAction(annotatableObject, this.transform.parent.gameObject).Execute();
-                    }
-                    else
-                    {
-                        annotatableObject.StartEditing(this.transform.parent.gameObject);
-                    }
+                    annotatableObject.AnnotationClicked(this.transform.parent.gameObject);
                 }
             }
-        }
-
-        public void SetDelete(bool delete)
-        {
-            this.delete = delete;
         }
     }
 }

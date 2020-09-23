@@ -23,7 +23,11 @@ namespace SEE.Controls
 
         private bool editorOpen = false;
 
+        private bool delete = false;
+
         private GameObject annotationToEdit;
+
+        private GameObject guiPointer;
 
         protected override void Awake()
         {
@@ -38,6 +42,7 @@ namespace SEE.Controls
                     Debug.LogErrorFormat("Prefab {0} not found.\n", path);
                 }
             }
+            guiPointer = GameObject.FindWithTag("GUICamera");
         }
 
         public void OpenAnnotationEditor()
@@ -46,10 +51,13 @@ namespace SEE.Controls
             {
                 annotationEditor = Instantiate(annotationEditorPrefab, Vector3.zero, Quaternion.identity);
                 annotationEditor.transform.SetParent(gameObject.transform);
+                annotationEditor.GetComponent<Canvas>().worldCamera = guiPointer.GetComponent<Camera>();
                 Vector3 position = transform.position;
                 position.y = BoundingBox.GetRoof(GameObjectHierarchy.Descendants(gameObject, Tags.Node)) + annotationEditor.GetComponent<RectTransform>().rect.height / 2.0f;
                 annotationEditor.transform.position = position;
                 annotationEditor.SetActive(true);
+                SwitchGUIPointer(true);
+                guiPointer.GetComponent<Pointer>().SetSelectionState(Pointer.SelectionState.UI, this);
             }
             else
             {
@@ -57,6 +65,8 @@ namespace SEE.Controls
                 HideInformation();
                 base.ShowInformation();
                 annotationEditor.SetActive(true);
+                SwitchGUIPointer(true);
+                guiPointer.GetComponent<Pointer>().SetSelectionState(Pointer.SelectionState.UI, this);
             }
         }
 
@@ -66,6 +76,15 @@ namespace SEE.Controls
             annotationEditor.SetActive(false);
             ShowInformation();
             MakeAnnotationsUnClickable();
+            SwitchGUIPointer(false);
+            guiPointer.GetComponent<Pointer>().SetSelectionState(Pointer.SelectionState.None, this);
+        }
+
+        private void SwitchGUIPointer(bool state)
+        {
+            guiPointer.GetComponent<LineRenderer>().enabled = state;
+            guiPointer.GetComponent<Pointer>().enabled = state;
+            guiPointer.transform.GetChild(0).gameObject.SetActive(state);
         }
 
         private void ResetAnnotationEditor()
@@ -116,9 +135,7 @@ namespace SEE.Controls
 
             annotationOnPaper.transform.SetParent(gameObject.transform);
             GameObject text = annotationOnPaper.transform.Find("Text").gameObject;
-            text.AddComponent<BoxCollider2D>();
             text.AddComponent<Clickable>();
-            text.GetComponent<BoxCollider2D>().enabled = false;
             text.GetComponent<Clickable>().enabled = false;
             annotations.Add(annotationOnPaper);
             isAnnotated = true;
@@ -134,12 +151,13 @@ namespace SEE.Controls
         public void StartEditing(GameObject annotation)
         {
             HideInformation();
+            SwitchGUIPointer(true);
             base.ShowInformation();
             annotationToEdit = annotation;
 
             GameObject editingInput = annotationEditor.transform.Find("Editing/EditingInput").gameObject;
             editingInput.GetComponent<TMP_InputField>().text = annotationToEdit.GetComponent<TextGUIAndPaperResizer>().Text.Replace(System.Environment.NewLine, " ");
-
+            guiPointer.GetComponent<Pointer>().SetSelectionState(Pointer.SelectionState.UI, this);
             annotationEditor.transform.Find("EditorMenu").gameObject.SetActive(false);
             annotationEditor.transform.Find("Editing").gameObject.SetActive(true);
             annotationEditor.SetActive(true);
@@ -172,7 +190,7 @@ namespace SEE.Controls
 
         public void RemoveAllAnnotations()
         {
-            foreach(GameObject annotation in annotations)
+            foreach (GameObject annotation in annotations)
             {
                 GameObject.Destroy(annotation);
             }
@@ -180,24 +198,31 @@ namespace SEE.Controls
             isAnnotated = false;
         }
 
+        public void AnnotationClicked(GameObject annotation)
+        {
+            if (delete)
+            {
+                new Net.RemoveAnnotationAction(this, annotation).Execute();
+            }
+            else
+            {
+                StartEditing(annotation);
+                guiPointer.GetComponent<Pointer>().SetSelectionState(Pointer.SelectionState.UI, this);
+            }
+        }
+
         public void MakeAnnotationsClickable(bool delete)
         {
             if (isAnnotated)
             {
+                this.delete = delete;
                 ShowInformation();
                 foreach (GameObject game in annotations)
                 {
+                    game.transform.Find("Paper").gameObject.SetActive(true);
                     GetComponentInChildren<Clickable>().enabled = true;
-                    GetComponentInChildren<BoxCollider2D>().enabled = true;
-                    if (delete)
-                    {
-                        GetComponentInChildren<Clickable>().SetDelete(true);
-                    }
-                    else
-                    {
-                        GetComponentInChildren<Clickable>().SetDelete(false);
-                    }
                 }
+                guiPointer.GetComponent<Pointer>().SetSelectionState(Pointer.SelectionState.Annotations, this);
             }
             else
             {
@@ -210,9 +235,11 @@ namespace SEE.Controls
         {
             foreach (GameObject game in annotations)
             {
+                game.transform.Find("Paper").gameObject.SetActive(false);
                 GetComponentInChildren<Clickable>().enabled = false;
-                GetComponentInChildren<BoxCollider2D>().enabled = false;
             }
+            guiPointer.GetComponent<Pointer>().SetSelectionState(Pointer.SelectionState.None, this);
+
         }
 
         public override void ShowInformation()

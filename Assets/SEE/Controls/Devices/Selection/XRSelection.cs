@@ -27,6 +27,8 @@ namespace SEE.Controls.Devices
 
         private SteamVR_Action_Boolean HomeButton = SteamVR_Input.GetBooleanAction(defaultActionSet, "Home");
 
+        private SteamVR_Action_Boolean AnnotationEditorAction = SteamVR_Input.GetBooleanAction(defaultActionSet, "AnnotationEditor");
+
         /// <summary>
         /// The default assignment of the grab button in SteamVR is the B button,
         /// but it may be re-assigned by the user.
@@ -60,7 +62,7 @@ namespace SEE.Controls.Devices
         /// </summary>
         public override bool IsSelecting => selectionButton.State;
 
-        public override bool IsAnnotating => selectionButton.State;
+        public override bool IsAnnotating => AnnotationEditorAction.state;
 
         /// <summary>
         /// True if the user presses the grabbing button ("Grab" in SteamVR) deeply enough.

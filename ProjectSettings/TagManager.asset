@@ -18,6 +18,7 @@ TagManager:
   - FxTemporaire
   - Runtime
   - Function Call
+  - GUICamera
   layers:
   - Default
   - TransparentFX

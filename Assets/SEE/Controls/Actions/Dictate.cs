@@ -53,15 +53,17 @@ public class Dictate : MonoBehaviour
 
     void Update()
     {
-        if (recording)
+        if (this.transform.Find("Adding").gameObject.activeSelf == true)
         {
             AnnotationEditor annotationEditor = this.gameObject.GetComponent<AnnotationEditor>();
             GameObject input = annotationEditor.transform.Find("Adding/AddingInput").gameObject;
             input.GetComponent<TMP_InputField>().text = record;
         }
-        else
+        else if (this.transform.Find("Editing").gameObject.activeSelf == true)
         {
-            record = "";
+            AnnotationEditor annotationEditor = this.gameObject.GetComponent<AnnotationEditor>();
+            GameObject input = annotationEditor.transform.Find("Editing/EditingInput").gameObject;
+            input.GetComponent<TMP_InputField>().text = record;
         }
     }
 
@@ -69,32 +71,50 @@ public class Dictate : MonoBehaviour
     {
         if (recording == false)
         {
+            recording = true;
             Go();
         }
         else
         {
+            recording = false;
             Stop();
         }
     }
 
     private void Go()
     {
-        recording = true;
         m_DictationRecognizer.Start();
+        record = "";
         AnnotationEditor annotationEditor = this.gameObject.GetComponent<AnnotationEditor>();
-        GameObject button = annotationEditor.transform.Find("Adding/Dictate").gameObject;
-        button.GetComponentInChildren<TMP_Text>().text = "Stop";
+        if (this.transform.Find("Adding").gameObject.activeSelf == true)
+        {
+            GameObject button = annotationEditor.transform.Find("Adding/Dictate").gameObject;
+            button.GetComponentInChildren<TMP_Text>().text = "Stop";
+        }
+        else if (this.transform.Find("Editing").gameObject.activeSelf == true)
+        {
+            GameObject button = annotationEditor.transform.Find("Editing/Dictate").gameObject;
+            button.GetComponentInChildren<TMP_Text>().text = "Stop";
+        }
     }
 
     private void Stop()
     {
         AnnotationEditor annotationEditor = this.gameObject.GetComponent<AnnotationEditor>();
-        GameObject input = annotationEditor.transform.Find("Adding/AddingInput").gameObject;
-        input.GetComponent<TMP_InputField>().text = record;
-        GameObject button = annotationEditor.transform.Find("Adding/Dictate").gameObject;
-        button.GetComponentInChildren<TMP_Text>().text = "Dictate";
-        m_DictationRecognizer.Stop();
-        recording = false;
+        if (this.transform.Find("Adding").gameObject.activeSelf == true)
+        {
+            GameObject input = annotationEditor.transform.Find("Adding/AddingInput").gameObject;
+            input.GetComponent<TMP_InputField>().text = record;
+            GameObject button = annotationEditor.transform.Find("Adding/Dictate").gameObject;
+            button.GetComponentInChildren<TMP_Text>().text = "Dictate";
+        }else if (this.transform.Find("Editing").gameObject.activeSelf == true)
+        {
+            GameObject input = annotationEditor.transform.Find("Editing/EditingInput").gameObject;
+            input.GetComponent<TMP_InputField>().text = record;
+            GameObject button = annotationEditor.transform.Find("Editing/Dictate").gameObject;
+            button.GetComponentInChildren<TMP_Text>().text = "Dictate";
+        }
+            m_DictationRecognizer.Stop();
     }
 
     public void Close()

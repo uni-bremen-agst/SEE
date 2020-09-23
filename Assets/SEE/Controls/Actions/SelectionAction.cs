@@ -101,7 +101,6 @@ namespace SEE.Controls
             bool startAnnotating = selectionDevice.IsAnnotating;
 
 
-
             if (isCanceling)
             {
                 if (handledObject != null)
