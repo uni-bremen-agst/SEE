@@ -121,7 +121,7 @@ namespace SEE.GO
         /// <returns>new material</returns>
         private Material NewMaterial(Color color)
         {
-            Material material = new Material(Shader.Find("Standard"))
+            Material material = new Material(Shader.Find("Custom/PortalShader"))
             {
                 color = color
             };
@@ -218,7 +218,7 @@ namespace SEE.GO
             GameObject donutChart = new GameObject();
             donutChart.transform.position = center;
             donutChart.tag = Tags.Decoration;
-            donutChart.isStatic = true;
+            donutChart.isStatic = false;
             donutChart.transform.localScale = new Vector3(2.0f * radius, Donut_Height, 2.0f * radius);
             AttachDonutChart(donutChart, innerValue, values, fractionOfInnerCircle);
             return donutChart;
@@ -327,7 +327,7 @@ namespace SEE.GO
             {
                 name = innerMetric + " = " + innerValue,
                 tag = Tags.Decoration,
-                isStatic = true
+                isStatic = false
             };
 
             innerCircle.AddComponent<MeshFilter>();
@@ -431,7 +431,7 @@ namespace SEE.GO
             // the resulting game object for which we create the circle sector by a line
             GameObject circle = new GameObject
             {
-                isStatic = true
+                isStatic = false
             };
 
             // FIXME: Draw only a part of the circle.
@@ -496,7 +496,7 @@ namespace SEE.GO
             // the resulting game object for which we create the circle sector as a mesh
             GameObject circleSector = new GameObject
             {
-                isStatic = true
+                isStatic = false
             };
 
             MeshFilter meshFilter = circleSector.AddComponent<MeshFilter>();

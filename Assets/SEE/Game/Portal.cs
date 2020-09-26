@@ -55,19 +55,15 @@ namespace SEE.Game
         /// <param name="rightBack">right back corner of the culling area</param>
         public static void SetPortal(Transform transform, Vector2 leftFront, Vector2 rightBack)
         {
-            if (transform.TryGetComponent<Renderer>(out Renderer renderer))
+            if (transform.TryGetComponent(out Renderer renderer))
             {
                 Material material = renderer.sharedMaterial;
                 material.SetVector("portalMin", new Vector4(leftFront.x, leftFront.y));
                 material.SetVector("portalMax", new Vector4(rightBack.x, rightBack.y));
-                foreach (Transform child in transform)
-                {
-                    SetPortal(child, leftFront, rightBack);
-                }
             }
-            else
+            foreach (Transform child in transform)
             {
-                Debug.LogErrorFormat("Game object {0} does not have a renderer attached to it. Culling portal cannot be set.\n", transform.name);
+                SetPortal(child, leftFront, rightBack);
             }
         }
 

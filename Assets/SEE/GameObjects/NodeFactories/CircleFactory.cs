@@ -19,8 +19,7 @@ namespace SEE.GO
         public CircleFactory(Shader shader, ColorRange colorRange, float unit)
             : base(shader, colorRange, unit)
         {
-            material = new Material(Materials.DefaultMaterial(0, 0));
-            material.color = colorRange.upper;
+            material = new Material(LineFactory.DefaultLineMaterial) { color = colorRange.upper };
         }
 
         /// <summary>
@@ -33,7 +32,7 @@ namespace SEE.GO
         /// </summary>
         private const float defaultRadius = 0.5f;
 
-        public override GameObject NewBlock(int index = 0, int level = 0)
+        public override GameObject NewBlock(int index = 0, int renderQueueOffset = 0)
         {
             GameObject result = new GameObject();
             AttachCircleLine(result, defaultRadius, Unit * defaultLineWidth, material.color);

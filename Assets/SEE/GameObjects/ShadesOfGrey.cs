@@ -40,7 +40,7 @@ namespace SEE.GO
         /// <returns></returns>
         private static Material[] CreateMaterials()
         {
-            Shader shader = Shader.Find("Diffuse");
+            Shader shader = Shader.Find("Custom/PortalShader");
             Material[] materials = new Material[30];
             float value = 0.0f;
             float inc = 1.0f / (float)materials.Length;
