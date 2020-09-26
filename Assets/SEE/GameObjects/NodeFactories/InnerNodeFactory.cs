@@ -13,14 +13,9 @@ namespace SEE.GO
     /// </summary>
     public abstract class InnerNodeFactory : NodeFactory
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
-        /// <param name="colorRange">the color range of the created objects</param>
-        public InnerNodeFactory(Shader shader, ColorRange colorRange)
+        public InnerNodeFactory(Materials.ShaderType shaderType, ColorRange colorRange)
         {
-            Materials = new Materials(shader, colorRange);
+            Materials = new Materials(shaderType, colorRange);
         }
 
         /// <summary>
@@ -56,7 +51,7 @@ namespace SEE.GO
                 UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>());
                 UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>().node);
                 int level = block.GetComponent<NodeRef>().node.Level;
-                renderer.sharedMaterial = Materials.DefaultMaterial(level, Mathf.Clamp(style, 0, (int)NumberOfStyles() - 1));
+                renderer.sharedMaterial = Materials.Get(level, Mathf.Clamp(style, 0, (int)NumberOfStyles() - 1));
             }
         }
     }

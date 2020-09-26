@@ -27,10 +27,11 @@ namespace SEE.Controls
         protected override void Awake()
         {
             base.Awake();
-            Shader shader = gameObject.GetComponent<Renderer>().material.shader;
-            HighlightMaterialChanger = new MaterialChanger(gameObject, 
-                                                           Materials.NewMaterial(shader, LocalHightlightColor), 
-                                                           Materials.NewMaterial(shader, RemoteHightlightColor));
+            // TODO(torben): see GrabbableObject
+            //Shader shader = gameObject.GetComponent<Renderer>().material.shader;
+            //HighlightMaterialChanger = new MaterialChanger(gameObject, 
+            //                                               Materials.NewMaterial(shader, LocalHightlightColor), 
+            //                                               Materials.NewMaterial(shader, RemoteHightlightColor));
         }
 
         public virtual void Hovered(bool isOwner)

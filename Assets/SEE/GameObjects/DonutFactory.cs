@@ -121,7 +121,7 @@ namespace SEE.GO
         /// <returns>new material</returns>
         private Material NewMaterial(Color color)
         {
-            Material material = new Material(Shader.Find("Custom/PortalShader"))
+            Material material = new Material(Shader.Find(Materials.OpaqueShaderName))
             {
                 color = color
             };

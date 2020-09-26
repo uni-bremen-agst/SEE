@@ -10,11 +10,6 @@ namespace SEE.GO
         const float defaultWidth = 0.1f;
 
         /// <summary>
-        /// Path to the material used for edges.
-        /// </summary>
-        protected const string materialPath = "Custom/PortalShaderTransparentLine";
-
-        /// <summary>
         /// The material used for lines.
         /// </summary>
         public readonly static Material DefaultLineMaterial = NewLineMaterial();
@@ -25,10 +20,10 @@ namespace SEE.GO
         /// <returns>default material for edges</returns>
         public static Material NewLineMaterial()
         {
-            Material material = new Material(Shader.Find(materialPath));
+            Material material = new Material(Shader.Find(Materials.TransparentLineShaderName));
             if (material == null)
             {
-                Debug.LogErrorFormat("SEE.Go.LineFactory: Could not find material {0} for lines.\n", materialPath);
+                Debug.LogErrorFormat("SEE.Go.LineFactory: Could not find material {0} for lines.\n", Materials.TransparentLineShaderName);
             }
             return material;
         }

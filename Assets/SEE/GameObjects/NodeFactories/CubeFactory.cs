@@ -14,14 +14,9 @@ namespace SEE.GO
     public class CubeFactory : InnerNodeFactory
     {
         private Mesh cubeMesh;
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
-        /// <param name="colorRange">the color range of the created objects</param>
-        public CubeFactory(Shader shader, ColorRange colorRange)
-            : base(shader, colorRange)
+        
+        public CubeFactory(Materials.ShaderType shaderType, ColorRange colorRange)
+            : base(shaderType, colorRange)
         {
             cubeMesh = new Mesh();
 
@@ -109,7 +104,7 @@ namespace SEE.GO
             result.AddComponent<BoxCollider>();
 
             MeshRenderer renderer = result.AddComponent<MeshRenderer>();
-            renderer.sharedMaterial = Materials.DefaultMaterial(renderQueueOffset, Mathf.Clamp(style, 0, (int)Materials.NumberOfMaterials - 1)); ;
+            renderer.sharedMaterial = Materials.Get(renderQueueOffset, Mathf.Clamp(style, 0, (int)Materials.NumberOfMaterials - 1)); ;
             renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;

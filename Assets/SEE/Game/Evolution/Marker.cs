@@ -14,8 +14,8 @@ namespace SEE.Game.Evolution
         public Marker(GraphRenderer graphRenderer)
         {
             this.graphRenderer = graphRenderer;
-            black = new Materials(graphRenderer.Shader, new ColorRange(Color.black, Color.black, 1));
-            green = new Materials(graphRenderer.Shader, new ColorRange(Color.green, Color.green, 1));
+            black = new Materials(graphRenderer.ShaderType, new ColorRange(Color.black, Color.black, 1));
+            green = new Materials(graphRenderer.ShaderType, new ColorRange(Color.green, Color.green, 1));
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace SEE.Game.Evolution
             // Object should not cast shadows: too expensive and may hide information,
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
-            renderer.sharedMaterial = material.DefaultMaterial(0, 0);
+            renderer.sharedMaterial = material.Get(0, 0);
             Vector3 position = graphRenderer.GetRoof(block);
             position.y += postScale.y / 2.0f;
             post.transform.position = position;
