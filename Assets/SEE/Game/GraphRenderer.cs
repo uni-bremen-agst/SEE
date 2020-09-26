@@ -28,13 +28,12 @@ namespace SEE.Game
         public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
             this.settings = settings;
-            shader = Materials.NewPortalShader();
-            lineShader = Materials.NewPortalShaderLine();
-            
+
+            ShaderType = Materials.ShaderType.Transparent;
             switch (this.settings.LeafObjects)
             {
                 case SEECity.LeafNodeKinds.Blocks:
-                    leafNodeFactory = new CubeFactory(shader, this.settings.LeafNodeColorRange);
+                    leafNodeFactory = new CubeFactory(ShaderType, this.settings.LeafNodeColorRange);
                     break;
                 case SEECity.LeafNodeKinds.Buildings:
                     leafNodeFactory = new BuildingFactory();
@@ -51,15 +50,8 @@ namespace SEE.Game
             }
         }
 
-        private const float LevelDistance = 0.001f;        
-
-        /// <summary>
-        /// The shader for all materials used for all objects created by this graph renderer.
-        /// </summary>
-        public Shader Shader
-        {
-            get => shader;
-        }
+        public readonly Materials.ShaderType ShaderType;
+        private const float LevelDistance = 0.001f;
 
         /// <summary>
         /// Returns the Factory for the inner nodes
@@ -72,15 +64,15 @@ namespace SEE.Game
             {
                 case AbstractSEECity.InnerNodeKinds.Empty:
                 case AbstractSEECity.InnerNodeKinds.Donuts:
-                    return new VanillaFactory(shader, settings.InnerNodeColorRange);
+                    return new VanillaFactory(ShaderType, settings.InnerNodeColorRange);
                 case AbstractSEECity.InnerNodeKinds.Circles:
-                    return new CircleFactory(shader, settings.InnerNodeColorRange, leafNodeFactory.Unit);
+                    return new CircleFactory(settings.InnerNodeColorRange, leafNodeFactory.Unit);
                 case AbstractSEECity.InnerNodeKinds.Cylinders:
-                    return new CylinderFactory(shader, settings.InnerNodeColorRange);
+                    return new CylinderFactory(ShaderType, settings.InnerNodeColorRange);
                 case AbstractSEECity.InnerNodeKinds.Rectangles:
-                    return new RectangleFactory(shader, settings.InnerNodeColorRange, leafNodeFactory.Unit);
+                    return new RectangleFactory(settings.InnerNodeColorRange, leafNodeFactory.Unit);
                 case AbstractSEECity.InnerNodeKinds.Blocks:
-                    return new CubeFactory(shader, settings.InnerNodeColorRange);
+                    return new CubeFactory(ShaderType, settings.InnerNodeColorRange);
                 default:
                     throw new Exception("Unhandled GraphSettings.InnerNodeKinds");
             }
@@ -120,16 +112,6 @@ namespace SEE.Game
         /// the groundlevel of the nodes
         /// </summary>
         private float groundLevel = 0.0f;
-
-        /// <summary>
-        /// The shader for all materials used for all objects created by this graph renderer.
-        /// </summary>
-        private readonly Shader shader;
-
-        /// <summary>
-        /// The shader to draw the lines of the edges.
-        /// </summary>
-        private readonly Shader lineShader;
 
         /// <summary>
         /// Sets the scaler to be used to map metric values onto graphical attributes
@@ -200,7 +182,7 @@ namespace SEE.Game
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
             }
             Performance p = Performance.Begin("edge layout " + layout.Name);
-            EdgeFactory edgeFactory = new EdgeFactory(lineShader, layout, settings.EdgeWidth);
+            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
             ICollection<GameObject> result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), ConnectingEdges(gameNodes));
             p.End();
             return result;
@@ -758,7 +740,7 @@ namespace SEE.Game
         /// <returns>a new plane</returns>
         public GameObject NewPlane(Vector2 leftFrontCorner, Vector2 rightBackCorner, float yLevel)
         {
-            return PlaneFactory.NewPlane(shader, leftFrontCorner, rightBackCorner, yLevel, Color.gray, LevelDistance);
+            return PlaneFactory.NewPlane(ShaderType, leftFrontCorner, rightBackCorner, yLevel, Color.gray, LevelDistance);
         }
 
         /// <summary>

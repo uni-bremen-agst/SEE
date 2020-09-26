@@ -1,8 +1,10 @@
 ﻿using SEE.DataModel;
 using SEE.Game;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.GO
 {
@@ -13,64 +15,39 @@ namespace SEE.GO
     /// </summary>
     public class Materials
     {
-        /// <summary>
-        /// Name of default shader to obtain the default material.
-        /// </summary>
-        //private const string ShaderName = "Custom/PortalShader";
-        private const string ShaderName = "Custom/PortalShaderTransparent";
-        private const string LineShaderName = "Custom/PortalShaderTransparentLine";
-
-        /// <summary>
-        /// Returns the standard shader for transparent materials that can be culled
-        /// if they leave a certain area (portal).
-        /// </summary>
-        /// <returns>standard portal shader for transparent objects</returns>
-        public static Shader PortalShader()
+        public enum ShaderType
         {
-            return Shader.Find(ShaderName);
+            Opaque,
+            Transparent,
+            TransparentLine
         }
 
-        public static Shader PortalLineShader()
-        {
-            return Shader.Find(LineShaderName);
-        }
+        public const string OpaqueShaderName = "Custom/OpaquePortalShader";
+        public const string TransparentShaderName = "Custom/TransparentPortalShader";
+        public const string TransparentLineShaderName = "Custom/TransparentLinePortalShader";
 
+        public const string OpaqueMaterialName = "Materials/OpaquePortalMaterial";
+        public const string TransparentMaterialName = "Materials/TransparentPortalMaterial";
+        public const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
+        
         /// <summary>
-        /// Returns a new instance of the standard shader for transparent materials that can be culled
-        /// if they leave a certain area (portal). Changes to this instance will not affect the
-        /// standard portal shared retrieved by PortalShader().
+        /// 
         /// </summary>
-        /// <returns>new instance of standard portal shader for transparent objects</returns>
-        public static Shader NewPortalShader()
+        /// <param name="shaderType"></param>
+        /// <param name="colorRange"></param>
+        public Materials(ShaderType shaderType, ColorRange colorRange)
         {
-            return (Shader)GameObject.Instantiate(PortalShader());
-        }
-
-        public static Shader NewPortalShaderLine()
-        {
-            return (Shader)GameObject.Instantiate(PortalLineShader());
-        }
-
-        /// <summary>
-        /// Creates default numberOfColors materials in the color range from
-        /// lower to higher color (linear interpolation).
-        /// </summary>
-        /// <param name="numberOfColors">the number of materials with different colors to be created</param>
-        /// <param name="lower">the color at the lower end of the color spectrum</param>
-        /// <param name="higher">the color at the higher end of the color spectrum</param>
-        public Materials(Shader shader, ColorRange colorRange)
-        {
-            this.shader = shader;
+            Type = shaderType;
             NumberOfMaterials = colorRange.NumberOfColors;
             Lower = colorRange.lower;
             Higher = colorRange.upper;
-            materials = new List<Material[]>() { Init(shader, colorRange.NumberOfColors, colorRange.lower, colorRange.upper, 0) };
+            materials = new List<Material[]>() { Init(shaderType, colorRange.NumberOfColors, colorRange.lower, colorRange.upper, 0) };
         }
 
         /// <summary>
-        /// The shader to be used for all materials created here.
+        /// The type of the shaders of this material instance.
         /// </summary>
-        private readonly Shader shader;
+        public readonly ShaderType Type;
 
         /// <summary>
         /// The number of different colors and, thus, the number of
@@ -105,7 +82,7 @@ namespace SEE.GO
         /// The larger the offset, the later the object will be rendered.</param>
         /// <param name="degree">index of the material (color) in the range [0, numberOfColors-1]</param>
         /// <returns>default material</returns>
-        public Material DefaultMaterial(int renderQueueOffset, int degree)
+        public Material Get(int renderQueueOffset, int degree)
         {
             if (degree < 0 || degree >= NumberOfMaterials)
             {
@@ -115,7 +92,7 @@ namespace SEE.GO
             {
                 for (int i = materials.Count; i <= renderQueueOffset; i++)
                 {
-                    materials.Add(Init(shader, NumberOfMaterials, Lower, Higher, i));
+                    materials.Add(Init(Type, NumberOfMaterials, Lower, Higher, i));
                 }
             }
             return materials[renderQueueOffset][degree];
@@ -124,35 +101,20 @@ namespace SEE.GO
         /// <summary>
         /// Creates and returns the materials, one for each different color.
         /// </summary>
+        /// <param name="shaderType">the type of the shader to be used to create the material</param>
         /// <param name="numberOfColors">the number of materials with different colors to be created</param>
         /// <param name="lower">the color at the lower end of the color spectrum</param>
         /// <param name="higher">the color at the higher end of the color spectrum</param>
         /// <param name="renderQueueOffset">the offset of the render queue</param>
         /// <returns>materials</returns>
-        private static Material[] Init(Shader shader, uint numberOfColors, Color lower, Color higher, int renderQueueOffset)
+        private static Material[] Init(ShaderType shaderType, uint numberOfColors, Color lower, Color higher, int renderQueueOffset)
         {
-            if (numberOfColors < 1)
-            {
-                throw new Exception("Number of colors must be greater than 0.");
-            }
+            Assert.IsTrue(numberOfColors > 0, "Number of colors must be greater than 0!");
             
-            // Shader to retrieve the default material.
-            // Shader shader = (Shader)GameObject.Instantiate(Resources.Load(ShaderName));
-            // Shader shader = Shader.Find(ShaderName);
-            // SetGlobalUniforms();
-
             Material[] result = new Material[numberOfColors];
-
-            if (numberOfColors == 1)
+            for (int i = 0; i < result.Length; i++)
             {
-                result[0] = NewMaterial(shader, lower, renderQueueOffset);
-            }
-            else
-            {
-                for (int i = 0; i < result.Length; i++)
-                {
-                    result[i] = NewMaterial(shader, Color.Lerp(lower, higher, (float)i / (float)(numberOfColors - 1)), renderQueueOffset);
-                }
+                result[i] = NewMaterial(shaderType, Color.Lerp(lower, higher, (float)i / (float)(numberOfColors - 1)), renderQueueOffset);
             }
             return result;
         }
@@ -161,14 +123,27 @@ namespace SEE.GO
         /// Creates and returns a new material with the given <paramref name="color"/>.
         /// Reflections are turned off for this material.
         /// </summary>
-        /// <param name="shader">shader to be used to create the material</param>
+        /// <param name="shaderType">the type of the shader to be used to create the material</param>
         /// <param name="color">requested color of the new material</param>
         /// <param name="renderQueueOffset">the offset of the render queue</param>
         /// <returns>new material</returns>
-        public static Material NewMaterial(Shader shader, Color color, int renderQueueOffset = 0)
+        public static Material NewMaterial(ShaderType shaderType, Color color, int renderQueueOffset = 0)
         {
-            Material material = new Material(shader);
-            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + renderQueueOffset + 1; //TODO(torben): the + 1 is a hack so the plane is rendered before everything else
+            string materialName = null;
+
+            switch (shaderType)
+            {
+                case ShaderType.Opaque:          materialName = OpaqueMaterialName;          break;
+                case ShaderType.Transparent:     materialName = TransparentMaterialName;     break;
+                case ShaderType.TransparentLine: materialName = TransparentLineMaterialName; break;
+                default: Assertions.InvalidCodePath();                                       break;
+            }
+
+            Material materialPrefab = Resources.Load<Material>(materialName);
+            Assert.IsNotNull(materialPrefab, "Material resource '" + materialName + "' could not be found!");
+
+            Material material = new Material(materialPrefab);
+            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + renderQueueOffset;
             material.color = color;
             return material;
         }
