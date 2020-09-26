@@ -5,21 +5,23 @@ namespace SEE.Controls
 
     public class PlayerMovement : MonoBehaviour
     {
+        private const float Speed = 2.0f;
+        private const float BoostFactor = 2.0f;
+
         private struct CameraState
         {
             internal float distance;
             internal float yaw;
             internal float pitch;
+            internal bool freeMode;
         }
 
         private CameraState cameraState;
-
         private const int RightMouseButton = 1;
 
         [Tooltip("The code city which the player is focusing on.")]
         public Plane focusedObject;
 
-        // Start is called before the first frame update
         void Start()
         {
             if (focusedObject != null)
@@ -37,35 +39,92 @@ namespace SEE.Controls
             Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
         }
 
-        // Update is called once per frame
         void Update()
         {
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                if (cameraState.freeMode)
+                {
+                    Vector3 positionToFocusedObject = focusedObject.CenterTop - transform.position;
+                    cameraState.distance = positionToFocusedObject.magnitude;
+                    transform.forward = positionToFocusedObject;
+                    Vector3 pitchYawRoll = transform.rotation.eulerAngles;
+                    cameraState.pitch = pitchYawRoll.x;
+                    cameraState.yaw = pitchYawRoll.y;
+                }
+                cameraState.freeMode = !cameraState.freeMode;
+            }
 
-            // Camera
-            const float Speed = 2.0f; // TODO(torben): this is arbitrary
-            float speed = Input.GetKey(KeyCode.LeftShift) ? 4.0f * Speed : Speed;
-            if (Input.GetKey(KeyCode.W))
+            float speed = Speed * Time.deltaTime;
+            if (Input.GetKey(KeyCode.LeftShift))
             {
-                cameraState.distance -= speed * Time.deltaTime;
+                speed *= BoostFactor;
             }
-            if (Input.GetKey(KeyCode.S))
+
+            if (!cameraState.freeMode)
             {
-                cameraState.distance += speed * Time.deltaTime;
-            }
-            if (Input.GetMouseButton(RightMouseButton))
-            {
-                float x = Input.GetAxis("mouse x");
-                float y = Input.GetAxis("mouse y");
-                cameraState.yaw += x;
-                cameraState.pitch -= y;
-            }
-            if (focusedObject != null)
-            {
+                float d = 0.0f;
+                if (Input.GetKey(KeyCode.W))
+                {
+                    d += speed;
+                }
+                if (Input.GetKey(KeyCode.S))
+                {
+                    d -= speed;
+                }
+                cameraState.distance -= d;
+
+                if (Input.GetMouseButton(RightMouseButton))
+                {
+                    float x = Input.GetAxis("mouse x");
+                    float y = Input.GetAxis("mouse y");
+                    cameraState.yaw += x;
+                    cameraState.pitch -= y;
+                }
                 Camera.main.transform.position = focusedObject.CenterTop;
+                Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
+                Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
             }
-            Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
-            Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
+            else // cameraState.freeMode == true
+            {
+                Vector3 v = Vector3.zero;
+                if (Input.GetKey(KeyCode.W))
+                {
+                    v += Camera.main.transform.forward;
+                }
+                if (Input.GetKey(KeyCode.S))
+                {
+                    v -= Camera.main.transform.forward;
+                }
+                if (Input.GetKey(KeyCode.D))
+                {
+                    v += Camera.main.transform.right;
+                }
+                if (Input.GetKey(KeyCode.A))
+                {
+                    v -= Camera.main.transform.right;
+                }
+                if (Input.GetKey(KeyCode.Space))
+                {
+                    v += Vector3.up;
+                }
+                if (Input.GetKey(KeyCode.LeftControl))
+                {
+                    v += Vector3.down;
+                }
+                v.Normalize();
+                v *= speed;
+                Camera.main.transform.position += v;
 
+                if (Input.GetMouseButton(RightMouseButton))
+                {
+                    float x = Input.GetAxis("mouse x");
+                    float y = Input.GetAxis("mouse y");
+                    cameraState.yaw += x;
+                    cameraState.pitch -= y;
+                }
+                Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
+            }
         }
     }
 }
