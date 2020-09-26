@@ -41,6 +41,7 @@
 			}
 
 			o.Albedo = c.rgb;
+			o.Emission = 0.5 * c.rgb;
 			o.Metallic = _Metallic;
 			o.Smoothness = _Smoothness;
 			o.Alpha = c.a;

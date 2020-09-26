@@ -24,7 +24,7 @@ namespace SEE.GO
 
 			MeshRenderer renderer = result.AddComponent<MeshRenderer>();
             renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
-            renderer.sharedMaterial = materials.DefaultMaterial(level, style);
+            renderer.sharedMaterial = Materials.DefaultMaterial(level, style);
 			renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 			renderer.receiveShadows = false;
 
