@@ -19,7 +19,7 @@ namespace SEE.GO
         public RectangleFactory(Shader shader, ColorRange colorRange, float unit)
             : base(shader, colorRange, unit)
         {
-            material = new Material(materials.DefaultMaterial(0, 0));
+            material = new Material(Materials.DefaultMaterial(0, 0));
             material.color = colorRange.upper;
         }
 

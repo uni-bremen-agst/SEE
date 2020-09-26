@@ -268,7 +268,7 @@ namespace SEE.Game
 
             Dictionary<Node, GameObject>.ValueCollection nodeToGameObject;
             ICollection<GameNode> gameNodes = new List<GameNode>();
-            Node artificalRoot  = null;
+            Node artificalRoot = null;
             GameObject plane;
 
             Performance p;
@@ -399,8 +399,36 @@ namespace SEE.Game
             // Create the laid out edges; they will be children of the unique root game node
             // representing the node hierarchy. This way the edges can be moved along with
             // the nodes.
-            AddToParent(EdgeLayout(gameNodes), RootGameNode(parent));
+            GameObject rootGameNode = RootGameNode(parent);
+            AddToParent(EdgeLayout(gameNodes), rootGameNode);
             Portal.SetPortal(parent);
+
+            // Add light to simulate emissive effect
+            {
+                const float RangeFactor = 3.0f;
+                const float IntensityFactor = 4.0f;
+
+                Light light = rootGameNode.AddComponent<Light>();
+
+                BoundingBox(nodeToGameObject, out Vector2 minCorner, out Vector2 maxCorner);
+                float bbw = maxCorner.x - minCorner.x;
+                float bbh = maxCorner.y - minCorner.y;
+                float diagonalLength = Mathf.Sqrt(bbw * bbw + bbh * bbh);
+
+                light.range = RangeFactor * diagonalLength;
+                light.type = LightType.Point;
+
+                Color lightColor = 0.5f * (innerNodeFactory.Materials.Lower + innerNodeFactory.Materials.Higher);
+                if (leafNodeFactory is InnerNodeFactory)
+                {
+                    lightColor = 0.5f * lightColor + 0.25f * (
+                        ((InnerNodeFactory)leafNodeFactory).Materials.Lower +
+                        ((InnerNodeFactory)leafNodeFactory).Materials.Higher);
+                }
+
+                float area = bbw * bbh;
+                light.intensity = IntensityFactor * area;
+            }
         }
 
         /// <summary>

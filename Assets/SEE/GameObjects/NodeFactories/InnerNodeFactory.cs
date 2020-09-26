@@ -20,7 +20,7 @@ namespace SEE.GO
         /// <param name="colorRange">the color range of the created objects</param>
         public InnerNodeFactory(Shader shader, ColorRange colorRange)
         {
-            materials = new Materials(shader, colorRange);
+            Materials = new Materials(shader, colorRange);
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace SEE.GO
         /// <summary>
         /// The collection of materials to be used as styles by this node factory.
         /// </summary>
-        protected Materials materials;
+        public Materials Materials;
 
         /// <summary>
         /// The default height of a inner node in world space Unity unit.
@@ -45,7 +45,7 @@ namespace SEE.GO
 
         public override uint NumberOfStyles()
         {
-            return materials.NumberOfMaterials;
+            return Materials.NumberOfMaterials;
         }
 
         public override void SetStyle(GameObject block, int style)
@@ -56,7 +56,7 @@ namespace SEE.GO
                 UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>());
                 UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>().node);
                 int level = block.GetComponent<NodeRef>().node.Level;
-                renderer.sharedMaterial = materials.DefaultMaterial(level, Mathf.Clamp(style, 0, (int)NumberOfStyles() - 1));
+                renderer.sharedMaterial = Materials.DefaultMaterial(level, Mathf.Clamp(style, 0, (int)NumberOfStyles() - 1));
             }
         }
     }
