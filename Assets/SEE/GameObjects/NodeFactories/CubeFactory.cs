@@ -100,7 +100,7 @@ namespace SEE.GO
             cubeMesh.SetIndices(indices, MeshTopology.Triangles, 0);
         }
 
-        public override GameObject NewBlock(int style, int level = 0)
+        public override GameObject NewBlock(int style, int renderQueueOffset = 0)
         {
             GameObject result = new GameObject("Cube") { tag = Tags.Node };
             //SetHeight(result, DefaultHeight);
@@ -109,7 +109,7 @@ namespace SEE.GO
             result.AddComponent<BoxCollider>();
 
             MeshRenderer renderer = result.AddComponent<MeshRenderer>();
-            renderer.sharedMaterial = Materials.DefaultMaterial(level, Mathf.Clamp(style, 0, (int)Materials.NumberOfMaterials - 1)); ;
+            renderer.sharedMaterial = Materials.DefaultMaterial(renderQueueOffset, Mathf.Clamp(style, 0, (int)Materials.NumberOfMaterials - 1)); ;
             renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;

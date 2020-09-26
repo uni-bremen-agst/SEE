@@ -406,7 +406,7 @@ namespace SEE.Game
             // Add light to simulate emissive effect
             {
                 const float RangeFactor = 3.0f;
-                const float IntensityFactor = 4.0f;
+                //const float IntensityFactor = 4.0f;
 
                 Light light = rootGameNode.AddComponent<Light>();
 
@@ -426,8 +426,9 @@ namespace SEE.Game
                         ((InnerNodeFactory)leafNodeFactory).Materials.Higher);
                 }
 
-                float area = bbw * bbh;
-                light.intensity = IntensityFactor * area;
+                //float area = bbw * bbh;
+                //light.intensity = IntensityFactor * area;
+                light.intensity = 1.0f;
             }
         }
 
@@ -1100,7 +1101,7 @@ namespace SEE.Game
         /// <returns>game object representing given <paramref name="node"/></returns>
         public GameObject NewLeafNode(Node node)
         {
-            GameObject block = leafNodeFactory.NewBlock(SelectStyle(node, innerNodeFactory), node.ItsGraph.MaxDepth + node.Level);
+            GameObject block = leafNodeFactory.NewBlock(SelectStyle(node, innerNodeFactory), node.ItsGraph.MaxDepth);
             block.name = node.ID;
             block.AddComponent<NodeRef>().node = node;
             block.AddComponent<NodeHighlights>();

@@ -122,44 +122,6 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns a new material with the given <paramref name="color"/>.
-        /// </summary>
-        /// <param name="color">color for the material</param>
-        /// <returns>new material with given <paramref name="color"/></returns>
-        public static Material NewMaterial(Shader shader, Color color)
-        {
-            // Shader shader = Shader.Find(ShaderName);
-            return NewMaterial(shader, color, 0);
-        }
-
-        //private static void SetGlobalUniforms()
-        //{
-        //    // FIXME: We need to support multiple culling planes.
-        //    GameObject table = GameObject.FindGameObjectWithTag(Tags.CullingPlane);
-        //    if (table != null)
-        //    {
-        //        Plane plane = table.GetComponent<Plane>();
-        //        if (plane != null)
-        //        {
-        //            //Vector2 leftFront = Plane.Instance.LeftFrontCorner;
-        //            Vector2 leftFront = plane.LeftFrontCorner;
-        //            Shader.SetGlobalVector("portalMin", new Vector4(leftFront.x, leftFront.y));
-        //            //Vector2 rightFront = Plane.Instance.RightBackCorner;
-        //            Vector2 rightFront = plane.RightBackCorner;
-        //            Shader.SetGlobalVector("portalMax", new Vector4(rightFront.x, rightFront.y));
-        //        }
-        //        else
-        //        {
-        //            Debug.LogErrorFormat("No plane attached to culling plane {0}.\n", table.name);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        Debug.LogErrorFormat("No game object tagged by {0} (serving as culling plane).\n", Tags.CullingPlane);
-        //    }
-        //}
-
-        /// <summary>
         /// Creates and returns the materials, one for each different color.
         /// </summary>
         /// <param name="numberOfColors">the number of materials with different colors to be created</param>
@@ -203,7 +165,7 @@ namespace SEE.GO
         /// <param name="color">requested color of the new material</param>
         /// <param name="renderQueueOffset">the offset of the render queue</param>
         /// <returns>new material</returns>
-        private static Material NewMaterial(Shader shader, Color color, int renderQueueOffset)
+        public static Material NewMaterial(Shader shader, Color color, int renderQueueOffset = 0)
         {
             Material material = new Material(shader);
             material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + renderQueueOffset + 1; //TODO(torben): the + 1 is a hack so the plane is rendered before everything else

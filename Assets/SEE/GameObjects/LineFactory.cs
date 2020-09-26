@@ -12,7 +12,7 @@ namespace SEE.GO
         /// <summary>
         /// Path to the material used for edges.
         /// </summary>
-        protected const string materialPath = "Hidden/Internal-Colored";
+        protected const string materialPath = "Custom/PortalShaderTransparentLine";
 
         /// <summary>
         /// The material used for lines.
