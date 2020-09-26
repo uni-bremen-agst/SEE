@@ -1,8 +1,7 @@
-﻿// Name this script "ScaleSliderEditor"
+﻿#if UNITY_EDITOR
+
 using UnityEngine;
 using UnityEditor;
-
-#if UNITY_EDITOR
 
 [CustomEditor(typeof(ScaleSlider))]
 [CanEditMultipleObjects]

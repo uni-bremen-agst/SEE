@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+
+using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using CScape;
 //using UnityEditor;
-
-#if UNITY_EDITOR
 
 namespace CScape
 {

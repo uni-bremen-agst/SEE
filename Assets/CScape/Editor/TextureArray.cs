@@ -1,10 +1,10 @@
 ﻿// Used to generate Texture Array asset
 // Menu button is available in GameObject > Create Texture Array
 // See CHANGEME in the file
+#if UNITY_EDITOR
+
 using UnityEngine;
 using UnityEditor;
-
-#if UNITY_EDITOR
 
 public class TextureArray : MonoBehaviour
 {

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+
+using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using UnityEditor.Callbacks;
@@ -52,3 +54,5 @@ namespace Valve.VR
         }
     }
 }
+
+#endif

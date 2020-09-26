@@ -1,10 +1,10 @@
-﻿using System.Collections;
+﻿#if UNITY_EDITOR
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using CScape;
 using UnityEditor;
-
-#if UNITY_EDITOR
 
 namespace CScape {
     [CustomEditor(typeof(CScapeLODManager))]
