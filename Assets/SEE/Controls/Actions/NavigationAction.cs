@@ -11,7 +11,7 @@ namespace SEE.Controls
     {
         private enum NavigationMode
         {
-            Move = 0,
+            Move,
             Rotate
         }
 
@@ -43,13 +43,6 @@ namespace SEE.Controls
                 float result = t * (float)TargetZoomSteps;
                 return result;
             }
-        }
-
-        private struct GrabState
-        {
-            internal Transform transform;        // The transform of the grabbed object or null, if no object is currently grabbed
-            internal Vector3 startPlaneHitPoint; // The point, where the screen raycast hit the table when the grabbing of the object began
-            internal Vector3 offset;             // The offset between 'startPlaneHitPoint' and 'transform'
         }
 
         private struct MoveState
@@ -93,7 +86,6 @@ namespace SEE.Controls
 
         private struct ActionState
         {
-            internal bool toggleGrab;        // grab element of city
             internal bool startDrag;         // drag entire city
             internal bool drag;              // drag entire city
             internal bool cancel;
@@ -111,11 +103,13 @@ namespace SEE.Controls
         private bool movingOrRotating;
         private UI3D.Cursor cursor;
 
-        GrabState grabState;
-        MoveState moveState;
-        RotateState rotateState;
-        ZoomState zoomState;
-        ActionState actionState;
+        private MoveState moveState;
+        private RotateState rotateState;
+        private ZoomState zoomState;
+        private ActionState actionState;
+
+        [Tooltip("The area in which to draw the code city")]
+        public Plane cullingPlane;
 
         [Tooltip("The unique ID used for network synchronization. This must be set via inspector to ensure that every client will have the correct ID assigned to the appropriate NavigationAction!")]
         [SerializeField]
@@ -140,13 +134,14 @@ namespace SEE.Controls
 
         private void Start()
         {
+            UnityEngine.Assertions.Assert.IsNotNull(cullingPlane, "The culling plane must not be null!");
             UnityEngine.Assertions.Assert.IsTrue(!navigationActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!");
             navigationActionDict.Add(id, this);
 
             cityRootTransform = GetCityRootNode(gameObject);
             if (cityRootTransform == null)
             {
-                this.enabled = false; // deactivate this component as it cannot work
+                enabled = false; // deactivate this component as it cannot work
                 throw new Exception("This NavigationAction is not attached to a code city.");
             }
 
@@ -178,25 +173,11 @@ namespace SEE.Controls
 
         }
 
-        [Tooltip("The area in which to draw the code city")]
-        public Plane cullingPlane;
-
         private void Update()
         {
             // Note: Input MUST NOT be inquired in FixedUpdate() for the input to feel responsive!
-            
-            // We check whether we are focusing on the code city this NavigationAction is attached to.
-            RaycastHit[] hits = Raycasting.SortedHits();
-            // If we don't hit anything or if we hit anything (including another code city 
-            // that is different from the code city this NavigationAction is attached to),
-            // we will not process any user input.
-            if ((hits.Length == 0 || GetHitCity(hits[0].transform) != cityRootTransform.parent))
-            {
-                return;
-            }
 
             actionState.drag = Input.GetMouseButton(2);
-            actionState.toggleGrab |= Input.GetKeyDown(KeyCode.G);
             actionState.startDrag |= Input.GetMouseButtonDown(2);
             actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
             actionState.snap = Input.GetKey(KeyCode.LeftAlt);
@@ -224,25 +205,38 @@ namespace SEE.Controls
 
             rotateState.rotateGizmo.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotateGizmo.Center).magnitude;
 
-            // selection with left mouse button           
+            // selection with left mouse button
             if (!actionState.drag && Input.GetMouseButtonDown(0))
             {
-                bool selected = false;
-                foreach (RaycastHit hit in hits)
+                RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint);
+                if (insideClippingArea)
                 {
-                    if (hit.transform.gameObject.GetComponent<NodeRef>() != null)
+                    foreach (RaycastHit hit in Raycasting.SortedHits())
                     {
-                        GameObject selectedObject = hit.transform.gameObject;
-                        Select(selectedObject);
-                        selected = true;
-                        break;
+                        if (hit.transform.gameObject.GetComponent<NodeRef>() != null)
+                        {
+                            Transform selectedTransform = hit.transform;
+                            Transform parentTransform = selectedTransform;
+                            do
+                            {
+                                if (parentTransform == cityRootTransform)
+                                {
+                                    Select(selectedTransform.gameObject);
+                                    goto SelectionFinished;
+                                }
+                                else
+                                {
+                                    parentTransform = parentTransform.parent;
+                                }
+                            } while (parentTransform != null);
+                        }
                     }
                 }
-                if (!selected)
-                {
-                    Select(null);
-                }
+
+                Select(null);
             }
+        SelectionFinished:
+
             if (cursor.GetFocus())
             {
                 rotateState.rotateGizmo.Center = cursor.GetFocus().position;
@@ -255,85 +249,12 @@ namespace SEE.Controls
         {
             // TODO(torben): abstract mouse away!
 
-            Ray ray = Camera.main.ScreenPointToRay(actionState.mousePosition);
-            bool raycastResult = raycastPlane.Raycast(ray, out float enter);
-            Vector3 planeHitPoint = ray.GetPoint(enter);
+            RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint);
 
             if (actionState.cancel && !movingOrRotating)
             {
                 Select(null);
             }
-
-#region Grab Part Of City
-
-            if (actionState.toggleGrab)
-            {
-                actionState.toggleGrab = false;
-
-                if (grabState.transform == null)
-                {
-                    RaycastHit[] raycastHits = Physics.RaycastAll(ray);
-                    int compareRaycastHits(RaycastHit h0, RaycastHit h1)
-                    {
-                        return h0.distance.CompareTo(h1.distance);
-                    };
-                    Array.Sort(raycastHits, compareRaycastHits);
-                    NodeRef nodeRef = null;
-                    foreach (RaycastHit raycastHit in raycastHits)
-                    {
-                        nodeRef = raycastHit.transform.GetComponent<NodeRef>();
-                        if (nodeRef != null)
-                        {
-#if UNITY_EDITOR
-                            if (nodeRef.node != null)
-                            {
-                                Debug.LogWarning("The node-ref of the grabbed object is not set!");
-                            }
-#endif
-
-                            CollisionEventHandler collisionEventHandler = raycastHit.transform.gameObject.AddComponent<CollisionEventHandler>();
-                            collisionEventHandler.onCollisionEnter += OnGrabbedObjectCollisionEnter;
-                            collisionEventHandler.onCollisionExit += OnGrabbedObjectCollisionExit;
-                            collisionEventHandler.onCollisionStay += OnGrabbedObjectCollisionStay;
-                            collisionEventHandler.onTriggerEnter += OnGrabbedObjectTriggerEnter;
-                            collisionEventHandler.onTriggerExit += OnGrabbedObjectTriggerExit;
-                            collisionEventHandler.onTriggerStay += OnGrabbedObjectTriggerStay;
-
-                            grabState.transform = raycastHit.transform;
-                            grabState.startPlaneHitPoint = planeHitPoint;
-                            grabState.offset = raycastHit.transform.position - planeHitPoint;
-                            break;
-                        }
-                    }
-                    actionState.toggleGrab = false;
-                    OnStartGrabbing(grabState.transform);
-                }
-                else
-                {
-                    Transform tf = grabState.transform;
-                    Destroy(grabState.transform.GetComponent<CollisionEventHandler>());
-                    grabState.transform = null;
-                    OnFinalizeGrabbing(tf);
-                }
-            }
-            else if (grabState.transform != null)
-            {
-                if (actionState.cancel)
-                {
-                    actionState.cancel = false;
-                    grabState.transform.position = grabState.startPlaneHitPoint + grabState.offset;
-                    Destroy(grabState.transform.GetComponent<CollisionEventHandler>());
-                    Transform tf = grabState.transform;
-                    grabState.transform = null;
-                    OnCancelGrabbing(tf);
-                }
-                else
-                {
-                    grabState.transform.position = planeHitPoint + grabState.offset;
-                }
-            }
-
-#endregion
 
 #region Move City
 
@@ -341,15 +262,16 @@ namespace SEE.Controls
             {
                 if (actionState.reset) // reset to center of table
                 {
-                    actionState.reset = false;
-                    movingOrRotating = false;
-                    moveState.moveGizmo.gameObject.SetActive(false);
+                    if ((insideClippingArea && !(actionState.drag ^ movingOrRotating)) || (actionState.drag && movingOrRotating))
+                    {
+                        movingOrRotating = false;
+                        moveState.moveGizmo.gameObject.SetActive(false);
 
-                    cityRootTransform.position = cullingPlane.CenterTop;
+                        cityRootTransform.position = cullingPlane.CenterTop;
+                    }
                 }
                 else if (actionState.cancel) // cancel movement
                 {
-                    actionState.cancel = false;
                     if (movingOrRotating)
                     {
                         movingOrRotating = false;
@@ -359,13 +281,12 @@ namespace SEE.Controls
                         cityRootTransform.position = moveState.dragStartTransformPosition + moveState.dragStartOffset - Vector3.Scale(moveState.dragCanonicalOffset, cityRootTransform.localScale);
                     }
                 }
-                else if (actionState.drag) // start or continue movement
+                else if (actionState.drag && hitPlane) // start or continue movement
                 {
-                    if (raycastResult)
+                    if (actionState.startDrag) // start movement
                     {
-                        if (actionState.startDrag) // start movement
+                        if (insideClippingArea)
                         {
-                            actionState.startDrag = false;
                             movingOrRotating = true;
                             moveState.moveGizmo.gameObject.SetActive(true);
 
@@ -374,26 +295,28 @@ namespace SEE.Controls
                             moveState.dragCanonicalOffset = moveState.dragStartOffset.DividePairwise(cityRootTransform.localScale);
                             moveState.moveVelocity = Vector3.zero;
                         }
-                        if (movingOrRotating) // continue movement
+                    }
+
+                    if (movingOrRotating) // continue movement
+                    {
+                        Vector3 totalDragOffsetFromStart = planeHitPoint - (moveState.dragStartTransformPosition + moveState.dragStartOffset);
+
+                        if (actionState.snap)
                         {
-                            Vector3 totalDragOffsetFromStart = planeHitPoint - (moveState.dragStartTransformPosition + moveState.dragStartOffset);
-
-                            if (actionState.snap)
-                            {
-                                totalDragOffsetFromStart = Project(totalDragOffsetFromStart);
-                            }
-
-                            Vector3 oldPosition = cityRootTransform.position;
-                            Vector3 newPosition = moveState.dragStartTransformPosition + totalDragOffsetFromStart;
-
-                            moveState.moveVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime;
-                            cityRootTransform.position = newPosition;
-                            moveState.moveGizmo.SetPositions(moveState.dragStartTransformPosition + moveState.dragStartOffset, cityRootTransform.position + Vector3.Scale(moveState.dragCanonicalOffset, cityRootTransform.localScale));
+                            totalDragOffsetFromStart = Project(totalDragOffsetFromStart);
                         }
+
+                        Vector3 oldPosition = cityRootTransform.position;
+                        Vector3 newPosition = moveState.dragStartTransformPosition + totalDragOffsetFromStart;
+
+                        moveState.moveVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime;
+                        cityRootTransform.position = newPosition;
+                        moveState.moveGizmo.SetPositions(moveState.dragStartTransformPosition + moveState.dragStartOffset, cityRootTransform.position + Vector3.Scale(moveState.dragCanonicalOffset, cityRootTransform.localScale));
                     }
                 }
                 else if (movingOrRotating) // finalize movement
                 {
+                    actionState.startDrag = false;
                     movingOrRotating = false;
                     moveState.moveGizmo.gameObject.SetActive(false);
                 }
@@ -405,82 +328,76 @@ namespace SEE.Controls
 
             else // mode == NavigationMode.Rotate
             {
-                if (cursor.GetFocus())
+                if (actionState.reset) // reset rotation to identity();
                 {
-                    if (actionState.reset) // reset rotation to identity();
+                    if ((insideClippingArea && !(actionState.drag ^ movingOrRotating)) || (actionState.drag && movingOrRotating))
                     {
-                        actionState.reset = false;
                         movingOrRotating = false;
                         rotateState.rotateGizmo.gameObject.SetActive(false);
 
                         cityRootTransform.RotateAround(rotateState.rotateGizmo.Center, Vector3.up, -cityRootTransform.rotation.eulerAngles.y);
                     }
-                    else if (actionState.cancel) // cancel rotation
-                    {
-                        actionState.cancel = false;
-                        if (movingOrRotating)
-                        {
-                            movingOrRotating = false;
-                            rotateState.rotateGizmo.gameObject.SetActive(false);
-
-                            cityRootTransform.rotation = Quaternion.Euler(0.0f, rotateState.originalEulerAngleY, 0.0f);
-                            cityRootTransform.position = rotateState.originalPosition;
-                        }
-                    }
-                    else if (actionState.drag) // start or continue rotation
-                    {
-                        if (raycastResult)
-                        {
-                            Vector2 toHit = new Vector2(planeHitPoint.x - rotateState.rotateGizmo.Center.x, planeHitPoint.z - rotateState.rotateGizmo.Center.z);
-                            float toHitAngle = toHit.Angle360();
-
-                            if (actionState.startDrag) // start rotation
-                            {
-                                actionState.startDrag = false;
-                                movingOrRotating = true;
-                                rotateState.rotateGizmo.gameObject.SetActive(true);
-
-                                rotateState.originalEulerAngleY = cityRootTransform.rotation.eulerAngles.y;
-                                rotateState.originalPosition = cityRootTransform.position;
-                                rotateState.startAngle = AngleMod(cityRootTransform.rotation.eulerAngles.y - toHitAngle);
-                                rotateState.rotateGizmo.SetMinAngle(Mathf.Deg2Rad * toHitAngle);
-                                rotateState.rotateGizmo.SetMaxAngle(Mathf.Deg2Rad * toHitAngle);
-                            }
-
-                            if (movingOrRotating) // continue rotation
-                            {
-                                float angle = AngleMod(rotateState.startAngle + toHitAngle);
-                                if (actionState.snap)
-                                {
-                                    angle = AngleMod(Mathf.Round(angle / RotateState.SnapStepAngle) * RotateState.SnapStepAngle);
-                                }
-                                cityRootTransform.RotateAround(cursor.GetFocus().position, Vector3.up, angle - cityRootTransform.rotation.eulerAngles.y);
-
-                                float prevAngle = Mathf.Rad2Deg * rotateState.rotateGizmo.GetMaxAngle();
-                                float currAngle = toHitAngle;
-
-                                while (Mathf.Abs(currAngle + 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
-                                {
-                                    currAngle += 360.0f;
-                                }
-                                while (Mathf.Abs(currAngle - 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
-                                {
-                                    currAngle -= 360.0f;
-                                }
-                                if (actionState.snap)
-                                {
-                                    currAngle = Mathf.Round((currAngle + rotateState.startAngle) / (RotateState.SnapStepAngle)) * (RotateState.SnapStepAngle) - rotateState.startAngle;
-                                }
-
-                                rotateState.rotateGizmo.SetMaxAngle(Mathf.Deg2Rad * currAngle);
-                            }
-                        }
-                    }
-                    else if (movingOrRotating) // finalize rotation
+                }
+                else if (actionState.cancel) // cancel rotation
+                {
+                    if (movingOrRotating)
                     {
                         movingOrRotating = false;
                         rotateState.rotateGizmo.gameObject.SetActive(false);
+
+                        cityRootTransform.rotation = Quaternion.Euler(0.0f, rotateState.originalEulerAngleY, 0.0f);
+                        cityRootTransform.position = rotateState.originalPosition;
                     }
+                }
+                else if (actionState.drag && hitPlane && cursor.GetFocus() != null) // start or continue rotation
+                {
+                    Vector2 toHit = planeHitPoint.XZ() - rotateState.rotateGizmo.Center.XZ();
+                    float toHitAngle = toHit.Angle360();
+
+                    if (actionState.startDrag) // start rotation
+                    {
+                        movingOrRotating = true;
+                        rotateState.rotateGizmo.gameObject.SetActive(true);
+
+                        rotateState.originalEulerAngleY = cityRootTransform.rotation.eulerAngles.y;
+                        rotateState.originalPosition = cityRootTransform.position;
+                        rotateState.startAngle = AngleMod(cityRootTransform.rotation.eulerAngles.y - toHitAngle);
+                        rotateState.rotateGizmo.SetMinAngle(Mathf.Deg2Rad * toHitAngle);
+                        rotateState.rotateGizmo.SetMaxAngle(Mathf.Deg2Rad * toHitAngle);
+                    }
+
+                    if (movingOrRotating) // continue rotation
+                    {
+                        float angle = AngleMod(rotateState.startAngle + toHitAngle);
+                        if (actionState.snap)
+                        {
+                            angle = AngleMod(Mathf.Round(angle / RotateState.SnapStepAngle) * RotateState.SnapStepAngle);
+                        }
+                        cityRootTransform.RotateAround(cursor.GetFocus().position, Vector3.up, angle - cityRootTransform.rotation.eulerAngles.y);
+
+                        float prevAngle = Mathf.Rad2Deg * rotateState.rotateGizmo.GetMaxAngle();
+                        float currAngle = toHitAngle;
+
+                        while (Mathf.Abs(currAngle + 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
+                        {
+                            currAngle += 360.0f;
+                        }
+                        while (Mathf.Abs(currAngle - 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
+                        {
+                            currAngle -= 360.0f;
+                        }
+                        if (actionState.snap)
+                        {
+                            currAngle = Mathf.Round((currAngle + rotateState.startAngle) / (RotateState.SnapStepAngle)) * (RotateState.SnapStepAngle) - rotateState.startAngle;
+                        }
+
+                        rotateState.rotateGizmo.SetMaxAngle(Mathf.Deg2Rad * currAngle);
+                    }
+                }
+                else if (movingOrRotating) // finalize rotation
+                {
+                    movingOrRotating = false;
+                    rotateState.rotateGizmo.gameObject.SetActive(false);
                 }
             }
 
@@ -517,7 +434,7 @@ namespace SEE.Controls
                 }
             }
 
-            if (Mathf.Abs(actionState.zoomStepsDelta) >= 1.0f)
+            if (Mathf.Abs(actionState.zoomStepsDelta) >= 1.0f && insideClippingArea)
             {
                 float fZoomSteps = actionState.zoomStepsDelta >= 0.0f ? Mathf.Floor(actionState.zoomStepsDelta) : Mathf.Ceil(actionState.zoomStepsDelta);
                 actionState.zoomStepsDelta -= fZoomSteps;
@@ -585,17 +502,26 @@ namespace SEE.Controls
             MathExtensions.TestCircleAABB(cityRootTransform.position.XZ(), 
                                           0.9f * radius,
                                           cullingPlane.LeftFrontCorner,
-                                          cullingPlane.RightBackCorner, 
-                                          out float distance, 
-                                          out Vector2 normalizedToSurfaceDirection);
+                                          cullingPlane.RightBackCorner,
+                                          out float distance,
+                                          out Vector2 normalizedFromCircleToSurfaceDirection);
 
             if (distance > 0.0f)
             {
-                Vector2 toSurfaceDirection = distance * normalizedToSurfaceDirection;
+                Vector2 toSurfaceDirection = distance * normalizedFromCircleToSurfaceDirection;
                 cityRootTransform.position += new Vector3(toSurfaceDirection.x, 0.0f, toSurfaceDirection.y);
             }
 
-#endregion
+            #endregion
+
+            #region ResetActionState
+            
+            actionState.startDrag = false;
+            actionState.cancel = false;
+            actionState.reset = false;
+            actionState.zoomToggleToObject = false;
+
+            #endregion
         }
 
         private float ConvertZoomStepsToZoomFactor(float zoomSteps)
@@ -679,92 +605,28 @@ namespace SEE.Controls
             }
         }
 
-        /// <summary>
-        /// Is called, if an element of the city is grabbed.
-        /// </summary>
-        /// <param name="grabbedTransform">The transform of the grabbed object.</param>
-        private void OnStartGrabbing(Transform grabbedTransform)
+        private void RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint)
         {
-            Debug.Log("Start grabbing '" + grabbedTransform.name + "'!");
-        }
+            Ray ray = Camera.main.ScreenPointToRay(actionState.mousePosition);
 
-        /// <summary>
-        /// Is called, if the grabbed element of the city is released.
-        /// </summary>
-        /// <param name="grabbedTransform">The transform of the released object.</param>
-        private void OnFinalizeGrabbing(Transform grabbedTransform)
-        {
-            Debug.Log("Finalized grabbing '" + grabbedTransform.name + "'!");
+            hitPlane = raycastPlane.Raycast(ray, out float enter);
+            if (hitPlane)
+            {
+                planeHitPoint = ray.GetPoint(enter);
+                MathExtensions.TestPointAABB(
+                    planeHitPoint.XZ(),
+                    cullingPlane.LeftFrontCorner,
+                    cullingPlane.RightBackCorner,
+                    out float distanceFromPoint,
+                    out Vector2 normalizedFromPointToSurfaceDirection
+                );
+                insideClippingArea = distanceFromPoint < 0.0f;
+            }
+            else
+            {
+                insideClippingArea = false;
+                planeHitPoint = Vector3.zero;
+            }
         }
-
-        /// <summary>
-        /// Is called, if grabbing of an object is cancelled.
-        /// </summary>
-        /// <param name="grabbedTransform">The transform of the cancelled object.</param>
-        private void OnCancelGrabbing(Transform grabbedTransform)
-        {
-            Debug.Log("Cancelled grabbing '" + grabbedTransform.name + "'!");
-        }
-
-        /// <summary>
-        /// Is called, if the grabbed object enters collision with an object.
-        /// </summary>
-        /// <param name="collider">The collider of the grabbed object.</param>
-        /// <param name="collision">The collision.</param>
-        private void OnGrabbedObjectCollisionEnter(CollisionEventHandler collider, Collision collision)
-        {
-            Debug.Log("'" + collider.name + "' entered the collider of '" + collision.gameObject.name + "'!");
-        }
-
-        /// <summary>
-        /// Is called, if the grabbed object exits collision with an object.
-        /// </summary>
-        /// <param name="collider">The collider of the grabbed object.</param>
-        /// <param name="collision">The collision.</param>
-        private void OnGrabbedObjectCollisionExit(CollisionEventHandler collider, Collision collision)
-        {
-            Debug.Log("'" + collider.name + "' exited the collider of '" + collision.gameObject.name + "'!");
-        }
-
-        /// <summary>
-        /// Is called, if the grabbed object stays in collision with an object.
-        /// </summary>
-        /// <param name="collider">The collider of the grabbed object.</param>
-        /// <param name="collision">The collision.</param>
-        private void OnGrabbedObjectCollisionStay(CollisionEventHandler collider, Collision collision)
-        {
-            Debug.Log("'" + collider.name + "' stayed in the collider of '" + collision.gameObject.name + "'!");
-        }
-
-        /// <summary>
-        /// Is called, if the grabbed object enters a trigger of an object.
-        /// </summary>
-        /// <param name="collider">The collider of the grabbed object.</param>
-        /// <param name="collision">The other collider.</param>
-        private void OnGrabbedObjectTriggerEnter(CollisionEventHandler collider, Collider other)
-        {
-            Debug.Log("'" + collider.name + "' entered the trigger of '" + other.name + "'!");
-        }
-
-        /// <summary>
-        /// Is called, if the grabbed object exits a trigger of an object.
-        /// </summary>
-        /// <param name="collider">The collider of the grabbed object.</param>
-        /// <param name="collision">The other collider.</param>
-        private void OnGrabbedObjectTriggerExit(CollisionEventHandler collider, Collider other)
-        {
-            Debug.Log("'" + collider.name + "' exited the trigger of '" + other.name + "'!");
-        }
-
-        /// <summary>
-        /// Is called, if the grabbed object stays in a trigger of an object.
-        /// </summary>
-        /// <param name="collider">The collider of the grabbed object.</param>
-        /// <param name="collider">The other collider.</param>
-        private void OnGrabbedObjectTriggerStay(CollisionEventHandler collider, Collider other)
-        {
-            Debug.Log("'" + collider.name + "' stayed in trigger of '" + other.name + "'!");
-        }
-
     }
 }
