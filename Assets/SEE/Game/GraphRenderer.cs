@@ -412,6 +412,9 @@ namespace SEE.Game
                 //light.intensity = IntensityFactor * area;
                 light.intensity = 1.0f;
             }
+
+            Plane portalPlane = parent.GetComponent<Plane>();
+            portalPlane.HeightOffset = rootGameNode.transform.position.y - parent.transform.position.y;
         }
 
         /// <summary>

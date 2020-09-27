@@ -7,6 +7,7 @@ using UnityEngine;
 namespace SEE.Controls
 {
 
+    [RequireComponent(typeof(Plane))]
     public class NavigationAction : CityAction
     {
         private enum NavigationMode
@@ -109,7 +110,7 @@ namespace SEE.Controls
         private ActionState actionState;
 
         [Tooltip("The area in which to draw the code city")]
-        public Plane cullingPlane;
+        public Plane portalPlane;
 
         [Tooltip("The unique ID used for network synchronization. This must be set via inspector to ensure that every client will have the correct ID assigned to the appropriate NavigationAction!")]
         [SerializeField]
@@ -134,7 +135,7 @@ namespace SEE.Controls
 
         private void Start()
         {
-            UnityEngine.Assertions.Assert.IsNotNull(cullingPlane, "The culling plane must not be null!");
+            UnityEngine.Assertions.Assert.IsNotNull(portalPlane, "The culling plane must not be null!");
             UnityEngine.Assertions.Assert.IsTrue(!navigationActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!");
             navigationActionDict.Add(id, this);
 
@@ -162,8 +163,8 @@ namespace SEE.Controls
             moveState.dragStartTransformPosition = cityRootTransform.position;
             moveState.dragCanonicalOffset = Vector3.zero;
             moveState.moveVelocity = Vector3.zero;
-            moveState.moveGizmo = UI3D.MoveGizmo.Create(0.008f * cullingPlane.MinLengthXZ);
-            rotateState.rotateGizmo = UI3D.RotateGizmo.Create(cullingPlane, 1024);
+            moveState.moveGizmo = UI3D.MoveGizmo.Create(0.008f * portalPlane.MinLengthXZ);
+            rotateState.rotateGizmo = UI3D.RotateGizmo.Create(portalPlane, 1024);
 
             zoomState.zoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps);
             zoomState.currentTargetZoomSteps = 0;
@@ -267,7 +268,7 @@ namespace SEE.Controls
                         movingOrRotating = false;
                         moveState.moveGizmo.gameObject.SetActive(false);
 
-                        cityRootTransform.position = cullingPlane.CenterTop;
+                        cityRootTransform.position = portalPlane.CenterTop;
                     }
                 }
                 else if (actionState.cancel) // cancel movement
@@ -410,7 +411,7 @@ namespace SEE.Controls
                 actionState.zoomToggleToObject = false;
                 if (cursor.GetFocus() != null)
                 {
-                    float optimalTargetZoomFactor = cullingPlane.MinLengthXZ / (cursor.GetFocus().lossyScale.x / zoomState.currentZoomFactor);
+                    float optimalTargetZoomFactor = portalPlane.MinLengthXZ / (cursor.GetFocus().lossyScale.x / zoomState.currentZoomFactor);
                     float optimalTargetZoomSteps = ConvertZoomFactorToZoomSteps(optimalTargetZoomFactor);
                     int actualTargetZoomSteps = Mathf.FloorToInt(optimalTargetZoomSteps);
                     float actualTargetZoomFactor = ConvertZoomStepsToZoomFactor(actualTargetZoomSteps);
@@ -426,8 +427,8 @@ namespace SEE.Controls
                     {
                         float zoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
                         Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.currentTargetZoomSteps ? cityRootTransform.position.XZ() : cursor.GetFocus().position.XZ();
-                        Vector2 toCenterOfTable = cullingPlane.CenterXZ - centerOfTableAfterZoom;
-                        Vector2 zoomCenter = cullingPlane.CenterXZ - (toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f)));
+                        Vector2 toCenterOfTable = portalPlane.CenterXZ - centerOfTableAfterZoom;
+                        Vector2 zoomCenter = portalPlane.CenterXZ - (toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f)));
                         float duration = 2.0f * ZoomState.DefaultZoomDuration;
                         new Net.ZoomCommandAction(this, zoomCenter, zoomSteps, duration).Execute();
                     }
@@ -501,8 +502,8 @@ namespace SEE.Controls
             float radius = 0.5f * cityRootTransform.lossyScale.x;
             MathExtensions.TestCircleAABB(cityRootTransform.position.XZ(), 
                                           0.9f * radius,
-                                          cullingPlane.LeftFrontCorner,
-                                          cullingPlane.RightBackCorner,
+                                          portalPlane.LeftFrontCorner,
+                                          portalPlane.RightBackCorner,
                                           out float distance,
                                           out Vector2 normalizedFromCircleToSurfaceDirection);
 
@@ -615,8 +616,8 @@ namespace SEE.Controls
                 planeHitPoint = ray.GetPoint(enter);
                 MathExtensions.TestPointAABB(
                     planeHitPoint.XZ(),
-                    cullingPlane.LeftFrontCorner,
-                    cullingPlane.RightBackCorner,
+                    portalPlane.LeftFrontCorner,
+                    portalPlane.RightBackCorner,
                     out float distanceFromPoint,
                     out Vector2 normalizedFromPointToSurfaceDirection
                 );
