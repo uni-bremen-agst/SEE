@@ -20,17 +20,9 @@ namespace SEE.GO
         {
             cubeMesh = new Mesh();
 
-            // For correct rendering of transparency, the faces are defined in the order:
-            // z+, x-, x+, y+, z-
-            // The bottom face is never seen and thus excluded.
-
-            Vector3[] vertices = new Vector3[20]
+            // x-, x+, y-, y+, z-, z+
+            Vector3[] vertices = new Vector3[24]
             {
-                new Vector3( 0.5f, -0.5f,  0.5f),
-                new Vector3(-0.5f, -0.5f,  0.5f),
-                new Vector3(-0.5f,  0.5f,  0.5f),
-                new Vector3( 0.5f,  0.5f,  0.5f),
-                
                 new Vector3(-0.5f, -0.5f,  0.5f),
                 new Vector3(-0.5f, -0.5f, -0.5f),
                 new Vector3(-0.5f,  0.5f, -0.5f),
@@ -41,6 +33,11 @@ namespace SEE.GO
                 new Vector3( 0.5f,  0.5f,  0.5f),
                 new Vector3( 0.5f,  0.5f, -0.5f),
                 
+                new Vector3( 0.5f, -0.5f, -0.5f),
+                new Vector3(-0.5f, -0.5f, -0.5f),
+                new Vector3(-0.5f, -0.5f,  0.5f),
+                new Vector3( 0.5f, -0.5f,  0.5f),
+                
                 new Vector3(-0.5f,  0.5f, -0.5f),
                 new Vector3( 0.5f,  0.5f, -0.5f),
                 new Vector3( 0.5f,  0.5f,  0.5f),
@@ -49,25 +46,30 @@ namespace SEE.GO
                 new Vector3(-0.5f, -0.5f, -0.5f),
                 new Vector3( 0.5f, -0.5f, -0.5f),
                 new Vector3( 0.5f,  0.5f, -0.5f),
-                new Vector3(-0.5f,  0.5f, -0.5f)
+                new Vector3(-0.5f,  0.5f, -0.5f),
+                
+                new Vector3( 0.5f, -0.5f,  0.5f),
+                new Vector3(-0.5f, -0.5f,  0.5f),
+                new Vector3(-0.5f,  0.5f,  0.5f),
+                new Vector3( 0.5f,  0.5f,  0.5f)
             };
 
-            Vector3[] normals = new Vector3[20]
+            Vector3[] normals = new Vector3[24]
             {
-                new Vector3( 0.0f,  0.0f,  1.0f),
-                new Vector3( 0.0f,  0.0f,  1.0f),
-                new Vector3( 0.0f,  0.0f,  1.0f),
-                new Vector3( 0.0f,  0.0f,  1.0f),
+                new Vector3(-1.0f,  0.0f,  0.0f),
+                new Vector3(-1.0f,  0.0f,  0.0f),
+                new Vector3(-1.0f,  0.0f,  0.0f),
+                new Vector3(-1.0f,  0.0f,  0.0f),
 
-                new Vector3(-1.0f,  0.0f,  0.0f),
-                new Vector3(-1.0f,  0.0f,  0.0f),
-                new Vector3(-1.0f,  0.0f,  0.0f),
-                new Vector3(-1.0f,  0.0f,  0.0f),
+                new Vector3( 1.0f,  0.0f,  0.0f),
+                new Vector3( 1.0f,  0.0f,  0.0f),
+                new Vector3( 1.0f,  0.0f,  0.0f),
+                new Vector3( 1.0f,  0.0f,  0.0f),
                 
-                new Vector3( 1.0f,  0.0f,  0.0f),
-                new Vector3( 1.0f,  0.0f,  0.0f),
-                new Vector3( 1.0f,  0.0f,  0.0f),
-                new Vector3( 1.0f,  0.0f,  0.0f),
+                new Vector3( 0.0f, -1.0f,  0.0f),
+                new Vector3( 0.0f, -1.0f,  0.0f),
+                new Vector3( 0.0f, -1.0f,  0.0f),
+                new Vector3( 0.0f, -1.0f,  0.0f),
                 
                 new Vector3( 0.0f,  1.0f,  0.0f),
                 new Vector3( 0.0f,  1.0f,  0.0f),
@@ -77,17 +79,23 @@ namespace SEE.GO
                 new Vector3( 0.0f,  0.0f, -1.0f),
                 new Vector3( 0.0f,  0.0f, -1.0f),
                 new Vector3( 0.0f,  0.0f, -1.0f),
-                new Vector3( 0.0f,  0.0f, -1.0f)
+                new Vector3( 0.0f,  0.0f, -1.0f),
+                
+                new Vector3( 0.0f,  0.0f,  1.0f),
+                new Vector3( 0.0f,  0.0f,  1.0f),
+                new Vector3( 0.0f,  0.0f,  1.0f),
+                new Vector3( 0.0f,  0.0f,  1.0f)
             };
 
             // Note: Winding order in unity is clockwise
-            int[] indices = new int[30]
+            int[] indices = new int[36]
             {
                  0,  3,  2,  2,  1,  0,
                  4,  7,  6,  6,  5,  4,
                  8, 11, 10, 10,  9,  8,
                 12, 15, 14, 14, 13, 12,
-                16, 19, 18, 18, 17, 16
+                16, 19, 18, 18, 17, 16,
+                20, 23, 22, 22, 21, 20
             };
 
             cubeMesh.SetVertices(vertices);
