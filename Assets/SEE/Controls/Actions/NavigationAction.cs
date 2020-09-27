@@ -8,12 +8,14 @@ namespace SEE.Controls
 {
 
     [RequireComponent(typeof(Plane))]
+    [RequireComponent(typeof(Collider))]
     public class NavigationAction : CityAction
     {
         private enum NavigationMode
         {
             Move,
-            Rotate
+            Rotate,
+            NavigationModeCount
         }
 
         internal class ZoomCommand
@@ -99,7 +101,6 @@ namespace SEE.Controls
         
         private Transform cityRootTransform;
         private UnityEngine.Plane raycastPlane;
-
         private NavigationMode mode;
         private bool movingOrRotating;
         private UI3D.Cursor cursor;
@@ -140,37 +141,30 @@ namespace SEE.Controls
             navigationActionDict.Add(id, this);
 
             cityRootTransform = GetCityRootNode(gameObject);
-            if (cityRootTransform == null)
-            {
-                enabled = false; // deactivate this component as it cannot work
-                throw new Exception("This NavigationAction is not attached to a code city.");
-            }
-
+            UnityEngine.Assertions.Assert.IsNotNull(cityRootTransform, "This NavigationAction is not attached to a code city!");
             Debug.LogFormat("NavigationAction controls {0}.\n", cityRootTransform.name);
 
-            zoomState.originalScale = cityRootTransform.localScale;
-            Collider collider = cityRootTransform.GetComponent<Collider>();
-            if (collider == null)
-            {
-                Debug.LogErrorFormat("The city object {0} has no collider attached to it.\n", cityRootTransform.name);
-            }
-            else
-            {
-                moveState.cityBounds = collider.bounds;
-            }
             raycastPlane = new UnityEngine.Plane(Vector3.up, cityRootTransform.position);
-            
-            moveState.dragStartTransformPosition = cityRootTransform.position;
+            mode = 0;
+            movingOrRotating = false;
+            cursor = UI3D.Cursor.Create();
+
+            moveState.moveGizmo = UI3D.MoveGizmo.Create(0.008f * portalPlane.MinLengthXZ);
+            moveState.cityBounds = cityRootTransform.GetComponent<Collider>().bounds;
+            moveState.dragStartTransformPosition = Vector3.zero;
+            moveState.dragStartOffset = Vector3.zero;
             moveState.dragCanonicalOffset = Vector3.zero;
             moveState.moveVelocity = Vector3.zero;
-            moveState.moveGizmo = UI3D.MoveGizmo.Create(0.008f * portalPlane.MinLengthXZ);
-            rotateState.rotateGizmo = UI3D.RotateGizmo.Create(portalPlane, 1024);
 
+            rotateState.rotateGizmo = UI3D.RotateGizmo.Create(portalPlane, 1024);
+            rotateState.originalEulerAngleY = 0.0f;
+            rotateState.originalPosition = Vector3.zero;
+            rotateState.startAngle = 0.0f;
+
+            zoomState.originalScale = cityRootTransform.localScale;
             zoomState.zoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps);
             zoomState.currentTargetZoomSteps = 0;
             zoomState.currentZoomFactor = 1.0f;
-
-            cursor = UI3D.Cursor.Create();
 
         }
 
@@ -189,59 +183,61 @@ namespace SEE.Controls
             {
                 actionState.zoomStepsDelta += Input.mouseScrollDelta.y;
                 actionState.zoomToggleToObject |= Input.GetKeyDown(KeyCode.F);
-            }
 
-            if (Input.GetKeyDown(KeyCode.Alpha1))
+                if (Input.GetMouseButtonDown(0))
+                {
+                    RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint);
+                    if (insideClippingArea)
+                    {
+                        foreach (RaycastHit hit in Raycasting.SortedHits())
+                        {
+                            if (hit.transform.gameObject.GetComponent<NodeRef>() != null)
+                            {
+                                Transform selectedTransform = hit.transform;
+                                Transform parentTransform = selectedTransform;
+                                do
+                                {
+                                    if (parentTransform == cityRootTransform)
+                                    {
+                                        Select(selectedTransform.gameObject);
+                                        goto SelectionFinished;
+                                    }
+                                    else
+                                    {
+                                        parentTransform = parentTransform.parent;
+                                    }
+                                } while (parentTransform != null);
+                            }
+                        }
+                    }
+
+                    Select(null);
+                }
+            }
+        SelectionFinished:
+
+            if (mode != NavigationMode.Move && Input.GetKeyDown(KeyCode.Alpha1))
             {
                 mode = NavigationMode.Move;
                 movingOrRotating = false;
                 rotateState.rotateGizmo.gameObject.SetActive(false);
             }
-            else if (Input.GetKeyDown(KeyCode.Alpha2))
+            else if (mode != NavigationMode.Rotate && Input.GetKeyDown(KeyCode.Alpha2))
             {
                 mode = NavigationMode.Rotate;
                 movingOrRotating = false;
                 moveState.moveGizmo.gameObject.SetActive(false);
             }
 
-            rotateState.rotateGizmo.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotateGizmo.Center).magnitude;
-
-            // selection with left mouse button
-            if (!actionState.drag && Input.GetMouseButtonDown(0))
+            if (mode == NavigationMode.Rotate)
             {
-                RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint);
-                if (insideClippingArea)
+                if (cursor.GetFocus())
                 {
-                    foreach (RaycastHit hit in Raycasting.SortedHits())
-                    {
-                        if (hit.transform.gameObject.GetComponent<NodeRef>() != null)
-                        {
-                            Transform selectedTransform = hit.transform;
-                            Transform parentTransform = selectedTransform;
-                            do
-                            {
-                                if (parentTransform == cityRootTransform)
-                                {
-                                    Select(selectedTransform.gameObject);
-                                    goto SelectionFinished;
-                                }
-                                else
-                                {
-                                    parentTransform = parentTransform.parent;
-                                }
-                            } while (parentTransform != null);
-                        }
-                    }
+                    rotateState.rotateGizmo.Center = cursor.GetFocus().position;
+                    rotateState.rotateGizmo.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotateGizmo.Center).magnitude;
                 }
-
-                Select(null);
             }
-        SelectionFinished:
 
-            if (cursor.GetFocus())
-            {
-                rotateState.rotateGizmo.Center = cursor.GetFocus().position;
-            }
         }
 
         // This logic is in FixedUpdate(), so that the behaviour is framerate-
@@ -537,20 +533,6 @@ namespace SEE.Controls
             return result;
         }
 
-        internal void PushZoomCommand(Vector2 zoomCenter, int zoomSteps, float duration)
-        {
-            zoomSteps = Mathf.Clamp(zoomSteps, -(int)zoomState.currentTargetZoomSteps, (int)ZoomState.ZoomMaxSteps - (int)zoomState.currentTargetZoomSteps);
-            if (zoomSteps != 0)
-            {
-                uint newZoomStepsInProgress = (uint)((int)zoomState.currentTargetZoomSteps + zoomSteps);
-                if (duration != 0)
-                {
-                    zoomState.zoomCommands.Add(new ZoomCommand(zoomCenter, zoomSteps, duration));
-                }
-                zoomState.currentTargetZoomSteps = newZoomStepsInProgress;
-            }
-        }
-
         private float AngleMod(float degrees)
         {
             float result = ((degrees % 360.0f) + 360.0f) % 360.0f;
@@ -627,6 +609,20 @@ namespace SEE.Controls
             {
                 insideClippingArea = false;
                 planeHitPoint = Vector3.zero;
+            }
+        }
+
+        internal void PushZoomCommand(Vector2 zoomCenter, int zoomSteps, float duration)
+        {
+            zoomSteps = Mathf.Clamp(zoomSteps, -(int)zoomState.currentTargetZoomSteps, (int)ZoomState.ZoomMaxSteps - (int)zoomState.currentTargetZoomSteps);
+            if (zoomSteps != 0)
+            {
+                uint newZoomStepsInProgress = (uint)((int)zoomState.currentTargetZoomSteps + zoomSteps);
+                if (duration != 0)
+                {
+                    zoomState.zoomCommands.Add(new ZoomCommand(zoomCenter, zoomSteps, duration));
+                }
+                zoomState.currentTargetZoomSteps = newZoomStepsInProgress;
             }
         }
     }
