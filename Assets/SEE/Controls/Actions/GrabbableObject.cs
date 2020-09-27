@@ -72,9 +72,47 @@ namespace SEE.Controls
 
             if (interactable.attachedToHand == null && startingGrabType != GrabTypes.None)
             {
-                Grab(true); // TODO(torben): net action
-                hand.HoverLock(interactable);
-                hand.AttachObject(gameObject, startingGrabType, AttachmentFlags);
+                switch (startingGrabType)
+                {
+                    case GrabTypes.None:
+                        break;
+                    case GrabTypes.Trigger:
+                        break;
+                    case GrabTypes.Pinch:
+                        {
+                            Grab(true); // TODO(torben): net action
+                            hand.HoverLock(interactable);
+                            hand.AttachObject(gameObject, startingGrabType, AttachmentFlags);
+                        }
+                        break;
+                    case GrabTypes.Grip:
+                        {
+                            Interactable rootInteractable = interactable;
+                            while (true)
+                            {
+                                Transform parent = rootInteractable.transform.parent;
+                                if (parent == null)
+                                {
+                                    break;
+                                }
+
+                                Interactable parentInteractable = parent.GetComponent<Interactable>();
+                                if (parentInteractable == null)
+                                {
+                                    break;
+                                }
+
+                                rootInteractable = parentInteractable;
+                            }
+                            hand.HoverLock(rootInteractable);
+                            hand.AttachObject(rootInteractable.gameObject, startingGrabType, AttachmentFlags);
+                        }
+                        break;
+                    case GrabTypes.Scripted:
+                        break;
+                    default:
+                        break;
+                }
             }
             else if (isGrabEnding)
             {
