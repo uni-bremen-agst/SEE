@@ -27,16 +27,16 @@ namespace SEE.Controls.Devices
 	public class VrChartControlsDevice : ChartControls
 	{
 		private readonly SteamVR_Action_Vector2 _moveAction =
-			SteamVR_Input.GetVector2Action(DefaultActionSet, MoveActionName);
+			SteamVR_Input.GetVector2Action(DefaultActionSetName, MoveActionName);
 
 		private readonly SteamVR_Action_Boolean _resetAction =
-			SteamVR_Input.GetBooleanAction(DefaultActionSet, ResetChartsName);
+			SteamVR_Input.GetBooleanAction(DefaultActionSetName, ResetChartsName);
 
 		private readonly SteamVR_Action_Boolean _clickAction =
-			SteamVR_Input.GetBooleanAction(DefaultActionSet, ClickActionName);
+			SteamVR_Input.GetBooleanAction(DefaultActionSetName, ClickActionName);
 
 		private readonly SteamVR_Action_Boolean _createAction =
-			SteamVR_Input.GetBooleanAction(DefaultActionSet, CreateChartActionName);
+			SteamVR_Input.GetBooleanAction(DefaultActionSetName, CreateChartActionName);
 
 		public override bool Toggle => false;
 

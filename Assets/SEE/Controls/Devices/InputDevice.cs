@@ -20,7 +20,7 @@ namespace SEE.Controls
 		/// <summary>
 		/// Name of the action set defined by VR Steam Input.
 		/// </summary>
-		protected const string DefaultActionSet = "default";
+		protected const string DefaultActionSetName = "default";
 
 		/// <summary>
 		/// Name of the throttle action defined by VR Steam Input.
