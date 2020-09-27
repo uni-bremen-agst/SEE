@@ -1,5 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.Game;
+﻿using SEE.Game;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -22,27 +21,9 @@ namespace SEE.GO
             TransparentLine
         }
 
-        public const string OpaqueShaderName = "Custom/OpaquePortalShader";
-        public const string TransparentShaderName = "Custom/TransparentPortalShader";
-        public const string TransparentLineShaderName = "Custom/TransparentLinePortalShader";
-
         public const string OpaqueMaterialName = "Materials/OpaquePortalMaterial";
         public const string TransparentMaterialName = "Materials/TransparentPortalMaterial";
         public const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="shaderType"></param>
-        /// <param name="colorRange"></param>
-        public Materials(ShaderType shaderType, ColorRange colorRange)
-        {
-            Type = shaderType;
-            NumberOfMaterials = colorRange.NumberOfColors;
-            Lower = colorRange.lower;
-            Higher = colorRange.upper;
-            materials = new List<Material[]>() { Init(shaderType, colorRange.NumberOfColors, colorRange.lower, colorRange.upper, 0) };
-        }
 
         /// <summary>
         /// The type of the shaders of this material instance.
@@ -70,6 +51,40 @@ namespace SEE.GO
         /// We will use a color gradient and one material for each color.
         /// </summary>
         private readonly List<Material[]> materials;
+
+
+
+        public Materials(ShaderType shaderType, ColorRange colorRange)
+        {
+            Type = shaderType;
+            NumberOfMaterials = colorRange.NumberOfColors;
+            Lower = colorRange.lower;
+            Higher = colorRange.upper;
+            materials = new List<Material[]>() { Init(shaderType, colorRange.NumberOfColors, colorRange.lower, colorRange.upper, 0) };
+        }
+
+        /// <summary>
+        /// Creates and returns the materials, one for each different color.
+        /// </summary>
+        /// <param name="shaderType">the type of the shader to be used to create the material</param>
+        /// <param name="numberOfColors">the number of materials with different colors to be created</param>
+        /// <param name="lower">the color at the lower end of the color spectrum</param>
+        /// <param name="higher">the color at the higher end of the color spectrum</param>
+        /// <param name="renderQueueOffset">the offset of the render queue</param>
+        /// <returns>materials</returns>
+        private static Material[] Init(ShaderType shaderType, uint numberOfColors, Color lower, Color higher, int renderQueueOffset)
+        {
+            Assert.IsTrue(numberOfColors > 0, "Number of colors must be greater than 0!");
+
+            Material[] result = new Material[numberOfColors];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = New(shaderType, Color.Lerp(lower, higher, (float)i / (float)(numberOfColors - 1)), renderQueueOffset);
+            }
+            return result;
+        }
+
+
 
         /// <summary>
         /// Returns the default material for the given <paramref name="degree"/> (always the identical 
@@ -99,35 +114,16 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Creates and returns the materials, one for each different color.
+        /// Creates and returns a new material of given <paramref name="shaderType"/> and
+        /// <paramref name="color"/>. This material will be unique and not reused by this
+        /// class!
         /// </summary>
-        /// <param name="shaderType">the type of the shader to be used to create the material</param>
-        /// <param name="numberOfColors">the number of materials with different colors to be created</param>
-        /// <param name="lower">the color at the lower end of the color spectrum</param>
-        /// <param name="higher">the color at the higher end of the color spectrum</param>
-        /// <param name="renderQueueOffset">the offset of the render queue</param>
-        /// <returns>materials</returns>
-        private static Material[] Init(ShaderType shaderType, uint numberOfColors, Color lower, Color higher, int renderQueueOffset)
-        {
-            Assert.IsTrue(numberOfColors > 0, "Number of colors must be greater than 0!");
-            
-            Material[] result = new Material[numberOfColors];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = NewMaterial(shaderType, Color.Lerp(lower, higher, (float)i / (float)(numberOfColors - 1)), renderQueueOffset);
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Creates and returns a new material with the given <paramref name="color"/>.
-        /// Reflections are turned off for this material.
-        /// </summary>
-        /// <param name="shaderType">the type of the shader to be used to create the material</param>
+        /// <param name="shaderType">the type of the shader to be used to create the
+        /// material</param>
         /// <param name="color">requested color of the new material</param>
         /// <param name="renderQueueOffset">the offset of the render queue</param>
         /// <returns>new material</returns>
-        public static Material NewMaterial(ShaderType shaderType, Color color, int renderQueueOffset = 0)
+        public static Material New(ShaderType shaderType, Color color, int renderQueueOffset = 0)
         {
             string materialName = null;
 
@@ -145,7 +141,22 @@ namespace SEE.GO
             Material material = new Material(materialPrefab);
             material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + renderQueueOffset;
             material.color = color;
+
             return material;
+        }
+
+        /// <summary>
+        /// Creates and returns a new material of given <paramref name="shaderType"/> and
+        /// <paramref name="color"/>. This material will be unique and not reused by this
+        /// class!
+        /// </summary>
+        /// <param name="shaderType">the type of the shader to be used to create the
+        /// material</param>
+        /// <param name="renderQueueOffset">the offset of the render queue</param>
+        /// <returns>new material</returns>
+        public static Material New(ShaderType shaderType, int renderQueueOffset = 0)
+        {
+            return New(shaderType, Color.white, renderQueueOffset);
         }
     }
 }

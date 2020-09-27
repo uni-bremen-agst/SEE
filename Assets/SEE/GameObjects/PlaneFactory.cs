@@ -28,7 +28,7 @@ namespace SEE.GO
             plane.transform.position = centerPosition;
 
             Renderer planeRenderer = plane.GetComponent<Renderer>();
-            planeRenderer.sharedMaterial = Materials.NewMaterial(shaderType, color, -1);
+            planeRenderer.sharedMaterial = Materials.New(shaderType, color, -1);
 
             // Neither casting nor receiving shadows.
             planeRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;

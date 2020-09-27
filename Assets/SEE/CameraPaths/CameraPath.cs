@@ -292,7 +292,7 @@ namespace SEE.CameraPaths
                     // All path lines have the same material to reduce the number of drawing calls.
                     if (lookoutMaterial == null)
                     {
-                        lookoutMaterial = LineFactory.NewLineMaterial();
+                        lookoutMaterial = Materials.New(Materials.ShaderType.TransparentLine);
                     }
                     line.sharedMaterial = lookoutMaterial;
 
@@ -443,7 +443,7 @@ namespace SEE.CameraPaths
             // All path lines have the same material to reduce the number of drawing calls.
             if (pathMaterial == null)
             {
-                pathMaterial = LineFactory.NewLineMaterial();
+                pathMaterial = Materials.New(Materials.ShaderType.TransparentLine);
             }
             line.sharedMaterial = pathMaterial;
 

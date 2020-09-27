@@ -33,7 +33,7 @@ namespace SEE.GO
         /// The material we use for the circle line. It is the same for all circle lines
         /// to reduce the number of drawing calls.
         /// </summary>
-        private Material material = new Material(LineFactory.DefaultLineMaterial);
+        private Material material = Materials.New(Materials.ShaderType.TransparentLine);
 
         /// <summary>
         /// Attaches a circle line to all game nodes. 
