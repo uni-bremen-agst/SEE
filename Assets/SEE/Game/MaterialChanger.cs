@@ -34,14 +34,9 @@ namespace SEE.Game
             {
                 oldMaterial = renderer.sharedMaterial;
             }
-            if (isOwner)
-            {
-                renderer.sharedMaterial = localSpecialMaterial;
-            }
-            else
-            {
-                renderer.sharedMaterial = remoteSpecialMaterial;
-            }
+
+            renderer.sharedMaterial = isOwner ? localSpecialMaterial : remoteSpecialMaterial;
+            renderer.sharedMaterial.renderQueue = oldMaterial.renderQueue;
         }
 
         /// <summary>
