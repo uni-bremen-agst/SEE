@@ -13,7 +13,6 @@ namespace SEE.Controls
         [Tooltip("The color to be used when the object is to be highlighted some other client.")]
         public Color RemoteHightlightColor = new Color(0.8f, 1.0f, 0.2f);
 
-        
         /// <summary>
         /// True if the object is currently being hovered over.
         /// </summary>
@@ -27,11 +26,11 @@ namespace SEE.Controls
         protected override void Awake()
         {
             base.Awake();
-            // TODO(torben): see GrabbableObject
-            //Shader shader = gameObject.GetComponent<Renderer>().material.shader;
-            //HighlightMaterialChanger = new MaterialChanger(gameObject, 
-            //                                               Materials.NewMaterial(shader, LocalHightlightColor), 
-            //                                               Materials.NewMaterial(shader, RemoteHightlightColor));
+            HighlightMaterialChanger = new MaterialChanger(
+                gameObject, 
+                Materials.NewMaterial(Materials.ShaderType.Transparent, LocalHightlightColor), 
+                Materials.NewMaterial(Materials.ShaderType.Transparent, RemoteHightlightColor)
+            );
         }
 
         public virtual void Hovered(bool isOwner)
@@ -61,7 +60,7 @@ namespace SEE.Controls
         private void OnHandHoverBegin(Hand hand)
         {
             // TODO: multiplayersupport
-            //Hovered(true);
+            Hovered(true);
         }
 
         /// <summary>
@@ -73,7 +72,7 @@ namespace SEE.Controls
         private void OnHandHoverEnd(Hand hand)
         {
             // TODO: multiplayersupport
-            //Unhovered();
+            Unhovered();
         }
     }
 }

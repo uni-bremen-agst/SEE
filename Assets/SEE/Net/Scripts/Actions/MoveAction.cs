@@ -55,7 +55,7 @@ namespace SEE.Net
             GrabbableObject grabbableObject = (GrabbableObject)InteractableObject.Get(id);
             if (grabbableObject)
             {
-                Assert.IsTrue(grabbableObject.isGrabbed);
+                Assert.IsTrue(grabbableObject.IsGrabbed);
                 grabbableObject.transform.position = position;
                 return true;
             }
