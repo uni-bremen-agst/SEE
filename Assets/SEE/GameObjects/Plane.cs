@@ -20,6 +20,9 @@ namespace SEE
         [Tooltip("The correction factor by which to scale to the true lengths in Unity units.")]
         public float ScaleFactor = 1.0f;
 
+        [HideInInspector]
+        public float HeightOffset = 0.0f;
+
         /// <summary>
         /// Returns the scale in Unity units by applying the ScaleFactor to the lossy scale
         /// of the transform.
@@ -94,7 +97,7 @@ namespace SEE
             get
             {
                 Vector3 scale = GetScale();
-                return transform.position + new Vector3(0.0f, scale.y / 2.0f + float.Epsilon, 0.0f);
+                return transform.position + new Vector3(0.0f, HeightOffset, 0.0f);
             }
         }
     }

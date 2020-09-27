@@ -57,7 +57,7 @@ Properties {
 SubShader {
 	Tags 
 	{
-		"Queue"="Transparent"
+		"Queue"="Transparent+999"
 		"IgnoreProjector"="True"
 		"RenderType"="Transparent"
 	}
@@ -97,8 +97,8 @@ SubShader {
 		#include "UnityUI.cginc"
 		#include "TMPro_Properties.cginc"
 
-		uniform float2 portalMin;
-		uniform float2 portalMax;
+		uniform float2 _PortalMin;
+		uniform float2 _PortalMax;
 
 		struct vertex_t {
 			UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -245,8 +245,8 @@ SubShader {
 			clip(c.a - 0.001);
 			#endif
 
-			if (input.v.x < portalMin.x || input.v.z < portalMin.y ||
-				input.v.x > portalMax.x || input.v.z > portalMax.y
+			if (input.v.x < _PortalMin.x || input.v.z < _PortalMin.y ||
+				input.v.x > _PortalMax.x || input.v.z > _PortalMax.y
 				)
 			{
 				c = fixed4(0.0f, 0.0f, 0.0f, 0.0f);

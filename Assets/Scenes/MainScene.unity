@@ -6560,12 +6560,12 @@ Shader:
           uv)\r\n            {\r\n                fixed4 color = tex2D (_MainTex,
           uv);\r\n \r\n#if ETC1_EXTERNAL_ALPHA\r\n                // get the color
           from an external texture (usecase: Alpha support for ETC1 on android)\r\n               
-          color.a = tex2D (_AlphaTex, uv).r;\r\n#endif //ETC1_EXTERNAL_ALPHA\r\n
-          \r\n                return color;\r\n            }\r\n \r\n           
-          fixed4 frag(v2f IN) : SV_Target\r\n            {\r\n                fixed4
-          c = SampleSpriteTexture (IN.texcoord) * IN.color;\r\n\t\t\t\tif (IN.worldPos.x
-          < portalMin.x || IN.worldPos.z < portalMin.y ||\r\n\t\t\t\t\tIN.worldPos.x
-          > portalMax.x || IN.worldPos.z > portalMax.y\r\n\t\t\t\t)\r\n\t\t\t\t{\r\n\t\t\t\t\tc.a
+          color.a = tex2D (_AlphaTex, uv).r;\r\n#endif //ETC1_EXTERNAL_ALPHA\r\n\r\n               
+          return color;\r\n            }\r\n \r\n            fixed4 frag(v2f IN)
+          : SV_Target\r\n            {\r\n                fixed4 c = SampleSpriteTexture
+          (IN.texcoord) * IN.color;\r\n\t\t\t\tif (IN.worldPos.x < portalMin.x ||
+          IN.worldPos.z < portalMin.y ||\r\n\t\t\t\t\tIN.worldPos.x > portalMax.x
+          || IN.worldPos.z > portalMax.y\r\n\t\t\t\t)\r\n\t\t\t\t{\r\n\t\t\t\t\tc.a
           = 0.0f;\r\n\t\t\t\t}\r\n                c.rgb *= c.a;\r\n               
           return c;\r\n            }\r\n        "
         m_AssetPath: Assets/Resources/Shaders
@@ -6830,6 +6830,99 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
+--- !u!1 &483782481
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 483782485}
+  - component: {fileID: 483782484}
+  - component: {fileID: 483782483}
+  - component: {fileID: 483782482}
+  m_Layer: 0
+  m_Name: Sphere
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!135 &483782482
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 483782481}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &483782483
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 483782481}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 4dafaa88d3a81b24abb5077c0699d0d2, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &483782484
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 483782481}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &483782485
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 483782481}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.752, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 21
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &497021511
 Mesh:
   m_ObjectHideFlags: 0
@@ -11023,7 +11116,7 @@ Shader:
           Hash: 1f6df6e66d33987fe50e33fa591eb5bb
         m_CodeHash:
           serializedVersion: 2
-          Hash: cde678278fe50a1585f736ab85d51a2c
+          Hash: 00000000000000000000000000000000
         m_FromOther: 1
         m_ForceSyncCompilation: 0
         m_Language: 0
@@ -12179,7 +12272,7 @@ Shader:
           Hash: 97b30b0546964766772cc76d40ed32a7
         m_CodeHash:
           serializedVersion: 2
-          Hash: 2040a31d09488559562943b79dd3230f
+          Hash: 00000000000000000000000000000000
         m_FromOther: 1
         m_ForceSyncCompilation: 0
         m_Language: 0
@@ -12441,7 +12534,7 @@ Shader:
           Hash: 1f6df6e66d33987fe50e33fa591eb5bb
         m_CodeHash:
           serializedVersion: 2
-          Hash: 9047faaab325aa02aeaa900873dde4ba
+          Hash: 00000000000000000000000000000000
         m_FromOther: 1
         m_ForceSyncCompilation: 0
         m_Language: 0
@@ -12682,7 +12775,7 @@ Shader:
           Hash: 6593b5bcf952a51208fc8ab2094ad321
         m_CodeHash:
           serializedVersion: 2
-          Hash: 0b92c4da4726623846323c218cf403cf
+          Hash: 00000000000000000000000000000000
         m_FromOther: 1
         m_ForceSyncCompilation: 0
         m_Language: 0
@@ -12995,7 +13088,7 @@ Shader:
           Hash: 00000000000000000000000000000000
         m_CodeHash:
           serializedVersion: 2
-          Hash: d04141a236e8bbcee3767e44a019df75
+          Hash: 00000000000000000000000000000000
         m_FromOther: 1
         m_ForceSyncCompilation: 0
         m_Language: 0
@@ -13213,7 +13306,7 @@ Shader:
           Hash: 6593b5bcf952a51208fc8ab2094ad321
         m_CodeHash:
           serializedVersion: 2
-          Hash: 3227f3e49350e8227a836c909d6fd836
+          Hash: 00000000000000000000000000000000
         m_FromOther: 1
         m_ForceSyncCompilation: 0
         m_Language: 0
@@ -13660,7 +13753,7 @@ Shader:
           Hash: 6593b5bcf952a51208fc8ab2094ad321
         m_CodeHash:
           serializedVersion: 2
-          Hash: 3dec6f0b6d99de8db6c839dd104e8499
+          Hash: 00000000000000000000000000000000
         m_FromOther: 1
         m_ForceSyncCompilation: 0
         m_Language: 0
@@ -14101,7 +14194,7 @@ Shader:
           requirements: 4075
         m_NonStrippedUserKeywords: INSTANCING_ON
         m_BuiltinKeywords: 
-    m_MeshComponentsFromSnippets: 19
+    m_MeshComponentsFromSnippets: 3
     m_HasSurfaceShaders: 0
     m_HasFixedFunctionShaders: 0
 --- !u!1 &776531487
@@ -15843,17 +15936,17 @@ Shader:
           mul(unity_ObjectToWorld, float4(IN.vertex.x, IN.vertex.y, IN.vertex.z,
           1.0)).xyz;\r\n                OUT.texcoord = IN.texcoord;\r\n               
           OUT.color = IN.color * _Color;\r\n                #ifdef PIXELSNAP_ON\r\n               
-          OUT.vertex = UnityPixelSnap (OUT.vertex);\r\n                #endif\r\n
-          \r\n                return OUT;\r\n            }\r\n \r\n            sampler2D
-          _MainTex;\r\n            sampler2D _AlphaTex;\r\n \r\n            fixed4
-          SampleSpriteTexture (float2 uv)\r\n            {\r\n                fixed4
-          color = tex2D (_MainTex, uv);\r\n \r\n#if ETC1_EXTERNAL_ALPHA\r\n               
-          // get the color from an external texture (usecase: Alpha support for ETC1
-          on android)\r\n                color.a = tex2D (_AlphaTex, uv).r;\r\n#endif
-          //ETC1_EXTERNAL_ALPHA\r\n \r\n                return color;\r\n           
-          }\r\n \r\n            fixed4 frag(v2f IN) : SV_Target\r\n            {\r\n               
-          fixed4 c = SampleSpriteTexture (IN.texcoord) * IN.color;\r\n\t\t\t\tif
-          (IN.worldPos.x < portalMin.x || IN.worldPos.z < portalMin.y ||\r\n\t\t\t\t\tIN.worldPos.x
+          OUT.vertex = UnityPixelSnap (OUT.vertex);\r\n                #endif\r\n\r\n               
+          return OUT;\r\n            }\r\n \r\n            sampler2D _MainTex;\r\n           
+          sampler2D _AlphaTex;\r\n \r\n            fixed4 SampleSpriteTexture (float2
+          uv)\r\n            {\r\n                fixed4 color = tex2D (_MainTex,
+          uv);\r\n \r\n#if ETC1_EXTERNAL_ALPHA\r\n                // get the color
+          from an external texture (usecase: Alpha support for ETC1 on android)\r\n               
+          color.a = tex2D (_AlphaTex, uv).r;\r\n#endif //ETC1_EXTERNAL_ALPHA\r\n
+          \r\n                return color;\r\n            }\r\n \r\n           
+          fixed4 frag(v2f IN) : SV_Target\r\n            {\r\n                fixed4
+          c = SampleSpriteTexture (IN.texcoord) * IN.color;\r\n\t\t\t\tif (IN.worldPos.x
+          < portalMin.x || IN.worldPos.z < portalMin.y ||\r\n\t\t\t\t\tIN.worldPos.x
           > portalMax.x || IN.worldPos.z > portalMax.y\r\n\t\t\t\t)\r\n\t\t\t\t{\r\n\t\t\t\t\tc.a
           = 0.0f;\r\n\t\t\t\t}\r\n                c.rgb *= c.a;\r\n               
           return c;\r\n            }\r\n        "
@@ -20860,7 +20953,7 @@ Shader:
           Hash: 1f6df6e66d33987fe50e33fa591eb5bb
         m_CodeHash:
           serializedVersion: 2
-          Hash: cde678278fe50a1585f736ab85d51a2c
+          Hash: 00000000000000000000000000000000
         m_FromOther: 1
         m_ForceSyncCompilation: 0
         m_Language: 0
@@ -21602,7 +21695,7 @@ Shader:
           Hash: 97b30b0546964766772cc76d40ed32a7
         m_CodeHash:
           serializedVersion: 2
-          Hash: 2040a31d09488559562943b79dd3230f
+          Hash: 00000000000000000000000000000000
         m_FromOther: 1
         m_ForceSyncCompilation: 0
         m_Language: 0
@@ -22142,7 +22235,7 @@ Shader:
           Hash: 1f6df6e66d33987fe50e33fa591eb5bb
         m_CodeHash:
           serializedVersion: 2
-          Hash: 9047faaab325aa02aeaa900873dde4ba
+          Hash: 00000000000000000000000000000000
         m_FromOther: 1
         m_ForceSyncCompilation: 0
         m_Language: 0
@@ -22369,7 +22462,7 @@ Shader:
           Hash: 97b30b0546964766772cc76d40ed32a7
         m_CodeHash:
           serializedVersion: 2
-          Hash: f0025afd400e6b75c5a3b1560c7a9f5e
+          Hash: 00000000000000000000000000000000
         m_FromOther: 1
         m_ForceSyncCompilation: 0
         m_Language: 0
@@ -22708,7 +22801,7 @@ Shader:
           Hash: 6593b5bcf952a51208fc8ab2094ad321
         m_CodeHash:
           serializedVersion: 2
-          Hash: 0b92c4da4726623846323c218cf403cf
+          Hash: 00000000000000000000000000000000
         m_FromOther: 1
         m_ForceSyncCompilation: 0
         m_Language: 0
@@ -22837,7 +22930,7 @@ Shader:
           Hash: 00000000000000000000000000000000
         m_CodeHash:
           serializedVersion: 2
-          Hash: d04141a236e8bbcee3767e44a019df75
+          Hash: 00000000000000000000000000000000
         m_FromOther: 1
         m_ForceSyncCompilation: 0
         m_Language: 0
@@ -23055,7 +23148,7 @@ Shader:
           Hash: 6593b5bcf952a51208fc8ab2094ad321
         m_CodeHash:
           serializedVersion: 2
-          Hash: 3227f3e49350e8227a836c909d6fd836
+          Hash: 00000000000000000000000000000000
         m_FromOther: 1
         m_ForceSyncCompilation: 0
         m_Language: 0
@@ -23502,7 +23595,7 @@ Shader:
           Hash: 6593b5bcf952a51208fc8ab2094ad321
         m_CodeHash:
           serializedVersion: 2
-          Hash: 3dec6f0b6d99de8db6c839dd104e8499
+          Hash: 00000000000000000000000000000000
         m_FromOther: 1
         m_ForceSyncCompilation: 0
         m_Language: 0
@@ -23943,8 +24036,8 @@ Shader:
           requirements: 4075
         m_NonStrippedUserKeywords: INSTANCING_ON
         m_BuiltinKeywords: 
-    m_MeshComponentsFromSnippets: 19
-    m_HasSurfaceShaders: 1
+    m_MeshComponentsFromSnippets: 3
+    m_HasSurfaceShaders: 0
     m_HasFixedFunctionShaders: 0
 --- !u!21 &1076221187
 Material:
