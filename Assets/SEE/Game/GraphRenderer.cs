@@ -387,17 +387,18 @@ namespace SEE.Game
 
             // Add light to simulate emissive effect
             {
-                const float RangeFactor = 3.0f;
-                //const float IntensityFactor = 4.0f;
-
-                Light light = rootGameNode.AddComponent<Light>();
+                GameObject lightGameObject = new GameObject("Light");
+                lightGameObject.transform.parent = rootGameNode.transform;
+                
+                Light light = lightGameObject.AddComponent<Light>();
 
                 BoundingBox(nodeToGameObject, out Vector2 minCorner, out Vector2 maxCorner);
                 float bbw = maxCorner.x - minCorner.x;
                 float bbh = maxCorner.y - minCorner.y;
-                float diagonalLength = Mathf.Sqrt(bbw * bbw + bbh * bbh);
 
-                light.range = RangeFactor * diagonalLength;
+                lightGameObject.transform.position = rootGameNode.transform.position + new Vector3(0.0f, 0.25f * (bbw + bbh), 0.0f);
+
+                light.range = 3.0f * Mathf.Sqrt(bbw * bbw + bbh * bbh);
                 light.type = LightType.Point;
 
                 Color lightColor = 0.5f * (innerNodeFactory.Materials.Lower + innerNodeFactory.Materials.Higher);
@@ -408,8 +409,6 @@ namespace SEE.Game
                         ((InnerNodeFactory)leafNodeFactory).Materials.Higher);
                 }
 
-                //float area = bbw * bbh;
-                //light.intensity = IntensityFactor * area;
                 light.intensity = 1.0f;
             }
 
