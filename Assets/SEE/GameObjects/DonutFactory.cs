@@ -121,7 +121,8 @@ namespace SEE.GO
         /// <returns>new material</returns>
         private Material NewMaterial(Color color)
         {
-            Material material = new Material(Shader.Find(Materials.OpaqueShaderName))
+            Material materialPrefab = Resources.Load<Material>(Materials.OpaqueMaterialName);
+            Material material = new Material(materialPrefab)
             {
                 color = color
             };

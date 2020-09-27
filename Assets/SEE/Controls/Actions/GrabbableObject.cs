@@ -1,4 +1,5 @@
-﻿using SEE.Game;
+﻿using SEE.DataModel;
+using SEE.Game;
 using SEE.GO;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
@@ -18,16 +19,26 @@ namespace SEE.Controls
 
         public bool IsGrabbed { get; private set; } = false;
 
-        private MaterialChanger grabbingMaterialChanger;
+        private static MaterialChanger grabbingMaterialChanger;
 
         protected override void Awake()
         {
             base.Awake();
+
+            // TODO(torben): this creates two unique materials for every grabbableObject! This can be cached better! same for HighlightableObject
             grabbingMaterialChanger = new MaterialChanger(
                 gameObject, 
-                Materials.NewMaterial(Materials.ShaderType.Transparent, LocalGrabbingColor), 
-                Materials.NewMaterial(Materials.ShaderType.Transparent, RemoteGrabbingColor)
+                Materials.New(Materials.ShaderType.Transparent, LocalGrabbingColor), 
+                Materials.New(Materials.ShaderType.Transparent, RemoteGrabbingColor)
             );
+            Transform parent = transform; // TODO(torben): there needs to be a better way to find the parents! this is slow! same for HighlightableObject
+            while (parent.parent != null)
+            {
+                parent = parent.parent;
+            }
+            Portal.GetDimensions(parent.gameObject, out Vector2 min, out Vector2 max);
+            Portal.SetPortal(min, max, grabbingMaterialChanger.LocalSpecialMaterial);
+            Portal.SetPortal(min, max, grabbingMaterialChanger.RemoteSpecialMaterial);
         }
         
         public void Grab(bool isOwner)
@@ -78,14 +89,14 @@ namespace SEE.Controls
                         break;
                     case GrabTypes.Trigger:
                         break;
-                    case GrabTypes.Pinch:
+                    case GrabTypes.Pinch: // grab and move part of city
                         {
                             Grab(true); // TODO(torben): net action
                             hand.HoverLock(interactable);
                             hand.AttachObject(gameObject, startingGrabType, AttachmentFlags);
                         }
                         break;
-                    case GrabTypes.Grip:
+                    case GrabTypes.Grip: // move city as a whole
                         {
                             Interactable rootInteractable = interactable;
                             while (true)

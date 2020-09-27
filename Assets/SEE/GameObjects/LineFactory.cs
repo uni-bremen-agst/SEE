@@ -9,25 +9,6 @@ namespace SEE.GO
     {
         const float defaultWidth = 0.1f;
 
-        /// <summary>
-        /// The material used for lines.
-        /// </summary>
-        public readonly static Material DefaultLineMaterial = NewLineMaterial();
-
-        /// <summary>
-        /// Returns a new material for lines.
-        /// </summary>
-        /// <returns>default material for edges</returns>
-        public static Material NewLineMaterial()
-        {
-            Material material = new Material(Shader.Find(Materials.TransparentLineShaderName));
-            if (material == null)
-            {
-                Debug.LogErrorFormat("SEE.Go.LineFactory: Could not find material {0} for lines.\n", Materials.TransparentLineShaderName);
-            }
-            return material;
-        }
-
         internal static void SetDefaults(LineRenderer line)
         {
             line.sortingLayerName = "OnTop";

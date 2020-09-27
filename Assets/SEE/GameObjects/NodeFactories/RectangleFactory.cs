@@ -18,7 +18,7 @@ namespace SEE.GO
         public RectangleFactory(ColorRange colorRange, float unit)
             : base(colorRange, unit)
         {
-            material = new Material(LineFactory.DefaultLineMaterial) { color = colorRange.upper };
+            material = Materials.New(Materials.ShaderType.TransparentLine, colorRange.upper);
         }
 
         /// <summary>

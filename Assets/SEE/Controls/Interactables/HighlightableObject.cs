@@ -28,9 +28,17 @@ namespace SEE.Controls
             base.Awake();
             HighlightMaterialChanger = new MaterialChanger(
                 gameObject, 
-                Materials.NewMaterial(Materials.ShaderType.Transparent, LocalHightlightColor), 
-                Materials.NewMaterial(Materials.ShaderType.Transparent, RemoteHightlightColor)
+                Materials.New(Materials.ShaderType.Transparent, LocalHightlightColor), 
+                Materials.New(Materials.ShaderType.Transparent, RemoteHightlightColor)
             );
+            Transform parent = transform;
+            while (parent.parent != null)
+            {
+                parent = parent.parent;
+            }
+            Portal.GetDimensions(parent.gameObject, out Vector2 min, out Vector2 max);
+            Portal.SetPortal(min, max, HighlightMaterialChanger.LocalSpecialMaterial);
+            Portal.SetPortal(min, max, HighlightMaterialChanger.RemoteSpecialMaterial);
         }
 
         public virtual void Hovered(bool isOwner)

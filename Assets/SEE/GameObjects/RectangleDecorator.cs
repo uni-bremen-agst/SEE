@@ -33,7 +33,7 @@ namespace SEE.GO
         /// The material we use for the rectangle line. It is the same for all rectangle lines
         /// to reduce the number of drawing calls.
         /// </summary>
-        private Material material = new Material(LineFactory.DefaultLineMaterial);
+        private Material material = Materials.New(Materials.ShaderType.TransparentLine);
 
         /// <summary>
         /// Attaches a deccorators to rectangle line to all game nodes. 

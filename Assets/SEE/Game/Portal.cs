@@ -57,9 +57,7 @@ namespace SEE.Game
         {
             if (transform.TryGetComponent(out Renderer renderer))
             {
-                Material material = renderer.sharedMaterial;
-                material.SetVector("_PortalMin", new Vector4(leftFront.x, leftFront.y));
-                material.SetVector("_PortalMax", new Vector4(rightBack.x, rightBack.y));
+                SetPortal(leftFront, rightBack, renderer.sharedMaterial);
             }
             foreach (Transform child in transform)
             {
@@ -79,9 +77,14 @@ namespace SEE.Game
             GetDimensions(root, out leftFront, out rightBack);
             foreach (Material material in go.GetComponent<MeshRenderer>().sharedMaterials)
             {
-                material.SetVector("_PortalMin", new Vector4(leftFront.x, leftFront.y));
-                material.SetVector("_PortalMax", new Vector4(rightBack.x, rightBack.y));
+                SetPortal(leftFront, rightBack, material);
             }
+        }
+
+        public static void SetPortal(Vector2 leftFrontCorner, Vector2 rightBackCorner, Material material)
+        {
+            material.SetVector("_PortalMin", new Vector4(leftFrontCorner.x, leftFrontCorner.y));
+            material.SetVector("_PortalMax", new Vector4(rightBackCorner.x, rightBackCorner.y));
         }
     }
 }
