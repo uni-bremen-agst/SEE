@@ -9,6 +9,7 @@ namespace SEE.Controls
     /// <summary>
     /// Implements interactions with a grabbed game object.
     /// </summary>
+    [RequireComponent(typeof(NodeRef))]
     public sealed class GrabbableObject : HoverableObject
     {
         [Tooltip("The color to be used when the object is grabbed by client.")]
@@ -19,19 +20,23 @@ namespace SEE.Controls
 
         public bool IsGrabbed { get; private set; } = false;
 
-        private static MaterialChanger grabbingMaterialChanger;
+        private XRNavigationAction navAction;
+        private MaterialChanger grabbingMaterialChanger;
 
         protected override void Awake()
         {
             base.Awake();
 
+            // TODO(torben): i don't like this!
+            navAction = SEECity.GetByGraph(GetComponent<NodeRef>().node.ItsGraph).GetComponent<XRNavigationAction>();
             // TODO(torben): this creates two unique materials for every grabbableObject! This can be cached better! same for HighlightableObject
             grabbingMaterialChanger = new MaterialChanger(
                 gameObject, 
                 Materials.New(Materials.ShaderType.Transparent, LocalGrabbingColor), 
                 Materials.New(Materials.ShaderType.Transparent, RemoteGrabbingColor)
             );
-            Transform parent = transform; // TODO(torben): there needs to be a better way to find the parents! this is slow! same for HighlightableObject
+            // TODO(torben): there needs to be a better way to find the parents! this is slow! same for HighlightableObject
+            Transform parent = transform;
             while (parent.parent != null)
             {
                 parent = parent.parent;
@@ -78,59 +83,31 @@ namespace SEE.Controls
         /// <param name="hand">the hand hovering over the object</param>
         private void HandHoverUpdate(Hand hand)
         {
-            GrabTypes startingGrabType = hand.GetGrabStarting();
             bool isGrabEnding = hand.IsGrabEnding(this.gameObject);
+            GrabTypes grabType = isGrabEnding ? hand.GetGrabEnding() : hand.GetGrabStarting();
 
-            if (interactable.attachedToHand == null && startingGrabType != GrabTypes.None)
+            if (!isGrabEnding)
             {
-                switch (startingGrabType)
+                if (grabType == GrabTypes.Pinch && interactable.attachedToHand == null)
                 {
-                    case GrabTypes.None:
-                        break;
-                    case GrabTypes.Trigger:
-                        break;
-                    case GrabTypes.Pinch: // grab and move part of city
-                        {
-                            Grab(true); // TODO(torben): net action
-                            hand.HoverLock(interactable);
-                            hand.AttachObject(gameObject, startingGrabType, AttachmentFlags);
-                        }
-                        break;
-                    case GrabTypes.Grip: // move city as a whole
-                        {
-                            Interactable rootInteractable = interactable;
-                            while (true)
-                            {
-                                Transform parent = rootInteractable.transform.parent;
-                                if (parent == null)
-                                {
-                                    break;
-                                }
-
-                                Interactable parentInteractable = parent.GetComponent<Interactable>();
-                                if (parentInteractable == null)
-                                {
-                                    break;
-                                }
-
-                                rootInteractable = parentInteractable;
-                            }
-                            hand.HoverLock(rootInteractable);
-                            hand.AttachObject(rootInteractable.gameObject, startingGrabType, AttachmentFlags);
-                        }
-                        break;
-                    case GrabTypes.Scripted:
-                        break;
-                    default:
-                        break;
+                    Grab(true); // TODO(torben): net action
+                    hand.HoverLock(interactable);
+                    hand.AttachObject(gameObject, grabType, AttachmentFlags);
+                }
+                else if (grabType == GrabTypes.Grip)
+                {
+                    navAction.OnStartGrab(hand, this);
                 }
             }
-            else if (isGrabEnding)
+            else // isGrabEnding == true
             {
-                gameObject.transform.rotation = Quaternion.identity;
-                hand.DetachObject(gameObject);
-                hand.HoverUnlock(interactable);
-                Release(true); // TODO(torben): net action
+                if (grabType == GrabTypes.Pinch)
+                {
+                    gameObject.transform.rotation = Quaternion.identity;
+                    hand.DetachObject(gameObject);
+                    hand.HoverUnlock(interactable);
+                    Release(true); // TODO(torben): net action
+                }
             }
         }
     }

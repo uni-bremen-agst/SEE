@@ -7,7 +7,6 @@ using System.Linq;
 using UnityEngine;
 using OdinSerializer;
 using SEE.DataModel.IO;
-using static SEE.Game.AbstractSEECity;
 using System.IO;
 using SEE.Utils;
 using SEE.Layout;
