@@ -68,11 +68,12 @@ namespace SEE.Controls
 
             cityTransform = GetCityRootNode(gameObject);
             UnityEngine.Assertions.Assert.IsNotNull(cityTransform, "This XRNavigationAction is not attached to a code city!");
-            Debug.LogFormat("NavigationAction controls {0}.\n", cityTransform.name);
 
             SteamVR_Input.GetActionSet("default").Activate();
             leftGripAction = SteamVR_Input.GetBooleanAction("default", "LGrip");
             rightGripAction = SteamVR_Input.GetBooleanAction("default", "RGrip");
+
+            Debug.LogFormat("XRNavigationAction controls {0}.\n", cityTransform.name);
         }
 
         private void Update()
