@@ -96,7 +96,7 @@ namespace SEE.Controls
                 }
                 else if (grabType == GrabTypes.Grip)
                 {
-                    navAction.OnStartGrab(hand, this);
+                    navAction.OnStartGrab(hand);
                 }
             }
             else // isGrabEnding == true
