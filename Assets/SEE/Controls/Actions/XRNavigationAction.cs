@@ -1,5 +1,4 @@
-﻿using SEE.DataModel;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
@@ -15,20 +14,19 @@ namespace SEE.Controls
         {
             None,
             MoveOnly,
-            MoveRotateZoom
+            MoveRotateScale
         }
 
         private Transform cityTransform;
-
         private XRNavigationMode mode;
         private Hand rightHand;
         private Hand leftHand;
-        private GrabbableObject rightGrabbableObject;
-        private GrabbableObject leftGrabbableObject;
-        private float leftAngle;
+        private float rightDistance;
         private float leftDistance;
         private float rightAngle;
-        private float rightDistance;
+        private float leftAngle;
+        private Vector3 cityStartGrabScale;
+        private float startHandDistance;
 
         private SteamVR_Action_Boolean leftGripAction;
         private SteamVR_Action_Boolean rightGripAction;
@@ -75,33 +73,33 @@ namespace SEE.Controls
             SteamVR_Input.GetActionSet("default").Activate();
             leftGripAction = SteamVR_Input.GetBooleanAction("default", "LGrip");
             rightGripAction = SteamVR_Input.GetBooleanAction("default", "RGrip");
-
-            mode = XRNavigationMode.None;
-            leftHand = null;
-            rightHand = null;
-            leftGrabbableObject = null;
-            rightGrabbableObject = null;
         }
 
         private void Update()
         {
+            // release
             if (leftGripAction.stateUp && leftHand)
             {
                 leftHand = null;
-                leftGrabbableObject = null;
                 mode -= 1;
             }
             if (rightGripAction.stateUp && rightHand)
             {
                 rightHand = null;
-                rightGrabbableObject = null;
                 mode -= 1;
             }
 
+            // move, rotate, scale
             if (mode != XRNavigationMode.None)
             {
-                // align with first hand
+                float scaleFactor = 1.0f;
+                if (mode == XRNavigationMode.MoveRotateScale)
+                {
+                    float currentDistance = (leftHand.transform.position.XZ() - rightHand.transform.position.XZ()).magnitude;
+                    scaleFactor = currentDistance / startHandDistance;
+                }
 
+                // align with first hand
                 Hand fstHand = rightHand;
                 float fstDistance = rightDistance;
                 float fstAngle = rightAngle;
@@ -112,55 +110,56 @@ namespace SEE.Controls
                     fstAngle = leftAngle;
                 }
 
+                fstDistance *= scaleFactor;
                 float cityAngleOffset = Mathf.Deg2Rad * cityTransform.rotation.eulerAngles.y;
                 fstAngle -= cityAngleOffset;
+
                 Vector2 fstOffsetV2 = new Vector2(Mathf.Cos(fstAngle), Mathf.Sin(fstAngle)) * fstDistance;
                 Vector2 fstHandPositionV2 = fstHand.transform.position.XZ();
+
                 Vector2 fstNewCityPositionV2 = fstHandPositionV2 - fstOffsetV2;
                 cityTransform.position = new Vector3(fstNewCityPositionV2.x, cityTransform.position.y, fstNewCityPositionV2.y);
 
                 // align with second hand
-
-                if (mode == XRNavigationMode.MoveRotateZoom)
+                if (mode == XRNavigationMode.MoveRotateScale)
                 {
-                    if (leftHand.transform.position.x > rightHand.transform.position.x)
-                    {
-                        int bh = 0;
-                    }
+                    // move, rotate
                     float sndAngle = leftAngle - cityAngleOffset;
-                    Vector2 sndOffsetV2 = new Vector2(Mathf.Cos(sndAngle), Mathf.Sin(sndAngle)) * leftDistance;
-                    Vector2 estimatedSndHandPositionV2 = fstNewCityPositionV2 + sndOffsetV2;
-                    Vector2 actualSndHandPositionV2 = leftHand.transform.position.XZ();
-                    Vector2 v0 = actualSndHandPositionV2 - fstHandPositionV2;
-                    Vector2 v1 = estimatedSndHandPositionV2 - fstHandPositionV2;
+
+                    Vector2 sndOffsetV2 = new Vector2(Mathf.Cos(sndAngle), Mathf.Sin(sndAngle)) * (leftDistance * scaleFactor);
+                    Vector2 sndHandPositionV2 = leftHand.transform.position.XZ();
+
+                    Vector2 v0 = sndHandPositionV2 - fstHandPositionV2;
+                    Vector2 v1 = (fstNewCityPositionV2 + sndOffsetV2) - fstHandPositionV2;
                     float a = Vector2.SignedAngle(v0, v1);
+
                     cityTransform.RotateAround(fstHand.transform.position, Vector3.up, a);
+
+                    // scale
+                    cityTransform.localScale = cityStartGrabScale * scaleFactor;
                 }
             }
         }
 
-        public void OnStartGrab(Hand hand, GrabbableObject grabbableObject)
+        public void OnStartGrab(Hand hand)
         {
             GrabTypes grabType = hand.GetGrabStarting();
             if (grabType == GrabTypes.Grip)
             {
                 ref Hand refHand = ref rightHand;
-                ref GrabbableObject refGrabbableObject = ref rightGrabbableObject;
                 ref float refDistance = ref rightDistance;
                 ref float refAngle = ref rightAngle;
 
                 if (hand.handType == SteamVR_Input_Sources.LeftHand)
                 {
                     refHand = ref leftHand;
-                    refGrabbableObject = ref leftGrabbableObject;
                     refDistance = ref leftDistance;
                     refAngle = ref leftAngle;
                 }
 
-                if (!refHand && !refGrabbableObject)
+                if (!refHand)
                 {
                     refHand = hand;
-                    refGrabbableObject = grabbableObject;
 
                     Vector2 toHandV2 = hand.transform.position.XZ() - cityTransform.position.XZ();
                     refDistance = toHandV2.magnitude;
@@ -169,6 +168,12 @@ namespace SEE.Controls
                     refAngle = Mathf.Atan2(toHandV2.y, toHandV2.x) + Mathf.Deg2Rad * cityTransform.rotation.eulerAngles.y;
 
                     mode += 1;
+                }
+
+                if (mode == XRNavigationMode.MoveRotateScale)
+                {
+                    cityStartGrabScale = cityTransform.localScale;
+                    startHandDistance = (leftHand.transform.position.XZ() - rightHand.transform.position.XZ()).magnitude;
                 }
             }
         }
