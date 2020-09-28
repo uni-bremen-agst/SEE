@@ -78,15 +78,23 @@ namespace SEE.Controls
         private void Update()
         {
             // release
-            if (leftGripAction.stateUp && leftHand)
+            if (!leftGripAction.state && leftHand)
             {
                 leftHand = null;
                 mode -= 1;
+                if (mode == XRNavigationMode.MoveOnly)
+                {
+                    rightDistance = (rightHand.transform.position.XZ() - cityTransform.position.XZ()).magnitude;
+                }
             }
-            if (rightGripAction.stateUp && rightHand)
+            if (!rightGripAction.state && rightHand)
             {
                 rightHand = null;
                 mode -= 1;
+                if (mode == XRNavigationMode.MoveOnly)
+                {
+                    leftDistance = (leftHand.transform.position.XZ() - cityTransform.position.XZ()).magnitude;
+                }
             }
 
             // move, rotate, scale
@@ -143,37 +151,41 @@ namespace SEE.Controls
 
         public void OnStartGrab(Hand hand)
         {
-            GrabTypes grabType = hand.GetGrabStarting();
-            if (grabType == GrabTypes.Grip)
+            if (hand.handType == SteamVR_Input_Sources.LeftHand && leftHand == null
+                || hand.handType == SteamVR_Input_Sources.RightHand && rightHand == null)
             {
-                ref Hand refHand = ref rightHand;
-                ref float refDistance = ref rightDistance;
-                ref float refAngle = ref rightAngle;
-
-                if (hand.handType == SteamVR_Input_Sources.LeftHand)
+                GrabTypes grabType = hand.GetGrabStarting();
+                if (grabType == GrabTypes.Grip)
                 {
-                    refHand = ref leftHand;
-                    refDistance = ref leftDistance;
-                    refAngle = ref leftAngle;
-                }
+                    ref Hand refHand = ref rightHand;
+                    ref float refDistance = ref rightDistance;
+                    ref float refAngle = ref rightAngle;
 
-                if (!refHand)
-                {
-                    refHand = hand;
+                    if (hand.handType == SteamVR_Input_Sources.LeftHand)
+                    {
+                        refHand = ref leftHand;
+                        refDistance = ref leftDistance;
+                        refAngle = ref leftAngle;
+                    }
 
-                    Vector2 toHandV2 = hand.transform.position.XZ() - cityTransform.position.XZ();
-                    refDistance = toHandV2.magnitude;
+                    if (!refHand)
+                    {
+                        refHand = hand;
 
-                    toHandV2.Normalize();
-                    refAngle = Mathf.Atan2(toHandV2.y, toHandV2.x) + Mathf.Deg2Rad * cityTransform.rotation.eulerAngles.y;
+                        Vector2 toHandV2 = hand.transform.position.XZ() - cityTransform.position.XZ();
+                        refDistance = toHandV2.magnitude;
 
-                    mode += 1;
-                }
+                        toHandV2.Normalize();
+                        refAngle = Mathf.Atan2(toHandV2.y, toHandV2.x) + Mathf.Deg2Rad * cityTransform.rotation.eulerAngles.y;
 
-                if (mode == XRNavigationMode.MoveRotateScale)
-                {
-                    cityStartGrabScale = cityTransform.localScale;
-                    startHandDistance = (leftHand.transform.position.XZ() - rightHand.transform.position.XZ()).magnitude;
+                        mode += 1;
+                    }
+
+                    if (mode == XRNavigationMode.MoveRotateScale)
+                    {
+                        cityStartGrabScale = cityTransform.localScale;
+                        startHandDistance = (leftHand.transform.position.XZ() - rightHand.transform.position.XZ()).magnitude;
+                    }
                 }
             }
         }
