@@ -179,7 +179,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &4971443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1337,7 +1336,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &56416408
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1775,7 +1773,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &132199015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1948,7 +1945,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 141690887}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.99999994, y: -4.5, z: 0}
+  m_LocalPosition: {x: -1.0024455, y: -4.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -2103,7 +2100,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 147216271}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 43.594837, z: 0}
   m_LocalScale: {x: 0.99999994, y: 26.18914, z: 0.99999994}
   m_Children:
@@ -2151,7 +2148,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &147216274
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2839,7 +2835,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &218914521
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3278,7 +3273,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &252321066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3485,7 +3479,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &252545681
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4106,7 +4099,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &259323069
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5027,7 +5019,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &295961149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5229,7 +5220,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &299593238
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5431,7 +5421,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &305651082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6170,7 +6159,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &442987517
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6734,7 +6722,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &469760004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6936,7 +6923,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &530100141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7546,7 +7532,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &588316148
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7843,7 +7828,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &611820175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8458,7 +8442,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &657379241
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8661,7 +8644,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &676352094
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8863,7 +8845,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &691818030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9065,7 +9046,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &696088951
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9451,7 +9431,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &738232707
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9653,7 +9632,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &750329666
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10094,7 +10072,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &755109317
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10296,7 +10273,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &768279456
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11272,7 +11248,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &869111654
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11474,7 +11449,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &879954577
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11676,7 +11650,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &899034798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11878,7 +11851,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &901703229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12567,7 +12539,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &920565087
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13214,7 +13185,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1010391815
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13419,7 +13389,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1010479601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13839,7 +13808,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1028673227
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15555,7 +15523,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1167845552
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16355,7 +16322,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1237038505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16817,7 +16783,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1257919095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17021,7 +16986,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1266102059
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17868,7 +17832,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1344008443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18071,7 +18034,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1362329048
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19044,7 +19006,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1446988350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20599,7 +20560,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1558336906
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21731,7 +21691,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1602358970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22409,7 +22368,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1626562202}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.99999994, y: -4, z: 0}
+  m_LocalPosition: {x: 0.99755436, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -22470,7 +22429,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636335451}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -9.632912, y: -4, z: 0}
+  m_LocalPosition: {x: -10.489726, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -22607,7 +22566,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1636376160
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24266,7 +24224,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1650926102
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24474,7 +24431,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1665109898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24676,7 +24632,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1665400681
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26079,7 +26034,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1765816809
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26284,7 +26238,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1772530680
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26458,7 +26411,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776319858}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.632912, y: -4, z: 0}
+  m_LocalPosition: {x: 10.484835, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -27741,7 +27694,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1916621817
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28961,7 +28913,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &1937438686
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29335,7 +29286,6 @@ MonoBehaviour:
   RemoteHightlightColor: {r: 0.8, g: 1, b: 0.2, a: 1}
   LocalGrabbingColor: {r: 0, g: 0, b: 1, a: 1}
   RemoteGrabbingColor: {r: 0.8, g: 0.2, b: 1, a: 1}
-  isGrabbed: 0
 --- !u!114 &2107484601
 MonoBehaviour:
   m_ObjectHideFlags: 0
