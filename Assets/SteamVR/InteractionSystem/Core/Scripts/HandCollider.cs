@@ -84,6 +84,9 @@ namespace Valve.VR.InteractionSystem
         {
             colliders = GetComponentsInChildren<Collider>();
 
+            // Hack to disable collision-handling between controller and objects
+            colliders.ForEach(c => c.isTrigger = true);
+
             if (physicMaterial_lowfriction == null)
             {
                 physicMaterial_lowfriction = new PhysicMaterial("hand_lowFriction");
