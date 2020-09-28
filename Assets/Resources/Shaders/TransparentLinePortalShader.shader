@@ -1,12 +1,12 @@
-﻿Shader "Custom/PortalShaderTransparentLine"
+﻿Shader "Custom/TransparentLinePortalShader"
 {
     Properties
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
         [MaterialToggle] PixelSnap ("Pixel snap", Float) = 0
-		portalMin("Portal Left Front Corner", vector) = (-10, -10, 0, 0)
-		portalMax("Portal Right Back Corner", vector) = (10, 10, 0, 0)
+		_PortalMin("Portal Left Front Corner", vector) = (-10, -10, 0, 0)
+		_PortalMax("Portal Right Back Corner", vector) = (10, 10, 0, 0)
     }
  
     SubShader
@@ -35,9 +35,6 @@
             #pragma multi_compile _ PIXELSNAP_ON
             #pragma multi_compile _ ETC1_EXTERNAL_ALPHA
             #include "UnityCG.cginc"
-
-			float2 portalMin;
-			float2 portalMax;
            
             struct appdata_t
             {
@@ -76,6 +73,8 @@
  
             sampler2D _MainTex;
             sampler2D _AlphaTex;
+			float2 _PortalMin;
+			float2 _PortalMax;
  
             fixed4 SampleSpriteTexture (float2 uv)
             {
@@ -92,8 +91,8 @@
             fixed4 frag(v2f IN) : SV_Target
             {
                 fixed4 c = SampleSpriteTexture (IN.texcoord) * IN.color;
-				if (IN.worldPos.x < portalMin.x || IN.worldPos.z < portalMin.y ||
-					IN.worldPos.x > portalMax.x || IN.worldPos.z > portalMax.y
+				if (IN.worldPos.x < _PortalMin.x || IN.worldPos.z < _PortalMin.y ||
+					IN.worldPos.x > _PortalMax.x || IN.worldPos.z > _PortalMax.y
 				)
 				{
 					c.a = 0.0f;
