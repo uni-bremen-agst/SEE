@@ -436,7 +436,6 @@ namespace SEE.Game
         public enum LeafNodeKinds
         {
             Blocks,
-            Buildings,
         }
 
         /// <summary>

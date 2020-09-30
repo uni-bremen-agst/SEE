@@ -35,9 +35,6 @@ namespace SEE.Game
                 case SEECity.LeafNodeKinds.Blocks:
                     leafNodeFactory = new CubeFactory(ShaderType, this.settings.LeafNodeColorRange);
                     break;
-                case SEECity.LeafNodeKinds.Buildings:
-                    leafNodeFactory = new BuildingFactory();
-                    break;
                 default:
                     throw new Exception("Unhandled GraphSettings.LeafNodeKinds");
             }
