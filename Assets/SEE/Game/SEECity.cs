@@ -136,7 +136,7 @@ namespace SEE.Game
                 }
             }
 
-#if true
+#if false
             foreach (NodeRef nodeRef in FindObjectsOfType<NodeRef>())
             {
                 MeshRenderer meshRenderer = nodeRef.gameObject.GetComponent<MeshRenderer>();

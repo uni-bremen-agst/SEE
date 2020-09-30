@@ -343,13 +343,13 @@ namespace SEE.GO
                 const int triangleCount = 2 * circleTriangleCount + sidesTriangleCount;
                 const int indicesCount = 3 * triangleCount;
 
-                Vector3[] vertices = new Vector3[vertexCount];
-                Vector2[] uv = new Vector2[vertexCount];
-                int[] triangles = new int[indicesCount];
+                Vector3[] positions = new Vector3[vertexCount];
+                Vector2[] uvs = new Vector2[vertexCount];
+                int[] indices = new int[indicesCount];
 
                 // vertices
                 const float y = 0.5f;
-                vertices[0] = new Vector3(0.0f, -y, 0.0f);
+                positions[0] = new Vector3(0.0f, -y, 0.0f);
                 for (int i = 0; i < segments; i++)
                 {
                     float x = 0.5f * Mathf.Cos(((float)i / (float)segments) * 2.0f * Mathf.PI);
@@ -359,50 +359,55 @@ namespace SEE.GO
                     Vector3 topVertex = new Vector3((float)x, y, (float)z);
                     Vector2 textureCoordinates = new Vector2(x, z);
 
-                    vertices[1 + i] = bottomVertex;
-                    vertices[1 + i + segments] = topVertex;
-                    uv[1 + i] = textureCoordinates;
-                    uv[1 + i + segments] = textureCoordinates;
+                    positions[1 + i] = bottomVertex;
+                    positions[1 + i + segments] = topVertex;
+                    uvs[1 + i] = textureCoordinates;
+                    uvs[1 + i + segments] = textureCoordinates;
                 }
-                vertices[vertexCount - 1] = new Vector3(0.0f, y, 0.0f);
+                positions[vertexCount - 1] = new Vector3(0.0f, y, 0.0f);
 
-                // triangles
+                // indices
                 for (int i = 0; i < segments - 1; i++)
                 {
-                    triangles[3 * i + 0] = 0;
-                    triangles[3 * i + 1] = i + 1;
-                    triangles[3 * i + 2] = i + 2;
+                    indices[3 * i + 0] = 0;
+                    indices[3 * i + 1] = i + 1;
+                    indices[3 * i + 2] = i + 2;
 
-                    triangles[3 * segments + 6 * i + 0] = i + 2 + segments;
-                    triangles[3 * segments + 6 * i + 1] = i + 2;
-                    triangles[3 * segments + 6 * i + 2] = i + 1;
-                    triangles[3 * segments + 6 * i + 3] = i + 1;
-                    triangles[3 * segments + 6 * i + 4] = i + 1 + segments;
-                    triangles[3 * segments + 6 * i + 5] = i + 2 + segments;
+                    indices[3 * segments + 6 * i + 0] = i + 2 + segments;
+                    indices[3 * segments + 6 * i + 1] = i + 2;
+                    indices[3 * segments + 6 * i + 2] = i + 1;
+                    indices[3 * segments + 6 * i + 3] = i + 1;
+                    indices[3 * segments + 6 * i + 4] = i + 1 + segments;
+                    indices[3 * segments + 6 * i + 5] = i + 2 + segments;
 
-                    triangles[9 * segments + 3 * i + 0] = vertexCount - 1;
-                    triangles[9 * segments + 3 * i + 1] = i + 2 + segments;
-                    triangles[9 * segments + 3 * i + 2] = i + 1 + segments;
+                    indices[9 * segments + 3 * i + 0] = vertexCount - 1;
+                    indices[9 * segments + 3 * i + 1] = i + 2 + segments;
+                    indices[9 * segments + 3 * i + 2] = i + 1 + segments;
                 }
-                triangles[3 * (segments - 1) + 0] = 0;
-                triangles[3 * (segments - 1) + 1] = (segments - 1) + 1;
-                triangles[3 * (segments - 1) + 2] = 1;
+                indices[3 * (segments - 1) + 0] = 0;
+                indices[3 * (segments - 1) + 1] = (segments - 1) + 1;
+                indices[3 * (segments - 1) + 2] = 1;
 
-                triangles[3 * segments + 6 * (segments - 1) + 0] = 1 + segments;
-                triangles[3 * segments + 6 * (segments - 1) + 1] = 1;
-                triangles[3 * segments + 6 * (segments - 1) + 2] = (segments - 1) + 1;
-                triangles[3 * segments + 6 * (segments - 1) + 3] = (segments - 1) + 1;
-                triangles[3 * segments + 6 * (segments - 1) + 4] = (segments - 1) + 1 + segments;
-                triangles[3 * segments + 6 * (segments - 1) + 5] = 1 + segments;
+                indices[3 * segments + 6 * (segments - 1) + 0] = 1 + segments;
+                indices[3 * segments + 6 * (segments - 1) + 1] = 1;
+                indices[3 * segments + 6 * (segments - 1) + 2] = (segments - 1) + 1;
+                indices[3 * segments + 6 * (segments - 1) + 3] = (segments - 1) + 1;
+                indices[3 * segments + 6 * (segments - 1) + 4] = (segments - 1) + 1 + segments;
+                indices[3 * segments + 6 * (segments - 1) + 5] = 1 + segments;
 
-                triangles[9 * segments + 3 * (segments - 1) + 0] = vertexCount - 1;
-                triangles[9 * segments + 3 * (segments - 1) + 1] = 1 + segments;
-                triangles[9 * segments + 3 * (segments - 1) + 2] = (segments - 1) + 1 + segments;
+                indices[9 * segments + 3 * (segments - 1) + 0] = vertexCount - 1;
+                indices[9 * segments + 3 * (segments - 1) + 1] = 1 + segments;
+                indices[9 * segments + 3 * (segments - 1) + 2] = (segments - 1) + 1 + segments;
 
-                Mesh mesh = new Mesh();
+                Mesh mesh = new Mesh
+                {
+                    vertices = positions,
+                    uv = uvs,
+                    triangles = indices
+                };
+                mesh.RecalculateNormals();
+
                 innerCircle.GetComponent<MeshFilter>().mesh = mesh;
-                mesh.vertices = vertices;
-                mesh.triangles = triangles;
             }
 
             innerCircle.transform.parent = donutChart.transform;
