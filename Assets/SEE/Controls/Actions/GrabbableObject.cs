@@ -1,5 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.Game;
+﻿using SEE.Game;
 using SEE.GO;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
