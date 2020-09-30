@@ -144,11 +144,6 @@ namespace SEE.Controls
                     HoverableObject newHoverableObject = hitObject.GetComponent<HoverableObject>();
                     if (newHoverableObject != null && !newHoverableObject.IsHovered)
                     {
-                        if (selectionDevice is MouseSelection)
-                        {
-                            // TODO: This could possibly also be interesting for other devices
-                            ((MouseSelection)selectionDevice).ResetSelectionTimer();
-                        }
                         HoverableObject oldHoverableObject = handledObject ? handledObject.GetComponent<HoverableObject>() : null;
                         new Net.SelectionAction(oldHoverableObject, newHoverableObject).Execute();
                         objectState = ObjectState.IsSelected;
