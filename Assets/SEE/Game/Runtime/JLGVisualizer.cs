@@ -68,6 +68,8 @@ namespace SEE.Game.Runtime
         /// </summary>
         private Boolean playDirection = true;
 
+        private Boolean lastDirection = true;
+
         /// <summary>
         /// 
         /// </summary>
@@ -163,14 +165,17 @@ namespace SEE.Game.Runtime
             {
                 updateIntervall = 1;
                 playDirection = !playDirection;
+                
                 showLabelUntil = Time.time + 1f;
                 if (playDirection)
                 {
+                    lastDirection = true;
                     statementCounter = statementCounter + 2; //These need to be called because the statementcounter was increased/decreased in the last UpdateVisualization call already. This prevents bugs.
                     labelText = "Forward";
                 }
                 else
                 {
+                    lastDirection = false;
                     statementCounter = statementCounter - 2;
                     labelText = "Rewind";
                 }
@@ -185,13 +190,13 @@ namespace SEE.Game.Runtime
             if (running)
             {
                 if (Input.GetKeyDown(KeyCode.Alpha3))
-                {
+                {                    
                     SpeedUp();
                     showLabelUntil = Time.time + 1f;
                     labelText = "Speed x" + 1f / updateIntervall;
                 }
                 if (Input.GetKeyDown(KeyCode.Alpha1))
-                {
+                {                    
                     SlowDown();
                     showLabelUntil = Time.time + 1f;
                     labelText = "Speed x" + 1f / updateIntervall;
@@ -222,12 +227,14 @@ namespace SEE.Game.Runtime
                         labelText = "Could not find Breakpoint";
                     }
                 }
-                if (Input.GetKeyDown(KeyCode.Alpha3)) {
+                if (Input.GetKeyDown(KeyCode.Alpha3)) {                    
                     OneStep(true);
+                    lastDirection = true;
                 }
                 if (Input.GetKeyDown(KeyCode.Alpha1))
-                {
+                {                    
                     OneStep(false);
+                    lastDirection = false;
                 }
                 if (Input.GetKeyDown(KeyCode.N))
                 {
@@ -256,6 +263,7 @@ namespace SEE.Game.Runtime
         /// 
         /// </summary>
         private void UpdateVisualization() {
+            Debug.Log(statementCounter);
             ///Check if currentGo is not GO of current Statement. If true change currentGO and generate FunctionCall to new class and new TextWindow.
             if (!NodeRepresentsStatementLocation(statementCounter, currentGO))
             {
@@ -535,14 +543,14 @@ namespace SEE.Game.Runtime
             if (playDirection)
             {
                 ///If previous statement exitted a class, metaphorically remove the statements class from the callstack 
-                ///by destroying its functionCall and coloring it back to normal. 
+                ///by disabling its functionCall and coloring it back to normal. 
                 if (statementCounter > 0
                         && parsedJLG.AllStatements[statementCounter - 1].StatementType.Equals("exit")
                         && currentGO != GetNodeForStatement(statementCounter - 1))
                 {                    
                     if (FindFunctionCallForGameObjects(GetNodeForStatement(statementCounter-1), currentGO, true) != null)
                     {
-                        FindFunctionCallForGameObjects(GetNodeForStatement(statementCounter - 1), currentGO, true).SetActive(false); // only disable, so it can be enable when the visualization is running backwards
+                        FindFunctionCallForGameObjects(GetNodeForStatement(statementCounter - 1), currentGO, true).SetActive(false); // only disable, so it can be enabled when the visualization is running backwards
                         GetNodeForStatement(statementCounter - 1).GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
                     }
                 }
@@ -630,7 +638,7 @@ namespace SEE.Game.Runtime
                 fileContent = string.Join(Environment.NewLine, lines);
                 currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = fileContent;
 
-                ///Scroll the Scroll rect so the current line is in the middle.
+                ///Scroll the Scroll rect so the current line is visible. This is not optimal yet, since sometimes it shows the current line right at the top of the Textwindow and not in the middle.
                 currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - ((float)parsedJLG.AllStatements[statementCounter].LineAsInt() / (float)lines.Length);
             }
         }
@@ -818,6 +826,15 @@ namespace SEE.Game.Runtime
         private void OneStep(Boolean direction) {
             Boolean saveDirection = playDirection;
             playDirection = direction;
+            if (!playDirection == lastDirection) {
+                if (direction)
+                {
+                    statementCounter = statementCounter + 2;
+                }
+                else {
+                    statementCounter = statementCounter - 2;
+                }
+            }
             UpdateVisualization();
             playDirection = saveDirection;
         }

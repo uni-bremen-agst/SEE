@@ -91,8 +91,6 @@ namespace SEE.Game.Runtime
         /// </summary>
         private GameObject[] spheres;
 
-        private float[] spheresY;
-
         /// <summary>
         /// The actual distance of the spheres. Optimally very close to
         /// <see cref="SPHERE_OPTIMAL_DISTANCE"/>.
@@ -119,7 +117,6 @@ namespace SEE.Game.Runtime
             int sphereCount = 1 + (int)(sourceToTargetLength / SPHERE_OPTIMAL_DISTANCE);
             sphereActualDistance = sourceToTargetLength / sphereCount;
             spheres = new GameObject[sphereCount];
-            spheresY = new float[sphereCount];
             for (int i = 0; i < spheres.Length; i++)
             {
                 spheres[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -127,10 +124,6 @@ namespace SEE.Game.Runtime
                 spheres[i].transform.rotation = Quaternion.identity;
                 spheres[i].transform.localScale = new Vector3(SPHERE_SCALE, SPHERE_SCALE, SPHERE_SCALE);
                 spheres[i].transform.parent = transform;
-            }
-
-            for (int i = 0; i < spheres.Length; i++) {
-                spheresY[i] = spheres[i].transform.position.y;
             }
 
             sourceOriginalScale = src.transform.localScale;
@@ -258,8 +251,15 @@ namespace SEE.Game.Runtime
                 spheres[i].GetComponentInChildren<MeshRenderer>().material.color = color;
 
                 // Altitude
-                float altitude = SPHERE_MAX_ALTITUDE * Mathf.Sin(t * Mathf.PI);
-                spheres[i].transform.position = new Vector3(spherePosFlat.x, spheresY[i]+altitude, spherePosFlat.y);
+                float srcRoofHeight = src.transform.position.y + src.transform.lossyScale.y / 2.0f;
+                float dstRoofHeight = dst.transform.position.y + dst.transform.lossyScale.y / 2.0f;
+                Vector3 srcPoint = src.transform.position;
+                srcPoint.y = srcRoofHeight;
+                Vector3 dstPoint = dst.transform.position;
+                dstPoint.y = dstRoofHeight;
+                float altitude = Vector3.Lerp(srcPoint, dstPoint, t).y;
+                altitude = altitude + SPHERE_MAX_ALTITUDE * Mathf.Sin(t * Mathf.PI);
+                spheres[i].transform.position = new Vector3(spherePosFlat.x, altitude, spherePosFlat.y);
             }
         }
     }
