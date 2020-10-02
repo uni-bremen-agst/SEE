@@ -13,8 +13,8 @@ Shader "Custom/Outline Fill"
 		[Enum(UnityEngine.Rendering.CompareFunction)] _ZTest("ZTest", Float) = 0
 		_OutlineColor("Outline Color", Color) = (1, 1, 1, 1)
 		_OutlineWidth("Outline Width", Range(0, 10)) = 2
-		portalMin("Portal Left Front Corner", vector) = (-10, -10, 0, 0)
-		portalMax("Portal Right Back Corner", vector) = (10, 10, 0, 0)
+		_PortalMin("Portal Left Front Corner", vector) = (-10, -10, 0, 0)
+		_PortalMax("Portal Right Back Corner", vector) = (10, 10, 0, 0)
 	}
 	
 	SubShader
@@ -66,8 +66,8 @@ Shader "Custom/Outline Fill"
 		uniform fixed4 _OutlineColor;
 		uniform float _OutlineWidth;
 
-		float2 portalMin;
-		float2 portalMax;
+		float2 _PortalMin;
+		float2 _PortalMax;
 
 		v2f vert(appdata input)
 		{
@@ -90,8 +90,8 @@ Shader "Custom/Outline Fill"
 		fixed4 frag(v2f input) : SV_Target
 		{
 			fixed4 c = input.color;
-			if (input.worldPos.x < portalMin.x || input.worldPos.z < portalMin.y ||
-				input.worldPos.x > portalMax.x || input.worldPos.z > portalMax.y
+			if (input.worldPos.x < _PortalMin.x || input.worldPos.z < _PortalMin.y ||
+				input.worldPos.x > _PortalMax.x || input.worldPos.z > _PortalMax.y
 			)
 			{
 				c.a = 0.0f;

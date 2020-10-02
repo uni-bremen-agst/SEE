@@ -23,16 +23,6 @@
       "haptics": [],
       "sources": [
         {
-          "path": "/user/hand/left/input/grip",
-          "mode": "button",
-          "parameters": {},
-          "inputs": {
-            "click": {
-              "output": "/actions/default/in/grabgrip"
-            }
-          }
-        },
-        {
           "path": "/user/hand/left/input/trackpad",
           "mode": "trackpad",
           "parameters": {},
@@ -93,16 +83,6 @@
             },
             "long": {
               "output": "/actions/default/in/home"
-            }
-          }
-        },
-        {
-          "path": "/user/hand/right/input/grip",
-          "mode": "button",
-          "parameters": {},
-          "inputs": {
-            "click": {
-              "output": "/actions/default/in/grabgrip"
             }
           }
         },

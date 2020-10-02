@@ -133,6 +133,7 @@ namespace SEE.Controls
                 Debug.LogWarningFormat("Outline could not be created for '{0}'! The NodeRef seems to not be set.\n", go.name);
             }
 #endif
+            outline.UpdateMaterialProperties();
 
             return outline;
         }

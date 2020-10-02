@@ -77,6 +77,14 @@
       "type": "boolean"
     },
     {
+      "name": "/actions/default/in/LGrip",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/RGrip",
+      "type": "boolean"
+    },
+    {
       "name": "/actions/default/out/Haptic",
       "type": "vibration"
     }
@@ -135,7 +143,6 @@
       "/actions/default/in/Throttle": "Throttle",
       "/actions/default/in/InteractUI": "Interact With UI",
       "/actions/default/in/Teleport": "Teleport",
-      "/actions/default/in/GrabGrip": "Grab Grip",
       "/actions/default/in/GrabPinch": "Grab Pinch",
       "/actions/default/out/Haptic": "Haptic",
       "/actions/default/in/Select": "Select",
@@ -145,7 +152,10 @@
       "/actions/default/in/Home": "Home",
       "/actions/default/in/Zoom": "Zoom",
       "/actions/default/in/ResetCharts": "Reset Charts",
-      "/actions/default/in/CreateChart": "Create Chart"
+      "/actions/default/in/CreateChart": "Create Chart",
+      "/actions/default/in/RGrip": "RGrip",
+      "/actions/default/in/LGrip": "LGrip",
+      "/actions/default/in/GrabGrip": "Grab Grip"
     }
   ]
 }

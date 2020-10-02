@@ -21,16 +21,14 @@ namespace SEE.GO
         /// <param name="depth">depth of the plane (z axis)</param>
         /// <param name="height">height of the plane (y axis)</param>
         /// <returns></returns>
-        public static GameObject NewPlane(Shader shader, Vector3 centerPosition, Color color, float width, float depth, float height = 1.0f)
+        public static GameObject NewPlane(Materials.ShaderType shaderType, Vector3 centerPosition, Color color, float width, float depth, float height = 1.0f)
         {
             GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
             plane.tag = Tags.Decoration;
             plane.transform.position = centerPosition;
 
             Renderer planeRenderer = plane.GetComponent<Renderer>();
-            planeRenderer.sharedMaterial = new Material(planeRenderer.sharedMaterial);
-            planeRenderer.sharedMaterial.shader = shader;
-            planeRenderer.sharedMaterial.color = color;
+            planeRenderer.sharedMaterial = Materials.New(shaderType, color, -1);
 
             // Neither casting nor receiving shadows.
             planeRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
@@ -71,13 +69,13 @@ namespace SEE.GO
         ///    defines the lower end along the y axis</param>
         /// <param name="color">color of the plane</param>
         /// <param name="height">height (thickness) of the plane</param>
-        public static GameObject NewPlane(Shader shader, Vector2 leftFrontCorner, Vector2 rightBackCorner, float groundLevel, Color color, float height = 2 * float.Epsilon)
+        public static GameObject NewPlane(Materials.ShaderType shaderType, Vector2 leftFrontCorner, Vector2 rightBackCorner, float groundLevel, Color color, float height = 2 * float.Epsilon)
         {
             float width = Distance(leftFrontCorner.x, rightBackCorner.x);
             float depth = Distance(leftFrontCorner.y, rightBackCorner.y);
 
             Vector3 centerPosition = new Vector3(leftFrontCorner.x + width / 2.0f, groundLevel + height / 2.0f, leftFrontCorner.y + depth / 2.0f);
-            return NewPlane(shader, centerPosition, color, width, depth, height);
+            return NewPlane(shaderType, centerPosition, color, width, depth, height);
         }
 
         /// <summary>

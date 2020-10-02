@@ -75,6 +75,25 @@ namespace SEE.Game
             }
         }
 
+        private static Dictionary<string, SEECity> dict = new Dictionary<string, SEECity>();
+        public static SEECity GetByGraph(Graph graph)
+        {
+            SEECity result = null;
+
+            if (graph.Path != null)
+            {
+                if (!dict.TryGetValue(graph.Path, out result))
+                {
+                    if (graph.Name != null)
+                    {
+                        dict.TryGetValue(graph.Name, out result);
+                    }
+                }
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// Loads the graph from GXLPath() and sets all NodeRef components to the
         /// loaded nodes if GXLPath() yields a valid filename. This "deserializes"
@@ -105,7 +124,19 @@ namespace SEE.Game
                 Debug.LogError("SEECity.Awake: GXL file is undefined.\n");
             }
 
-#if true
+            if (loadedGraph != null)
+            {
+                if (dict.ContainsKey(filename))
+                {
+                    Debug.LogWarning("Graph seems to exists twice!");
+                }
+                else
+                {
+                    dict.Add(filename, this);
+                }
+            }
+
+#if false
             foreach (NodeRef nodeRef in FindObjectsOfType<NodeRef>())
             {
                 MeshRenderer meshRenderer = nodeRef.gameObject.GetComponent<MeshRenderer>();

@@ -40,14 +40,14 @@ namespace SEE.GO
         /// <returns></returns>
         private static Material[] CreateMaterials()
         {
-            Shader shader = Shader.Find("Diffuse");
+            Material materialPrefab = Resources.Load<Material>(Materials.OpaqueMaterialName);
             Material[] materials = new Material[30];
             float value = 0.0f;
             float inc = 1.0f / (float)materials.Length;
 
             for (int i = 0; i < materials.Length; i++)
             {
-                materials[i] = new Material(shader);
+                materials[i] = new Material(materialPrefab);
                 materials[i].color = Color.Lerp(Color.white, Color.black, value);
                 value += inc;
             }

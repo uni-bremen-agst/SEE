@@ -13,14 +13,12 @@ namespace SEE.GO
         /// Every line width passed as a parameter to methods of this class will be multiplied by this factor
         /// for the actual rendering.
         /// </summary>
-        /// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
         /// <param name="colorRange">the color range of the created objects</param>
         /// <param name="unit">initial unit for the width of all lines</param>
-        public CircleFactory(Shader shader, ColorRange colorRange, float unit)
-            : base(shader, colorRange, unit)
+        public CircleFactory(ColorRange colorRange, float unit)
+            : base(colorRange, unit)
         {
-            material = new Material(materials.DefaultMaterial(0, 0));
-            material.color = colorRange.upper;
+            material = Materials.New(Materials.ShaderType.TransparentLine, colorRange.upper);
         }
 
         /// <summary>
@@ -33,7 +31,7 @@ namespace SEE.GO
         /// </summary>
         private const float defaultRadius = 0.5f;
 
-        public override GameObject NewBlock(int index = 0, int level = 0)
+        public override GameObject NewBlock(int index = 0, int renderQueueOffset = 0)
         {
             GameObject result = new GameObject();
             AttachCircleLine(result, defaultRadius, Unit * defaultLineWidth, material.color);

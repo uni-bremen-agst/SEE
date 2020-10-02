@@ -12,11 +12,11 @@ namespace SEE.GO
     /// </summary>
     public class EdgeFactory
     {
-        public EdgeFactory(Shader shader, IEdgeLayout layout, float edgeWidth)
+        public EdgeFactory(IEdgeLayout layout, float edgeWidth)
         {
             this.layout = layout;
             this.edgeWidth = edgeWidth;
-            defaultLineMaterial = LineMaterial(shader);
+            defaultLineMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
         }
 
         /// <summary>
@@ -28,16 +28,6 @@ namespace SEE.GO
         /// The material used for edges.
         /// </summary>
         protected readonly Material defaultLineMaterial;
-
-        /// <summary>
-        /// Returns the default material for edges using the materialPath.
-        /// </summary>
-        /// <returns>default material for edges</returns>
-        private static Material LineMaterial(Shader shader)
-        {
-            Material material = new Material(shader);
-            return material;
-        }
 
         private readonly float edgeWidth;
 

@@ -110,46 +110,5 @@ namespace SEE.Controls
             bool result = interactableObjects.TryGetValue(id, out InteractableObject interactableObject);
             return interactableObject;
         }
-
-        //---------------------------------------------------------
-        // Called when this GameObject becomes attached to the hand
-        //-------------------------------------------------
-        //private void OnAttachedToHand(Hand hand)
-        //{
-        //    sourceText.text = sourceName;
-        //    hoveringText.text = detailText;
-        //}
-
-        //-------------------------------------------------
-        // Called when this GameObject is detached from the hand
-        //-------------------------------------------------
-        //private void OnDetachedFromHand(Hand hand)
-        //{
-        //    sourceText.text = sourceName;
-        //    hoveringText.text = "";
-        //}
-
-        //-------------------------------------------------
-        // Called every Update() while this GameObject is attached to the hand
-        //-------------------------------------------------
-        //private void HandAttachedUpdate(Hand hand)
-        //{
-        //    sourceText.text = sourceName;
-        //    hoveringText.text = detailText;
-        //}
-
-        //-------------------------------------------------
-        // Called when this attached GameObject becomes the primary attached object
-        //-------------------------------------------------
-        //private void OnHandFocusAcquired(Hand hand)
-        //{
-        //}
-
-        //-------------------------------------------------
-        // Called when another attached GameObject becomes the primary attached object
-        //-------------------------------------------------
-        //private void OnHandFocusLost(Hand hand)
-        //{
-        //}
     }
 }
