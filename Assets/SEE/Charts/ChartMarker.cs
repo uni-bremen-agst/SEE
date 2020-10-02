@@ -116,14 +116,15 @@ namespace SEE.Charts.Scripts
 		private float _highlightLineLength;
 
 		/// <summary>
-		/// Stores if the marker is accentuated.
+		/// True iff the marker is accentuated.
 		/// </summary>
 		private bool _accentuated;
 
 		/// <summary>
 		/// A text popup containing useful information about the marker and its <see cref="linkedObject" />.
 		/// </summary>
-		[Header("Other"), SerializeField] private TextMeshProUGUI infoText;
+		[Header("Other"), SerializeField] 
+		private TextMeshProUGUI infoText;
 
 		/// <summary>
 		/// Calls methods for initialization.
@@ -405,7 +406,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		public void Accentuate()
         {
-            markerHighlight.TryGetComponent<Image>(out var image);			
+            markerHighlight.TryGetComponent<Image>(out Image image);
             image.color = _accentuated ? ChartManager.Instance.standardColor
                                        : ChartManager.Instance.accentuationColor;
 			_accentuated = !_accentuated;
