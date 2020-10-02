@@ -9,7 +9,7 @@ namespace SEE.Controls.Devices
 	public class XRThrottle : Throttle
 	{
 		private readonly SteamVR_Action_Single _throttleAction =
-			SteamVR_Input.GetSingleAction(DefaultActionSet, ThrottleActionName);
+			SteamVR_Input.GetSingleAction(DefaultActionSetName, ThrottleActionName);
 
 		/// <summary>
 		/// Yields the value from the "Throttle" action as assigned by the user in SteamVR.

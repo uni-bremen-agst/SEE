@@ -9,7 +9,8 @@ namespace SEE.Controls
         private static void PrepareForInteraction(GameObject go)
         {
             go.isStatic = false; // we want to move the object during the game
-            go.AddComponent<Interactable>(); // enable interactions
+            Interactable interactable = go.AddComponent<Interactable>(); // enable interactions
+            interactable.highlightOnHover = false;
             GrabbableObject grabbableObject = go.AddComponent<GrabbableObject>(); // our customized reactions to hovering and grabbing events
             //go.AddComponent<Rigidbody>(); // so the object follows the laws of physics
         }

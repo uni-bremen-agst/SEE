@@ -55,19 +55,13 @@ namespace SEE.Game
         /// <param name="rightBack">right back corner of the culling area</param>
         public static void SetPortal(Transform transform, Vector2 leftFront, Vector2 rightBack)
         {
-            if (transform.TryGetComponent<Renderer>(out Renderer renderer))
+            if (transform.TryGetComponent(out Renderer renderer))
             {
-                Material material = renderer.sharedMaterial;
-                material.SetVector("portalMin", new Vector4(leftFront.x, leftFront.y));
-                material.SetVector("portalMax", new Vector4(rightBack.x, rightBack.y));
-                foreach (Transform child in transform)
-                {
-                    SetPortal(child, leftFront, rightBack);
-                }
+                SetPortal(leftFront, rightBack, renderer.sharedMaterial);
             }
-            else
+            foreach (Transform child in transform)
             {
-                Debug.LogErrorFormat("Game object {0} does not have a renderer attached to it. Culling portal cannot be set.\n", transform.name);
+                SetPortal(child, leftFront, rightBack);
             }
         }
 
@@ -83,9 +77,14 @@ namespace SEE.Game
             GetDimensions(root, out leftFront, out rightBack);
             foreach (Material material in go.GetComponent<MeshRenderer>().sharedMaterials)
             {
-                material.SetVector("portalMin", new Vector4(leftFront.x, leftFront.y));
-                material.SetVector("portalMax", new Vector4(rightBack.x, rightBack.y));
+                SetPortal(leftFront, rightBack, material);
             }
+        }
+
+        public static void SetPortal(Vector2 leftFrontCorner, Vector2 rightBackCorner, Material material)
+        {
+            material.SetVector("_PortalMin", new Vector4(leftFrontCorner.x, leftFrontCorner.y));
+            material.SetVector("_PortalMax", new Vector4(rightBackCorner.x, rightBackCorner.y));
         }
     }
 }

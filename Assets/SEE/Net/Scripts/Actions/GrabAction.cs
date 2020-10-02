@@ -93,7 +93,7 @@ namespace SEE.Net
             {
                 if (grab)
                 {
-                    grabbableObject.Grab(null, IsRequester());
+                    grabbableObject.Grab(IsRequester());
                 }
                 else
                 {

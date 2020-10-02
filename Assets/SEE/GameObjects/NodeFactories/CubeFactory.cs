@@ -14,28 +14,15 @@ namespace SEE.GO
     public class CubeFactory : InnerNodeFactory
     {
         private Mesh cubeMesh;
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
-        /// <param name="colorRange">the color range of the created objects</param>
-        public CubeFactory(Shader shader, ColorRange colorRange)
-            : base(shader, colorRange)
+        
+        public CubeFactory(Materials.ShaderType shaderType, ColorRange colorRange)
+            : base(shaderType, colorRange)
         {
             cubeMesh = new Mesh();
 
-            // For correct rendering of transparency, the faces are defined in the order:
-            // z+, x-, x+, y+, z-
-            // The bottom face is never seen and thus excluded.
-
-            Vector3[] vertices = new Vector3[20]
+            // x-, x+, y-, y+, z-, z+
+            Vector3[] vertices = new Vector3[24]
             {
-                new Vector3( 0.5f, -0.5f,  0.5f),
-                new Vector3(-0.5f, -0.5f,  0.5f),
-                new Vector3(-0.5f,  0.5f,  0.5f),
-                new Vector3( 0.5f,  0.5f,  0.5f),
-                
                 new Vector3(-0.5f, -0.5f,  0.5f),
                 new Vector3(-0.5f, -0.5f, -0.5f),
                 new Vector3(-0.5f,  0.5f, -0.5f),
@@ -46,6 +33,11 @@ namespace SEE.GO
                 new Vector3( 0.5f,  0.5f,  0.5f),
                 new Vector3( 0.5f,  0.5f, -0.5f),
                 
+                new Vector3( 0.5f, -0.5f, -0.5f),
+                new Vector3(-0.5f, -0.5f, -0.5f),
+                new Vector3(-0.5f, -0.5f,  0.5f),
+                new Vector3( 0.5f, -0.5f,  0.5f),
+                
                 new Vector3(-0.5f,  0.5f, -0.5f),
                 new Vector3( 0.5f,  0.5f, -0.5f),
                 new Vector3( 0.5f,  0.5f,  0.5f),
@@ -54,25 +46,30 @@ namespace SEE.GO
                 new Vector3(-0.5f, -0.5f, -0.5f),
                 new Vector3( 0.5f, -0.5f, -0.5f),
                 new Vector3( 0.5f,  0.5f, -0.5f),
-                new Vector3(-0.5f,  0.5f, -0.5f)
+                new Vector3(-0.5f,  0.5f, -0.5f),
+                
+                new Vector3( 0.5f, -0.5f,  0.5f),
+                new Vector3(-0.5f, -0.5f,  0.5f),
+                new Vector3(-0.5f,  0.5f,  0.5f),
+                new Vector3( 0.5f,  0.5f,  0.5f)
             };
 
-            Vector3[] normals = new Vector3[20]
+            Vector3[] normals = new Vector3[24]
             {
-                new Vector3( 0.0f,  0.0f,  1.0f),
-                new Vector3( 0.0f,  0.0f,  1.0f),
-                new Vector3( 0.0f,  0.0f,  1.0f),
-                new Vector3( 0.0f,  0.0f,  1.0f),
+                new Vector3(-1.0f,  0.0f,  0.0f),
+                new Vector3(-1.0f,  0.0f,  0.0f),
+                new Vector3(-1.0f,  0.0f,  0.0f),
+                new Vector3(-1.0f,  0.0f,  0.0f),
 
-                new Vector3(-1.0f,  0.0f,  0.0f),
-                new Vector3(-1.0f,  0.0f,  0.0f),
-                new Vector3(-1.0f,  0.0f,  0.0f),
-                new Vector3(-1.0f,  0.0f,  0.0f),
+                new Vector3( 1.0f,  0.0f,  0.0f),
+                new Vector3( 1.0f,  0.0f,  0.0f),
+                new Vector3( 1.0f,  0.0f,  0.0f),
+                new Vector3( 1.0f,  0.0f,  0.0f),
                 
-                new Vector3( 1.0f,  0.0f,  0.0f),
-                new Vector3( 1.0f,  0.0f,  0.0f),
-                new Vector3( 1.0f,  0.0f,  0.0f),
-                new Vector3( 1.0f,  0.0f,  0.0f),
+                new Vector3( 0.0f, -1.0f,  0.0f),
+                new Vector3( 0.0f, -1.0f,  0.0f),
+                new Vector3( 0.0f, -1.0f,  0.0f),
+                new Vector3( 0.0f, -1.0f,  0.0f),
                 
                 new Vector3( 0.0f,  1.0f,  0.0f),
                 new Vector3( 0.0f,  1.0f,  0.0f),
@@ -82,17 +79,23 @@ namespace SEE.GO
                 new Vector3( 0.0f,  0.0f, -1.0f),
                 new Vector3( 0.0f,  0.0f, -1.0f),
                 new Vector3( 0.0f,  0.0f, -1.0f),
-                new Vector3( 0.0f,  0.0f, -1.0f)
+                new Vector3( 0.0f,  0.0f, -1.0f),
+                
+                new Vector3( 0.0f,  0.0f,  1.0f),
+                new Vector3( 0.0f,  0.0f,  1.0f),
+                new Vector3( 0.0f,  0.0f,  1.0f),
+                new Vector3( 0.0f,  0.0f,  1.0f)
             };
 
             // Note: Winding order in unity is clockwise
-            int[] indices = new int[30]
+            int[] indices = new int[36]
             {
                  0,  3,  2,  2,  1,  0,
                  4,  7,  6,  6,  5,  4,
                  8, 11, 10, 10,  9,  8,
                 12, 15, 14, 14, 13, 12,
-                16, 19, 18, 18, 17, 16
+                16, 19, 18, 18, 17, 16,
+                20, 23, 22, 22, 21, 20
             };
 
             cubeMesh.SetVertices(vertices);
@@ -100,7 +103,7 @@ namespace SEE.GO
             cubeMesh.SetIndices(indices, MeshTopology.Triangles, 0);
         }
 
-        public override GameObject NewBlock(int style, int level = 0)
+        public override GameObject NewBlock(int style, int renderQueueOffset = 0)
         {
             GameObject result = new GameObject("Cube") { tag = Tags.Node };
             //SetHeight(result, DefaultHeight);
@@ -109,7 +112,7 @@ namespace SEE.GO
             result.AddComponent<BoxCollider>();
 
             MeshRenderer renderer = result.AddComponent<MeshRenderer>();
-            renderer.sharedMaterial = materials.DefaultMaterial(level, Mathf.Clamp(style, 0, (int)materials.NumberOfMaterials - 1)); ;
+            renderer.sharedMaterial = Materials.Get(renderQueueOffset, Mathf.Clamp(style, 0, (int)Materials.NumberOfMaterials - 1)); ;
             renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;

@@ -57,7 +57,7 @@ namespace SEE.Charts.Scripts.VR
 		/// </summary>
 		private void GetSettingData()
 		{
-			_chartAction = GameObject.Find("VRPlayer").GetComponent<Actor>().ChartAction;
+			_chartAction = GameObject.Find("VRPlayer").GetComponent<ChartAction>();
 		}
 
 		/// <summary>

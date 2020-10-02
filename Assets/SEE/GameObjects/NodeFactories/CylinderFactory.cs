@@ -13,18 +13,18 @@ namespace SEE.GO
 		/// </summary>
 		/// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
 		/// <param name="colorRange">the color range of the created objects</param>
-		public CylinderFactory(Shader shader, ColorRange colorRange)
-			: base(shader, colorRange)
+		public CylinderFactory(Materials.ShaderType shaderType, ColorRange colorRange)
+			: base(shaderType, colorRange)
         { }
 
-        public override GameObject NewBlock(int style = 0, int level = 0)
+        public override GameObject NewBlock(int style = 0, int renderQueueOffset = 0)
 		{
 			GameObject result = CreateCylinder();
 			result.AddComponent<MeshCollider>();
 
 			MeshRenderer renderer = result.AddComponent<MeshRenderer>();
             renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
-            renderer.sharedMaterial = materials.DefaultMaterial(level, style);
+            renderer.sharedMaterial = Materials.Get(renderQueueOffset, style);
 			renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 			renderer.receiveShadows = false;
 
