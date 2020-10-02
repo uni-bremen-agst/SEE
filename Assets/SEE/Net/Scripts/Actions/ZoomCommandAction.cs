@@ -11,10 +11,10 @@ namespace SEE.Net
     {
         public int navigationActionID;
         public Vector2 zoomCenter;
-        public int zoomSteps;
+        public float zoomSteps;
         public float duration;
 
-        public ZoomCommandAction(DesktopNavigationAction navigationAction, Vector2 zoomCenter, int zoomSteps, float duration) : base(false)
+        public ZoomCommandAction(DesktopNavigationAction navigationAction, Vector2 zoomCenter, float zoomSteps, float duration) : base(false)
         {
             navigationActionID = navigationAction.ID;
             this.zoomCenter = zoomCenter;
@@ -31,7 +31,7 @@ namespace SEE.Net
         {
             bool result = false;
 
-            DesktopNavigationAction navigationAction = DesktopNavigationAction.Get(navigationActionID);
+            NavigationAction navigationAction = NavigationAction.Get(navigationActionID);
             if (navigationAction)
             {
                 navigationAction.PushZoomCommand(zoomCenter, zoomSteps, duration);

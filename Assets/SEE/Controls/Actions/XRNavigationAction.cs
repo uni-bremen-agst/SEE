@@ -8,7 +8,7 @@ namespace SEE.Controls
 
     [RequireComponent(typeof(Collider))]
     [RequireComponent(typeof(Plane))]
-    public class XRNavigationAction : CityAction
+    public class XRNavigationAction : NavigationAction
     {
         private enum XRNavigationMode
         {
@@ -34,24 +34,6 @@ namespace SEE.Controls
         [Tooltip("The area in which to draw the code city")]
         [SerializeField] private Plane portalPlane;
 
-        [Tooltip("The unique ID used for network synchronization. This must be set via inspector to ensure that every client will have the correct ID assigned to the appropriate NavigationAction!")]
-        [SerializeField] private int id;
-
-        private static readonly Dictionary<int, XRNavigationAction> navigationActionDict = new Dictionary<int, XRNavigationAction>(2);
-        public static XRNavigationAction Get(int id)
-        {
-            bool result = navigationActionDict.TryGetValue(id, out XRNavigationAction value);
-            if (result)
-            {
-                return value;
-            }
-            else
-            {
-                Debug.LogWarning("ID does not match any NavigationAction!");
-                return null;
-            }
-        }
-
 
 
         private void Start()
@@ -63,8 +45,8 @@ namespace SEE.Controls
             }
 
             UnityEngine.Assertions.Assert.IsNotNull(portalPlane, "The culling plane must not be null!");
-            UnityEngine.Assertions.Assert.IsTrue(!navigationActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!");
-            navigationActionDict.Add(id, this);
+            UnityEngine.Assertions.Assert.IsTrue(!idToActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!");
+            idToActionDict.Add(id, this);
 
             cityTransform = GetCityRootNode(gameObject);
             UnityEngine.Assertions.Assert.IsNotNull(cityTransform, "This XRNavigationAction is not attached to a code city!");

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using SEE.DataModel;
 using SEE.GO;
+using System.Collections.Generic;
 
 namespace SEE.Controls
 {
@@ -9,7 +10,6 @@ namespace SEE.Controls
     /// </summary>
     public abstract class CityAction : MonoBehaviour
     {
-
         /// <summary>
         /// Returns first child of <paramref name="codeCity"/> tagged by Tags.Node. 
         /// If <paramref name="codeCity"/> is a node representing a code city,

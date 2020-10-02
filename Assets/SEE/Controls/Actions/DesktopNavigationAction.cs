@@ -8,43 +8,13 @@ namespace SEE.Controls
 
     [RequireComponent(typeof(Collider))]
     [RequireComponent(typeof(Plane))]
-    public class DesktopNavigationAction : CityAction
+    public class DesktopNavigationAction : NavigationAction
     {
         private enum NavigationMode
         {
             Move,
             Rotate,
             NavigationModeCount
-        }
-
-        internal class ZoomCommand
-        {
-            public readonly int TargetZoomSteps;
-            public readonly Vector2 ZoomCenter;
-            private readonly float duration;
-            private readonly float startTime;
-
-            internal ZoomCommand(Vector2 zoomCenter, int targetZoomSteps, float duration)
-            {
-                TargetZoomSteps = targetZoomSteps;
-                ZoomCenter = zoomCenter;
-                this.duration = duration;
-                startTime = Time.realtimeSinceStartup;
-            }
-
-            internal bool IsFinished()
-            {
-                bool result = Time.realtimeSinceStartup - startTime >= duration;
-                return result;
-            }
-
-            internal float CurrentDeltaScale()
-            {
-                float x = Mathf.Min((Time.realtimeSinceStartup - startTime) / duration, 1.0f);
-                float t = 0.5f - 0.5f * Mathf.Cos(x * Mathf.PI);
-                float result = t * (float)TargetZoomSteps;
-                return result;
-            }
         }
 
         private struct MoveState
@@ -74,18 +44,6 @@ namespace SEE.Controls
             internal float startAngle;
         }
 
-        private struct ZoomState
-        {
-            internal const float DefaultZoomDuration = 0.1f;
-            internal const uint ZoomMaxSteps = 32;
-            internal const float ZoomFactor = 0.5f;
-
-            internal Vector3 originalScale;
-            internal List<ZoomCommand> zoomCommands;
-            internal uint currentTargetZoomSteps;
-            internal float currentZoomFactor;
-        }
-
         private struct ActionState
         {
             internal bool startDrag;         // drag entire city
@@ -106,31 +64,10 @@ namespace SEE.Controls
 
         private MoveState moveState;
         private RotateState rotateState;
-        private ZoomState zoomState;
         private ActionState actionState;
 
         [Tooltip("The area in which to draw the code city")]
         public Plane portalPlane;
-
-        [Tooltip("The unique ID used for network synchronization. This must be set via inspector to ensure that every client will have the correct ID assigned to the appropriate NavigationAction!")]
-        [SerializeField]
-        private int id;
-        public int ID { get => id; }
-
-        private static readonly Dictionary<int, DesktopNavigationAction> navigationActionDict = new Dictionary<int, DesktopNavigationAction>(2);
-        public static DesktopNavigationAction Get(int id)
-        {
-            bool result = navigationActionDict.TryGetValue(id, out DesktopNavigationAction value);
-            if (result)
-            {
-                return value;
-            }
-            else
-            {
-                Debug.LogWarning("ID does not match any NavigationAction!");
-                return null;
-            }
-        }
 
 
 
@@ -143,8 +80,8 @@ namespace SEE.Controls
             }
 
             UnityEngine.Assertions.Assert.IsNotNull(portalPlane, "The culling plane must not be null!");
-            UnityEngine.Assertions.Assert.IsTrue(!navigationActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!");
-            navigationActionDict.Add(id, this);
+            UnityEngine.Assertions.Assert.IsTrue(!idToActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!");
+            idToActionDict.Add(id, this);
 
             cityTransform = GetCityRootNode(gameObject);
             UnityEngine.Assertions.Assert.IsNotNull(cityTransform, "This DesktopNavigationAction is not attached to a code city!");
@@ -616,20 +553,6 @@ namespace SEE.Controls
             {
                 insideClippingArea = false;
                 planeHitPoint = Vector3.zero;
-            }
-        }
-
-        internal void PushZoomCommand(Vector2 zoomCenter, int zoomSteps, float duration)
-        {
-            zoomSteps = Mathf.Clamp(zoomSteps, -(int)zoomState.currentTargetZoomSteps, (int)ZoomState.ZoomMaxSteps - (int)zoomState.currentTargetZoomSteps);
-            if (zoomSteps != 0)
-            {
-                uint newZoomStepsInProgress = (uint)((int)zoomState.currentTargetZoomSteps + zoomSteps);
-                if (duration != 0)
-                {
-                    zoomState.zoomCommands.Add(new ZoomCommand(zoomCenter, zoomSteps, duration));
-                }
-                zoomState.currentTargetZoomSteps = newZoomStepsInProgress;
             }
         }
     }
