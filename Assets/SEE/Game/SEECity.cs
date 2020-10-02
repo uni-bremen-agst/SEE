@@ -113,7 +113,18 @@ namespace SEE.Game
                 {
                     Material material = meshRenderer.material;
                     Color color = material.GetColor("_Color");
-                    color.a = 0.5f;
+                    color.a = 1.0f;
+                    material.SetColor("_Color", color);
+                }
+            }
+            foreach (EdgeRef edgeRef in FindObjectsOfType<EdgeRef>())
+            {
+                LineRenderer lineRenderer = edgeRef.gameObject.GetComponent<LineRenderer>();
+                if (lineRenderer)
+                {
+                    Material material = lineRenderer.material;
+                    Color color = material.GetColor("_Color");
+                    color.a = 1.0f;
                     material.SetColor("_Color", color);
                 }
             }
