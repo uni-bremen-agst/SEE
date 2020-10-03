@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 
@@ -123,7 +122,7 @@ namespace SEE.Controls
                         CityTransform.localScale = cityStartGrabScale * scaleFactor;
                     }
 
-                    zoomState.currentZoomFactor = zoomState.originalScale.x / CityTransform.localScale.x;
+                    zoomState.currentZoomFactor = CityTransform.localScale.x / zoomState.originalScale.x;
                     float zoomSteps = ConvertZoomFactorToZoomSteps(zoomState.currentZoomFactor);
                     zoomState.currentTargetZoomSteps = zoomSteps;
                     new Net.SyncCitiesAction(this).Execute();
