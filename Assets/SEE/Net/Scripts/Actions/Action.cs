@@ -82,7 +82,7 @@ namespace SEE.Net
         /// otherwise.</returns>
         protected bool IsRequester()
         {
-            if (Network.UseInOfflineMode)
+            if (Network.UseInOfflineMode || requesterIPAddress == null || requesterPort == -1)
             {
                 return true;
             }
