@@ -15,6 +15,7 @@ namespace SEE.Controls
         public void Start()
         {
             characterController = GetComponent<CharacterController>();
+            ThrottleDevice = GetComponent<Devices.Throttle>();
         }
 
         /// <summary>
