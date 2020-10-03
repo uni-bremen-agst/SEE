@@ -16,6 +16,9 @@ namespace SEE.Controls
         {
             characterController = GetComponent<CharacterController>();
             ThrottleDevice = GetComponent<Devices.Throttle>();
+            DirectionDevice = GetComponent<Devices.Direction>();
+            ViewpointDevice = GetComponent<Devices.Viewpoint>();
+            BoostDevice = GetComponent<Devices.Boost>();
         }
 
         /// <summary>

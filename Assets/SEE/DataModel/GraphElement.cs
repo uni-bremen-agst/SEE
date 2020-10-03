@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SEE.DataModel
 {
@@ -126,6 +127,18 @@ namespace SEE.DataModel
             GraphElement target = (GraphElement)clone;
             target.type = this.type;
             target.graph = null;
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 316397938;
+            hashCode = hashCode * -1521134295 + base.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(type);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Graph>.Default.GetHashCode(graph);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Graph>.Default.GetHashCode(ItsGraph);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Type);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ID);
+            return hashCode;
         }
     }
 }
