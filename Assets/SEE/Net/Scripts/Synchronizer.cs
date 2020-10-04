@@ -43,7 +43,7 @@ namespace SEE.Net
                 else
                 {
                     sendUpdate = false;
-                    new SynchronizeAction(gameObject, false).Execute();
+                    new SynchronizeBuildingTransformAction(gameObject).Execute();
                 }
             }
         }

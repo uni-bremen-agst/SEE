@@ -21,6 +21,7 @@ namespace SEE.Controls
 
         private XRNavigationAction navAction;
         private MaterialChanger grabbingMaterialChanger;
+        private Transform previousParent;
 
         protected override void Awake()
         {
@@ -30,8 +31,8 @@ namespace SEE.Controls
             navAction = SEECity.GetByGraph(GetComponent<NodeRef>().node.ItsGraph).GetComponent<XRNavigationAction>();
             // TODO(torben): this creates two unique materials for every grabbableObject! This can be cached better! same for HighlightableObject
             grabbingMaterialChanger = new MaterialChanger(
-                gameObject, 
-                Materials.New(Materials.ShaderType.Transparent, LocalGrabbingColor), 
+                gameObject,
+                Materials.New(Materials.ShaderType.Transparent, LocalGrabbingColor),
                 Materials.New(Materials.ShaderType.Transparent, RemoteGrabbingColor)
             );
             // TODO(torben): there needs to be a better way to find the parents! this is slow! same for HighlightableObject
@@ -44,6 +45,14 @@ namespace SEE.Controls
             Portal.SetPortal(min, max, grabbingMaterialChanger.LocalSpecialMaterial);
             Portal.SetPortal(min, max, grabbingMaterialChanger.RemoteSpecialMaterial);
         }
+
+        private void Update()
+        {
+            if (IsGrabbed)
+            {
+                new Net.SynchronizeBuildingTransformAction(interactable.gameObject).Execute();
+            }
+        }
         
         public void Grab(bool isOwner)
         {
@@ -53,12 +62,22 @@ namespace SEE.Controls
             }
             IsGrabbed = true;
             grabbingMaterialChanger.UseSpecialMaterial(isOwner);
+
+            previousParent = interactable.transform.parent;
+            new Net.SetParentOfBuildingTransformAction(interactable.gameObject, null).Execute();
+
+            interactable.gameObject.AddComponent<Net.Synchronizer>();
         }
         
         public void Release(bool isOwner)
         {
-            IsGrabbed = false;
+            Destroy(interactable.gameObject.GetComponent<Net.Synchronizer>());
+
+            new Net.SetParentOfBuildingTransformAction(interactable.gameObject, previousParent.gameObject).Execute();
+            previousParent = null;
+
             grabbingMaterialChanger.ResetMaterial();
+            IsGrabbed = false;
             if (IsHovered)
             {
                 HighlightMaterialChanger.UseSpecialMaterial(isOwner);
