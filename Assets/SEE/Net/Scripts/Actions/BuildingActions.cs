@@ -1,19 +1,18 @@
-﻿using UnityEngine;
+﻿using SEE.Controls;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace SEE.Net
 {
-    public class SetParentOfBuildingTransformAction : AbstractAction
+    public class GrabBuildingAction : AbstractAction
     {
-        public string uniqueGameObjectName;
-        public string uniqueParentName;
+        public uint id;
 
-        public SetParentOfBuildingTransformAction(GameObject gameObject, GameObject parent) : base(false)
+        public GrabBuildingAction(GrabbableObject grabbableObject) : base(false)
         {
-            Assert.IsNotNull(gameObject);
+            Assert.IsNotNull(grabbableObject);
 
-            uniqueGameObjectName = gameObject.name;
-            uniqueParentName = parent ? parent.name : null;
+            id = grabbableObject.id;
         }
 
         protected override bool ExecuteOnServer() => true;
@@ -28,12 +27,51 @@ namespace SEE.Net
             }
             else
             {
-                GameObject gameObject = GameObject.Find(uniqueGameObjectName);
-                GameObject parent = uniqueParentName != null ? GameObject.Find(uniqueParentName) : null;
-                if (gameObject)
+                GrabbableObject grabbableObject = (GrabbableObject)InteractableObject.Get(id);
+                if (grabbableObject)
                 {
                     result = true;
-                    gameObject.transform.parent = parent ? parent.transform : null;
+                    grabbableObject.Grab(false);
+                }
+            }
+
+            return result;
+        }
+
+        protected override bool UndoOnServer() => throw new System.NotImplementedException();
+        protected override bool UndoOnClient() => throw new System.NotImplementedException();
+        protected override bool RedoOnServer() => throw new System.NotImplementedException();
+        protected override bool RedoOnClient() => throw new System.NotImplementedException();
+    }
+
+    public class ReleaseBuildingAction : AbstractAction
+    {
+        public uint id;
+
+        public ReleaseBuildingAction(GrabbableObject grabbableObject) : base(false)
+        {
+            Assert.IsNotNull(grabbableObject);
+
+            id = grabbableObject.id;
+        }
+
+        protected override bool ExecuteOnServer() => true;
+
+        protected override bool ExecuteOnClient()
+        {
+            bool result = false;
+
+            if (IsRequester())
+            {
+                result = true;
+            }
+            else
+            {
+                GrabbableObject grabbableObject = (GrabbableObject)InteractableObject.Get(id);
+                if (grabbableObject)
+                {
+                    result = true;
+                    grabbableObject.Release(false);
                 }
             }
 

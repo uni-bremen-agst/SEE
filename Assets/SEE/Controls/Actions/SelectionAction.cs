@@ -149,7 +149,7 @@ namespace SEE.Controls
                         HoverableObject oldHoverableObject = handledObject ? handledObject.GetComponent<HoverableObject>() : null;
                         new Net.SelectionAction(oldHoverableObject, newHoverableObject).Execute();
                         objectState = ObjectState.IsSelected;
-                        handledObject = hitObject;
+                        handledObject = hitObject; // TODO(torben): it seems like this code path is never actually executed...
                     }
                 }
                 else if ((hitObject == null || hitObject.GetComponent<HoverableObject>() == null) && handledObject != null && objectState == ObjectState.IsSelected)
