@@ -21,7 +21,6 @@ namespace SEE.Controls
 
         private XRNavigationAction navAction;
         private MaterialChanger grabbingMaterialChanger;
-        private Transform previousParent;
 
         protected override void Awake()
         {
@@ -62,20 +61,10 @@ namespace SEE.Controls
             }
             IsGrabbed = true;
             grabbingMaterialChanger.UseSpecialMaterial(isOwner);
-
-            previousParent = interactable.transform.parent;
-            new Net.SetParentOfBuildingTransformAction(interactable.gameObject, null).Execute();
-
-            interactable.gameObject.AddComponent<Net.Synchronizer>();
         }
         
         public void Release(bool isOwner)
         {
-            Destroy(interactable.gameObject.GetComponent<Net.Synchronizer>());
-
-            new Net.SetParentOfBuildingTransformAction(interactable.gameObject, previousParent.gameObject).Execute();
-            previousParent = null;
-
             grabbingMaterialChanger.ResetMaterial();
             IsGrabbed = false;
             if (IsHovered)
@@ -108,7 +97,10 @@ namespace SEE.Controls
             {
                 if (grabType == GrabTypes.Pinch && interactable.attachedToHand == null)
                 {
-                    Grab(true); // TODO(torben): net action
+                    new Net.GrabBuildingAction(this).Execute();
+                    interactable.gameObject.AddComponent<Net.Synchronizer>();
+
+                    Grab(true);
                     hand.HoverLock(interactable);
                     hand.AttachObject(gameObject, grabType, AttachmentFlags);
                 }
@@ -124,7 +116,10 @@ namespace SEE.Controls
                     gameObject.transform.rotation = Quaternion.identity;
                     hand.DetachObject(gameObject);
                     hand.HoverUnlock(interactable);
-                    Release(true); // TODO(torben): net action
+                    Release(true);
+
+                    Destroy(interactable.gameObject.GetComponent<Net.Synchronizer>());
+                    new Net.ReleaseBuildingAction(this).Execute();
                 }
             }
         }
