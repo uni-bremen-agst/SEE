@@ -21,6 +21,7 @@ namespace SEE.Controls
 
         private XRNavigationAction navAction;
         private MaterialChanger grabbingMaterialChanger;
+        private Transform originalParent;
 
         protected override void Awake()
         {
@@ -44,14 +45,6 @@ namespace SEE.Controls
             Portal.SetPortal(min, max, grabbingMaterialChanger.LocalSpecialMaterial);
             Portal.SetPortal(min, max, grabbingMaterialChanger.RemoteSpecialMaterial);
         }
-
-        private void Update()
-        {
-            if (IsGrabbed)
-            {
-                new Net.SynchronizeBuildingTransformAction(interactable.gameObject).Execute();
-            }
-        }
         
         public void Grab(bool isOwner)
         {
@@ -59,14 +52,28 @@ namespace SEE.Controls
             {
                 HighlightMaterialChanger.ResetMaterial();
             }
-            IsGrabbed = true;
             grabbingMaterialChanger.UseSpecialMaterial(isOwner);
+
+            if (!isOwner)
+            {
+                originalParent = transform.parent;
+                transform.parent = null;
+            }
+
+            IsGrabbed = true;
         }
         
         public void Release(bool isOwner)
         {
-            grabbingMaterialChanger.ResetMaterial();
             IsGrabbed = false;
+
+            if (!isOwner)
+            {
+                transform.parent = originalParent;
+                originalParent = null;
+            }
+
+            grabbingMaterialChanger.ResetMaterial();
             if (IsHovered)
             {
                 HighlightMaterialChanger.UseSpecialMaterial(isOwner);

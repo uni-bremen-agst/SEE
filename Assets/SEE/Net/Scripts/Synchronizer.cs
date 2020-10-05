@@ -7,7 +7,7 @@ namespace SEE.Net
         private bool sendUpdate;
         public int updateTimeout;
 
-        void Start()
+        private void Start()
         {
             sendUpdate = false;
             updateTimeout = 0;
@@ -22,9 +22,9 @@ namespace SEE.Net
             }
         }
 
-        void Update()
+        private void Update()
         {
-            sendUpdate |= Input.GetMouseButton(2) && transform.hasChanged;
+            sendUpdate |= transform.hasChanged;
         }
 
         public void NotifyJustReceivedUpdate()
@@ -43,7 +43,7 @@ namespace SEE.Net
                 else
                 {
                     sendUpdate = false;
-                    new SynchronizeBuildingTransformAction(gameObject).Execute();
+                    new SynchronizeBuildingTransformAction(gameObject, false).Execute();
                 }
             }
         }
