@@ -60,12 +60,6 @@ namespace SEE.Controls
             SetActive("GamepadPlayer", playerInputType == PlayerInputType.TouchGamepad);
             SetActive("InControl",     playerInputType == PlayerInputType.TouchGamepad);
 
-            // Turn off controller hints if requested in the user settings.
-			SetActive("DesktopPlayer", playerInputType == PlayerInputType.Desktop);
-			SetActive("VRPlayer", playerInputType == PlayerInputType.VR);
-			SetActive("GamepadPlayer", playerInputType == PlayerInputType.TouchGamepad);
-			SetActive("InControl", playerInputType == PlayerInputType.TouchGamepad);
-
 			// Turn off controller hints if requested in the user settings.
 			if (!ShowControllerHints)
 			{
