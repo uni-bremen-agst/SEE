@@ -83,15 +83,17 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		[SerializeField] protected GameObject sizeButton;
 
-		/// <summary>
-		/// The sidebar in which the user can select what nodes will be displayed in the chart.
-		/// </summary>
-		[SerializeField] private GameObject contentSelection;
+        /// <summary>
+        /// The sidebar in which the user can select what nodes will be displayed in the chart.
+        /// </summary>
+#pragma warning disable CS0649
+        [SerializeField] private GameObject contentSelection;
+#pragma warning restore CS0649
 
-		/// <summary>
-		/// Links the <see cref="Scripts.ChartManager" /> and initializes attributes.
-		/// </summary>
-		protected virtual void Awake()
+        /// <summary>
+        /// Links the <see cref="Scripts.ChartManager" /> and initializes attributes.
+        /// </summary>
+        protected virtual void Awake()
 		{
 			GetSettingData();
 			_chart = transform.parent.GetComponent<RectTransform>();
