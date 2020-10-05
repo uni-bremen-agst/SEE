@@ -109,7 +109,7 @@ namespace SEE.Controls
             outline.OutlineWidth = 4.0f;
 
             NodeRef nodeRef = go.GetComponent<NodeRef>();
-            if (nodeRef && nodeRef.node != null)
+            if (nodeRef != null && nodeRef.node != null)
             {
                 Node node = nodeRef.node;
                 Graph graph = node.ItsGraph;
@@ -124,8 +124,6 @@ namespace SEE.Controls
 
                 outline.outlineMaskMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset;
                 outline.outlineFillMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset + 1;
-
-                Game.Portal.SetPortal(root, go);
             }
 #if UNITY_EDITOR
             else
@@ -133,6 +131,8 @@ namespace SEE.Controls
                 Debug.LogWarningFormat("Outline could not be created for '{0}'! The NodeRef seems to not be set.\n", go.name);
             }
 #endif
+
+            Game.Portal.SetPortal(root, go);
             outline.UpdateMaterialProperties();
 
             return outline;
