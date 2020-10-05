@@ -29,7 +29,8 @@ namespace SEE.Controls
 	/// </summary>
 	public abstract class ChartAction : MonoBehaviour
 	{
-		[HideInInspector] public ChartControls chartControlsDevice;
+		//[HideInInspector] 
+		public ChartControls chartControlsDevice;
 
 		[HideInInspector] public float move;
 
