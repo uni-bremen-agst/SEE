@@ -95,14 +95,14 @@ namespace SEE.Net
         public Quaternion rotation;
         public Vector3 localScale;
 
-        public SynchronizeBuildingTransformAction(GameObject gameObject) : base(false)
+        public SynchronizeBuildingTransformAction(GameObject gameObject, bool syncLocalScale) : base(false)
         {
             Assert.IsNotNull(gameObject);
 
             uniqueGameObjectName = gameObject.name;
             position = gameObject.transform.position;
             rotation = gameObject.transform.rotation;
-            localScale = gameObject.transform.localScale;
+            localScale = syncLocalScale ? gameObject.transform.localScale : Vector3.zero;
         }
 
         protected override bool ExecuteOnServer() => true;
@@ -124,7 +124,10 @@ namespace SEE.Net
                     gameObject.GetComponent<Synchronizer>()?.NotifyJustReceivedUpdate();
                     gameObject.transform.position = position;
                     gameObject.transform.rotation = rotation;
-                    gameObject.transform.localScale = localScale;
+                    if (localScale.sqrMagnitude > 0.0f)
+                    {
+                        gameObject.transform.localScale = localScale;
+                    }
                 }
             }
 
