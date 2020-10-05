@@ -132,7 +132,17 @@ namespace SEE.Controls
             }
         }
 
+        private bool CheckCondition(bool condition, string message)
+        {
+            if (!condition)
+            {
+                Debug.LogErrorFormat("DesktopNavigationAction of game object {0}: {1}. Component will be disabled.\n",
+                      name, message);
+                enabled = false; // disable this component
+            }
+            return condition;
 
+        }
 
         private void Start()
         {
@@ -142,13 +152,22 @@ namespace SEE.Controls
                 return;
             }
 
-            UnityEngine.Assertions.Assert.IsNotNull(portalPlane, "The culling plane must not be null!");
-            UnityEngine.Assertions.Assert.IsTrue(!navigationActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!");
+            if (!CheckCondition(portalPlane != null, "The culling plane must not be null!"))
+            {
+                return;
+            }
+            if (!CheckCondition(!navigationActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!"))
+            {
+                return;
+            }
             navigationActionDict.Add(id, this);
 
             cityTransform = GetCityRootNode(gameObject);
-            UnityEngine.Assertions.Assert.IsNotNull(cityTransform, "This DesktopNavigationAction is not attached to a code city!");
-            Debug.LogFormat("NavigationAction controls {0}.\n", cityTransform.name);
+            if (!CheckCondition(cityTransform != null, "This DesktopNavigationAction is not attached to a code city!"))
+            {
+                return;
+            }
+            Debug.LogFormat("DesktopNavigationAction controls {0}.\n", cityTransform.name);
 
             raycastPlane = new UnityEngine.Plane(Vector3.up, cityTransform.position);
             mode = 0;
