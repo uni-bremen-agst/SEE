@@ -1,5 +1,6 @@
 ﻿using SEE.Game;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
 
@@ -11,12 +12,6 @@ namespace SEE.Controls
     [RequireComponent(typeof(NodeRef))]
     public sealed class GrabbableObject : HoverableObject
     {
-        [Tooltip("The color to be used when the object is grabbed by client.")]
-        public Color LocalGrabbingColor = new Color(0.0f, 0.0f, 1.0f);
-
-        [Tooltip("The color to be used when the object is grabbed by some other client.")]
-        public Color RemoteGrabbingColor = new Color(0.8f, 0.2f, 1.0f);
-
         public bool IsGrabbed { get; private set; } = false;
 
         private XRNavigationAction navAction;
@@ -30,10 +25,17 @@ namespace SEE.Controls
             // TODO(torben): i don't like this!
             navAction = SEECity.GetByGraph(GetComponent<NodeRef>().node.ItsGraph).GetComponent<XRNavigationAction>();
             // TODO(torben): this creates two unique materials for every grabbableObject! This can be cached better! same for HighlightableObject
+
+            Color color = GetComponent<MeshRenderer>().sharedMaterial.color;
+            Color.RGBToHSV(color, out float h, out float s, out float v);
+
+            Color localColor = Color.HSVToRGB((h - 0.1f) % 1.0f, s, v);
+            Color remoteColor = Color.HSVToRGB((h + 0.1f) % 1.0f, s, v);
+
             grabbingMaterialChanger = new MaterialChanger(
                 gameObject,
-                Materials.New(Materials.ShaderType.Transparent, LocalGrabbingColor),
-                Materials.New(Materials.ShaderType.Transparent, RemoteGrabbingColor)
+                Materials.New(Materials.ShaderType.Transparent, localColor),
+                Materials.New(Materials.ShaderType.Transparent, remoteColor)
             );
             // TODO(torben): there needs to be a better way to find the parents! this is slow! same for HighlightableObject
             Transform parent = transform;

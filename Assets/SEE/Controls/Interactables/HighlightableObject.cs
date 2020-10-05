@@ -7,12 +7,6 @@ namespace SEE.Controls
 {
     public class HighlightableObject : InteractableObject
     {
-        [Tooltip("The color to be used when the object is to be highlighted by this client.")]
-        public Color LocalHightlightColor = new Color(0.0f, 1.0f, 0.0f);
-
-        [Tooltip("The color to be used when the object is to be highlighted some other client.")]
-        public Color RemoteHightlightColor = new Color(0.8f, 1.0f, 0.2f);
-
         /// <summary>
         /// True if the object is currently being hovered over.
         /// </summary>
@@ -26,10 +20,17 @@ namespace SEE.Controls
         protected override void Awake()
         {
             base.Awake();
+
+            Color color = GetComponent<MeshRenderer>().sharedMaterial.color;
+            Color.RGBToHSV(color, out float h, out float s, out float v);
+
+            Color localColor = Color.HSVToRGB((h - 0.05f) % 1.0f, s, v);
+            Color remoteColor = Color.HSVToRGB((h + 0.05f) % 1.0f, s, v);
+
             HighlightMaterialChanger = new MaterialChanger(
                 gameObject, 
-                Materials.New(Materials.ShaderType.Transparent, LocalHightlightColor), 
-                Materials.New(Materials.ShaderType.Transparent, RemoteHightlightColor)
+                Materials.New(Materials.ShaderType.Transparent, localColor), 
+                Materials.New(Materials.ShaderType.Transparent, remoteColor)
             );
             Transform parent = transform;
             while (parent.parent != null)
