@@ -70,7 +70,6 @@ namespace SEE.Controls
             if (!isOwner)
             {
                 gameObject.transform.rotation = Quaternion.identity;
-                gameObject.transform.rotation = Quaternion.identity;
                 transform.parent = originalParent;
                 originalParent = null;
             }
