@@ -27,6 +27,11 @@ namespace SEE.Controls
 	{
 		private bool _lastClick;
 
+        private void Start()
+        {
+            chartControlsDevice = GetComponent<Devices.ChartControls>();
+        }
+
 		private void Update()
 		{
 			if (chartControlsDevice.ResetCharts) ChartManager.ResetPosition();

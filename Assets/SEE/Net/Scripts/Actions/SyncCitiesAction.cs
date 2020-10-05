@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Controls;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace SEE.Net
@@ -7,20 +8,23 @@ namespace SEE.Net
     /// !!! IMPORTANT !!!
     ///   See <see cref="AbstractAction"/> before modifying this class!
     /// </summary>
-    public class SynchronizeAction : AbstractAction
+    public class SyncCitiesAction : AbstractAction
     {
-        public string uniqueGameObjectName;
+        public int navigationActionID;
         public Vector3 position;
         public Quaternion rotation;
         public Vector3 localScale;
+        public float currentTargetZoomSteps;
 
-        public SynchronizeAction(GameObject gameObject, bool syncScale) : base(false)
+        public SyncCitiesAction(NavigationAction navigationAction) : base(false)
         {
-            Assert.IsNotNull(gameObject);
-            uniqueGameObjectName = gameObject.name;
-            position = gameObject.transform.position;
-            rotation = gameObject.transform.rotation;
-            localScale = syncScale ? gameObject.transform.localScale : Vector3.zero;
+            Assert.IsNotNull(navigationAction);
+
+            navigationActionID = navigationAction.ID;
+            position = navigationAction.CityTransform.position;
+            rotation = navigationAction.CityTransform.rotation;
+            localScale = navigationAction.CityTransform.localScale;
+            currentTargetZoomSteps = navigationAction.zoomState.currentTargetZoomSteps;
         }
 
         protected override bool ExecuteOnClient()
@@ -33,17 +37,19 @@ namespace SEE.Net
             }
             else
             {
-                GameObject gameObject = GameObject.Find(uniqueGameObjectName);
-                gameObject.GetComponent<Synchronizer>().NotifyJustReceivedUpdate();
-                if (gameObject)
+                NavigationAction navigationAction = NavigationAction.Get(navigationActionID);
+                if (navigationAction)
                 {
                     result = true;
-                    gameObject.transform.position = position;
-                    gameObject.transform.rotation = rotation;
-                    if (localScale.sqrMagnitude != 0.0f)
-                    {
-                        gameObject.transform.localScale = localScale;
-                    }
+
+                    navigationAction.CityTransform.position = position;
+                    navigationAction.CityTransform.rotation = rotation;
+                    navigationAction.CityTransform.localScale = localScale;
+                    navigationAction.zoomState.currentTargetZoomSteps = currentTargetZoomSteps;
+                }
+                else
+                {
+                    Debug.LogWarning("NavigationAction could not be found!");
                 }
             }
 

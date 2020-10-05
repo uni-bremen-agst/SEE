@@ -21,6 +21,7 @@ namespace SEE.Controls
 
         private XRNavigationAction navAction;
         private MaterialChanger grabbingMaterialChanger;
+        private Transform originalParent;
 
         protected override void Awake()
         {
@@ -30,8 +31,8 @@ namespace SEE.Controls
             navAction = SEECity.GetByGraph(GetComponent<NodeRef>().node.ItsGraph).GetComponent<XRNavigationAction>();
             // TODO(torben): this creates two unique materials for every grabbableObject! This can be cached better! same for HighlightableObject
             grabbingMaterialChanger = new MaterialChanger(
-                gameObject, 
-                Materials.New(Materials.ShaderType.Transparent, LocalGrabbingColor), 
+                gameObject,
+                Materials.New(Materials.ShaderType.Transparent, LocalGrabbingColor),
                 Materials.New(Materials.ShaderType.Transparent, RemoteGrabbingColor)
             );
             // TODO(torben): there needs to be a better way to find the parents! this is slow! same for HighlightableObject
@@ -51,13 +52,28 @@ namespace SEE.Controls
             {
                 HighlightMaterialChanger.ResetMaterial();
             }
-            IsGrabbed = true;
             grabbingMaterialChanger.UseSpecialMaterial(isOwner);
+
+            if (!isOwner)
+            {
+                originalParent = transform.parent;
+                transform.parent = null;
+            }
+
+            IsGrabbed = true;
         }
         
         public void Release(bool isOwner)
         {
             IsGrabbed = false;
+
+            if (!isOwner)
+            {
+                gameObject.transform.rotation = Quaternion.identity;
+                transform.parent = originalParent;
+                originalParent = null;
+            }
+
             grabbingMaterialChanger.ResetMaterial();
             if (IsHovered)
             {
@@ -89,7 +105,10 @@ namespace SEE.Controls
             {
                 if (grabType == GrabTypes.Pinch && interactable.attachedToHand == null)
                 {
-                    Grab(true); // TODO(torben): net action
+                    new Net.GrabBuildingAction(this).Execute();
+                    interactable.gameObject.AddComponent<Net.Synchronizer>();
+
+                    Grab(true);
                     hand.HoverLock(interactable);
                     hand.AttachObject(gameObject, grabType, AttachmentFlags);
                 }
@@ -105,7 +124,10 @@ namespace SEE.Controls
                     gameObject.transform.rotation = Quaternion.identity;
                     hand.DetachObject(gameObject);
                     hand.HoverUnlock(interactable);
-                    Release(true); // TODO(torben): net action
+                    Release(true);
+
+                    Destroy(interactable.gameObject.GetComponent<Net.Synchronizer>());
+                    new Net.ReleaseBuildingAction(this).Execute();
                 }
             }
         }

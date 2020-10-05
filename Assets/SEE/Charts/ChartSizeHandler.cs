@@ -45,15 +45,17 @@ namespace SEE.Charts.Scripts
 		[Header("For resizing"), SerializeField]
 		private Transform dragButton;
 
-		/// <summary>
-		/// The warning displayed when no data is displayed in the chart.
-		/// </summary>
-		[SerializeField] private RectTransform noDataWarning;
+        /// <summary>
+        /// The warning displayed when no data is displayed in the chart.
+        /// </summary>
+#pragma warning disable CS0649
+        [SerializeField] private RectTransform noDataWarning;
+#pragma warning restore CS0649
 
-		/// <summary>
-		/// Top right area of the chart.
-		/// </summary>
-		[SerializeField] private Transform topRight;
+        /// <summary>
+        /// Top right area of the chart.
+        /// </summary>
+        [SerializeField] private Transform topRight;
 
 		/// <summary>
 		/// Top left area of the chart.

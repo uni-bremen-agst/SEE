@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 
@@ -8,7 +7,7 @@ namespace SEE.Controls
 
     [RequireComponent(typeof(Collider))]
     [RequireComponent(typeof(Plane))]
-    public class XRNavigationAction : CityAction
+    public class XRNavigationAction : NavigationAction
     {
         private enum XRNavigationMode
         {
@@ -17,7 +16,6 @@ namespace SEE.Controls
             MoveRotateScale
         }
 
-        private Transform cityTransform;
         private XRNavigationMode mode;
         private Hand rightHand;
         private Hand leftHand;
@@ -31,30 +29,9 @@ namespace SEE.Controls
         private SteamVR_Action_Boolean leftGripAction;
         private SteamVR_Action_Boolean rightGripAction;
 
-        [Tooltip("The area in which to draw the code city")]
-        [SerializeField] private Plane portalPlane;
-
-        [Tooltip("The unique ID used for network synchronization. This must be set via inspector to ensure that every client will have the correct ID assigned to the appropriate NavigationAction!")]
-        [SerializeField] private int id;
-
-        private static readonly Dictionary<int, XRNavigationAction> navigationActionDict = new Dictionary<int, XRNavigationAction>(2);
-        public static XRNavigationAction Get(int id)
-        {
-            bool result = navigationActionDict.TryGetValue(id, out XRNavigationAction value);
-            if (result)
-            {
-                return value;
-            }
-            else
-            {
-                Debug.LogWarning("ID does not match any NavigationAction!");
-                return null;
-            }
-        }
 
 
-
-        private void Start()
+        protected sealed override void Start()
         {
             if (FindObjectOfType<PlayerSettings>().playerInputType != PlayerSettings.PlayerInputType.VR)
             {
@@ -62,18 +39,13 @@ namespace SEE.Controls
                 return;
             }
 
-            UnityEngine.Assertions.Assert.IsNotNull(portalPlane, "The culling plane must not be null!");
-            UnityEngine.Assertions.Assert.IsTrue(!navigationActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!");
-            navigationActionDict.Add(id, this);
-
-            cityTransform = GetCityRootNode(gameObject);
-            UnityEngine.Assertions.Assert.IsNotNull(cityTransform, "This XRNavigationAction is not attached to a code city!");
+            base.Start();
 
             SteamVR_Input.GetActionSet("default").Activate();
             leftGripAction = SteamVR_Input.GetBooleanAction("default", "LGrip");
             rightGripAction = SteamVR_Input.GetBooleanAction("default", "RGrip");
 
-            Debug.LogFormat("XRNavigationAction controls {0}.\n", cityTransform.name);
+            Debug.LogFormat("XRNavigationAction controls {0}.\n", CityTransform.name);
         }
 
         private void Update()
@@ -85,7 +57,7 @@ namespace SEE.Controls
                 mode -= 1;
                 if (mode == XRNavigationMode.MoveOnly)
                 {
-                    rightDistance = (rightHand.transform.position.XZ() - cityTransform.position.XZ()).magnitude;
+                    rightDistance = (rightHand.transform.position.XZ() - CityTransform.position.XZ()).magnitude;
                 }
             }
             if (!rightGripAction.state && rightHand)
@@ -94,58 +66,66 @@ namespace SEE.Controls
                 mode -= 1;
                 if (mode == XRNavigationMode.MoveOnly)
                 {
-                    leftDistance = (leftHand.transform.position.XZ() - cityTransform.position.XZ()).magnitude;
+                    leftDistance = (leftHand.transform.position.XZ() - CityTransform.position.XZ()).magnitude;
                 }
             }
 
-            // move, rotate, scale
-            if (mode != XRNavigationMode.None)
+            if (!UpdateZoom())
             {
-                float scaleFactor = 1.0f;
-                if (mode == XRNavigationMode.MoveRotateScale)
+                // move, rotate, scale
+                if (mode != XRNavigationMode.None)
                 {
-                    float currentDistance = (leftHand.transform.position.XZ() - rightHand.transform.position.XZ()).magnitude;
-                    scaleFactor = currentDistance / startHandDistance;
-                }
+                    float scaleFactor = 1.0f;
+                    if (mode == XRNavigationMode.MoveRotateScale)
+                    {
+                        float currentDistance = (leftHand.transform.position.XZ() - rightHand.transform.position.XZ()).magnitude;
+                        scaleFactor = currentDistance / startHandDistance;
+                    }
 
-                // align with first hand
-                Hand fstHand = rightHand;
-                float fstDistance = rightDistance;
-                float fstAngle = rightAngle;
-                if (!fstHand)
-                {
-                    fstHand = leftHand;
-                    fstDistance = leftDistance;
-                    fstAngle = leftAngle;
-                }
+                    // align with first hand
+                    Hand fstHand = rightHand;
+                    float fstDistance = rightDistance;
+                    float fstAngle = rightAngle;
+                    if (!fstHand)
+                    {
+                        fstHand = leftHand;
+                        fstDistance = leftDistance;
+                        fstAngle = leftAngle;
+                    }
 
-                fstDistance *= scaleFactor;
-                float cityAngleOffset = Mathf.Deg2Rad * cityTransform.rotation.eulerAngles.y;
-                fstAngle -= cityAngleOffset;
+                    fstDistance *= scaleFactor;
+                    float cityAngleOffset = Mathf.Deg2Rad * CityTransform.rotation.eulerAngles.y;
+                    fstAngle -= cityAngleOffset;
 
-                Vector2 fstOffsetV2 = new Vector2(Mathf.Cos(fstAngle), Mathf.Sin(fstAngle)) * fstDistance;
-                Vector2 fstHandPositionV2 = fstHand.transform.position.XZ();
+                    Vector2 fstOffsetV2 = new Vector2(Mathf.Cos(fstAngle), Mathf.Sin(fstAngle)) * fstDistance;
+                    Vector2 fstHandPositionV2 = fstHand.transform.position.XZ();
 
-                Vector2 fstNewCityPositionV2 = fstHandPositionV2 - fstOffsetV2;
-                cityTransform.position = new Vector3(fstNewCityPositionV2.x, cityTransform.position.y, fstNewCityPositionV2.y);
+                    Vector2 fstNewCityPositionV2 = fstHandPositionV2 - fstOffsetV2;
+                    CityTransform.position = new Vector3(fstNewCityPositionV2.x, CityTransform.position.y, fstNewCityPositionV2.y);
 
-                // align with second hand
-                if (mode == XRNavigationMode.MoveRotateScale)
-                {
-                    // move, rotate
-                    float sndAngle = leftAngle - cityAngleOffset;
+                    // align with second hand
+                    if (mode == XRNavigationMode.MoveRotateScale)
+                    {
+                        // move, rotate
+                        float sndAngle = leftAngle - cityAngleOffset;
 
-                    Vector2 sndOffsetV2 = new Vector2(Mathf.Cos(sndAngle), Mathf.Sin(sndAngle)) * (leftDistance * scaleFactor);
-                    Vector2 sndHandPositionV2 = leftHand.transform.position.XZ();
+                        Vector2 sndOffsetV2 = new Vector2(Mathf.Cos(sndAngle), Mathf.Sin(sndAngle)) * (leftDistance * scaleFactor);
+                        Vector2 sndHandPositionV2 = leftHand.transform.position.XZ();
 
-                    Vector2 v0 = sndHandPositionV2 - fstHandPositionV2;
-                    Vector2 v1 = (fstNewCityPositionV2 + sndOffsetV2) - fstHandPositionV2;
-                    float a = Vector2.SignedAngle(v0, v1);
+                        Vector2 v0 = sndHandPositionV2 - fstHandPositionV2;
+                        Vector2 v1 = (fstNewCityPositionV2 + sndOffsetV2) - fstHandPositionV2;
+                        float a = Vector2.SignedAngle(v0, v1);
 
-                    cityTransform.RotateAround(fstHand.transform.position, Vector3.up, a);
+                        CityTransform.RotateAround(fstHand.transform.position, Vector3.up, a);
 
-                    // scale
-                    cityTransform.localScale = cityStartGrabScale * scaleFactor;
+                        // scale
+                        CityTransform.localScale = cityStartGrabScale * scaleFactor;
+                    }
+
+                    zoomState.currentZoomFactor = CityTransform.localScale.x / zoomState.originalScale.x;
+                    float zoomSteps = ConvertZoomFactorToZoomSteps(zoomState.currentZoomFactor);
+                    zoomState.currentTargetZoomSteps = zoomSteps;
+                    new Net.SyncCitiesAction(this).Execute();
                 }
             }
         }
@@ -173,18 +153,18 @@ namespace SEE.Controls
                     {
                         refHand = hand;
 
-                        Vector2 toHandV2 = hand.transform.position.XZ() - cityTransform.position.XZ();
+                        Vector2 toHandV2 = hand.transform.position.XZ() - CityTransform.position.XZ();
                         refDistance = toHandV2.magnitude;
 
                         toHandV2.Normalize();
-                        refAngle = Mathf.Atan2(toHandV2.y, toHandV2.x) + Mathf.Deg2Rad * cityTransform.rotation.eulerAngles.y;
+                        refAngle = Mathf.Atan2(toHandV2.y, toHandV2.x) + Mathf.Deg2Rad * CityTransform.rotation.eulerAngles.y;
 
                         mode += 1;
                     }
 
                     if (mode == XRNavigationMode.MoveRotateScale)
                     {
-                        cityStartGrabScale = cityTransform.localScale;
+                        cityStartGrabScale = CityTransform.localScale;
                         startHandDistance = (leftHand.transform.position.XZ() - rightHand.transform.position.XZ()).magnitude;
                     }
                 }

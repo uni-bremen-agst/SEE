@@ -9,6 +9,7 @@ namespace SEE.Controls
     /// Abstract super class of all selection actions. A selection action
     /// is one that is selected by the player.
     /// </summary>
+    [RequireComponent(typeof(Selection))]
     public abstract class SelectionAction : MonoBehaviour
     {
         /// <summary>
@@ -61,6 +62,7 @@ namespace SEE.Controls
         /// </summary>
         protected virtual void Start()
         {
+            selectionDevice = GetComponent<Selection>();
         }
 
         private enum ObjectState
@@ -147,7 +149,7 @@ namespace SEE.Controls
                         HoverableObject oldHoverableObject = handledObject ? handledObject.GetComponent<HoverableObject>() : null;
                         new Net.SelectionAction(oldHoverableObject, newHoverableObject).Execute();
                         objectState = ObjectState.IsSelected;
-                        handledObject = hitObject;
+                        handledObject = hitObject; // TODO(torben): it seems like this code path is never actually executed...
                     }
                 }
                 else if ((hitObject == null || hitObject.GetComponent<HoverableObject>() == null) && handledObject != null && objectState == ObjectState.IsSelected)
