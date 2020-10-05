@@ -37,5 +37,11 @@ namespace SEE.Controls
 			    hit.transform.gameObject.TryGetComponent(out NodeRef _))
 				ChartManager.HighlightObject(hit.transform.gameObject, false);
 		}
-	}
+
+        private void Start()
+        {
+			Debug.LogFormat("DesktopChartAction started with control device: {0}\n",
+				chartControlsDevice == null ? "NULL": chartControlsDevice.Name);
+        }
+    }
 }
