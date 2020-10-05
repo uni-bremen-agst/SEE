@@ -67,8 +67,8 @@ namespace SEE.Controls
         /// <param name="hand">the hand hovering over the object</param>
         private void OnHandHoverBegin(Hand hand)
         {
-            // TODO: multiplayersupport
             Hovered(true);
+            new Net.HighlightBuildingAction(this).Execute();
         }
 
         /// <summary>
@@ -79,8 +79,8 @@ namespace SEE.Controls
         /// <param name="hand">the hand hovering over the object</param>
         private void OnHandHoverEnd(Hand hand)
         {
-            // TODO: multiplayersupport
             Unhovered();
+            new Net.UnhighlightBuildingAction(this).Execute();
         }
     }
 }

@@ -4,6 +4,99 @@ using UnityEngine.Assertions;
 
 namespace SEE.Net
 {
+
+    /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    /// </summary>
+    public class HighlightBuildingAction : AbstractAction
+    {
+        public uint id;
+
+        public HighlightBuildingAction(HighlightableObject highlightableObject) : base(false)
+        {
+            Assert.IsNotNull(highlightableObject);
+
+            id = highlightableObject.id;
+        }
+
+        protected override bool ExecuteOnServer() => true;
+
+        protected override bool ExecuteOnClient()
+        {
+            bool result = false;
+
+            if (IsRequester())
+            {
+                result = true;
+            }
+            else
+            {
+                HighlightableObject highlightableObject = (HighlightableObject)InteractableObject.Get(id);
+                if (highlightableObject)
+                {
+                    result = true;
+                    highlightableObject.Hovered(false);
+                }
+            }
+
+            return result;
+        }
+
+        protected override bool UndoOnServer() => throw new System.NotImplementedException();
+        protected override bool UndoOnClient() => throw new System.NotImplementedException();
+        protected override bool RedoOnServer() => throw new System.NotImplementedException();
+        protected override bool RedoOnClient() => throw new System.NotImplementedException();
+    }
+
+    /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    /// </summary>
+    public class UnhighlightBuildingAction : AbstractAction
+    {
+        public uint id;
+
+        public UnhighlightBuildingAction(HighlightableObject highlightableObject) : base(false)
+        {
+            Assert.IsNotNull(highlightableObject);
+
+            id = highlightableObject.id;
+        }
+
+        protected override bool ExecuteOnServer() => true;
+
+        protected override bool ExecuteOnClient()
+        {
+            bool result = false;
+
+            if (IsRequester())
+            {
+                result = true;
+            }
+            else
+            {
+                HighlightableObject highlightableObject = (HighlightableObject)InteractableObject.Get(id);
+                if (highlightableObject)
+                {
+                    result = true;
+                    highlightableObject.Unhovered();
+                }
+            }
+
+            return result;
+        }
+
+        protected override bool UndoOnServer() => throw new System.NotImplementedException();
+        protected override bool UndoOnClient() => throw new System.NotImplementedException();
+        protected override bool RedoOnServer() => throw new System.NotImplementedException();
+        protected override bool RedoOnClient() => throw new System.NotImplementedException();
+    }
+    
+    /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    /// </summary>
     public class GrabBuildingAction : AbstractAction
     {
         public uint id;
@@ -44,6 +137,10 @@ namespace SEE.Net
         protected override bool RedoOnClient() => throw new System.NotImplementedException();
     }
 
+    /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    /// </summary>
     public class ReleaseBuildingAction : AbstractAction
     {
         public uint id;
