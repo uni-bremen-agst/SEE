@@ -8,6 +8,16 @@ namespace SEE.Utils
     /// </summary>
     public static class Raycasting 
     {
+        //public static bool RaycastWorld()
+        //{
+        //
+        //}
+        //
+        //public static bool RaycastGUI()
+        //{
+        //
+        //}
+
         /// <summary>
         /// Returns a sorted list of hits of a ray starting at the main camera and directing
         /// at towards the current mouse position. The list is sorted by the diancce to the camera;

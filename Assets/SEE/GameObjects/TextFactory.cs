@@ -13,6 +13,7 @@ namespace SEE.GO
         /// Color of the text.
         /// </summary>
         private readonly static Color TextColor = new Color(0.5f, 0.5f, 0.5f, 1); // Color.white;
+        private const string PortalFontName = "Fonts & Materials/LiberationSans SDF - Portal";
 
         /// <summary>
         /// Returns a game object showing the given <paramref name="text"/> at given <paramref name="position"/>. 
@@ -33,6 +34,7 @@ namespace SEE.GO
             result.transform.position = position;
 
             TextMeshPro tm = result.AddComponent<TextMeshPro>();
+            tm.font = Resources.Load<TMP_FontAsset>(PortalFontName);
             tm.text = text;
             tm.color = TextColor;
             tm.alignment = TextAlignmentOptions.Center;
