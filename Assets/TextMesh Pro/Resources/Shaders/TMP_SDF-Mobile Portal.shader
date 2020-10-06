@@ -3,7 +3,7 @@
 // - No Glow Option
 // - Softness is applied on both side of the outline
 
-Shader "TextMeshPro/Mobile/Distance Field" {
+Shader "TextMeshPro/Mobile/Distance Field Portal" {
 
 Properties {
 	_FaceColor			("Face Color", Color) = (1,1,1,1)
@@ -50,12 +50,14 @@ Properties {
 	_StencilReadMask	("Stencil Read Mask", Float) = 255
 	
 	_ColorMask			("Color Mask", Float) = 15
+	
+	_Cutoff             ("Cutoff", Range(0, 1)) = 0.5
 }
 
 SubShader {
 	Tags 
 	{
-		"Queue"="Transparent"
+		"Queue"="Transparent+999"
 		"IgnoreProjector"="True"
 		"RenderType"="Transparent"
 	}
@@ -80,6 +82,9 @@ SubShader {
 
 	Pass {
 		CGPROGRAM
+
+		#define SEE_TEXT_FACING_CAMERA
+
 		#pragma vertex VertShader
 		#pragma fragment PixShader
 		#pragma shader_feature __ OUTLINE_ON
@@ -91,6 +96,9 @@ SubShader {
 		#include "UnityCG.cginc"
 		#include "UnityUI.cginc"
 		#include "TMPro_Properties.cginc"
+
+		uniform float2 _PortalMin;
+		uniform float2 _PortalMax;
 
 		struct vertex_t {
 			UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -114,6 +122,8 @@ SubShader {
 			float4	texcoord1		: TEXCOORD3;			// Texture UV, alpha, reserved
 			half2	underlayParam	: TEXCOORD4;			// Scale(x), Bias(y)
 			#endif
+
+			float3  v               : TEXCOORD5;
 		};
 
 
@@ -139,6 +149,10 @@ SubShader {
 			float scale = rsqrt(dot(pixelSize, pixelSize));
 			scale *= abs(input.texcoord1.y) * _GradientScale * (_Sharpness + 1);
 			if(UNITY_MATRIX_P[3][3] == 0) scale = lerp(abs(scale) * (1 - _PerspectiveFilter), scale, abs(dot(UnityObjectToWorldNormal(input.normal.xyz), normalize(WorldSpaceViewDir(vert)))));
+
+#ifdef SEE_TEXT_FACING_CAMERA
+			vPosition = mul(UNITY_MATRIX_P, float4(UnityObjectToViewPos(float3(0.0, 0.0, 0.0)), 1.0) + float4(input.vertex.x, input.vertex.y, 0.0, 0.0) * float4(_ScaleX, _ScaleY, 1.0, 1.0));
+#endif
 
 			float weight = lerp(_WeightNormal, _WeightBold, bold) / 4.0;
 			weight = (weight + _FaceDilate) * _ScaleRatioA * 0.5;
@@ -187,6 +201,8 @@ SubShader {
 			output.underlayParam = half2(layerScale, layerBias);
 			#endif
 
+			output.v = mul(unity_ObjectToWorld, input.vertex);
+
 			return output;
 		}
 
@@ -228,6 +244,13 @@ SubShader {
 			#if UNITY_UI_ALPHACLIP
 			clip(c.a - 0.001);
 			#endif
+
+			if (input.v.x < _PortalMin.x || input.v.z < _PortalMin.y ||
+				input.v.x > _PortalMax.x || input.v.z > _PortalMax.y
+				)
+			{
+				c = fixed4(0.0f, 0.0f, 0.0f, 0.0f);
+			}
 
 			return c;
 		}

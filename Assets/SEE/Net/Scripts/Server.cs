@@ -70,6 +70,9 @@ namespace SEE.Net
         /// </summary>
         public static Dictionary<Connection, ulong> outgoingPacketSequenceIDs = new Dictionary<Connection, ulong>();
 
+        /// <summary>
+        /// Whether the server is currently initialized.
+        /// </summary>
         private static bool initialized = false;
 
 
@@ -136,6 +139,7 @@ namespace SEE.Net
                     }
                     Connections.Clear();
                 }
+                initialized = false;
             }
         }
 
