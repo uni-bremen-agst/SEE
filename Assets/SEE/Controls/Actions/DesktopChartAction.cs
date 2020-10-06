@@ -26,18 +26,22 @@ using UnityEngine;
 namespace SEE.Controls
 {
 	public class DesktopChartAction : ChartAction
-	{
+    {
+        private const KeyCode ToggleKey = KeyCode.G;
+        private const KeyCode SelectionKey = KeyCode.LeftControl;
+        private const KeyCode ClickKey = KeyCode.Mouse0;
+
         private void Update()
         {
-            if (chartControlsDevice.Toggle)
+            if (Input.GetKeyDown(ToggleKey))
             {
                 ChartManager.Instance.ToggleCharts();
             }
-            if (chartControlsDevice.Select)
+            if (Input.GetKeyDown(SelectionKey) || Input.GetKeyUp(SelectionKey))
             {
                 ChartManager.Instance.ToggleSelectionMode();
             }
-            if (chartControlsDevice.Click)
+            if (Input.GetKeyDown(ClickKey))
             {
 			    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			    if (Physics.Raycast(ray, out RaycastHit hit, 100f) && hit.transform.gameObject.TryGetComponent(out NodeRef _))
@@ -46,11 +50,5 @@ namespace SEE.Controls
                 }
             }
 		}
-
-        private void Start()
-        {
-			Debug.LogFormat("DesktopChartAction started with control device: {0}\n",
-				chartControlsDevice == null ? "NULL": chartControlsDevice.Name);
-        }
     }
 }
