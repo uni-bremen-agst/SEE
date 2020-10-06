@@ -20,41 +20,41 @@ namespace SEE.Controls
 		/// <summary>
 		/// Name of the action set defined by VR Steam Input.
 		/// </summary>
-		protected const string DefaultActionSetName = "default";
+		public const string DefaultActionSetName = "default";
 
-		/// <summary>
-		/// Name of the throttle action defined by VR Steam Input.
-		/// </summary>
-		protected const string ThrottleActionName = "Throttle";
+        /// <summary>
+        /// Name of the throttle action defined by VR Steam Input.
+        /// </summary>
+        public const string ThrottleActionName = "Throttle";
 
-		/// <summary>
-		/// Name of the reset charts action defined by VR Steam Input
-		/// </summary>
-		protected const string ResetChartsName = "ResetCharts";
+        /// <summary>
+        /// Name of the reset charts action defined by VR Steam Input
+        /// </summary>
+        public const string ResetChartsName = "ResetCharts";
 
-		/// <summary>
-		/// Name of the create chart action defined by VR Steam Input.
-		/// </summary>
-		protected const string CreateChartActionName = "CreateChart";
+        /// <summary>
+        /// Name of the create chart action defined by VR Steam Input.
+        /// </summary>
+        public const string CreateChartActionName = "CreateChart";
 
-		/// <summary>
-		/// Name of the create chart action defined by VR Steam Input.
-		/// </summary>
-		protected const string ClickActionName = "InteractUI";
+        /// <summary>
+        /// Name of the create chart action defined by VR Steam Input.
+        /// </summary>
+        public const string ClickActionName = "InteractUI";
 
-		/// <summary>
-		/// Name of the move chart action defined by VR Steam Input.
-		/// </summary>
-		protected const string MoveActionName = "Move";
+        /// <summary>
+        /// Name of the move chart action defined by VR Steam Input.
+        /// </summary>
+        public const string MoveActionName = "Move";
 
-		/// <summary>
-		/// Name of the mouse X axis as defined in the Unity Input Manager.
-		/// </summary>
-		protected const string MouseXActionName = "mouse x";
+        /// <summary>
+        /// Name of the mouse X axis as defined in the Unity Input Manager.
+        /// </summary>
+        public const string MouseXActionName = "mouse x";
 
-		/// <summary>
-		/// Name of the mouse Y axis as defined in the Unity Input Manager.
-		/// </summary>
-		protected const string MouseYActionName = "mouse y";
+        /// <summary>
+        /// Name of the mouse Y axis as defined in the Unity Input Manager.
+        /// </summary>
+        public const string MouseYActionName = "mouse y";
 	}
 }

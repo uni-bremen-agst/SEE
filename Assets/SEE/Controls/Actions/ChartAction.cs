@@ -19,7 +19,6 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.Controls.Devices;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -29,9 +28,6 @@ namespace SEE.Controls
 	/// </summary>
 	public abstract class ChartAction : MonoBehaviour
 	{
-		//[HideInInspector] 
-		public ChartControls chartControlsDevice;
-
 		[HideInInspector] public float move;
 
 		/// <summary>
