@@ -110,7 +110,6 @@ namespace SEE.Net
         {
             if (initialized)
             {
-                packetHandler.HandlePendingPackets();
                 while (pendingEstablishedConnections.Count != 0)
                 {
                     OnConnectionEstablished(pendingEstablishedConnections.Pop());
@@ -119,6 +118,7 @@ namespace SEE.Net
                 {
                     OnConnectionClosed(pendingClosedConnections.Pop());
                 }
+                packetHandler.HandlePendingPackets();
             }
         }
 
@@ -175,17 +175,38 @@ namespace SEE.Net
                 {
                     Debug.LogFormat("Connection established: {0}\n", connection.ToString());
 
-                    IPEndPoint[] recipients = new IPEndPoint[1] { (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint };
-                    List<InstantiatePrefabAction> actions = PrefabAction.GetAllActions();
-                    foreach (InstantiatePrefabAction action in actions)
+                    // synchronize current state with new client
+                    if (!connection.ConnectionInfo.RemoteEndPoint.Equals(Client.LocalEndPoint))
                     {
-                        action.Execute(recipients);
+                        IPEndPoint[] recipient = new IPEndPoint[1] { (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint };
+                        List<InstantiatePrefabAction> actions = PrefabAction.GetAllActions();
+                        foreach (InstantiatePrefabAction action in actions)
+                        {
+                            action.Execute(recipient);
+                        }
+                        if (Network.LoadCityOnStart)
+                        {
+                            foreach (Game.AbstractSEECity city in UnityEngine.Object.FindObjectsOfType<Game.AbstractSEECity>())
+                            {
+                                new LoadCityAction(city).Execute(recipient);
+                            }
+                        }
+                        foreach (Controls.NavigationAction navigationAction in UnityEngine.Object.FindObjectsOfType<Controls.NavigationAction>())
+                        {
+                            new SyncCitiesAction(navigationAction).Execute(recipient);
+                        }
+                        foreach (Controls.Outline outline in UnityEngine.Object.FindObjectsOfType<Controls.Outline>())
+                        {
+                            new SelectionAction(null, outline.GetComponent<Controls.HoverableObject>()).Execute(recipient);
+                        }
                     }
 
+                    // recognize client
                     Connections.Add(connection);
                     incomingPacketSequenceIDs.Add(connection, 0);
                     outgoingPacketSequenceIDs.Add(connection, 0);
 
+                    // create new player head for every client
                     new InstantiatePrefabAction(
                         (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint,
                         "PlayerHead",

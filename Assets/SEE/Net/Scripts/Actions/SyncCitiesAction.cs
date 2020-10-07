@@ -38,10 +38,21 @@ namespace SEE.Net
                 NavigationAction navigationAction = NavigationAction.Get(navigationActionID);
                 if (navigationAction)
                 {
-                    navigationAction.CityTransform.position = position;
-                    navigationAction.CityTransform.rotation = rotation;
-                    navigationAction.CityTransform.localScale = localScale;
-                    navigationAction.zoomState.currentTargetZoomSteps = currentTargetZoomSteps;
+                    if (!navigationAction.CityTransform)
+                    {
+                        navigationAction.Update();
+                    }
+                    if (navigationAction.CityTransform)
+                    {
+                        navigationAction.CityTransform.position = position;
+                        navigationAction.CityTransform.rotation = rotation;
+                        navigationAction.CityTransform.localScale = localScale;
+                        navigationAction.zoomState.currentTargetZoomSteps = currentTargetZoomSteps;
+                    }
+                    else
+                    {
+                        Debug.LogWarning("NavigationAction does not have an initialized city attached!");
+                    }
                 }
                 else
                 {

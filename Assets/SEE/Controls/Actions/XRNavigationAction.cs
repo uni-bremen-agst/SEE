@@ -29,7 +29,7 @@ namespace SEE.Controls
 
 
 
-        protected sealed override void Start()
+        protected sealed override void Awake()
         {
             if (FindObjectOfType<PlayerSettings>().playerInputType != PlayerSettings.PlayerInputType.VR)
             {
@@ -37,7 +37,7 @@ namespace SEE.Controls
                 return;
             }
 
-            base.Start();
+            base.Awake();
 
             SteamVR_Input.GetActionSet(XRInput.DefaultActionSetName).Activate();
             leftGripAction = SteamVR_Input.GetBooleanAction(XRInput.DefaultActionSetName, "LGrip");
@@ -46,7 +46,7 @@ namespace SEE.Controls
             Debug.LogFormat("XRNavigationAction controls {0}.\n", CityTransform.name);
         }
 
-        protected sealed override void Update()
+        public sealed override void Update()
         {
             base.Update();
 

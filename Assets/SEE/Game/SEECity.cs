@@ -101,7 +101,7 @@ namespace SEE.Game
         /// </summary>
         protected void Awake()
         {
-            string filename = GXLPath();
+            string filename = GXLPath;
             if (loadedGraph != null)
             {
                 Debug.Log("SEECity.Awake: graph is already loaded.\n");
@@ -210,20 +210,14 @@ namespace SEE.Game
         /// absolute path to the GXL file containing the graph data.
         /// </summary>
         /// <returns>concatenation of pathPrefix and gxlPath</returns>
-        public string GXLPath()
-        {
-            return PathPrefix + gxlPath;
-        }
+        public string GXLPath => PathPrefix + gxlPath;
 
         /// <summary>
         /// Returns the concatenation of pathPrefix and csvPath. That is the complete
         /// absolute path to the CSV file containing the additional metric values.
         /// </summary>
         /// <returns>concatenation of pathPrefix and csvPath</returns>
-        public string CSVPath()
-        {
-            return PathPrefix + csvPath;
-        }
+        public string CSVPath => PathPrefix + csvPath;
 
         /// <summary>
         /// Loads the metrics from CSVPath() and aggregates and adds them to the graph.
@@ -231,7 +225,7 @@ namespace SEE.Game
         /// </summary>
         private void LoadMetrics()
         {
-            string filename = CSVPath();
+            string filename = CSVPath;
             Performance p = Performance.Begin("loading metric data data from CSV file " + filename);
             int numberOfErrors = MetricImporter.Load(LoadedGraph, filename);
             if (numberOfErrors > 0)
@@ -271,7 +265,7 @@ namespace SEE.Game
         /// </summary>
         public virtual void LoadData()
         {
-            if (string.IsNullOrEmpty(GXLPath()))
+            if (string.IsNullOrEmpty(GXLPath))
             {
                 Debug.LogError("Empty graph path.\n");
             }
@@ -281,7 +275,7 @@ namespace SEE.Game
                 {
                     Reset();
                 }
-                LoadedGraph = LoadGraph(GXLPath());
+                LoadedGraph = LoadGraph(GXLPath);
                 LoadMetrics();
             }
         }
@@ -291,7 +285,7 @@ namespace SEE.Game
         /// </summary>
         public virtual void SaveData()
         {
-            if (string.IsNullOrEmpty(GXLPath()))
+            if (string.IsNullOrEmpty(GXLPath))
             {
                 Debug.LogError("Empty graph path.\n");
             }
@@ -304,7 +298,7 @@ namespace SEE.Game
                     // arbitrary element from a HashSet (the type of HierarchicalEdges).
                     foreach (string hierarchicalEdge in HierarchicalEdges)
                     {
-                        GraphWriter.Save(GXLPath(), LoadedGraph, hierarchicalEdge);
+                        GraphWriter.Save(GXLPath, LoadedGraph, hierarchicalEdge);
                         break;
                     }
                 }
@@ -381,7 +375,7 @@ namespace SEE.Game
         /// </summary>
         public void SaveLayout()
         {
-            SEE.Layout.IO.Writer.Save(GVLPath(), loadedGraph.Name, AllNodeDescendants(gameObject));
+            SEE.Layout.IO.Writer.Save(GVLPath, loadedGraph.Name, AllNodeDescendants(gameObject));
         }
 
         /// <summary>

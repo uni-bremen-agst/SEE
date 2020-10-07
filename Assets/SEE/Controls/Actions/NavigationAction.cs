@@ -92,7 +92,7 @@ namespace SEE.Controls
             }
         }
 
-        protected virtual void Start()
+        protected virtual void Awake()
         {
             Assertions.DisableOnCondition(this, portalPlane == null, "The culling plane must not be null!");
             Assertions.DisableOnCondition(this, idToActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!");
@@ -101,7 +101,7 @@ namespace SEE.Controls
             Update();
         }
 
-        protected virtual void Update()
+        public virtual void Update()
         {
             if (!CityAvailable)
             {
