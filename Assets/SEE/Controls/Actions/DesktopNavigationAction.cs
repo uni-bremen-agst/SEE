@@ -55,7 +55,7 @@ namespace SEE.Controls
             internal float zoomStepsDelta;
             internal bool zoomToggleToObject;
         }
-        
+
         private UnityEngine.Plane raycastPlane;
         private NavigationMode mode;
         private bool movingOrRotating;
@@ -111,13 +111,10 @@ namespace SEE.Controls
                 return;
             }
             navigationActionDict.Add(id, this);
+        }
 
-            CityTransform = GetCityRootNode(gameObject);
-            if (!CheckCondition(CityTransform != null, "This DesktopNavigationAction is not attached to a code city!"))
-            {
-                return;
-            }
-
+        protected sealed override void OnCityAvailable()
+        {
             raycastPlane = new UnityEngine.Plane(Vector3.up, CityTransform.position);
             mode = 0;
             movingOrRotating = false;
@@ -138,8 +135,15 @@ namespace SEE.Controls
             Debug.LogFormat("DesktopNavigationAction controls {0}.\n", CityTransform.name);
         }
 
-        private void Update()
+        protected sealed override void Update()
         {
+            base.Update();
+
+            if (!CityAvailable)
+            {
+                return;
+            }
+
             // Note: Input MUST NOT be inquired in FixedUpdate() for the input to feel responsive!
 
             actionState.drag = Input.GetMouseButton(2);
@@ -211,14 +215,16 @@ namespace SEE.Controls
                     rotateState.rotateGizmo.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotateGizmo.Center).magnitude;
                 }
             }
-
         }
 
         // This logic is in FixedUpdate(), so that the behaviour is framerate-
         // 'independent'.
         private void FixedUpdate()
         {
-            // TODO(torben): abstract mouse away!
+            if (!CityAvailable)
+            {
+                return;
+            }
 
             bool synchronize = false;
             RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint);

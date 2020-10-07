@@ -18,7 +18,7 @@ namespace SEE.Net
         /// <summary>
         /// The name of the game object defining the loading details.
         /// </summary>
-        public static readonly string gameObjectName = "Implementation";
+        public string gameObjectName;
 
         /// <summary>
         /// The type of the city as string.
@@ -121,6 +121,7 @@ namespace SEE.Net
         /// <param name="city">The city to load.</param>
         public LoadCityAction(AbstractSEECity city)
         {
+            gameObjectName = city.name;
             type = city.GetType().ToString();
             position = city.transform.position;
             rotation = city.transform.rotation;

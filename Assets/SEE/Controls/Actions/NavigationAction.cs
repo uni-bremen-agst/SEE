@@ -48,6 +48,8 @@ namespace SEE.Controls
             internal float currentZoomFactor;
         }
 
+        protected bool CityAvailable { get; private set; } = false;
+
         public Transform CityTransform { get; protected set; }
         internal ZoomState zoomState;
 
@@ -94,14 +96,30 @@ namespace SEE.Controls
             UnityEngine.Assertions.Assert.IsTrue(!idToActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!");
             idToActionDict.Add(id, this);
 
-            CityTransform = GetCityRootNode(gameObject);
-            UnityEngine.Assertions.Assert.IsNotNull(CityTransform, "This NavigationAction is not attached to a code city!");
-
-            zoomState.originalScale = CityTransform.localScale;
-            zoomState.zoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps);
-            zoomState.currentTargetZoomSteps = 0;
-            zoomState.currentZoomFactor = 1.0f;
+            Update();
         }
+
+        protected virtual void Update()
+        {
+            if (!CityAvailable)
+            {
+                CityTransform = GetCityRootNode(gameObject);
+
+                if (CityTransform)
+                {
+                    CityAvailable = true;
+
+                    zoomState.originalScale = CityTransform.localScale;
+                    zoomState.zoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps);
+                    zoomState.currentTargetZoomSteps = 0;
+                    zoomState.currentZoomFactor = 1.0f;
+
+                    OnCityAvailable();
+                }
+            }
+        }
+
+        protected virtual void OnCityAvailable() { }
 
         protected float ConvertZoomStepsToZoomFactor(float zoomSteps)
         {

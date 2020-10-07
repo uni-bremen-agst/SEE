@@ -3737,8 +3737,10 @@ MonoBehaviour:
   remoteServerIPAddress: 192.168.178.22
   localServerPort: 55555
   remoteServerPort: 55555
-  loadCityOnStart: 0
-  loadCityGameObject: {fileID: 0}
+  loadCityOnStart: 1
+  cities:
+  - {fileID: 1930472483}
+  - {fileID: 1649116645}
   nativeLoggingEnabled: 0
   minimalSeverity: 2
   vivoxChannelName: SEECity
