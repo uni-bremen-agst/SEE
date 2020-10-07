@@ -61,12 +61,6 @@ namespace SEE.Net
         /// </summary>
         [SerializeField] private bool loadCityOnStart = false;
 
-        /// <summary>
-        /// The <see cref="GameObject"/> containing the <see cref="SEECity"/>-Script. Is
-        /// ignored, if city can not be loaded on start.
-        /// </summary>
-        [SerializeField] private AbstractSEECity[] cities = null;
-
 #if UNITY_EDITOR
         /// <summary>
         /// Whether native logging should be enabled.
@@ -98,6 +92,7 @@ namespace SEE.Net
         /// <see cref="remoteServerIPAddress"/>
         /// </summary>
         public static string RemoteServerIPAddress { get => instance ? instance.remoteServerIPAddress : string.Empty; }
+
         /// <summary>
         /// <see cref="localServerPort"/>
         /// </summary>
@@ -107,6 +102,11 @@ namespace SEE.Net
         /// <see cref="remoteServerPort"/>
         /// </summary>
         public static int RemoteServerPort { get => instance ? instance.remoteServerPort : -1; }
+
+        /// <summary>
+        /// <see cref="loadCityOnStart"/>
+        /// </summary>
+        public static bool LoadCityOnStart { get => instance ? instance.loadCityOnStart : false; }
 
         /// <summary>
         /// Contains the main thread of the application.
@@ -173,17 +173,14 @@ namespace SEE.Net
         /// </summary>
         private void InitializeGame()
         {
-            if ((useInOfflineMode || hostServer) && loadCityOnStart && cities != null)
+            if ((useInOfflineMode || hostServer) && loadCityOnStart)
             {
-                foreach (AbstractSEECity city in cities)
+                foreach (AbstractSEECity city in FindObjectsOfType<AbstractSEECity>())
                 {
                     new LoadCityAction(city).Execute();
                 }
             }
-
-            // TODO(torben): not sure if this should be the job of the networking script
-            //new InstantiateAction("PlayerHead", Vector3.zero, Quaternion.identity, new Vector3(0.02f, 0.015f, 0.015f)).Execute();
-
+            
             GameObject rig = GameObject.Find("Player Rig");
             if (rig)
             {

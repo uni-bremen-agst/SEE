@@ -714,7 +714,7 @@ namespace SEE.Game
                 case SEECity.NodeLayouts.CompoundSpringEmbedder:
                     return new CoseLayout(groundLevel, settings);
                 case SEECity.NodeLayouts.FromFile:
-                    return new LoadedNodeLayout(groundLevel, settings.GVLPath());
+                    return new LoadedNodeLayout(groundLevel, settings.GVLPath);
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }

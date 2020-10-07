@@ -32,9 +32,9 @@ namespace SEE.Controls
             {
                 Debug.LogErrorFormat("Player {0} has no focus object assigned.\n", name);
             }
-            cameraState.distance = 1.0f;
+            cameraState.distance = 2.0f;
             cameraState.yaw = 0.0f;
-            cameraState.pitch = 30.0f;
+            cameraState.pitch = 45.0f;
             Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
         }

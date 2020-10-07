@@ -30,7 +30,6 @@ namespace SEEEditor
             SerializedProperty localServerPort = serializedObject.FindProperty("localServerPort");
             SerializedProperty remoteServerPort = serializedObject.FindProperty("remoteServerPort");
             SerializedProperty loadCityOnStart = serializedObject.FindProperty("loadCityOnStart");
-            SerializedProperty cities = serializedObject.FindProperty("cities");
             SerializedProperty useInOfflineMode = serializedObject.FindProperty("useInOfflineMode");
             SerializedProperty hostServer = serializedObject.FindProperty("hostServer");
             SerializedProperty nativeLoggingEnabled = serializedObject.FindProperty("nativeLoggingEnabled");
@@ -68,11 +67,6 @@ namespace SEEEditor
                     EditorGUI.BeginDisabledGroup(!useInOfflineMode.boolValue && !hostServer.boolValue);
                     {
                         EditorGUILayout.PropertyField(loadCityOnStart, new GUIContent("Load City On Start", "Whether the city should be loaded on start of the application."));
-                        EditorGUI.BeginDisabledGroup(!loadCityOnStart.boolValue);
-                        {
-                            EditorGUILayout.PropertyField(cities, new GUIContent("SEE Cities", "The given cities can be created on start-up for each client."));
-                        }
-                        EditorGUI.EndDisabledGroup();
                     }
                     EditorGUI.EndDisabledGroup();
 

@@ -63,7 +63,7 @@ namespace SEE.Controls
         private RotateState rotateState;
         private ActionState actionState;
 
-        protected sealed override void Start()
+        protected sealed override void Awake()
         {
             if (FindObjectOfType<PlayerSettings>().playerInputType != PlayerSettings.PlayerInputType.Desktop)
             {
@@ -71,7 +71,7 @@ namespace SEE.Controls
                 return;
             }
 
-            base.Start();
+            base.Awake();
         }
 
         protected sealed override void OnCityAvailable()
@@ -96,7 +96,7 @@ namespace SEE.Controls
             Debug.LogFormat("DesktopNavigationAction controls {0}.\n", CityTransform.name);
         }
 
-        protected sealed override void Update()
+        public sealed override void Update()
         {
             base.Update();
 

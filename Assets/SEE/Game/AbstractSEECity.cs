@@ -45,21 +45,16 @@ namespace SEE.Game
         /// </summary>
         public string PathPrefix
         {
-            set
-            {
-                pathPrefix = Filenames.ToInternalRepresentation(value);
-                // pathPrefix must end with a directory separator /
-                if (pathPrefix.Length > 0 && pathPrefix[pathPrefix.Length - 1] != Filenames.UnixDirectorySeparator)
-                {
-                    pathPrefix += Filenames.UnixDirectorySeparator;
-                }
-            }
-
             get
             {
-                return string.IsNullOrEmpty(pathPrefix) ? 
-                    UnityProject.GetPath() 
-                    : Filenames.OnCurrentPlatform(pathPrefix);
+                UnityEngine.Assertions.Assert.IsTrue(!string.IsNullOrEmpty(pathPrefix));
+                string result = pathPrefix;
+                if (result[result.Length - 1] != Filenames.UnixDirectorySeparator)
+                {
+                    result += Filenames.UnixDirectorySeparator;
+                }
+                result = Filenames.OnCurrentPlatform(result);
+                return result;
             }
         }
 
@@ -73,10 +68,7 @@ namespace SEE.Game
         /// absolute path to the GVL file containing the layout information.
         /// </summary>
         /// <returns>concatenation of pathPrefix and gvlPath</returns>
-        public string GVLPath()
-        {
-            return PathPrefix + gvlPath;
-        }
+        public string GVLPath => PathPrefix + gvlPath;
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.

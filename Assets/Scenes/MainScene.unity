@@ -1695,13 +1695,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1566173679}
-  m_LocalRotation: {x: 0.6427876, y: 0, z: 0, w: 0.7660445}
-  m_LocalPosition: {x: -0.418, y: 1.688, z: -2.283}
+  m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
+  m_LocalPosition: {x: -0.25, y: 2, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 80, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
 --- !u!114 &1566173691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3170,6 +3170,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+  pathPrefix: C:\Users\Torben\dev\SEE\Assets
   gvlPath: ..\Data\GXL\SEE\CodeFacts.gvl
   WidthMetric: Metric.Number_Of_Calling_Routines
   HeightMetric: Metric.Lines.LOC
@@ -3590,9 +3591,6 @@ MonoBehaviour:
   localServerPort: 55555
   remoteServerPort: 55555
   loadCityOnStart: 1
-  cities:
-  - {fileID: 1930472483}
-  - {fileID: 1649116645}
   nativeLoggingEnabled: 0
   minimalSeverity: 2
   vivoxChannelName: SEECity
@@ -4161,6 +4159,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+  pathPrefix: C:\Users\Torben\dev\SEE\Assets
   gvlPath: ..\Data\GXL\SEE\Architecture.gvl
   WidthMetric: Metric.Number_of_Descendants
   HeightMetric: 0.0001
