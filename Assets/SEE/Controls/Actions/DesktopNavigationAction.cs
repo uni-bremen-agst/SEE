@@ -117,7 +117,6 @@ namespace SEE.Controls
             {
                 return;
             }
-            Debug.LogFormat("DesktopNavigationAction controls {0}.\n", CityTransform.name);
 
             raycastPlane = new UnityEngine.Plane(Vector3.up, CityTransform.position);
             mode = 0;

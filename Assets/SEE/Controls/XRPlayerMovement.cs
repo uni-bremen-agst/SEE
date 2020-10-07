@@ -22,7 +22,7 @@ namespace SEE.Controls
 
         public CharacterController characterController;
 
-        private readonly SteamVR_Action_Single throttleAction = SteamVR_Input.GetSingleAction("default", "Throttle");
+        private readonly SteamVR_Action_Single throttleAction = SteamVR_Input.GetSingleAction(XRInput.DefaultActionSetName, XRInput.ThrottleActionName);
 
         /// <summary>
         /// Moves the game object this action is attached to based on input of the direction

@@ -25,8 +25,6 @@ namespace SEE.Net
         /// </summary>
         public uint newID;
 
-
-
         /// <summary>
         /// Constructs a new selection action. At least one of the parameters must not be
         /// <code>null</code>. If one of the objects is null, it is simply not
@@ -34,7 +32,7 @@ namespace SEE.Net
         /// </summary>
         /// <param name="oldHoverableObject">The hoverable object to deselect.</param>
         /// <param name="newHoverableObject">The hoverable object to select.</param>
-        public SelectionAction(HoverableObject oldHoverableObject, HoverableObject newHoverableObject) : base(false)
+        public SelectionAction(HoverableObject oldHoverableObject, HoverableObject newHoverableObject)
         {
             Assert.IsTrue(oldHoverableObject != newHoverableObject);
             Assert.IsTrue(oldHoverableObject != null || newHoverableObject != null);
@@ -43,31 +41,15 @@ namespace SEE.Net
             newID = newHoverableObject ? newHoverableObject.id : uint.MaxValue;
         }
 
-
-
-        /// <summary>
-        /// Updates the game state for future clients.
-        /// </summary>
-        /// <returns><code>true</code>.</returns>
-        protected override bool ExecuteOnServer()
+        protected override void ExecuteOnServer()
         {
-            if (oldID != uint.MaxValue)
-            {
-                Server.gameState.selectedGameObjectIDs.Remove(oldID);
-            }
-            if (newID != uint.MaxValue)
-            {
-                Server.gameState.selectedGameObjectIDs.Add(newID);
-            }
-            return true;
         }
 
         /// <summary>
         /// Deselects hoverable object with <see cref="oldID"/> if it exists and selects
         /// hoverable object with <see cref="newID"/> if it exists.
         /// </summary>
-        /// <returns><code>true</code>.</returns>
-        protected override bool ExecuteOnClient()
+        protected override void ExecuteOnClient()
         {
             HoverableObject oldHoverableObject = (HoverableObject)InteractableObject.Get(oldID);
             HoverableObject newHoverableObject = (HoverableObject)InteractableObject.Get(newID);
@@ -90,32 +72,6 @@ namespace SEE.Net
                     Outline.Create(newHoverableObject.gameObject, false);
                 }
             }
-
-            return true;
-        }
-
-        protected override bool UndoOnServer()
-        {
-            Utils.Assertions.InvalidCodePath();
-            return false;
-        }
-
-        protected override bool UndoOnClient()
-        {
-            Utils.Assertions.InvalidCodePath();
-            return false;
-        }
-
-        protected override bool RedoOnServer()
-        {
-            Utils.Assertions.InvalidCodePath();
-            return false;
-        }
-
-        protected override bool RedoOnClient()
-        {
-            Utils.Assertions.InvalidCodePath();
-            return false;
         }
     }
 

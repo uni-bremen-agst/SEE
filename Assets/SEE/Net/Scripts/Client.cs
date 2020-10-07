@@ -4,6 +4,7 @@ using NetworkCommsDotNet.Connections.TCP;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using UnityEngine;
 
 namespace SEE.Net
 {
@@ -56,7 +57,7 @@ namespace SEE.Net
         /// </summary>
         public static void Initialize()
         {
-            NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => Network.SwitchToOfflineMode());
+            NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => { if (c.Equals(Connection)) Network.SwitchToOfflineMode(); });
 
             void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => PacketHandler.Push(packetHeader, connection, data);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>(PacketType, OnIncomingPacket);
