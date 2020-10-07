@@ -142,12 +142,12 @@ namespace SEEEditor
 
         private void SaveLayoutAnnotations(SEECity city)
         {
-            city.Save();
+            city.SaveLayoutAndAnnotations();
         }
 
         private void LoadLayoutAnnotations(SEECity city)
         {
-            city.Load();
+            city.LoadLayoutAndAnnotations();
         }
     }
 }

@@ -53,13 +53,13 @@ public class Dictate : MonoBehaviour
 
     void Update()
     {
-        if (this.transform.Find("Adding").gameObject.activeSelf == true)
+        if (this.transform.Find("Adding").gameObject.activeSelf == true && recording)
         {
             AnnotationEditor annotationEditor = this.gameObject.GetComponent<AnnotationEditor>();
             GameObject input = annotationEditor.transform.Find("Adding/AddingInput").gameObject;
             input.GetComponent<TMP_InputField>().text = record;
         }
-        else if (this.transform.Find("Editing").gameObject.activeSelf == true)
+        else if (this.transform.Find("Editing").gameObject.activeSelf == true && recording)
         {
             AnnotationEditor annotationEditor = this.gameObject.GetComponent<AnnotationEditor>();
             GameObject input = annotationEditor.transform.Find("Editing/EditingInput").gameObject;

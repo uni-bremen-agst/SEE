@@ -51,7 +51,10 @@ namespace SEE.Controls
             {
                 annotationEditor = Instantiate(annotationEditorPrefab, Vector3.zero, Quaternion.identity);
                 annotationEditor.transform.SetParent(gameObject.transform);
-                annotationEditor.GetComponent<Canvas>().worldCamera = guiPointer.GetComponent<Camera>();
+                if (guiPointer.transform.root.gameObject.activeSelf)
+                {
+                    annotationEditor.GetComponent<Canvas>().worldCamera = guiPointer.GetComponent<Camera>();
+                }
                 Vector3 position = transform.position;
                 position.y = BoundingBox.GetRoof(GameObjectHierarchy.Descendants(gameObject, Tags.Node)) + annotationEditor.GetComponent<RectTransform>().rect.height / 2.0f;
                 annotationEditor.transform.position = position;
@@ -122,7 +125,7 @@ namespace SEE.Controls
                 {
                     texts.Add(game.transform.Find("Text").gameObject);
                 }
-                position.y = BoundingBox.GetRoof(texts) + paperHeight * 1.1f;
+                position.y = BoundingBox.GetRoof(texts) + paperHeight / 1.3f;
 
             }
             else
@@ -285,7 +288,8 @@ namespace SEE.Controls
         private string ResizeAnnotation(string annotation)
         {
             string annotationNewLine = annotation;
-            int informationLength = textOnPaper.GetComponent<TextGUIAndPaperResizer>().Text.Length;
+            // Determines the line length of the annotations
+            int informationLength = 30;
             if (informationLength < annotationNewLine.Length)
             {
                 for (int i = 1; i * informationLength < annotationNewLine.Length; i++)

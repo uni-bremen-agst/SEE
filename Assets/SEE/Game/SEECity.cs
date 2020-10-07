@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -93,6 +94,13 @@ namespace SEE.Game
                     SetNodeRefs(loadedGraph, gameObject);
                 }
             }
+
+            InvokeRepeating("SaveLayoutAndAnnotations", 30.0f, 60.0f);
+        }
+
+        protected void OnApplicationQuit()
+        {
+            SaveLayoutAndAnnotations();
         }
 
         /// <summary>
@@ -198,7 +206,9 @@ namespace SEE.Game
 
         public string SEESavePath()
         {
-            return PathPrefix + seeSavePath;
+            String format = "dd-MM-yyyy_hh-mm_";
+            String str = DateTime.Now.ToString(format);
+            return PathPrefix + str + seeSavePath;
         }
 
         public string SEELoadPath()
@@ -425,7 +435,7 @@ namespace SEE.Game
             return null;
         }
 
-        public void Save()
+        public void SaveLayoutAndAnnotations()
         {
             List<GameObject> gameObjects = SEECity.AllNodeDescendants(gameObject).ToList();
             List<AnnotatableObjectData> annotatableObjects = new List<AnnotatableObjectData>();
@@ -435,10 +445,14 @@ namespace SEE.Game
                 annotatableObjects.Add(new AnnotatableObjectData(gameObject.GetComponent<AnnotatableObject>()));
             }
 
-            LayoutSaveSystem.SaveAnnotatableObjects(annotatableObjects,SEESavePath());
+            try
+            {
+                LayoutSaveSystem.SaveAnnotatableObjects(annotatableObjects, SEESavePath());
+            }
+            catch (DirectoryNotFoundException e) { }
         }
 
-        public void Load()
+        public void LoadLayoutAndAnnotations()
         {
             List<AnnotatableObjectData> annotatableObjects = LayoutSaveSystem.LoadAnnotatableObjects(SEELoadPath());
             List<GameObject> gameObjects = SEECity.AllNodeDescendants(gameObject).ToList();

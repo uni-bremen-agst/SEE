@@ -18,7 +18,7 @@ namespace SEE.DataModel.IO
             try
             {
                 binaryFormatter.Serialize(stream, annotatableObjects);
-                Debug.Log("Saving complete");
+                Debug.Log("Saving complete " + path.Substring(path.LastIndexOf('\\') + 1));
             }
             finally
             {
