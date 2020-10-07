@@ -27,16 +27,16 @@ namespace SEE.Controls
 	public class XRChartAction : ChartAction
     {
         private readonly SteamVR_Action_Vector2 moveAction =
-            SteamVR_Input.GetVector2Action(InputDevice.DefaultActionSetName, InputDevice.MoveActionName);
+            SteamVR_Input.GetVector2Action(XRInput.DefaultActionSetName, XRInput.MoveActionName);
 
         private readonly SteamVR_Action_Boolean resetAction =
-            SteamVR_Input.GetBooleanAction(InputDevice.DefaultActionSetName, InputDevice.ResetChartsName);
+            SteamVR_Input.GetBooleanAction(XRInput.DefaultActionSetName, XRInput.ResetChartsName);
 
         private readonly SteamVR_Action_Boolean clickAction =
-            SteamVR_Input.GetBooleanAction(InputDevice.DefaultActionSetName, InputDevice.ClickActionName);
+            SteamVR_Input.GetBooleanAction(XRInput.DefaultActionSetName, XRInput.ClickActionName);
 
         private readonly SteamVR_Action_Boolean createAction =
-            SteamVR_Input.GetBooleanAction(InputDevice.DefaultActionSetName, InputDevice.CreateChartActionName);
+            SteamVR_Input.GetBooleanAction(XRInput.DefaultActionSetName, XRInput.CreateChartActionName);
 
         private bool _lastClick;
 

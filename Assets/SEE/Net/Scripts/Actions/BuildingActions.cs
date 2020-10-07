@@ -13,40 +13,24 @@ namespace SEE.Net
     {
         public uint id;
 
-        public HighlightBuildingAction(HighlightableObject highlightableObject) : base(false)
+        public HighlightBuildingAction(HighlightableObject highlightableObject)
         {
             Assert.IsNotNull(highlightableObject);
 
             id = highlightableObject.id;
         }
 
-        protected override bool ExecuteOnServer() => true;
-
-        protected override bool ExecuteOnClient()
+        protected override void ExecuteOnServer()
         {
-            bool result = false;
-
-            if (IsRequester())
-            {
-                result = true;
-            }
-            else
-            {
-                HighlightableObject highlightableObject = (HighlightableObject)InteractableObject.Get(id);
-                if (highlightableObject)
-                {
-                    result = true;
-                    highlightableObject.Hovered(false);
-                }
-            }
-
-            return result;
         }
 
-        protected override bool UndoOnServer() => throw new System.NotImplementedException();
-        protected override bool UndoOnClient() => throw new System.NotImplementedException();
-        protected override bool RedoOnServer() => throw new System.NotImplementedException();
-        protected override bool RedoOnClient() => throw new System.NotImplementedException();
+        protected override void ExecuteOnClient()
+        {
+            if (!IsRequester())
+            {
+                ((HighlightableObject)InteractableObject.Get(id))?.Hovered(false);
+            }
+        }
     }
 
     /// <summary>
@@ -57,40 +41,24 @@ namespace SEE.Net
     {
         public uint id;
 
-        public UnhighlightBuildingAction(HighlightableObject highlightableObject) : base(false)
+        public UnhighlightBuildingAction(HighlightableObject highlightableObject)
         {
             Assert.IsNotNull(highlightableObject);
 
             id = highlightableObject.id;
         }
 
-        protected override bool ExecuteOnServer() => true;
-
-        protected override bool ExecuteOnClient()
+        protected override void ExecuteOnServer()
         {
-            bool result = false;
-
-            if (IsRequester())
-            {
-                result = true;
-            }
-            else
-            {
-                HighlightableObject highlightableObject = (HighlightableObject)InteractableObject.Get(id);
-                if (highlightableObject)
-                {
-                    result = true;
-                    highlightableObject.Unhovered();
-                }
-            }
-
-            return result;
         }
 
-        protected override bool UndoOnServer() => throw new System.NotImplementedException();
-        protected override bool UndoOnClient() => throw new System.NotImplementedException();
-        protected override bool RedoOnServer() => throw new System.NotImplementedException();
-        protected override bool RedoOnClient() => throw new System.NotImplementedException();
+        protected override void ExecuteOnClient()
+        {
+            if (!IsRequester())
+            {
+                ((HighlightableObject)InteractableObject.Get(id))?.Unhovered();
+            }
+        }
     }
     
     /// <summary>
@@ -101,40 +69,24 @@ namespace SEE.Net
     {
         public uint id;
 
-        public GrabBuildingAction(GrabbableObject grabbableObject) : base(false)
+        public GrabBuildingAction(GrabbableObject grabbableObject)
         {
             Assert.IsNotNull(grabbableObject);
 
             id = grabbableObject.id;
         }
 
-        protected override bool ExecuteOnServer() => true;
-
-        protected override bool ExecuteOnClient()
+        protected override void ExecuteOnServer()
         {
-            bool result = false;
-
-            if (IsRequester())
-            {
-                result = true;
-            }
-            else
-            {
-                GrabbableObject grabbableObject = (GrabbableObject)InteractableObject.Get(id);
-                if (grabbableObject)
-                {
-                    result = true;
-                    grabbableObject.Grab(false);
-                }
-            }
-
-            return result;
         }
 
-        protected override bool UndoOnServer() => throw new System.NotImplementedException();
-        protected override bool UndoOnClient() => throw new System.NotImplementedException();
-        protected override bool RedoOnServer() => throw new System.NotImplementedException();
-        protected override bool RedoOnClient() => throw new System.NotImplementedException();
+        protected override void ExecuteOnClient()
+        {
+            if (!IsRequester())
+            {
+                ((GrabbableObject)InteractableObject.Get(id))?.Grab(false);
+            }
+        }
     }
 
     /// <summary>
@@ -145,40 +97,24 @@ namespace SEE.Net
     {
         public uint id;
 
-        public ReleaseBuildingAction(GrabbableObject grabbableObject) : base(false)
+        public ReleaseBuildingAction(GrabbableObject grabbableObject)
         {
             Assert.IsNotNull(grabbableObject);
 
             id = grabbableObject.id;
         }
 
-        protected override bool ExecuteOnServer() => true;
-
-        protected override bool ExecuteOnClient()
+        protected override void ExecuteOnServer()
         {
-            bool result = false;
-
-            if (IsRequester())
-            {
-                result = true;
-            }
-            else
-            {
-                GrabbableObject grabbableObject = (GrabbableObject)InteractableObject.Get(id);
-                if (grabbableObject)
-                {
-                    result = true;
-                    grabbableObject.Release(false);
-                }
-            }
-
-            return result;
         }
 
-        protected override bool UndoOnServer() => throw new System.NotImplementedException();
-        protected override bool UndoOnClient() => throw new System.NotImplementedException();
-        protected override bool RedoOnServer() => throw new System.NotImplementedException();
-        protected override bool RedoOnClient() => throw new System.NotImplementedException();
+        protected override void ExecuteOnClient()
+        {
+            if (!IsRequester())
+            {
+                ((GrabbableObject)InteractableObject.Get(id))?.Release(false);
+            }
+        }
     }
 
     /// <summary>
@@ -192,7 +128,7 @@ namespace SEE.Net
         public Quaternion rotation;
         public Vector3 localScale;
 
-        public SynchronizeBuildingTransformAction(GameObject gameObject, bool syncLocalScale) : base(false)
+        public SynchronizeBuildingTransformAction(GameObject gameObject, bool syncLocalScale)
         {
             Assert.IsNotNull(gameObject);
 
@@ -202,22 +138,17 @@ namespace SEE.Net
             localScale = syncLocalScale ? gameObject.transform.localScale : Vector3.zero;
         }
 
-        protected override bool ExecuteOnServer() => true;
-
-        protected override bool ExecuteOnClient()
+        protected override void ExecuteOnServer()
         {
-            bool result = false;
+        }
 
-            if (IsRequester())
-            {
-                result = true;
-            }
-            else
+        protected override void ExecuteOnClient()
+        {
+            if (!IsRequester())
             {
                 GameObject gameObject = GameObject.Find(uniqueGameObjectName);
                 if (gameObject)
                 {
-                    result = true;
                     gameObject.GetComponent<Synchronizer>()?.NotifyJustReceivedUpdate();
                     gameObject.transform.position = position;
                     gameObject.transform.rotation = rotation;
@@ -227,13 +158,6 @@ namespace SEE.Net
                     }
                 }
             }
-
-            return result;
         }
-
-        protected override bool UndoOnServer() => throw new System.NotImplementedException();
-        protected override bool UndoOnClient() => throw new System.NotImplementedException();
-        protected override bool RedoOnServer() => throw new System.NotImplementedException();
-        protected override bool RedoOnClient() => throw new System.NotImplementedException();
     }
 }

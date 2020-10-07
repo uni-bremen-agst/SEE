@@ -187,7 +187,7 @@ namespace SEE.Net
             }
 
             // TODO(torben): not sure if this should be the job of the networking script
-            new InstantiateAction("PlayerHead", Vector3.zero, Quaternion.identity, new Vector3(0.02f, 0.015f, 0.015f)).Execute();
+            //new InstantiateAction("PlayerHead", Vector3.zero, Quaternion.identity, new Vector3(0.02f, 0.015f, 0.015f)).Execute();
 
             GameObject rig = GameObject.Find("Player Rig");
             if (rig)
@@ -226,7 +226,8 @@ namespace SEE.Net
         /// </summary>
         private void LateUpdate()
         {
-            if (hostServer && !useInOfflineMode)
+            bool updateServer = hostServer && !useInOfflineMode;
+            if (updateServer)
             {
                 Server.Update();
             }
@@ -243,7 +244,7 @@ namespace SEE.Net
                         if (serializedObjects.Count != 0)
                         {
                             ulong id = ulong.MaxValue;
-                            if (Server.Connections.Contains(connection))
+                            if (updateServer && Server.Connections.Contains(connection))
                             {
                                 id = Server.outgoingPacketSequenceIDs[connection]++;
                             }
@@ -295,7 +296,13 @@ namespace SEE.Net
                 {
                     if (fileName.Contains(prefixes[j]))
                     {
-                        fileInfo.Delete();
+                        try
+                        {
+                            fileInfo.Delete();
+                        }
+                        catch (IOException)
+                        {
+                        }
                         break;
                     }
                 }
@@ -320,12 +327,21 @@ namespace SEE.Net
                 }
 
                 instance.useInOfflineMode = true;
-                try
+
+                if (instance.hostServer)
                 {
-                    if (instance.hostServer)
+                    try
                     {
                         Server.Shutdown();
                     }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
+                }
+
+                try
+                {
                     Client.Shutdown();
                 }
                 catch (Exception e)
@@ -392,7 +408,14 @@ namespace SEE.Net
                             connection.ConnectionInfo.RemoteEndPoint.ToString() +
                             "'! Destination may not be listening or connection timed out. Closing connection!"
                         );
-                        SwitchToOfflineMode();
+                        if (hostServer)
+                        {
+                            connection.CloseConnection(true);
+                        }
+                        else
+                        {
+                            SwitchToOfflineMode();
+                        }
                     }
                 }
             }

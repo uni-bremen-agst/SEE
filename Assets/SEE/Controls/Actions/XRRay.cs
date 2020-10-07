@@ -102,9 +102,9 @@ namespace SEE.Controls
         [Tooltip("The width of the selection ray line")]
         public float rayWidth = 0.005f;
 
-        private SteamVR_Action_Single GrabAction = SteamVR_Input.GetSingleAction(InputDevice.DefaultActionSetName, "Grab");
+        private SteamVR_Action_Single GrabAction = SteamVR_Input.GetSingleAction(XRInput.DefaultActionSetName, "Grab");
 
-        private SteamVR_Action_Boolean SelectionButton = SteamVR_Input.GetBooleanAction(InputDevice.DefaultActionSetName, "Select");
+        private SteamVR_Action_Boolean SelectionButton = SteamVR_Input.GetBooleanAction(XRInput.DefaultActionSetName, "Select");
 
         private DelayedToggle selectionButton;
 
