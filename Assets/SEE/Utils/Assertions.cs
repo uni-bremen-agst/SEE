@@ -50,6 +50,23 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// Disables the given MonoBehaviour and prints the given message, if the given
+        /// condition is <code>true</code>.
+        /// </summary>
+        /// <param name="monoBehaviour">The MonoBehaviour to disable on condition.
+        /// </param>
+        /// <param name="condition">The condition to check.</param>
+        /// <param name="message">The message to print on condition.</param>
+        public static void DisableOnCondition(UnityEngine.MonoBehaviour monoBehaviour, bool condition, string message)
+        {
+            if (condition)
+            {
+                UnityEngine.Debug.LogErrorFormat("DesktopNavigationAction of game object {0}: {1}. Component will be disabled.\n", monoBehaviour.name, message);
+                monoBehaviour.enabled = false;
+            }
+        }
+
+        /// <summary>
         /// Checks whether <paramref name="obj"/> is null and throws a System.Exception
         /// containing the <paramref name="paramName"/> if so.
         /// </summary>

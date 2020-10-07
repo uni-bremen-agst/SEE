@@ -27,8 +27,8 @@ namespace SEE.Game
         /// The internal representation of this path is always in the Unix style
         /// (or also Unity style), independent from the operating system we are currently
         /// running on.
-        /// </summary>        
-        private string pathPrefix = null; // serialized by Unity
+        /// </summary>
+        [SerializeField] private string pathPrefix = null;
 
         /// <summary>
         /// The prefix of the absolute paths for the GXL, CSV, GVL data; that is,

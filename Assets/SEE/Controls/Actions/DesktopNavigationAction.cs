@@ -1,13 +1,11 @@
 ﻿using SEE.GO;
 using SEE.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls
 {
 
     [RequireComponent(typeof(Collider))]
-    [RequireComponent(typeof(Plane))]
     public class DesktopNavigationAction : NavigationAction
     {
         private enum NavigationMode
@@ -51,7 +49,7 @@ namespace SEE.Controls
             internal bool cancel;
             internal bool snap;
             internal bool reset;
-            internal Vector3 mousePosition;  // TODO(torben): this needs to be abstracted for other modalities
+            internal Vector3 mousePosition;
             internal float zoomStepsDelta;
             internal bool zoomToggleToObject;
         }
@@ -65,33 +63,6 @@ namespace SEE.Controls
         private RotateState rotateState;
         private ActionState actionState;
 
-        private static readonly Dictionary<int, DesktopNavigationAction> navigationActionDict = new Dictionary<int, DesktopNavigationAction>(2);
-        public static DesktopNavigationAction Get(int id)
-        {
-            bool result = navigationActionDict.TryGetValue(id, out DesktopNavigationAction value);
-            if (result)
-            {
-                return value;
-            }
-            else
-            {
-                Debug.LogWarning("ID does not match any NavigationAction!");
-                return null;
-            }
-        }
-
-        private bool CheckCondition(bool condition, string message)
-        {
-            if (!condition)
-            {
-                Debug.LogErrorFormat("DesktopNavigationAction of game object {0}: {1}. Component will be disabled.\n",
-                      name, message);
-                enabled = false; // disable this component
-            }
-            return condition;
-
-        }
-
         protected sealed override void Start()
         {
             if (FindObjectOfType<PlayerSettings>().playerInputType != PlayerSettings.PlayerInputType.Desktop)
@@ -101,16 +72,6 @@ namespace SEE.Controls
             }
 
             base.Start();
-
-            if (!CheckCondition(portalPlane != null, "The culling plane must not be null!"))
-            {
-                return;
-            }
-            if (!CheckCondition(!navigationActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!"))
-            {
-                return;
-            }
-            navigationActionDict.Add(id, this);
         }
 
         protected sealed override void OnCityAvailable()
