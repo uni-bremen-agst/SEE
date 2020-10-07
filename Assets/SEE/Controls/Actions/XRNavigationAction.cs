@@ -5,9 +5,7 @@ using Valve.VR.InteractionSystem;
 namespace SEE.Controls
 {
 
-    [RequireComponent(typeof(Collider))]
-    [RequireComponent(typeof(Plane))]
-    public class XRNavigationAction : NavigationAction
+    public sealed class XRNavigationAction : NavigationAction
     {
         private enum XRNavigationMode
         {
@@ -48,8 +46,15 @@ namespace SEE.Controls
             Debug.LogFormat("XRNavigationAction controls {0}.\n", CityTransform.name);
         }
 
-        private void Update()
+        protected sealed override void Update()
         {
+            base.Update();
+
+            if (!CityAvailable)
+            {
+                return;
+            }
+
             // release
             if (!leftGripAction.state && leftHand)
             {

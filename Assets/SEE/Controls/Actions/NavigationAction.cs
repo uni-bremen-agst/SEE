@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using SEE.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls
 {
 
+    [RequireComponent(typeof(Plane))]
     public abstract class NavigationAction : CityAction
     {
         internal class ZoomCommand
@@ -92,8 +94,8 @@ namespace SEE.Controls
 
         protected virtual void Start()
         {
-            UnityEngine.Assertions.Assert.IsNotNull(portalPlane, "The culling plane must not be null!");
-            UnityEngine.Assertions.Assert.IsTrue(!idToActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!");
+            Assertions.DisableOnCondition(this, portalPlane == null, "The culling plane must not be null!");
+            Assertions.DisableOnCondition(this, idToActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!");
             idToActionDict.Add(id, this);
 
             Update();
