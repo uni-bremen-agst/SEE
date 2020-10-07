@@ -12,12 +12,10 @@ namespace SEE.Controls
             Interactable interactable = go.AddComponent<Interactable>(); // enable interactions
             interactable.highlightOnHover = false;
             GrabbableObject grabbableObject = go.AddComponent<GrabbableObject>(); // our customized reactions to hovering and grabbing events
-            //go.AddComponent<Rigidbody>(); // so the object follows the laws of physics
         }
 
         public static void PrepareForInteraction(ICollection<GameObject> gameNodes)
         {
-            InteractableObject.ResetAllObjects();
             foreach (GameObject go in gameNodes)
             {
                 PrepareForInteraction(go);
