@@ -65,7 +65,7 @@ namespace SEE.Net
         /// The <see cref="GameObject"/> containing the <see cref="SEECity"/>-Script. Is
         /// ignored, if city can not be loaded on start.
         /// </summary>
-        [SerializeField] private GameObject loadCityGameObject = null;
+        [SerializeField] private AbstractSEECity[] cities = null;
 
 #if UNITY_EDITOR
         /// <summary>
@@ -173,16 +173,11 @@ namespace SEE.Net
         /// </summary>
         private void InitializeGame()
         {
-            if ((useInOfflineMode || hostServer) && loadCityOnStart && loadCityGameObject != null)
+            if ((useInOfflineMode || hostServer) && loadCityOnStart && cities != null)
             {
-                AbstractSEECity seeCity = loadCityGameObject.GetComponent<AbstractSEECity>();
-                if (seeCity)
+                foreach (AbstractSEECity city in cities)
                 {
-                    new LoadCityAction(seeCity).Execute();
-                }
-                else
-                {
-                    Debug.LogWarning("Attached GameObject does not contain an AbstractSEECity script! City will not be loaded!");
+                    new LoadCityAction(city).Execute();
                 }
             }
 

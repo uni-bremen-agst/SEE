@@ -50,6 +50,8 @@ namespace SEE.Net
         /// </summary>
         public static ulong outgoingPacketID = 0;
 
+        private static bool initialized = false;
+
 
 
         /// <summary>
@@ -57,30 +59,35 @@ namespace SEE.Net
         /// </summary>
         public static void Initialize()
         {
-            NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => { if (c.Equals(Connection)) Network.SwitchToOfflineMode(); });
-
-            void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => PacketHandler.Push(packetHeader, connection, data);
-            NetworkComms.AppendGlobalIncomingPacketHandler<string>(PacketType, OnIncomingPacket);
-
-            List<IPEndPoint> endPoints = Network.HostServer
-                ? (from connectionListener in Server.ConnectionListeners select connectionListener.LocalListenEndPoint as IPEndPoint).ToList()
-                : new List<IPEndPoint>() { new IPEndPoint(IPAddress.Parse(Network.RemoteServerIPAddress), Network.RemoteServerPort) };
-
-            bool success = false;
-            foreach (ConnectionInfo connectionInfo in from endPoint in endPoints select new ConnectionInfo(endPoint))
+            if (!initialized)
             {
-                try
+                NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => { if (c.Equals(Connection)) Network.SwitchToOfflineMode(); });
+
+                void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => PacketHandler.Push(packetHeader, connection, data);
+                NetworkComms.AppendGlobalIncomingPacketHandler<string>(PacketType, OnIncomingPacket);
+
+                List<IPEndPoint> endPoints = Network.HostServer
+                    ? (from connectionListener in Server.ConnectionListeners select connectionListener.LocalListenEndPoint as IPEndPoint).ToList()
+                    : new List<IPEndPoint>() { new IPEndPoint(IPAddress.Parse(Network.RemoteServerIPAddress), Network.RemoteServerPort) };
+
+                bool success = false;
+                foreach (ConnectionInfo connectionInfo in from endPoint in endPoints select new ConnectionInfo(endPoint))
                 {
-                    Connection = TCPConnection.GetConnection(connectionInfo);
-                    success = true;
-                    break;
+                    try
+                    {
+                        Connection = TCPConnection.GetConnection(connectionInfo);
+                        success = true;
+                        break;
+                    }
+                    catch (ConnectionSetupException) { }
                 }
-                catch (ConnectionSetupException) { }
-            }
-            if (!success)
-            {
-                Network.SwitchToOfflineMode();
-                throw new ConnectionSetupException();
+                if (!success)
+                {
+                    Network.SwitchToOfflineMode();
+                    throw new ConnectionSetupException();
+                }
+
+                initialized = true;
             }
         }
 
@@ -89,7 +96,10 @@ namespace SEE.Net
         /// </summary>
         public static void Update()
         {
-            PacketHandler.HandlePendingPackets();
+            if (initialized)
+            {
+                PacketHandler.HandlePendingPackets();
+            }
         }
 
         /// <summary>
@@ -97,8 +107,13 @@ namespace SEE.Net
         /// </summary>
         public static void Shutdown()
         {
-            Connection?.CloseConnection(false);
-            Connection = null;
+            if (initialized)
+            {
+                initialized = false;
+
+                Connection?.CloseConnection(false);
+                Connection = null;
+            }
         }
     }
 
