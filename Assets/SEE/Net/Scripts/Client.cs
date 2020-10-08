@@ -77,6 +77,7 @@ namespace SEE.Net
                     {
                         Connection = TCPConnection.GetConnection(connectionInfo);
                         success = true;
+                        Logger.Log("Connection with server established: " + Connection.ToString());
                         break;
                     }
                     catch (ConnectionSetupException) { }

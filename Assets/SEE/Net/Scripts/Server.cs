@@ -89,14 +89,18 @@ namespace SEE.Net
                 try
                 {
                     ConnectionListeners.AddRange(Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.LocalServerPort), false));
+#if UNITY_EDITOR
+                    string message = "Server listening on end-points:";
                     foreach (ConnectionListenerBase connectionListener in ConnectionListeners)
                     {
-                        Debug.Log("Listening on: '" + connectionListener.LocalListenEndPoint.ToString() + "'.\n");
+                        message += "\n" + connectionListener.LocalListenEndPoint.ToString();
                     }
+                    Logger.Log(message);
+#endif
                 }
                 catch (Exception e)
                 {
-                    Debug.LogException(e);
+                    Logger.LogException(e);
                 }
 
                 initialized = true;
@@ -173,7 +177,7 @@ namespace SEE.Net
             {
                 if (!Connections.Contains(connection))
                 {
-                    Debug.LogFormat("Connection established: {0}\n", connection.ToString());
+                    Logger.Log("Connection with client established: " + connection.ToString());
 
                     // synchronize current state with new client
                     if (!connection.ConnectionInfo.RemoteEndPoint.Equals(Client.LocalEndPoint))
@@ -252,7 +256,7 @@ namespace SEE.Net
                         new DestroyPrefabAction(viewContainer).Execute();
                     }
 
-                    Debug.Log("Connection closed: " + connection.ToString());
+                    Logger.Log("Connection closed: " + connection.ToString());
                 }
             }
         }

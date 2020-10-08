@@ -120,7 +120,7 @@ namespace Valve.VR
         private static void ReportGeneralErrors()
         {
             string errorLog = "<b>[SteamVR]</b> Initialization failed. ";
-
+            
             if (XRSettings.enabled == false)
                 errorLog += "VR may be disabled in player settings. Go to player settings in the editor and check the 'Virtual Reality Supported' checkbox'. ";
             if (XRSettings.supportedDevices != null && XRSettings.supportedDevices.Length > 0)
@@ -151,7 +151,7 @@ namespace Valve.VR
 #if !OPENVR_XR_API
                 if (!SteamVR.usingNativeSupport)
                 {
-                    ReportGeneralErrors();
+                    //ReportGeneralErrors();
                     initializedState = InitializedStates.InitializeFailure;
                     SteamVR_Events.Initialized.Send(false);
                     return null;
