@@ -42,8 +42,6 @@ namespace SEE.Controls
             SteamVR_Input.GetActionSet(XRInput.DefaultActionSetName).Activate();
             leftGripAction = SteamVR_Input.GetBooleanAction(XRInput.DefaultActionSetName, "LGrip");
             rightGripAction = SteamVR_Input.GetBooleanAction(XRInput.DefaultActionSetName, "RGrip");
-
-            Debug.LogFormat("XRNavigationAction controls {0}.\n", CityTransform.name);
         }
 
         public sealed override void Update()

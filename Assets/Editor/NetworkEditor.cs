@@ -22,7 +22,7 @@ namespace SEEEditor
         /// <summary>
         /// Whether editor-only info should be displayed.
         /// </summary>
-        private bool showDebug = true;
+        private bool showLogging = true;
 
         public override void OnInspectorGUI()
         {
@@ -32,7 +32,8 @@ namespace SEEEditor
             SerializedProperty loadCityOnStart = serializedObject.FindProperty("loadCityOnStart");
             SerializedProperty useInOfflineMode = serializedObject.FindProperty("useInOfflineMode");
             SerializedProperty hostServer = serializedObject.FindProperty("hostServer");
-            SerializedProperty nativeLoggingEnabled = serializedObject.FindProperty("nativeLoggingEnabled");
+            SerializedProperty networkCommsLoggingEnabled = serializedObject.FindProperty("networkCommsLoggingEnabled");
+            SerializedProperty internalLoggingEnabled = serializedObject.FindProperty("internalLoggingEnabled");
             SerializedProperty minimalSeverity = serializedObject.FindProperty("minimalSeverity");
 
             // Infos
@@ -99,18 +100,20 @@ namespace SEEEditor
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
 
-            // Debug
-            showDebug = EditorGUILayout.BeginFoldoutHeaderGroup(showDebug, "Debug");
-            if (showDebug)
+            // Logging
+            showLogging = EditorGUILayout.BeginFoldoutHeaderGroup(showLogging, "Logging");
+            if (showLogging)
             {
                 using (new EditorGUI.IndentLevelScope())
                 {
                     EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
                     {
-                        EditorGUILayout.PropertyField(nativeLoggingEnabled);
-                        EditorGUI.BeginDisabledGroup(!nativeLoggingEnabled.boolValue);
+                        EditorGUILayout.PropertyField(internalLoggingEnabled, new GUIContent("Internal"));
+
+                        EditorGUILayout.PropertyField(networkCommsLoggingEnabled, new GUIContent("NetworkComms"));
+                        EditorGUI.BeginDisabledGroup(!networkCommsLoggingEnabled.boolValue);
                         {
-                            EditorGUILayout.PropertyField(minimalSeverity);
+                            EditorGUILayout.PropertyField(minimalSeverity, new GUIContent("NetworkComms Severity"));
                         }
                         EditorGUI.EndDisabledGroup();
                     }

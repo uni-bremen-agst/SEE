@@ -92,8 +92,6 @@ namespace SEE.Controls
             rotateState.originalEulerAngleY = 0.0f;
             rotateState.originalPosition = Vector3.zero;
             rotateState.startAngle = 0.0f;
-
-            Debug.LogFormat("DesktopNavigationAction controls {0}.\n", CityTransform.name);
         }
 
         public sealed override void Update()

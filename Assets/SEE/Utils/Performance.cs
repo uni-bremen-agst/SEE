@@ -40,7 +40,6 @@ namespace SEE.Utils
         {
             Stopwatch sw = new Stopwatch();
             Performance result = new Performance(action, sw);
-            Debug.LogFormat("Begin of {0}.\n", action);
             sw.Start();
             return result;
         }
@@ -54,17 +53,8 @@ namespace SEE.Utils
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
             totalTimeInMilliSeconds = ts.TotalMilliseconds;
-            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+            string elapsedTime = string.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
             this.elapsedTime = elapsedTime;
-            try
-            {
-                Debug.Log("End of " + action + " (" + elapsedTime + " [h:m:s:ms] elapsed time).\n");
-            } catch(Exception e)
-            {
-                Debug.Log(e);
-            }
-            
         }
 
         public string GetElapsedTime()
