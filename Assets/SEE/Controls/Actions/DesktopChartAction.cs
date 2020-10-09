@@ -26,26 +26,29 @@ using UnityEngine;
 namespace SEE.Controls
 {
 	public class DesktopChartAction : ChartAction
-	{
-		private void Update()
-		{
-			if (chartControlsDevice.Toggle) ChartManager.Instance.ToggleCharts();
-			if (chartControlsDevice.Select) ChartManager.Instance.ToggleSelectionMode();
-			if (chartControlsDevice.Click)
-			{
-				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-				if (Physics.Raycast(ray, out RaycastHit hit, 100f)
-					&& hit.transform.gameObject.TryGetComponent(out NodeRef _))
-				{
-					ChartManager.HighlightObject(hit.transform.gameObject, false);
-				}
-			}
-		}
+    {
+        private const KeyCode ToggleKey = KeyCode.G;
+        private const KeyCode SelectionKey = KeyCode.LeftControl;
+        private const KeyCode ClickKey = KeyCode.Mouse0;
 
-        private void Start()
+        private void Update()
         {
-			Debug.LogFormat("DesktopChartAction started with control device: {0}\n",
-				chartControlsDevice == null ? "NULL": chartControlsDevice.Name);
-        }
+            if (Input.GetKeyDown(ToggleKey))
+            {
+                ChartManager.Instance.ToggleCharts();
+            }
+            if (Input.GetKeyDown(SelectionKey) || Input.GetKeyUp(SelectionKey))
+            {
+                ChartManager.Instance.ToggleSelectionMode();
+            }
+            if (Input.GetKeyDown(ClickKey))
+            {
+			    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			    if (Physics.Raycast(ray, out RaycastHit hit, 100f) && hit.transform.gameObject.TryGetComponent(out NodeRef _))
+                {
+				    ChartManager.HighlightObject(hit.transform.gameObject, false);
+                }
+            }
+		}
     }
 }

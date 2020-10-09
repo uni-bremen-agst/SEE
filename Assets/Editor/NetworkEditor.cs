@@ -22,7 +22,7 @@ namespace SEEEditor
         /// <summary>
         /// Whether editor-only info should be displayed.
         /// </summary>
-        private bool showDebug = true;
+        private bool showLogging = true;
 
         public override void OnInspectorGUI()
         {
@@ -30,10 +30,10 @@ namespace SEEEditor
             SerializedProperty localServerPort = serializedObject.FindProperty("localServerPort");
             SerializedProperty remoteServerPort = serializedObject.FindProperty("remoteServerPort");
             SerializedProperty loadCityOnStart = serializedObject.FindProperty("loadCityOnStart");
-            SerializedProperty loadCityGameObject = serializedObject.FindProperty("loadCityGameObject");
             SerializedProperty useInOfflineMode = serializedObject.FindProperty("useInOfflineMode");
             SerializedProperty hostServer = serializedObject.FindProperty("hostServer");
-            SerializedProperty nativeLoggingEnabled = serializedObject.FindProperty("nativeLoggingEnabled");
+            SerializedProperty networkCommsLoggingEnabled = serializedObject.FindProperty("networkCommsLoggingEnabled");
+            SerializedProperty internalLoggingEnabled = serializedObject.FindProperty("internalLoggingEnabled");
             SerializedProperty minimalSeverity = serializedObject.FindProperty("minimalSeverity");
 
             // Infos
@@ -68,11 +68,6 @@ namespace SEEEditor
                     EditorGUI.BeginDisabledGroup(!useInOfflineMode.boolValue && !hostServer.boolValue);
                     {
                         EditorGUILayout.PropertyField(loadCityOnStart, new GUIContent("Load City On Start", "Whether the city should be loaded on start of the application."));
-                        EditorGUI.BeginDisabledGroup(!loadCityOnStart.boolValue);
-                        {
-                            EditorGUILayout.PropertyField(loadCityGameObject, new GUIContent("City Loading GameObject", "If the given GameObject contains some AbstractSEECity-script, the defined city can be built for each client."));
-                        }
-                        EditorGUI.EndDisabledGroup();
                     }
                     EditorGUI.EndDisabledGroup();
 
@@ -105,18 +100,20 @@ namespace SEEEditor
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
 
-            // Debug
-            showDebug = EditorGUILayout.BeginFoldoutHeaderGroup(showDebug, "Debug");
-            if (showDebug)
+            // Logging
+            showLogging = EditorGUILayout.BeginFoldoutHeaderGroup(showLogging, "Logging");
+            if (showLogging)
             {
                 using (new EditorGUI.IndentLevelScope())
                 {
                     EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
                     {
-                        EditorGUILayout.PropertyField(nativeLoggingEnabled);
-                        EditorGUI.BeginDisabledGroup(!nativeLoggingEnabled.boolValue);
+                        EditorGUILayout.PropertyField(internalLoggingEnabled, new GUIContent("Internal"));
+
+                        EditorGUILayout.PropertyField(networkCommsLoggingEnabled, new GUIContent("NetworkComms"));
+                        EditorGUI.BeginDisabledGroup(!networkCommsLoggingEnabled.boolValue);
                         {
-                            EditorGUILayout.PropertyField(minimalSeverity);
+                            EditorGUILayout.PropertyField(minimalSeverity, new GUIContent("NetworkComms Severity"));
                         }
                         EditorGUI.EndDisabledGroup();
                     }

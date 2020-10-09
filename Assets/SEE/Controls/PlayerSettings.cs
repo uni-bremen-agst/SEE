@@ -36,6 +36,12 @@ namespace SEE.Controls
         [Tooltip("Whether hints should be shown for controllers.")]
         public bool ShowControllerHints = false;
 
+        public static PlayerInputType GetInputType()
+        {
+            PlayerInputType result = FindObjectOfType<PlayerSettings>().playerInputType;
+            return result;
+        }
+
         /// <summary>
         /// Depending on the user's selection, turns VR mode on or off and activates/deactivates
         /// the game objects representing the player in the scene.
@@ -48,16 +54,16 @@ namespace SEE.Controls
             try
             {
                 XRSettings.enabled = playerInputType == PlayerInputType.VR;
-                Debug.LogFormat("VR enabled: {0}\n", XRSettings.enabled);
             }
             catch (Exception e)
             {
-                Debug.LogWarningFormat("VR enabling/disabling issue: {0}\n", e);
+                Debug.LogWarningFormat("VR enabling/disabling issue: {0}", e);
             }
+
+            Debug.LogFormat("Player input type: {0}\n", playerInputType.ToString());
 
             SetActive("DesktopPlayer", playerInputType == PlayerInputType.Desktop);
             SetActive("VRPlayer",      playerInputType == PlayerInputType.VR);
-            SetActive("GamepadPlayer", playerInputType == PlayerInputType.TouchGamepad);
             SetActive("InControl",     playerInputType == PlayerInputType.TouchGamepad);
 
 			// Turn off controller hints if requested in the user settings.
@@ -80,17 +86,7 @@ namespace SEE.Controls
 		/// <param name="activate">whether to enable or disable the object</param>
 		private void SetActive(string name, bool activate)
 		{
-			GameObject player = GameObject.Find(name);
-			if (player != null)
-			{
-				player.SetActive(activate);
-				Debug.LogFormat("Game object {0} {1}.\n", player.name,
-					activate ? "enabled" : "disabled");
-			}
-			else
-			{
-				Debug.LogFormat("No game object named {0} found.\n", name);
-			}
+			GameObject.Find(name)?.SetActive(activate);
 		}
 
 		/// <summary>

@@ -182,6 +182,7 @@ namespace SEE.Game
             EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
             ICollection<GameObject> result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), ConnectingEdges(gameNodes));
             p.End();
+            Debug.LogFormat("Built \"" + settings.EdgeLayout + "\" edge layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
             return result;
         }
 
@@ -349,6 +350,7 @@ namespace SEE.Game
                     ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
                     nodeLayout.Apply(layoutNodes);
                     p.End();
+                    Debug.LogFormat("Built \"" + settings.NodeLayout + "\" node layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
 
                     Fit(parent, layoutNodes);
 
@@ -714,7 +716,7 @@ namespace SEE.Game
                 case SEECity.NodeLayouts.CompoundSpringEmbedder:
                     return new CoseLayout(groundLevel, settings);
                 case SEECity.NodeLayouts.FromFile:
-                    return new LoadedNodeLayout(groundLevel, settings.GVLPath());
+                    return new LoadedNodeLayout(groundLevel, settings.GVLPath);
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }

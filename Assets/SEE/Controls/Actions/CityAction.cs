@@ -26,7 +26,6 @@ namespace SEE.Controls
                     return child.transform;
                 }
             }
-            Debug.LogErrorFormat("Game object named {0} has no child tagged by {1}.\n", codeCity.name, Tags.Node);
             return null;
         }
 

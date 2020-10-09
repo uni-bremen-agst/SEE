@@ -223,7 +223,7 @@ namespace SEE
         /// </summary>
         public string GetNodesPerformance()
         {
-            if (nodePerformance != null )
+            if (nodePerformance != null)
             {
                 return nodePerformance.GetElapsedTime();
             }

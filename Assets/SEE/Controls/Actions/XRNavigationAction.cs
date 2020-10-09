@@ -5,9 +5,7 @@ using Valve.VR.InteractionSystem;
 namespace SEE.Controls
 {
 
-    [RequireComponent(typeof(Collider))]
-    [RequireComponent(typeof(Plane))]
-    public class XRNavigationAction : NavigationAction
+    public sealed class XRNavigationAction : NavigationAction
     {
         private enum XRNavigationMode
         {
@@ -31,7 +29,7 @@ namespace SEE.Controls
 
 
 
-        protected sealed override void Start()
+        protected sealed override void Awake()
         {
             if (FindObjectOfType<PlayerSettings>().playerInputType != PlayerSettings.PlayerInputType.VR)
             {
@@ -39,17 +37,22 @@ namespace SEE.Controls
                 return;
             }
 
-            base.Start();
+            base.Awake();
 
-            SteamVR_Input.GetActionSet("default").Activate();
-            leftGripAction = SteamVR_Input.GetBooleanAction("default", "LGrip");
-            rightGripAction = SteamVR_Input.GetBooleanAction("default", "RGrip");
-
-            Debug.LogFormat("XRNavigationAction controls {0}.\n", CityTransform.name);
+            SteamVR_Input.GetActionSet(XRInput.DefaultActionSetName).Activate();
+            leftGripAction = SteamVR_Input.GetBooleanAction(XRInput.DefaultActionSetName, "LGrip");
+            rightGripAction = SteamVR_Input.GetBooleanAction(XRInput.DefaultActionSetName, "RGrip");
         }
 
-        private void Update()
+        public sealed override void Update()
         {
+            base.Update();
+
+            if (!CityAvailable)
+            {
+                return;
+            }
+
             // release
             if (!leftGripAction.state && leftHand)
             {

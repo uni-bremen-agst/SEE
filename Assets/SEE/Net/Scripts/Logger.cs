@@ -4,10 +4,72 @@ namespace SEE.Net
 {
 
     /// <summary>
+    /// An internal logger for the networking.
+    /// </summary>
+    public class Logger
+    {
+        /// <summary>
+        /// Calls Debug.Log with networking prefix and given message.
+        /// </summary>
+        /// <param name="message">The message to be logged.</param>
+        public static void Log(string message)
+        {
+            if (Network.InternalLoggingEnabled)
+            {
+                UnityEngine.Debug.LogFormat("<b>[SEE Net]</b> {0}\n", message);
+            }
+        }
+
+        /// <summary>
+        /// Calls Debug.LogException with networking prefix and given message.
+        /// </summary>
+        /// <param name="exception">The exception to be logged.</param>
+        /// <param name="message">The message to be logged.</param>
+        public static void LogException(Exception exception, string message = null)
+        {
+            if (Network.InternalLoggingEnabled)
+            {
+                if (message != null)
+                {
+                    UnityEngine.Debug.LogErrorFormat("<b>[SEE Net]</b> Exception: {0}\n{0}\n", exception.ToString(), message);
+                }
+                else
+                {
+                    UnityEngine.Debug.LogErrorFormat("<b>[SEE Net]</b> Exception: {0}\n", exception.ToString());
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calls Debug.LogError with networking prefix and given message.
+        /// </summary>
+        /// <param name="message">The message to be logged.</param>
+        public static void LogError(string message)
+        {
+            if (Network.InternalLoggingEnabled)
+            {
+                UnityEngine.Debug.LogErrorFormat("<b>[SEE Net]</b> {0}\n", message);
+            }
+        }
+
+        /// <summary>
+        /// Calls Debug.LogWarning with networking prefix and given message.
+        /// </summary>
+        /// <param name="message">The message to be logged.</param>
+        public static void LogWarning(string message)
+        {
+            if (Network.InternalLoggingEnabled)
+            {
+                UnityEngine.Debug.LogWarningFormat("<b>[SEE Net]</b> {0}\n", message);
+            }
+        }
+    }
+
+    /// <summary>
     /// The native logger implementation of
     /// <see cref="NetworkCommsDotNet.Tools.ILogger"/>.
     /// </summary>
-    public class Logger : NetworkCommsDotNet.Tools.ILogger
+    internal class NetworkCommsLogger : NetworkCommsDotNet.Tools.ILogger
     {
         /// <summary>
         /// The available severities.
@@ -30,7 +92,7 @@ namespace SEE.Net
         /// Creates a logger with given minimal severity.
         /// </summary>
         /// <param name="minSeverity">The minimal severity of the logger.</param>
-        public Logger(Severity minSeverity)
+        public NetworkCommsLogger(Severity minSeverity)
         {
             this.minSeverity = minSeverity;
         }

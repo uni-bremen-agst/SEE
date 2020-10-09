@@ -1,13 +1,11 @@
 ﻿using SEE.GO;
 using SEE.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls
 {
 
     [RequireComponent(typeof(Collider))]
-    [RequireComponent(typeof(Plane))]
     public class DesktopNavigationAction : NavigationAction
     {
         private enum NavigationMode
@@ -51,11 +49,11 @@ namespace SEE.Controls
             internal bool cancel;
             internal bool snap;
             internal bool reset;
-            internal Vector3 mousePosition;  // TODO(torben): this needs to be abstracted for other modalities
+            internal Vector3 mousePosition;
             internal float zoomStepsDelta;
             internal bool zoomToggleToObject;
         }
-        
+
         private UnityEngine.Plane raycastPlane;
         private NavigationMode mode;
         private bool movingOrRotating;
@@ -65,34 +63,7 @@ namespace SEE.Controls
         private RotateState rotateState;
         private ActionState actionState;
 
-        private static readonly Dictionary<int, DesktopNavigationAction> navigationActionDict = new Dictionary<int, DesktopNavigationAction>(2);
-        public static DesktopNavigationAction Get(int id)
-        {
-            bool result = navigationActionDict.TryGetValue(id, out DesktopNavigationAction value);
-            if (result)
-            {
-                return value;
-            }
-            else
-            {
-                Debug.LogWarning("ID does not match any NavigationAction!");
-                return null;
-            }
-        }
-
-        private bool CheckCondition(bool condition, string message)
-        {
-            if (!condition)
-            {
-                Debug.LogErrorFormat("DesktopNavigationAction of game object {0}: {1}. Component will be disabled.\n",
-                      name, message);
-                enabled = false; // disable this component
-            }
-            return condition;
-
-        }
-
-        protected sealed override void Start()
+        protected sealed override void Awake()
         {
             if (FindObjectOfType<PlayerSettings>().playerInputType != PlayerSettings.PlayerInputType.Desktop)
             {
@@ -100,25 +71,11 @@ namespace SEE.Controls
                 return;
             }
 
-            base.Start();
+            base.Awake();
+        }
 
-            if (!CheckCondition(portalPlane != null, "The culling plane must not be null!"))
-            {
-                return;
-            }
-            if (!CheckCondition(!navigationActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!"))
-            {
-                return;
-            }
-            navigationActionDict.Add(id, this);
-
-            CityTransform = GetCityRootNode(gameObject);
-            if (!CheckCondition(CityTransform != null, "This DesktopNavigationAction is not attached to a code city!"))
-            {
-                return;
-            }
-            Debug.LogFormat("DesktopNavigationAction controls {0}.\n", CityTransform.name);
-
+        protected sealed override void OnCityAvailable()
+        {
             raycastPlane = new UnityEngine.Plane(Vector3.up, CityTransform.position);
             mode = 0;
             movingOrRotating = false;
@@ -135,12 +92,17 @@ namespace SEE.Controls
             rotateState.originalEulerAngleY = 0.0f;
             rotateState.originalPosition = Vector3.zero;
             rotateState.startAngle = 0.0f;
-
-            Debug.LogFormat("DesktopNavigationAction controls {0}.\n", CityTransform.name);
         }
 
-        private void Update()
+        public sealed override void Update()
         {
+            base.Update();
+
+            if (!CityAvailable)
+            {
+                return;
+            }
+
             // Note: Input MUST NOT be inquired in FixedUpdate() for the input to feel responsive!
 
             actionState.drag = Input.GetMouseButton(2);
@@ -212,14 +174,16 @@ namespace SEE.Controls
                     rotateState.rotateGizmo.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotateGizmo.Center).magnitude;
                 }
             }
-
         }
 
         // This logic is in FixedUpdate(), so that the behaviour is framerate-
         // 'independent'.
         private void FixedUpdate()
         {
-            // TODO(torben): abstract mouse away!
+            if (!CityAvailable)
+            {
+                return;
+            }
 
             bool synchronize = false;
             RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint);

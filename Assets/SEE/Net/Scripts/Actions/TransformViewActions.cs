@@ -64,7 +64,7 @@ namespace SEE.Net
         /// </summary>
         /// <param name="transformView">The transform view to synchronize.</param>
         /// <param name="position">The new position.</param>
-        public TransformViewPositionAction(TransformView transformView, Vector3 position) : base(false)
+        public TransformViewPositionAction(TransformView transformView, Vector3 position)
         {
             viewContainerID = transformView.viewContainer.id;
             viewIndex = transformView.viewContainer.GetIndexOf(transformView);
@@ -73,46 +73,17 @@ namespace SEE.Net
 
 
 
-        protected override bool ExecuteOnServer()
+        protected override void ExecuteOnServer()
         {
-            return true;
         }
 
         /// <summary>
         /// Sets the <see cref="position"/> in transform view of <see cref="viewIndex"/>
         /// in view container with <see cref="viewContainerID"/>.
         /// </summary>
-        /// <returns><code>true</code> if transform view exists and position could be updated,
-        /// <code>false</code> otherwise.</returns>
-        protected override bool ExecuteOnClient()
+        protected override void ExecuteOnClient()
         {
-            TransformView transformView = TransformViewActionHelper.AcquireTransformView(viewContainerID, viewIndex);
-            if (transformView)
-            {
-                transformView.SetNextPosition(position);
-                return true;
-            }
-            return false;
-        }
-
-        protected override bool UndoOnServer()
-        {
-            return false;
-        }
-
-        protected override bool UndoOnClient()
-        {
-            return false;
-        }
-
-        protected override bool RedoOnServer()
-        {
-            return false;
-        }
-
-        protected override bool RedoOnClient()
-        {
-            return false;
+            TransformViewActionHelper.AcquireTransformView(viewContainerID, viewIndex)?.SetNextPosition(position);
         }
     }
 
@@ -146,7 +117,7 @@ namespace SEE.Net
         /// </summary>
         /// <param name="transformView">The transform view to synchronize.</param>
         /// <param name="rotation">The new rotation.</param>
-        public TransformViewRotationAction(TransformView transformView, Quaternion rotation) : base(false)
+        public TransformViewRotationAction(TransformView transformView, Quaternion rotation)
         {
             viewContainerID = transformView.viewContainer.id;
             viewIndex = transformView.viewContainer.GetIndexOf(transformView);
@@ -155,46 +126,17 @@ namespace SEE.Net
 
 
 
-        protected override bool ExecuteOnServer()
+        protected override void ExecuteOnServer()
         {
-            return true;
         }
 
         /// <summary>
         /// Sets the <see cref="rotation"/> in transform view of <see cref="viewIndex"/>
         /// in view container with <see cref="viewContainerID"/>.
         /// </summary>
-        /// <returns><code>true</code> if transform view exists and rotation could be updated,
-        /// <code>false</code> otherwise.</returns>
-        protected override bool ExecuteOnClient()
+        protected override void ExecuteOnClient()
         {
-            TransformView transformView = TransformViewActionHelper.AcquireTransformView(viewContainerID, viewIndex);
-            if (transformView)
-            {
-                transformView.SetNextRotation(rotation);
-                return true;
-            }
-            return false;
-        }
-
-        protected override bool UndoOnServer()
-        {
-            return false;
-        }
-
-        protected override bool UndoOnClient()
-        {
-            return false;
-        }
-
-        protected override bool RedoOnServer()
-        {
-            return false;
-        }
-
-        protected override bool RedoOnClient()
-        {
-            return false;
+            TransformViewActionHelper.AcquireTransformView(viewContainerID, viewIndex)?.SetNextRotation(rotation);
         }
     }
 
@@ -228,7 +170,7 @@ namespace SEE.Net
         /// </summary>
         /// <param name="transformView">The transform view to synchronize.</param>
         /// <param name="scale">The new scale.</param>
-        public TransformViewScaleAction(TransformView transformView, Vector3 scale) : base(false)
+        public TransformViewScaleAction(TransformView transformView, Vector3 scale)
         {
             viewContainerID = transformView.viewContainer.id;
             viewIndex = transformView.viewContainer.GetIndexOf(transformView);
@@ -237,46 +179,17 @@ namespace SEE.Net
 
 
 
-        protected override bool ExecuteOnServer()
+        protected override void ExecuteOnServer()
         {
-            return true;
         }
 
         /// <summary>
         /// Sets the <see cref="scale"/> in transform view of <see cref="viewIndex"/>
         /// in view container with <see cref="viewContainerID"/>.
         /// </summary>
-        /// <returns><code>true</code> if transform view exists and scale could be updated,
-        /// <code>false</code> otherwise.</returns>
-        protected override bool ExecuteOnClient()
+        protected override void ExecuteOnClient()
         {
-            TransformView transformView = TransformViewActionHelper.AcquireTransformView(viewContainerID, viewIndex);
-            if (transformView)
-            {
-                transformView.SetNextScale(scale);
-                return true;
-            }
-            return false;
-        }
-
-        protected override bool UndoOnServer()
-        {
-            return false;
-        }
-
-        protected override bool UndoOnClient()
-        {
-            return false;
-        }
-
-        protected override bool RedoOnServer()
-        {
-            return false;
-        }
-
-        protected override bool RedoOnClient()
-        {
-            return false;
+            TransformViewActionHelper.AcquireTransformView(viewContainerID, viewIndex)?.SetNextScale(scale);
         }
     }
 
