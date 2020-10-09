@@ -31,7 +31,7 @@ namespace SEE.Game
         /// </summary>
         public override void LoadData()
         {
-            if (string.IsNullOrEmpty(GXLPath()))
+            if (string.IsNullOrEmpty(GXLPath))
             {
                 Debug.LogError("Empty graph path.\n");
             }

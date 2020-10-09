@@ -4,6 +4,7 @@ using UnityEditor;
 using SEE.Game;
 using UnityEngine;
 using System.Collections.Generic;
+using SEE.Utils;
 
 namespace SEEEditor
 {
@@ -16,21 +17,36 @@ namespace SEEEditor
     [CanEditMultipleObjects]
     public abstract class StoredSEECityEditor : AbstractSEECityEditor
     {
+        private bool pressed = false;
+        private string path = "";
+
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
+
+            SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
+
             AbstractSEECity city = target as AbstractSEECity;
 
             EditorGUILayout.BeginHorizontal();
             {
-                city.PathPrefix = EditorGUILayout.TextField("Data path prefix", city.PathPrefix);
+                EditorGUILayout.PropertyField(pathPrefix, new GUIContent("Data path prefix"));
                 if (GUILayout.Button("Select"))
                 {
-                    city.PathPrefix = EditorUtility.OpenFolderPanel("Select GXL graph data directory", city.PathPrefix, "");
-                    GUIUtility.ExitGUI(); // This call is to avoid the error "EndLayoutGroup: BeginLayoutGroup must be called first."
+                    pressed = true;
+                    path = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select graph data directory", pathPrefix.stringValue, ""));
+                }
+                else if (pressed)
+                {
+                    pressed = false;
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        pathPrefix.stringValue = path;
+                    }
                 }
             }
             EditorGUILayout.EndHorizontal();
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
         /// <summary>

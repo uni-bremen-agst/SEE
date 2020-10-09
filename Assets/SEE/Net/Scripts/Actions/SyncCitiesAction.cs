@@ -16,7 +16,7 @@ namespace SEE.Net
         public Vector3 localScale;
         public float currentTargetZoomSteps;
 
-        public SyncCitiesAction(NavigationAction navigationAction) : base(false)
+        public SyncCitiesAction(NavigationAction navigationAction)
         {
             Assert.IsNotNull(navigationAction);
 
@@ -27,58 +27,38 @@ namespace SEE.Net
             currentTargetZoomSteps = navigationAction.zoomState.currentTargetZoomSteps;
         }
 
-        protected override bool ExecuteOnClient()
+        protected override void ExecuteOnServer()
         {
-            bool result = false;
+        }
 
-            if (IsRequester())
-            {
-                result = true;
-            }
-            else
+        protected override void ExecuteOnClient()
+        {
+            if (!IsRequester())
             {
                 NavigationAction navigationAction = NavigationAction.Get(navigationActionID);
                 if (navigationAction)
                 {
-                    result = true;
-
-                    navigationAction.CityTransform.position = position;
-                    navigationAction.CityTransform.rotation = rotation;
-                    navigationAction.CityTransform.localScale = localScale;
-                    navigationAction.zoomState.currentTargetZoomSteps = currentTargetZoomSteps;
+                    if (!navigationAction.CityTransform)
+                    {
+                        navigationAction.Update();
+                    }
+                    if (navigationAction.CityTransform)
+                    {
+                        navigationAction.CityTransform.position = position;
+                        navigationAction.CityTransform.rotation = rotation;
+                        navigationAction.CityTransform.localScale = localScale;
+                        navigationAction.zoomState.currentTargetZoomSteps = currentTargetZoomSteps;
+                    }
+                    else
+                    {
+                        Debug.LogWarning("NavigationAction does not have an initialized city attached!");
+                    }
                 }
                 else
                 {
                     Debug.LogWarning("NavigationAction could not be found!");
                 }
             }
-
-            return result;
-        }
-
-        protected override bool ExecuteOnServer()
-        {
-            return true;
-        }
-
-        protected override bool UndoOnServer()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        protected override bool UndoOnClient()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        protected override bool RedoOnServer()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        protected override bool RedoOnClient()
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

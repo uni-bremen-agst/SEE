@@ -91,15 +91,6 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Resets all interactableObjects.
-        /// </summary>
-        public static void ResetAllObjects()
-        {
-            nextID = 0;
-            interactableObjects.Clear();
-        }
-
-        /// <summary>
         /// Returns the interactable object of given id or <code>null</code>, if it does
         /// not exist.
         /// </summary>

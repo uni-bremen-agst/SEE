@@ -20,28 +20,53 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Charts.Scripts;
+using Valve.VR;
 
 namespace SEE.Controls
 {
 	public class XRChartAction : ChartAction
-	{
-		private bool _lastClick;
+    {
+        private readonly SteamVR_Action_Vector2 moveAction =
+            SteamVR_Input.GetVector2Action(XRInput.DefaultActionSetName, XRInput.MoveActionName);
 
-        private void Start()
-        {
-            chartControlsDevice = GetComponent<Devices.ChartControls>();
-        }
+        private readonly SteamVR_Action_Boolean resetAction =
+            SteamVR_Input.GetBooleanAction(XRInput.DefaultActionSetName, XRInput.ResetChartsName);
+
+        private readonly SteamVR_Action_Boolean clickAction =
+            SteamVR_Input.GetBooleanAction(XRInput.DefaultActionSetName, XRInput.ClickActionName);
+
+        private readonly SteamVR_Action_Boolean createAction =
+            SteamVR_Input.GetBooleanAction(XRInput.DefaultActionSetName, XRInput.CreateChartActionName);
+
+        private bool _lastClick;
 
 		private void Update()
 		{
-			if (chartControlsDevice.ResetCharts) ChartManager.ResetPosition();
-			if (!chartControlsDevice.Move.y.Equals(0)) move = chartControlsDevice.Move.y;
-			if (chartControlsDevice.Create) ChartManager.Instance.CreateChartVr();
+            if (resetAction.stateDown)
+            {
+                ChartManager.ResetPosition();
+            }
+            if (moveAction.axis.y != 0.0f)
+            {
+                move = moveAction.axis.y;
+            }
+            if (createAction.stateDown)
+            {
+                ChartManager.Instance.CreateChartVr();
+            }
+
 			clickDown = false;
 			clickUp = false;
-			if (!_lastClick && chartControlsDevice.Click) clickDown = true;
-			if (_lastClick && !chartControlsDevice.Click) clickUp = true;
-			_lastClick = chartControlsDevice.Click;
+
+            if (!_lastClick && clickAction.state)
+            {
+                clickDown = true;
+            }
+            if (_lastClick && !clickAction.state)
+            {
+                clickUp = true;
+            }
+			_lastClick = clickAction.state;
 		}
 	}
 }

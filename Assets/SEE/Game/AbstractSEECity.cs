@@ -27,8 +27,8 @@ namespace SEE.Game
         /// The internal representation of this path is always in the Unix style
         /// (or also Unity style), independent from the operating system we are currently
         /// running on.
-        /// </summary>        
-        private string pathPrefix = null; // serialized by Unity
+        /// </summary>
+        [SerializeField] private string pathPrefix = null;
 
         /// <summary>
         /// The prefix of the absolute paths for the GXL, CSV, GVL data; that is,
@@ -45,21 +45,16 @@ namespace SEE.Game
         /// </summary>
         public string PathPrefix
         {
-            set
-            {
-                pathPrefix = Filenames.ToInternalRepresentation(value);
-                // pathPrefix must end with a directory separator /
-                if (pathPrefix.Length > 0 && pathPrefix[pathPrefix.Length - 1] != Filenames.UnixDirectorySeparator)
-                {
-                    pathPrefix += Filenames.UnixDirectorySeparator;
-                }
-            }
-
             get
             {
-                return string.IsNullOrEmpty(pathPrefix) ? 
-                    UnityProject.GetPath() 
-                    : Filenames.OnCurrentPlatform(pathPrefix);
+                UnityEngine.Assertions.Assert.IsTrue(!string.IsNullOrEmpty(pathPrefix));
+                string result = pathPrefix;
+                if (result[result.Length - 1] != Filenames.UnixDirectorySeparator)
+                {
+                    result += Filenames.UnixDirectorySeparator;
+                }
+                result = Filenames.OnCurrentPlatform(result);
+                return result;
             }
         }
 
@@ -73,10 +68,7 @@ namespace SEE.Game
         /// absolute path to the GVL file containing the layout information.
         /// </summary>
         /// <returns>concatenation of pathPrefix and gvlPath</returns>
-        public string GVLPath()
-        {
-            return PathPrefix + gvlPath;
-        }
+        public string GVLPath => PathPrefix + gvlPath;
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
@@ -184,14 +176,12 @@ namespace SEE.Game
         {
             if (AllNodeTypesAreRelevant)
             {
-                Debug.Log("All node types are relevant.\n");
                 return graph;
             } 
             else
             {
                 ICollection<string> matches = nodeTypes.Where(pair => pair.Value == true)
                   .Select(pair => pair.Key).ToList();
-                Debug.Log("Considering only a subgraph.\n");
                 return graph.Subgraph(matches);
             }
         }
@@ -561,13 +551,16 @@ namespace SEE.Game
             {
                 if (File.Exists(filename))
                 {
-                    SEE.Utils.Performance p = SEE.Utils.Performance.Begin("loading graph data from " + filename);
+                    Performance p = Performance.Begin("loading graph data from " + filename);
                     GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "", new SEELogger());
                     graphCreator.Load();
                     Graph graph = graphCreator.GetGraph();
                     p.End();
-                    Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
-                    Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
+                    Debug.Log("Loaded graph data successfully:"
+                        + "\nFilename: "        + filename
+                        + "\nNumber of nodes: " + graph.NodeCount
+                        + "\nNumber of edges: " + graph.EdgeCount
+                        + "\nElapsed time: "    + p.GetElapsedTime() + "[h:m:s:ms]\n");
 
                     LoadDataForGraphListing(graph);
 

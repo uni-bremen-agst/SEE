@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using SEE.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls
 {
 
+    [RequireComponent(typeof(Plane))]
     public abstract class NavigationAction : CityAction
     {
         internal class ZoomCommand
@@ -48,6 +50,8 @@ namespace SEE.Controls
             internal float currentZoomFactor;
         }
 
+        protected bool CityAvailable { get; private set; } = false;
+
         public Transform CityTransform { get; protected set; }
         internal ZoomState zoomState;
 
@@ -88,20 +92,36 @@ namespace SEE.Controls
             }
         }
 
-        protected virtual void Start()
+        protected virtual void Awake()
         {
-            UnityEngine.Assertions.Assert.IsNotNull(portalPlane, "The culling plane must not be null!");
-            UnityEngine.Assertions.Assert.IsTrue(!idToActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!");
+            Assertions.DisableOnCondition(this, portalPlane == null, "The culling plane must not be null!");
+            Assertions.DisableOnCondition(this, idToActionDict.ContainsKey(id), "A unique ID must be assigned to every NavigationAction!");
             idToActionDict.Add(id, this);
 
-            CityTransform = GetCityRootNode(gameObject);
-            UnityEngine.Assertions.Assert.IsNotNull(CityTransform, "This NavigationAction is not attached to a code city!");
-
-            zoomState.originalScale = CityTransform.localScale;
-            zoomState.zoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps);
-            zoomState.currentTargetZoomSteps = 0;
-            zoomState.currentZoomFactor = 1.0f;
+            Update();
         }
+
+        public virtual void Update()
+        {
+            if (!CityAvailable)
+            {
+                CityTransform = GetCityRootNode(gameObject);
+
+                if (CityTransform)
+                {
+                    CityAvailable = true;
+
+                    zoomState.originalScale = CityTransform.localScale;
+                    zoomState.zoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps);
+                    zoomState.currentTargetZoomSteps = 0;
+                    zoomState.currentZoomFactor = 1.0f;
+
+                    OnCityAvailable();
+                }
+            }
+        }
+
+        protected virtual void OnCityAvailable() { }
 
         protected float ConvertZoomStepsToZoomFactor(float zoomSteps)
         {

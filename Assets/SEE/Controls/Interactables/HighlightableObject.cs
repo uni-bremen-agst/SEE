@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using SEE.GO;
-using Valve.VR.InteractionSystem;
 using SEE.Game;
+using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls
 {
