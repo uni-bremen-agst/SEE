@@ -1535,7 +1535,8 @@ namespace SEE.Game
                     }
                     else
                     {
-                        throw new Exception("Code city " + codeCity.name + " has multiple children tagged by " + Tags.Node);
+                        throw new Exception("Code city " + codeCity.name + " has multiple children tagged by " + Tags.Node
+                            + ": " + result.name + " and " + child.name);
                     }
                 }
             }
