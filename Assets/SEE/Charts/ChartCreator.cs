@@ -43,7 +43,9 @@ namespace SEE.Charts.Scripts
         /// </summary>
         public void CreateChart()
         {
-            Instantiate(chartPrefab, chartsCanvas).GetComponent<ChartContent>();
+            GameObject chart = Instantiate(chartPrefab, chartsCanvas);
+            ChartManager.Instance.RegisterChart(chart);
+            //chart.GetComponent<ChartContent>();
         }
 
         /// <summary>
