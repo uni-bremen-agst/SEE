@@ -146,13 +146,15 @@ namespace SEE.Charts.Scripts
 		private float highlightOutline = 0.1f;
 
 		/// <summary>
-		/// The color highlighted objects will have.
+		/// The color highlighted objects will have. An object will be highlighted if it
+		/// was selected.
 		/// </summary>
 		[Tooltip("Color for selected game nodes")] 
 		public Color standardColor = Color.red;
 
 		/// <summary>
-		/// The color accentuated highlighted objects will have.
+		/// The color accentuated highlighted objects will have. An object will be accentuated
+		/// when it is already selected (thus, highlighted) and then hovered over.
 		/// </summary>
 		[Tooltip("Color for accentuated selected game nodes")] 
 		public Color accentuationColor = Color.blue;
@@ -236,9 +238,13 @@ namespace SEE.Charts.Scripts
 				 == PlayerSettings.PlayerInputType.VR;
 			if (!_isVirtualReality)
 			{
-				_chartsOpen = GameObject.Find("ChartCanvas") != null
-					? GameObject.Find("ChartCanvas").transform.Find("ChartsOpen").gameObject
-					: Instantiate(chartsPrefab).transform.Find("ChartsOpen").gameObject;
+                GameObject chartCanvas = GameObject.Find("ChartCanvas");
+				if (chartCanvas == null)
+                {
+					chartCanvas = Instantiate(chartsPrefab);
+
+				}
+				_chartsOpen = chartCanvas.transform.Find("ChartsOpen").gameObject;
 			}
 			else
 			{
