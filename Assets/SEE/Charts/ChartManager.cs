@@ -20,7 +20,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Controls;
+using SEE.DataModel;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Charts.Scripts
 {
@@ -34,42 +37,37 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private static ChartManager _instance;
 
-		/// <summary>
-		/// Tag of a game object having a ChartManager as a component.
-		/// </summary>
-		private const string ChartManagerTag = "ChartManager";
-
-		/// <summary>
-		/// Returns the unique chart manager component in the scene.
-		/// 
-		/// Precondition: There must be at least one game object tagged by ChartManagerTag
-		/// holding a ChartManager component. If there is more than one such object, an error
-		/// will be logged and the first game object will be used. If there is no such object,
-		/// an exception is raised.
-		/// </summary>
-		public static ChartManager Instance
+        /// <summary>
+        /// Returns the unique chart manager component in the scene.
+        /// 
+        /// Precondition: There must be at least one game object tagged by ChartManagerTag
+        /// holding a ChartManager component. If there is more than one such object, an error
+        /// will be logged and the first game object will be used. If there is no such object,
+        /// an exception is raised.
+        /// </summary>
+        public static ChartManager Instance
         {
 			get
             {
 				if (_instance == null)
 				{
-					GameObject[] chartManagers = GameObject.FindGameObjectsWithTag(ChartManagerTag);
+					GameObject[] chartManagers = GameObject.FindGameObjectsWithTag(Tags.ChartManager);
 					if (chartManagers.Length == 0)
 					{
 						Debug.LogErrorFormat("There is no chart manager tagged by {0} in the scene.\n",
-											 ChartManagerTag);
+											 Tags.ChartManager);
 						throw new System.Exception("No chart manager in the scene");
 					}
 					else if (chartManagers.Length > 1)
 					{
 						Debug.LogErrorFormat("There are multiple chart managers named {0} in the scene.\n",
-											 ChartManagerTag);
+											 Tags.ChartManager);
 					}
 					_instance = chartManagers[0].GetComponent<ChartManager>();
 					if (_instance == null)
                     {
 						Debug.LogWarningFormat("The game object named {0} does not have a ChartManager component. Will be added.\n",
-					                           ChartManagerTag);
+											   Tags.ChartManager);
 						_instance = chartManagers[0].AddComponent<ChartManager>();
 					}
 				}
@@ -278,7 +276,7 @@ namespace SEE.Charts.Scripts
 		public static void ResetPosition()
 		{
 			var cameraPosition = Camera.main.transform;
-			var charts = GameObject.FindGameObjectsWithTag("ChartContainer");
+			var charts = GameObject.FindGameObjectsWithTag(Tags.ChartContainer);
 			var offset = 0f;
 			foreach (var chart in charts)
 			{
@@ -288,6 +286,42 @@ namespace SEE.Charts.Scripts
 			}
 		}
 
+		// All created and still existing charts. Charts are game objects tagged by Tags.Chart
+		// representing a metric chart.
+		private HashSet<GameObject> allCharts = new HashSet<GameObject>();
+
+		private ICollection<GameObject> AllCharts()
+        {
+			//return GameObject.FindGameObjectsWithTag(Tags.Chart);
+			return allCharts;
+		}
+
+		/// <summary>
+		/// Registers the descendant of given <paramref name="gameObject"/> tagged by Tags.Chart
+		/// in allCharts. Hightlighting and accentuation works only for elements of registered
+		/// charts.
+		/// </summary>
+		/// <param name="gameObject">a game object containing a chart</param>
+		public void RegisterChart(GameObject gameObject)
+		{
+			GameObject chart = Tags.FindChildWithTag(gameObject, Tags.Chart);
+			Assert.IsNotNull(chart);
+			allCharts.Add(chart);
+		}
+
+		/// <summary>
+		/// Unregisters the descendant of given <paramref name="gameObject"/> tagged by Tags.Chart
+		/// in allCharts. Hightlighting and accentuation works only for elements of registered
+		/// charts.
+		/// </summary>
+		/// <param name="gameObject">a game object containing a chart</param>
+		public void UnregisterChart(GameObject gameObject)
+		{
+			GameObject chart = Tags.FindChildWithTag(gameObject, Tags.Chart);
+			Assert.IsNotNull(chart);
+			allCharts.Remove(chart);
+		}
+
 		/// <summary>
 		/// Highlights an object and all markers associated with it.
 		/// </summary>
@@ -295,8 +329,7 @@ namespace SEE.Charts.Scripts
 		/// <param name="scrollView">If this is triggered by a <see cref="ScrollViewToggle" /> or not.</param>
 		public static void HighlightObject(GameObject highlight, bool scrollView)
 		{
-			var charts = GameObject.FindGameObjectsWithTag("Chart");
-			foreach (var chart in charts)
+			foreach (var chart in Instance.AllCharts())
 			{
 				chart.TryGetComponent<ChartContent>(out var content);
 				content.HighlightCorrespondingMarker(highlight, scrollView);
@@ -309,7 +342,7 @@ namespace SEE.Charts.Scripts
 		/// <param name="highlight"></param>
 		public static void Accentuate(GameObject highlight)
 		{
-            foreach (var chart in GameObject.FindGameObjectsWithTag("Chart"))
+            foreach (var chart in Instance.AllCharts())
 			{
 				chart.TryGetComponent<ChartContent>(out var content);
 				content.AccentuateCorrespondingMarker(highlight);
@@ -355,14 +388,14 @@ namespace SEE.Charts.Scripts
 		{
 			var cameraPosition = Camera.main.transform;
 
-			Instantiate(chartPrefabVr, cameraPosition.position + 2 * cameraPosition.forward,
-				Quaternion.identity, transform.GetChild(0));
+			RegisterChart(Instantiate(chartPrefabVr, cameraPosition.position + 2 * cameraPosition.forward,
+				          Quaternion.identity, transform.GetChild(0)));			
 		}
 
-		/// <summary>
-		/// Sets the properties of <see cref="buildingHighlightMaterial" /> to their original state.
-		/// </summary>
-		private void OnDestroy()
+        /// <summary>
+        /// Sets the properties of <see cref="buildingHighlightMaterial" /> to their original state.
+        /// </summary>
+        private void OnDestroy()
 		{
 			buildingHighlightMaterial.SetFloat("g_flOutlineWidth", highlightOutline);
 			buildingHighlightMaterialAccentuated.SetFloat("g_flOutlineWidth", highlightOutline);

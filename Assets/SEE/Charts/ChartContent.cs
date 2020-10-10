@@ -50,7 +50,7 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// The number of seconds to be waited until drawing the charts for large cities.
 		/// </summary>
-		private const float LongDrawWaitingTime = 0.2f;
+		private const float LongDrawWaitingTime = 5.0f;
 		/// <summary>
 		/// The number of seconds to be waited until drawing the charts for small cities.
 		/// </summary>
@@ -62,6 +62,7 @@ namespace SEE.Charts.Scripts
         [SerializeField] private GameObject scrollContent;
 
 		/// <summary>
+		/// A checkbox associated to a <see cref="Node" /> in the scene to activate it in the chart.
 		/// A checkbox associated to a <see cref="Node" /> in the scene to activate it in the chart.
 		/// </summary>
 		[SerializeField] private GameObject scrollEntryPrefab;
@@ -908,7 +909,8 @@ namespace SEE.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Destroys the chart including its container if VR is activated.
+		/// Destroys the chart including its container. Called when the user clicks on
+		/// the closing button.
 		/// </summary>
 		public void Destroy()
 		{
@@ -920,6 +922,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		public void OnDestroy()
 		{
+			ChartManager.Instance.UnregisterChart(gameObject);
 			foreach (var dataObject in _dataObjects)
 				if (dataObject != null)
 					dataObject.GetComponent<NodeHighlights>().showInChart.Remove(this);
