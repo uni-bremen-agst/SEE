@@ -923,14 +923,11 @@ namespace SEE.Charts.Scripts
 		{
 			foreach (GameObject activeMarker in ActiveMarkers)
             {
-				if (activeMarker)
-				{
-					if (activeMarker.TryGetComponent(out ChartMarker script) && script.linkedObject.Equals(highlight))
-                    {
-					    script.TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, scrollView);
-					    break;
-                    }
-				}
+				if (activeMarker && activeMarker.TryGetComponent(out ChartMarker script) && script.linkedObject.Equals(highlight))
+                {
+					script.TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, scrollView);
+					break;
+                }
             }
 		}
 

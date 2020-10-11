@@ -10,7 +10,6 @@
 
 using SEE.DataModel;
 using SEE.GO;
-using SEE.UI3D;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,7 +94,7 @@ namespace SEE.Controls
 
         private bool needsUpdate;
 
-        public static Outline Create(GameObject go, bool primaryColor = true)
+        public static Outline Create(GameObject go, Color color)
         {
             Outline result = null;
 
@@ -104,12 +103,20 @@ namespace SEE.Controls
                 GameObject root = go;
                 while (root.GetComponent<Plane>() == null)
                 {
-                    root = root.transform.parent.gameObject;
+                    Transform parent = root.transform.parent;
+                    if (parent)
+                    {
+                        root = parent.gameObject;
+                    }
+                    else
+                    {
+                        goto End;
+                    }
                 }
 
                 result = go.AddComponent<Outline>();
                 result.OutlineMode = Mode.OutlineAll;
-                result.OutlineColor = primaryColor ? UI3DProperties.DefaultColor : UI3DProperties.DefaultColorSecondary;
+                result.OutlineColor = color;
                 result.OutlineWidth = 4.0f;
 
                 NodeRef nodeRef = go.GetComponent<NodeRef>();
@@ -140,6 +147,7 @@ namespace SEE.Controls
                 result.UpdateMaterialProperties();
             }
 
+        End:
             return result;
         }
 
@@ -246,6 +254,12 @@ namespace SEE.Controls
             // Destroy material instances
             Destroy(outlineMaskMaterial);
             Destroy(outlineFillMaterial);
+        }
+
+        public void SetColor(Color color)
+        {
+            OutlineColor = color;
+            UpdateMaterialProperties();
         }
 
         void Bake()

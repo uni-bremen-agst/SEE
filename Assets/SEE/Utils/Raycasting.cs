@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System;
+using SEE.GO;
+using UnityEngine.EventSystems;
 
 namespace SEE.Utils
 {
@@ -8,15 +10,28 @@ namespace SEE.Utils
     /// </summary>
     public static class Raycasting 
     {
-        //public static bool RaycastWorld()
-        //{
-        //
-        //}
-        //
+        public static bool RaycastNodes(out RaycastHit raycastHit)
+        {
+            bool result = false;
+
+            raycastHit = new RaycastHit();
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (!UnityEngine.Object.FindObjectOfType<EventSystem>().IsPointerOverGameObject()
+                && Physics.Raycast(ray, out RaycastHit hit)
+                && hit.transform.GetComponent<NodeRef>() != null)
+            {
+                raycastHit = hit;
+                result = true;
+            }
+
+            return result;
+        }
+        
         //public static bool RaycastGUI()
         //{
         //
         //}
+        // DesktopChartAction.cs
 
         /// <summary>
         /// Returns a sorted list of hits of a ray starting at the main camera and directing

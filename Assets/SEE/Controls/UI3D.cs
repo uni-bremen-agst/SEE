@@ -37,6 +37,7 @@ namespace SEE.UI3D
             c.focusses = new List<Transform>();
 
             c.outline = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            Destroy(c.outline.GetComponent<MeshCollider>());
             c.outline.transform.parent = go.transform;
             c.outline.transform.localPosition = Vector3.zero;
             c.outline.transform.localScale = Vector3.one;
@@ -98,7 +99,7 @@ namespace SEE.UI3D
         
         public void AddFocus(Transform focus)
         {
-            if (focus)
+            if (focus && !focusses.Contains(focus))
             {
                 focusses.Add(focus);
                 gameObject.SetActive(true);
@@ -314,6 +315,7 @@ namespace SEE.UI3D
         internal static RotateGizmo Create(Plane cullingPlane, int textureResolution)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            Destroy(go.GetComponent<MeshCollider>());
             go.name = "RotatePivot";
             go.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
             go.transform.position = cullingPlane.CenterTop;
