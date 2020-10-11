@@ -23,6 +23,7 @@ using SEE.Controls;
 using SEE.DataModel;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Charts.Scripts
 {
@@ -31,6 +32,11 @@ namespace SEE.Charts.Scripts
     /// </summary>
     public class ChartManager : MonoBehaviour
     {
+        /// <summary>
+        /// The prefix of the name of a metric shown in a chart.
+        /// </summary>
+        public const string MetricPrefix = "Metric.";
+
         /// <summary>
         /// The instance of the <see cref="ChartManager" />, to ensure there will be only one.
         /// </summary>
@@ -276,6 +282,42 @@ namespace SEE.Charts.Scripts
                 chart.transform.position = cameraPosition.position + (2.0f + offset) * cameraPosition.forward;
                 offset += 0.01f;
             }
+        }
+
+        // All created and still existing charts. Charts are game objects tagged by Tags.Chart
+        // representing a metric chart.
+        private HashSet<GameObject> allCharts = new HashSet<GameObject>();
+
+        private ICollection<GameObject> AllCharts()
+        {
+            //return GameObject.FindGameObjectsWithTag(Tags.Chart);
+            return allCharts;
+        }
+
+        /// <summary>
+        /// Registers the descendant of given <paramref name="gameObject"/> tagged by Tags.Chart
+        /// in allCharts. Hightlighting and accentuation works only for elements of registered
+        /// charts.
+        /// </summary>
+        /// <param name="gameObject">a game object containing a chart</param>
+        public void RegisterChart(GameObject gameObject)
+        {
+            GameObject chart = Tags.FindChildWithTag(gameObject, Tags.Chart);
+            Assert.IsNotNull(chart);
+            allCharts.Add(chart);
+        }
+
+        /// <summary>
+        /// Unregisters the descendant of given <paramref name="gameObject"/> tagged by Tags.Chart
+        /// in allCharts. Hightlighting and accentuation works only for elements of registered
+        /// charts.
+        /// </summary>
+        /// <param name="gameObject">a game object containing a chart</param>
+        public void UnregisterChart(GameObject gameObject)
+        {
+            GameObject chart = Tags.FindChildWithTag(gameObject, Tags.Chart);
+            Assert.IsNotNull(chart);
+            allCharts.Remove(chart);
         }
 
         /// <summary>

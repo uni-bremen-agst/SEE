@@ -133,8 +133,6 @@ namespace SEE.Charts.Scripts
 			_cameraFlightTime                     = chartManager.cameraFlightTime;
 			_clickDelay                           = chartManager.clickDelay;
 			_highlightDuration                    = chartManager.highlightDuration;
-			_buildingHighlightMaterial            = chartManager.buildingHighlightMaterial;
-			_buildingHighlightMaterialAccentuated = chartManager.buildingHighlightMaterialAccentuated;
 			_highlightLineLength                  = chartManager.highlightLineLength;
 		}
 
