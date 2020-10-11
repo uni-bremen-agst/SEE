@@ -27,7 +27,7 @@ namespace SEE.Controls
 {
 	public class DesktopChartAction : ChartAction
     {
-        private const KeyCode ToggleKey = KeyCode.G;
+        private const KeyCode ToggleKey = KeyCode.C;
         private const KeyCode SelectionKey = KeyCode.LeftControl;
         private const KeyCode ClickKey = KeyCode.Mouse0;
 

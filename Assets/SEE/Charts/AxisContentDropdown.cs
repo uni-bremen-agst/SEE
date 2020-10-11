@@ -19,9 +19,11 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Charts.Scripts
 {
@@ -31,8 +33,9 @@ namespace SEE.Charts.Scripts
     /// </summary>
     public class AxisContentDropdown : MonoBehaviour
     {
+
         /// <summary>
-        ///     Visualizes the content displayed in the chart.
+        ///  Visualizes the content displayed in the chart.
         /// </summary>
         private ChartContent _chartContent;
 
@@ -42,24 +45,9 @@ namespace SEE.Charts.Scripts
         private TMP_Dropdown _dropdown;
 
         /// <summary>
-        ///     The old value of the other <see cref="AxisContentDropdown" />.
-        /// </summary>
-        private int _oldNone;
-
-        /// <summary>
-        ///     A list containing all options for the <see cref="_dropdown" />
-        /// </summary>
-        private string[] _options;
-
-        /// <summary>
-        ///     The other dropdown of this chart.
-        /// </summary>
-        private AxisContentDropdown _other;
-
-        /// <summary>
         ///     The currently selected option of the <see cref="_dropdown" />.
         /// </summary>
-        public string Value { get; private set; }
+        public string CurrentlySelectedMetric { get; private set; }
 
         /// <summary>
         ///     Adds all possible options to the <see cref="TMP_Dropdown" />.
@@ -68,14 +56,12 @@ namespace SEE.Charts.Scripts
         {
             _chartContent = transform.parent.parent.GetComponent<ChartContent>();
             _dropdown = GetComponent<TMP_Dropdown>();
-            GetKeys();
+            FillDropDown();
             if (_dropdown.options.Count > 0)
             {
-                Value = "Metric." + _dropdown.options[0].text;
+                CurrentlySelectedMetric = GetEntry(_dropdown.options[0].text);
                 _chartContent.SetInfoText();
-                var noneText = "(NONE) " + _dropdown.options[0].text;
-                _dropdown.options[0].text = noneText;
-                _dropdown.captionText.text = noneText;
+                _dropdown.captionText.text = CurrentlySelectedMetric;
             }
             else
             {
@@ -83,44 +69,70 @@ namespace SEE.Charts.Scripts
             }
         }
 
-        /// <summary>
-        ///     Adds all metrics contained in the chart to the dropdown.
-        /// </summary>
-        private void GetKeys()
+        private string GetEntry(string entry)
         {
-            _dropdown.ClearOptions();
-            _options = _chartContent.AllKeys.ToArray();
-            for (var i = 0; i < _options.Length; i++) _options[i] = _options[i].Remove(0, 7);
-            _dropdown.AddOptions(_options.ToList());
+            return entry.Equals(specialEntry) ? entry : ChartManager.MetricPrefix + entry;
         }
 
         /// <summary>
-        ///     Updates <see cref="Value" /> to match the selected option of <see cref="_dropdown" />
+        /// The special entry that was requsted to be added in addition to the node metrics.
+        /// It can be added by clients by way of calling AddEntry(). The special entry
+        /// is not a metric, but a place holder for specifying that the nodes should be
+        /// enumerated on the axis.
+        /// </summary>
+        private string specialEntry;
+
+        /// <summary>
+        /// For requests to a add special entry in addition to the node metrics
+        /// derived from AllMetricNames of the ChartContent. The special entry
+        /// will be added to the drop box before AllMetricNames in verbatim
+        /// (no removal of any prefix whatsoever). The special entry is not a
+        /// metric, but a place holder for specifying that the nodes should be
+        /// enumerated on the axis.
+        /// </summary>
+        /// <param name="entry">dropdown entry to be added (exactly at it appears)</param>
+        public void AddNodeEnumerationEntry(string entry)
+        {
+            Assert.IsTrue(string.IsNullOrEmpty(specialEntry));
+            specialEntry = entry;
+        }
+
+        /// <summary>
+        /// First the special entry that was added by AddEntry() and only then all 
+        /// node metrics are added to the dropdown. The MetricPrefix of the node metrics (not those
+        /// added by AddEntry()) will be removed for the labels added to the 
+        /// dropdown box.
+        /// </summary>
+        private void FillDropDown()
+        {
+            _dropdown.ClearOptions();
+            if (!string.IsNullOrEmpty(specialEntry))
+            {
+                List<string> options = new List<string>() { specialEntry };
+                _dropdown.AddOptions(options);
+            }
+            {
+                // Add all node metrics without their prefix
+                string[] options = _chartContent.AllMetricNames.ToArray();
+                int MetricPrefixLength = ChartManager.MetricPrefix.Length;
+                for (var i = 0; i < options.Length; i++)
+                {
+                    options[i] = options[i].Remove(0, MetricPrefixLength);
+                }
+                _dropdown.AddOptions(options.ToList());
+            }
+        }
+
+        /// <summary>
+        ///     Updates <see cref="CurrentlySelectedMetric" /> to match the selected option of <see cref="_dropdown" />
         /// </summary>
         public void ChangeValue()
         {
             var currentValue = _dropdown.options[_dropdown.value].text;
-            if (currentValue.StartsWith("(NONE) ")) currentValue = currentValue.Remove(0, 7);
-            Value = "Metric." + currentValue;
+            CurrentlySelectedMetric = GetEntry(currentValue);
             _chartContent.DrawData(true);
             _chartContent.SetInfoText();
-            _other.OtherChanged(_dropdown.value);
-        }
-
-        /// <summary>
-        ///     Adds an indicator to a value in the dropdown, that signalizes that the same value is used on the
-        ///     other axis.
-        /// </summary>
-        /// <param name="value">The value of the other <see cref="AxisContentDropdown" />.</param>
-        private void OtherChanged(int value)
-        {
-            _dropdown.options[_oldNone].text = _dropdown.options[_oldNone].text.Remove(0, 7);
-            if (_oldNone == _dropdown.value)
-                _dropdown.captionText.text = _dropdown.captionText.text.Remove(0, 7);
-            _dropdown.options[value].text = "(NONE) " + _dropdown.options[value].text;
-            if (value == _dropdown.value)
-                _dropdown.captionText.text = _dropdown.options[value].text;
-            _oldNone = value;
+            //_other.OtherChanged(_dropdown.value);
         }
 
         /// <summary>
@@ -130,11 +142,6 @@ namespace SEE.Charts.Scripts
         public void SetText(string text)
         {
             _dropdown.captionText.text = text;
-        }
-
-        public void SetOther(AxisContentDropdown other)
-        {
-            _other = other;
         }
     }
 }

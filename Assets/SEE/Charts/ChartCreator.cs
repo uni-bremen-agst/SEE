@@ -45,7 +45,6 @@ namespace SEE.Charts.Scripts
         {
             GameObject chart = Instantiate(chartPrefab, chartsCanvas);
             ChartManager.Instance.RegisterChart(chart);
-            //chart.GetComponent<ChartContent>();
         }
 
         /// <summary>
