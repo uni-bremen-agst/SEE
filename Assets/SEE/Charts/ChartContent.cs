@@ -50,7 +50,7 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// The number of seconds to be waited until drawing the charts for large cities.
 		/// </summary>
-		private const float LongDrawWaitingTime = 5.0f;
+		private const float LongDrawWaitingTime = 1.0f;
 		/// <summary>
 		/// The number of seconds to be waited until drawing the charts for small cities.
 		/// </summary>
@@ -225,19 +225,18 @@ namespace SEE.Charts.Scripts
 		/// Fills the scroll view on the right of the chart with one entry for each node in the scene including
 		/// two headers to toggle all buildings and all nodes.
 		/// </summary>
-		private void FillScrollView()
+		private void FillScrollViewAsList()
 		{
-			Performance p = Performance.Begin("FillScrollView()");
-			foreach (Transform child in scrollContent.transform) Destroy(child.gameObject);
+			Performance p = Performance.Begin("FillScrollViewAsList()");
 
-			var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-			tempObject.TryGetComponent<ScrollViewToggle>(out var parentToggle);
+            GameObject scrollEntry = Instantiate(scrollEntryPrefab, scrollContent.transform);
+			scrollEntry.TryGetComponent<ScrollViewToggle>(out ScrollViewToggle parentToggle);
 			parentToggle.SetLabel("Leaves");
-			tempObject.transform.localPosition = headerOffset;
+			scrollEntry.transform.localPosition = headerOffset;
 			parentToggle.Initialize(this);
 
-			var index = 0;
-			foreach (var dataObject in _dataObjects)
+            int index = 0;
+			foreach (GameObject dataObject in _dataObjects)
 			{
 				if (SceneQueries.IsLeaf(dataObject))
                 {
@@ -245,13 +244,13 @@ namespace SEE.Charts.Scripts
 				}
 			}
 
-			tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-			tempObject.TryGetComponent(out parentToggle);
+			scrollEntry = Instantiate(scrollEntryPrefab, scrollContent.transform);
+			scrollEntry.TryGetComponent(out parentToggle);
 			parentToggle.SetLabel("Inner Nodes");
-			tempObject.transform.localPosition = headerOffset + new Vector2(0, _yGap) * ++index;
+			scrollEntry.transform.localPosition = headerOffset + new Vector2(0, _yGap) * ++index;
 			parentToggle.Initialize(this);
 
-			foreach (var dataObject in _dataObjects)
+			foreach (GameObject dataObject in _dataObjects)
 			{
 				if (SceneQueries.IsInnerNode(dataObject))
 				{
@@ -261,33 +260,43 @@ namespace SEE.Charts.Scripts
 
 			scrollContent.TryGetComponent<RectTransform>(out var rect);
 			rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
-			p.End();
+			p.End(true);
 		}
 
 		private void FillScrollView(bool tree)
         {
             Performance p = Performance.Begin("FillScrollView(bool)");
-            foreach (Transform child in scrollContent.transform) Destroy(child.gameObject);
+			foreach (Transform child in scrollContent.transform)
+			{
+				Destroy(child.gameObject);
+			}
 
-            if (!tree)
+			if (!tree)
+			{
+				FillScrollViewAsList();
+			}
+			else
             {
-                FillScrollView();
-                p.End();
-                return;
+                FillScrollViewAsTree();
             }
+            p.End(true);
+        }
 
-            var index = 0;
-            var hierarchy = 0;
-            var maxHierarchy = 0;
+        private void FillScrollViewAsTree()
+        {
+            Performance p = Performance.Begin("FillScrollViewAsTree");
+            int index = 0;
+            int hierarchy = 0;
+            int maxHierarchy = 0;
 
             foreach (var root in SceneQueries.GetRoots(_dataObjects))
             {
-                var inScene = _dataObjects.First(entry =>
+                GameObject inScene = _dataObjects.First(entry =>
                 {
                     entry.TryGetComponent<NodeRef>(out var nodeRef);
                     return nodeRef.node.ID.Equals(root.ID);
                 });
-                var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+                GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
                 tempObject.TryGetComponent<ScrollViewToggle>(out var rootToggle);
                 inScene.TryGetComponent<NodeHighlights>(out var highlights);
                 rootToggle.LinkedObject = highlights;
@@ -304,7 +313,7 @@ namespace SEE.Charts.Scripts
             if (hierarchy > maxHierarchy) maxHierarchy = hierarchy; //TODO: Use this...
             scrollContent.TryGetComponent<RectTransform>(out var rect);
             rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
-            p.End();
+            p.End(true);
         }
 
         /// <summary>
@@ -419,7 +428,7 @@ namespace SEE.Charts.Scripts
 					Debug.LogWarning("No metrics available for charts.\n");
                 }
 			}
-			p.End();
+			p.End(true);
 		}
 
 		/// <summary>
@@ -430,7 +439,7 @@ namespace SEE.Charts.Scripts
 			Performance p = Performance.Begin("FindDataObjects: Find nodes");
 			_dataObjects = SceneQueries.AllGameNodesInScene(ChartManager.Instance.ShowLeafMetrics, 
 				                                            ChartManager.Instance.ShowInnerNodeMetrics);
-			p.End();
+			p.End(true);
 
 			int numberOfDataObjectsWithNodeHightLights = 0;
 			p = Performance.Begin("FindDataObjects: Node highlights");
@@ -443,12 +452,12 @@ namespace SEE.Charts.Scripts
                 }
                 //if (!highlights.showInChart.Contains(this)) highlights.showInChart.Add(this, true);
             }
-            p.End();
+            p.End(true);
             Debug.LogFormat("numberOfDataObjectsWithNodeHightLights: {0}\n", numberOfDataObjectsWithNodeHightLights);
 
             p = Performance.Begin("FindDataObjects: Fill scroll view");
             FillScrollView(_displayAsTree);
-            p.End();
+            p.End(true);
         }
 
         /// <summary>
@@ -459,7 +468,7 @@ namespace SEE.Charts.Scripts
 		{
 			Performance p = Performance.Begin("CallDrawData");
 			DrawData(true);
-			p.End();
+			p.End(true);
 		}
 
 		/// <summary>
@@ -503,7 +512,7 @@ namespace SEE.Charts.Scripts
 			{ 
 				noDataWarning.SetActive(true); 
 			}
-			p.End();
+			p.End(true);
 		}
 
 		/// <summary>
@@ -576,7 +585,7 @@ namespace SEE.Charts.Scripts
 				foreach (var activeMarker in ActiveMarkers) Destroy(activeMarker);
 				noDataWarning.SetActive(true);
 			}
-			p.End();
+			p.End(true);
 		}
 
 		/// <summary>
@@ -636,7 +645,7 @@ namespace SEE.Charts.Scripts
 				foreach (var activeMarker in ActiveMarkers) Destroy(activeMarker);
 				noDataWarning.SetActive(true);
 			}
-			p.End();
+			p.End(true);
 		}
 
 		/// <summary>
@@ -667,23 +676,23 @@ namespace SEE.Charts.Scripts
 				var node = data.GetComponent<NodeRef>().node;
 				node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out var valueX);
 				node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out var valueY);
-				var type = node.IsLeaf() ? "Building" : "Node";
-				chartMarker.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
-				                   valueX.ToString("N") + ", Y: " + valueY.ToString("N"));
+				chartMarker.SetInfoText("Linked to: " + data.name + "\nX: "
+				                        + valueX.ToString("N") + ", Y: " + valueY.ToString("N"));
 				marker.GetComponent<RectTransform>().anchoredPosition =
 					new Vector2((valueX - minX) * width, (valueY - minY) * height);
-				CheckOverlapping(marker, updatedMarkers.ToArray());
+				//CheckOverlapping(marker, updatedMarkers.ToArray());
 				updatedMarkers.Add(marker);
 
 				var highlightTimeLeft = CheckOldMarkers(data);
 				if (highlightTimeLeft > 0f)
-					chartMarker.TriggerTimedHighlight(ChartManager.Instance.highlightDuration - highlightTimeLeft,
-						true, false);
+				{
+					chartMarker.TriggerTimedHighlight(ChartManager.Instance.highlightDuration - highlightTimeLeft, true, false);
+				}
 			}
 
 			foreach (var marker in ActiveMarkers) Destroy(marker);
 			ActiveMarkers = updatedMarkers;
-			p.End();
+			p.End(true);
 		}
 
 		/// <summary>
@@ -737,7 +746,7 @@ namespace SEE.Charts.Scripts
 				foreach (var marker in ActiveMarkers) Destroy(marker);
 				ActiveMarkers = updatedMarkers;
 			}
-			p.End();
+			p.End(true);
 		}
 
 		/// <summary>
@@ -785,7 +794,7 @@ namespace SEE.Charts.Scripts
 
 			foreach (var marker in ActiveMarkers) Destroy(marker);
 			ActiveMarkers = updatedMarkers;
-			p.End();
+			p.End(true);
 		}
 
 		/// <summary>
