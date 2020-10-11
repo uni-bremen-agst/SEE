@@ -28,7 +28,7 @@ namespace SEE.Controls
 	/// </summary>
 	public abstract class ChartAction : MonoBehaviour
 	{
-		[HideInInspector] public float move;
+		[HideInInspector] public float move; // TODO(torben): are any of these used at all?
 
 		/// <summary>
 		/// Click was false in the last update and true in this update.

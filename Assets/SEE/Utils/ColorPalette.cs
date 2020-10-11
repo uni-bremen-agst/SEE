@@ -23,7 +23,7 @@ namespace SEE.Utils
 
         public static Color Viridis(float t)
         {
-            int i = Mathf.Clamp(Mathf.RoundToInt(t), 0, ViridisColorPalette.Length - 1);
+            int i = Mathf.Clamp(Mathf.RoundToInt(t * (ViridisColorPalette.Length - 1)), 0, ViridisColorPalette.Length - 1);
             Color result = ViridisColorPalette[i];
             return result;
         }

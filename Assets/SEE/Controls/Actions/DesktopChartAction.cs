@@ -20,34 +20,17 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Charts.Scripts;
-using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Controls
 {
 	public class DesktopChartAction : ChartAction
     {
-        private const KeyCode ToggleKey = KeyCode.C;
-        private const KeyCode SelectionKey = KeyCode.LeftControl;
-        private const KeyCode ClickKey = KeyCode.Mouse0;
-
         private void Update()
         {
-            if (Input.GetKeyDown(ToggleKey))
+            if (Input.GetKeyDown(KeyCode.G))
             {
                 ChartManager.Instance.ToggleCharts();
-            }
-            if (Input.GetKeyDown(SelectionKey) || Input.GetKeyUp(SelectionKey))
-            {
-                ChartManager.Instance.ToggleSelectionMode();
-            }
-            if (Input.GetKeyDown(ClickKey))
-            {
-			    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			    if (Physics.Raycast(ray, out RaycastHit hit, 100f) && hit.transform.gameObject.TryGetComponent(out NodeRef _))
-                {
-				    ChartManager.HighlightObject(hit.transform.gameObject, false);
-                }
             }
 		}
     }
