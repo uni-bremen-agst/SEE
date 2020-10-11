@@ -33,6 +33,11 @@ namespace SEE.Charts.Scripts
 	public class ChartManager : MonoBehaviour
 	{
 		/// <summary>
+		/// The prefix of the name of a metric shown in a chart.
+		/// </summary>
+		public const string MetricPrefix = "Metric.";
+
+		/// <summary>
 		/// The instance of the <see cref="ChartManager" />, to ensure there will be only one.
 		/// </summary>
 		private static ChartManager _instance;

@@ -177,9 +177,9 @@ namespace SEE.Charts.Scripts
 		public RectTransform labelsPanel;
 
 		/// <summary>
-		/// Contains all keys contained in any <see cref="GameObject" /> of <see cref="_dataObjects" />.
+		/// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="_dataObjects" />.
 		/// </summary>
-		public HashSet<string> AllKeys { get; } = new HashSet<string>();
+		public HashSet<string> AllMetricNames { get; } = new HashSet<string>();
 
 		/// <summary>
 		/// The number of game objects representing a graph node in the current scene.
@@ -201,6 +201,11 @@ namespace SEE.Charts.Scripts
 			GetAllNumericAttributes();
 		}
 
+		// This entry of the dropdown box represents not a metric but just the enumeration of nodes.
+		// This entry can be selected if one wants to have a metric on one axis and then all nodes 
+		// sorted by this metric on the other axis.
+		private const string NodeEnumeration = "NODES";
+
 		/// <summary>
 		/// Fills the chart for the first time and invokes <see cref="CallDrawData" /> to keep the chart up to
 		/// date.
@@ -210,8 +215,7 @@ namespace SEE.Charts.Scripts
 			// The time in seconds to wait until CallDrawData is called.
 			// FIXME: Why is this waiting time needed?
 			var time = _dataObjects.Count > BigCityThreshold ? LongDrawWaitingTime : ShortDrawWaitingTime;
-			axisDropdownX.SetOther(axisDropdownY);
-			axisDropdownY.SetOther(axisDropdownX);
+			axisDropdownX.AddNodeEnumerationEntry(NodeEnumeration);
 			// FIXME: Why is this delayed call needed and what consequences does
 			// it have? It seems as if this slows down the completion of drawing the objects.
 			Invoke(nameof(CallDrawData), time);
@@ -303,8 +307,6 @@ namespace SEE.Charts.Scripts
             p.End();
         }
 
-
-
         /// <summary>
         /// Creates a toggle for an object in the scene that is a node.
         /// </summary>
@@ -359,13 +361,14 @@ namespace SEE.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Gets all keys for <see cref="float" /> values contained in the <see cref="NodeRef" /> of each
-		/// <see cref="GameObject" /> in <see cref="_dataObjects" />.
+		/// Gets all metric names for <see cref="float" /> values contained in the <see cref="NodeRef" /> of each
+		/// <see cref="GameObject" /> in <see cref="_dataObjects" />. A metric name is the name of a
+		/// numeric (either float or int) node attribute that starts with the prefix ChartManager.MetricPrefix.
 		/// </summary>
 		private void GetAllNumericAttributes()
 		{
 			Performance p = Performance.Begin("GetAllNumericAttributes");
-			AllKeys.Clear();
+			AllMetricNames.Clear();
 			if (_dataObjects.Count == 0)
             {
 				Debug.LogWarning("There are no nodes for showing metrics.\n");
@@ -381,11 +384,17 @@ namespace SEE.Charts.Scripts
 						{
 							foreach (var key in node.FloatAttributes.Keys)
 							{
-								AllKeys.Add(key);
+								if (key.StartsWith(ChartManager.MetricPrefix))
+								{
+									AllMetricNames.Add(key);
+								}
 							}
 							foreach (var key in node.IntAttributes.Keys)
 							{
-								AllKeys.Add(key);
+								if (key.StartsWith(ChartManager.MetricPrefix))
+								{
+									AllMetricNames.Add(key);
+								}
 							}
 						}
 						else
@@ -398,9 +407,9 @@ namespace SEE.Charts.Scripts
 						Debug.LogWarningFormat("Game node {0} without node reference.\n", data.name);
                     }
 				}
-				if (AllKeys.Count > 0)
+				if (AllMetricNames.Count > 0)
 				{
-					foreach (string metric in AllKeys)
+					foreach (string metric in AllMetricNames)
 					{
 						Debug.LogFormat("Available metric: {0}\n", metric);
 					}
@@ -478,13 +487,17 @@ namespace SEE.Charts.Scripts
 				FindDataObjects();
 			}
 			noDataWarning.SetActive(false);
-			if (axisDropdownX.Value.Equals(axisDropdownY.Value))
+			if (axisDropdownX.CurrentlySelectedMetric.Equals(axisDropdownY.CurrentlySelectedMetric))
 			{
-				DrawOneAxis();
+				DrawY(true);
+			}
+			else if (axisDropdownX.CurrentlySelectedMetric.Equals(NodeEnumeration))
+            {
+				DrawY(false);
 			}
 			else
 			{
-				DrawTwoAxes();
+				DrawXY();
 			}
 			if (ActiveMarkers.Count == 0)
 			{ 
@@ -494,12 +507,12 @@ namespace SEE.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Adds a marker for every <see cref="Node" /> containing the metrics from both axes. Its position
-		/// depends on the values of those metrics.
+		/// Adds a marker for every <see cref="Node" /> for two metrics X and Y to be
+		/// put on both axes. A marker's position depends on the values of those metrics.
 		/// </summary>
-		private void DrawTwoAxes()
+		private void DrawXY()
 		{
-			Performance p = Performance.Begin("DrawTwoAxes");
+			Performance p = Performance.Begin("DrawXY");
 			// Note that we determine the minimal and maximal metric values of the two
 			// axes globally, that is, over all nodes in the scene and not just those
 			// shown in this particular chart. This way, the scale of all charts for the
@@ -514,22 +527,21 @@ namespace SEE.Charts.Scripts
 				data.TryGetComponent(out NodeRef nodeRef);
 				Node node = nodeRef.node;
 				bool inX = false;				
-				if (node.TryGetNumeric(axisDropdownX.Value, out float valueX))
+				if (node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX))
 				{
 					if (valueX < minX) minX = valueX;
 					if (valueX > maxX) maxX = valueX;
 					inX = true;
 				}
 				bool inY = false;
-				if (node.TryGetNumeric(axisDropdownY.Value, out float valueY))
+				if (node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY))
 				{
 					if (valueY > maxY) maxY = valueY;
 					if (valueY < minY) minY = valueY;
 					inY = true;
 				}
-				// Is this node shown in this chart at all?
-				bool showInChart = (bool)nodeRef.highlights.showInChart[this];
-				if (inX && inY && showInChart)
+                // Is this node shown in this chart at all?
+                if (inX && inY && (bool)nodeRef.highlights.showInChart[this])
 				{
 					// only nodes to be shown in this chart and having values for both
 					// currently selected metrics for the axes will be added to the chart
@@ -568,33 +580,51 @@ namespace SEE.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Adds a marker for every <see cref="Node" /> containing the metric that is the same for both axes.
-		/// Therefore markers will be ordered by that one value and the distance between markers on the x-Axis
-		/// will be consistent.
+		/// Adds a marker for every <see cref="Node" /> for a single metric to be put onto the
+		/// Y axis. If SortByMetric is true, the markers will be ordered in ascending order 
+		/// by that metric and the distance between markers on the x-Axis will be equistant.
+		/// If SortByMetric is false, they will be drawn in the order in which they appear
+		/// in the list of _dataObjects.
 		/// </summary>
-		private void DrawOneAxis()
+		private void DrawY(bool SortByMetric)
 		{
-			Performance p = Performance.Begin("DrawOneAxis");
-			var toDraw = new List<GameObject>();
-			var metric = axisDropdownY.Value;
+			Performance p = Performance.Begin("DrawY");
+            List<GameObject> toDraw = new List<GameObject>();
+            string metric = axisDropdownY.CurrentlySelectedMetric;
 
+			float min = float.PositiveInfinity;
+			float max = float.NegativeInfinity;
+
+			// Collect all data objects possessing the metric and whose value is to
+			// be represented in this chart.
 			foreach (var dataObject in _dataObjects)
-				if (dataObject.GetComponent<NodeRef>().node.TryGetNumeric(metric, out _) &&
-				    (bool) dataObject.GetComponent<NodeHighlights>().showInChart[this])
+			{
+				if (dataObject.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float value) &&
+					(bool)dataObject.GetComponent<NodeHighlights>().showInChart[this])
+				{
+					if (value > max)
+                    {
+						max = value;
+                    }
+					if (value < min)
+                    {
+						min = value;
+                    }
 					toDraw.Add(dataObject);
+				}
+			}
 			if (toDraw.Count > 0)
 			{
-				toDraw.Sort(delegate(GameObject go1, GameObject go2)
-				{
-					go1.GetComponent<NodeRef>().node.TryGetNumeric(metric, out var value1);
-					go2.GetComponent<NodeRef>().node.TryGetNumeric(metric, out var value2);
-					return value1.CompareTo(value2);
-				});
-
-				toDraw.First().GetComponent<NodeRef>().node.TryGetNumeric(metric, out var min);
-				toDraw.Last().GetComponent<NodeRef>().node.TryGetNumeric(metric, out var max);
-
-				AddMarkers(toDraw, min, max);
+				if (SortByMetric)
+                {
+                    toDraw.Sort(delegate (GameObject go1, GameObject go2)
+                    {
+                        go1.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float value1);
+                        go2.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float value2);
+                        return value1.CompareTo(value2);
+                    });
+                }
+                AddMarkers(toDraw, min, max);
 
 				minXText.text = "0";
 				maxXText.text = toDraw.Count.ToString();
@@ -635,8 +665,8 @@ namespace SEE.Charts.Scripts
 				chartMarker.linkedObject = data;
 				chartMarker.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
 				var node = data.GetComponent<NodeRef>().node;
-				node.TryGetNumeric(axisDropdownX.Value, out var valueX);
-				node.TryGetNumeric(axisDropdownY.Value, out var valueY);
+				node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out var valueX);
+				node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out var valueY);
 				var type = node.IsLeaf() ? "Building" : "Node";
 				chartMarker.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
 				                   valueX.ToString("N") + ", Y: " + valueY.ToString("N"));
@@ -675,7 +705,7 @@ namespace SEE.Charts.Scripts
 				var dataRect = dataPanel.rect;
 				var width = dataRect.width / (toDraw.Count - 1);
 				var height = dataRect.height / (max - min);
-				var metric = axisDropdownY.Value;
+				var metric = axisDropdownY.CurrentlySelectedMetric;
 				var x = 0;
 				var positionInLayer = 0;
 
@@ -736,8 +766,8 @@ namespace SEE.Charts.Scripts
 				script.ScrollViewToggle = highlights.scrollViewToggle;
 				data.TryGetComponent<NodeRef>(out var nodeRef);
 				var node = nodeRef.node;
-				node.TryGetNumeric(axisDropdownX.Value, out var valueX);
-				node.TryGetNumeric(axisDropdownY.Value, out var valueY);
+				node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out var valueX);
+				node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out var valueY);
 				var type = node.IsLeaf() ? "Building" : "Node";
 				script.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
 				                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("N"));
@@ -854,13 +884,13 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		public void SetInfoText()
 		{
-			var metricX = axisDropdownX.Value;
-			var metricY = axisDropdownY.Value;
+			var metricX = axisDropdownX.CurrentlySelectedMetric;
+			var metricY = axisDropdownY.CurrentlySelectedMetric;
 			if (metricX.Equals(metricY))
 				moveHandler.SetInfoText(metricX);
 			else
-				moveHandler.SetInfoText("X-Axis: " + axisDropdownX.Value + "\n" + "Y-Axis: " +
-				                        axisDropdownY.Value);
+				moveHandler.SetInfoText("X-Axis: " + axisDropdownX.CurrentlySelectedMetric + "\n" + "Y-Axis: " +
+				                        axisDropdownY.CurrentlySelectedMetric);
 		}
 
 		/// <summary>
