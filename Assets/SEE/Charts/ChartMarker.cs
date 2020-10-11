@@ -278,26 +278,34 @@ namespace SEE.Charts.Scripts
 		{
 			if (scrollView)
 			{
-				if (TimedHighlight != null) return;
-				HighlightLinkedObjectToggle(!_highlightCopy);
+				if (TimedHighlight == null)
+                {
+				    HighlightLinkedObjectToggle(!_highlightCopy);
+                }
 			}
 			else
 			{
-				var reactivate = false;
+				bool reactivate = false;
 
 				if (TimedHighlight != null)
 				{
 					StopCoroutine(TimedHighlight);
 					HighlightLinkedObjectToggle(false);
 					TimedHighlight = null;
-					if (ChartManager.Instance.selectionMode || reenable) reactivate = true;
+                    if (ChartManager.Instance.selectionMode || reenable)
+                    {
+                        reactivate = true;
+                    }
 				}
 				else
 				{
 					reactivate = true;
 				}
 
-				if (reactivate) TimedHighlight = StartCoroutine(TimedHighlightRoutine(time));
+                if (reactivate)
+                {
+                    TimedHighlight = StartCoroutine(TimedHighlightRoutine(time));
+                }
 			}
 		}
 

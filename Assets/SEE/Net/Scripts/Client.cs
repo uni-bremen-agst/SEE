@@ -4,7 +4,6 @@ using NetworkCommsDotNet.Connections.TCP;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using UnityEngine;
 
 namespace SEE.Net
 {
@@ -50,6 +49,9 @@ namespace SEE.Net
         /// </summary>
         public static ulong outgoingPacketID = 0;
 
+        /// <summary>
+        /// Whether the client is currently initialized.
+        /// </summary>
         private static bool initialized = false;
 
 

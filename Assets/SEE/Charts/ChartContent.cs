@@ -881,14 +881,17 @@ namespace SEE.Charts.Scripts
 		/// <param name="scrollView">If this is triggered by a <see cref="ScrollViewToggle" /> or not.</param>
 		public void HighlightCorrespondingMarker(GameObject highlight, bool scrollView)
 		{
-			foreach (var activeMarker in ActiveMarkers)
+			foreach (GameObject activeMarker in ActiveMarkers)
+            {
 				if (activeMarker)
 				{
-					activeMarker.TryGetComponent<ChartMarker>(out var script);
-					if (!script.linkedObject.Equals(highlight)) continue;
-					script.TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, scrollView);
-					break;
+					if (activeMarker.TryGetComponent(out ChartMarker script) && script.linkedObject.Equals(highlight))
+                    {
+					    script.TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, scrollView);
+					    break;
+                    }
 				}
+            }
 		}
 
 		/// <summary>

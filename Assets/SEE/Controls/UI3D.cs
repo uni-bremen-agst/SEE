@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.UI3D
 {
@@ -15,7 +17,7 @@ namespace SEE.UI3D
         private const string OutlineShaderName = "Unlit/CursorOutlineShader";
         private const string PlainColorShaderName = "Unlit/PlainColorShader";
 
-        private Transform focus;
+        private List<Transform> focusses;
 
         private GameObject outline;
         private Material outlineMaterial;
@@ -31,6 +33,8 @@ namespace SEE.UI3D
         {
             GameObject go = new GameObject("Cursor");
             Cursor c = go.AddComponent<Cursor>();
+
+            c.focusses = new List<Transform>();
 
             c.outline = GameObject.CreatePrimitive(PrimitiveType.Quad);
             c.outline.transform.parent = go.transform;
@@ -51,23 +55,23 @@ namespace SEE.UI3D
 
         private void Update()
         {
-            if (focus != null)
+            if (focusses.Count != 0)
             {
-                transform.position = focus.position;
+                transform.position = GetPosition();
                 axisHalfLength = 0.01f * (Camera.main.transform.position - transform.position).magnitude;
             }
         }
 
         private void OnRenderObject()
         {
-            if (focus)
+            if (focusses.Count != 0)
             {
                 if (axisHalfLength > 0.0f)
                 {
                     axisMaterial.SetPass(0);
                     GL.Begin(GL.LINES);
                     {
-                        Vector3 c = focus.transform.position;
+                        Vector3 c = GetPosition();
                         GL.Vertex(new Vector3(c.x - axisHalfLength, c.y, c.z));
                         GL.Vertex(new Vector3(c.x + axisHalfLength, c.y, c.z));
                         GL.Vertex(new Vector3(c.x, c.y - axisHalfLength, c.z));
@@ -80,15 +84,141 @@ namespace SEE.UI3D
             }
         }
 
-        public Transform GetFocus()
+        public bool HasFocus()
         {
-            return focus;
+            return focusses.Count != 0;
         }
 
-        public void SetFocus(Transform focus)
+        public Transform[] GetFocusses()
         {
-            this.focus = focus;
-            gameObject.SetActive(focus != null);
+            Transform[] result = new Transform[focusses.Count];
+            focusses.CopyTo(result);
+            return result;
+        }
+        
+        public void AddFocus(Transform focus)
+        {
+            if (focus)
+            {
+                focusses.Add(focus);
+                gameObject.SetActive(true);
+            }
+        }
+
+        public void RemoveFocus(Transform focus)
+        {
+            if (focus)
+            {
+                focusses.Remove(focus);
+                gameObject.SetActive(focusses.Count != 0);
+            }
+        }
+
+        public void ReplaceFocusses(List<Transform> focusses)
+        {
+            if (focusses != null && focusses.Count != 0)
+            {
+                this.focusses = focusses;
+                gameObject.SetActive(true);
+            }
+            else
+            {
+                this.focusses.Clear();
+                gameObject.SetActive(false);
+            }
+        }
+
+        public void ReplaceFocus(Transform focus)
+        {
+            if (focus != null)
+            {
+                focusses.Clear();
+                focusses.Add(focus);
+                gameObject.SetActive(true);
+            }
+            else
+            {
+                focusses.Clear();
+                gameObject.SetActive(false);
+            }
+        }
+
+        public Vector3 GetPosition()
+        {
+            Vector3 result = Vector3.zero;
+
+            if (focusses.Count == 1)
+            {
+                result = focusses[0].position;
+            }
+            else
+            {
+                GetMostDistantFocussesXZ(out Transform focus0, out Transform focus1, out float radius0, out float radius1, out float diameter);
+                Vector3 p0 = focus0.position;
+                Vector3 p1 = focus1.position;
+                Vector3 v01 = focus1.position - focus0.position;
+                if (v01.sqrMagnitude != 0.0f)
+                {
+                    v01.Normalize();
+                }
+                p0 -= v01 * radius0;
+                p1 += v01 * radius1;
+                result = 0.5f * (p0 + p1);
+            }
+
+            return result;
+        }
+
+        public float GetDiameterXZ()
+        {
+            float result = 0.0f;
+
+            if (focusses.Count == 1)
+            {
+                result = focusses[0].lossyScale.x;
+            }
+            else
+            {
+                GetMostDistantFocussesXZ(out Transform _, out Transform _, out float _, out float _, out result);
+            }
+
+            return result;
+        }
+
+        private void GetMostDistantFocussesXZ(out Transform focus0, out Transform focus1, out float radius0, out float radius1, out float diameter)
+        {
+            Assert.IsTrue(focusses.Count >= 2);
+
+            focus0 = null;
+            focus1 = null;
+            radius0 = 0.0f;
+            radius1 = 0.0f;
+            diameter = 0.0f;
+
+            for (int i = 0; i < focusses.Count; i++)
+            {
+                for (int j = i + 1; j < focusses.Count; j++)
+                {
+                    // TODO(torben): it is assumed that the x and z scale are
+                    // identical and x or z are the diameter of the circle, which is
+                    // obviously not true for rectangular layouts!
+
+                    Transform foc0 = focusses[i];
+                    Transform foc1 = focusses[j];
+                    float rad0 = 0.5f * foc0.lossyScale.x;
+                    float rad1 = 0.5f * foc1.lossyScale.x;
+                    float dia = rad0 + rad1 + (foc1.position.XZ() - foc0.position.XZ()).magnitude;
+
+                    if (dia > diameter)
+                    {
+                        focus0 = foc0;
+                        focus1 = foc1;
+                        radius0 = rad0;
+                        radius1 = rad1;
+                        diameter = dia;
+                    }
+                }
+            }
         }
     }
 
