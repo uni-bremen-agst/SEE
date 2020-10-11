@@ -20,8 +20,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Controls;
-using SEE.Game;
-using SEE.GO;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -41,16 +39,6 @@ namespace SEE.Charts.Scripts
 		private float _cameraFlightTime;
 		private float _clickDelay;
 		private float _highlightDuration;
-
-		/// <summary>
-		/// The <see cref="Material" /> making the object look highlighted.
-		/// </summary>
-		private Material _buildingHighlightMaterial;
-
-		/// <summary>
-		/// The <see cref="Material" /> making the object look accentuated.
-		/// </summary>
-		private Material _buildingHighlightMaterialAccentuated;
 
 		/// <summary>
 		/// The <see cref="GameObject" /> in the code city that is connected with this button.
@@ -111,11 +99,6 @@ namespace SEE.Charts.Scripts
 		[SerializeField] private GameObject highlightLine;
 
 		/// <summary>
-		/// The length of the beam appearing above highlighted objects.
-		/// </summary>
-		private float _highlightLineLength;
-
-		/// <summary>
 		/// True iff the marker is accentuated.
 		/// </summary>
 		private bool _accentuated;
@@ -145,9 +128,6 @@ namespace SEE.Charts.Scripts
 			_cameraFlightTime                     = chartManager.cameraFlightTime;
 			_clickDelay                           = chartManager.clickDelay;
 			_highlightDuration                    = chartManager.highlightDuration;
-			_buildingHighlightMaterial            = chartManager.buildingHighlightMaterial;
-			_buildingHighlightMaterialAccentuated = chartManager.buildingHighlightMaterialAccentuated;
-			_highlightLineLength                  = chartManager.highlightLineLength;
 		}
 
 		/// <summary>
@@ -156,9 +136,8 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void Start()
 		{
-			for (var i = 0; i < linkedObject.transform.childCount; i++)
-			{
-				var child = linkedObject.transform.GetChild(i);
+			foreach (Transform child in linkedObject.transform)
+            {
 				if (!child.name.Equals(linkedObject.name + "(Clone)")) continue;
 				TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, false);
 				break;
