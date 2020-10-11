@@ -1,11 +1,9 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
-using SEE.Game;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using UnityEngine;
@@ -184,11 +182,11 @@ namespace SEE.Net
         {
             if ((useInOfflineMode || hostServer) && loadCityOnStart)
             {
-                foreach (AbstractSEECity city in FindObjectsOfType<AbstractSEECity>())
+                foreach (Game.AbstractSEECity city in FindObjectsOfType<Game.AbstractSEECity>())
                 {
-                    if (city is SEECity)
+                    if (city is Game.SEECity)
                     {
-                        ((SEECity)city).LoadAndDrawGraph();
+                        ((Game.SEECity)city).LoadAndDrawGraph();
                     }
                     else
                     {
@@ -442,7 +440,8 @@ namespace SEE.Net
             }
 
             IPAddress[] localIPAddresses = LookupLocalIPAddresses();
-            return localIPAddresses.Contains(ipAddress);
+            bool result = Array.Exists(localIPAddresses, e => e.Equals(ipAddress));
+            return result;
         }
 
         /// <summary>
@@ -504,7 +503,7 @@ namespace SEE.Net
                     if (HostServer && VivoxChannelSession.Participants.Count != 0)
                     {
                         // TODO: this channel already exists and the name is unavailable!
-                        Logger.Log("Channel with given name already exists. Select differend name!");
+                        Logger.Log("Channel with given name already exists. Select a differend name!");
                         VivoxChannelSession.Disconnect();
                         VivoxLoginSession.DeleteChannelSession(channelID);
                     }

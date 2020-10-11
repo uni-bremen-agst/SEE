@@ -20,7 +20,7 @@ namespace SEEEditor
         public bool showSettings = true;
 
         /// <summary>
-        /// Whether editor-only info should be displayed.
+        /// Whether logging-info should be displayed.
         /// </summary>
         private bool showLogging = true;
 
