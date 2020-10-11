@@ -1,5 +1,6 @@
 ﻿using SEE.GO;
 using SEE.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -44,8 +45,9 @@ namespace SEE.Controls
 
         private struct ActionState
         {
-            internal bool startDrag;         // drag entire city
-            internal bool drag;              // drag entire city
+            internal bool selectToggle;
+            internal bool startDrag;
+            internal bool drag;
             internal bool cancel;
             internal bool snap;
             internal bool reset;
@@ -105,6 +107,7 @@ namespace SEE.Controls
 
             // Note: Input MUST NOT be inquired in FixedUpdate() for the input to feel responsive!
 
+            actionState.selectToggle = Input.GetKey(KeyCode.LeftControl);
             actionState.drag = Input.GetMouseButton(2);
             actionState.startDrag |= Input.GetMouseButtonDown(2);
             actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
@@ -136,8 +139,8 @@ namespace SEE.Controls
                                 {
                                     if (parentTransform == CityTransform)
                                     {
-                                        Select(selectedTransform.gameObject);
-                                        goto SelectionFinished;
+                                        Select(selectedTransform.gameObject, !actionState.selectToggle);
+                                        goto End;
                                     }
                                     else
                                     {
@@ -146,13 +149,21 @@ namespace SEE.Controls
                                 } while (parentTransform != null);
                             }
                         }
+
+                        if (!actionState.selectToggle)
+                        {
+
+                        }
                     }
 
-                    Select(null);
+                    if (!actionState.selectToggle)
+                    {
+                        Select(null, true);
+                    }
                 }
             }
-        SelectionFinished:
 
+        End:
             if (mode != NavigationMode.Move && Input.GetKeyDown(KeyCode.Alpha1))
             {
                 mode = NavigationMode.Move;
@@ -168,9 +179,9 @@ namespace SEE.Controls
 
             if (mode == NavigationMode.Rotate)
             {
-                if (cursor.GetFocus())
+                if (cursor.HasFocus())
                 {
-                    rotateState.rotateGizmo.Center = cursor.GetFocus().position;
+                    rotateState.rotateGizmo.Center = cursor.GetPosition();
                     rotateState.rotateGizmo.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotateGizmo.Center).magnitude;
                 }
             }
@@ -188,9 +199,9 @@ namespace SEE.Controls
             bool synchronize = false;
             RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint);
 
-            if (actionState.cancel && !movingOrRotating)
+            if (actionState.cancel && !movingOrRotating && !actionState.selectToggle)
             {
-                Select(null);
+                Select(null, true);
             }
 
             #region Move City
@@ -291,7 +302,7 @@ namespace SEE.Controls
                         synchronize = true;
                     }
                 }
-                else if (actionState.drag && hitPlane && cursor.GetFocus() != null) // start or continue rotation
+                else if (actionState.drag && hitPlane && cursor.HasFocus()) // start or continue rotation
                 {
                     Vector2 toHit = planeHitPoint.XZ() - rotateState.rotateGizmo.Center.XZ();
                     float toHitAngle = toHit.Angle360();
@@ -315,7 +326,7 @@ namespace SEE.Controls
                         {
                             angle = AngleMod(Mathf.Round(angle / RotateState.SnapStepAngle) * RotateState.SnapStepAngle);
                         }
-                        CityTransform.RotateAround(cursor.GetFocus().position, Vector3.up, angle - CityTransform.rotation.eulerAngles.y);
+                        CityTransform.RotateAround(cursor.GetPosition(), Vector3.up, angle - CityTransform.rotation.eulerAngles.y);
 
                         float prevAngle = Mathf.Rad2Deg * rotateState.rotateGizmo.GetMaxAngle();
                         float currAngle = toHitAngle;
@@ -351,9 +362,9 @@ namespace SEE.Controls
             if (actionState.zoomToggleToObject)
             {
                 actionState.zoomToggleToObject = false;
-                if (cursor.GetFocus() != null)
+                if (cursor.HasFocus())
                 {
-                    float optimalTargetZoomFactor = portalPlane.MinLengthXZ / (cursor.GetFocus().lossyScale.x / zoomState.currentZoomFactor);
+                    float optimalTargetZoomFactor = portalPlane.MinLengthXZ / (cursor.GetDiameterXZ() / zoomState.currentZoomFactor);
                     float optimalTargetZoomSteps = ConvertZoomFactorToZoomSteps(optimalTargetZoomFactor);
                     int actualTargetZoomSteps = Mathf.FloorToInt(optimalTargetZoomSteps);
                     float actualTargetZoomFactor = ConvertZoomStepsToZoomFactor(actualTargetZoomSteps);
@@ -368,7 +379,7 @@ namespace SEE.Controls
                     if (zoomSteps != 0)
                     {
                         float zoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
-                        Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.currentTargetZoomSteps ? CityTransform.position.XZ() : cursor.GetFocus().position.XZ();
+                        Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.currentTargetZoomSteps ? CityTransform.position.XZ() : cursor.GetPosition().XZ();
                         Vector2 toCenterOfTable = portalPlane.CenterXZ - centerOfTableAfterZoom;
                         Vector2 zoomCenter = portalPlane.CenterXZ - (toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f)));
                         float duration = 2.0f * ZoomState.DefaultZoomDuration;
@@ -471,40 +482,55 @@ namespace SEE.Controls
             return result;
         }
 
-        private void Select(GameObject go)
+        private void Select(GameObject go, bool replaceAndDontToggle)
         {
-            Transform oldT = cursor.GetFocus();
-            Transform newT = go ? go.transform : null;
-            bool updateServer = false;
-
-            if (oldT != newT)
+            if (replaceAndDontToggle)
             {
-                if (oldT)
+                bool createNewFocus = true;
+
+                foreach (Transform oldFocus in cursor.GetFocusses())
                 {
-                    Outline outline = oldT.GetComponent<Outline>();
+                    Outline outline = oldFocus.GetComponent<Outline>();
                     if (outline)
                     {
-                        updateServer = true;
-                        Destroy(outline);
-                        cursor.SetFocus(null);
+                        if (outline.gameObject == go)
+                        {
+                            createNewFocus = false;
+                        }
+                        else
+                        {
+                            Destroy(outline);
+                            cursor.RemoveFocus(oldFocus);
+                            new Net.SelectionAction(oldFocus.GetComponent<HoverableObject>(), false).Execute();
+                        }
                     }
                 }
-                if (newT)
+
+                if (createNewFocus && go)
                 {
-                    if (newT.GetComponent<Outline>() == null)
+                    if (go.GetComponent<Outline>() == null)
                     {
-                        updateServer = true;
-                        Outline.Create(newT.gameObject);
-                        cursor.SetFocus(newT);
+                        Outline.Create(go, true);
+                        cursor.AddFocus(go.transform);
+                        new Net.SelectionAction(go.GetComponent<HoverableObject>(), true).Execute();
                     }
                 }
             }
-
-            if (updateServer)
+            else if (go) // replaceAndDontToggle == false
             {
-                HoverableObject oldH = oldT ? oldT.GetComponent<HoverableObject>() : null;
-                HoverableObject newH = newT ? newT.GetComponent<HoverableObject>() : null;
-                new Net.SelectionAction(oldH, newH).Execute();
+                Outline outline = go.GetComponent<Outline>();
+                if (outline == null)
+                {
+                    Outline.Create(go, true);
+                    cursor.AddFocus(go.transform);
+                    new Net.SelectionAction(go.GetComponent<HoverableObject>(), true).Execute();
+                }
+                else
+                {
+                    Destroy(outline);
+                    cursor.RemoveFocus(go.transform);
+                    new Net.SelectionAction(go.GetComponent<HoverableObject>(), false).Execute();
+                }
             }
         }
 

@@ -14,31 +14,26 @@ namespace SEE.Net
     public class SelectionAction : AbstractAction
     {
         /// <summary>
-        /// The ID of the object to deselect. Is <see cref="uint.MaxValue"/>, if the
-        /// object does not exist.
+        /// The IDs of the objects to deselect.
         /// </summary>
-        public uint oldID;
+        public uint id;
 
         /// <summary>
-        /// The ID of the object to select. Is <see cref="uint.MaxValue"/>, if the object
-        /// does not exist.
+        /// Whether the objects of given ID should be selected of deselected.
         /// </summary>
-        public uint newID;
+        public bool select;
 
         /// <summary>
-        /// Constructs a new selection action. At least one of the parameters must not be
-        /// <code>null</code>. If one of the objects is null, it is simply not
-        /// (de)selected. The objects must not be identical.
+        /// Constructor.
         /// </summary>
-        /// <param name="oldHoverableObject">The hoverable object to deselect.</param>
-        /// <param name="newHoverableObject">The hoverable object to select.</param>
-        public SelectionAction(HoverableObject oldHoverableObject, HoverableObject newHoverableObject)
+        /// <param name="hoverableObjects">The hoverable object to select.</param>
+        /// <param name="select">Whether the objects should be selected or deselected.</param>
+        public SelectionAction(HoverableObject hoverableObject, bool select)
         {
-            Assert.IsTrue(oldHoverableObject != newHoverableObject);
-            Assert.IsTrue(oldHoverableObject != null || newHoverableObject != null);
+            Assert.IsNotNull(hoverableObject);
 
-            oldID = oldHoverableObject ? oldHoverableObject.id : uint.MaxValue;
-            newID = newHoverableObject ? newHoverableObject.id : uint.MaxValue;
+            id = hoverableObject.id;
+            this.select = select;
         }
 
         protected override void ExecuteOnServer()
@@ -46,30 +41,39 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Deselects hoverable object with <see cref="oldID"/> if it exists and selects
-        /// hoverable object with <see cref="newID"/> if it exists.
+        /// Selects or deselects the HoverableObjects of given ids.
         /// </summary>
         protected override void ExecuteOnClient()
         {
-            HoverableObject oldHoverableObject = (HoverableObject)InteractableObject.Get(oldID);
-            HoverableObject newHoverableObject = (HoverableObject)InteractableObject.Get(newID);
-
-            Assert.IsTrue(oldHoverableObject != null || newHoverableObject != null);
-
-            if (oldHoverableObject)
+            if (!IsRequester())
             {
-                Outline outline = oldHoverableObject.GetComponent<Outline>();
-                if (outline)
-                {
-                    UnityEngine.Object.Destroy(outline);
-                }
-            }
+                HoverableObject hoverableObject = (HoverableObject)InteractableObject.Get(id);
 
-            if (newHoverableObject)
-            {
-                if (newHoverableObject.GetComponent<Outline>() == null)
+                if (hoverableObject)
                 {
-                    Outline.Create(newHoverableObject.gameObject, false);
+                    if (select)
+                    {
+                        if (hoverableObject.GetComponent<Outline>() == null)
+                        {
+                            Outline.Create(hoverableObject.gameObject, false);
+                        }
+                        else
+                        {
+                            UnityEngine.Debug.LogWarning("HoverableObject already has an Outline attached!");
+                        }
+                    }
+                    else
+                    {
+                        Outline outline = hoverableObject.GetComponent<Outline>();
+                        if (outline)
+                        {
+                            UnityEngine.Object.Destroy(outline);
+                        }
+                        else
+                        {
+                            UnityEngine.Debug.LogWarning("HoverableObject does not have an Outline attached!");
+                        }
+                    }
                 }
             }
         }

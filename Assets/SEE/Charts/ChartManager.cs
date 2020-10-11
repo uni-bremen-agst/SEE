@@ -330,14 +330,13 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// Highlights an object and all markers associated with it.
 		/// </summary>
-		/// <param name="highlight"></param>
-		/// <param name="scrollView">If this is triggered by a <see cref="ScrollViewToggle" /> or not.</param>
+		/// <param name="highlight">the game object to be highlighted</param>
+		/// <param name="scrollView">Whether this is triggered by a <see cref="ScrollViewToggle" /> or not.</param>
 		public static void HighlightObject(GameObject highlight, bool scrollView)
 		{
-			foreach (var chart in Instance.AllCharts())
+			foreach (GameObject chart in Instance.AllCharts())
 			{
-				chart.TryGetComponent<ChartContent>(out var content);
-				content.HighlightCorrespondingMarker(highlight, scrollView);
+                chart.GetComponent<ChartContent>()?.HighlightCorrespondingMarker(highlight, scrollView);
 			}
 		}
 
