@@ -289,11 +289,10 @@ namespace SEE.Charts.Scripts
 		/// <param name="scrollView">If this is triggered by a <see cref="ScrollViewToggle" /> or not.</param>
 		public static void HighlightObject(GameObject highlight, bool scrollView)
 		{
-			var charts = GameObject.FindGameObjectsWithTag("Chart");
-			foreach (var chart in charts)
+			GameObject[] charts = GameObject.FindGameObjectsWithTag("Chart");
+			foreach (GameObject chart in charts)
 			{
-				chart.TryGetComponent<ChartContent>(out var content);
-				content.HighlightCorrespondingMarker(highlight, scrollView);
+                chart.GetComponent<ChartContent>()?.HighlightCorrespondingMarker(highlight, scrollView);
 			}
 		}
 

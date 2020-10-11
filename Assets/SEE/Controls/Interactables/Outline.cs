@@ -97,45 +97,50 @@ namespace SEE.Controls
 
         public static Outline Create(GameObject go, bool primaryColor = true)
         {
-            GameObject root = go;
-            while (root.GetComponent<Plane>() == null)
+            Outline result = null;
+
+            if (go)
             {
-                root = root.transform.parent.gameObject;
-            }
-
-            Outline outline = go.AddComponent<Outline>();
-            outline.OutlineMode = Mode.OutlineAll;
-            outline.OutlineColor = primaryColor ? UI3DProperties.DefaultColor : UI3DProperties.DefaultColorSecondary;
-            outline.OutlineWidth = 4.0f;
-
-            NodeRef nodeRef = go.GetComponent<NodeRef>();
-            if (nodeRef != null && nodeRef.node != null)
-            {
-                Node node = nodeRef.node;
-                Graph graph = node.ItsGraph;
-                int maxDepth = graph.MaxDepth;
-
-                int inverseRenderQueueOffset = node.Level;
-                if (nodeRef.node.Type.Equals("Directory"))
+                GameObject root = go;
+                while (root.GetComponent<Plane>() == null)
                 {
-                    inverseRenderQueueOffset += maxDepth;
+                    root = root.transform.parent.gameObject;
                 }
-                int renderQueueOffset = 2 * maxDepth - inverseRenderQueueOffset;
 
-                outline.outlineMaskMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset;
-                outline.outlineFillMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset + 1;
-            }
+                result = go.AddComponent<Outline>();
+                result.OutlineMode = Mode.OutlineAll;
+                result.OutlineColor = primaryColor ? UI3DProperties.DefaultColor : UI3DProperties.DefaultColorSecondary;
+                result.OutlineWidth = 4.0f;
+
+                NodeRef nodeRef = go.GetComponent<NodeRef>();
+                if (nodeRef != null && nodeRef.node != null)
+                {
+                    Node node = nodeRef.node;
+                    Graph graph = node.ItsGraph;
+                    int maxDepth = graph.MaxDepth;
+
+                    int inverseRenderQueueOffset = node.Level;
+                    if (nodeRef.node.Type.Equals("Directory"))
+                    {
+                        inverseRenderQueueOffset += maxDepth;
+                    }
+                    int renderQueueOffset = 2 * maxDepth - inverseRenderQueueOffset;
+
+                    result.outlineMaskMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset;
+                    result.outlineFillMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset + 1;
+                }
 #if UNITY_EDITOR
-            else
-            {
-                Debug.LogWarningFormat("Outline could not be created for '{0}'! The NodeRef seems to not be set.\n", go.name);
-            }
+                else
+                {
+                    Debug.LogWarningFormat("Outline could not be created for '{0}'! The NodeRef seems to not be set.\n", go.name);
+                }
 #endif
 
-            Game.Portal.SetPortal(root, go);
-            outline.UpdateMaterialProperties();
+                Game.Portal.SetPortal(root, go);
+                result.UpdateMaterialProperties();
+            }
 
-            return outline;
+            return result;
         }
 
         void Awake()
