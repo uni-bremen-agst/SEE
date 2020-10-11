@@ -69,6 +69,12 @@ namespace SEE.Charts.Scripts
             }
         }
 
+        /// <summary>
+        /// If <paramref name="entry"/> equals <see cref="specialEntry"/>, entry is returned.
+        /// Otherwise the ChartManager.MetricPrefix is appended to <paramref name="entry"/>.
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <returns>either entry or entry with the ChartManager.MetricPrefix</returns>
         private string GetEntry(string entry)
         {
             return entry.Equals(specialEntry) ? entry : ChartManager.MetricPrefix + entry;
