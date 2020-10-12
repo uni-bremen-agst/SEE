@@ -38,7 +38,9 @@ namespace SEE.Utils
         /// <returns>the color with the given <paramref name="colorIndex"/> in the Viridis color palette</returns>
         public static Color Viridis(float colorIndex)
         {
-            return ViridisColorPalette[Mathf.Clamp(Mathf.RoundToInt(colorIndex), 0, ViridisColorPalette.Length - 1)];
+            int i = Mathf.Clamp(Mathf.RoundToInt(colorIndex * (ViridisColorPalette.Length - 1)), 0, ViridisColorPalette.Length - 1);
+            Color result = ViridisColorPalette[i];
+            return result;
         }
     }
 }

@@ -99,6 +99,11 @@ namespace SEE.Charts.Scripts
 		[SerializeField] private GameObject highlightLine;
 
 		/// <summary>
+		/// The length of the beam appearing above highlighted objects.
+		/// </summary>
+		private float _highlightLineLength;
+
+		/// <summary>
 		/// True iff the marker is accentuated.
 		/// </summary>
 		private bool _accentuated;
@@ -128,6 +133,7 @@ namespace SEE.Charts.Scripts
 			_cameraFlightTime                     = chartManager.cameraFlightTime;
 			_clickDelay                           = chartManager.clickDelay;
 			_highlightDuration                    = chartManager.highlightDuration;
+			_highlightLineLength                  = chartManager.highlightLineLength;
 		}
 
 		/// <summary>
@@ -136,11 +142,14 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void Start()
 		{
-			foreach (Transform child in linkedObject.transform)
-            {
-				if (!child.name.Equals(linkedObject.name + "(Clone)")) continue;
-				TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, false);
-				break;
+			for (var i = 0; i < linkedObject.transform.childCount; i++)
+			{
+				var child = linkedObject.transform.GetChild(i);
+                if (child.name.Equals(linkedObject.name + "(Clone)"))
+                {
+				    TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, false);
+				    break;
+                }
 			}
 		}
 
@@ -149,7 +158,10 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void Update()
 		{
-			if (TimedHighlight != null) HighlightTime += Time.deltaTime;
+            if (TimedHighlight != null)
+            {
+                HighlightTime += Time.deltaTime;
+            }
 		}
 
 		/// <summary>
@@ -158,9 +170,13 @@ namespace SEE.Charts.Scripts
 		public void ButtonClicked()
 		{
 			if (_runningClick)
+            {
 				_waiting = false;
+            }
 			else
+            {
 				StartCoroutine(WaitForDoubleClick());
+            }
 		}
 
 		/// <summary>
@@ -193,11 +209,11 @@ namespace SEE.Charts.Scripts
 		{
 			if (highlight)
 			{
-				HighlightNode(linkedObject);
+                SetHighlighting(linkedObject, true);
 			}
 			else
-			{
-				UnhighlightNode(linkedObject);
+            {
+                SetHighlighting(linkedObject, false);
 				_accentuated = false;
 			}
 
@@ -213,46 +229,25 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private GameObject _highlightCopy;
 
-		private void SetHighlighting(GameObject highLightedNode, bool highlight)
-        {			
-			HighlightableObject highlightableObject = highLightedNode.GetComponent<HighlightableObject>();
-			if (highlightableObject == null)
-			{
-				highlightableObject = highLightedNode.AddComponent<HighlightableObject>();
-			}
-
-			if (highlight && !highlightableObject.IsHovered)
-            {
-				// should be highlighted but is currently not
-				highlightableObject.Hovered(isOwner: true);
-			}
-			else if (!highlight && highlightableObject.IsHovered)
-            {
-				// should not be highlighted, but is currently highlighted
-				highlightableObject.Unhovered();
-			}
-		}
-
-		private void HighlightNode(GameObject highLightedNode)
+		private void SetHighlighting(GameObject go, bool highlight)
         {
-			SetHighlighting(highLightedNode, true);
-        }
-
-		private void UnhighlightNode(GameObject highLightedNode)
-        {
-			SetHighlighting(highLightedNode, false);
+            if (go.TryGetComponent(out InteractableObject interactable))
+            {
+                interactable.SetSelect(highlight, true);
+            }
 		}
 
 		/// <summary>
-		/// Toggles the highlights this marker and its <see cref="linkedObject" /> for a given amount of time.
-		/// Reactivates it after deactivation if <see cref="ChartManager.selectionMode" /> is toggled on
+		/// Toggles the highlights this marker and its <see cref="linkedObject" /> for a given
+        /// amount of time. Reactivates it after deactivation if
+        /// <see cref="ChartManager.selectionMode"/> is toggled on.
 		/// </summary>
 		/// <param name="time">How long the highlight will last.</param>
-		/// <param name="reenable">
-		/// Overwrites the selection mode to reactivate the highlight after
-		/// deactivation.
+		/// <param name="reenable">Overwrites the selection mode to reactivate the highlight
+        /// after deactivation.
 		/// </param>
-		/// <param name="scrollView">If this is triggered by a <see cref="ScrollViewToggle" /> or not.</param>
+		/// <param name="scrollView">If this is triggered by a <see cref="ScrollViewToggle" />
+        /// or not.</param>
 		public void TriggerTimedHighlight(float time, bool reenable, bool scrollView)
 		{
 			if (scrollView)
@@ -296,24 +291,31 @@ namespace SEE.Charts.Scripts
 		private IEnumerator TimedHighlightRoutine(float time)
 		{
 			if (time < _highlightDuration)
+            {
 				HighlightTime = _highlightDuration - time;
+            }
 			else
-				HighlightTime = 0f;
+            {
+                HighlightTime = 0.0f;
+            }
 
 			HighlightLinkedObjectToggle(true);
 			yield return new WaitForSeconds(time);
-			while (ChartManager.Instance.selectionMode) yield return new WaitForEndOfFrame();
+            while (ChartManager.Instance.selectionMode)
+            {
+                yield return new WaitForEndOfFrame();
+            }
 			HighlightLinkedObjectToggle(false);
 			TimedHighlight = null;
 		}
 
 		/// <summary>
-		/// Moves the camera to view the <see cref="linkedObject" />.
+		/// Moves the camera to view the <see cref="linkedObject />.
 		/// </summary>
 		private void ShowLinkedObject()
 		{
 			_activeCamera = Camera.main;
-			var cameraPos = _activeCamera.transform.position;
+			Vector3 cameraPos = _activeCamera.transform.position;
 
 			if (_moveWithRotation)
 			{
@@ -323,8 +325,8 @@ namespace SEE.Charts.Scripts
 					_cameraMoving = null;
 				}
 
-				var linkedPos = linkedObject.transform.position;
-				var lookPos = linkedPos - cameraPos;
+				Vector3 linkedPos = linkedObject.transform.position;
+				Vector3 lookPos = linkedPos - cameraPos;
 				_cameraMoving = StartCoroutine(MoveCameraTo(
 					Vector3.MoveTowards(cameraPos, linkedPos, lookPos.magnitude - _cameraDistance),
 					Quaternion.LookRotation(lookPos)));
@@ -337,35 +339,34 @@ namespace SEE.Charts.Scripts
 					_cameraMoving = null;
 				}
 
-				var pos = linkedObject.transform.position;
-				_cameraMoving =
-					StartCoroutine(MoveCameraTo(new Vector3(pos.x, cameraPos.y,
-						pos.z - _cameraDistance)));
+				Vector3 pos = linkedObject.transform.position;
+				_cameraMoving = StartCoroutine(MoveCameraTo(new Vector3(pos.x, cameraPos.y, pos.z - _cameraDistance)));
 			}
 		}
 
 		/// <summary>
-		/// Moves the <see cref="Camera" /> smoothly from one position to another and rotates it to look
-		/// towards a specified position.
+		/// Moves the <see cref="Camera"/> smoothly from one position to another and
+        /// rotates it to look towards a specified position.
 		/// </summary>
 		/// <param name="newPos">The target position.</param>
 		/// <param name="lookAt">The position to look at.</param>
 		/// <returns></returns>
 		private IEnumerator MoveCameraTo(Vector3 newPos, Quaternion lookAt)
 		{
-			var oldPos = _activeCamera.transform.position;
-			if (newPos == linkedObject.transform.position) yield break;
-			var oldRot = _activeCamera.transform.rotation;
-			for (var time = 0f; time <= _cameraFlightTime; time += Time.deltaTime)
+			Vector3 oldPos = _activeCamera.transform.position;
+            if (newPos == linkedObject.transform.position)
+            {
+                yield break;
+            }
+			Quaternion oldRot = _activeCamera.transform.rotation;
+			for (float time = 0.0f; time <= _cameraFlightTime; time += Time.deltaTime)
 			{
-				_activeCamera.transform.position =
-					Vector3.Lerp(oldPos, newPos, time * (1 / _cameraFlightTime));
-				_activeCamera.transform.rotation =
-					Quaternion.Slerp(oldRot, lookAt, time * (1 / _cameraFlightTime));
+				_activeCamera.transform.position = Vector3.Lerp(oldPos, newPos, time * (1.0f / _cameraFlightTime));
+				_activeCamera.transform.rotation = Quaternion.Slerp(oldRot, lookAt, time * (1.0f / _cameraFlightTime));
 				yield return new WaitForEndOfFrame();
 			}
 
-			var cameraPos = _activeCamera.transform;
+			Transform cameraPos = _activeCamera.transform;
 			cameraPos.rotation = lookAt;
 			cameraPos.transform.position = newPos;
 		}
@@ -377,11 +378,10 @@ namespace SEE.Charts.Scripts
 		/// <returns></returns>
 		private IEnumerator MoveCameraTo(Vector3 newPos)
 		{
-			var oldPos = _activeCamera.transform.position;
+			Vector3 oldPos = _activeCamera.transform.position;
 			for (float time = 0; time <= _cameraFlightTime; time += Time.deltaTime)
 			{
-				_activeCamera.transform.position =
-					Vector3.Lerp(oldPos, newPos, time * (1 / _cameraFlightTime));
+				_activeCamera.transform.position = Vector3.Lerp(oldPos, newPos, time * (1 / _cameraFlightTime));
 				yield return new WaitForEndOfFrame();
 			}
 
@@ -393,9 +393,10 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		public void Accentuate()
         {
-            markerHighlight.TryGetComponent<Image>(out Image image);
-            image.color = _accentuated ? ChartManager.Instance.standardColor
-                                       : ChartManager.Instance.accentuationColor;
+            if (markerHighlight.TryGetComponent(out Image image))
+            {
+                image.color = _accentuated ? ChartManager.Instance.standardColor : ChartManager.Instance.accentuationColor;
+            }
 			_accentuated = !_accentuated;
         }
 
@@ -415,7 +416,10 @@ namespace SEE.Charts.Scripts
 		public void OnPointerEnter(PointerEventData eventData)
 		{
 			infoText.gameObject.SetActive(true);
-			if (TimedHighlight != null) ChartManager.Accentuate(linkedObject);
+            if (TimedHighlight != null)
+            {
+                ChartManager.Accentuate(linkedObject);
+            }
 		}
 
 		/// <summary>
@@ -425,7 +429,10 @@ namespace SEE.Charts.Scripts
 		public void OnPointerExit(PointerEventData eventData)
 		{
 			infoText.gameObject.SetActive(false);
-			if (_accentuated) ChartManager.Accentuate(linkedObject);
+            if (_accentuated)
+            {
+                ChartManager.Accentuate(linkedObject);
+            }
 		}
 
 		/// <summary>
@@ -434,7 +441,10 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void OnDisable()
 		{
-			if (TimedHighlight != null) _reactivateHighlight = true;
+            if (TimedHighlight != null)
+            {
+                _reactivateHighlight = true;
+            }
 		}
 
 		/// <summary>
@@ -442,9 +452,11 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void OnEnable()
 		{
-			if (!_reactivateHighlight) return;
-			TriggerTimedHighlight(_highlightDuration - HighlightTime, true, false);
-			_reactivateHighlight = false;
+			if (_reactivateHighlight)
+            {
+			    TriggerTimedHighlight(_highlightDuration - HighlightTime, true, false);
+			    _reactivateHighlight = false;
+            }
 		}
 
 		/// <summary>
@@ -452,7 +464,10 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void OnDestroy()
 		{
-			if (_highlightCopy != null) Destroy(_highlightCopy);
+            if (_highlightCopy != null)
+            {
+                Destroy(_highlightCopy);
+            }
 			StopAllCoroutines();
 		}
 	}

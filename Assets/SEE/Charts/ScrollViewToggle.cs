@@ -101,17 +101,23 @@ namespace SEE.Charts.Scripts
 		{
 			if (Parent == null)
 			{
-				if (StatusUpdate != null) return;
-				var active = toggle.isOn;
-				foreach (var child in _children) child.Toggle(active, true);
+				if (StatusUpdate == null)
+                {
+				    bool active = toggle.isOn;
+				    foreach (ScrollViewToggle child in _children) child.Toggle(active, true);
+                }
 			}
 			else
 			{
 				LinkedObject.showInChart[_chartContent] = toggle.isOn;
 				if (Parent.StatusUpdate == null)
+                {
 					Parent.StatusUpdate = StartCoroutine(Parent.UpdateStatus());
+                }
 				if (_chartContent.drawing == null)
+                {
 					_chartContent.drawing = StartCoroutine(_chartContent.QueueDraw());
+                }
 			}
 		}
 
@@ -124,8 +130,13 @@ namespace SEE.Charts.Scripts
 		{
 			toggle.isOn = active;
 
-			if (!initial || _children.Count <= 0) return;
-			foreach (var child in _children) child.Toggle(active, true);
+            if (initial && _children.Count > 0)
+            {
+                foreach (ScrollViewToggle child in _children)
+                {
+                    child.Toggle(active, true);
+                }
+            }
 		}
 
 		/// <summary>
@@ -135,16 +146,21 @@ namespace SEE.Charts.Scripts
 		private IEnumerator UpdateStatus()
 		{
 			yield return new WaitForSeconds(0.2f);
-			var active = true;
-			foreach (var child in _children)
+			bool active = true;
+			foreach (ScrollViewToggle child in _children)
+            {
 				if (!child.GetStatus())
 				{
 					Toggle(false, false);
 					active = false;
 					break;
 				}
+            }
 
-			if (active) Toggle(true, true);
+            if (active)
+            {
+                Toggle(true, true);
+            }
 
 			StatusUpdate = null;
 		}
@@ -173,10 +189,12 @@ namespace SEE.Charts.Scripts
 		/// <param name="highlighted">Highlight on or off.</param>
 		public void SetHighlighted(bool highlighted)
 		{
-			TryGetComponent<Toggle>(out var highlightToggle);
-			var colors = highlightToggle.colors;
-			colors.normalColor = highlighted ? Color.yellow : Color.white;
-			highlightToggle.colors = colors;
+			if (TryGetComponent<Toggle>(out Toggle highlightToggle))
+            {
+			    ColorBlock colors = highlightToggle.colors;
+			    colors.normalColor = highlighted ? Color.yellow : Color.white;
+			    highlightToggle.colors = colors;
+            }
 		}
 
 		/// <summary>
@@ -185,9 +203,11 @@ namespace SEE.Charts.Scripts
 		/// <param name="eventData"></param>
 		public void OnPointerEnter(PointerEventData eventData)
 		{
-			if (LinkedObject == null) return;
-			_pointedOn = true;
-			ChartManager.HighlightObject(LinkedObject.gameObject, true);
+			if (LinkedObject != null)
+            {
+			    _pointedOn = true;
+			    ChartManager.HighlightObject(LinkedObject.gameObject, true);
+            }
 		}
 
 		/// <summary>
@@ -196,9 +216,11 @@ namespace SEE.Charts.Scripts
 		/// <param name="eventData"></param>
 		public void OnPointerExit(PointerEventData eventData)
 		{
-			if (!_pointedOn) return;
-			ChartManager.HighlightObject(LinkedObject.gameObject, true);
-			_pointedOn = false;
+			if (_pointedOn)
+            {
+			    ChartManager.HighlightObject(LinkedObject.gameObject, true);
+			    _pointedOn = false;
+            }
 		}
 
 		/// <summary>
@@ -208,7 +230,9 @@ namespace SEE.Charts.Scripts
 		private void OnDestroy()
 		{
 			if (_pointedOn && LinkedObject != null)
+            {
 				ChartManager.HighlightObject(LinkedObject.gameObject, true);
+            }
 			StopAllCoroutines();
 		}
 	}

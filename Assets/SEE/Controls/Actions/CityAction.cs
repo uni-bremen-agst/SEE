@@ -8,7 +8,7 @@ namespace SEE.Controls
     /// <summary>
     /// Abstract super class of all actions dealing with a code-city object.
     /// </summary>
-    public abstract class CityAction : MonoBehaviour
+    public abstract class CityAction : MonoBehaviour // TODO(torben): is this very similar to SceneQueries.cs?
     {
         /// <summary>
         /// Returns first child of <paramref name="codeCity"/> tagged by Tags.Node. 

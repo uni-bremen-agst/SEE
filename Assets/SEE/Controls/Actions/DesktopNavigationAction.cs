@@ -1,6 +1,5 @@
-﻿using SEE.GO;
-using SEE.Utils;
-using System.Collections.Generic;
+﻿using SEE.Utils;
+using System;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -47,6 +46,7 @@ namespace SEE.Controls
         {
             internal bool selectToggle;
             internal bool startDrag;
+            internal InteractableObject grabbedInteractable;
             internal bool drag;
             internal bool cancel;
             internal bool snap;
@@ -107,6 +107,8 @@ namespace SEE.Controls
 
             // Note: Input MUST NOT be inquired in FixedUpdate() for the input to feel responsive!
 
+            bool raycastNodesResult = Raycasting.RaycastNodes(out RaycastHit raycastHit);
+
             actionState.selectToggle = Input.GetKey(KeyCode.LeftControl);
             actionState.drag = Input.GetMouseButton(2);
             actionState.startDrag |= Input.GetMouseButtonDown(2);
@@ -114,6 +116,11 @@ namespace SEE.Controls
             actionState.snap = Input.GetKey(KeyCode.LeftAlt);
             actionState.reset |= Input.GetKeyDown(KeyCode.R);
             actionState.mousePosition = Input.mousePosition;
+
+            if (actionState.startDrag && raycastNodesResult)
+            {
+                actionState.grabbedInteractable = raycastHit.transform.GetComponent<InteractableObject>();
+            }
 
             if (!actionState.drag)
             {
@@ -127,33 +134,22 @@ namespace SEE.Controls
 
                 if (Input.GetMouseButtonDown(0))
                 {
-                    if (insideClippingArea)
+                    if (insideClippingArea && raycastNodesResult)
                     {
-                        foreach (RaycastHit hit in Raycasting.SortedHits())
+                        Transform selectedTransform = raycastHit.transform;
+                        Transform parentTransform = selectedTransform;
+                        do
                         {
-                            if (hit.transform.gameObject.GetComponent<NodeRef>() != null)
+                            if (parentTransform == CityTransform)
                             {
-                                Transform selectedTransform = hit.transform;
-                                Transform parentTransform = selectedTransform;
-                                do
-                                {
-                                    if (parentTransform == CityTransform)
-                                    {
-                                        Select(selectedTransform.gameObject, !actionState.selectToggle);
-                                        goto End;
-                                    }
-                                    else
-                                    {
-                                        parentTransform = parentTransform.parent;
-                                    }
-                                } while (parentTransform != null);
+                                Select(selectedTransform.gameObject, !actionState.selectToggle);
+                                goto End;
                             }
-                        }
-
-                        if (!actionState.selectToggle)
-                        {
-
-                        }
+                            else
+                            {
+                                parentTransform = parentTransform.parent;
+                            }
+                        } while (parentTransform != null);
                     }
 
                     if (!actionState.selectToggle)
@@ -213,6 +209,8 @@ namespace SEE.Controls
                     if ((insideClippingArea && !(actionState.drag ^ movingOrRotating)) || (actionState.drag && movingOrRotating))
                     {
                         movingOrRotating = false;
+
+                        actionState.grabbedInteractable.SetGrab(false, true);
                         moveState.moveGizmo.gameObject.SetActive(false);
 
                         CityTransform.position = portalPlane.CenterTop;
@@ -224,6 +222,8 @@ namespace SEE.Controls
                     if (movingOrRotating)
                     {
                         movingOrRotating = false;
+
+                        actionState.grabbedInteractable.SetGrab(false, true);
                         moveState.moveGizmo.gameObject.SetActive(false);
 
                         moveState.moveVelocity = Vector3.zero;
@@ -238,6 +238,8 @@ namespace SEE.Controls
                         if (insideClippingArea)
                         {
                             movingOrRotating = true;
+
+                            actionState.grabbedInteractable.SetGrab(true, true);
                             moveState.moveGizmo.gameObject.SetActive(true);
 
                             moveState.dragStartTransformPosition = CityTransform.position;
@@ -269,6 +271,8 @@ namespace SEE.Controls
                 {
                     actionState.startDrag = false;
                     movingOrRotating = false;
+
+                    actionState.grabbedInteractable.SetGrab(false, true);
                     moveState.moveGizmo.gameObject.SetActive(false);
                 }
             }
@@ -284,6 +288,8 @@ namespace SEE.Controls
                     if ((insideClippingArea && !(actionState.drag ^ movingOrRotating)) || (actionState.drag && movingOrRotating))
                     {
                         movingOrRotating = false;
+
+                        Array.ForEach(cursor.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(false, true));
                         rotateState.rotateGizmo.gameObject.SetActive(false);
 
                         CityTransform.RotateAround(rotateState.rotateGizmo.Center, Vector3.up, -CityTransform.rotation.eulerAngles.y);
@@ -295,6 +301,8 @@ namespace SEE.Controls
                     if (movingOrRotating)
                     {
                         movingOrRotating = false;
+
+                        Array.ForEach(cursor.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(false, true));
                         rotateState.rotateGizmo.gameObject.SetActive(false);
 
                         CityTransform.rotation = Quaternion.Euler(0.0f, rotateState.originalEulerAngleY, 0.0f);
@@ -310,6 +318,8 @@ namespace SEE.Controls
                     if (actionState.startDrag) // start rotation
                     {
                         movingOrRotating = true;
+
+                        Array.ForEach(cursor.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(true, true));
                         rotateState.rotateGizmo.gameObject.SetActive(true);
 
                         rotateState.originalEulerAngleY = CityTransform.rotation.eulerAngles.y;
@@ -351,6 +361,8 @@ namespace SEE.Controls
                 else if (movingOrRotating) // finalize rotation
                 {
                     movingOrRotating = false;
+
+                    Array.ForEach(cursor.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(false, true));
                     rotateState.rotateGizmo.gameObject.SetActive(false);
                 }
             }
@@ -486,50 +498,37 @@ namespace SEE.Controls
         {
             if (replaceAndDontToggle)
             {
-                bool createNewFocus = true;
-
                 foreach (Transform oldFocus in cursor.GetFocusses())
                 {
-                    Outline outline = oldFocus.GetComponent<Outline>();
-                    if (outline)
+                    InteractableObject interactable = oldFocus.GetComponent<InteractableObject>();
+                    if (interactable)
                     {
-                        if (outline.gameObject == go)
-                        {
-                            createNewFocus = false;
-                        }
-                        else
-                        {
-                            Destroy(outline);
-                            cursor.RemoveFocus(oldFocus);
-                            new Net.SelectionAction(oldFocus.GetComponent<HoverableObject>(), false).Execute();
-                        }
+                        interactable.SetSelect(false, true);
+                        cursor.RemoveFocus(oldFocus);
                     }
                 }
 
-                if (createNewFocus && go)
+                if (go)
                 {
-                    if (go.GetComponent<Outline>() == null)
-                    {
-                        Outline.Create(go, true);
-                        cursor.AddFocus(go.transform);
-                        new Net.SelectionAction(go.GetComponent<HoverableObject>(), true).Execute();
-                    }
+                    go.GetComponent<InteractableObject>()?.SetSelect(true, true);
+                    cursor.ReplaceFocus(go.transform);
                 }
             }
             else if (go) // replaceAndDontToggle == false
             {
-                Outline outline = go.GetComponent<Outline>();
-                if (outline == null)
+                InteractableObject interactable = go.GetComponent<InteractableObject>();
+                if (interactable)
                 {
-                    Outline.Create(go, true);
-                    cursor.AddFocus(go.transform);
-                    new Net.SelectionAction(go.GetComponent<HoverableObject>(), true).Execute();
-                }
-                else
-                {
-                    Destroy(outline);
-                    cursor.RemoveFocus(go.transform);
-                    new Net.SelectionAction(go.GetComponent<HoverableObject>(), false).Execute();
+                    if (interactable.IsSelected)
+                    {
+                        interactable.SetSelect(false, true);
+                        cursor.RemoveFocus(go.transform);
+                    }
+                    else
+                    {
+                        interactable.SetSelect(true, true);
+                        cursor.AddFocus(go.transform);
+                    }
                 }
             }
         }

@@ -67,7 +67,7 @@ namespace SEE.GO
 		/// (e.g., 3 gives you a triangle shape)</param>
 		/// <param name="heightSegments">the number of height segments</param>
 		/// <returns>cylinder mesh (the same for each call)</returns>
-		private static Mesh GetCylinderMesh(int radialSegments = DEFAULT_RADIAL_SEGMENTS, 
+		public static Mesh GetCylinderMesh(int radialSegments = DEFAULT_RADIAL_SEGMENTS, 
 			                                int heightSegments = DEFAULT_HEIGHT_SEGMENTS)
 		{
 			if (modelMesh != null)

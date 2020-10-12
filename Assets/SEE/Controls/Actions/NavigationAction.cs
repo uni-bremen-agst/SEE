@@ -63,10 +63,12 @@ namespace SEE.Controls
             "to the appropriate NavigationAction! If a GameObject contains both a" +
             "Desktop- and XRNavigationAction, those IDs must be identical.")]
         // TODO(torben): a better alternative would be to use the SEECity and hash the path of the graph or something...
+        // also, this will most likely be replaces by an automatic approach
         [SerializeField] protected int id;
         public int ID => id;
 
         protected static readonly Dictionary<int, NavigationAction> idToActionDict = new Dictionary<int, NavigationAction>(2);
+
         public static NavigationAction Get(int id)
         {
             bool result = idToActionDict.TryGetValue(id, out NavigationAction value);
@@ -78,17 +80,6 @@ namespace SEE.Controls
             {
                 Debug.LogWarning("ID does not match any NavigationAction!");
                 return null;
-            }
-        }
-
-        internal void PushZoomCommand(Vector2 zoomCenter, float zoomSteps, float duration)
-        {
-            zoomSteps = Mathf.Clamp(zoomSteps, -zoomState.currentTargetZoomSteps, (float)ZoomState.ZoomMaxSteps - (float)zoomState.currentTargetZoomSteps);
-            if (zoomSteps != 0.0f)
-            {
-                float newZoomStepsInProgress = zoomState.currentTargetZoomSteps + zoomSteps;
-                zoomState.zoomCommands.Add(new ZoomCommand(zoomCenter, zoomSteps, duration));
-                zoomState.currentTargetZoomSteps = newZoomStepsInProgress;
             }
         }
 
@@ -191,6 +182,17 @@ namespace SEE.Controls
             }
 
             return hasChanged;
+        }
+
+        internal void PushZoomCommand(Vector2 zoomCenter, float zoomSteps, float duration)
+        {
+            zoomSteps = Mathf.Clamp(zoomSteps, -zoomState.currentTargetZoomSteps, (float)ZoomState.ZoomMaxSteps - (float)zoomState.currentTargetZoomSteps);
+            if (zoomSteps != 0.0f)
+            {
+                float newZoomStepsInProgress = zoomState.currentTargetZoomSteps + zoomSteps;
+                zoomState.zoomCommands.Add(new ZoomCommand(zoomCenter, zoomSteps, duration));
+                zoomState.currentTargetZoomSteps = newZoomStepsInProgress;
+            }
         }
     }
 

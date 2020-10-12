@@ -18,12 +18,14 @@ namespace SEE.GO
         {
             Opaque,
             Transparent,
-            TransparentLine
+            TransparentLine,
+            Invisible
         }
 
         public const string OpaqueMaterialName = "Materials/OpaquePortalMaterial";
         public const string TransparentMaterialName = "Materials/TransparentPortalMaterial";
         public const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
+        public const string InvisibleMaterialName = "Materials/InvisibleMaterial";
 
         /// <summary>
         /// The type of the shaders of this material instance.
@@ -132,15 +134,18 @@ namespace SEE.GO
                 case ShaderType.Opaque:          materialName = OpaqueMaterialName;          break;
                 case ShaderType.Transparent:     materialName = TransparentMaterialName;     break;
                 case ShaderType.TransparentLine: materialName = TransparentLineMaterialName; break;
+                case ShaderType.Invisible:       materialName = InvisibleMaterialName;       break;
                 default: Assertions.InvalidCodePath();                                       break;
             }
 
             Material materialPrefab = Resources.Load<Material>(materialName);
             Assert.IsNotNull(materialPrefab, "Material resource '" + materialName + "' could not be found!");
 
-            Material material = new Material(materialPrefab);
-            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + renderQueueOffset;
-            material.color = color;
+            Material material = new Material(materialPrefab)
+            {
+                renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + renderQueueOffset,
+                color = color
+            };
 
             return material;
         }
