@@ -46,7 +46,7 @@ namespace Assets.SEE.DataModel
         private String statementType;
 
         /// <summary>
-        /// This field contains the return value of a statement, if it has one. Otherwise it is not used.
+        /// This field contains the return value of a statement, if it has one. Otherwise it is not used and stays null.
         /// </summary>
         [SerializeField]
         private String returnValue;
