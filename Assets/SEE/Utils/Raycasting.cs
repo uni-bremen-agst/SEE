@@ -16,7 +16,7 @@ namespace SEE.Utils
 
             raycastHit = new RaycastHit();
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (!UnityEngine.Object.FindObjectOfType<EventSystem>().IsPointerOverGameObject()
+            if (!IsMouseOverGUI()
                 && Physics.Raycast(ray, out RaycastHit hit)
                 && hit.transform.GetComponent<NodeRef>() != null)
             {
@@ -24,6 +24,12 @@ namespace SEE.Utils
                 result = true;
             }
 
+            return result;
+        }
+
+        public static bool IsMouseOverGUI()
+        {
+            bool result = UnityEngine.Object.FindObjectOfType<EventSystem>().IsPointerOverGameObject();
             return result;
         }
         
