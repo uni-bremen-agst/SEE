@@ -25,6 +25,7 @@ using UnityEngine;
 
 namespace SEE.GO.Whiteboard
 {
+    [System.Obsolete("Experimental code. Do not use it. May be removed soon.")]
     public class Painter : MonoBehaviour
     {
         [SerializeField]

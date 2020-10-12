@@ -25,12 +25,14 @@ using UnityEngine;
 
 namespace SEE.GO.Whiteboard
 {
+    [System.Obsolete("Experimental code. Do not use it. May be removed soon.")]
     public enum PaintMode : byte
     {
         Draw,
         Erase
     }
 
+    [System.Obsolete("Experimental code. Do not use it. May be removed soon.")]
     public class Stamp
     {
         private float[] Pixels;
