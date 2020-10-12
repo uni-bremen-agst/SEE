@@ -1,4 +1,6 @@
 ﻿using SEE.Controls;
+using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -11,6 +13,8 @@ namespace SEE.Net
     /// </summary>
     public class SetHoverAction : AbstractAction
     {
+        internal static readonly Dictionary<IPEndPoint, HashSet<InteractableObject>> HoveredObjects = new Dictionary<IPEndPoint, HashSet<InteractableObject>>();
+
         public uint id;
         public bool hover;
 
@@ -24,6 +28,36 @@ namespace SEE.Net
 
         protected override void ExecuteOnServer()
         {
+            if (hover)
+            {
+                InteractableObject interactable = InteractableObject.Get(id);
+                if (interactable)
+                {
+                    IPEndPoint requester = GetRequester();
+                    if (!HoveredObjects.TryGetValue(requester, out HashSet<InteractableObject> interactables))
+                    {
+                        interactables = new HashSet<InteractableObject>();
+                        HoveredObjects.Add(requester, interactables);
+                    }
+                    interactables.Add(interactable);
+                }
+            }
+            else
+            {
+                InteractableObject interactable = InteractableObject.Get(id);
+                if (interactable)
+                {
+                    IPEndPoint requester = GetRequester();
+                    if (HoveredObjects.TryGetValue(requester, out HashSet<InteractableObject> interactables))
+                    {
+                        interactables.Remove(interactable);
+                        if (interactables.Count == 0)
+                        {
+                            HoveredObjects.Remove(requester);
+                        }
+                    }
+                }
+            }
         }
 
         protected override void ExecuteOnClient()
@@ -45,6 +79,8 @@ namespace SEE.Net
     /// </summary>
     public class SetSelectAction : AbstractAction
     {
+        internal static readonly Dictionary<IPEndPoint, HashSet<InteractableObject>> SelectedObjects = new Dictionary<IPEndPoint, HashSet<InteractableObject>>();
+
         public uint id;
         public bool select;
 
@@ -58,6 +94,36 @@ namespace SEE.Net
 
         protected override void ExecuteOnServer()
         {
+            if (select)
+            {
+                InteractableObject interactable = InteractableObject.Get(id);
+                if (interactable)
+                {
+                    IPEndPoint requester = GetRequester();
+                    if (!SelectedObjects.TryGetValue(requester, out HashSet<InteractableObject> interactables))
+                    {
+                        interactables = new HashSet<InteractableObject>();
+                        SelectedObjects.Add(requester, interactables);
+                    }
+                    interactables.Add(interactable);
+                }
+            }
+            else
+            {
+                InteractableObject interactable = InteractableObject.Get(id);
+                if (interactable)
+                {
+                    IPEndPoint requester = GetRequester();
+                    if (SelectedObjects.TryGetValue(requester, out HashSet<InteractableObject> interactables))
+                    {
+                        interactables.Remove(interactable);
+                        if (interactables.Count == 0)
+                        {
+                            SelectedObjects.Remove(requester);
+                        }
+                    }
+                }
+            }
         }
 
         protected override void ExecuteOnClient()
@@ -79,6 +145,8 @@ namespace SEE.Net
     /// </summary>
     public class SetGrabAction : AbstractAction
     {
+        internal static readonly Dictionary<IPEndPoint, HashSet<InteractableObject>> GrabbedObjects = new Dictionary<IPEndPoint, HashSet<InteractableObject>>();
+
         public uint id;
         public bool grab;
 
@@ -92,6 +160,36 @@ namespace SEE.Net
 
         protected override void ExecuteOnServer()
         {
+            if (grab)
+            {
+                InteractableObject interactable = InteractableObject.Get(id);
+                if (interactable)
+                {
+                    IPEndPoint requester = GetRequester();
+                    if (!GrabbedObjects.TryGetValue(requester, out HashSet<InteractableObject> interactables))
+                    {
+                        interactables = new HashSet<InteractableObject>();
+                        GrabbedObjects.Add(requester, interactables);
+                    }
+                    interactables.Add(interactable);
+                }
+            }
+            else
+            {
+                InteractableObject interactable = InteractableObject.Get(id);
+                if (interactable)
+                {
+                    IPEndPoint requester = GetRequester();
+                    if (GrabbedObjects.TryGetValue(requester, out HashSet<InteractableObject> interactables))
+                    {
+                        interactables.Remove(interactable);
+                        if (interactables.Count == 0)
+                        {
+                            GrabbedObjects.Remove(requester);
+                        }
+                    }
+                }
+            }
         }
 
         protected override void ExecuteOnClient()
@@ -139,7 +237,7 @@ namespace SEE.Net
                 InteractableObject interactable = InteractableObject.Get(id);
                 if (interactable)
                 {
-                    interactable.SynchronizerObj?.NotifyJustReceivedUpdate();
+                    interactable.InteractableSynchronizer?.NotifyJustReceivedUpdate();
                     interactable.transform.position = position;
                     interactable.transform.rotation = rotation;
                     if (localScale.sqrMagnitude > 0.0f)
