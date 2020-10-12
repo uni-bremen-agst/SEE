@@ -1,6 +1,7 @@
 ﻿using SEE.DataModel;
 using SEE.Game;
 using SEE.Layout;
+using SEE.Layout.EdgeLayout;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;

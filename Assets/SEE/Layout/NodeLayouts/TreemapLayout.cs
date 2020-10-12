@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using SEE.Layout.TreeMap;
+using SEE.Layout.NodeLayouts.TreeMap;
 using SEE.DataModel;
+using SEE.Layout.NodeLayouts.Cose;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// Yields a squarified treemap node layout according to the algorithm 

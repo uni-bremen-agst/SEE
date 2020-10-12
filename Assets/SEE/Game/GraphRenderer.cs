@@ -10,6 +10,10 @@ using SEE.Layout;
 using SEE.Utils;
 using UnityEngine;
 using static SEE.Game.AbstractSEECity;
+using SEE.Layout.EdgeLayout;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout.NodeLayouts.Cose;
+using SEE.Layout.EdgeLayouts;
 
 namespace SEE.Game
 {
@@ -163,16 +167,16 @@ namespace SEE.Game
             IEdgeLayout layout;
             switch (settings.EdgeLayout)
             {
-                case EdgeLayouts.Straight:
+                case EdgeLayoutKind.Straight:
                     layout = new StraightEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance);
                     break;
-                case EdgeLayouts.Spline:
+                case EdgeLayoutKind.Spline:
                     layout = new SplineEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.RDP);
                     break;
-                case EdgeLayouts.Bundling:
+                case EdgeLayoutKind.Bundling:
                     layout = new BundledEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.Tension, settings.RDP);
                     break;
-                case EdgeLayouts.None:
+                case EdgeLayoutKind.None:
                     // nothing to be done
                     return new List<GameObject>();
                 default:
@@ -701,21 +705,21 @@ namespace SEE.Game
         {
             switch (settings.NodeLayout)
             {
-                case SEECity.NodeLayouts.Manhattan:                    
+                case NodeLayoutKind.Manhattan:                    
                     return new ManhattanLayout(groundLevel, leafNodeFactory.Unit);
-                case SEECity.NodeLayouts.RectanglePacking:
+                case NodeLayoutKind.RectanglePacking:
                     return new RectanglePackingNodeLayout(groundLevel, leafNodeFactory.Unit);
-                case SEECity.NodeLayouts.EvoStreets:
+                case NodeLayoutKind.EvoStreets:
                     return new EvoStreetsNodeLayout(groundLevel, leafNodeFactory.Unit);
-                case SEECity.NodeLayouts.Treemap:
+                case NodeLayoutKind.Treemap:
                     return new TreemapLayout(groundLevel, 1000.0f * Unit(), 1000.0f * Unit());
-                case SEECity.NodeLayouts.Balloon:
+                case NodeLayoutKind.Balloon:
                     return new BalloonNodeLayout(groundLevel);
-                case SEECity.NodeLayouts.CirclePacking:
+                case NodeLayoutKind.CirclePacking:
                     return new CirclePackingNodeLayout(groundLevel);
-                case SEECity.NodeLayouts.CompoundSpringEmbedder:
+                case NodeLayoutKind.CompoundSpringEmbedder:
                     return new CoseLayout(groundLevel, settings);
-                case SEECity.NodeLayouts.FromFile:
+                case NodeLayoutKind.FromFile:
                     return new LoadedNodeLayout(groundLevel, settings.GVLPath);
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
@@ -814,7 +818,7 @@ namespace SEE.Game
         /// <param name="innerNodeKinds">the inner node kinds for the gameobject</param>
         /// <param name="nodeLayout">the nodeLayout used for this gameobject</param>
         /// <returns>the game objects added for the decorations; may be an empty collection</returns>
-        private void AddDecorations(ICollection<GameObject> gameNodes, InnerNodeKinds innerNodeKinds, NodeLayouts nodeLayout)
+        private void AddDecorations(ICollection<GameObject> gameNodes, InnerNodeKinds innerNodeKinds, NodeLayoutKind nodeLayout)
         {
             var innerNodeFactory = GetInnerNodeFactory(innerNodeKinds);
       
@@ -826,8 +830,8 @@ namespace SEE.Game
             }
 
             // Add text labels for all inner nodes
-            if (nodeLayout == SEECity.NodeLayouts.Balloon 
-                || nodeLayout == SEECity.NodeLayouts.EvoStreets)
+            if (nodeLayout == NodeLayoutKind.Balloon 
+                || nodeLayout == NodeLayoutKind.EvoStreets)
             {
                 AddLabels(InnerNodes(gameNodes), innerNodeFactory);
             }
@@ -1291,7 +1295,7 @@ namespace SEE.Game
                     Vector3 scale = GetScale(node);
 
                     // Scale according to the metrics.
-                    if (settings.NodeLayout == SEECity.NodeLayouts.Treemap)
+                    if (settings.NodeLayout == NodeLayoutKind.Treemap)
                     {
                         // FIXME: This is ugly. The graph renderer should not need to care what
                         // kind of layout was applied.

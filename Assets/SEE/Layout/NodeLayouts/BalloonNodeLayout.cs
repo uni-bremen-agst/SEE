@@ -1,9 +1,11 @@
 ﻿using SEE.DataModel;
+using SEE.Layout.NodeLayouts.Cose;
+using SEE.Layout.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// Creates a balloon layout according to "Reconfigurable Disc Trees for Visualizing 

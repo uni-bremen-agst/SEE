@@ -2,6 +2,7 @@
 using UnityEngine;
 using System;
 using UnityEngine.Assertions;
+using SEE.Layout.Utils;
 
 namespace SEE.Layout.EdgeLayout
 {

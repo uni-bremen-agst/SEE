@@ -1,4 +1,6 @@
 ﻿using SEE.Game;
+using SEE.Layout.EdgeLayouts;
+using SEE.Layout.NodeLayouts;
 using System;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -77,8 +79,8 @@ namespace SEE.Net
         public AbstractSEECity.LeafNodeKinds LeafObjects;
         public AbstractSEECity.InnerNodeKinds InnerNodeObjects;
 
-        public AbstractSEECity.NodeLayouts NodeLayout;
-        public AbstractSEECity.EdgeLayouts EdgeLayout;
+        public NodeLayoutKind NodeLayout;
+        public EdgeLayoutKind EdgeLayout;
         public bool ZScoreScale;
         public float EdgeWidth;
         public bool ShowErosions;

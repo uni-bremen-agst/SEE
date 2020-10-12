@@ -1,10 +1,11 @@
 ﻿using SEE.DataModel;
-using SEE.Layout.RectanglePacking;
+using SEE.Layout.NodeLayouts.Cose;
+using SEE.Layout.NodeLayouts.RectanglePacking;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// This layout packs rectangles closely together as a set of nested packed rectangles to decrease 

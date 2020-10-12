@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout.CirclePacking
+namespace SEE.Layout.NodeLayouts.CirclePacking
 {
     /// <summary>
     /// Represents a circle by its center and radius for a given game object to be laid out.

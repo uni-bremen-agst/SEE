@@ -2,7 +2,7 @@
 using SEE.DataModel.IO;
 using SEE.Game;
 using SEE.GO;
-using SEE.Tools.Architecture;
+using SEE.Tools;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;

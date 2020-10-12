@@ -16,10 +16,11 @@
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.DataModel;
+using SEE.Layout.NodeLayouts;
 using System.Collections.Generic;
 using static SEE.Game.AbstractSEECity;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
     /// <summary>
     /// This class holds all settings for the cose layout
@@ -79,7 +80,7 @@ namespace SEE.Layout
         /// <summary>
         ///  key: dir ids, value: the nodelayout
         /// </summary>
-        public Dictionary<string, NodeLayouts> DirNodeLayout = new Dictionary<string, NodeLayouts>();
+        public Dictionary<string, NodeLayoutKind> DirNodeLayout = new Dictionary<string, NodeLayoutKind>();
 
         /// <summary>
         /// key: dir ids, value: the inner node kind

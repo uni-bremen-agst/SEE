@@ -28,6 +28,7 @@ using SEE.Game.Evolution;
 using SEE.DataModel;
 using SEE.Layout;
 using SEE.Utils;
+using SEE.Layout.NodeLayouts;
 
 namespace SEE.Game
 {

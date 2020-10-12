@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.Utils
 {
     /// <summary>
     /// Creates points of straight lines, simple splines, and B-splines.

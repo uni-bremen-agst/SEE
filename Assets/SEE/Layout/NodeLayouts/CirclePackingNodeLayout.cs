@@ -2,10 +2,11 @@
 using System.Linq;
 using UnityEngine;
 
-using SEE.Layout.CirclePacking;
+using SEE.Layout.NodeLayouts.CirclePacking;
 using SEE.DataModel;
+using SEE.Layout.NodeLayouts.Cose;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// This layout packs circles closely together as a set of nested circles to decrease 

@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using SEE.Layout.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.EdgeLayout
 {
     /// <summary>
     /// Draws edges as splines with three control points between either the roof or ground of

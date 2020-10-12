@@ -2,10 +2,11 @@
 using UnityEngine;
 using System.Linq;
 
-using SEE.Layout.EvoStreets;
+using SEE.Layout.NodeLayouts.EvoStreets;
 using SEE.DataModel;
+using SEE.Layout.NodeLayouts.Cose;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts
 {
     public class EvoStreetsNodeLayout : HierarchicalNodeLayout
     {

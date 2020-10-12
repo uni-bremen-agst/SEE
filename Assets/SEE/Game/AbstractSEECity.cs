@@ -10,6 +10,9 @@ using SEE.DataModel.IO;
 using System.IO;
 using SEE.Utils;
 using SEE.Layout;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout.EdgeLayouts;
+using SEE.Layout.NodeLayouts.Cose;
 
 namespace SEE.Game
 {
@@ -452,40 +455,14 @@ namespace SEE.Game
         public InnerNodeKinds InnerNodeObjects; // serialized by Unity
 
         /// <summary>
-        /// The kinds of node layouts available.
-        /// </summary>
-        public enum NodeLayouts
-        {            
-            EvoStreets,
-            Balloon,
-            RectanglePacking,
-            Treemap,
-            CirclePacking,
-            Manhattan,
-            CompoundSpringEmbedder,
-            FromFile
-        }
-
-        /// <summary>
-        /// The kinds of edge layouts available.
-        /// </summary>
-        public enum EdgeLayouts
-        {
-            None = 0,        // no edges are to be drawn
-            Straight = 1,
-            Spline = 2,
-            Bundling = 3
-        }
-
-        /// <summary>
         /// The layout that should be used for nodes.
         /// </summary>
-        public NodeLayouts NodeLayout; // serialized by Unity
+        public NodeLayoutKind NodeLayout; // serialized by Unity
 
         /// <summary>
         /// The layout that should be used for edges.
         /// </summary>
-        public EdgeLayouts EdgeLayout; // serialized by Unity
+        public EdgeLayoutKind EdgeLayout; // serialized by Unity
 
         /// <summary>
         /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
@@ -592,12 +569,12 @@ namespace SEE.Game
         /// <summary>
         /// Dictionary with all Nodelayouts for leaf and inner nodes
         /// </summary>
-        public Dictionary<NodeLayouts, string> SubLayoutsInnerNodes = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().Where(nodeLayout => !nodeLayout.GetModel().OnlyLeaves).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
+        public Dictionary<NodeLayoutKind, string> SubLayoutsInnerNodes = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().Where(nodeLayout => !nodeLayout.GetModel().OnlyLeaves).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
 
         /// <summary>
         ///  Dictionary with all Nodelayouts only for leaf nodes
         /// </summary>
-        public Dictionary<NodeLayouts, string> SubLayoutsLeafNodes = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
+        public Dictionary<NodeLayoutKind, string> SubLayoutsLeafNodes = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
 
         /// <summary>
         /// Saves all data needed for the listing of the dirs in gui in cosegraphSettings
@@ -605,13 +582,13 @@ namespace SEE.Game
         /// <param name="graph"></param>
         public void LoadDataForGraphListing(Graph graph)
         {
-            if (NodeLayout == NodeLayouts.CompoundSpringEmbedder)
+            if (NodeLayout == NodeLayoutKind.CompoundSpringEmbedder)
             {
                 Dictionary<string, bool> dirs = CoseGraphSettings.ListDirToggle;
                 // die neuen dirs 
                 Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
 
-                Dictionary<string, NodeLayouts> dirsLayout = new Dictionary<string, NodeLayouts>();
+                Dictionary<string, NodeLayoutKind> dirsLayout = new Dictionary<string, NodeLayoutKind>();
                 Dictionary<string, InnerNodeKinds> dirsShape = new Dictionary<string, InnerNodeKinds>();
 
                 foreach (Node node in graph.Nodes())

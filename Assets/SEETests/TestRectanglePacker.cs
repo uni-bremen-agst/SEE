@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using SEE.GO;
+using SEE.Layout.NodeLayouts.RectanglePacking;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout.Utils;
 
 namespace SEE.Layout.RectanglePacking
 {

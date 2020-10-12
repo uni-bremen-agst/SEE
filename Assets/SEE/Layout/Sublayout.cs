@@ -18,10 +18,11 @@
 using SEE.DataModel;
 using SEE.Game;
 using SEE.GO;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout.NodeLayouts.Cose;
 using SEE.Layout.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using static SEE.Game.AbstractSEECity;
 
 namespace SEE.Layout
 {
@@ -30,7 +31,7 @@ namespace SEE.Layout
         /// <summary>
         /// the layout of the sublayout
         /// </summary>
-        private readonly NodeLayouts nodeLayout;
+        private readonly NodeLayoutKind nodeLayout;
 
         /// <summary>
         /// a map from every sublayout node to the corresponding gameobject

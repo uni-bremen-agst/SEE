@@ -6,6 +6,9 @@ using SEE.DataModel.IO;
 using System.Linq;
 using SEE.Game;
 using SEE.GO;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout.EdgeLayouts;
+using SEE.Layout.Utils;
 
 namespace SEE.Layout
 {
@@ -154,8 +157,8 @@ namespace SEE.Layout
             seeCity.transform.position = Vector3.zero; // new Vector3(-1012.38f, 0.0f, 581.414f);
             seeCity.transform.localScale = Vector3.one * 100 * 18.91f;
             SEECity seeCityComponent = seeCity.AddComponent<SEECity>();
-            seeCityComponent.NodeLayout = AbstractSEECity.NodeLayouts.FromFile;
-            seeCityComponent.EdgeLayout = AbstractSEECity.EdgeLayouts.None;
+            seeCityComponent.NodeLayout = NodeLayoutKind.FromFile;
+            seeCityComponent.EdgeLayout = EdgeLayoutKind.None;
             seeCityComponent.LeafObjects = AbstractSEECity.LeafNodeKinds.Blocks;
             seeCityComponent.InnerNodeObjects = AbstractSEECity.InnerNodeKinds.Blocks;
             seeCityComponent.gvlPath = path + "Architecture.gvl";

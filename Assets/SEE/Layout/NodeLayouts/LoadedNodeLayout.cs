@@ -1,11 +1,12 @@
 ﻿using SEE.DataModel;
+using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// A layout that is read from a GVL file.

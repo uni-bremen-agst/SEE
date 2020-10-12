@@ -1,18 +1,18 @@
 ﻿using SEE.DataModel;
-using SEE.Game;
 using SEE.Layout;
+using SEE.Layout.NodeLayouts.Cose;
 using SEE.Layout.Utils;
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
 using UnityEngine;
 
 namespace SEE
 {
-
+    /// <summary>
+    /// FIXME: This should be moved to a more specific namespace.
+    /// </summary>
     public class EdgesMeasurements {
 
         /// <summary>
