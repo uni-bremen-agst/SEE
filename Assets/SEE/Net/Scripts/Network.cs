@@ -201,6 +201,7 @@ namespace SEE.Net
             if (rig)
             {
                 // TODO(torben): this has to adapted once VR-hardware is available
+                // also, this is now initialized in Server.cs
 #if false
                 ControlMode mode = rig.GetComponent<ControlMode>();
 #if UNITY_EDITOR

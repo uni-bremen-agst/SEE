@@ -368,57 +368,36 @@ namespace SEE.Controls
             //------------------------------------------------------------------------
 
             // We check whether we are focusing on the code city this NavigationAction is attached to.
-            RaycastHit[] hits = Raycasting.SortedHits();
-            // If we don't hit anything or if we hit anything (including another code city 
-            // that is different from the code city this NavigationAction is attached to),
-            // we will not process any user input.
-            if (hits.Length == 0)
+            if (Raycasting.RaycastNodes(out RaycastHit hit))
             {
-                // nothing hit; we are not focusing on anything
-                //Debug.Log("nothing hit\n");
-                return;
-            }
-            else
-            {
-                Transform firstHit = GetHitCity(hits[0].transform);
-                if (firstHit == null)
+                Transform firstHit = hit.transform;
+                if (firstHit.gameObject == Architecture)
                 {
-                    // Neither the architecture nor the implementation city was hit.
-                    //Debug.Log("neither architecture nor implementation was hit\n");
-                    return;
-                }
-                else if (firstHit.gameObject == Architecture)
-                {
-                    //Debug.Log("hit architecture\n");
                     actionState.hitCity = HitCity.Architecture;
                 }
                 else if (firstHit.gameObject == Implementation)
                 {
-                    //Debug.Log("hit implementation\n");
                     actionState.hitCity = HitCity.Implementation;
                 }
                 else
                 {
-                    //Debug.LogFormat("hit some other city {0}\n", firstHit.name);
                     return;
                 }
             }
+            else
+            {
+                return;
+            }
 
             // Selection of an object
-            if (Input.GetMouseButtonDown(0))  // left mouse button
+            if (Input.GetMouseButtonDown(0)) // left mouse button
             {
-                bool selected = false;
-                foreach (RaycastHit hit in hits)
+                if (hit.transform.gameObject.TryGetComponent(out NodeRef nodeRef))
                 {
-                    if (hit.transform.gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
-                    {
-                        selection.gameNode = hit.transform.gameObject;
-                        selection.graphNode = nodeRef.node;
-                        selected = true;
-                        break;
-                    }
+                    selection.gameNode = hit.transform.gameObject;
+                    selection.graphNode = nodeRef.node;
                 }
-                if (!selected)
+                else
                 {
                     selection.gameNode = null;
                     selection.graphNode = null;
@@ -427,18 +406,11 @@ namespace SEE.Controls
 
             bool leftControl = LeftControlPressed();
 
-
             actionState.save = leftControl && Input.GetKeyDown(SaveKey);
             actionState.copy = leftControl && Input.GetKeyDown(CopyKey);
             actionState.paste = leftControl && Input.GetKeyDown(PasteKey);
             actionState.clearClipboard = leftControl && Input.GetKeyDown(ClearKey);
-
-            //if (actionState.copy || actionState.paste || actionState.clearClipboard)
-            //{
-            //    Debug.LogFormat("copy={0} paste={1} clearClipboard={2} selectedObject={3}\n",
-            //                    actionState.copy, actionState.paste, actionState.clearClipboard,
-            //                    selection.gameNode != null ? selection.gameNode.name : "NONE");
-            //}
+            
             // We can copy only from the implementation city and if there is a selected object.
             if (actionState.copy && actionState.hitCity == HitCity.Implementation && selection.gameNode != null)
             {

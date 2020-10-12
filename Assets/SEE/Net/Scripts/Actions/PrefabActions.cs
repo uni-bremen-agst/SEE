@@ -7,13 +7,26 @@ using UnityEngine.Assertions;
 namespace SEE.Net
 {
 
+    /// <summary>
+    /// Abstract class for all prefab related actions.
+    /// </summary>
     public abstract class PrefabAction : AbstractAction
     {
-        private static Dictionary<IPEndPoint, List<InstantiatePrefabAction>> dict = new Dictionary<IPEndPoint, List<InstantiatePrefabAction>>();
+        /// <summary>
+        /// Contains every <see cref="InstantiatePrefabAction"/> of every connected
+        /// client. This is only used/updated by the server itself.
+        /// </summary>
+        private static readonly Dictionary<IPEndPoint, List<InstantiatePrefabAction>> Dict = new Dictionary<IPEndPoint, List<InstantiatePrefabAction>>();
 
+        /// <summary>
+        /// Returns all active actions of given end point.
+        /// </summary>
+        /// <param name="ipEndPoint">The end point to be queried.</param>
+        /// <returns>All active actions of given end point or <code>null</code>, if none
+        /// was found.</returns>
         internal static List<InstantiatePrefabAction> GetActions(IPEndPoint ipEndPoint)
         {
-            bool contains = dict.TryGetValue(ipEndPoint, out List<InstantiatePrefabAction> result);
+            bool contains = Dict.TryGetValue(ipEndPoint, out List<InstantiatePrefabAction> result);
             if (!contains)
             {
                 result = null;
@@ -21,11 +34,15 @@ namespace SEE.Net
             return result;
         }
 
+        /// <summary>
+        /// Returns a list of all active actions of every client.
+        /// </summary>
+        /// <returns>A list of all active actions of every client.</returns>
         internal static List<InstantiatePrefabAction> GetAllActions()
         {
             List<InstantiatePrefabAction> result = new List<InstantiatePrefabAction>();
 
-            foreach (List<InstantiatePrefabAction> actions in InstantiatePrefabAction.dict.Values)
+            foreach (List<InstantiatePrefabAction> actions in Dict.Values)
             {
                 result.AddRange(actions);
             }
@@ -33,21 +50,32 @@ namespace SEE.Net
             return result;
         }
 
+        /// <summary>
+        /// Adds the given action, instantiated by given end point to <see cref="Dict"/>.
+        /// </summary>
+        /// <param name="ipEndPoint">The owning end point.</param>
+        /// <param name="action">The action.</param>
         protected static void Add(IPEndPoint ipEndPoint, InstantiatePrefabAction action)
         {
-            if (!dict.ContainsKey(ipEndPoint))
+            if (!Dict.ContainsKey(ipEndPoint))
             {
-                dict.Add(ipEndPoint, new List<InstantiatePrefabAction>());
+                Dict.Add(ipEndPoint, new List<InstantiatePrefabAction>());
             }
-            if (!dict[ipEndPoint].Contains(action))
+            if (!Dict[ipEndPoint].Contains(action))
             {
-                dict[ipEndPoint].Add(action);
+                Dict[ipEndPoint].Add(action);
             }
         }
 
+        /// <summary>
+        /// Removes the action, that was requested by given end point and created the
+        /// view container of given id from <see cref="Dict"/>.
+        /// </summary>
+        /// <param name="ipEndPoint">The owning end point.</param>
+        /// <param name="viewContainerID">The created view container.</param>
         protected static void Remove(IPEndPoint ipEndPoint, uint viewContainerID)
         {
-            if (dict.TryGetValue(ipEndPoint, out List<InstantiatePrefabAction> actions))
+            if (Dict.TryGetValue(ipEndPoint, out List<InstantiatePrefabAction> actions))
             {
                 for (int i = 0; i < actions.Count; i++)
                 {
@@ -56,7 +84,7 @@ namespace SEE.Net
                         actions.RemoveAt(i);
                         if (actions.Count == 0)
                         {
-                            dict.Remove(ipEndPoint);
+                            Dict.Remove(ipEndPoint);
                         }
                         break;
                     }
