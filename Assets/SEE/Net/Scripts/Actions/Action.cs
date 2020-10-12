@@ -27,6 +27,8 @@ namespace SEE.Net
     ///        
     ///   These rules are necessary, to allow (de)serialization of the classes for
     ///   networking.
+    ///   
+    ///   See <see cref="JsonUtility.ToJson(object)"/> for further details.
     /// 
     /// 
     /// 
@@ -63,6 +65,15 @@ namespace SEE.Net
         public AbstractAction()
         {
             IPEndPoint requester = Client.LocalEndPoint;
+            SetRequester(requester);
+        }
+
+        /// <summary>
+        /// Sets the requester of this action to given end-point.
+        /// </summary>
+        /// <param name="requester">The requester.</param>
+        public void SetRequester(IPEndPoint requester)
+        {
             if (requester != null)
             {
                 requesterIPAddress = requester.Address.ToString();
@@ -73,6 +84,18 @@ namespace SEE.Net
                 requesterIPAddress = null;
                 requesterPort = -1;
             }
+        }
+
+        /// <summary>
+        /// Returns the <see cref="IPEndPoint"/> of the client, that requested this
+        /// action.
+        /// </summary>
+        /// <returns>The <see cref="IPEndPoint"/> of the client, that requested this
+        /// action.</returns>
+        protected IPEndPoint GetRequester()
+        {
+            IPEndPoint result = new IPEndPoint(IPAddress.Parse(requesterIPAddress), requesterPort);
+            return result;
         }
 
         /// <summary>
@@ -87,7 +110,7 @@ namespace SEE.Net
                 return true;
             }
 
-            IPEndPoint requesterEndPoint = new IPEndPoint(IPAddress.Parse(requesterIPAddress), requesterPort);
+            IPEndPoint requesterEndPoint = GetRequester();
             bool result = Client.LocalEndPoint.Equals(requesterEndPoint);
             return result;
         }

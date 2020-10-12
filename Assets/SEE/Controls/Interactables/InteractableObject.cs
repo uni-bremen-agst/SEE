@@ -39,22 +39,83 @@ namespace SEE.Controls
         private static readonly Dictionary<uint, InteractableObject> interactableObjects = new Dictionary<uint, InteractableObject>();
 
         /// <summary>
+        /// The hovered objects.
+        /// </summary>
+        public static readonly HashSet<InteractableObject> HoveredObjects = new HashSet<InteractableObject>();
+
+        /// <summary>
+        /// The selected objects.
+        /// </summary>
+        public static readonly HashSet<InteractableObject> SelectedObjects = new HashSet<InteractableObject>();
+
+        /// <summary>
+        /// The grabbed objects.
+        /// </summary>
+        public static readonly HashSet<InteractableObject> GrabbedObjects = new HashSet<InteractableObject>();
+
+        /// <summary>
         /// The unique id of the interactable object.
         /// </summary>
         public uint ID { get; private set; }
 
+        /// <summary>
+        /// Whether the object is currently hovered by e.g. the mouse or the VR-
+        /// controller.
+        /// </summary>
         public bool IsHovered { get; private set; }
+
+        /// <summary>
+        /// Whether the object is currently selected by e.g. the mouse or the VR-
+        /// controller.
+        /// </summary>
         public bool IsSelected { get; private set; }
+
+        /// <summary>
+        /// Whether the object is currently grabbed by e.g. the mouse or the VR-
+        /// controller.
+        /// </summary>
         public bool IsGrabbed { get; private set; }
 
-        public Interactable InteractableObj { get; private set; }
-        public Net.Synchronizer SynchronizerObj { get; private set; }
+        /// <summary>
+        /// The interactable component, that is used by SteamVR. The interactable
+        /// component is attached to <code>this.gameObject</code>.
+        /// </summary>
+        private Interactable interactable;
 
+        /// <summary>
+        /// The synchronizer is attached to <code>this.gameObject</code>, iff it is
+        /// grabbed.
+        /// </summary>
+        public Net.Synchronizer InteractableSynchronizer { get; private set; }
+
+        /// <summary>
+        /// The local hovering color of the outline.
+        /// </summary>
         private readonly Color LocalHoverColor = Utils.ColorPalette.Viridis(0.0f);
+
+        /// <summary>
+        /// The remote hovering color of the outline.
+        /// </summary>
         private readonly Color RemoteHoverColor = Utils.ColorPalette.Viridis(0.2f);
+
+        /// <summary>
+        /// The local selection color of the outline.
+        /// </summary>
         private readonly Color LocalSelectColor = Utils.ColorPalette.Viridis(0.4f);
+
+        /// <summary>
+        /// The remote selection color of the outline.
+        /// </summary>
         private readonly Color RemoteSelectColor = Utils.ColorPalette.Viridis(0.6f);
+        
+        /// <summary>
+        /// The local grabbing color of the outline.
+        /// </summary>
         private readonly Color LocalGrabColor = Utils.ColorPalette.Viridis(0.8f);
+
+        /// <summary>
+        /// The remote grabbing color of the outline.
+        /// </summary>
         private readonly Color RemoteGrabColor = Utils.ColorPalette.Viridis(0.0f);
 
         private void Awake()
@@ -62,8 +123,8 @@ namespace SEE.Controls
             ID = nextID++;
             interactableObjects.Add(ID, this);
             
-            InteractableObj = GetComponent<Interactable>();
-            if (InteractableObj == null)
+            interactable = GetComponent<Interactable>();
+            if (interactable == null)
             {
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
@@ -84,6 +145,14 @@ namespace SEE.Controls
             return result;
         }
 
+        #region Interaction
+
+        /// <summary>
+        /// Visually emphasizes this object for hovering.
+        /// </summary>
+        /// <param name="hover">Whether this object should be hovered.</param>
+        /// <param name="isOwner">Whether this client is initiating the hovering action.
+        /// </param>
         public void SetHover(bool hover, bool isOwner)
         {
             IsHovered = hover;
@@ -110,14 +179,29 @@ namespace SEE.Controls
                         DestroyImmediate(outline);
                     }
                 }
+            }
 
-                if (!Net.Network.UseInOfflineMode && isOwner)
-                {
-                    new Net.SetHoverAction(this, hover).Execute();
-                }
+            if (hover)
+            {
+                HoveredObjects.Add(this);
+            }
+            else
+            {
+                HoveredObjects.Remove(this);
+            }
+
+            if (!Net.Network.UseInOfflineMode && isOwner)
+            {
+                new Net.SetHoverAction(this, hover).Execute();
             }
         }
 
+        /// <summary>
+        /// Visually emphasizes this object for selection.
+        /// </summary>
+        /// <param name="hover">Whether this object should be selected.</param>
+        /// <param name="isOwner">Whether this client is initiating the selection action.
+        /// </param>
         public void SetSelect(bool select, bool isOwner)
         {
             IsSelected = select;
@@ -148,14 +232,29 @@ namespace SEE.Controls
                         DestroyImmediate(outline);
                     }
                 }
+            }
 
-                if (!Net.Network.UseInOfflineMode && isOwner)
-                {
-                    new Net.SetSelectAction(this, select).Execute();
-                }
+            if (select)
+            {
+                SelectedObjects.Add(this);
+            }
+            else
+            {
+                SelectedObjects.Remove(this);
+            }
+
+            if (!Net.Network.UseInOfflineMode && isOwner)
+            {
+                new Net.SetSelectAction(this, select).Execute();
             }
         }
 
+        /// <summary>
+        /// Visually emphasizes this object for grabbing.
+        /// </summary>
+        /// <param name="hover">Whether this object should be grabbed.</param>
+        /// <param name="isOwner">Whether this client is initiating the grabbing action.
+        /// </param>
         public void SetGrab(bool grab, bool isOwner)
         {
             IsGrabbed = grab;
@@ -172,6 +271,8 @@ namespace SEE.Controls
                 {
                     Outline.Create(gameObject, isOwner ? LocalGrabColor : RemoteGrabColor);
                 }
+
+                GrabbedObjects.Add(this);
             }
             else
             {
@@ -187,6 +288,8 @@ namespace SEE.Controls
                 {
                     DestroyImmediate(outline);
                 }
+
+                GrabbedObjects.Remove(this);
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
@@ -194,15 +297,19 @@ namespace SEE.Controls
                 new Net.SetGrabAction(this, grab).Execute();
                 if (grab)
                 {
-                    SynchronizerObj = InteractableObj.gameObject.AddComponent<Net.Synchronizer>();
+                    InteractableSynchronizer = interactable.gameObject.AddComponent<Net.Synchronizer>();
                 }
                 else
                 {
-                    Destroy(SynchronizerObj);
-                    SynchronizerObj = null;
+                    Destroy(InteractableSynchronizer);
+                    InteractableSynchronizer = null;
                 }
             }
         }
+
+        #endregion
+
+        #region Events
 
         //----------------------------------------------------------------
         // Mouse actions
@@ -238,5 +345,7 @@ namespace SEE.Controls
 
         private void OnHandHoverBegin(Hand hand) => SetHover(true, true);
         private void OnHandHoverEnd(Hand hand) => SetHover(false, true);
+
+        #endregion
     }
 }
