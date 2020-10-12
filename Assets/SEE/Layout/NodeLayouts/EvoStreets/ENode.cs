@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout.EvoStreets
+namespace SEE.Layout.NodeLayouts.EvoStreets
 {
     /// <summary>
     /// Necessary layout data on graph nodes 

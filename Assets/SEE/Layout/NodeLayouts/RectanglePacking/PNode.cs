@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Layout.RectanglePacking
+namespace SEE.Layout.NodeLayouts.RectanglePacking
 { 
     /// <summary>
     /// A node of PTree that is aware of its assigned space 

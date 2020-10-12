@@ -18,7 +18,7 @@
 using UnityEngine;
 using System;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
     public static class CoseGeometry
     {

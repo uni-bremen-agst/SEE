@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.Utils
 {
     /// <summary>
     /// Computes the lowest common ancestors (LCA) in a rooted tree or a forest based on

@@ -21,9 +21,8 @@ using SEE.DataModel;
 using System.Linq;
 using System;
 using SEE.Game;
-using static SEE.Game.AbstractSEECity;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
     internal class IterationConstraint
     {
@@ -198,7 +197,7 @@ namespace SEE.Layout
                 {
                     SublayoutLayoutNode sublayoutNode = CoseHelper.CheckIfNodeIsSublayouRoot(SublayoutNodes, graph.Parent.NodeObject.ID);
 
-                    if (sublayoutNode != null && sublayoutNode.NodeLayout == NodeLayouts.EvoStreets)
+                    if (sublayoutNode != null && sublayoutNode.NodeLayout == NodeLayoutKind.EvoStreets)
                     {
                         width = graph.Parent.SublayoutValues.Sublayout.RootNodeRealScale.x;
                         height = graph.Parent.SublayoutValues.Sublayout.RootNodeRealScale.z;

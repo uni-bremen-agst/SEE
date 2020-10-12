@@ -1,9 +1,10 @@
 ﻿using SEE.DataModel;
+using SEE.Layout.NodeLayouts.Cose;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// Calculates a simple grid layout for leaf nodes (only). The order is

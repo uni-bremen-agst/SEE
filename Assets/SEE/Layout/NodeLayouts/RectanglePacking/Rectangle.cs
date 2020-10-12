@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Layout.RectanglePacking
+namespace SEE.Layout.NodeLayouts.RectanglePacking
 {
     /// <summary>
     /// Representation of a rectangle area for PTree, either occupied or free.

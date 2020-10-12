@@ -18,7 +18,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
     public class CoseGraphManager 
     {

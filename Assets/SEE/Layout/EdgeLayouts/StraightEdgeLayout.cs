@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using SEE.Layout.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.EdgeLayout
 {
     /// <summary>
     /// Draws edges as straight lines at either above or below the game nodes.

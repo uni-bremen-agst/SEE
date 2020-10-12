@@ -1,4 +1,4 @@
-﻿namespace SEE.Layout
+﻿namespace SEE.Layout.Utils
 {
     /// <summary>
     /// Provides ordered pairs of arbitrary element types.

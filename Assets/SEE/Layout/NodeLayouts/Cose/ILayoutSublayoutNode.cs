@@ -18,7 +18,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
     /// <summary>
     /// ILayoutNode for the caluclation of the sublayouts

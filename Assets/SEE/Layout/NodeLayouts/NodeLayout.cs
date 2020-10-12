@@ -1,9 +1,10 @@
 ﻿using SEE.DataModel;
+using SEE.Layout.NodeLayouts.Cose;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// The abstract super class of all node layouts.

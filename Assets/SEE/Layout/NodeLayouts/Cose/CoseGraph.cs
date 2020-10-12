@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
     public class CoseGraph 
     {

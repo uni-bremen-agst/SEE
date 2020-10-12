@@ -18,7 +18,7 @@
 using System;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
     public class CoseEdge
     {

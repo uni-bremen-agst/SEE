@@ -15,10 +15,11 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.Layout.NodeLayouts;
 using System.Collections.Generic;
 using static SEE.Game.AbstractSEECity;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
     public abstract class AbstractSublayoutNode<T>
     {
@@ -45,7 +46,7 @@ namespace SEE.Layout
         /// <summary>
         /// the node Layout
         /// </summary>
-        public NodeLayouts NodeLayout { get; }
+        public NodeLayoutKind NodeLayout { get; }
 
         /// <summary>
         /// constructor
@@ -53,7 +54,7 @@ namespace SEE.Layout
         /// <param name="node">the root node</param>
         /// <param name="innerNodeKinds">the kind of the inner nodes</param>
         /// <param name="nodeLayouts">the node Layout</param>
-        public AbstractSublayoutNode(T node, InnerNodeKinds innerNodeKinds, NodeLayouts nodeLayouts)
+        public AbstractSublayoutNode(T node, InnerNodeKinds innerNodeKinds, NodeLayoutKind nodeLayouts)
         {
             this.Node = node;
             this.InnerNodeKind = innerNodeKinds;
