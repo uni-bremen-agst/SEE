@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using System;
-using NUnit.Framework;
+using UnityEngine.Assertions;
 
-namespace SEE.Layout
+namespace SEE.Layout.EdgeLayout
 {
     /// <summary>
     /// Draws edges as hierarchically bundled edges. 
