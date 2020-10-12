@@ -286,11 +286,10 @@ namespace SEE.Charts.Scripts
 
         // All created and still existing charts. Charts are game objects tagged by Tags.Chart
         // representing a metric chart.
-        private HashSet<GameObject> allCharts = new HashSet<GameObject>();
+        private readonly HashSet<GameObject> allCharts = new HashSet<GameObject>();
 
         private ICollection<GameObject> AllCharts()
         {
-            //return GameObject.FindGameObjectsWithTag(Tags.Chart);
             return allCharts;
         }
 
@@ -328,8 +327,7 @@ namespace SEE.Charts.Scripts
         /// <see cref="ScrollViewToggle"/> or not.</param>
         public static void HighlightObject(GameObject highlight, bool scrollView)
         {
-            GameObject[] charts = GameObject.FindGameObjectsWithTag("Chart");
-            foreach (GameObject chart in charts)
+            foreach (GameObject chart in Instance.AllCharts())
             {
                 chart.GetComponent<ChartContent>()?.HighlightCorrespondingMarker(highlight, scrollView);
             }
@@ -341,7 +339,7 @@ namespace SEE.Charts.Scripts
         /// <param name="highlight"></param>
         public static void Accentuate(GameObject highlight)
         {
-            foreach (GameObject chart in GameObject.FindGameObjectsWithTag("Chart"))
+            foreach (GameObject chart in Instance.AllCharts())
             {
                 chart.GetComponent<ChartContent>()?.AccentuateCorrespondingMarker(highlight);
             }
