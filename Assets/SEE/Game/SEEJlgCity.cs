@@ -37,8 +37,8 @@ namespace SEE.Game
             {
                 GameObject jlgVisualisationGameObject = new GameObject();
                 jlgVisualisationGameObject.transform.parent = transform;
-                jlgVisualisationGameObject.name = Tags.JLGVisualisation;
-                jlgVisualisationGameObject.tag = Tags.JLGVisualisation;
+                jlgVisualisationGameObject.name = Tags.JLGVisualization;
+                jlgVisualisationGameObject.tag = Tags.JLGVisualization;
 
                 jlgVisualisationGameObject.AddComponent<Runtime.JLGVisualizer>().jlgFilePath = jlgPath;
             }

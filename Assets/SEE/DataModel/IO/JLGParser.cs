@@ -118,7 +118,7 @@ namespace Assets.SEE.DataModel.IO
                 {
                     string table = line.Substring(1);
                     //Fill LocationLookupTable
-                    string locationLookupTableRegex = "-\\d+=([A-Za-z0-9.()<>\\[\\]]*)";
+                    string locationLookupTableRegex = "-\\d+=([A-Za-z0-9.,\\s()<>\\[\\]]*)";
                     var regex1 = new Regex(locationLookupTableRegex);
                     foreach (Match m in regex1.Matches(table))
                     {
@@ -141,7 +141,7 @@ namespace Assets.SEE.DataModel.IO
                     }
                 }
             }
-            javaStatements.Add(javaStatement); //make sure the last javastatement is also added, since otherwise a statement is added to the list, when a new one starts.
+            javaStatements.Add(javaStatement); //make sure the last javastatement is also added
             ParsedJLG parsed = new ParsedJLG(filesOfProject, locationLookupTable, fieldLookupTable, javaStatements);
             return parsed;
         }

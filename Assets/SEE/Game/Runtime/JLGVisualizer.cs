@@ -21,17 +21,17 @@ namespace SEE.Game.Runtime
         private ParsedJLG parsedJLG;
 
         /// <summary>
-        /// 
+        /// The full path the the JLG-File that is being visualized.
         /// </summary>
         public string jlgFilePath;
 
         /// <summary>
-        /// 
+        /// The Class the breakpoint is in.
         /// </summary>
         public string BreakpointClass = "classname";
 
         /// <summary>
-        /// 
+        /// The line of the breakpoint.
         /// </summary>
         public int BreakpointLine = 0;
 
@@ -42,7 +42,7 @@ namespace SEE.Game.Runtime
         private int statementCounter = 0;
 
         /// <summary>
-        /// 
+        /// This Field saves the text, that is displayed when a button is hit is saved.
         /// </summary>
         private string labelText = "";
 
@@ -68,12 +68,10 @@ namespace SEE.Game.Runtime
         /// </summary>
         private Boolean playDirection = true;
 
-        private Boolean lastDirection = true;
-
         /// <summary>
-        /// 
+        /// This saves the direction in which the last Statement was visualized.
         /// </summary>
-        private Boolean windowsToggled = false;
+        private Boolean lastDirection = true;
 
         /// <summary>
         /// The GameObject that represents the class, to which the current statement belongs to. 
@@ -86,12 +84,12 @@ namespace SEE.Game.Runtime
         private GameObject[] nodesGOs;
 
         /// <summary>
-        /// 
+        /// Stack of all existing FileContent Textwindows.
         /// </summary>
         private Stack<GameObject> textWindows = new Stack<GameObject>();
 
         /// <summary>
-        /// 
+        /// Stack of all existing functioncalls.
         /// </summary>
         private Stack<GameObject> functionCalls = new Stack<GameObject>();
 
@@ -180,13 +178,6 @@ namespace SEE.Game.Runtime
                     labelText = "Rewind";
                 }
             }
-
-            ///not needed in current visualisation
-            //if (Input.GetKeyDown(KeyCode.J))
-            //{
-            //windowsToggled = !windowsToggled;
-            //ToggleTextWindows();
-            //}
             if (running)
             {
                 if (Input.GetKeyDown(KeyCode.Alpha3))
@@ -204,16 +195,6 @@ namespace SEE.Game.Runtime
             }
 
             if (!running) {
-                if (Input.GetKeyDown(KeyCode.I)) {
-                    JumpToNextClass();
-                    showLabelUntil = Time.time + 1f;
-                    labelText = "Jumped to " + currentGO.name;
-                }
-                if (Input.GetKeyDown(KeyCode.U)) {
-                    JumpToNextMethod();
-                    showLabelUntil = Time.time + 1f;
-                    labelText = "Jumped to " + parsedJLG.GetStatementLocationString(statementCounter);
-                }
                 if (Input.GetKeyDown(KeyCode.B)) {
                     showLabelUntil = Time.time + 1f;
                     labelText = "Jumping to Breakpoint...";
@@ -260,28 +241,21 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// 
+        /// This Method updates the visualization for one Step.
         /// </summary>
         private void UpdateVisualization() {
             Debug.Log(statementCounter);
-            ///Check if currentGo is not GO of current Statement. If true change currentGO and generate FunctionCall to new class and new TextWindow.
-            if (!NodeRepresentsStatementLocation(statementCounter, currentGO))
-            {
-                if (playDirection && statementCounter > 0 && parsedJLG.AllStatements[statementCounter].StatementType.Equals("entry"))
-                {
-                    CreateFunctionCall(currentGO, GetNodeForStatement(statementCounter));
-                }
-                currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.530f, 0.637f, 0.858f, 1f);
-                currentGO = GetNodeForStatement(statementCounter);
-                currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
-            }
+
+            CheckCurrentGO();
+            
             if (!textWindowForNodeExists(currentGO))
             {
                 GenerateScrollableTextWindow();
             }
+
             ToggleTextWindows();
 
-            updateStacks();
+            UpdateStacks();
 
             if (playDirection)
             {
@@ -292,9 +266,25 @@ namespace SEE.Game.Runtime
                 PreviousStatement();
             }
         }
+        /// <summary>
+        /// Check if currentGo is GO of current Statement. If not change currentGO
+        /// </summary>
+        private void CheckCurrentGO()
+        {
+            if (!NodeRepresentsStatementLocation(statementCounter, currentGO))
+            {
+                if (playDirection && statementCounter > 0 && parsedJLG.AllStatements[statementCounter].StatementType.Equals("entry"))
+                {
+                    CreateFunctionCall(currentGO, GetNodeForStatement(statementCounter));
+                }
+             currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.530f, 0.637f, 0.858f, 1f);
+             currentGO = GetNodeForStatement(statementCounter);
+             currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
+            }
+        }
 
         /// <summary>
-        /// 
+        /// Activates the FileContent Gameobject of a given node and disables all other.
         /// </summary>
         /// <param name="gameObject"></param>
         private void ActivateNodeTextWindow(GameObject gameObject)
@@ -313,9 +303,9 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// 
+        /// Checks if a mouse click hit a Node Gameobject. Returns GameObject or Null if no object was hit.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>hit gameobject</returns>
         private GameObject MouseClickHitActiveNode()
         {
             RaycastHit hit;
@@ -446,10 +436,10 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// 
+        /// Gets the FileContent GameObject of a given Node, if it exists in textwindows. Otherwise returns null.
         /// </summary>
-        /// <param name="classGO"></param>
-        /// <returns></returns>
+        /// <param name="classGO">given node</param>
+        /// <returns>FileContent for node</returns>
         private GameObject GetFileContentGOForNode(GameObject classGO){
             foreach (GameObject fc in textWindows) {
                 if(fc.name.Equals(classGO.name + "FileContent"))
@@ -475,7 +465,6 @@ namespace SEE.Game.Runtime
         /// Visualizes the current statement and then increases statementCounter by 1.
         /// </summary>
         private void NextStatement() {
-            Debug.Log(parsedJLG.AllStatements[statementCounter].Line + " " + parsedJLG.GetStatementLocationString(statementCounter)+" CurrentGo:"+ currentGO.name);
 
                 HighlightCurrentLineFadePrevious();           
 
@@ -499,7 +488,6 @@ namespace SEE.Game.Runtime
         /// Visualizes the current statement and then decreases the statementCounter by 1.
         /// </summary>
         private void PreviousStatement() {
-            Debug.Log(parsedJLG.AllStatements[statementCounter].Line+ " "+parsedJLG.GetStatementLocationString(statementCounter) + " CurrentGo:" + currentGO.name);
                       
                 HighlightCurrentLineFadePreviousReverse();
 
@@ -519,27 +507,27 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// 
+        /// Activates the Textwindow of the currentGO and disables all other.
         /// </summary>
         private void ToggleTextWindows() {
             foreach (GameObject go in textWindows) {
                 ///Textwindow of currentGO is always active
-                if (go.name == currentGO.name+"FileContent") {
+                if (go.name == currentGO.name + "FileContent")
+                {
                     go.SetActive(true);
                 }
-                else
-                {
-                    go.SetActive(windowsToggled);
+                else {
+                    go.SetActive(false);
                 }
             }
         }
 
         /// <summary>
         /// This Method updates all stacks that are need for the Visualization, depending on the playdirection.
-        /// The Stacks modified here are: functionCalls and parsedJLG.ReturnValues
+        /// The Stacks modified here are: functionCalls and parsedJLG.ReturnValues.
         /// The returnValues stack is filled inside the parsedJLG Object when playdirection is true/Forward.
         /// </summary>
-        private void updateStacks() {
+        private void UpdateStacks() {
             if (playDirection)
             {
                 ///If previous statement exitted a class, metaphorically remove the statements class from the callstack 
@@ -567,7 +555,7 @@ namespace SEE.Game.Runtime
                     FindFunctionCallForGameObjects(currentGO, GetNodeForStatement(statementCounter + 1), false).SetActive(true);
                 }
                 ///If previous statement entered a class, metaphorically remove the class from the callstack by destroying its textwindow and its FunctionCallSimulator.
-                ///Looking for an "entrystatement", because the visualisation is running backwards.
+                ///Looking for an at statementCounter+1 "entrystatement", because the visualisation is running backwards.
                 else if (statementCounter < parsedJLG.AllStatements.Count - 1
                     && parsedJLG.AllStatements[statementCounter + 1].StatementType.Equals("entry")
                     && currentGO != GetNodeForStatement(statementCounter + 1))
@@ -583,7 +571,7 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// 
+        /// This Method returns the first FunctionCall that matches the two given GameObjects.
         /// </summary>
         /// <param name="dstGO"></param>
         /// <param name="srcGO"></param>
@@ -753,32 +741,7 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        private void JumpToNextClass()
-        {
-            GameObject classToBeJumped = currentGO;
-            while (classToBeJumped == currentGO)
-            {
-                UpdateVisualization();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void JumpToNextMethod()
-        {
-            String currentMethod = parsedJLG.AllStatements[statementCounter].Location;
-            while (currentMethod == parsedJLG.AllStatements[statementCounter].Location)
-            {
-                UpdateVisualization();
-            }
-            UpdateVisualization(); //Call once more so it jumps into the method too.
-        }
-
-        /// <summary>
-        /// 
+        /// This Method jumps to the next Breakpoint. If the Breakpoint is more than 200 Statements ahead, it only visualizes the last 150 steps.
         /// </summary>
         /// <returns></returns>
         private Boolean JumpToNextBreakpointHit() {
@@ -862,7 +825,7 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// 
+        /// This method resets the visualization by destroying all Textwindows and functionCalls and setting the StatementCounter to 0.
         /// </summary>
         private void ResetVisualization() {
             foreach (GameObject go in textWindows) {
@@ -877,7 +840,7 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// 
+        /// This Method does a complete reset by calling ResetVisualization() and reparsing the JLG-File by calling Start().
         /// </summary>
         private void ResetComplete() {
             ResetVisualization();

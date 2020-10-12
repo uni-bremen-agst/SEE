@@ -55,7 +55,7 @@ namespace Assets.SEE.DataModel
         public ParsedJLG() { }
 
         /// <summary>
-        /// 
+        /// This Method returns the Location for a given Index in the list.
         /// </summary>
         /// <param name="i">index of the Java statement in List allStatements</param>
         /// <returns>The Location String from LocationLookupTable</returns>
@@ -69,7 +69,7 @@ namespace Assets.SEE.DataModel
         }
 
         /// <summary>
-        /// 
+        /// This method looks up a coded Fieldname in the Fieldlookuptable
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
@@ -88,7 +88,7 @@ namespace Assets.SEE.DataModel
         public Stack<string> ReturnValues { get => returnValues; set => returnValues = value; }
 
         /// <summary>
-        /// 
+        /// This Methode creates the string, that visualizes the runtime data in the small text window.
         /// </summary>
         /// <param name="statementCounter"></param>
         /// <param name="AddReturnValueToStack">This should be true when the Visualization is running forward. Only then the return value is put on the stack.</param>
