@@ -199,11 +199,18 @@ namespace SEE.Net
                         {
                             new SyncCitiesAction(navigationAction).Execute(recipient);
                         }
-                        // TODO(torben): set hover, select and grab for everything!
-                        //foreach (Controls.Outline outline in UnityEngine.Object.FindObjectsOfType<Controls.Outline>())
-                        //{
-                        //    new SelectionAction(null, outline.GetComponent<Controls.HoverableObject>()).Execute(recipient);
-                        //}
+                        foreach (Controls.InteractableObject interactableObject in Controls.InteractableObject.GrabbedObjects)
+                        {
+                            new SetGrabAction(interactableObject, true).Execute(recipient);
+                        }
+                        foreach (Controls.InteractableObject interactableObject in Controls.InteractableObject.SelectedObjects)
+                        {
+                            new SetSelectAction(interactableObject, true).Execute(recipient);
+                        }
+                        foreach (Controls.InteractableObject interactableObject in Controls.InteractableObject.HoveredObjects)
+                        {
+                            new SetHoverAction(interactableObject, true).Execute(recipient);
+                        }
                     }
 
                     // recognize client
@@ -251,10 +258,41 @@ namespace SEE.Net
                     Connections.Remove(connection);
                     incomingPacketSequenceIDs.Remove(connection);
                     outgoingPacketSequenceIDs.Remove(connection);
-                    ViewContainer[] viewContainers = ViewContainer.GetViewContainersByOwner((IPEndPoint)connection.ConnectionInfo.RemoteEndPoint);
+
+                    IPEndPoint remoteEndPoint = (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint;
+
+                    ViewContainer[] viewContainers = ViewContainer.GetViewContainersByOwner(remoteEndPoint);
                     foreach (ViewContainer viewContainer in viewContainers)
                     {
                         new DestroyPrefabAction(viewContainer).Execute();
+                    }
+
+                    if (SetGrabAction.GrabbedObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> grabbedInteractables))
+                    {
+                        foreach (Controls.InteractableObject grabbedInteractable in grabbedInteractables)
+                        {
+                            SetGrabAction action = new SetGrabAction(grabbedInteractable, false);
+                            action.SetRequester(remoteEndPoint);
+                            action.Execute();
+                        }
+                    }
+                    if (SetSelectAction.SelectedObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> selectedInteractables))
+                    {
+                        foreach (Controls.InteractableObject selectedInteractable in selectedInteractables)
+                        {
+                            SetSelectAction action = new SetSelectAction(selectedInteractable, false);
+                            action.SetRequester(remoteEndPoint);
+                            action.Execute();
+                        }
+                    }
+                    if (SetHoverAction.HoveredObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> hoveredInteractables))
+                    {
+                        foreach (Controls.InteractableObject hoveredInteractable in hoveredInteractables)
+                        {
+                            SetHoverAction action = new SetHoverAction(hoveredInteractable, false);
+                            action.SetRequester(remoteEndPoint);
+                            action.Execute();
+                        }
                     }
 
                     Logger.Log("Connection closed: " + connection.ToString());
