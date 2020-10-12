@@ -5,17 +5,6 @@ using UnityEngine;
 namespace SEE.Net
 {
 
-    public class ActionFailedException : Exception
-    {
-        public ActionFailedException()
-        {
-        }
-
-        public ActionFailedException(string message) : base(message)
-        {
-        }
-    }
-
     /// <summary>
     /// !!! IMPORTANT !!!
     /// 
@@ -28,7 +17,9 @@ namespace SEE.Net
     ///   These rules are necessary, to allow (de)serialization of the classes for
     ///   networking.
     ///   
-    ///   See <see cref="JsonUtility.ToJson(object)"/> for further details.
+    ///   See section Networking.Actions.Creation in
+    ///   <see href="https://github.com/uni-bremen-agst/SEE/wiki/Networking">here</see>
+    ///   for further details.
     /// 
     /// 
     /// 
@@ -135,6 +126,7 @@ namespace SEE.Net
             return result;
         }
 
+
         /// <summary>
         /// Executes this action for the server and every client.
         /// 
@@ -148,6 +140,8 @@ namespace SEE.Net
         /// <param name="recipients">The recipients of this action. If <code>null</code>,
         /// this actions will be executed everywhere.</param>
         /// </summary>
+        /// 
+        /// <param name="recipients">The recipients of the actions.dadawawdaddWADAWDAWD</param>
         public void Execute(IPEndPoint[] recipients = null)
         {
             if (Network.UseInOfflineMode)
