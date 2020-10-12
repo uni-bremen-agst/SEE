@@ -267,6 +267,11 @@ namespace SEE.GO
             // appear as circle segments. The inner circle needs to cover them partly.
             CreateCircleSegments(donutChart, values);
             CreateInnerCircle(donutChart, innerValue, fractionOfInnerCircle);
+
+            // Create collider for selection
+            donutChart.AddComponent<MeshFilter>().sharedMesh = CylinderFactory.GetCylinderMesh();
+            donutChart.AddComponent<MeshRenderer>().sharedMaterial = Materials.New(Materials.ShaderType.Invisible, materials[0].renderQueue);
+            donutChart.AddComponent<MeshCollider>().sharedMesh = CylinderFactory.GetCylinderMesh();
         }
 
         /// <summary>
