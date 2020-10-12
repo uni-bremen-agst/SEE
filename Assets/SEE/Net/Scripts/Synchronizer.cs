@@ -1,15 +1,19 @@
-﻿using UnityEngine;
+﻿using SEE.Controls;
+using UnityEngine;
 
 namespace SEE.Net
 {
+    [RequireComponent(typeof(InteractableObject))]
     public class Synchronizer : MonoBehaviour
     {
         private bool sendUpdate;
+        private InteractableObject interactable;
         public int updateTimeout;
 
         private void Start()
         {
             sendUpdate = false;
+            interactable = GetComponent<InteractableObject>();
             updateTimeout = 0;
 
             if (Network.UseInOfflineMode)
@@ -34,7 +38,11 @@ namespace SEE.Net
 
         private void Synchronize()
         {
-            if (sendUpdate)
+            if (Network.UseInOfflineMode)
+            {
+                Destroy(this);
+            }
+            else if (sendUpdate)
             {
                 if (updateTimeout > 0)
                 {
@@ -43,7 +51,7 @@ namespace SEE.Net
                 else
                 {
                     sendUpdate = false;
-                    new SynchronizeBuildingTransformAction(gameObject, false).Execute();
+                    new SynchronizeInteractableAction(interactable, false).Execute();
                 }
             }
         }

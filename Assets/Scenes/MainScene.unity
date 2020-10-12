@@ -147,7 +147,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 141690887}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.99999994, y: -4.5, z: 0}
+  m_LocalPosition: {x: -1.0006944, y: -4.5002317, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -182,7 +182,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 7, y: 7}
     lockAspectRatio: 1
-    worldSize: {x: 0.6999999, y: 0.6999999}
+    worldSize: {x: 0.69967586, y: 0.69967586}
 --- !u!1001 &145073678
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1498,7 +1498,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcc1cedcf0a20b04ca3d2bb78035f3cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInputType: 0
+  playerInputType: 2
   HideVRControllers: 0
   ShowControllerHints: 0
 --- !u!4 &1510433995
@@ -1789,7 +1789,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1626562202}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.99999994, y: -4, z: 0}
+  m_LocalPosition: {x: 0.9983796, y: -4.000463, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -1824,7 +1824,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 7, y: 7}
     lockAspectRatio: 1
-    worldSize: {x: 0.6999999, y: 0.6999999}
+    worldSize: {x: 0.69967586, y: 0.69967586}
 --- !u!1 &1636335451
 GameObject:
   m_ObjectHideFlags: 0
@@ -1850,7 +1850,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636335451}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -7.8888893, y: -4, z: 0}
+  m_LocalPosition: {x: -9.9648075, y: -4.000463, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -1921,7 +1921,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 20, y: 20}
     lockAspectRatio: 1
-    worldSize: {x: 1.9999999, y: 1.9999999}
+    worldSize: {x: 1.999074, y: 1.999074}
   knob:
     idleSprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
     busySprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
@@ -1931,7 +1931,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 10, y: 10}
     lockAspectRatio: 1
-    worldSize: {x: 0.99999994, y: 0.99999994}
+    worldSize: {x: 0.999537, y: 0.999537}
   knobRange: 7.5
 --- !u!1 &1649116644
 GameObject:
@@ -3337,6 +3337,11 @@ PrefabInstance:
       propertyPath: cameraTransform
       value: 
       objectReference: {fileID: 844925776}
+    - target: {fileID: 2342395875013397700, guid: 51821f11a04e1ab4d9151f06c2366bbc,
+        type: 3}
+      propertyPath: clickDelay
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3473,7 +3478,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776319858}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.8888893, y: -4, z: 0}
+  m_LocalPosition: {x: 9.962492, y: -4.000463, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -3544,7 +3549,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 20, y: 20}
     lockAspectRatio: 1
-    worldSize: {x: 1.9999999, y: 1.9999999}
+    worldSize: {x: 1.999074, y: 1.999074}
   knob:
     idleSprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
     busySprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
@@ -3554,7 +3559,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 10, y: 10}
     lockAspectRatio: 1
-    worldSize: {x: 0.99999994, y: 0.99999994}
+    worldSize: {x: 0.999537, y: 0.999537}
   knobRange: 7.5
 --- !u!1 &1925924584
 GameObject:
@@ -3585,13 +3590,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68cd993404524eb45918638d10b68356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useInOfflineMode: 0
+  useInOfflineMode: 1
   hostServer: 1
   remoteServerIPAddress: 192.168.178.22
   localServerPort: 55555
   remoteServerPort: 55555
-  loadCityOnStart: 1
-  nativeLoggingEnabled: 0
+  loadCityOnStart: 0
+  networkCommsLoggingEnabled: 0
+  internalLoggingEnabled: 1
   minimalSeverity: 2
   vivoxChannelName: SEECity
 --- !u!4 &1925924586

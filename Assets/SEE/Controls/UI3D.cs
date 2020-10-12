@@ -37,6 +37,7 @@ namespace SEE.UI3D
             c.focusses = new List<Transform>();
 
             c.outline = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            Destroy(c.outline.GetComponent<MeshCollider>());
             c.outline.transform.parent = go.transform;
             c.outline.transform.localPosition = Vector3.zero;
             c.outline.transform.localScale = Vector3.one;
@@ -98,7 +99,7 @@ namespace SEE.UI3D
         
         public void AddFocus(Transform focus)
         {
-            if (focus)
+            if (focus && !focusses.Contains(focus))
             {
                 focusses.Add(focus);
                 gameObject.SetActive(true);
@@ -153,17 +154,7 @@ namespace SEE.UI3D
             }
             else
             {
-                GetMostDistantFocussesXZ(out Transform focus0, out Transform focus1, out float radius0, out float radius1, out float diameter);
-                Vector3 p0 = focus0.position;
-                Vector3 p1 = focus1.position;
-                Vector3 v01 = focus1.position - focus0.position;
-                if (v01.sqrMagnitude != 0.0f)
-                {
-                    v01.Normalize();
-                }
-                p0 -= v01 * radius0;
-                p1 += v01 * radius1;
-                result = 0.5f * (p0 + p1);
+                GetMostDistantFocussesXZ(out Transform _, out Transform _, out float _, out float _, out float _, out result);
             }
 
             return result;
@@ -179,13 +170,16 @@ namespace SEE.UI3D
             }
             else
             {
-                GetMostDistantFocussesXZ(out Transform _, out Transform _, out float _, out float _, out result);
+                GetMostDistantFocussesXZ(out Transform _, out Transform _, out float _, out float _, out result, out Vector3 _);
             }
 
             return result;
         }
 
-        private void GetMostDistantFocussesXZ(out Transform focus0, out Transform focus1, out float radius0, out float radius1, out float diameter)
+        private void GetMostDistantFocussesXZ(
+            out Transform focus0, out Transform focus1,
+            out float radius0, out float radius1,
+            out float diameter, out Vector3 center)
         {
             Assert.IsTrue(focusses.Count >= 2);
 
@@ -194,8 +188,9 @@ namespace SEE.UI3D
             radius0 = 0.0f;
             radius1 = 0.0f;
             diameter = 0.0f;
+            center = Vector3.zero;
 
-            for (int i = 0; i < focusses.Count; i++)
+            for (int i = 0; i < focusses.Count - 1; i++)
             {
                 for (int j = i + 1; j < focusses.Count; j++)
                 {
@@ -207,15 +202,46 @@ namespace SEE.UI3D
                     Transform foc1 = focusses[j];
                     float rad0 = 0.5f * foc0.lossyScale.x;
                     float rad1 = 0.5f * foc1.lossyScale.x;
-                    float dia = rad0 + rad1 + (foc1.position.XZ() - foc0.position.XZ()).magnitude;
+                    float d01 = (foc1.position.XZ() - foc0.position.XZ()).magnitude;
 
-                    if (dia > diameter)
+                    if (rad0 >= d01 + rad1)
                     {
-                        focus0 = foc0;
-                        focus1 = foc1;
-                        radius0 = rad0;
-                        radius1 = rad1;
-                        diameter = dia;
+                        float dia = 2.0f * rad0;
+                        if (dia > diameter)
+                        {
+                            focus0 = foc0;
+                            radius0 = rad0;
+                            diameter = dia;
+                            center = foc0.position;
+                        }
+                    }
+                    else if (rad1 >= d01 + rad0)
+                    {
+                        float dia = 2.0f * rad1;
+                        if (dia > diameter)
+                        {
+                            focus0 = foc1;
+                            radius0 = rad1;
+                            diameter = dia;
+                            center = foc1.position;
+                        }
+                    }
+                    else
+                    {
+                        float dia = rad0 + rad1 + d01;
+                        if (dia > diameter)
+                        {
+                            focus0 = foc0;
+                            focus1 = foc1;
+                            radius0 = rad0;
+                            radius1 = rad1;
+                            diameter = dia;
+                            Vector3 v01 = foc1.position - foc0.position;
+                            Vector3 v01n = v01.normalized;
+                            Vector3 p0 = focus0.position - v01n * rad0;
+                            Vector3 p1 = focus1.position + v01n * rad1;
+                            center = 0.5f * (p0 + p1);
+                        }
                     }
                 }
             }
@@ -314,6 +340,7 @@ namespace SEE.UI3D
         internal static RotateGizmo Create(Plane cullingPlane, int textureResolution)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            Destroy(go.GetComponent<MeshCollider>());
             go.name = "RotatePivot";
             go.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
             go.transform.position = cullingPlane.CenterTop;

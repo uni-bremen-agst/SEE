@@ -199,10 +199,11 @@ namespace SEE.Net
                         {
                             new SyncCitiesAction(navigationAction).Execute(recipient);
                         }
-                        foreach (Controls.Outline outline in UnityEngine.Object.FindObjectsOfType<Controls.Outline>())
-                        {
-                            new SelectionAction(null, outline.GetComponent<Controls.HoverableObject>()).Execute(recipient);
-                        }
+                        // TODO(torben): set hover, select and grab for everything!
+                        //foreach (Controls.Outline outline in UnityEngine.Object.FindObjectsOfType<Controls.Outline>())
+                        //{
+                        //    new SelectionAction(null, outline.GetComponent<Controls.HoverableObject>()).Execute(recipient);
+                        //}
                     }
 
                     // recognize client

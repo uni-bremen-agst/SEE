@@ -62,23 +62,27 @@ namespace SEE.Charts.Scripts.VR
 		public override void AreaSelection(Vector2 min, Vector2 max, bool direction)
 		{
 			if (direction)
-				foreach (var marker in ActiveMarkers)
+            {
+				foreach (GameObject marker in ActiveMarkers)
 				{
-					var markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
-					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y &&
-					    markerPos.y < max.y)
-						ChartManager.HighlightObject(
-							marker.GetComponent<ChartMarker>().linkedObject, false);
+					Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
+					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
+                    {
+						ChartManager.HighlightObject(marker.GetComponent<ChartMarker>().linkedObject, false);
+                    }
 				}
+            }
 			else
-				foreach (var marker in ActiveMarkers)
+            {
+				foreach (GameObject marker in ActiveMarkers)
 				{
-					var markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
-					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y &&
-					    markerPos.y > max.y)
-						ChartManager.HighlightObject(
-							marker.GetComponent<ChartMarker>().linkedObject, false);
+                    Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
+					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y && markerPos.y > max.y)
+                    {
+						ChartManager.HighlightObject(marker.GetComponent<ChartMarker>().linkedObject, false);
+                    }
 				}
+            }
 		}
 
 		/// <summary>

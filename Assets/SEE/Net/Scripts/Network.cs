@@ -111,10 +111,12 @@ namespace SEE.Net
         /// </summary>
         public static bool LoadCityOnStart => instance ? instance.loadCityOnStart : false;
 
+#if UNITY_EDITOR
         /// <summary>
         /// <see cref="internalLoggingEnabled"/>
         /// </summary>
         public static bool InternalLoggingEnabled => instance ? instance.internalLoggingEnabled : false;
+#endif
 
         /// <summary>
         /// Contains the main thread of the application.
