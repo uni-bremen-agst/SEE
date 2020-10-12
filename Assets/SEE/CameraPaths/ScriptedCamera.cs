@@ -133,8 +133,10 @@ namespace SEE.CameraPaths
             {
                 Debug.LogWarning($"ScriptedCamera: Interpolation failed with error '{e.Message}'\n");
                 Debug.LogWarning($"ScriptedCamera: Creating spline with default location\n");
-                spline = new BSpline(1, 4, 0);
-                spline.ControlPoints = new List<double> { 0, 0, 0, 0 };
+                spline = new BSpline(1, 4, 0)
+                {
+                    ControlPoints = new List<double> { 0, 0, 0, 0 }
+                };
                 pathIsEnabled = false;
             }
             transform.position = ListToVectors(spline.ControlPointAt(0))[0];

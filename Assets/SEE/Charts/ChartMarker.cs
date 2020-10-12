@@ -227,7 +227,7 @@ namespace SEE.Charts.Scripts
 		/// <summary>
 		/// Copy of the <see cref="linkedObject" /> with different material to make it look highlighted.
 		/// </summary>
-		private GameObject _highlightCopy;
+		private readonly GameObject _highlightCopy;
 
 		private void SetHighlighting(GameObject go, bool highlight)
         {
