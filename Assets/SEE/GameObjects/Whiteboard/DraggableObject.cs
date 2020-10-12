@@ -27,6 +27,7 @@ using Valve.VR.InteractionSystem;
 
 namespace SEE.GO.Whiteboard
 {
+    [System.Obsolete("Experimental code. Do not use it. May be removed soon.")]
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(Interactable))]
     public class DraggableObject : MonoBehaviour

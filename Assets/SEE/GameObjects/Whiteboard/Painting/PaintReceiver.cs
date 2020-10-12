@@ -26,6 +26,7 @@ using UnityEngine;
 namespace SEE.GO.Whiteboard
 {
     [RequireComponent(typeof(MeshRenderer))]
+    [System.Obsolete("Experimental code. Do not use it. May be removed soon.")]
     public class PaintReceiver : MonoBehaviour
     {
         [SerializeField]
