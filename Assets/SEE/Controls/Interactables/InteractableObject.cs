@@ -1,4 +1,5 @@
 ﻿using SEE.GO;
+using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
@@ -317,15 +318,30 @@ namespace SEE.Controls
 
         private void OnMouseEnter()
         {
-            if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop)
+            if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop && !Raycasting.IsMouseOverGUI())
             {
                 SetHover(true, true);
             }
         }
 
-        private void OnMouseExit()
+        private void OnMouseOver()
         {
             if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop)
+            {
+                if (IsHovered && Raycasting.IsMouseOverGUI())
+                {
+                    SetHover(false, true);
+                }
+                else if (!IsHovered && !Raycasting.IsMouseOverGUI())
+                {
+                    SetHover(true, true);
+                }
+            }
+        }
+
+        private void OnMouseExit()
+        {
+            if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop && !Raycasting.IsMouseOverGUI())
             {
                 SetHover(false, true);
             }
