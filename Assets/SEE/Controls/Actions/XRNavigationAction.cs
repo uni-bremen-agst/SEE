@@ -5,8 +5,14 @@ using Valve.VR.InteractionSystem;
 namespace SEE.Controls
 {
 
+    /// <summary>
+    /// Controls the interactions with the city in XR mode.
+    /// </summary>
     public sealed class XRNavigationAction : NavigationAction
     {
+        /// <summary>
+        /// The current mode of navigation depents on the number of interacting hands.
+        /// </summary>
         private enum XRNavigationMode
         {
             None,
@@ -14,23 +20,96 @@ namespace SEE.Controls
             MoveRotateScale
         }
         
+        /// <summary>
+        /// The current interaction mode.
+        /// </summary>
         private XRNavigationMode mode;
+
+        /// <summary>
+        /// The currently interacting right hand or <code>null</code>, if it currently
+        /// does not interact.
+        /// </summary>
         private Hand rightHand;
+
+        /// <summary>
+        /// The currently interacting left hand or <code>null</code>, if it currently
+        /// does not interact.
+        /// </summary>
         private Hand leftHand;
+
+        /// <summary>
+        /// Distance between the right hand and the city center. Is used to be able to calculate
+        /// the current offset vector, independent of the rotation of the city.
+        /// </summary>
         private float rightDistance;
+
+        /// <summary>
+        /// Distance between the left hand and the city center. Is used to be able to calculate
+        /// the current offset vector, independent of the rotation of the city.
+        /// </summary>
         private float leftDistance;
+
+        /// <summary>
+        /// The angle in degrees between the two vectors counterclockwise:
+        /// - Vector from city center to initial grabbed position in city by right hand.
+        /// - The vector (1, 0)
+        /// 
+        /// Is used to be able to calculate the current offset vector, independent of the
+        /// rotation of the city.
+        /// </summary>
         private float rightAngle;
+
+        /// <summary>
+        /// The angle in degrees between the two vectors counterclockwise:
+        /// - Vector from city center to initial grabbed position in city by left hand.
+        /// - The vector (1, 0)
+        /// 
+        /// Is used to be able to calculate the current offset vector, independent of the
+        /// rotation of the city.
+        /// </summary>
         private float leftAngle;
-        private InteractableObject leftInteractable;
+
+        /// <summary>
+        /// The object, the right hand currently interacts with.
+        /// </summary>
         private InteractableObject rightInteractable;
+
+        /// <summary>
+        /// The object, the left hand currently interacts with.
+        /// </summary>
+        private InteractableObject leftInteractable;
+
+        /// <summary>
+        /// The original scale of the city upon grabbing it.
+        /// </summary>
         private Vector3 cityStartGrabScale;
+
+        /// <summary>
+        /// The initial distance between both interacting hands. Only used, if both hands
+        /// currently interact.
+        /// </summary>
         private float startHandDistance;
 
+        /// <summary>
+        /// The left grip action for grabbing the whole city.
+        /// </summary>
         private SteamVR_Action_Boolean leftGripAction;
+
+        /// <summary>
+        /// The right grip action for grabbing the whole city.
+        /// </summary>
         private SteamVR_Action_Boolean rightGripAction;
 
-        private Interactable attachedInteractable;
+        /// <summary>
+        /// The current grab action for grabbing individual parts of the city.
+        /// </summary>
         private SteamVR_Action_Single grabAction;
+
+        /// <summary>
+        /// The interactable, that is currently attached to grabbing hand. This is not
+        /// necessarily the whole city, as parts of the city can be moved individually.
+        /// </summary>
+        private Interactable attachedInteractable;
 
 
 
@@ -54,120 +133,124 @@ namespace SEE.Controls
         {
             base.Update();
 
-            if (!CityAvailable)
+            if (CityAvailable)
             {
-                return;
-            }
-
-            if (grabAction.lastAxis < 0.9f && grabAction.axis >= 0.9f)
-            {
-                Hand theRightHand = Player.instance.rightHand;
-                Interactable hoveringInteractable = theRightHand.hoveringInteractable;
-                if (hoveringInteractable && hoveringInteractable.GetComponentInParent<XRNavigationAction>() == this)
+                // Grab, release parts of city
+                if (grabAction.lastAxis < 0.9f && grabAction.axis >= 0.9f)
                 {
-                    const Hand.AttachmentFlags AttachmentFlags
-                        = Hand.defaultAttachmentFlags
-                        & (~Hand.AttachmentFlags.SnapOnAttach)
-                        & (~Hand.AttachmentFlags.DetachOthers)
-                        & (~Hand.AttachmentFlags.VelocityMovement);
+                    Hand theRightHand = Player.instance.rightHand;
+                    Interactable hoveringInteractable = theRightHand.hoveringInteractable;
+                    if (hoveringInteractable && hoveringInteractable.GetComponentInParent<XRNavigationAction>() == this)
+                    {
+                        const Hand.AttachmentFlags AttachmentFlags
+                            = Hand.defaultAttachmentFlags
+                            & (~Hand.AttachmentFlags.SnapOnAttach)
+                            & (~Hand.AttachmentFlags.DetachOthers)
+                            & (~Hand.AttachmentFlags.VelocityMovement);
 
-                    attachedInteractable = hoveringInteractable;
-                    theRightHand.HoverLock(hoveringInteractable);
-                    theRightHand.AttachObject(hoveringInteractable.gameObject, GrabTypes.Pinch, AttachmentFlags);
+                        attachedInteractable = hoveringInteractable;
+                        theRightHand.HoverLock(hoveringInteractable);
+                        theRightHand.AttachObject(hoveringInteractable.gameObject, GrabTypes.Pinch, AttachmentFlags);
+                    }
                 }
-            }
-            else if (grabAction.lastAxis >= 0.9f && grabAction.axis < 0.9f && attachedInteractable)
-            {
-                Hand theRightHand = Player.instance.rightHand;
-                attachedInteractable.transform.rotation = Quaternion.identity;
-
-                theRightHand.DetachObject(attachedInteractable.gameObject);
-                theRightHand.HoverUnlock(attachedInteractable);
-                attachedInteractable = null;
-            }
-
-            if (leftGripAction.state && !leftHand
-                && Player.instance.leftHand.hoveringInteractable
-                && Player.instance.leftHand.hoveringInteractable.GetComponentInParent<XRNavigationAction>() == this)
-            {
-                OnStartGrab(Player.instance.leftHand, Player.instance.leftHand.hoveringInteractable.gameObject);
-            }
-            else if (!leftGripAction.state && leftHand)
-            {
-                OnStopGrab(Player.instance.leftHand);
-            }
-
-            if (rightGripAction.state && !rightHand
-                && Player.instance.rightHand.hoveringInteractable
-                && Player.instance.rightHand.hoveringInteractable.GetComponentInParent<XRNavigationAction>() == this)
-            {
-                OnStartGrab(Player.instance.rightHand, Player.instance.rightHand.hoveringInteractable.gameObject);
-            }
-            else if (!rightGripAction.state && rightHand)
-            {
-                OnStopGrab(Player.instance.rightHand);
-            }
-
-            if (!UpdateZoom())
-            {
-                // move, rotate, scale
-                if (mode != XRNavigationMode.None)
+                else if (grabAction.lastAxis >= 0.9f && grabAction.axis < 0.9f && attachedInteractable)
                 {
-                    float scaleFactor = 1.0f;
-                    if (mode == XRNavigationMode.MoveRotateScale)
+                    Hand theRightHand = Player.instance.rightHand;
+                    attachedInteractable.transform.rotation = Quaternion.identity;
+
+                    theRightHand.DetachObject(attachedInteractable.gameObject);
+                    theRightHand.HoverUnlock(attachedInteractable);
+                    attachedInteractable = null;
+                }
+
+                if (leftGripAction.state && !leftHand
+                    && Player.instance.leftHand.hoveringInteractable
+                    && Player.instance.leftHand.hoveringInteractable.GetComponentInParent<XRNavigationAction>() == this)
+                {
+                    OnStartGrab(Player.instance.leftHand, Player.instance.leftHand.hoveringInteractable.gameObject);
+                }
+                else if (!leftGripAction.state && leftHand)
+                {
+                    OnStopGrab(Player.instance.leftHand);
+                }
+
+                if (rightGripAction.state && !rightHand
+                    && Player.instance.rightHand.hoveringInteractable
+                    && Player.instance.rightHand.hoveringInteractable.GetComponentInParent<XRNavigationAction>() == this)
+                {
+                    OnStartGrab(Player.instance.rightHand, Player.instance.rightHand.hoveringInteractable.gameObject);
+                }
+                else if (!rightGripAction.state && rightHand)
+                {
+                    OnStopGrab(Player.instance.rightHand);
+                }
+
+                if (!UpdateZoom())
+                {
+                    // move, rotate, scale
+                    if (mode != XRNavigationMode.None)
                     {
-                        float currentDistance = (leftHand.transform.position.XZ() - rightHand.transform.position.XZ()).magnitude;
-                        scaleFactor = currentDistance / startHandDistance;
+                        float scaleFactor = 1.0f;
+                        if (mode == XRNavigationMode.MoveRotateScale)
+                        {
+                            float currentDistance = (leftHand.transform.position.XZ() - rightHand.transform.position.XZ()).magnitude;
+                            scaleFactor = currentDistance / startHandDistance;
+                        }
+
+                        // align with first hand
+                        Hand fstHand = rightHand;
+                        float fstDistance = rightDistance;
+                        float fstAngle = rightAngle;
+                        if (!fstHand)
+                        {
+                            fstHand = leftHand;
+                            fstDistance = leftDistance;
+                            fstAngle = leftAngle;
+                        }
+
+                        fstDistance *= scaleFactor;
+                        float cityAngleOffset = Mathf.Deg2Rad * CityTransform.rotation.eulerAngles.y;
+                        fstAngle -= cityAngleOffset;
+
+                        Vector2 fstOffsetV2 = new Vector2(Mathf.Cos(fstAngle), Mathf.Sin(fstAngle)) * fstDistance;
+                        Vector2 fstHandPositionV2 = fstHand.transform.position.XZ();
+
+                        Vector2 fstNewCityPositionV2 = fstHandPositionV2 - fstOffsetV2;
+                        CityTransform.position = new Vector3(fstNewCityPositionV2.x, CityTransform.position.y, fstNewCityPositionV2.y);
+
+                        // align with second hand
+                        if (mode == XRNavigationMode.MoveRotateScale)
+                        {
+                            // move, rotate
+                            float sndAngle = leftAngle - cityAngleOffset;
+
+                            Vector2 sndOffsetV2 = new Vector2(Mathf.Cos(sndAngle), Mathf.Sin(sndAngle)) * (leftDistance * scaleFactor);
+                            Vector2 sndHandPositionV2 = leftHand.transform.position.XZ();
+
+                            Vector2 v0 = sndHandPositionV2 - fstHandPositionV2;
+                            Vector2 v1 = (fstNewCityPositionV2 + sndOffsetV2) - fstHandPositionV2;
+                            float a = Vector2.SignedAngle(v0, v1);
+
+                            CityTransform.RotateAround(fstHand.transform.position, Vector3.up, a);
+
+                            // scale
+                            CityTransform.localScale = cityStartGrabScale * scaleFactor;
+                        }
+
+                        zoomState.currentZoomFactor = CityTransform.localScale.x / zoomState.originalScale.x;
+                        float zoomSteps = ConvertZoomFactorToZoomSteps(zoomState.currentZoomFactor);
+                        zoomState.currentTargetZoomSteps = zoomSteps;
+                        new Net.SyncCitiesAction(this).Execute();
                     }
-
-                    // align with first hand
-                    Hand fstHand = rightHand;
-                    float fstDistance = rightDistance;
-                    float fstAngle = rightAngle;
-                    if (!fstHand)
-                    {
-                        fstHand = leftHand;
-                        fstDistance = leftDistance;
-                        fstAngle = leftAngle;
-                    }
-
-                    fstDistance *= scaleFactor;
-                    float cityAngleOffset = Mathf.Deg2Rad * CityTransform.rotation.eulerAngles.y;
-                    fstAngle -= cityAngleOffset;
-
-                    Vector2 fstOffsetV2 = new Vector2(Mathf.Cos(fstAngle), Mathf.Sin(fstAngle)) * fstDistance;
-                    Vector2 fstHandPositionV2 = fstHand.transform.position.XZ();
-
-                    Vector2 fstNewCityPositionV2 = fstHandPositionV2 - fstOffsetV2;
-                    CityTransform.position = new Vector3(fstNewCityPositionV2.x, CityTransform.position.y, fstNewCityPositionV2.y);
-
-                    // align with second hand
-                    if (mode == XRNavigationMode.MoveRotateScale)
-                    {
-                        // move, rotate
-                        float sndAngle = leftAngle - cityAngleOffset;
-
-                        Vector2 sndOffsetV2 = new Vector2(Mathf.Cos(sndAngle), Mathf.Sin(sndAngle)) * (leftDistance * scaleFactor);
-                        Vector2 sndHandPositionV2 = leftHand.transform.position.XZ();
-
-                        Vector2 v0 = sndHandPositionV2 - fstHandPositionV2;
-                        Vector2 v1 = (fstNewCityPositionV2 + sndOffsetV2) - fstHandPositionV2;
-                        float a = Vector2.SignedAngle(v0, v1);
-
-                        CityTransform.RotateAround(fstHand.transform.position, Vector3.up, a);
-
-                        // scale
-                        CityTransform.localScale = cityStartGrabScale * scaleFactor;
-                    }
-
-                    zoomState.currentZoomFactor = CityTransform.localScale.x / zoomState.originalScale.x;
-                    float zoomSteps = ConvertZoomFactorToZoomSteps(zoomState.currentZoomFactor);
-                    zoomState.currentTargetZoomSteps = zoomSteps;
-                    new Net.SyncCitiesAction(this).Execute();
                 }
             }
         }
 
+        /// <summary>
+        /// Updates data if given hand starts grabbing the given game object.
+        /// </summary>
+        /// <param name="hand">The grabbing hand.</param>
+        /// <param name="go">The grabbed object.</param>
         private void OnStartGrab(Hand hand, GameObject go)
         {
             if (hand.handType == SteamVR_Input_Sources.LeftHand && leftHand == null
@@ -214,6 +297,10 @@ namespace SEE.Controls
             }
         }
 
+        /// <summary>
+        /// Updates data if given hand stops grabbing the given game object.
+        /// </summary>
+        /// <param name="hand">The releasing hand.</param>
         private void OnStopGrab(Hand hand)
         {
             if (hand == leftHand)

@@ -5,16 +5,44 @@ using UnityEngine;
 namespace SEE.Controls
 {
 
+    /// <summary>
+    /// The abstract navigation action handles generic interactions with the city.
+    /// </summary>
     [RequireComponent(typeof(Plane))]
     public abstract class NavigationAction : CityAction
     {
+        /// <summary>
+        /// Zoom commands hold data about zooming into or out of the city.
+        /// </summary>
         internal class ZoomCommand
         {
+            /// <summary>
+            /// The amount of zoom steps this command is trying to reach.
+            /// </summary>
             public readonly float TargetZoomSteps;
+
+            /// <summary>
+            /// The position onto where this command is supposed to zoom on the XZ-plane.
+            /// </summary>
             public readonly Vector2 ZoomCenter;
+
+            /// <summary>
+            /// The amount of time in seconds that it should take to reach
+            /// <see cref="TargetZoomSteps"/>.
+            /// </summary>
             private readonly float duration;
+
+            /// <summary>
+            /// The creation time of the zoom command.
+            /// </summary>
             private readonly float startTime;
 
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="zoomCenter"><see cref="ZoomCenter"/>.</param>
+            /// <param name="targetZoomSteps"><see cref="TargetZoomSteps"/>.</param>
+            /// <param name="duration"><see cref="this.duration"/>.</param>
             internal ZoomCommand(Vector2 zoomCenter, float targetZoomSteps, float duration)
             {
                 TargetZoomSteps = targetZoomSteps;
@@ -23,12 +51,22 @@ namespace SEE.Controls
                 startTime = Time.realtimeSinceStartup;
             }
 
+            /// <summary>
+            /// Whether the command has finished zooming.
+            /// </summary>
+            /// <returns>Whether the command has finished zooming.</returns>
             internal bool IsFinished()
             {
                 bool result = Time.realtimeSinceStartup - startTime >= duration;
                 return result;
             }
 
+            /// <summary>
+            /// The current delta in zoom steps, depending on the elapsed time since
+            /// creation and the desired amount of target zoom steps.
+            /// </summary>
+            /// <returns>The current delta in scale between zero and
+            /// <see cref="TargetZoomSteps"/> converted to a zoom factor.</returns>
             internal float CurrentDeltaScale()
             {
                 float x = Mathf.Min((Time.realtimeSinceStartup - startTime) / duration, 1.0f);
@@ -38,26 +76,46 @@ namespace SEE.Controls
             }
         }
 
+        /// <summary>
+        /// The zoom state contains the active zoom commands and further relevant data.
+        /// </summary>
         internal struct ZoomState
         {
             internal const float DefaultZoomDuration = 0.1f;
             internal const uint ZoomMaxSteps = 32;
-            internal const float ZoomFactor = 0.5f;
+            internal const float ZoomFactor = 0.5f;          // handles the speed in which is zoomed into the city
 
-            internal Vector3 originalScale;
+            internal Vector3 originalScale;                  // original scale of city for reset
             internal List<ZoomCommand> zoomCommands;
-            internal float currentTargetZoomSteps;
-            internal float currentZoomFactor;
+            internal float currentTargetZoomSteps;           // the desired amount of zoom steps
+            internal float currentZoomFactor;                // current zoom factor or scale of the city, relative to its original scale
         }
 
+        /// <summary>
+        /// Whether the city is already available. This might be false in multiplayer
+        /// mode, if the city is created after connecting to the server.
+        /// </summary>
         protected bool CityAvailable { get; private set; } = false;
 
+        /// <summary>
+        /// The transform of the city.
+        /// </summary>
         public Transform CityTransform { get; protected set; }
+
+        /// <summary>
+        /// The current zoom state.
+        /// </summary>
         internal ZoomState zoomState;
 
+        /// <summary>
+        /// The plane of the table
+        /// </summary>
         [Tooltip("The area in which to draw the code city")]
         [SerializeField] protected Plane portalPlane;
 
+        /// <summary>
+        /// See the tooltip.
+        /// </summary>
         [Tooltip("The unique ID used for network synchronization. This must be set via" +
             "inspector to ensure that every client will have the correct ID assigned" +
             "to the appropriate NavigationAction! If a GameObject contains both a" +
@@ -67,8 +125,17 @@ namespace SEE.Controls
         [SerializeField] protected int id;
         public int ID => id;
 
+        /// <summary>
+        /// Dictionary mapping the unique id to a navigation action object.
+        /// </summary>
         protected static readonly Dictionary<int, NavigationAction> idToActionDict = new Dictionary<int, NavigationAction>(2);
 
+        /// <summary>
+        /// Returns the navigation action of given id.
+        /// </summary>
+        /// <param name="id">Returns the navigation action of given id or
+        /// <code>null</code>, if it does not exist.</param>
+        /// <returns></returns>
         public static NavigationAction Get(int id)
         {
             bool result = idToActionDict.TryGetValue(id, out NavigationAction value);
@@ -112,20 +179,38 @@ namespace SEE.Controls
             }
         }
 
+        /// <summary>
+        /// Is called if the city is made available. This might be called delayed if the
+        /// city is initialized on load by server.
+        /// </summary>
         protected virtual void OnCityAvailable() { }
 
+        /// <summary>
+        /// Converts zoom steps to an actual zoom factor (scale factor).
+        /// </summary>
+        /// <param name="zoomSteps">The amount of zoom steps.</param>
+        /// <returns>The zoom factor.</returns>
         protected float ConvertZoomStepsToZoomFactor(float zoomSteps)
         {
             float result = Mathf.Pow(2, zoomSteps * ZoomState.ZoomFactor);
             return result;
         }
 
+        /// <summary>
+        /// Converts a zoom factor (scale) to actual zoom steps.
+        /// </summary>
+        /// <param name="zoomFactor">The zoom factor.</param>
+        /// <returns>The amount of zoom steps.</returns>
         protected float ConvertZoomFactorToZoomSteps(float zoomFactor)
         {
             float result = Mathf.Log(zoomFactor, 2) / ZoomState.ZoomFactor;
             return result;
         }
 
+        /// <summary>
+        /// Applies the currently active zoom commands to the city.
+        /// </summary>
+        /// <returns>Whether the transform of the city has been changed at all.</returns>
         protected bool UpdateZoom()
         {
             bool hasChanged = false;
@@ -184,6 +269,13 @@ namespace SEE.Controls
             return hasChanged;
         }
 
+        /// <summary>
+        /// Pushes a zoom command for execution. Zoom commands are automatically removed
+        /// once they are finished.
+        /// </summary>
+        /// <param name="zoomCenter">The position to be zoomed towards.</param>
+        /// <param name="zoomSteps">The desired amount of zoom steps.</param>
+        /// <param name="duration">The desired duration of the zooming.</param>
         internal void PushZoomCommand(Vector2 zoomCenter, float zoomSteps, float duration)
         {
             zoomSteps = Mathf.Clamp(zoomSteps, -zoomState.currentTargetZoomSteps, (float)ZoomState.ZoomMaxSteps - (float)zoomState.currentTargetZoomSteps);

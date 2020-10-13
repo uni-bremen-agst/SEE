@@ -206,14 +206,10 @@ namespace SEE.Charts.Scripts
 		/// Toggles the highlight of the <see cref="linkedObject" /> and this marker.
 		/// </summary>
 		private void HighlightLinkedObjectToggle(bool highlight)
-		{
-			if (highlight)
+        {
+            linkedObject.GetComponent<InteractableObject>()?.SetSelect(highlight, true);
+            if (!highlight)
 			{
-                SetHighlighting(linkedObject, true);
-			}
-			else
-            {
-                SetHighlighting(linkedObject, false);
 				_accentuated = false;
 			}
 
@@ -228,14 +224,6 @@ namespace SEE.Charts.Scripts
 		/// Copy of the <see cref="linkedObject" /> with different material to make it look highlighted.
 		/// </summary>
 		private readonly GameObject _highlightCopy;
-
-		private void SetHighlighting(GameObject go, bool highlight)
-        {
-            if (go.TryGetComponent(out InteractableObject interactable))
-            {
-                interactable.SetSelect(highlight, true);
-            }
-		}
 
 		/// <summary>
 		/// Toggles the highlights this marker and its <see cref="linkedObject" /> for a given

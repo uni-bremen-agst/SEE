@@ -5,22 +5,32 @@ using UnityEngine;
 namespace SEE.Controls
 {
 
+    /// <summary>
+    /// Controls the interactions with the city in desktop mode.
+    /// </summary>
     [RequireComponent(typeof(Collider))]
     public class DesktopNavigationAction : NavigationAction
     {
+        /// <summary>
+        /// The mode of interaction. In desktop mode, movement and rotation are always
+        /// separate interactions.
+        /// </summary>
         private enum NavigationMode
         {
             Move,
             Rotate
         }
 
+        /// <summary>
+        /// The state for moving the city or parts of the city.
+        /// </summary>
         private struct MoveState
         {
-            internal const float MaxVelocity = 10.0f;
+            internal const float MaxVelocity = 10.0f;                        // This is only used, if the city was moved as a whole
             internal const float MaxSqrVelocity = MaxVelocity * MaxVelocity;
+            internal const float DragFrictionFactor = 32.0f;
             internal const float SnapStepCount = 8;
             internal const float SnapStepAngle = 360.0f / SnapStepCount;
-            internal const float DragFrictionFactor = 32.0f;
 
             internal UI3D.MoveGizmo moveGizmo;
             internal Bounds cityBounds;
@@ -31,6 +41,9 @@ namespace SEE.Controls
             internal Transform draggedTransform;
         }
 
+        /// <summary>
+        /// The state for rotating the city.
+        /// </summary>
         private struct RotateState
         {
             internal const float SnapStepCount = 8;
@@ -42,11 +55,15 @@ namespace SEE.Controls
             internal float startAngle;
         }
 
+        /// <summary>
+        /// The actions, that are currently active. This is initially set by
+        /// <see cref="Update"/> and used and partly reset in <see cref="FixedUpdate"/>.
+        /// </summary>
         private struct ActionState
         {
-            internal bool selectToggle;
+            internal bool selectToggle;       // Whether selected elements should be toggled instead of being selected separate
             internal bool startDrag;
-            internal bool dragHoveredOnly;
+            internal bool dragHoveredOnly;    // true, if only the element, that is hovered by the mouse should be moved instead of whole city
             internal bool drag;
             internal bool cancel;
             internal bool snap;
@@ -57,13 +74,40 @@ namespace SEE.Controls
             internal Transform hoveredTransform;
         }
 
+        /// <summary>
+        /// The plane, the city is located on top of.
+        /// </summary>
         private UnityEngine.Plane raycastPlane;
+
+        /// <summary>
+        /// The current mode of navigation.
+        /// </summary>
         private NavigationMode mode;
+
+        /// <summary>
+        /// Whether the city is currently moved or rotated by the player.
+        /// </summary>
         private bool movingOrRotating;
+
+        /// <summary>
+        /// The cursor visually represents the center of all selected objects and is used
+        /// for the center of rotations.
+        /// </summary>
         private UI3D.Cursor cursor;
 
+        /// <summary>
+        /// The current move state.
+        /// </summary>
         private MoveState moveState;
+
+        /// <summary>
+        /// The current rotate state.
+        /// </summary>
         private RotateState rotateState;
+
+        /// <summary>
+        /// The current action state.
+        /// </summary>
         private ActionState actionState;
 
         protected sealed override void Awake()
@@ -273,7 +317,13 @@ namespace SEE.Controls
 
                         if (actionState.snap)
                         {
-                            totalDragOffsetFromStart = Project(totalDragOffsetFromStart);
+                            Vector2 point2 = new Vector2(totalDragOffsetFromStart.x, totalDragOffsetFromStart.z);
+                            float angleDeg = point2.Angle360();
+                            float snappedAngleDeg = Mathf.Round(angleDeg / MoveState.SnapStepAngle) * MoveState.SnapStepAngle;
+                            float snappedAngleRad = Mathf.Deg2Rad * snappedAngleDeg;
+                            Vector2 dir = new Vector2(Mathf.Cos(snappedAngleRad), Mathf.Sin(-snappedAngleRad));
+                            Vector2 proj = dir * Vector2.Dot(point2, dir);
+                            totalDragOffsetFromStart = new Vector3(proj.x, totalDragOffsetFromStart.y, proj.y);
                         }
 
                         Vector3 oldPosition = moveState.draggedTransform.position;
@@ -501,24 +551,26 @@ namespace SEE.Controls
 
 
 
+        /// <summary>
+        /// Converts the given angle in degrees into the range [0, 360) degrees and returns the result.
+        /// </summary>
+        /// <param name="degrees">The angle in degrees.</param>
+        /// <returns>The angle in the range [0, 360) degrees.</returns>
         private float AngleMod(float degrees)
         {
             float result = ((degrees % 360.0f) + 360.0f) % 360.0f;
             return result;
         }
 
-        private Vector3 Project(Vector3 offset)
-        {
-            Vector2 point2 = new Vector2(offset.x, offset.z);
-            float angleDeg = point2.Angle360();
-            float snappedAngleDeg = Mathf.Round(angleDeg / MoveState.SnapStepAngle) * MoveState.SnapStepAngle;
-            float snappedAngleRad = Mathf.Deg2Rad * snappedAngleDeg;
-            Vector2 dir = new Vector2(Mathf.Cos(snappedAngleRad), Mathf.Sin(-snappedAngleRad));
-            Vector2 proj = dir * Vector2.Dot(point2, dir);
-            Vector3 result = new Vector3(proj.x, offset.y, proj.y);
-            return result;
-        }
-
+        /// <summary>
+        /// If <paramref name="replaceAndDontToggle"/> is <code>true</code>, the given
+        /// object (if not <code>null</code>) will be selected and every selected object
+        /// will be deselected. Otherwise, the given objects selection state will be
+        /// toggled and the selection state of other selected objects will not change.
+        /// </summary>
+        /// <param name="go">The object to be selected/toggled.</param>
+        /// <param name="replaceAndDontToggle">Whether the object should be selected
+        /// solely or be toggled on/off.</param>
         private void Select(GameObject go, bool replaceAndDontToggle)
         {
             if (replaceAndDontToggle)
@@ -558,6 +610,14 @@ namespace SEE.Controls
             }
         }
 
+        /// <summary>
+        /// Raycasts against the clipping plane of the city ground.
+        /// </summary>
+        /// <param name="hitPlane">Whether the infinite plane was hit
+        /// (<code>false</code>, if ray is parallel to plane).</param>
+        /// <param name="insideClippingArea">Whether the plane was hit inside of its
+        /// clipping area.</param>
+        /// <param name="planeHitPoint">The point, the plane was hit by the ray.</param>
         private void RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint)
         {
             Ray ray = Camera.main.ScreenPointToRay(actionState.mousePosition);
