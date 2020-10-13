@@ -31,6 +31,7 @@ namespace SEE.Charts.Scripts
 	/// <summary>
 	/// Contains the logic for entries in the content selection scroll view.
 	/// </summary>
+    [RequireComponent(typeof(Toggle))]
 	public class ScrollViewToggle : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	{
 		/// <summary>
@@ -74,23 +75,16 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		public NodeHighlights LinkedObject { private get; set; }
 
-		/// <summary>
-		/// Called by <see cref="ChartContent" /> after creation to pass some values and initialize attributes.
-		/// </summary>
-		/// <param name="script">The script to link.</param>
-		public void Initialize(ChartContent script)
-		{
-			_chartContent = script;
+        /// <summary>
+        /// Called by <see cref="ChartContent" /> after creation to pass some values and initialize attributes.
+        /// </summary>
+        /// <param name="label">The label.</param>
+        /// <param name="script">The script to link.</param>
+        public void Initialize(string label, ChartContent script)
+        {
+            this.label.text = label;
+            _chartContent = script;
 			toggle.isOn = !Parent || (bool) LinkedObject.showInChart[_chartContent];
-		}
-
-		/// <summary>
-		/// Changes the UI label of this entry.
-		/// </summary>
-		/// <param name="text">The new label.</param>
-		public void SetLabel(string text)
-		{
-			label.text = text;
 		}
 
 		/// <summary>
@@ -189,12 +183,10 @@ namespace SEE.Charts.Scripts
 		/// <param name="highlighted">Highlight on or off.</param>
 		public void SetHighlighted(bool highlighted)
 		{
-			if (TryGetComponent<Toggle>(out Toggle highlightToggle))
-            {
-			    ColorBlock colors = highlightToggle.colors;
-			    colors.normalColor = highlighted ? Color.yellow : Color.white;
-			    highlightToggle.colors = colors;
-            }
+            Toggle toggle = GetComponent<Toggle>();
+			ColorBlock colors = toggle.colors;
+			colors.normalColor = highlighted ? Color.yellow : Color.white;
+			toggle.colors = colors;
 		}
 
 		/// <summary>
@@ -203,10 +195,10 @@ namespace SEE.Charts.Scripts
 		/// <param name="eventData"></param>
 		public void OnPointerEnter(PointerEventData eventData)
 		{
-			if (LinkedObject != null)
+			if (LinkedObject != null && !_pointedOn)
             {
 			    _pointedOn = true;
-			    ChartManager.HighlightObject(LinkedObject.gameObject, true);
+			    ChartManager.OnSelect(LinkedObject.gameObject, true);
             }
 		}
 
@@ -218,7 +210,7 @@ namespace SEE.Charts.Scripts
 		{
 			if (_pointedOn)
             {
-			    ChartManager.HighlightObject(LinkedObject.gameObject, true);
+			    ChartManager.OnDeselect(LinkedObject.gameObject, true);
 			    _pointedOn = false;
             }
 		}
@@ -231,7 +223,7 @@ namespace SEE.Charts.Scripts
 		{
 			if (_pointedOn && LinkedObject != null)
             {
-				ChartManager.HighlightObject(LinkedObject.gameObject, true);
+				ChartManager.OnSelect(LinkedObject.gameObject, true);
             }
 			StopAllCoroutines();
 		}

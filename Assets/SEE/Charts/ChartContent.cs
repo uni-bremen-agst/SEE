@@ -231,9 +231,8 @@ namespace SEE.Charts.Scripts
 
             GameObject scrollEntry = Instantiate(scrollEntryPrefab, scrollContent.transform);
 			scrollEntry.TryGetComponent<ScrollViewToggle>(out ScrollViewToggle parentToggle);
-			parentToggle.SetLabel("Leaves");
 			scrollEntry.transform.localPosition = headerOffset;
-			parentToggle.Initialize(this);
+			parentToggle.Initialize("Leaves", this);
 
             int index = 0;
 			foreach (GameObject dataObject in _dataObjects)
@@ -246,9 +245,8 @@ namespace SEE.Charts.Scripts
 
 			scrollEntry = Instantiate(scrollEntryPrefab, scrollContent.transform);
 			scrollEntry.TryGetComponent(out parentToggle);
-			parentToggle.SetLabel("Inner Nodes");
 			scrollEntry.transform.localPosition = headerOffset + new Vector2(0, _yGap) * ++index;
-			parentToggle.Initialize(this);
+			parentToggle.Initialize("Inner Nodes", this);
 
 			foreach (GameObject dataObject in _dataObjects)
 			{
@@ -301,10 +299,8 @@ namespace SEE.Charts.Scripts
                 inScene.TryGetComponent<NodeHighlights>(out var highlights);
                 rootToggle.LinkedObject = highlights;
                 highlights.scrollViewToggle = rootToggle;
-                rootToggle.SetLabel(root.SourceName);
-                tempObject.transform.localPosition =
-                    headerOffset + new Vector2(0f, _yGap) * index;
-                rootToggle.Initialize(this);
+                tempObject.transform.localPosition = headerOffset + new Vector2(0f, _yGap) * index;
+                rootToggle.Initialize(root.SourceName, this);
                 if (hierarchy > maxHierarchy) maxHierarchy = hierarchy;
                 hierarchy = 0;
                 CreateChildToggles(root, rootToggle, ref index, ref hierarchy);
@@ -333,9 +329,8 @@ namespace SEE.Charts.Scripts
 			dataObject.TryGetComponent<NodeHighlights>(out var highlights);
 			toggle.LinkedObject = highlights;
 			highlights.scrollViewToggle = toggle;
-			toggle.SetLabel(dataObject.name);
 			tempObject.transform.localPosition = childOffset + new Vector2(0f, gap) * index;
-			toggle.Initialize(this);
+			toggle.Initialize(dataObject.name, this);
 			parentToggle.AddChild(toggle);
 		}
 
@@ -358,11 +353,8 @@ namespace SEE.Charts.Scripts
 				inScene.TryGetComponent<NodeHighlights>(out var highlights);
 				toggle.LinkedObject = highlights;
 				highlights.scrollViewToggle = toggle;
-				toggle.SetLabel(child.SourceName);
-				tempObject.transform.localPosition =
-					childOffset + new Vector2(_xGap, 0f) * hierarchy +
-					new Vector2(0f, _yGap) * index++;
-				toggle.Initialize(this);
+				tempObject.transform.localPosition = childOffset + new Vector2(_xGap, 0f) * hierarchy + new Vector2(0f, _yGap) * index++;
+				toggle.Initialize(child.SourceName, this);
 				parentToggle.AddChild(toggle);
 				var tempHierarchy = hierarchy;
 				CreateChildToggles(child, toggle, ref index, ref tempHierarchy);
@@ -682,12 +674,6 @@ namespace SEE.Charts.Scripts
 					new Vector2((valueX - minX) * width, (valueY - minY) * height);
 				//CheckOverlapping(marker, updatedMarkers.ToArray());
 				updatedMarkers.Add(marker);
-
-				var highlightTimeLeft = CheckOldMarkers(data);
-				if (highlightTimeLeft > 0f)
-				{
-					chartMarker.TriggerTimedHighlight(ChartManager.Instance.highlightDuration - highlightTimeLeft, true, false);
-				}
 			}
 
 			foreach (var marker in ActiveMarkers) Destroy(marker);
@@ -735,12 +721,6 @@ namespace SEE.Charts.Scripts
 						new Vector2(x++ * width, (value - min) * height);
 					CheckOverlapping(marker, updatedMarkers.ToArray());
 					updatedMarkers.Add(marker);
-
-					if (ActiveMarkers.Count <= 0) continue;
-					var highlightTimeLeft = CheckOldMarkers(data);
-					if (highlightTimeLeft > 0f)
-						script.TriggerTimedHighlight(
-							ChartManager.Instance.highlightDuration - highlightTimeLeft, true, false);
 				}
 
 				foreach (var marker in ActiveMarkers) Destroy(marker);
@@ -786,10 +766,6 @@ namespace SEE.Charts.Scripts
 				updatedMarkers.Add(marker);
 
 				if (ActiveMarkers.Count <= 0) break;
-				var highlightTimeLeft = CheckOldMarkers(data);
-				if (highlightTimeLeft > 0f)
-					script.TriggerTimedHighlight(ChartManager.Instance.highlightDuration - highlightTimeLeft,
-						true, false);
 			}
 
 			foreach (var marker in ActiveMarkers) Destroy(marker);
@@ -833,34 +809,6 @@ namespace SEE.Charts.Scripts
 		}
 
 		/// <summary>
-		/// Checks if any of the old markers that will be removed were highlighted. If so, the highlight will
-		/// be carried over to the new marker.
-		/// </summary>
-		/// <param name="marker">The new marker.</param>
-		/// <returns></returns>
-		private float CheckOldMarkers(GameObject marker)
-		{
-			loop:
-			foreach (var oldMarker in ActiveMarkers)
-				if (oldMarker.Equals(null))
-				{
-					Destroy(oldMarker);
-					ActiveMarkers.Remove(oldMarker);
-					goto loop;
-				}
-				else if (oldMarker.TryGetComponent(out ChartMarker oldScript) &&
-				         oldScript.linkedObject.GetInstanceID() == marker.GetInstanceID() &&
-				         oldScript.TimedHighlight != null)
-				{
-					ActiveMarkers.Remove(oldMarker);
-					Destroy(oldMarker);
-					return oldScript.HighlightTime;
-				}
-
-			return 0f;
-		}
-
-		/// <summary>
 		/// Calls <see cref="ChartMarker.TriggerTimedHighlight" /> for all Markers in a rectangle in the chart.
 		/// </summary>
 		/// <param name="min">The starting edge of the rectangle.</param>
@@ -869,23 +817,27 @@ namespace SEE.Charts.Scripts
 		public virtual void AreaSelection(Vector2 min, Vector2 max, bool direction)
 		{
 			if (direction)
-				foreach (var marker in ActiveMarkers)
+            {
+				foreach (GameObject marker in ActiveMarkers)
 				{
 					Vector2 markerPos = marker.transform.position;
-					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y &&
-					    markerPos.y < max.y)
-						ChartManager.HighlightObject(
-							marker.GetComponent<ChartMarker>().linkedObject, false);
+					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
+                    {
+						ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject, false);
+                    }
 				}
+            }
 			else
-				foreach (var marker in ActiveMarkers)
+            {
+				foreach (GameObject marker in ActiveMarkers)
 				{
 					Vector2 markerPos = marker.transform.position;
-					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y &&
-					    markerPos.y > max.y)
-						ChartManager.HighlightObject(
-							marker.GetComponent<ChartMarker>().linkedObject, false);
+					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y && markerPos.y > max.y)
+                    {
+						ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject, false);
+                    }
 				}
+            }
 		}
 
 		/// <summary>
@@ -925,7 +877,7 @@ namespace SEE.Charts.Scripts
             {
 				if (activeMarker && activeMarker.TryGetComponent(out ChartMarker script) && script.linkedObject.Equals(highlight))
                 {
-					script.TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, scrollView);
+                    script.HighlightLinkedObjectToggle();
 					break;
                 }
             }
@@ -938,12 +890,14 @@ namespace SEE.Charts.Scripts
 		/// <param name="highlight">The object the marker will refer to.</param>
 		public void AccentuateCorrespondingMarker(GameObject highlight)
 		{
-			foreach (var activeMarker in ActiveMarkers)
+			foreach (GameObject activeMarker in ActiveMarkers)
 			{
-				activeMarker.TryGetComponent<ChartMarker>(out ChartMarker marker);
-				if (!marker.linkedObject.Equals(highlight)) continue;
-				marker.Accentuate();
-				break;
+                ChartMarker marker = activeMarker.GetComponent<ChartMarker>();
+                if (marker.linkedObject.Equals(highlight))
+                {
+				    marker.ToggleAccentuation();
+				    break;
+                }
 			}
 		}
 
