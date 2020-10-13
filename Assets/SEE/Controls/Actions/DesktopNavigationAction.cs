@@ -11,8 +11,7 @@ namespace SEE.Controls
         private enum NavigationMode
         {
             Move,
-            Rotate,
-            NavigationModeCount
+            Rotate
         }
 
         private struct MoveState
@@ -29,6 +28,7 @@ namespace SEE.Controls
             internal Vector3 dragStartOffset;
             internal Vector3 dragCanonicalOffset;
             internal Vector3 moveVelocity;
+            internal Transform draggedTransform;
         }
 
         private struct RotateState
@@ -46,7 +46,7 @@ namespace SEE.Controls
         {
             internal bool selectToggle;
             internal bool startDrag;
-            internal InteractableObject grabbedInteractable;
+            internal bool dragHoveredOnly;
             internal bool drag;
             internal bool cancel;
             internal bool snap;
@@ -54,6 +54,7 @@ namespace SEE.Controls
             internal Vector3 mousePosition;
             internal float zoomStepsDelta;
             internal bool zoomToggleToObject;
+            internal Transform hoveredTransform;
         }
 
         private UnityEngine.Plane raycastPlane;
@@ -100,50 +101,35 @@ namespace SEE.Controls
         {
             base.Update();
 
-            if (!CityAvailable)
+            if (CityAvailable)
             {
-                return;
-            }
+                // Fill action state with player input. Input MUST NOT be inquired in
+                // FixedUpdate() for the input to feel responsive!
+                actionState.selectToggle = Input.GetKey(KeyCode.LeftControl);
+                actionState.drag = Input.GetMouseButton(2);
+                actionState.startDrag |= Input.GetMouseButtonDown(2);
+                actionState.dragHoveredOnly = Input.GetKey(KeyCode.LeftControl);
+                actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
+                actionState.snap = Input.GetKey(KeyCode.LeftAlt);
+                actionState.reset |= Input.GetKeyDown(KeyCode.R);
+                actionState.mousePosition = Input.mousePosition;
 
-            // Note: Input MUST NOT be inquired in FixedUpdate() for the input to feel responsive!
-
-            bool raycastNodesResult = Raycasting.RaycastNodes(out RaycastHit raycastHit);
-
-            actionState.selectToggle = Input.GetKey(KeyCode.LeftControl);
-            actionState.drag = Input.GetMouseButton(2);
-            actionState.startDrag |= Input.GetMouseButtonDown(2);
-            actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
-            actionState.snap = Input.GetKey(KeyCode.LeftAlt);
-            actionState.reset |= Input.GetKeyDown(KeyCode.R);
-            actionState.mousePosition = Input.mousePosition;
-
-            if (actionState.startDrag && raycastNodesResult)
-            {
-                actionState.grabbedInteractable = raycastHit.transform.GetComponent<InteractableObject>();
-            }
-
-            if (!actionState.drag)
-            {
                 RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint);
 
+                // Find hovered GameObject with node, if it exists
+                actionState.hoveredTransform = null;
                 if (insideClippingArea)
                 {
-                    actionState.zoomStepsDelta += Input.mouseScrollDelta.y;
-                }
-                actionState.zoomToggleToObject |= Input.GetKeyDown(KeyCode.F);
-
-                if (Input.GetMouseButtonDown(0))
-                {
-                    if (insideClippingArea && raycastNodesResult)
+                    if (Raycasting.RaycastNodes(out RaycastHit raycastHit))
                     {
-                        Transform selectedTransform = raycastHit.transform;
-                        Transform parentTransform = selectedTransform;
+                        Transform hoveredTransform = raycastHit.transform;
+                        Transform parentTransform = hoveredTransform;
                         do
                         {
                             if (parentTransform == CityTransform)
                             {
-                                Select(selectedTransform.gameObject, !actionState.selectToggle);
-                                goto End;
+                                actionState.hoveredTransform = hoveredTransform;
+                                break;
                             }
                             else
                             {
@@ -152,30 +138,39 @@ namespace SEE.Controls
                         } while (parentTransform != null);
                     }
 
-                    if (!actionState.selectToggle)
+                    // For simplicity, zooming is only allowed if the city is not
+                    // currently dragged
+                    if (!actionState.drag)
                     {
-                        Select(null, true);
+                        actionState.zoomStepsDelta += Input.mouseScrollDelta.y;
                     }
                 }
-            }
 
-        End:
-            if (mode != NavigationMode.Move && Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                mode = NavigationMode.Move;
-                movingOrRotating = false;
-                rotateState.rotateGizmo.gameObject.SetActive(false);
-            }
-            else if (mode != NavigationMode.Rotate && Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                mode = NavigationMode.Rotate;
-                movingOrRotating = false;
-                moveState.moveGizmo.gameObject.SetActive(false);
-            }
+                if (!actionState.drag)
+                {
+                    actionState.zoomToggleToObject |= Input.GetKeyDown(KeyCode.F);
 
-            if (mode == NavigationMode.Rotate)
-            {
-                if (cursor.HasFocus())
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        Select(actionState.hoveredTransform ? actionState.hoveredTransform.gameObject : null, !actionState.selectToggle);
+                    }
+                }
+
+                // Select mode
+                if (mode != NavigationMode.Move && Input.GetKeyDown(KeyCode.Alpha1))
+                {
+                    mode = NavigationMode.Move;
+                    movingOrRotating = false;
+                    rotateState.rotateGizmo.gameObject.SetActive(false);
+                }
+                else if (mode != NavigationMode.Rotate && Input.GetKeyDown(KeyCode.Alpha2))
+                {
+                    mode = NavigationMode.Rotate;
+                    movingOrRotating = false;
+                    moveState.moveGizmo.gameObject.SetActive(false);
+                }
+
+                if (mode == NavigationMode.Rotate && cursor.HasFocus())
                 {
                     rotateState.rotateGizmo.Center = cursor.GetPosition();
                     rotateState.rotateGizmo.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotateGizmo.Center).magnitude;
@@ -210,7 +205,11 @@ namespace SEE.Controls
                     {
                         movingOrRotating = false;
 
-                        actionState.grabbedInteractable.SetGrab(false, true);
+                        if (moveState.draggedTransform)
+                        {
+                            moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(false, true);
+                            moveState.draggedTransform = null;
+                        }
                         moveState.moveGizmo.gameObject.SetActive(false);
 
                         CityTransform.position = portalPlane.CenterTop;
@@ -223,11 +222,14 @@ namespace SEE.Controls
                     {
                         movingOrRotating = false;
 
-                        actionState.grabbedInteractable.SetGrab(false, true);
+                        moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(false, true);
                         moveState.moveGizmo.gameObject.SetActive(false);
 
                         moveState.moveVelocity = Vector3.zero;
-                        CityTransform.position = moveState.dragStartTransformPosition + moveState.dragStartOffset - Vector3.Scale(moveState.dragCanonicalOffset, CityTransform.localScale);
+                        moveState.draggedTransform.position =
+                            moveState.dragStartTransformPosition + moveState.dragStartOffset
+                            - Vector3.Scale(moveState.dragCanonicalOffset, moveState.draggedTransform.localScale);
+                        moveState.draggedTransform = null;
                         synchronize = true;
                     }
                 }
@@ -237,15 +239,31 @@ namespace SEE.Controls
                     {
                         if (insideClippingArea)
                         {
-                            movingOrRotating = true;
+                            if (actionState.dragHoveredOnly)
+                            {
+                                if (actionState.hoveredTransform != null)
+                                {
+                                    movingOrRotating = true;
+                                    moveState.draggedTransform = actionState.hoveredTransform;
 
-                            actionState.grabbedInteractable.SetGrab(true, true);
-                            moveState.moveGizmo.gameObject.SetActive(true);
+                                }
+                            }
+                            else
+                            {
+                                movingOrRotating = true;
+                                moveState.draggedTransform = CityTransform;
+                            }
 
-                            moveState.dragStartTransformPosition = CityTransform.position;
-                            moveState.dragStartOffset = planeHitPoint - CityTransform.position;
-                            moveState.dragCanonicalOffset = moveState.dragStartOffset.DividePairwise(CityTransform.localScale);
-                            moveState.moveVelocity = Vector3.zero;
+                            if (movingOrRotating)
+                            {
+                                moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(true, true);
+                                moveState.moveGizmo.gameObject.SetActive(true);
+
+                                moveState.dragStartTransformPosition = moveState.draggedTransform.position;
+                                moveState.dragStartOffset = planeHitPoint - moveState.draggedTransform.position;
+                                moveState.dragCanonicalOffset = moveState.dragStartOffset.DividePairwise(moveState.draggedTransform.localScale);
+                                moveState.moveVelocity = Vector3.zero;
+                            }
                         }
                     }
 
@@ -258,12 +276,14 @@ namespace SEE.Controls
                             totalDragOffsetFromStart = Project(totalDragOffsetFromStart);
                         }
 
-                        Vector3 oldPosition = CityTransform.position;
+                        Vector3 oldPosition = moveState.draggedTransform.position;
                         Vector3 newPosition = moveState.dragStartTransformPosition + totalDragOffsetFromStart;
 
-                        moveState.moveVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime;
-                        CityTransform.position = newPosition;
-                        moveState.moveGizmo.SetPositions(moveState.dragStartTransformPosition + moveState.dragStartOffset, CityTransform.position + Vector3.Scale(moveState.dragCanonicalOffset, CityTransform.localScale));
+                        moveState.moveVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime; // TODO(torben): it might be possible to determine velocity only on release
+                        moveState.draggedTransform.position = newPosition;
+                        moveState.moveGizmo.SetPositions(
+                            moveState.dragStartTransformPosition + moveState.dragStartOffset,
+                            moveState.draggedTransform.position + Vector3.Scale(moveState.dragCanonicalOffset, moveState.draggedTransform.localScale));
                         synchronize = true;
                     }
                 }
@@ -272,7 +292,12 @@ namespace SEE.Controls
                     actionState.startDrag = false;
                     movingOrRotating = false;
 
-                    actionState.grabbedInteractable.SetGrab(false, true);
+                    moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(false, true);
+                    if (moveState.draggedTransform != CityTransform)
+                    {
+                        moveState.moveVelocity = Vector3.zero; // TODO(torben): do we want to apply velocity to individually moved buildings or keep it like this?
+                    }
+                    moveState.draggedTransform = null;
                     moveState.moveGizmo.gameObject.SetActive(false);
                 }
             }
