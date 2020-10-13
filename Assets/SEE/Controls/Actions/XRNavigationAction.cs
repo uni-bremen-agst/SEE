@@ -151,6 +151,7 @@ namespace SEE.Controls
                         attachedInteractable = hoveringInteractable;
                         theRightHand.HoverLock(hoveringInteractable);
                         theRightHand.AttachObject(hoveringInteractable.gameObject, GrabTypes.Pinch, AttachmentFlags);
+                        hoveringInteractable.GetComponent<InteractableObject>().SetGrab(true, true);
                     }
                 }
                 else if (grabAction.lastAxis >= 0.9f && grabAction.axis < 0.9f && attachedInteractable)
@@ -158,6 +159,7 @@ namespace SEE.Controls
                     Hand theRightHand = Player.instance.rightHand;
                     attachedInteractable.transform.rotation = Quaternion.identity;
 
+                    attachedInteractable.GetComponent<InteractableObject>().SetGrab(false, true);
                     theRightHand.DetachObject(attachedInteractable.gameObject);
                     theRightHand.HoverUnlock(attachedInteractable);
                     attachedInteractable = null;
@@ -283,7 +285,7 @@ namespace SEE.Controls
                         refAngle = Mathf.Atan2(toHandV2.y, toHandV2.x) + Mathf.Deg2Rad * CityTransform.rotation.eulerAngles.y;
 
                         refInteractable = go.GetComponent<InteractableObject>();
-                        refInteractable?.SetSelect(true, true);
+                        refInteractable?.SetGrab(true, true);
 
                         mode += 1;
                     }
@@ -306,7 +308,7 @@ namespace SEE.Controls
             if (hand == leftHand)
             {
                 leftHand = null;
-                leftInteractable.SetSelect(false, true);
+                leftInteractable.SetGrab(false, true);
                 leftInteractable = null;
                 mode -= 1;
                 if (mode == XRNavigationMode.MoveOnly)
@@ -317,7 +319,7 @@ namespace SEE.Controls
             else if (hand == rightHand)
             {
                 rightHand = null;
-                rightInteractable.SetSelect(false, true);
+                rightInteractable.SetGrab(false, true);
                 rightInteractable = null;
                 mode -= 1;
                 if (mode == XRNavigationMode.MoveOnly)
