@@ -100,32 +100,9 @@ namespace SEE.Charts.Scripts
         [HideInInspector] public bool selectionMode;
 
         /// <summary>
-        /// The distance the camera will keep to the <see cref="GameObject" /> to focus on.
-        /// </summary>
-        [Header("Camera Settings")]
-        public float cameraDistance = 40.0f;
-
-        /// <summary>
-        /// When checked, the <see cref="Camera" /> will rotate while moving.
-        /// </summary>
-        public bool moveWithRotation = true;
-
-        /// <summary>
-        /// The time the <see cref="Camera" /> needs to reach it's destination when moving from one
-        /// <see cref="GameObject" /> to another.
-        /// </summary>
-        public float cameraFlightTime = 0.5f;
-
-        /// <summary>
         /// The minimum size a chart can have for width and height.
         /// </summary>
         public int minimumSize = 400;
-
-        /// <summary>
-        /// The maximum time between two clicks to recognize them as double click.
-        /// </summary>
-        [Header("User Inputs"), Range(0.1f, 1f)]
-        public float clickDelay = 0.1f;
 
         /// <summary>
         /// The minimum time for a drag to be recognized as a drag and not a click.
@@ -161,16 +138,6 @@ namespace SEE.Charts.Scripts
         /// </summary>
         [Tooltip("Color for accentuated selected game nodes")]
         public Color accentuationColor = Color.blue;
-
-        /// <summary>
-        /// The length of the beam appearing above highlighted objects.
-        /// </summary>
-        public float highlightLineLength = 20.0f;
-
-        /// <summary>
-        /// The time an object will be highlighted for.
-        /// </summary>
-        public float highlightDuration = 5.0f;
 
         /// <summary>
         /// Determines if the scene is being played in VR or not.
@@ -318,14 +285,16 @@ namespace SEE.Charts.Scripts
             Assert.IsNotNull(chart);
             allCharts.Remove(chart);
         }
+        
+        public static void OnSelect(GameObject highlight, bool scrollView)
+        {
+            foreach (GameObject chart in Instance.AllCharts())
+            {
+                chart.GetComponent<ChartContent>()?.HighlightCorrespondingMarker(highlight, scrollView);
+            }
+        }
 
-        /// <summary>
-        /// Highlights an object and all markers associated with it.
-        /// </summary>
-        /// <param name="highlight"></param>
-        /// <param name="scrollView">If this is triggered by a
-        /// <see cref="ScrollViewToggle"/> or not.</param>
-        public static void HighlightObject(GameObject highlight, bool scrollView)
+        public static void OnDeselect(GameObject highlight, bool scrollView)
         {
             foreach (GameObject chart in Instance.AllCharts())
             {

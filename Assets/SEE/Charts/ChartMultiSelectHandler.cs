@@ -78,14 +78,16 @@ namespace SEE.Charts.Scripts
 
 			if (eventData.position.x - startingPos.x < 0)
 			{
-				selectionRect.sizeDelta =
-					new Vector2(
-						Mathf.Abs(eventData.position.x - startingPos.x) /
-						selectionRect.lossyScale.x,
-						(eventData.position.y - startingPos.y) / lossyScale.y);
+				selectionRect.sizeDelta = new Vector2(
+                    Mathf.Abs(eventData.position.x - startingPos.x) / selectionRect.lossyScale.x,
+                    (eventData.position.y - startingPos.y) / lossyScale.y
+                );
 				sizeDelta = selectionRect.sizeDelta;
-				selectionRect.position = new Vector3(startingPos.x - sizeDelta.x / 2 * lossyScale.x,
-					startingPos.y + sizeDelta.y / 2 * lossyScale.y, 0);
+				selectionRect.position = new Vector3(
+                    startingPos.x - sizeDelta.x / 2 * lossyScale.x,
+					startingPos.y + sizeDelta.y / 2 * lossyScale.y,
+                    0
+                );
 				negative = true;
 			}
 
@@ -93,32 +95,38 @@ namespace SEE.Charts.Scripts
 			{
 				if (negative)
 				{
-					selectionRect.sizeDelta = new Vector2(selectionRect.sizeDelta.x,
-						Mathf.Abs(eventData.position.y - startingPos.y) /
-						selectionRect.lossyScale.y);
-					selectionRect.position = new Vector3(selectionRect.position.x,
-						startingPos.y - selectionRect.sizeDelta.y / 2 * lossyScale.y, 0);
+					selectionRect.sizeDelta = new Vector2(
+                        selectionRect.sizeDelta.x,
+						Mathf.Abs(eventData.position.y - startingPos.y) / selectionRect.lossyScale.y
+                    );
+					selectionRect.position = new Vector3(
+                        selectionRect.position.x,
+						startingPos.y - selectionRect.sizeDelta.y / 2 * lossyScale.y,
+                        0
+                    );
 				}
 				else
 				{
-					selectionRect.sizeDelta =
-						new Vector2((eventData.position.x - startingPos.x) / lossyScale.x,
-							Mathf.Abs(eventData.position.y - startingPos.y) / lossyScale.y);
+					selectionRect.sizeDelta = new Vector2(
+                        (eventData.position.x - startingPos.x) / lossyScale.x,
+						Mathf.Abs(eventData.position.y - startingPos.y) / lossyScale.y
+                    );
 					sizeDelta = selectionRect.sizeDelta;
-					selectionRect.position =
-						new Vector3(startingPos.x + sizeDelta.x / 2 * lossyScale.x,
-							startingPos.y - sizeDelta.y / 2 * lossyScale.y, 0);
+					selectionRect.position = new Vector3(
+                        startingPos.x + sizeDelta.x / 2 * lossyScale.x,
+						startingPos.y - sizeDelta.y / 2 * lossyScale.y,
+                        0
+                    );
 					negative = true;
 				}
 			}
 
-			if (negative) return;
-			selectionRect.sizeDelta =
-				new Vector2((eventData.position.x - startingPos.x) / lossyScale.x,
-					(eventData.position.y - startingPos.y) / lossyScale.y);
-			sizeDelta = selectionRect.sizeDelta;
-			selectionRect.position = new Vector3(startingPos.x + sizeDelta.x / 2 * lossyScale.x,
-				startingPos.y + sizeDelta.y / 2 * lossyScale.y, 0);
+            if (!negative)
+            {
+			    selectionRect.sizeDelta = new Vector2((eventData.position.x - startingPos.x) / lossyScale.x, (eventData.position.y - startingPos.y) / lossyScale.y);
+			    sizeDelta = selectionRect.sizeDelta;
+			    selectionRect.position = new Vector3(startingPos.x + sizeDelta.x / 2 * lossyScale.x, startingPos.y + sizeDelta.y / 2 * lossyScale.y, 0);
+            }
 		}
 
 		/// <summary>
@@ -128,11 +136,13 @@ namespace SEE.Charts.Scripts
 		public virtual void OnPointerUp(PointerEventData eventData)
 		{
 			if (startingPos.x < eventData.position.x)
-				chartContent.AreaSelection(startingPos, eventData.position,
-					startingPos.y < eventData.position.y);
+            {
+				chartContent.AreaSelection(startingPos, eventData.position, startingPos.y < eventData.position.y);
+            }
 			else
-				chartContent.AreaSelection(eventData.position, startingPos,
-					startingPos.y > eventData.position.y);
+            {
+				chartContent.AreaSelection(eventData.position, startingPos, startingPos.y > eventData.position.y);
+            }
 
 			selectionRect.gameObject.SetActive(false);
 		}

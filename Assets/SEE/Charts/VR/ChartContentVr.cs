@@ -68,7 +68,7 @@ namespace SEE.Charts.Scripts.VR
 					Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                     {
-						ChartManager.HighlightObject(marker.GetComponent<ChartMarker>().linkedObject, false);
+						ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject, false);
                     }
 				}
             }
@@ -79,7 +79,7 @@ namespace SEE.Charts.Scripts.VR
                     Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
 					if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y && markerPos.y > max.y)
                     {
-						ChartManager.HighlightObject(marker.GetComponent<ChartMarker>().linkedObject, false);
+						ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject, false);
                     }
 				}
             }

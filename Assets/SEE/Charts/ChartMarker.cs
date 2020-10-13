@@ -33,13 +33,6 @@ namespace SEE.Charts.Scripts
 	/// </summary>
 	public class ChartMarker : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	{
-		//User Variables from ChartManager
-		private float _cameraDistance;
-		private bool _moveWithRotation;
-		private float _cameraFlightTime;
-		private float _clickDelay;
-		private float _highlightDuration;
-
 		/// <summary>
 		/// The <see cref="GameObject" /> in the code city that is connected with this button.
 		/// </summary>
@@ -61,16 +54,6 @@ namespace SEE.Charts.Scripts
 		private Coroutine _cameraMoving;
 
 		/// <summary>
-		/// Determines if a second click happened during <see cref="_clickDelay" />.
-		/// </summary>
-		private bool _waiting;
-
-		/// <summary>
-		/// Determines if <see cref="WaitForDoubleClick" /> is currently running.
-		/// </summary>
-		private bool _runningClick;
-
-		/// <summary>
 		/// The currently running <see cref="TimedHighlightRoutine" />.
 		/// </summary>
 		public Coroutine TimedHighlight { get; private set; }
@@ -81,27 +64,10 @@ namespace SEE.Charts.Scripts
 		public float HighlightTime { get; private set; }
 
 		/// <summary>
-		/// Tells if <see cref="TimedHighlight" /> was running when script was deactivated due to minimization
-		/// of the chart.
-		/// </summary>
-		private bool _reactivateHighlight;
-
-		/// <summary>
 		/// The <see cref="GameObject" /> making the marker look highlighted when active.
 		/// </summary>
 		[Header("Highlight Properties"), SerializeField]
 		private GameObject markerHighlight;
-
-		/// <summary>
-		/// The prefab containing the <see cref="LineRenderer" /> that creates the beam above highlighted
-		/// objects.
-		/// </summary>
-		[SerializeField] private GameObject highlightLine;
-
-		/// <summary>
-		/// The length of the beam appearing above highlighted objects.
-		/// </summary>
-		private float _highlightLineLength;
 
 		/// <summary>
 		/// True iff the marker is accentuated.
@@ -127,13 +93,7 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void GetSettingData()
 		{
-			ChartManager chartManager             = ChartManager.Instance;
-			_cameraDistance                       = chartManager.cameraDistance;
-			_moveWithRotation                     = chartManager.moveWithRotation;
-			_cameraFlightTime                     = chartManager.cameraFlightTime;
-			_clickDelay                           = chartManager.clickDelay;
-			_highlightDuration                    = chartManager.highlightDuration;
-			_highlightLineLength                  = chartManager.highlightLineLength;
+			ChartManager chartManager = ChartManager.Instance;
 		}
 
 		/// <summary>
@@ -142,15 +102,15 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		private void Start()
 		{
-			for (var i = 0; i < linkedObject.transform.childCount; i++)
-			{
-				var child = linkedObject.transform.GetChild(i);
-                if (child.name.Equals(linkedObject.name + "(Clone)"))
-                {
-				    TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, false);
-				    break;
-                }
-			}
+			//for (var i = 0; i < linkedObject.transform.childCount; i++)
+			//{
+			//	var child = linkedObject.transform.GetChild(i);
+            //    if (child.name.Equals(linkedObject.name + "(Clone)"))
+            //    {
+			//	    TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, false);
+			//	    break;
+            //    }
+			//}
 		}
 
 		/// <summary>
@@ -169,217 +129,36 @@ namespace SEE.Charts.Scripts
 		/// </summary>
 		public void ButtonClicked()
 		{
-			if (_runningClick)
-            {
-				_waiting = false;
-            }
-			else
-            {
-				StartCoroutine(WaitForDoubleClick());
-            }
-		}
-
-		/// <summary>
-		/// Checks if one or two clicks happen in a given interval.
-		/// </summary>
-		/// <returns></returns>
-		private IEnumerator WaitForDoubleClick()
-		{
-			_runningClick = true;
-			_waiting = true;
-			yield return new WaitForSeconds(_clickDelay);
-			if (_waiting)
-			{
-				ChartManager.HighlightObject(linkedObject, false);
-			}
-			else
-			{
-				ShowLinkedObject();
-				HighlightLinkedObjectToggle(true);
-			}
-
-			_waiting = false;
-			_runningClick = false;
+            ChartManager.OnSelect(linkedObject, false);
 		}
 
 		/// <summary>
 		/// Toggles the highlight of the <see cref="linkedObject" /> and this marker.
 		/// </summary>
-		private void HighlightLinkedObjectToggle(bool highlight)
+		public void HighlightLinkedObjectToggle()
         {
-            linkedObject.GetComponent<InteractableObject>()?.SetSelect(highlight, true);
-            if (!highlight)
-			{
-				_accentuated = false;
-			}
-
-			markerHighlight.SetActive(highlight);
-			if (ScrollViewToggle)
-			{
-				ScrollViewToggle.SetHighlighted(highlight);
-			}
-		}
-
-		/// <summary>
-		/// Copy of the <see cref="linkedObject" /> with different material to make it look highlighted.
-		/// </summary>
-		private readonly GameObject _highlightCopy;
-
-		/// <summary>
-		/// Toggles the highlights this marker and its <see cref="linkedObject" /> for a given
-        /// amount of time. Reactivates it after deactivation if
-        /// <see cref="ChartManager.selectionMode"/> is toggled on.
-		/// </summary>
-		/// <param name="time">How long the highlight will last.</param>
-		/// <param name="reenable">Overwrites the selection mode to reactivate the highlight
-        /// after deactivation.
-		/// </param>
-		/// <param name="scrollView">If this is triggered by a <see cref="ScrollViewToggle" />
-        /// or not.</param>
-		public void TriggerTimedHighlight(float time, bool reenable, bool scrollView)
-		{
-			if (scrollView)
-			{
-				if (TimedHighlight == null)
-                {
-				    HighlightLinkedObjectToggle(!_highlightCopy);
-                }
-			}
-			else
-			{
-				bool reactivate = false;
-
-				if (TimedHighlight != null)
-				{
-					StopCoroutine(TimedHighlight);
-					HighlightLinkedObjectToggle(false);
-					TimedHighlight = null;
-                    if (ChartManager.Instance.selectionMode || reenable)
-                    {
-                        reactivate = true;
-                    }
-				}
-				else
-				{
-					reactivate = true;
-				}
-
-                if (reactivate)
-                {
-                    TimedHighlight = StartCoroutine(TimedHighlightRoutine(time));
-                }
-			}
-		}
-
-		/// <summary>
-		/// The <see cref="Coroutine" /> stopping the highlight after the given time has passed.
-		/// </summary>
-		/// <param name="time">The time after which to stop the highlight.</param>
-		/// <returns></returns>
-		private IEnumerator TimedHighlightRoutine(float time)
-		{
-			if (time < _highlightDuration)
+            InteractableObject interactableObject = linkedObject.GetComponent<InteractableObject>();
+            if (interactableObject)
             {
-				HighlightTime = _highlightDuration - time;
+                bool highlight = !interactableObject.IsSelected;
+                interactableObject.SetSelect(highlight, true);
+                if (!highlight)
+			    {
+				    _accentuated = false;
+			    }
+
+			    markerHighlight.SetActive(highlight);
+			    if (ScrollViewToggle)
+			    {
+				    ScrollViewToggle.SetHighlighted(highlight);
+			    }
             }
-			else
-            {
-                HighlightTime = 0.0f;
-            }
-
-			HighlightLinkedObjectToggle(true);
-			yield return new WaitForSeconds(time);
-            while (ChartManager.Instance.selectionMode)
-            {
-                yield return new WaitForEndOfFrame();
-            }
-			HighlightLinkedObjectToggle(false);
-			TimedHighlight = null;
-		}
-
-		/// <summary>
-		/// Moves the camera to view the <see cref="linkedObject />.
-		/// </summary>
-		private void ShowLinkedObject()
-		{
-			_activeCamera = Camera.main;
-			Vector3 cameraPos = _activeCamera.transform.position;
-
-			if (_moveWithRotation)
-			{
-				if (_cameraMoving != null)
-				{
-					StopCoroutine(_cameraMoving);
-					_cameraMoving = null;
-				}
-
-				Vector3 linkedPos = linkedObject.transform.position;
-				Vector3 lookPos = linkedPos - cameraPos;
-				_cameraMoving = StartCoroutine(MoveCameraTo(
-					Vector3.MoveTowards(cameraPos, linkedPos, lookPos.magnitude - _cameraDistance),
-					Quaternion.LookRotation(lookPos)));
-			}
-			else
-			{
-				if (_cameraMoving != null)
-				{
-					StopCoroutine(_cameraMoving);
-					_cameraMoving = null;
-				}
-
-				Vector3 pos = linkedObject.transform.position;
-				_cameraMoving = StartCoroutine(MoveCameraTo(new Vector3(pos.x, cameraPos.y, pos.z - _cameraDistance)));
-			}
-		}
-
-		/// <summary>
-		/// Moves the <see cref="Camera"/> smoothly from one position to another and
-        /// rotates it to look towards a specified position.
-		/// </summary>
-		/// <param name="newPos">The target position.</param>
-		/// <param name="lookAt">The position to look at.</param>
-		/// <returns></returns>
-		private IEnumerator MoveCameraTo(Vector3 newPos, Quaternion lookAt)
-		{
-			Vector3 oldPos = _activeCamera.transform.position;
-            if (newPos == linkedObject.transform.position)
-            {
-                yield break;
-            }
-			Quaternion oldRot = _activeCamera.transform.rotation;
-			for (float time = 0.0f; time <= _cameraFlightTime; time += Time.deltaTime)
-			{
-				_activeCamera.transform.position = Vector3.Lerp(oldPos, newPos, time * (1.0f / _cameraFlightTime));
-				_activeCamera.transform.rotation = Quaternion.Slerp(oldRot, lookAt, time * (1.0f / _cameraFlightTime));
-				yield return new WaitForEndOfFrame();
-			}
-
-			Transform cameraPos = _activeCamera.transform;
-			cameraPos.rotation = lookAt;
-			cameraPos.transform.position = newPos;
-		}
-
-		/// <summary>
-		/// Moves the camera smoothly from one position to another without rotation.
-		/// </summary>
-		/// <param name="newPos">The target position.</param>
-		/// <returns></returns>
-		private IEnumerator MoveCameraTo(Vector3 newPos)
-		{
-			Vector3 oldPos = _activeCamera.transform.position;
-			for (float time = 0; time <= _cameraFlightTime; time += Time.deltaTime)
-			{
-				_activeCamera.transform.position = Vector3.Lerp(oldPos, newPos, time * (1 / _cameraFlightTime));
-				yield return new WaitForEndOfFrame();
-			}
-
-			_activeCamera.transform.position = newPos;
 		}
 
 		/// <summary>
 		/// Changes the color of the marker to the accentuation color.
 		/// </summary>
-		public void Accentuate()
+		public void ToggleAccentuation()
         {
             if (markerHighlight.TryGetComponent(out Image image))
             {
@@ -424,38 +203,10 @@ namespace SEE.Charts.Scripts
 		}
 
 		/// <summary>
-		/// If <see cref="TimedHighlight" /> was running, this will be saved to
-		/// <see cref="_reactivateHighlight" />.
-		/// </summary>
-		private void OnDisable()
-		{
-            if (TimedHighlight != null)
-            {
-                _reactivateHighlight = true;
-            }
-		}
-
-		/// <summary>
-		/// Reactivates the highlight if it was running before disable.
-		/// </summary>
-		private void OnEnable()
-		{
-			if (_reactivateHighlight)
-            {
-			    TriggerTimedHighlight(_highlightDuration - HighlightTime, true, false);
-			    _reactivateHighlight = false;
-            }
-		}
-
-		/// <summary>
-		/// Stops all co-routines and destroys the <see cref="_highlightCopy" /> if it exists.
+		/// Stops all co-routines.
 		/// </summary>
 		private void OnDestroy()
 		{
-            if (_highlightCopy != null)
-            {
-                Destroy(_highlightCopy);
-            }
 			StopAllCoroutines();
 		}
 	}
