@@ -40,7 +40,7 @@ namespace SEE.Game
         /// <param name="rightBackCorner">the right back corner in the X/Z plane of the plane component</param>
         public static void GetDimensions(GameObject gameObject, out Vector2 leftFrontCorner, out Vector2 rightBackCorner)
         {
-            Plane cullingPlane = gameObject.GetComponent<Plane>();
+            GO.Plane cullingPlane = gameObject.GetComponent<GO.Plane>();
             leftFrontCorner = cullingPlane.LeftFrontCorner;
             rightBackCorner = cullingPlane.RightBackCorner;
         }

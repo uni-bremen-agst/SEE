@@ -415,7 +415,7 @@ namespace SEE.Game
                 light.intensity = 1.0f;
             }
 
-            Plane portalPlane = parent.GetComponent<Plane>();
+            GO.Plane portalPlane = parent.GetComponent<GO.Plane>();
             portalPlane.HeightOffset = rootGameNode.transform.position.y - parent.transform.position.y;
         }
 

@@ -101,7 +101,7 @@ namespace SEE.Controls
             if (go)
             {
                 GameObject root = go;
-                while (root.GetComponent<Plane>() == null)
+                while (root.GetComponent<GO.Plane>() == null)
                 {
                     Transform parent = root.transform.parent;
                     if (parent)

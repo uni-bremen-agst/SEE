@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE
+namespace SEE.GO
 {
     /// <summary>
     /// Represents a plane on which the city objects can be placed defined as
