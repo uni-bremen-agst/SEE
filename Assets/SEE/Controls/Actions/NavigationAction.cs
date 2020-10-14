@@ -111,7 +111,7 @@ namespace SEE.Controls
         /// The plane of the table
         /// </summary>
         [Tooltip("The area in which to draw the code city")]
-        [SerializeField] protected Plane portalPlane;
+        [SerializeField] protected GO.Plane portalPlane;
 
         /// <summary>
         /// See the tooltip.

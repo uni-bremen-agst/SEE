@@ -337,7 +337,7 @@ namespace SEE.UI3D
         private float minAngle;
         private float maxAngle;
 
-        internal static RotateGizmo Create(Plane cullingPlane, int textureResolution)
+        internal static RotateGizmo Create(GO.Plane cullingPlane, int textureResolution)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
             Destroy(go.GetComponent<MeshCollider>());

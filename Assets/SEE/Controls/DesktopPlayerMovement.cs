@@ -20,7 +20,7 @@ namespace SEE.Controls
         private const int RightMouseButton = 1;
 
         [Tooltip("The code city which the player is focusing on.")]
-        public Plane focusedObject;
+        public GO.Plane focusedObject;
 
         void Start()
         {

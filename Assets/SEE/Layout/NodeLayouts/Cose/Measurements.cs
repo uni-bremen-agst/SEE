@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE
+namespace SEE.Layout.NodeLayouts.Cose
 {
     /// <summary>
     /// FIXME: This should be moved to a more specific namespace.
