@@ -16,10 +16,12 @@ REM   and then run:
 REM     MSBuild /t:CSharp /p:VisualStudioVersion=19.0 InstallAxivion.proj
 
 REM The folder where Axivion Suite is installed.
-SET "AXIVION_BASE_DIR=f:\Program Files (x86)\Bauhaus"
+REM SET "AXIVION_BASE_DIR=f:\Program Files (x86)\Bauhaus"
+SET "AXIVION_BASE_DIR=C:\Program Files (x86)\Bauhaus"
 
 REM The path to MSBuild.
-SET MSBUILD="f:\Program Files (x86)\Microsoft Visual Studio\2019\MSBuild\Current\Bin\amd64\MSBuild.exe" 
+REM SET MSBUILD="f:\Program Files (x86)\Microsoft Visual Studio\2019\MSBuild\Current\Bin\amd64\MSBuild.exe" 
+SET MSBUILD="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe" 
 
 REM Generate RFG for SEE:
 %MSBUILD% /t:AxivionBuild SEE.csproj
