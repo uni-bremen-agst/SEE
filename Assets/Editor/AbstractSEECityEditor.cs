@@ -7,7 +7,6 @@ using SEE.DataModel;
 using SEE.Layout.NodeLayouts;
 using System.Collections.Generic;
 using System.Linq;
-using static SEE.Game.AbstractSEECity;
 using SEE.Layout.EdgeLayouts;
 
 namespace SEEEditor
