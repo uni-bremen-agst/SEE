@@ -1,6 +1,6 @@
 ﻿using SEE.Utils;
 
-namespace SEE.DataModel.IO
+namespace SEE.DataModel.Runtime.IO
 {
     /// <summary>
     /// Generates a call tree out of a DYN-file.

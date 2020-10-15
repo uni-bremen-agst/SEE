@@ -5,6 +5,7 @@ using SEE.DataModel.DG;
 using SEE.GO;
 using OdinSerializer;
 using System;
+using SEE.DataModel.Runtime;
 
 namespace SEE.Game.Runtime
 {
