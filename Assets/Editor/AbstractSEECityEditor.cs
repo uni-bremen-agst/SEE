@@ -1,13 +1,13 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEngine;
-using UnityEditor;
-using SEE.Game;
 using SEE.DataModel.DG;
+using SEE.Game;
+using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.Layout.EdgeLayouts;
+using UnityEditor;
+using UnityEngine;
 
 namespace SEEEditor
 {
@@ -92,7 +92,7 @@ namespace SEEEditor
                     city.CoseGraphSettings.multiLevelScaling = false;
                     city.CoseGraphSettings.UseSmartMultilevelScaling = false;
                     city.CoseGraphSettings.UseSmartIdealEdgeCalculation = false;
-                    city.CoseGraphSettings.UseSmartRepulsionRangeCalculation = false; 
+                    city.CoseGraphSettings.UseSmartRepulsionRangeCalculation = false;
                 }
             }
 
@@ -119,9 +119,10 @@ namespace SEEEditor
                         {
                             TraverseThruNodesCounter(root);
                         }
-                    } 
+                    }
 
-                    if (city.CoseGraphSettings.showGraphListing) {
+                    if (city.CoseGraphSettings.showGraphListing)
+                    {
                         List<NodeLayoutKind> parentNodeLayouts = new List<NodeLayoutKind>();
                         foreach (Node root in roots)
                         {
@@ -319,18 +320,19 @@ namespace SEEEditor
         private void ShowInnerNodesEnum(NodeLayoutKind nodeLayout, Node node)
         {
             GUILayoutOption[] guiOptions = { GUILayout.ExpandWidth(false), GUILayout.Width(200) };
-            EditorGUIUtility.labelWidth = 80; 
+            EditorGUIUtility.labelWidth = 80;
             EditorGUILayout.PrefixLabel("Inner nodes");
             Dictionary<AbstractSEECity.InnerNodeKinds, string> shapeKinds = nodeLayout.GetInnerNodeKinds().ToDictionary(kind => kind, kind => kind.ToString());
 
             if (shapeKinds.ContainsKey(city.CoseGraphSettings.DirShape[node.ID]))
             {
                 city.CoseGraphSettings.DirShape[node.ID] = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(city.CoseGraphSettings.DirShape[node.ID]), shapeKinds.Values.ToArray(), guiOptions)).Key;
-            } else
+            }
+            else
             {
                 city.CoseGraphSettings.DirShape[node.ID] = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(shapeKinds.First().Key), shapeKinds.Values.ToArray(), guiOptions)).Key;
             }
-            
+
             EditorGUIUtility.labelWidth = 150;
         }
 
@@ -350,7 +352,7 @@ namespace SEEEditor
             foreach (NodeLayoutKind layout in parentNodeLayouts)
             {
                 List<NodeLayoutKind> possible = layout.GetPossibleSublayouts();
-                subLayoutNodeLayouts = subLayoutNodeLayouts.Where(elem => possible.Contains(elem.Key)).ToDictionary(x=> x.Key, x=> x.Value);
+                subLayoutNodeLayouts = subLayoutNodeLayouts.Where(elem => possible.Contains(elem.Key)).ToDictionary(x => x.Key, x => x.Value);
             }
 
             if (subLayoutNodeLayouts.ContainsKey(city.CoseGraphSettings.DirNodeLayout[root.ID]))

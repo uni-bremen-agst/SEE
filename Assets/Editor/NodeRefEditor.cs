@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEditor;
 using SEE.GO;
+using UnityEditor;
 using UnityEngine;
 
 namespace SEEEditor
@@ -19,7 +19,7 @@ namespace SEEEditor
 
             GUILayout.Label("Node attributes", EditorStyles.boldLabel);
             if (nodeRef.node != null)
-            {                
+            {
                 ShowTypeAndAttributes(nodeRef.node);
             }
             else

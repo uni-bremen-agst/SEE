@@ -1,10 +1,10 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEditor;
 using SEE.Game;
-using UnityEngine;
-using System.Collections.Generic;
 using SEE.Utils;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
 namespace SEEEditor
 {
@@ -87,12 +87,12 @@ namespace SEEEditor
                 {
                     allTypes = false;
                 }
-               
+
             }
 
             if (allTypes)
             {
-                if (countSelected != city.CoseGraphSettings.loadedForNodeTypes.Count )
+                if (countSelected != city.CoseGraphSettings.loadedForNodeTypes.Count)
                 {
                     allTypes = false;
                 }

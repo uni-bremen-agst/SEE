@@ -1,10 +1,10 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEditor;
-using UnityEngine;
-using SEE.Game;
-using UnityEditorInternal;
 using SEE.DataModel.DG.IO;
+using SEE.Game;
+using UnityEditor;
+using UnityEditorInternal;
+using UnityEngine;
 
 namespace SEEEditor
 {
@@ -41,10 +41,10 @@ namespace SEEEditor
                     float nameLength = rect.width * 0.75f;
                     float valueLength = (rect.width - nameLength) / 2.0f;
 
-                    city.LeafAttributes[index].Name 
+                    city.LeafAttributes[index].Name
                         = EditorGUI.TextField(new Rect(rect.x, rect.y, nameLength, EditorGUIUtility.singleLineHeight),
                                               name.stringValue);
-                    float meanValue 
+                    float meanValue
                         = EditorGUI.FloatField(new Rect(rect.x + nameLength, rect.y, valueLength, EditorGUIUtility.singleLineHeight),
                                                mean.floatValue);
                     if (meanValue >= 0.0f)
