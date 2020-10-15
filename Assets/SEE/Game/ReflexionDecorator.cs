@@ -33,15 +33,15 @@ namespace SEE.Game
         /// <summary>
         /// Prefab for absences.
         /// </summary>
-        private GameObject absencePrefab;
+        private readonly GameObject absencePrefab;
         /// <summary>
         /// Prefab for convergences.
         /// </summary>
-        private GameObject convergencePrefab;
+        private readonly GameObject convergencePrefab;
         /// <summary>
         /// Prefab for divergences.
         /// </summary>
-        private GameObject divergencePrefab;
+        private readonly GameObject divergencePrefab;
 
         /// <summary>
         /// Decorates the game object representing the given <paramref name="edge"/> edge

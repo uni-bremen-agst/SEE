@@ -208,22 +208,22 @@ namespace SEE.DataModel.DG
             else
             {
                 Attributable otherAttributable = other as Attributable;
-                if (!this.toggleAttributes.SetEquals(otherAttributable.toggleAttributes))
+                if (!toggleAttributes.SetEquals(otherAttributable.toggleAttributes))
                 {
                     Report("The toggle attributes are different");
                     return false;
                 }
-                else if (!AreEqual<string>(this.stringAttributes, otherAttributable.stringAttributes))
+                else if (!AreEqual<string>(stringAttributes, otherAttributable.stringAttributes))
                 {
                     Report("The string attributes are different");
                     return false;
                 }
-                else if (!AreEqual<int>(this.intAttributes, otherAttributable.intAttributes))
+                else if (!AreEqual<int>(intAttributes, otherAttributable.intAttributes))
                 {
                     Report("The int attributes are different");
                     return false;
                 }
-                else if (!AreEqual<float>(this.floatAttributes, otherAttributable.floatAttributes))
+                else if (!AreEqual<float>(floatAttributes, otherAttributable.floatAttributes))
                 {
                     Report("The float attributes are different");
                     return false;
@@ -299,7 +299,7 @@ namespace SEE.DataModel.DG
         /// <returns>deep clone</returns>
         public virtual object Clone()
         {
-            Attributable clone = (Attributable)this.MemberwiseClone();
+            Attributable clone = (Attributable)MemberwiseClone();
             HandleCloned(clone);
             return clone;
         }
@@ -318,10 +318,10 @@ namespace SEE.DataModel.DG
             // original attributable.
             // Because the keys and values are primitive types, the following are deep copies of the 
             // attributes.
-            target.toggleAttributes = new HashSet<string>(this.toggleAttributes);
-            target.stringAttributes = new Dictionary<string, string>(this.stringAttributes);
-            target.floatAttributes = new Dictionary<string, float>(this.floatAttributes);
-            target.intAttributes = new Dictionary<string, int>(this.intAttributes);
+            target.toggleAttributes = new HashSet<string>(toggleAttributes);
+            target.stringAttributes = new Dictionary<string, string>(stringAttributes);
+            target.floatAttributes = new Dictionary<string, float>(floatAttributes);
+            target.intAttributes = new Dictionary<string, int>(intAttributes);
         }
     }
 }

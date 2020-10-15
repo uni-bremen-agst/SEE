@@ -28,7 +28,7 @@ namespace SEE.GO
             {
                 throw new System.Exception("[DonutFactory] number of metrics must not exceed " + (colorPalette.Length + 1) + ".");
             }
-            this.materials = GetMaterials(numberOfDonutMetrics);
+            materials = GetMaterials(numberOfDonutMetrics);
             this.innerMetric = innerMetric;
             this.metrics = metrics;
         }
@@ -357,8 +357,8 @@ namespace SEE.GO
                 positions[0] = new Vector3(0.0f, -y, 0.0f);
                 for (int i = 0; i < segments; i++)
                 {
-                    float x = 0.5f * Mathf.Cos(((float)i / (float)segments) * 2.0f * Mathf.PI);
-                    float z = 0.5f * Mathf.Sin(((float)i / (float)segments) * 2.0f * Mathf.PI);
+                    float x = 0.5f * Mathf.Cos((i / (float)segments) * 2.0f * Mathf.PI);
+                    float z = 0.5f * Mathf.Sin((i / (float)segments) * 2.0f * Mathf.PI);
 
                     Vector3 bottomVertex = new Vector3((float)x, -y, (float)z);
                     Vector3 topVertex = new Vector3((float)x, y, (float)z);

@@ -31,7 +31,7 @@ namespace SEE.GO
         /// <summary>
         /// The grey materials we can return.
         /// </summary>
-        private static Material[] materials = CreateMaterials();
+        private static readonly Material[] materials = CreateMaterials();
 
         /// <summary>
         /// Creates and returns 30 materials with different shades of grey
@@ -43,7 +43,7 @@ namespace SEE.GO
             Material materialPrefab = Resources.Load<Material>(Materials.OpaqueMaterialName);
             Material[] materials = new Material[30];
             float value = 0.0f;
-            float inc = 1.0f / (float)materials.Length;
+            float inc = 1.0f / materials.Length;
 
             for (int i = 0; i < materials.Length; i++)
             {

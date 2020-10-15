@@ -348,7 +348,7 @@ namespace SEE.UI3D
             RotateGizmo p = go.AddComponent<RotateGizmo>();
 
             int outer = textureResolution / 2;
-            int inner = Mathf.RoundToInt((float)outer * 0.98f);
+            int inner = Mathf.RoundToInt(outer * 0.98f);
 
             p.material = new Material(Shader.Find(PivotOutlineShaderName));
             p.material.SetTexture("_MainTex", Tools.TextureGenerator.CreateCircleOutlineTextureR8(outer, inner, Alpha, 0.0f));

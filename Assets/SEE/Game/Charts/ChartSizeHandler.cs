@@ -123,7 +123,11 @@ namespace SEE.Game.Charts
             pos.position = eventData.position;
             Vector2 anchoredPos = pos.anchoredPosition;
             if (anchoredPos.x / pos.lossyScale.x < MinimumSize ||
-                anchoredPos.y / pos.lossyScale.y < MinimumSize) pos.position = oldPos;
+                anchoredPos.y / pos.lossyScale.y < MinimumSize)
+            {
+                pos.position = oldPos;
+            }
+
             anchoredPos = pos.anchoredPosition;
             ChangeSize(anchoredPos.x, anchoredPos.y);
         }
@@ -163,7 +167,9 @@ namespace SEE.Game.Charts
             if (_chartContent.TotalNumberOfGraphNodesInTheScene > 50)
             {
                 if (_chartContent.drawing == null)
+                {
                     _chartContent.drawing = StartCoroutine(_chartContent.QueueDraw());
+                }
             }
             else
             {

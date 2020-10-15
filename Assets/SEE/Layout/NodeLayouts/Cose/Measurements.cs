@@ -180,11 +180,11 @@ namespace SEE.Layout.NodeLayouts.Cose
                             Vector2 leftFrontCorner, Vector2 rightBackCorner,
                             Performance performance = null)
         {
-            this.width = Distance(leftFrontCorner.x, rightBackCorner.x);
-            this.height = Distance(leftFrontCorner.y, rightBackCorner.y);
+            width = Distance(leftFrontCorner.x, rightBackCorner.x);
+            height = Distance(leftFrontCorner.y, rightBackCorner.y);
             this.layoutNodes = new List<ILayoutNode>(layoutNodes);
-            this.edges = graph.ConnectingEdges(layoutNodes);
-            this.nodePerformance = performance;
+            edges = graph.ConnectingEdges(layoutNodes);
+            nodePerformance = performance;
             EdgeDistCalculation(graph, layoutNodes);
         }
 

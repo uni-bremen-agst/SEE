@@ -449,7 +449,7 @@ namespace SEE.DataModel.DG
             IList<Edge> result = new List<Edge>();
             HashSet<Node> nodes = new HashSet<Node>(selectedNodes);
 
-            foreach (Edge edge in this.Edges())
+            foreach (Edge edge in Edges())
             {
                 if (nodes.Contains(edge.Source) && nodes.Contains(edge.Target))
                 {
@@ -531,8 +531,8 @@ namespace SEE.DataModel.DG
         {
             base.HandleCloned(clone);
             Graph target = (Graph)clone;
-            target.name = this.name;
-            target.path = this.path;
+            target.name = name;
+            target.path = path;
             CopyNodesTo(target);
             CopyEdgesTo(target);
             CopyHierarchy(this, target);
@@ -541,7 +541,7 @@ namespace SEE.DataModel.DG
         private void CopyNodesTo(Graph target)
         {
             target.nodes = new Dictionary<string, Node>();
-            foreach (KeyValuePair<string, Node> entry in this.nodes)
+            foreach (KeyValuePair<string, Node> entry in nodes)
             {
                 Node node = (Node)entry.Value.Clone();
                 target.AddNode(node);
@@ -551,7 +551,7 @@ namespace SEE.DataModel.DG
         private void CopyEdgesTo(Graph target)
         {
             target.edges = new Dictionary<string, Edge>();
-            foreach (KeyValuePair<string, Edge> entry in this.edges)
+            foreach (KeyValuePair<string, Edge> entry in edges)
             {
                 Edge edge = entry.Value;
                 Edge clone = (Edge)edge.Clone();
@@ -869,22 +869,22 @@ namespace SEE.DataModel.DG
             else
             {
                 Graph otherGraph = other as Graph;
-                if (this.path != otherGraph.path)
+                if (path != otherGraph.path)
                 {
                     Report("Graph paths are different");
                     return false;
                 }
-                else if (this.name != otherGraph.name)
+                else if (name != otherGraph.name)
                 {
                     Report("Graph names are different");
                     return false;
                 }
-                else if (this.NodeCount != otherGraph.NodeCount)
+                else if (NodeCount != otherGraph.NodeCount)
                 {
                     Report("Number of nodes are different");
                     return false;
                 }
-                else if (!AreEqual(this.nodes, otherGraph.nodes))
+                else if (!AreEqual(nodes, otherGraph.nodes))
                 {
                     // Note: because the Equals operation for nodes checks also the ID
                     // of the node's parents and children, we will also implicitly check the
@@ -892,14 +892,14 @@ namespace SEE.DataModel.DG
                     Report("Graph nodes are different");
                     return false;
                 }
-                else if (this.edges.Count != otherGraph.edges.Count)
+                else if (edges.Count != otherGraph.edges.Count)
                 {
                     Report("Number of edges are different");
                     return false;
                 }
                 else
                 {
-                    bool equal = AreEqual(this.edges, otherGraph.edges);
+                    bool equal = AreEqual(edges, otherGraph.edges);
                     if (!equal)
                     {
                         Report("Graph edges are different");

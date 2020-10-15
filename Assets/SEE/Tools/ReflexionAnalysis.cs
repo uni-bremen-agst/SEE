@@ -1077,7 +1077,7 @@ namespace SEE.Tools
         ///   data are updated; all observers are informed of the change.
         /// </summary>
         /// <param name="edge">the dependency edge to be removed from the implementation graph</param>
-        void Delete_From_Dependencies(Edge edge)
+        private void Delete_From_Dependencies(Edge edge)
         {
             throw new NotImplementedException(); // FIXME
         }
@@ -1151,7 +1151,7 @@ namespace SEE.Tools
         /// <returns>summary of the number of edges in the architecture for each respective state</returns>
         public int[] Summary()
         {
-            Graph _architecture = this.Get_Architecture();
+            Graph _architecture = Get_Architecture();
             string[] stateNames = Enum.GetNames(typeof(State));
             int[] summary = new int[stateNames.Length];
 
@@ -1165,7 +1165,7 @@ namespace SEE.Tools
         /// <summary>
         /// Whether descendants may implicitly access their ancestors.
         /// </summary>
-        private bool _allow_dependencies_to_parents;
+        private readonly bool _allow_dependencies_to_parents;
 
         // *****************************************
         // involved graphs
@@ -1174,17 +1174,17 @@ namespace SEE.Tools
         /// <summary>
         /// The graph representing the implementation.
         /// </summary>
-        private Graph _implementation;
+        private readonly Graph _implementation;
 
         /// <summary>
         /// The graph representing the specified architecture model.
         /// </summary>
-        private Graph _architecture;
+        private readonly Graph _architecture;
 
         /// <summary>
         /// The graph describing the mapping of implementation entities onto architecture entities.
         /// </summary>
-        private Graph _mapping;
+        private readonly Graph _mapping;
 
         // ******************************************************************
         // node mappings from node IDs onto nodes in the various graphs
@@ -2026,7 +2026,7 @@ namespace SEE.Tools
         /// </summary>
         /// <param name="node_set">list of nodes whose qualified name is to be dumped</param>
         /// <param name="message">message to be emitted before the nodes</param>
-        static void Dump_Node_Set(List<Node> node_set, string message)
+        private static void Dump_Node_Set(List<Node> node_set, string message)
         {
             Debug.Log(message + "\n");
             foreach (Node node in node_set)
@@ -2040,7 +2040,7 @@ namespace SEE.Tools
         /// </summary>
         /// <param name="edge_set">list of edges whose qualified name is to be dumped</param>
         /// <param name="message">message to be emitted before the edges</param>
-        static void Dump_Edge_Set(List<Edge> edge_set)
+        private static void Dump_Edge_Set(List<Edge> edge_set)
         {
             foreach (Edge edge in edge_set)
             {

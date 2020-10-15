@@ -46,7 +46,7 @@ namespace SEE.Controls
             /// </summary>
             private bool buttonEventConsumed = false;
 
-            private SteamVR_Action_Boolean button;
+            private readonly SteamVR_Action_Boolean button;
 
             public DelayedToggle(SteamVR_Action_Boolean button)
             {
@@ -102,9 +102,9 @@ namespace SEE.Controls
         [Tooltip("The width of the selection ray line")]
         public float rayWidth = 0.005f;
 
-        private SteamVR_Action_Single GrabAction = SteamVR_Input.GetSingleAction(XRInput.DefaultActionSetName, "Grab");
+        private readonly SteamVR_Action_Single GrabAction = SteamVR_Input.GetSingleAction(XRInput.DefaultActionSetName, "Grab");
 
-        private SteamVR_Action_Boolean SelectionButton = SteamVR_Input.GetBooleanAction(XRInput.DefaultActionSetName, "Select");
+        private readonly SteamVR_Action_Boolean SelectionButton = SteamVR_Input.GetBooleanAction(XRInput.DefaultActionSetName, "Select");
 
         private DelayedToggle selectionButton;
 

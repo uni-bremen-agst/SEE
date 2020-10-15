@@ -23,7 +23,7 @@ namespace SEE.Net
         /// <summary>
         /// A dictionary, mapping unique IDs to its corresponding view container.
         /// </summary>
-        private static Dictionary<uint, ViewContainer> viewContainers = new Dictionary<uint, ViewContainer>();
+        private static readonly Dictionary<uint, ViewContainer> viewContainers = new Dictionary<uint, ViewContainer>();
 
         /// <summary>
         /// The unique ID of the view container.
@@ -43,7 +43,7 @@ namespace SEE.Net
         /// <summary>
         /// All views, this view container manages.
         /// </summary>
-        [SerializeField] private AbstractView[] views = new AbstractView[1];
+        [SerializeField] private readonly AbstractView[] views = new AbstractView[1];
 
 
 

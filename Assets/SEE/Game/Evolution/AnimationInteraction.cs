@@ -112,7 +112,7 @@ namespace SEE.Game.Evolution
         ///   0-9 => the time in between two revisions in auto-play mode is adjusted
         ///   ESC => toggle between the two canvases AnimationCanvas and RevisionSelectionCanvas
         /// </summary>
-        void Update()
+        private void Update()
         {
             if (!IsRevisionSelectionOpen)
             {

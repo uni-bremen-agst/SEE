@@ -56,10 +56,17 @@ namespace SEE.Tools
             int dx = p1.x - p0.x;
             int dy = p1.y - p0.y;
 
-            int inc_x = (int)Mathf.Sign(Mathf.Sign((float)dx) + 0.5f);
-            int inc_y = (int)Mathf.Sign(Mathf.Sign((float)dy) + 0.5f);
-            if (dx < 0) dx = -dx;
-            if (dy < 0) dy = -dy;
+            int inc_x = (int)Mathf.Sign(Mathf.Sign(dx) + 0.5f);
+            int inc_y = (int)Mathf.Sign(Mathf.Sign(dy) + 0.5f);
+            if (dx < 0)
+            {
+                dx = -dx;
+            }
+
+            if (dy < 0)
+            {
+                dy = -dy;
+            }
 
             int len, sd0x, sd0y, dd0x, dd0y, sd1x, sd1y, dd1x, dd1y, ku, kv, kd, kt;
             if (dx > dy)
@@ -101,7 +108,7 @@ namespace SEE.Tools
             int d1 = 0;
             int dd = 0;
 
-            while ((float)dd < tk)
+            while (dd < tk)
             {
                 BresenhamLineDraw(p0, d1);
 
@@ -134,7 +141,7 @@ namespace SEE.Tools
                         }
 
                         d1 = d1 - kd;
-                        if ((float)dd > tk)
+                        if (dd > tk)
                         {
                             return result;
                         }

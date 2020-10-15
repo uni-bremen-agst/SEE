@@ -81,7 +81,7 @@ namespace SEE.GO
             Material[] result = new Material[numberOfColors];
             for (int i = 0; i < result.Length; i++)
             {
-                result[i] = New(shaderType, Color.Lerp(lower, higher, (float)i / (float)(numberOfColors - 1)), renderQueueOffset);
+                result[i] = New(shaderType, Color.Lerp(lower, higher, i / (float)(numberOfColors - 1)), renderQueueOffset);
             }
             return result;
         }

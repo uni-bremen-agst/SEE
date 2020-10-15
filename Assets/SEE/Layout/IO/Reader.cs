@@ -32,7 +32,7 @@ namespace SEE.Layout.IO
             this.filename = filename;
             this.logger = logger;
             this.groundLevel = groundLevel;
-            this.reader = new XmlTextReader(filename)
+            reader = new XmlTextReader(filename)
             {
                 WhitespaceHandling = WhitespaceHandling.None
             };
@@ -164,7 +164,7 @@ namespace SEE.Layout.IO
         {
             if (logger != null)
             {
-                IXmlLineInfo xmlInfo = (IXmlLineInfo)reader;
+                IXmlLineInfo xmlInfo = reader;
                 int lineNumber = xmlInfo.LineNumber - 1;
                 logger.LogError(filename + ":" + lineNumber + ": " + message + "\n");
             }
@@ -174,7 +174,7 @@ namespace SEE.Layout.IO
         {
             if (logger != null)
             {
-                IXmlLineInfo xmlInfo = (IXmlLineInfo)reader;
+                IXmlLineInfo xmlInfo = reader;
                 int lineNumber = xmlInfo.LineNumber - 1;
                 logger.LogWarning(filename + ":" + lineNumber + ": " + message + "\n");
             }

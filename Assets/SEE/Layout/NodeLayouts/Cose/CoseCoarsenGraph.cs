@@ -22,7 +22,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <summary>
         /// the layout
         /// </summary>
-        private CoseLayout layout;
+        private readonly CoseLayout layout;
 
         /// <summary>
         /// constructor

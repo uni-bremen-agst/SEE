@@ -21,7 +21,7 @@ namespace SEEEditor
         /// <summary>
         /// the city to display
         /// </summary>
-        AbstractSEECity city;
+        private AbstractSEECity city;
 
         public override void OnInspectorGUI()
         {
@@ -188,9 +188,9 @@ namespace SEEEditor
         /// Displays a horizontal line
         /// </summary>
         /// <param name="color">the color for the line</param>
-        static void HorizontalLine(Color color)
+        private static void HorizontalLine(Color color)
         {
-            var c = GUI.color;
+            Color c = GUI.color;
             GUI.color = color;
             GUILayout.Box(GUIContent.none, SetupHorizontalLine());
             GUI.color = c;
@@ -200,7 +200,7 @@ namespace SEEEditor
         /// returns a horizontal line
         /// </summary>
         /// <returns></returns>
-        static GUIStyle SetupHorizontalLine()
+        private static GUIStyle SetupHorizontalLine()
         {
             GUIStyle horizontalLine;
             horizontalLine = new GUIStyle();
@@ -237,7 +237,7 @@ namespace SEEEditor
 
                     if (!allLeaves)
                     {
-                        var showPosition = EditorGUILayout.Foldout(city.CoseGraphSettings.show[root.ID], root.ID, true);
+                        bool showPosition = EditorGUILayout.Foldout(city.CoseGraphSettings.show[root.ID], root.ID, true);
                         city.CoseGraphSettings.show[root.ID] = showPosition;
 
                         if (showPosition)

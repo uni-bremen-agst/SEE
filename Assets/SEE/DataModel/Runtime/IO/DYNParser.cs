@@ -81,12 +81,19 @@ namespace SEE.DataModel.Runtime.IO
             try
             {
                 string[] lines = File.ReadAllLines(filename);
-                if (lines.Length < 2) throw new ArgumentException("Not enough entries!");
+                if (lines.Length < 2)
+                {
+                    throw new ArgumentException("Not enough entries!");
+                }
 
                 currentLineNumber = 1;
                 string[] categories = Tokenize(lines[0]);
                 int categoryCount = categories.Length;
-                if (categoryCount < 2) throw new NotEnoughCategoriesException(categoryCount);
+                if (categoryCount < 2)
+                {
+                    throw new NotEnoughCategoriesException(categoryCount);
+                }
+
                 Categories(categories);
                 for (int i = 1; i < lines.Length; i++)
                 {

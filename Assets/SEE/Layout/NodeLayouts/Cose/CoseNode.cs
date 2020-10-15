@@ -516,7 +516,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         public void UpdateBounding(Vector2 position, Vector2 scale)
         {
             this.scale = scale;
-            this.centerPosition = position;
+            centerPosition = position;
         }
 
         /// <summary>

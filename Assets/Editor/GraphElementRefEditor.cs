@@ -23,22 +23,22 @@ namespace SEEEditor
             EditorGUILayout.TextField("Type", graphElement.Type);
 
             GUILayout.Label("String attributes", EditorStyles.boldLabel);
-            foreach (var entry in graphElement.StringAttributes)
+            foreach (System.Collections.Generic.KeyValuePair<string, string> entry in graphElement.StringAttributes)
             {
                 EditorGUILayout.TextField(entry.Key, entry.Value);
             }
             GUILayout.Label("Float attributes", EditorStyles.boldLabel);
-            foreach (var entry in graphElement.FloatAttributes)
+            foreach (System.Collections.Generic.KeyValuePair<string, float> entry in graphElement.FloatAttributes)
             {
                 EditorGUILayout.TextField(entry.Key, entry.Value.ToString());
             }
             GUILayout.Label("Integer attributes", EditorStyles.boldLabel);
-            foreach (var entry in graphElement.IntAttributes)
+            foreach (System.Collections.Generic.KeyValuePair<string, int> entry in graphElement.IntAttributes)
             {
                 EditorGUILayout.TextField(entry.Key, entry.Value.ToString());
             }
             GUILayout.Label("Toggle attributes", EditorStyles.boldLabel);
-            foreach (var entry in graphElement.ToggleAttributes)
+            foreach (string entry in graphElement.ToggleAttributes)
             {
                 EditorGUILayout.LabelField(entry);
             }

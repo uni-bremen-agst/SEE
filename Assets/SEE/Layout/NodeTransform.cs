@@ -21,7 +21,7 @@ namespace SEE.Layout
         {
             this.position = position;
             this.scale = scale;
-            this.rotation = 0.0f;
+            rotation = 0.0f;
         }
 
         /// <summary>

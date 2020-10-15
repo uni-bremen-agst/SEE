@@ -63,8 +63,10 @@ namespace SEE.Game.Charts
                 eventData.position.x < _screenSize.sizeDelta.x * _screenSize.lossyScale.x &&
                 eventData.position.y > 0 &&
                 eventData.position.y < _screenSize.sizeDelta.y * _screenSize.lossyScale.y)
+            {
                 chart.position = new Vector2(eventData.position.x - _distance.x,
                     eventData.position.y - _distance.y);
+            }
         }
 
         /// <summary>

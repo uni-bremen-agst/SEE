@@ -89,25 +89,43 @@ namespace SEE.Game.Charts.VR
                 : EventData.pointerCurrentRaycast.distance;
 
             if (colliderDistance.CompareTo(canvasDistance) < 0)
+            {
                 ExecutePhysical(hitData);
+            }
             else
+            {
                 ExecuteCanvas();
+            }
         }
 
         private void ExecutePhysical(RaycastHit hitData)
         {
             HandlePointerExitAndEnter(EventData, hitData.transform.gameObject);
             ExecuteEvents.Execute(EventData.pointerDrag, EventData, ExecuteEvents.dragHandler);
-            if (_chartAction.clickDown) Press(hitData.transform.gameObject);
-            if (_chartAction.clickUp) Release(hitData.transform.gameObject);
+            if (_chartAction.clickDown)
+            {
+                Press(hitData.transform.gameObject);
+            }
+
+            if (_chartAction.clickUp)
+            {
+                Release(hitData.transform.gameObject);
+            }
         }
 
         private void ExecuteCanvas()
         {
             HandlePointerExitAndEnter(EventData, EventData.pointerCurrentRaycast.gameObject);
             ExecuteEvents.Execute(EventData.pointerDrag, EventData, ExecuteEvents.dragHandler);
-            if (_chartAction.clickDown) Press(EventData.pointerCurrentRaycast.gameObject);
-            if (_chartAction.clickUp) Release(EventData.pointerCurrentRaycast.gameObject);
+            if (_chartAction.clickDown)
+            {
+                Press(EventData.pointerCurrentRaycast.gameObject);
+            }
+
+            if (_chartAction.clickUp)
+            {
+                Release(EventData.pointerCurrentRaycast.gameObject);
+            }
         }
 
         /// <summary>
@@ -136,8 +154,10 @@ namespace SEE.Game.Charts.VR
             GameObject pointerRelease = ExecuteEvents.GetEventHandler<IPointerClickHandler>(hitObject);
 
             if (EventData.pointerPress == pointerRelease)
+            {
                 ExecuteEvents.Execute(EventData.pointerPress, EventData,
                     ExecuteEvents.pointerClickHandler);
+            }
 
             ExecuteEvents.Execute(EventData.pointerPress, EventData,
                 ExecuteEvents.pointerUpHandler);

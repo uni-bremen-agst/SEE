@@ -17,7 +17,7 @@ namespace SEE.DataModel.Runtime
         /// The name of the category.
         /// </summary>
         [SerializeField]
-        private string name;
+        private readonly string name;
         public string Name { get => name; }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace SEE.DataModel.Runtime
         /// Categories of a call tree.
         /// </summary>
         [SerializeField]
-        private CallTreeCategory[] categories;
+        private readonly CallTreeCategory[] categories;
         public CallTreeCategory[] Categories { get => categories; }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace SEE.DataModel.Runtime
         /// The categories of the call tree.
         /// </summary>
         [SerializeField]
-        private CallTreeCategories categories;
+        private readonly CallTreeCategories categories;
 
         /// <summary>
         /// The predecessor function call. Can not be serialized due to depth limits of
@@ -144,7 +144,7 @@ namespace SEE.DataModel.Runtime
         /// The attributes of the function call.
         /// </summary>
         [SerializeField]
-        private string[] attributes;
+        private readonly string[] attributes;
 
         /// <summary>
         /// The <see cref="GameObject"/>, that represents this function call as a
@@ -272,14 +272,14 @@ namespace SEE.DataModel.Runtime
         /// The categories of the call tree.
         /// </summary>
         [SerializeField]
-        private CallTreeCategories categories;
+        private readonly CallTreeCategories categories;
         public CallTreeCategories Categories { get => categories; }
 
         /// <summary>
         /// The function calls of the call tree.
         /// </summary>
         [SerializeField]
-        private List<CallTreeFunctionCall> functionCalls;
+        private readonly List<CallTreeFunctionCall> functionCalls;
         public List<CallTreeFunctionCall> FunctionCalls { get => functionCalls; }
 
         /// <summary>
@@ -586,7 +586,10 @@ namespace SEE.DataModel.Runtime
                     delim = " ";
                 }
                 returnValue = ConvertFromDYNType(returnValue);
-                if (returnValue.Length == 0) returnValue = FunctionInformation.VOID_RETURN;
+                if (returnValue.Length == 0)
+                {
+                    returnValue = FunctionInformation.VOID_RETURN;
+                }
 
                 // name (namespaces and class name)
                 tokens = temp.Split(new string[] { "::" }, StringSplitOptions.RemoveEmptyEntries);

@@ -63,7 +63,7 @@ namespace SEE.Net
         {
             if (!initialized)
             {
-                NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => { if (c.Equals(Connection)) Network.SwitchToOfflineMode(); });
+                NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => { if (c.Equals(Connection)) { Network.SwitchToOfflineMode(); } });
 
                 void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => PacketHandler.Push(packetHeader, connection, data);
                 NetworkComms.AppendGlobalIncomingPacketHandler<string>(PacketType, OnIncomingPacket);

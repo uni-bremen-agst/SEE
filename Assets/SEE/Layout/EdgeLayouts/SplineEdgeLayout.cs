@@ -34,7 +34,7 @@ namespace SEE.Layout.EdgeLayout
         /// <summary>
         /// Determines to which extent the polylines of the generated splines are simplified.
         /// </summary>
-        private float rdp = 0.0f; // 0.0f means no simplification
+        private readonly float rdp = 0.0f; // 0.0f means no simplification
 
         /// <summary>
         /// Adds way points to each edge in the given list of<paramref name= "edges" />

@@ -61,7 +61,7 @@ namespace SEE.Game.Evolution
         /// <param name="maxAnimationTime">The maximum time the animation is allowed to run.</param>
         public AbstractAnimator(float maxAnimationTime = DefaultAnimationTime)
         {
-            this.MaxAnimationTime = maxAnimationTime;
+            MaxAnimationTime = maxAnimationTime;
         }
 
         /// <summary>

@@ -32,10 +32,10 @@ namespace SEEEditor
             leafAttributes.drawElementCallback
                 = (Rect rect, int index, bool isActive, bool isFocused) =>
                 {
-                    var element = leafAttributes.serializedProperty.GetArrayElementAtIndex(index);
-                    var name = element.FindPropertyRelative("Name");
-                    var mean = element.FindPropertyRelative("Mean");
-                    var standardDeviation = element.FindPropertyRelative("StandardDeviation");
+                    SerializedProperty element = leafAttributes.serializedProperty.GetArrayElementAtIndex(index);
+                    SerializedProperty name = element.FindPropertyRelative("Name");
+                    SerializedProperty mean = element.FindPropertyRelative("Mean");
+                    SerializedProperty standardDeviation = element.FindPropertyRelative("StandardDeviation");
 
                     rect.y += 2;
                     float nameLength = rect.width * 0.75f;

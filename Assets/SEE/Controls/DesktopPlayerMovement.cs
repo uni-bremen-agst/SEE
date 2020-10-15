@@ -22,7 +22,7 @@ namespace SEE.Controls
         [Tooltip("The code city which the player is focusing on.")]
         public GO.Plane focusedObject;
 
-        void Start()
+        private void Start()
         {
             if (focusedObject != null)
             {
@@ -39,7 +39,7 @@ namespace SEE.Controls
             Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
         }
 
-        void Update()
+        private void Update()
         {
             if (Input.GetKeyDown(KeyCode.C))
             {

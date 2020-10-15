@@ -20,7 +20,7 @@ namespace SEE.Controls
     [DisallowMultipleComponent]
     public class Outline : MonoBehaviour
     {
-        private static HashSet<Mesh> registeredMeshes = new HashSet<Mesh>();
+        private static readonly HashSet<Mesh> registeredMeshes = new HashSet<Mesh>();
 
         public enum Mode
         {
@@ -80,13 +80,13 @@ namespace SEE.Controls
 
         [SerializeField, Tooltip("Precompute enabled: Per-vertex calculations are performed in the editor and serialized with the object. "
         + "Precompute disabled: Per-vertex calculations are performed at runtime in Awake(). This may cause a pause for large meshes.")]
-        private bool precomputeOutline;
+        private readonly bool precomputeOutline;
 
         [SerializeField, HideInInspector]
-        private List<Mesh> bakeKeys = new List<Mesh>();
+        private readonly List<Mesh> bakeKeys = new List<Mesh>();
 
         [SerializeField, HideInInspector]
-        private List<ListVector3> bakeValues = new List<ListVector3>();
+        private readonly List<ListVector3> bakeValues = new List<ListVector3>();
 
         private Renderer[] renderers;
         private Material outlineMaskMaterial;
@@ -151,7 +151,7 @@ namespace SEE.Controls
             return result;
         }
 
-        void Awake()
+        private void Awake()
         {
             // Cache renderers
             renderers = GetComponents<Renderer>();
@@ -170,7 +170,7 @@ namespace SEE.Controls
             needsUpdate = true;
         }
 
-        void OnEnable()
+        private void OnEnable()
         {
             foreach (Renderer renderer in renderers)
             {
@@ -198,7 +198,7 @@ namespace SEE.Controls
             }
         }
 
-        void OnValidate()
+        private void OnValidate()
         {
             // Update material properties
             needsUpdate = true;
@@ -217,7 +217,7 @@ namespace SEE.Controls
             }
         }
 
-        void Update()
+        private void Update()
         {
             if (needsUpdate)
             {
@@ -227,7 +227,7 @@ namespace SEE.Controls
             }
         }
 
-        void OnDisable()
+        private void OnDisable()
         {
             foreach (Renderer renderer in renderers)
             {
@@ -249,7 +249,7 @@ namespace SEE.Controls
             }
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
             // Destroy material instances
             Destroy(outlineMaskMaterial);
@@ -262,7 +262,7 @@ namespace SEE.Controls
             UpdateMaterialProperties();
         }
 
-        void Bake()
+        private void Bake()
         {
             // Generate smooth normals for each mesh
             HashSet<Mesh> bakedMeshes = new HashSet<Mesh>();
@@ -283,7 +283,7 @@ namespace SEE.Controls
             }
         }
 
-        void LoadSmoothNormals()
+        private void LoadSmoothNormals()
         {
             // Retrieve or generate smooth normals
             foreach (MeshFilter meshFilter in GetComponentsInChildren<MeshFilter>())
@@ -312,7 +312,7 @@ namespace SEE.Controls
             }
         }
 
-        List<Vector3> SmoothNormals(Mesh mesh)
+        private List<Vector3> SmoothNormals(Mesh mesh)
         {
             // Group vertices by location
             IEnumerable<IGrouping<Vector3, KeyValuePair<Vector3, int>>> groups = mesh.vertices.Select((vertex, index) => new KeyValuePair<Vector3, int>(vertex, index)).GroupBy(pair => pair.Key);
@@ -349,7 +349,7 @@ namespace SEE.Controls
             return smoothNormals;
         }
 
-        void UpdateMaterialProperties()
+        private void UpdateMaterialProperties()
         {
             // Apply properties according to mode
             outlineFillMaterial.SetColor("_OutlineColor", outlineColor);

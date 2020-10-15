@@ -20,10 +20,10 @@ namespace SEE.Utils
         private Performance(string action, Stopwatch sw)
         {
             this.action = action;
-            this.stopWatch = sw;
+            stopWatch = sw;
         }
 
-        private Stopwatch stopWatch;
+        private readonly Stopwatch stopWatch;
 
         private readonly string action;
 

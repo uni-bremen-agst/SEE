@@ -22,9 +22,9 @@ namespace SEE.Tools
 
         public RandomAttributeDescriptor(string name, float mean, float standardDeviation)
         {
-            this.Name = name;
-            this.Mean = mean;
-            this.StandardDeviation = standardDeviation;
+            Name = name;
+            Mean = mean;
+            StandardDeviation = standardDeviation;
         }
         [SerializeField]
         public string Name;
@@ -64,10 +64,10 @@ namespace SEE.Tools
 
         public Constraint(string nodeType, int nodeNumber, string edgeType, float edgeDensity)
         {
-            this.NodeType = nodeType;
-            this.NodeNumber = nodeNumber;
-            this.EdgeType = edgeType;
-            this.EdgeDensity = edgeDensity;
+            NodeType = nodeType;
+            NodeNumber = nodeNumber;
+            EdgeType = edgeType;
+            EdgeDensity = edgeDensity;
             Check();
         }
 
@@ -137,9 +137,9 @@ namespace SEE.Tools
 
             Debug.LogFormat("Number of edges:       {0}\n", graph.EdgeCount);
             Debug.LogFormat("Number of leaf edges:  {0}\n", leafEdgesCount);
-            Debug.LogFormat("Leaf edge density:     {0}\n", (float)leafEdgesCount / (float)leavesCount);
+            Debug.LogFormat("Leaf edge density:     {0}\n", leafEdgesCount / (float)leavesCount);
             Debug.LogFormat("Number of inner edges: {0}\n", innerEdgesCount);
-            Debug.LogFormat("Inner edge density:    {0}\n", (float)innerEdgesCount / (float)innerNodesCount);
+            Debug.LogFormat("Inner edge density:    {0}\n", innerEdgesCount / (float)innerNodesCount);
 
             Debug.LogFormat("Maximal tree depth:    {0}\n", graph.MaxDepth);
         }

@@ -29,7 +29,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// The name of the GVL file from which to read the layout information.
         /// </summary>
-        private string filename;
+        private readonly string filename;
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes)
         {

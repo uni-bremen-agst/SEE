@@ -300,12 +300,20 @@ namespace SEE.Game.Charts
                 highlights.scrollViewToggle = rootToggle;
                 tempObject.transform.localPosition = headerOffset + new Vector2(0f, _yGap) * index;
                 rootToggle.Initialize(root.SourceName, this);
-                if (hierarchy > maxHierarchy) maxHierarchy = hierarchy;
+                if (hierarchy > maxHierarchy)
+                {
+                    maxHierarchy = hierarchy;
+                }
+
                 hierarchy = 0;
                 CreateChildToggles(root, rootToggle, ref index, ref hierarchy);
             }
 
-            if (hierarchy > maxHierarchy) maxHierarchy = hierarchy; //TODO: Use this...
+            if (hierarchy > maxHierarchy)
+            {
+                maxHierarchy = hierarchy; //TODO: Use this...
+            }
+
             scrollContent.TryGetComponent<RectTransform>(out RectTransform rect);
             rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
             p.End(true);
@@ -336,7 +344,10 @@ namespace SEE.Game.Charts
         private void CreateChildToggles(Node root, ScrollViewToggle parentToggle, ref int index,
             ref int hierarchy)
         {
-            if (root.IsLeaf()) return;
+            if (root.IsLeaf())
+            {
+                return;
+            }
 
             hierarchy++;
             foreach (Node child in root.Children())
@@ -468,8 +479,14 @@ namespace SEE.Game.Charts
         /// <returns></returns>
         public IEnumerator QueueDraw()
         {
-            if (_dataObjects.Count > BigCityThreshold) yield return new WaitForSeconds(LongDrawWaitingTime);
-            else yield return new WaitForSeconds(0.5f);
+            if (_dataObjects.Count > BigCityThreshold)
+            {
+                yield return new WaitForSeconds(LongDrawWaitingTime);
+            }
+            else
+            {
+                yield return new WaitForSeconds(0.5f);
+            }
 
             DrawData(false);
             drawing = null;
@@ -529,15 +546,31 @@ namespace SEE.Game.Charts
                 bool inX = false;
                 if (node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX))
                 {
-                    if (valueX < minX) minX = valueX;
-                    if (valueX > maxX) maxX = valueX;
+                    if (valueX < minX)
+                    {
+                        minX = valueX;
+                    }
+
+                    if (valueX > maxX)
+                    {
+                        maxX = valueX;
+                    }
+
                     inX = true;
                 }
                 bool inY = false;
                 if (node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY))
                 {
-                    if (valueY > maxY) maxY = valueY;
-                    if (valueY < minY) minY = valueY;
+                    if (valueY > maxY)
+                    {
+                        maxY = valueY;
+                    }
+
+                    if (valueY < minY)
+                    {
+                        minY = valueY;
+                    }
+
                     inY = true;
                 }
                 // Is this node shown in this chart at all?
@@ -573,7 +606,11 @@ namespace SEE.Game.Charts
             }
             else
             {
-                foreach (GameObject activeMarker in ActiveMarkers) Destroy(activeMarker);
+                foreach (GameObject activeMarker in ActiveMarkers)
+                {
+                    Destroy(activeMarker);
+                }
+
                 noDataWarning.SetActive(true);
             }
             p.End(true);
@@ -633,7 +670,11 @@ namespace SEE.Game.Charts
             }
             else
             {
-                foreach (GameObject activeMarker in ActiveMarkers) Destroy(activeMarker);
+                foreach (GameObject activeMarker in ActiveMarkers)
+                {
+                    Destroy(activeMarker);
+                }
+
                 noDataWarning.SetActive(true);
             }
             p.End(true);
@@ -675,7 +716,11 @@ namespace SEE.Game.Charts
                 updatedMarkers.Add(marker);
             }
 
-            foreach (GameObject marker in ActiveMarkers) Destroy(marker);
+            foreach (GameObject marker in ActiveMarkers)
+            {
+                Destroy(marker);
+            }
+
             ActiveMarkers = updatedMarkers;
             p.End(true);
         }
@@ -722,7 +767,11 @@ namespace SEE.Game.Charts
                     updatedMarkers.Add(marker);
                 }
 
-                foreach (GameObject marker in ActiveMarkers) Destroy(marker);
+                foreach (GameObject marker in ActiveMarkers)
+                {
+                    Destroy(marker);
+                }
+
                 ActiveMarkers = updatedMarkers;
             }
             p.End(true);
@@ -764,10 +813,17 @@ namespace SEE.Game.Charts
                 CheckOverlapping(marker, updatedMarkers.ToArray());
                 updatedMarkers.Add(marker);
 
-                if (ActiveMarkers.Count <= 0) break;
+                if (ActiveMarkers.Count <= 0)
+                {
+                    break;
+                }
             }
 
-            foreach (GameObject marker in ActiveMarkers) Destroy(marker);
+            foreach (GameObject marker in ActiveMarkers)
+            {
+                Destroy(marker);
+            }
+
             ActiveMarkers = updatedMarkers;
             p.End(true);
         }
@@ -782,29 +838,45 @@ namespace SEE.Game.Charts
         {
             marker.TryGetComponent<Image>(out Image image);
             if (updatedMarkers.Length > 10)
+            {
                 for (int i = updatedMarkers.Length - 10; i < updatedMarkers.Length; i++)
                 {
                     GameObject updatedMarker = updatedMarkers[i];
                     if (Vector3.Distance(marker.transform.position,
                                 updatedMarker.transform.position)
                             .CompareTo(MarkerOverlapDistance * marker.transform.lossyScale.x) >=
-                        0) return;
-                    if (image.color.g - 0.1f < 0) return;
+                        0)
+                    {
+                        return;
+                    }
+
+                    if (image.color.g - 0.1f < 0)
+                    {
+                        return;
+                    }
+
                     Color oldColor = image.color;
                     image.color = new Color(oldColor.r, oldColor.g - 0.1f,
                         oldColor.b - 0.1f);
                 }
+            }
             else
+            {
                 foreach (GameObject updatedMarker in updatedMarkers)
+                {
                     if (Vector3.Distance(marker.transform.position,
                             updatedMarker.transform.position)
                         .CompareTo(MarkerOverlapDistance * marker.transform.lossyScale.x) < 0)
+                    {
                         if (image.color.g - 0.1f >= 0)
                         {
                             Color oldColor = image.color;
                             image.color = new Color(oldColor.r, oldColor.g - 0.1f,
                                 oldColor.b - 0.1f);
                         }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -847,10 +919,14 @@ namespace SEE.Game.Charts
             string metricX = axisDropdownX.CurrentlySelectedMetric;
             string metricY = axisDropdownY.CurrentlySelectedMetric;
             if (metricX.Equals(metricY))
+            {
                 moveHandler.SetInfoText(metricX);
+            }
             else
+            {
                 moveHandler.SetInfoText("X-Axis: " + axisDropdownX.CurrentlySelectedMetric + "\n" + "Y-Axis: " +
                                         axisDropdownY.CurrentlySelectedMetric);
+            }
         }
 
         /// <summary>
@@ -916,8 +992,12 @@ namespace SEE.Game.Charts
         {
             ChartManager.Instance.UnregisterChart(gameObject);
             foreach (GameObject dataObject in _dataObjects)
+            {
                 if (dataObject != null)
+                {
                     dataObject.GetComponent<NodeHighlights>().showInChart.Remove(this);
+                }
+            }
         }
     }
 }

@@ -76,14 +76,21 @@ namespace SEE.Game.Charts.VR
         /// <param name="eventData">Contains position data of the pointer.</param>
         public override void OnDrag(PointerEventData eventData)
         {
-            if (eventData.pointerCurrentRaycast.worldPosition == Vector3.zero) return;
+            if (eventData.pointerCurrentRaycast.worldPosition == Vector3.zero)
+            {
+                return;
+            }
+
             RectTransform pos = GetComponent<RectTransform>();
             Vector3 oldPos = pos.position;
             pos.position = eventData.pointerCurrentRaycast.worldPosition;
             pos.anchoredPosition3D =
                 new Vector3(pos.anchoredPosition.x, pos.anchoredPosition.y, 0);
             if (pos.anchoredPosition.x < MinimumSize || pos.anchoredPosition.y < MinimumSize)
+            {
                 pos.position = oldPos;
+            }
+
             ChangeSize(pos.anchoredPosition.x, pos.anchoredPosition.y);
         }
 

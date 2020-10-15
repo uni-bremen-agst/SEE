@@ -74,7 +74,7 @@ namespace SEE.Game
             }
         }
 
-        private static Dictionary<string, SEECity> dict = new Dictionary<string, SEECity>();
+        private static readonly Dictionary<string, SEECity> dict = new Dictionary<string, SEECity>();
         public static SEECity GetByGraph(Graph graph)
         {
             SEECity result = null;

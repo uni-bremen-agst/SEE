@@ -55,7 +55,9 @@ namespace SEE.Game.Charts.VR
         public override void OnDrag(PointerEventData eventData)
         {
             if (eventData.pointerCurrentRaycast.worldPosition != Vector3.zero)
+            {
                 _parent.position = eventData.pointerCurrentRaycast.worldPosition - _distance;
+            }
         }
 
         /// <summary>

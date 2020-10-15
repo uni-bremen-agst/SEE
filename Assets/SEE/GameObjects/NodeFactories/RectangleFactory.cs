@@ -24,7 +24,7 @@ namespace SEE.GO
         /// <summary>
         /// The material we use for the line drawing the rectangle.
         /// </summary>
-        private Material material;
+        private readonly Material material;
 
         /// <summary>
         /// The default line width of the rectangle line.

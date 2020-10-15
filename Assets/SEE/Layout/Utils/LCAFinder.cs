@@ -132,7 +132,7 @@ namespace SEE.Layout.Utils
         {
             CheckTree(roots);
             int numberOfNodes = MapAllNodes(roots);
-            this.maxLevel = 1 + Log2((uint)numberOfNodes);
+            maxLevel = 1 + Log2((uint)numberOfNodes);
             DetermineEulerTours(roots, numberOfNodes);
         }
 

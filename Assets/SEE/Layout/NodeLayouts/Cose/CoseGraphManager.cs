@@ -423,7 +423,7 @@ namespace SEE.Layout.NodeLayouts.Cose
 
             lastM.Layout.GraphManager = lastM;
 
-            this.AddEdges(lastM, newM);
+            AddEdges(lastM, newM);
 
             return newM;
         }
