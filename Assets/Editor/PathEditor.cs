@@ -1,11 +1,11 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEngine;
-using UnityEditor;
-using System.IO;
-using System;
-using SEE.Utils;
 using SEE.CameraPaths;
+using SEE.Utils;
+using System;
+using System.IO;
+using UnityEditor;
+using UnityEngine;
 
 namespace SEEEditor
 {
@@ -114,7 +114,7 @@ namespace SEEEditor
                 {
                     EditorGUILayout.BeginHorizontal();
                     string file = EditorGUILayout.TextField("Path[" + i + "]", fileData.Key);
-                    if (! file.Equals(fileData.Key))
+                    if (!file.Equals(fileData.Key))
                     {
                         // FIXME: Update
                     }
@@ -208,7 +208,8 @@ namespace SEEEditor
                 CameraPath path = CameraPath.ReadPath(file);
                 GameObject o = path.Draw();
                 files.Add(file, o);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Debug.LogErrorFormat("Failure in loading camera path {0}: {1}\n", file, e.ToString());
             }

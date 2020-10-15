@@ -1,9 +1,9 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEngine;
-using UnityEditor;
-using SEE.Utils;
 using SEE.Game;
+using SEE.Utils;
+using UnityEditor;
+using UnityEngine;
 
 namespace SEEEditor
 {
@@ -49,7 +49,7 @@ namespace SEEEditor
             {
                 case 0: // Delete Everything
                     DeleteEverything();
-                break;
+                    break;
             }
         }
 
