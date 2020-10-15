@@ -95,7 +95,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
-        Dictionary<ILayoutNode, NodeTransform> layout_result;
+        private Dictionary<ILayoutNode, NodeTransform> layout_result;
 
         /// <summary>
         /// A list with all graph managers (used for multilevel scaling)
@@ -135,7 +135,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> coseSublayoutNodes)
         {
             this.edges = edges;
-            this.SublayoutNodes = coseSublayoutNodes.ToList();
+            SublayoutNodes = coseSublayoutNodes.ToList();
 
             layout_result = new Dictionary<ILayoutNode, NodeTransform>();
             this.layoutNodes = layoutNodes.ToList();
@@ -1203,7 +1203,7 @@ namespace SEE.Layout.NodeLayouts.Cose
             CoseNode cNode = NewNode(node);
             CoseGraph rootGraph = graphManager.RootGraph;
 
-            this.nodeToCoseNode.Add(node, cNode);
+            nodeToCoseNode.Add(node, cNode);
 
             if (parent != null)
             {
@@ -1224,7 +1224,7 @@ namespace SEE.Layout.NodeLayouts.Cose
 
             if (!node.IsLeaf)
             {
-                CoseGraph graph = new CoseGraph(null, this.graphManager);
+                CoseGraph graph = new CoseGraph(null, graphManager);
                 graph.GraphObject = node;
                 graphManager.Add(graph, cNode);
 

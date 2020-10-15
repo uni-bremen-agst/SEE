@@ -7,7 +7,7 @@ namespace SEE.Layout
     /// <summary>
     /// Unit tests for LCAFinder.
     /// </summary>
-    class TestLCAFinder
+    internal class TestLCAFinder
     {
         private int nodeID = 0;
 
@@ -50,7 +50,7 @@ namespace SEE.Layout
                 set => linkname = value;
             }
 
-            private ICollection<LNode> children = new List<LNode>();
+            private readonly ICollection<LNode> children = new List<LNode>();
 
             public ICollection<LNode> Children()
             {

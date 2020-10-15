@@ -98,7 +98,10 @@ namespace SEE.Game.Charts
                 if (StatusUpdate == null)
                 {
                     bool active = toggle.isOn;
-                    foreach (ScrollViewToggle child in _children) child.Toggle(active, true);
+                    foreach (ScrollViewToggle child in _children)
+                    {
+                        child.Toggle(active, true);
+                    }
                 }
             }
             else

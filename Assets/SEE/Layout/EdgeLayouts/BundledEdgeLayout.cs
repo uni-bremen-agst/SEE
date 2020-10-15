@@ -39,7 +39,7 @@ namespace SEE.Layout.EdgeLayout
             Debug.Assert(0.0f <= tension && tension <= 1.0f);
             this.tension = tension;
             this.rdp = rdp;
-            this.levelDistance = minLevelDistance;
+            levelDistance = minLevelDistance;
         }
 
         /// <summary>

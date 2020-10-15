@@ -172,37 +172,37 @@ namespace SEE.DataModel.DG
             else
             {
                 Node otherNode = other as Node;
-                if (this.level != otherNode.level)
+                if (level != otherNode.level)
                 {
                     Report(ID + ": The levels are different");
                     return false;
                 }
-                else if ((this.Parent == null && otherNode.Parent != null)
-                          || ((this.Parent != null && otherNode.Parent == null)))
+                else if ((Parent == null && otherNode.Parent != null)
+                          || ((Parent != null && otherNode.Parent == null)))
                 {
                     Report(ID + ": The parents are different (only one of them is null)");
                     return false;
                 }
-                else if (this.Parent != null && otherNode.Parent != null
-                          && this.Parent.ID != otherNode.Parent.ID)
+                else if (Parent != null && otherNode.Parent != null
+                          && Parent.ID != otherNode.Parent.ID)
                 {
                     Report(ID + ": The parents' IDs are different");
                     return false;
                 }
-                else if (this.NumberOfChildren() != otherNode.NumberOfChildren()
-                         || !GetIDs(this.children).SetEquals(GetIDs(otherNode.children)))
+                else if (NumberOfChildren() != otherNode.NumberOfChildren()
+                         || !GetIDs(children).SetEquals(GetIDs(otherNode.children)))
                 {
                     Report(ID + ": The children are different.");
                     return false;
                 }
-                else if (this.outgoings.Count != otherNode.outgoings.Count
-                         || !GetIDs(this.outgoings).SetEquals(GetIDs(otherNode.outgoings)))
+                else if (outgoings.Count != otherNode.outgoings.Count
+                         || !GetIDs(outgoings).SetEquals(GetIDs(otherNode.outgoings)))
                 {
                     Report(ID + ": The outgoing edges are different.");
                     return false;
                 }
-                else if (this.incomings.Count != otherNode.incomings.Count
-                         || !GetIDs(this.incomings).SetEquals(GetIDs(otherNode.incomings)))
+                else if (incomings.Count != otherNode.incomings.Count
+                         || !GetIDs(incomings).SetEquals(GetIDs(otherNode.incomings)))
                 {
                     Report(ID + ": The incoming edges are different.");
                     return false;
@@ -279,7 +279,7 @@ namespace SEE.DataModel.DG
             }
             else if (edge.Target != this)
             {
-                throw new Exception("edge " + edge.ToString() + " is no incoming edge of " + this.ToString());
+                throw new Exception("edge " + edge.ToString() + " is no incoming edge of " + ToString());
             }
             else
             {
@@ -304,13 +304,13 @@ namespace SEE.DataModel.DG
             }
             else if (edge.Target != this)
             {
-                throw new Exception("edge " + edge.ToString() + " is no incoming edge of " + this.ToString());
+                throw new Exception("edge " + edge.ToString() + " is no incoming edge of " + ToString());
             }
             else
             {
                 if (!incomings.Remove(edge))
                 {
-                    throw new Exception("edge " + edge.ToString() + " is no incoming edge of " + this.ToString());
+                    throw new Exception("edge " + edge.ToString() + " is no incoming edge of " + ToString());
                 }
             }
         }
@@ -357,7 +357,7 @@ namespace SEE.DataModel.DG
             }
             else if (edge.Source != this)
             {
-                throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + this.ToString());
+                throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + ToString());
             }
             else
             {
@@ -382,13 +382,13 @@ namespace SEE.DataModel.DG
             }
             else if (edge.Source != this)
             {
-                throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + this.ToString());
+                throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + ToString());
             }
             else
             {
                 if (!outgoings.Remove(edge))
                 {
-                    throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + this.ToString());
+                    throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + ToString());
                 }
             }
         }
@@ -442,7 +442,7 @@ namespace SEE.DataModel.DG
         /// <param name="comparison"></param>
         public void SortChildren(Comparison<Node> comparison)
         {
-            List<Node> sortedChildren = children as List<Node>;
+            List<Node> sortedChildren = children;
             sortedChildren.Sort(comparison);
         }
 

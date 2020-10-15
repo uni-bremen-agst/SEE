@@ -43,7 +43,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// The list of posts added for the new game objects since the last call to Clear().
         /// </summary>
-        private List<GameObject> posts = new List<GameObject>();
+        private readonly List<GameObject> posts = new List<GameObject>();
 
         /// <summary>
         /// Marks the given <paramref name="block"/> as dying by putting a post on top

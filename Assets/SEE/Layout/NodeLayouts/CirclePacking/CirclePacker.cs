@@ -60,7 +60,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         /// The minimal separation between two circles to be placed next to each other,
         /// initially DefaultMinimalSeparation but possibly later adjusted by the world unit.
         /// </summary>
-        private static float MinimalSeparation = DefaultMinimalSeparation;
+        private static readonly float MinimalSeparation = DefaultMinimalSeparation;
 
         /// <summary>
         /// Compares <paramref name="c1"/> and <paramref name="c2"/> by radius (descending).
@@ -73,10 +73,17 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
             float r1 = c1.radius;
             float r2 = c2.radius;
             if (r1 < r2)
+            {
                 return 1;
+            }
             else if (r1 > r2)
+            {
                 return -1;
-            else return 0;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         /// <summary>
@@ -104,7 +111,9 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
                     for (int j = i + 1; j < circles.Count; j++)
                     {
                         if (i == j)
+                        {
                             continue;
+                        }
 
                         // vector between the two centers
                         Vector2 AB = circles[j].center - circles[i].center;

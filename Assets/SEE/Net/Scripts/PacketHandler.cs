@@ -50,12 +50,12 @@ namespace SEE.Net
         /// <summary>
         /// List of all serialized pending packets.
         /// </summary>
-        private List<SerializedPendingPacket> serializedPendingPackets = new List<SerializedPendingPacket>();
+        private readonly List<SerializedPendingPacket> serializedPendingPackets = new List<SerializedPendingPacket>();
 
         /// <summary>
         /// List of all translated pending packets.
         /// </summary>
-        private List<TranslatedPendingPacket> translatedPendingPackets = new List<TranslatedPendingPacket>();
+        private readonly List<TranslatedPendingPacket> translatedPendingPackets = new List<TranslatedPendingPacket>();
 
 
 

@@ -23,7 +23,7 @@ namespace SEE.DataModel.DG
         {
             this.source = source;
             this.target = target;
-            this.Type = type;
+            Type = type;
         }
 
         /// <summary>
@@ -109,8 +109,8 @@ namespace SEE.DataModel.DG
             else
             {
                 Edge otherEdge = other as Edge;
-                bool equal = this.target.ID == otherEdge.target.ID
-                    && this.source.ID == otherEdge.source.ID;
+                bool equal = target.ID == otherEdge.target.ID
+                    && source.ID == otherEdge.source.ID;
                 if (!equal)
                 {
                     Report(ID + ": Source or target are different.");
@@ -142,8 +142,8 @@ namespace SEE.DataModel.DG
         {
             base.HandleCloned(clone);
             Edge target = (Edge)clone;
-            target.id = this.id;
-            target.source = this.source;
+            target.id = id;
+            target.source = source;
             target.target = this.target;
         }
 

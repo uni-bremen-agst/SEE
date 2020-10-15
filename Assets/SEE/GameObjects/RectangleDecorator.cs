@@ -22,7 +22,7 @@ namespace SEE.GO
         /// <summary>
         /// The factory that was used to create the objects for which to draw a rectangle line.
         /// </summary>
-        private NodeFactory nodeFactory;
+        private readonly NodeFactory nodeFactory;
 
         /// <summary>
         /// The color for the rectangle line.
@@ -33,7 +33,7 @@ namespace SEE.GO
         /// The material we use for the rectangle line. It is the same for all rectangle lines
         /// to reduce the number of drawing calls.
         /// </summary>
-        private Material material = Materials.New(Materials.ShaderType.TransparentLine);
+        private readonly Material material = Materials.New(Materials.ShaderType.TransparentLine);
 
         /// <summary>
         /// Attaches a deccorators to rectangle line to all game nodes. 

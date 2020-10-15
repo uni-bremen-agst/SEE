@@ -278,7 +278,7 @@ namespace SEE.Controls
         /// <param name="duration">The desired duration of the zooming.</param>
         internal void PushZoomCommand(Vector2 zoomCenter, float zoomSteps, float duration)
         {
-            zoomSteps = Mathf.Clamp(zoomSteps, -zoomState.currentTargetZoomSteps, (float)ZoomState.ZoomMaxSteps - (float)zoomState.currentTargetZoomSteps);
+            zoomSteps = Mathf.Clamp(zoomSteps, -zoomState.currentTargetZoomSteps, ZoomState.ZoomMaxSteps - zoomState.currentTargetZoomSteps);
             if (zoomSteps != 0.0f)
             {
                 float newZoomStepsInProgress = zoomState.currentTargetZoomSteps + zoomSteps;

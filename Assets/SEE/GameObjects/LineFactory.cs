@@ -5,9 +5,9 @@ namespace SEE.GO
     /// <summary>
     /// Sets attributes of lines.
     /// </summary>
-    class LineFactory
+    internal class LineFactory
     {
-        const float defaultWidth = 0.1f;
+        private const float defaultWidth = 0.1f;
 
         internal static void SetDefaults(LineRenderer line)
         {

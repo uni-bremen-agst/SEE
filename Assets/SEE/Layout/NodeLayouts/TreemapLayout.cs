@@ -144,7 +144,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// The size metric of each node. The area of the rectangle is proportional to a node's size.
         /// </summary>
-        private Dictionary<ILayoutNode, RectangleTiling.NodeSize> sizes = new Dictionary<ILayoutNode, RectangleTiling.NodeSize>();
+        private readonly Dictionary<ILayoutNode, RectangleTiling.NodeSize> sizes = new Dictionary<ILayoutNode, RectangleTiling.NodeSize>();
 
         /// <summary>
         /// Calculates the size of node and all its descendants. The size of a leaf

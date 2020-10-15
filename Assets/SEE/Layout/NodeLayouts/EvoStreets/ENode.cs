@@ -13,7 +13,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
 
         public ENode(ILayoutNode node)
         {
-            this.GraphNode = node;
+            GraphNode = node;
         }
 
         /// <summary>

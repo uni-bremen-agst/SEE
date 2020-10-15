@@ -75,7 +75,10 @@ namespace SEE.Controls
                     ControllerButtonHints.HideAllTextHints(hand);
                 }
 
-                if (Teleport.instance != null) Teleport.instance.CancelTeleportHint();
+                if (Teleport.instance != null)
+                {
+                    Teleport.instance.CancelTeleportHint();
+                }
             }
         }
 
@@ -97,8 +100,13 @@ namespace SEE.Controls
         /// </summary>
         private void Update()
         {
-            if (playerInputType != PlayerInputType.VR) return;
+            if (playerInputType != PlayerInputType.VR)
+            {
+                return;
+            }
+
             foreach (Hand hand in Player.instance.hands)
+            {
                 if (HideVRControllers)
                 {
                     hand.HideController();
@@ -109,6 +117,7 @@ namespace SEE.Controls
                     hand.ShowController();
                     hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithController);
                 }
+            }
         }
     }
 }

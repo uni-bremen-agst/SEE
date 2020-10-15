@@ -24,7 +24,7 @@ namespace SEE.Game
         {
             this.lower = lower;
             this.upper = upper;
-            this.NumberOfColors = numberOfColors;
+            NumberOfColors = numberOfColors;
         }
     }
 }

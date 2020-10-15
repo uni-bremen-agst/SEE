@@ -86,7 +86,7 @@ namespace SEE.CameraPaths
         /// </summary>
         public bool Interactive = false;
 
-        void Start()
+        private void Start()
         {
             // This gets the Main Camera from the Scene
             mainCamera = Camera.main;
@@ -97,7 +97,7 @@ namespace SEE.CameraPaths
             }
         }
 
-        void Update()
+        private void Update()
         {
             accumulatedTime += Time.deltaTime;
             if (accumulatedTime >= Period)
@@ -121,7 +121,7 @@ namespace SEE.CameraPaths
         /// This function is called on all game objects before the application is quit. 
         /// In the editor it is called when the user stops playmode.
         /// </summary>
-        void OnApplicationQuit()
+        private void OnApplicationQuit()
         {
             if (path == null || path.Count == 0)
             {

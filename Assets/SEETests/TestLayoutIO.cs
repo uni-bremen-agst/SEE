@@ -44,7 +44,7 @@ namespace SEE.Layout
 
             // Apply the layout.
             Dictionary<string, NodeTransform> layoutMap = new Dictionary<string, NodeTransform>(savedLayout.Count);
-            foreach (var entry in savedLayout)
+            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in savedLayout)
             {
                 ILayoutNode node = entry.Key;
                 NodeTransform transform = entry.Value;
@@ -76,7 +76,7 @@ namespace SEE.Layout
             // Now savedLayout and readLayout should be the same except for  
             // scale.y and, thus, position.y (none of those are stored in GVL).
             Assert.AreEqual(savedLayout.Count, readLayout.Count); // no gameObject added or removed
-            foreach (var entry in readLayout)
+            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in readLayout)
             {
                 ILayoutNode node = entry.Key;
                 NodeTransform readTransform = entry.Value;
@@ -93,7 +93,7 @@ namespace SEE.Layout
 
         private void Dump(Dictionary<ILayoutNode, NodeTransform> readLayout, int howMany = int.MaxValue)
         {
-            foreach (var entry in readLayout)
+            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in readLayout)
             {
                 howMany--;
                 if (howMany <= 0)

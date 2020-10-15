@@ -70,7 +70,11 @@ namespace SEE.Game.Charts.VR
         private void Update()
         {
             if (Vector3.Distance(transform.position, cameraTransform.position) <=
-                _distanceThreshold) return;
+                _distanceThreshold)
+            {
+                return;
+            }
+
             if (_movingChart != null)
             {
                 StopCoroutine(_movingChart);

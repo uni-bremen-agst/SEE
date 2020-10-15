@@ -67,7 +67,7 @@ namespace SEE.Game
             this.CanApplySublayouts = CanApplySublayouts;
             this.InnerNodesEncloseLeafNodes = InnerNodesEncloseLeafNodes;
             this.IsCircular = IsCircular;
-            this.IsHierarchical = isHierarchical;
+            IsHierarchical = isHierarchical;
         }
     }
 

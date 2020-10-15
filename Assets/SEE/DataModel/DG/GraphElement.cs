@@ -125,7 +125,7 @@ namespace SEE.DataModel.DG
         {
             base.HandleCloned(clone);
             GraphElement target = (GraphElement)clone;
-            target.type = this.type;
+            target.type = type;
             target.graph = null;
         }
 

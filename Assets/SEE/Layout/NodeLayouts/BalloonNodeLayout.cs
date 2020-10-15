@@ -45,7 +45,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// A mapping of nodes onto their circle data.
         /// </summary>
-        private Dictionary<ILayoutNode, NodeInfo> nodeInfos = new Dictionary<ILayoutNode, NodeInfo>();
+        private readonly Dictionary<ILayoutNode, NodeInfo> nodeInfos = new Dictionary<ILayoutNode, NodeInfo>();
 
         /// <summary>
         /// The node layout we compute as a result.
@@ -316,7 +316,7 @@ namespace SEE.Layout.NodeLayouts
                     }
                     else
                     {
-                        space_between_child_circles = (2 * Math.PI - accummulated_alpha) / (double)children.Count;
+                        space_between_child_circles = (2 * Math.PI - accummulated_alpha) / children.Count;
                     }
                 }
                 // Now that we know the space we can put in between neighboring circles, we can

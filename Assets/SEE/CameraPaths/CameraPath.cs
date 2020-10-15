@@ -64,7 +64,7 @@ namespace SEE.CameraPaths
         /// <summary>
         /// The path data captured.
         /// </summary>
-        private List<PathData> data = new List<PathData>();
+        private readonly List<PathData> data = new List<PathData>();
 
         /// <summary>
         /// Operator[key] yielding the key'th entry in the path. The first
@@ -214,7 +214,7 @@ namespace SEE.CameraPaths
         /// <returns>an enumerator over all path data entries in the path</returns>
         public IEnumerator GetEnumerator()
         {
-            return (IEnumerator)this.data.GetEnumerator();
+            return data.GetEnumerator();
         }
 
         /// <summary>

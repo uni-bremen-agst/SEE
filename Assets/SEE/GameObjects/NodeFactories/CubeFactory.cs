@@ -13,7 +13,7 @@ namespace SEE.GO
     /// </summary>
     public class CubeFactory : InnerNodeFactory
     {
-        private Mesh cubeMesh;
+        private readonly Mesh cubeMesh;
 
         public CubeFactory(Materials.ShaderType shaderType, ColorRange colorRange)
             : base(shaderType, colorRange)

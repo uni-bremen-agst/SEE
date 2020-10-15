@@ -59,8 +59,8 @@ namespace SEEEditor
             // Make a copy to loop over the dictionary while making changes.
             Dictionary<string, bool> selection = new Dictionary<string, bool>(city.SelectedNodeTypes);
 
-            var countSelected = 0;
-            foreach (var entry in selection)
+            int countSelected = 0;
+            foreach (KeyValuePair<string, bool> entry in selection)
             {
                 city.SelectedNodeTypes[entry.Key] = EditorGUILayout.Toggle("  " + entry.Key, entry.Value);
 

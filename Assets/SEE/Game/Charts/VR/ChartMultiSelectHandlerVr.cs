@@ -99,7 +99,11 @@ namespace SEE.Game.Charts.VR
                 }
             }
 
-            if (negative) return;
+            if (negative)
+            {
+                return;
+            }
+
             selectionRect.sizeDelta = new Vector2(_referencePos.x - startingPos.x,
                 _referencePos.y - startingPos.y);
             sizeDelta = selectionRect.sizeDelta;
@@ -114,11 +118,15 @@ namespace SEE.Game.Charts.VR
         public override void OnPointerUp(PointerEventData eventData)
         {
             if (startingPos.x < _referencePos.x)
+            {
                 chartContent.AreaSelection(startingPos, _referencePos,
                     startingPos.y < _referencePos.y);
+            }
             else
+            {
                 chartContent.AreaSelection(_referencePos, startingPos,
                     startingPos.y > _referencePos.y);
+            }
 
             selectionRect.gameObject.SetActive(false);
         }

@@ -126,8 +126,8 @@ namespace SEE.Layout.NodeLayouts.Cose
         {
             if (parent.SublayoutValues.IsSubLayoutNode)
             {
-                this.LeftFrontCorner = parent.GetLeftFrontCorner();
-                this.RightBackCorner = parent.GetRightBackCorner();
+                LeftFrontCorner = parent.GetLeftFrontCorner();
+                RightBackCorner = parent.GetRightBackCorner();
 
                 UpdateBounding();
 
@@ -185,15 +185,15 @@ namespace SEE.Layout.NodeLayouts.Cose
 
             if (leftLowerCorner.x == Mathf.Infinity)
             {
-                this.leftFrontCorner = parent.GetLeftFrontCorner();
-                this.rightBackCorner = parent.GetRightBackCorner();
+                leftFrontCorner = parent.GetLeftFrontCorner();
+                rightBackCorner = parent.GetRightBackCorner();
             }
 
-            this.leftFrontCorner.x = leftLowerCorner.x - defaultMargin;
-            this.leftFrontCorner.y = leftLowerCorner.y + defaultMargin;
+            leftFrontCorner.x = leftLowerCorner.x - defaultMargin;
+            leftFrontCorner.y = leftLowerCorner.y + defaultMargin;
 
-            this.rightBackCorner.x = rightUpperCorner.x + defaultMargin;
-            this.rightBackCorner.y = rightUpperCorner.y - defaultMargin;
+            rightBackCorner.x = rightUpperCorner.x + defaultMargin;
+            rightBackCorner.y = rightUpperCorner.y - defaultMargin;
 
             UpdateBounding();
         }

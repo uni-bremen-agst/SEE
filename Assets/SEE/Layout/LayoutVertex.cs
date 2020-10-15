@@ -15,8 +15,8 @@ namespace SEE.Layout
         /// <param name="index">the unique ID of the node (a number to be converted into a string)</param>
         public LayoutVertex(Vector3 initialSize, int index)
         {
-            this.scale = initialSize;
-            this.id = index.ToString();
+            scale = initialSize;
+            id = index.ToString();
         }
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace SEE.Layout
         /// <param name="id">unique ID of the node</param>
         public LayoutVertex(string id)
         {
-            this.scale = Vector3.zero;
+            scale = Vector3.zero;
             this.id = id;
         }
 
@@ -67,7 +67,7 @@ namespace SEE.Layout
         /// <summary>
         /// Immediate children of the node.
         /// </summary>
-        private List<ILayoutNode> children = new List<ILayoutNode>();
+        private readonly List<ILayoutNode> children = new List<ILayoutNode>();
 
         /// <summary>
         /// Immediate children of the node.

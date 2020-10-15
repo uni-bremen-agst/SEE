@@ -18,7 +18,7 @@ namespace SEE.Game
         public LayoutEdge(ILayoutNode source, ILayoutNode target, Edge edge)
             : base(source, target)
         {
-            this.ItsEdge = edge;
+            ItsEdge = edge;
         }
 
         /// <summary>

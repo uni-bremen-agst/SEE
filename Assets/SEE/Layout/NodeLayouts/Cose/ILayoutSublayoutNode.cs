@@ -160,8 +160,8 @@ namespace SEE.Layout.NodeLayouts.Cose
         {
             this.node = node;
             this.isLeaf = isLeaf;
-            this.temporaryChildren = children;
-            this.temporaryParent = parent;
+            temporaryChildren = children;
+            temporaryParent = parent;
             node.LocalScale = localScale;
             this.ILayout_to_CoseSublayoutNode = ILayout_to_CoseSublayoutNode;
             ILayout_to_CoseSublayoutNode[node] = this;
@@ -170,9 +170,9 @@ namespace SEE.Layout.NodeLayouts.Cose
         public ILayoutSublayoutNode(ILayoutNode node, Dictionary<ILayoutNode, ILayoutSublayoutNode> ILayout_to_CoseSublayoutNode)
         {
             this.node = node;
-            this.isLeaf = node.IsLeaf;
-            this.temporaryChildren = node.Children();
-            this.temporaryParent = node.Parent;
+            isLeaf = node.IsLeaf;
+            temporaryChildren = node.Children();
+            temporaryParent = node.Parent;
             node.LocalScale = node.LocalScale;
             this.ILayout_to_CoseSublayoutNode = ILayout_to_CoseSublayoutNode;
             ILayout_to_CoseSublayoutNode[node] = this;

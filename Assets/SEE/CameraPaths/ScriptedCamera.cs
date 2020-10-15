@@ -101,7 +101,7 @@ namespace SEE.CameraPaths
         ///
         /// Start is called before the first frame update.
         /// </summary>
-        void Start()
+        private void Start()
         {
             try
             {
@@ -147,7 +147,7 @@ namespace SEE.CameraPaths
         /// Update is called once per frame and moves and rotates the camera along the
         /// timed path.
         /// </summary>
-        void Update()
+        private void Update()
         {
             if (pathIsEnabled)
             {

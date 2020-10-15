@@ -27,8 +27,8 @@ namespace SEE.Layout
         /// <param name="target">Target of the edge.</param>
         public ILayoutEdge(ILayoutNode source, ILayoutNode target)
         {
-            this.Source = source;
-            this.Target = target;
+            Source = source;
+            Target = target;
         }
     }
 }

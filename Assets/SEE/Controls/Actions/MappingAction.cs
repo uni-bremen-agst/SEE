@@ -113,15 +113,15 @@ namespace SEE.Controls
         /// <summary>
         /// The game objects that have been copied to the clipboard via Ctrl-C.
         /// </summary>
-        private HashSet<Selection> objectsInClipboard = new HashSet<Selection>();
+        private readonly HashSet<Selection> objectsInClipboard = new HashSet<Selection>();
 
         // Use this for initialization
-        void Start()
+        private void Start()
         {
             if (Architecture == null)
             {
                 Debug.LogWarning("No architecture city was specified for architectural mapping.\n");
-                this.enabled = false;
+                enabled = false;
             }
             else
             {
@@ -129,14 +129,14 @@ namespace SEE.Controls
                 if (architecture == null)
                 {
                     Debug.LogWarning("The architecture city has no associated graph.\n");
-                    this.enabled = false;
+                    enabled = false;
                 }
             }
 
             if (Implementation == null)
             {
                 Debug.LogWarning("No implementation city was specified for architectural mapping.\n");
-                this.enabled = false;
+                enabled = false;
             }
             else
             {
@@ -144,7 +144,7 @@ namespace SEE.Controls
                 if (implementation == null)
                 {
                     Debug.LogWarning("The implementation city has no associated graph.\n");
-                    this.enabled = false;
+                    enabled = false;
                 }
             }
 
@@ -171,17 +171,17 @@ namespace SEE.Controls
             if (AbsencePrefab == null)
             {
                 Debug.LogErrorFormat("No material assigned for absences.\n");
-                this.enabled = false;
+                enabled = false;
             }
             if (ConvergencePrefab == null)
             {
                 Debug.LogErrorFormat("No material assigned for convergences.\n");
-                this.enabled = false;
+                enabled = false;
             }
             if (DivergencePrefab == null)
             {
                 Debug.LogErrorFormat("No material assigned for divergences.\n");
-                this.enabled = false;
+                enabled = false;
             }
             if (Architecture.TryGetComponent<SEECity>(out SEECity city))
             {
@@ -189,15 +189,15 @@ namespace SEE.Controls
                 if (architectureGraphRenderer == null)
                 {
                     Debug.LogErrorFormat("The SEECity component attached to the object representing the architecture has no graph renderer.\n");
-                    this.enabled = false;
+                    enabled = false;
                 }
             }
             else
             {
                 Debug.LogErrorFormat("The object representing the architecture has no SEECity component attached to it.\n");
-                this.enabled = false;
+                enabled = false;
             }
-            if (this.enabled)
+            if (enabled)
             {
                 Usage();
                 SetupGameObjectMappings();
@@ -224,12 +224,12 @@ namespace SEE.Controls
         /// <summary>
         /// Mapping of edge IDs onto game objects representing these edges in the architecture code city.
         /// </summary>
-        private Dictionary<string, GameObject> architectureEdges = new Dictionary<string, GameObject>();
+        private readonly Dictionary<string, GameObject> architectureEdges = new Dictionary<string, GameObject>();
 
         /// <summary>
         /// Mapping of node IDs onto game objects representing these nodes in the architecture code city.
         /// </summary>
-        private Dictionary<string, GameObject> architectureNodes = new Dictionary<string, GameObject>();
+        private readonly Dictionary<string, GameObject> architectureNodes = new Dictionary<string, GameObject>();
 
         private void SetupGameObjectMappings()
         {
@@ -362,7 +362,7 @@ namespace SEE.Controls
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
             //------------------------------------------------------------------------
             // ARCHITECTURAL MAPPING

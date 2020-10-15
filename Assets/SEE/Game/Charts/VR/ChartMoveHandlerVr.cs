@@ -136,14 +136,20 @@ namespace SEE.Game.Charts.VR
         /// </summary>
         private void ScrollInOut()
         {
-            if (!PointerDown || _chartAction.move.Equals(0)) return;
+            if (!PointerDown || _chartAction.move.Equals(0))
+            {
+                return;
+            }
+
             Vector3 direction = _pointerCamera.transform.position - _rectTransform.position;
             float moveBy = _chartAction.move * _chartScrollSpeed * Time.deltaTime;
             if (!(_chartAction.move < 0 &&
                   direction.magnitude < _minimumDistance + moveBy ||
                   _chartAction.move > 0 &&
                   direction.magnitude > _maximumDistance - moveBy))
+            {
                 _parent.position -= direction * moveBy;
+            }
         }
 
         /// <summary>
@@ -153,9 +159,11 @@ namespace SEE.Game.Charts.VR
         public override void OnDrag(PointerEventData eventData)
         {
             if (eventData.pointerCurrentRaycast.worldPosition != Vector3.zero)
+            {
                 _parent.position = eventData.pointerCurrentRaycast.worldPosition -
                                    (transform.position - (_parent.position + _chartOffset)) -
                                    _chartOffset;
+            }
         }
 
         /// <summary>

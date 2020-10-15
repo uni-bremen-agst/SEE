@@ -115,7 +115,10 @@ namespace SEE.Game.Charts
         /// </summary>
         protected virtual void Update()
         {
-            if (PointerDown) _timer += Time.deltaTime;
+            if (PointerDown)
+            {
+                _timer += Time.deltaTime;
+            }
         }
 
         /// <summary>
@@ -129,9 +132,11 @@ namespace SEE.Game.Charts
                 eventData.position.x < _screenSize.sizeDelta.x * _screenSize.lossyScale.x &&
                 eventData.position.y > 0 &&
                 eventData.position.y < _screenSize.sizeDelta.y * _screenSize.lossyScale.y)
+            {
                 _chart.position =
                     new Vector2(eventData.position.x - pos.anchoredPosition.x * pos.lossyScale.x,
                         eventData.position.y - pos.anchoredPosition.y * pos.lossyScale.y);
+            }
         }
 
         /// <summary>
@@ -152,8 +157,15 @@ namespace SEE.Game.Charts
         public void OnPointerUp(PointerEventData eventData)
         {
             PointerDown = false;
-            if (_timer < _dragDelay) ToggleMinimize();
-            if (Minimized) chartInfo.SetActive(true);
+            if (_timer < _dragDelay)
+            {
+                ToggleMinimize();
+            }
+
+            if (Minimized)
+            {
+                chartInfo.SetActive(true);
+            }
         }
 
         /// <summary>
@@ -162,7 +174,10 @@ namespace SEE.Game.Charts
         /// <param name="eventData"></param>
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (Minimized && !PointerDown) chartInfo.SetActive(true);
+            if (Minimized && !PointerDown)
+            {
+                chartInfo.SetActive(true);
+            }
         }
 
         /// <summary>

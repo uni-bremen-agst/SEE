@@ -24,7 +24,7 @@ namespace SEE.GO
         /// <summary>
         /// The material we use for the circle lines.
         /// </summary>
-        private Material material;
+        private readonly Material material;
 
         /// <summary>
         /// The default radius of a circle if none is given.

@@ -12,7 +12,7 @@ namespace SEE.GO
         /// <summary>
         /// Color of the text.
         /// </summary>
-        private readonly static Color TextColor = new Color(0.5f, 0.5f, 0.5f, 1); // Color.white;
+        private static readonly Color TextColor = new Color(0.5f, 0.5f, 0.5f, 1); // Color.white;
         private const string PortalFontName = "Fonts & Materials/LiberationSans SDF - Portal";
 
         /// <summary>

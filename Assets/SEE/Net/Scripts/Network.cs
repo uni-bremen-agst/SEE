@@ -35,51 +35,51 @@ namespace SEE.Net
         /// <summary>
         /// Whether this clients hosts the server. Is ignored in offline mode.
         /// </summary>
-        [SerializeField] private bool hostServer = false;
+        [SerializeField] private readonly bool hostServer = false;
 
         /// <summary>
         /// The remote IP-address of the server. Is empty, if this client hosts the
         /// server.
         /// </summary>
-        [SerializeField] private string remoteServerIPAddress = string.Empty;
+        [SerializeField] private readonly string remoteServerIPAddress = string.Empty;
 
         /// <summary>
         /// The port of the server. Is ignored, if this host does not host the server.
         /// </summary>
-        [SerializeField] private int localServerPort = 55555;
+        [SerializeField] private readonly int localServerPort = 55555;
 
         /// <summary>
         /// The port of the remote server. Is ignored, if this client hosts the server.
         /// </summary>
-        [SerializeField] private int remoteServerPort = 0;
+        [SerializeField] private readonly int remoteServerPort = 0;
 
         /// <summary>
         /// Whether the city should be loaded on start up. Is ignored, if this client
         /// does not host the server.
         /// </summary>
-        [SerializeField] private bool loadCityOnStart = false;
+        [SerializeField] private readonly bool loadCityOnStart = false;
 
 #if UNITY_EDITOR
         /// <summary>
         /// Whether the logging of NetworkComms should be enabled.
         /// </summary>
-        [SerializeField] private bool networkCommsLoggingEnabled = false;
+        [SerializeField] private readonly bool networkCommsLoggingEnabled = false;
 
         /// <summary>
         /// Whether the internal logging should be enabled.
         /// </summary>
-        [SerializeField] private bool internalLoggingEnabled = true;
+        [SerializeField] private readonly bool internalLoggingEnabled = true;
 
         /// <summary>
         /// The minimal logged severity.
         /// </summary>
-        [SerializeField] private NetworkCommsLogger.Severity minimalSeverity = DefaultSeverity;
+        [SerializeField] private readonly NetworkCommsLogger.Severity minimalSeverity = DefaultSeverity;
 #endif
 
         /// <summary>
         /// Submitted packets, that will be sent in the next <see cref="LateUpdate"/>.
         /// </summary>
-        private Dictionary<Connection, List<string>> submittedSerializedPackets = new Dictionary<Connection, List<string>>();
+        private readonly Dictionary<Connection, List<string>> submittedSerializedPackets = new Dictionary<Connection, List<string>>();
 
         /// <summary>
         /// <see cref="useInOfflineMode"/>
@@ -127,7 +127,7 @@ namespace SEE.Net
         /// List of dead connections. Is packets can not be sent, this list is searched
         /// to reduce the frequency of warning messages.
         /// </summary>
-        private static List<Connection> deadConnections = new List<Connection>();
+        private static readonly List<Connection> deadConnections = new List<Connection>();
 
         /// <summary>
         /// Initializes the server, client and game.
@@ -470,7 +470,7 @@ namespace SEE.Net
         public static VivoxUnity.ILoginSession VivoxLoginSession { get; private set; } = null;
         public static VivoxUnity.IChannelSession VivoxChannelSession { get; private set; } = null;
 
-        [SerializeField] private string vivoxChannelName = string.Empty;
+        [SerializeField] private readonly string vivoxChannelName = string.Empty;
         public static string VivoxChannelName { get => instance ? instance.vivoxChannelName : string.Empty; }
 
         private static void VivoxInitialize()

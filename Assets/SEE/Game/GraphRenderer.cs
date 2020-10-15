@@ -108,12 +108,12 @@ namespace SEE.Game
         /// <summary>
         /// A mapping from Node to ILayoutNode.
         /// </summary>
-        private Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+        private readonly Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
 
         /// <summary>
         /// the groundlevel of the nodes
         /// </summary>
-        private float groundLevel = 0.0f;
+        private readonly float groundLevel = 0.0f;
 
         /// <summary>
         /// Sets the scaler to be used to map metric values onto graphical attributes
@@ -1133,7 +1133,7 @@ namespace SEE.Game
                 value = scaler.GetNormalizedValue(styleMetric, node);
             }
             return Mathf.RoundToInt(Mathf.Lerp(0.0f,
-                                               (float)(numberOfStyles - 1),
+                                               numberOfStyles - 1,
                                                value / metricMaximum));
         }
 

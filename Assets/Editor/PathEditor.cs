@@ -17,6 +17,7 @@ namespace SEEEditor
     public class PathEditor : EditorWindow
     {
         [MenuItem("Window/Path Editor")]
+        private
         // This method will be called when the user selects the menu item to create the window.
         // Such methods must be static and void. They can have any name.
         static void Init()
@@ -48,7 +49,7 @@ namespace SEEEditor
         /// <summary>
         /// Creates a new window offering the path editor commands.
         /// </summary>
-        void OnGUI()
+        private void OnGUI()
         {
             // Important note: OnGUI is called whenever the windows gets or looses the focus
             // as well as when any of its widgets are hovered by the mouse cursor. For this
@@ -91,7 +92,7 @@ namespace SEEEditor
             }
         }
 
-        void YourCallback()
+        private void YourCallback()
         {
             Debug.Log("Hi there\n");
         }
@@ -108,7 +109,7 @@ namespace SEEEditor
 
             string selectedIndex = "";
             int i = 0;
-            foreach (var fileData in files)
+            foreach (System.Collections.Generic.KeyValuePair<string, GameObject> fileData in files)
             {
                 if (!string.IsNullOrEmpty(fileData.Key))
                 {
@@ -230,7 +231,7 @@ namespace SEEEditor
         /// </summary>
         private void RemoveAll()
         {
-            foreach (var file in files)
+            foreach (System.Collections.Generic.KeyValuePair<string, GameObject> file in files)
             {
                 ClearPath(file.Value);
             }

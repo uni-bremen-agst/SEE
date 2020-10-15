@@ -83,8 +83,15 @@ namespace SEE.GO
             float length = DEFAULT_HEIGHT;
 
             //sanity check
-            if (radialSegments < MIN_RADIAL_SEGMENTS) radialSegments = MIN_RADIAL_SEGMENTS;
-            if (heightSegments < MIN_HEIGHT_SEGMENTS) heightSegments = MIN_HEIGHT_SEGMENTS;
+            if (radialSegments < MIN_RADIAL_SEGMENTS)
+            {
+                radialSegments = MIN_RADIAL_SEGMENTS;
+            }
+
+            if (heightSegments < MIN_HEIGHT_SEGMENTS)
+            {
+                heightSegments = MIN_HEIGHT_SEGMENTS;
+            }
 
             //calculate how many vertices we need
             numVertexColumns = radialSegments + 1;  //+1 for welding

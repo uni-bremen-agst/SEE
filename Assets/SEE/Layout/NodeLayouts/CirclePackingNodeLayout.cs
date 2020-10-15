@@ -27,7 +27,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
-        Dictionary<ILayoutNode, NodeTransform> layout_result;
+        private Dictionary<ILayoutNode, NodeTransform> layout_result;
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes)
         {
@@ -111,7 +111,7 @@ namespace SEE.Layout.NodeLayouts
                 {
                     float radius = child.IsLeaf ? LeafRadius(child) : PlaceNodes(child);
                     // Position the children on a circle as required by CirclePacker.Pack.
-                    float radians = ((float)i / (float)children.Count) * (2.0f * Mathf.PI);
+                    float radians = (i / (float)children.Count) * (2.0f * Mathf.PI);
                     circles.Add(new Circle(child, new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * radius, radius));
                     i++;
                 }

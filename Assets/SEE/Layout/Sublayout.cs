@@ -36,7 +36,7 @@ namespace SEE.Layout
         /// <summary>
         /// a map from every sublayout node to the corresponding gameobject
         /// </summary>
-        private ICollection<ILayoutNode> sublayoutNodes;
+        private readonly ICollection<ILayoutNode> sublayoutNodes;
 
         /// <summary>
         /// the y co-ordinate setting the ground level; all nodes will be placed on this level
@@ -81,7 +81,7 @@ namespace SEE.Layout
         /// <summary>
         /// A Mapping from ILayoutNodes to ILayoutSublayoutNodes
         /// </summary>
-        private Dictionary<ILayoutNode, ILayoutSublayoutNode> ILayout_to_CoseSublayoutNode = new Dictionary<ILayoutNode, ILayoutSublayoutNode>();
+        private readonly Dictionary<ILayoutNode, ILayoutSublayoutNode> ILayout_to_CoseSublayoutNode = new Dictionary<ILayoutNode, ILayoutSublayoutNode>();
 
         /// <summary>
         /// abstract see city settings 
@@ -109,7 +109,7 @@ namespace SEE.Layout
         /// <param name="settings">abstract see city settings</param>
         public Sublayout(SublayoutLayoutNode sublayout, float groundLevel, NodeFactory leafNodeFactory, Graph graph, AbstractSEECity settings)
         {
-            this.nodeLayout = sublayout.NodeLayout;
+            nodeLayout = sublayout.NodeLayout;
             this.groundLevel = groundLevel;
             this.leafNodeFactory = leafNodeFactory;
             this.sublayout = sublayout;

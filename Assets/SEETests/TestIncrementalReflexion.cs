@@ -11,21 +11,21 @@ namespace SEE.Tools.Architecture
     /// "Incremental Reflexion Analysis", Rainer Koschke, Journal on Software Maintenance
     /// and Evolution, 2011, DOI 10.1002 / smr.542 in Figure 8.
     /// </summary>
-    class TestIncrementalReflexion : TestReflexionAnalysis
+    internal class TestIncrementalReflexion : TestReflexionAnalysis
     {
         /// <summary>
         /// The implementation nodes in the implementation graph: i[j] where 1 <= j <= 17.
         /// 
         /// Note: i[0] does not exist.
         /// </summary>
-        Dictionary<int, Node> i;
+        private Dictionary<int, Node> i;
 
         /// <summary>
         /// The architecture nodes in the architecture graph: a[j] where 1 <= j <= 8.
         /// 
         /// Note: a[0] does not exist.
         /// </summary>
-        Dictionary<int, Node> a;
+        private Dictionary<int, Node> a;
 
         /// <summary>
         /// Sets up all three graphs (implementation, architecture,

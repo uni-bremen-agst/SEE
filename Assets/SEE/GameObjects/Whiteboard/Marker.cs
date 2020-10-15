@@ -32,13 +32,13 @@ namespace SEE.GO.Whiteboard
         private Color color;
 
         [SerializeField]
-        private MeshRenderer[] colouredParts;
+        private readonly MeshRenderer[] colouredParts;
 
         [SerializeField]
-        private Painter painter; // FIXME: Never assigned.
+        private readonly Painter painter; // FIXME: Never assigned.
 
         [SerializeField]
-        private PaintReceiver paintReceiver;
+        private readonly PaintReceiver paintReceiver;
 
         protected override void Awake()
         {

@@ -39,9 +39,9 @@ using UnityEngine;
 public abstract class SerializableDictionaryBase<TKey, TValue, TValueStorage> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
 {
     [SerializeField]
-    TKey[] m_keys;
+    private TKey[] m_keys;
     [SerializeField]
-    TValueStorage[] m_values;
+    private TValueStorage[] m_values;
 
     public SerializableDictionaryBase()
     {
@@ -62,7 +62,7 @@ public abstract class SerializableDictionaryBase<TKey, TValue, TValueStorage> : 
 
     public void CopyFrom(IDictionary<TKey, TValue> dict)
     {
-        this.Clear();
+        Clear();
         foreach (KeyValuePair<TKey, TValue> kvp in dict)
         {
             this[kvp.Key] = kvp.Value;
@@ -73,7 +73,7 @@ public abstract class SerializableDictionaryBase<TKey, TValue, TValueStorage> : 
     {
         if (m_keys != null && m_values != null && m_keys.Length == m_values.Length)
         {
-            this.Clear();
+            Clear();
             int n = m_keys.Length;
             for (int i = 0; i < n; ++i)
             {
@@ -88,7 +88,7 @@ public abstract class SerializableDictionaryBase<TKey, TValue, TValueStorage> : 
 
     public void OnBeforeSerialize()
     {
-        int n = this.Count;
+        int n = Count;
         m_keys = new TKey[n];
         m_values = new TValueStorage[n];
 

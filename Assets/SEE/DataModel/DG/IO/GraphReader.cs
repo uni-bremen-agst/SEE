@@ -117,7 +117,7 @@ namespace SEE.DataModel.DG.IO
         private GraphElement current = null;
 
         // A mapping of the GXL node ids onto the graph nodes.
-        private Dictionary<String, Node> nodes = new Dictionary<string, Node>();
+        private readonly Dictionary<String, Node> nodes = new Dictionary<string, Node>();
 
         // The set of edge-type names for edges considered to represent nesting.
         private readonly HashSet<string> hierarchicalEdgeTypes = null;
