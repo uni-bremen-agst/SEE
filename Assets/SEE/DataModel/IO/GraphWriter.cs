@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Xml;
 
-namespace SEE.DataModel.IO
+namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Saves graphs in GXL format on disk.

@@ -21,9 +21,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.Game.Evolution;
-using SEE.DataModel.IO;
+using SEE.DataModel.DG.IO;
 using SEE.Utils;
 
 namespace SEE.Game

@@ -1,6 +1,5 @@
-﻿using SEE.DataModel;
+﻿using SEE.DataModel.DG;
 using SEE.Layout.NodeLayouts.Cose;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 

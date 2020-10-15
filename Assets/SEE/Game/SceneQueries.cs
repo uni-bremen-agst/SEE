@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.DataModel;
 
 namespace SEE.Game
 {

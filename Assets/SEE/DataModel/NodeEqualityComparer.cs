@@ -19,7 +19,7 @@
 
 using System.Collections.Generic;
 
-namespace SEE.DataModel
+namespace SEE.DataModel.DG
 {
     /// <summary>
     /// Compares two nodes by Node.ID for equality.

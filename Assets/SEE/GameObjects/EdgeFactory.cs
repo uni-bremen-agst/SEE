@@ -1,4 +1,5 @@
-﻿using SEE.DataModel;
+﻿using SEE.DataModel.DG;
+using SEE.DataModel;
 using SEE.Game;
 using SEE.Layout;
 using SEE.Layout.EdgeLayout;

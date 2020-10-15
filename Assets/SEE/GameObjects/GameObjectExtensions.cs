@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+using SEE.DataModel.DG;
+
 namespace SEE.GO
 {
     /// <summary>

@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+using SEE.DataModel.DG;
 using SEE.DataModel;
 
 namespace SEE.Tools

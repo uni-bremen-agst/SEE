@@ -1,4 +1,4 @@
-﻿namespace SEE.DataModel
+﻿namespace SEE.DataModel.DG
 {
     public enum NumericAttributeNames
     {

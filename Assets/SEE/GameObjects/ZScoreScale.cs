@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using System.Collections.Generic;
 
 namespace SEE.GO

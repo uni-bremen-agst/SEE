@@ -4,7 +4,7 @@ using UnityEngine;
 
 using SEE.Utils;
 
-namespace SEE.DataModel.IO
+namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Reads a graph from a GXL file and returns it as a graph.

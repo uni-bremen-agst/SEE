@@ -1,4 +1,4 @@
-﻿using SEE.DataModel;
+﻿using SEE.DataModel.DG;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
 using System.Collections.Generic;

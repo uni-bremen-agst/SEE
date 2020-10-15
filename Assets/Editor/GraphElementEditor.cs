@@ -2,7 +2,7 @@
 
 using UnityEngine;
 using UnityEditor;
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.GO;
 
 namespace SEEEditor

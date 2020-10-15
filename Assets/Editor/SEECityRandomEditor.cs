@@ -5,6 +5,7 @@ using UnityEngine;
 using SEE.Game;
 using UnityEditorInternal;
 using SEE.DataModel.IO;
+using SEE.DataModel.DG.IO;
 
 namespace SEEEditor
 {

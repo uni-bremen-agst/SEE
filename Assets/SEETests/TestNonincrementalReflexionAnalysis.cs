@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-using SEE.DataModel;
+using SEE.DataModel.DG;
 
 namespace SEE.Tools.Architecture
 {

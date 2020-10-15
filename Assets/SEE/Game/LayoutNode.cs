@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.Layout;
 
 namespace SEE.Game

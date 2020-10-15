@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SEE.DataModel
+namespace SEE.DataModel.DG
 {
     /// <summary>
     /// Directed and typed edges of the graph with source and target node.

@@ -3,7 +3,7 @@
 using UnityEngine;
 using UnityEditor;
 using SEE.Game;
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.Layout.NodeLayouts;
 using System.Collections.Generic;
 using System.Linq;

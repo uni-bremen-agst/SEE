@@ -3,7 +3,6 @@
 using UnityEditor;
 using SEE.GO;
 using UnityEngine;
-using SEE.DataModel;
 
 namespace SEEEditor
 {

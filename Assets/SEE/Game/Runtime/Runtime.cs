@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.GO;
 using OdinSerializer;
 using System;
