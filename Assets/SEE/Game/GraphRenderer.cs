@@ -4,7 +4,6 @@ using SEE.DataModel.DG;
 using SEE.Game.Charts;
 using SEE.GO;
 using SEE.Layout;
-using SEE.Layout.EdgeLayout;
 using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;

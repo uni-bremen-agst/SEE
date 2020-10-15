@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout.EdgeLayout
+namespace SEE.Layout.EdgeLayouts
 {
     /// <summary>
     /// Shared abstract super class of all edge layouts.

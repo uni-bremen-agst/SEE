@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.Layout.EdgeLayout
+namespace SEE.Layout.EdgeLayouts
 {
     /// <summary>
     /// Draws edges as hierarchically bundled edges. 
