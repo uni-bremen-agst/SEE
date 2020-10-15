@@ -11,7 +11,8 @@ namespace SEE.Layout.NodeLayouts.Cose
     /// <summary>
     /// FIXME: This should be moved to a more specific namespace.
     /// </summary>
-    public class EdgesMeasurements {
+    public class EdgesMeasurements
+    {
 
         /// <summary>
         /// The maximum length of an edge
@@ -142,7 +143,7 @@ namespace SEE.Layout.NodeLayouts.Cose
             get => MeasurementsEdges();
         }
 
-        public int OverlappingGameNodes 
+        public int OverlappingGameNodes
         {
             get => CalcOverlappingGameNodes();
         }
@@ -195,7 +196,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         public Measurements(ICollection<ILayoutNode> layoutNodes, List<Edge> edges)
         {
             this.layoutNodes = new List<ILayoutNode>(layoutNodes);
-            this.edges = edges; 
+            this.edges = edges;
         }
 
         private Dictionary<Edge, float> edgeLengths;
@@ -247,7 +248,8 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <returns>string dictinary with measurements</returns>
         public SortedDictionary<string, string> ToStringDictionary(bool calcualteNew = false)
         {
-            if (!calcualteNew && measurementsDict.Count > 0) {
+            if (!calcualteNew && measurementsDict.Count > 0)
+            {
                 return measurementsDict;
             }
 
@@ -297,10 +299,10 @@ namespace SEE.Layout.NodeLayouts.Cose
                 foreach (Edge edge2 in edgesToIterate)
                 {
 
-                    Vector3 sourcePosition = CoseHelper.GetLayoutNodeFromLinkname(edge.Source.ID, layoutNodes).CenterPosition; 
-                    Vector3 targetPosition = CoseHelper.GetLayoutNodeFromLinkname(edge.Target.ID, layoutNodes).CenterPosition; 
-                    Vector3 sourcePosition2 = CoseHelper.GetLayoutNodeFromLinkname(edge2.Source.ID, layoutNodes).CenterPosition; 
-                    Vector3 targetPosition2 = CoseHelper.GetLayoutNodeFromLinkname(edge2.Target.ID, layoutNodes).CenterPosition; 
+                    Vector3 sourcePosition = CoseHelper.GetLayoutNodeFromLinkname(edge.Source.ID, layoutNodes).CenterPosition;
+                    Vector3 targetPosition = CoseHelper.GetLayoutNodeFromLinkname(edge.Target.ID, layoutNodes).CenterPosition;
+                    Vector3 sourcePosition2 = CoseHelper.GetLayoutNodeFromLinkname(edge2.Source.ID, layoutNodes).CenterPosition;
+                    Vector3 targetPosition2 = CoseHelper.GetLayoutNodeFromLinkname(edge2.Target.ID, layoutNodes).CenterPosition;
                     bool doIntersect = FasterLineSegmentIntersection(new Vector2(sourcePosition.x, sourcePosition.z),
                                                   new Vector2(targetPosition.x, targetPosition.z),
                                                   new Vector2(sourcePosition2.x, sourcePosition2.z),
@@ -375,7 +377,7 @@ namespace SEE.Layout.NodeLayouts.Cose
             float relationMinDistEdge;
             float relationMaxDistEdge;
             float relationTotalDist;
-            float relationAvgDist; 
+            float relationAvgDist;
             float averageDistEdge = 0;
             float varianceDistEdge = 0;
             float relativeVarianceDistEdge = 0;
@@ -422,7 +424,8 @@ namespace SEE.Layout.NodeLayouts.Cose
                 if (edges.Count == 1)
                 {
                     varianceDistEdge = 0;
-                } else
+                }
+                else
                 {
                     varianceDistEdge = variance / (edges.Count - 1);
                 }
@@ -442,24 +445,25 @@ namespace SEE.Layout.NodeLayouts.Cose
                 if (edges.Count == 1)
                 {
                     relativeVarianceDistEdge = 0;
-                } else
+                }
+                else
                 {
                     relativeVarianceDistEdge = varianceRelative / (edges.Count - 1);
                 }
             }
             relativeStandardDeviation = Mathf.Sqrt(relativeVarianceDistEdge);
 
-            return new EdgesMeasurements(lengthMax: maxDistEdge, 
-                                         lengthMin: minDistEdge, 
-                                         lengthTotal:  totalDist,
+            return new EdgesMeasurements(lengthMax: maxDistEdge,
+                                         lengthMin: minDistEdge,
+                                         lengthTotal: totalDist,
                                          lengthMaxArea: relationMaxDistEdge,
                                          lengthMinArea: relationMinDistEdge,
                                          lengthTotalArea: relationTotalDist,
                                          lengthAverage: averageDistEdge,
                                          lengthAverageArea: relationAvgDist,
                                          lengthVariance: varianceDistEdge,
-                                         lengthStandardDeviation: standardDeviation, 
-                                         lengthVarianceArea: relativeVarianceDistEdge, 
+                                         lengthStandardDeviation: standardDeviation,
+                                         lengthVarianceArea: relativeVarianceDistEdge,
                                          lengthStandardDeviationArea: relativeStandardDeviation);
         }
 

@@ -15,7 +15,7 @@ namespace SEE.Layout.EdgeLayout
         /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
         /// <param name="minLevelDistance">the minimal distance between different edge levels;
         /// here: the offset for the edge line w.r.t. its source and target block</param>
-        public StraightEdgeLayout(bool edgesAboveBlocks, float minLevelDistance) 
+        public StraightEdgeLayout(bool edgesAboveBlocks, float minLevelDistance)
             : base(edgesAboveBlocks, minLevelDistance)
         {
             name = "Straight";

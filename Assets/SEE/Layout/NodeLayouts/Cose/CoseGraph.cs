@@ -15,13 +15,13 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 namespace SEE.Layout.NodeLayouts.Cose
 {
-    public class CoseGraph 
+    public class CoseGraph
     {
         /// <summary>
         /// the parent of the graph
@@ -217,7 +217,7 @@ namespace SEE.Layout.NodeLayouts.Cose
             scale.x = RightBackCorner.x - LeftFrontCorner.x;
             scale.z = LeftFrontCorner.y - RightBackCorner.y;
             centerPosition.x = LeftFrontCorner.x + Extend.x;
-            centerPosition.z = RightBackCorner.y + Extend.z; 
+            centerPosition.z = RightBackCorner.y + Extend.z;
         }
 
         /// <summary>

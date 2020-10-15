@@ -1,7 +1,6 @@
-﻿using System;
+﻿using SEE.DataModel.DG;
+using System;
 using System.Collections.Generic;
-
-using SEE.DataModel.DG;
 
 namespace SEE.Tools
 {
@@ -9,7 +8,7 @@ namespace SEE.Tools
     /// Allows one to aggregate or derive metrics for nodes.
     /// </summary>
     public class MetricAggregator
-    {        
+    {
         /// <summary>
         /// Sum of left and right used as a function delegate.
         /// </summary>

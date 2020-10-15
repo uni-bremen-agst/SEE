@@ -96,7 +96,7 @@ namespace SEE.UI3D
             focusses.CopyTo(result);
             return result;
         }
-        
+
         public void AddFocus(Transform focus)
         {
             if (focus && !focusses.Contains(focus))
@@ -332,7 +332,7 @@ namespace SEE.UI3D
 
         public Vector3 Center { get => transform.position; set => transform.position = value; }
         public float Radius { get => transform.localScale.x; set => transform.localScale = new Vector3(value, value, value); }
-        
+
         private Material material;
         private float minAngle;
         private float maxAngle;
@@ -369,7 +369,7 @@ namespace SEE.UI3D
         {
             return maxAngle;
         }
-        
+
         internal void SetMinAngle(float minAngleRadians)
         {
             minAngle = minAngleRadians;

@@ -26,20 +26,20 @@ using UnityEngine.Serialization;
 
 namespace SEE.Game.Charts
 {
-	/// <summary>
-	/// Manages the highlighting and visibility of <see cref="DataModel.Node" />s.
-	/// </summary>
-	public class NodeHighlights : MonoBehaviour
-	{
-		/// <summary>
-		/// Determines if this objects node will be displayed in charts.
-		/// </summary>
-		public IDictionary showInChart = new Dictionary<ChartContent, bool>();
+    /// <summary>
+    /// Manages the highlighting and visibility of <see cref="DataModel.Node" />s.
+    /// </summary>
+    public class NodeHighlights : MonoBehaviour
+    {
+        /// <summary>
+        /// Determines if this objects node will be displayed in charts.
+        /// </summary>
+        public IDictionary showInChart = new Dictionary<ChartContent, bool>();
 
-		/// <summary>
-		/// A toggle linked to this object.
-		/// </summary>
-		[FormerlySerializedAs("ScrollViewToggle")]
-		public ScrollViewToggle scrollViewToggle;
-	}
+        /// <summary>
+        /// A toggle linked to this object.
+        /// </summary>
+        [FormerlySerializedAs("ScrollViewToggle")]
+        public ScrollViewToggle scrollViewToggle;
+    }
 }

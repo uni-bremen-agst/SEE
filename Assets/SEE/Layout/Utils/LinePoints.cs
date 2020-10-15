@@ -170,12 +170,12 @@ namespace SEE.Layout.Utils
         public static Vector3[] StraightLinePoints(Vector3 start, Vector3 end, float yLevel)
         {
             Vector3[] points = new Vector3[4];
-            points[0]   = start;
-            points[1]   = points[0]; // we are maintaining the x and z co-ordinates,
+            points[0] = start;
+            points[1] = points[0]; // we are maintaining the x and z co-ordinates,
             points[1].y = yLevel;   // but adjust the y co-ordinate
-            points[2]   = end;
+            points[2] = end;
             points[2].y = yLevel;
-            points[3]   = end;
+            points[3] = end;
             return points;
         }
     }

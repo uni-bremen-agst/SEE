@@ -17,14 +17,13 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
+using SEE.Game.Evolution;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
-using SEE.DataModel.DG;
-using SEE.Game.Evolution;
-using SEE.DataModel.DG.IO;
-using SEE.Utils;
 
 namespace SEE.Game
 {

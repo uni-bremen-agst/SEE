@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using OdinSerializer;
 using SEE.DataModel;
 using SEE.DataModel.DG;
-using SEE.GO;
-using OdinSerializer;
-using System;
 using SEE.DataModel.Runtime;
+using SEE.GO;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Game.Runtime
 {
@@ -61,7 +61,7 @@ namespace SEE.Game.Runtime
             {
                 throw new Exception("'callTree' is null!");
             }
-            
+
             // The buildings representing function calls are all tagged with these tags.
             // Currently, these are solely Tags.Building.
             string[] tags = new string[] { Tags.Node };

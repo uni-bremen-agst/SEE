@@ -23,21 +23,21 @@ using UnityEngine;
 
 namespace SEE.Controls
 {
-	/// <summary>
-	/// Abstract super class of the actions applied to metric charts.
-	/// </summary>
-	public abstract class ChartAction : MonoBehaviour
-	{
-		[HideInInspector] public float move; // TODO(torben): are any of these used at all?
+    /// <summary>
+    /// Abstract super class of the actions applied to metric charts.
+    /// </summary>
+    public abstract class ChartAction : MonoBehaviour
+    {
+        [HideInInspector] public float move; // TODO(torben): are any of these used at all?
 
-		/// <summary>
-		/// Click was false in the last update and true in this update.
-		/// </summary>
-		[HideInInspector] public bool clickDown;
+        /// <summary>
+        /// Click was false in the last update and true in this update.
+        /// </summary>
+        [HideInInspector] public bool clickDown;
 
-		/// <summary>
-		/// Click was true in the last update and false in this update.
-		/// </summary>
-		[HideInInspector] public bool clickUp;
-	}
+        /// <summary>
+        /// Click was true in the last update and false in this update.
+        /// </summary>
+        [HideInInspector] public bool clickUp;
+    }
 }

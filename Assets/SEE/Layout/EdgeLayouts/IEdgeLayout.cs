@@ -88,7 +88,7 @@ namespace SEE.Layout.EdgeLayout
                     {
                         minY = ground;
                     }
-                }                
+                }
                 if (height > maxHeight)
                 {
                     maxHeight = height;

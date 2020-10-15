@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System;
-
+﻿using SEE.DataModel.DG;
 using SEE.Tools;
-using SEE.DataModel.DG;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SEE.Game

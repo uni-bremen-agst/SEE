@@ -24,7 +24,7 @@ namespace SEE.Layout.EdgeLayout
         /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
         /// <param name="minLevelDistance">the minimal distance between different edge levels</param>
         /// <param name="rdp">epsilon parameter of the Ramer–Douglas–Peucker algorithm</param>
-        public SplineEdgeLayout(bool edgesAboveBlocks, float minLevelDistance, float rdp = 0.0f) 
+        public SplineEdgeLayout(bool edgesAboveBlocks, float minLevelDistance, float rdp = 0.0f)
             : base(edgesAboveBlocks, minLevelDistance)
         {
             name = "Splines";
@@ -61,7 +61,7 @@ namespace SEE.Layout.EdgeLayout
             // This offset is used to draw the line somewhat below
             // or above the house (depending on the orientation).
             float offset = Mathf.Max(minLevelDistance, 0.2f * maxHeight); // must be positive
-                                    
+
             foreach (ILayoutEdge edge in edges)
             {
                 ILayoutNode source = edge.Source;

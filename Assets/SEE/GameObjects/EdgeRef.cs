@@ -1,5 +1,5 @@
-﻿using System;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
+using System;
 
 namespace SEE.GO
 {

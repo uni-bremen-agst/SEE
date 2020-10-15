@@ -24,7 +24,7 @@ using Valve.VR;
 
 namespace SEE.Controls
 {
-	public class XRChartAction : ChartAction
+    public class XRChartAction : ChartAction
     {
         private readonly SteamVR_Action_Vector2 moveAction =
             SteamVR_Input.GetVector2Action(XRInput.DefaultActionSetName, XRInput.MoveActionName);
@@ -40,8 +40,8 @@ namespace SEE.Controls
 
         private bool _lastClick;
 
-		private void Update()
-		{
+        private void Update()
+        {
             if (resetAction.stateDown)
             {
                 ChartManager.ResetPosition();
@@ -55,8 +55,8 @@ namespace SEE.Controls
                 ChartManager.Instance.CreateChartVr();
             }
 
-			clickDown = false;
-			clickUp = false;
+            clickDown = false;
+            clickUp = false;
 
             if (!_lastClick && clickAction.state)
             {
@@ -66,7 +66,7 @@ namespace SEE.Controls
             {
                 clickUp = true;
             }
-			_lastClick = clickAction.state;
-		}
-	}
+            _lastClick = clickAction.state;
+        }
+    }
 }

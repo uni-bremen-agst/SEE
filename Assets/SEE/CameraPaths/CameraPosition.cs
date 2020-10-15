@@ -107,7 +107,7 @@ namespace SEE.CameraPaths
 
             // Press the P key to save position on user demand. If the period has
             // been completed, the position is saved, too, if recording is not interactive.
-            if (Input.GetKeyDown(KeyCode.P) || (! Interactive && accumulatedTime == 0.0f))
+            if (Input.GetKeyDown(KeyCode.P) || (!Interactive && accumulatedTime == 0.0f))
             {
                 Vector3 position = mainCamera.transform.position;
                 Quaternion rotation = mainCamera.transform.rotation;

@@ -36,7 +36,7 @@ namespace SEE.Layout.NodeLayouts
             Dictionary<ILayoutNode, NodeTransform> result = new Dictionary<ILayoutNode, NodeTransform>();
             if (File.Exists(filename))
             {
-                SEE.Layout.IO.Reader reader 
+                SEE.Layout.IO.Reader reader
                     = new SEE.Layout.IO.Reader(filename, layoutNodes.Cast<IGameNode>().ToList(), groundLevel, new SEELogger());
                 foreach (ILayoutNode node in layoutNodes)
                 {

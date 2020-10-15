@@ -113,7 +113,7 @@ namespace SEE.Game
             switch (nodeLayout)
             {
                 case NodeLayoutKind.CompoundSpringEmbedder:
-                    return new NodelayoutModel(OnlyLeaves: false,  CanApplySublayouts: true,  InnerNodesEncloseLeafNodes: true,  IsCircular: false, isHierarchical: true);
+                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: true, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
                 case NodeLayoutKind.EvoStreets:
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false, isHierarchical: true);
                 case NodeLayoutKind.Balloon:
@@ -124,8 +124,8 @@ namespace SEE.Game
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
                 case NodeLayoutKind.CirclePacking:
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: true, isHierarchical: true);
-                case NodeLayoutKind.Manhattan: 
-                    return new NodelayoutModel(OnlyLeaves: true, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false, isHierarchical: false); 
+                case NodeLayoutKind.Manhattan:
+                    return new NodelayoutModel(OnlyLeaves: true, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false, isHierarchical: false);
                 default:
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
             }

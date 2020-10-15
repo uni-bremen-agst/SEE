@@ -1,8 +1,8 @@
 ﻿using SEE.DataModel.DG;
-using System.Collections.Generic;
-using System;
-using UnityEngine;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Tools
 {
@@ -112,8 +112,8 @@ namespace SEE.Tools
         /// <param name="leafAttributes">constraints for node attributes to be generated</param>
         /// <returns>a random graph fulfilling the given constraints</returns>
         public Graph Create
-            (Constraint leafConstraint, 
-             Constraint innerNodeConstraint, 
+            (Constraint leafConstraint,
+             Constraint innerNodeConstraint,
              ICollection<RandomAttributeDescriptor> leafAttributes)
         {
             leafConstraint.Check();
@@ -238,7 +238,7 @@ namespace SEE.Tools
             graph.AddNode(result);
             return result;
         }
-        
+
 
         /// <summary>
         /// Returns a random number drawn from a normal distribution with given 

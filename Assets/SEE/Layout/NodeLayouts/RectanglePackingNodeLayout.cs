@@ -61,7 +61,7 @@ namespace SEE.Layout.NodeLayouts
                         // We add the padding upfront. Padding is added on both sides.
                         // The padding will later be removed again.
                         Vector3 scale = node.LocalScale;
-                        scale.x += 2.0f * padding; 
+                        scale.x += 2.0f * padding;
                         scale.z += 2.0f * padding;
                         layout_result[node] = new NodeTransform(Vector3.zero, scale);
                         numberOfLeaves++;
@@ -417,7 +417,7 @@ namespace SEE.Layout.NodeLayouts
 
         public override bool UsesEdgesAndSublayoutNodes()
         {
-            return false; 
+            return false;
         }
     }
 }

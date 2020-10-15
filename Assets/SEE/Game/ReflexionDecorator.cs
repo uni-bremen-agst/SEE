@@ -4,21 +4,21 @@ using UnityEngine;
 
 namespace SEE.Game
 {
-    internal class ReflexionDecorator 
+    internal class ReflexionDecorator
     {
 
         internal ReflexionDecorator
             (GameObject absencePrefab,
              GameObject convergencePrefab,
              GameObject divergencePrefab,
-             Vector2 leftFrontCorner, 
+             Vector2 leftFrontCorner,
              Vector2 rightBackCorner)
         {
-            this.absencePrefab     = absencePrefab;
+            this.absencePrefab = absencePrefab;
             this.convergencePrefab = convergencePrefab;
-            this.divergencePrefab  = divergencePrefab;
-            this.leftFrontCorner   = leftFrontCorner;
-            this.rightBackCorner   = rightBackCorner;
+            this.divergencePrefab = divergencePrefab;
+            this.leftFrontCorner = leftFrontCorner;
+            this.rightBackCorner = rightBackCorner;
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace SEE.Game
         /// <param name="prefab">the prefab from which to instantiate the decoration objects</param>
         /// <param name="name">the game-object name for all created decoration objects</param>
         private void DecorateEdge(GameObject gameEdge, GameObject prefab, string name)
-        {            
+        {
             LineRenderer line = gameEdge.GetComponent<LineRenderer>();
             // Demeter of the spheres to be used as decoration along the line.
             float demeter = 2 * line.startWidth; // We assume the line has the same width everywhere.

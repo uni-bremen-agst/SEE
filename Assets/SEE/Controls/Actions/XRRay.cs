@@ -45,9 +45,9 @@ namespace SEE.Controls
             /// will be ignored until the button is released again.
             /// </summary>
             private bool buttonEventConsumed = false;
-            
+
             private SteamVR_Action_Boolean button;
-            
+
             public DelayedToggle(SteamVR_Action_Boolean button)
             {
                 this.button = button;
@@ -202,7 +202,7 @@ namespace SEE.Controls
                 lineRenderer.SetPosition(1, origin + RayDistance * Direction.normalized);
             }
         }
-        
+
         private void HideRay()
         {
             Vector3 origin = Position;

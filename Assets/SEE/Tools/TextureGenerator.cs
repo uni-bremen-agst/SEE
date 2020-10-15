@@ -60,13 +60,13 @@ namespace SEE.Tools
             int inc_y = (int)Mathf.Sign(Mathf.Sign((float)dy) + 0.5f);
             if (dx < 0) dx = -dx;
             if (dy < 0) dy = -dy;
-            
+
             int len, sd0x, sd0y, dd0x, dd0y, sd1x, sd1y, dd1x, dd1y, ku, kv, kd, kt;
             if (dx > dy)
             {
                 len = dx;
-    
-                sd0x = 0;      sd0y = inc_y;
+
+                sd0x = 0; sd0y = inc_y;
                 dd0x = -inc_x; dd0y = inc_y;
 
                 sd1x = inc_x; sd1y = 0;
@@ -81,11 +81,11 @@ namespace SEE.Tools
             else
             {
                 len = dy;
-    
+
                 sd0x = inc_x; sd0y = 0;
                 dd0x = inc_x; dd0y = -inc_y;
 
-                sd1x = 0;     sd1y = inc_y;
+                sd1x = 0; sd1y = inc_y;
                 dd1x = inc_x; dd1y = inc_y;
 
                 ku = 2 * dy;
@@ -130,7 +130,7 @@ namespace SEE.Tools
                         }
                         else
                         {
-                            p0.y = p0.y + dd0y;    
+                            p0.y = p0.y + dd0y;
                         }
 
                         d1 = d1 - kd;

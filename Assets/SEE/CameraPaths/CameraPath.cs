@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+﻿using SEE.DataModel;
+using SEE.GO;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Collections;
-using SEE.GO;
-using SEE.DataModel;
+using UnityEngine;
 
 namespace SEE.CameraPaths
 {
@@ -16,7 +16,7 @@ namespace SEE.CameraPaths
         /// <summary>
         /// The file extension of files storing path data.
         /// </summary>
-        public const string PathFileExtension    = "csv";
+        public const string PathFileExtension = "csv";
         public const string DotPathFileExtension = ".csv";
 
         /// <summary>
@@ -459,20 +459,20 @@ namespace SEE.CameraPaths
             line.positionCount = positions.Length;
             line.SetPositions(positions);
         }
-       
+
         private string Dump(Vector3 v)
         {
-            return ("("    + v.x.ToString("0.00000")
+            return ("(" + v.x.ToString("0.00000")
                     + ", " + v.y.ToString("0.00000")
                     + ", " + v.z.ToString("0.00000") + ")");
         }
 
         public void Dump()
         {
-            foreach(PathData d in data)
+            foreach (PathData d in data)
             {
-                Debug.LogFormat("position(x,y,z)={0} rotation={1}, rotation(x, y, z, w)= ({2}, {3}, {4}, {5}), rotation(Euler angles)={6}, time={7})\n", 
-                                d.position, 
+                Debug.LogFormat("position(x,y,z)={0} rotation={1}, rotation(x, y, z, w)= ({2}, {3}, {4}, {5}), rotation(Euler angles)={6}, time={7})\n",
+                                d.position,
                                 d.rotation,
                                 d.rotation.x.ToString("0.000"), d.rotation.y.ToString("0.000"), d.rotation.z.ToString("0.000"), d.rotation.w.ToString("0.000"),
                                 Dump(d.rotation.eulerAngles),

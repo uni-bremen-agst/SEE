@@ -1,14 +1,13 @@
+using SEE.DataModel;
+using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
+using SEE.GO;
+using SEE.Tools;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
-using SEE.Tools;
-using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
-using SEE.GO;
-using SEE.Utils;
-using SEE.DataModel;
 
 namespace SEE.Game
 {
@@ -367,7 +366,7 @@ namespace SEE.Game
                     return new GraphRenderer(this, VisualizedSubGraph);
                 }
                 return graphRenderer;
-            }            
+            }
         }
 
         /// <summary>

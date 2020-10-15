@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 
-using SEE.DataModel.DG;
-
 namespace SEE.GO
 {
     /// <summary>
@@ -34,7 +32,7 @@ namespace SEE.GO
             }
             else
             {
-                return nodeRef.node.ID; 
+                return nodeRef.node.ID;
             }
         }
 

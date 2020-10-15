@@ -19,7 +19,7 @@ namespace SEE.Game
         /// <summary>
         /// The underlying graph node represented by this laid out node.
         /// </summary>
-        public Node ItsNode 
+        public Node ItsNode
         {
             get => node;
         }
@@ -139,7 +139,7 @@ namespace SEE.Game
         {
             relativePosition.x -= node.CenterPosition.x;
             relativePosition.z -= node.CenterPosition.z;
-            sublayoutRoot = node; 
+            sublayoutRoot = node;
         }
 
         public ICollection<ILayoutNode> Successors
@@ -157,7 +157,7 @@ namespace SEE.Game
 
         // Features defined by LayoutNode that must be implemented by subclasses.
         public abstract Vector3 LocalScale { get; set; }
-        public abstract Vector3 AbsoluteScale { get;  }
+        public abstract Vector3 AbsoluteScale { get; }
 
         public abstract void ScaleBy(float factor);
         public abstract Vector3 CenterPosition { get; set; }
@@ -173,7 +173,7 @@ namespace SEE.Game
 
         public Vector3 RelativePosition { get => relativePosition; set => relativePosition = value; }
         public bool IsSublayoutNode { get => isSublayoutNode; set => isSublayoutNode = value; }
-        public bool IsSublayoutRoot { get => isSublayoutRoot; set => isSublayoutRoot = value ; }
+        public bool IsSublayoutRoot { get => isSublayoutRoot; set => isSublayoutRoot = value; }
         public Sublayout Sublayout { get => sublayout; set => sublayout = value; }
         public ILayoutNode SublayoutRoot { get => sublayoutRoot; set => sublayoutRoot = value; }
 

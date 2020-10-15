@@ -42,7 +42,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         public virtual string Type
         {
-	        get => type;
+            get => type;
             set => type = !string.IsNullOrEmpty(value) ? value : "Unknown";
         }
 
@@ -87,7 +87,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                GraphElement graphElement = other as GraphElement;                
+                GraphElement graphElement = other as GraphElement;
                 bool equal = type == graphElement.type;
                 if (!equal)
                 {

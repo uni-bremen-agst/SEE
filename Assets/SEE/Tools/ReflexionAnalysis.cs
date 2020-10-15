@@ -27,12 +27,11 @@ Open issues: implementation of incremental analysis is missing.
 
 */
 
+using SEE.DataModel;
+using SEE.DataModel.DG;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
-using SEE.DataModel.DG;
-using SEE.DataModel;
 
 namespace SEE.Tools
 {
@@ -44,9 +43,9 @@ namespace SEE.Tools
     /// <summary>
     /// Thrown if the hierarchy is not a tree structure.
     /// </summary>
-    public class Hierarchy_Is_Not_A_Tree : DG_Exception {}
+    public class Hierarchy_Is_Not_A_Tree : DG_Exception { }
 
-    public class Corrupt_State : DG_Exception {}
+    public class Corrupt_State : DG_Exception { }
 
     /// <summary>
     /// State of a dependency in the architecture or implementation within the 

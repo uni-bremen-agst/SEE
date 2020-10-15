@@ -14,7 +14,7 @@ namespace SEE.GO
     public class CubeFactory : InnerNodeFactory
     {
         private Mesh cubeMesh;
-        
+
         public CubeFactory(Materials.ShaderType shaderType, ColorRange colorRange)
             : base(shaderType, colorRange)
         {
@@ -27,27 +27,27 @@ namespace SEE.GO
                 new Vector3(-0.5f, -0.5f, -0.5f),
                 new Vector3(-0.5f,  0.5f, -0.5f),
                 new Vector3(-0.5f,  0.5f,  0.5f),
-                
+
                 new Vector3( 0.5f, -0.5f, -0.5f),
                 new Vector3( 0.5f, -0.5f,  0.5f),
                 new Vector3( 0.5f,  0.5f,  0.5f),
                 new Vector3( 0.5f,  0.5f, -0.5f),
-                
+
                 new Vector3( 0.5f, -0.5f, -0.5f),
                 new Vector3(-0.5f, -0.5f, -0.5f),
                 new Vector3(-0.5f, -0.5f,  0.5f),
                 new Vector3( 0.5f, -0.5f,  0.5f),
-                
+
                 new Vector3(-0.5f,  0.5f, -0.5f),
                 new Vector3( 0.5f,  0.5f, -0.5f),
                 new Vector3( 0.5f,  0.5f,  0.5f),
                 new Vector3(-0.5f,  0.5f,  0.5f),
-                
+
                 new Vector3(-0.5f, -0.5f, -0.5f),
                 new Vector3( 0.5f, -0.5f, -0.5f),
                 new Vector3( 0.5f,  0.5f, -0.5f),
                 new Vector3(-0.5f,  0.5f, -0.5f),
-                
+
                 new Vector3( 0.5f, -0.5f,  0.5f),
                 new Vector3(-0.5f, -0.5f,  0.5f),
                 new Vector3(-0.5f,  0.5f,  0.5f),
@@ -65,22 +65,22 @@ namespace SEE.GO
                 new Vector3( 1.0f,  0.0f,  0.0f),
                 new Vector3( 1.0f,  0.0f,  0.0f),
                 new Vector3( 1.0f,  0.0f,  0.0f),
-                
+
                 new Vector3( 0.0f, -1.0f,  0.0f),
                 new Vector3( 0.0f, -1.0f,  0.0f),
                 new Vector3( 0.0f, -1.0f,  0.0f),
                 new Vector3( 0.0f, -1.0f,  0.0f),
-                
+
                 new Vector3( 0.0f,  1.0f,  0.0f),
                 new Vector3( 0.0f,  1.0f,  0.0f),
                 new Vector3( 0.0f,  1.0f,  0.0f),
                 new Vector3( 0.0f,  1.0f,  0.0f),
-                
+
                 new Vector3( 0.0f,  0.0f, -1.0f),
                 new Vector3( 0.0f,  0.0f, -1.0f),
                 new Vector3( 0.0f,  0.0f, -1.0f),
                 new Vector3( 0.0f,  0.0f, -1.0f),
-                
+
                 new Vector3( 0.0f,  0.0f,  1.0f),
                 new Vector3( 0.0f,  0.0f,  1.0f),
                 new Vector3( 0.0f,  0.0f,  1.0f),

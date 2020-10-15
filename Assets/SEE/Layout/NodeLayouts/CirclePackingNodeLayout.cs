@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using SEE.DataModel.DG;
+using SEE.Layout.NodeLayouts.CirclePacking;
+using SEE.Layout.NodeLayouts.Cose;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
-using SEE.Layout.NodeLayouts.CirclePacking;
-using SEE.DataModel.DG;
-using SEE.Layout.NodeLayouts.Cose;
 
 namespace SEE.Layout.NodeLayouts
 {
@@ -19,7 +18,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
-        public CirclePackingNodeLayout(float groundLevel) 
+        public CirclePackingNodeLayout(float groundLevel)
             : base(groundLevel)
         {
             name = "Circle Packing";
@@ -104,7 +103,7 @@ namespace SEE.Layout.NodeLayouts
                 return LeafRadius(parent);
             }
             else
-            { 
+            {
                 List<Circle> circles = new List<Circle>(children.Count);
 
                 int i = 0;
@@ -128,7 +127,7 @@ namespace SEE.Layout.NodeLayouts
                 {
                     // Note: The position of the transform is currently only local, relative to the zero center
                     // within the parent node. The co-ordinates will later be adjusted to the world scope.
-                    layout_result[circle.gameObject] 
+                    layout_result[circle.gameObject]
                          = new NodeTransform(new Vector3(circle.center.x, groundLevel, circle.center.y),
                                              GetScale(circle.gameObject, circle.radius));
                 }
@@ -148,7 +147,7 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>the scale of <paramref name="node"/></returns>
         private Vector3 GetScale(ILayoutNode node, float radius)
         {
-            return node.IsLeaf ? node.LocalScale 
+            return node.IsLeaf ? node.LocalScale
                                : new Vector3(2 * radius, innerNodeHeight, 2 * radius);
         }
 

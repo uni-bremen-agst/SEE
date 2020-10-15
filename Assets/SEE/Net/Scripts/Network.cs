@@ -196,7 +196,7 @@ namespace SEE.Net
                     }
                 }
             }
-            
+
             GameObject rig = GameObject.Find("Player Rig");
             if (rig)
             {
@@ -229,7 +229,7 @@ namespace SEE.Net
 #endif
             }
         }
-        
+
         /// <summary>
         /// Sends all pending packets.
         /// </summary>
@@ -561,7 +561,7 @@ namespace SEE.Net
             {
                 switch (channelSession.AudioState)
                 {
-                    case VivoxUnity.ConnectionState.Connected:    Logger.Log("Audio chat connected in " + channelSession.Key.Name + " channel."); break;
+                    case VivoxUnity.ConnectionState.Connected: Logger.Log("Audio chat connected in " + channelSession.Key.Name + " channel."); break;
                     case VivoxUnity.ConnectionState.Disconnected: Logger.Log("Audio chat disconnected in " + channelSession.Key.Name + " channel."); break;
                 }
             }

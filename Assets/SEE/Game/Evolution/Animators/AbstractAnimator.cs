@@ -120,7 +120,7 @@ namespace SEE.Game.Evolution
             (GameObject gameObject,
              ILayoutNode nodeTransform,
              bool wasModified,
-             GameObject callBackTarget, 
+             GameObject callBackTarget,
              string callbackName,
              Action<object> callback);
     }

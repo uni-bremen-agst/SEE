@@ -231,7 +231,7 @@ namespace SEE.Game.Evolution
         {
             ClearEdges();
             // FIXME: Provide meaningful values for scaleFactor.
-            edges = _graphRenderer.EdgeLayout(nodes.Values); 
+            edges = _graphRenderer.EdgeLayout(nodes.Values);
         }
 
         /// <summary>

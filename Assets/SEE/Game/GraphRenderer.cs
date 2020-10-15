@@ -1,20 +1,20 @@
-﻿using System;
+﻿using SEE.Controls;
+using SEE.DataModel;
+using SEE.DataModel.DG;
+using SEE.Game.Charts;
+using SEE.GO;
+using SEE.Layout;
+using SEE.Layout.EdgeLayout;
+using SEE.Layout.EdgeLayouts;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout.NodeLayouts.Cose;
+using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using SEE.Controls;
-using SEE.Game.Charts;
-using SEE.DataModel.DG;
-using SEE.GO;
-using SEE.Layout;
-using SEE.Utils;
 using UnityEngine;
 using static SEE.Game.AbstractSEECity;
-using SEE.Layout.EdgeLayout;
-using SEE.Layout.NodeLayouts;
-using SEE.Layout.NodeLayouts.Cose;
-using SEE.Layout.EdgeLayouts;
-using SEE.DataModel;
 
 namespace SEE.Game
 {
@@ -328,7 +328,7 @@ namespace SEE.Game
                     // If we added an artifical root node to the graph, we must remove it again
                     // from the graph when we are done.
                     RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
-                }               
+                }
             }
             else
             {
@@ -348,7 +348,7 @@ namespace SEE.Game
                     // calculate and apply the node layout
                     gameNodes = ToLayoutNodes(nodeMap.Values);
                     RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
-                    
+
                     p = Performance.Begin("node layout " + settings.NodeLayout + " for " + gameNodes.Count + " nodes");
                     // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
                     // (GameNode implements ILayoutNode).
@@ -393,7 +393,7 @@ namespace SEE.Game
             {
                 GameObject lightGameObject = new GameObject("Light");
                 lightGameObject.transform.parent = rootGameNode.transform;
-                
+
                 Light light = lightGameObject.AddComponent<Light>();
 
                 BoundingBox(nodeToGameObject, out Vector2 minCorner, out Vector2 maxCorner);
@@ -582,7 +582,8 @@ namespace SEE.Game
         private List<SublayoutLayoutNode> ConvertSublayoutToLayoutNodes(List<SublayoutNode> sublayouts)
         {
             List<SublayoutLayoutNode> sublayoutLayoutNodes = new List<SublayoutLayoutNode>();
-            sublayouts.ForEach(sublayoutNode => {
+            sublayouts.ForEach(sublayoutNode =>
+            {
 
                 SublayoutLayoutNode sublayout = new SublayoutLayoutNode(to_layout_node[sublayoutNode.Node], sublayoutNode.InnerNodeKind, sublayoutNode.NodeLayout);
                 sublayoutNode.Nodes.ForEach(n => sublayout.Nodes.Add(to_layout_node[n]));
@@ -671,7 +672,7 @@ namespace SEE.Game
                     // that there is exactly one root node of the graph.
 
             if (root is object)
-            {                
+            {
                 if (layoutNodes != null)
                 {
                     // Remove from layout
@@ -691,7 +692,7 @@ namespace SEE.Game
                 }
                 GameObject go = nodeMap[root];
                 nodeMap.Remove(root);
-                graph.RemoveNode(root);                                
+                graph.RemoveNode(root);
                 Destroyer.DestroyGameObject(go);
                 root = null;
             }
@@ -706,7 +707,7 @@ namespace SEE.Game
         {
             switch (settings.NodeLayout)
             {
-                case NodeLayoutKind.Manhattan:                    
+                case NodeLayoutKind.Manhattan:
                     return new ManhattanLayout(groundLevel, leafNodeFactory.Unit);
                 case NodeLayoutKind.RectanglePacking:
                     return new RectanglePackingNodeLayout(groundLevel, leafNodeFactory.Unit);
@@ -822,7 +823,7 @@ namespace SEE.Game
         private void AddDecorations(ICollection<GameObject> gameNodes, InnerNodeKinds innerNodeKinds, NodeLayoutKind nodeLayout)
         {
             var innerNodeFactory = GetInnerNodeFactory(innerNodeKinds);
-      
+
             // Add software erosion decorators for all leaf nodes if requested.
             if (settings.ShowErosions)
             {
@@ -831,7 +832,7 @@ namespace SEE.Game
             }
 
             // Add text labels for all inner nodes
-            if (nodeLayout == NodeLayoutKind.Balloon 
+            if (nodeLayout == NodeLayoutKind.Balloon
                 || nodeLayout == NodeLayoutKind.EvoStreets)
             {
                 AddLabels(InnerNodes(gameNodes), innerNodeFactory);
@@ -848,7 +849,7 @@ namespace SEE.Game
                 case SEECity.InnerNodeKinds.Circles:
                     {
                         // We want to adjust the size and the line width of the circle line created by the CircleFactory.
-                        CircleDecorator decorator = new CircleDecorator(innerNodeFactory, Color.white);                        
+                        CircleDecorator decorator = new CircleDecorator(innerNodeFactory, Color.white);
                         decorator.Add(InnerNodes(gameNodes));
                     }
                     break;
@@ -861,7 +862,7 @@ namespace SEE.Game
                     break;
                 case SEECity.InnerNodeKinds.Donuts:
                     {
-                        DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric, 
+                        DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric,
                                                                       settings.AllInnerNodeIssues().ToArray<string>());
                         // the circle segments and the inner circle for the donut are added as children by Add();
                         // that is why we do not add the result to decorations.
@@ -922,7 +923,7 @@ namespace SEE.Game
         /// <param name="innerNodeFactory">the inner node factory that created the inner nodes in <paramref name="gameNodes"/></param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         private ICollection<GameNode> ToLayoutNodes
-            (ICollection<GameObject> gameNodes, 
+            (ICollection<GameObject> gameNodes,
             NodeFactory leafNodeFactory,
             NodeFactory innerNodeFactory)
         {
@@ -957,7 +958,7 @@ namespace SEE.Game
                 Vector3 size = innerNodeFactory.GetSize(node);
                 float length = Mathf.Min(size.x, size.z);
                 // The text may occupy up to 30% of the length.
-                GameObject text = TextFactory.GetText(node.GetComponent<NodeRef>().node.SourceName, 
+                GameObject text = TextFactory.GetText(node.GetComponent<NodeRef>().node.SourceName,
                                                       node.transform.position, length * 0.3f);
                 text.transform.SetParent(node.transform);
             }
@@ -970,7 +971,7 @@ namespace SEE.Game
         /// <returns>the inner nodes in gameNodes as a list</returns>
         private ICollection<GameObject> InnerNodes(ICollection<GameObject> gameNodes)
         {
-            return gameNodes.Where(o => ! IsLeaf(o)).ToList();
+            return gameNodes.Where(o => !IsLeaf(o)).ToList();
         }
 
         /// <summary>
@@ -1224,7 +1225,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNode">inner node whose height is to be set</param>
         private void AdjustHeightOfInnerNode(GameObject gameNode)
-        {            
+        {
             NodeRef noderef = gameNode.GetComponent<NodeRef>();
             if (noderef == null)
             {
@@ -1462,12 +1463,12 @@ namespace SEE.Game
             }
         }
 
-       /// <summary>
-       /// calculates the left lower corner position and the right uppr corner position for a given list of ILayoutNodes
-       /// </summary>
-       /// <param name="layoutNodes">the layout nodes</param>
-       /// <param name="leftLowerCorner">the left lower corner</param>
-       /// <param name="rightUpperCorner">the right upper corner</param>
+        /// <summary>
+        /// calculates the left lower corner position and the right uppr corner position for a given list of ILayoutNodes
+        /// </summary>
+        /// <param name="layoutNodes">the layout nodes</param>
+        /// <param name="leftLowerCorner">the left lower corner</param>
+        /// <param name="rightUpperCorner">the right upper corner</param>
         public void BoundingBox(ICollection<ILayoutNode> layoutNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
         {
             if (layoutNodes.Count == 0)

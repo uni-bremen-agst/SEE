@@ -1,8 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
-using System.Collections.Generic;
-using System;
+using UnityEngine;
 
 namespace SEE.Layout.IO
 {
@@ -295,12 +295,12 @@ namespace SEE.Layout.IO
                                 }
                                 switch (state)
                                 {
-                                    case State.undefined:         StartUndefined();       break;
-                                    case State.inLayout:          StartLayout();          break;
+                                    case State.undefined: StartUndefined(); break;
+                                    case State.inLayout: StartLayout(); break;
                                     case State.inHiddenNodeTypes: StartHiddenNodeTypes(); break;
-                                    case State.inNode:            StartNode();            break;
-                                    case State.inVisualization:   StartVisualization();   break;
-                                    case State.inOption:          StartOption();          break;
+                                    case State.inNode: StartNode(); break;
+                                    case State.inVisualization: StartVisualization(); break;
+                                    case State.inOption: StartOption(); break;
                                     default: throw new NotImplementedException();
                                 }
                             }
@@ -313,12 +313,12 @@ namespace SEE.Layout.IO
                             Expected();
                             switch (ToState(reader.Name))
                             {
-                                case State.undefined:           EndUndefined();       break;
-                                case State.inLayout:            EndLayout();          break;
-                                case State.inHiddenNodeTypes:   EndHiddenNodeTypes(); break;
-                                case State.inNode:              EndNode();            break;
-                                case State.inVisualization:     EndVisualization();   break;
-                                case State.inOption:            EndOption();          break;
+                                case State.undefined: EndUndefined(); break;
+                                case State.inLayout: EndLayout(); break;
+                                case State.inHiddenNodeTypes: EndHiddenNodeTypes(); break;
+                                case State.inNode: EndNode(); break;
+                                case State.inVisualization: EndVisualization(); break;
+                                case State.inOption: EndOption(); break;
                                 default: throw new NotImplementedException();
                             }
                             break;
@@ -572,7 +572,7 @@ namespace SEE.Layout.IO
                 // Transform to center position for Unity.
                 position.x = X + scale.x / 2.0f;
                 // Lift y center so that the node stands on ground zero.
-                position.y = groundLevel + Mathf.Max(MinimalHeight, scale.y) / 2.0f; 
+                position.y = groundLevel + Mathf.Max(MinimalHeight, scale.y) / 2.0f;
                 // Gravis's Y is Unity's inverted z axis, i.e., we need to mirror Y
                 // as follows: z = -Y. By mirroring Y, the left upper corner of a node
                 // becomes its left lower corner.

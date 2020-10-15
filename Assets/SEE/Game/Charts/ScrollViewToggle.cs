@@ -28,52 +28,52 @@ using UnityEngine.UI;
 
 namespace SEE.Game.Charts
 {
-	/// <summary>
-	/// Contains the logic for entries in the content selection scroll view.
-	/// </summary>
+    /// <summary>
+    /// Contains the logic for entries in the content selection scroll view.
+    /// </summary>
     [RequireComponent(typeof(Toggle))]
-	public class ScrollViewToggle : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
-	{
-		/// <summary>
-		/// The linked chart. Also contains methods to refresh the chart.
-		/// </summary>
-		private ChartContent _chartContent;
+    public class ScrollViewToggle : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    {
+        /// <summary>
+        /// The linked chart. Also contains methods to refresh the chart.
+        /// </summary>
+        private ChartContent _chartContent;
 
-		/// <summary>
-		/// If the user is currently pointing on this <see cref="GameObject" />
-		/// </summary>
-		private bool _pointedOn;
+        /// <summary>
+        /// If the user is currently pointing on this <see cref="GameObject" />
+        /// </summary>
+        private bool _pointedOn;
 
-		/// <summary>
-		/// The parent to this <see cref="ScrollViewToggle" />.
-		/// </summary>
-		public ScrollViewToggle Parent { private get; set; }
+        /// <summary>
+        /// The parent to this <see cref="ScrollViewToggle" />.
+        /// </summary>
+        public ScrollViewToggle Parent { private get; set; }
 
-		/// <summary>
-		/// Contains all children to this <see cref="ScrollViewToggle" />.
-		/// </summary>
-		private readonly List<ScrollViewToggle> _children = new List<ScrollViewToggle>();
+        /// <summary>
+        /// Contains all children to this <see cref="ScrollViewToggle" />.
+        /// </summary>
+        private readonly List<ScrollViewToggle> _children = new List<ScrollViewToggle>();
 
-		/// <summary>
-		/// The running <see cref="UpdateStatus" /> <see cref="Coroutine" />.
-		/// </summary>
-		public Coroutine StatusUpdate { private get; set; }
+        /// <summary>
+        /// The running <see cref="UpdateStatus" /> <see cref="Coroutine" />.
+        /// </summary>
+        public Coroutine StatusUpdate { private get; set; }
 
-		/// <summary>
-		/// Contains the name of the <see cref="LinkedObject" /> in the UI.
-		/// </summary>
-		[SerializeField] private TextMeshProUGUI label;
+        /// <summary>
+        /// Contains the name of the <see cref="LinkedObject" /> in the UI.
+        /// </summary>
+        [SerializeField] private TextMeshProUGUI label;
 
-		/// <summary>
-		/// The UI element the user can click on to change the state of
-		/// <see cref="UnityEngine.UI.Toggle.isOn" />.
-		/// </summary>
-		[SerializeField] private Toggle toggle;
+        /// <summary>
+        /// The UI element the user can click on to change the state of
+        /// <see cref="UnityEngine.UI.Toggle.isOn" />.
+        /// </summary>
+        [SerializeField] private Toggle toggle;
 
-		/// <summary>
-		/// Contains properties for adding objects to charts.
-		/// </summary>
-		public NodeHighlights LinkedObject { private get; set; }
+        /// <summary>
+        /// Contains properties for adding objects to charts.
+        /// </summary>
+        public NodeHighlights LinkedObject { private get; set; }
 
         /// <summary>
         /// Called by <see cref="ChartContent" /> after creation to pass some values and initialize attributes.
@@ -84,45 +84,45 @@ namespace SEE.Game.Charts
         {
             this.label.text = label;
             _chartContent = script;
-			toggle.isOn = !Parent || (bool) LinkedObject.showInChart[_chartContent];
-		}
+            toggle.isOn = !Parent || (bool)LinkedObject.showInChart[_chartContent];
+        }
 
-		/// <summary>
-		/// Mainly called by Unity. Activates or deactivates a marker in the linked chart, depending on the
-		/// status of <see cref="UnityEngine.UI.Toggle.isOn" />.
-		/// </summary>
-		public void Toggle()
-		{
-			if (Parent == null)
-			{
-				if (StatusUpdate == null)
+        /// <summary>
+        /// Mainly called by Unity. Activates or deactivates a marker in the linked chart, depending on the
+        /// status of <see cref="UnityEngine.UI.Toggle.isOn" />.
+        /// </summary>
+        public void Toggle()
+        {
+            if (Parent == null)
+            {
+                if (StatusUpdate == null)
                 {
-				    bool active = toggle.isOn;
-				    foreach (ScrollViewToggle child in _children) child.Toggle(active, true);
+                    bool active = toggle.isOn;
+                    foreach (ScrollViewToggle child in _children) child.Toggle(active, true);
                 }
-			}
-			else
-			{
-				LinkedObject.showInChart[_chartContent] = toggle.isOn;
-				if (Parent.StatusUpdate == null)
+            }
+            else
+            {
+                LinkedObject.showInChart[_chartContent] = toggle.isOn;
+                if (Parent.StatusUpdate == null)
                 {
-					Parent.StatusUpdate = StartCoroutine(Parent.UpdateStatus());
+                    Parent.StatusUpdate = StartCoroutine(Parent.UpdateStatus());
                 }
-				if (_chartContent.drawing == null)
+                if (_chartContent.drawing == null)
                 {
-					_chartContent.drawing = StartCoroutine(_chartContent.QueueDraw());
+                    _chartContent.drawing = StartCoroutine(_chartContent.QueueDraw());
                 }
-			}
-		}
+            }
+        }
 
-		/// <summary>
-		/// Activates or deactivates a marker in the linked chart.
-		/// </summary>
-		/// <param name="active">If the marker will be activated</param>
-		/// <param name="initial"></param>
-		public void Toggle(bool active, bool initial)
-		{
-			toggle.isOn = active;
+        /// <summary>
+        /// Activates or deactivates a marker in the linked chart.
+        /// </summary>
+        /// <param name="active">If the marker will be activated</param>
+        /// <param name="initial"></param>
+        public void Toggle(bool active, bool initial)
+        {
+            toggle.isOn = active;
 
             if (initial && _children.Count > 0)
             {
@@ -131,24 +131,24 @@ namespace SEE.Game.Charts
                     child.Toggle(active, true);
                 }
             }
-		}
+        }
 
-		/// <summary>
-		/// Updates the status on parent markers depending on the values of it's children.
-		/// </summary>
-		/// <returns></returns>
-		private IEnumerator UpdateStatus()
-		{
-			yield return new WaitForSeconds(0.2f);
-			bool active = true;
-			foreach (ScrollViewToggle child in _children)
+        /// <summary>
+        /// Updates the status on parent markers depending on the values of it's children.
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator UpdateStatus()
+        {
+            yield return new WaitForSeconds(0.2f);
+            bool active = true;
+            foreach (ScrollViewToggle child in _children)
             {
-				if (!child.GetStatus())
-				{
-					Toggle(false, false);
-					active = false;
-					break;
-				}
+                if (!child.GetStatus())
+                {
+                    Toggle(false, false);
+                    active = false;
+                    break;
+                }
             }
 
             if (active)
@@ -156,76 +156,76 @@ namespace SEE.Game.Charts
                 Toggle(true, true);
             }
 
-			StatusUpdate = null;
-		}
+            StatusUpdate = null;
+        }
 
-		/// <summary>
-		/// Used to check if a marker for the <see cref="LinkedObject" /> will be added to the linked chart.
-		/// </summary>
-		/// <returns>The status of the <see cref="LinkedObject" />.</returns>
-		private bool GetStatus()
-		{
-			return (bool) LinkedObject.showInChart[_chartContent];
-		}
+        /// <summary>
+        /// Used to check if a marker for the <see cref="LinkedObject" /> will be added to the linked chart.
+        /// </summary>
+        /// <returns>The status of the <see cref="LinkedObject" />.</returns>
+        private bool GetStatus()
+        {
+            return (bool)LinkedObject.showInChart[_chartContent];
+        }
 
-		/// <summary>
-		/// Adds a <see cref="ScrollViewToggle" /> as a child of this <see cref="ScrollViewToggle" />.
-		/// </summary>
-		/// <param name="child">The new child.</param>
-		public void AddChild(ScrollViewToggle child)
-		{
-			_children.Add(child);
-		}
+        /// <summary>
+        /// Adds a <see cref="ScrollViewToggle" /> as a child of this <see cref="ScrollViewToggle" />.
+        /// </summary>
+        /// <param name="child">The new child.</param>
+        public void AddChild(ScrollViewToggle child)
+        {
+            _children.Add(child);
+        }
 
-		/// <summary>
-		/// Sets the highlight state of this toggle.
-		/// </summary>
-		/// <param name="highlighted">Highlight on or off.</param>
-		public void SetHighlighted(bool highlighted)
-		{
+        /// <summary>
+        /// Sets the highlight state of this toggle.
+        /// </summary>
+        /// <param name="highlighted">Highlight on or off.</param>
+        public void SetHighlighted(bool highlighted)
+        {
             Toggle toggle = GetComponent<Toggle>();
-			ColorBlock colors = toggle.colors;
-			colors.normalColor = highlighted ? Color.yellow : Color.white;
-			toggle.colors = colors;
-		}
+            ColorBlock colors = toggle.colors;
+            colors.normalColor = highlighted ? Color.yellow : Color.white;
+            toggle.colors = colors;
+        }
 
-		/// <summary>
-		/// Highlights the <see cref="LinkedObject" /> when the user points on this <see cref="GameObject" />.
-		/// </summary>
-		/// <param name="eventData"></param>
-		public void OnPointerEnter(PointerEventData eventData)
-		{
-			if (LinkedObject != null && !_pointedOn)
+        /// <summary>
+        /// Highlights the <see cref="LinkedObject" /> when the user points on this <see cref="GameObject" />.
+        /// </summary>
+        /// <param name="eventData"></param>
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (LinkedObject != null && !_pointedOn)
             {
-			    _pointedOn = true;
-			    ChartManager.OnSelect(LinkedObject.gameObject, true);
+                _pointedOn = true;
+                ChartManager.OnSelect(LinkedObject.gameObject, true);
             }
-		}
+        }
 
-		/// <summary>
-		/// Stops highlighting the <see cref="LinkedObject" /> when the user stops pointing on it.
-		/// </summary>
-		/// <param name="eventData"></param>
-		public void OnPointerExit(PointerEventData eventData)
-		{
-			if (_pointedOn)
+        /// <summary>
+        /// Stops highlighting the <see cref="LinkedObject" /> when the user stops pointing on it.
+        /// </summary>
+        /// <param name="eventData"></param>
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (_pointedOn)
             {
-			    ChartManager.OnDeselect(LinkedObject.gameObject, true);
-			    _pointedOn = false;
+                ChartManager.OnDeselect(LinkedObject.gameObject, true);
+                _pointedOn = false;
             }
-		}
+        }
 
-		/// <summary>
-		/// If the <see cref="GameObject" /> was still pointed on, the highlight of the
-		/// <see cref="LinkedObject" /> will be stopped.
-		/// </summary>
-		private void OnDestroy()
-		{
-			if (_pointedOn && LinkedObject != null)
+        /// <summary>
+        /// If the <see cref="GameObject" /> was still pointed on, the highlight of the
+        /// <see cref="LinkedObject" /> will be stopped.
+        /// </summary>
+        private void OnDestroy()
+        {
+            if (_pointedOn && LinkedObject != null)
             {
-				ChartManager.OnSelect(LinkedObject.gameObject, true);
+                ChartManager.OnSelect(LinkedObject.gameObject, true);
             }
-			StopAllCoroutines();
-		}
-	}
+            StopAllCoroutines();
+        }
+    }
 }

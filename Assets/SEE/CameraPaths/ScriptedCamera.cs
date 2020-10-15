@@ -1,7 +1,7 @@
-using System.Collections.Generic;
-using UnityEngine;
 using System;
+using System.Collections.Generic;
 using TinySpline;
+using UnityEngine;
 
 namespace SEE.CameraPaths
 {

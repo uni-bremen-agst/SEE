@@ -15,7 +15,7 @@ namespace SEE.DataModel.DG
         private Dictionary<string, Node> nodes = new Dictionary<string, Node>();
 
         // The list of graph edges indexed by their unique IDs.
-        private Dictionary<string, Edge> edges = new Dictionary<string, Edge>();        
+        private Dictionary<string, Edge> edges = new Dictionary<string, Edge>();
 
         // The (view) name of the graph.
         private string name = "";
@@ -57,7 +57,7 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("ID '" + node.ID + "' is not unique:\n"
                                     + node.ToString()
-                                    + ".\nDuplicate already in graph: " 
+                                    + ".\nDuplicate already in graph: "
                                     + nodes[node.ID].ToString());
             }
             else if (!ReferenceEquals(node.ItsGraph, null))
@@ -765,7 +765,7 @@ namespace SEE.DataModel.DG
                 Node sourceInSubgraph = mapsTo[edge.Source];
                 Node targetInSubgraph = mapsTo[edge.Target];
 
-                if (sourceInSubgraph != null && targetInSubgraph != null 
+                if (sourceInSubgraph != null && targetInSubgraph != null
                     && !sourceInSubgraph.HasSuccessor(targetInSubgraph, edge.Type))
                 {
                     Edge edgeInSubgraph = (Edge)edge.Clone();
