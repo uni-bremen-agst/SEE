@@ -1,13 +1,11 @@
 ﻿using NUnit.Framework;
-using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
 using SEE.Tools;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Constraint = SEE.Tools.Constraint;
 
-namespace SEE.DataModel.IO
+namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Unit tests for GraphWriter and GraphReader.
