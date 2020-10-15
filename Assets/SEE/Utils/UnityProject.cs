@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Utilities regarding Unity project data (e.g., Asset directory).
 /// </summary>
-public class UnityProject 
+public class UnityProject
 {
     /// <summary>
     /// Returns the path to our Unity project folder. A Path.DirectorySeparatorChar will

@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using SEE.Layout.Utils;
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Assertions;
-using SEE.Layout.Utils;
 
 namespace SEE.Layout.EdgeLayout
 {
@@ -205,11 +205,11 @@ namespace SEE.Layout.EdgeLayout
         /// <param name="maxLevel">the maximal level of the node hierarchy</param>
         /// <returns>points to draw a spline between source and target</returns>
         private Vector3[] GetLinePoints
-            (ILayoutNode source, 
-             ILayoutNode target, 
-             LCAFinder<ILayoutNode> lcaFinder, 
+            (ILayoutNode source,
+             ILayoutNode target,
+             LCAFinder<ILayoutNode> lcaFinder,
              int maxLevel)
-        { 
+        {
             if (source == target)
             {
                 return SelfLoop(source);
@@ -307,7 +307,7 @@ namespace SEE.Layout.EdgeLayout
         private Vector3[] DirectSpline(ILayoutNode source, ILayoutNode target, float yLevel)
         {
             Vector3 start = edgesAboveBlocks ? source.Roof : source.Ground;
-            Vector3 end   = edgesAboveBlocks ? target.Roof : target.Ground;
+            Vector3 end = edgesAboveBlocks ? target.Roof : target.Ground;
             // position in between start and end
             Vector3 middle = Vector3.Lerp(start, end, 0.5f);
             middle.y = yLevel;
@@ -361,7 +361,7 @@ namespace SEE.Layout.EdgeLayout
             // right back corner of center area
             Vector3 end = new Vector3(center.x + extent.x, center.y, center.z + extent.z);
             Vector3 middle = center;
-            middle.y += edgesAboveBlocks? levelDistance : -levelDistance;
+            middle.y += edgesAboveBlocks ? levelDistance : -levelDistance;
             return LinePoints.SplineLinePoints(start, middle, end);
         }
 

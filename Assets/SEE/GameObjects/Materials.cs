@@ -131,11 +131,11 @@ namespace SEE.GO
 
             switch (shaderType)
             {
-                case ShaderType.Opaque:          materialName = OpaqueMaterialName;          break;
-                case ShaderType.Transparent:     materialName = TransparentMaterialName;     break;
+                case ShaderType.Opaque: materialName = OpaqueMaterialName; break;
+                case ShaderType.Transparent: materialName = TransparentMaterialName; break;
                 case ShaderType.TransparentLine: materialName = TransparentLineMaterialName; break;
-                case ShaderType.Invisible:       materialName = InvisibleMaterialName;       break;
-                default: Assertions.InvalidCodePath();                                       break;
+                case ShaderType.Invisible: materialName = InvisibleMaterialName; break;
+                default: Assertions.InvalidCodePath(); break;
             }
 
             Material materialPrefab = Resources.Load<Material>(materialName);

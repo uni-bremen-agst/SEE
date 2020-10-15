@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using SEE.GO;
+﻿using SEE.GO;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace SEE.Utils
@@ -7,7 +7,7 @@ namespace SEE.Utils
     /// <summary>
     /// Utilities related to ray casting.
     /// </summary>
-    public static class Raycasting 
+    public static class Raycasting
     {
         /// <summary>
         /// Raycasts the scene from the camera in the direction the mouse is pointing.

@@ -64,9 +64,9 @@ namespace SEE.GO
 
             // Set some positions
             Vector3[] positions = new Vector3[4];
-            positions[0] = new Vector3(-halfLength, 0.0f,  halfLength);  // left back corner
-            positions[1] = new Vector3( halfLength, 0.0f,  halfLength);  // right back corner
-            positions[2] = new Vector3( halfLength, 0.0f, -halfLength);  // right front corner
+            positions[0] = new Vector3(-halfLength, 0.0f, halfLength);  // left back corner
+            positions[1] = new Vector3(halfLength, 0.0f, halfLength);  // right back corner
+            positions[2] = new Vector3(halfLength, 0.0f, -halfLength);  // right front corner
             positions[3] = new Vector3(-halfLength, 0.0f, -halfLength);  // left front corner
             line.positionCount = positions.Length;
             line.SetPositions(positions);

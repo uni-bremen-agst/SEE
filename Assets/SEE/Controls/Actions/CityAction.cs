@@ -1,7 +1,7 @@
-﻿using UnityEngine;
+﻿using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
-using SEE.DataModel;
+using UnityEngine;
 
 namespace SEE.Controls
 {

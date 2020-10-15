@@ -65,7 +65,7 @@ namespace SEE.Net
         /// The transform to synchronize.
         /// </summary>
         public Transform TransformToSynchronize { get => transformToSynchronize; }
-        
+
         /// <summary>
         /// Whether the position should be synchronized.
         /// </summary>
@@ -99,7 +99,7 @@ namespace SEE.Net
         /// positions.
         /// </summary>
         private Vector3 positionNext;
-        
+
 
 
         /// <summary>

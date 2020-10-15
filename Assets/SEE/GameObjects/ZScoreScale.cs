@@ -1,6 +1,6 @@
-﻿using UnityEngine;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -136,7 +136,7 @@ namespace SEE.GO
             foreach (string metric in metrics)
             {
                 Debug.LogFormat("statistics of metric {0}: {1}\n", metric, statistics[metric].ToString());
-            }      
+            }
         }
 
         /// <summary>

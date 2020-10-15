@@ -1,11 +1,10 @@
 ﻿using NUnit.Framework;
-using System.Collections.Generic;
-using UnityEngine;
-
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Utils;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Tools.Architecture
 {
@@ -73,11 +72,11 @@ namespace SEE.Tools.Architecture
         /// </summary>
         protected void ResetEvents()
         {
-            edgeChanges            = new List<EdgeChange>();
-            propagatedEdgesAdded   = new List<PropagatedEdge>();
+            edgeChanges = new List<EdgeChange>();
+            propagatedEdgesAdded = new List<PropagatedEdge>();
             propagatedEdgesRemoved = new List<PropagatedEdge>();
-            mapsToEdgesAdded       = new List<MapsToEdgeAdded>();
-            mapsToEdgesRemoved     = new List<MapsToEdgeRemoved>(); 
+            mapsToEdgesAdded = new List<MapsToEdgeAdded>();
+            mapsToEdgesRemoved = new List<MapsToEdgeRemoved>();
         }
 
         /// <summary>
@@ -298,16 +297,16 @@ namespace SEE.Tools.Architecture
         [TearDown]
         protected virtual void Teardown()
         {
-            impl                   = null;
-            arch                   = null;
-            mapping                = null;
-            reflexion              = null;
-            HierarchicalEdges      = null;
-            logger                 = null;
-            edgeChanges            = null;
-            propagatedEdgesAdded   = null;
-            mapsToEdgesAdded       = null;
-            mapsToEdgesRemoved     = null;
+            impl = null;
+            arch = null;
+            mapping = null;
+            reflexion = null;
+            HierarchicalEdges = null;
+            logger = null;
+            edgeChanges = null;
+            propagatedEdgesAdded = null;
+            mapsToEdgesAdded = null;
+            mapsToEdgesRemoved = null;
             propagatedEdgesRemoved = null;
         }
 

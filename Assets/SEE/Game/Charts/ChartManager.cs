@@ -285,7 +285,7 @@ namespace SEE.Game.Charts
             Assert.IsNotNull(chart);
             allCharts.Remove(chart);
         }
-        
+
         public static void OnSelect(GameObject highlight, bool scrollView)
         {
             foreach (GameObject chart in Instance.AllCharts())

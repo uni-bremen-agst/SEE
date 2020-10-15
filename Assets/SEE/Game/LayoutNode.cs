@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using SEE.Layout;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Game
 {
@@ -23,7 +22,7 @@ namespace SEE.Game
         /// <param name="node">graph node corresponding to this layout node</param>
         /// <param name="to_layout_node">the mapping of graph nodes onto LayoutNodes this node should be added to</param>
         public LayoutNode(Node node, Dictionary<Node, ILayoutNode> to_layout_node)
-            : base (node, to_layout_node)
+            : base(node, to_layout_node)
         { }
 
         private Vector3 scale;

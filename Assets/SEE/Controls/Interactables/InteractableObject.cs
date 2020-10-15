@@ -1,5 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.GO;
+﻿using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
@@ -109,7 +108,7 @@ namespace SEE.Controls
         /// The remote selection color of the outline.
         /// </summary>
         private readonly Color RemoteSelectColor = Utils.ColorPalette.Viridis(0.6f);
-        
+
         /// <summary>
         /// The local grabbing color of the outline.
         /// </summary>
@@ -124,7 +123,7 @@ namespace SEE.Controls
         {
             ID = nextID++;
             interactableObjects.Add(ID, this);
-            
+
             interactable = GetComponent<Interactable>();
             if (interactable == null)
             {

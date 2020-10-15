@@ -19,7 +19,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
-        public BalloonNodeLayout(float groundLevel) 
+        public BalloonNodeLayout(float groundLevel)
             : base(groundLevel)
         {
             name = "Balloon";
@@ -256,7 +256,7 @@ namespace SEE.Layout.NodeLayouts
                 position.y += LevelLift(node);
                 layout_result[node]
                     = new NodeTransform(position,
-                                        new Vector3(2 * nodeInfos[node].outer_radius, 
+                                        new Vector3(2 * nodeInfos[node].outer_radius,
                                                     innerNodeHeight, 2 * nodeInfos[node].outer_radius));
 
                 // The center points of the children circles are located on the circle
@@ -366,7 +366,7 @@ namespace SEE.Layout.NodeLayouts
 
         public override bool UsesEdgesAndSublayoutNodes()
         {
-            return false; 
+            return false;
         }
     }
 }

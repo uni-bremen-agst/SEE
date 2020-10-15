@@ -17,8 +17,8 @@ namespace SEE.Controls
     /// </summary>
     public class MappingAction : CityAction, Observer
     {
-        private const KeyCode SaveKey  = KeyCode.S;
-        private const KeyCode CopyKey  = KeyCode.C;
+        private const KeyCode SaveKey = KeyCode.S;
+        private const KeyCode CopyKey = KeyCode.C;
         private const KeyCode PasteKey = KeyCode.V;
         private const KeyCode ClearKey = KeyCode.X;
 
@@ -120,7 +120,7 @@ namespace SEE.Controls
         {
             if (Architecture == null)
             {
-                Debug.LogWarning("No architecture city was specified for architectural mapping.\n");                
+                Debug.LogWarning("No architecture city was specified for architectural mapping.\n");
                 this.enabled = false;
             }
             else
@@ -153,7 +153,7 @@ namespace SEE.Controls
                 Debug.LogWarning("A filename for the architectural mapping should be set. Continuing with an empty mapping. Mapping cannot be saved.\n");
                 mapping = new Graph();
             }
-            else 
+            else
             {
                 mapping = LoadMapping(MappingFile);
                 if (mapping == null)
@@ -202,7 +202,7 @@ namespace SEE.Controls
                 Usage();
                 SetupGameObjectMappings();
                 SetupReflexion();
-                SetupReflexionDecorator();                
+                SetupReflexionDecorator();
             }
         }
 
@@ -272,7 +272,7 @@ namespace SEE.Controls
                 {
                     Node node = nodeRef.node;
                     if (node != null)
-                    {                        
+                    {
                         nodes[node.ID] = gameObject;
                     }
                     else
@@ -411,7 +411,7 @@ namespace SEE.Controls
             actionState.copy = leftControl && Input.GetKeyDown(CopyKey);
             actionState.paste = leftControl && Input.GetKeyDown(PasteKey);
             actionState.clearClipboard = leftControl && Input.GetKeyDown(ClearKey);
-            
+
             // We can copy only from the implementation city and if there is a selected object.
             if (actionState.copy && actionState.hitCity == HitCity.Implementation && selection.gameNode != null)
             {
@@ -425,7 +425,7 @@ namespace SEE.Controls
                     Debug.LogFormat("Copying node {0} to clipboard\n", selection.gameNode.name);
                     objectsInClipboard.Add(selection);
                 }
-            }            
+            }
             if (actionState.clearClipboard)
             {
                 Debug.Log("Node clipboard has been cleared.\n");
@@ -451,7 +451,7 @@ namespace SEE.Controls
         private void MapClipboardContent(Selection target)
         {
             foreach (Selection implementation in objectsInClipboard)
-            {                
+            {
                 if (!reflexion.Is_Mapper(implementation.graphNode))
                 {
                     Debug.LogFormat("Mapping {0} -> {1}.\n", implementation.gameNode.name, target.gameNode.name);
@@ -634,7 +634,7 @@ namespace SEE.Controls
                 Debug.LogErrorFormat("Edge {0} is unknown.\n", edgeChange.edge.ID);
             }
         }
-       
+
         private void HandlePropagatedEdgeRemoved(PropagatedEdgeRemoved propagatedEdgeRemoved)
         {
             Debug.Log(propagatedEdgeRemoved.ToString());

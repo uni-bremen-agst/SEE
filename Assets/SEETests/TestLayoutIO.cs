@@ -1,13 +1,13 @@
-﻿using UnityEngine;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using SEE.DataModel;
-using System.Collections.Generic;
-using System.Linq;
-using SEE.Game;
-using SEE.Layout.NodeLayouts;
-using SEE.Layout.EdgeLayouts;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
+using SEE.Game;
+using SEE.Layout.EdgeLayouts;
+using SEE.Layout.NodeLayouts;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace SEE.Layout
 {
@@ -63,7 +63,7 @@ namespace SEE.Layout
             // that they are actually read. Note that the GVL does not contain scale.y,
             // that is why we need to maintain it.
             foreach (ILayoutNode layoutNode in gameObjects)
-            {                
+            {
                 layoutNode.LocalScale = new Vector3(0.0f, layoutNode.LocalScale.y, 0.0f);
                 layoutNode.CenterPosition = Vector3.zero;
             }
@@ -87,7 +87,7 @@ namespace SEE.Layout
                 Assert.That(readTransform.scale.z, Is.EqualTo(savedTransform.scale.z).Within(floatTolerance));
                 Assert.That(readTransform.position.x, Is.EqualTo(savedTransform.position.x).Within(floatTolerance));
                 Assert.That(readTransform.position.z, Is.EqualTo(savedTransform.position.z).Within(floatTolerance));
-                Assert.AreEqual(savedTransform.rotation, readTransform.rotation);                
+                Assert.AreEqual(savedTransform.rotation, readTransform.rotation);
             }
         }
 
@@ -186,7 +186,7 @@ namespace SEE.Layout
 
         private ICollection<GameObject> GetGameObjects(GameObject go)
         {
-            List <GameObject>  result = new List<GameObject>();
+            List<GameObject> result = new List<GameObject>();
             if (go.tag == Tags.Node)
             {
                 result.Add(go);
@@ -232,7 +232,7 @@ namespace SEE.Layout
             {
                 indentation += "-";
             }
-            Debug.LogFormat("{0}{1}: position={2} worldscale={3} rotation={4}.\n", indentation, root.ID, root.CenterPosition, root.AbsoluteScale, root.Rotation);            
+            Debug.LogFormat("{0}{1}: position={2} worldscale={3} rotation={4}.\n", indentation, root.ID, root.CenterPosition, root.AbsoluteScale, root.Rotation);
             foreach (ILayoutNode child in root.Children())
             {
                 DumpTree(child, level + 1);

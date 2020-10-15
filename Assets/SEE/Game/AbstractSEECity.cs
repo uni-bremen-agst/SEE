@@ -1,17 +1,17 @@
 
-﻿using SEE.DataModel.DG;
+using OdinSerializer;
+using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.GO;
+using SEE.Layout.EdgeLayouts;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout.NodeLayouts.Cose;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
-using OdinSerializer;
-using SEE.DataModel.DG.IO;
-using System.IO;
-using SEE.Utils;
-using SEE.Layout.NodeLayouts;
-using SEE.Layout.EdgeLayouts;
-using SEE.Layout.NodeLayouts.Cose;
 
 namespace SEE.Game
 {
@@ -110,7 +110,7 @@ namespace SEE.Game
         {
             get => nodeTypes;
         }
-        
+
         /// <summary>
         /// Resets everything that is specific to a given graph. Here: the 
         /// node types.
@@ -179,7 +179,7 @@ namespace SEE.Game
             if (AllNodeTypesAreRelevant)
             {
                 return graph;
-            } 
+            }
             else
             {
                 ICollection<string> matches = nodeTypes.Where(pair => pair.Value == true)
@@ -509,7 +509,7 @@ namespace SEE.Game
         /// </summary>
         [Tooltip("Tolerance for spline simplification (Ramer–Douglas–Peucker algorithm):"
             + " line points whose distances fall below that threshold are merged. A value <= 0 means "
-            + " no simplification. Recommended value: 0.05." )]
+            + " no simplification. Recommended value: 0.05.")]
         public float RDP = 0.05f;
 
         /// <summary>
@@ -533,10 +533,10 @@ namespace SEE.Game
                     Graph graph = graphCreator.GetGraph();
                     p.End();
                     Debug.Log("Loaded graph data successfully:"
-                        + "\nFilename: "        + filename
+                        + "\nFilename: " + filename
                         + "\nNumber of nodes: " + graph.NodeCount
                         + "\nNumber of edges: " + graph.EdgeCount
-                        + "\nElapsed time: "    + p.GetElapsedTime() + "[h:m:s:ms]\n");
+                        + "\nElapsed time: " + p.GetElapsedTime() + "[h:m:s:ms]\n");
 
                     LoadDataForGraphListing(graph);
 
@@ -546,7 +546,7 @@ namespace SEE.Game
                 {
                     Debug.LogWarningFormat("GXL file {0} does not exist.\n", filename);
                     return new Graph();
-                } 
+                }
             }
         }
 

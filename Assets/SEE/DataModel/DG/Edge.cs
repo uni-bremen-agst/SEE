@@ -23,7 +23,7 @@ namespace SEE.DataModel.DG
         {
             this.source = source;
             this.target = target;
-            this.Type   = type;
+            this.Type = type;
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace SEE.DataModel.DG
         {
             base.HandleCloned(clone);
             Edge target = (Edge)clone;
-            target.id     = this.id;
+            target.id = this.id;
             target.source = this.source;
             target.target = this.target;
         }

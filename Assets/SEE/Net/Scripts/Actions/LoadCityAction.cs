@@ -213,7 +213,7 @@ namespace SEE.Net
 
             AbstractSEECity city = null;
             Type t = Type.GetType(type);
-            
+
             if (t == typeof(SEECity))
             {
                 city = gameObject.GetComponent<SEECity>();

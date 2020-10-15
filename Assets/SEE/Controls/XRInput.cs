@@ -1,11 +1,11 @@
 ﻿namespace SEE.Controls
 {
-	public static class XRInput
-	{
-		/// <summary>
-		/// Name of the action set defined by VR Steam Input.
-		/// </summary>
-		public const string DefaultActionSetName = "default";
+    public static class XRInput
+    {
+        /// <summary>
+        /// Name of the action set defined by VR Steam Input.
+        /// </summary>
+        public const string DefaultActionSetName = "default";
 
         /// <summary>
         /// Name of the throttle action defined by VR Steam Input.
@@ -31,5 +31,5 @@
         /// Name of the move chart action defined by VR Steam Input.
         /// </summary>
         public const string MoveActionName = "Move";
-	}
+    }
 }

@@ -515,7 +515,7 @@ namespace SEE.Controls
 
             // Keep city constrained to table
             float radius = 0.5f * CityTransform.lossyScale.x;
-            MathExtensions.TestCircleAABB(CityTransform.position.XZ(), 
+            MathExtensions.TestCircleAABB(CityTransform.position.XZ(),
                                           0.9f * radius,
                                           portalPlane.LeftFrontCorner,
                                           portalPlane.RightBackCorner,
@@ -531,7 +531,7 @@ namespace SEE.Controls
             #endregion
 
             #region ResetActionState
-            
+
             actionState.startDrag = false;
             actionState.cancel = false;
             actionState.reset = false;

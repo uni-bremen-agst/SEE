@@ -16,7 +16,6 @@
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Game;
-using SEE.Layout.NodeLayouts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -146,18 +145,20 @@ namespace SEE.Layout.NodeLayouts.Cose
             float countNodesConstant = 0.206f;
             float countMaxDepthConstant = 2.279f;
             float edgeDensityConstant = -57.829f;
-           
+
             float edgeDensity;
 
-            if (leafNodesCount == 0 || countEdges == 0) {
+            if (leafNodesCount == 0 || countEdges == 0)
+            {
                 edgeDensity = 0;
-            } else
+            }
+            else
             {
                 float leafNodeCountMinus = leafNodesCount > 1 ? leafNodesCount - 1 : 1;
                 edgeDensity = countEdges / (leafNodesCount * leafNodeCountMinus);
             }
 
-            float edgeLength = countNodesConstant * countNodes + countMaxDepthConstant * maxDepth + edgeDensityConstant* edgeDensity + constant;
+            float edgeLength = countNodesConstant * countNodes + countMaxDepthConstant * maxDepth + edgeDensityConstant * edgeDensity + constant;
             return Math.Max((int)Math.Ceiling(edgeLength), 2);
         }
 

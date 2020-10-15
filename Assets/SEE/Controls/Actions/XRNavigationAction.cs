@@ -19,7 +19,7 @@ namespace SEE.Controls
             MoveOnly,
             MoveRotateScale
         }
-        
+
         /// <summary>
         /// The current interaction mode.
         /// </summary>

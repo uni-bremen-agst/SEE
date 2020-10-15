@@ -38,7 +38,7 @@ namespace SEE.GO
             tm.text = text;
             tm.color = TextColor;
             tm.alignment = TextAlignmentOptions.Center;
-            
+
             RectTransform rect = tm.GetComponent<RectTransform>();
             // We set width and height of the rectangle and leave the actual size to Unity,
             // which will select a font that matches our size constraints.

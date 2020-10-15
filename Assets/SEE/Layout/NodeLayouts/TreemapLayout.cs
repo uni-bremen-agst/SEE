@@ -1,10 +1,9 @@
-﻿using System;
+﻿using SEE.DataModel.DG;
+using SEE.Layout.NodeLayouts.Cose;
+using SEE.Layout.NodeLayouts.TreeMap;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-
-using SEE.Layout.NodeLayouts.TreeMap;
-using SEE.DataModel.DG;
-using SEE.Layout.NodeLayouts.Cose;
 
 namespace SEE.Layout.NodeLayouts
 {
@@ -58,7 +57,7 @@ namespace SEE.Layout.NodeLayouts
             else if (layoutNodes.Count == 1)
             {
                 ILayoutNode gameNode = layoutNodes.GetEnumerator().Current;
-                layout_result[gameNode] = new NodeTransform(Vector3.zero, 
+                layout_result[gameNode] = new NodeTransform(Vector3.zero,
                                                             new Vector3(width, gameNode.LocalScale.y, depth));
             }
             else
@@ -81,7 +80,7 @@ namespace SEE.Layout.NodeLayouts
             if (roots.Count == 1)
             {
                 ILayoutNode root = roots[0];
-                layout_result[root] = new NodeTransform(Vector3.zero, 
+                layout_result[root] = new NodeTransform(Vector3.zero,
                                                         new Vector3(width, root.LocalScale.y, depth));
                 CalculateLayout(root.Children(), -width / 2.0f, -depth / 2.0f, width, depth);
             }
@@ -117,10 +116,10 @@ namespace SEE.Layout.NodeLayouts
                     // Note: nodeTransform.position is the center position, while 
                     // CalculateLayout assumes co-ordinates x and z as the left front corner
                     NodeTransform nodeTransform = layout_result[node];
-                    CalculateLayout(kids, 
-                                    nodeTransform.position.x - nodeTransform.scale.x / 2.0f, 
+                    CalculateLayout(kids,
+                                    nodeTransform.position.x - nodeTransform.scale.x / 2.0f,
                                     nodeTransform.position.z - nodeTransform.scale.z / 2.0f,
-                                    nodeTransform.scale.x, 
+                                    nodeTransform.scale.x,
                                     nodeTransform.scale.z);
                 }
             }
@@ -135,7 +134,7 @@ namespace SEE.Layout.NodeLayouts
         private float CalculateSize()
         {
             float total_size = 0.0f;
-            foreach(ILayoutNode root in roots)
+            foreach (ILayoutNode root in roots)
             {
                 total_size += CalculateSize(root);
             }
@@ -224,7 +223,7 @@ namespace SEE.Layout.NodeLayouts
 
         public override bool UsesEdgesAndSublayoutNodes()
         {
-            return false; 
+            return false;
         }
     }
 }

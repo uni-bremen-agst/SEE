@@ -81,7 +81,7 @@ namespace SEE.Layout.Utils
                 visited.Add(node);
                 HNode parent = node.Parent;
                 // We should have visited the parent already in this pre-order depth-first traversal.
-                if (parent != null && ! visited.Contains(parent))
+                if (parent != null && !visited.Contains(parent))
                 {
                     throw new Exception("Parent in tree is inconsistent. Violating node: " + parent);
                 }

@@ -1,5 +1,5 @@
-﻿using System;
-using OdinSerializer;
+﻿using OdinSerializer;
+using System;
 using UnityEngine;
 using UnityEngine.XR;
 using Valve.VR;
@@ -63,52 +63,52 @@ namespace SEE.Controls
             Debug.LogFormat("Player input type: {0}\n", playerInputType.ToString());
 
             SetActive("DesktopPlayer", playerInputType == PlayerInputType.Desktop);
-            SetActive("VRPlayer",      playerInputType == PlayerInputType.VR);
-            SetActive("InControl",     playerInputType == PlayerInputType.TouchGamepad);
+            SetActive("VRPlayer", playerInputType == PlayerInputType.VR);
+            SetActive("InControl", playerInputType == PlayerInputType.TouchGamepad);
 
-			// Turn off controller hints if requested in the user settings.
-			if (!ShowControllerHints)
-			{
-				foreach (Hand hand in Player.instance.hands)
-				{
-					ControllerButtonHints.HideAllButtonHints(hand);
-					ControllerButtonHints.HideAllTextHints(hand);
-				}
+            // Turn off controller hints if requested in the user settings.
+            if (!ShowControllerHints)
+            {
+                foreach (Hand hand in Player.instance.hands)
+                {
+                    ControllerButtonHints.HideAllButtonHints(hand);
+                    ControllerButtonHints.HideAllTextHints(hand);
+                }
 
-				if (Teleport.instance != null) Teleport.instance.CancelTeleportHint();
-			}
-		}
+                if (Teleport.instance != null) Teleport.instance.CancelTeleportHint();
+            }
+        }
 
-		/// <summary>
-		/// Enables or disables a game object with the given <paramref name="name" />.
-		/// </summary>
-		/// <param name="name">name of the object to be enabled/disabled</param>
-		/// <param name="activate">whether to enable or disable the object</param>
-		private void SetActive(string name, bool activate)
-		{
-			GameObject.Find(name)?.SetActive(activate);
-		}
+        /// <summary>
+        /// Enables or disables a game object with the given <paramref name="name" />.
+        /// </summary>
+        /// <param name="name">name of the object to be enabled/disabled</param>
+        /// <param name="activate">whether to enable or disable the object</param>
+        private void SetActive(string name, bool activate)
+        {
+            GameObject.Find(name)?.SetActive(activate);
+        }
 
-		/// <summary>
-		/// If and only if HideControllers is true (when a VR player is playing), the VR controllers
-		/// will not be visualized together with the hands of the player. Apparently, this
-		/// hiding/showing must be run at each frame and, hence, we need to put this code into
-		/// an Update() method.
-		/// </summary>
-		private void Update()
-		{
-			if (playerInputType != PlayerInputType.VR) return;
-			foreach (var hand in Player.instance.hands)
-				if (HideVRControllers)
-				{
-					hand.HideController();
-					hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithoutController);
-				}
-				else
-				{
-					hand.ShowController();
-					hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithController);
-				}
-		}
-	}
+        /// <summary>
+        /// If and only if HideControllers is true (when a VR player is playing), the VR controllers
+        /// will not be visualized together with the hands of the player. Apparently, this
+        /// hiding/showing must be run at each frame and, hence, we need to put this code into
+        /// an Update() method.
+        /// </summary>
+        private void Update()
+        {
+            if (playerInputType != PlayerInputType.VR) return;
+            foreach (var hand in Player.instance.hands)
+                if (HideVRControllers)
+                {
+                    hand.HideController();
+                    hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithoutController);
+                }
+                else
+                {
+                    hand.ShowController();
+                    hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithController);
+                }
+        }
+    }
 }

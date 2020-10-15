@@ -78,7 +78,7 @@ namespace SEE.GO
         /// <returns>array of new materials</returns>
         private Material[] GetMaterials(int howMany)
         {
-            switch(howMany)
+            switch (howMany)
             {
                 case 0: return NewMaterials();
                 case 1: return NewMaterials(colorPalette[0]);
@@ -307,7 +307,7 @@ namespace SEE.GO
                         bool asPie = true;
 
                         GameObject child = asPie ? CreateCircleSector(Vector3.zero, 0.5f, previousRadian, newRadian, materials[i])
-                                                 : CreateCircleSectorAsLine(Vector3.zero, 0.5f, previousRadian, newRadian, materials[i]);                       
+                                                 : CreateCircleSectorAsLine(Vector3.zero, 0.5f, previousRadian, newRadian, materials[i]);
                         child.name = metrics[i] + " = " + value;
                         child.tag = Tags.Decoration;
                         child.transform.parent = donutChart.transform;

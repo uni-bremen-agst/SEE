@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.DataModel
 {
@@ -11,7 +10,7 @@ namespace SEE.DataModel
         public const string None = ""; // pseudo tag whenever a value for no tag is needed
 
         public const string CodeCity = "Code City"; // for objects representing a code city hosting objects tagged by Node and Edge tags.
-        
+
         // graph concepts
         public const string Graph = "Graph";
         public const string Node = "Node"; // for logical graph nodes (not their visual representation such as Blocks and Buildings)
@@ -38,8 +37,8 @@ namespace SEE.DataModel
         /// <summary>
         /// All existing tags in one.
         /// </summary>
-        public static readonly string[] All = new string[] 
-            { Graph, Node, Edge, NodePrefab, Text, Erosion, Decoration, 
+        public static readonly string[] All = new string[]
+            { Graph, Node, Edge, NodePrefab, Text, Erosion, Decoration,
               Path, Runtime, FunctionCall, CullingPlane, ChartContainer, Chart };
 
         /// <summary>

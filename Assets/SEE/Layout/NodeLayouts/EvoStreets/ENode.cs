@@ -85,7 +85,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <returns>Children.Count > 0</returns>
         public bool IsStreet()
         {
-            return ! GraphNode.IsLeaf;
+            return !GraphNode.IsLeaf;
         }
 
         /// <summary>

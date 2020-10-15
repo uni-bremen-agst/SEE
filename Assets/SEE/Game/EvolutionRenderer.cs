@@ -18,17 +18,17 @@
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+using SEE.DataModel.DG;
+using SEE.Game.Evolution;
+using SEE.GO;
+using SEE.Layout;
+using SEE.Layout.NodeLayouts;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
-using SEE.GO;
-using SEE.Game.Evolution;
-using SEE.DataModel.DG;
-using SEE.Layout;
-using SEE.Utils;
-using SEE.Layout.NodeLayouts;
 
 namespace SEE.Game
 {
@@ -82,7 +82,8 @@ namespace SEE.Game
         /// </summary>
         public SEECityEvolution CityEvolution
         {
-            set {
+            set
+            {
                 // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
                 // So we cannot make the following assignment in the constructor. Neither
                 // can we assign this value at the declaration of graphRenderer because
@@ -139,8 +140,11 @@ namespace SEE.Game
         /// <summary>
         /// True if animation is still ongoing.
         /// </summary>
-        public bool IsStillAnimating { get => _isStillAnimating;
-                                       set => _isStillAnimating = value; }
+        public bool IsStillAnimating
+        {
+            get => _isStillAnimating;
+            set => _isStillAnimating = value;
+        }
 
         /// <summary>
         /// The collection of registered <see cref="AbstractAnimator"/> to be updated
@@ -220,7 +224,7 @@ namespace SEE.Game
         /// All pre-computed layouts for the whole graph series.
         /// </summary>
         private Dictionary<Graph, Dictionary<string, ILayoutNode>> Layouts { get; }
-             =  new Dictionary<Graph, Dictionary<string, ILayoutNode>>();  // not serialized by Unity
+             = new Dictionary<Graph, Dictionary<string, ILayoutNode>>();  // not serialized by Unity
 
         /// <summary>
         /// Creates and saves the layouts for all given <paramref name="graphs"/>. This will 
@@ -269,10 +273,10 @@ namespace SEE.Game
             NodeLayout nodeLayout = graphRenderer.GetLayout();
 
             // Gather all nodes for the layout.
-            ignoreInnerNodes = ! nodeLayout.IsHierarchical();
+            ignoreInnerNodes = !nodeLayout.IsHierarchical();
             foreach (Node node in graph.Nodes())
             {
-                if (! ignoreInnerNodes || node.IsLeaf())
+                if (!ignoreInnerNodes || node.IsLeaf())
                 {
                     // All layouts (flat and hierarchical ones) must be able to handle leaves; 
                     // hence, leaves can be added at any rate. For a hierarchical layout, we 
@@ -458,7 +462,7 @@ namespace SEE.Game
             // FOR ANIMATION: next.Graph.Edges().ForEach(RenderEdge);
 
             // We have made the transition to the next graph.
-            _currentCity = next;            
+            _currentCity = next;
             RenderPlane();
             Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }

@@ -132,12 +132,12 @@ namespace SEE.DataModel.DG.IO
         /// <param name="graphNodeIdsToGXLNodeIds">a mapping from graph node IDs onto node IDs used in the GXL file</param>
         /// <param name="edgeCount">the GXL index for the next edge to be added</param>
         private static void AppendDependencyEdges
-            (XmlDocument doc, 
-            XmlElement parentXMLNode, 
-            Graph graph, 
+            (XmlDocument doc,
+            XmlElement parentXMLNode,
+            Graph graph,
             Dictionary<string, string> graphNodeIdsToGXLNodeIds,
             ref int edgeCount)
-        {  
+        {
             foreach (Edge edge in graph.Edges())
             {
                 string type = edge.Type;
@@ -162,11 +162,11 @@ namespace SEE.DataModel.DG.IO
         /// <param name="source">GXL node ID of the source of the edge</param>
         /// <param name="target">GXL node ID of the target of the edge</param>
         private static XmlElement AppendEdge
-            (XmlDocument doc, 
-             XmlElement parentXMLNode, 
-             int edgeCount, 
-             string type, 
-             string source, 
+            (XmlDocument doc,
+             XmlElement parentXMLNode,
+             int edgeCount,
+             string type,
+             string source,
              string target)
         {
             XmlElement xmlNode = doc.CreateElement("edge");
@@ -188,9 +188,9 @@ namespace SEE.DataModel.DG.IO
         /// <param name="graphNodeIDsToGXLNodeIDs">a mapping from node ID onto node IDs used in the GXL file</param>
         /// <param name="edgeCount">the GXL index for the next edge to be added</param>
         private static void AppendChildren
-            (XmlDocument doc, 
-            XmlElement parentXMLNode, 
-            Graph graph, 
+            (XmlDocument doc,
+            XmlElement parentXMLNode,
+            Graph graph,
             Dictionary<string, string> graphNodeIDsToGXLNodeIDs,
             int edgeCount,
             string hierarchicalEdgeType)
@@ -315,10 +315,10 @@ namespace SEE.DataModel.DG.IO
         /// <param name="attributes">the attributes whose description is to be appended to <paramref name="xmlNode"/></param>
         /// <param name="AsString">the delegate to convert each attribute value into a string</param>
         private static void AppendAttributes<V>
-            (XmlDocument doc, 
-            XmlElement xmlNode, 
-            string type, 
-            Dictionary<string,V> attributes,
+            (XmlDocument doc,
+            XmlElement xmlNode,
+            string type,
+            Dictionary<string, V> attributes,
             AsString<V> AsString)
         {
             foreach (var attribute in attributes)

@@ -38,7 +38,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         protected readonly float groundLevel;
 
-        public float Groundlevel {get => groundLevel; }
+        public float Groundlevel { get => groundLevel; }
 
         public float InnerNodeHeight { get => innerNodeHeight; }
 
@@ -109,7 +109,7 @@ namespace SEE.Layout.NodeLayouts
         public static Dictionary<ILayoutNode, NodeTransform> Move(Dictionary<ILayoutNode, NodeTransform> layout, Vector3 offset)
         {
             Dictionary<ILayoutNode, NodeTransform> result = new Dictionary<ILayoutNode, NodeTransform>();
-            foreach(var entry in layout)
+            foreach (var entry in layout)
             {
                 NodeTransform transform = entry.Value;
                 transform.position += offset;

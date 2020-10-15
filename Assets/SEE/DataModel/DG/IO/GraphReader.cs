@@ -1,8 +1,7 @@
-﻿using System;
+﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-
-using SEE.Utils;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -28,7 +27,7 @@ namespace SEE.DataModel.DG.IO
         /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
         /// <param name="rootName">name of the artifical root node if required</param>
         /// <param name="logger">the logger used for messages; if null, no messages are emitted</param>
-        public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string rootName = "", SEE.Utils.ILogger logger = null) 
+        public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string rootName = "", SEE.Utils.ILogger logger = null)
             : base(filename, logger)
         {
             this.hierarchicalEdgeTypes = hierarchicalEdgeTypes;
@@ -57,7 +56,7 @@ namespace SEE.DataModel.DG.IO
                 }
                 else if (roots.Count > 1)
                 {
-                    Debug.LogWarningFormat("Graph stored in {0} has multiple roots. Adding an artificial single root {1}.\n", 
+                    Debug.LogWarningFormat("Graph stored in {0} has multiple roots. Adding an artificial single root {1}.\n",
                                            filename, rootName);
                     Node singleRoot = new Node
                     {

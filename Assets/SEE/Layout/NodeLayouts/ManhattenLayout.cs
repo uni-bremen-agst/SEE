@@ -85,7 +85,7 @@ namespace SEE.Layout.NodeLayouts
 
         public override bool UsesEdgesAndSublayoutNodes()
         {
-            return false; 
+            return false;
         }
     }
 }

@@ -62,6 +62,6 @@ namespace SEE.Layout.NodeLayouts.Cose
             this.RemovedChildren = new List<T>();
         }
     }
-    
+
 }
 

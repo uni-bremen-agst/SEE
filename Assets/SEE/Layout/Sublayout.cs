@@ -110,7 +110,7 @@ namespace SEE.Layout
         public Sublayout(SublayoutLayoutNode sublayout, float groundLevel, NodeFactory leafNodeFactory, Graph graph, AbstractSEECity settings)
         {
             this.nodeLayout = sublayout.NodeLayout;
-            this.groundLevel = groundLevel;  
+            this.groundLevel = groundLevel;
             this.leafNodeFactory = leafNodeFactory;
             this.sublayout = sublayout;
             this.graph = graph;
@@ -120,10 +120,10 @@ namespace SEE.Layout
             {
                 sublayoutNodes = CalculateNodesForSublayout();
 
-                foreach(ILayoutNode layoutNode in sublayoutNodes)
+                foreach (ILayoutNode layoutNode in sublayoutNodes)
                 {
                     ILayoutNode sublayoutNode = (layoutNode as ILayoutSublayoutNode).Node;
-                    sublayoutNode.IsSublayoutNode = true; 
+                    sublayoutNode.IsSublayoutNode = true;
                 }
             }
 
@@ -148,7 +148,7 @@ namespace SEE.Layout
             }
             else
             {
-                sublayoutNodes.Add(new ILayoutSublayoutNode(sublayout.Node,  ILayout_to_CoseSublayoutNode));
+                sublayoutNodes.Add(new ILayoutSublayoutNode(sublayout.Node, ILayout_to_CoseSublayoutNode));
 
                 // bei einem subsubLayout wird der root wieder hinzugefügt
                 foreach (ILayoutNode node in sublayout.RemovedChildren)
@@ -195,7 +195,7 @@ namespace SEE.Layout
                 Vector3 position = transform.position;
                 Vector3 scale = transform.scale;
 
-                sublayoutNode.RelativePosition = position; 
+                sublayoutNode.RelativePosition = position;
                 sublayoutNode.CenterPosition = position;
                 sublayoutNode.LocalScale = scale;
                 sublayoutNode.Rotation = transform.rotation;
@@ -216,7 +216,7 @@ namespace SEE.Layout
 
                             if (subSubNode != sublayoutNode)
                             {
-                                subSubNode.SetOrigin(); 
+                                subSubNode.SetOrigin();
                                 subSubNode.RelativePosition = subSubNode.CenterPosition;
 
                                 sublayoutNodes.Add(new ILayoutSublayoutNode(subSubNode, ILayout_to_CoseSublayoutNode));
@@ -290,8 +290,8 @@ namespace SEE.Layout
 
                 if (!nodeLayout.GetModel().OnlyLeaves)
                 {
-                   rootNodeRealScale = new Vector3(sublayout.Node.LocalScale.x, innerNodeHeight, sublayout.Node.LocalScale.z);
-                   LayoutOffset = position - sublayout.Node.CenterPosition;
+                    rootNodeRealScale = new Vector3(sublayout.Node.LocalScale.x, innerNodeHeight, sublayout.Node.LocalScale.z);
+                    LayoutOffset = position - sublayout.Node.CenterPosition;
                 }
 
                 sublayout.Node.LocalScale = scale;
@@ -311,7 +311,8 @@ namespace SEE.Layout
             nodes.AddRange(sublayout.RemovedChildren);
             nodes.Remove(sublayout.Node);
 
-            nodes.ForEach(node => {
+            nodes.ForEach(node =>
+            {
                 node.SetRelative(sublayout.Node);
             });
         }
@@ -327,7 +328,8 @@ namespace SEE.Layout
             if (layout.UsesEdgesAndSublayoutNodes())
             {
                 return layout.Layout(sublayoutNodes, edges, new List<SublayoutLayoutNode>());
-            } else
+            }
+            else
             {
                 return layout.Layout(sublayoutNodes);
             }

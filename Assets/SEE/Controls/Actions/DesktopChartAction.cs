@@ -24,7 +24,7 @@ using UnityEngine;
 
 namespace SEE.Controls
 {
-	public class DesktopChartAction : ChartAction
+    public class DesktopChartAction : ChartAction
     {
         private void Update()
         {
@@ -32,6 +32,6 @@ namespace SEE.Controls
             {
                 ChartManager.Instance.ToggleCharts();
             }
-		}
+        }
     }
 }

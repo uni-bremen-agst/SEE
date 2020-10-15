@@ -177,7 +177,7 @@ namespace SEE.DataModel.DG
                     Report(ID + ": The levels are different");
                     return false;
                 }
-                else if ((this.Parent == null && otherNode.Parent != null) 
+                else if ((this.Parent == null && otherNode.Parent != null)
                           || ((this.Parent != null && otherNode.Parent == null)))
                 {
                     Report(ID + ": The parents are different (only one of them is null)");
@@ -188,8 +188,8 @@ namespace SEE.DataModel.DG
                 {
                     Report(ID + ": The parents' IDs are different");
                     return false;
-                } 
-                else if (this.NumberOfChildren() != otherNode.NumberOfChildren() 
+                }
+                else if (this.NumberOfChildren() != otherNode.NumberOfChildren()
                          || !GetIDs(this.children).SetEquals(GetIDs(otherNode.children)))
                 {
                     Report(ID + ": The children are different.");
@@ -207,7 +207,7 @@ namespace SEE.DataModel.DG
                     Report(ID + ": The incoming edges are different.");
                     return false;
                 }
-                else 
+                else
                 {
                     return true;
                 }
@@ -577,7 +577,7 @@ namespace SEE.DataModel.DG
         {
             foreach (Edge outgoing in Outgoings)
             {
-                if (outgoing.Target == other 
+                if (outgoing.Target == other
                     && (string.IsNullOrEmpty(edgeType) || outgoing.Type == edgeType))
                 {
                     return true;

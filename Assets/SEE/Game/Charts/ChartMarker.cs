@@ -27,114 +27,114 @@ using UnityEngine.UI;
 
 namespace SEE.Game.Charts
 {
-	/// <summary>
-	/// Contains the logic for the markers representing entries linked to objects in the chart.
-	/// </summary>
-	public class ChartMarker : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
-	{
-		/// <summary>
-		/// The <see cref="GameObject" /> in the code city that is connected with this button.
-		/// </summary>
-		[HideInInspector] public GameObject linkedObject;
+    /// <summary>
+    /// Contains the logic for the markers representing entries linked to objects in the chart.
+    /// </summary>
+    public class ChartMarker : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    {
+        /// <summary>
+        /// The <see cref="GameObject" /> in the code city that is connected with this button.
+        /// </summary>
+        [HideInInspector] public GameObject linkedObject;
 
-		/// <summary>
-		/// The toggle linked to this marker.
-		/// </summary>
-		public ScrollViewToggle ScrollViewToggle { private get; set; }
+        /// <summary>
+        /// The toggle linked to this marker.
+        /// </summary>
+        public ScrollViewToggle ScrollViewToggle { private get; set; }
 
-		/// <summary>
-		/// The active <see cref="Camera" /> in the scene.
-		/// </summary>
-		private Camera _activeCamera;
+        /// <summary>
+        /// The active <see cref="Camera" /> in the scene.
+        /// </summary>
+        private Camera _activeCamera;
 
-		/// <summary>
-		/// The currently running camera movement <see cref="Coroutine" />.
-		/// </summary>
-		private Coroutine _cameraMoving;
+        /// <summary>
+        /// The currently running camera movement <see cref="Coroutine" />.
+        /// </summary>
+        private Coroutine _cameraMoving;
 
-		/// <summary>
-		/// The currently running <see cref="TimedHighlightRoutine" />.
-		/// </summary>
-		public Coroutine TimedHighlight { get; private set; }
+        /// <summary>
+        /// The currently running <see cref="TimedHighlightRoutine" />.
+        /// </summary>
+        public Coroutine TimedHighlight { get; private set; }
 
-		/// <summary>
-		/// Counts the time <see cref="TimedHighlight" /> has been running for.
-		/// </summary>
-		public float HighlightTime { get; private set; }
+        /// <summary>
+        /// Counts the time <see cref="TimedHighlight" /> has been running for.
+        /// </summary>
+        public float HighlightTime { get; private set; }
 
-		/// <summary>
-		/// The <see cref="GameObject" /> making the marker look highlighted when active.
-		/// </summary>
-		[Header("Highlight Properties"), SerializeField]
-		private GameObject markerHighlight;
+        /// <summary>
+        /// The <see cref="GameObject" /> making the marker look highlighted when active.
+        /// </summary>
+        [Header("Highlight Properties"), SerializeField]
+        private GameObject markerHighlight;
 
-		/// <summary>
-		/// True iff the marker is accentuated.
-		/// </summary>
-		private bool _accentuated;
+        /// <summary>
+        /// True iff the marker is accentuated.
+        /// </summary>
+        private bool _accentuated;
 
-		/// <summary>
-		/// A text popup containing useful information about the marker and its <see cref="linkedObject" />.
-		/// </summary>
-		[Header("Other"), SerializeField] 
-		private TextMeshProUGUI infoText;
+        /// <summary>
+        /// A text popup containing useful information about the marker and its <see cref="linkedObject" />.
+        /// </summary>
+        [Header("Other"), SerializeField]
+        private TextMeshProUGUI infoText;
 
-		/// <summary>
-		/// Calls methods for initialization.
-		/// </summary>
-		private void Awake()
-		{
-			GetSettingData();
-		}
+        /// <summary>
+        /// Calls methods for initialization.
+        /// </summary>
+        private void Awake()
+        {
+            GetSettingData();
+        }
 
-		/// <summary>
-		/// Links the <see cref="ChartManager" /> and gets its setting data.
-		/// </summary>
-		private void GetSettingData()
-		{
-			ChartManager chartManager = ChartManager.Instance;
-		}
+        /// <summary>
+        /// Links the <see cref="ChartManager" /> and gets its setting data.
+        /// </summary>
+        private void GetSettingData()
+        {
+            ChartManager chartManager = ChartManager.Instance;
+        }
 
-		/// <summary>
-		/// Reactivates the highlight if a previous marker linked to the same <see cref="linkedObject" />
-		/// highlighted it.
-		/// </summary>
-		private void Start()
-		{
-			//for (var i = 0; i < linkedObject.transform.childCount; i++)
-			//{
-			//	var child = linkedObject.transform.GetChild(i);
+        /// <summary>
+        /// Reactivates the highlight if a previous marker linked to the same <see cref="linkedObject" />
+        /// highlighted it.
+        /// </summary>
+        private void Start()
+        {
+            //for (var i = 0; i < linkedObject.transform.childCount; i++)
+            //{
+            //	var child = linkedObject.transform.GetChild(i);
             //    if (child.name.Equals(linkedObject.name + "(Clone)"))
             //    {
-			//	    TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, false);
-			//	    break;
+            //	    TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, false);
+            //	    break;
             //    }
-			//}
-		}
+            //}
+        }
 
-		/// <summary>
-		/// Adds the time that passed since the last <see cref="Update" /> to the <see cref="HighlightTime" />.
-		/// </summary>
-		private void Update()
-		{
+        /// <summary>
+        /// Adds the time that passed since the last <see cref="Update" /> to the <see cref="HighlightTime" />.
+        /// </summary>
+        private void Update()
+        {
             if (TimedHighlight != null)
             {
                 HighlightTime += Time.deltaTime;
             }
-		}
+        }
 
-		/// <summary>
-		/// Called by Unity when the button assigned to the <see cref="ChartMarker" /> is pressed.
-		/// </summary>
-		public void ButtonClicked()
-		{
+        /// <summary>
+        /// Called by Unity when the button assigned to the <see cref="ChartMarker" /> is pressed.
+        /// </summary>
+        public void ButtonClicked()
+        {
             ChartManager.OnSelect(linkedObject, false);
-		}
+        }
 
-		/// <summary>
-		/// Toggles the highlight of the <see cref="linkedObject" /> and this marker.
-		/// </summary>
-		public void HighlightLinkedObjectToggle()
+        /// <summary>
+        /// Toggles the highlight of the <see cref="linkedObject" /> and this marker.
+        /// </summary>
+        public void HighlightLinkedObjectToggle()
         {
             InteractableObject interactableObject = linkedObject.GetComponent<InteractableObject>();
             if (interactableObject)
@@ -142,71 +142,71 @@ namespace SEE.Game.Charts
                 bool highlight = !interactableObject.IsSelected;
                 interactableObject.SetSelect(highlight, true);
                 if (!highlight)
-			    {
-				    _accentuated = false;
-			    }
+                {
+                    _accentuated = false;
+                }
 
-			    markerHighlight.SetActive(highlight);
-			    if (ScrollViewToggle)
-			    {
-				    ScrollViewToggle.SetHighlighted(highlight);
-			    }
+                markerHighlight.SetActive(highlight);
+                if (ScrollViewToggle)
+                {
+                    ScrollViewToggle.SetHighlighted(highlight);
+                }
             }
-		}
+        }
 
-		/// <summary>
-		/// Changes the color of the marker to the accentuation color.
-		/// </summary>
-		public void ToggleAccentuation()
+        /// <summary>
+        /// Changes the color of the marker to the accentuation color.
+        /// </summary>
+        public void ToggleAccentuation()
         {
             if (markerHighlight.TryGetComponent(out Image image))
             {
                 image.color = _accentuated ? ChartManager.Instance.standardColor : ChartManager.Instance.accentuationColor;
             }
-			_accentuated = !_accentuated;
+            _accentuated = !_accentuated;
         }
 
-		/// <summary>
-		/// Changes the <see cref="infoText" /> of this marker.
-		/// </summary>
-		/// <param name="info">The new text.</param>
-		public void SetInfoText(string info)
-		{
-			infoText.text = info;
-		}
+        /// <summary>
+        /// Changes the <see cref="infoText" /> of this marker.
+        /// </summary>
+        /// <param name="info">The new text.</param>
+        public void SetInfoText(string info)
+        {
+            infoText.text = info;
+        }
 
-		/// <summary>
-		/// Activates the <see cref="infoText" />.
-		/// </summary>
-		/// <param name="eventData"></param>
-		public void OnPointerEnter(PointerEventData eventData)
-		{
-			infoText.gameObject.SetActive(true);
+        /// <summary>
+        /// Activates the <see cref="infoText" />.
+        /// </summary>
+        /// <param name="eventData"></param>
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            infoText.gameObject.SetActive(true);
             if (TimedHighlight != null)
             {
                 ChartManager.Accentuate(linkedObject);
             }
-		}
+        }
 
-		/// <summary>
-		/// Deactivates the <see cref="infoText" />.
-		/// </summary>
-		/// <param name="eventData"></param>
-		public void OnPointerExit(PointerEventData eventData)
-		{
-			infoText.gameObject.SetActive(false);
+        /// <summary>
+        /// Deactivates the <see cref="infoText" />.
+        /// </summary>
+        /// <param name="eventData"></param>
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            infoText.gameObject.SetActive(false);
             if (_accentuated)
             {
                 ChartManager.Accentuate(linkedObject);
             }
-		}
+        }
 
-		/// <summary>
-		/// Stops all co-routines.
-		/// </summary>
-		private void OnDestroy()
-		{
-			StopAllCoroutines();
-		}
-	}
+        /// <summary>
+        /// Stops all co-routines.
+        /// </summary>
+        private void OnDestroy()
+        {
+            StopAllCoroutines();
+        }
+    }
 }
