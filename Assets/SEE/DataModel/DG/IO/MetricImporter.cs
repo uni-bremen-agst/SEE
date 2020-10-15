@@ -45,7 +45,7 @@ namespace SEE.DataModel.DG.IO
             int numberOfErrors = 0;
             try
             {
-                using (var reader = new StreamReader(filename))
+                using (StreamReader reader = new StreamReader(filename))
                 {
                     if (reader.EndOfStream)
                     {

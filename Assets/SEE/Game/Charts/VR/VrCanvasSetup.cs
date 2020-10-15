@@ -34,7 +34,7 @@ namespace SEE.Game.Charts.VR
         /// </summary>
         private void Awake()
         {
-            var eventCamera = GetComponent<Canvas>().worldCamera =
+            Camera eventCamera = GetComponent<Canvas>().worldCamera =
                 GameObject.FindGameObjectWithTag("Pointer").GetComponent<Camera>();
             eventCamera.enabled = false;
         }

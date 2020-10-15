@@ -189,7 +189,7 @@ namespace SEE.Game.Evolution
                 // if revision-selection mode is enabled, we re-fill the drop-down
                 // selection menu with all available graph indices.
                 revisionSelectionDataModel.RevisionDropdown.ClearOptions();
-                var options = Enumerable
+                System.Collections.Generic.List<Dropdown.OptionData> options = Enumerable
                     .Range(1, evolutionRenderer.GraphCount)
                     .Select(i => new Dropdown.OptionData(i.ToString()))
                     .ToList();

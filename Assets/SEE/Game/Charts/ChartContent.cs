@@ -213,7 +213,7 @@ namespace SEE.Game.Charts
         {
             // The time in seconds to wait until CallDrawData is called.
             // FIXME: Why is this waiting time needed?
-            var time = _dataObjects.Count > BigCityThreshold ? LongDrawWaitingTime : ShortDrawWaitingTime;
+            float time = _dataObjects.Count > BigCityThreshold ? LongDrawWaitingTime : ShortDrawWaitingTime;
             axisDropdownX.AddNodeEnumerationEntry(NodeEnumeration);
             // FIXME: Why is this delayed call needed and what consequences does
             // it have? It seems as if this slows down the completion of drawing the objects.
@@ -255,7 +255,7 @@ namespace SEE.Game.Charts
                 }
             }
 
-            scrollContent.TryGetComponent<RectTransform>(out var rect);
+            scrollContent.TryGetComponent<RectTransform>(out RectTransform rect);
             rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
             p.End(true);
         }
@@ -286,16 +286,16 @@ namespace SEE.Game.Charts
             int hierarchy = 0;
             int maxHierarchy = 0;
 
-            foreach (var root in SceneQueries.GetRoots(_dataObjects))
+            foreach (Node root in SceneQueries.GetRoots(_dataObjects))
             {
                 GameObject inScene = _dataObjects.First(entry =>
                 {
-                    entry.TryGetComponent<NodeRef>(out var nodeRef);
+                    entry.TryGetComponent<NodeRef>(out NodeRef nodeRef);
                     return nodeRef.node.ID.Equals(root.ID);
                 });
                 GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-                tempObject.TryGetComponent<ScrollViewToggle>(out var rootToggle);
-                inScene.TryGetComponent<NodeHighlights>(out var highlights);
+                tempObject.TryGetComponent<ScrollViewToggle>(out ScrollViewToggle rootToggle);
+                inScene.TryGetComponent<NodeHighlights>(out NodeHighlights highlights);
                 rootToggle.LinkedObject = highlights;
                 highlights.scrollViewToggle = rootToggle;
                 tempObject.transform.localPosition = headerOffset + new Vector2(0f, _yGap) * index;
@@ -306,7 +306,7 @@ namespace SEE.Game.Charts
             }
 
             if (hierarchy > maxHierarchy) maxHierarchy = hierarchy; //TODO: Use this...
-            scrollContent.TryGetComponent<RectTransform>(out var rect);
+            scrollContent.TryGetComponent<RectTransform>(out RectTransform rect);
             rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
             p.End(true);
         }
@@ -322,10 +322,10 @@ namespace SEE.Game.Charts
             int index,
             float gap)
         {
-            var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-            tempObject.TryGetComponent<ScrollViewToggle>(out var toggle);
+            GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+            tempObject.TryGetComponent<ScrollViewToggle>(out ScrollViewToggle toggle);
             toggle.Parent = parentToggle;
-            dataObject.TryGetComponent<NodeHighlights>(out var highlights);
+            dataObject.TryGetComponent<NodeHighlights>(out NodeHighlights highlights);
             toggle.LinkedObject = highlights;
             highlights.scrollViewToggle = toggle;
             tempObject.transform.localPosition = childOffset + new Vector2(0f, gap) * index;
@@ -339,23 +339,23 @@ namespace SEE.Game.Charts
             if (root.IsLeaf()) return;
 
             hierarchy++;
-            foreach (var child in root.Children())
+            foreach (Node child in root.Children())
             {
-                var inScene = _dataObjects.First(entry =>
+                GameObject inScene = _dataObjects.First(entry =>
                 {
-                    entry.TryGetComponent<NodeRef>(out var nodeRef);
+                    entry.TryGetComponent<NodeRef>(out NodeRef nodeRef);
                     return nodeRef.node.ID.Equals(child.ID);
                 });
-                var tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-                tempObject.TryGetComponent<ScrollViewToggle>(out var toggle);
+                GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+                tempObject.TryGetComponent<ScrollViewToggle>(out ScrollViewToggle toggle);
                 toggle.Parent = parentToggle;
-                inScene.TryGetComponent<NodeHighlights>(out var highlights);
+                inScene.TryGetComponent<NodeHighlights>(out NodeHighlights highlights);
                 toggle.LinkedObject = highlights;
                 highlights.scrollViewToggle = toggle;
                 tempObject.transform.localPosition = childOffset + new Vector2(_xGap, 0f) * hierarchy + new Vector2(0f, _yGap) * index++;
                 toggle.Initialize(child.SourceName, this);
                 parentToggle.AddChild(toggle);
-                var tempHierarchy = hierarchy;
+                int tempHierarchy = hierarchy;
                 CreateChildToggles(child, toggle, ref index, ref tempHierarchy);
             }
         }
@@ -382,14 +382,14 @@ namespace SEE.Game.Charts
                         Node node = nodeRef.node;
                         if (node != null)
                         {
-                            foreach (var key in node.FloatAttributes.Keys)
+                            foreach (string key in node.FloatAttributes.Keys)
                             {
                                 if (key.StartsWith(ChartManager.MetricPrefix))
                                 {
                                     AllMetricNames.Add(key);
                                 }
                             }
-                            foreach (var key in node.IntAttributes.Keys)
+                            foreach (string key in node.IntAttributes.Keys)
                             {
                                 if (key.StartsWith(ChartManager.MetricPrefix))
                                 {
@@ -434,7 +434,7 @@ namespace SEE.Game.Charts
 
             int numberOfDataObjectsWithNodeHightLights = 0;
             p = Performance.Begin("FindDataObjects: Node highlights");
-            foreach (var entry in _dataObjects)
+            foreach (GameObject entry in _dataObjects)
             {
                 if (entry.TryGetComponent<NodeHighlights>(out NodeHighlights highlights))
                 {
@@ -522,7 +522,7 @@ namespace SEE.Game.Charts
             float minY = float.PositiveInfinity; // globally minimal value on Y axis
             float maxY = float.NegativeInfinity; // globally maximal value on Y axis
             List<GameObject> toDraw = new List<GameObject>(); // nodes to be drawn in the chart
-            foreach (var data in _dataObjects)
+            foreach (GameObject data in _dataObjects)
             {
                 data.TryGetComponent(out NodeRef nodeRef);
                 Node node = nodeRef.node;
@@ -551,8 +551,8 @@ namespace SEE.Game.Charts
 
             if (toDraw.Count > 0)
             {
-                var xEqual = minX.Equals(maxX);
-                var yEqual = minY.Equals(maxY);
+                bool xEqual = minX.Equals(maxX);
+                bool yEqual = minY.Equals(maxY);
                 if (xEqual || yEqual)
                 {
                     (float min, float max) = minX.Equals(maxX) ? (minY, maxY) : (minX, maxX);
@@ -573,7 +573,7 @@ namespace SEE.Game.Charts
             }
             else
             {
-                foreach (var activeMarker in ActiveMarkers) Destroy(activeMarker);
+                foreach (GameObject activeMarker in ActiveMarkers) Destroy(activeMarker);
                 noDataWarning.SetActive(true);
             }
             p.End(true);
@@ -597,7 +597,7 @@ namespace SEE.Game.Charts
 
             // Collect all data objects possessing the metric and whose value is to
             // be represented in this chart.
-            foreach (var dataObject in _dataObjects)
+            foreach (GameObject dataObject in _dataObjects)
             {
                 if (dataObject.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float value) &&
                     (bool)dataObject.GetComponent<NodeHighlights>().showInChart[this])
@@ -633,7 +633,7 @@ namespace SEE.Game.Charts
             }
             else
             {
-                foreach (var activeMarker in ActiveMarkers) Destroy(activeMarker);
+                foreach (GameObject activeMarker in ActiveMarkers) Destroy(activeMarker);
                 noDataWarning.SetActive(true);
             }
             p.End(true);
@@ -651,22 +651,22 @@ namespace SEE.Game.Charts
             float maxY)
         {
             Performance p = Performance.Begin("AddMarkers(IEnumerable, float, float, float)");
-            var updatedMarkers = new List<GameObject>();
-            var dataRect = dataPanel.rect;
-            var width = dataRect.width / (maxX - minX);
-            var height = dataRect.height / (maxY - minY);
-            var positionInLayer = 0;
+            List<GameObject> updatedMarkers = new List<GameObject>();
+            Rect dataRect = dataPanel.rect;
+            float width = dataRect.width / (maxX - minX);
+            float height = dataRect.height / (maxY - minY);
+            int positionInLayer = 0;
 
-            foreach (var data in toDraw)
+            foreach (GameObject data in toDraw)
             {
-                var marker = Instantiate(markerPrefab, entries.transform);
+                GameObject marker = Instantiate(markerPrefab, entries.transform);
                 marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
                 marker.TryGetComponent<ChartMarker>(out ChartMarker chartMarker);
                 chartMarker.linkedObject = data;
                 chartMarker.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
-                var node = data.GetComponent<NodeRef>().node;
-                node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out var valueX);
-                node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out var valueY);
+                Node node = data.GetComponent<NodeRef>().node;
+                node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX);
+                node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
                 chartMarker.SetInfoText("Linked to: " + data.name + "\nX: "
                                         + valueX.ToString("N") + ", Y: " + valueY.ToString("N"));
                 marker.GetComponent<RectTransform>().anchoredPosition =
@@ -675,7 +675,7 @@ namespace SEE.Game.Charts
                 updatedMarkers.Add(marker);
             }
 
-            foreach (var marker in ActiveMarkers) Destroy(marker);
+            foreach (GameObject marker in ActiveMarkers) Destroy(marker);
             ActiveMarkers = updatedMarkers;
             p.End(true);
         }
@@ -695,24 +695,24 @@ namespace SEE.Game.Charts
             }
             else
             {
-                var updatedMarkers = new List<GameObject>();
-                var dataRect = dataPanel.rect;
-                var width = dataRect.width / (toDraw.Count - 1);
-                var height = dataRect.height / (max - min);
-                var metric = axisDropdownY.CurrentlySelectedMetric;
-                var x = 0;
-                var positionInLayer = 0;
+                List<GameObject> updatedMarkers = new List<GameObject>();
+                Rect dataRect = dataPanel.rect;
+                float width = dataRect.width / (toDraw.Count - 1);
+                float height = dataRect.height / (max - min);
+                string metric = axisDropdownY.CurrentlySelectedMetric;
+                int x = 0;
+                int positionInLayer = 0;
 
-                foreach (var data in toDraw)
+                foreach (GameObject data in toDraw)
                 {
-                    var marker = Instantiate(markerPrefab, entries.transform);
+                    GameObject marker = Instantiate(markerPrefab, entries.transform);
                     marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
-                    marker.TryGetComponent<ChartMarker>(out var script);
+                    marker.TryGetComponent<ChartMarker>(out ChartMarker script);
                     script.linkedObject = data;
                     script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
-                    var node = data.GetComponent<NodeRef>().node;
-                    node.TryGetNumeric(metric, out var value);
-                    var type = node.IsLeaf() ? "Building" : "Node";
+                    Node node = data.GetComponent<NodeRef>().node;
+                    node.TryGetNumeric(metric, out float value);
+                    string type = node.IsLeaf() ? "Building" : "Node";
                     script.SetInfoText("Linked to: " + data.name + " of type " + type + "\n" +
                                        metric +
                                        ": " + value.ToString("N"));
@@ -722,7 +722,7 @@ namespace SEE.Game.Charts
                     updatedMarkers.Add(marker);
                 }
 
-                foreach (var marker in ActiveMarkers) Destroy(marker);
+                foreach (GameObject marker in ActiveMarkers) Destroy(marker);
                 ActiveMarkers = updatedMarkers;
             }
             p.End(true);
@@ -735,31 +735,31 @@ namespace SEE.Game.Charts
         private void AddMarkers(List<GameObject> toDraw)
         {
             Performance p = Performance.Begin("AddMarkers(List)");
-            var updatedMarkers = new List<GameObject>();
-            var dataRect = dataPanel.rect;
-            var width = dataRect.width / toDraw.Count;
-            var height = dataRect.height / toDraw.Count;
-            var x = 0;
-            var y = 0;
-            var positionInLayer = 0;
+            List<GameObject> updatedMarkers = new List<GameObject>();
+            Rect dataRect = dataPanel.rect;
+            float width = dataRect.width / toDraw.Count;
+            float height = dataRect.height / toDraw.Count;
+            int x = 0;
+            int y = 0;
+            int positionInLayer = 0;
 
-            foreach (var data in toDraw)
+            foreach (GameObject data in toDraw)
             {
-                var marker = Instantiate(markerPrefab, entries.transform);
-                marker.TryGetComponent<SortingGroup>(out var group);
+                GameObject marker = Instantiate(markerPrefab, entries.transform);
+                marker.TryGetComponent<SortingGroup>(out SortingGroup group);
                 group.sortingOrder = positionInLayer++;
-                marker.TryGetComponent<ChartMarker>(out var script);
+                marker.TryGetComponent<ChartMarker>(out ChartMarker script);
                 script.linkedObject = data;
-                data.TryGetComponent<NodeHighlights>(out var highlights);
+                data.TryGetComponent<NodeHighlights>(out NodeHighlights highlights);
                 script.ScrollViewToggle = highlights.scrollViewToggle;
-                data.TryGetComponent<NodeRef>(out var nodeRef);
-                var node = nodeRef.node;
-                node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out var valueX);
-                node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out var valueY);
-                var type = node.IsLeaf() ? "Building" : "Node";
+                data.TryGetComponent<NodeRef>(out NodeRef nodeRef);
+                Node node = nodeRef.node;
+                node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX);
+                node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
+                string type = node.IsLeaf() ? "Building" : "Node";
                 script.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
                                    valueX.ToString("0.00") + ", Y: " + valueY.ToString("N"));
-                marker.TryGetComponent<RectTransform>(out var anchoredPos);
+                marker.TryGetComponent<RectTransform>(out RectTransform anchoredPos);
                 anchoredPos.anchoredPosition = new Vector2(x++ * width, y++ * height);
                 CheckOverlapping(marker, updatedMarkers.ToArray());
                 updatedMarkers.Add(marker);
@@ -767,7 +767,7 @@ namespace SEE.Game.Charts
                 if (ActiveMarkers.Count <= 0) break;
             }
 
-            foreach (var marker in ActiveMarkers) Destroy(marker);
+            foreach (GameObject marker in ActiveMarkers) Destroy(marker);
             ActiveMarkers = updatedMarkers;
             p.End(true);
         }
@@ -780,28 +780,28 @@ namespace SEE.Game.Charts
         /// <param name="updatedMarkers">The already active new markers.</param>
         private static void CheckOverlapping(GameObject marker, GameObject[] updatedMarkers)
         {
-            marker.TryGetComponent<Image>(out var image);
+            marker.TryGetComponent<Image>(out Image image);
             if (updatedMarkers.Length > 10)
-                for (var i = updatedMarkers.Length - 10; i < updatedMarkers.Length; i++)
+                for (int i = updatedMarkers.Length - 10; i < updatedMarkers.Length; i++)
                 {
-                    var updatedMarker = updatedMarkers[i];
+                    GameObject updatedMarker = updatedMarkers[i];
                     if (Vector3.Distance(marker.transform.position,
                                 updatedMarker.transform.position)
                             .CompareTo(MarkerOverlapDistance * marker.transform.lossyScale.x) >=
                         0) return;
                     if (image.color.g - 0.1f < 0) return;
-                    var oldColor = image.color;
+                    Color oldColor = image.color;
                     image.color = new Color(oldColor.r, oldColor.g - 0.1f,
                         oldColor.b - 0.1f);
                 }
             else
-                foreach (var updatedMarker in updatedMarkers)
+                foreach (GameObject updatedMarker in updatedMarkers)
                     if (Vector3.Distance(marker.transform.position,
                             updatedMarker.transform.position)
                         .CompareTo(MarkerOverlapDistance * marker.transform.lossyScale.x) < 0)
                         if (image.color.g - 0.1f >= 0)
                         {
-                            var oldColor = image.color;
+                            Color oldColor = image.color;
                             image.color = new Color(oldColor.r, oldColor.g - 0.1f,
                                 oldColor.b - 0.1f);
                         }
@@ -844,8 +844,8 @@ namespace SEE.Game.Charts
         /// </summary>
         public void SetInfoText()
         {
-            var metricX = axisDropdownX.CurrentlySelectedMetric;
-            var metricY = axisDropdownY.CurrentlySelectedMetric;
+            string metricX = axisDropdownX.CurrentlySelectedMetric;
+            string metricY = axisDropdownY.CurrentlySelectedMetric;
             if (metricX.Equals(metricY))
                 moveHandler.SetInfoText(metricX);
             else
@@ -915,7 +915,7 @@ namespace SEE.Game.Charts
         public void OnDestroy()
         {
             ChartManager.Instance.UnregisterChart(gameObject);
-            foreach (var dataObject in _dataObjects)
+            foreach (GameObject dataObject in _dataObjects)
                 if (dataObject != null)
                     dataObject.GetComponent<NodeHighlights>().showInChart.Remove(this);
         }

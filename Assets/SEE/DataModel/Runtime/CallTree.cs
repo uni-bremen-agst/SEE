@@ -340,12 +340,12 @@ namespace SEE.DataModel.Runtime
         /// </summary>
         public void GenerateTree()
         {
-            var callStack = new Stack<KeyValuePair<int, CallTreeFunctionCall>>();
+            Stack<KeyValuePair<int, CallTreeFunctionCall>> callStack = new Stack<KeyValuePair<int, CallTreeFunctionCall>>();
             for (int i = 0; i < functionCalls.Count; i++)
             {
-                var key = int.Parse(functionCalls[i].GetAttributeForCategory(LEVEL));
-                var value = functionCalls[i];
-                var pair = new KeyValuePair<int, CallTreeFunctionCall>(key, value);
+                int key = int.Parse(functionCalls[i].GetAttributeForCategory(LEVEL));
+                CallTreeFunctionCall value = functionCalls[i];
+                KeyValuePair<int, CallTreeFunctionCall> pair = new KeyValuePair<int, CallTreeFunctionCall>(key, value);
                 value.successors = new List<CallTreeFunctionCall>();
                 while (callStack.Count != 0 && callStack.Peek().Key >= key)
                 {
@@ -379,7 +379,7 @@ namespace SEE.DataModel.Runtime
                 }
 
                 bool mapped = false;
-                foreach (var go in gameObjects)
+                foreach (KeyValuePair<string, GameObject> go in gameObjects)
                 {
                     string gxlLinkageName = go.Key;
                     FunctionInformation gxlFunctionInformation = FunctionInformation.CreateFromGXLLinkageName(gxlLinkageName);
@@ -759,7 +759,7 @@ namespace SEE.DataModel.Runtime
 
             public override int GetHashCode()
             {
-                var hashCode = -1534923972;
+                int hashCode = -1534923972;
                 hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
                 hashCode = hashCode * -1521134295 + EqualityComparer<string[]>.Default.GetHashCode(Parameters);
                 hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ReturnValue);

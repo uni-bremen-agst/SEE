@@ -32,6 +32,18 @@ using UnityEngine;namespace SEE.Game.Charts.VR{
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
     /// <summary>    /// Manages the pointer used to interact with canvases in VR.    /// </summary>    public class VrPointer : MonoBehaviour
     {
 
@@ -40,7 +52,19 @@ using UnityEngine;namespace SEE.Game.Charts.VR{
 
 
 
+
+
+
+
+
+
         /// <summary>        /// The length of the pointer attached to the controller.        /// </summary>        private float _pointerLength;
+
+
+
+
+
+
 
 
 
@@ -56,7 +80,19 @@ using UnityEngine;namespace SEE.Game.Charts.VR{
 
 
 
+
+
+
+
+
+
         /// <summary>        /// TODO        /// </summary>        private VrInputModule _inputModule;
+
+
+
+
+
+
 
 
 
@@ -72,7 +108,19 @@ using UnityEngine;namespace SEE.Game.Charts.VR{
 
 
 
+
+
+
+
+
+
         /// <summary>        /// Attached to the players controller to create raycasts from it.        /// </summary>        public Camera Camera { get; private set; }
+
+
+
+
+
+
 
 
 
@@ -94,11 +142,23 @@ using UnityEngine;namespace SEE.Game.Charts.VR{
 
 
 
+
+
+
+
+
+
         /// <summary>        /// Initializes some attributes.        /// </summary>        private void Start()
         {
             _inputModule = GameObject.FindGameObjectWithTag("VREventSystem")
                 .GetComponent<VrInputModule>();
         }
+
+
+
+
+
+
 
 
 
@@ -117,6 +177,12 @@ using UnityEngine;namespace SEE.Game.Charts.VR{
 
 
 
+
+
+
+
+
+
         /// <summary>        /// Update is called once per frame.        /// </summary>        private void Update()
         {
             UpdateLine();
@@ -128,16 +194,22 @@ using UnityEngine;namespace SEE.Game.Charts.VR{
 
 
 
+
+
+
+
+
+
         /// <summary>        /// Checks the distance to the hit object and sets the length of the pointer accordingly.        /// </summary>        private void UpdateLine()
         {
-            var data = _inputModule.EventData;
-            var hit = CreateRaycast();
-            var colliderDistance = hit.distance.Equals(0f) ? _pointerLength : hit.distance;
-            var canvasDistance = data.pointerCurrentRaycast.distance.Equals(0f)
+            UnityEngine.EventSystems.PointerEventData data = _inputModule.EventData;
+            RaycastHit hit = CreateRaycast();
+            float colliderDistance = hit.distance.Equals(0f) ? _pointerLength : hit.distance;
+            float canvasDistance = data.pointerCurrentRaycast.distance.Equals(0f)
                 ? _pointerLength
                 : data.pointerCurrentRaycast.distance;
-            var targetLength = Mathf.Min(colliderDistance, canvasDistance);
-            var hitPosition = transform.position + transform.forward * targetLength;
+            float targetLength = Mathf.Min(colliderDistance, canvasDistance);
+            Vector3 hitPosition = transform.position + transform.forward * targetLength;
             hitDot.transform.position = hitPosition;
             _lineRenderer.SetPosition(0, transform.position);
             _lineRenderer.SetPosition(1, hitPosition);
@@ -151,10 +223,18 @@ using UnityEngine;namespace SEE.Game.Charts.VR{
 
 
 
+
+
+
+
+
+
+
+
         /// <summary>        /// Sends out a new Raycast and returns the hit data.        /// </summary>        /// <returns>Information about the hit.</returns>        private RaycastHit CreateRaycast()
         {
-            var ray = new Ray(transform.position, transform.forward);
-            Physics.Raycast(ray, out var hitData, _pointerLength);
+            Ray ray = new Ray(transform.position, transform.forward);
+            Physics.Raycast(ray, out RaycastHit hitData, _pointerLength);
 
             return hitData;
         }

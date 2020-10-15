@@ -321,7 +321,7 @@ namespace SEE.DataModel.DG.IO
             Dictionary<string, V> attributes,
             AsString<V> AsString)
         {
-            foreach (var attribute in attributes)
+            foreach (KeyValuePair<string, V> attribute in attributes)
             {
                 XmlElement attr = doc.CreateElement("attr");
                 attr.SetAttribute("name", attribute.Key);

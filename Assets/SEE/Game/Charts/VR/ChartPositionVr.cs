@@ -86,8 +86,8 @@ namespace SEE.Game.Charts.VR
         /// <returns></returns>
         private IEnumerator MoveChart()
         {
-            var startPosition = transform.position;
-            for (var time = 0f; time < 1f; time += Time.deltaTime * ChartSpeed)
+            Vector3 startPosition = transform.position;
+            for (float time = 0f; time < 1f; time += Time.deltaTime * ChartSpeed)
             {
                 transform.position = Vector3.Lerp(startPosition, cameraTransform.position, time);
                 yield return new WaitForEndOfFrame();

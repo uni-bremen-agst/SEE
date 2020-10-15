@@ -321,21 +321,21 @@ namespace SEE.CameraPaths
         private int CompareTo(Vector3 me, Vector3 other, float allowedDifference)
         {
             {
-                var delta = me.x - other.x;
+                float delta = me.x - other.x;
                 if (Mathf.Abs(delta) > allowedDifference)
                 {
                     return delta > 0 ? 1 : -1;
                 }
             }
             {
-                var delta = me.y - other.y;
+                float delta = me.y - other.y;
                 if (Mathf.Abs(delta) > allowedDifference)
                 {
                     return delta > 0 ? 1 : -1;
                 }
             }
             {
-                var delta = me.z - other.z;
+                float delta = me.z - other.z;
                 if (Mathf.Abs(delta) > allowedDifference)
                 {
                     return delta > 0 ? 1 : -1;

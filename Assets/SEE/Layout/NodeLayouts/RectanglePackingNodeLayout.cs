@@ -350,7 +350,7 @@ namespace SEE.Layout.NodeLayouts
                 {
                     // targetNode is the node with the lowest waste in preservers
                     float lowestWaste = Mathf.Infinity;
-                    foreach (var entry in preservers)
+                    foreach (KeyValuePair<PNode, float> entry in preservers)
                     {
                         if (entry.Value < lowestWaste)
                         {
@@ -368,7 +368,7 @@ namespace SEE.Layout.NodeLayouts
 
                     // targetNode is the node with the aspect ratio closest to 1
                     float bestRatio = Mathf.Infinity;
-                    foreach (var entry in expanders)
+                    foreach (KeyValuePair<PNode, float> entry in expanders)
                     {
                         if (entry.Value < bestRatio)
                         {

@@ -40,7 +40,7 @@ namespace SEE.Game
             // We are using a set because the same name could be used more than once
             // in the settings below.
             HashSet<string> leafAttributeNames = new HashSet<string>();
-            foreach (var value in Enum.GetValues(typeof(NumericAttributeNames)).Cast<NumericAttributeNames>())
+            foreach (NumericAttributeNames value in Enum.GetValues(typeof(NumericAttributeNames)).Cast<NumericAttributeNames>())
             {
                 leafAttributeNames.Add(value.Name());
             }

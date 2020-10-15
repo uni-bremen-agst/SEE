@@ -109,7 +109,7 @@ namespace SEE.Layout.NodeLayouts
         public static Dictionary<ILayoutNode, NodeTransform> Move(Dictionary<ILayoutNode, NodeTransform> layout, Vector3 offset)
         {
             Dictionary<ILayoutNode, NodeTransform> result = new Dictionary<ILayoutNode, NodeTransform>();
-            foreach (var entry in layout)
+            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
             {
                 NodeTransform transform = entry.Value;
                 transform.position += offset;
@@ -335,7 +335,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="layout">the calculated layout</param>
         private void ApplyLayoutNodeTransform(Dictionary<ILayoutNode, NodeTransform> layout)
         {
-            foreach (var entry in layout)
+            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
             {
                 ILayoutNode node = entry.Key;
                 NodeTransform transform = entry.Value;

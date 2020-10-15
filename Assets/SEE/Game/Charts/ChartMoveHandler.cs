@@ -124,7 +124,7 @@ namespace SEE.Game.Charts
         /// <param name="eventData">Contains the position data.</param>
         public virtual void OnDrag(PointerEventData eventData)
         {
-            var pos = GetComponent<RectTransform>();
+            RectTransform pos = GetComponent<RectTransform>();
             if (eventData.position.x > 0 &&
                 eventData.position.x < _screenSize.sizeDelta.x * _screenSize.lossyScale.x &&
                 eventData.position.y > 0 &&
@@ -188,7 +188,7 @@ namespace SEE.Game.Charts
         /// </summary>
         protected virtual void ToggleMinimize()
         {
-            var chart = _chart.GetComponent<ChartContent>();
+            ChartContent chart = _chart.GetComponent<ChartContent>();
             chart.labelsPanel.gameObject.SetActive(Minimized);
             chart.dataPanel.gameObject.SetActive(Minimized);
             sizeButton.SetActive(Minimized);

@@ -270,22 +270,22 @@ namespace SEE.DataModel.DG
         {
             string result = "";
 
-            foreach (var attr in toggleAttributes)
+            foreach (string attr in toggleAttributes)
             {
                 result += " \"" + attr + "\": true,\n";
             }
 
-            foreach (var attr in stringAttributes)
+            foreach (KeyValuePair<string, string> attr in stringAttributes)
             {
                 result += " \"" + attr.Key + "\": \"" + attr.Value + "\",\n";
             }
 
-            foreach (var attr in intAttributes)
+            foreach (KeyValuePair<string, int> attr in intAttributes)
             {
                 result += " \"" + attr.Key + "\": " + attr.Value + ",\n";
             }
 
-            foreach (var attr in floatAttributes)
+            foreach (KeyValuePair<string, float> attr in floatAttributes)
             {
                 result += " \"" + attr.Key + "\": " + attr.Value + ",\n";
             }
@@ -299,7 +299,7 @@ namespace SEE.DataModel.DG
         /// <returns>deep clone</returns>
         public virtual object Clone()
         {
-            var clone = (Attributable)this.MemberwiseClone();
+            Attributable clone = (Attributable)this.MemberwiseClone();
             HandleCloned(clone);
             return clone;
         }

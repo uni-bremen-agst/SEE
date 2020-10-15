@@ -96,7 +96,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             get
             {
                 float max = 0;
-                foreach (var child in Children)
+                foreach (ENode child in Children)
                 {
                     if (child.Scale.z > max)
                     {

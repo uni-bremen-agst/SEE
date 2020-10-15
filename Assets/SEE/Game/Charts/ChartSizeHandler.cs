@@ -98,7 +98,7 @@ namespace SEE.Game.Charts
         protected virtual void Awake()
         {
             GetSettingData();
-            var parent = transform.parent;
+            Transform parent = transform.parent;
             _chartContent = parent.GetComponent<ChartContent>();
             Chart = parent.GetComponent<RectTransform>();
         }
@@ -118,10 +118,10 @@ namespace SEE.Game.Charts
         /// <param name="eventData">Contains the position data.</param>
         public virtual void OnDrag(PointerEventData eventData)
         {
-            var pos = GetComponent<RectTransform>();
+            RectTransform pos = GetComponent<RectTransform>();
             Vector2 oldPos = pos.position;
             pos.position = eventData.position;
-            var anchoredPos = pos.anchoredPosition;
+            Vector2 anchoredPos = pos.anchoredPosition;
             if (anchoredPos.x / pos.lossyScale.x < MinimumSize ||
                 anchoredPos.y / pos.lossyScale.y < MinimumSize) pos.position = oldPos;
             anchoredPos = pos.anchoredPosition;
@@ -135,17 +135,17 @@ namespace SEE.Game.Charts
         /// <param name="height">The new height of the chart.</param>
         protected virtual void ChangeSize(float width, float height)
         {
-            var dataPanel = _chartContent.dataPanel;
+            RectTransform dataPanel = _chartContent.dataPanel;
             dataPanel.sizeDelta = new Vector2(width - 80, height - 80);
             dataPanel.anchoredPosition = new Vector2(width / 2, height / 2);
             noDataWarning.sizeDelta = new Vector2(width - 150, height - 150);
-            var labelsPanel = _chartContent.labelsPanel;
+            RectTransform labelsPanel = _chartContent.labelsPanel;
             labelsPanel.sizeDelta = new Vector2(width, height);
             labelsPanel.anchoredPosition = new Vector2(width / 2, height / 2);
-            var xDropdown = _chartContent.axisDropdownX.GetComponent<RectTransform>();
+            RectTransform xDropdown = _chartContent.axisDropdownX.GetComponent<RectTransform>();
             xDropdown.anchoredPosition = new Vector2(width / 2, xDropdown.anchoredPosition.y);
             xDropdown.sizeDelta = new Vector2(width / 2, xDropdown.sizeDelta.y);
-            var yDropdown = _chartContent.axisDropdownY.GetComponent<RectTransform>();
+            RectTransform yDropdown = _chartContent.axisDropdownY.GetComponent<RectTransform>();
             yDropdown.anchoredPosition = new Vector2(yDropdown.anchoredPosition.x, height / 2);
             yDropdown.sizeDelta = new Vector2(height / 2, yDropdown.sizeDelta.y);
             Chart.sizeDelta = new Vector2(width, height);

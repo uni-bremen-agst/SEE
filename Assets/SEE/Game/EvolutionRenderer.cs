@@ -234,7 +234,7 @@ namespace SEE.Game
         private void CalculateAllGraphLayouts(List<Graph> graphs)
         {
             // Determine the layouts of all loaded graphs upfront.
-            var p = Performance.Begin("Layouting all " + graphs.Count + " graphs");
+            Performance p = Performance.Begin("Layouting all " + graphs.Count + " graphs");
             graphs.ForEach(graph =>
             {
                 Layouts[graph] = CalculateLayout(graph);
@@ -267,7 +267,7 @@ namespace SEE.Game
             // Collecting all game objects corresponding to nodes of the given graph.
             // If the node existed in a previous graph, we will re-use its corresponding
             // game object created earlier.
-            var gameObjects = new List<GameObject>();
+            List<GameObject> gameObjects = new List<GameObject>();
 
             // The layout to be applied.
             NodeLayout nodeLayout = graphRenderer.GetLayout();
@@ -282,7 +282,7 @@ namespace SEE.Game
                     // hence, leaves can be added at any rate. For a hierarchical layout, we 
                     // need to add the game objects for inner nodes, too. To put it differently,
                     // inner nodes are added only if we apply a hierarchical layout.
-                    objectManager.GetNode(node, out var gameNode);
+                    objectManager.GetNode(node, out GameObject gameNode);
                     // Now after having attached the new node to the game object,
                     // we must adjust the scale of it according to the newly attached node so 
                     // that the layouter has these. We need to adjust the scale only for leaves, 
@@ -598,7 +598,7 @@ namespace SEE.Game
             {
                 // if the node needs to be removed, mark it dead and let it sink into the ground
                 marker.MarkDead(block);
-                var newPosition = block.transform.position;
+                Vector3 newPosition = block.transform.position;
                 newPosition.y = -block.transform.localScale.y;
                 ILayoutNode nodeTransform = new AnimationNode(newPosition, block.transform.localScale);
                 moveScaleShakeAnimator.AnimateTo(block, nodeTransform, false, OnRemovedNodeFinishedAnimation);

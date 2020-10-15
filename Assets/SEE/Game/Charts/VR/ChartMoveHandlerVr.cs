@@ -97,7 +97,7 @@ namespace SEE.Game.Charts.VR
         protected override void Awake()
         {
             base.Awake();
-            var parent = transform.parent;
+            Transform parent = transform.parent;
             _parent = parent.GetComponent<ChartContent>().parent.transform;
             _mainCamera = Camera.main;
             _pointerCamera = GameObject.FindGameObjectWithTag("Pointer").GetComponent<Camera>();
@@ -125,7 +125,7 @@ namespace SEE.Game.Charts.VR
         protected override void Update()
         {
             base.Update();
-            var parentPosition = _parent.position;
+            Vector3 parentPosition = _parent.position;
             _parent.LookAt(parentPosition - (_mainCamera.transform.position - parentPosition));
             ScrollInOut();
         }
@@ -137,8 +137,8 @@ namespace SEE.Game.Charts.VR
         private void ScrollInOut()
         {
             if (!PointerDown || _chartAction.move.Equals(0)) return;
-            var direction = _pointerCamera.transform.position - _rectTransform.position;
-            var moveBy = _chartAction.move * _chartScrollSpeed * Time.deltaTime;
+            Vector3 direction = _pointerCamera.transform.position - _rectTransform.position;
+            float moveBy = _chartAction.move * _chartScrollSpeed * Time.deltaTime;
             if (!(_chartAction.move < 0 &&
                   direction.magnitude < _minimumDistance + moveBy ||
                   _chartAction.move > 0 &&
