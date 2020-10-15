@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using SEE.Controls;
-using SEE.Charts.Scripts;
+using SEE.Game.Charts;
 using SEE.DataModel;
 using SEE.GO;
 using SEE.Layout;

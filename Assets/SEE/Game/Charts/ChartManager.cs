@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.Charts.Scripts
+namespace SEE.Game.Charts
 {
     /// <summary>
     /// Contains most settings and some methods needed across all charts.

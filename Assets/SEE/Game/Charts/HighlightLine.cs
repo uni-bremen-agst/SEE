@@ -21,7 +21,7 @@
 
 using UnityEngine;
 
-namespace SEE.Charts.Scripts
+namespace SEE.Game.Charts
 {
 	/// <summary>
 	/// A line placed above a node in the scene that is highlighted.

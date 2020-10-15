@@ -19,7 +19,7 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.Charts.Scripts;
+using SEE.Game.Charts;
 using Valve.VR;
 
 namespace SEE.Controls

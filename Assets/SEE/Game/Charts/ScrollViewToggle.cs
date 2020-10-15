@@ -26,7 +26,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace SEE.Charts.Scripts
+namespace SEE.Game.Charts
 {
 	/// <summary>
 	/// Contains the logic for entries in the content selection scroll view.

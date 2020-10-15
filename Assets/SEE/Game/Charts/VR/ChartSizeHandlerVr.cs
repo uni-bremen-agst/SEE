@@ -22,7 +22,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace SEE.Charts.Scripts.VR
+namespace SEE.Game.Charts.VR
 {
 	/// <summary>
 	/// The VR version of <see cref="ChartSizeHandler" />.

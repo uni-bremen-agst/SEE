@@ -25,7 +25,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.Charts.Scripts
+namespace SEE.Game.Charts
 {
     /// <summary>
     ///     Manages results and options of <see cref="TMP_Dropdown" />s used to select what metric to display

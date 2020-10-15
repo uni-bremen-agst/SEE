@@ -20,13 +20,12 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Controls;
-using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace SEE.Charts.Scripts
+namespace SEE.Game.Charts
 {
 	/// <summary>
 	/// Contains the logic for the markers representing entries linked to objects in the chart.

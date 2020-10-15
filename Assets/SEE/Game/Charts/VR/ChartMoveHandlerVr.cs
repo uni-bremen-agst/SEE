@@ -23,7 +23,7 @@ using SEE.Controls;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace SEE.Charts.Scripts.VR
+namespace SEE.Game.Charts.VR
 {
 	/// <summary>
 	/// Handles the dragging and minimization of charts in VR.

@@ -20,30 +20,39 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using UnityEngine;
-using UnityEngine.UI;
 
-namespace SEE.Charts.Scripts
+namespace SEE.Game.Charts
 {
     /// <summary>
-    ///     This class is used to put into a working scene using charts. It eases access to specific components
-    ///     and <see cref="GameObject" />s during testing.
+    ///     Used to create new charts.
     /// </summary>
-    public class TestHelper : MonoBehaviour
+    public class ChartCreator : MonoBehaviour
     {
-        public GameObject charts;
+        /// <summary>
+        ///     The prefab for a new chart.
+        /// </summary>
+        [SerializeField] private GameObject chartPrefab;
 
         /// <summary>
-        ///     Fill this with prefabs of cities in the following order:
-        ///     1. A city with multiple buildings
-        ///     2. A city with one building
-        ///     3. A city with zero buildings
-        ///     They might have to be regenerated after changes to the software.
+        ///     The <see cref="Canvas" /> on which the chart is created.
         /// </summary>
-        public GameObject[] cityPrefabs;
+        [SerializeField] private Transform chartsCanvas;
 
-        public Button closeChartsButton;
-        public Button createChartButton;
-        public ChartCreator creator;
-        public ChartManager manager;
+        /// <summary>
+        ///     Initializes the new chart as GameObject.
+        /// </summary>
+        public void CreateChart()
+        {
+            GameObject chart = Instantiate(chartPrefab, chartsCanvas);
+            ChartManager.Instance.RegisterChart(chart);
+        }
+
+        /// <summary>
+        ///     Deactivates the chart canvas.
+        /// </summary>
+        public void CloseCharts()
+        {
+            gameObject.SetActive(false);
+        }
     }
 }

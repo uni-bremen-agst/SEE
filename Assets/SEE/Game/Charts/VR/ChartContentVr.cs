@@ -22,7 +22,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEE.Charts.Scripts.VR
+namespace SEE.Game.Charts.VR
 {
 	/// <summary>
 	/// The virtual reality version of <see cref="ChartContent" />.

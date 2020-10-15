@@ -22,7 +22,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace SEE.Charts.Scripts
+namespace SEE.Game.Charts
 {
 	/// <summary>
 	/// Handles the resizing of charts.
