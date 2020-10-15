@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SEE.DataModel
+namespace SEE.DataModel.DG
 {
     /// <summary>
     /// An exception thrown in case a graph, node, or edge attribute is unknown.

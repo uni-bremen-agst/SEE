@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace SEE.DataModel
+namespace SEE.DataModel.DG
 {
     // When you hit the play button in the editor, all the objects in the active scene are 
     // serialized and saved, so that unity can deserialize and return them to their original 

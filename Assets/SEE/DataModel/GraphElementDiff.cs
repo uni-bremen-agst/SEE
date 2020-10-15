@@ -1,4 +1,4 @@
-﻿namespace SEE.DataModel
+﻿namespace SEE.DataModel.DG
 {
     /// <summary>
     /// Allows one to determine whether there is any difference between two 

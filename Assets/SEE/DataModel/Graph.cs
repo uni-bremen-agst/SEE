@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.DataModel
+namespace SEE.DataModel.DG
 {
     /// <summary>
     /// A graph with nodes and edges representing the data to be visualized 

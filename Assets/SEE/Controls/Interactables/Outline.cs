@@ -8,7 +8,7 @@
 // https://assetstore.unity.com/packages/tools/particles-effects/quick-outline-115488
 //
 
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.GO;
 using System;
 using System.Collections.Generic;

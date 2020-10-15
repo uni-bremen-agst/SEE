@@ -1,15 +1,14 @@
 
-﻿using SEE.DataModel;
+﻿using SEE.DataModel.DG;
 using SEE.GO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using OdinSerializer;
-using SEE.DataModel.IO;
+using SEE.DataModel.DG.IO;
 using System.IO;
 using SEE.Utils;
-using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts.Cose;

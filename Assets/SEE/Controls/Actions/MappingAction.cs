@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel;
-using SEE.DataModel.IO;
+using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.Game;
 using SEE.GO;
 using SEE.Tools;

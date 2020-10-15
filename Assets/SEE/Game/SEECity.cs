@@ -4,11 +4,11 @@ using System.Linq;
 using UnityEngine;
 
 using SEE.Tools;
-using SEE.DataModel;
-using SEE.DataModel.IO;
+using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.GO;
 using SEE.Utils;
-
+using SEE.DataModel;
 
 namespace SEE.Game
 {

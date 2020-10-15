@@ -3,7 +3,7 @@ using System.Globalization;
 using System.IO;
 using UnityEngine;
 
-namespace SEE.DataModel.IO
+namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Imports node metrics from files into the graph.

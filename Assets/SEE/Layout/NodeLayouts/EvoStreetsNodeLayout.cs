@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Linq;
 
 using SEE.Layout.NodeLayouts.EvoStreets;
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.Layout.NodeLayouts.Cose;
 
 namespace SEE.Layout.NodeLayouts

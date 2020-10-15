@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SEE.DataModel
+namespace SEE.DataModel.DG
 {
     /// <summary>
     /// A type graph element. Either a node or an edge.

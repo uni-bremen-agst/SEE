@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using SEE.Controls;
 using SEE.Game.Charts;
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Utils;
@@ -14,6 +14,7 @@ using SEE.Layout.EdgeLayout;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Layout.EdgeLayouts;
+using SEE.DataModel;
 
 namespace SEE.Game
 {

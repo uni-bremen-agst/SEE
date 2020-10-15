@@ -17,7 +17,7 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;

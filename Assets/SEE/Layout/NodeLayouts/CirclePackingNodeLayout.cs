@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 using SEE.Layout.NodeLayouts.CirclePacking;
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.Layout.NodeLayouts.Cose;
 
 namespace SEE.Layout.NodeLayouts

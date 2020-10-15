@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using SEE.DataModel;
-using SEE.DataModel.IO;
+using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.Utils;
 
 namespace SEE.Tools.Architecture

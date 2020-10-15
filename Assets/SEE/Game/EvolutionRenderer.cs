@@ -25,7 +25,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using SEE.GO;
 using SEE.Game.Evolution;
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.Layout;
 using SEE.Utils;
 using SEE.Layout.NodeLayouts;

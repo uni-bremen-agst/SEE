@@ -1,6 +1,6 @@
 ﻿using System;
 using SEE.Game.Charts;
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using UnityEngine;
 
 namespace SEE.GO

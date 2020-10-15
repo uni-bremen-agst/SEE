@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using SEE.Layout.NodeLayouts.TreeMap;
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.Layout.NodeLayouts.Cose;
 
 namespace SEE.Layout.NodeLayouts

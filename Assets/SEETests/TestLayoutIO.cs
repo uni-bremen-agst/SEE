@@ -2,13 +2,12 @@
 using NUnit.Framework;
 using SEE.DataModel;
 using System.Collections.Generic;
-using SEE.DataModel.IO;
 using System.Linq;
 using SEE.Game;
-using SEE.GO;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.EdgeLayouts;
-using SEE.Layout.Utils;
+using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 
 namespace SEE.Layout
 {

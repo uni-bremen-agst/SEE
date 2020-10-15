@@ -22,8 +22,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel;
-using SEE.Game;
+using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;

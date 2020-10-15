@@ -2,7 +2,7 @@
 using System;
 
 using SEE.Tools;
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using System.Linq;
 
 namespace SEE.Game
@@ -41,7 +41,7 @@ namespace SEE.Game
             // We are using a set because the same name could be used more than once
             // in the settings below.
             HashSet<string> leafAttributeNames = new HashSet<string>();
-            foreach (var value in Enum.GetValues(typeof(SEE.DataModel.NumericAttributeNames)).Cast<SEE.DataModel.NumericAttributeNames>())
+            foreach (var value in Enum.GetValues(typeof(NumericAttributeNames)).Cast<NumericAttributeNames>())
             {
                 leafAttributeNames.Add(value.Name());
             }

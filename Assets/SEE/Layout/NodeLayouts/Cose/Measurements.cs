@@ -1,6 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.Layout;
-using SEE.Layout.NodeLayouts.Cose;
+﻿using SEE.DataModel.DG;
 using SEE.Layout.Utils;
 using SEE.Utils;
 using System;
