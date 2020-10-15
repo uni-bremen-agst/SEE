@@ -94,6 +94,10 @@ namespace SEE.Game
                     SetNodeRefs(loadedGraph, gameObject);
                 }
             }
+            foreach(GameObject node in AllNodeDescendants(this.gameObject))
+            {
+                node.GetComponent<AnnotatableObject>().SetIsAnnotatable(annotatable);
+            }
 
             InvokeRepeating("SaveLayoutAndAnnotations", 30.0f, 60.0f);
         }
@@ -170,6 +174,8 @@ namespace SEE.Game
         public string seeSavePath = "..\\Data\\GXL\\minimal_clones.see";
 
         public bool dictate = false;
+
+        public bool annotatable = false;
 
         // Larger clone graph with single root (Linux directory "drivers"): 16.920 nodes, 10583 edges.
         //public string gxlPath = "..\\Data\\GXL\\linux-clones\\drivers.gxl";

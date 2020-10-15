@@ -85,6 +85,7 @@ namespace SEEEditor
             city.seeLoadPath = EditorGUILayout.TextField("SEE load file", city.seeLoadPath);
             city.seeSavePath = EditorGUILayout.TextField("SEE save file", city.seeSavePath);
             city.dictate = EditorGUILayout.Toggle("Dictate", city.dictate);
+            city.annotatable = EditorGUILayout.Toggle("Annotatable", city.annotatable);
         }
 
         /// <summary>

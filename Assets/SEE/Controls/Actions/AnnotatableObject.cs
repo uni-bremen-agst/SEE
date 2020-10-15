@@ -29,6 +29,8 @@ namespace SEE.Controls
 
         private GameObject guiPointer;
 
+        private bool isAnnotatable;
+
         protected override void Awake()
         {
             base.Awake();
@@ -47,29 +49,36 @@ namespace SEE.Controls
 
         public void OpenAnnotationEditor()
         {
-            if (annotationEditor == null)
+            if (isAnnotatable)
             {
-                annotationEditor = Instantiate(annotationEditorPrefab, Vector3.zero, Quaternion.identity);
-                annotationEditor.transform.SetParent(gameObject.transform);
-                if (guiPointer.transform.root.gameObject.activeSelf)
+                if (annotationEditor == null)
                 {
-                    annotationEditor.GetComponent<Canvas>().worldCamera = guiPointer.GetComponent<Camera>();
+                    annotationEditor = Instantiate(annotationEditorPrefab, Vector3.zero, Quaternion.identity);
+                    annotationEditor.transform.SetParent(gameObject.transform);
+                    if (guiPointer.transform.root.gameObject.activeSelf)
+                    {
+                        annotationEditor.GetComponent<Canvas>().worldCamera = guiPointer.GetComponent<Camera>();
+                    }
+                    Vector3 position = transform.position;
+                    position.y = BoundingBox.GetRoof(GameObjectHierarchy.Descendants(gameObject, Tags.Node)) + annotationEditor.GetComponent<RectTransform>().rect.height / 2.0f;
+                    annotationEditor.transform.position = position;
+                    annotationEditor.SetActive(true);
+                    SwitchGUIPointer(true);
+                    guiPointer.GetComponent<Pointer>().SetSelectionState(Pointer.SelectionState.UI, this);
                 }
-                Vector3 position = transform.position;
-                position.y = BoundingBox.GetRoof(GameObjectHierarchy.Descendants(gameObject, Tags.Node)) + annotationEditor.GetComponent<RectTransform>().rect.height / 2.0f;
-                annotationEditor.transform.position = position;
-                annotationEditor.SetActive(true);
-                SwitchGUIPointer(true);
-                guiPointer.GetComponent<Pointer>().SetSelectionState(Pointer.SelectionState.UI, this);
+                else
+                {
+                    ResetAnnotationEditor();
+                    HideInformation();
+                    base.ShowInformation();
+                    annotationEditor.SetActive(true);
+                    SwitchGUIPointer(true);
+                    guiPointer.GetComponent<Pointer>().SetSelectionState(Pointer.SelectionState.UI, this);
+                }
             }
             else
             {
-                ResetAnnotationEditor();
-                HideInformation();
-                base.ShowInformation();
-                annotationEditor.SetActive(true);
-                SwitchGUIPointer(true);
-                guiPointer.GetComponent<Pointer>().SetSelectionState(Pointer.SelectionState.UI, this);
+                editorOpen = false;
             }
         }
 
@@ -283,6 +292,16 @@ namespace SEE.Controls
         public bool GetEditorState()
         {
             return editorOpen;
+        }
+
+        public void SetIsAnnotatable(bool annotatble)
+        {
+            this.isAnnotatable = annotatble;
+        }
+
+        public bool GetIsAnnotatable()
+        {
+            return isAnnotatable;
         }
 
         private string ResizeAnnotation(string annotation)
