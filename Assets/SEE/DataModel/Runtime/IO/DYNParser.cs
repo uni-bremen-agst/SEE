@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace SEE.DataModel.IO
+namespace SEE.DataModel.Runtime.IO
 {
     /// <summary>
     /// Parses a file with DYN-extension.

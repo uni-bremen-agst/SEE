@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SEE.DataModel
+namespace SEE.DataModel.Runtime
 {
 
     /// <summary>
