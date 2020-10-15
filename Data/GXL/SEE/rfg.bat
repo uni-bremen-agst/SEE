@@ -5,13 +5,13 @@ REM folder of SEE.
 REM
 REM The Axivion Suite must be installed and integrated into MSBuild.
 REM The integration with MSBuild works as follows. Run with administrator
-REM previlages (we assume the Axivion Suite is installed in folder
-REM "f:\Program Files (x86)\Bauhaus"):
+REM privilages (we assume the Axivion Suite is installed in folder
+REM "C:\Program Files (x86)\Bauhaus"):
 REM
-REM   "f:\Program Files (x86)\Bauhaus\doc\MSBuild\install_csharp_vs2019.cmd"
+REM   "C:\Program Files (x86)\Bauhaus\doc\MSBuild\install_csharp_vs2019.cmd"
 REM or:
 REM   change the current directory to:
-REM     "f:\Program Files (x86)\Bauhaus\doc\MSBuild"
+REM     "C:\Program Files (x86)\Bauhaus\doc\MSBuild"
 REM   and then run:
 REM     MSBuild /t:CSharp /p:VisualStudioVersion=19.0 InstallAxivion.proj
 
