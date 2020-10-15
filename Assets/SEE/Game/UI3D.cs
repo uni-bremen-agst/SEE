@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using SEE.GO;
 
-namespace SEE.UI3D
+namespace SEE.Game.UI3D
 {
     internal static class UI3DProperties
     {
@@ -42,7 +43,7 @@ namespace SEE.UI3D
             c.outline.transform.localPosition = Vector3.zero;
             c.outline.transform.localScale = Vector3.one;
             c.outlineMaterial = new Material(Shader.Find(OutlineShaderName));
-            c.outlineMaterial.SetTexture("_MainTex", Tools.TextureGenerator.CreateCircleOutlineTextureR8(32, 31, 1.0f, 0.0f));
+            c.outlineMaterial.SetTexture("_MainTex", TextureGenerator.CreateCircleOutlineTextureR8(32, 31, 1.0f, 0.0f));
             c.outlineMaterial.SetColor("_Color", UI3DProperties.DefaultColor);
             c.outline.GetComponent<MeshRenderer>().sharedMaterial = c.outlineMaterial;
 
@@ -325,7 +326,7 @@ namespace SEE.UI3D
         }
     }
 
-    internal class RotateGizmo : MonoBehaviour
+    public class RotateGizmo : MonoBehaviour
     {
         private const string PivotOutlineShaderName = "Unlit/RotationGizmoShader";
         private const float Alpha = 0.5f;
@@ -351,7 +352,7 @@ namespace SEE.UI3D
             int inner = Mathf.RoundToInt(outer * 0.98f);
 
             p.material = new Material(Shader.Find(PivotOutlineShaderName));
-            p.material.SetTexture("_MainTex", Tools.TextureGenerator.CreateCircleOutlineTextureR8(outer, inner, Alpha, 0.0f));
+            p.material.SetTexture("_MainTex", TextureGenerator.CreateCircleOutlineTextureR8(outer, inner, Alpha, 0.0f));
             p.material.SetFloat("_Alpha", Alpha);
 
             go.GetComponent<MeshRenderer>().sharedMaterial = p.material;

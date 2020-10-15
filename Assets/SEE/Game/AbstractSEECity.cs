@@ -30,7 +30,8 @@ namespace SEE.Game
         /// (or also Unity style), independent from the operating system we are currently
         /// running on.
         /// </summary>
-        [SerializeField] private readonly string pathPrefix = null;
+        /// Must not be readonly because it will be modified in an editor of the inspector.
+        [SerializeField] private string pathPrefix = null;
 
         /// <summary>
         /// The prefix of the absolute paths for the GXL, CSV, GVL data; that is,
