@@ -102,7 +102,7 @@ namespace SEE.Layout.NodeLayouts
             {
                 // Street
                 Place_Street(node, ref layout_result);
-                foreach (var child in node.Children)
+                foreach (ENode child in node.Children)
                 {
                     To_Layout(child, ref layout_result);
                 }

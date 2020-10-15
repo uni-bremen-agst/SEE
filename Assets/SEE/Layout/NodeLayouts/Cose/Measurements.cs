@@ -253,7 +253,7 @@ namespace SEE.Layout.NodeLayouts.Cose
                 return measurementsDict;
             }
 
-            var edgeMeasure = EdgesMeasurements;
+            EdgesMeasurements edgeMeasure = EdgesMeasurements;
             SortedDictionary<string, string> measurements = new SortedDictionary<string, string>
             {
                 { "Area", Math.Round (Area, 2).ToString() },
@@ -406,7 +406,7 @@ namespace SEE.Layout.NodeLayouts.Cose
                 }
             }
 
-            var areaLength = (height + width) / 2;
+            float areaLength = (height + width) / 2;
             relationMaxDistEdge = maxDistEdge / areaLength;
             relationMinDistEdge = minDistEdge / areaLength;
             relationTotalDist = totalDist / areaLength;
@@ -439,7 +439,7 @@ namespace SEE.Layout.NodeLayouts.Cose
 
                 foreach (Edge edge in edges)
                 {
-                    var edgeDistRelative = edgeLengths[edge] / areaLength;
+                    float edgeDistRelative = edgeLengths[edge] / areaLength;
                     varianceRelative += (edgeDistRelative - relationAvgDist) * (edgeDistRelative - relationAvgDist);
                 }
                 if (edges.Count == 1)

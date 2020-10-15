@@ -440,7 +440,7 @@ namespace SEE.Game
         /// <param name="root">the parent of every game object not nested in any other game object</param>
         private void CreateObjectHierarchy(Dictionary<Node, GameObject> nodeMap, GameObject root)
         {
-            foreach (var entry in nodeMap)
+            foreach (KeyValuePair<Node, GameObject> entry in nodeMap)
             {
                 Node node = entry.Key;
                 Node parent = node.Parent;
@@ -538,7 +538,7 @@ namespace SEE.Game
             {
                 if (dir.Value)
                 {
-                    var name = dir.Key;
+                    string name = dir.Key;
                     if (settings.CoseGraphSettings.DirNodeLayout.ContainsKey(name) && settings.CoseGraphSettings.DirShape.ContainsKey(name))
                     {
                         IEnumerable<Node> matches = nodes.Where(i => i.ID.Equals(name));
@@ -822,7 +822,7 @@ namespace SEE.Game
         /// <returns>the game objects added for the decorations; may be an empty collection</returns>
         private void AddDecorations(ICollection<GameObject> gameNodes, InnerNodeKinds innerNodeKinds, NodeLayoutKind nodeLayout)
         {
-            var innerNodeFactory = GetInnerNodeFactory(innerNodeKinds);
+            InnerNodeFactory innerNodeFactory = GetInnerNodeFactory(innerNodeKinds);
 
             // Add software erosion decorators for all leaf nodes if requested.
             if (settings.ShowErosions)

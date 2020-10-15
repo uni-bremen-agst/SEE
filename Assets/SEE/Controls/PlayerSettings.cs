@@ -98,7 +98,7 @@ namespace SEE.Controls
         private void Update()
         {
             if (playerInputType != PlayerInputType.VR) return;
-            foreach (var hand in Player.instance.hands)
+            foreach (Hand hand in Player.instance.hands)
                 if (HideVRControllers)
                 {
                     hand.HideController();

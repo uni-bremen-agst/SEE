@@ -541,7 +541,7 @@ namespace SEE.DataModel.DG
         private void CopyNodesTo(Graph target)
         {
             target.nodes = new Dictionary<string, Node>();
-            foreach (var entry in this.nodes)
+            foreach (KeyValuePair<string, Node> entry in this.nodes)
             {
                 Node node = (Node)entry.Value.Clone();
                 target.AddNode(node);
@@ -551,7 +551,7 @@ namespace SEE.DataModel.DG
         private void CopyEdgesTo(Graph target)
         {
             target.edges = new Dictionary<string, Edge>();
-            foreach (var entry in this.edges)
+            foreach (KeyValuePair<string, Edge> entry in this.edges)
             {
                 Edge edge = entry.Value;
                 Edge clone = (Edge)edge.Clone();

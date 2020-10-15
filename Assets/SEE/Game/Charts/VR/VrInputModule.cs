@@ -79,12 +79,12 @@ namespace SEE.Game.Charts.VR
         {
             eventSystem.RaycastAll(EventData, m_RaycastResultCache);
             EventData.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
-            var ray = new Ray(_pointer.transform.position, _pointer.transform.forward);
-            Physics.Raycast(ray, out var hitData, ChartManager.Instance.pointerLength);
-            var colliderDistance = hitData.distance.Equals(0f)
+            Ray ray = new Ray(_pointer.transform.position, _pointer.transform.forward);
+            Physics.Raycast(ray, out RaycastHit hitData, ChartManager.Instance.pointerLength);
+            float colliderDistance = hitData.distance.Equals(0f)
                 ? ChartManager.Instance.pointerLength
                 : hitData.distance;
-            var canvasDistance = EventData.pointerCurrentRaycast.distance.Equals(0f)
+            float canvasDistance = EventData.pointerCurrentRaycast.distance.Equals(0f)
                 ? ChartManager.Instance.pointerLength
                 : EventData.pointerCurrentRaycast.distance;
 
@@ -133,7 +133,7 @@ namespace SEE.Game.Charts.VR
         /// </summary>
         private void Release(GameObject hitObject)
         {
-            var pointerRelease = ExecuteEvents.GetEventHandler<IPointerClickHandler>(hitObject);
+            GameObject pointerRelease = ExecuteEvents.GetEventHandler<IPointerClickHandler>(hitObject);
 
             if (EventData.pointerPress == pointerRelease)
                 ExecuteEvents.Execute(EventData.pointerPress, EventData,

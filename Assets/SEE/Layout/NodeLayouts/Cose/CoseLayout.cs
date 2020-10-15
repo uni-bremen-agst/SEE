@@ -250,9 +250,9 @@ namespace SEE.Layout.NodeLayouts.Cose
             int countNode = layoutNodes.Where(node => !node.IsSublayoutNode || node.IsSublayoutRoot).ToList().Count;
             int countMax = CountDepthMax(layoutNodes);
 
-            var leafNodesCount = layoutNodes.Where(node => node.IsLeaf && (!node.IsSublayoutNode || node.IsSublayoutRoot)).ToList().Count;
+            int leafNodesCount = layoutNodes.Where(node => node.IsLeaf && (!node.IsSublayoutNode || node.IsSublayoutRoot)).ToList().Count;
 
-            var edgesCount = edges.Where(edge => edge.Source.Children().Count > 0 && edge.Target.Children().Count > 0).ToList().Count;
+            int edgesCount = edges.Where(edge => edge.Source.Children().Count > 0 && edge.Target.Children().Count > 0).ToList().Count;
 
             int edgeLength = CoseHelper.GetGoodEgdeLength(countNode, countMax, leafNodesCount, edgesCount);
             int repulsionStrength = CoseHelper.GetGoodRepulsionRange(countMax, countNode, edgesCount);
@@ -313,7 +313,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// </summary>
         private void ApplyLayout()
         {
-            foreach (var entry in layout_result)
+            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout_result)
             {
                 ILayoutNode node = entry.Key;
                 NodeTransform transform = entry.Value;
@@ -506,9 +506,9 @@ namespace SEE.Layout.NodeLayouts.Cose
                 // we dont have to look at the original graph 
                 for (int i = 1; i < gmList.Count; i++)
                 {
-                    var k = edgeLengths[i - 1];
-                    var fac = Math.Sqrt(4.0 / 7);
-                    var newEdgeLength = (int)(fac * k);
+                    int k = edgeLengths[i - 1];
+                    double fac = Math.Sqrt(4.0 / 7);
+                    int newEdgeLength = (int)(fac * k);
                     newEdgeLength = Math.Max(newEdgeLength, 1);
                     Debug.Log("");
                     edgeLengths.Add(i, newEdgeLength);
@@ -791,11 +791,11 @@ namespace SEE.Layout.NodeLayouts.Cose
 
                         if (!((i < 0) || (j < 0) || (i >= grid.GetLength(0)) || (j >= grid.GetLength(1))))
                         {
-                            var list = grid[i, j];
+                            List<CoseNode> list = grid[i, j];
 
-                            for (var k = 0; k < list.Count; k++)
+                            for (int k = 0; k < list.Count; k++)
                             {
-                                var nodeB = list[k];
+                                CoseNode nodeB = list[k];
 
                                 if ((nodeA.Owner != nodeB.Owner) || (nodeA == nodeB))
                                 {
@@ -935,8 +935,8 @@ namespace SEE.Layout.NodeLayouts.Cose
 
             List<CoseNode>[,] collect;
 
-            var sizeX = (int)Mathf.Ceil((float)((graph.RightBackCorner.x - graph.LeftFrontCorner.x) / coseLayoutSettings.RepulsionRange));
-            var sizeY = (int)Mathf.Ceil((float)((graph.LeftFrontCorner.y - graph.RightBackCorner.y) / coseLayoutSettings.RepulsionRange));
+            int sizeX = (int)Mathf.Ceil((float)((graph.RightBackCorner.x - graph.LeftFrontCorner.x) / coseLayoutSettings.RepulsionRange));
+            int sizeY = (int)Mathf.Ceil((float)((graph.LeftFrontCorner.y - graph.RightBackCorner.y) / coseLayoutSettings.RepulsionRange));
 
             collect = new List<CoseNode>[sizeX, sizeY];
 

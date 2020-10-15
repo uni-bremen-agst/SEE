@@ -1499,7 +1499,7 @@ namespace SEE.Tools
             // Iterate on all nodes in the domain of implicit_maps_to_table
             // (N.B.: these are nodes that are in 'implementation'), and
             // propagate and lift their dependencies in the architecture
-            foreach (var mapsto in _implicit_maps_to_table)
+            foreach (KeyValuePair<string, Node> mapsto in _implicit_maps_to_table)
             {
                 // source_node is in implementation
                 Node source_node = InImplementation[mapsto.Key];
@@ -2101,7 +2101,7 @@ namespace SEE.Tools
 
         public static void DumpTable(Dictionary<string, Node> table)
         {
-            foreach (var entry in table)
+            foreach (KeyValuePair<string, Node> entry in table)
             {
                 Debug.LogFormat("  {0} -> {1}\n", entry.Key, entry.Value.ID);
             }

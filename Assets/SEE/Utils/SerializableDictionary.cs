@@ -49,7 +49,7 @@ public abstract class SerializableDictionaryBase<TKey, TValue, TValueStorage> : 
 
     public SerializableDictionaryBase(IDictionary<TKey, TValue> dict) : base(dict.Count)
     {
-        foreach (var kvp in dict)
+        foreach (KeyValuePair<TKey, TValue> kvp in dict)
         {
             this[kvp.Key] = kvp.Value;
         }
@@ -63,7 +63,7 @@ public abstract class SerializableDictionaryBase<TKey, TValue, TValueStorage> : 
     public void CopyFrom(IDictionary<TKey, TValue> dict)
     {
         this.Clear();
-        foreach (var kvp in dict)
+        foreach (KeyValuePair<TKey, TValue> kvp in dict)
         {
             this[kvp.Key] = kvp.Value;
         }
@@ -93,7 +93,7 @@ public abstract class SerializableDictionaryBase<TKey, TValue, TValueStorage> : 
         m_values = new TValueStorage[n];
 
         int i = 0;
-        foreach (var kvp in this)
+        foreach (KeyValuePair<TKey, TValue> kvp in this)
         {
             m_keys[i] = kvp.Key;
             SetValue(m_values, i, kvp.Value);

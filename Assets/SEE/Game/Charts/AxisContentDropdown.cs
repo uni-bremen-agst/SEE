@@ -121,7 +121,7 @@ namespace SEE.Game.Charts
                 // Add all node metrics without their prefix
                 string[] options = _chartContent.AllMetricNames.ToArray();
                 int MetricPrefixLength = ChartManager.MetricPrefix.Length;
-                for (var i = 0; i < options.Length; i++)
+                for (int i = 0; i < options.Length; i++)
                 {
                     options[i] = options[i].Remove(0, MetricPrefixLength);
                 }
@@ -134,7 +134,7 @@ namespace SEE.Game.Charts
         /// </summary>
         public void ChangeValue()
         {
-            var currentValue = _dropdown.options[_dropdown.value].text;
+            string currentValue = _dropdown.options[_dropdown.value].text;
             CurrentlySelectedMetric = GetEntry(currentValue);
             _chartContent.DrawData(true);
             _chartContent.SetInfoText();

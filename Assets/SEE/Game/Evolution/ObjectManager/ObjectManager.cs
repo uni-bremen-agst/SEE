@@ -213,7 +213,7 @@ namespace SEE.Game.Evolution
         {
             node.AssertNotNull("node");
 
-            var wasNodeRemoved = nodes.TryGetValue(node.ID, out gameObject);
+            bool wasNodeRemoved = nodes.TryGetValue(node.ID, out gameObject);
             nodes.Remove(node.ID);
             return wasNodeRemoved;
         }

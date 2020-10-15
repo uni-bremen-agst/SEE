@@ -72,9 +72,9 @@ namespace SEE.Game.Charts
         /// <param name="eventData">Contains the position data.</param>
         public virtual void OnDrag(PointerEventData eventData)
         {
-            var negative = false;
-            var lossyScale = selectionRect.lossyScale;
-            var sizeDelta = Vector2.zero;
+            bool negative = false;
+            Vector3 lossyScale = selectionRect.lossyScale;
+            Vector2 sizeDelta = Vector2.zero;
 
             if (eventData.position.x - startingPos.x < 0)
             {

@@ -269,8 +269,8 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         /// <returns></returns>
         private static bool CircleContainsCircle(Vector2 position, float radius, Circle circle)
         {
-            var xc0 = position.x - circle.center.x;
-            var yc0 = position.y - circle.center.y;
+            float xc0 = position.x - circle.center.x;
+            float yc0 = position.y - circle.center.y;
             return Mathf.Sqrt(xc0 * xc0 + yc0 * yc0) < radius - circle.radius + float.Epsilon;
         }
 

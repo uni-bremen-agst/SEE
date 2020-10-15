@@ -605,8 +605,8 @@ namespace SEE.Game
 
                 CoseGraphSettings.show = new Dictionary<string, bool>();
 
-                var diff1 = dirs.Keys.Except(dirsLocal.Keys).Any();
-                var diff2 = dirsLocal.Keys.Except(dirs.Keys).Any();
+                bool diff1 = dirs.Keys.Except(dirsLocal.Keys).Any();
+                bool diff2 = dirsLocal.Keys.Except(dirs.Keys).Any();
 
                 if (dirs.Count == dirsLocal.Count && !diff1 && !diff2)
                 {

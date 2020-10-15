@@ -62,8 +62,8 @@ namespace SEE.Game.Charts.VR
         /// <param name="eventData">Contains position data of the pointer.</param>
         public override void OnDrag(PointerEventData eventData)
         {
-            var negative = false;
-            var sizeDelta = Vector2.zero;
+            bool negative = false;
+            Vector2 sizeDelta = Vector2.zero;
             reference.position = eventData.pointerCurrentRaycast.worldPosition;
             reference.anchoredPosition3D = new Vector3(reference.anchoredPosition.x,
                 reference.anchoredPosition.y, 0);

@@ -77,8 +77,8 @@ namespace SEE.Game.Charts.VR
         public override void OnDrag(PointerEventData eventData)
         {
             if (eventData.pointerCurrentRaycast.worldPosition == Vector3.zero) return;
-            var pos = GetComponent<RectTransform>();
-            var oldPos = pos.position;
+            RectTransform pos = GetComponent<RectTransform>();
+            Vector3 oldPos = pos.position;
             pos.position = eventData.pointerCurrentRaycast.worldPosition;
             pos.anchoredPosition3D =
                 new Vector3(pos.anchoredPosition.x, pos.anchoredPosition.y, 0);
