@@ -19,19 +19,27 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.Game.Charts;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-namespace SEE.Controls
+namespace SEE.Game.Charts
 {
-	public class DesktopChartAction : ChartAction
-    {
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.G))
-            {
-                ChartManager.Instance.ToggleCharts();
-            }
-		}
-    }
+	/// <summary>
+	/// Manages the highlighting and visibility of <see cref="DataModel.Node" />s.
+	/// </summary>
+	public class NodeHighlights : MonoBehaviour
+	{
+		/// <summary>
+		/// Determines if this objects node will be displayed in charts.
+		/// </summary>
+		public IDictionary showInChart = new Dictionary<ChartContent, bool>();
+
+		/// <summary>
+		/// A toggle linked to this object.
+		/// </summary>
+		[FormerlySerializedAs("ScrollViewToggle")]
+		public ScrollViewToggle scrollViewToggle;
+	}
 }

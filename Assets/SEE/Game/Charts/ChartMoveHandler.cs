@@ -24,7 +24,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace SEE.Charts.Scripts
+namespace SEE.Game.Charts
 {
 	/// <summary>
 	/// Handles the dragging and minimization of charts.

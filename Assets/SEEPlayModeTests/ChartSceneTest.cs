@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using NUnit.Framework;
-using SEE.Charts.Scripts;
 using SEE.GO;
 using TMPro;
 using UnityEngine;
@@ -8,7 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
 
-namespace SEE.Charts.ChartTests
+namespace SEE.Game.Charts
 {
     /// <summary>
     ///     Tests for charts. Need a working scene with charts in it and a <see cref="GameObject" /> with a

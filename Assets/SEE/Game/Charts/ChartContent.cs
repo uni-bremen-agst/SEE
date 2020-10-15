@@ -31,7 +31,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 
-namespace SEE.Charts.Scripts
+namespace SEE.Game.Charts
 {
 	/// <summary>
 	/// Fills Charts with data and manages that data.

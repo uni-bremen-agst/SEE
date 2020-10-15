@@ -1,5 +1,5 @@
 ﻿using System;
-using SEE.Charts.Scripts;
+using SEE.Game.Charts;
 using SEE.DataModel;
 using UnityEngine;
 
