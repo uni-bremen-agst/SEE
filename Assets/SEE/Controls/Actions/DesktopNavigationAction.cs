@@ -1,6 +1,7 @@
 ﻿using SEE.Utils;
 using System;
 using UnityEngine;
+using SEE.Game.UI3D;
 
 namespace SEE.Controls
 {
@@ -32,7 +33,7 @@ namespace SEE.Controls
             internal const float SnapStepCount = 8;
             internal const float SnapStepAngle = 360.0f / SnapStepCount;
 
-            internal UI3D.MoveGizmo moveGizmo;
+            internal MoveGizmo moveGizmo;
             internal Bounds cityBounds;
             internal Vector3 dragStartTransformPosition;
             internal Vector3 dragStartOffset;
@@ -49,7 +50,7 @@ namespace SEE.Controls
             internal const float SnapStepCount = 8;
             internal const float SnapStepAngle = 360.0f / SnapStepCount;
 
-            internal UI3D.RotateGizmo rotateGizmo;
+            internal RotateGizmo rotateGizmo;
             internal float originalEulerAngleY;
             internal Vector3 originalPosition;
             internal float startAngle;
@@ -93,7 +94,7 @@ namespace SEE.Controls
         /// The cursor visually represents the center of all selected objects and is used
         /// for the center of rotations.
         /// </summary>
-        private UI3D.Cursor cursor;
+        private Game.UI3D.Cursor cursor;
 
         /// <summary>
         /// The current move state.
@@ -126,16 +127,16 @@ namespace SEE.Controls
             raycastPlane = new UnityEngine.Plane(Vector3.up, CityTransform.position);
             mode = 0;
             movingOrRotating = false;
-            cursor = UI3D.Cursor.Create();
+            cursor = Game.UI3D.Cursor.Create();
 
-            moveState.moveGizmo = UI3D.MoveGizmo.Create(0.008f * portalPlane.MinLengthXZ);
+            moveState.moveGizmo = MoveGizmo.Create(0.008f * portalPlane.MinLengthXZ);
             moveState.cityBounds = CityTransform.GetComponent<Collider>().bounds;
             moveState.dragStartTransformPosition = Vector3.zero;
             moveState.dragStartOffset = Vector3.zero;
             moveState.dragCanonicalOffset = Vector3.zero;
             moveState.moveVelocity = Vector3.zero;
 
-            rotateState.rotateGizmo = UI3D.RotateGizmo.Create(portalPlane, 1024);
+            rotateState.rotateGizmo = RotateGizmo.Create(portalPlane, 1024);
             rotateState.originalEulerAngleY = 0.0f;
             rotateState.originalPosition = Vector3.zero;
             rotateState.startAngle = 0.0f;

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Tools
+namespace SEE.GO
 {
     /// <summary>
     /// Creates various textures.
