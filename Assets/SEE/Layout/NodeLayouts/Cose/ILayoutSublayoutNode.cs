@@ -18,7 +18,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
     /// <summary>
     /// ILayoutNode for the caluclation of the sublayouts
@@ -28,7 +28,7 @@ namespace SEE.Layout
         /// <summary>
         /// the scale
         /// </summary>
-        public Vector3 LocalScale { get => node.LocalScale ; set => node.LocalScale = value; }
+        public Vector3 LocalScale { get => node.LocalScale; set => node.LocalScale = value; }
 
         /// <summary>
         /// the center position
@@ -63,7 +63,7 @@ namespace SEE.Layout
         /// <summary>
         /// collection of successor nodes
         /// </summary>
-        public ICollection<ILayoutNode> Successors => GetSuccessors(); 
+        public ICollection<ILayoutNode> Successors => GetSuccessors();
 
         /// <summary>
         /// the parent node
@@ -158,21 +158,21 @@ namespace SEE.Layout
 
         public ILayoutSublayoutNode(ILayoutNode node, ICollection<ILayoutNode> children, bool isLeaf, ILayoutNode parent, Vector3 localScale, Dictionary<ILayoutNode, ILayoutSublayoutNode> ILayout_to_CoseSublayoutNode)
         {
-            this.node = node; 
+            this.node = node;
             this.isLeaf = isLeaf;
-            this.temporaryChildren = children;
-            this.temporaryParent = parent;
+            temporaryChildren = children;
+            temporaryParent = parent;
             node.LocalScale = localScale;
             this.ILayout_to_CoseSublayoutNode = ILayout_to_CoseSublayoutNode;
-            ILayout_to_CoseSublayoutNode[node] = this; 
+            ILayout_to_CoseSublayoutNode[node] = this;
         }
 
         public ILayoutSublayoutNode(ILayoutNode node, Dictionary<ILayoutNode, ILayoutSublayoutNode> ILayout_to_CoseSublayoutNode)
         {
             this.node = node;
-            this.isLeaf = node.IsLeaf;
-            this.temporaryChildren = node.Children();
-            this.temporaryParent = node.Parent;
+            isLeaf = node.IsLeaf;
+            temporaryChildren = node.Children();
+            temporaryParent = node.Parent;
             node.LocalScale = node.LocalScale;
             this.ILayout_to_CoseSublayoutNode = ILayout_to_CoseSublayoutNode;
             ILayout_to_CoseSublayoutNode[node] = this;
@@ -187,7 +187,7 @@ namespace SEE.Layout
                     parent = ILayout_to_CoseSublayoutNode[temporaryParent];
                 }
             }
-            return parent; 
+            return parent;
         }
 
         private ICollection<ILayoutNode> GetSuccessors()
@@ -200,7 +200,7 @@ namespace SEE.Layout
                     if (ILayout_to_CoseSublayoutNode.ContainsKey(successor))
                     {
                         succesorsCollection.Add(ILayout_to_CoseSublayoutNode[successor]);
-                    } 
+                    }
                 }
                 successors = succesorsCollection;
             }

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SEE.DataModel;
+﻿using SEE.DataModel.DG;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.GO
@@ -16,8 +16,8 @@ namespace SEE.GO
         /// <param name="leaveNodeFactory">factory that created the game nodes that are to be decorated</param>
         /// <param name="scaler">scaling to be applied on the metrics for the erosion issues</param>
         /// <param name="maxSpriteWidth">the maximal absolute width of a sprite representing an erosion in world-space Unity units</param>
-        public ErosionIssues(Dictionary<string, IconFactory.Erosion> issueMap, 
-                             NodeFactory leaveNodeFactory, 
+        public ErosionIssues(Dictionary<string, IconFactory.Erosion> issueMap,
+                             NodeFactory leaveNodeFactory,
                              IScale scaler,
                              float maxSpriteWidth)
         {
@@ -103,7 +103,7 @@ namespace SEE.GO
 
                         sprite.transform.localScale = scale;
                         sprite.transform.position = leaveNodeFactory.Roof(gameNode);
-                        
+
                         sprites.Add(sprite);
                     }
                 }

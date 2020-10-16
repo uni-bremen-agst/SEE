@@ -17,9 +17,9 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using UnityEngine;
 using SEE.Layout;
 using System;
+using UnityEngine;
 
 namespace SEE.Game.Evolution
 {
@@ -43,9 +43,9 @@ namespace SEE.Game.Evolution
         /// <param name="callbackName">the method name of the callback</param>
         protected override void AnimateToInternalWithCallback
                   (GameObject gameObject,
-                   ILayoutNode layout, 
-                   bool wasModified, 
-                   GameObject callBackTarget, 
+                   ILayoutNode layout,
+                   bool wasModified,
+                   GameObject callBackTarget,
                    string callbackName,
                    Action<object> callback)
         {

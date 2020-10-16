@@ -15,6 +15,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.Layout.NodeLayouts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,7 +67,7 @@ namespace SEE.Game
             this.CanApplySublayouts = CanApplySublayouts;
             this.InnerNodesEncloseLeafNodes = InnerNodesEncloseLeafNodes;
             this.IsCircular = IsCircular;
-            this.IsHierarchical = isHierarchical;
+            IsHierarchical = isHierarchical;
         }
     }
 
@@ -107,24 +108,24 @@ namespace SEE.Game
         /// </summary>
         /// <param name="nodeLayout">the nodelayout</param>
         /// <returns>the model</returns>
-        public static NodelayoutModel GetModel(this NodeLayouts nodeLayout)
+        public static NodelayoutModel GetModel(this NodeLayoutKind nodeLayout)
         {
             switch (nodeLayout)
             {
-                case NodeLayouts.CompoundSpringEmbedder:
-                    return new NodelayoutModel(OnlyLeaves: false,  CanApplySublayouts: true,  InnerNodesEncloseLeafNodes: true,  IsCircular: false, isHierarchical: true);
-                case NodeLayouts.EvoStreets:
+                case NodeLayoutKind.CompoundSpringEmbedder:
+                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: true, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
+                case NodeLayoutKind.EvoStreets:
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false, isHierarchical: true);
-                case NodeLayouts.Balloon:
+                case NodeLayoutKind.Balloon:
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: true, isHierarchical: true);
-                case NodeLayouts.RectanglePacking:
+                case NodeLayoutKind.RectanglePacking:
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
-                case NodeLayouts.Treemap:
+                case NodeLayoutKind.Treemap:
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
-                case NodeLayouts.CirclePacking:
+                case NodeLayoutKind.CirclePacking:
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: true, isHierarchical: true);
-                case NodeLayouts.Manhattan: 
-                    return new NodelayoutModel(OnlyLeaves: true, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false, isHierarchical: false); 
+                case NodeLayoutKind.Manhattan:
+                    return new NodelayoutModel(OnlyLeaves: true, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false, isHierarchical: false);
                 default:
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
             }
@@ -135,7 +136,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="nodeLayout">the nodelayout</param>
         /// <returns>the inner node kinds</returns>
-        public static List<InnerNodeKinds> GetInnerNodeKinds(this NodeLayouts nodeLayout)
+        public static List<InnerNodeKinds> GetInnerNodeKinds(this NodeLayoutKind nodeLayout)
         {
             List<InnerNodeKinds> values = Enum.GetValues(typeof(InnerNodeKinds)).Cast<InnerNodeKinds>().ToList();
             List<InnerNodeKinds> list = new List<InnerNodeKinds>();
@@ -150,12 +151,12 @@ namespace SEE.Game
         /// </summary>
         /// <param name="nodeLayout">the given nodelayout</param>
         /// <returns>a list of possible sublayout</returns>
-        public static List<NodeLayouts> GetPossibleSublayouts(this NodeLayouts nodeLayout)
+        public static List<NodeLayoutKind> GetPossibleSublayouts(this NodeLayoutKind nodeLayout)
         {
-            List<NodeLayouts> values = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().ToList();
-            values.Remove(NodeLayouts.FromFile);
+            List<NodeLayoutKind> values = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().ToList();
+            values.Remove(NodeLayoutKind.FromFile);
 
-            if (nodeLayout == NodeLayouts.EvoStreets)
+            if (nodeLayout == NodeLayoutKind.EvoStreets)
             {
                 return values.Where(layout => !layout.GetModel().IsCircular).ToList();
             }

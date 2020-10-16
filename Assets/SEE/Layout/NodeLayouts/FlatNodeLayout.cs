@@ -1,4 +1,4 @@
-﻿namespace SEE.Layout
+﻿namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// The abstract super class of all non-hierarchical (flat) node layouts.
@@ -26,7 +26,7 @@
 
         public override bool UsesEdgesAndSublayoutNodes()
         {
-            return false; 
+            return false;
         }
     }
 }

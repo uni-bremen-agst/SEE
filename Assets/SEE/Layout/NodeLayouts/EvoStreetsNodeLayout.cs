@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using SEE.DataModel.DG;
+using SEE.Layout.NodeLayouts.Cose;
+using SEE.Layout.NodeLayouts.EvoStreets;
+using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
-using SEE.Layout.EvoStreets;
-using SEE.DataModel;
-
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts
 {
     public class EvoStreetsNodeLayout : HierarchicalNodeLayout
     {
@@ -102,7 +102,7 @@ namespace SEE.Layout
             {
                 // Street
                 Place_Street(node, ref layout_result);
-                foreach (var child in node.Children)
+                foreach (ENode child in node.Children)
                 {
                     To_Layout(child, ref layout_result);
                 }
@@ -126,9 +126,9 @@ namespace SEE.Layout
         /// <param name="layout_result">layout result</param>
         private void Place_Street(ENode node, ref Dictionary<ILayoutNode, NodeTransform> layout_result)
         {
-            layout_result[node.GraphNode] 
-                = new NodeTransform(node.Location, 
-                                    new Vector3(node.Scale.x, StreetHeight, node.Scale.z), 
+            layout_result[node.GraphNode]
+                = new NodeTransform(node.Location,
+                                    new Vector3(node.Scale.x, StreetHeight, node.Scale.z),
                                     node.Rotation);
         }
 
@@ -206,7 +206,7 @@ namespace SEE.Layout
                 node.Scale = new Vector3(node.Scale.x, node.Scale.y, relStreetWidth);
 
                 foreach (ENode eNode in node.Children)
-                {           
+                {
                     float streetMod = eNode.Left ? -relStreetWidth / 2 : +relStreetWidth / 2;
                     Vector2 relChild = new Vector2(eNode.XPivot, 0.0f);
                     relChild = relChild.GetRotated(node.Rotation);
@@ -256,7 +256,7 @@ namespace SEE.Layout
                             newChildNode.XPivot = leftPivotX;
                             leftPivotX += OffsetBetweenBuildings;
                         }
-                        else 
+                        else
                         {   // street
                             newChildNode.XPivot = leftPivotX;
                             leftPivotX += newChildNode.Scale.z;
@@ -357,7 +357,7 @@ namespace SEE.Layout
             float rightMax = 0.0f;
 
             foreach (ENode eNode in node.Children)
-            {   
+            {
                 if (eNode.Left)
                 {
                     if (eNode.IsHouse())
@@ -461,7 +461,7 @@ namespace SEE.Layout
 
         public override bool UsesEdgesAndSublayoutNodes()
         {
-            return false; 
+            return false;
         }
     }
 }

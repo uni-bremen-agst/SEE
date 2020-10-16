@@ -20,14 +20,12 @@ namespace SEE.Utils
         private Performance(string action, Stopwatch sw)
         {
             this.action = action;
-            this.stopWatch = sw;
+            stopWatch = sw;
         }
 
-        private Stopwatch stopWatch;
+        private readonly Stopwatch stopWatch;
 
         private readonly string action;
-
-        private string elapsedTime = "00:00:00:00";
 
         private double totalTimeInMilliSeconds = 0.0;
 
@@ -40,7 +38,6 @@ namespace SEE.Utils
         {
             Stopwatch sw = new Stopwatch();
             Performance result = new Performance(action, sw);
-            Debug.LogFormat("Begin of {0}.\n", action);
             sw.Start();
             return result;
         }
@@ -49,29 +46,34 @@ namespace SEE.Utils
         /// Emits the elapsed time from the start of the performance time span
         /// until now. Reports it to Debug.Log along with the action name.
         /// </summary>
-        public void End()
+        /// <param name="print">if true, the elapsed time will be printed</param>
+        public void End(bool print = false)
         {
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
             totalTimeInMilliSeconds = ts.TotalMilliseconds;
-            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-            this.elapsedTime = elapsedTime;
-            try
+            if (print)
             {
-                Debug.Log("End of " + action + " (" + elapsedTime + " [h:m:s:ms] elapsed time).\n");
-            } catch(Exception e)
-            {
-                Debug.Log(e);
+                Debug.LogFormat("Action {0} finished in {1} [h:m:s:ms] elapsed time).\n", action, GetElapsedTime());
             }
-            
         }
 
+        /// <summary>
+        /// Returns the elapsed time between the calls of Begin(string) and End(bool)
+        /// in the format h:m:s:ms.
+        /// </summary>
+        /// <returns>elapsed time</returns>
         public string GetElapsedTime()
         {
-            return elapsedTime;
+            TimeSpan ts = TimeSpan.FromMilliseconds(totalTimeInMilliSeconds);
+            return string.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
         }
 
+        /// <summary>
+        /// Returns the elapsed time in milliseconds between the calls of Begin(string)
+        /// and End(bool).
+        /// </summary>
+        /// <returns>elapsed time in milliseconds</returns>
         public double GetTimeInMilliSeconds()
         {
             return totalTimeInMilliSeconds;

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Game;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -12,12 +13,9 @@ namespace SEE.GO
     /// </summary>
     public abstract class InnerNodeFactory : NodeFactory
     {
-        /// <summary>
-        /// Constructor setting the available styles.
-        /// </summary>
-        public InnerNodeFactory()
+        public InnerNodeFactory(Materials.ShaderType shaderType, ColorRange colorRange)
         {
-            materials = new Materials(10, Color.white, Color.red);
+            Materials = new Materials(shaderType, colorRange);
         }
 
         /// <summary>
@@ -33,16 +31,16 @@ namespace SEE.GO
         /// <summary>
         /// The collection of materials to be used as styles by this node factory.
         /// </summary>
-        protected Materials materials;
+        public Materials Materials;
 
         /// <summary>
         /// The default height of a inner node in world space Unity unit.
         /// </summary>
         protected const float DefaultHeight = 0.000001f;
 
-        public override int NumberOfStyles()
+        public override uint NumberOfStyles()
         {
-            return materials.NumberOfMaterials();
+            return Materials.NumberOfMaterials;
         }
 
         public override void SetStyle(GameObject block, int style)
@@ -50,7 +48,10 @@ namespace SEE.GO
             Renderer renderer = block.GetComponent<Renderer>();
             if (renderer != null)
             {
-                renderer.sharedMaterial = materials.DefaultMaterial(Mathf.Clamp(style, 0, NumberOfStyles() - 1));
+                UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>());
+                UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>().node);
+                int level = block.GetComponent<NodeRef>().node.Level;
+                renderer.sharedMaterial = Materials.Get(level, Mathf.Clamp(style, 0, (int)NumberOfStyles() - 1));
             }
         }
     }

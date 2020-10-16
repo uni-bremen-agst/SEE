@@ -15,11 +15,11 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
     public class CoseNode
     {
@@ -142,7 +142,7 @@ namespace SEE.Layout
             }
 
             centerPosition = center;
-            
+
             Rect rectA = CoseHelper.NewRect(Scale, centerPosition);
             Rect rectB = CoseHelper.NewRect(nodeB.Scale, nodeB.CenterPosition);
 
@@ -207,12 +207,12 @@ namespace SEE.Layout
 
             if (Math.Abs(layoutValues.DisplacementX) > maxNodeDisplacement)
             {
-                layoutValues.DisplacementX = (float) maxNodeDisplacement * CoseHelper.Sign(layoutValues.DisplacementX);
+                layoutValues.DisplacementX = (float)maxNodeDisplacement * CoseHelper.Sign(layoutValues.DisplacementX);
             }
 
             if (Math.Abs(layoutValues.DisplacementY) > maxNodeDisplacement)
             {
-                layoutValues.DisplacementY = (float) maxNodeDisplacement * CoseHelper.Sign(layoutValues.DisplacementY);
+                layoutValues.DisplacementY = (float)maxNodeDisplacement * CoseHelper.Sign(layoutValues.DisplacementY);
             }
 
             if (child == null && !sublayoutValues.IsSubLayoutNode)
@@ -475,8 +475,8 @@ namespace SEE.Layout
             else
             {
                 estimatedSize = child.CalcEstimatedSize();
-                scale.x = (float) estimatedSize;
-                scale.z = (float) estimatedSize;
+                scale.x = (float)estimatedSize;
+                scale.z = (float)estimatedSize;
                 return estimatedSize;
             }
         }
@@ -516,7 +516,7 @@ namespace SEE.Layout
         public void UpdateBounding(Vector2 position, Vector2 scale)
         {
             this.scale = scale;
-            this.centerPosition = position;
+            centerPosition = position;
         }
 
         /// <summary>
@@ -552,7 +552,7 @@ namespace SEE.Layout
         /// <param name="height">the width</param>
         public void SetWidth(double width)
         {
-            scale.x = (float) width;
+            scale.x = (float)width;
         }
 
         /// <summary>

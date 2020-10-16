@@ -15,7 +15,7 @@ namespace SEE.Net
         public const string NAME_L = "/Player Rig/Interaction Manager/VR Vive-style Controller (Left)";
         public const string NAME_R = "/Player Rig/Interaction Manager/VR Vive-style Controller (Right)";
 
-        [SerializeField] private ViveControllerHand hand;
+        [SerializeField] private readonly ViveControllerHand hand;
         public ViveControllerHand Hand { get => hand; }
 
         private Transform controllerTransform;

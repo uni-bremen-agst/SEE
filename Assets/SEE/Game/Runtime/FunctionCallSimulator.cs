@@ -120,7 +120,7 @@ namespace SEE.Game.Runtime
             for (int i = 0; i < spheres.Length; i++)
             {
                 spheres[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                spheres[i].transform.position = Vector3.Lerp(sourcePosition, targetPosition, (float)i / (float)spheres.Length);
+                spheres[i].transform.position = Vector3.Lerp(sourcePosition, targetPosition, i / (float)spheres.Length);
                 spheres[i].transform.rotation = Quaternion.identity;
                 spheres[i].transform.localScale = new Vector3(SPHERE_SCALE, SPHERE_SCALE, SPHERE_SCALE);
                 spheres[i].transform.parent = transform;
@@ -130,7 +130,7 @@ namespace SEE.Game.Runtime
             sourceOriginalColor = src.GetComponentInChildren<MeshRenderer>().material.color;
             targetOriginalColor = dst.GetComponentInChildren<MeshRenderer>().material.color;
         }
-        
+
         /// <summary>
         /// Resets the source's and target's scale and color and destroys the object.
         /// </summary>
@@ -145,7 +145,7 @@ namespace SEE.Game.Runtime
                 Destroy(spheres[i]);
             }
         }
-        
+
         /// <summary>
         /// Updates the simulation.
         /// </summary>
@@ -200,7 +200,7 @@ namespace SEE.Game.Runtime
                 srcToDstDistFlat = srcToDstFlat.magnitude;
             }
             Vector2 flyDirFlat = srcToDstFlat.normalized;
-            
+
             // Translate first sphere
             Vector2 stepFlat = flyDirFlat * SPHERE_HORIZONTAL_SPEED * Time.deltaTime * Mathf.Sqrt(srcToDstDistFlat);
             Vector2 fstPosFlat = new Vector2(spheres[0].transform.position.x, spheres[0].transform.position.z) + stepFlat;
@@ -222,7 +222,7 @@ namespace SEE.Game.Runtime
                 Vector2 spherePosFlat = new Vector2(spherePos.x, spherePos.z);
 
                 spherePosFlat = fstPosFlat + i * sphereOffsetFlat;
-                
+
                 if (!pastDst)
                 {
                     float sphereToSrcDstFlat = Vector2.Distance(spherePosFlat, srcPosFlat);

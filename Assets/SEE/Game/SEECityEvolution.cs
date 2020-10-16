@@ -17,14 +17,13 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
+using SEE.Game.Evolution;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
-using SEE.DataModel;
-using SEE.Game.Evolution;
-using SEE.DataModel.IO;
-using SEE.Utils;
 
 namespace SEE.Game
 {
@@ -66,7 +65,7 @@ namespace SEE.Game
         {
             GraphsReader graphsReader = new GraphsReader();
             // Load all GXL graphs in directory PathPrefix but not more than maxRevisionsToLoad many.
-            graphsReader.Load(this.PathPrefix, this.HierarchicalEdges, maxRevisionsToLoad);
+            graphsReader.Load(PathPrefix, HierarchicalEdges, maxRevisionsToLoad);
 
             // TODO: The CSV metric files should be loaded, too.
 
@@ -83,7 +82,7 @@ namespace SEE.Game
         /// <returns>the loaded graph or null if none could be found</returns>
         public Graph LoadFirstGraph()
         {
-            GraphReader graphReader = new GraphReader(FirstFilename(this.PathPrefix), this.HierarchicalEdges);
+            GraphReader graphReader = new GraphReader(FirstFilename(PathPrefix), HierarchicalEdges);
             graphReader.Load();
             return graphReader.GetGraph();
         }
@@ -111,7 +110,7 @@ namespace SEE.Game
         /// and can enter the game for the first time. Loads all graphs, calculates their
         /// layouts, and displays the first graph in the graph series.
         /// </summary>
-        void Start()
+        private void Start()
         {
             evolutionRenderer = CreateEvolutionRenderer();
             evolutionRenderer.AssertNotNull("renderer");

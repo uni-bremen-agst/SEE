@@ -20,9 +20,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static SEE.Game.AbstractSEECity;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
     /// <summary>
     /// Helper functions
@@ -111,23 +110,23 @@ namespace SEE.Layout
         /// <param name="unit">the leafNode unit</param>
         /// <param name="settings">the abstract see city settings</param>
         /// <returns>a node layout object</returns>
-        public static NodeLayout GetNodelayout(NodeLayouts nodeLayout, float groundLevel, float unit, AbstractSEECity settings)
+        public static NodeLayout GetNodelayout(NodeLayoutKind nodeLayout, float groundLevel, float unit, AbstractSEECity settings)
         {
             switch (nodeLayout)
             {
-                case NodeLayouts.Manhattan:
+                case NodeLayoutKind.Manhattan:
                     return new ManhattanLayout(groundLevel, unit);
-                case NodeLayouts.RectanglePacking:
+                case NodeLayoutKind.RectanglePacking:
                     return new RectanglePackingNodeLayout(groundLevel, unit);
-                case NodeLayouts.EvoStreets:
+                case NodeLayoutKind.EvoStreets:
                     return new EvoStreetsNodeLayout(groundLevel, unit);
-                case NodeLayouts.Treemap:
+                case NodeLayoutKind.Treemap:
                     return new TreemapLayout(groundLevel, 1000.0f * unit, 1000.0f * unit);
-                case NodeLayouts.Balloon:
+                case NodeLayoutKind.Balloon:
                     return new BalloonNodeLayout(groundLevel);
-                case NodeLayouts.CirclePacking:
+                case NodeLayoutKind.CirclePacking:
                     return new CirclePackingNodeLayout(groundLevel);
-                case NodeLayouts.CompoundSpringEmbedder:
+                case NodeLayoutKind.CompoundSpringEmbedder:
                     return new CoseLayout(groundLevel, settings);
                 default:
                     throw new Exception("Unhandled node layout " + nodeLayout);
@@ -146,18 +145,20 @@ namespace SEE.Layout
             float countNodesConstant = 0.206f;
             float countMaxDepthConstant = 2.279f;
             float edgeDensityConstant = -57.829f;
-           
+
             float edgeDensity;
 
-            if (leafNodesCount == 0 || countEdges == 0) {
+            if (leafNodesCount == 0 || countEdges == 0)
+            {
                 edgeDensity = 0;
-            } else
+            }
+            else
             {
                 float leafNodeCountMinus = leafNodesCount > 1 ? leafNodesCount - 1 : 1;
                 edgeDensity = countEdges / (leafNodesCount * leafNodeCountMinus);
             }
 
-            float edgeLength = countNodesConstant * countNodes + countMaxDepthConstant * maxDepth + edgeDensityConstant* edgeDensity + constant;
+            float edgeLength = countNodesConstant * countNodes + countMaxDepthConstant * maxDepth + edgeDensityConstant * edgeDensity + constant;
             return Math.Max((int)Math.Ceiling(edgeLength), 2);
         }
 

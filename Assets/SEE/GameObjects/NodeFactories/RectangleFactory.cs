@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Game;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -12,33 +13,28 @@ namespace SEE.GO
         /// Every line width passed as a parameter to methods of this class will be multiplied by this factor
         /// for the actual rendering.
         /// </summary>
+        /// <param name="colorRange">the color range of the created objects</param>
         /// <param name="unit">initial unit for the width of all lines</param>
-        public RectangleFactory(float unit)
-            : base(unit)
+        public RectangleFactory(ColorRange colorRange, float unit)
+            : base(colorRange, unit)
         {
-            materials = new Materials(1, DefaultColor, DefaultColor);
-            material = new Material(materials.DefaultMaterial(0));
-            material.color = DefaultColor;
+            material = Materials.New(Materials.ShaderType.TransparentLine, colorRange.upper);
         }
 
         /// <summary>
         /// The material we use for the line drawing the rectangle.
         /// </summary>
-        private Material material;
+        private readonly Material material;
 
         /// <summary>
         /// The default line width of the rectangle line.
         /// </summary>
         private const float defaultLength = 1.0f;
 
-        // The default color for rectangle lines.
-        public static Color DefaultColor = Color.blue;
-
-        public override GameObject NewBlock(int index = 0)
+        public override GameObject NewBlock(int index = 0, int level = 0)
         {
             GameObject result = new GameObject();
-            result.isStatic = true;
-            AttachLine(result, defaultLength, defaultLineWidth * Unit, DefaultColor);
+            AttachLine(result, defaultLength, defaultLineWidth * Unit, material.color);
             return result;
         }
 
@@ -68,9 +64,9 @@ namespace SEE.GO
 
             // Set some positions
             Vector3[] positions = new Vector3[4];
-            positions[0] = new Vector3(-halfLength, 0.0f,  halfLength);  // left back corner
-            positions[1] = new Vector3( halfLength, 0.0f,  halfLength);  // right back corner
-            positions[2] = new Vector3( halfLength, 0.0f, -halfLength);  // right front corner
+            positions[0] = new Vector3(-halfLength, 0.0f, halfLength);  // left back corner
+            positions[1] = new Vector3(halfLength, 0.0f, halfLength);  // right back corner
+            positions[2] = new Vector3(halfLength, 0.0f, -halfLength);  // right front corner
             positions[3] = new Vector3(-halfLength, 0.0f, -halfLength);  // left front corner
             line.positionCount = positions.Length;
             line.SetPositions(positions);

@@ -6,21 +6,28 @@ namespace SEE.Net
 {
 
     /// <summary>
+    /// !!! IMPORTANT !!!
+    /// 
+    ///   Rules for every deriving class:
+    ///   
+    ///     1. Every field MUST be public!
+    ///     2. Deriving classes MUST NOT have fields of the type GameObjects or
+    ///        MonoBehaviours.
+    ///        
+    ///   These rules are necessary, to allow (de)serialization of the classes for
+    ///   networking.
+    ///   
+    ///   See section Networking.Actions.Creation in
+    ///   <see href="https://github.com/uni-bremen-agst/SEE/wiki/Networking">here</see>
+    ///   for further details.
+    /// 
+    /// 
+    /// 
     /// An abstract networked action. Actions can be completely arbitrary and can be
     /// executed on the server and/or client.
     /// </summary>
     public abstract class AbstractAction
     {
-        /// <summary>
-        /// The next unique ID of an action.
-        /// </summary>
-        private static int nextIndex = 0;
-
-        /// <summary>
-        /// The unique ID of the action.
-        /// </summary>
-        public int index = -1;
-
         /// <summary>
         /// The IP-address of the requester of this action.
         /// </summary>
@@ -32,21 +39,32 @@ namespace SEE.Net
         public int requesterPort;
 
         /// <summary>
-        /// Whether the action should be buffered, so that new clients in the future will
-        /// receive it.
+        /// The IP-addresses of the recipients.
         /// </summary>
-        public bool buffer;
+        public string[] recipientsIPAddresses;
+
+        /// <summary>
+        /// The ports of the recipients.
+        /// </summary>
+        public int[] recipientsPorts;
 
 
 
         /// <summary>
         /// Constructs an abstract action.
         /// </summary>
-        /// <param name="buffer">Whether the action should be buffered, so that new
-        /// clients in the future will receive it.</param>
-        public AbstractAction(bool buffer)
+        public AbstractAction()
         {
             IPEndPoint requester = Client.LocalEndPoint;
+            SetRequester(requester);
+        }
+
+        /// <summary>
+        /// Sets the requester of this action to given end-point.
+        /// </summary>
+        /// <param name="requester">The requester.</param>
+        public void SetRequester(IPEndPoint requester)
+        {
             if (requester != null)
             {
                 requesterIPAddress = requester.Address.ToString();
@@ -57,10 +75,19 @@ namespace SEE.Net
                 requesterIPAddress = null;
                 requesterPort = -1;
             }
-            this.buffer = buffer;
         }
 
-
+        /// <summary>
+        /// Returns the <see cref="IPEndPoint"/> of the client, that requested this
+        /// action.
+        /// </summary>
+        /// <returns>The <see cref="IPEndPoint"/> of the client, that requested this
+        /// action.</returns>
+        protected IPEndPoint GetRequester()
+        {
+            IPEndPoint result = new IPEndPoint(IPAddress.Parse(requesterIPAddress), requesterPort);
+            return result;
+        }
 
         /// <summary>
         /// Checks, if the executing client is the one that requested this action.
@@ -69,16 +96,35 @@ namespace SEE.Net
         /// otherwise.</returns>
         protected bool IsRequester()
         {
-            if (Network.UseInOfflineMode)
+            if (Network.UseInOfflineMode || requesterIPAddress == null || requesterPort == -1)
             {
                 return true;
             }
 
-            IPEndPoint requesterEndPoint = new IPEndPoint(IPAddress.Parse(requesterIPAddress), requesterPort);
+            IPEndPoint requesterEndPoint = GetRequester();
             bool result = Client.LocalEndPoint.Equals(requesterEndPoint);
             return result;
         }
 
+        /// <summary>
+        /// Returns all of the recipients of this action.
+        /// </summary>
+        /// <returns>All of the recipients of this action.</returns>
+        public IPEndPoint[] GetRecipients()
+        {
+            IPEndPoint[] result = null;
+
+            if (recipientsIPAddresses != null && recipientsPorts != null)
+            {
+                result = new IPEndPoint[recipientsIPAddresses.Length];
+                for (int i = 0; i < recipientsIPAddresses.Length; i++)
+                {
+                    result[i] = new IPEndPoint(IPAddress.Parse(recipientsIPAddresses[i]), recipientsPorts[i]);
+                }
+            }
+
+            return result;
+        }
 
 
         /// <summary>
@@ -90,8 +136,13 @@ namespace SEE.Net
         /// 
         /// If <see cref="Network.UseInOfflineMode"/> is <code>true</code>, this will be
         /// simulated locally without sending networked packets.
+        /// 
+        /// <param name="recipients">The recipients of this action. If <code>null</code>,
+        /// this actions will be executed everywhere.</param>
         /// </summary>
-        public void Execute()
+        /// 
+        /// <param name="recipients">The recipients of the actions.dadawawdaddWADAWDAWD</param>
+        public void Execute(IPEndPoint[] recipients = null)
         {
             if (Network.UseInOfflineMode)
             {
@@ -100,6 +151,21 @@ namespace SEE.Net
             }
             else
             {
+                if (recipients == null)
+                {
+                    recipientsIPAddresses = null;
+                    recipientsPorts = null;
+                }
+                else
+                {
+                    recipientsIPAddresses = new string[recipients.Length];
+                    recipientsPorts = new int[recipients.Length];
+                    for (int i = 0; i < recipients.Length; i++)
+                    {
+                        recipientsIPAddresses[i] = recipients[i].Address.ToString();
+                        recipientsPorts[i] = recipients[i].Port;
+                    }
+                }
 #if UNITY_EDITOR
                 DebugAssertCanBeSerialized();
 #endif
@@ -108,58 +174,6 @@ namespace SEE.Net
             }
         }
 
-        /// <summary>
-        /// Undos this action for the server and every client. The procedure is analogous
-        /// to <see cref="Execute"/>.
-        /// 
-        /// Order of execution:
-        /// 1. <see cref="UndoOnServer"/>
-        /// 2. <see cref="UndoOnClient"/>
-        /// </summary>
-        public void Undo()
-        {
-            if (Network.UseInOfflineMode)
-            {
-                UndoOnServerBase();
-                UndoOnClientBase();
-            }
-            else
-            {
-#if UNITY_EDITOR
-                DebugAssertCanBeSerialized();
-#endif
-                UndoActionPacket packet = new UndoActionPacket(this);
-                Network.SubmitPacket(Client.Connection, packet);
-            }
-        }
-
-        /// <summary>
-        /// Redos this action for the server and every client. The procedure is analogous
-        /// to <see cref="Execute"/>.
-        /// 
-        /// Order of execution:
-        /// 1. <see cref="RedoOnServer"/>
-        /// 2. <see cref="RedoOnClient"/>
-        /// </summary>
-        public void Redo()
-        {
-            if (Network.UseInOfflineMode)
-            {
-                RedoOnServerBase();
-                RedoOnClientBase();
-            }
-            else
-            {
-#if UNITY_EDITOR
-                DebugAssertCanBeSerialized();
-#endif
-                RedoActionPacket packet = new RedoActionPacket(this);
-                Network.SubmitPacket(Client.Connection, packet);
-            }
-        }
-
-
-
         /// Executes the action on the server locally. This function is only called by
         /// <see cref="ExecuteActionPacket"/> or by <see cref="Execute"/> directly in
         /// offline mode directly. It must not be called otherwise!
@@ -167,14 +181,6 @@ namespace SEE.Net
         {
             try
             {
-                if (buffer)
-                {
-                    index = nextIndex++;
-                }
-                else
-                {
-                    index = -1;
-                }
                 ExecuteOnServer();
             }
             catch (Exception e)
@@ -192,90 +198,13 @@ namespace SEE.Net
         {
             try
             {
-                bool result = ExecuteOnClient();
-                if (result)
-                {
-                    if (buffer)
-                    {
-                        ActionHistory.DebugOnExecute(this);
-                    }
-                }
+                ExecuteOnClient();
             }
             catch (Exception e)
             {
                 Debug.LogException(e);
             }
         }
-
-        /// <summary>
-        /// Undos the action on the server locally. This function is only called by
-        /// <see cref="UndoActionPacket"/> or by <see cref="Undo"/> directly in
-        /// offline mode directly. It must not be called otherwise!
-        /// </summary>
-        internal void UndoOnServerBase()
-        {
-            try
-            {
-                UndoOnServer();
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
-        }
-
-        /// <summary>
-        /// Undos the action on the client locally. This function is only called by
-        /// <see cref="UndoActionPacket"/> or by <see cref="Undo"/> directly in
-        /// offline mode directly. It must not be called otherwise!
-        /// </summary>
-        internal void UndoOnClientBase()
-        {
-            try
-            {
-                bool result = UndoOnClient();
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
-        }
-
-        /// <summary>
-        /// Redos the action on the server locally. This function is only called by
-        /// <see cref="RedoActionPacket"/> or by <see cref="Redo"/> directly in
-        /// offline mode directly. It must not be called otherwise!
-        /// </summary>
-        internal void RedoOnServerBase()
-        {
-            try
-            {
-                RedoOnServer();
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
-        }
-
-        /// <summary>
-        /// Redos the action on the client locally. This function is only called by
-        /// <see cref="RedoActionPacket"/> or by <see cref="Redo"/> directly in
-        /// offline mode directly. It must not be called otherwise!
-        /// </summary>
-        internal void RedoOnClientBase()
-        {
-            try
-            {
-                bool result = RedoOnClient();
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
-        }
-
-
 
         /// <summary>
         /// The implementation of the action for the server. Returns whether the action
@@ -284,9 +213,7 @@ namespace SEE.Net
         /// If the implementation throws an exception, it will be interpreted just like
         /// returning <code>false</code>.
         /// </summary>
-        /// <returns><code>true</code>, if the action could be executed, <code>false</code>
-        /// otherwise.</returns>
-        protected abstract bool ExecuteOnServer();
+        protected abstract void ExecuteOnServer();
 
         /// <summary>
         /// The implementation of the action for the client. Returns whether the action
@@ -295,63 +222,7 @@ namespace SEE.Net
         /// If the implementation throws an exception, it will be interpreted just like
         /// returning <code>false</code>.
         /// </summary>
-        /// <returns><code>true</code>, if the action could be executed, <code>false</code>
-        /// otherwise.</returns>
-        protected abstract bool ExecuteOnClient();
-
-        /// <summary>
-        /// The implementation of undoing the action for the server. Returns whether the
-        /// action could be undone successfully.
-        /// 
-        /// If the implementation throws an exception, it will be interpreted just like
-        /// returning <code>false</code>.
-        /// 
-        /// If <see cref="buffer"/> is <code>false</code>, this function will never be called.
-        /// </summary>
-        /// <returns><code>true</code>, if the action could be undone, <code>false</code>
-        /// otherwise.</returns>
-        protected abstract bool UndoOnServer();
-
-        /// <summary>
-        /// The implementation of undoing the action for the client. Returns whether the
-        /// action could be undone successfully.
-        /// 
-        /// If the implementation throws an exception, it will be interpreted just like
-        /// returning <code>false</code>.
-        /// 
-        /// If <see cref="buffer"/> is <code>false</code>, this function will never be called.
-        /// </summary>
-        /// <returns><code>true</code>, if the action could be undone, <code>false</code>
-        /// otherwise.</returns>
-        protected abstract bool UndoOnClient();
-
-        /// <summary>
-        /// The implementation of redoing the action for the server. Returns whether the
-        /// action could be redone successfully.
-        /// 
-        /// If the implementation throws an exception, it will be interpreted just like
-        /// returning <code>false</code>.
-        /// 
-        /// If <see cref="buffer"/> is <code>false</code>, this function will never be called.
-        /// </summary>
-        /// <returns><code>true</code>, if the action could be redone, <code>false</code>
-        /// otherwise.</returns>
-        protected abstract bool RedoOnServer();
-
-        /// <summary>
-        /// The implementation of redoing the action for the client. Returns whether the
-        /// action could be redone successfully.
-        /// 
-        /// If the implementation throws an exception, it will be interpreted just like
-        /// returning <code>false</code>.
-        /// 
-        /// If <see cref="buffer"/> is <code>false</code>, this function will never be called.
-        /// </summary>
-        /// <returns><code>true</code>, if the action could be redone, <code>false</code>
-        /// otherwise.</returns>
-        protected abstract bool RedoOnClient();
-
-
+        protected abstract void ExecuteOnClient();
 
 #if UNITY_EDITOR
         /// <summary>
@@ -404,6 +275,11 @@ namespace SEE.Net
         {
             string[] tokens = data.Split(new char[] { ';' }, 2, StringSplitOptions.None);
             AbstractAction result = (AbstractAction)JsonUtility.FromJson(tokens[1], Type.GetType(tokens[0]));
+            if (result.recipientsIPAddresses.Length == 0)
+            {
+                result.recipientsIPAddresses = null;
+                result.recipientsPorts = null;
+            }
             return result;
         }
     }

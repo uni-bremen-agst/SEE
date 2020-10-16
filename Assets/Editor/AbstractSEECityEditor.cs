@@ -1,14 +1,13 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEngine;
-using UnityEditor;
+using SEE.DataModel.DG;
 using SEE.Game;
-using System.IO;
-using SEE;
-using SEE.DataModel;
+using SEE.Layout.EdgeLayouts;
+using SEE.Layout.NodeLayouts;
 using System.Collections.Generic;
 using System.Linq;
-using static SEE.Game.AbstractSEECity;
+using UnityEditor;
+using UnityEngine;
 
 namespace SEEEditor
 {
@@ -22,7 +21,7 @@ namespace SEEEditor
         /// <summary>
         /// the city to display
         /// </summary>
-        AbstractSEECity city;
+        private AbstractSEECity city;
 
         public override void OnInspectorGUI()
         {
@@ -33,14 +32,20 @@ namespace SEEEditor
             city.HeightMetric = EditorGUILayout.TextField("Height", city.HeightMetric);
             city.DepthMetric = EditorGUILayout.TextField("Depth", city.DepthMetric);
             city.LeafStyleMetric = EditorGUILayout.TextField("Style", city.LeafStyleMetric);
+            city.LeafNodeColorRange.lower = EditorGUILayout.ColorField("Lower Color", city.LeafNodeColorRange.lower);
+            city.LeafNodeColorRange.upper = EditorGUILayout.ColorField("Upper Color", city.LeafNodeColorRange.upper);
+            city.LeafNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.LeafNodeColorRange.NumberOfColors, 1, 15);
 
             GUILayout.Label("Attributes of inner nodes", EditorStyles.boldLabel);
             city.InnerNodeHeightMetric = EditorGUILayout.TextField("Height", city.InnerNodeHeightMetric);
             city.InnerNodeStyleMetric = EditorGUILayout.TextField("Style", city.InnerNodeStyleMetric);
+            city.InnerNodeColorRange.lower = EditorGUILayout.ColorField("Lower Color", city.InnerNodeColorRange.lower);
+            city.InnerNodeColorRange.upper = EditorGUILayout.ColorField("Upper Color", city.InnerNodeColorRange.upper);
+            city.InnerNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.InnerNodeColorRange.NumberOfColors, 1, 15);
 
             GUILayout.Label("Nodes and Node Layout", EditorStyles.boldLabel);
             city.LeafObjects = (SEECity.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
-            city.NodeLayout = (SEECity.NodeLayouts)EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
+            city.NodeLayout = (NodeLayoutKind)EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
             city.gvlPath = EditorGUILayout.TextField("GVL file", city.gvlPath);
 
             GUILayout.BeginHorizontal();
@@ -61,7 +66,7 @@ namespace SEEEditor
             city.ShowErosions = EditorGUILayout.Toggle("Show erosions", city.ShowErosions);
             city.MaxErosionWidth = EditorGUILayout.FloatField("Max. width of erosion icon", city.MaxErosionWidth);
 
-            if (city.NodeLayout == AbstractSEECity.NodeLayouts.CompoundSpringEmbedder)
+            if (city.NodeLayout == NodeLayoutKind.CompoundSpringEmbedder)
             {
                 GUILayout.Label("Compound spring embedder layout attributes", EditorStyles.boldLabel);
                 city.CoseGraphSettings.EdgeLength = EditorGUILayout.IntField("Edge length", city.CoseGraphSettings.EdgeLength);
@@ -79,21 +84,20 @@ namespace SEEEditor
                     //city.CoseGraphSettings.useCalculationParameter = false; 
                 }*/
                 city.CoseGraphSettings.useCalculationParameter = EditorGUILayout.Toggle("Calc parameters automatically", city.CoseGraphSettings.useCalculationParameter);
-                city.CoseGraphSettings.useItertivCalclation = EditorGUILayout.Toggle("Find parameters iteratively", city.CoseGraphSettings.useItertivCalclation);
-                if (city.CoseGraphSettings.useCalculationParameter || city.CoseGraphSettings.useItertivCalclation)
+                city.CoseGraphSettings.useIterativeCalculation = EditorGUILayout.Toggle("Find parameters iteratively", city.CoseGraphSettings.useIterativeCalculation);
+                if (city.CoseGraphSettings.useCalculationParameter || city.CoseGraphSettings.useIterativeCalculation)
                 {
-                    city.CoseGraphSettings.useOptAlgorithm = false;
                     city.ZScoreScale = true;
 
                     city.CoseGraphSettings.multiLevelScaling = false;
                     city.CoseGraphSettings.UseSmartMultilevelScaling = false;
                     city.CoseGraphSettings.UseSmartIdealEdgeCalculation = false;
-                    city.CoseGraphSettings.UseSmartRepulsionRangeCalculation = false; 
+                    city.CoseGraphSettings.UseSmartRepulsionRangeCalculation = false;
                 }
             }
 
             GUILayout.Label("Edges and Edge Layout", EditorStyles.boldLabel);
-            city.EdgeLayout = (SEECity.EdgeLayouts)EditorGUILayout.EnumPopup("Edge layout", city.EdgeLayout);
+            city.EdgeLayout = (EdgeLayoutKind)EditorGUILayout.EnumPopup("Edge layout", city.EdgeLayout);
             city.EdgeWidth = EditorGUILayout.FloatField("Edge width", city.EdgeWidth);
             city.EdgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", city.EdgesAboveBlocks);
             EditorGUILayout.BeginHorizontal();
@@ -102,7 +106,7 @@ namespace SEEEditor
             EditorGUILayout.EndHorizontal();
             city.RDP = EditorGUILayout.FloatField("RDP", city.RDP);
 
-            if (city.NodeLayout == AbstractSEECity.NodeLayouts.CompoundSpringEmbedder)
+            if (city.NodeLayout == NodeLayoutKind.CompoundSpringEmbedder)
             {
                 if (city.CoseGraphSettings.rootDirs != null && city.CoseGraphSettings.rootDirs.Count > 0)
                 {
@@ -115,10 +119,11 @@ namespace SEEEditor
                         {
                             TraverseThruNodesCounter(root);
                         }
-                    } 
+                    }
 
-                    if (city.CoseGraphSettings.showGraphListing) {
-                        List<NodeLayouts> parentNodeLayouts = new List<NodeLayouts>();
+                    if (city.CoseGraphSettings.showGraphListing)
+                    {
+                        List<NodeLayoutKind> parentNodeLayouts = new List<NodeLayoutKind>();
                         foreach (Node root in roots)
                         {
                             TraverseThruNodes(root, parentNodeLayouts);
@@ -183,9 +188,9 @@ namespace SEEEditor
         /// Displays a horizontal line
         /// </summary>
         /// <param name="color">the color for the line</param>
-        static void HorizontalLine(Color color)
+        private static void HorizontalLine(Color color)
         {
-            var c = GUI.color;
+            Color c = GUI.color;
             GUI.color = color;
             GUILayout.Box(GUIContent.none, SetupHorizontalLine());
             GUI.color = c;
@@ -195,7 +200,7 @@ namespace SEEEditor
         /// returns a horizontal line
         /// </summary>
         /// <returns></returns>
-        static GUIStyle SetupHorizontalLine()
+        private static GUIStyle SetupHorizontalLine()
         {
             GUIStyle horizontalLine;
             horizontalLine = new GUIStyle();
@@ -210,7 +215,7 @@ namespace SEEEditor
         /// traverses thru the nodes and displays the sublayout hierarchie graph
         /// </summary>
         /// <param name="root"></param>
-        private void TraverseThruNodes(Node root, List<NodeLayouts> parentNodelayouts)
+        private void TraverseThruNodes(Node root, List<NodeLayoutKind> parentNodelayouts)
         {
             EditorGUIUtility.labelWidth = 80;
             if (root.Children() != null && !root.IsLeaf())
@@ -232,7 +237,7 @@ namespace SEEEditor
 
                     if (!allLeaves)
                     {
-                        var showPosition = EditorGUILayout.Foldout(city.CoseGraphSettings.show[root.ID], root.ID, true);
+                        bool showPosition = EditorGUILayout.Foldout(city.CoseGraphSettings.show[root.ID], root.ID, true);
                         city.CoseGraphSettings.show[root.ID] = showPosition;
 
                         if (showPosition)
@@ -245,7 +250,7 @@ namespace SEEEditor
                             {
                                 foreach (Node child in root.Children())
                                 {
-                                    TraverseThruNodes(child, new List<NodeLayouts>(parentNodelayouts));
+                                    TraverseThruNodes(child, new List<NodeLayoutKind>(parentNodelayouts));
                                 }
                             }
                         }
@@ -270,7 +275,7 @@ namespace SEEEditor
         /// </summary>
         /// <param name="root"></param>
         /// <param name="childrenAreLeaves"></param>
-        private void ShowCheckBox(Node root, bool childrenAreLeaves, List<NodeLayouts> parentNodeLayouts)
+        private void ShowCheckBox(Node root, bool childrenAreLeaves, List<NodeLayoutKind> parentNodeLayouts)
         {
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
@@ -286,7 +291,7 @@ namespace SEEEditor
             else
             {
                 EditorGUI.BeginDisabledGroup(true);
-                ShowSublayoutEnum(AbstractSEECity.NodeLayouts.CompoundSpringEmbedder, root, childrenAreLeaves, new List<NodeLayouts>());
+                ShowSublayoutEnum(NodeLayoutKind.CompoundSpringEmbedder, root, childrenAreLeaves, new List<NodeLayoutKind>());
                 EditorGUI.EndDisabledGroup();
             }
 
@@ -312,21 +317,22 @@ namespace SEEEditor
         /// </summary>
         /// <param name="nodeLayout"></param>
         /// <param name="node"></param>
-        private void ShowInnerNodesEnum(AbstractSEECity.NodeLayouts nodeLayout, Node node)
+        private void ShowInnerNodesEnum(NodeLayoutKind nodeLayout, Node node)
         {
             GUILayoutOption[] guiOptions = { GUILayout.ExpandWidth(false), GUILayout.Width(200) };
-            EditorGUIUtility.labelWidth = 80; 
+            EditorGUIUtility.labelWidth = 80;
             EditorGUILayout.PrefixLabel("Inner nodes");
             Dictionary<AbstractSEECity.InnerNodeKinds, string> shapeKinds = nodeLayout.GetInnerNodeKinds().ToDictionary(kind => kind, kind => kind.ToString());
 
             if (shapeKinds.ContainsKey(city.CoseGraphSettings.DirShape[node.ID]))
             {
                 city.CoseGraphSettings.DirShape[node.ID] = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(city.CoseGraphSettings.DirShape[node.ID]), shapeKinds.Values.ToArray(), guiOptions)).Key;
-            } else
+            }
+            else
             {
                 city.CoseGraphSettings.DirShape[node.ID] = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(shapeKinds.First().Key), shapeKinds.Values.ToArray(), guiOptions)).Key;
             }
-            
+
             EditorGUIUtility.labelWidth = 150;
         }
 
@@ -336,17 +342,17 @@ namespace SEEEditor
         /// <param name="nodeLayout"></param>
         /// <param name="root"></param>
         /// <param name="childrenAreLeaves"></param>
-        private void ShowSublayoutEnum(AbstractSEECity.NodeLayouts nodeLayout, Node root, bool childrenAreLeaves, List<NodeLayouts> parentNodeLayouts)
+        private void ShowSublayoutEnum(NodeLayoutKind nodeLayout, Node root, bool childrenAreLeaves, List<NodeLayoutKind> parentNodeLayouts)
         {
             GUILayoutOption[] guiOptions = { GUILayout.ExpandWidth(false), GUILayout.Width(200) };
             EditorGUIUtility.labelWidth = 80;
             EditorGUILayout.PrefixLabel("Sublayouts");
-            Dictionary<AbstractSEECity.NodeLayouts, string> subLayoutNodeLayouts = childrenAreLeaves ? city.SubLayoutsLeafNodes : city.SubLayoutsInnerNodes;
+            Dictionary<NodeLayoutKind, string> subLayoutNodeLayouts = childrenAreLeaves ? city.SubLayoutsLeafNodes : city.SubLayoutsInnerNodes;
 
-            foreach (NodeLayouts layout in parentNodeLayouts)
+            foreach (NodeLayoutKind layout in parentNodeLayouts)
             {
-                List<NodeLayouts> possible = layout.GetPossibleSublayouts();
-                subLayoutNodeLayouts = subLayoutNodeLayouts.Where(elem => possible.Contains(elem.Key)).ToDictionary(x=> x.Key, x=> x.Value);
+                List<NodeLayoutKind> possible = layout.GetPossibleSublayouts();
+                subLayoutNodeLayouts = subLayoutNodeLayouts.Where(elem => possible.Contains(elem.Key)).ToDictionary(x => x.Key, x => x.Value);
             }
 
             if (subLayoutNodeLayouts.ContainsKey(city.CoseGraphSettings.DirNodeLayout[root.ID]))

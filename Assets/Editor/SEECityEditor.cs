@@ -1,8 +1,8 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEngine;
-using UnityEditor;
 using SEE.Game;
+using UnityEditor;
+using UnityEngine;
 
 namespace SEEEditor
 {
@@ -124,7 +124,7 @@ namespace SEEEditor
         private void SaveLayout(SEECity city)
         {
             city.SaveLayout();
-        }        
+        }
     }
 }
 

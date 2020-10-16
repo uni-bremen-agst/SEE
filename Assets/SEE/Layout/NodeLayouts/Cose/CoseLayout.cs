@@ -15,16 +15,46 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Collections.Generic;
-using UnityEngine;
-using SEE.DataModel;
-using System.Linq;
-using System;
+using SEE.DataModel.DG;
 using SEE.Game;
-using static SEE.Game.AbstractSEECity;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
+    internal class IterationConstraint
+    {
+        /// <summary>
+        /// the start value
+        /// </summary>
+        public int start;
+
+        /// <summary>
+        /// the end value
+        /// </summary>
+        public int end;
+
+        /// <summary>
+        /// The value by which the parameter value is increased within each iteration
+        /// </summary>
+        public int iterationStep;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="start"> the start value</param>
+        /// <param name="end">the end value</param>
+        /// <param name="iterationStep">The value by which the parameter value is increased within each iteration</param>
+        public IterationConstraint(int start, int end, int iterationStep)
+        {
+            this.start = start;
+            this.end = end;
+            this.iterationStep = iterationStep;
+        }
+    }
+
     public class CoseLayout : NodeLayout
     {
         /// <summary>
@@ -65,7 +95,7 @@ namespace SEE.Layout
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
-        Dictionary<ILayoutNode, NodeTransform> layout_result;
+        private Dictionary<ILayoutNode, NodeTransform> layout_result;
 
         /// <summary>
         /// A list with all graph managers (used for multilevel scaling)
@@ -103,9 +133,9 @@ namespace SEE.Layout
         /// <param name="coseSublayoutNodes">the sublayouts</param>
         /// <returns></returns>
         public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> coseSublayoutNodes)
-        {            
+        {
             this.edges = edges;
-            this.SublayoutNodes = coseSublayoutNodes.ToList();
+            SublayoutNodes = coseSublayoutNodes.ToList();
 
             layout_result = new Dictionary<ILayoutNode, NodeTransform>();
             this.layoutNodes = layoutNodes.ToList();
@@ -126,7 +156,7 @@ namespace SEE.Layout
             {
                 GetGoodParameter();
             }
-            
+
             PlaceNodes(root);
             SetCalculatedLayoutPositionToNodes();
 
@@ -167,7 +197,7 @@ namespace SEE.Layout
                 {
                     SublayoutLayoutNode sublayoutNode = CoseHelper.CheckIfNodeIsSublayouRoot(SublayoutNodes, graph.Parent.NodeObject.ID);
 
-                    if (sublayoutNode != null && sublayoutNode.NodeLayout == NodeLayouts.EvoStreets)
+                    if (sublayoutNode != null && sublayoutNode.NodeLayout == NodeLayoutKind.EvoStreets)
                     {
                         width = graph.Parent.SublayoutValues.Sublayout.RootNodeRealScale.x;
                         height = graph.Parent.SublayoutValues.Sublayout.RootNodeRealScale.z;
@@ -205,7 +235,7 @@ namespace SEE.Layout
         /// </summary>
         public void Reset()
         {
-            foreach(ILayoutNode layoutNode in layoutNodes)
+            foreach (ILayoutNode layoutNode in layoutNodes)
             {
                 layoutNode.CenterPosition = new Vector3(0, groundLevel, 0);
                 layoutNode.Rotation = 0.0f;
@@ -220,9 +250,9 @@ namespace SEE.Layout
             int countNode = layoutNodes.Where(node => !node.IsSublayoutNode || node.IsSublayoutRoot).ToList().Count;
             int countMax = CountDepthMax(layoutNodes);
 
-            var leafNodesCount = layoutNodes.Where(node => node.IsLeaf && (!node.IsSublayoutNode || node.IsSublayoutRoot)).ToList().Count;
+            int leafNodesCount = layoutNodes.Where(node => node.IsLeaf && (!node.IsSublayoutNode || node.IsSublayoutRoot)).ToList().Count;
 
-            var edgesCount = edges.Where(edge => edge.Source.Children().Count > 0 && edge.Target.Children().Count > 0).ToList().Count;
+            int edgesCount = edges.Where(edge => edge.Source.Children().Count > 0 && edge.Target.Children().Count > 0).ToList().Count;
 
             int edgeLength = CoseHelper.GetGoodEgdeLength(countNode, countMax, leafNodesCount, edgesCount);
             int repulsionStrength = CoseHelper.GetGoodRepulsionRange(countMax, countNode, edgesCount);
@@ -237,7 +267,7 @@ namespace SEE.Layout
         /// <summary>
         /// Calculates the values for edgelength and repuslionforce iterativaly by increasing the values each iteration until a "good" layout is found
         /// </summary>
-        private void CalculateParameterAutomatically ()
+        private void CalculateParameterAutomatically()
         {
             int currentEdgeLength = CoseLayoutSettings.Edge_Length;
             int currentRepulsionStrength = (int)CoseLayoutSettings.Repulsion_Strength;
@@ -254,7 +284,8 @@ namespace SEE.Layout
                 if (nextRep <= repulsionRangeConstraint.end)
                 {
                     currentRepulsionStrength = nextRep;
-                } else
+                }
+                else
                 {
                     int nextEdgeLength = currentEdgeLength + edgeLengthConstraint.iterationStep;
 
@@ -262,10 +293,11 @@ namespace SEE.Layout
                     {
                         currentEdgeLength = nextEdgeLength;
                         currentRepulsionStrength = repulsionRangeConstraint.start;
-                    } else
+                    }
+                    else
                     {
                         break;
-                    }  
+                    }
                 }
 
                 Reset();
@@ -281,7 +313,7 @@ namespace SEE.Layout
         /// </summary>
         private void ApplyLayout()
         {
-            foreach (var entry in layout_result)
+            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout_result)
             {
                 ILayoutNode node = entry.Key;
                 NodeTransform transform = entry.Value;
@@ -328,7 +360,7 @@ namespace SEE.Layout
                 }
             }
 
-            return depth ;
+            return depth;
         }
 
         /// <summary>
@@ -348,7 +380,7 @@ namespace SEE.Layout
             CoseLayoutSettings.Multilevel_Scaling = settings.multiLevelScaling;
             CoseLayoutSettings.Use_Smart_Multilevel_Calculation = settings.UseSmartMultilevelScaling;
             CoseLayoutSettings.Automatic_Parameter_Calculation = settings.useCalculationParameter;
-            CoseLayoutSettings.Iterativ_Parameter_Calculation = settings.useItertivCalclation;
+            CoseLayoutSettings.Iterativ_Parameter_Calculation = settings.useIterativeCalculation;
 
             coseLayoutSettings = new CoseLayoutSettings();
 
@@ -405,10 +437,11 @@ namespace SEE.Layout
             if (SublayoutNodes.Count > 0 && CoseHelper.CheckIfNodeIsSublayouRoot(SublayoutNodes, graphManager.RootGraph.Nodes.First().NodeObject.ID) != null)
             {
                 graphManager.UpdateBounds();
-            } else
+            }
+            else
             {
                 StartLayoutProzess();
-            } 
+            }
         }
 
         /// <summary>
@@ -473,15 +506,15 @@ namespace SEE.Layout
                 // we dont have to look at the original graph 
                 for (int i = 1; i < gmList.Count; i++)
                 {
-                    var k = edgeLengths[i - 1];
-                    var fac = Math.Sqrt(4.0 / 7);
-                    var newEdgeLength = (int)(fac * k);
+                    int k = edgeLengths[i - 1];
+                    double fac = Math.Sqrt(4.0 / 7);
+                    int newEdgeLength = (int)(fac * k);
                     newEdgeLength = Math.Max(newEdgeLength, 1);
                     Debug.Log("");
                     edgeLengths.Add(i, newEdgeLength);
                 }
             }
-            
+
             while (coseLayoutSettings.Level >= 0)
             {
                 graphManager = gmList[coseLayoutSettings.Level];
@@ -490,7 +523,7 @@ namespace SEE.Layout
                 {
                     CoseLayoutSettings.Edge_Length = edgeLengths[coseLayoutSettings.Level];
                 }
-                
+
                 ClassicLayout();
                 CoseLayoutSettings.Incremental = true;
 
@@ -587,7 +620,7 @@ namespace SEE.Layout
                     coseLayoutSettings.Coolingcycle++;
 
                     // based on www.btluke.com/simanf1.html, schedule 3
-                    coseLayoutSettings.CoolingFactor = Mathf.Max(coseLayoutSettings.InitialCoolingFactor - Mathf.Pow(coseLayoutSettings.Coolingcycle, Mathf.Log(100 * (coseLayoutSettings.InitialCoolingFactor - coseLayoutSettings.FinalTemperature)) / Mathf.Log(coseLayoutSettings.MaxCoolingCycle)) / 100 , coseLayoutSettings.FinalTemperature);
+                    coseLayoutSettings.CoolingFactor = Mathf.Max(coseLayoutSettings.InitialCoolingFactor - Mathf.Pow(coseLayoutSettings.Coolingcycle, Mathf.Log(100 * (coseLayoutSettings.InitialCoolingFactor - coseLayoutSettings.FinalTemperature)) / Mathf.Log(coseLayoutSettings.MaxCoolingCycle)) / 100, coseLayoutSettings.FinalTemperature);
                     //Debug.LogFormat("cooling factor: {0}\n", coseLayoutSettings.CoolingFactor);
                 }
 
@@ -658,7 +691,8 @@ namespace SEE.Layout
             {
                 springForceX = 0;
                 springForceY = 0;
-            } else
+            }
+            else
             {
                 springForce = CoseLayoutSettings.Spring_Strength * dl;
                 springForceX = springForce * (edge.LengthX / length);
@@ -669,7 +703,7 @@ namespace SEE.Layout
             {
                 Debug.Log("");
             }
-            
+
             source.LayoutValues.SpringForceX += springForceX;
             source.LayoutValues.SpringForceY += springForceY;
             target.LayoutValues.SpringForceX -= springForceX;
@@ -725,7 +759,7 @@ namespace SEE.Layout
                     {
                         CoseNode nodeB = nodes[j];
 
-                        if (nodeA.Owner != nodeB.Owner) 
+                        if (nodeA.Owner != nodeB.Owner)
                         {
                             continue;
                         }
@@ -757,11 +791,11 @@ namespace SEE.Layout
 
                         if (!((i < 0) || (j < 0) || (i >= grid.GetLength(0)) || (j >= grid.GetLength(1))))
                         {
-                            var list = grid[i, j];
+                            List<CoseNode> list = grid[i, j];
 
-                            for (var k = 0; k < list.Count; k++)
+                            for (int k = 0; k < list.Count; k++)
                             {
-                                var nodeB = list[k];
+                                CoseNode nodeB = list[k];
 
                                 if ((nodeA.Owner != nodeB.Owner) || (nodeA == nodeB))
                                 {
@@ -809,8 +843,8 @@ namespace SEE.Layout
 
             if (nodeA.CalcOverlap(nodeB, overlapAmount))
             {
-                repulsionForceX = 2 * (float) overlapAmount[0];
-                repulsionForceY = 2 * (float) overlapAmount[1];
+                repulsionForceX = 2 * (float)overlapAmount[0];
+                repulsionForceY = 2 * (float)overlapAmount[1];
 
                 float childrenConstant = nodeA.NoOfChildren * nodeB.NoOfChildren / (float)(nodeA.NoOfChildren + nodeB.NoOfChildren);
 
@@ -826,7 +860,8 @@ namespace SEE.Layout
                 {
                     distanceX = nodeB.CenterPosition.x - nodeA.CenterPosition.x;
                     distanceY = nodeB.CenterPosition.z - nodeA.CenterPosition.z;
-                } else
+                }
+                else
                 {
                     clipPoints = nodeA.CalcIntersection(nodeB, clipPoints);
 
@@ -875,8 +910,8 @@ namespace SEE.Layout
         {
             int startX = (int)Math.Floor((v.GetLeftFrontCorner().x - left) / coseLayoutSettings.RepulsionRange);
             int finishX = (int)Math.Floor((v.Scale.x + v.GetLeftFrontCorner().x - left) / coseLayoutSettings.RepulsionRange);
-            int startY = (int)Math.Floor((v.GetRightBackCorner().y  - top) / coseLayoutSettings.RepulsionRange);
-            int finishY = (int)Math.Floor((v.Scale.z + v.GetRightBackCorner().y - top)/ coseLayoutSettings.RepulsionRange);
+            int startY = (int)Math.Floor((v.GetRightBackCorner().y - top) / coseLayoutSettings.RepulsionRange);
+            int finishY = (int)Math.Floor((v.Scale.z + v.GetRightBackCorner().y - top) / coseLayoutSettings.RepulsionRange);
 
             for (int i = startX; i <= finishX; i++)
             {
@@ -899,9 +934,9 @@ namespace SEE.Layout
             int j;
 
             List<CoseNode>[,] collect;
-                                                                                                                                                                     
-            var sizeX = (int)Mathf.Ceil((float)((graph.RightBackCorner.x - graph.LeftFrontCorner.x) / coseLayoutSettings.RepulsionRange));
-            var sizeY = (int)Mathf.Ceil((float)((graph.LeftFrontCorner.y - graph.RightBackCorner.y) / coseLayoutSettings.RepulsionRange));
+
+            int sizeX = (int)Mathf.Ceil((float)((graph.RightBackCorner.x - graph.LeftFrontCorner.x) / coseLayoutSettings.RepulsionRange));
+            int sizeY = (int)Mathf.Ceil((float)((graph.LeftFrontCorner.y - graph.RightBackCorner.y) / coseLayoutSettings.RepulsionRange));
 
             collect = new List<CoseNode>[sizeX, sizeY];
 
@@ -935,7 +970,7 @@ namespace SEE.Layout
             int estimatedSize;
 
             ownerGraph = node.Owner;
-            ownerCenterX = ownerGraph.CenterPosition.x; 
+            ownerCenterX = ownerGraph.CenterPosition.x;
             ownerCenterY = ownerGraph.CenterPosition.z;
             distanceX = node.GetCenterX() - ownerCenterX;
             distanceY = node.GetCenterY() - ownerCenterY;
@@ -1017,7 +1052,7 @@ namespace SEE.Layout
             {
                 oscilating = Math.Abs(coseLayoutSettings.TotalDisplacement - coseLayoutSettings.OldTotalDisplacement) < 2;
             }
-            converged = coseLayoutSettings.TotalDisplacement < (decimal) coseLayoutSettings.TotalDisplacementThreshold;
+            converged = coseLayoutSettings.TotalDisplacement < (decimal)coseLayoutSettings.TotalDisplacementThreshold;
             coseLayoutSettings.OldTotalDisplacement = coseLayoutSettings.TotalDisplacement;
             return converged || oscilating;
         }
@@ -1074,7 +1109,7 @@ namespace SEE.Layout
                     source = edge.Source;
                     target = edge.Target;
 
-                    
+
 
                     if (CoseLayoutSettings.Use_Smart_Ideal_Edge_Calculation)
                     {
@@ -1120,9 +1155,9 @@ namespace SEE.Layout
         /// <param name="node"></param>
         /// <param name="children"></param>
         /// <returns></returns>
-        private bool CheckChildrenForHierachie(ILayoutNode node, ICollection<ILayoutNode> children) 
+        private bool CheckChildrenForHierachie(ILayoutNode node, ICollection<ILayoutNode> children)
         {
-            foreach(ILayoutNode child in children)
+            foreach (ILayoutNode child in children)
             {
                 if (node.ID == child.ID)
                 {
@@ -1153,7 +1188,7 @@ namespace SEE.Layout
                 if (ExcludeEdgesInSameHierarchie(edge) && (edge.Source.ID != edge.Target.ID))
                 {
                     CreateEdge(edge);
-                } 
+                }
             }
             graphManager.UpdateBounds();
         }
@@ -1168,7 +1203,7 @@ namespace SEE.Layout
             CoseNode cNode = NewNode(node);
             CoseGraph rootGraph = graphManager.RootGraph;
 
-            this.nodeToCoseNode.Add(node, cNode);
+            nodeToCoseNode.Add(node, cNode);
 
             if (parent != null)
             {
@@ -1189,7 +1224,7 @@ namespace SEE.Layout
 
             if (!node.IsLeaf)
             {
-                CoseGraph graph = new CoseGraph(null, this.graphManager);
+                CoseGraph graph = new CoseGraph(null, graphManager);
                 graph.GraphObject = node;
                 graphManager.Add(graph, cNode);
 
@@ -1233,7 +1268,7 @@ namespace SEE.Layout
         /// <param name="edge">the new edge </param>
         private void CreateEdge(Edge edge)
         {
-            CoseEdge cEdge = new CoseEdge(nodeToCoseNode[CoseHelper.GetLayoutNodeFromLinkname(edge.Source.ID, layoutNodes)], 
+            CoseEdge cEdge = new CoseEdge(nodeToCoseNode[CoseHelper.GetLayoutNodeFromLinkname(edge.Source.ID, layoutNodes)],
                                           nodeToCoseNode[CoseHelper.GetLayoutNodeFromLinkname(edge.Target.ID, layoutNodes)]);
 
             graphManager.Add(cEdge, cEdge.Source, cEdge.Target);

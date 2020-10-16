@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEditor;
 using SEE.Game;
+using UnityEditor;
 using UnityEngine;
 
 namespace SEEEditor

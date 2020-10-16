@@ -17,7 +17,7 @@
 
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
     public class CoseNodeSublayoutValues
     {

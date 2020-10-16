@@ -28,7 +28,7 @@ namespace SEE.GO
             {
                 throw new System.Exception("[DonutFactory] number of metrics must not exceed " + (colorPalette.Length + 1) + ".");
             }
-            this.materials = GetMaterials(numberOfDonutMetrics);
+            materials = GetMaterials(numberOfDonutMetrics);
             this.innerMetric = innerMetric;
             this.metrics = metrics;
         }
@@ -78,7 +78,7 @@ namespace SEE.GO
         /// <returns>array of new materials</returns>
         private Material[] GetMaterials(int howMany)
         {
-            switch(howMany)
+            switch (howMany)
             {
                 case 0: return NewMaterials();
                 case 1: return NewMaterials(colorPalette[0]);
@@ -121,7 +121,8 @@ namespace SEE.GO
         /// <returns>new material</returns>
         private Material NewMaterial(Color color)
         {
-            Material material = new Material(Shader.Find("Standard"))
+            Material materialPrefab = Resources.Load<Material>(Materials.OpaqueMaterialName);
+            Material material = new Material(materialPrefab)
             {
                 color = color
             };
@@ -218,7 +219,7 @@ namespace SEE.GO
             GameObject donutChart = new GameObject();
             donutChart.transform.position = center;
             donutChart.tag = Tags.Decoration;
-            donutChart.isStatic = true;
+            donutChart.isStatic = false;
             donutChart.transform.localScale = new Vector3(2.0f * radius, Donut_Height, 2.0f * radius);
             AttachDonutChart(donutChart, innerValue, values, fractionOfInnerCircle);
             return donutChart;
@@ -266,6 +267,11 @@ namespace SEE.GO
             // appear as circle segments. The inner circle needs to cover them partly.
             CreateCircleSegments(donutChart, values);
             CreateInnerCircle(donutChart, innerValue, fractionOfInnerCircle);
+
+            // Create collider for selection
+            donutChart.AddComponent<MeshFilter>().sharedMesh = CylinderFactory.GetCylinderMesh();
+            donutChart.AddComponent<MeshRenderer>().sharedMaterial = Materials.New(Materials.ShaderType.Invisible, materials[0].renderQueue);
+            donutChart.AddComponent<MeshCollider>().sharedMesh = CylinderFactory.GetCylinderMesh();
         }
 
         /// <summary>
@@ -301,7 +307,7 @@ namespace SEE.GO
                         bool asPie = true;
 
                         GameObject child = asPie ? CreateCircleSector(Vector3.zero, 0.5f, previousRadian, newRadian, materials[i])
-                                                 : CreateCircleSectorAsLine(Vector3.zero, 0.5f, previousRadian, newRadian, materials[i]);                       
+                                                 : CreateCircleSectorAsLine(Vector3.zero, 0.5f, previousRadian, newRadian, materials[i]);
                         child.name = metrics[i] + " = " + value;
                         child.tag = Tags.Decoration;
                         child.transform.parent = donutChart.transform;
@@ -327,7 +333,7 @@ namespace SEE.GO
             {
                 name = innerMetric + " = " + innerValue,
                 tag = Tags.Decoration,
-                isStatic = true
+                isStatic = false
             };
 
             innerCircle.AddComponent<MeshFilter>();
@@ -342,66 +348,71 @@ namespace SEE.GO
                 const int triangleCount = 2 * circleTriangleCount + sidesTriangleCount;
                 const int indicesCount = 3 * triangleCount;
 
-                Vector3[] vertices = new Vector3[vertexCount];
-                Vector2[] uv = new Vector2[vertexCount];
-                int[] triangles = new int[indicesCount];
+                Vector3[] positions = new Vector3[vertexCount];
+                Vector2[] uvs = new Vector2[vertexCount];
+                int[] indices = new int[indicesCount];
 
                 // vertices
                 const float y = 0.5f;
-                vertices[0] = new Vector3(0.0f, -y, 0.0f);
+                positions[0] = new Vector3(0.0f, -y, 0.0f);
                 for (int i = 0; i < segments; i++)
                 {
-                    float x = 0.5f * Mathf.Cos(((float)i / (float)segments) * 2.0f * Mathf.PI);
-                    float z = 0.5f * Mathf.Sin(((float)i / (float)segments) * 2.0f * Mathf.PI);
+                    float x = 0.5f * Mathf.Cos((i / (float)segments) * 2.0f * Mathf.PI);
+                    float z = 0.5f * Mathf.Sin((i / (float)segments) * 2.0f * Mathf.PI);
 
                     Vector3 bottomVertex = new Vector3((float)x, -y, (float)z);
                     Vector3 topVertex = new Vector3((float)x, y, (float)z);
                     Vector2 textureCoordinates = new Vector2(x, z);
 
-                    vertices[1 + i] = bottomVertex;
-                    vertices[1 + i + segments] = topVertex;
-                    uv[1 + i] = textureCoordinates;
-                    uv[1 + i + segments] = textureCoordinates;
+                    positions[1 + i] = bottomVertex;
+                    positions[1 + i + segments] = topVertex;
+                    uvs[1 + i] = textureCoordinates;
+                    uvs[1 + i + segments] = textureCoordinates;
                 }
-                vertices[vertexCount - 1] = new Vector3(0.0f, y, 0.0f);
+                positions[vertexCount - 1] = new Vector3(0.0f, y, 0.0f);
 
-                // triangles
+                // indices
                 for (int i = 0; i < segments - 1; i++)
                 {
-                    triangles[3 * i + 0] = 0;
-                    triangles[3 * i + 1] = i + 1;
-                    triangles[3 * i + 2] = i + 2;
+                    indices[3 * i + 0] = 0;
+                    indices[3 * i + 1] = i + 1;
+                    indices[3 * i + 2] = i + 2;
 
-                    triangles[3 * segments + 6 * i + 0] = i + 2 + segments;
-                    triangles[3 * segments + 6 * i + 1] = i + 2;
-                    triangles[3 * segments + 6 * i + 2] = i + 1;
-                    triangles[3 * segments + 6 * i + 3] = i + 1;
-                    triangles[3 * segments + 6 * i + 4] = i + 1 + segments;
-                    triangles[3 * segments + 6 * i + 5] = i + 2 + segments;
+                    indices[3 * segments + 6 * i + 0] = i + 2 + segments;
+                    indices[3 * segments + 6 * i + 1] = i + 2;
+                    indices[3 * segments + 6 * i + 2] = i + 1;
+                    indices[3 * segments + 6 * i + 3] = i + 1;
+                    indices[3 * segments + 6 * i + 4] = i + 1 + segments;
+                    indices[3 * segments + 6 * i + 5] = i + 2 + segments;
 
-                    triangles[9 * segments + 3 * i + 0] = vertexCount - 1;
-                    triangles[9 * segments + 3 * i + 1] = i + 2 + segments;
-                    triangles[9 * segments + 3 * i + 2] = i + 1 + segments;
+                    indices[9 * segments + 3 * i + 0] = vertexCount - 1;
+                    indices[9 * segments + 3 * i + 1] = i + 2 + segments;
+                    indices[9 * segments + 3 * i + 2] = i + 1 + segments;
                 }
-                triangles[3 * (segments - 1) + 0] = 0;
-                triangles[3 * (segments - 1) + 1] = (segments - 1) + 1;
-                triangles[3 * (segments - 1) + 2] = 1;
+                indices[3 * (segments - 1) + 0] = 0;
+                indices[3 * (segments - 1) + 1] = (segments - 1) + 1;
+                indices[3 * (segments - 1) + 2] = 1;
 
-                triangles[3 * segments + 6 * (segments - 1) + 0] = 1 + segments;
-                triangles[3 * segments + 6 * (segments - 1) + 1] = 1;
-                triangles[3 * segments + 6 * (segments - 1) + 2] = (segments - 1) + 1;
-                triangles[3 * segments + 6 * (segments - 1) + 3] = (segments - 1) + 1;
-                triangles[3 * segments + 6 * (segments - 1) + 4] = (segments - 1) + 1 + segments;
-                triangles[3 * segments + 6 * (segments - 1) + 5] = 1 + segments;
+                indices[3 * segments + 6 * (segments - 1) + 0] = 1 + segments;
+                indices[3 * segments + 6 * (segments - 1) + 1] = 1;
+                indices[3 * segments + 6 * (segments - 1) + 2] = (segments - 1) + 1;
+                indices[3 * segments + 6 * (segments - 1) + 3] = (segments - 1) + 1;
+                indices[3 * segments + 6 * (segments - 1) + 4] = (segments - 1) + 1 + segments;
+                indices[3 * segments + 6 * (segments - 1) + 5] = 1 + segments;
 
-                triangles[9 * segments + 3 * (segments - 1) + 0] = vertexCount - 1;
-                triangles[9 * segments + 3 * (segments - 1) + 1] = 1 + segments;
-                triangles[9 * segments + 3 * (segments - 1) + 2] = (segments - 1) + 1 + segments;
+                indices[9 * segments + 3 * (segments - 1) + 0] = vertexCount - 1;
+                indices[9 * segments + 3 * (segments - 1) + 1] = 1 + segments;
+                indices[9 * segments + 3 * (segments - 1) + 2] = (segments - 1) + 1 + segments;
 
-                Mesh mesh = new Mesh();
+                Mesh mesh = new Mesh
+                {
+                    vertices = positions,
+                    uv = uvs,
+                    triangles = indices
+                };
+                mesh.RecalculateNormals();
+
                 innerCircle.GetComponent<MeshFilter>().mesh = mesh;
-                mesh.vertices = vertices;
-                mesh.triangles = triangles;
             }
 
             innerCircle.transform.parent = donutChart.transform;
@@ -431,7 +442,7 @@ namespace SEE.GO
             // the resulting game object for which we create the circle sector by a line
             GameObject circle = new GameObject
             {
-                isStatic = true
+                isStatic = false
             };
 
             // FIXME: Draw only a part of the circle.
@@ -496,7 +507,7 @@ namespace SEE.GO
             // the resulting game object for which we create the circle sector as a mesh
             GameObject circleSector = new GameObject
             {
-                isStatic = true
+                isStatic = false
             };
 
             MeshFilter meshFilter = circleSector.AddComponent<MeshFilter>();

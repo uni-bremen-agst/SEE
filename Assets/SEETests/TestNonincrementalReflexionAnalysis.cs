@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-using SEE.DataModel;
+using SEE.DataModel.DG;
 
 namespace SEE.Tools.Architecture
 {
@@ -80,21 +80,21 @@ namespace SEE.Tools.Architecture
         private void SetNodes()
         {
             // implementation nodes
-            n1       = impl.GetNode("n1");
-            n1_c1    = impl.GetNode("n1_c1");
-            n1_c2    = impl.GetNode("n1_c2");
+            n1 = impl.GetNode("n1");
+            n1_c1 = impl.GetNode("n1_c1");
+            n1_c2 = impl.GetNode("n1_c2");
             n1_c1_c1 = impl.GetNode("n1_c1_c1");
             n1_c1_c2 = impl.GetNode("n1_c1_c2");
-            n2       = impl.GetNode("n2");
-            n2_c1    = impl.GetNode("n2_c1");
-            n3       = impl.GetNode("n3");
+            n2 = impl.GetNode("n2");
+            n2_c1 = impl.GetNode("n2_c1");
+            n3 = impl.GetNode("n3");
             // architecture nodes
-            N1       = arch.GetNode("N1");
-            N1_C1    = arch.GetNode("N1_C1");
-            N1_C2    = arch.GetNode("N1_C2");
-            N2       = arch.GetNode("N2");
-            N2_C1    = arch.GetNode("N2_C1");
-            N3       = arch.GetNode("N3");
+            N1 = arch.GetNode("N1");
+            N1_C1 = arch.GetNode("N1_C1");
+            N1_C2 = arch.GetNode("N1_C2");
+            N2 = arch.GetNode("N2");
+            N2_C1 = arch.GetNode("N2_C1");
+            N3 = arch.GetNode("N3");
         }
 
         /// <summary>
@@ -104,21 +104,21 @@ namespace SEE.Tools.Architecture
         private void ClearNodes()
         {
             // implementation nodes
-            n1       = null;
-            n1_c1    = null;
-            n1_c2    = null;
+            n1 = null;
+            n1_c1 = null;
+            n1_c2 = null;
             n1_c1_c1 = null;
             n1_c1_c2 = null;
-            n2       = null;
-            n2_c1    = null;
-            n3       = null;
+            n2 = null;
+            n2_c1 = null;
+            n3 = null;
             // architecture nodes
-            N1       = null;
-            N1_C1    = null;
-            N1_C2    = null;
-            N2       = null;
-            N2_C1    = null;
-            N3       = null;
+            N1 = null;
+            N1_C1 = null;
+            N1_C2 = null;
+            N2 = null;
+            N2_C1 = null;
+            N3 = null;
         }
 
         /// <summary>

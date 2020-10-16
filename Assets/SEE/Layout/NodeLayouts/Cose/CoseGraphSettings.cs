@@ -15,11 +15,11 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using System.Collections.Generic;
 using static SEE.Game.AbstractSEECity;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
     /// <summary>
     /// This class holds all settings for the cose layout
@@ -79,7 +79,7 @@ namespace SEE.Layout
         /// <summary>
         ///  key: dir ids, value: the nodelayout
         /// </summary>
-        public Dictionary<string, NodeLayouts> DirNodeLayout = new Dictionary<string, NodeLayouts>();
+        public Dictionary<string, NodeLayoutKind> DirNodeLayout = new Dictionary<string, NodeLayoutKind>();
 
         /// <summary>
         /// key: dir ids, value: the inner node kind
@@ -95,11 +95,6 @@ namespace SEE.Layout
         /// key: dir ids, value: bool, if true the dir is shown in the foldout, if false the sectioon feldout is collapsed 
         /// </summary>
         public Dictionary<string, bool> show = new Dictionary<string, bool>();
-
-        /// <summary>
-        /// if true the potalgorithm is used
-        /// </summary>
-        public bool useOptAlgorithm = false;
 
         /// <summary>
         /// if true is listing of dirs with posiible nodelayouts and inner node kinds is shown
@@ -119,7 +114,7 @@ namespace SEE.Layout
         /// <summary>
         /// is true the parameter edgeLength and repulsion strength are calculated automatically and are iteratily changed till a goog layout is found
         /// </summary>
-        public bool useItertivCalclation = false; 
+        public bool useIterativeCalculation = false;
     }
 }
 

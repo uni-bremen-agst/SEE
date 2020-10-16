@@ -1,4 +1,4 @@
-﻿using SEE.DataModel;
+﻿using SEE.DataModel.DG;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -120,7 +120,7 @@ namespace SEE.GO
         /// </summary>
         protected void DumpMetricMaxima(Dictionary<string, float> metricMaxima)
         {
-            foreach (var item in metricMaxima)
+            foreach (KeyValuePair<string, float> item in metricMaxima)
             {
                 Debug.Log("maximum of " + item.Key + ": " + item.Value + "\n");
             }

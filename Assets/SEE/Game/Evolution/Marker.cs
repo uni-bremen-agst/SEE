@@ -14,19 +14,21 @@ namespace SEE.Game.Evolution
         public Marker(GraphRenderer graphRenderer)
         {
             this.graphRenderer = graphRenderer;
+            black = new Materials(graphRenderer.ShaderType, new ColorRange(Color.black, Color.black, 1));
+            green = new Materials(graphRenderer.ShaderType, new ColorRange(Color.green, Color.green, 1));
         }
 
         /// <summary>
         /// Black material used for the posts on top of nodes to be removed. Will be set
         /// at Start(). Cannot be initialized here because of Unity restrictions.
         /// </summary>
-        private Materials black = new Materials(1, Color.black, Color.black);
+        private readonly Materials black;
 
         /// <summary>
         /// Green material used for the posts on top of new nodes to be added. Will be set
         /// at Start(). Cannot be initialized here because of Unity restrictions.
         /// </summary>
-        private Materials green = new Materials(1, Color.green, Color.green);
+        private readonly Materials green;
 
         /// <summary>
         /// The scale of all posts to be put onto game nodes in order to mark them.
@@ -41,7 +43,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// The list of posts added for the new game objects since the last call to Clear().
         /// </summary>
-        private List<GameObject> posts = new List<GameObject>();
+        private readonly List<GameObject> posts = new List<GameObject>();
 
         /// <summary>
         /// Marks the given <paramref name="block"/> as dying by putting a post on top
@@ -58,7 +60,7 @@ namespace SEE.Game.Evolution
             // Object should not cast shadows: too expensive and may hide information,
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
-            renderer.sharedMaterial = material.DefaultMaterial();
+            renderer.sharedMaterial = material.Get(0, 0);
             Vector3 position = graphRenderer.GetRoof(block);
             position.y += postScale.y / 2.0f;
             post.transform.position = position;

@@ -1,6 +1,5 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-using System;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Layout
 {
@@ -18,7 +17,7 @@ namespace SEE.Layout
         /// <param name="howDeeplyNested">the nesting levels of each binary tree</param>
         /// <returns><paramref name="howManyRootNodes"/> new root nodes, each is a root of a <paramref name="howDeeplyNested"/> binary tree</returns>
         public static ICollection<ILayoutNode> CreateNodes(int howManyRootNodes = 100, int howDeeplyNested = 3)
-        {            
+        {
             Vector3 initialSize = Vector3.one;
             int id = 0;
 
@@ -28,7 +27,7 @@ namespace SEE.Layout
             ICollection<ILayoutNode> gameObjects = new List<ILayoutNode>();
             gameObjects.Add(root);
 
-            
+
             for (int i = 1; i <= howManyRootNodes; i++)
             {
                 initialSize *= 1.01f;

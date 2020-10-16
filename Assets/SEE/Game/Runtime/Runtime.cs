@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using OdinSerializer;
 using SEE.DataModel;
+using SEE.DataModel.DG;
+using SEE.DataModel.Runtime;
 using SEE.GO;
-using OdinSerializer;
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Game.Runtime
 {
@@ -48,18 +50,18 @@ namespace SEE.Game.Runtime
         /// The list of the simulators.
         /// </summary>
         [NonSerialized, OdinSerialize]
-        private List<FunctionCallSimulator> functionCalls = new List<FunctionCallSimulator>();
+        private readonly List<FunctionCallSimulator> functionCalls = new List<FunctionCallSimulator>();
 
         /// <summary>
         /// Initializes non serializable part of call tree and general initialization.
         /// </summary>
-        void Start()
+        private void Start()
         {
             if (callTree == null)
             {
                 throw new Exception("'callTree' is null!");
             }
-            
+
             // The buildings representing function calls are all tagged with these tags.
             // Currently, these are solely Tags.Building.
             string[] tags = new string[] { Tags.Node };
@@ -110,7 +112,7 @@ namespace SEE.Game.Runtime
         /// Key +      => one step forward
         /// Key -      => one step backward
         /// </summary>
-        void Update()
+        private void Update()
         {
             bool leftTrackpadPressed = false;//Input.GetButtonDown("LeftVRTrackpadPress");
             float leftTrackpadHorizontalMovement = 0.0f;//Input.GetAxis("LeftVRTrackpadHorizontalMovement");

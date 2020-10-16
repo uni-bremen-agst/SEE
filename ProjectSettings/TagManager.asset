@@ -25,6 +25,8 @@ TagManager:
   - Function Call
   - TestHelper
   - Building
+  - CullingPlane
+  - Code City
   layers:
   - Default
   - TransparentFX

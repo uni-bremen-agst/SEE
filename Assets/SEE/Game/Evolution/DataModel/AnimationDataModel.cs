@@ -50,7 +50,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Checks if all fields are initialized.
         /// </summary>
-        void Start()
+        private void Start()
         {
             AnimationLagText.AssertNotNull("AnimationLagText");
             RevisionNumberText.AssertNotNull("RevisionNumberText");

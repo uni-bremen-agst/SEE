@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout.EvoStreets
+namespace SEE.Layout.NodeLayouts.EvoStreets
 {
     /// <summary>
     /// Necessary layout data on graph nodes 
@@ -13,7 +13,7 @@ namespace SEE.Layout.EvoStreets
 
         public ENode(ILayoutNode node)
         {
-            this.GraphNode = node;
+            GraphNode = node;
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace SEE.Layout.EvoStreets
         /// <returns>Children.Count > 0</returns>
         public bool IsStreet()
         {
-            return ! GraphNode.IsLeaf;
+            return !GraphNode.IsLeaf;
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace SEE.Layout.EvoStreets
             get
             {
                 float max = 0;
-                foreach (var child in Children)
+                foreach (ENode child in Children)
                 {
                     if (child.Scale.z > max)
                     {

@@ -1,9 +1,10 @@
-﻿using SEE.DataModel;
+﻿using SEE.DataModel.DG;
+using SEE.Layout.NodeLayouts.Cose;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// Creates a balloon layout according to "Reconfigurable Disc Trees for Visualizing 
@@ -18,7 +19,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
-        public BalloonNodeLayout(float groundLevel) 
+        public BalloonNodeLayout(float groundLevel)
             : base(groundLevel)
         {
             name = "Balloon";
@@ -44,7 +45,7 @@ namespace SEE.Layout
         /// <summary>
         /// A mapping of nodes onto their circle data.
         /// </summary>
-        private Dictionary<ILayoutNode, NodeInfo> nodeInfos = new Dictionary<ILayoutNode, NodeInfo>();
+        private readonly Dictionary<ILayoutNode, NodeInfo> nodeInfos = new Dictionary<ILayoutNode, NodeInfo>();
 
         /// <summary>
         /// The node layout we compute as a result.
@@ -255,7 +256,7 @@ namespace SEE.Layout
                 position.y += LevelLift(node);
                 layout_result[node]
                     = new NodeTransform(position,
-                                        new Vector3(2 * nodeInfos[node].outer_radius, 
+                                        new Vector3(2 * nodeInfos[node].outer_radius,
                                                     innerNodeHeight, 2 * nodeInfos[node].outer_radius));
 
                 // The center points of the children circles are located on the circle
@@ -315,7 +316,7 @@ namespace SEE.Layout
                     }
                     else
                     {
-                        space_between_child_circles = (2 * Math.PI - accummulated_alpha) / (double)children.Count;
+                        space_between_child_circles = (2 * Math.PI - accummulated_alpha) / children.Count;
                     }
                 }
                 // Now that we know the space we can put in between neighboring circles, we can
@@ -365,7 +366,7 @@ namespace SEE.Layout
 
         public override bool UsesEdgesAndSublayoutNodes()
         {
-            return false; 
+            return false;
         }
     }
 }

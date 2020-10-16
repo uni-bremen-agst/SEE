@@ -1,13 +1,11 @@
 ﻿using NUnit.Framework;
 using SEE.Tools;
-using SEE.Utils;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using UnityEngine;
 using Constraint = SEE.Tools.Constraint;
 
-namespace SEE.DataModel.IO
+namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Unit tests for GraphWriter and GraphReader.
@@ -119,7 +117,7 @@ namespace SEE.DataModel.IO
                 // Make a copy of the attributes so that we can modify the original
                 // values in the loop.
                 Dictionary<string, float> floatAttributes = new Dictionary<string, float>(node.FloatAttributes);
-                foreach (var entry in floatAttributes)
+                foreach (KeyValuePair<string, float> entry in floatAttributes)
                 {
                     node.SetFloat(entry.Key, (float)Math.Round(entry.Value, 2));
                 }

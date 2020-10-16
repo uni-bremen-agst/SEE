@@ -25,34 +25,34 @@ namespace SEE.Net
         /// <summary>
         /// The transform view to synchronize.
         /// </summary>
-        [SerializeField] private Transform transformToSynchronize = null;
+        [SerializeField] private readonly Transform transformToSynchronize = null;
 
         /// <summary>
         /// Whether the position should be synchronized.
         /// </summary>
-        [SerializeField] private bool synchronizePosition = false;
+        [SerializeField] private readonly bool synchronizePosition = false;
 
         /// <summary>
         /// Whether the rotation should be synchronized.
         /// </summary>
-        [SerializeField] private bool synchronizeRotation = false;
+        [SerializeField] private readonly bool synchronizeRotation = false;
 
         /// <summary>
         /// Whether the scale should be synchronized.
         /// </summary>
-        [SerializeField] private bool synchronizeScale = false;
+        [SerializeField] private readonly bool synchronizeScale = false;
 
         /// <summary>
         /// Whether game objects should teleport for great distances.
         /// </summary>
-        [SerializeField] private bool teleportForGreatDistances = true;
+        [SerializeField] private readonly bool teleportForGreatDistances = true;
 
         /// <summary>
         /// The minimal distance, at which the transform is teleported, rather than
         /// smoothly moved. Is ignored, if <see cref="teleportForGreatDistances"/> is
         /// <code>false</code>.
         /// </summary>
-        [SerializeField] private float teleportMinDistance = 8.0f;
+        [SerializeField] private readonly float teleportMinDistance = 8.0f;
 
         /// <summary>
         /// The squared minimal teleport distance.
@@ -65,7 +65,7 @@ namespace SEE.Net
         /// The transform to synchronize.
         /// </summary>
         public Transform TransformToSynchronize { get => transformToSynchronize; }
-        
+
         /// <summary>
         /// Whether the position should be synchronized.
         /// </summary>
@@ -86,7 +86,7 @@ namespace SEE.Net
         /// <summary>
         /// Stopwatch for determining whether a positional update should be submitted.
         /// </summary>
-        private Stopwatch positionUpdateStopwatch = new Stopwatch();
+        private readonly Stopwatch positionUpdateStopwatch = new Stopwatch();
 
         /// <summary>
         /// The previous received position. Used for linear interpolation between
@@ -99,13 +99,13 @@ namespace SEE.Net
         /// positions.
         /// </summary>
         private Vector3 positionNext;
-        
+
 
 
         /// <summary>
         /// Stopwatch for determining whether a rotational update should be submitted.
         /// </summary>
-        private Stopwatch rotationUpdateStopwatch = new Stopwatch();
+        private readonly Stopwatch rotationUpdateStopwatch = new Stopwatch();
 
         /// <summary>
         /// The previous received rotation. Used for linear interpolation between
@@ -124,7 +124,7 @@ namespace SEE.Net
         /// <summary>
         /// Stopwatch for determining whether a scale update should be submitted.
         /// </summary>
-        private Stopwatch scaleUpdateStopwatch = new Stopwatch();
+        private readonly Stopwatch scaleUpdateStopwatch = new Stopwatch();
 
         /// <summary>
         /// The previous received scale. Used for linear interpolation between scales.

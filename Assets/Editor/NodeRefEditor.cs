@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEditor;
 using SEE.GO;
+using UnityEditor;
 using UnityEngine;
 
 namespace SEEEditor
@@ -11,7 +11,7 @@ namespace SEEEditor
     /// </summary>
     [CustomEditor(typeof(NodeRef))]
     [CanEditMultipleObjects]
-    public class NodeRefEditor : Editor
+    public class NodeRefEditor : GraphElementRefEditor
     {
         public override void OnInspectorGUI()
         {
@@ -20,29 +20,7 @@ namespace SEEEditor
             GUILayout.Label("Node attributes", EditorStyles.boldLabel);
             if (nodeRef.node != null)
             {
-                EditorGUILayout.TextField("ID", nodeRef.node.ID);
-                EditorGUILayout.TextField("Type", nodeRef.node.Type);
-
-                GUILayout.Label("String attributes", EditorStyles.boldLabel);
-                foreach (var entry in nodeRef.node.StringAttributes)
-                {
-                    EditorGUILayout.TextField(entry.Key, entry.Value);
-                }
-                GUILayout.Label("Float attributes", EditorStyles.boldLabel);
-                foreach (var entry in nodeRef.node.FloatAttributes)
-                {
-                    EditorGUILayout.TextField(entry.Key, entry.Value.ToString());
-                }
-                GUILayout.Label("Integer attributes", EditorStyles.boldLabel);
-                foreach (var entry in nodeRef.node.IntAttributes)
-                {
-                    EditorGUILayout.TextField(entry.Key, entry.Value.ToString());
-                }
-                GUILayout.Label("Toggle attributes", EditorStyles.boldLabel);
-                foreach (var entry in nodeRef.node.ToggleAttributes)
-                {
-                    EditorGUILayout.LabelField(entry);
-                }
+                ShowTypeAndAttributes(nodeRef.node);
             }
             else
             {

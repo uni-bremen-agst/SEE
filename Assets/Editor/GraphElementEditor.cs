@@ -1,9 +1,9 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEngine;
-using UnityEditor;
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.GO;
+using UnityEditor;
+using UnityEngine;
 
 namespace SEEEditor
 {

@@ -45,12 +45,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e460e911cf837cf4ab51fe6330360685, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowLeafMetrics: 1
+  ShowInnerNodeMetrics: 1
   selectionMode: 0
   cameraDistance: 40
   moveWithRotation: 1
   cameraFlightTime: 0.5
   minimumSize: 300
-  clickDelay: 0.5
+  clickDelay: 0.1
   dragDelay: 0.2
   buildingHighlightMaterial: {fileID: 2100000, guid: 9d631e931375b5242b8903c497a12c74,
     type: 2}

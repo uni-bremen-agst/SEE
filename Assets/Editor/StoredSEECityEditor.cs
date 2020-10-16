@@ -1,9 +1,10 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEditor;
 using SEE.Game;
-using UnityEngine;
+using SEE.Utils;
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
 namespace SEEEditor
 {
@@ -16,21 +17,36 @@ namespace SEEEditor
     [CanEditMultipleObjects]
     public abstract class StoredSEECityEditor : AbstractSEECityEditor
     {
+        private bool pressed = false;
+        private string path = "";
+
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
+
+            SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
+
             AbstractSEECity city = target as AbstractSEECity;
 
             EditorGUILayout.BeginHorizontal();
             {
-                city.PathPrefix = EditorGUILayout.TextField("Data path prefix", city.PathPrefix);
+                EditorGUILayout.PropertyField(pathPrefix, new GUIContent("Data path prefix"));
                 if (GUILayout.Button("Select"))
                 {
-                    city.PathPrefix = EditorUtility.OpenFolderPanel("Select GXL graph data directory", city.PathPrefix, "");
-                    GUIUtility.ExitGUI(); // This call is to avoid the error "EndLayoutGroup: BeginLayoutGroup must be called first."
+                    pressed = true;
+                    path = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select graph data directory", pathPrefix.stringValue, ""));
+                }
+                else if (pressed)
+                {
+                    pressed = false;
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        pathPrefix.stringValue = path;
+                    }
                 }
             }
             EditorGUILayout.EndHorizontal();
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
         /// <summary>
@@ -43,8 +59,8 @@ namespace SEEEditor
             // Make a copy to loop over the dictionary while making changes.
             Dictionary<string, bool> selection = new Dictionary<string, bool>(city.SelectedNodeTypes);
 
-            var countSelected = 0;
-            foreach (var entry in selection)
+            int countSelected = 0;
+            foreach (KeyValuePair<string, bool> entry in selection)
             {
                 city.SelectedNodeTypes[entry.Key] = EditorGUILayout.Toggle("  " + entry.Key, entry.Value);
 
@@ -71,12 +87,12 @@ namespace SEEEditor
                 {
                     allTypes = false;
                 }
-               
+
             }
 
             if (allTypes)
             {
-                if (countSelected != city.CoseGraphSettings.loadedForNodeTypes.Count )
+                if (countSelected != city.CoseGraphSettings.loadedForNodeTypes.Count)
                 {
                     allTypes = false;
                 }

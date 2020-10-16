@@ -34,14 +34,19 @@ namespace SEE.GO
         /// <param name="style">specifies an additional visual style parameter of 
         /// the object</param>
         /// <returns>new block representation</returns>
-        public abstract GameObject NewBlock(int style = 0);
+        /// <param name="renderQueueOffset">specifies the offset of the render
+        /// queue of the new block. The higher the value, the later the object
+        /// will be drawn. This parameter can be used in for the rendering of
+        /// transparent objects, where the inner nodes must be rendered before
+        /// the leafes to ensure correct sorting.</param>
+        public abstract GameObject NewBlock(int style = 0, int renderQueueOffset = 0);
 
         /// <summary>
         /// The number of styles offered. A style index must be in the range
         /// [0, NumberOfStyles()-1].
         /// </summary>
         /// <returns>number of materials offered</returns>
-        public abstract int NumberOfStyles();
+        public abstract uint NumberOfStyles();
 
         /// <summary>
         /// The length unit of a block representation in Unity measures.

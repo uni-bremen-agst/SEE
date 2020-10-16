@@ -109,8 +109,10 @@ namespace Leap.Unity.Attachments
         void Update()
         {
 #if UNITY_EDITOR
-            PrefabType prefabType = PrefabUtility.GetPrefabType(this.gameObject);
+#pragma warning disable CS0618 // Type or member is obsolete
+            PrefabType prefabType = PrefabUtility.GetPrefabType(gameObject);
             if (prefabType == PrefabType.Prefab || prefabType == PrefabType.ModelPrefab)
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 return;
             }

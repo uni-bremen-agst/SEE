@@ -1,5 +1,5 @@
-﻿using SEE.DataModel;
-using SEE.GO;
+﻿using SEE.GO;
+using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
@@ -10,8 +10,25 @@ namespace SEE.Controls
     /// Super class of the behaviours of game objects the player interacts with.
     /// </summary>
     [RequireComponent(typeof(Interactable))]
-    public abstract class InteractableObject : MonoBehaviour
+    [RequireComponent(typeof(NodeRef))]
+    public sealed class InteractableObject : MonoBehaviour
     {
+        // Tutorial on grabbing objects:
+        // https://www.youtube.com/watch?v=MKOc8J877tI&t=15s
+
+        // These are the messages the hand sends to objects that it is interacting with:
+        //
+        // OnHandHoverBegin:       Sent when the hand first starts hovering over the object
+        // HandHoverUpdate:        Sent every frame that the hand is hovering over the object
+        // OnHandHoverEnd:         Sent when the hand stops hovering over the object
+        // OnAttachedToHand:       Sent when the object gets attached to the hand
+        // HandAttachedUpdate:     Sent every frame while the object is attached to the hand
+        // OnDetachedFromHand:     Sent when the object gets detached from the hand
+        // OnHandFocusLost:        Sent when an attached object loses focus because something else has been attached to the hand
+        // OnHandFocusAcquired:    Sent when an attached object gains focus because the previous focus object has been detached from the hand
+        //
+        // See https://valvesoftware.github.io/steamvr_unity_plugin/articles/Interaction-System.html
+
         /// <summary>
         /// The next available ID to be assigned.
         /// </summary>
@@ -23,80 +40,95 @@ namespace SEE.Controls
         private static readonly Dictionary<uint, InteractableObject> interactableObjects = new Dictionary<uint, InteractableObject>();
 
         /// <summary>
+        /// The hovered objects.
+        /// </summary>
+        public static readonly HashSet<InteractableObject> HoveredObjects = new HashSet<InteractableObject>();
+
+        /// <summary>
+        /// The selected objects.
+        /// </summary>
+        public static readonly HashSet<InteractableObject> SelectedObjects = new HashSet<InteractableObject>();
+
+        /// <summary>
+        /// The grabbed objects.
+        /// </summary>
+        public static readonly HashSet<InteractableObject> GrabbedObjects = new HashSet<InteractableObject>();
+
+        /// <summary>
         /// The unique id of the interactable object.
         /// </summary>
-        public uint id;
-
-        // Tutorial on grabbing objects:
-        // https://www.youtube.com/watch?v=MKOc8J877tI&t=15s
-
-        // These are the messages the hand sends to objects that it is interacting with:
-        //
-        // OnHandHoverBegin: Sent when the hand first starts hovering over the object
-        // HandHoverUpdate: Sent every frame that the hand is hovering over the object
-        // OnHandHoverEnd: Sent when the hand stops hovering over the object
-        // OnAttachedToHand: Sent when the object gets attached to the hand
-        // HandAttachedUpdate: Sent every frame while the object is attached to the hand
-        // OnDetachedFromHand: Sent when the object gets detached from the hand
-        // OnHandFocusLost: Sent when an attached object loses focus because something else 
-        //                  has been attached to the hand
-        // OnHandFocusAcquired: Sent when an attached object gains focus because the previous 
-        //                      focus object has been detached from the hand
-        //
-        // See https://valvesoftware.github.io/steamvr_unity_plugin/articles/Interaction-System.html
+        public uint ID { get; private set; }
 
         /// <summary>
-        /// SteamVR component required for interactions. We assume the gameObject has it as 
-        /// component attached. It will be set in Start().
+        /// Whether the object is currently hovered by e.g. the mouse or the VR-
+        /// controller.
         /// </summary>
-        protected Interactable interactable;
+        public bool IsHovered { get; private set; }
 
         /// <summary>
-        /// The graph node represented by the gameObject. We assume that gameObject has a 
-        /// NodeRef component by which it can be retrieved. It will be set in Start().
+        /// Whether the object is currently selected by e.g. the mouse or the VR-
+        /// controller.
         /// </summary>
-        protected Node graphNode;
+        public bool IsSelected { get; private set; }
 
         /// <summary>
-        /// Sets up graphNode and interactable.
-        /// 
-        /// The following assumptions are made:
-        /// * gameObject has an Interactable component attached to it
-        /// * gameObject has a NodeRef component attached to it
-        /// * that NodeRef refers to a valid graph node with a valid information that can
-        ///    be retrieved and shown when the user hovers over the object
+        /// Whether the object is currently grabbed by e.g. the mouse or the VR-
+        /// controller.
         /// </summary>
-        protected virtual void Awake()
+        public bool IsGrabbed { get; private set; }
+
+        /// <summary>
+        /// The interactable component, that is used by SteamVR. The interactable
+        /// component is attached to <code>this.gameObject</code>.
+        /// </summary>
+        private Interactable interactable;
+
+        /// <summary>
+        /// The synchronizer is attached to <code>this.gameObject</code>, iff it is
+        /// grabbed.
+        /// </summary>
+        public Net.Synchronizer InteractableSynchronizer { get; private set; }
+
+        /// <summary>
+        /// The local hovering color of the outline.
+        /// </summary>
+        private readonly Color LocalHoverColor = Utils.ColorPalette.Viridis(0.0f);
+
+        /// <summary>
+        /// The remote hovering color of the outline.
+        /// </summary>
+        private readonly Color RemoteHoverColor = Utils.ColorPalette.Viridis(0.2f);
+
+        /// <summary>
+        /// The local selection color of the outline.
+        /// </summary>
+        private readonly Color LocalSelectColor = Utils.ColorPalette.Viridis(0.4f);
+
+        /// <summary>
+        /// The remote selection color of the outline.
+        /// </summary>
+        private readonly Color RemoteSelectColor = Utils.ColorPalette.Viridis(0.6f);
+
+        /// <summary>
+        /// The local grabbing color of the outline.
+        /// </summary>
+        private readonly Color LocalGrabColor = Utils.ColorPalette.Viridis(0.8f);
+
+        /// <summary>
+        /// The remote grabbing color of the outline.
+        /// </summary>
+        private readonly Color RemoteGrabColor = Utils.ColorPalette.Viridis(0.0f);
+
+        private void Awake()
         {
-            NodeRef nodeRef = gameObject.GetComponent<NodeRef>();
-            if (nodeRef != null)
-            {
-                graphNode = nodeRef.node;
-                if (graphNode == null)
-                {
-                    Debug.LogWarningFormat("The node reference in game object {0} is undefined.\n", gameObject.name);
-                }
-            }
-            else
-            {
-                Debug.LogWarningFormat("The game object {0} has no node reference.\n", gameObject.name);
-            }
-            interactable = this.GetComponent<Interactable>();
+            ID = nextID++;
+            interactableObjects.Add(ID, this);
+
+            interactable = GetComponent<Interactable>();
             if (interactable == null)
             {
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
-            id = nextID++;
-            interactableObjects.Add(id, this);
-        }
-
-        /// <summary>
-        /// Resets all interactableObjects.
-        /// </summary>
-        public static void ResetAllObjects()
-        {
-            nextID = 0;
-            interactableObjects.Clear();
         }
 
         /// <summary>
@@ -107,49 +139,229 @@ namespace SEE.Controls
         /// <returns></returns>
         public static InteractableObject Get(uint id)
         {
-            bool result = interactableObjects.TryGetValue(id, out InteractableObject interactableObject);
-            return interactableObject;
+            if (!interactableObjects.TryGetValue(id, out InteractableObject result))
+            {
+                result = null;
+            }
+            return result;
         }
 
-        //---------------------------------------------------------
-        // Called when this GameObject becomes attached to the hand
-        //-------------------------------------------------
-        //private void OnAttachedToHand(Hand hand)
-        //{
-        //    sourceText.text = sourceName;
-        //    hoveringText.text = detailText;
-        //}
+        #region Interaction
 
-        //-------------------------------------------------
-        // Called when this GameObject is detached from the hand
-        //-------------------------------------------------
-        //private void OnDetachedFromHand(Hand hand)
-        //{
-        //    sourceText.text = sourceName;
-        //    hoveringText.text = "";
-        //}
+        /// <summary>
+        /// Visually emphasizes this object for hovering.
+        /// </summary>
+        /// <param name="hover">Whether this object should be hovered.</param>
+        /// <param name="isOwner">Whether this client is initiating the hovering action.
+        /// </param>
+        public void SetHover(bool hover, bool isOwner)
+        {
+            IsHovered = hover;
 
-        //-------------------------------------------------
-        // Called every Update() while this GameObject is attached to the hand
-        //-------------------------------------------------
-        //private void HandAttachedUpdate(Hand hand)
-        //{
-        //    sourceText.text = sourceName;
-        //    hoveringText.text = detailText;
-        //}
+            if (!IsSelected && !IsGrabbed)
+            {
+                bool hasOutline = TryGetComponent(out Outline outline);
 
-        //-------------------------------------------------
-        // Called when this attached GameObject becomes the primary attached object
-        //-------------------------------------------------
-        //private void OnHandFocusAcquired(Hand hand)
-        //{
-        //}
+                if (hover)
+                {
+                    if (hasOutline)
+                    {
+                        outline.SetColor(isOwner ? LocalHoverColor : RemoteHoverColor);
+                    }
+                    else
+                    {
+                        Outline.Create(gameObject, isOwner ? LocalHoverColor : RemoteHoverColor);
+                    }
+                }
+                else
+                {
+                    if (hasOutline)
+                    {
+                        DestroyImmediate(outline);
+                    }
+                }
+            }
 
-        //-------------------------------------------------
-        // Called when another attached GameObject becomes the primary attached object
-        //-------------------------------------------------
-        //private void OnHandFocusLost(Hand hand)
-        //{
-        //}
+            if (hover)
+            {
+                HoveredObjects.Add(this);
+            }
+            else
+            {
+                HoveredObjects.Remove(this);
+            }
+
+            if (!Net.Network.UseInOfflineMode && isOwner)
+            {
+                new Net.SetHoverAction(this, hover).Execute();
+            }
+        }
+
+        /// <summary>
+        /// Visually emphasizes this object for selection.
+        /// </summary>
+        /// <param name="hover">Whether this object should be selected.</param>
+        /// <param name="isOwner">Whether this client is initiating the selection action.
+        /// </param>
+        public void SetSelect(bool select, bool isOwner)
+        {
+            IsSelected = select;
+
+            if (!IsGrabbed)
+            {
+                bool hasOutline = TryGetComponent(out Outline outline);
+
+                if (select)
+                {
+                    if (hasOutline)
+                    {
+                        outline.SetColor(isOwner ? LocalSelectColor : RemoteSelectColor);
+                    }
+                    else
+                    {
+                        Outline.Create(gameObject, isOwner ? LocalSelectColor : RemoteSelectColor);
+                    }
+                }
+                else
+                {
+                    if (IsHovered)
+                    {
+                        SetHover(true, isOwner);
+                    }
+                    else if (hasOutline)
+                    {
+                        DestroyImmediate(outline);
+                    }
+                }
+            }
+
+            if (select)
+            {
+                SelectedObjects.Add(this);
+            }
+            else
+            {
+                SelectedObjects.Remove(this);
+            }
+
+            if (!Net.Network.UseInOfflineMode && isOwner)
+            {
+                new Net.SetSelectAction(this, select).Execute();
+            }
+        }
+
+        /// <summary>
+        /// Visually emphasizes this object for grabbing.
+        /// </summary>
+        /// <param name="hover">Whether this object should be grabbed.</param>
+        /// <param name="isOwner">Whether this client is initiating the grabbing action.
+        /// </param>
+        public void SetGrab(bool grab, bool isOwner)
+        {
+            IsGrabbed = grab;
+
+            bool hasOutline = TryGetComponent(out Outline outline);
+
+            if (grab)
+            {
+                if (hasOutline)
+                {
+                    outline.SetColor(isOwner ? LocalGrabColor : RemoteGrabColor);
+                }
+                else
+                {
+                    Outline.Create(gameObject, isOwner ? LocalGrabColor : RemoteGrabColor);
+                }
+
+                GrabbedObjects.Add(this);
+            }
+            else
+            {
+                if (IsSelected)
+                {
+                    SetSelect(true, isOwner);
+                }
+                else if (IsHovered)
+                {
+                    SetHover(true, isOwner);
+                }
+                else if (hasOutline)
+                {
+                    DestroyImmediate(outline);
+                }
+
+                GrabbedObjects.Remove(this);
+            }
+
+            if (!Net.Network.UseInOfflineMode && isOwner)
+            {
+                new Net.SetGrabAction(this, grab).Execute();
+                if (grab)
+                {
+                    InteractableSynchronizer = interactable.gameObject.AddComponent<Net.Synchronizer>();
+                }
+                else
+                {
+                    Destroy(InteractableSynchronizer);
+                    InteractableSynchronizer = null;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Events
+
+        //----------------------------------------------------------------
+        // Mouse actions
+        //----------------------------------------------------------------
+
+        private void OnMouseEnter()
+        {
+            if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop && !Raycasting.IsMouseOverGUI())
+            {
+                SetHover(true, true);
+            }
+        }
+
+        private void OnMouseOver()
+        {
+            if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop)
+            {
+                if (IsHovered && Raycasting.IsMouseOverGUI())
+                {
+                    SetHover(false, true);
+                }
+                else if (!IsHovered && !Raycasting.IsMouseOverGUI())
+                {
+                    SetHover(true, true);
+                }
+            }
+        }
+
+        private void OnMouseExit()
+        {
+            if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop && !Raycasting.IsMouseOverGUI())
+            {
+                SetHover(false, true);
+            }
+        }
+
+        //----------------------------------------------------------------
+        // Private actions called by the hand when the object is hovered.
+        // These methods are called by SteamVR by way of the interactable.
+        // <see cref="Hand.Update"/>
+        //----------------------------------------------------------------
+
+        private const Hand.AttachmentFlags AttachmentFlags
+            = Hand.defaultAttachmentFlags
+            & (~Hand.AttachmentFlags.SnapOnAttach)
+            & (~Hand.AttachmentFlags.DetachOthers)
+            & (~Hand.AttachmentFlags.VelocityMovement);
+
+        private void OnHandHoverBegin(Hand hand) => SetHover(true, true);
+        private void OnHandHoverEnd(Hand hand) => SetHover(false, true);
+
+        #endregion
     }
 }
