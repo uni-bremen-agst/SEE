@@ -1,396 +1,36 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
-<gxl xmlns="http://www.w3.org/1999/xlink">
-  <graph id="Mapping" edgeids="true" xmlns="">
-    <node id="N1">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>GO</string>
-      </attr>
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="Mapping" edgeids="true">
+    <node id="N362495">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
-        <string>SEE.GO</string>
-      </attr>
-    </node>
-    <node id="N2">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>Whiteboard</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.GO.Whiteboard</string>
-      </attr>
-    </node>
-    <node id="N3">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>Layout</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.Layout</string>
-      </attr>
-    </node>
-    <node id="N4">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>Game</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.Game</string>
-      </attr>
-    </node>
-    <node id="N5">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>Controls</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.Controls</string>
-      </attr>
-    </node>
-    <node id="N6">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>Utils</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.Utils</string>
-      </attr>
-    </node>
-    <node id="N7">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>Tools</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.Tools</string>
-      </attr>
-    </node>
-    <node id="N8">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>DataModel</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.DataModel</string>
-      </attr>
-    </node>
-    <node id="N9">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>Devices</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.Controls.Devices</string>
-      </attr>
-    </node>
-    <node id="N10">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>CameraPaths</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.CameraPaths</string>
-      </attr>
-    </node>
-    <node id="N11">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>EvoStreets</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.Layout.EvoStreets</string>
-      </attr>
-    </node>
-    <node id="N12">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>CirclePacking</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.Layout.CirclePacking</string>
-      </attr>
-    </node>
-    <node id="N13">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>RectanglePacking</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.Layout.RectanglePacking</string>
-      </attr>
-    </node>
-    <node id="N14">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>TreeMap</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.Layout.TreeMap</string>
-      </attr>
-    </node>
-    <node id="N15">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>IO</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.DataModel.IO</string>
-      </attr>
-    </node>
-    <node id="N16">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>Runtime</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.Game.Runtime</string>
-      </attr>
-    </node>
-    <node id="N17">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>Evolution</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEE.Game.Evolution</string>
-      </attr>
-    </node>
-    <node id="N18">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Source.Name">
-        <string>SEEEditor</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>SEEEditor</string>
-      </attr>
-    </node>
-    <node id="N19">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:Boost@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+43!</string>
+        <string>N global:TinySpline</string>
       </attr>
       <attr name="Source.Name">
-        <string>Boost</string>
+        <string>TinySpline</string>
       </attr>
     </node>
-    <node id="N20">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N362509">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:MouseBoost@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+48!</string>
+        <string>N global:InControl</string>
       </attr>
       <attr name="Source.Name">
-        <string>MouseBoost</string>
+        <string>InControl</string>
       </attr>
     </node>
-    <node id="N21">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N362511">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:NullBoost@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+47!</string>
+        <string>N global:OdinSerializer</string>
       </attr>
       <attr name="Source.Name">
-        <string>NullBoost</string>
+        <string>OdinSerializer</string>
       </attr>
     </node>
-    <node id="N22">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:Direction@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+47!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>Direction</string>
-      </attr>
-    </node>
-    <node id="N23">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:KeyboardDirection@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+55!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>KeyboardDirection</string>
-      </attr>
-    </node>
-    <node id="N24">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:NullDirection@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+51!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>NullDirection</string>
-      </attr>
-    </node>
-    <node id="N25">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:TouchGamepadDirection@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+59!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>TouchGamepadDirection</string>
-      </attr>
-    </node>
-    <node id="N26">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:XRDirection@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+49!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>XRDirection</string>
-      </attr>
-    </node>
-    <node id="N27">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:MouseSelection@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+52!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>MouseSelection</string>
-      </attr>
-    </node>
-    <node id="N28">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:NullSelection@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+51!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>NullSelection</string>
-      </attr>
-    </node>
-    <node id="N29">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:Selection@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+47!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>Selection</string>
-      </attr>
-    </node>
-    <node id="N30">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:!13+7!lerSelection@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+57!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>ControllerSelection</string>
-      </attr>
-    </node>
-    <node id="N31">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:XRSelection@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+49!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>XRSelection</string>
-      </attr>
-    </node>
-    <node id="N32">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:KeyboardThrottle@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+54!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>KeyboardThrottle</string>
-      </attr>
-    </node>
-    <node id="N33">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:NullThrottle@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+50!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>NullThrottle</string>
-      </attr>
-    </node>
-    <node id="N34">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:Throttle@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+46!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>Throttle</string>
-      </attr>
-    </node>
-    <node id="N35">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:TouchGamepadThrottle@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+58!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>TouchGamepadThrottle</string>
-      </attr>
-    </node>
-    <node id="N36">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:XRThrottle@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+48!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>XRThrottle</string>
-      </attr>
-    </node>
-    <node id="N37">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:NullTransformation@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+56!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>NullTransformation</string>
-      </attr>
-    </node>
-    <node id="N38">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:Transformation@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+52!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>Transformation</string>
-      </attr>
-    </node>
-    <node id="N39">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:XRGestureTransformation@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+61!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>XRGestureTransformation</string>
-      </attr>
-    </node>
-    <node id="N40">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:MouseViewpoint@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+52!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>MouseViewpoint</string>
-      </attr>
-    </node>
-    <node id="N41">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:NullViewpoint@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+51!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>NullViewpoint</string>
-      </attr>
-    </node>
-    <node id="N42">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:TouchGamepadViewpoint@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+59!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>TouchGamepadViewpoint</string>
-      </attr>
-    </node>
-    <node id="N43">
-      <type xlink:href="Class" xmlns:xlink="http://www.w3.org/1999/xlink" />
-      <attr name="Linkage.Name">
-        <string>C global:SEE:Controls:Devices:Viewpoint@F:/develop/SEE/Temp/bin/Debug/SEE.dll^:!28+47!</string>
-      </attr>
-      <attr name="Source.Name">
-        <string>Viewpoint</string>
-      </attr>
-    </node>
-    <node id="N44">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N362739">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
         <string>N global:SEE:CameraPaths</string>
       </attr>
@@ -398,8 +38,8 @@
         <string>CameraPaths</string>
       </attr>
     </node>
-    <node id="N45">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N362740">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
         <string>N global:SEE:Controls</string>
       </attr>
@@ -407,8 +47,8 @@
         <string>Controls</string>
       </attr>
     </node>
-    <node id="N46">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N362741">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
         <string>N global:SEE:DataModel</string>
       </attr>
@@ -416,8 +56,8 @@
         <string>DataModel</string>
       </attr>
     </node>
-    <node id="N47">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N362742">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
         <string>N global:SEE:Game</string>
       </attr>
@@ -425,8 +65,8 @@
         <string>Game</string>
       </attr>
     </node>
-    <node id="N48">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N362743">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
         <string>N global:SEE:GO</string>
       </attr>
@@ -434,8 +74,8 @@
         <string>GO</string>
       </attr>
     </node>
-    <node id="N49">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N362744">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
         <string>N global:SEE:Layout</string>
       </attr>
@@ -443,8 +83,17 @@
         <string>Layout</string>
       </attr>
     </node>
-    <node id="N50">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N362745">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N global:SEE:Net</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Net</string>
+      </attr>
+    </node>
+    <node id="N362746">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
         <string>N global:SEE:Tools</string>
       </attr>
@@ -452,8 +101,8 @@
         <string>Tools</string>
       </attr>
     </node>
-    <node id="N51">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N362747">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
         <string>N global:SEE:Utils</string>
       </attr>
@@ -461,26 +110,35 @@
         <string>Utils</string>
       </attr>
     </node>
-    <node id="N52">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N363024">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
-        <string>N global:SEE:Controls:Devices</string>
+        <string>N global:SEE:DataModel:DG</string>
       </attr>
       <attr name="Source.Name">
-        <string>Devices</string>
+        <string>DG</string>
       </attr>
     </node>
-    <node id="N53">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N363025">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
-        <string>N global:SEE:DataModel:IO</string>
+        <string>N global:SEE:DataModel:Runtime</string>
       </attr>
       <attr name="Source.Name">
-        <string>IO</string>
+        <string>Runtime</string>
       </attr>
     </node>
-    <node id="N54">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N363026">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N global:SEE:Game:Charts</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Charts</string>
+      </attr>
+    </node>
+    <node id="N363027">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
         <string>N global:SEE:Game:Evolution</string>
       </attr>
@@ -488,8 +146,8 @@
         <string>Evolution</string>
       </attr>
     </node>
-    <node id="N55">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N363028">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
         <string>N global:SEE:Game:Runtime</string>
       </attr>
@@ -497,8 +155,17 @@
         <string>Runtime</string>
       </attr>
     </node>
-    <node id="N56">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N363029">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N global:SEE:Game:UI3D</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>UI3D</string>
+      </attr>
+    </node>
+    <node id="N363031">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
         <string>N global:SEE:GO:Whiteboard</string>
       </attr>
@@ -506,221 +173,494 @@
         <string>Whiteboard</string>
       </attr>
     </node>
-    <node id="N57">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N363032">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
-        <string>N global:SEE:Layout:CirclePacking</string>
+        <string>N global:SEE:Layout:EdgeLayouts</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>EdgeLayouts</string>
+      </attr>
+    </node>
+    <node id="N363033">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N global:SEE:Layout:IO</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>IO</string>
+      </attr>
+    </node>
+    <node id="N363034">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N global:SEE:Layout:NodeLayouts</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>NodeLayouts</string>
+      </attr>
+    </node>
+    <node id="N363035">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N global:SEE:Layout:Utils</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Utils</string>
+      </attr>
+    </node>
+    <node id="N363170">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N global:SEE:DataModel:DG:IO</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>IO</string>
+      </attr>
+    </node>
+    <node id="N363171">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N global:SEE:DataModel:Runtime:IO</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>IO</string>
+      </attr>
+    </node>
+    <node id="N363172">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N global:SEE:Game:Charts:VR</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>VR</string>
+      </attr>
+    </node>
+    <node id="N363173">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N global:SEE:Layout:NodeLayouts:CirclePacking</string>
       </attr>
       <attr name="Source.Name">
         <string>CirclePacking</string>
       </attr>
     </node>
-    <node id="N58">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N363174">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
-        <string>N global:SEE:Layout:EvoStreets</string>
+        <string>N global:SEE:Layout:NodeLayouts:Cose</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Cose</string>
+      </attr>
+    </node>
+    <node id="N363175">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N global:SEE:Layout:NodeLayouts:EvoStreets</string>
       </attr>
       <attr name="Source.Name">
         <string>EvoStreets</string>
       </attr>
     </node>
-    <node id="N59">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N363176">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
-        <string>N global:SEE:Layout:RectanglePacking</string>
+        <string>N global:SEE:Layout:NodeLayouts:RectanglePacking</string>
       </attr>
       <attr name="Source.Name">
         <string>RectanglePacking</string>
       </attr>
     </node>
-    <node id="N60">
-      <type xlink:href="Namespace" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N363177">
+      <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
-        <string>N global:SEE:Layout:TreeMap</string>
+        <string>N global:SEE:Layout:NodeLayouts:TreeMap</string>
       </attr>
       <attr name="Source.Name">
         <string>TreeMap</string>
       </attr>
     </node>
-    <node id="N61">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N370562">
+      <type xlink:href="Cluster"/>
       <attr name="Source.Name">
-        <string>Boost</string>
+        <string>Cose</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>SEE.Controls.Devices.Boost</string>
+        <string>SEE.Layouts.NodeLayouts.Cose</string>
       </attr>
     </node>
-    <node id="N62">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N370563">
+      <type xlink:href="Cluster"/>
       <attr name="Source.Name">
-        <string>Direction</string>
+        <string>GO</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>SEE.Controls.Devices.Direction</string>
+        <string>SEE.GO</string>
       </attr>
     </node>
-    <node id="N63">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N370564">
+      <type xlink:href="Cluster"/>
       <attr name="Source.Name">
-        <string>Selection</string>
+        <string>Whiteboard</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>SEE.Controls.Devices.Selection</string>
+        <string>SEE.GO.Whiteboard</string>
       </attr>
     </node>
-    <node id="N64">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N370565">
+      <type xlink:href="Cluster"/>
       <attr name="Source.Name">
-        <string>Throttle</string>
+        <string>Layout</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>SEE.Controls.Devices.Throttle</string>
+        <string>SEE.Layout</string>
       </attr>
     </node>
-    <node id="N65">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N370566">
+      <type xlink:href="Cluster"/>
       <attr name="Source.Name">
-        <string>Transformation</string>
+        <string>Game</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>SEE.Controls.Devices.Transformation</string>
+        <string>SEE.Game</string>
       </attr>
     </node>
-    <node id="N66">
-      <type xlink:href="Cluster" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N370567">
+      <type xlink:href="Cluster"/>
       <attr name="Source.Name">
-        <string>Viewpoint</string>
+        <string>Controls</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>SEE.Controls.Devices.Viewpoint</string>
+        <string>SEE.Controls</string>
       </attr>
     </node>
-    <edge id="E1" from="N52" to="N9">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <node id="N370568">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Utils</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Utils</string>
+      </attr>
+    </node>
+    <node id="N370569">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Tools</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Tools</string>
+      </attr>
+    </node>
+    <node id="N370570">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>DataModel</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.DataModel</string>
+      </attr>
+    </node>
+    <node id="N370571">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>CameraPaths</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.CameraPaths</string>
+      </attr>
+    </node>
+    <node id="N370572">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>EvoStreets</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Layouts.NodeLayouts.EvoStreets</string>
+      </attr>
+    </node>
+    <node id="N370573">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>CirclePacking</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Layouts.NodeLayouts.CirclePacking</string>
+      </attr>
+    </node>
+    <node id="N370574">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>RectanglePacking</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Layouts.NodeLayouts.RectanglePacking</string>
+      </attr>
+    </node>
+    <node id="N370575">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>TreeMap</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Layouts.NodeLayouts.TreeMap</string>
+      </attr>
+    </node>
+    <node id="N370576">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Runtime</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Game.Runtime</string>
+      </attr>
+    </node>
+    <node id="N370577">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Evolution</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Game.Evolution</string>
+      </attr>
+    </node>
+    <node id="N370578">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>SEEEditor</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEEEditor</string>
+      </attr>
+    </node>
+    <node id="N370579">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>UI3D</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Controls.UI3D</string>
+      </attr>
+    </node>
+    <node id="N370581">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Utils</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Layouts.Utils</string>
+      </attr>
+    </node>
+    <node id="N370582">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>IO</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Layouts.IO</string>
+      </attr>
+    </node>
+    <node id="N370583">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>EdgeLayouts</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Layouts.EdgeLayouts</string>
+      </attr>
+    </node>
+    <node id="N370584">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>NodeLayouts</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Layouts.NodeLayouts</string>
+      </attr>
+    </node>
+    <node id="N370585">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>VR</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Game.Charts.VR</string>
+      </attr>
+    </node>
+    <node id="N370586">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Charts</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Game.Charts</string>
+      </attr>
+    </node>
+    <node id="N370587">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Net</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.Net</string>
+      </attr>
+    </node>
+    <node id="N370588">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>TinySplines</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TinySplines</string>
+      </attr>
+    </node>
+    <node id="N370589">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>OdinSerializer</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>OdinSerializer</string>
+      </attr>
+    </node>
+    <node id="N370590">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>InControl</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>InControl</string>
+      </attr>
+    </node>
+    <node id="N370591">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>DG</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.DataModel.DG</string>
+      </attr>
+    </node>
+    <node id="N370592">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Runtime</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.DataModel.Runtime</string>
+      </attr>
+    </node>
+    <node id="N370593">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>IO</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEE.DataModel.DG.IO</string>
+      </attr>
+    </node>
+    <node id="N370594">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>IO</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>DG.DataModel.Runtime.IO</string>
+      </attr>
+    </node>
+    <edge id="E1177541" from="N363025" to="N370592">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E2" from="N45" to="N5">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177542" from="N362745" to="N370587">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E3" from="N46" to="N8">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177543" from="N362495" to="N370588">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E4" from="N53" to="N15">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177544" from="N363024" to="N370591">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E5" from="N55" to="N16">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177545" from="N362511" to="N370589">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E6" from="N56" to="N2">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177546" from="N363171" to="N370594">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E7" from="N48" to="N1">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177547" from="N362509" to="N370590">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E8" from="N57" to="N12">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177549" from="N362739" to="N370571">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E9" from="N58" to="N11">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177550" from="N363027" to="N370577">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E10" from="N59" to="N13">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177551" from="N362742" to="N370566">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E11" from="N60" to="N14">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177552" from="N362747" to="N370568">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E12" from="N49" to="N3">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177553" from="N362746" to="N370569">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E13" from="N50" to="N7">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177554" from="N362744" to="N370565">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E14" from="N51" to="N6">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177555" from="N362743" to="N370563">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E15" from="N47" to="N4">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177556" from="N363031" to="N370564">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E16" from="N54" to="N17">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177557" from="N363028" to="N370576">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E17" from="N44" to="N10">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177558" from="N362741" to="N370570">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E18" from="N19" to="N61">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177559" from="N362740" to="N370567">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E19" from="N30" to="N63">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177560" from="N363035" to="N370581">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E20" from="N22" to="N62">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177561" from="N363177" to="N370575">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E21" from="N23" to="N62">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177562" from="N363176" to="N370574">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E22" from="N32" to="N64">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177563" from="N363175" to="N370572">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E23" from="N20" to="N61">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177564" from="N363174" to="N370562">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E24" from="N27" to="N63">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177565" from="N363173" to="N370573">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E25" from="N40" to="N66">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177566" from="N363034" to="N370584">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E26" from="N21" to="N61">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177567" from="N363033" to="N370582">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E27" from="N24" to="N62">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177568" from="N363032" to="N370583">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E28" from="N28" to="N63">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177569" from="N363029" to="N370579">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E29" from="N33" to="N64">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177570" from="N363172" to="N370585">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E30" from="N37" to="N65">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1177571" from="N363026" to="N370586">
+      <type xlink:href="Maps_To"/>
     </edge>
-    <edge id="E31" from="N41" to="N66">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
-    </edge>
-    <edge id="E32" from="N29" to="N63">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
-    </edge>
-    <edge id="E33" from="N34" to="N64">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
-    </edge>
-    <edge id="E34" from="N25" to="N62">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
-    </edge>
-    <edge id="E35" from="N35" to="N64">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
-    </edge>
-    <edge id="E36" from="N42" to="N66">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
-    </edge>
-    <edge id="E37" from="N38" to="N65">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
-    </edge>
-    <edge id="E38" from="N43" to="N66">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
-    </edge>
-    <edge id="E39" from="N26" to="N62">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
-    </edge>
-    <edge id="E40" from="N39" to="N65">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
-    </edge>
-    <edge id="E41" from="N31" to="N63">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
-    </edge>
-    <edge id="E42" from="N36" to="N64">
-      <type xlink:href="Maps_To" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <edge id="E1178391" from="N363170" to="N370593">
+      <type xlink:href="Maps_To"/>
     </edge>
   </graph>
 </gxl>
