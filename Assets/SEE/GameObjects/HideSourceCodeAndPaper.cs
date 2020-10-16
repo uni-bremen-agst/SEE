@@ -5,7 +5,7 @@ namespace SEE.GO
     [ExecuteInEditMode]
     public class HideSourceCodeAndPaper : MonoBehaviour
     {
-        void Start()
+        private void Start()
         {
             GameObject textObject = transform.Find("SourceCode").gameObject;
             GameObject paperObject = transform.Find("Paper").gameObject;

@@ -1,9 +1,10 @@
-﻿using SEE.DataModel;
+﻿using SEE.DataModel.DG;
+using SEE.Layout.NodeLayouts.Cose;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// Calculates a simple grid layout for leaf nodes (only). The order is
@@ -84,7 +85,7 @@ namespace SEE.Layout
 
         public override bool UsesEdgesAndSublayoutNodes()
         {
-            return false; 
+            return false;
         }
     }
 }

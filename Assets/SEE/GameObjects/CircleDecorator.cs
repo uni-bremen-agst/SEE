@@ -22,7 +22,7 @@ namespace SEE.GO
         /// <summary>
         /// The factory that was used to create the objects for which to draw a circle line.
         /// </summary>
-        private NodeFactory nodeFactory;
+        private readonly NodeFactory nodeFactory;
 
         /// <summary>
         /// The color for the circle line.
@@ -33,7 +33,7 @@ namespace SEE.GO
         /// The material we use for the circle line. It is the same for all circle lines
         /// to reduce the number of drawing calls.
         /// </summary>
-        private Material material = new Material(LineFactory.DefaultLineMaterial);
+        private readonly Material material = Materials.New(Materials.ShaderType.TransparentLine);
 
         /// <summary>
         /// Attaches a circle line to all game nodes. 

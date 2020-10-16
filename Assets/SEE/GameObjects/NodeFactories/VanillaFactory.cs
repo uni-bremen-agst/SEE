@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Game;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -8,13 +9,21 @@ namespace SEE.GO
     internal class VanillaFactory : InnerNodeFactory
     {
         /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
+        /// <param name="colorRange">the color range of the created objects</param>
+        public VanillaFactory(Materials.ShaderType shaderType, ColorRange colorRange)
+            : base(shaderType, colorRange)
+        { }
+
+        /// <summary>
         /// Returns a new empty plain game object with an ordinary Renderer component.
         /// </summary>
         /// <returns></returns>
-        public override GameObject NewBlock(int index = 0)
+        public override GameObject NewBlock(int index = 0, int renderQueueOffset = 0)
         {
             GameObject gameObject = new GameObject();
-            gameObject.isStatic = true;
             return gameObject;
         }
 

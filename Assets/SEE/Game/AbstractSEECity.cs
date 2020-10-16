@@ -1,16 +1,17 @@
 
-﻿using SEE.DataModel;
+using OdinSerializer;
+using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.GO;
+using SEE.Layout.EdgeLayouts;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout.NodeLayouts.Cose;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
-using OdinSerializer;
-using SEE.DataModel.IO;
-using static SEE.Game.AbstractSEECity;
-using System.IO;
-using SEE.Utils;
-using SEE.Layout;
 
 namespace SEE.Game
 {
@@ -28,8 +29,9 @@ namespace SEE.Game
         /// The internal representation of this path is always in the Unix style
         /// (or also Unity style), independent from the operating system we are currently
         /// running on.
-        /// </summary>        
-        private string pathPrefix = null; // serialized by Unity
+        /// </summary>
+        /// Must not be readonly because it will be modified in an editor of the inspector.
+        [SerializeField] private string pathPrefix = null;
 
         /// <summary>
         /// The prefix of the absolute paths for the GXL, CSV, GVL data; that is,
@@ -46,21 +48,16 @@ namespace SEE.Game
         /// </summary>
         public string PathPrefix
         {
-            set
-            {
-                pathPrefix = Filenames.ToInternalRepresentation(value);
-                // pathPrefix must end with a directory separator /
-                if (pathPrefix.Length > 0 && pathPrefix[pathPrefix.Length - 1] != Filenames.UnixDirectorySeparator)
-                {
-                    pathPrefix += Filenames.UnixDirectorySeparator;
-                }
-            }
-
             get
             {
-                return string.IsNullOrEmpty(pathPrefix) ? 
-                    UnityProject.GetPath() 
-                    : Filenames.OnCurrentPlatform(pathPrefix);
+                UnityEngine.Assertions.Assert.IsTrue(!string.IsNullOrEmpty(pathPrefix));
+                string result = pathPrefix;
+                if (result[result.Length - 1] != Filenames.UnixDirectorySeparator)
+                {
+                    result += Filenames.UnixDirectorySeparator;
+                }
+                result = Filenames.OnCurrentPlatform(result);
+                return result;
             }
         }
 
@@ -74,10 +71,7 @@ namespace SEE.Game
         /// absolute path to the GVL file containing the layout information.
         /// </summary>
         /// <returns>concatenation of pathPrefix and gvlPath</returns>
-        public string GVLPath()
-        {
-            return PathPrefix + gvlPath;
-        }
+        public string GVLPath => PathPrefix + gvlPath;
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
@@ -117,7 +111,7 @@ namespace SEE.Game
         {
             get => nodeTypes;
         }
-        
+
         /// <summary>
         /// Resets everything that is specific to a given graph. Here: the 
         /// node types.
@@ -185,17 +179,25 @@ namespace SEE.Game
         {
             if (AllNodeTypesAreRelevant)
             {
-                Debug.Log("All node types are relevant.\n");
                 return graph;
-            } 
+            }
             else
             {
                 ICollection<string> matches = nodeTypes.Where(pair => pair.Value == true)
                   .Select(pair => pair.Key).ToList();
-                Debug.Log("Considering only a subgraph.\n");
                 return graph.Subgraph(matches);
             }
         }
+
+        //---------------------------------
+        // Color range of leaf nodes
+        //---------------------------------
+        public ColorRange LeafNodeColorRange = new ColorRange(Color.white, Color.red, 10);
+
+        //---------------------------------
+        // Color range of inner nodes
+        //---------------------------------
+        public ColorRange InnerNodeColorRange = new ColorRange(Color.white, Color.yellow, 10);
 
         //---------------------------------
         // Visual attributes of a leaf node
@@ -427,7 +429,6 @@ namespace SEE.Game
         public enum LeafNodeKinds
         {
             Blocks,
-            Buildings,
         }
 
         /// <summary>
@@ -454,40 +455,14 @@ namespace SEE.Game
         public InnerNodeKinds InnerNodeObjects; // serialized by Unity
 
         /// <summary>
-        /// The kinds of node layouts available.
-        /// </summary>
-        public enum NodeLayouts
-        {            
-            EvoStreets,
-            Balloon,
-            RectanglePacking,
-            Treemap,
-            CirclePacking,
-            Manhattan,
-            CompoundSpringEmbedder,
-            FromFile
-        }
-
-        /// <summary>
-        /// The kinds of edge layouts available.
-        /// </summary>
-        public enum EdgeLayouts
-        {
-            None = 0,        // no edges are to be drawn
-            Straight = 1,
-            Spline = 2,
-            Bundling = 3
-        }
-
-        /// <summary>
         /// The layout that should be used for nodes.
         /// </summary>
-        public NodeLayouts NodeLayout; // serialized by Unity
+        public NodeLayoutKind NodeLayout; // serialized by Unity
 
         /// <summary>
         /// The layout that should be used for edges.
         /// </summary>
-        public EdgeLayouts EdgeLayout; // serialized by Unity
+        public EdgeLayoutKind EdgeLayout; // serialized by Unity
 
         /// <summary>
         /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
@@ -535,7 +510,7 @@ namespace SEE.Game
         /// </summary>
         [Tooltip("Tolerance for spline simplification (Ramer–Douglas–Peucker algorithm):"
             + " line points whose distances fall below that threshold are merged. A value <= 0 means "
-            + " no simplification. Recommended value: 0.05." )]
+            + " no simplification. Recommended value: 0.05.")]
         public float RDP = 0.05f;
 
         /// <summary>
@@ -553,13 +528,16 @@ namespace SEE.Game
             {
                 if (File.Exists(filename))
                 {
-                    SEE.Utils.Performance p = SEE.Utils.Performance.Begin("loading graph data from " + filename);
+                    Performance p = Performance.Begin("loading graph data from " + filename);
                     GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "", new SEELogger());
                     graphCreator.Load();
                     Graph graph = graphCreator.GetGraph();
                     p.End();
-                    Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
-                    Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
+                    Debug.Log("Loaded graph data successfully:"
+                        + "\nFilename: " + filename
+                        + "\nNumber of nodes: " + graph.NodeCount
+                        + "\nNumber of edges: " + graph.EdgeCount
+                        + "\nElapsed time: " + p.GetElapsedTime() + "[h:m:s:ms]\n");
 
                     LoadDataForGraphListing(graph);
 
@@ -569,7 +547,7 @@ namespace SEE.Game
                 {
                     Debug.LogWarningFormat("GXL file {0} does not exist.\n", filename);
                     return new Graph();
-                } 
+                }
             }
         }
 
@@ -591,12 +569,12 @@ namespace SEE.Game
         /// <summary>
         /// Dictionary with all Nodelayouts for leaf and inner nodes
         /// </summary>
-        public Dictionary<NodeLayouts, string> SubLayoutsInnerNodes = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().Where(nodeLayout => !nodeLayout.GetModel().OnlyLeaves).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
+        public Dictionary<NodeLayoutKind, string> SubLayoutsInnerNodes = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().Where(nodeLayout => !nodeLayout.GetModel().OnlyLeaves).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
 
         /// <summary>
         ///  Dictionary with all Nodelayouts only for leaf nodes
         /// </summary>
-        public Dictionary<NodeLayouts, string> SubLayoutsLeafNodes = Enum.GetValues(typeof(NodeLayouts)).Cast<NodeLayouts>().OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
+        public Dictionary<NodeLayoutKind, string> SubLayoutsLeafNodes = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
 
         /// <summary>
         /// Saves all data needed for the listing of the dirs in gui in cosegraphSettings
@@ -604,13 +582,13 @@ namespace SEE.Game
         /// <param name="graph"></param>
         public void LoadDataForGraphListing(Graph graph)
         {
-            if (NodeLayout == NodeLayouts.CompoundSpringEmbedder)
+            if (NodeLayout == NodeLayoutKind.CompoundSpringEmbedder)
             {
                 Dictionary<string, bool> dirs = CoseGraphSettings.ListDirToggle;
                 // die neuen dirs 
                 Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
 
-                Dictionary<string, NodeLayouts> dirsLayout = new Dictionary<string, NodeLayouts>();
+                Dictionary<string, NodeLayoutKind> dirsLayout = new Dictionary<string, NodeLayoutKind>();
                 Dictionary<string, InnerNodeKinds> dirsShape = new Dictionary<string, InnerNodeKinds>();
 
                 foreach (Node node in graph.Nodes())
@@ -628,8 +606,8 @@ namespace SEE.Game
 
                 CoseGraphSettings.show = new Dictionary<string, bool>();
 
-                var diff1 = dirs.Keys.Except(dirsLocal.Keys).Any();
-                var diff2 = dirsLocal.Keys.Except(dirs.Keys).Any();
+                bool diff1 = dirs.Keys.Except(dirsLocal.Keys).Any();
+                bool diff2 = dirsLocal.Keys.Except(dirs.Keys).Any();
 
                 if (dirs.Count == dirsLocal.Count && !diff1 && !diff2)
                 {

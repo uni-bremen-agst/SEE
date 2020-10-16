@@ -1,4 +1,5 @@
 ﻿using NetworkCommsDotNet.Connections;
+using System.Net;
 using UnityEngine.Assertions;
 
 namespace SEE.Net
@@ -7,14 +8,12 @@ namespace SEE.Net
     /// <summary>
     /// This packet can execute various actions.
     /// </summary>
-    internal class ExecuteActionPacket : AbstractPacket
+    internal sealed class ExecuteActionPacket : AbstractPacket
     {
         /// <summary>
         /// The action to be executed.
         /// </summary>
         public AbstractAction action;
-
-
 
         /// <summary>
         /// Empty constructor is necessary for JsonUtility-serialization.
@@ -31,8 +30,6 @@ namespace SEE.Net
         {
             this.action = action;
         }
-
-
 
         internal override string Serialize()
         {
@@ -51,22 +48,36 @@ namespace SEE.Net
         /// server and broadcasts packet to all connections.
         /// </summary>
         /// <param name="connection">The connection of this packet.</param>
-        /// <returns></returns>
+        /// <returns><code>true</code>.</returns>
         internal override bool ExecuteOnServer(Connection connection)
         {
             Assert.IsNotNull(connection);
 
             action.ExecuteOnServerBase();
 
-            if (action.buffer)
+            IPEndPoint[] recipients = action.GetRecipients();
+            if (recipients == null)
             {
-                Server.BufferPacket(this);
+                foreach (Connection c in Server.Connections)
+                {
+                    Network.SubmitPacket(c, this);
+                }
+            }
+            else
+            {
+                foreach (Connection c in Server.Connections)
+                {
+                    foreach (IPEndPoint recipient in recipients) // TODO(torben): we might want to have a hashmap for IPEndPoint => connection
+                    {
+                        if (c.ConnectionInfo.RemoteEndPoint.Equals(recipient))
+                        {
+                            Network.SubmitPacket(c, this);
+                            break;
+                        }
+                    }
+                }
             }
 
-            foreach (Connection c in Server.Connections)
-            {
-                Network.SubmitPacket(c, this);
-            }
             return true;
         }
 
@@ -82,162 +93,6 @@ namespace SEE.Net
             Assert.IsTrue(action.requesterPort != -1);
 
             action.ExecuteOnClientBase();
-            return true;
-        }
-    }
-
-
-
-    /// <summary>
-    /// Can undo an action.
-    /// </summary>
-    internal class UndoActionPacket : AbstractPacket
-    {
-        /// <summary>
-        /// The action to undo.
-        /// </summary>
-        public AbstractAction action;
-
-
-
-        /// <summary>
-        /// Empty constructor is necessary for JsonUtility-serialization.
-        /// </summary>
-        public UndoActionPacket()
-        {
-        }
-
-        /// <summary>
-        /// Constructs a packet with given action.
-        /// </summary>
-        /// <param name="action">The action to undo.</param>
-        public UndoActionPacket(AbstractAction action)
-        {
-            this.action = action;
-        }
-
-
-
-        internal override string Serialize()
-        {
-            string result = action.index.ToString();
-            return result;
-        }
-
-        internal override void Deserialize(string serializedPacket)
-        {
-            int index = int.Parse(serializedPacket);
-            UndoActionPacket deserializedPacket = new UndoActionPacket(ActionHistory.actions[index]);
-            action = deserializedPacket.action;
-        }
-
-        /// <summary>
-        /// Buffers this packet and redos the action of this packet as a server.
-        /// </summary>
-        /// <param name="connection">The connection of this packet.</param>
-        /// <returns><code>true</code>.</returns>
-        internal override bool ExecuteOnServer(Connection connection)
-        {
-            Assert.IsNotNull(connection);
-
-            Server.BufferPacket(this);
-            action.UndoOnServerBase();
-
-            foreach (Connection co in Server.Connections)
-            {
-                Network.SubmitPacket(co, this);
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Undos the action of this packet as a client.
-        /// </summary>
-        /// <param name="connection">The connection of this packet.</param>
-        /// <returns><code>true</code>.</returns>
-        internal override bool ExecuteOnClient(Connection connection)
-        {
-            Assert.IsNotNull(connection);
-
-            action.UndoOnClientBase();
-            return true;
-        }
-    }
-
-
-
-    /// <summary>
-    /// Can redo an action.
-    /// </summary>
-    internal class RedoActionPacket : AbstractPacket
-    {
-        /// <summary>
-        /// The action to redo.
-        /// </summary>
-        public AbstractAction action;
-
-
-
-        /// <summary>
-        /// Empty constructor is necessary for JsonUtility-serialization.
-        /// </summary>
-        public RedoActionPacket()
-        {
-        }
-
-        /// <summary>
-        /// Constructs a packet with given action.
-        /// </summary>
-        /// <param name="action">The action to redo.</param>
-        public RedoActionPacket(AbstractAction action)
-        {
-            this.action = action;
-        }
-
-
-
-        internal override string Serialize()
-        {
-            string result = action.index.ToString();
-            return result;
-        }
-
-        internal override void Deserialize(string serializedPacket)
-        {
-            int index = int.Parse(serializedPacket);
-            RedoActionPacket deserializedPacket = new RedoActionPacket(ActionHistory.actions[index]);
-            action = deserializedPacket.action;
-        }
-
-        /// <summary>
-        /// Buffers this packet and redos the action of this packet as a server.
-        /// </summary>
-        /// <param name="connection">The connection of this packet.</param>
-        /// <returns><code>true</code>.</returns>
-        internal override bool ExecuteOnServer(Connection connection)
-        {
-            Assert.IsNotNull(connection);
-
-            Server.BufferPacket(this);
-            action.RedoOnServerBase();
-
-            foreach (Connection co in Server.Connections)
-            {
-                Network.SubmitPacket(co, this);
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Redos the action of this packet as a client.
-        /// </summary>
-        /// <param name="connection">The connection of this packet.</param>
-        /// <returns><code>true</code>.</returns>
-        internal override bool ExecuteOnClient(Connection connection)
-        {
-            Assert.IsNotNull(connection);
-
-            action.RedoOnClientBase();
             return true;
         }
     }

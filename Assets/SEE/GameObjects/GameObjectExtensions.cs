@@ -3,7 +3,7 @@
 namespace SEE.GO
 {
     /// <summary>
-    /// Provides extensions for GameObjects.
+    /// Provides extensions for GameObjects retrieving their ID.
     /// </summary>
     public static class GameObjectExtensions
     {
@@ -32,19 +32,8 @@ namespace SEE.GO
             }
             else
             {
-                return nodeRef.node.ID; 
+                return nodeRef.node.ID;
             }
-        }
-
-        /// <summary>
-        /// Returns the size of the given <paramref name="gameObject"/>.
-        /// </summary>
-        /// <param name="gameObject"></param>
-        /// <returns>size of given <paramref name="gameObject"/></returns>
-        public static Vector3 Size(this GameObject gameObject)
-        {
-            Renderer renderer = gameObject.GetComponent<Renderer>();
-            return renderer.bounds.size;
         }
     }
 }

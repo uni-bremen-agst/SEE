@@ -15,13 +15,13 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
-    public class CoseGraph 
+    public class CoseGraph
     {
         /// <summary>
         /// the parent of the graph
@@ -126,8 +126,8 @@ namespace SEE.Layout
         {
             if (parent.SublayoutValues.IsSubLayoutNode)
             {
-                this.LeftFrontCorner = parent.GetLeftFrontCorner();
-                this.RightBackCorner = parent.GetRightBackCorner();
+                LeftFrontCorner = parent.GetLeftFrontCorner();
+                RightBackCorner = parent.GetRightBackCorner();
 
                 UpdateBounding();
 
@@ -185,15 +185,15 @@ namespace SEE.Layout
 
             if (leftLowerCorner.x == Mathf.Infinity)
             {
-                this.leftFrontCorner = parent.GetLeftFrontCorner();
-                this.rightBackCorner = parent.GetRightBackCorner();
+                leftFrontCorner = parent.GetLeftFrontCorner();
+                rightBackCorner = parent.GetRightBackCorner();
             }
 
-            this.leftFrontCorner.x = leftLowerCorner.x - defaultMargin;
-            this.leftFrontCorner.y = leftLowerCorner.y + defaultMargin;
+            leftFrontCorner.x = leftLowerCorner.x - defaultMargin;
+            leftFrontCorner.y = leftLowerCorner.y + defaultMargin;
 
-            this.rightBackCorner.x = rightUpperCorner.x + defaultMargin;
-            this.rightBackCorner.y = rightUpperCorner.y - defaultMargin;
+            rightBackCorner.x = rightUpperCorner.x + defaultMargin;
+            rightBackCorner.y = rightUpperCorner.y - defaultMargin;
 
             UpdateBounding();
         }
@@ -217,7 +217,7 @@ namespace SEE.Layout
             scale.x = RightBackCorner.x - LeftFrontCorner.x;
             scale.z = LeftFrontCorner.y - RightBackCorner.y;
             centerPosition.x = LeftFrontCorner.x + Extend.x;
-            centerPosition.z = RightBackCorner.y + Extend.z; 
+            centerPosition.z = RightBackCorner.y + Extend.z;
         }
 
         /// <summary>

@@ -1,11 +1,9 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
-using SEE.Game;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using UnityEngine;
@@ -22,7 +20,7 @@ namespace SEE.Net
         /// <summary>
         /// The default severity of the native logger of <see cref="NetworkCommsDotNet"/>.
         /// </summary>
-        private const Logger.Severity DefaultSeverity = Logger.Severity.High;
+        private const NetworkCommsLogger.Severity DefaultSeverity = NetworkCommsLogger.Severity.High;
 
         /// <summary>
         /// The instance of the network.
@@ -37,79 +35,88 @@ namespace SEE.Net
         /// <summary>
         /// Whether this clients hosts the server. Is ignored in offline mode.
         /// </summary>
-        [SerializeField] private bool hostServer = false;
+        [SerializeField] private readonly bool hostServer = false;
 
         /// <summary>
         /// The remote IP-address of the server. Is empty, if this client hosts the
         /// server.
         /// </summary>
-        [SerializeField] private string remoteServerIPAddress = string.Empty;
+        [SerializeField] private readonly string remoteServerIPAddress = string.Empty;
 
         /// <summary>
         /// The port of the server. Is ignored, if this host does not host the server.
         /// </summary>
-        [SerializeField] private int localServerPort = 55555;
+        [SerializeField] private readonly int localServerPort = 55555;
 
         /// <summary>
         /// The port of the remote server. Is ignored, if this client hosts the server.
         /// </summary>
-        [SerializeField] private int remoteServerPort = 0;
+        [SerializeField] private readonly int remoteServerPort = 0;
 
         /// <summary>
         /// Whether the city should be loaded on start up. Is ignored, if this client
         /// does not host the server.
         /// </summary>
-        [SerializeField] private bool loadCityOnStart = false;
-
-        /// <summary>
-        /// The <see cref="GameObject"/> containing the <see cref="SEECity"/>-Script. Is
-        /// ignored, if city can not be loaded on start.
-        /// </summary>
-        [SerializeField] private GameObject loadCityGameObject = null;
+        [SerializeField] private readonly bool loadCityOnStart = false;
 
 #if UNITY_EDITOR
         /// <summary>
-        /// Whether native logging should be enabled.
+        /// Whether the logging of NetworkComms should be enabled.
         /// </summary>
-        [SerializeField] private bool nativeLoggingEnabled = false;
+        [SerializeField] private readonly bool networkCommsLoggingEnabled = false;
+
+        /// <summary>
+        /// Whether the internal logging should be enabled.
+        /// </summary>
+        [SerializeField] private readonly bool internalLoggingEnabled = true;
 
         /// <summary>
         /// The minimal logged severity.
         /// </summary>
-        [SerializeField] private Logger.Severity minimalSeverity = DefaultSeverity;
+        [SerializeField] private readonly NetworkCommsLogger.Severity minimalSeverity = DefaultSeverity;
 #endif
 
         /// <summary>
         /// Submitted packets, that will be sent in the next <see cref="LateUpdate"/>.
         /// </summary>
-        private Dictionary<Connection, List<string>> submittedSerializedPackets = new Dictionary<Connection, List<string>>();
-
-
+        private readonly Dictionary<Connection, List<string>> submittedSerializedPackets = new Dictionary<Connection, List<string>>();
 
         /// <summary>
         /// <see cref="useInOfflineMode"/>
         /// </summary>
-        public static bool UseInOfflineMode { get => instance ? instance.useInOfflineMode : true; }
+        public static bool UseInOfflineMode => instance ? instance.useInOfflineMode : true;
 
         /// <summary>
         /// <see cref="hostServer"/>
         /// </summary>
-        public static bool HostServer { get => instance ? instance.hostServer : false; }
+        public static bool HostServer => instance ? instance.hostServer : false;
 
         /// <summary>
         /// <see cref="remoteServerIPAddress"/>
         /// </summary>
-        public static string RemoteServerIPAddress { get => instance ? instance.remoteServerIPAddress : string.Empty; }
+        public static string RemoteServerIPAddress => instance ? instance.remoteServerIPAddress : string.Empty;
 
         /// <summary>
         /// <see cref="localServerPort"/>
         /// </summary>
-        public static int LocalServerPort { get => instance ? instance.localServerPort : -1; }
+        public static int LocalServerPort => instance ? instance.localServerPort : -1;
 
         /// <summary>
         /// <see cref="remoteServerPort"/>
         /// </summary>
-        public static int RemoteServerPort { get => instance ? instance.remoteServerPort : -1; }
+        public static int RemoteServerPort => instance ? instance.remoteServerPort : -1;
+
+        /// <summary>
+        /// <see cref="loadCityOnStart"/>
+        /// </summary>
+        public static bool LoadCityOnStart => instance ? instance.loadCityOnStart : false;
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// <see cref="internalLoggingEnabled"/>
+        /// </summary>
+        public static bool InternalLoggingEnabled => instance ? instance.internalLoggingEnabled : false;
+#endif
 
         /// <summary>
         /// Contains the main thread of the application.
@@ -120,9 +127,7 @@ namespace SEE.Net
         /// List of dead connections. Is packets can not be sent, this list is searched
         /// to reduce the frequency of warning messages.
         /// </summary>
-        private static List<Connection> deadConnections = new List<Connection>();
-
-
+        private static readonly List<Connection> deadConnections = new List<Connection>();
 
         /// <summary>
         /// Initializes the server, client and game.
@@ -131,7 +136,7 @@ namespace SEE.Net
         {
             if (instance)
             {
-                Debug.LogError("There must not be more than one Network-script! This script will be destroyed!");
+                Logger.Log("There must not be more than one Network-script! This script will be destroyed!");
                 Destroy(this);
                 return;
             }
@@ -141,9 +146,9 @@ namespace SEE.Net
             if (!useInOfflineMode)
             {
 #if UNITY_EDITOR
-                if (nativeLoggingEnabled)
+                if (networkCommsLoggingEnabled)
                 {
-                    NetworkComms.EnableLogging(new Logger(minimalSeverity));
+                    NetworkComms.EnableLogging(new NetworkCommsLogger(minimalSeverity));
                 }
                 else
                 {
@@ -164,8 +169,7 @@ namespace SEE.Net
                 }
                 catch (Exception e)
                 {
-                    Debug.LogException(e);
-                    Debug.LogWarning("Some network-error happened! Continuing in offline mode...");
+                    Logger.LogWarning("Some network-error happened! Continuing in offline mode...\nException: " + e.ToString());
                     useInOfflineMode = true;
                 }
             }
@@ -178,32 +182,32 @@ namespace SEE.Net
         /// </summary>
         private void InitializeGame()
         {
-            if ((useInOfflineMode || hostServer) && loadCityOnStart && loadCityGameObject != null)
+            if ((useInOfflineMode || hostServer) && loadCityOnStart)
             {
-                AbstractSEECity seeCity = loadCityGameObject.GetComponent<AbstractSEECity>();
-                if (seeCity)
+                foreach (Game.AbstractSEECity city in FindObjectsOfType<Game.AbstractSEECity>())
                 {
-                    new LoadCityAction(seeCity).Execute();
-                }
-                else
-                {
-                    Debug.LogWarning("Attached GameObject does not contain an AbstractSEECity script! City will not be loaded!");
+                    if (city is Game.SEECity)
+                    {
+                        ((Game.SEECity)city).LoadAndDrawGraph();
+                    }
+                    else
+                    {
+                        Logger.LogError("Unsupported city-type!");
+                    }
                 }
             }
-
-            // TODO: not sure if this should be the job of the networking script
-            new InstantiateAction("Player").Execute();
 
             GameObject rig = GameObject.Find("Player Rig");
             if (rig)
             {
                 // TODO(torben): this has to adapted once VR-hardware is available
+                // also, this is now initialized in Server.cs
 #if false
                 ControlMode mode = rig.GetComponent<ControlMode>();
 #if UNITY_EDITOR
                 if (mode.ViveController && mode.LeapMotion)
                 {
-                    Debug.LogError("Only one mode should be enabled!");
+                    Logger.LogError("Only one mode should be enabled!");
                 }
 #endif
                 if (mode.ViveController)
@@ -219,19 +223,20 @@ namespace SEE.Net
 #if UNITY_EDITOR
                 else
                 {
-                    Debug.LogError("No mode selected!");
+                    Logger.LogError("No mode selected!");
                 }
 #endif
 #endif
             }
         }
-        
+
         /// <summary>
         /// Sends all pending packets.
         /// </summary>
         private void LateUpdate()
         {
-            if (hostServer && !useInOfflineMode)
+            bool updateServer = hostServer && !useInOfflineMode;
+            if (updateServer)
             {
                 Server.Update();
             }
@@ -248,7 +253,7 @@ namespace SEE.Net
                         if (serializedObjects.Count != 0)
                         {
                             ulong id = ulong.MaxValue;
-                            if (Server.Connections.Contains(connection))
+                            if (updateServer && Server.Connections.Contains(connection))
                             {
                                 id = Server.outgoingPacketSequenceIDs[connection]++;
                             }
@@ -300,7 +305,13 @@ namespace SEE.Net
                 {
                     if (fileName.Contains(prefixes[j]))
                     {
-                        fileInfo.Delete();
+                        try
+                        {
+                            fileInfo.Delete();
+                        }
+                        catch (IOException)
+                        {
+                        }
                         break;
                     }
                 }
@@ -325,17 +336,26 @@ namespace SEE.Net
                 }
 
                 instance.useInOfflineMode = true;
-                try
+
+                if (instance.hostServer)
                 {
-                    if (instance.hostServer)
+                    try
                     {
                         Server.Shutdown();
                     }
+                    catch (Exception e)
+                    {
+                        Logger.LogException(e);
+                    }
+                }
+
+                try
+                {
                     Client.Shutdown();
                 }
                 catch (Exception e)
                 {
-                    Debug.LogException(e);
+                    Logger.LogException(e);
                 }
             }
         }
@@ -392,12 +412,19 @@ namespace SEE.Net
                     {
                         deadConnections.Add(connection);
                         Invoker.Invoke((Connection c) => { deadConnections.Remove(c); }, 1.0f, connection);
-                        Debug.LogWarning(
+                        Logger.LogWarning(
                             "Packet could not be sent to '" +
                             connection.ConnectionInfo.RemoteEndPoint.ToString() +
                             "'! Destination may not be listening or connection timed out. Closing connection!"
                         );
-                        SwitchToOfflineMode();
+                        if (hostServer)
+                        {
+                            connection.CloseConnection(true);
+                        }
+                        else
+                        {
+                            SwitchToOfflineMode();
+                        }
                     }
                 }
             }
@@ -416,7 +443,8 @@ namespace SEE.Net
             }
 
             IPAddress[] localIPAddresses = LookupLocalIPAddresses();
-            return localIPAddresses.Contains(ipAddress);
+            bool result = Array.Exists(localIPAddresses, e => e.Equals(ipAddress));
+            return result;
         }
 
         /// <summary>
@@ -442,7 +470,7 @@ namespace SEE.Net
         public static VivoxUnity.ILoginSession VivoxLoginSession { get; private set; } = null;
         public static VivoxUnity.IChannelSession VivoxChannelSession { get; private set; } = null;
 
-        [SerializeField] private string vivoxChannelName = string.Empty;
+        [SerializeField] private readonly string vivoxChannelName = string.Empty;
         public static string VivoxChannelName { get => instance ? instance.vivoxChannelName : string.Empty; }
 
         private static void VivoxInitialize()
@@ -478,7 +506,7 @@ namespace SEE.Net
                     if (HostServer && VivoxChannelSession.Participants.Count != 0)
                     {
                         // TODO: this channel already exists and the name is unavailable!
-                        Debug.Log("Channel with given name already exists. Select differend name!\n");
+                        Logger.Log("Channel with given name already exists. Select a differend name!");
                         VivoxChannelSession.Disconnect();
                         VivoxLoginSession.DeleteChannelSession(channelID);
                     }
@@ -500,7 +528,7 @@ namespace SEE.Net
                 }
                 catch (Exception e)
                 {
-                    Debug.LogException(e);
+                    Logger.LogException(e);
                 }
             });
         }
@@ -533,8 +561,8 @@ namespace SEE.Net
             {
                 switch (channelSession.AudioState)
                 {
-                    case VivoxUnity.ConnectionState.Connected:    Debug.LogFormat("Audio connected in {0}\n", channelSession.Key.Name); break;
-                    case VivoxUnity.ConnectionState.Disconnected: Debug.LogFormat("Audio disconnected in {0}\n", channelSession.Key.Name); break;
+                    case VivoxUnity.ConnectionState.Connected: Logger.Log("Audio chat connected in " + channelSession.Key.Name + " channel."); break;
+                    case VivoxUnity.ConnectionState.Disconnected: Logger.Log("Audio chat disconnected in " + channelSession.Key.Name + " channel."); break;
                 }
             }
             else if (propertyChangedEventArgs.PropertyName == "TextState")
@@ -542,11 +570,11 @@ namespace SEE.Net
                 switch (channelSession.TextState)
                 {
                     case VivoxUnity.ConnectionState.Connected:
-                        Debug.LogFormat("Text connected in {0}\n", channelSession.Key.Name);
+                        Logger.Log("Text chat connected in " + channelSession.Key.Name + " channel.");
                         SendGroupMessage();
                         break;
                     case VivoxUnity.ConnectionState.Disconnected:
-                        Debug.LogFormat("Text disconnected in {0}\n", channelSession.Key.Name);
+                        Logger.Log("Text chat disconnected in " + channelSession.Key.Name + " channel.");
                         break;
                 }
             }
@@ -558,12 +586,15 @@ namespace SEE.Net
             string senderName = queueItemAddedEventArgs.Value.Sender.Name;
             string message = queueItemAddedEventArgs.Value.Message;
 
-            Debug.Log(channelName + ": " + senderName + ": " + message + "\n");
+            Logger.Log(channelName + ": " + senderName + ": " + message + "\n");
         }
 
         private void OnApplicationQuit()
         {
-            VivoxClient.Uninitialize();
+            if (VivoxClient != null)
+            {
+                VivoxClient.Uninitialize();
+            }
         }
 
         #endregion

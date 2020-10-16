@@ -1,10 +1,11 @@
-﻿using SEE.DataModel;
-using SEE.Layout.RectanglePacking;
+﻿using SEE.DataModel.DG;
+using SEE.Layout.NodeLayouts.Cose;
+using SEE.Layout.NodeLayouts.RectanglePacking;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// This layout packs rectangles closely together as a set of nested packed rectangles to decrease 
@@ -60,7 +61,7 @@ namespace SEE.Layout
                         // We add the padding upfront. Padding is added on both sides.
                         // The padding will later be removed again.
                         Vector3 scale = node.LocalScale;
-                        scale.x += 2.0f * padding; 
+                        scale.x += 2.0f * padding;
                         scale.z += 2.0f * padding;
                         layout_result[node] = new NodeTransform(Vector3.zero, scale);
                         numberOfLeaves++;
@@ -349,7 +350,7 @@ namespace SEE.Layout
                 {
                     // targetNode is the node with the lowest waste in preservers
                     float lowestWaste = Mathf.Infinity;
-                    foreach (var entry in preservers)
+                    foreach (KeyValuePair<PNode, float> entry in preservers)
                     {
                         if (entry.Value < lowestWaste)
                         {
@@ -367,7 +368,7 @@ namespace SEE.Layout
 
                     // targetNode is the node with the aspect ratio closest to 1
                     float bestRatio = Mathf.Infinity;
-                    foreach (var entry in expanders)
+                    foreach (KeyValuePair<PNode, float> entry in expanders)
                     {
                         if (entry.Value < bestRatio)
                         {
@@ -416,7 +417,7 @@ namespace SEE.Layout
 
         public override bool UsesEdgesAndSublayoutNodes()
         {
-            return false; 
+            return false;
         }
     }
 }

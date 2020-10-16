@@ -11,7 +11,7 @@ namespace SEE.Utils
         {
             this.filename = filename;
             this.logger = logger;
-            this.reader = new XmlTextReader(filename)
+            reader = new XmlTextReader(filename)
             {
                 WhitespaceHandling = WhitespaceHandling.None
             };
@@ -134,7 +134,7 @@ namespace SEE.Utils
         {
             if (logger != null)
             {
-                IXmlLineInfo xmlInfo = (IXmlLineInfo)reader;
+                IXmlLineInfo xmlInfo = reader;
                 int lineNumber = xmlInfo.LineNumber - 1;
                 logger.LogError(filename + ":" + lineNumber + ": " + message + "\n");
             }

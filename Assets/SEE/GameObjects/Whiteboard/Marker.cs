@@ -25,19 +25,20 @@ using UnityEngine;
 
 namespace SEE.GO.Whiteboard
 {
+    [System.Obsolete("Experimental code. Do not use it. May be removed soon.")]
     public class Marker : DraggableObject
     {
         [SerializeField]
         private Color color;
 
         [SerializeField]
-        private MeshRenderer[] colouredParts;
+        private readonly MeshRenderer[] colouredParts;
 
         [SerializeField]
-        private Painter painter; // FIXME: Never assigned.
+        private readonly Painter painter; // FIXME: Never assigned.
 
         [SerializeField]
-        private PaintReceiver paintReceiver;
+        private readonly PaintReceiver paintReceiver;
 
         protected override void Awake()
         {

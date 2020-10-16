@@ -1,4 +1,6 @@
 ﻿using SEE.Game;
+using SEE.Layout.EdgeLayouts;
+using SEE.Layout.NodeLayouts;
 using System;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -7,6 +9,9 @@ namespace SEE.Net
 {
 
     /// <summary>
+    /// !!! IMPORTANT !!!
+    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   
     /// Loads a city with the attributes defined in object with name
     /// <see cref="gameObjectName"/> for every client.
     /// </summary>
@@ -15,7 +20,7 @@ namespace SEE.Net
         /// <summary>
         /// The name of the game object defining the loading details.
         /// </summary>
-        public static readonly string gameObjectName = "Implementation";
+        public string gameObjectName;
 
         /// <summary>
         /// The type of the city as string.
@@ -74,8 +79,8 @@ namespace SEE.Net
         public AbstractSEECity.LeafNodeKinds LeafObjects;
         public AbstractSEECity.InnerNodeKinds InnerNodeObjects;
 
-        public AbstractSEECity.NodeLayouts NodeLayout;
-        public AbstractSEECity.EdgeLayouts EdgeLayout;
+        public NodeLayoutKind NodeLayout;
+        public EdgeLayoutKind EdgeLayout;
         public bool ZScoreScale;
         public float EdgeWidth;
         public bool ShowErosions;
@@ -116,8 +121,9 @@ namespace SEE.Net
         /// Constructs a an action to load the given city for every client.
         /// </summary>
         /// <param name="city">The city to load.</param>
-        public LoadCityAction(AbstractSEECity city) : base(true)
+        public LoadCityAction(AbstractSEECity city)
         {
+            gameObjectName = city.name;
             type = city.GetType().ToString();
             position = city.transform.position;
             rotation = city.transform.rotation;
@@ -189,16 +195,14 @@ namespace SEE.Net
 
 
 
-        protected override bool ExecuteOnServer()
+        protected override void ExecuteOnServer()
         {
-            return true;
         }
 
         /// <summary>
         /// Loads the city of given attributes.
         /// </summary>
-        /// <returns><code>true</code>.</returns>
-        protected override bool ExecuteOnClient()
+        protected override void ExecuteOnClient()
         {
             GameObject gameObject = GameObject.Find(gameObjectName);
             Assert.IsNotNull(gameObject);
@@ -209,7 +213,7 @@ namespace SEE.Net
 
             AbstractSEECity city = null;
             Type t = Type.GetType(type);
-            
+
             if (t == typeof(SEECity))
             {
                 city = gameObject.GetComponent<SEECity>();
@@ -299,38 +303,6 @@ namespace SEE.Net
             {
                 Debug.LogError("Unknown city-type!");
             }
-
-            return true;
-        }
-
-        protected override bool UndoOnServer()
-        {
-            return true;
-        }
-
-        /// <summary>
-        /// Destroys the city.
-        /// </summary>
-        /// <returns><code>true</code>.</returns>
-        protected override bool UndoOnClient()
-        {
-            AbstractSEECity city = GameObject.Find(gameObjectName).GetComponent<AbstractSEECity>();
-            city.Reset();
-            return true;
-        }
-
-        protected override bool RedoOnServer()
-        {
-            return true;
-        }
-
-        /// <summary>
-        /// Rebuilds the city.
-        /// </summary>
-        /// <returns>The result of <see cref="ExecuteOnClient"/>.</returns>
-        protected override bool RedoOnClient()
-        {
-            return ExecuteOnClient();
         }
     }
 

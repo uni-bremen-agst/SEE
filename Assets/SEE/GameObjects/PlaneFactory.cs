@@ -14,21 +14,21 @@ namespace SEE.GO
         /// <summary>
         /// Returns a newly created plane at centerPosition with given color, width, depth, and height.
         /// </summary>
+        /// <param name="shader">the shader to draw the plane</param>
         /// <param name="centerPosition">center position of the plane</param>
         /// <param name="color">color of the plane</param>
         /// <param name="width">width of the plane (x axis)</param>
         /// <param name="depth">depth of the plane (z axis)</param>
         /// <param name="height">height of the plane (y axis)</param>
         /// <returns></returns>
-        public static GameObject NewPlane(Vector3 centerPosition, Color color, float width, float depth, float height = 1.0f)
+        public static GameObject NewPlane(Materials.ShaderType shaderType, Vector3 centerPosition, Color color, float width, float depth, float height = 1.0f)
         {
             GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
             plane.tag = Tags.Decoration;
             plane.transform.position = centerPosition;
 
             Renderer planeRenderer = plane.GetComponent<Renderer>();
-            planeRenderer.sharedMaterial = new Material(planeRenderer.sharedMaterial);
-            planeRenderer.sharedMaterial.color = color;
+            planeRenderer.sharedMaterial = Materials.New(shaderType, color, -1);
 
             // Neither casting nor receiving shadows.
             planeRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
@@ -62,18 +62,20 @@ namespace SEE.GO
         /// 
         /// Preconditions: x0 < x1 and z0 < z1 (Exception is thrown otherwise)
         /// </summary>
+        /// <param name="shader">the shader to draw the plane</param>
         /// <param name="leftFrontCorner">2D co-ordinate of the left front corner</param>
         /// <param name="rightBackCorner">2D co-ordinate of the right back corner</param>
-        /// <param name="groundLevel">y co-ordinate for the plane</param>
+        /// <param name="groundLevel">y co-ordinate for ground level of the plane; 
+        ///    defines the lower end along the y axis</param>
         /// <param name="color">color of the plane</param>
         /// <param name="height">height (thickness) of the plane</param>
-        public static GameObject NewPlane(Vector2 leftFrontCorner, Vector2 rightBackCorner, float groundLevel, Color color, float height = 0.1f)
+        public static GameObject NewPlane(Materials.ShaderType shaderType, Vector2 leftFrontCorner, Vector2 rightBackCorner, float groundLevel, Color color, float height = 2 * float.Epsilon)
         {
             float width = Distance(leftFrontCorner.x, rightBackCorner.x);
             float depth = Distance(leftFrontCorner.y, rightBackCorner.y);
 
-            Vector3 centerPosition = new Vector3(leftFrontCorner.x + width / 2.0f, groundLevel, leftFrontCorner.y + depth / 2.0f);
-            return NewPlane(centerPosition, color, width, depth, height);
+            Vector3 centerPosition = new Vector3(leftFrontCorner.x + width / 2.0f, groundLevel + height / 2.0f, leftFrontCorner.y + depth / 2.0f);
+            return NewPlane(shaderType, centerPosition, color, width, depth, height);
         }
 
         /// <summary>

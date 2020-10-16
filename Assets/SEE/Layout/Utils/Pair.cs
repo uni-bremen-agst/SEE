@@ -1,4 +1,4 @@
-﻿namespace SEE.Layout
+﻿namespace SEE.Layout.Utils
 {
     /// <summary>
     /// Provides ordered pairs of arbitrary element types.
@@ -24,8 +24,8 @@
         /// <param name="b">the second element</param>
         public Pair(A a, B b)
         {
-            this.first = a;
-            this.second = b;
+            first = a;
+            second = b;
         }
 
         /// <summary>

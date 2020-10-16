@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
-using NUnit.Framework;
+﻿using NUnit.Framework;
+using SEE.Layout.Utils;
+using System.Collections.Generic;
 
 namespace SEE.Layout
 {
     /// <summary>
     /// Unit tests for LCAFinder.
     /// </summary>
-    class TestLCAFinder
+    internal class TestLCAFinder
     {
         private int nodeID = 0;
 
@@ -49,7 +50,7 @@ namespace SEE.Layout
                 set => linkname = value;
             }
 
-            private ICollection<LNode> children = new List<LNode>();
+            private readonly ICollection<LNode> children = new List<LNode>();
 
             public ICollection<LNode> Children()
             {
@@ -193,7 +194,7 @@ namespace SEE.Layout
 
             LNode r1 = NewVertex("r1");
             LNode a = NewVertex("a");
-            LNode b = NewVertex("b");            
+            LNode b = NewVertex("b");
             LNode a1 = NewVertex("a1");
             LNode a2 = NewVertex("a2");
             LNode b1 = NewVertex("b1");
@@ -224,7 +225,7 @@ namespace SEE.Layout
 
             Assert.AreEqual(a, lca.LCA(a1, a2));
             Assert.AreEqual(r1, lca.LCA(a2, b1));
-            
+
             Assert.AreEqual(c1, lca.LCA(c11, c12));
             Assert.AreEqual(c, lca.LCA(c2, c12));
             Assert.AreEqual(c, lca.LCA(c1, c));

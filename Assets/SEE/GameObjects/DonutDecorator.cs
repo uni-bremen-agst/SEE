@@ -1,4 +1,4 @@
-﻿using SEE.DataModel;
+﻿using SEE.DataModel.DG;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,7 +20,7 @@ namespace SEE.GO
         public DonutDecorator(NodeFactory nodeFactory, IScale scaler, string innerMetric, string[] metrics)
         {
             this.nodeFactory = nodeFactory;
-            this.donutFactory = new DonutFactory(innerMetric, metrics);
+            donutFactory = new DonutFactory(innerMetric, metrics);
             this.metrics = metrics;
             this.innerMetric = innerMetric;
             this.scaler = scaler;

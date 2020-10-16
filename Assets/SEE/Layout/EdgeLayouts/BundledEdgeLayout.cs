@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using SEE.Layout.Utils;
 using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Assertions;
 
-namespace SEE.Layout
+namespace SEE.Layout.EdgeLayouts
 {
     /// <summary>
     /// Draws edges as hierarchically bundled edges. 
@@ -37,7 +39,7 @@ namespace SEE.Layout
             Debug.Assert(0.0f <= tension && tension <= 1.0f);
             this.tension = tension;
             this.rdp = rdp;
-            this.levelDistance = minLevelDistance;
+            levelDistance = minLevelDistance;
         }
 
         /// <summary>
@@ -76,33 +78,35 @@ namespace SEE.Layout
         private float levelOffset = 0.0f;
 
         /// <summary>
-        /// Returns hierarchically bundled splines for all edges among the given <paramref name="layoutNodes"/>.
-        /// 
+        /// Adds way points to the given <paramref name="edges"/> along hierarchically
+        /// bundled splines.
+        /// The <paramref name="edges"/> are assumed to be in between pairs of nodes in
+        /// the given set of <paramref name="nodes"/>. Because this is a hierarchical edge 
+        /// layout,  <paramref name="nodes"/> must include all ancestors for all nodes that are
+        /// source or target of any edge in the given set of <paramref name="edges"/>.
         /// </summary>
-        /// <param name="layoutNodes">nodes whose connecting edges are to be drawn</param>
-        /// <returns>hierarchically bundled splines</returns>
-        public override ICollection<LayoutEdge> Create(ICollection<ILayoutNode> layoutNodes)
+        /// <param name="nodes">nodes whose edges are to be drawn or which are 
+        /// ancestors of any nodes whose edges are to be drawn</param>
+        /// <param name="edges">edges for which to add way points</param>
+        public override void Create(ICollection<ILayoutNode> nodes, ICollection<ILayoutEdge> edges)
         {
-            ICollection<LayoutEdge> layout = new List<LayoutEdge>();
-
-            ICollection<ILayoutNode> roots = GetRoots(layoutNodes);
-            maxLevel = GetMaxLevel(roots, -1);
-
-            MinMaxBlockY(layoutNodes, out float minY, out float maxY, out float maxHeight);
-            levelDistance = Math.Max(levelDistance, maxHeight / 5.0f);
-            levelOffset = edgesAboveBlocks ? maxY + levelDistance : minY - levelDistance;
-            //Debug.LogFormat("levelDistance {0} levelOffset {1} maxHeight {2}\n", levelDistance, levelOffset, maxHeight);
-
-            LCAFinder<ILayoutNode> lca = new LCAFinder<ILayoutNode>(roots);
-
-            foreach (ILayoutNode source in layoutNodes)
+            if (edges.Count > 0)
             {
-                foreach (ILayoutNode target in source.Successors)
+                ICollection<ILayoutNode> roots = GetRoots(nodes);
+                Assert.AreNotEqual(roots.Count, 0);
+                maxLevel = GetMaxLevel(roots, -1);
+
+                MinMaxBlockY(nodes, out float minY, out float maxY, out float maxHeight);
+                levelDistance = Math.Max(levelDistance, maxHeight / 5.0f);
+                levelOffset = edgesAboveBlocks ? maxY + levelDistance : minY - levelDistance;
+
+                LCAFinder<ILayoutNode> lca = new LCAFinder<ILayoutNode>(roots);
+
+                foreach (ILayoutEdge edge in edges)
                 {
-                    layout.Add(new LayoutEdge(source, target, GetLinePoints(source, target, lca, maxLevel)));
+                    edge.Points = GetLinePoints(edge.Source, edge.Target, lca, maxLevel);
                 }
             }
-            return layout;
         }
 
         /// <summary>
@@ -201,11 +205,11 @@ namespace SEE.Layout
         /// <param name="maxLevel">the maximal level of the node hierarchy</param>
         /// <returns>points to draw a spline between source and target</returns>
         private Vector3[] GetLinePoints
-            (ILayoutNode source, 
-             ILayoutNode target, 
-             LCAFinder<ILayoutNode> lcaFinder, 
+            (ILayoutNode source,
+             ILayoutNode target,
+             LCAFinder<ILayoutNode> lcaFinder,
              int maxLevel)
-        { 
+        {
             if (source == target)
             {
                 return SelfLoop(source);
@@ -303,7 +307,7 @@ namespace SEE.Layout
         private Vector3[] DirectSpline(ILayoutNode source, ILayoutNode target, float yLevel)
         {
             Vector3 start = edgesAboveBlocks ? source.Roof : source.Ground;
-            Vector3 end   = edgesAboveBlocks ? target.Roof : target.Ground;
+            Vector3 end = edgesAboveBlocks ? target.Roof : target.Ground;
             // position in between start and end
             Vector3 middle = Vector3.Lerp(start, end, 0.5f);
             middle.y = yLevel;
@@ -357,7 +361,7 @@ namespace SEE.Layout
             // right back corner of center area
             Vector3 end = new Vector3(center.x + extent.x, center.y, center.z + extent.z);
             Vector3 middle = center;
-            middle.y += edgesAboveBlocks? levelDistance : -levelDistance;
+            middle.y += edgesAboveBlocks ? levelDistance : -levelDistance;
             return LinePoints.SplineLinePoints(start, middle, end);
         }
 

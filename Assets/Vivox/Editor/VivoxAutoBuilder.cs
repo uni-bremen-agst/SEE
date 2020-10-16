@@ -1,4 +1,6 @@
-﻿/*
+﻿#if UNITY_EDITOR
+
+/*
 Copyright (c) 2014-2018 by Mercer Road Corp
 
 Permission to use, copy, modify or distribute this software in binary or source form
@@ -589,3 +591,5 @@ report = BuildPipeline.BuildPlayer(
 
 #endregion
 }
+
+#endif

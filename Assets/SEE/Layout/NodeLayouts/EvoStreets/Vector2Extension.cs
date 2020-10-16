@@ -1,14 +1,12 @@
 ﻿using UnityEngine;
 
-namespace SEE.Layout.EvoStreets
+namespace SEE.Layout.NodeLayouts.EvoStreets
 {
+    /// <summary>
+    /// Provides extensions for Vector2.
+    /// </summary>
     public static class Vector2Extension
     {
-        public static Vector2 GetRotated2(this Vector2 v, float degrees)
-        {
-            return Quaternion.Euler(0, 0, degrees) * v;
-        }
-
         public static Vector2 GetRotated(this Vector2 v, float angle)
         {
             float radian = angle * Mathf.Deg2Rad;

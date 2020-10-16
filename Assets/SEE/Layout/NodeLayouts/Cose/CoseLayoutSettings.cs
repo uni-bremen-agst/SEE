@@ -15,15 +15,15 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
-    public class CoseLayoutSettings 
+    public class CoseLayoutSettings
     {
         /// <summary>
         /// the margin of a graph
         /// </summary>
         public static float Graph_Margin = 0.5f;
-        
+
         /// <summary>
         /// the margin of a compound node
         /// </summary>
@@ -47,7 +47,7 @@ namespace SEE.Layout
         /// <summary>
         /// true if smart multilevel calculation is used 
         /// </summary>
-        public static bool Use_Smart_Multilevel_Calculation = false; 
+        public static bool Use_Smart_Multilevel_Calculation = false;
 
         /// <summary>
         /// the simple node size
@@ -147,7 +147,7 @@ namespace SEE.Layout
         /// <summary>
         /// true if the layout process continues until a "good" layout is found
         /// </summary>
-        public static bool Iterativ_Parameter_Calculation = false; 
+        public static bool Iterativ_Parameter_Calculation = false;
 
         /// <summary>
         /// the cooling factor

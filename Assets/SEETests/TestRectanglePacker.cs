@@ -1,8 +1,9 @@
 ﻿using NUnit.Framework;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout.NodeLayouts.RectanglePacking;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using SEE.GO;
 
 namespace SEE.Layout.RectanglePacking
 {

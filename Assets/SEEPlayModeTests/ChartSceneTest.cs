@@ -1,14 +1,13 @@
-﻿using System.Collections;
-using NUnit.Framework;
-using SEE.Charts.Scripts;
+﻿using NUnit.Framework;
 using SEE.GO;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
 
-namespace SEE.Charts.ChartTests
+namespace SEE.Game.Charts
 {
     /// <summary>
     ///     Tests for charts. Need a working scene with charts in it and a <see cref="GameObject" /> with a
@@ -36,7 +35,7 @@ namespace SEE.Charts.ChartTests
             _tester = new MonoBehaviourTest<MonoTest>();
             yield return new WaitForSeconds(1f);
             _tester.component.FindHelper();
-            var helper = _tester.component.helper;
+            TestHelper helper = _tester.component.helper;
             _manager = helper.manager;
             _creator = helper.creator;
             _charts = helper.charts;
@@ -86,8 +85,8 @@ namespace SEE.Charts.ChartTests
         [Test]
         public void TestUiButtons()
         {
-            var closeButton = _tester.component.helper.closeChartsButton;
-            var createButton = _tester.component.helper.createChartButton;
+            Button closeButton = _tester.component.helper.closeChartsButton;
+            Button createButton = _tester.component.helper.createChartButton;
             Assert.NotNull(closeButton);
             Assert.NotNull(createButton);
             createButton.onClick.Invoke();
@@ -105,8 +104,8 @@ namespace SEE.Charts.ChartTests
         {
             _creator.CreateChart();
             yield return new WaitForSeconds(0.2f);
-            var chart = _charts.transform.Find(ChartString);
-            var closeButton = chart.Find("LabelsPanel").Find("TopLeft").Find("DestroyButton").GetComponent<Button>();
+            Transform chart = _charts.transform.Find(ChartString);
+            Button closeButton = chart.Find("LabelsPanel").Find("TopLeft").Find("DestroyButton").GetComponent<Button>();
             closeButton.onClick.Invoke();
             yield return new WaitForSeconds(0.2f);
             bool destroyed = chart == null;
@@ -123,12 +122,12 @@ namespace SEE.Charts.ChartTests
             _creator.CreateChart();
             yield return new WaitForSeconds(0.2f);
             Assert.AreEqual(3, _charts.transform.childCount);
-            var chart = _charts.transform.Find(ChartString);
+            Transform chart = _charts.transform.Find(ChartString);
             Assert.NotNull(chart);
-            var entries = chart.Find(DataString).Find(EntriesString);
+            Transform entries = chart.Find(DataString).Find(EntriesString);
             Assert.NotNull(entries);
             Assert.AreEqual(2, entries.childCount);
-            var marker = entries.Find(MarkerString).GetComponent<ChartMarker>();
+            ChartMarker marker = entries.Find(MarkerString).GetComponent<ChartMarker>();
             Assert.NotNull(marker);
             Assert.AreEqual("a1_a.cpp",
                 marker.linkedObject.GetComponent<NodeRef>().node.SourceName);
@@ -143,8 +142,8 @@ namespace SEE.Charts.ChartTests
         {
             _creator.CreateChart();
             yield return new WaitForSeconds(0.2f);
-            var entries = _charts.transform.Find(ChartString).Find(DataString).Find(EntriesString);
-            var dropdown = _charts.transform.Find(ChartString).Find("LabelsPanel")
+            Transform entries = _charts.transform.Find(ChartString).Find(DataString).Find(EntriesString);
+            TMP_Dropdown dropdown = _charts.transform.Find(ChartString).Find("LabelsPanel")
                 .Find("AxisDropdownX").GetComponent<TMP_Dropdown>();
             Assert.AreEqual(2, entries.childCount);
             dropdown.value = 1;
@@ -167,13 +166,13 @@ namespace SEE.Charts.ChartTests
         {
             _creator.CreateChart();
             yield return new WaitForSeconds(0.2f);
-            var entries = _charts.transform.Find(ChartString).Find(DataString).Find(EntriesString);
+            Transform entries = _charts.transform.Find(ChartString).Find(DataString).Find(EntriesString);
             _charts.transform.Find(ChartString).Find("ContentSelection").gameObject
                 .SetActive(true);
-            var scrollView = _charts.transform.Find(ChartString).Find("ContentSelection")
+            Transform scrollView = _charts.transform.Find(ChartString).Find("ContentSelection")
                 .Find("Scroll View").Find("Viewport").Find("Content");
-            var parent = scrollView.GetChild(0).GetComponent<ScrollViewToggle>();
-            var child = scrollView.GetChild(1).GetComponent<ScrollViewToggle>();
+            ScrollViewToggle parent = scrollView.GetChild(0).GetComponent<ScrollViewToggle>();
+            ScrollViewToggle child = scrollView.GetChild(1).GetComponent<ScrollViewToggle>();
             Assert.AreEqual(2, entries.childCount);
             parent.Toggle(false, true);
             yield return new WaitForSeconds(3f);
@@ -198,13 +197,13 @@ namespace SEE.Charts.ChartTests
         {
             _creator.CreateChart();
             yield return new WaitForSeconds(0.2f);
-            var entries = _charts.transform.Find(ChartString).Find(DataString).Find(EntriesString);
-            var button = entries.Find(MarkerString).GetComponent<Button>();
-            var marker = entries.Find(MarkerString).GetComponent<ChartMarker>();
-            var markerHighlight = marker.transform.Find("MarkerHighlight").gameObject;
-            var buildingName = marker.linkedObject.GetComponent<NodeRef>().node.SourceName;
-            var folder = _city.transform.Find("dir_A_1");
-            var building = folder.Find(buildingName);
+            Transform entries = _charts.transform.Find(ChartString).Find(DataString).Find(EntriesString);
+            Button button = entries.Find(MarkerString).GetComponent<Button>();
+            ChartMarker marker = entries.Find(MarkerString).GetComponent<ChartMarker>();
+            GameObject markerHighlight = marker.transform.Find("MarkerHighlight").gameObject;
+            string buildingName = marker.linkedObject.GetComponent<NodeRef>().node.SourceName;
+            Transform folder = _city.transform.Find("dir_A_1");
+            Transform building = folder.Find(buildingName);
             button.onClick.Invoke();
             yield return new WaitForSeconds(1f);
             Assert.True(markerHighlight.activeInHierarchy);
@@ -223,12 +222,12 @@ namespace SEE.Charts.ChartTests
             _creator.CreateChart();
             yield return new WaitForSeconds(0.2f);
             Assert.AreEqual(3, _charts.transform.childCount);
-            var chart = _charts.transform.Find(ChartString);
+            Transform chart = _charts.transform.Find(ChartString);
             Assert.NotNull(chart);
-            var entries = chart.Find(DataString).Find(EntriesString);
+            Transform entries = chart.Find(DataString).Find(EntriesString);
             Assert.NotNull(entries);
             Assert.AreEqual(1, entries.childCount);
-            var marker = entries.Find(MarkerString).GetComponent<ChartMarker>();
+            ChartMarker marker = entries.Find(MarkerString).GetComponent<ChartMarker>();
             Assert.NotNull(marker);
             Assert.AreEqual("a1_a.cpp",
                 marker.linkedObject.GetComponent<NodeRef>().node.SourceName);
@@ -246,9 +245,9 @@ namespace SEE.Charts.ChartTests
             _creator.CreateChart();
             yield return new WaitForSeconds(0.2f);
             Assert.AreEqual(3, _charts.transform.childCount);
-            var chart = _charts.transform.Find(ChartString);
+            Transform chart = _charts.transform.Find(ChartString);
             Assert.NotNull(chart);
-            var entries = chart.Find(DataString).Find(EntriesString);
+            Transform entries = chart.Find(DataString).Find(EntriesString);
             Assert.NotNull(entries);
             Assert.AreEqual(0, entries.childCount);
         }

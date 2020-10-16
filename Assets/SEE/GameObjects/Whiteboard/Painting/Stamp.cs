@@ -25,15 +25,17 @@ using UnityEngine;
 
 namespace SEE.GO.Whiteboard
 {
+    [System.Obsolete("Experimental code. Do not use it. May be removed soon.")]
     public enum PaintMode : byte
     {
         Draw,
         Erase
     }
 
+    [System.Obsolete("Experimental code. Do not use it. May be removed soon.")]
     public class Stamp
     {
-        private float[] Pixels;
+        private readonly float[] Pixels;
         public float[] CurrentPixels;
 
         public int Width;
@@ -91,9 +93,13 @@ namespace SEE.GO.Whiteboard
                         yp = (int)(deltaX * sin + deltaY * cos + y0);
 
                         if (xp >= 0 && xp < Width && yp >= 0 && yp < Height)
+                        {
                             rotatedPixelValue = Pixels[xp + Width * yp];
+                        }
                         else
+                        {
                             rotatedPixelValue = 0f;
+                        }
 
                         CurrentPixels[x + Width * y] = rotatedPixelValue;
                     }

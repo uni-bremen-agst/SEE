@@ -18,9 +18,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts.Cose
 {
-    public class CoseGraphManager 
+    public class CoseGraphManager
     {
         /// <summary>
         /// the layout 
@@ -211,7 +211,7 @@ namespace SEE.Layout
                     Debug.Log("stop");
                 }
                 return newEdge;
-            }  
+            }
         }
 
         /// <summary>
@@ -264,7 +264,7 @@ namespace SEE.Layout
 
                 if (node.Child != null)
                 {
-                    CalcInclusionTreeDepth(node.Child, depth +1);
+                    CalcInclusionTreeDepth(node.Child, depth + 1);
                 }
             });
         }
@@ -423,7 +423,7 @@ namespace SEE.Layout
 
             lastM.Layout.GraphManager = lastM;
 
-            this.AddEdges(lastM, newM);
+            AddEdges(lastM, newM);
 
             return newM;
         }
@@ -435,7 +435,7 @@ namespace SEE.Layout
         /// <param name="newM">the new graphManager</param>
         private void AddEdges(CoseGraphManager lastM, CoseGraphManager newM)
         {
-            foreach(CoseEdge edge in lastM.GetAllEdges())
+            foreach (CoseEdge edge in lastM.GetAllEdges())
             {
                 if (edge.IsInterGraph || edge.Source.Child != null || edge.Target != null)
                 {
@@ -443,7 +443,8 @@ namespace SEE.Layout
                     {
                         newM.Add(new CoseEdge(null, null), edge.Source.LayoutValues.Next, edge.Target.LayoutValues.Next);
                     }
-                } else
+                }
+                else
                 {
                     if (edge.Source.LayoutValues.Next != edge.Target.LayoutValues.Next)
                     {

@@ -17,7 +17,7 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
@@ -213,7 +213,7 @@ namespace SEE.Game.Evolution
         {
             node.AssertNotNull("node");
 
-            var wasNodeRemoved = nodes.TryGetValue(node.ID, out gameObject);
+            bool wasNodeRemoved = nodes.TryGetValue(node.ID, out gameObject);
             nodes.Remove(node.ID);
             return wasNodeRemoved;
         }
@@ -227,12 +227,11 @@ namespace SEE.Game.Evolution
         /// Renders all edges for the nodes in the node cache according to the settings.
         /// If edges for these nodes existed already, their game objects are destroyed first.
         /// </summary>
-        /// <param name="graph">the graph from which to retrieve the edges among the nodes in the node cache</param>
-        public void RenderEdges(Graph graph)
+        public void RenderEdges()
         {
             ClearEdges();
             // FIXME: Provide meaningful values for scaleFactor.
-            edges = _graphRenderer.EdgeLayout(graph, nodes.Values); 
+            edges = _graphRenderer.EdgeLayout(nodes.Values);
         }
 
         /// <summary>

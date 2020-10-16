@@ -1,9 +1,9 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEngine;
-using UnityEditor;
-using SEE.Utils;
 using SEE.Game;
+using SEE.Utils;
+using UnityEditor;
+using UnityEngine;
 
 namespace SEEEditor
 {
@@ -13,6 +13,7 @@ namespace SEEEditor
     public class CityEditor : EditorWindow
     {
         [MenuItem("Window/City Editor")]
+        private
         // This method will be called when the user selects the menu item to create the window.
         // Such methods must be static and void. They can have any name.
         static void Init()
@@ -34,7 +35,7 @@ namespace SEEEditor
         /// <summary>
         /// Creates a new window offering the city editor commands.
         /// </summary>
-        void OnGUI()
+        private void OnGUI()
         {
             // Important note: OnGUI is called whenever the windows gets or looses the focus
             // as well as when any of its widgets are hovered by the mouse cursor. For this
@@ -49,7 +50,7 @@ namespace SEEEditor
             {
                 case 0: // Delete Everything
                     DeleteEverything();
-                break;
+                    break;
             }
         }
 

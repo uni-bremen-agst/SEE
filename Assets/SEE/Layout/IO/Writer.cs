@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+﻿using SEE.DataModel;
+using SEE.GO;
+using SEE.Utils;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
-using System.Collections.Generic;
-using SEE.DataModel;
-using SEE.Utils;
-using SEE.GO;
+using UnityEngine;
 
 namespace SEE.Layout.IO
 {
@@ -201,8 +201,8 @@ namespace SEE.Layout.IO
             bool isRoot = parent == null;
             Vector3 parentPosition = isRoot ? Vector3.zero : parent.CenterPosition;
             Vector3 parentScale = isRoot ? Vector3.zero : parent.AbsoluteScale;
-            XmlElement xmlNode = AppendNode(doc, xmlParent, 
-                                            ID, node.CenterPosition, node.AbsoluteScale, 
+            XmlElement xmlNode = AppendNode(doc, xmlParent,
+                                            ID, node.CenterPosition, node.AbsoluteScale,
                                             isRoot, parentPosition, parentScale);
 
             foreach (ILayoutNode child in node.Children())
@@ -283,7 +283,7 @@ namespace SEE.Layout.IO
             Vector3 parentCenterPosition,
             Vector3 parentAbsoluteScale)
         {
-            Debug.LogFormat("ID={0} nodeCenterPosition={1} nodeAbsoluteScale={2} isRoot={3} parentCenterPosition={4} parentAbsoluteScale={5}\n", 
+            Debug.LogFormat("ID={0} nodeCenterPosition={1} nodeAbsoluteScale={2} isRoot={3} parentCenterPosition={4} parentAbsoluteScale={5}\n",
                             ID, nodeCenterPosition.ToString("F4"), nodeAbsoluteScale.ToString("F4"), isRoot, parentCenterPosition.ToString("F4"), parentAbsoluteScale.ToString("F4"));
 
 

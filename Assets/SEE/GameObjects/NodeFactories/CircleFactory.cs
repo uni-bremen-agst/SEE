@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Game;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -12,35 +13,28 @@ namespace SEE.GO
         /// Every line width passed as a parameter to methods of this class will be multiplied by this factor
         /// for the actual rendering.
         /// </summary>
+        /// <param name="colorRange">the color range of the created objects</param>
         /// <param name="unit">initial unit for the width of all lines</param>
-        public CircleFactory(float unit)
-            : base(unit)
+        public CircleFactory(ColorRange colorRange, float unit)
+            : base(colorRange, unit)
         {
-            materials = new Materials(1, DefaultColor, DefaultColor);
-            material = new Material(materials.DefaultMaterial(0));
-            material.color = DefaultColor;
+            material = Materials.New(Materials.ShaderType.TransparentLine, colorRange.upper);
         }
-
-        /// <summary>
-        /// The default color for circle lines.
-        /// </summary>
-        public static Color DefaultColor = Color.blue;
 
         /// <summary>
         /// The material we use for the circle lines.
         /// </summary>
-        private Material material;
+        private readonly Material material;
 
         /// <summary>
         /// The default radius of a circle if none is given.
         /// </summary>
         private const float defaultRadius = 0.5f;
 
-        public override GameObject NewBlock(int index = 0)
+        public override GameObject NewBlock(int index = 0, int renderQueueOffset = 0)
         {
             GameObject result = new GameObject();
-            result.isStatic = true;
-            AttachCircleLine(result, defaultRadius, Unit * defaultLineWidth, DefaultColor);
+            AttachCircleLine(result, defaultRadius, Unit * defaultLineWidth, material.color);
             return result;
         }
 

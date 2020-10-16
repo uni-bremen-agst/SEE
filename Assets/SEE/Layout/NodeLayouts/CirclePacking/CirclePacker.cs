@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout.CirclePacking
+namespace SEE.Layout.NodeLayouts.CirclePacking
 {
     /// <summary>
     /// Represents a circle by its center and radius for a given game object to be laid out.
@@ -60,7 +60,7 @@ namespace SEE.Layout.CirclePacking
         /// The minimal separation between two circles to be placed next to each other,
         /// initially DefaultMinimalSeparation but possibly later adjusted by the world unit.
         /// </summary>
-        private static float MinimalSeparation = DefaultMinimalSeparation;
+        private static readonly float MinimalSeparation = DefaultMinimalSeparation;
 
         /// <summary>
         /// Compares <paramref name="c1"/> and <paramref name="c2"/> by radius (descending).
@@ -73,10 +73,17 @@ namespace SEE.Layout.CirclePacking
             float r1 = c1.radius;
             float r2 = c2.radius;
             if (r1 < r2)
+            {
                 return 1;
+            }
             else if (r1 > r2)
+            {
                 return -1;
-            else return 0;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         /// <summary>
@@ -104,7 +111,9 @@ namespace SEE.Layout.CirclePacking
                     for (int j = i + 1; j < circles.Count; j++)
                     {
                         if (i == j)
+                        {
                             continue;
+                        }
 
                         // vector between the two centers
                         Vector2 AB = circles[j].center - circles[i].center;
@@ -269,8 +278,8 @@ namespace SEE.Layout.CirclePacking
         /// <returns></returns>
         private static bool CircleContainsCircle(Vector2 position, float radius, Circle circle)
         {
-            var xc0 = position.x - circle.center.x;
-            var yc0 = position.y - circle.center.y;
+            float xc0 = position.x - circle.center.x;
+            float yc0 = position.y - circle.center.y;
             return Mathf.Sqrt(xc0 * xc0 + yc0 * yc0) < radius - circle.radius + float.Epsilon;
         }
 

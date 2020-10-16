@@ -7,14 +7,14 @@ namespace SEE.Game
         public MaterialChanger(GameObject gameObject, Material localSpecialMaterial, Material remoteSpecialMaterial)
         {
             this.gameObject = gameObject;
-            this.localSpecialMaterial = localSpecialMaterial;
-            this.remoteSpecialMaterial = remoteSpecialMaterial;
+            LocalSpecialMaterial = localSpecialMaterial;
+            RemoteSpecialMaterial = remoteSpecialMaterial;
         }
 
         private readonly GameObject gameObject;
 
-        private Material localSpecialMaterial;
-        private Material remoteSpecialMaterial;
+        public readonly Material LocalSpecialMaterial;
+        public readonly Material RemoteSpecialMaterial;
 
         /// <summary>
         /// The material before the object was hovered so that it can be restored
@@ -34,14 +34,9 @@ namespace SEE.Game
             {
                 oldMaterial = renderer.sharedMaterial;
             }
-            if (isOwner)
-            {
-                renderer.sharedMaterial = localSpecialMaterial;
-            }
-            else
-            {
-                renderer.sharedMaterial = remoteSpecialMaterial;
-            }
+
+            renderer.sharedMaterial = isOwner ? LocalSpecialMaterial : RemoteSpecialMaterial;
+            renderer.sharedMaterial.renderQueue = oldMaterial.renderQueue;
         }
 
         /// <summary>

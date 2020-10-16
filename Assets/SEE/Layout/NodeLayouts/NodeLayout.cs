@@ -1,8 +1,9 @@
-﻿using SEE.DataModel;
+﻿using SEE.DataModel.DG;
+using SEE.Layout.NodeLayouts.Cose;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// The abstract super class of all node layouts.
@@ -37,7 +38,7 @@ namespace SEE.Layout
         /// </summary>
         protected readonly float groundLevel;
 
-        public float Groundlevel {get => groundLevel; }
+        public float Groundlevel { get => groundLevel; }
 
         public float InnerNodeHeight { get => innerNodeHeight; }
 
@@ -108,7 +109,7 @@ namespace SEE.Layout
         public static Dictionary<ILayoutNode, NodeTransform> Move(Dictionary<ILayoutNode, NodeTransform> layout, Vector3 offset)
         {
             Dictionary<ILayoutNode, NodeTransform> result = new Dictionary<ILayoutNode, NodeTransform>();
-            foreach(var entry in layout)
+            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
             {
                 NodeTransform transform = entry.Value;
                 transform.position += offset;
@@ -128,6 +129,8 @@ namespace SEE.Layout
             // The center of the bounding 3D box enclosing all layoutNodes
             Vector3 centerPosition = (right + left) / 2.0f;
             Vector3 offset = target - centerPosition;
+            // It is assumed that target.y is the lowest point of the city.
+            offset.y = target.y;
             foreach (ILayoutNode layoutNode in layoutNodes)
             {
                 layoutNode.CenterPosition += offset;
@@ -155,6 +158,64 @@ namespace SEE.Layout
                 layoutNode.CenterPosition = newPosition;
             }
             return scaleFactor;
+        }
+
+        /// <summary>
+        /// Stacks all <paramref name="layoutNodes"/> onto each other with <paramref name="levelDelta"/> 
+        /// in between parent and children (children are on top of their parent) where the initial 
+        /// y co-ordinate ground position of the roof nodes is specified by <paramref name="groundLevel"/>.
+        /// The x and z co-ordinates of the <paramref name="layoutNodes"/> are not changed.
+        /// </summary>
+        /// <param name="layoutNodes">the nodes to be stacked onto each other</param>
+        /// <param name="groundLevel">target y co-ordinate ground position of the layout nodes</param>
+        /// <param name="levelDelta">the y distance between parents and their children</param>
+        public static void Stack(ICollection<ILayoutNode> layoutNodes, float groundLevel, float levelDelta = 0.001f)
+        {
+            // position all root nodes at groundLevel
+            foreach (ILayoutNode layoutNode in layoutNodes)
+            {
+                if (layoutNode.Parent == null)
+                {
+                    float newRoofY = PutOn(layoutNode, groundLevel);
+                    // Continue with the children
+                    foreach (ILayoutNode child in layoutNode.Children())
+                    {
+                        Stack(child, newRoofY + levelDelta, levelDelta);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Positions the ground of <paramref name="layoutNode"/> on <paramref name="groundLevel"/>
+        /// and then stacks its children onto <paramref name="layoutNode"/> with <paramref name="levelDelta"/>
+        /// space along the y axis in between. Recurses to its children. Children are put on top of
+        /// <paramref name="layoutNode"/>.
+        /// <param name="layoutNode">the node to be positioned</param>
+        /// <param name="groundLevel">the target y co-ordinate ground position of <paramref name="layoutNode"/></param>
+        /// <param name="levelDelta">the y distance between <paramref name="layoutNode"/> and its children</param>
+        private static void Stack(ILayoutNode layoutNode, float groundLevel, float levelDelta)
+        {
+            float newRoofY = PutOn(layoutNode, groundLevel);
+            foreach (ILayoutNode child in layoutNode.Children())
+            {
+                Stack(child, newRoofY + levelDelta, levelDelta);
+            }
+        }
+
+        /// <summary>
+        /// Puts the ground of <paramref name="layoutNode"/> on <paramref name="groundLevel"/> (y axis).
+        /// </summary>
+        /// <param name="layoutNode">the layout node to be positioned</param>
+        /// <param name="groundLevel">the y-coordinate of the ground of <paramref name="layoutNode"/> to be positioned</param>
+        /// <returns>the y co-ordinate of the roof of the <paramref name="groundLevel"/> after it was moved along the y-axis</returns>
+        private static float PutOn(ILayoutNode layoutNode, float groundLevel)
+        {
+            Vector3 centerPosition = layoutNode.CenterPosition;
+            float yExtent = layoutNode.AbsoluteScale.y / 2.0f;
+            centerPosition.y = groundLevel + yExtent;
+            layoutNode.CenterPosition = centerPosition;
+            return centerPosition.y + yExtent;
         }
 
         /// <summary>
@@ -274,7 +335,7 @@ namespace SEE.Layout
         /// <param name="layout">the calculated layout</param>
         private void ApplyLayoutNodeTransform(Dictionary<ILayoutNode, NodeTransform> layout)
         {
-            foreach (var entry in layout)
+            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
             {
                 ILayoutNode node = entry.Key;
                 NodeTransform transform = entry.Value;
