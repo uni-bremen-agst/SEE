@@ -24,7 +24,23 @@ namespace SEE.DataModel.DG
         /// empty string if the graph was not created by loading it from disk.
         private string path = "";
 
-        public int MaxDepth { get; private set; } = -1;
+        private int maxDepth = -1;
+        /// <summary>
+        /// The maximal depth of the node hierarchy. This value must be computed
+        /// by calling FinalizeGraph() before accessing <see cref="MaxDepth"/>.
+        /// </summary>
+        public int MaxDepth 
+        { 
+            get
+            {
+                if (maxDepth < 0)
+                {
+                    Debug.LogErrorFormat("Forgotten call to FinalizeGraph() for graph {0}\n", name);
+                    FinalizeGraph();
+                }
+                return maxDepth;
+            }
+        }
 
         /// <summary>
         /// Constructor.
@@ -513,9 +529,14 @@ namespace SEE.DataModel.DG
             }
         }
 
+        /// <summary>
+        /// Sets the maximal depth of the graph. This method must be called
+        /// after the graph has been fully loaded and before any client is 
+        /// accessing MaxDepth.
+        /// </summary>
         public void FinalizeGraph()
         {
-            MaxDepth = CalcMaxDepth(GetRoots(), -1);
+            maxDepth = CalcMaxDepth(GetRoots(), -1);
         }
 
         /// <summary>
