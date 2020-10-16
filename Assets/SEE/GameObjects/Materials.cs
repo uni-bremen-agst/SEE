@@ -2,6 +2,7 @@
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -54,11 +55,10 @@ namespace SEE.GO
         /// </summary>
         private readonly List<Material[]> materials;
 
-
-
         public Materials(ShaderType shaderType, ColorRange colorRange)
         {
             Type = shaderType;
+            Assert.IsTrue(colorRange.NumberOfColors > 0, "At least one color is needed");
             NumberOfMaterials = colorRange.NumberOfColors;
             Lower = colorRange.lower;
             Higher = colorRange.upper;
@@ -86,14 +86,12 @@ namespace SEE.GO
             return result;
         }
 
-
-
         /// <summary>
         /// Returns the default material for the given <paramref name="degree"/> (always the identical 
         /// material, no matter how often this method is called). That means, if 
         /// the caller modifies this material, other objects using it will be affected, too.
         /// 
-        /// Precondition: 0 <= degree <= numberOfColors-1; otherwise an exception is thrown
+        /// Precondition: 0 <= degree <= numberOfColors-1 and renderQueueOffset >= 0; otherwise an exception is thrown
         /// </summary>
         /// <param name="renderQueueOffset">The offset of the render queue for rendering.
         /// The larger the offset, the later the object will be rendered.</param>
@@ -104,6 +102,10 @@ namespace SEE.GO
             if (degree < 0 || degree >= NumberOfMaterials)
             {
                 throw new Exception("Color degree " + degree + " out of range [0," + (NumberOfMaterials - 1) + "]");
+            }
+            if (renderQueueOffset < 0)
+            {
+                throw new Exception("Render queue offset must not be negative");
             }
             if (renderQueueOffset >= materials.Count)
             {
