@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 using static SEE.Game.AbstractSEECity;
 
 namespace SEE.Game
@@ -1089,6 +1090,7 @@ namespace SEE.Game
         /// <returns>game object representing given <paramref name="node"/></returns>
         public GameObject NewLeafNode(Node node)
         {
+            Assert.IsTrue(node.ItsGraph.MaxDepth >= 0, "Graph of node " + node.ID + " has negative depth");
             GameObject block = leafNodeFactory.NewBlock(SelectStyle(node, innerNodeFactory), node.ItsGraph.MaxDepth);
             block.name = node.ID;
             block.AddComponent<NodeRef>().node = node;
