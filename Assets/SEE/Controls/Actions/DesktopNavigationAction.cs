@@ -124,7 +124,7 @@ namespace SEE.Controls
 
         protected sealed override void OnCityAvailable()
         {
-            raycastPlane = new UnityEngine.Plane(Vector3.up, CityTransform.position);
+            raycastPlane = new Plane(Vector3.up, CityTransform.position);
             mode = 0;
             movingOrRotating = false;
             cursor = Game.UI3D.Cursor.Create();
