@@ -1,6 +1,8 @@
 ﻿#if UNITY_EDITOR
 
+using SEE.DataModel.DG;
 using SEE.Game;
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -18,11 +20,17 @@ namespace SEEEditor
         {
             base.OnInspectorGUI();
             SEECityEvolution city = target as SEECityEvolution;
-
             city.maxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.maxRevisionsToLoad);
-            ShowNodeTypes(city);
+            if (isGraphLoaded)
+            {
+                ShowNodeTypes(city);
+            }
             Buttons();
         }
+
+        private bool isGraphLoaded = false;
+
+        private Graph graph = null;
 
         /// <summary>
         /// Creates the buttons for loading the first graph of the evolution series.
@@ -32,8 +40,37 @@ namespace SEEEditor
             SEECityEvolution city = target as SEECityEvolution;
             if (GUILayout.Button("Load First Graph"))
             {
-                city.InspectSchema(city.LoadFirstGraph());
+                graph = city.LoadFirstGraph();
+                city.InspectSchema(graph);
+                isGraphLoaded = true;
             }
+            if (isGraphLoaded)
+            {
+                if (GUILayout.Button("Draw"))
+                {
+                    if (graph != null)
+                    {
+                        DrawGraph(city, graph);
+                    }
+                    else
+                    {
+                        Debug.LogError("No valid graph loaded.\n");
+                    }
+                }
+                if (GUILayout.Button("Delete"))
+                {
+                    isGraphLoaded = false;
+                    city.Reset();
+                }
+            }
+        }
+
+        private void DrawGraph(AbstractSEECity city, Graph graph)
+        {
+            GraphRenderer graphRenderer = new GraphRenderer(city, graph);
+            // We assume here that this SEECity instance was added to a game object as
+            // a component. The inherited attribute gameObject identifies this game object.
+            graphRenderer.Draw(city.gameObject);
         }
     }
 }

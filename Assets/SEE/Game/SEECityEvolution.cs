@@ -87,6 +87,11 @@ namespace SEE.Game
             return graphReader.GetGraph();
         }
 
+        public void DrawGraph(Graph graph)
+        {
+            DrawGraphs(new List<Graph>() { graph });
+        }
+
         /// <summary>
         /// Yields the first name of a GXL file in the sorted list of GXL files located
         /// in the given <paramref name="directory"/>.
@@ -112,9 +117,7 @@ namespace SEE.Game
         /// </summary>
         private void Start()
         {
-            evolutionRenderer = CreateEvolutionRenderer();
-            evolutionRenderer.AssertNotNull("renderer");
-            evolutionRenderer.ShowGraphEvolution(LoadData());
+            DrawGraphs(LoadData());
             // We assume this SEECityEvolution instance is a component of a game object
             // to which an AnimationInteraction component is attached. This AniminationInteraction
             // component must know the evolution renderer.
@@ -129,6 +132,13 @@ namespace SEE.Game
                     animationInteraction.EvolutionRenderer = evolutionRenderer;
                 }
             }
+        }
+
+        private void DrawGraphs(List<Graph> graphs)
+        {
+            evolutionRenderer = CreateEvolutionRenderer();
+            evolutionRenderer.AssertNotNull("renderer");
+            evolutionRenderer.ShowGraphEvolution(graphs);
         }
     }
 }
