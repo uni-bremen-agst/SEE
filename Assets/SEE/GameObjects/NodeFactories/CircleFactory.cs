@@ -35,6 +35,7 @@ namespace SEE.GO
         {
             GameObject result = new GameObject();
             AttachCircleLine(result, defaultRadius, Unit * defaultLineWidth, material.color);
+            result.AddComponent<MeshCollider>();
             return result;
         }
 
