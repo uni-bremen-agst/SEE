@@ -1,5 +1,7 @@
 ﻿using SEE.GO;
 using SEE.Utils;
+using SEE.DataModel.DG;
+using SEE.Game;
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
@@ -84,6 +86,11 @@ namespace SEE.Controls
         private Interactable interactable;
 
         /// <summary>
+        /// The label of the object.
+        /// </summary>
+        private GameObject hoverLabel;
+
+        /// <summary>
         /// The synchronizer is attached to <code>this.gameObject</code>, iff it is
         /// grabbed.
         /// </summary>
@@ -146,6 +153,42 @@ namespace SEE.Controls
             return result;
         }
 
+        /// <summary>
+        /// Creates a new label.
+        /// </summary>
+        private void CreateLabel()
+        {
+
+            if (hoverLabel != null) return;
+
+            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            {
+                Node node = nodeRef.node;
+                if (node != null)
+                {
+                    Debug.LogFormat("Hovered object: {0}\n", node.SourceName);
+                    Vector3 loc = gameObject.transform.position;
+                    Vector3 size = gameObject.Size();
+                    Vector3 labelLoc = new Vector3(loc.x, loc.y + size.y, loc.z);
+
+                    
+                    float length = Mathf.Min(size.x, size.z);
+
+                    hoverLabel = TextFactory.GetText(node.SourceName, labelLoc,  length*0.3f);
+                    hoverLabel.transform.SetParent(gameObject.transform);
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Removes a label.
+        /// </summary>
+        private void RemoveLabel()
+        {
+            if (hoverLabel != null) Destroyer.DestroyGameObject(hoverLabel);
+        }
+
         #region Interaction
 
         /// <summary>
@@ -185,10 +228,12 @@ namespace SEE.Controls
             if (hover)
             {
                 HoveredObjects.Add(this);
+                CreateLabel();
             }
             else
             {
                 HoveredObjects.Remove(this);
+                RemoveLabel();
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
