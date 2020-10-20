@@ -218,6 +218,14 @@ namespace SEE.Game
         /// The attribute name of the metric to be used for determining the style of leaf nodes.
         /// </summary>
         public string LeafStyleMetric = NumericAttributeNames.Complexity.Name(); // serialized by Unity
+        
+        //----------------------------------
+        // Attributes of a leaf node's label
+        //----------------------------------
+        /// <summary>
+        /// If true, label's with the node's SourceName will be displayed above each leaf node.
+        /// </summary>
+        public bool ShowLabel = true;
 
         /// <summary>
         /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
@@ -395,6 +403,15 @@ namespace SEE.Game
         /// The attribute name of the metric to be used for determining the style of inner nodes.
         /// </summary>
         public string InnerNodeStyleMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
+        
+        //-----------------------------------
+        // Visual attributes of an inner node
+        //-----------------------------------
+        
+        /// <summary>
+        /// If true, label's with the node's SourceName will be displayed above each inner node.
+        /// </summary>
+        public bool InnerNodeShowLabel = true;
 
 
         /// <summary>
