@@ -1,6 +1,8 @@
 ﻿using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
+using SEE.DataModel.DG;
+using SEE.Game;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
 
@@ -82,6 +84,12 @@ namespace SEE.Controls
         /// component is attached to <code>this.gameObject</code>.
         /// </summary>
         private Interactable interactable;
+
+        /// <summary>
+        /// The text label that's displayed above the object when the user hovers over it.
+        /// Will be <code>null</code> when the label is not currently being displayed.
+        /// </summary>
+        private GameObject nodeLabel;
 
         /// <summary>
         /// The synchronizer is attached to <code>this.gameObject</code>, iff it is
@@ -184,10 +192,12 @@ namespace SEE.Controls
 
             if (hover)
             {
+                CreateObjectLabel();
                 HoveredObjects.Add(this);
             }
             else
             {
+                DestroyObjectLabel();
                 HoveredObjects.Remove(this);
             }
 
@@ -195,6 +205,39 @@ namespace SEE.Controls
             {
                 new Net.SetHoverAction(this, hover).Execute();
             }
+        }
+
+        /// <summary>
+        /// Creates a text label above the object with its node's SourceName if the label doesn't exist yet.
+        /// </summary>
+        private void CreateObjectLabel()
+        {
+            // If label already exists, nothing needs to be done
+            if (nodeLabel != null || !gameObject.TryGetComponent(out NodeRef nodeRef)) return;
+            
+            Node node = nodeRef.node;
+            if (node == null) return;
+            //TODO: If labels are disabled, we don't need to do anything
+            
+            Vector3 position = gameObject.transform.position;
+            position.y += 0.1f; //TODO: Dynamic scale
+            Vector3 size = gameObject.Size();
+            float length = Mathf.Min(size.x, size.z);
+
+            nodeLabel = TextFactory.GetText(node.SourceName, position, length * 0.3f, textColor: Color.black);
+
+            nodeLabel.transform.SetParent(gameObject.transform);
+            Portal.SetPortal(gameObject, nodeLabel); // TODO: Maybe don't cull text, else it could be cut off
+            // TODO: Rectangular box behind text to improve readability
+        }
+
+        /// <summary>
+        /// Destroys the text label above the object if it exists.
+        /// </summary>
+        /// <seealso cref="CreateObjectLabel"/>
+        private void DestroyObjectLabel()
+        {
+            if (nodeLabel != null) Destroyer.DestroyGameObject(nodeLabel);
         }
 
         /// <summary>

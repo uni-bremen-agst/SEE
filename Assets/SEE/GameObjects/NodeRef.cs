@@ -20,7 +20,7 @@ namespace SEE.GO
         [NonSerialized] public Node node;
 
         /// <summary>
-        /// The NodeHightlights component of this NodeRef (needed for nodes represented 
+        /// The NodeHighlights component of this NodeRef (needed for nodes represented 
         /// in metric charts).
         /// </summary>
         [HideInInspector] public NodeHighlights highlights;
