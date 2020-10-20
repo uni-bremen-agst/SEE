@@ -1,4 +1,8 @@
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using OdinSerializer;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
@@ -7,10 +11,6 @@ using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game
@@ -229,7 +229,11 @@ namespace SEE.Game
         /// <summary>
         /// The distance between the top of the leaf node and its label.
         /// </summary>
-        public float LabelDistance = 0.1f;
+        public float LabelDistance = 0.2f;
+        /// <summary>
+        /// The size of the leaf node's label.
+        /// </summary>
+        public float LabelSize = 0.2f;
 
         /// <summary>
         /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
@@ -419,7 +423,11 @@ namespace SEE.Game
         /// <summary>
         /// The distance between the top of the inner node and its label.
         /// </summary>
-        public float InnerNodeLabelDistance = 0.1f;
+        public float InnerNodeLabelDistance = 0.2f;
+        /// <summary>
+        /// The size of the inner node's label.
+        /// </summary>
+        public float InnerNodeLabelSize = 0.2f;
 
 
         /// <summary>

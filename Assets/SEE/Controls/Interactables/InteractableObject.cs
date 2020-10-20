@@ -1,8 +1,9 @@
-﻿using SEE.GO;
-using SEE.Utils;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.GO;
+using SEE.Utils;
+using TMPro;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
 
@@ -252,16 +253,22 @@ namespace SEE.Controls
             Node node = nodeRef.node;
             if (node == null) return;
             
+            // Add text
             Vector3 position = gameObject.transform.position;
             position.y += isLeaf ? settings.LabelDistance : settings.InnerNodeLabelDistance;
-            Vector3 size = gameObject.Size();
-            float length = Mathf.Min(size.x, size.z);
-
-            nodeLabel = TextFactory.GetText(node.SourceName, position, length * 0.3f, textColor: Color.black);
-
+            nodeLabel = TextFactory.GetText(node.SourceName, position, 
+                isLeaf ? settings.LabelSize : settings.InnerNodeLabelSize, textColor: Color.black);
             nodeLabel.transform.SetParent(gameObject.transform);
-            //Portal.SetPortal(gameObject, nodeLabel); // TODO: Maybe don't cull text, else it could be cut off
-            // TODO: Rectangular box behind text to improve readability
+            
+            // Add connecting line between "roof" of object and text
+            Vector3 labelPosition = nodeLabel.transform.position;
+            Vector3 nodeTopPosition = gameObject.transform.position;
+            nodeTopPosition.y = BoundingBox.GetRoof(new List<GameObject> {gameObject});
+            labelPosition.y -= nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
+            LineFactory.Draw(nodeLabel, new []{nodeTopPosition, labelPosition}, 0.01f, 
+                Materials.New(Materials.ShaderType.TransparentLine, Color.black.ColorWithAlpha(0.9f)));
+            
+            Portal.SetPortal(gameObject, nodeLabel); // TODO: Maybe don't cull text, else it could be cut off
         }
 
         /// <summary>
@@ -270,7 +277,6 @@ namespace SEE.Controls
         /// <seealso cref="CreateObjectLabel"/>
         private void DestroyObjectLabel()
         {
-            
             if (!LabelsEnabled()) return;  // If labels are disabled, we don't need to do anything
             if (nodeLabel != null) Destroyer.DestroyGameObject(nodeLabel);
         }

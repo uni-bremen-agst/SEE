@@ -1,11 +1,11 @@
 ﻿#if UNITY_EDITOR
 
+using System.Collections.Generic;
+using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -37,6 +37,7 @@ namespace SEEEditor
             city.LeafNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.LeafNodeColorRange.NumberOfColors, 1, 15);
             city.ShowLabel = EditorGUILayout.Toggle("Show labels", city.ShowLabel);
             city.LabelDistance = EditorGUILayout.FloatField("Label Distance", city.LabelDistance);
+            city.LabelSize = EditorGUILayout.FloatField("Label Size", city.LabelSize);
 
             GUILayout.Label("Attributes of inner nodes", EditorStyles.boldLabel);
             city.InnerNodeHeightMetric = EditorGUILayout.TextField("Height", city.InnerNodeHeightMetric);
@@ -46,6 +47,7 @@ namespace SEEEditor
             city.InnerNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.InnerNodeColorRange.NumberOfColors, 1, 15);
             city.InnerNodeShowLabel = EditorGUILayout.Toggle("Show labels", city.InnerNodeShowLabel);
             city.InnerNodeLabelDistance = EditorGUILayout.FloatField("Label Distance", city.InnerNodeLabelDistance);
+            city.InnerNodeLabelSize = EditorGUILayout.FloatField("Label Size", city.InnerNodeLabelSize);
 
             GUILayout.Label("Nodes and Node Layout", EditorStyles.boldLabel);
             city.LeafObjects = (SEECity.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
