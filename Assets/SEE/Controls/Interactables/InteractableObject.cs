@@ -92,6 +92,16 @@ namespace SEE.Controls
         private GameObject nodeLabel;
 
         /// <summary>
+        /// Settings for the visualization of the node.
+        /// </summary>
+        private AbstractSEECity settings;
+
+        /// <summary>
+        /// True if this node is a leaf. This value is cached to avoid frequent retrievals.
+        /// </summary>
+        private bool isLeaf;
+
+        /// <summary>
         /// The synchronizer is attached to <code>this.gameObject</code>, iff it is
         /// grabbed.
         /// </summary>
@@ -137,6 +147,19 @@ namespace SEE.Controls
             {
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
+            
+            // Traverse parents until we reach the gameObject with tag "Code City", so that we can access its settings.
+            // We also set a maximum of 1000 traversals in case something goes horribly wrong, to avoid an infinite loop.
+            GameObject rootCity = gameObject;
+            for (uint i = 0; i < 1000 && !rootCity.CompareTag("Code City"); i++)
+            { 
+                // According to Unity documentation, none of these will ever be null
+                rootCity = rootCity.transform.root.gameObject;
+            }
+
+            UnityEngine.Assertions.Assert.IsTrue(rootCity.TryGetComponent(out settings));
+
+            isLeaf = gameObject.GetComponent<NodeRef>()?.node?.IsLeaf() ?? false;
         }
 
         /// <summary>
@@ -208,26 +231,36 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// Returns true iff labels are enabled for this node type.
+        /// </summary>
+        /// <returns>true iff labels are enabled for this node type</returns>
+        private bool LabelsEnabled()
+        {
+            return isLeaf && settings.ShowLabel || !isLeaf && settings.InnerNodeShowLabel;
+        }
+
+        /// <summary>
         /// Creates a text label above the object with its node's SourceName if the label doesn't exist yet.
         /// </summary>
         private void CreateObjectLabel()
         {
+            if (!LabelsEnabled()) return;  // If labels are disabled, we don't need to do anything
+            
             // If label already exists, nothing needs to be done
             if (nodeLabel != null || !gameObject.TryGetComponent(out NodeRef nodeRef)) return;
             
             Node node = nodeRef.node;
             if (node == null) return;
-            //TODO: If labels are disabled, we don't need to do anything
             
             Vector3 position = gameObject.transform.position;
-            position.y += 0.1f; //TODO: Dynamic scale
+            position.y += isLeaf ? settings.LabelDistance : settings.InnerNodeLabelDistance;
             Vector3 size = gameObject.Size();
             float length = Mathf.Min(size.x, size.z);
 
             nodeLabel = TextFactory.GetText(node.SourceName, position, length * 0.3f, textColor: Color.black);
 
             nodeLabel.transform.SetParent(gameObject.transform);
-            Portal.SetPortal(gameObject, nodeLabel); // TODO: Maybe don't cull text, else it could be cut off
+            //Portal.SetPortal(gameObject, nodeLabel); // TODO: Maybe don't cull text, else it could be cut off
             // TODO: Rectangular box behind text to improve readability
         }
 
@@ -237,6 +270,8 @@ namespace SEE.Controls
         /// <seealso cref="CreateObjectLabel"/>
         private void DestroyObjectLabel()
         {
+            
+            if (!LabelsEnabled()) return;  // If labels are disabled, we don't need to do anything
             if (nodeLabel != null) Destroyer.DestroyGameObject(nodeLabel);
         }
 
