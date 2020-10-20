@@ -226,6 +226,10 @@ namespace SEE.Game
         /// If true, label's with the node's SourceName will be displayed above each leaf node.
         /// </summary>
         public bool ShowLabel = true;
+        /// <summary>
+        /// The distance between the top of the leaf node and its label.
+        /// </summary>
+        public float LabelDistance = 0.1f;
 
         /// <summary>
         /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
@@ -412,6 +416,10 @@ namespace SEE.Game
         /// If true, label's with the node's SourceName will be displayed above each inner node.
         /// </summary>
         public bool InnerNodeShowLabel = true;
+        /// <summary>
+        /// The distance between the top of the inner node and its label.
+        /// </summary>
+        public float InnerNodeLabelDistance = 0.1f;
 
 
         /// <summary>
