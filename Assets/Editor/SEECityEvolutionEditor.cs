@@ -21,6 +21,8 @@ namespace SEEEditor
             base.OnInspectorGUI();
             SEECityEvolution city = target as SEECityEvolution;
             city.maxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.maxRevisionsToLoad);
+            city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
+            city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
             if (isGraphLoaded)
             {
                 ShowNodeTypes(city);
@@ -28,8 +30,14 @@ namespace SEEEditor
             Buttons();
         }
 
+        /// <summary>
+        /// True if the underlying graph was successfully loaded.
+        /// </summary>
         private bool isGraphLoaded = false;
 
+        /// <summary>
+        /// The loaded graph. The value is different from null only if isGraphLoaded is true.
+        /// </summary>
         private Graph graph = null;
 
         /// <summary>
