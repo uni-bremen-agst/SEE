@@ -27,6 +27,11 @@ namespace SEE.GO
         /// <returns>the game object representing the text</returns>
         public static GameObject GetText(string text, Vector3 position, float width, bool lift = true)
         {
+            return GetText(text, position, width, TextColor, lift);
+        }
+
+        public static GameObject GetText(string text, Vector3 position, float width, Color textColor, bool lift = true)
+        {
             GameObject result = new GameObject("Text " + text)
             {
                 tag = Tags.Text
@@ -36,7 +41,7 @@ namespace SEE.GO
             TextMeshPro tm = result.AddComponent<TextMeshPro>();
             tm.font = Resources.Load<TMP_FontAsset>(PortalFontName);
             tm.text = text;
-            tm.color = TextColor;
+            tm.color = textColor;
             tm.alignment = TextAlignmentOptions.Center;
 
             RectTransform rect = tm.GetComponent<RectTransform>();
