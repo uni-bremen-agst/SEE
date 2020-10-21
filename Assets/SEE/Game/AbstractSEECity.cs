@@ -445,6 +445,11 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// How far above the object should the hover label be.
+        /// </summary>
+        public float HoverLabelHeight;  // serialized by Unity
+
+        /// <summary>
         /// What kinds of game objects are to be created for leaf nodes in the graph.
         /// </summary>
         public LeafNodeKinds LeafObjects; // serialized by Unity

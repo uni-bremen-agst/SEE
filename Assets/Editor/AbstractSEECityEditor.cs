@@ -44,9 +44,11 @@ namespace SEEEditor
             city.InnerNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.InnerNodeColorRange.NumberOfColors, 1, 15);
 
             GUILayout.Label("Nodes and Node Layout", EditorStyles.boldLabel);
+            city.HoverLabelHeight = EditorGUILayout.FloatField("Label Height", city.HoverLabelHeight);
             city.LeafObjects = (SEECity.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
             city.NodeLayout = (NodeLayoutKind)EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
             city.gvlPath = EditorGUILayout.TextField("GVL file", city.gvlPath);
+
 
             GUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Inner nodes");
