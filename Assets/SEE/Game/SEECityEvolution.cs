@@ -20,7 +20,6 @@
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
-using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -44,15 +43,27 @@ namespace SEE.Game
         private EvolutionRenderer evolutionRenderer;  // not serialized by Unity; will be set in Start()
 
         /// <summary>
+        /// The height of posts used as markers for new and deleted elements.
+        /// </summary>
+        [Tooltip("The height of posts used as markers for new and deleted elements (>=0).")]
+        public float MarkerHeight = 0.2f;
+
+        /// <summary>
+        /// The width (x and z lengths) of posts used as markers for new and deleted elements.
+        /// </summary>
+        [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
+        public float MarkerWidth = 0.01f;
+        
+        /// <summary>
         /// Factory method to create the used EvolutionRenderer.
         /// </summary>
         /// <returns></returns>
         protected EvolutionRenderer CreateEvolutionRenderer()
         {
-            // FIXME: Do we really need to attach the evolution renderer as a component to
-            // the game object? That was likely done because EvolutionRenderer derives from
-            // MonoBehaviour and MonoBehaviours cannot be created by the new operator.
-            EvolutionRenderer result = gameObject.AddComponent<EvolutionRenderer>();
+            if (!gameObject.TryGetComponent<EvolutionRenderer>(out EvolutionRenderer result))
+            {
+                result = gameObject.AddComponent<EvolutionRenderer>();
+            }
             result.CityEvolution = this;
             return result;
         }
@@ -115,7 +126,7 @@ namespace SEE.Game
         /// and can enter the game for the first time. Loads all graphs, calculates their
         /// layouts, and displays the first graph in the graph series.
         /// </summary>
-        private void Start()
+        private void Awake()
         {
             DrawGraphs(LoadData());
             // We assume this SEECityEvolution instance is a component of a game object
@@ -137,7 +148,6 @@ namespace SEE.Game
         private void DrawGraphs(List<Graph> graphs)
         {
             evolutionRenderer = CreateEvolutionRenderer();
-            evolutionRenderer.AssertNotNull("renderer");
             evolutionRenderer.ShowGraphEvolution(graphs);
         }
     }

@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Events;
 
 namespace SEE.Game
@@ -38,6 +39,9 @@ namespace SEE.Game
     /// 
     /// Note: The renderer is a MonoBehaviour, thus, will be added as a component to a game
     /// object. As a consequence, a constructor will not be called and is meaningless.
+    /// 
+    /// Assumption: This EvolutionRenderer is attached to a game object representing a code
+    /// city that has another component of type SEECityEvolution.
     /// </summary>
     public class EvolutionRenderer : MonoBehaviour
     {
@@ -91,9 +95,23 @@ namespace SEE.Game
                 // assign a new city, we also need a new graph renderer for that city.
                 // So in fact this is the perfect place to assign graphRenderer.
                 graphRenderer = new GraphRenderer(value, null);
+                Assert.IsNotNull(graphRenderer);
                 diff = new NumericAttributeDiff(value.AllMetricAttributes());
                 objectManager = new ObjectManager(graphRenderer, gameObject);
-                marker = new Marker(graphRenderer);
+                float markerHeight = 1.0f;
+                float markerWidth = 1.0f;
+                if (gameObject.TryGetComponent<SEECityEvolution>(out SEECityEvolution cityEvolution))
+                {
+                    markerHeight = cityEvolution.MarkerHeight;
+                    markerWidth = cityEvolution.MarkerWidth;
+                }
+                else
+                {
+                    Debug.LogErrorFormat("This EvolutionRenderer attached to {0} has no sibling component of type SEECityEvolution",
+                                         name);
+                    enabled = false;
+                }
+                marker = new Marker(graphRenderer, markerWidth, markerHeight);
             }
         }
 
@@ -214,11 +232,6 @@ namespace SEE.Game
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
         /// </summary>
         private readonly NodeEqualityComparer nodeEqualityComparer = new NodeEqualityComparer();
-
-        /// <summary>
-        /// Allows the comparison of two instances of <see cref="Edge"/> from different graphs.
-        /// </summary>
-        private readonly EdgeEqualityComparer edgeEqualityComparer = new EdgeEqualityComparer();
 
         /// <summary>
         /// All pre-computed layouts for the whole graph series.
@@ -546,9 +559,18 @@ namespace SEE.Game
         /// <param name="graphNode">graph node to be displayed</param>
         protected virtual void RenderNode(Node graphNode)
         {
+            // the layout to be applied to graphNode
             ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
+            // the game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
 
+            // 
+            Vector3 groundLevel = Vector3.zero;
+            groundLevel.y = gameObject.transform.position.y;
+            layoutNode.CenterPosition += groundLevel;
+
+            // will be true iff the node existed in the previous graph and any of its node
+            // attributes were changed
             bool wasModified;
             if (formerGraphNode == null)
             {
@@ -559,7 +581,7 @@ namespace SEE.Game
                 Vector3 position = layoutNode.CenterPosition;
                 position.y -= layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
-                graphRenderer.Apply(currentGameNode, layoutNode);
+                graphRenderer.Apply(currentGameNode, gameObject, layoutNode);
                 // Revert the change to the y co-ordindate.
                 position.y += layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
