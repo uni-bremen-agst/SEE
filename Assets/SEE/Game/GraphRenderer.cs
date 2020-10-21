@@ -493,7 +493,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="parent">the parent in which to fit the <paramref name="layoutNodes"/></param>
         /// <param name="layoutNodes">the nodes to be fitted into the <paramref name="parent"/></param>
-        private static void Fit(GameObject parent, ICollection<ILayoutNode> layoutNodes)
+        public static void Fit(GameObject parent, ICollection<ILayoutNode> layoutNodes)
         {
             NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x);
             NodeLayout.MoveTo(layoutNodes, parent.transform.position);

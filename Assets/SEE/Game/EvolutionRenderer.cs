@@ -312,10 +312,9 @@ namespace SEE.Game
             ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(gameObjects);
             // Note: Apply applies its results only on the layoutNodes but not on the game objects
             // these layoutNodes represent. Here, we leave the game objects untouched. The layout
-            // must be later applied when render a city. Here, we only store the layout for later use.
+            // must be later applied when we render a city. Here, we only store the layout for later use.
             nodeLayout.Apply(layoutNodes);
-            NodeLayout.MoveTo(layoutNodes, gameObject.transform.position);
-            NodeLayout.Scale(layoutNodes, gameObject.transform.lossyScale.x);
+            GraphRenderer.Fit(gameObject, layoutNodes);          
             return ToNodeIDLayout(layoutNodes);
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to 
@@ -563,11 +562,6 @@ namespace SEE.Game
             ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
             // the game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
-
-            // 
-            Vector3 groundLevel = Vector3.zero;
-            groundLevel.y = gameObject.transform.position.y;
-            layoutNode.CenterPosition += groundLevel;
 
             // will be true iff the node existed in the previous graph and any of its node
             // attributes were changed
