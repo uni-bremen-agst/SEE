@@ -35,5 +35,26 @@ namespace SEE.GO
                 return nodeRef.node.ID;
             }
         }
+
+        /// <summary>
+        /// Returns the render-queue offset of given <paramref name="gameObject"/>.
+        /// 
+        /// Precondition: <paramref name="gameObject"/> must have a renderer attached
+        /// to it; otherwise 0 will be returned.
+        /// </summary>
+        /// <param name="gameObject">objects whose render-queue is requested</param>
+        /// <returns>render-queue offset</returns>
+        public static int GetRenderQueue(this GameObject gameObject)
+        {
+            if (gameObject.TryGetComponent<Renderer>(out Renderer renderer))
+            {
+                return renderer.sharedMaterial.renderQueue;
+            }
+            else
+            {
+                Debug.LogWarningFormat("GetRenderQueue: Game object {0} has no renderer.\n", gameObject.name);
+                return 0;
+            }
+        }
     }
 }
