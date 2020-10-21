@@ -90,6 +90,9 @@ namespace SEE.Controls
         /// </summary>
         private GameObject hoverLabel;
 
+        /// <summary>
+        /// The city the object is in.
+        /// </summary>
         private AbstractSEECity city;
 
         /// <summary>
@@ -158,7 +161,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Creates a new label.
+        /// Creates the label.
         /// </summary>
         private void CreateLabel()
         {
@@ -170,14 +173,10 @@ namespace SEE.Controls
                 Node node = nodeRef.node;
                 if (node != null)
                 {
-                    Debug.LogFormat("Hovered object: {0}\n", node.SourceName);
                     Vector3 loc = gameObject.transform.position;
                     Vector3 size = gameObject.Size();
-                    Debug.LogFormat("Label height: {0}\n", city.HoverLabelHeight);
                     Vector3 labelLoc = new Vector3(loc.x, loc.y + city.HoverLabelHeight, loc.z);
-                    
                     float length = Mathf.Min(size.x, size.z);
-
                     hoverLabel = TextFactory.GetText(node.SourceName, labelLoc,  length*0.3f);
                     hoverLabel.transform.SetParent(gameObject.transform);
                 }
@@ -186,7 +185,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Removes a label.
+        /// Removes the label.
         /// </summary>
         private void RemoveLabel()
         {
