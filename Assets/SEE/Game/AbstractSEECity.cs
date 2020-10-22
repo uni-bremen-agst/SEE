@@ -68,6 +68,11 @@ namespace SEE.Game
         public string gvlPath = "..\\Data\\GXL\\linux-clones\\net.gvl";
 
         /// <summary>
+        /// Float needed for HoverLabel to be shown above hovered Object.
+        /// </summary>
+        public float HoverLabelElevation;
+
+        /// <summary>
         /// Returns the concatenation of pathPrefix and gvlPath. That is the complete
         /// absolute path to the GVL file containing the layout information.
         /// </summary>

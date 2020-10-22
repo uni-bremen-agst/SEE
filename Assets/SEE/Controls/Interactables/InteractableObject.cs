@@ -1,6 +1,10 @@
-﻿using SEE.GO;
+﻿using SEE.DataModel.DG;
+using SEE.Game;
+using SEE.GO;
 using SEE.Utils;
+using System;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
 
@@ -84,6 +88,17 @@ namespace SEE.Controls
         private Interactable interactable;
 
         /// <summary>
+        /// The label shown above the hovered Object
+        /// </summary>
+        private GameObject hoverLabel;
+
+        /// <summary>
+        /// The label shown above the hovered Object
+        /// </summary>
+        private AbstractSEECity abstractSEECity;
+
+
+        /// <summary>
         /// The synchronizer is attached to <code>this.gameObject</code>, iff it is
         /// grabbed.
         /// </summary>
@@ -129,6 +144,39 @@ namespace SEE.Controls
             {
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
+
+            gameObject.transform.root.TryGetComponent<AbstractSEECity>(out abstractSEECity);
+        }
+
+
+        /// <summary>
+        /// Giving the GameObject HoverLabel the TextMesh in order to
+        /// visualize the Name.
+        /// </summary>
+        private void CreateHoverLabel()
+        {
+            if(hoverLabel == null)
+            {
+                if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                {
+                    Node node = nodeRef.node;
+                    if (node != null)
+                    {
+                        hoverLabel = TextFactory.GetText(node.SourceName, new Vector3(gameObject.transform.position.x,
+                            gameObject.transform.position.y + abstractSEECity.HoverLabelElevation , gameObject.transform.position.z), 0.2f, true, Color.black);
+                        hoverLabel.transform.SetParent(gameObject.transform.root);
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Destroying HoverLabel after finished hovering.
+        /// </summary>
+        private void DestroyHoverLabel()
+        {
+            Destroyer.DestroyGameObject(hoverLabel);
         }
 
         /// <summary>
@@ -185,10 +233,12 @@ namespace SEE.Controls
             if (hover)
             {
                 HoveredObjects.Add(this);
+                CreateHoverLabel();
             }
             else
             {
                 HoveredObjects.Remove(this);
+                DestroyHoverLabel();
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
