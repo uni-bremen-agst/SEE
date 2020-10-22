@@ -35,6 +35,7 @@ namespace SEE.GO
         {
             GameObject result = new GameObject();
             AttachLine(result, defaultLength, defaultLineWidth * Unit, material.color);
+            result.AddComponent<BoxCollider>();
             return result;
         }
 
@@ -72,7 +73,7 @@ namespace SEE.GO
             line.SetPositions(positions);
 
             // Connect the start and end positions of the line together to form a continuous loop.
-            line.loop = true;
+            line.loop = true;            
         }
     }
 }

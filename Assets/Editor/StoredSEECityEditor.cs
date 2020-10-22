@@ -26,8 +26,6 @@ namespace SEEEditor
 
             SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
 
-            AbstractSEECity city = target as AbstractSEECity;
-
             EditorGUILayout.BeginHorizontal();
             {
                 EditorGUILayout.PropertyField(pathPrefix, new GUIContent("Data path prefix"));

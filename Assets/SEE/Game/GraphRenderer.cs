@@ -249,11 +249,12 @@ namespace SEE.Game
             // the layout to be applied
             NodeLayout nodeLayout = GetLayout();
 
-            // for a hierarchical layout, we need to add the game objects for inner nodes
-
+            // a mapping of graph nodes onto the game objects by which they are represented
             Dictionary<Node, GameObject>.ValueCollection nodeToGameObject;
             ICollection<GameNode> gameNodes = new List<GameNode>();
+            // the artificial unique graph root we add if the graph has more than one root
             Node artificalRoot = null;
+            // the plane upon which the game objects will be placed
             GameObject plane;
 
             Performance p;
@@ -297,7 +298,6 @@ namespace SEE.Game
 
                     // The layouNodes are put just above the plane w.r.t. the y axis.
                     NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
-
 
                     CreateObjectHierarchy(nodeMap, parent);
                     InteractionDecorator.PrepareForInteraction(nodeToGameObject);
@@ -349,6 +349,7 @@ namespace SEE.Game
                     gameNodes = ToLayoutNodes(nodeMap.Values);
                     RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
 
+                    // 1) Calculate the layout
                     p = Performance.Begin("node layout " + settings.NodeLayout + " for " + gameNodes.Count + " nodes");
                     // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
                     // (GameNode implements ILayoutNode).
@@ -357,9 +358,13 @@ namespace SEE.Game
                     p.End();
                     Debug.LogFormat("Built \"" + settings.NodeLayout + "\" node layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
 
+                    // 2) Apply the calculated layout to the game objects
+
+                    // fit layoutNodes into parent
                     Fit(parent, layoutNodes);
 
                     nodeToGameObject = nodeMap.Values;
+
                     // add the plane surrounding all game objects for nodes
                     plane = NewPlane(nodeToGameObject, parent.transform.position.y + parent.transform.lossyScale.y / 2.0f + LevelDistance);
                     AddToParent(plane, parent);
@@ -387,37 +392,100 @@ namespace SEE.Game
             // the nodes.
             GameObject rootGameNode = RootGameNode(parent);
             AddToParent(EdgeLayout(gameNodes), rootGameNode);
+
             Portal.SetPortal(parent);
 
             // Add light to simulate emissive effect
-            {
-                GameObject lightGameObject = new GameObject("Light");
-                lightGameObject.transform.parent = rootGameNode.transform;
-
-                Light light = lightGameObject.AddComponent<Light>();
-
-                BoundingBox(nodeToGameObject, out Vector2 minCorner, out Vector2 maxCorner);
-                float bbw = maxCorner.x - minCorner.x;
-                float bbh = maxCorner.y - minCorner.y;
-
-                lightGameObject.transform.position = rootGameNode.transform.position + new Vector3(0.0f, 0.25f * (bbw + bbh), 0.0f);
-
-                light.range = 3.0f * Mathf.Sqrt(bbw * bbw + bbh * bbh);
-                light.type = LightType.Point;
-
-                Color lightColor = 0.5f * (innerNodeFactory.Materials.Lower + innerNodeFactory.Materials.Higher);
-                if (leafNodeFactory is InnerNodeFactory)
-                {
-                    lightColor = 0.5f * lightColor + 0.25f * (
-                        ((InnerNodeFactory)leafNodeFactory).Materials.Lower +
-                        ((InnerNodeFactory)leafNodeFactory).Materials.Higher);
-                }
-
-                light.intensity = 1.0f;
-            }
+            AddLight(nodeToGameObject, rootGameNode);
 
             GO.Plane portalPlane = parent.GetComponent<GO.Plane>();
             portalPlane.HeightOffset = rootGameNode.transform.position.y - parent.transform.position.y;
+        }
+
+        /// <summary>
+        /// Applies the given <paramref name="layout"/> to the given <paramref name="gameNode"/>,
+        /// i.e., sets its size and position according to the <paramref name="layout"/> and
+        /// possibly rotates it. The game node can represent a leaf or inner node of the node 
+        /// hierarchy.
+        /// 
+        /// Precondition: <paramref name="gameNode"/> must have NodeRef component referencing a
+        /// graph node.
+        /// </summary>
+        /// <param name="gameNode">the game node the layout should be applied to</param>
+        /// <param name="layout">layout to be applied to the game node</param>
+        public void Apply(GameObject gameNode, GameObject itsParent, ILayoutNode layout)
+        {
+            Node node = gameNode.GetComponent<NodeRef>().node;
+
+            if (node.IsLeaf())
+            {
+                // Leaf nodes were created as blocks by leaveNodeFactory.
+                // We need to first scale the game node and only afterwards set its
+                // position because transform.scale refers to the center position.
+                leafNodeFactory.SetSize(gameNode, layout.LocalScale);
+                // FIXME: Must adjust layout.CenterPosition.y
+                leafNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
+            }
+            else
+            {
+                // Inner nodes were created by innerNodeFactory.
+                innerNodeFactory.SetSize(gameNode, layout.LocalScale);
+                // FIXME: Must adjust layout.CenterPosition.y
+                innerNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
+            }
+            // Rotate the game object.
+            Rotate(gameNode, layout.Rotation);
+
+            // fit layoutNodes into parent
+            //Fit(itsParent, layoutNodes); // FIXME
+
+            // Stack the node onto its parent (maintaining its x and z co-ordinates)
+            Vector3 levelIncrease = gameNode.transform.position;
+            levelIncrease.y = itsParent.transform.position.y + itsParent.transform.lossyScale.y / 2.0f + LevelDistance;
+            gameNode.transform.position = levelIncrease;
+
+            // Add the node to the node hierarchy
+            gameNode.transform.SetParent(itsParent.transform);
+
+
+            // Prepare the node for interactions
+            InteractionDecorator.PrepareForInteraction(gameNode);
+
+            // Decorations must be applied after the blocks have been placed, so that
+            // we also know their positions.
+            AddDecorations(gameNode);
+        }
+
+        /// <summary>
+        /// Adds light to simulate an emissive effect.
+        /// </summary>
+        /// <param name="gameObjects"></param>
+        /// <param name="rootGameNode"></param>
+        private void AddLight(ICollection<GameObject> gameObjects, GameObject rootGameNode)
+        {
+            GameObject lightGameObject = new GameObject("Light");
+            lightGameObject.transform.parent = rootGameNode.transform;
+
+            Light light = lightGameObject.AddComponent<Light>();
+
+            BoundingBox(gameObjects, out Vector2 minCorner, out Vector2 maxCorner);
+            float bbw = maxCorner.x - minCorner.x;
+            float bbh = maxCorner.y - minCorner.y;
+
+            lightGameObject.transform.position = rootGameNode.transform.position + new Vector3(0.0f, 0.25f * (bbw + bbh), 0.0f);
+
+            light.range = 3.0f * Mathf.Sqrt(bbw * bbw + bbh * bbh);
+            light.type = LightType.Point;
+
+            Color lightColor = 0.5f * (innerNodeFactory.Materials.Lower + innerNodeFactory.Materials.Higher);
+            if (leafNodeFactory is InnerNodeFactory)
+            {
+                lightColor = 0.5f * lightColor + 0.25f * (
+                    ((InnerNodeFactory)leafNodeFactory).Materials.Lower +
+                    ((InnerNodeFactory)leafNodeFactory).Materials.Higher);
+            }
+
+            light.intensity = 1.0f;
         }
 
         /// <summary>
@@ -425,7 +493,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="parent">the parent in which to fit the <paramref name="layoutNodes"/></param>
         /// <param name="layoutNodes">the nodes to be fitted into the <paramref name="parent"/></param>
-        private static void Fit(GameObject parent, ICollection<ILayoutNode> layoutNodes)
+        public static void Fit(GameObject parent, ICollection<ILayoutNode> layoutNodes)
         {
             NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x);
             NodeLayout.MoveTo(layoutNodes, parent.transform.position);
@@ -700,7 +768,8 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns the node layouter according to the settings. The node layouter will
-        /// place the nodes at ground level 0.
+        /// place the nodes at ground level 0. This method just returns the layouter,
+        /// it does not actually calculate the layout.
         /// </summary>
         /// <returns>node layout selected</returns>
         public NodeLayout GetLayout()
@@ -804,10 +873,20 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// draws Decoration for the given List of gameNodes with the global settings for inner node kinds and nodelayout
+        /// Adds decoration for the given <paramref name="gameNode"/> with the global settings 
+        /// for inner node kinds and nodelayout.
         /// </summary>
-        /// <param name="gameNodes"> a list with gamenode objects</param>
-        /// <returns>a list with gamennode objects</returns>
+        /// <param name="gameNode"></param>
+        protected void AddDecorations(GameObject gameNode)
+        {
+            AddDecorations(new List<GameObject>() { gameNode });
+        }
+
+        /// <summary>
+        /// Adds decoration for the given list of <paramref name="gameNodes"/> with the global settings 
+        /// for inner node kinds and nodelayout.
+        /// </summary>
+        /// <param name="gameNodes">a list with gamenode objects</param>
         protected void AddDecorations(ICollection<GameObject> gameNodes)
         {
             AddDecorations(gameNodes, settings.InnerNodeObjects, settings.NodeLayout);
@@ -992,41 +1071,6 @@ namespace SEE.Game
         private static bool IsLeaf(GameObject gameNode)
         {
             return gameNode.GetComponent<NodeRef>().node.IsLeaf();
-        }
-
-        /// <summary>
-        /// Applies the given <paramref name="layout"/> to the given <paramref name="gameNode"/>,
-        /// i.e., sets its size and position according to the <paramref name="layout"/> and
-        /// possibly rotates it. The game node can represent a leaf or inner node of the node 
-        /// hierarchy.
-        /// 
-        /// Precondition: <paramref name="gameNode"/> must have NodeRef component referencing a
-        /// graph node.
-        /// </summary>
-        /// <param name="gameNode">the game node the layout should be applied to</param>
-        /// <param name="layout">layout to be applied to the game node</param>
-        public void Apply(GameObject gameNode, ILayoutNode layout)
-        {
-            Node node = gameNode.GetComponent<NodeRef>().node;
-
-            if (node.IsLeaf())
-            {
-                // Leaf nodes were created as blocks by leaveNodeFactory.
-                // We need to first scale the game node and only afterwards set its
-                // position because transform.scale refers to the center position.
-                leafNodeFactory.SetSize(gameNode, layout.LocalScale);
-                // FIXME: Must adjust layout.CenterPosition.y
-                leafNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
-            }
-            else
-            {
-                // Inner nodes were created by innerNodeFactory.
-                innerNodeFactory.SetSize(gameNode, layout.LocalScale);
-                // FIXME: Must adjust layout.CenterPosition.y
-                innerNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
-            }
-            // Rotate the game object.
-            Rotate(gameNode, layout.Rotation);
         }
 
         /// <summary>

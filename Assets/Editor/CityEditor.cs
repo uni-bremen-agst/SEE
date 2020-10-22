@@ -95,7 +95,7 @@ namespace SEEEditor
             // necessary for prefabs serving as prototypes for active game objects.
             foreach (GameObject go in Resources.FindObjectsOfTypeAll(typeof(GameObject)) as GameObject[])
             {
-                if (go.tag == tag)
+                if (go.CompareTag(tag))
                 {
                     Destroyer.DestroyGameObject(go);
                     count++;

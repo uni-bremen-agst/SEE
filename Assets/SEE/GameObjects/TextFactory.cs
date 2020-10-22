@@ -22,8 +22,10 @@ namespace SEE.GO
         /// <param name="text">the text to be drawn</param>
         /// <param name="position">the center position at which to draw the text</param>
         /// <param name="width">the width of the rectangle enclosing the text (essentially, 
-        /// the text width); the font size will be chose appropriately</param>
-        /// <param name="lift">if true, the text will be lifted up by its extent; that is, is y position is actually the bottom line (position.y + extents.y)</param>
+        /// the text width); the font size will be chosen appropriately</param>
+        /// <param name="lift">if true, the text will be lifted up by its extent; that is, its y position is actually
+        /// the bottom line (position.y + extents.y)</param>
+        /// <param name="textColor">the color of the text (default: light gray)</param>
         /// <returns>the game object representing the text</returns>
         public static GameObject GetText(string text, Vector3 position, float width, bool lift = true, Color? textColor = null)
         {
