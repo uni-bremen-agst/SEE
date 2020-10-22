@@ -1462,20 +1462,21 @@ namespace SEE.Game
                     }
 
                     SetNodeTooltip(go, node.SourceName);
-
-                    
-                    void SetNodeTooltip(GameObject block, string nodeSourceName)
-                    {
-                        var blockGameObject = block.AddComponent<MouseOverNodeGameObject>();
-                        blockGameObject.Text = nodeSourceName;
-
-                        var goPosition = block.transform.position;
-                        goPosition.y = goPosition.y + innerNodeFactory.Roof(block).y / 3;
-
-                        blockGameObject.Position = goPosition;
-                    }
                 }
             }
+
+            #region LocalMethods
+            void SetNodeTooltip(GameObject block, string nodeSourceName)
+            {
+                var blockGameObject = block.AddComponent<MouseOverNodeGameObject>();
+                blockGameObject.Text = nodeSourceName;
+
+                var goPosition = block.transform.position;
+                goPosition.y = goPosition.y + innerNodeFactory.Roof(block).y / 3;
+
+                blockGameObject.Position = goPosition;
+            }
+            #endregion
         }
 
         /// <summary>
