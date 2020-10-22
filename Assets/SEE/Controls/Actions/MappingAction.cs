@@ -125,7 +125,7 @@ namespace SEE.Controls
             }
             else
             {
-                architecture = GetGraph(Architecture);
+                architecture = SceneQueries.GetGraph(Architecture);
                 if (architecture == null)
                 {
                     Debug.LogWarning("The architecture city has no associated graph.\n");
@@ -140,7 +140,7 @@ namespace SEE.Controls
             }
             else
             {
-                implementation = GetGraph(Implementation);
+                implementation = SceneQueries.GetGraph(Implementation);
                 if (implementation == null)
                 {
                     Debug.LogWarning("The implementation city has no associated graph.\n");
