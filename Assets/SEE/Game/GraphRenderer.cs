@@ -1460,6 +1460,14 @@ namespace SEE.Game
                             rightUpperCorner.y = z;
                         }
                     }
+
+                    var blockGameObject = go.AddComponent<MouseOverNodeGameObject>();
+                    blockGameObject.Text = node.SourceName;
+
+                    var goPosition = go.transform.position;
+                    goPosition.y = goPosition.y + innerNodeFactory.Roof(go).y / 3;
+
+                    blockGameObject.Position = goPosition;
                 }
             }
         }
