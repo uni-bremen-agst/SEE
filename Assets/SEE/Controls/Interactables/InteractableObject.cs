@@ -3,6 +3,9 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
+using TMPro;
+using SEE.DataModel.DG;
+using System.Security.Policy;
 
 namespace SEE.Controls
 {
@@ -28,6 +31,8 @@ namespace SEE.Controls
         // OnHandFocusAcquired:    Sent when an attached object gains focus because the previous focus object has been detached from the hand
         //
         // See https://valvesoftware.github.io/steamvr_unity_plugin/articles/Interaction-System.html
+
+        private TextMeshProUGUI tmGUI;
 
         /// <summary>
         /// The next available ID to be assigned.
@@ -76,6 +81,12 @@ namespace SEE.Controls
         /// controller.
         /// </summary>
         public bool IsGrabbed { get; private set; }
+
+        /// <summary>
+        /// A textMeshPro instance in order to represent by 3 three dimensional object, 
+        /// in this case used to label the specific name of nodes or objects.
+        /// </summary>
+        private TextMeshPro tmp;
 
         /// <summary>
         /// The interactable component, that is used by SteamVR. The interactable
@@ -158,6 +169,9 @@ namespace SEE.Controls
         {
             IsHovered = hover;
 
+            //TextMeshPro tmp = gameObject.AddComponent<TextMeshPro>();
+
+
             if (!IsSelected && !IsGrabbed)
             {
                 bool hasOutline = TryGetComponent(out Outline outline);
@@ -167,18 +181,26 @@ namespace SEE.Controls
                     if (hasOutline)
                     {
                         outline.SetColor(isOwner ? LocalHoverColor : RemoteHoverColor);
+
                     }
                     else
                     {
                         Outline.Create(gameObject, isOwner ? LocalHoverColor : RemoteHoverColor);
+
+
                     }
                 }
                 else
                 {
+                    //killEmAll(tmp);
+
+
                     if (hasOutline)
                     {
                         DestroyImmediate(outline);
+
                     }
+
                 }
             }
 
@@ -189,12 +211,20 @@ namespace SEE.Controls
             else
             {
                 HoveredObjects.Remove(this);
+
+
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
             {
                 new Net.SetHoverAction(this, hover).Execute();
             }
+        }
+
+
+        void killEmAll(TextMeshPro textMeshPro)
+        {
+            textMeshPro.text = "";
         }
 
         /// <summary>
@@ -231,6 +261,7 @@ namespace SEE.Controls
                     else if (hasOutline)
                     {
                         DestroyImmediate(outline);
+
                     }
                 }
             }
@@ -320,6 +351,22 @@ namespace SEE.Controls
         {
             if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop && !Raycasting.IsMouseOverGUI())
             {
+                // whenever a player enters the are of an object, a text should be displayed 
+                if  (gameObject.GetComponent<TextMeshPro>() == null )
+                    { 
+
+                         tmp = gameObject.AddComponent<TextMeshPro>();
+
+                        if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                    {
+                        if (nodeRef.node != null)
+                        {
+                            Node node = nodeRef.node;
+                            tmp.text = name;
+                        }
+                    }
+                }
+
                 SetHover(true, true);
             }
         }
@@ -343,7 +390,10 @@ namespace SEE.Controls
         {
             if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop && !Raycasting.IsMouseOverGUI())
             {
+                Destroy(tmp);
                 SetHover(false, true);
+
+
             }
         }
 
