@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Controls
 {
@@ -315,7 +316,10 @@ namespace SEE.Controls
         private List<Vector3> SmoothNormals(Mesh mesh)
         {
             // Group vertices by location
-            IEnumerable<IGrouping<Vector3, KeyValuePair<Vector3, int>>> groups = mesh.vertices.Select((vertex, index) => new KeyValuePair<Vector3, int>(vertex, index)).GroupBy(pair => pair.Key);
+            Assert.IsNotNull(mesh);
+            Assert.IsNotNull(mesh.vertices);
+            IEnumerable<IGrouping<Vector3, KeyValuePair<Vector3, int>>> groups 
+                = mesh.vertices.Select((vertex, index) => new KeyValuePair<Vector3, int>(vertex, index)).GroupBy(pair => pair.Key);
 
             // Copy normals to a new list
             List<Vector3> smoothNormals = new List<Vector3>(mesh.normals);
