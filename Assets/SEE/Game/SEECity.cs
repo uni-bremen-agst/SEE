@@ -317,7 +317,7 @@ namespace SEE.Game
             }
             else
             {
-                DeleteGameObjects();
+                DeleteGraphGameObjects();
                 DrawGraph();
             }
         }
@@ -384,65 +384,13 @@ namespace SEE.Game
         public override void Reset()
         {
             base.Reset();
-            DeleteGameObjects();
             // Delete the underlying graph.
             if (loadedGraph != null)
             {
                 loadedGraph.Destroy();
             }
             LoadedGraph = null;
-
             Measurements = new SortedDictionary<string, string>();
-        }
-
-        /// <summary>
-        /// Deletes all game objects that were created for rendering the graph.
-        /// The underlying loaded graph is not deleted.
-        /// </summary>
-        private void DeleteGameObjects()
-        {
-            // Delete all children.
-            // Note: foreach (GameObject child in transform)... would not work;
-            // we really need to collect all children first and only then can destroy each.
-            foreach (GameObject child in AllChildren())
-            {
-                Destroyer.DestroyGameObject(child);
-            }
-        }
-
-        /// <summary>
-        /// Returns all immediate children of the game object this SEECity is attached to.
-        /// </summary>
-        /// <returns>immediate children of the game object this SEECity is attached to</returns>
-        private List<GameObject> AllChildren()
-        {
-            List<GameObject> result = new List<GameObject>();
-            foreach (Transform child in transform)
-            {
-                result.Add(child.gameObject);
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Returns all (transitive) descendants of <paramref name="go"/> that are tagged
-        /// by Tags.Node (including <paramref name="go"/> if it is tagged by Tags.Node).
-        /// </summary>
-        /// <param name="go">game objects whose node descendants are required</param>
-        /// <returns>all node descendants of <paramref name="go"/></returns>
-        private static ICollection<GameObject> AllNodeDescendants(GameObject go)
-        {
-            List<GameObject> result = new List<GameObject>();
-            if (go.tag == Tags.Node)
-            {
-                result.Add(go);
-            }
-            foreach (Transform child in go.transform)
-            {
-                ICollection<GameObject> ascendants = AllNodeDescendants(child.gameObject);
-                result.AddRange(ascendants);
-            }
-            return result;
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OdinSerializer;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.GO;
@@ -118,7 +119,64 @@ namespace SEE.Game
         /// </summary>
         public virtual void Reset()
         {
+            DeleteGraphGameObjects();
             nodeTypes = new Dictionary<string, bool>();
+        }
+
+        /// <summary>
+        /// Deletes all game objects that were created for rendering nodes or edges
+        /// of the graph or any decoration thereof. More precisely, all children of this 
+        /// game object tagged by Tags.Node, Tags.Edge, or Tags.Decoration are destroyed 
+        /// (in editor mode or play mode).
+        /// The underlying loaded graph is not deleted.
+        /// </summary>
+        protected void DeleteGraphGameObjects()
+        {
+            // Delete all children.
+            // Note: foreach (GameObject child in transform)... would not work;
+            // we really need to collect all children first and only then can destroy each.
+            foreach (GameObject child in AllNodesEdgesDecorationChildren())
+            {
+                Destroyer.DestroyGameObject(child);
+            }
+        }
+
+        /// <summary>
+        /// Returns all immediate children of the game object this SEECity is attached to.
+        /// </summary>
+        /// <returns>immediate children of the game object this SEECity is attached to</returns>
+        private List<GameObject> AllNodesEdgesDecorationChildren()
+        {
+            List<GameObject> result = new List<GameObject>();
+            foreach (Transform child in transform)
+            {
+                if (child.CompareTag(Tags.Node) || child.CompareTag(Tags.Edge) || child.CompareTag(Tags.Decoration))
+                {
+                    result.Add(child.gameObject);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns all (transitive) descendants of <paramref name="go"/> that are tagged
+        /// by Tags.Node (including <paramref name="go"/> if it is tagged by Tags.Node).
+        /// </summary>
+        /// <param name="go">game objects whose node descendants are required</param>
+        /// <returns>all node descendants of <paramref name="go"/></returns>
+        protected static ICollection<GameObject> AllNodeDescendants(GameObject go)
+        {
+            List<GameObject> result = new List<GameObject>();
+            if (go.CompareTag(Tags.Node))
+            {
+                result.Add(go);
+            }
+            foreach (Transform child in go.transform)
+            {
+                ICollection<GameObject> ascendants = AllNodeDescendants(child.gameObject);
+                result.AddRange(ascendants);
+            }
+            return result;
         }
 
         /// <summary>
