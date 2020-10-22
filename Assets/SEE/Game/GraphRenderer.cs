@@ -1,4 +1,8 @@
-﻿using SEE.Controls;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.Charts;
@@ -8,10 +12,6 @@ using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using static SEE.Game.AbstractSEECity;
@@ -1037,7 +1037,7 @@ namespace SEE.Game
                 Vector3 size = innerNodeFactory.GetSize(node);
                 float length = Mathf.Min(size.x, size.z);
                 // The text may occupy up to 30% of the length.
-                GameObject text = TextFactory.GetText(node.GetComponent<NodeRef>().node.SourceName,
+                GameObject text = TextFactory.GetTextWithWidth(node.GetComponent<NodeRef>().node.SourceName,
                                                       node.transform.position, length * 0.3f);
                 text.transform.SetParent(node.transform);
             }

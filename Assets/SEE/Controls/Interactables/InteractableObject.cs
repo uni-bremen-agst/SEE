@@ -1,10 +1,11 @@
-﻿using SEE.DataModel.DG;
+﻿using System.Collections.Generic;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls
@@ -149,16 +150,9 @@ namespace SEE.Controls
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
 
-            // Traverse parents until we reach the gameObject with tag "Code City", so that we can access its settings.
-            // We also set a maximum of 1000 traversals in case something goes horribly wrong, to avoid an infinite loop.
-            GameObject rootCity = gameObject;
-            for (uint i = 0; i < 1000 && !rootCity.CompareTag("Code City"); i++)
-            {
-                // According to Unity documentation, none of these will ever be null
-                rootCity = rootCity.transform.root.gameObject;
-            }
 
-            UnityEngine.Assertions.Assert.IsTrue(rootCity.TryGetComponent(out settings));
+            GameObject cityGo = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
+            Assert.IsTrue(cityGo != null && cityGo.TryGetComponent(out settings));
 
             isLeaf = gameObject.GetComponent<NodeRef>()?.node?.IsLeaf() ?? false;
         }
@@ -265,7 +259,7 @@ namespace SEE.Controls
             // Add text
             Vector3 position = gameObject.transform.position;
             position.y += isLeaf ? settings.LabelDistance : settings.InnerNodeLabelDistance;
-            nodeLabel = TextFactory.GetText(node.SourceName, position,
+            nodeLabel = TextFactory.GetTextWithSize(node.SourceName, position,
                 isLeaf ? settings.LabelSize : settings.InnerNodeLabelSize, textColor: Color.black);
             nodeLabel.transform.SetParent(gameObject.transform);
 

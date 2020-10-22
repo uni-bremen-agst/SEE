@@ -289,9 +289,9 @@ namespace SEE.Game
         /// </summary>
         public float LabelDistance = 0.2f;
         /// <summary>
-        /// The size of the leaf node's label.
+        /// The font size of the leaf node's label.
         /// </summary>
-        public float LabelSize = 0.2f;
+        public float LabelSize = 1f;
 
         /// <summary>
         /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
@@ -483,9 +483,9 @@ namespace SEE.Game
         /// </summary>
         public float InnerNodeLabelDistance = 0.2f;
         /// <summary>
-        /// The size of the inner node's label.
+        /// The font size of the inner node's label.
         /// </summary>
-        public float InnerNodeLabelSize = 0.2f;
+        public float InnerNodeLabelSize = 1f;
 
 
         /// <summary>
