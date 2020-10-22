@@ -20,7 +20,6 @@
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
-using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -44,15 +43,27 @@ namespace SEE.Game
         private EvolutionRenderer evolutionRenderer;  // not serialized by Unity; will be set in Start()
 
         /// <summary>
+        /// The height of posts used as markers for new and deleted elements.
+        /// </summary>
+        [Tooltip("The height of posts used as markers for new and deleted elements (>=0).")]
+        public float MarkerHeight = 0.2f;
+
+        /// <summary>
+        /// The width (x and z lengths) of posts used as markers for new and deleted elements.
+        /// </summary>
+        [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
+        public float MarkerWidth = 0.01f;
+        
+        /// <summary>
         /// Factory method to create the used EvolutionRenderer.
         /// </summary>
         /// <returns></returns>
         protected EvolutionRenderer CreateEvolutionRenderer()
         {
-            // FIXME: Do we really need to attach the evolution renderer as a component to
-            // the game object? That was likely done because EvolutionRenderer derives from
-            // MonoBehaviour and MonoBehaviours cannot be created by the new operator.
-            EvolutionRenderer result = gameObject.AddComponent<EvolutionRenderer>();
+            if (!gameObject.TryGetComponent<EvolutionRenderer>(out EvolutionRenderer result))
+            {
+                result = gameObject.AddComponent<EvolutionRenderer>();
+            }
             result.CityEvolution = this;
             return result;
         }
@@ -87,6 +98,11 @@ namespace SEE.Game
             return graphReader.GetGraph();
         }
 
+        public void DrawGraph(Graph graph)
+        {
+            DrawGraphs(new List<Graph>() { graph });
+        }
+
         /// <summary>
         /// Yields the first name of a GXL file in the sorted list of GXL files located
         /// in the given <paramref name="directory"/>.
@@ -110,11 +126,9 @@ namespace SEE.Game
         /// and can enter the game for the first time. Loads all graphs, calculates their
         /// layouts, and displays the first graph in the graph series.
         /// </summary>
-        private void Start()
+        private void Awake()
         {
-            evolutionRenderer = CreateEvolutionRenderer();
-            evolutionRenderer.AssertNotNull("renderer");
-            evolutionRenderer.ShowGraphEvolution(LoadData());
+            DrawGraphs(LoadData());
             // We assume this SEECityEvolution instance is a component of a game object
             // to which an AnimationInteraction component is attached. This AniminationInteraction
             // component must know the evolution renderer.
@@ -129,6 +143,12 @@ namespace SEE.Game
                     animationInteraction.EvolutionRenderer = evolutionRenderer;
                 }
             }
+        }
+
+        private void DrawGraphs(List<Graph> graphs)
+        {
+            evolutionRenderer = CreateEvolutionRenderer();
+            evolutionRenderer.ShowGraphEvolution(graphs);
         }
     }
 }
