@@ -149,7 +149,7 @@ namespace SEE.Controls
                     Node node = nodeRef.node;
                     if (node != null)
                     {
-                        label = TextFactory.GetText(node.SourceName, new Vector3(gameObject.transform.position.x,gameObject.transform.position.y /*+ abstractSEECity.LabelElevation*/, gameObject.transform.position.z ), Mathf.Min(gameObject.Size().x, gameObject.Size().z) * 10f, false);
+                        label = TextFactory.GetText(node.SourceName, new Vector3(gameObject.transform.position.x,gameObject.transform.position.y + abstractSEECity.LabelElevation, gameObject.transform.position.z ), Mathf.Min(gameObject.Size().x, gameObject.Size().z) * 0.3f);
                         label.transform.SetParent(gameObject.transform.root);
                     }
                 }
@@ -157,7 +157,7 @@ namespace SEE.Controls
         }
         private void RemoveLabel(){
            if(label != null){
-             //Destroyer.DestroyGameObject(label);
+             Destroyer.DestroyGameObject(label);
            }
         }
 
