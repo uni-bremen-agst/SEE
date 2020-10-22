@@ -267,8 +267,8 @@ namespace SEE.Controls
             labelPosition.y -= nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
             LineFactory.Draw(nodeLabel, new []{nodeTopPosition, labelPosition}, 0.01f, 
                 Materials.New(Materials.ShaderType.TransparentLine, Color.black.ColorWithAlpha(0.9f)));
-            
-            Portal.SetPortal(gameObject, nodeLabel); // TODO: Maybe don't cull text, else it could be cut off
+
+            Portal.SetInfinitePortal(nodeLabel);
         }
 
         /// <summary>
