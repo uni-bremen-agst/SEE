@@ -1,8 +1,11 @@
 ﻿using SEE.GO;
+using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
+using System.Collections.Specialized;
 
 namespace SEE.Controls
 {
@@ -119,6 +122,17 @@ namespace SEE.Controls
         /// </summary>
         private readonly Color RemoteGrabColor = Utils.ColorPalette.Viridis(0.0f);
 
+        /// <summary>
+        /// The Gameobject to show the Name
+        /// </summary>
+        private GameObject gameObjectLable;
+
+        /// <summary>
+        /// The City to Import the Distance
+        /// </summary>
+        private AbstractSEECity abstractSEECity;
+
+
         private void Awake()
         {
             ID = nextID++;
@@ -129,6 +143,8 @@ namespace SEE.Controls
             {
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
+
+            gameObject.transform.root.TryGetComponent(out abstractSEECity);
         }
 
         /// <summary>
@@ -147,6 +163,35 @@ namespace SEE.Controls
         }
 
         #region Interaction
+        /// <summary>
+        /// Creates a lable of a GO
+        /// </summary>
+        public void ConstructLable()
+        {
+            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            {
+                Node node = nodeRef.node;
+                if (node != null)
+                {
+                    Vector3 size = gameObject.Size();
+                    float length = Mathf.Min(size.x, size.z);
+                    Vector3 goPosition = new Vector3(gameObject.transform.position.x,gameObject.transform.position.y + abstractSEECity.LableDistanceToRoof, gameObject.transform.position.z);
+                    gameObjectLable = TextFactory.GetText(node.SourceName, goPosition, length * 0.3f);
+                    gameObjectLable.transform.SetParent(gameObject.transform.root);
+                    Debug.LogFormat("Hovered object: {0}\n", node.SourceName);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Destructs the Lable for the GO
+        /// </summary>
+        public void DestructLable()
+        {
+            if(null != gameObjectLable) 
+            Destroyer.DestroyGameObject(gameObjectLable);
+        }
+
 
         /// <summary>
         /// Visually emphasizes this object for hovering.
@@ -185,10 +230,12 @@ namespace SEE.Controls
             if (hover)
             {
                 HoveredObjects.Add(this);
+                ConstructLable();
             }
             else
             {
                 HoveredObjects.Remove(this);
+                DestructLable();
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
@@ -308,9 +355,9 @@ namespace SEE.Controls
             }
         }
 
-        #endregion
+#endregion
 
-        #region Events
+#region Events
 
         //----------------------------------------------------------------
         // Mouse actions
@@ -362,6 +409,6 @@ namespace SEE.Controls
         private void OnHandHoverBegin(Hand hand) => SetHover(true, true);
         private void OnHandHoverEnd(Hand hand) => SetHover(false, true);
 
-        #endregion
+#endregion
     }
 }

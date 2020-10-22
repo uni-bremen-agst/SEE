@@ -61,6 +61,12 @@ namespace SEE.Game
                 return result;
             }
         }
+        //// <summary>
+        ///The Distance beetween rooftop and lable
+        ///</summary>
+        public float LableDistanceToRoof;
+
+
 
         /// <summary>
         /// The relative path for the GVL file containing the node layout information.
