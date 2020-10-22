@@ -1,4 +1,5 @@
-﻿using SEE.Utils;
+﻿using SEE.Game;
+using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -163,7 +164,7 @@ namespace SEE.Controls
         {
             if (!CityAvailable)
             {
-                CityTransform = GetCityRootNode(gameObject);
+                CityTransform = SceneQueries.GetCityRootNode(gameObject);
 
                 if (CityTransform)
                 {

@@ -2,7 +2,6 @@
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -67,6 +66,8 @@ namespace SEE.GO
 
         /// <summary>
         /// Creates and returns the materials, one for each different color.
+        /// 
+        /// Precondition: <paramref name="numberOfColors"/> > 0.
         /// </summary>
         /// <param name="shaderType">the type of the shader to be used to create the material</param>
         /// <param name="numberOfColors">the number of materials with different colors to be created</param>
@@ -76,12 +77,18 @@ namespace SEE.GO
         /// <returns>materials</returns>
         private static Material[] Init(ShaderType shaderType, uint numberOfColors, Color lower, Color higher, int renderQueueOffset)
         {
-            Assert.IsTrue(numberOfColors > 0, "Number of colors must be greater than 0!");
-
             Material[] result = new Material[numberOfColors];
-            for (int i = 0; i < result.Length; i++)
+            if (numberOfColors == 1)
             {
-                result[i] = New(shaderType, Color.Lerp(lower, higher, i / (float)(numberOfColors - 1)), renderQueueOffset);
+                result[0] = New(shaderType, Color.Lerp(lower, higher, 0.5f), renderQueueOffset);
+            }
+            else
+            {
+                // Assumption: numberOfColors > 1; if numberOfColors == 0, we would devide by zero.
+                for (int i = 0; i < result.Length; i++)
+                {
+                    result[i] = New(shaderType, Color.Lerp(lower, higher, i / (float)(numberOfColors - 1)), renderQueueOffset);
+                }
             }
             return result;
         }
