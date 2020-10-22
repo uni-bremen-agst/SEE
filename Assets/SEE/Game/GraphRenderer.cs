@@ -905,6 +905,7 @@ namespace SEE.Game
                 // Adjust text width and height to fit
                 RectTransform rectangleTramsform = (RectTransform) text.transform;
                 rectangleTramsform.sizeDelta = new Vector2(0.1f, 0.1f);
+                text.SetActive(false);
             }
         }
 

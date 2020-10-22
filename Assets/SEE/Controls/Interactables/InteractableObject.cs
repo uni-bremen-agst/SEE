@@ -185,10 +185,34 @@ namespace SEE.Controls
             if (hover)
             {
                 HoveredObjects.Add(this);
+                try
+                {
+                    GameObject text = this.gameObject.transform.GetChild(0).gameObject;
+                    if (text.name.Contains("Text"))
+                    {
+                        text.SetActive(true);
+                    }
+                }
+                catch
+                {
+                    Debug.LogError("GameObject has no children");
+                }
             }
             else
             {
                 HoveredObjects.Remove(this);
+                try
+                {
+                    GameObject text = this.gameObject.transform.GetChild(0).gameObject;
+                    if (text.name.Contains("Text"))
+                    {
+                        text.SetActive(false);
+                    }
+                }
+                catch
+                {
+                    Debug.LogError("GameObject has no children");
+                }
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
