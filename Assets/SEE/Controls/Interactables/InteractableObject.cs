@@ -1,4 +1,6 @@
-﻿using SEE.GO;
+﻿using SEE.DataModel.DG;
+using SEE.Game;
+using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
@@ -119,6 +121,21 @@ namespace SEE.Controls
         /// </summary>
         private readonly Color RemoteGrabColor = Utils.ColorPalette.Viridis(0.0f);
 
+        /// <summary>
+        /// A Label attached to <code>gameObject</code>, displayed while hovering.
+        /// </summary>
+        private GameObject objectLabelHover;
+
+        /// <summary>
+        /// Properties, to adjust variables in the Inspector.
+        /// </summary>
+        private AbstractSEECity properties;
+
+        /// <summary>
+        /// Whether  Node is a LeafNode or not.
+        /// </summary>
+        private bool isLeafNode;
+
         private void Awake()
         {
             ID = nextID++;
@@ -144,6 +161,29 @@ namespace SEE.Controls
                 result = null;
             }
             return result;
+        }
+
+        private void CreateLabel()
+        {
+            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef)) { 
+                Node node = nodeRef.node;
+                if (node != null)
+                {
+                    Vector3 size = gameObject.Size();
+                    float length = Mathf.Min(size.x, size.z);
+
+                    Vector3 location = gameObject.transform.position;
+                    Vector3 labelLocation = new Vector3(location.x, isLeafNode ? properties.LeafNodeDistanceLabel : properties.InnerNodeDistanceLabel, location.z);
+
+                    objectLabelHover = TextFactory.GetText(node.SourceName, labelLocation, length*0.3f, true , Color.black);
+                    objectLabelHover.transform.SetParent(gameObject.transform);
+                }
+            }  
+        }
+
+        private void DestroyLabel()
+        {
+            Destroyer.DestroyGameObject(objectLabelHover);
         }
 
         #region Interaction
@@ -185,10 +225,12 @@ namespace SEE.Controls
             if (hover)
             {
                 HoveredObjects.Add(this);
+                CreateLabel();
             }
             else
             {
                 HoveredObjects.Remove(this);
+                DestroyLabel();
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)

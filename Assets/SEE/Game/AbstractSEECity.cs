@@ -200,6 +200,18 @@ namespace SEE.Game
         public ColorRange InnerNodeColorRange = new ColorRange(Color.white, Color.yellow, 10);
 
         //---------------------------------
+        // Adjustable settings for ObjectLabels
+        //---------------------------------
+        /// <summary>
+        /// The Distance between the leaf node and the label.
+        /// </summary>
+        public float LeafNodeDistanceLabel = 0.3f;
+        /// <summary>
+        /// The Distance between the inner node and the label.
+        /// </summary>
+        public float InnerNodeDistanceLabel = 0.3f;
+
+        //---------------------------------
         // Visual attributes of a leaf node
         //---------------------------------
         /// <summary>
