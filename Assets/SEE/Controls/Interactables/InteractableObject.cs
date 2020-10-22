@@ -1,4 +1,6 @@
 ﻿using SEE.GO;
+using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
@@ -129,6 +131,7 @@ namespace SEE.Controls
             {
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
+            gameObject.transform.root.TryGetComponent(out city);
         }
 
         /// <summary>
@@ -185,16 +188,61 @@ namespace SEE.Controls
             if (hover)
             {
                 HoveredObjects.Add(this);
+                ShowHoveredLabel();
             }
+
             else
             {
                 HoveredObjects.Remove(this);
+                DestroyLabel();
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
             {
                 new Net.SetHoverAction(this, hover).Execute();
             }
+        }
+        /// <summary>
+        /// The hovered object to show the label of.
+        /// </summary>
+        private GameObject objectLabelHover;
+
+
+        /// <summary>
+        /// The distance between the object and the label.
+        /// </summary>
+        private AbstractSEECity city;
+
+        /// <summary>
+        /// Gets the hovered object and shows its name.
+        /// </summary>
+
+        public void ShowHoveredLabel()
+        {
+            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            {
+                Node node = nodeRef.node;
+                if (node != null)
+                {
+                    Vector3 size = gameObject.Size();
+                    float length = Mathf.Min(size.x, size.z);
+
+                    Vector3 location = gameObject.transform.position;
+                    Vector3 labelLocation = new Vector3(location.x, location.y + city.distanceLabel, location.z);
+
+                    objectLabelHover = TextFactory.GetText(node.SourceName, labelLocation, 0.3f, true, Color.black);
+                    objectLabelHover.transform.SetParent(gameObject.transform.root);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Destroys the label of the object that was previously hovered.
+        /// </summary>
+
+        public void DestroyLabel()
+        {
+            Destroyer.DestroyGameObject(objectLabelHover);
         }
 
         /// <summary>

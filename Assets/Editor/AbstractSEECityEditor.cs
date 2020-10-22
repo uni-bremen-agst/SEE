@@ -48,6 +48,13 @@ namespace SEEEditor
             city.NodeLayout = (NodeLayoutKind)EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
             city.gvlPath = EditorGUILayout.TextField("GVL file", city.gvlPath);
 
+            /// <summary>
+            /// The label in the inspector of the field to set the distance between the label and the object.
+            /// </summary>
+
+            city.distanceLabel = EditorGUILayout.FloatField("Distance between Label and Object", city.distanceLabel);
+
+
             GUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Inner nodes");
             Dictionary<AbstractSEECity.InnerNodeKinds, string> shapeKinds = city.NodeLayout.GetInnerNodeKinds().ToDictionary(kind => kind, kind => kind.ToString());

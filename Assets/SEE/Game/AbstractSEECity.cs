@@ -34,6 +34,13 @@ namespace SEE.Game
         /// Must not be readonly because it will be modified in an editor of the inspector.
         [SerializeField] private string pathPrefix = null;
 
+
+        /// <summary>
+        /// The value of the distance between the label and the object.
+        /// </summary>
+        public float distanceLabel;
+
+
         /// <summary>
         /// The prefix of the absolute paths for the GXL, CSV, GVL data; that is,
         /// the directory where these data files are located in.
