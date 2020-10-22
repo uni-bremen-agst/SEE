@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
@@ -148,12 +148,12 @@ namespace SEE.Controls
             {
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
-            
+
             // Traverse parents until we reach the gameObject with tag "Code City", so that we can access its settings.
             // We also set a maximum of 1000 traversals in case something goes horribly wrong, to avoid an infinite loop.
             GameObject rootCity = gameObject;
             for (uint i = 0; i < 1000 && !rootCity.CompareTag("Code City"); i++)
-            { 
+            {
                 // According to Unity documentation, none of these will ever be null
                 rootCity = rootCity.transform.root.gameObject;
             }
@@ -245,30 +245,41 @@ namespace SEE.Controls
         /// </summary>
         private void CreateObjectLabel()
         {
-            if (!LabelsEnabled()) return;  // If labels are disabled, we don't need to do anything
-            
+            if (!LabelsEnabled())
+            {
+                return;  // If labels are disabled, we don't need to do anything
+            }
+
             // If label already exists, nothing needs to be done
-            if (nodeLabel != null || !gameObject.TryGetComponent(out NodeRef nodeRef)) return;
-            
+            if (nodeLabel != null || !gameObject.TryGetComponent(out NodeRef nodeRef))
+            {
+                return;
+            }
+
             Node node = nodeRef.node;
-            if (node == null) return;
-            
+            if (node == null)
+            {
+                return;
+            }
+
             // Add text
             Vector3 position = gameObject.transform.position;
             position.y += isLeaf ? settings.LabelDistance : settings.InnerNodeLabelDistance;
-            nodeLabel = TextFactory.GetText(node.SourceName, position, 
+            nodeLabel = TextFactory.GetText(node.SourceName, position,
                 isLeaf ? settings.LabelSize : settings.InnerNodeLabelSize, textColor: Color.black);
             nodeLabel.transform.SetParent(gameObject.transform);
-            
+
             // Add connecting line between "roof" of object and text
             Vector3 labelPosition = nodeLabel.transform.position;
             Vector3 nodeTopPosition = gameObject.transform.position;
-            nodeTopPosition.y = BoundingBox.GetRoof(new List<GameObject> {gameObject});
+            nodeTopPosition.y = BoundingBox.GetRoof(new List<GameObject> { gameObject });
             labelPosition.y -= nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
-            LineFactory.Draw(nodeLabel, new []{nodeTopPosition, labelPosition}, 0.01f, 
+            LineFactory.Draw(nodeLabel, new[] { nodeTopPosition, labelPosition }, 0.01f,
                 Materials.New(Materials.ShaderType.TransparentLine, Color.black.ColorWithAlpha(0.9f)));
 
             Portal.SetInfinitePortal(nodeLabel);
+            // Animate text movement
+            //iTween.MoveFrom(nodeLabel, nodeTopPosition, 1f);
         }
 
         /// <summary>
@@ -277,8 +288,15 @@ namespace SEE.Controls
         /// <seealso cref="CreateObjectLabel"/>
         private void DestroyObjectLabel()
         {
-            if (!LabelsEnabled()) return;  // If labels are disabled, we don't need to do anything
-            if (nodeLabel != null) Destroyer.DestroyGameObject(nodeLabel);
+            if (!LabelsEnabled())
+            {
+                return;  // If labels are disabled, we don't need to do anything
+            }
+
+            if (nodeLabel != null)
+            {
+                Destroyer.DestroyGameObject(nodeLabel);
+            }
         }
 
         /// <summary>
