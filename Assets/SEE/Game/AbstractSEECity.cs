@@ -66,6 +66,8 @@ namespace SEE.Game
         /// </summary>
         public string gvlPath = "..\\Data\\GXL\\linux-clones\\net.gvl";
 
+        public float LabelElevation;
+
         /// <summary>
         /// Returns the concatenation of pathPrefix and gvlPath. That is the complete
         /// absolute path to the GVL file containing the layout information.

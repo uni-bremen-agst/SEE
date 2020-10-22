@@ -2,6 +2,8 @@
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.DataModel.DG;
+using SEE.Game;
 using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls
@@ -109,6 +111,10 @@ namespace SEE.Controls
         /// </summary>
         private readonly Color RemoteSelectColor = Utils.ColorPalette.Viridis(0.6f);
 
+        private GameObject label;
+
+        private AbstractSEECity abstractSEECity;
+
         /// <summary>
         /// The local grabbing color of the outline.
         /// </summary>
@@ -129,6 +135,30 @@ namespace SEE.Controls
             {
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
+
+            gameObject.transform.root.TryGetComponent<AbstractSEECity>(out abstractSEECity);
+
+        }
+
+
+        private void DrawLabel(){
+            
+            if(label == null){
+                if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+             {
+                    Node node = nodeRef.node;
+                    if (node != null)
+                    {
+                        label = TextFactory.GetText(node.SourceName, new Vector3(gameObject.transform.position.x,gameObject.transform.position.y /*+ abstractSEECity.LabelElevation*/, gameObject.transform.position.z ), Mathf.Min(gameObject.Size().x, gameObject.Size().z) * 10f, false);
+                        label.transform.SetParent(gameObject.transform.root);
+                    }
+                }
+            }
+        }
+        private void RemoveLabel(){
+           if(label != null){
+             //Destroyer.DestroyGameObject(label);
+           }
         }
 
         /// <summary>
@@ -185,10 +215,12 @@ namespace SEE.Controls
             if (hover)
             {
                 HoveredObjects.Add(this);
+                DrawLabel();
             }
             else
             {
                 HoveredObjects.Remove(this);
+                RemoveLabel();
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
@@ -196,6 +228,8 @@ namespace SEE.Controls
                 new Net.SetHoverAction(this, hover).Execute();
             }
         }
+
+        
 
         /// <summary>
         /// Visually emphasizes this object for selection.
