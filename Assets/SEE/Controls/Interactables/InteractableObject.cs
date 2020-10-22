@@ -129,12 +129,7 @@ namespace SEE.Controls
         /// <summary>
         /// Properties, to adjust variables in the Inspector.
         /// </summary>
-        private AbstractSEECity properties;
-
-        /// <summary>
-        /// Whether  Node is a LeafNode or not.
-        /// </summary>
-        private bool isLeafNode;
+        private AbstractSEECity city;
 
         private void Awake()
         {
@@ -163,6 +158,9 @@ namespace SEE.Controls
             return result;
         }
 
+        /// <summary>
+        /// Creates a label for an GameObject and put it centered above a GameObject.
+        /// </summary>
         private void CreateLabel()
         {
             if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef)) { 
@@ -173,14 +171,16 @@ namespace SEE.Controls
                     float length = Mathf.Min(size.x, size.z);
 
                     Vector3 location = gameObject.transform.position;
-                    Vector3 labelLocation = new Vector3(location.x, isLeafNode ? properties.LeafNodeDistanceLabel : properties.InnerNodeDistanceLabel, location.z);
+                    Vector3 labelLocation = new Vector3(location.x, location.y + city.DistanceLabel, location.z);
 
-                    objectLabelHover = TextFactory.GetText(node.SourceName, labelLocation, length*0.3f, true , Color.black);
-                    objectLabelHover.transform.SetParent(gameObject.transform);
+                    objectLabelHover = TextFactory.GetText(node.SourceName, labelLocation, 2f, true , Color.black);
+                    objectLabelHover.transform.SetParent(gameObject.transform.root);
                 }
             }  
         }
-
+        /// <summary>
+        /// Destroys the Label of an GameObject.
+        /// </summary>
         private void DestroyLabel()
         {
             Destroyer.DestroyGameObject(objectLabelHover);

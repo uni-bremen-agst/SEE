@@ -35,7 +35,6 @@ namespace SEEEditor
             city.LeafNodeColorRange.lower = EditorGUILayout.ColorField("Lower Color", city.LeafNodeColorRange.lower);
             city.LeafNodeColorRange.upper = EditorGUILayout.ColorField("Upper Color", city.LeafNodeColorRange.upper);
             city.LeafNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.LeafNodeColorRange.NumberOfColors, 1, 15);
-            city.LeafNodeDistanceLabel = EditorGUILayout.FloatField("Distance node Leaf and Label", city.LeafNodeDistanceLabel);
 
             GUILayout.Label("Attributes of inner nodes", EditorStyles.boldLabel);
             city.InnerNodeHeightMetric = EditorGUILayout.TextField("Height", city.InnerNodeHeightMetric);
@@ -43,12 +42,12 @@ namespace SEEEditor
             city.InnerNodeColorRange.lower = EditorGUILayout.ColorField("Lower Color", city.InnerNodeColorRange.lower);
             city.InnerNodeColorRange.upper = EditorGUILayout.ColorField("Upper Color", city.InnerNodeColorRange.upper);
             city.InnerNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.InnerNodeColorRange.NumberOfColors, 1, 15);
-            city.InnerNodeDistanceLabel = EditorGUILayout.FloatField("Distance node Leaf and Label", city.InnerNodeDistanceLabel);
 
             GUILayout.Label("Nodes and Node Layout", EditorStyles.boldLabel);
             city.LeafObjects = (SEECity.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
             city.NodeLayout = (NodeLayoutKind)EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
             city.gvlPath = EditorGUILayout.TextField("GVL file", city.gvlPath);
+            city.DistanceLabel = EditorGUILayout.FloatField("Distance node and Label", city.DistanceLabel);
 
             GUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Inner nodes");

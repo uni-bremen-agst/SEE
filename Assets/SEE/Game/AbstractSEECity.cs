@@ -67,6 +67,15 @@ namespace SEE.Game
         /// </summary>
         public string gvlPath = "..\\Data\\GXL\\linux-clones\\net.gvl";
 
+        //---------------------------------
+        // Adjustable settings for ObjectLabels
+        //---------------------------------
+        /// <summary>
+        /// The Distance between the node and the label.
+        /// </summary>
+        public float DistanceLabel;
+
+
         /// <summary>
         /// Returns the concatenation of pathPrefix and gvlPath. That is the complete
         /// absolute path to the GVL file containing the layout information.
@@ -256,18 +265,6 @@ namespace SEE.Game
         // Color range of inner nodes
         //---------------------------------
         public ColorRange InnerNodeColorRange = new ColorRange(Color.white, Color.yellow, 10);
-
-        //---------------------------------
-        // Adjustable settings for ObjectLabels
-        //---------------------------------
-        /// <summary>
-        /// The Distance between the leaf node and the label.
-        /// </summary>
-        public float LeafNodeDistanceLabel = 0.3f;
-        /// <summary>
-        /// The Distance between the inner node and the label.
-        /// </summary>
-        public float InnerNodeDistanceLabel = 0.3f;
 
         //---------------------------------
         // Visual attributes of a leaf node
