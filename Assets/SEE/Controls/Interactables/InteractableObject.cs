@@ -163,7 +163,7 @@ namespace SEE.Controls
                     if (node != null)
                     {
                         hoverLabel = TextFactory.GetText(node.SourceName, new Vector3(gameObject.transform.position.x,
-                            gameObject.transform.position.y + abstractSEECity.HoverLabelElevation , gameObject.transform.position.z), 0.2f, true, Color.black);
+                            gameObject.transform.position.y + abstractSEECity.HoverLabelElevation , gameObject.transform.position.z), 0.3f, true, Color.black);
                         hoverLabel.transform.SetParent(gameObject.transform.root);
                     }
                 }
