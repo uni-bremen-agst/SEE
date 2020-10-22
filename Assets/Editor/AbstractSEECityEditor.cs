@@ -47,7 +47,7 @@ namespace SEEEditor
             city.LeafObjects = (SEECity.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
             city.NodeLayout = (NodeLayoutKind)EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
             city.gvlPath = EditorGUILayout.TextField("GVL file", city.gvlPath);
-            city.LabelElevation = EditorGUILayout.FloatField("Label Elevation", city.LabelElevation);
+            city.LabelElevation = EditorGUILayout.FloatField("Label Elevation", city.LabelElevation); //Sets the height of the label
 
             GUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Inner nodes");

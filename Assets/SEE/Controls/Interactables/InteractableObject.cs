@@ -110,7 +110,10 @@ namespace SEE.Controls
         /// The remote selection color of the outline.
         /// </summary>
         private readonly Color RemoteSelectColor = Utils.ColorPalette.Viridis(0.6f);
-
+ 
+        /// <summary>
+        /// SThe label that appears above the node   
+        /// </summary>    
         private GameObject label;
 
         /// <summary>
