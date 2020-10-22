@@ -253,7 +253,7 @@ namespace SEE.Game.Evolution
         {
             if (currentPlane ?? true)
             {
-                Object.Destroy(currentPlane);
+                Destroyer.DestroyGameObject(currentPlane);
                 currentPlane = null;
             }
         }
@@ -265,7 +265,7 @@ namespace SEE.Game.Evolution
         {
             foreach (GameObject gameObject in nodes.Values)
             {
-                Object.Destroy(gameObject);
+                Destroyer.DestroyGameObject(gameObject);
             }
             nodes.Clear();
         }
@@ -280,7 +280,7 @@ namespace SEE.Game.Evolution
             {
                 foreach (GameObject gameObject in edges)
                 {
-                    Object.Destroy(gameObject);
+                    Destroyer.DestroyGameObject(gameObject);
                 }
                 // edges will be overridden in RenderEdges() each time, that is why we
                 // do not Clear() it but reset it to null

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SEE.Utils
 {
     /// <summary>
-    /// A simple logger for SEE that just logs the messages viar UnityEngine.Debug.
+    /// A simple logger for SEE that just logs the messages via UnityEngine.Debug.
     /// </summary>
     public class SEELogger : ILogger
     {
