@@ -62,6 +62,11 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// The height of the label Elevation
+        /// </summary>
+        public float labelELevationHeight;
+
+        /// <summary>
         /// The relative path for the GVL file containing the node layout information.
         /// </summary>
         public string gvlPath = "..\\Data\\GXL\\linux-clones\\net.gvl";

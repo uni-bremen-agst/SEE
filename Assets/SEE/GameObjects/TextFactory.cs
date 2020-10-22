@@ -30,6 +30,18 @@ namespace SEE.GO
             return GetText(text, position, width, TextColor, lift);
         }
 
+        /// <summary>
+        /// Returns a game object showing the given <paramref name="text"/> at given <paramref name="position"/>. 
+        /// The text rotates towards the main camera.
+        /// The parameter textColor was added 
+        /// </summary>
+        /// <param name="text">the text to be drawn</param>
+        /// <param name="position">the center position at which to draw the text</param>
+        /// <param name="width">the width of the rectangle enclosing the text</param>
+        /// <param name="textColor">the color of the text</param>
+        /// <param name="lift">if true, the text will be lifted up by its extent; that is, is y position is actually the bottom line (position.y + extents.y)</param>
+        /// <returns>the game object representing the text</param>
+        /// <returns></returns>
         public static GameObject GetText(string text, Vector3 position, float width, Color textColor, bool lift = true)
         {
             GameObject result = new GameObject("Text " + text)

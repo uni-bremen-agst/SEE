@@ -85,9 +85,14 @@ namespace SEE.Controls
         /// </summary>
         private Interactable interactable;
 
-
+        /// <summary>
+        /// The Label that hovers over the Object
+        /// </summary>
         private GameObject hoverLabel;
 
+        /// <summary>
+        /// The city the object is in
+        /// </summary>
         private AbstractSEECity city;
 
         /// <summary>
@@ -154,29 +159,29 @@ namespace SEE.Controls
             }
             return result;
         }
-
+        /// <summary>
+        /// Creates the labels of the gameobjects
+        /// </summary>
         private void CreateLabel()
         {
             
-
             if(gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
                 Node node = nodeRef.node;
                 if(node != null)
                 {
-                    Vector3 size = gameObject.Size();
-                    float length = Mathf.Min(size.x, size.z);
-
                     Vector3 location = gameObject.transform.position;
-                    Vector3 labelLocation = new Vector3(location.x, location.y + size.y, location.z);
+                    Vector3 labelLocation = new Vector3(location.x, location.y + city.labelELevationHeight, location.z);
 
-                    hoverLabel = TextFactory.GetText(node.SourceName, labelLocation, length * 0.5f, new Color(1f, 0f, 1f, 1));
-                    hoverLabel.transform.SetParent(gameObject.transform);
+                    hoverLabel = TextFactory.GetText(node.SourceName, labelLocation, 0.3f, new Color(0, 0, 0, 1));
+                    hoverLabel.transform.SetParent(gameObject.transform.root);
                 }
             }
 
         }
-
+        /// <summary>
+        /// removes the labels of the gameobjects
+        /// </summary>
         public void RemoveLabel()
         {
             if (hoverLabel != null) Destroyer.DestroyGameObject(hoverLabel);
@@ -222,12 +227,12 @@ namespace SEE.Controls
             {
                 HoveredObjects.Add(this);
                 CreateLabel();
-                hoverLabel.SetActive(true);
+                
             }
             else
             {
                 HoveredObjects.Remove(this);
-                hoverLabel.SetActive(false);
+                RemoveLabel();
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
