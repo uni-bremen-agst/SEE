@@ -141,6 +141,8 @@ namespace SEE.Controls
             {
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
+
+            gameObject.transform.root.TryGetComponent(out city);
         }
 
         /// <summary>
@@ -173,7 +175,7 @@ namespace SEE.Controls
                     Vector3 location = gameObject.transform.position;
                     Vector3 labelLocation = new Vector3(location.x, location.y + city.DistanceLabel, location.z);
 
-                    objectLabelHover = TextFactory.GetText(node.SourceName, labelLocation, 2f, true , Color.black);
+                    objectLabelHover = TextFactory.GetText(node.SourceName, labelLocation, 0.3f, true , Color.black);
                     objectLabelHover.transform.SetParent(gameObject.transform.root);
                 }
             }  
