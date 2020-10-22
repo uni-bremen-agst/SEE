@@ -113,6 +113,9 @@ namespace SEE.Controls
 
         private GameObject label;
 
+        /// <summary>
+        /// Saves the AbstractSEECity object to determine the height of the label.
+        /// </summary>
         private AbstractSEECity abstractSEECity;
 
         /// <summary>
@@ -136,11 +139,13 @@ namespace SEE.Controls
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
 
-            gameObject.transform.root.TryGetComponent<AbstractSEECity>(out abstractSEECity);
+            gameObject.transform.root.TryGetComponent<AbstractSEECity>(out abstractSEECity); //
 
         }
 
-
+        /// <summary>
+        /// Creates a label above the node
+        /// </summary>
         private void DrawLabel(){
             
             if(label == null){
@@ -149,15 +154,18 @@ namespace SEE.Controls
                     Node node = nodeRef.node;
                     if (node != null)
                     {
-                        label = TextFactory.GetText(node.SourceName, new Vector3(gameObject.transform.position.x,gameObject.transform.position.y + abstractSEECity.LabelElevation, gameObject.transform.position.z ), Mathf.Min(gameObject.Size().x, gameObject.Size().z) * 0.3f);
+                        label = TextFactory.GetText(node.SourceName, new Vector3(gameObject.transform.position.x,gameObject.transform.position.y + abstractSEECity.LabelElevation, gameObject.transform.position.z ), Mathf.Min(gameObject.Size().x, gameObject.Size().z) * 0.3f); //Assigns a TextMash object from the TextFactory to the label
                         label.transform.SetParent(gameObject.transform.root);
                     }
                 }
             }
         }
+        /// <summary>
+        /// Removes the label above the node
+        /// </summary>
         private void RemoveLabel(){
            if(label != null){
-             Destroyer.DestroyGameObject(label);
+             Destroyer.DestroyGameObject(label); 
            }
         }
 

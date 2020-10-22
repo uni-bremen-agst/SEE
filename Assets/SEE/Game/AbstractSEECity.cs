@@ -66,6 +66,10 @@ namespace SEE.Game
         /// </summary>
         public string gvlPath = "..\\Data\\GXL\\linux-clones\\net.gvl";
 
+
+        /// <summary>
+        /// Saves the specified height of the label.
+        /// </summary>
         public float LabelElevation;
 
         /// <summary>
