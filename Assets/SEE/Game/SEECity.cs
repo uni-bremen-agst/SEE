@@ -328,6 +328,11 @@ namespace SEE.Game
         private GraphRenderer graphRenderer;
 
         /// <summary>
+        /// Distance between text and gameobject
+        /// </summary>
+        public float distanceBetweenTextAndGameObject;
+
+        /// <summary>
         /// Draws the graph.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
@@ -347,6 +352,7 @@ namespace SEE.Game
                 else
                 {
                     graphRenderer = new GraphRenderer(this, visualizedSubGraph);
+                    graphRenderer.distanceBetweenTextAndGameobject = distanceBetweenTextAndGameObject;
                     // We assume here that this SEECity instance was added to a game object as
                     // a component. The inherited attribute gameObject identifies this game object.
                     graphRenderer.Draw(gameObject);

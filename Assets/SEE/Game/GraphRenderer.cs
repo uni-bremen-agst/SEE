@@ -836,8 +836,7 @@ namespace SEE.Game
                 || nodeLayout == NodeLayoutKind.EvoStreets)
             {
                 AddLabels(InnerNodes(gameNodes), innerNodeFactory);
-                // Decorate inner LeafNodes with hovering text
-                GenerateLabelsForLeafs(gameNodes, innerNodeFactory);
+                GenerateLabelsForLeaves(gameNodes, leafNodeFactory);
             }
 
             // Add decorators specific to the shape of inner nodes (circle decorators for circles
@@ -882,11 +881,16 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Generates floating labels above the internal leaf nodes which appear upon interaction and then disappear
+        /// Distance between text and gameObject
+        /// </summary>
+        public float distanceBetweenTextAndGameobject;
+
+        /// <summary>
+        /// Generates floating labels above the internal nodes which appear upon interaction and then disappear
         /// <param name="gameNodes">All GameNodes
         /// <paramref name="innerNodeFactory"/> Node Factory
         /// </summary>
-        private void GenerateLabelsForLeafs(ICollection<GameObject> gameNodes, InnerNodeFactory innerNodeFactory) {
+        private void GenerateLabelsForLeaves(ICollection<GameObject> gameNodes, NodeFactory leafNodeFactory) {
             ICollection<GameObject> nonDecoratedLeafs = new List<GameObject>();
             foreach (GameObject o in gameNodes)
             {
@@ -895,13 +899,14 @@ namespace SEE.Game
                     nonDecoratedLeafs.Add(o);
                 }
             }
-            AddLabels(nonDecoratedLeafs,innerNodeFactory);
+            AddLabels(nonDecoratedLeafs, leafNodeFactory);
             foreach (GameObject o in nonDecoratedLeafs)
             {
                 GameObject text = o.transform.GetChild(0).gameObject;
                 Vector3 size = o.GetComponent<Renderer>().bounds.size;
                 // Put text above leaf in graph
-                text.transform.position = new Vector3(text.transform.position.x, text.transform.position.y + size.y, text.transform.position.z);
+                text.transform.position = new Vector3(text.transform.position.x, text.transform.position.y + size.y + distanceBetweenTextAndGameobject,
+                    text.transform.position.z);
                 // Adjust text width and height to fit
                 RectTransform rectangleTramsform = (RectTransform) text.transform;
                 rectangleTramsform.sizeDelta = new Vector2(0.1f, 0.1f);

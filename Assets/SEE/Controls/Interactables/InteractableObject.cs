@@ -185,33 +185,33 @@ namespace SEE.Controls
             if (hover)
             {
                 HoveredObjects.Add(this);
-                try
+                if (this.gameObject.transform.childCount > 0)
                 {
-                    GameObject text = this.gameObject.transform.GetChild(0).gameObject;
-                    if (text.name.Contains("Text"))
+                    for (int i = 0; i < this.gameObject.transform.childCount; i++)
                     {
-                        text.SetActive(true);
+                        GameObject text = this.gameObject.transform.GetChild(i).gameObject;
+                        if (text.name.Contains("Text"))
+                        {
+                            text.SetActive(true);
+                            break;
+                        }
                     }
-                }
-                catch
-                {
-                    Debug.LogError("GameObject has no children");
                 }
             }
             else
             {
                 HoveredObjects.Remove(this);
-                try
+                if (this.gameObject.transform.childCount > 0)
                 {
-                    GameObject text = this.gameObject.transform.GetChild(0).gameObject;
-                    if (text.name.Contains("Text"))
+                    for (int i = 0; i < this.gameObject.transform.childCount; i++)
                     {
-                        text.SetActive(false);
+                        GameObject text = this.gameObject.transform.GetChild(i).gameObject;
+                        if (text.name.Contains("Text"))
+                        {
+                            text.SetActive(false);
+                            break;
+                        }
                     }
-                }
-                catch
-                {
-                    Debug.LogError("GameObject has no children");
                 }
             }
 
