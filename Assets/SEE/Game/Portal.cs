@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SEE.Game
 {
@@ -40,9 +41,17 @@ namespace SEE.Game
         /// <param name="rightBackCorner">the right back corner in the X/Z plane of the plane component</param>
         public static void GetDimensions(GameObject gameObject, out Vector2 leftFrontCorner, out Vector2 rightBackCorner)
         {
-            GO.Plane cullingPlane = gameObject.GetComponent<GO.Plane>();
-            leftFrontCorner = cullingPlane.LeftFrontCorner;
-            rightBackCorner = cullingPlane.RightBackCorner;
+            if (gameObject.TryGetComponent<GO.Plane>(out GO.Plane cullingPlane))
+            {
+                leftFrontCorner = cullingPlane.LeftFrontCorner;
+                rightBackCorner = cullingPlane.RightBackCorner;
+            }
+            else
+            {
+                Debug.LogWarningFormat("Game object {0} has no GO.Plane.\n", gameObject.name);
+                leftFrontCorner = Vector2.zero;
+                rightBackCorner = Vector2.zero;
+            }
         }
 
         /// <summary>
@@ -67,24 +76,38 @@ namespace SEE.Game
 
         /// <summary>
         /// Sets the culling area (portal) of <paramref name="go"/> to the rectangle in
-        /// the x/z plane defined by the extends of <paramref name="root"/>.
+        /// the x/z plane defined by the extents of <paramref name="root"/>.
         /// </summary>
         /// <param name="root">object defining the extends of the culling area</param>
         /// <param name="go">object whose culling area is to be set</param>
         public static void SetPortal(GameObject root, GameObject go)
         {
-            Vector2 leftFront, rightBack;
-            GetDimensions(root, out leftFront, out rightBack);
+            GetDimensions(root, out Vector2 leftFront, out Vector2 rightBack);
+            SetPortalOfMaterials(go, leftFront, rightBack);
+        }
+
+        /// <summary>
+        /// Sets the culling area (portal) of <paramref name="go"/> to an infititely large rectangle.
+        /// </summary>
+        /// <param name="go">object whose culling area is to be set</param>
+        public static void SetInfinitePortal(GameObject go)
+        {
+            SetPortalOfMaterials(go, Vector2.negativeInfinity, Vector2.positiveInfinity);
+        }
+
+        private static void SetPortalOfMaterials(GameObject go, Vector2 leftFront, Vector2 rightBack)
+        {
             foreach (Material material in go.GetComponent<MeshRenderer>().sharedMaterials)
             {
                 SetPortal(leftFront, rightBack, material);
             }
         }
 
-        public static void SetPortal(Vector2 leftFrontCorner, Vector2 rightBackCorner, Material material)
+        private static void SetPortal(Vector2 leftFrontCorner, Vector2 rightBackCorner, Material material)
         {
             material.SetVector("_PortalMin", new Vector4(leftFrontCorner.x, leftFrontCorner.y));
             material.SetVector("_PortalMax", new Vector4(rightBackCorner.x, rightBackCorner.y));
         }
+        
     }
 }

@@ -1,4 +1,8 @@
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using OdinSerializer;
 using SEE.DataModel;
 using SEE.DataModel.DG;
@@ -8,10 +12,6 @@ using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game
@@ -276,6 +276,22 @@ namespace SEE.Game
         /// The attribute name of the metric to be used for determining the style of leaf nodes.
         /// </summary>
         public string LeafStyleMetric = NumericAttributeNames.Complexity.Name(); // serialized by Unity
+        
+        //----------------------------------
+        // Attributes of a leaf node's label
+        //----------------------------------
+        /// <summary>
+        /// If true, label's with the node's SourceName will be displayed above each leaf node.
+        /// </summary>
+        public bool ShowLabel = true;
+        /// <summary>
+        /// The distance between the top of the leaf node and its label.
+        /// </summary>
+        public float LeafLabelDistance = 0.2f;
+        /// <summary>
+        /// The font size of the leaf node's label.
+        /// </summary>
+        public float LeafLabelFontSize = 0.4f;
 
         /// <summary>
         /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
@@ -453,6 +469,23 @@ namespace SEE.Game
         /// The attribute name of the metric to be used for determining the style of inner nodes.
         /// </summary>
         public string InnerNodeStyleMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
+        
+        //-----------------------------------
+        // Visual attributes of an inner node
+        //-----------------------------------
+        
+        /// <summary>
+        /// If true, label's with the node's SourceName will be displayed above each inner node.
+        /// </summary>
+        public bool InnerNodeShowLabel = true;
+        /// <summary>
+        /// The distance between the top of the inner node and its label.
+        /// </summary>
+        public float InnerNodeLabelDistance = 0.2f;
+        /// <summary>
+        /// The font size of the inner node's label.
+        /// </summary>
+        public float InnerNodeLabelFontSize = 0.4f;
 
 
         /// <summary>
