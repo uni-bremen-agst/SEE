@@ -32,8 +32,8 @@ namespace SEEEditor
             city.HeightMetric = EditorGUILayout.TextField("Height", city.HeightMetric);
             city.DepthMetric = EditorGUILayout.TextField("Depth", city.DepthMetric);
             city.LeafStyleMetric = EditorGUILayout.TextField("Style", city.LeafStyleMetric);
-            city.LeafNodeColorRange.lower = EditorGUILayout.ColorField("Lower solor", city.LeafNodeColorRange.lower);
-            city.LeafNodeColorRange.upper = EditorGUILayout.ColorField("Upper solor", city.LeafNodeColorRange.upper);
+            city.LeafNodeColorRange.lower = EditorGUILayout.ColorField("Lower color", city.LeafNodeColorRange.lower);
+            city.LeafNodeColorRange.upper = EditorGUILayout.ColorField("Upper color", city.LeafNodeColorRange.upper);
             city.LeafNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.LeafNodeColorRange.NumberOfColors, 1, 15);
             city.ShowLabel = EditorGUILayout.Toggle("Show labels", city.ShowLabel);
             city.LabelDistance = EditorGUILayout.FloatField("Label distance", city.LabelDistance);
