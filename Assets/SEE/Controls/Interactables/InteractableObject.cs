@@ -281,12 +281,8 @@ namespace SEE.Controls
         /// <seealso cref="CreateObjectLabel"/>
         private void DestroyObjectLabel()
         {
-            if (!LabelsEnabled())
-            {
-                return;  // If labels are disabled, we don't need to do anything
-            }
-
-            if (nodeLabel != null)
+            // If labels are disabled, we don't need to do anything
+            if (LabelsEnabled() && nodeLabel != null)
             {
                 Destroyer.DestroyGameObject(nodeLabel);
             }
