@@ -90,7 +90,7 @@ namespace SEE.Game
         /// <returns>true if <paramref name="gameNode"/> represents a leaf in the graph</returns>
         public static bool IsLeaf(GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>().node.IsLeaf();
+            return gameNode.GetComponent<NodeRef>()?.node?.IsLeaf() ?? false;
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace SEE.Game
         /// <returns>true if <paramref name="gameNode"/> represents an inner node in the graph</returns>
         public static bool IsInnerNode(GameObject gameNode)
         {
-            return !gameNode.GetComponent<NodeRef>().node.IsLeaf();
+            return gameNode.GetComponent<NodeRef>()?.node?.IsInnerNode() ?? false;
         }
 
         /// <summary>
