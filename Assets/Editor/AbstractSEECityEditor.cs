@@ -32,24 +32,24 @@ namespace SEEEditor
             city.HeightMetric = EditorGUILayout.TextField("Height", city.HeightMetric);
             city.DepthMetric = EditorGUILayout.TextField("Depth", city.DepthMetric);
             city.LeafStyleMetric = EditorGUILayout.TextField("Style", city.LeafStyleMetric);
-            city.LeafNodeColorRange.lower = EditorGUILayout.ColorField("Lower Color", city.LeafNodeColorRange.lower);
-            city.LeafNodeColorRange.upper = EditorGUILayout.ColorField("Upper Color", city.LeafNodeColorRange.upper);
+            city.LeafNodeColorRange.lower = EditorGUILayout.ColorField("Lower solor", city.LeafNodeColorRange.lower);
+            city.LeafNodeColorRange.upper = EditorGUILayout.ColorField("Upper solor", city.LeafNodeColorRange.upper);
             city.LeafNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.LeafNodeColorRange.NumberOfColors, 1, 15);
-            city.ShowLabel = EditorGUILayout.Toggle("Show Labels", city.ShowLabel);
-            city.LabelDistance = EditorGUILayout.FloatField("Label Distance", city.LabelDistance);
-            city.LabelSize = EditorGUILayout.FloatField("Label Font Size", city.LabelSize);
+            city.ShowLabel = EditorGUILayout.Toggle("Show labels", city.ShowLabel);
+            city.LabelDistance = EditorGUILayout.FloatField("Label distance", city.LabelDistance);
+            city.LabelSize = EditorGUILayout.FloatField("Label font size", city.LabelSize);
 
             GUILayout.Label("Attributes of inner nodes", EditorStyles.boldLabel);
             city.InnerNodeHeightMetric = EditorGUILayout.TextField("Height", city.InnerNodeHeightMetric);
             city.InnerNodeStyleMetric = EditorGUILayout.TextField("Style", city.InnerNodeStyleMetric);
-            city.InnerNodeColorRange.lower = EditorGUILayout.ColorField("Lower Color", city.InnerNodeColorRange.lower);
-            city.InnerNodeColorRange.upper = EditorGUILayout.ColorField("Upper Color", city.InnerNodeColorRange.upper);
+            city.InnerNodeColorRange.lower = EditorGUILayout.ColorField("Lower color", city.InnerNodeColorRange.lower);
+            city.InnerNodeColorRange.upper = EditorGUILayout.ColorField("Upper color", city.InnerNodeColorRange.upper);
             city.InnerNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.InnerNodeColorRange.NumberOfColors, 1, 15);
-            city.InnerNodeShowLabel = EditorGUILayout.Toggle("Show Labels", city.InnerNodeShowLabel);
-            city.InnerNodeLabelDistance = EditorGUILayout.FloatField("Label Distance", city.InnerNodeLabelDistance);
-            city.InnerNodeLabelSize = EditorGUILayout.FloatField("Label Font Size", city.InnerNodeLabelSize);
+            city.InnerNodeShowLabel = EditorGUILayout.Toggle("Show labels", city.InnerNodeShowLabel);
+            city.InnerNodeLabelDistance = EditorGUILayout.FloatField("Label distance", city.InnerNodeLabelDistance);
+            city.InnerNodeLabelSize = EditorGUILayout.FloatField("Label font size", city.InnerNodeLabelSize);
 
-            GUILayout.Label("Nodes and Node Layout", EditorStyles.boldLabel);
+            GUILayout.Label("Nodes and node Layout", EditorStyles.boldLabel);
             city.LeafObjects = (SEECity.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
             city.NodeLayout = (NodeLayoutKind)EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
             city.gvlPath = EditorGUILayout.TextField("GVL file", city.gvlPath);
@@ -81,7 +81,7 @@ namespace SEEEditor
                 city.CoseGraphSettings.multiLevelScaling = EditorGUILayout.Toggle("MultiLevel-Scaling", city.CoseGraphSettings.multiLevelScaling);
                 city.CoseGraphSettings.UseSmartMultilevelScaling = EditorGUILayout.Toggle("Smart multilevel-scaling", city.CoseGraphSettings.UseSmartMultilevelScaling);
                 city.CoseGraphSettings.UseSmartRepulsionRangeCalculation = EditorGUILayout.Toggle("Smart repulsion range", city.CoseGraphSettings.UseSmartRepulsionRangeCalculation);
-                city.CoseGraphSettings.RepulsionStrength = EditorGUILayout.FloatField("Repulsion Strength", city.CoseGraphSettings.RepulsionStrength);
+                city.CoseGraphSettings.RepulsionStrength = EditorGUILayout.FloatField("Repulsion strength", city.CoseGraphSettings.RepulsionStrength);
                 city.CoseGraphSettings.GravityStrength = EditorGUILayout.FloatField("Gravity", city.CoseGraphSettings.GravityStrength);
                 city.CoseGraphSettings.CompoundGravityStrength = EditorGUILayout.FloatField("Compound gravity", city.CoseGraphSettings.CompoundGravityStrength);
                 /*city.CoseGraphSettings.useOptAlgorithm = EditorGUILayout.Toggle("Use Opt-Algorithm", city.CoseGraphSettings.useOptAlgorithm);
@@ -102,7 +102,7 @@ namespace SEEEditor
                 }
             }
 
-            GUILayout.Label("Edges and Edge Layout", EditorStyles.boldLabel);
+            GUILayout.Label("Edges and edge Layout", EditorStyles.boldLabel);
             city.EdgeLayout = (EdgeLayoutKind)EditorGUILayout.EnumPopup("Edge layout", city.EdgeLayout);
             city.EdgeWidth = EditorGUILayout.FloatField("Edge width", city.EdgeWidth);
             city.EdgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", city.EdgesAboveBlocks);
@@ -116,7 +116,7 @@ namespace SEEEditor
             {
                 if (city.CoseGraphSettings.rootDirs != null && city.CoseGraphSettings.rootDirs.Count > 0)
                 {
-                    GUILayout.Label("Choose Sublayouts", EditorStyles.boldLabel);
+                    GUILayout.Label("Choose sublayouts", EditorStyles.boldLabel);
                     List<Node> roots = city.CoseGraphSettings.rootDirs;
 
                     if (city.CoseGraphSettings.show.Count == 0)
@@ -141,7 +141,7 @@ namespace SEEEditor
             EditorGUIUtility.labelWidth = 150;
             GUILayout.Label("Measurements", EditorStyles.boldLabel);
 
-            city.calculateMeasurements = EditorGUILayout.Toggle("Calculate Measurements", city.calculateMeasurements);
+            city.calculateMeasurements = EditorGUILayout.Toggle("Calculate measurements", city.calculateMeasurements);
 
             if (city.calculateMeasurements)
             {
