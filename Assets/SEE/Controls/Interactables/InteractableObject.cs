@@ -96,7 +96,7 @@ namespace SEE.Controls
         /// <summary>
         /// Settings for the visualization of the node.
         /// </summary>
-        private AbstractSEECity settings;
+        private AbstractSEECity city;
 
         /// <summary>
         /// True if this node is a leaf. This value is cached to avoid frequent retrievals.
@@ -152,7 +152,7 @@ namespace SEE.Controls
 
             GameObject cityGo = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
             Assert.IsTrue(cityGo != null);
-            cityGo.TryGetComponent(out settings);
+            cityGo.TryGetComponent(out city);
             isLeaf = SceneQueries.IsLeaf(gameObject);
         }
 
@@ -230,7 +230,7 @@ namespace SEE.Controls
         /// <returns>true iff labels are enabled for this node type</returns>
         private bool LabelsEnabled()
         {
-            return isLeaf && settings.ShowLabel || !isLeaf && settings.InnerNodeShowLabel;
+            return isLeaf && city.ShowLabel || !isLeaf && city.InnerNodeShowLabel;
         }
 
         /// <summary>
@@ -257,9 +257,9 @@ namespace SEE.Controls
 
             // Add text
             Vector3 position = gameObject.transform.position;
-            position.y += isLeaf ? settings.LabelDistance : settings.InnerNodeLabelDistance;
+            position.y += isLeaf ? city.LabelDistance : city.InnerNodeLabelDistance;
             nodeLabel = TextFactory.GetTextWithSize(node.SourceName, position,
-                isLeaf ? settings.LabelSize : settings.InnerNodeLabelSize, textColor: Color.black);
+                isLeaf ? city.LabelSize : city.InnerNodeLabelSize, textColor: Color.black);
             nodeLabel.transform.SetParent(gameObject.transform);
 
             // Add connecting line between "roof" of object and text
