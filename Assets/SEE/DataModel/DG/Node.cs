@@ -513,6 +513,15 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// True if node is an inner node, i.e., has children.
+        /// </summary>
+        /// <returns>true iff inner node</returns>
+        public bool IsInnerNode()
+        {
+            return children.Count > 0;
+        }
+
+        /// <summary>
         /// Creates deep copies of attributes where necessary. Is called by
         /// Clone() once the copy is created. Must be extended by every 
         /// subclass that adds fields that should be cloned, too.
