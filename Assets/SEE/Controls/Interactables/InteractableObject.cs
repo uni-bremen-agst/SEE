@@ -150,11 +150,10 @@ namespace SEE.Controls
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
 
-
             GameObject cityGo = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
             Assert.IsTrue(cityGo != null && cityGo.TryGetComponent(out settings));
 
-            isLeaf = gameObject.GetComponent<NodeRef>()?.node?.IsLeaf() ?? false;
+            isLeaf = SceneQueries.IsLeaf(gameObject);
         }
 
         /// <summary>
