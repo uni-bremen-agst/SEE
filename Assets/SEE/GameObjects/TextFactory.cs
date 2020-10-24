@@ -17,22 +17,22 @@ namespace SEE.GO
 
         /// <summary>
         /// Returns a game object showing the given <paramref name="text"/> at given <paramref name="position"/>
-        /// with given <paramref name="size"/>. 
+        /// with given <paramref name="fontSize"/>. 
         /// The text rotates towards the main camera.
         /// </summary>
         /// <param name="text">the text to be drawn</param>
         /// <param name="position">the center position at which to draw the text</param>
-        /// <param name="size">the size of the font with which the text is drawn</param>
+        /// <param name="fontSize">the size of the font with which the text is drawn</param>
         /// <param name="lift">if true, the text will be lifted up by its extent; that is, its y position is actually
         /// the bottom line (position.y + extents.y)</param>
         /// <param name="textColor">the color of the text (default: light gray)</param>
         /// <returns>the game object representing the text</returns>
-        public static GameObject GetTextWithSize(string text, Vector3 position, float size, bool lift = true, 
+        public static GameObject GetTextWithSize(string text, Vector3 position, float fontSize, bool lift = true, 
             Color? textColor = null)
         {
             CreateText(text, position, textColor, out TextMeshPro tm, out GameObject result);
 
-            tm.fontSize = size;
+            tm.fontSize = fontSize;
 
             // No shading as this might be expensive and even distracts.
             DisableShading(result);
