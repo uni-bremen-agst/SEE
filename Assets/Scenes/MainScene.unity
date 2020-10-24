@@ -3177,8 +3177,8 @@ MonoBehaviour:
   DepthMetric: Metric.Number_Of_Called_Routines
   LeafStyleMetric: Metric.McCabe_Complexity
   ShowLabel: 1
-  LabelDistance: 0.2
-  LabelSize: 0.2
+  LeafLabelDistance: 0.2
+  LeafLabelFontSize: 0.4
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -3198,7 +3198,7 @@ MonoBehaviour:
   InnerNodeStyleMetric: Metric.Number_Of_Descendants
   InnerNodeShowLabel: 1
   InnerNodeLabelDistance: 0.2
-  InnerNodeLabelSize: 0.2
+  InnerNodeLabelFontSize: 0.4
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
@@ -4169,8 +4169,8 @@ MonoBehaviour:
   DepthMetric: Metric.Number_of_Descendants
   LeafStyleMetric: Metric.Number_of_Clusters
   ShowLabel: 1
-  LabelDistance: 0.2
-  LabelSize: 0.2
+  LeafLabelDistance: 0.2
+  LeafLabelFontSize: 0.4
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -4190,7 +4190,7 @@ MonoBehaviour:
   InnerNodeStyleMetric: Metric.Number_of_Descendants
   InnerNodeShowLabel: 1
   InnerNodeLabelDistance: 0.2
-  InnerNodeLabelSize: 0.2
+  InnerNodeLabelFontSize: 0.4
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
