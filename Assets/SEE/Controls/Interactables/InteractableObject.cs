@@ -151,8 +151,8 @@ namespace SEE.Controls
             }
 
             GameObject cityGo = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
-            Assert.IsTrue(cityGo != null && cityGo.TryGetComponent(out settings));
-
+            Assert.IsTrue(cityGo != null);
+            cityGo.TryGetComponent(out settings);
             isLeaf = SceneQueries.IsLeaf(gameObject);
         }
 
