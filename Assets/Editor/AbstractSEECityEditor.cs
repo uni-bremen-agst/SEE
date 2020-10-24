@@ -36,8 +36,8 @@ namespace SEEEditor
             city.LeafNodeColorRange.upper = EditorGUILayout.ColorField("Upper color", city.LeafNodeColorRange.upper);
             city.LeafNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.LeafNodeColorRange.NumberOfColors, 1, 15);
             city.ShowLabel = EditorGUILayout.Toggle("Show labels", city.ShowLabel);
-            city.LabelDistance = EditorGUILayout.FloatField("Label distance", city.LabelDistance);
-            city.LabelSize = EditorGUILayout.FloatField("Label font size", city.LabelSize);
+            city.LeafLabelDistance = EditorGUILayout.FloatField("Label distance", city.LeafLabelDistance);
+            city.LeafLabelFontSize = EditorGUILayout.FloatField("Label font size", city.LeafLabelFontSize);
 
             GUILayout.Label("Attributes of inner nodes", EditorStyles.boldLabel);
             city.InnerNodeHeightMetric = EditorGUILayout.TextField("Height", city.InnerNodeHeightMetric);
@@ -47,7 +47,7 @@ namespace SEEEditor
             city.InnerNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.InnerNodeColorRange.NumberOfColors, 1, 15);
             city.InnerNodeShowLabel = EditorGUILayout.Toggle("Show labels", city.InnerNodeShowLabel);
             city.InnerNodeLabelDistance = EditorGUILayout.FloatField("Label distance", city.InnerNodeLabelDistance);
-            city.InnerNodeLabelSize = EditorGUILayout.FloatField("Label font size", city.InnerNodeLabelSize);
+            city.InnerNodeLabelFontSize = EditorGUILayout.FloatField("Label font size", city.InnerNodeLabelFontSize);
 
             GUILayout.Label("Nodes and node Layout", EditorStyles.boldLabel);
             city.LeafObjects = (SEECity.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);

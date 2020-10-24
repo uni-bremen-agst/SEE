@@ -257,9 +257,9 @@ namespace SEE.Controls
 
             // Add text
             Vector3 position = gameObject.transform.position;
-            position.y += isLeaf ? city.LabelDistance : city.InnerNodeLabelDistance;
+            position.y += isLeaf ? city.LeafLabelDistance : city.InnerNodeLabelDistance;
             nodeLabel = TextFactory.GetTextWithSize(node.SourceName, position,
-                isLeaf ? city.LabelSize : city.InnerNodeLabelSize, textColor: Color.black);
+                isLeaf ? city.LeafLabelFontSize : city.InnerNodeLabelFontSize, textColor: Color.black);
             nodeLabel.transform.SetParent(gameObject.transform);
 
             // Add connecting line between "roof" of object and text
