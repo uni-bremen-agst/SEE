@@ -8,6 +8,9 @@ namespace SEE.Controls
         private const float Speed = 2.0f;
         private const float BoostFactor = 2.0f;
 
+        //temp save the new node
+        Node newNode;
+
         private struct CameraState
         {
             internal float distance;
@@ -124,6 +127,28 @@ namespace SEE.Controls
                     cameraState.pitch -= y;
                 }
                 Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
+            }
+
+
+            //Test for insert a new node
+            if (Input.GetKeyDown(KeyCode.N && newNode == null){
+                //create new Node and let him stick to the 
+            } 
+            if(newNode != null)
+            {
+                if (Input.GetKeyDown(KeyCode.M))
+                {
+                    //Change node type to the next in the list
+                }
+                if (Input.GetMouseButton(LeftMouseButton))
+                {
+                    //Place node and set newNode to Null
+                }
+            }
+            if(Input.GetKeyDown(KeyCode.N && newNode != null){
+                //exit node adding
+                //remove node from cursor
+                newNode = null;
             }
         }
     }
