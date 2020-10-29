@@ -95,6 +95,7 @@ namespace SEE.DataModel.DG.IO
                                             {
                                                 float value = float.Parse(values[i], CultureInfo.InvariantCulture);
                                                 node.SetFloat(columnNames[i], value);
+                                                UnityEngine.Debug.Log("FUNKTIONIERT: " + columnNames[i] + "   " + value);
                                             }
                                             else
                                             {
