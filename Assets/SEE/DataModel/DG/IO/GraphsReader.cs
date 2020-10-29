@@ -23,6 +23,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.Text.RegularExpressions;
+using SEE.DataModel.DG.IO; 
 
 namespace SEE.DataModel.DG.IO
 {
@@ -39,7 +41,7 @@ namespace SEE.DataModel.DG.IO
         /// Contains a List of CSV files matching the GXL filenames.
         /// </summary>
         /// 
-        public List<string> csvFileNames = new List<string>(); 
+        public List<string> csvFileNames = new List<string>();
         /// <summary>
         /// Loads all GXL files (limited to <paramref name="maxRevisionsToLoad"/> many 
         /// files) from <paramref name="directory"/> and and saves all loaded graph data.
@@ -56,6 +58,9 @@ namespace SEE.DataModel.DG.IO
             }
             graphs.Clear();
 
+            MatchingCSVandGXL(directory);
+
+
             SEE.Utils.Performance p = SEE.Utils.Performance.Begin("Loading GXL files from " + directory);
             // for all found GXL files load and save the graph data
             foreach (string gxlPath in sortedGraphNames)
@@ -64,6 +69,8 @@ namespace SEE.DataModel.DG.IO
                 GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes, gxlPath, new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
+
+                
 
                 // if graph was loaded put in graph list
                 if (graph == null)
@@ -74,6 +81,12 @@ namespace SEE.DataModel.DG.IO
                 {
                     maxRevisionsToLoad--;
                     graphs.Add(graph);
+                    
+                    foreach (string search in csvFileNames)
+                        if (Regex.IsMatch(search, gxlPath))
+                        {
+                            MetricImporter.Load(graph, search, ';') ; 
+                        }
                 }
                 if (maxRevisionsToLoad <= 0)
                 {
@@ -84,6 +97,11 @@ namespace SEE.DataModel.DG.IO
             Debug.Log("Number of graphs loaded: " + graphs.Count + "\n");
         }
 
+        /// <summary>
+        /// Compares all existing .gxl Files with existing .csv files in the given directory 
+        /// and saves the names of every match within a predefined datastructure.
+        /// </summary>
+        /// <param name="directory">the directory path where the GXL and CSV file are located in</param>
         public void MatchingCSVandGXL(string directory)
         {
             
