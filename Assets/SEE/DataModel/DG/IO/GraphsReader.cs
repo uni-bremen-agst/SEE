@@ -23,6 +23,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using SEE.DataModel.DG.IO;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -39,7 +40,7 @@ namespace SEE.DataModel.DG.IO
         /// Contains a List of CSV files matching the GXL filenames.
         /// </summary>
         /// 
-        public List<string> csvFileNames = new List<string>(); 
+        public List<string> csvFileNames = new List<string>();
         /// <summary>
         /// Loads all GXL files (limited to <paramref name="maxRevisionsToLoad"/> many 
         /// files) from <paramref name="directory"/> and and saves all loaded graph data.
@@ -50,12 +51,12 @@ namespace SEE.DataModel.DG.IO
         public void Load(string directory, HashSet<string> hierarchicalEdgeTypes, int maxRevisionsToLoad)
         {
             IEnumerable<string> sortedGraphNames = Filenames.GXLFilenames(directory);
+            IEnumerable<string> sortedCSVNames = Filenames.CSVFilenames(directory);
             if (sortedGraphNames.Count<string>() == 0)
             {
                 throw new Exception("Directory '" + directory + "' has no GXL files.");
             }
             graphs.Clear();
-
             SEE.Utils.Performance p = SEE.Utils.Performance.Begin("Loading GXL files from " + directory);
             // for all found GXL files load and save the graph data
             foreach (string gxlPath in sortedGraphNames)
@@ -72,7 +73,17 @@ namespace SEE.DataModel.DG.IO
                 }
                 else
                 {
-                    maxRevisionsToLoad--;
+                    foreach (string s in sortedCSVNames)
+                    {
+                        foreach (string m in sortedGraphNames)
+                        {
+                            if (s.Substring(0, s.Length - 3).Equals(m.Substring(0,m.Length - 3))){
+                                MetricImporter.Load(graph, s,';');
+                                UnityEngine.Debug.Log(s + "HIER");
+                            }
+                        }
+                    }
+                    maxRevisionsToLoad--;         
                     graphs.Add(graph);
                 }
                 if (maxRevisionsToLoad <= 0)
@@ -84,32 +95,6 @@ namespace SEE.DataModel.DG.IO
             Debug.Log("Number of graphs loaded: " + graphs.Count + "\n");
         }
 
-        public void MatchingCSVandGXL(string directory)
-        {
-            
-
-            IEnumerable<string> CSVinDirectory= Filenames.CSVFilenames(directory);
-            IEnumerable<string> GXLinDirectoryTemp = Filenames.GXLFilenames(directory);
-            List<string> GXLinDirectory = new List<string>();
-
-            foreach(string t in GXLinDirectoryTemp)
-            {
-               GXLinDirectory.Add(t.Substring(0, (t.Length - 3)));
-            }
-
-            foreach (string s in CSVinDirectory)
-            {
-                s.Substring(0,(s.Length - 3));
-                if (GXLinDirectory.Contains(s))
-                {
-                    csvFileNames.Add(s);                
-                }
-                
-
-            }
-
-
-        }
 
     }
 }
