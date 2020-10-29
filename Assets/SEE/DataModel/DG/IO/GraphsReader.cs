@@ -79,7 +79,7 @@ namespace SEE.DataModel.DG.IO
                         {
                             if (s.Substring(0, s.Length - 3).Equals(m.Substring(0,m.Length - 3))){
                                 MetricImporter.Load(graph, s,';');
-                                UnityEngine.Debug.Log(s + "HIER");
+                               
                             }
                         }
                     }
