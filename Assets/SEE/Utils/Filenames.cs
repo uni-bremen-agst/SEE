@@ -15,6 +15,26 @@ namespace SEE.Utils
         public const char UnixDirectorySeparator = '/';
 
         /// <summary>
+        /// File extension of GXL filenames.
+        /// </summary>
+        public const string GXLExtension = ".gxl";
+
+        /// <summary>
+        /// File extension of CSV filenames.
+        /// </summary>
+        public const string CSVExtension = ".csv";
+
+        /// <summary>
+        /// Yields string "*" + <paramref name="extension"/>.
+        /// </summary>
+        /// <param name="extension">file extension to be appended to "*"</param>
+        /// <returns>"*" + <paramref name="extension"/></returns>
+        private static string Globbing(string extension)
+        {
+            return "*" + extension;
+        }
+
+        /// <summary>
         /// Returns path where all Unity directory separators have been replaced by
         /// the directory separator of the current operating-system platform.
         /// </summary>
@@ -55,7 +75,7 @@ namespace SEE.Utils
         /// <returns>sorted list of GXL filenames</returns>
         public static IEnumerable<string> GXLFilenames(string directory)
         {
-            return FilenamesInDirectory(directory, "*.gxl");
+            return FilenamesInDirectory(directory, Globbing(GXLExtension));
         }
 
         /// <summary>
@@ -68,7 +88,7 @@ namespace SEE.Utils
         /// <returns>sorted list of CSV filenames</returns>
         public static IEnumerable<string> CSVFilenames(string directory)
         {
-            return FilenamesInDirectory(directory, "*.csv");
+            return FilenamesInDirectory(directory, Globbing(CSVExtension));
         }
 
         /// <summary>
@@ -101,32 +121,5 @@ namespace SEE.Utils
             sortedGraphNames = sortedGraphNames.Distinct().NumericalSort();
             return sortedGraphNames;
         }
-    }
-
-        /// <summary>
-        /// Extension for IEnumerable<string>, that sorts by numbers in the string.
-        /// For example {a-1, a-11, a-2} becomes {a-1, a-2, a-11}.
-        /// </summary>
-        internal static class NumericalSortExtension
-        {
-            /// <summary>
-            /// Sorts the given IEnumerable<string> by numbers contained in the string.
-            /// For example {a-1, a-11, a-2} becomes {a-1, a-2, a-11}.
-            /// </summary>
-            /// <param name="list">An IEnumerable<string> to be sorted</param>
-            /// <returns>The passed list sorted by numbers</returns>
-            public static IEnumerable<string> NumericalSort(this IEnumerable<string> list)
-            {
-                int maxLen = list.Select(s => s.Length).Max();
-
-                return list.Select(s => new
-                {
-                    OrgStr = s,
-                    SortStr = Regex.Replace(s, @"(\d+)|(\D+)", m => m.Value.PadLeft(maxLen, char.IsDigit(m.Value[0]) ? ' ' : '\xffff'))
-                })
-                .OrderBy(x => x.SortStr)
-                .Select(x => x.OrgStr);
-            }
-        }
-    
+    }    
 }
