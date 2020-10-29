@@ -34,7 +34,10 @@ namespace SEE.DataModel.DG.IO
         /// Contains all loaded graphs after calling Load().
         /// </summary>
         public readonly List<Graph> graphs = new List<Graph>();
-
+        /// <summary>
+        /// Contains a List of CSV files matching the GXL filenames.
+        /// </summary>
+        public List<string> CSVfileNames = new List<string>(); 
         /// <summary>
         /// Loads all GXL files (limited to <paramref name="maxRevisionsToLoad"/> many 
         /// files) from <paramref name="directory"/> and and saves all loaded graph data.
@@ -78,5 +81,30 @@ namespace SEE.DataModel.DG.IO
             p.End();
             Debug.Log("Number of graphs loaded: " + graphs.Count + "\n");
         }
+
+        public static void MatchingCSVandGXL(string directory)
+        {
+
+            IEnumerable<string> CSVinDirectory= fileNames.CSVFilenames(directory);
+            IEnumerable<string> GXLinDirectory = filenames.GXLFilenames(string directory);
+
+            foreach(string t in GXLinDirectory)
+            {
+                t = t.Substring((0, (s.Length - 3)));
+            }
+
+            foreach (string s in CSVinDirectory)
+            {
+                s.Substring(0, (s.Length - 3));
+                if (GXLinDirectory.Contains(s)
+                {
+                    CSVfileNames.Add(s);                }
+                
+
+            }
+
+
+        }
+
     }
 }
