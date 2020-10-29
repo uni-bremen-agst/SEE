@@ -20,6 +20,7 @@
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -114,7 +115,7 @@ namespace SEE.Game
         /// <returns>first filename</returns>
         private string FirstFilename(string directory)
         {
-            foreach (string filename in GraphsReader.GXLFilenames(directory))
+            foreach (string filename in Filenames.GXLFilenames(directory))
             {
                 return filename;
             }
