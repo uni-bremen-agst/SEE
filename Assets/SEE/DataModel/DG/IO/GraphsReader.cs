@@ -19,11 +19,12 @@
 
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.Text.RegularExpressions;
 using SEE.DataModel.DG.IO;
+using System.IO;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -57,7 +58,8 @@ namespace SEE.DataModel.DG.IO
                 throw new Exception("Directory '" + directory + "' has no GXL files.");
             }
             graphs.Clear();
-            SEE.Utils.Performance p = SEE.Utils.Performance.Begin("Loading GXL files from " + directory);
+
+            Performance p = Performance.Begin("Loading GXL files from " + directory);
             // for all found GXL files load and save the graph data
             foreach (string gxlPath in sortedGraphNames)
             {
@@ -65,7 +67,7 @@ namespace SEE.DataModel.DG.IO
                 GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes, gxlPath, new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
-
+             
                 // if graph was loaded put in graph list
                 if (graph == null)
                 {
@@ -73,18 +75,34 @@ namespace SEE.DataModel.DG.IO
                 }
                 else
                 {
-                    foreach (string s in sortedCSVNames)
+                    string csvFilename = Path.ChangeExtension(gxlPath, Filenames.CSVExtension);
+                    if (File.Exists(csvFilename))
                     {
-                        foreach (string m in sortedGraphNames)
-                        {
-                            if (s.Substring(0, s.Length - 3).Equals(m.Substring(0,m.Length - 3))){
-                                MetricImporter.Load(graph, s,';');
-                                UnityEngine.Debug.Log(s + "HIER");
-                            }
-                        }
+                        Debug.LogFormat("Loading CSV file {0}.\n", csvFilename);
+                        MetricImporter.Load(graph, csvFilename, ';');
                     }
+                    else
+                    {
+                        Debug.LogWarningFormat("CSV file {0} does not exist.\n", csvFilename);
+                    }
+                    //foreach (string s in sortedCSVNames)
+                    //{
+                    //    foreach (string m in sortedGraphNames)
+                    //    {
+                    //        if (s.Substring(0, s.Length - 3).Equals(m.Substring(0,m.Length - 3))){
+                    //            MetricImporter.Load(graph, s,';');
+                    //            UnityEngine.Debug.Log(s + "HIER");
+                    //        }
+                    //    }
+                    //}
                     maxRevisionsToLoad--;         
                     graphs.Add(graph);
+                    
+                    //foreach (string search in csvFileNames)
+                    //    if (Regex.IsMatch(search, gxlPath))
+                    //    {
+                    //        MetricImporter.Load(graph, search, ';');
+                    //    }
                 }
                 if (maxRevisionsToLoad <= 0)
                 {
@@ -95,6 +113,36 @@ namespace SEE.DataModel.DG.IO
             Debug.Log("Number of graphs loaded: " + graphs.Count + "\n");
         }
 
+        /// <summary>
+        /// Compares all existing .gxl Files with existing .csv files in the given directory 
+        /// and saves the names of every match within a predefined datastructure.
+        /// </summary>
+        /// <param name="directory">the directory path where the GXL and CSV file are located in</param>
+        public void MatchingCSVandGXL(string directory)
+        {
+            
 
+            IEnumerable<string> CSVinDirectory= Filenames.CSVFilenames(directory);
+            IEnumerable<string> GXLinDirectoryTemp = Filenames.GXLFilenames(directory);
+            List<string> GXLinDirectory = new List<string>();
+
+            foreach(string t in GXLinDirectoryTemp)
+            {
+               GXLinDirectory.Add(t.Substring(0, (t.Length - 3)));
+            }
+
+            foreach (string s in CSVinDirectory)
+            {
+                s.Substring(0,(s.Length - 3));
+                if (GXLinDirectory.Contains(s))
+                {
+                    csvFileNames.Add(s);                
+                }
+                
+
+            }
+
+
+        }
     }
 }
