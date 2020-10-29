@@ -19,6 +19,7 @@
 
 using SEE.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -85,18 +86,19 @@ namespace SEE.DataModel.DG.IO
         public static void MatchingCSVandGXL(string directory)
         {
 
-            IEnumerable<string> CSVinDirectory= fileNames.CSVFilenames(directory);
-            IEnumerable<string> GXLinDirectory = filenames.GXLFilenames(string directory);
+            IEnumerable<string> CSVinDirectory= Filenames.CSVFilenames(directory);
+            IEnumerable<string> GXLinDirectoryTemp = Filenames.GXLFilenames(directory);
+            List<string> GXLinDirectory = new List<string>();
 
-            foreach(string t in GXLinDirectory)
+            foreach(string t in GXLinDirectoryTemp)
             {
-                t = t.Substring((0, (s.Length - 3)));
+               GXLinDirectory.Add(t.Substring((0, (t.Length - 3))));
             }
 
             foreach (string s in CSVinDirectory)
             {
                 s.Substring(0, (s.Length - 3));
-                if (GXLinDirectory.Contains(s)
+                if (GXLinDirectory.Contains(s))
                 {
                     CSVfileNames.Add(s);                }
                 
