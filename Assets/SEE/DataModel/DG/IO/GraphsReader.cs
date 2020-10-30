@@ -76,11 +76,19 @@ namespace SEE.DataModel.DG.IO
                     foreach (string s in sortedCSVNames)
                     {
                         
-                            if (s.Substring(0, s.Length - 3).Equals(gxlPath.Substring(0,gxlPath.Length - 3))){
-                                // load the CSV into the graph assuming ";" is the delmiter in every CSV
-                                MetricImporter.Load(graph, s,';');
-                               
+                            if (s.Substring(0, s.Length - 3).Equals(gxlPath.Substring(0,gxlPath.Length - 3)))
+                        
+                        {
+                            // load the CSV into the graph assuming ";" is the delmiter in every CSV
+
+
+                            if (MetricImporter.Load(graph, s, ';') > 0)
+                            {
+                                Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", filename, numberOfErrors);
                             }
+
+
+                        }
                         
                     }
                     maxRevisionsToLoad--;         
