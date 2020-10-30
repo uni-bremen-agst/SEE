@@ -119,6 +119,7 @@ namespace SEE.Game
         /// </summary>
         public virtual void Reset()
         {
+        
             DeleteGraphGameObjects();
             nodeTypes = new Dictionary<string, bool>();
         }
@@ -235,6 +236,10 @@ namespace SEE.Game
         /// <returns>subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/></returns>
         protected Graph RelevantGraph(Graph graph)
         {
+            foreach (KeyValuePair<string, bool> k in nodeTypes)
+            {
+                UnityEngine.Debug.Log("2.NODETYPE: " + k.Key +" " + k.Value);
+            }
             if (AllNodeTypesAreRelevant)
             {
                 return graph;
@@ -510,7 +515,7 @@ namespace SEE.Game
 
         /// <summary>
         /// This parameter determines the maximal width, breadth, and height of each block
-        /// representing a graph node visually. Must not be smaller than MinimalBlockLength.
+        /// representing a graph node visuavisually. Must not be smaller than MinimalBlockLength.
         /// </summary>
         public float MaximalBlockLength = 100.0f; // serialized by Unity
 
@@ -610,6 +615,10 @@ namespace SEE.Game
         /// <returns>the loaded graph (may be empty if a graph could not be loaded)</returns>
         public Graph LoadGraph(string filename)
         {
+            foreach (KeyValuePair<string, bool> k in nodeTypes)
+            {
+                UnityEngine.Debug.Log("NODETYPE: " + k.Value);
+            }
             if (string.IsNullOrEmpty(filename))
             {
                 Debug.LogError("Empty graph path.\n");
@@ -619,6 +628,7 @@ namespace SEE.Game
             {
                 if (File.Exists(filename))
                 {
+                 
                     Performance p = Performance.Begin("loading graph data from " + filename);
                     GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "", new SEELogger());
                     graphCreator.Load();
