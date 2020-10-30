@@ -22,8 +22,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using System.Text.RegularExpressions;
-using SEE.DataModel.DG.IO;
 using System.IO;
 
 namespace SEE.DataModel.DG.IO
