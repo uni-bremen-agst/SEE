@@ -95,7 +95,7 @@ namespace SEE.DataModel.DG.IO
                                             {
                                                 float value = float.Parse(values[i], CultureInfo.InvariantCulture);
                                                 node.SetFloat(columnNames[i], value);
-                                                UnityEngine.Debug.Log("FUNKTIONIERT: " + columnNames[i] + "   " + value);
+                                               
                                             }
                                             else
                                             {
@@ -141,6 +141,8 @@ namespace SEE.DataModel.DG.IO
                 Debug.LogErrorFormat("Exception {0} while loading data from CSV file {1}.\n", e.Message, filename);
                 throw e;
             }
+
+            UnityEngine.Debug.Log("FUNKTIONIERT: " + numberOfErrors);
             return numberOfErrors;
         }
     }

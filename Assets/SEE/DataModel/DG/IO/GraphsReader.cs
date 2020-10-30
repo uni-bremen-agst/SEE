@@ -75,13 +75,13 @@ namespace SEE.DataModel.DG.IO
                 {
                     foreach (string s in sortedCSVNames)
                     {
-                        foreach (string m in sortedGraphNames)
-                        {
-                            if (s.Substring(0, s.Length - 3).Equals(m.Substring(0,m.Length - 3))){
+                        
+                            if (s.Substring(0, s.Length - 3).Equals(gxlPath.Substring(0,gxlPath.Length - 3))){
+                                // load the CSV into the graph assuming ";" is the delmiter in every CSV
                                 MetricImporter.Load(graph, s,';');
                                
                             }
-                        }
+                        
                     }
                     maxRevisionsToLoad--;         
                     graphs.Add(graph);
