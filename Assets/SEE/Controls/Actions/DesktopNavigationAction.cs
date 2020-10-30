@@ -124,7 +124,7 @@ namespace SEE.Controls
 
         protected sealed override void OnCityAvailable()
         {
-            raycastPlane = new UnityEngine.Plane(Vector3.up, CityTransform.position);
+            raycastPlane = new Plane(Vector3.up, CityTransform.position);
             mode = 0;
             movingOrRotating = false;
             cursor = Game.UI3D.Cursor.Create();
@@ -148,15 +148,17 @@ namespace SEE.Controls
 
             if (CityAvailable)
             {
+                bool isMouseOverGUI = Raycasting.IsMouseOverGUI();
+
                 // Fill action state with player input. Input MUST NOT be inquired in
                 // FixedUpdate() for the input to feel responsive!
                 actionState.selectToggle = Input.GetKey(KeyCode.LeftControl);
                 actionState.drag = Input.GetMouseButton(2);
-                actionState.startDrag |= Input.GetMouseButtonDown(2);
+                actionState.startDrag |= !isMouseOverGUI && Input.GetMouseButtonDown(2);
                 actionState.dragHoveredOnly = Input.GetKey(KeyCode.LeftControl);
                 actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
                 actionState.snap = Input.GetKey(KeyCode.LeftAlt);
-                actionState.reset |= Input.GetKeyDown(KeyCode.R);
+                actionState.reset |= (actionState.drag || !isMouseOverGUI) && Input.GetKeyDown(KeyCode.R);
                 actionState.mousePosition = Input.mousePosition;
 
                 RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint);
@@ -185,7 +187,7 @@ namespace SEE.Controls
 
                     // For simplicity, zooming is only allowed if the city is not
                     // currently dragged
-                    if (!actionState.drag)
+                    if (!isMouseOverGUI && !actionState.drag)
                     {
                         actionState.zoomStepsDelta += Input.mouseScrollDelta.y;
                     }
