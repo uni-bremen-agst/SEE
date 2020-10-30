@@ -19,15 +19,10 @@
 
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-<<<<<<< HEAD
 using System.IO;
-=======
-using SEE.DataModel.DG.IO;
->>>>>>> fdb13d3b9ac4b54ce1da6eb4a1c5875a6ebbfb36
 
 namespace SEE.DataModel.DG.IO
 {
@@ -55,7 +50,6 @@ namespace SEE.DataModel.DG.IO
         public void Load(string directory, HashSet<string> hierarchicalEdgeTypes, int maxRevisionsToLoad)
         {
             IEnumerable<string> sortedGraphNames = Filenames.GXLFilenames(directory);
-            IEnumerable<string> sortedCSVNames = Filenames.CSVFilenames(directory);
             if (sortedGraphNames.Count<string>() == 0)
             {
                 throw new Exception("Directory '" + directory + "' has no GXL files.");
