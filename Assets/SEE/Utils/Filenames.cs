@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace SEE.Utils
 {
@@ -121,5 +120,5 @@ namespace SEE.Utils
             sortedGraphNames = sortedGraphNames.Distinct().NumericalSort();
             return sortedGraphNames;
         }
-    }    
+    }
 }
