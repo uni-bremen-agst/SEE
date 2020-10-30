@@ -61,11 +61,12 @@ namespace SEE.DataModel.DG.IO
             // for all found GXL files load and save the graph data
             foreach (string gxlPath in sortedGraphNames)
             {
-                // load graph
+                // load graph (we can safely assume that the file exists because we retrieved its 
+                // name just from the directory
                 GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes, gxlPath, new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
-             
+
                 // if graph was loaded put in graph list
                 if (graph == null)
                 {
@@ -87,24 +88,8 @@ namespace SEE.DataModel.DG.IO
                     {
                         Debug.LogWarningFormat("CSV file {0} does not exist.\n", csvFilename);
                     }
-                    //foreach (string s in sortedCSVNames)
-                    //{
-                    //    foreach (string m in sortedGraphNames)
-                    //    {
-                    //        if (s.Substring(0, s.Length - 3).Equals(m.Substring(0,m.Length - 3))){
-                    //            MetricImporter.Load(graph, s,';');
-                    //            UnityEngine.Debug.Log(s + "HIER");
-                    //        }
-                    //    }
-                    //}
-                    maxRevisionsToLoad--;         
+                    maxRevisionsToLoad--;
                     graphs.Add(graph);
-                    
-                    //foreach (string search in csvFileNames)
-                    //    if (Regex.IsMatch(search, gxlPath))
-                    //    {
-                    //        MetricImporter.Load(graph, search, ';');
-                    //    }
                 }
                 if (maxRevisionsToLoad <= 0)
                 {
@@ -113,38 +98,6 @@ namespace SEE.DataModel.DG.IO
             }
             p.End();
             Debug.Log("Number of graphs loaded: " + graphs.Count + "\n");
-        }
-
-        /// <summary>
-        /// Compares all existing .gxl Files with existing .csv files in the given directory 
-        /// and saves the names of every match within a predefined datastructure.
-        /// </summary>
-        /// <param name="directory">the directory path where the GXL and CSV file are located in</param>
-        public void MatchingCSVandGXL(string directory)
-        {
-            
-
-            IEnumerable<string> CSVinDirectory= Filenames.CSVFilenames(directory);
-            IEnumerable<string> GXLinDirectoryTemp = Filenames.GXLFilenames(directory);
-            List<string> GXLinDirectory = new List<string>();
-
-            foreach(string t in GXLinDirectoryTemp)
-            {
-               GXLinDirectory.Add(t.Substring(0, (t.Length - 3)));
-            }
-
-            foreach (string s in CSVinDirectory)
-            {
-                s.Substring(0,(s.Length - 3));
-                if (GXLinDirectory.Contains(s))
-                {
-                    csvFileNames.Add(s);                
-                }
-                
-
-            }
-
-
         }
     }
 }
