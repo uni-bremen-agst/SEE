@@ -77,9 +77,10 @@ namespace SEE.DataModel.DG.IO
                     if (File.Exists(csvFilename))
                     {
                         Debug.LogFormat("Loading CSV file {0}.\n", csvFilename);
-                        if (MetricImporter.Load(graph, csvFilename, ';') > 0)
+                        int numberOfErrors = MetricImporter.Load(graph, csvFilename, ';');
+                        if (numberOfErrors > 0)
                         {
-                            Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", filename, numberOfErrors);
+                            Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", csvFilename, numberOfErrors);
                         }
                     }
                     else
