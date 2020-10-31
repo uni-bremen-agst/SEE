@@ -92,8 +92,7 @@ namespace SEE.DataModel.DG.IO
                                             if (values[i].Contains("."))
                                             {
                                                 float value = float.Parse(values[i], CultureInfo.InvariantCulture);
-                                                node.SetFloat(columnNames[i], value);
-                                               
+                                                node.SetFloat(columnNames[i], value);                                               
                                             }
                                             else
                                             {
