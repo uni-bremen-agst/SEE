@@ -1,10 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.DataModel.DG;
 
 public class DesktopNewNodeAction : MonoBehaviour
 {
     // Start is called before the first frame update
+    //temp save the new node
+    Node newNode;
     void Start()
     {
         
@@ -15,13 +18,14 @@ public class DesktopNewNodeAction : MonoBehaviour
     {
 
         //Test for insert a new node
-        if (Input.GetKeyDown(KeyCode.N && newNode == null){
+        if (Input.GetKeyDown(KeyCode.N )&& newNode == null){
             //create new Node and let him stick to the 
         }
         if (newNode != null)
         {
             if (Input.GetKeyDown(KeyCode.M))
-            {
+
+            { 
                 //Change node type to the next in the list
             }
             if (Input.GetMouseButton(LeftMouseButton))
@@ -29,10 +33,11 @@ public class DesktopNewNodeAction : MonoBehaviour
                 //Place node and set newNode to Null
             }
         }
-        if (Input.GetKeyDown(KeyCode.N && newNode != null){
+        if (Input.GetKeyDown(KeyCode.N) && newNode != null){
             //exit node adding
             //remove node from cursor
             newNode = null;
+            //DesktopInput.NodeCreationRequested()
         }
     }
 }
