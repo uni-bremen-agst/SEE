@@ -8,7 +8,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Controls
+namespace SEE.Controls.Actions
 {
     /// <summary>
     /// Implements the architectural mapping for the reflexion analysis. 
