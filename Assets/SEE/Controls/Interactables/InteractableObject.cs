@@ -198,16 +198,7 @@ namespace SEE.Controls
 
             if (hover)
             {
-                //HoverIn?.Invoke();
-                if (HoverIn != null)
-                {
-                    Debug.LogFormat("Hover on {0}\n", name);
-                    HoverIn();
-                }
-                else
-                {
-                    Debug.LogFormat("HoverIn is null on {0}\n", name);
-                }
+                HoverIn?.Invoke();
                 HoveredObjects.Add(this);
             }
             else
