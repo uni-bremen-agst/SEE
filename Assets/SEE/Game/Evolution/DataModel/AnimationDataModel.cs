@@ -48,6 +48,11 @@ namespace SEE.Game.Evolution
         public Toggle AutoplayToggle; // serialized by Unity
 
         /// <summary>
+        /// Slider to show the progress of the animation.
+        /// </summary>
+        public Slider Slider; // serialized by Unity
+
+        /// <summary>
         /// Checks if all fields are initialized.
         /// </summary>
         private void Start()
@@ -55,6 +60,7 @@ namespace SEE.Game.Evolution
             AnimationLagText.AssertNotNull("AnimationLagText");
             RevisionNumberText.AssertNotNull("RevisionNumberText");
             AutoplayToggle.AssertNotNull("AutoplayToggle");
+            Slider.AssertNotNull("Slider");
         }
     }
 }

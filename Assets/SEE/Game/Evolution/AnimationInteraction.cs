@@ -99,6 +99,10 @@ namespace SEE.Game.Evolution
             revisionSelectionDataModel.CloseViewButton.onClick.AddListener(ToogleMode);
             revisionSelectionDataModel.RevisionDropdown.onValueChanged.AddListener(OnDropDownChanged);
 
+            animationDataModel.Slider.minValue = 1;
+            animationDataModel.Slider.maxValue = evolutionRenderer.GraphCount-1;
+            animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
+
             SetMode(true);
             OnShownGraphHasChanged();
             evolutionRenderer.Register(OnShownGraphHasChanged);
@@ -137,6 +141,11 @@ namespace SEE.Game.Evolution
                     {
                         evolutionRenderer.AnimationLag = animationTimeValues[i];
                     }
+                }
+
+                if(animationDataModel.Slider.value != evolutionRenderer.CurrentGraphIndex)
+                {
+                    evolutionRenderer.TryShowSpecificGraph((int)animationDataModel.Slider.value);
                 }
             }
             if (Input.GetKeyDown(KeyCode.Escape))
@@ -209,6 +218,7 @@ namespace SEE.Game.Evolution
             animationDataModel.RevisionNumberText.text = (evolutionRenderer.CurrentGraphIndex + 1) + " / " + evolutionRenderer.GraphCount;
             animationDataModel.AutoplayToggle.isOn = evolutionRenderer.IsAutoPlay;
             animationDataModel.AnimationLagText.text = "Revision animation lag: " + evolutionRenderer.AnimationLag + "s";
+            animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
         }
 
         /// <summary>
