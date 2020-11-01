@@ -9,7 +9,7 @@ namespace SEE.Controls.Actions
     public abstract class InteractableObjectSelectionAction : InteractableObjectAction
     {
         /// <summary>
-        /// Registers On() and Off() for the respective hovering events.
+        /// Registers On() and Off() for the respective selection events.
         /// </summary>
         protected virtual void OnEnable()
         {
@@ -25,7 +25,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Unregisters On() and Off() from the respective hovering events.
+        /// Unregisters On() and Off() from the respective selection events.
         /// </summary>
         protected virtual void OnDisable()
         {
