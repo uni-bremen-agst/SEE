@@ -58,7 +58,7 @@ namespace SEE.Controls.Actions
         /// Creates a text label above the object with its node's SourceName if the label doesn't exist yet.
         /// </summary>
         /// <param name="isOwner">true if a local user initiated this call</param>
-        protected override void Show(bool isOwner)
+        protected override void On(bool isOwner)
         {
             if (!LabelsEnabled())
             {
@@ -100,10 +100,10 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Destroys the text label above the object if it exists.
         /// 
-        ///  <seealso cref="Show"/>
+        ///  <seealso cref="On"/>
         /// </summary>
         /// <param name="isOwner">true if a local user initiated this call</param>
-        protected override void Hide(bool isOwner)
+        protected override void Off(bool isOwner)
         {
             // If labels are disabled, we don't need to do anything
             if (LabelsEnabled() && nodeLabel != null)

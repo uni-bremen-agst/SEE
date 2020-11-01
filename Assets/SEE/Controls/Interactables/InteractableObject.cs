@@ -90,16 +90,6 @@ namespace SEE.Controls
         public Net.Synchronizer InteractableSynchronizer { get; private set; }
 
         /// <summary>
-        /// The local selection color of the outline.
-        /// </summary>
-        private readonly Color LocalSelectColor = Utils.ColorPalette.Viridis(0.4f);
-
-        /// <summary>
-        /// The remote selection color of the outline.
-        /// </summary>
-        private readonly Color RemoteSelectColor = Utils.ColorPalette.Viridis(0.6f);
-
-        /// <summary>
         /// The local grabbing color of the outline.
         /// </summary>
         private readonly Color LocalGrabColor = Utils.ColorPalette.Viridis(0.8f);
@@ -110,7 +100,7 @@ namespace SEE.Controls
         private readonly Color RemoteGrabColor = Utils.ColorPalette.Viridis(0.0f);
 
         /// <summary>
-        /// A delegate to be called when a hovering events has happened (hover over
+        /// A delegate to be called when a hovering event has happened (hover over
         /// or hover off the game object).
         /// </summary>
         public delegate void HoverAction(bool isOwner);
@@ -122,6 +112,20 @@ namespace SEE.Controls
         /// Event to be triggered when this game object is no longer hovered over.
         /// </summary>
         public event HoverAction HoverOut;
+
+        /// <summary>
+        /// A delegate to be called when a selection event has happened (selecting
+        /// or deselecting the game object).
+        /// </summary>
+        public delegate void SelectAction(bool isOwner);
+        /// <summary>
+        /// Event to be triggered when this game object is being selected.
+        /// </summary>
+        public event SelectAction SelectIn;
+        /// <summary>
+        /// Event to be triggered when this game object is no longer selected.
+        /// </summary>
+        public event SelectAction SelectOut;
 
         private void Awake()
         {
@@ -195,40 +199,21 @@ namespace SEE.Controls
         {
             IsSelected = select;
 
-            if (!IsGrabbed)
+            if (!IsGrabbed && !IsSelected && IsHovered)
             {
-                bool hasOutline = TryGetComponent(out Outline outline);
-
-                if (select)
-                {
-                    if (hasOutline)
-                    {
-                        outline.SetColor(isOwner ? LocalSelectColor : RemoteSelectColor);
-                    }
-                    else
-                    {
-                        Outline.Create(gameObject, isOwner ? LocalSelectColor : RemoteSelectColor);
-                    }
-                }
-                else
-                {
-                    if (IsHovered)
-                    {
-                        SetHover(true, isOwner);
-                    }
-                    else if (hasOutline)
-                    {
-                        DestroyImmediate(outline);
-                    }
-                }
+                // Hovering is a continuous operation, that is why we call it here
+                // when the object is in the focus but neither grabbed nor selected.
+                SetHover(true, isOwner);
             }
 
             if (select)
             {
+                SelectIn?.Invoke(isOwner);
                 SelectedObjects.Add(this);
             }
             else
             {
+                SelectOut?.Invoke(isOwner);
                 SelectedObjects.Remove(this);
             }
 
