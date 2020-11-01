@@ -21,10 +21,11 @@ namespace SEE.Controls
             Interactable interactable = gameNode.AddComponent<Interactable>(); // enable interactions
             interactable.highlightOnHover = false;
             gameNode.AddComponent<InteractableObject>();
-            // The following addition of ShowLabel must come after the addtion of InteractableObject
-            // because ShowLabel requires the presence of an InteractableObject.
+            // The following additions of components must come after the addtion of InteractableObject
+            // because they require the presence of an InteractableObject.
             gameNode.AddComponent<ShowLabel>();
             gameNode.AddComponent<ShowHovering>();
+            gameNode.AddComponent<ShowSelection>();            
         }
 
         /// <summary>
