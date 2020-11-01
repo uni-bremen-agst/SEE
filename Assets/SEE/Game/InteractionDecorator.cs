@@ -25,7 +25,8 @@ namespace SEE.Controls
             // because they require the presence of an InteractableObject.
             gameNode.AddComponent<ShowLabel>();
             gameNode.AddComponent<ShowHovering>();
-            gameNode.AddComponent<ShowSelection>();            
+            gameNode.AddComponent<ShowSelection>();
+            gameNode.AddComponent<ShowGrabbing>();            
         }
 
         /// <summary>
