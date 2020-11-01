@@ -90,16 +90,6 @@ namespace SEE.Controls
         public Net.Synchronizer InteractableSynchronizer { get; private set; }
 
         /// <summary>
-        /// The local hovering color of the outline.
-        /// </summary>
-        private readonly Color LocalHoverColor = Utils.ColorPalette.Viridis(0.0f);
-
-        /// <summary>
-        /// The remote hovering color of the outline.
-        /// </summary>
-        private readonly Color RemoteHoverColor = Utils.ColorPalette.Viridis(0.2f);
-
-        /// <summary>
         /// The local selection color of the outline.
         /// </summary>
         private readonly Color LocalSelectColor = Utils.ColorPalette.Viridis(0.4f);
@@ -123,7 +113,7 @@ namespace SEE.Controls
         /// A delegate to be called when a hovering events has happened (hover over
         /// or hover off the game object).
         /// </summary>
-        public delegate void HoverAction();
+        public delegate void HoverAction(bool isOwner);
         /// <summary>
         /// Event to be triggered when this game object is being hovered over.
         /// </summary>
@@ -163,7 +153,13 @@ namespace SEE.Controls
         #region Interaction
 
         /// <summary>
-        /// Visually emphasizes this object for hovering.
+        /// Visually emphasizes this object for hovering. 
+        /// 
+        /// Note: This method may be called locally when a local user interacts with the
+        /// object or remotely when a remote user has interacted with the object. In the
+        /// former case, <paramref name="isOwner"/> will be true. In the
+        /// latter case, it will be called via <see cref="SEE.Net.SetHoverAction.ExecuteOnClient()"/>
+        /// where <paramref name="isOwner"/> is false.
         /// </summary>
         /// <param name="hover">Whether this object should be hovered.</param>
         /// <param name="isOwner">Whether this client is initiating the hovering action.
@@ -172,38 +168,14 @@ namespace SEE.Controls
         {
             IsHovered = hover;
 
-            if (!IsSelected && !IsGrabbed)
-            {
-                bool hasOutline = TryGetComponent(out Outline outline);
-
-                if (hover)
-                {
-                    if (hasOutline)
-                    {
-                        outline.SetColor(isOwner ? LocalHoverColor : RemoteHoverColor);
-                    }
-                    else
-                    {
-                        Outline.Create(gameObject, isOwner ? LocalHoverColor : RemoteHoverColor);
-                    }
-                }
-                else
-                {                    
-                    if (hasOutline)
-                    {
-                        DestroyImmediate(outline);
-                    }
-                }
-            }
-
             if (hover)
             {
-                HoverIn?.Invoke();
+                HoverIn?.Invoke(isOwner);
                 HoveredObjects.Add(this);
             }
             else
             {
-                HoverOut?.Invoke();
+                HoverOut?.Invoke(isOwner);
                 HoveredObjects.Remove(this);
             }
 

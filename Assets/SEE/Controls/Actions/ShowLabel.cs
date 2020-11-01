@@ -15,7 +15,7 @@ namespace SEE.Controls.Actions
     /// object. In between that label and the game object, a connecting bar
     /// will be shown.
     /// </summary>
-    public class ShowLabel : InteractableObjectAction
+    public class ShowLabel : InteractableObjectHoveringAction
     {
         /// <summary>
         /// Sets <see cref="isLeaf"/> and <see cref="city"/>.
@@ -27,38 +27,6 @@ namespace SEE.Controls.Actions
             GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
             Assert.IsTrue(codeCityObject != null);
             codeCityObject.TryGetComponent(out city);
-        }
-
-        /// <summary>
-        /// Registers Show() and Hide() for the respective hovering events.
-        /// </summary>
-        void OnEnable()
-        {            
-            if (interactable != null)
-            {
-                interactable.HoverIn += Show;
-                interactable.HoverOut += Hide;
-            }
-            else
-            {
-                Debug.LogErrorFormat("ShowLabel.OnEnable for {0} has NO interactable.\n", name);
-            }
-        }
-
-        /// <summary>
-        /// Unregisters Show() and Hide() from the respective hovering events.
-        /// </summary>
-        void OnDisable()
-        {            
-            if (interactable != null)
-            {
-                interactable.HoverIn -= Show;
-                interactable.HoverOut -= Hide;
-            }
-            else
-            {
-                Debug.LogErrorFormat("ShowLabel.OnDisable for {0} has NO interactable.\n", name);
-            }
         }
 
         /// <summary>
@@ -89,7 +57,8 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Creates a text label above the object with its node's SourceName if the label doesn't exist yet.
         /// </summary>
-        private void Show()
+        /// <param name="isOwner">true if a local user initiated this call</param>
+        protected override void Show(bool isOwner)
         {
             if (!LabelsEnabled())
             {
@@ -130,9 +99,11 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Destroys the text label above the object if it exists.
+        /// 
+        ///  <seealso cref="Show"/>
         /// </summary>
-        /// <seealso cref="Show"/>
-        private void Hide()
+        /// <param name="isOwner">true if a local user initiated this call</param>
+        protected override void Hide(bool isOwner)
         {
             // If labels are disabled, we don't need to do anything
             if (LabelsEnabled() && nodeLabel != null)
