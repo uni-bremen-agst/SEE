@@ -89,16 +89,9 @@ namespace SEE.Controls
         /// </summary>
         public Net.Synchronizer InteractableSynchronizer { get; private set; }
 
-        /// <summary>
-        /// The local grabbing color of the outline.
-        /// </summary>
-        private readonly Color LocalGrabColor = Utils.ColorPalette.Viridis(0.8f);
-
-        /// <summary>
-        /// The remote grabbing color of the outline.
-        /// </summary>
-        private readonly Color RemoteGrabColor = Utils.ColorPalette.Viridis(0.0f);
-
+        /// ----------------------------
+        /// Hovering event system
+        /// ----------------------------
         /// <summary>
         /// A delegate to be called when a hovering event has happened (hover over
         /// or hover off the game object).
@@ -113,6 +106,9 @@ namespace SEE.Controls
         /// </summary>
         public event HoverAction HoverOut;
 
+        /// ----------------------------
+        /// Selection event system
+        /// ----------------------------
         /// <summary>
         /// A delegate to be called when a selection event has happened (selecting
         /// or deselecting the game object).
@@ -126,6 +122,23 @@ namespace SEE.Controls
         /// Event to be triggered when this game object is no longer selected.
         /// </summary>
         public event SelectAction SelectOut;
+
+        /// ----------------------------
+        /// Grabbing event system
+        /// ----------------------------
+        /// <summary>
+        /// A delegate to be called when a grab event has happened (grabbing
+        /// or releasing the game object).
+        /// </summary>
+        public delegate void GrabAction(bool isOwner);
+        /// <summary>
+        /// Event to be triggered when this game object is being grabbed.
+        /// </summary>
+        public event GrabAction GrabIn;
+        /// <summary>
+        /// Event to be triggered when this game object is no longer grabbed.
+        /// </summary>
+        public event GrabAction GrabOut;
 
         private void Awake()
         {
@@ -226,30 +239,23 @@ namespace SEE.Controls
         /// <summary>
         /// Visually emphasizes this object for grabbing.
         /// </summary>
-        /// <param name="hover">Whether this object should be grabbed.</param>
+        /// <param name="grab">Whether this object should be grabbed.</param>
         /// <param name="isOwner">Whether this client is initiating the grabbing action.
         /// </param>
         public void SetGrab(bool grab, bool isOwner)
         {
             IsGrabbed = grab;
 
-            bool hasOutline = TryGetComponent(out Outline outline);
-
             if (grab)
             {
-                if (hasOutline)
-                {
-                    outline.SetColor(isOwner ? LocalGrabColor : RemoteGrabColor);
-                }
-                else
-                {
-                    Outline.Create(gameObject, isOwner ? LocalGrabColor : RemoteGrabColor);
-                }
-
+                GrabIn?.Invoke(isOwner);
                 GrabbedObjects.Add(this);
             }
             else
             {
+                GrabOut?.Invoke(isOwner);
+                // Hovering and selection are continuous operations, that is why we call them here
+                // when the object is in the focus but not grabbed any longer.
                 if (IsSelected)
                 {
                     SetSelect(true, isOwner);
@@ -258,11 +264,6 @@ namespace SEE.Controls
                 {
                     SetHover(true, isOwner);
                 }
-                else if (hasOutline)
-                {
-                    DestroyImmediate(outline);
-                }
-
                 GrabbedObjects.Remove(this);
             }
 
