@@ -89,57 +89,6 @@ namespace SEE.Controls
         /// </summary>
         public Net.Synchronizer InteractableSynchronizer { get; private set; }
 
-        /// ----------------------------
-        /// Hovering event system
-        /// ----------------------------
-        /// <summary>
-        /// A delegate to be called when a hovering event has happened (hover over
-        /// or hover off the game object).
-        /// </summary>
-        public delegate void HoverAction(bool isOwner);
-        /// <summary>
-        /// Event to be triggered when this game object is being hovered over.
-        /// </summary>
-        public event HoverAction HoverIn;
-        /// <summary>
-        /// Event to be triggered when this game object is no longer hovered over.
-        /// </summary>
-        public event HoverAction HoverOut;
-
-        /// ----------------------------
-        /// Selection event system
-        /// ----------------------------
-        /// <summary>
-        /// A delegate to be called when a selection event has happened (selecting
-        /// or deselecting the game object).
-        /// </summary>
-        public delegate void SelectAction(bool isOwner);
-        /// <summary>
-        /// Event to be triggered when this game object is being selected.
-        /// </summary>
-        public event SelectAction SelectIn;
-        /// <summary>
-        /// Event to be triggered when this game object is no longer selected.
-        /// </summary>
-        public event SelectAction SelectOut;
-
-        /// ----------------------------
-        /// Grabbing event system
-        /// ----------------------------
-        /// <summary>
-        /// A delegate to be called when a grab event has happened (grabbing
-        /// or releasing the game object).
-        /// </summary>
-        public delegate void GrabAction(bool isOwner);
-        /// <summary>
-        /// Event to be triggered when this game object is being grabbed.
-        /// </summary>
-        public event GrabAction GrabIn;
-        /// <summary>
-        /// Event to be triggered when this game object is no longer grabbed.
-        /// </summary>
-        public event GrabAction GrabOut;
-
         private void Awake()
         {
             ID = nextID++;
@@ -285,6 +234,62 @@ namespace SEE.Controls
         #endregion
 
         #region Events
+
+        ///------------------------------------------------------------------
+        /// Actions can register on selection, hovering, and grabbing events.
+        /// Then they will be invoked if those events occur.
+        ///------------------------------------------------------------------
+        ///
+        /// ----------------------------
+        /// Hovering event system
+        /// ----------------------------
+        /// <summary>
+        /// A delegate to be called when a hovering event has happened (hover over
+        /// or hover off the game object).
+        /// </summary>
+        public delegate void HoverAction(bool isOwner);
+        /// <summary>
+        /// Event to be triggered when this game object is being hovered over.
+        /// </summary>
+        public event HoverAction HoverIn;
+        /// <summary>
+        /// Event to be triggered when this game object is no longer hovered over.
+        /// </summary>
+        public event HoverAction HoverOut;
+
+        /// ----------------------------
+        /// Selection event system
+        /// ----------------------------
+        /// <summary>
+        /// A delegate to be called when a selection event has happened (selecting
+        /// or deselecting the game object).
+        /// </summary>
+        public delegate void SelectAction(bool isOwner);
+        /// <summary>
+        /// Event to be triggered when this game object is being selected.
+        /// </summary>
+        public event SelectAction SelectIn;
+        /// <summary>
+        /// Event to be triggered when this game object is no longer selected.
+        /// </summary>
+        public event SelectAction SelectOut;
+
+        /// ----------------------------
+        /// Grabbing event system
+        /// ----------------------------
+        /// <summary>
+        /// A delegate to be called when a grab event has happened (grabbing
+        /// or releasing the game object).
+        /// </summary>
+        public delegate void GrabAction(bool isOwner);
+        /// <summary>
+        /// Event to be triggered when this game object is being grabbed.
+        /// </summary>
+        public event GrabAction GrabIn;
+        /// <summary>
+        /// Event to be triggered when this game object is no longer grabbed.
+        /// </summary>
+        public event GrabAction GrabOut;
 
         //----------------------------------------------------------------
         // Mouse actions
