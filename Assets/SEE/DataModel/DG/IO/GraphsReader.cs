@@ -20,10 +20,9 @@
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
+using System.IO;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -38,26 +37,34 @@ namespace SEE.DataModel.DG.IO
         public readonly List<Graph> graphs = new List<Graph>();
 
         /// <summary>
-        /// Loads all GXL files (limited to <paramref name="maxRevisionsToLoad"/> many 
-        /// files) from <paramref name="directory"/> and and saves all loaded graph data.
+        /// Loads all GXL and their associated CSV files (limited to <paramref name="maxRevisionsToLoad"/> many 
+        /// files) from <paramref name="directory"/> and saves these in <see cref="graphs"/>. 
+        /// 
+        /// For every GXL file, F.gxl , contained in <paramref name="directory"/>, the graph
+        /// data therein will be loaded into a new graph that is then added to <see cref="graphs"/>.
+        /// If there is a file F.csv contained in <paramref name="directory"/>, this file is assumed
+        /// to carry additional metrics for the graph nodes. These metrics will be read and added to
+        /// the nodes in the loaded graph where the unique node ID is used to identify the node to
+        /// which the metrics are to be added.
         /// </summary>
         /// <param name="directory">the directory path where the GXL file are located in</param>
         /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
         /// <param name="maxRevisionsToLoad">the upper limit of files to be loaded</param>
         public void Load(string directory, HashSet<string> hierarchicalEdgeTypes, int maxRevisionsToLoad)
         {
-            IEnumerable<string> sortedGraphNames = GXLFilenames(directory);
+            IEnumerable<string> sortedGraphNames = Filenames.GXLFilenames(directory);
             if (sortedGraphNames.Count<string>() == 0)
             {
                 throw new Exception("Directory '" + directory + "' has no GXL files.");
             }
             graphs.Clear();
 
-            SEE.Utils.Performance p = SEE.Utils.Performance.Begin("Loading GXL files from " + directory);
+            Performance p = Performance.Begin("Loading GXL files from " + directory);
             // for all found GXL files load and save the graph data
             foreach (string gxlPath in sortedGraphNames)
             {
-                // load graph
+                // load graph (we can safely assume that the file exists because we retrieved its 
+                // name just from the directory
                 GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes, gxlPath, new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
@@ -69,6 +76,20 @@ namespace SEE.DataModel.DG.IO
                 }
                 else
                 {
+                    string csvFilename = Path.ChangeExtension(gxlPath, Filenames.CSVExtension);
+                    if (File.Exists(csvFilename))
+                    {
+                        Debug.LogFormat("Loading CSV file {0}.\n", csvFilename);
+                        int numberOfErrors = MetricImporter.Load(graph, csvFilename, ';');
+                        if (numberOfErrors > 0)
+                        {
+                            Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", csvFilename, numberOfErrors);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarningFormat("CSV file {0} does not exist.\n", csvFilename);
+                    }
                     maxRevisionsToLoad--;
                     graphs.Add(graph);
                 }
@@ -81,58 +102,6 @@ namespace SEE.DataModel.DG.IO
             Debug.Log("Number of graphs loaded: " + graphs.Count + "\n");
         }
 
-        /// <summary>
-        /// Returns the sorted list of GXL filenames of the given <paramref name="directory"/>.
-        /// 
-        /// Precondition: <paramref name="directory"/> must not be null or empty and must exist
-        /// as a directory in the file system.
-        /// </summary>
-        /// <param name="directory">name of the directory in which to search for GXL files</param>
-        /// <returns>sorted list of GXL filenames</returns>
-        public static IEnumerable<string> GXLFilenames(string directory)
-        {
-            if (String.IsNullOrEmpty(directory))
-            {
-                throw new Exception("Directory not set.");
-            }
-            else if (!Directory.Exists(directory))
-            {
-                throw new Exception("Directory " + directory + " does not exist.");
-            }
 
-            // get all GXL files sorted by numbers in their name
-            IEnumerable<string> sortedGraphNames = Directory
-                .GetFiles(directory, "*.gxl", SearchOption.TopDirectoryOnly)
-                .Where(e => !string.IsNullOrEmpty(e));
-
-            sortedGraphNames = sortedGraphNames.Distinct().NumericalSort();
-            return sortedGraphNames;
-        }
-    }
-
-    /// <summary>
-    /// Extension for IEnumerable<string>, that sorts by numbers in the string.
-    /// For example {a-1, a-11, a-2} becomes {a-1, a-2, a-11}.
-    /// </summary>
-    internal static class NumericalSortExtension
-    {
-        /// <summary>
-        /// Sorts the given IEnumerable<string> by numbers contained in the string.
-        /// For example {a-1, a-11, a-2} becomes {a-1, a-2, a-11}.
-        /// </summary>
-        /// <param name="list">An IEnumerable<string> to be sorted</param>
-        /// <returns>The passed list sorted by numbers</returns>
-        public static IEnumerable<string> NumericalSort(this IEnumerable<string> list)
-        {
-            int maxLen = list.Select(s => s.Length).Max();
-
-            return list.Select(s => new
-            {
-                OrgStr = s,
-                SortStr = Regex.Replace(s, @"(\d+)|(\D+)", m => m.Value.PadLeft(maxLen, char.IsDigit(m.Value[0]) ? ' ' : '\xffff'))
-            })
-            .OrderBy(x => x.SortStr)
-            .Select(x => x.OrgStr);
-        }
     }
 }

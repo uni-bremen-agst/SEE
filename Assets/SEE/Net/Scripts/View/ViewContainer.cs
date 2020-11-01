@@ -43,7 +43,7 @@ namespace SEE.Net
         /// <summary>
         /// All views, this view container manages.
         /// </summary>
-        [SerializeField] private readonly AbstractView[] views = new AbstractView[1];
+        [SerializeField] private AbstractView[] views = new AbstractView[1];
 
 
 
