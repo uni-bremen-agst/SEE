@@ -24,6 +24,7 @@ namespace SEE.Controls
             // The following addition of ShowLabel must come after the addtion of InteractableObject
             // because ShowLabel requires the presence of an InteractableObject.
             gameNode.AddComponent<ShowLabel>();
+            gameNode.AddComponent<ShowHovering>();
         }
 
         /// <summary>
