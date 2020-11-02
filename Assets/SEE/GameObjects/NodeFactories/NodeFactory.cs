@@ -38,7 +38,7 @@ namespace SEE.GO
         /// queue of the new block. The higher the value, the later the object
         /// will be drawn. This parameter can be used in for the rendering of
         /// transparent objects, where the inner nodes must be rendered before
-        /// the leafes to ensure correct sorting.</param>
+        /// the leaves to ensure correct sorting.</param>
         public abstract GameObject NewBlock(int style = 0, int renderQueueOffset = 0);
 
         /// <summary>
