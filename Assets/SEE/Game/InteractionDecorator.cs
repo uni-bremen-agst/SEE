@@ -26,7 +26,8 @@ namespace SEE.Controls
             gameNode.AddComponent<ShowLabel>();
             gameNode.AddComponent<ShowHovering>();
             gameNode.AddComponent<ShowSelection>();
-            gameNode.AddComponent<ShowGrabbing>();            
+            gameNode.AddComponent<ShowGrabbing>();
+            gameNode.AddComponent<ShowMenu>();
         }
 
         /// <summary>
