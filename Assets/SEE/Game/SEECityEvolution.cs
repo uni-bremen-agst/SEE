@@ -94,6 +94,10 @@ namespace SEE.Game
         {
             GraphsReader reader = new GraphsReader();
             reader.Load(PathPrefix, HierarchicalEdges, 1);
+
+
+             
+
             List<Graph> graphs = reader.graphs;
             if (graphs.Count == 0)
             {
@@ -101,7 +105,10 @@ namespace SEE.Game
             }
             else
             {
-                return graphs.First<Graph>();
+                Graph graph = graphs.First<Graph>();
+                graph = RelevantGraph(graph);
+                LoadDataForGraphListing(graph);
+                return graph;
             }
         }
 
