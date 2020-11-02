@@ -939,5 +939,107 @@ namespace SEE.DataModel.DG
             // we are using the viewName which is intended to be unique
             return name.GetHashCode();
         }
+
+        /// <summary>
+        /// All names of integer attributes of all nodes in the graph.
+        /// </summary>
+        /// <returns>names of integer node attributes</returns>
+        public List<string> AllIntNodeAttributes()
+        {
+            return AllNodeAttributes(AllIntAttributeNames);
+        }
+
+        /// <summary>
+        /// All names of float attributes of all nodes in the graph.
+        /// </summary>
+        /// <returns>names of float node attributes</returns>
+        public List<string> AllFloatNodeAttributes()
+        {
+            return AllNodeAttributes(AllFloatAttributeNames);
+        }
+
+        /// <summary>
+        /// All names of toggle attributes of all nodes in the graph.
+        /// </summary>
+        /// <returns>names of toggle node attributes</returns>
+        public List<string> AllToggleNodeAttributes()
+        {
+            return AllNodeAttributes(AllToggleAttributeNames);
+        }
+
+        /// <summary>
+        /// All names of string attributes of all nodes in the graph.
+        /// </summary>
+        /// <returns>names of string node attributes</returns>
+        public List<string> AllStringNodeAttributes()
+        {
+            return AllNodeAttributes(AllStringAttributeNames);
+        }
+
+        /// <summary>
+        /// Returns the attribute names of given <paramref name="node"/>.
+        /// </summary>
+        /// <param name="node">the node whose attribute names are to be retrieved</param>
+        /// <returns>attribute names of a particular type</returns>
+        private delegate ICollection<string> AllAttributeNames(Node node);
+
+        /// <summary>
+        /// Yields all string attribute names of given <paramref name="node"/>.
+        /// </summary>
+        /// <param name="node">node whose string attributes are to be retrieved</param>
+        /// <returns>all string attribute names</returns>
+        private ICollection<string> AllStringAttributeNames(Node node)
+        {
+            return node.StringAttributes.Keys;
+        }
+
+        /// <summary>
+        /// Yields all toggle attribute names of given <paramref name="node"/>.
+        /// </summary>
+        /// <param name="node">node whose toggle attributes are to be retrieved</param>
+        /// <returns>all toggle attribute names</returns>
+        private ICollection<string> AllToggleAttributeNames(Node node)
+        {
+            return node.ToggleAttributes;
+        }
+
+        /// <summary>
+        /// Yields all float attribute names of given <paramref name="node"/>.
+        /// </summary>
+        /// <param name="node">node whose float attributes are to be retrieved</param>
+        /// <returns>all float attribute names</returns>
+        private ICollection<string> AllFloatAttributeNames(Node node)
+        {
+            return node.FloatAttributes.Keys;
+        }
+
+        /// <summary>
+        /// Yields all integer attribute names of given <paramref name="node"/>.
+        /// </summary>
+        /// <param name="node">node whose integer attributes are to be retrieved</param>
+        /// <returns>all integer attribute names</returns>
+        private ICollection<string> AllIntAttributeNames(Node node)
+        {
+            return node.IntAttributes.Keys;
+        }
+
+        /// <summary>
+        /// Returns all node attribute names collected via given <paramref name="attributeNames"/>
+        /// over all nodes in the graph.
+        /// </summary>
+        /// <param name="attributeNames">yields the node attribute names to collect</param>
+        /// <returns>all node attribute names collected via <paramref name="attributeNames"/></returns>
+        private List<string> AllNodeAttributes(AllAttributeNames attributeNames)
+        {
+            HashSet<string> result = new HashSet<string>();
+            foreach (Node node in Nodes())
+            {
+                foreach (string name in attributeNames(node))
+                {
+                    result.Add(name);
+                }
+            }
+            return result.ToList<string>();
+        }
     }
 }
