@@ -106,6 +106,8 @@ namespace SEE.Game
             else
             {
                 Graph graph = graphs.First<Graph>();
+                
+                
                 graph = RelevantGraph(graph);
                 LoadDataForGraphListing(graph);
                 return graph;
@@ -118,6 +120,7 @@ namespace SEE.Game
         /// <param name="graph">graph to be drawn</param>
         public void DrawGraph(Graph graph)
         {
+           
             DrawGraphs(new List<Graph>() { graph });
         }
 
@@ -151,7 +154,13 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graphs">the series of graph to be drawn</param>
         private void DrawGraphs(List<Graph> graphs)
-        {
+        {   
+            foreach(Graph g in graphs)
+            {
+                Graph graph= RelevantGraph(g);
+                LoadDataForGraphListing(graph);
+            }
+
             evolutionRenderer = CreateEvolutionRenderer();
             evolutionRenderer.ShowGraphEvolution(graphs);
         }
