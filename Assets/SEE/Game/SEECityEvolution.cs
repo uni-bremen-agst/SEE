@@ -150,9 +150,9 @@ namespace SEE.Game
         {   
             foreach(Graph g in graphs)
             {
-                Graph graph= RelevantGraph(g);
-                LoadDataForGraphListing(graph);
-                graph.FinalizeGraph(); 
+                RelevantGraph(g);
+                LoadDataForGraphListing(g);
+                g.FinalizeGraph();             
             }
             evolutionRenderer = CreateEvolutionRenderer();
             evolutionRenderer.ShowGraphEvolution(graphs);

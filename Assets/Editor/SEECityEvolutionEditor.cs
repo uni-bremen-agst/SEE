@@ -39,17 +39,26 @@ namespace SEEEditor
         /// </summary>
         private Graph graph = null;
 
+        private bool alreadyLoaded = false;
+
         /// <summary>
         /// Creates the buttons for loading the first graph of the evolution series.
         /// </summary>
         protected void Buttons()
         {
             SEECityEvolution city = target as SEECityEvolution;
-            if (GUILayout.Button("Load First Graph"))
+            if (GUILayout.Button("Load First Graph / Reset"))
             {
+                if (alreadyLoaded)
+                {
+                    city.Reset();
+                    alreadyLoaded = false;
+                }
                 graph = city.LoadFirstGraph();
                 city.InspectSchema(graph);
                 isGraphLoaded = true;
+                alreadyLoaded = true;
+
             }
             if (isGraphLoaded)
             {
