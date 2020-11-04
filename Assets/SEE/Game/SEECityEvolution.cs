@@ -121,8 +121,7 @@ namespace SEE.Game
         /// <param name="graph">graph to be drawn</param>
         public void DrawGraph(Graph graph)
         {
-            graph = RelevantGraph(graph);
-            LoadDataForGraphListing(graph);
+          
             DrawGraphs(new List<Graph>() { graph });
         }
 
