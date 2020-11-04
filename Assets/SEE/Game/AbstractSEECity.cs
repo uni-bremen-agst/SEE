@@ -236,10 +236,7 @@ namespace SEE.Game
         /// <returns>subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/></returns>
         protected Graph RelevantGraph(Graph graph)
         {
-            foreach (KeyValuePair<string, bool> k in nodeTypes)
-            {
-                UnityEngine.Debug.Log("2.NODETYPE: " + k.Key +" " + k.Value);
-            }
+            
             if (AllNodeTypesAreRelevant)
             {
                 return graph;
