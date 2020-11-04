@@ -56,7 +56,8 @@ namespace SEEEditor
                 if (GUILayout.Button("Draw"))
                 {
                     if (graph != null)
-                    {    graph = RelevantGraph(graph);
+                    {   
+                        graph = city.LoadFirstGraph();
                         DrawGraph(city, graph);
                     }
                     else
