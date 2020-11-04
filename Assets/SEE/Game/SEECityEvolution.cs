@@ -23,6 +23,7 @@ using SEE.Game.Evolution;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+ 
 
 namespace SEE.Game
 {
@@ -110,6 +111,7 @@ namespace SEE.Game
                 
                 graph = RelevantGraph(graph);
                 LoadDataForGraphListing(graph);
+                
                 return graph;
             }
         }
@@ -159,6 +161,7 @@ namespace SEE.Game
             {
                 Graph graph= RelevantGraph(g);
                 LoadDataForGraphListing(graph);
+                graph.FinalizeGraph(); 
             }
 
             evolutionRenderer = CreateEvolutionRenderer();
