@@ -37,6 +37,8 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The text label that's displayed above the object when the user hovers over it.
         /// Will be <code>null</code> when the label is not currently being displayed.
+        /// This nodeLabel will contain a TextMeshPro component for the label text and a
+        /// LineRenderer that connects the labeled object and the label text visually.
         /// </summary>
         private GameObject nodeLabel;
 
@@ -82,6 +84,7 @@ namespace SEE.Controls.Actions
             position.y += isLeaf ? city.LeafLabelDistance : city.InnerNodeLabelDistance;
             nodeLabel = TextFactory.GetTextWithSize(node.SourceName, position,
                 isLeaf ? city.LeafLabelFontSize : city.InnerNodeLabelFontSize, textColor: Color.black);
+            nodeLabel.name = "Label " + node.SourceName;
             nodeLabel.transform.SetParent(gameObject.transform);
 
             // Add connecting line between "roof" of object and text
