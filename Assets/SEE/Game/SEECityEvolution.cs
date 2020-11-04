@@ -54,6 +54,8 @@ namespace SEE.Game
         /// </summary>
         [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
         public float MarkerWidth = 0.01f;
+
+       
         
         /// <summary>
         /// Factory method to create the used EvolutionRenderer.
@@ -93,11 +95,9 @@ namespace SEE.Game
         /// <returns>the loaded graph or null if none could be found</returns>
         public Graph LoadFirstGraph()
         {
+            
             GraphsReader reader = new GraphsReader();
             reader.Load(PathPrefix, HierarchicalEdges, 1);
-
-
-             
 
             List<Graph> graphs = reader.graphs;
             if (graphs.Count == 0)
@@ -107,7 +107,6 @@ namespace SEE.Game
             else
             {
                 Graph graph = graphs.First<Graph>();
-                
                 
                 graph = RelevantGraph(graph);
                 LoadDataForGraphListing(graph);
@@ -122,7 +121,8 @@ namespace SEE.Game
         /// <param name="graph">graph to be drawn</param>
         public void DrawGraph(Graph graph)
         {
-           
+            graph = RelevantGraph(graph);
+            LoadDataForGraphListing(graph);
             DrawGraphs(new List<Graph>() { graph });
         }
 
