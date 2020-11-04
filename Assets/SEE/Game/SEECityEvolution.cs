@@ -23,7 +23,6 @@ using SEE.Game.Evolution;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
- 
 
 namespace SEE.Game
 {
@@ -54,8 +53,6 @@ namespace SEE.Game
         /// </summary>
         [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
         public float MarkerWidth = 0.01f;
-
-       
         
         /// <summary>
         /// Factory method to create the used EvolutionRenderer.
@@ -94,11 +91,9 @@ namespace SEE.Game
         /// </summary>
         /// <returns>the loaded graph or null if none could be found</returns>
         public Graph LoadFirstGraph()
-        {
-            
+        {           
             GraphsReader reader = new GraphsReader();
             reader.Load(PathPrefix, HierarchicalEdges, 1);
-
             List<Graph> graphs = reader.graphs;
             if (graphs.Count == 0)
             {
@@ -106,11 +101,9 @@ namespace SEE.Game
             }
             else
             {
-                Graph graph = graphs.First<Graph>();
-                
+                Graph graph = graphs.First<Graph>();                
                 graph = RelevantGraph(graph);
-                LoadDataForGraphListing(graph);
-                
+                LoadDataForGraphListing(graph);               
                 return graph;
             }
         }
@@ -120,8 +113,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph to be drawn</param>
         public void DrawGraph(Graph graph)
-        {
-          
+        {  
             DrawGraphs(new List<Graph>() { graph });
         }
 
@@ -150,7 +142,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Creates <see cref="evolutionRenderer"/> and shows the complete graph
+        /// Creates <see cref="evolutionRenderer"/> and shows the selected node-types of the graph
         /// evolution for given <paramref name="graphs"/> using it.
         /// </summary>
         /// <param name="graphs">the series of graph to be drawn</param>
@@ -162,7 +154,6 @@ namespace SEE.Game
                 LoadDataForGraphListing(graph);
                 graph.FinalizeGraph(); 
             }
-
             evolutionRenderer = CreateEvolutionRenderer();
             evolutionRenderer.ShowGraphEvolution(graphs);
         }
