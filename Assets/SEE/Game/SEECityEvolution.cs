@@ -103,7 +103,7 @@ namespace SEE.Game
             {
                 Graph graph = graphs.First<Graph>();                
                 graph = RelevantGraph(graph);
-                LoadDataForGraphListing(graph);               
+                graph.FinalizeGraph();
                 return graph;
             }
         }
