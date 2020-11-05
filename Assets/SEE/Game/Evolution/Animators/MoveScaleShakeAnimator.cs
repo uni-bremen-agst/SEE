@@ -112,6 +112,21 @@ namespace SEE.Game.Evolution
             // Shake the object if it was modified.
             if (wasModified)
             {
+                // Changes the modified object's color to blue while animating
+                gameObject.GetComponent<Renderer>().material.color = Color.blue;
+                // Generate power beam above updated objects
+                GameObject powerBeam = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                powerBeam.transform.localScale = new Vector3(0.01f, 10f, 0.01f);
+                powerBeam.transform.position = new Vector3(position.x, position.y, position.z);
+                // Color of the power beam
+                Color beamColor = new Color(0, 255, 0);
+                // Change power beam material color
+                powerBeam.GetComponent<Renderer>().material.color = beamColor;
+                // Set power beam material to emissive with intensity 3
+                powerBeam.GetComponent<Renderer>().material.EnableKeyword("_EMISSION");
+                // TODO GLOW NOT WORKING
+                powerBeam.GetComponent<Renderer>().material.SetColor("_EMISSION",beamColor * 3);
+
                 if (mustCallBack)
                 {
                     iTween.ShakeRotation(gameObject, iTween.Hash(
