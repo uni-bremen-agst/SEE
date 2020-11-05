@@ -20,6 +20,7 @@
 using SEE.Layout;
 using System;
 using UnityEngine;
+using DG.Tweening;
 
 namespace SEE.Game.Evolution
 {
@@ -52,20 +53,23 @@ namespace SEE.Game.Evolution
             gameObject.transform.localScale = layout.LocalScale;
             if (callBackTarget != null)
             {
-                iTween.MoveTo(gameObject, iTween.Hash(
-                    "position", layout.CenterPosition,
-                    "time", MaxAnimationTime,
-                    "oncompletetarget", callBackTarget,
-                    "oncomplete", callbackName,
-                    "oncompleteparams", gameObject
-                ));
+                gameObject.transform.DOMove(layout.CenterPosition, MaxAnimationTime);
+
+                //       iTween.MoveTo(gameObject, iTween.Hash(
+                //       "position", layout.CenterPosition,
+                //"time", MaxAnimationTime,
+                //"oncompletetarget", callBackTarget,
+                //"oncomplete", callbackName,
+                //"oncompleteparams", gameObject
+                //));
             }
             else
             {
-                iTween.MoveTo(gameObject, iTween.Hash(
-                                          "position", layout.CenterPosition,
-                                          "time", MaxAnimationTime
-                ));
+                gameObject.transform.DOMove(layout.CenterPosition, MaxAnimationTime);
+                //iTween.MoveTo(gameObject, iTween.Hash(
+                //"position", layout.CenterPosition,
+                //"time", MaxAnimationTime
+                //));
             }
         }
     }
