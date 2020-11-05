@@ -46,9 +46,11 @@ namespace SEEEditor
         /// </summary>
         protected void Buttons()
         {
+            
             SEECityEvolution city = target as SEECityEvolution;
             if (GUILayout.Button("Load First Graph / Reset"))
             {
+               
                 if (alreadyLoaded)
                 {
                     city.Reset();
@@ -59,15 +61,22 @@ namespace SEEEditor
                 isGraphLoaded = true;
                 alreadyLoaded = true;
 
+                int k  = graph.NodeCount;
+                UnityEngine.Debug.Log("after loading " + k);
+
             }
             if (isGraphLoaded)
             {
                 if (GUILayout.Button("Draw"))
                 {
                     if (graph != null)
+
                     {   
+                        
                         graph = city.LoadFirstGraph();
                         DrawGraph(city, graph);
+                        int n  = graph.NodeCount;
+                        UnityEngine.Debug.Log("after drawing" + n);
                     }
                     else
                     {
