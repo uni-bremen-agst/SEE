@@ -93,12 +93,6 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Whether the city is already available. This might be false in multiplayer
-        /// mode, if the city is created after connecting to the server.
-        /// </summary>
-        protected bool CityAvailable { get; private set; } = false;
-
-        /// <summary>
         /// The transform of the city.
         /// </summary>
         public Transform CityTransform { get; protected set; }
@@ -174,13 +168,11 @@ namespace SEE.Controls
                 if (currentCityTransform == null)
                 {                    
                     CityTransform = null;
-                    CityAvailable = false;
                 }
                 else
                 {
                     // There is a new valid root node. We must update the state.                    
                     CityTransform = currentCityTransform;
-                    CityAvailable = true;
 
                     zoomState.originalScale = CityTransform.localScale;
                     zoomState.zoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps);
