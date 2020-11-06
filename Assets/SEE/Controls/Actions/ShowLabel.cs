@@ -22,7 +22,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected override void Awake()           
         {
-            base.Awake();
+            base.Awake();  // Must be called to register for the hovering events.
             isLeaf = SceneQueries.IsLeaf(gameObject);
             GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
             Assert.IsTrue(codeCityObject != null);
