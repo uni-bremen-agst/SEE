@@ -50,7 +50,7 @@ namespace SEE.GO
             return gameEdge;
         }
 
-        public ICollection<GameObject> DrawEdges(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges)
+        public ICollection<GameObject> DrawEdges(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges, bool draw = false)
         {
             List<GameObject> result = new List<GameObject>(edges.Count);
             if (edges.Count == 0)
@@ -62,6 +62,8 @@ namespace SEE.GO
             {
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);
+
+               // Debug.Log(gameEdge.tag);
 
                 // gameEdge does not yet have a renderer; we add a new one
                 LineRenderer line = gameEdge.AddComponent<LineRenderer>();
@@ -98,7 +100,19 @@ namespace SEE.GO
                 //capsule.transform.LookAt(points[1]);
                 //capsule.height = (points[2] - points[1]).magnitude;
             }
+            
             return result;
         }
+
+
+        /// <summary>
+        /// Calculates the Edge Lines
+        /// </summary>
+        /// <returns>Layout Edge with Points</returns>
+        public ICollection<LayoutEdge> CalculateEdges(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges, bool draw = false)
+        {
+            layout.Create(nodes, edges.Cast<ILayoutEdge>().ToList());
+            return edges;
+    }
     }
 }

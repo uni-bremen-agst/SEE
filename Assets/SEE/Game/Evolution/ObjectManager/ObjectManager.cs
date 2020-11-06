@@ -22,6 +22,7 @@ using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Layout;
 using UnityEngine;
 
 namespace SEE.Game.Evolution
@@ -223,6 +224,8 @@ namespace SEE.Game.Evolution
         /// </summary>
         private ICollection<GameObject> edges;
 
+        private ICollection<LayoutEdge> oldEdges;
+
         /// <summary>
         /// Renders all edges for the nodes in the node cache according to the settings.
         /// If edges for these nodes existed already, their game objects are destroyed first.
@@ -231,7 +234,34 @@ namespace SEE.Game.Evolution
         {
             ClearEdges();
             // FIXME: Provide meaningful values for scaleFactor.
+           
+
             edges = _graphRenderer.EdgeLayout(nodes.Values);
+
+            oldEdges = _graphRenderer.CalculateEdges(nodes.Values);
+
+            
+
+            //Debug.LogFormat("Edge 01: " + le[0].Points[0].x);
+
+
+           /* int count = 0;
+            foreach(GameObject e in edges){
+                LineRenderer line;
+                
+                e.TryGetComponent<LineRenderer>(out line);
+                int pos = line.positionCount;
+                Debug.LogFormat("Count: " + pos);
+
+
+                for(int i = 0; i < pos; i++){
+                    Debug.LogFormat("Edge: " + count + " Pos:" + line.GetPosition(i));
+                    
+                }
+                count++;
+            }*/
+                
+            
         }
 
         /// <summary>
