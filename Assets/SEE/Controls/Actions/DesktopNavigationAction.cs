@@ -229,7 +229,7 @@ namespace SEE.Controls
         // 'independent'.
         private void FixedUpdate()
         {
-            if (!CityAvailable)
+            if (!CityAvailable || CityTransform == null)
             {
                 return;
             }
