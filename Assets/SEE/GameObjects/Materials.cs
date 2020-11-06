@@ -97,11 +97,12 @@ namespace SEE.GO
         /// Returns the default material for the given <paramref name="degree"/> (always the identical 
         /// material, no matter how often this method is called). That means, if 
         /// the caller modifies this material, other objects using it will be affected, too.
-        /// 
+        /// <paramref name="renderQueueOffset"/> specifies the offset of the render queue for rendering.
+        /// The larger the offset, the later the object will be rendered. An object drawn later
+        /// will cover objects drawn earlier.
         /// Precondition: 0 <= degree <= numberOfColors-1 and renderQueueOffset >= 0; otherwise an exception is thrown
         /// </summary>
-        /// <param name="renderQueueOffset">The offset of the render queue for rendering.
-        /// The larger the offset, the later the object will be rendered.</param>
+        /// <param name="renderQueueOffset">offset for the render queue</param>
         /// <param name="degree">index of the material (color) in the range [0, numberOfColors-1]</param>
         /// <returns>default material</returns>
         public Material Get(int renderQueueOffset, int degree)
