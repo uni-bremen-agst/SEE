@@ -22,7 +22,7 @@
 using SEE.Game.Charts;
 using UnityEngine;
 
-namespace SEE.Controls
+namespace SEE.Controls.Actions
 {
     public class DesktopChartAction : ChartAction
     {

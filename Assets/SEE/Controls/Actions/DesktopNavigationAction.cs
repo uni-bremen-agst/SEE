@@ -3,9 +3,8 @@ using System;
 using UnityEngine;
 using SEE.Game.UI3D;
 
-namespace SEE.Controls
+namespace SEE.Controls.Actions
 {
-
     /// <summary>
     /// Controls the interactions with the city in desktop mode.
     /// </summary>
