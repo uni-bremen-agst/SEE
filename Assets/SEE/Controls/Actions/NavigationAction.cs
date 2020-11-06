@@ -162,12 +162,24 @@ namespace SEE.Controls
 
         public virtual void Update()
         {
-            if (!CityAvailable)
+            Transform currentCityTransform = SceneQueries.GetCityRootNode(gameObject);
+            // Nothing to be done if the city root node has not changed (including
+            // the case that it was null before and is still null).
+            if (currentCityTransform != CityTransform)
             {
-                CityTransform = SceneQueries.GetCityRootNode(gameObject);
-
-                if (CityTransform)
+                // The city root node has changed. This may be caused by a new city
+                // root node during the visualization of an evolving graph series.
+                // The new node may be valid, but could also be null (for the empty
+                // graph).
+                if (currentCityTransform == null)
+                {                    
+                    CityTransform = null;
+                    CityAvailable = false;
+                }
+                else
                 {
+                    // There is a new valid root node. We must update the state.                    
+                    CityTransform = currentCityTransform;
                     CityAvailable = true;
 
                     zoomState.originalScale = CityTransform.localScale;
