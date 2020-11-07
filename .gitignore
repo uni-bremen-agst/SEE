@@ -109,3 +109,4 @@ PacketHandlerErrorGlobal*.txt
 # Custom entries
 LinuxPlayer_s.debug
 UnityPlayer_s.debug
+.idea

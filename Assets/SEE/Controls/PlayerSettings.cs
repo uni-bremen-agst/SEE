@@ -23,6 +23,7 @@ namespace SEE.Controls
             Desktop,      // player for desktop and mouse input
             TouchGamepad, // player for touch devices or gamepads using InControl
             VR,           // player for virtual reality devices
+            HoloLens      // player for mixed reality devices
         }
 
         [Tooltip("What kind of player type should be enabled.")]
@@ -53,7 +54,7 @@ namespace SEE.Controls
             // is connected. That seems to be a bug.
             try
             {
-                XRSettings.enabled = playerInputType == PlayerInputType.VR;
+                XRSettings.enabled = playerInputType == PlayerInputType.VR || playerInputType == PlayerInputType.HoloLens;
             }
             catch (Exception e)
             {
@@ -65,6 +66,7 @@ namespace SEE.Controls
             SetActive("DesktopPlayer", playerInputType == PlayerInputType.Desktop);
             SetActive("VRPlayer", playerInputType == PlayerInputType.VR);
             SetActive("InControl", playerInputType == PlayerInputType.TouchGamepad);
+            SetActive("MRPlayer", playerInputType == PlayerInputType.HoloLens);
 
             // Turn off controller hints if requested in the user settings.
             if (!ShowControllerHints)
