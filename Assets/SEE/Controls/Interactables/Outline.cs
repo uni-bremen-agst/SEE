@@ -232,21 +232,13 @@ namespace SEE.Controls
         {
             foreach (Renderer renderer in renderers)
             {
-                if (renderer.sharedMaterials.Length > 2)
-                {
-                    // Remove outline shaders
-                    List<Material> materials = renderer.sharedMaterials.ToList();
+                // Remove outline shaders
+                List<Material> materials = renderer.sharedMaterials.ToList();
 
-                    materials.Remove(outlineMaskMaterial);
-                    materials.Remove(outlineFillMaterial);
+                materials.Remove(outlineMaskMaterial);
+                materials.Remove(outlineFillMaterial);
 
-                    renderer.materials = materials.ToArray();
-                }
-                else
-                {
-                    renderer.enabled = false;
-                    renderer.materials = new Material[0];
-                }
+                renderer.materials = materials.ToArray();
             }
         }
 
@@ -290,7 +282,7 @@ namespace SEE.Controls
             foreach (MeshFilter meshFilter in GetComponentsInChildren<MeshFilter>())
             {
                 // Skip if smooth normals have already been adopted
-                if (!registeredMeshes.Add(meshFilter.sharedMesh))
+                if (meshFilter.sharedMesh == null ||!registeredMeshes.Add(meshFilter.sharedMesh))
                 {
                     continue;
                 }
