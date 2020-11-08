@@ -2,7 +2,6 @@
 using SEE.Game;
 using SEE.GO;
 using System;
-using TMPro;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -82,7 +81,7 @@ namespace SEE.Controls.Actions
             }
             if (menu == null)
             {
-                menu = CreateMenu(entries, Radius, Depth);
+                menu = CreateMenu(Entries, Radius, Depth);
                 Off();
             }
         }
@@ -120,72 +119,120 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// The color of the menu itself, that is, the outer circle serving as a canvas
+        /// for the menu entries.
+        /// </summary>
+        private static readonly Color colorOfMenu = Color.white;
+        /// <summary>
+        /// The inner circles for the menu entries have different colors within
+        /// a color range depending upon their index. The first color gets this
+        /// color.
+        /// </summary>
+        private static readonly Color MenuEntryColorStart = Color.black;
+        /// <summary>
+        /// This is the color for the last menu entry.
+        /// </summary>
+        private static readonly Color MenuEntryColorEnd = Color.grey;
+        /// <summary>
+        /// The color of the text within the inner circles, that is, the label of all
+        /// menu entries.
+        /// </summary>
+        private static readonly Color menuEntryTextColor = Color.white;
+
+        private static readonly string[] Entries = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
+
+        /// <summary>
         /// Creates the circular menu.
         /// </summary>
+        /// <param name="entries">the labels of the menu entries</param>
         /// <param name="radius">the radius the circular menu should have</param>
+        /// <param name="depth">the depth of the menu and the menu entries (z length)</param>
         /// <returns>a new circular menu with given <paramref name="radius"/></returns>
-        private static GameObject CreateMenu(int entries, float radius, float depth)
+        private static GameObject CreateMenu(string[] entries, float radius, float depth)
         {
-            GameObject menu = NewCircle(radius, depth, Color.white);
-            menu.transform.position = Vector3.zero; // the real position will be set when it becomes visible
-            menu.name = MouseMenuName;
-
-            AddInnerCircles(menu, radius, depth, entries);
-            return menu;
+            int numberOfEntries = entries.Length;
+            if (numberOfEntries < 1 || numberOfEntries > circles.Length)
+            {
+                throw new Exception("Unsupported number of inner circles: " + numberOfEntries);
+            }
+            else
+            {
+                GameObject menu = NewCircle(radius, depth, colorOfMenu);
+                menu.transform.position = Vector3.zero; // the real position will be set when it becomes visible
+               
+                if (numberOfEntries > 1)
+                {
+                    menu.name = MouseMenuName;
+                    AddInnerCircles(menu, radius, depth, entries);
+                }
+                else
+                {
+                    int index = 1;
+                    menu.name = index.ToString();
+                    AddEntryLabel(menu, entries[0], radius);
+                }
+                return menu;
+            }
         }
 
-        private static void AddInnerCircles(GameObject menu, float radius, float depth, int entries)
+        /// <summary>
+        /// Creates the menu entries as inner circles nested within given <paramref name="menu"/>.
+        /// </summary>
+        /// <param name="menu">the menu these menu entries belong to</param>
+        /// <param name="radius">the radius of the menu</param>
+        /// <param name="depth">the depth of the menu entries (z length); must be greater than 0</param>
+        /// <param name="entries">the labels of the menu entries</param>
+        private static void AddInnerCircles(GameObject menu, float radius, float depth, string[] entries)
         {
-            if (entries < 1 || entries > circles.Length)
+            int numberOfEntries = entries.Length;
+            InnerCircles selectedInnerCircles = circles[numberOfEntries - 1];
+            float relativeInnerRadius = selectedInnerCircles.radius;
+            float absoluteInnerRadius = relativeInnerRadius * radius;
+            int menuEntryIndex = 1;
+            foreach (Vector2 center in selectedInnerCircles.centers)
             {
-                throw new Exception("Unsupported number of inner circles: " + entries);
-            } 
-            else if (entries > 1)
-            {
-                
-                InnerCircles selectedInnerCircles = circles[entries - 1];
-                float relativeInnerRadius = selectedInnerCircles.radius;
-                float absoluteInnerRadius = relativeInnerRadius * radius;
-                int menuEntryIndex = 1;
-                foreach (Vector2 center in selectedInnerCircles.centers)
+                Color color = Color.Lerp(MenuEntryColorStart, MenuEntryColorEnd, (float)(menuEntryIndex - 1) / (float)numberOfEntries);
+                // create the sprite circle
+                GameObject inner = NewCircle(absoluteInnerRadius, depth, color);
+                // the name of the game object for the menu entry holds the entry's index
+                inner.name = menuEntryIndex.ToString();
                 {
-                    Color color = Color.Lerp(Color.black, Color.grey, (float)(menuEntryIndex-1)/(float)entries);
-                    // create the sprite circle
-                    GameObject inner = NewCircle(absoluteInnerRadius, depth, color);
-                    // the name of the game object for the menu entry holds the entry's index
-                    inner.name = menuEntryIndex.ToString();
-                    {
-                        // Set the position of the inner circle
-                        Vector3 position = menu.transform.position;
-                        position.x += center.x * radius;
-                        position.y += center.y * radius;
-                        position.z += distanceBetweenOuterAndInnerCircles; // strangely enough, the z axis is inversed for sprites
-                        inner.transform.position = position;
-                    }
-                    inner.transform.SetParent(menu.transform);
-                    {
-                        // Adds the text label to the menu entry
-                        string menuEntryLabel = "label" + inner.name;
-                        GameObject label = TextFactory.GetTextWithWidth
-                                                 (text: menuEntryLabel, position: Vector3.zero, 
-                                                  width: 1.8f * absoluteInnerRadius, textColor: Color.white, lift: false);
-                        Portal.SetInfinitePortal(label);
-                        label.transform.SetParent(inner.transform);
-                        // Text will be centered within the inner circle.
-                        {
-                            RectTransform rect = label.GetComponent<RectTransform>();
-                            rect.localPosition = Vector3.zero;
-                        }
-                    }
-                    menuEntryIndex++;
+                    // Set the position of the inner circle
+                    Vector3 position = menu.transform.position;
+                    position.x += center.x * radius;
+                    position.y += center.y * radius;
+                    position.z += distanceBetweenOuterAndInnerCircles; // strangely enough, the z axis is inversed for sprites
+                    inner.transform.position = position;
                 }
+                inner.transform.SetParent(menu.transform);
+                AddEntryLabel(inner, entries[menuEntryIndex - 1], absoluteInnerRadius);
+                menuEntryIndex++;
+            }
+        }
+
+        /// <summary>
+        ///  Adds <paramref name="menuEntryLabel"/> to the <paramref name="gameObject"/> which is assumed by
+        ///  circle with given <paramref name="radius"/>.  The ext will be centered within the circle.
+        /// </summary>
+        /// <param name="gameObject">the game object where to add the text as a child</param>
+        /// <param name="menuEntryLabel">the text to be added</param>
+        /// <param name="radius">the radius of <paramref name="gameObject"/></param>
+        private static void AddEntryLabel(GameObject gameObject, string menuEntryLabel, float radius)
+        {                                  
+            GameObject label = TextFactory.GetTextWithWidth
+                                     (text: menuEntryLabel, position: Vector3.zero,
+                                      width: 1.8f * radius, textColor: menuEntryTextColor, lift: false);
+            Portal.SetInfinitePortal(label);
+            label.transform.SetParent(gameObject.transform);
+            // Text will be centered within the inner circle.
+            {
+                RectTransform rect = label.GetComponent<RectTransform>();
+                rect.localPosition = Vector3.zero;
             }
         }
 
         private static GameObject NewCircle(float radius, float depth, Color color)
         {
-            //GameObject menu = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-
             UnityEngine.Object prefab = IconFactory.LoadSprite("Icons/Circle");
             if (prefab == null)
             {
@@ -297,10 +344,28 @@ namespace SEE.Controls.Actions
             return entry != -1;
         }
 
+        /// <summary>
+        /// Representation of inner circles nested within an outer circle with 
+        /// radius 1. The inner circles have all the same radius. They do not
+        /// overlap and are as close together as possible. That is, the area
+        /// covered by the outer circle minus the sum of all areas of all inner
+        /// circles is minimal.
+        /// </summary>
         struct InnerCircles
         {
+            /// <summary>
+            /// The radius of the inner circle.
+            /// </summary>
             public float radius;   
+            /// <summary>
+            /// The co-ordinates of the centers of the inner circles.
+            /// </summary>
             public Vector2[] centers;
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="radius">the radius of the inner circle</param>
+            /// <param name="centers">the co-ordinates of the centers of the inner circles</param>
             public InnerCircles(float radius, Vector2[] centers)
             {
                 this.radius = radius;
@@ -308,12 +373,14 @@ namespace SEE.Controls.Actions
             }
         }
 
-        public int entries = 3;
-
         /// <summary>
         /// A mapping of the number of equally sized inner circles to be enclosed
         /// in an outer circle with radius 1 onto the radius and co-ordinates of
         /// those inner circles.
+        /// 
+        /// The radius of the inner circles and their co-ordinates set so that
+        /// they do not overlap and the area covered by the outer circle minus 
+        /// the sum of all areas of all inner circles is minimal.
         /// 
         /// The data were retrieved from http://hydra.nat.uni-magdeburg.de/packing/cci/cci.html.
         /// </summary>
