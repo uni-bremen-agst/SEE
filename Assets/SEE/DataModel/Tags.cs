@@ -34,6 +34,9 @@ namespace SEE.DataModel
         public const string ChartContainer = "ChartContainer";
         public const string Chart = "Chart"; // for a metric chart
 
+        // for game objects representing a UI element
+        public static string UI = "UI";
+
         /// <summary>
         /// All existing tags in one.
         /// </summary>
