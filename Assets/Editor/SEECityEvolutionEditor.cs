@@ -42,24 +42,16 @@ namespace SEEEditor
         /// <summary>
         /// Creates the buttons for loading the first graph of the evolution series.
         /// </summary>
+        ///
         protected void Buttons()
         {
             
             SEECityEvolution city = target as SEECityEvolution;
-            if (GUILayout.Button("Load First Graph / Reset"))
-            {
-               
-                if (isGraphLoaded)
-                {
-                    city.Reset();
-                    isGraphLoaded = false;
-                }
+            if (GUILayout.Button("Load First Graph"))
+            {                          
                 graph = city.LoadFirstGraph();
                 city.InspectSchema(graph);
-                isGraphLoaded = true;                
-                int k  = graph.NodeCount;
-                UnityEngine.Debug.Log("after loading " + k);
-
+                isGraphLoaded = true;                            
             }
             if (isGraphLoaded)
             {
@@ -70,9 +62,7 @@ namespace SEEEditor
                     {   
                         
                         graph = city.LoadFirstGraph();
-                        DrawGraph(city, graph);
-                        int n  = graph.NodeCount;
-                        UnityEngine.Debug.Log("after drawing" + n);
+                        DrawGraph(city, graph);                     
                     }
                     else
                     {
@@ -84,6 +74,7 @@ namespace SEEEditor
                     isGraphLoaded = false;
                     city.Reset();
                 }
+               
             }
         }
 
