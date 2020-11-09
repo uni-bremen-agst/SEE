@@ -147,13 +147,13 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graphs">the series of graph to be drawn</param>
         private void DrawGraphs(List<Graph> graphs)
-        {   
-            foreach(Graph g in graphs)
+        {           
+                for(int i = 0; i < graphs.Count; i++) 
             {
-                RelevantGraph(g);
-                LoadDataForGraphListing(g);
-                g.FinalizeGraph();
-                UnityEngine.Debug.Log(g.Nodes().Count+ " Loaded Nodes");
+                graphs[i]=RelevantGraph(graphs[i]);
+                LoadDataForGraphListing(graphs[i]);
+                graphs[i].FinalizeGraph();
+                UnityEngine.Debug.Log(graphs[i].Nodes().Count+ " Loaded Nodes");
             }
             evolutionRenderer = CreateEvolutionRenderer();
             evolutionRenderer.ShowGraphEvolution(graphs);
