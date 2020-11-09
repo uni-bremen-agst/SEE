@@ -51,16 +51,14 @@ namespace SEEEditor
             if (GUILayout.Button("Load First Graph / Reset"))
             {
                
-                if (alreadyLoaded)
+                if (isGraphLoaded)
                 {
                     city.Reset();
-                    alreadyLoaded = false;
+                    isGraphLoaded = false;
                 }
                 graph = city.LoadFirstGraph();
                 city.InspectSchema(graph);
-                isGraphLoaded = true;
-                alreadyLoaded = true;
-
+                isGraphLoaded = true;                
                 int k  = graph.NodeCount;
                 UnityEngine.Debug.Log("after loading " + k);
 
