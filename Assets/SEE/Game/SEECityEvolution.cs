@@ -142,7 +142,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Creates <see cref="evolutionRenderer"/> and shows shows the nodes having one of the selected node types of the graph
+        /// Creates <see cref="evolutionRenderer"/> and shows the nodes having one of the selected node types of the graph
         /// evolution for given <paramref name="graphs"/> using it.
         /// </summary>
         /// <param name="graphs">the series of graph to be drawn</param>
