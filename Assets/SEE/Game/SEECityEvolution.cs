@@ -113,7 +113,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph to be drawn</param>
         public void DrawGraph(Graph graph)
-        {  
+        { 
             DrawGraphs(new List<Graph>() { graph });
         }
 
@@ -123,7 +123,7 @@ namespace SEE.Game
         /// layouts, and displays the first graph in the graph series.
         /// </summary>
         private void Awake()
-        {
+        {           
             DrawGraphs(LoadData());
             // We assume this SEECityEvolution instance is a component of a game object
             // to which an AnimationInteraction component is attached. This AniminationInteraction
@@ -142,7 +142,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Creates <see cref="evolutionRenderer"/> and shows the selected node-types of the graph
+        /// Creates <see cref="evolutionRenderer"/> and shows the nodes of the graph having one of the selected node types of the graph
         /// evolution for given <paramref name="graphs"/> using it.
         /// </summary>
         /// <param name="graphs">the series of graph to be drawn</param>
@@ -150,8 +150,7 @@ namespace SEE.Game
         {   
             foreach(Graph g in graphs)
             {
-                RelevantGraph(g);
-                LoadDataForGraphListing(g);
+                RelevantGraph(g);              
                 g.FinalizeGraph();             
             }
             evolutionRenderer = CreateEvolutionRenderer();
