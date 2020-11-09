@@ -39,8 +39,6 @@ namespace SEEEditor
         /// </summary>
         private Graph graph = null;
 
-        private bool alreadyLoaded = false;
-
         /// <summary>
         /// Creates the buttons for loading the first graph of the evolution series.
         /// </summary>
