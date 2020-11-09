@@ -56,9 +56,18 @@ namespace SEE.Layout.NodeLayouts
             }
             else if (layoutNodes.Count == 1)
             {
-                ILayoutNode gameNode = layoutNodes.GetEnumerator().Current;
-                layout_result[gameNode] = new NodeTransform(Vector3.zero,
-                                                            new Vector3(width, gameNode.LocalScale.y, depth));
+                IEnumerator<ILayoutNode> enumerator = layoutNodes.GetEnumerator();
+                if (enumerator.MoveNext())
+                {
+                    // MoveNext() must be called before we can call Current.
+                    ILayoutNode gameNode = enumerator.Current;
+                    layout_result[gameNode] = new NodeTransform(Vector3.zero,
+                                                                new Vector3(width, gameNode.LocalScale.y, depth));
+                }
+                else
+                {
+                    Debug.LogError("We should never arrive here.\n");
+                }
             }
             else
             {
