@@ -84,7 +84,9 @@ namespace SEE.Game
         /// Yields the graph of the first GXL found in the directory named <code>PathPrefix</code>.
         /// The order is ascending and alphabetic by the GXL filenames located in that directory.
         /// If the first GXL file has a corresponding CSV with additional metrics, this CSV file
-        /// will be read, too, and the node metrics added to the graph. There will be loaded only the chosen node-types.
+        /// will be read, too, and the node metrics added to the graph. 
+        /// Furthermore the selection of the specific node types selected by the user is applied in case 
+        /// the user speciefied it before.By default every node type is selected.
         /// 
         /// Precondition: PathPrefix must be set and denote an existing directory in the
         /// file system containing at least one GXL file.

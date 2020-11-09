@@ -42,7 +42,6 @@ namespace SEEEditor
         /// <summary>
         /// Creates the buttons for loading the first graph of the evolution series.
         /// </summary>
-        ///
         protected void Buttons()
         {
             
@@ -51,7 +50,7 @@ namespace SEEEditor
             {                          
                 graph = city.LoadFirstGraph();
                 city.InspectSchema(graph);
-                isGraphLoaded = true;                            
+                isGraphLoaded = true;                           
             }
             if (isGraphLoaded)
             {
@@ -62,7 +61,7 @@ namespace SEEEditor
                     {   
                         
                         graph = city.LoadFirstGraph();
-                        DrawGraph(city, graph);                     
+                        DrawGraph(city, graph);                      
                     }
                     else
                     {
