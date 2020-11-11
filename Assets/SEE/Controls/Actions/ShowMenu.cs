@@ -60,12 +60,27 @@ namespace SEE.Controls.Actions
         /// </summary>
         private bool menuIsOn = false;
 
+        private MenuDescriptor[] Entries;
+
+        /// <summary>
+        /// The time in seconds between the time in point when any transient
+        /// menu entry was activated until all transient menu entries should 
+        /// be deactivated again.
+        /// </summary>
+        private const float activationPeriod = 1.0f;
+
+        /// <summary>
+        /// IsActive[i] <=> the menu entry i is activated. Transient menu entries
+        /// are activated only for 
+        /// </summary>
+        private bool[] IsActive;
+
         /// <summary>
         /// Creates the <see cref="menu"/> if it does not exist yet.
         /// Sets <see cref="mainCamera"/>.
         /// </summary>
         protected virtual void Start()
-        {
+        {            
             if (mainCamera == null)
             {
                 if (Camera.allCameras.Length > 1)
@@ -79,11 +94,12 @@ namespace SEE.Controls.Actions
                 }
                 mainCamera = Camera.main;
             }
-            if (menu == null)
-            {
-                menu = CreateMenu(Entries, Radius, Depth);
-                Off();
-            }
+            Entries = EntriesParameter;
+            // For bool, the default value is false, which is what we want:
+            // none of the menu entries is activated initially.
+            IsActive = new Boolean[Entries.Length]; 
+            menu = CreateMenu(Entries, Radius, Depth);
+            Off();
         }
 
         /// <summary>
@@ -139,7 +155,60 @@ namespace SEE.Controls.Actions
         /// </summary>
         private static readonly Color menuEntryTextColor = Color.white;
 
-        private static readonly string[] Entries = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
+        public delegate void EntryEvent();
+
+        public struct MenuDescriptor
+        {
+            public readonly string Label;
+            public readonly EntryEvent EntryOn;
+            public readonly EntryEvent EntryOff;
+            public readonly bool IsTransient;
+
+            public MenuDescriptor(string label, EntryEvent entryOn, EntryEvent entryOff, bool isTransient)
+            {
+                Label = label;
+                EntryOn = entryOn;
+                EntryOff = entryOff;
+                IsTransient = isTransient;
+            }
+        }
+
+        private static void EntryAOn()
+        {
+            Debug.Log("EntryAOn\n");
+        }
+
+        private static void EntryAOff()
+        {
+            Debug.LogError("EntryAOff must never be called: is transient.\n");
+        }
+
+        private static void EntryBOn()
+        {
+            Debug.Log("EntryBOn\n");
+        }
+
+        private static void EntryBOff()
+        {
+            Debug.Log("EntryBOff\n");
+        }
+
+        private static void EntryCOn()
+        {
+            Debug.Log("EntryCOn\n");
+        }
+
+        private static void EntryCOff()
+        {
+            Debug.LogError("EntryCOff must never be called: is transient.\n");
+        }
+
+        private static readonly MenuDescriptor[] EntriesParameter =
+            {
+                new MenuDescriptor(label: "A", entryOn: EntryAOn, entryOff: EntryAOff, true),
+                new MenuDescriptor(label: "B", entryOn: EntryBOn, entryOff: EntryBOff, false),
+                new MenuDescriptor(label: "C", entryOn: EntryCOn, entryOff: EntryCOff, true),
+            };
 
         /// <summary>
         /// Creates the circular menu.
@@ -148,7 +217,7 @@ namespace SEE.Controls.Actions
         /// <param name="radius">the radius the circular menu should have</param>
         /// <param name="depth">the depth of the menu and the menu entries (z length)</param>
         /// <returns>a new circular menu with given <paramref name="radius"/></returns>
-        private static GameObject CreateMenu(string[] entries, float radius, float depth)
+        private static GameObject CreateMenu(MenuDescriptor[] entries, float radius, float depth)
         {
             int numberOfEntries = entries.Length;
             if (numberOfEntries < 1 || numberOfEntries > circles.Length)
@@ -169,7 +238,7 @@ namespace SEE.Controls.Actions
                 {
                     int index = 1;
                     menu.name = index.ToString();
-                    AddEntryLabel(menu, entries[0], radius);
+                    AddEntryLabel(menu, entries[0].Label, radius);
                 }
                 return menu;
             }
@@ -182,7 +251,7 @@ namespace SEE.Controls.Actions
         /// <param name="radius">the radius of the menu</param>
         /// <param name="depth">the depth of the menu entries (z length); must be greater than 0</param>
         /// <param name="entries">the labels of the menu entries</param>
-        private static void AddInnerCircles(GameObject menu, float radius, float depth, string[] entries)
+        private static void AddInnerCircles(GameObject menu, float radius, float depth, MenuDescriptor[] entries)
         {
             int numberOfEntries = entries.Length;
             InnerCircles selectedInnerCircles = circles[numberOfEntries - 1];
@@ -205,7 +274,7 @@ namespace SEE.Controls.Actions
                     inner.transform.position = position;
                 }
                 inner.transform.SetParent(menu.transform);
-                AddEntryLabel(inner, entries[menuEntryIndex - 1], absoluteInnerRadius);
+                AddEntryLabel(inner, entries[menuEntryIndex - 1].Label, absoluteInnerRadius);
                 menuEntryIndex++;
             }
         }
@@ -295,7 +364,24 @@ namespace SEE.Controls.Actions
                 menu.transform.LookAt(mainCamera.transform);
                 if (SelectedMenuEntry(out int hitEntry))
                 {
+                    // hitEntry == 0 => the menu itself was selected                    
                     Debug.LogFormat("Hit menu entry: {0}\n", hitEntry);
+                    if (hitEntry > 0)
+                    {
+                        // the index of menu entries starts at 1, while the arrays start at 0
+                        hitEntry--;
+                        MenuDescriptor entry = Entries[hitEntry];
+                        IsActive[hitEntry] = !IsActive[hitEntry];
+                        if (entry.IsTransient || IsActive[hitEntry])
+                        {
+                            entry.EntryOn();
+                        }
+                        else
+                        {
+                            entry.EntryOff();
+                        }
+                        ShowActivation();
+                    }
                 }
             }
             else
@@ -304,6 +390,29 @@ namespace SEE.Controls.Actions
                 {
                     Off();
                 }
+            }
+        }
+
+        private static readonly Color ActivationColor = Color.blue;
+
+        private void ShowActivation()
+        {
+            int i = 0;
+            foreach(Transform child in menu.transform)
+            {
+                if (IsActive[i])
+                {
+                    SetColor(child.gameObject, ActivationColor);
+                }                
+                i++;
+            }
+        }
+
+        private static void SetColor(GameObject hitObject, Color color)
+        {
+            if (hitObject.TryGetComponent<SpriteRenderer>(out SpriteRenderer renderer))
+            {
+                renderer.color = color;
             }
         }
 
@@ -334,11 +443,8 @@ namespace SEE.Controls.Actions
                     {
                         entry = int.Parse(hit2D.collider.name);
                     }
-                    GameObject hitObject = hit2D.collider.gameObject;
-                    if (hitObject.TryGetComponent<SpriteRenderer>(out SpriteRenderer renderer))
-                    {
-                        renderer.color = InvertColor(renderer.color);
-                    }
+                    //GameObject hitObject = hit2D.collider.gameObject;
+                    //SetColor(hitObject);
                 }
             }
             return entry != -1;
