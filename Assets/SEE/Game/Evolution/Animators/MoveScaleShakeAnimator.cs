@@ -112,7 +112,7 @@ namespace SEE.Game.Evolution
                 else
                 {
                     //iTween.MoveTo(gameObject, iTween.Hash("position", position, "time", MaxAnimationTime));
-                    gameObject.transform.DOScale(position, MaxAnimationTime);
+                    gameObject.transform.DOMove(position, MaxAnimationTime);
                 }
             }
 
