@@ -47,7 +47,7 @@ namespace SEEEditor
             
             SEECityEvolution city = target as SEECityEvolution;
             if (GUILayout.Button("Load First Graph") && !isGraphLoaded)
-            {                          
+            {
                 graph = city.LoadFirstGraph();
                 city.InspectSchema(graph);
                 isGraphLoaded = true;                           
