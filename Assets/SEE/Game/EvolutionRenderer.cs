@@ -423,6 +423,7 @@ namespace SEE.Game
                 Debug.Log("Graph changes are blocked while animations are running.\n");
                 return;
             }
+            MoveScaleShakeAnimator.DeletePowerBeams();
             RenderGraph(current, next);
         }
 
