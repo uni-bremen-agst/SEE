@@ -44,28 +44,32 @@ namespace SEEEditor
         /// </summary>
         protected void Buttons()
         {
-            
             SEECityEvolution city = target as SEECityEvolution;
             if (GUILayout.Button("Load First Graph") && !isGraphLoaded)
             {
                 graph = city.LoadFirstGraph();
                 city.InspectSchema(graph);
-                isGraphLoaded = true;                           
-            }         
-                if (GUILayout.Button("Draw") && isGraphLoaded)
+                isGraphLoaded = true;
+            }
+            if (GUILayout.Button("Draw"))
+            {
+                if (isGraphLoaded)
                 {
                     if (graph != null)
-
-                    {   
-                        
+                    {
                         graph = city.LoadFirstGraph();
-                        DrawGraph(city, graph);                      
+                        DrawGraph(city, graph);
                     }
                     else
                     {
                         Debug.LogError("No valid graph loaded.\n");
                     }
                 }
+                else
+                {
+                    Debug.LogError("No valid graph loaded.\n");
+                }
+            }
                 if (GUILayout.Button("Delete") && isGraphLoaded)
                 {
                     isGraphLoaded = false;
@@ -74,11 +78,7 @@ namespace SEEEditor
         }
 
         private void DrawGraph(AbstractSEECity city, Graph graph)
-        {
-            if (graph==null)
-            {             
-                    Debug.LogError("No graph loaded.\n");
-            }            
+        {                  
                 GraphRenderer graphRenderer = new GraphRenderer(city, graph);
                 // We assume here that this SEECity instance was added to a game object as
                 // a component. The inherited attribute gameObject identifies this game object.
