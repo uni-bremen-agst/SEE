@@ -53,7 +53,7 @@ namespace SEE.Game
         /// </summary>
         [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
         public float MarkerWidth = 0.01f;
-        
+
         /// <summary>
         /// Factory method to create the used EvolutionRenderer.
         /// </summary>

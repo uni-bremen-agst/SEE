@@ -36,6 +36,11 @@ namespace SEEEditor
         private bool isGraphLoaded = false;
 
         /// <summary>
+        /// The name of the file where a node-selection will be saved
+        /// </summary>
+        public string savedProfile;
+
+        /// <summary>
         /// The loaded graph. The value is different from null only if isGraphLoaded is true.
         /// </summary>
         private Graph graph = null;
@@ -76,9 +81,10 @@ namespace SEEEditor
             if (GUILayout.Button("Save Selection") && isGraphLoaded)
             {                             
                 string path = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select saving directory", pathPrefix.stringValue, ""));               
-                city.SaveSelection(path);
+                city.SaveSelection(path, savedProfile);
 
             }
+            savedProfile = EditorGUILayout.TextField("Name of File: ", savedProfile);
             }
 
         private void DrawGraph(AbstractSEECity city, Graph graph)

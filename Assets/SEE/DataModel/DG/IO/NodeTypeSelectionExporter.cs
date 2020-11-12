@@ -15,9 +15,10 @@ public class NodeTypeSelectionExporter
 {
 
 
-    public static bool Persist(string pathPrefix,int allNodes, Dictionary<string, bool> nodeTypes, string path)
+    public static bool Persist(string pathPrefix,int allNodes, Dictionary<string, bool> nodeTypes, string path, string savedProfile)
     {
         UnityEngine.Debug.Log("Pfad: " + path);
+        UnityEngine.Debug.Log("Name: " + savedProfile);
         String directoryDelimiter= "/";
         string directory = path + directoryDelimiter; 
         GraphsReader gr = new GraphsReader();
