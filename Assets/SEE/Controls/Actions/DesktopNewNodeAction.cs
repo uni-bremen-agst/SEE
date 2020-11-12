@@ -3,27 +3,35 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.DataModel.DG;
 using SEE.Game;
+using UnityEngine.TestTools;
 
 namespace SEE.Controls {
     public class DesktopNewNodeAction : MonoBehaviour
     {
         // Start is called before the first frame update
         //temp save the new node
+        //maybe i need graphrenderer.draw(gameObject)
         Node newNode;
         GameObject nodeRepresentation;
-        static SEECity city = new SEECity();
-        GraphRenderer graphRenderer = new GraphRenderer(city, city.LoadedGraph);
-        private const int LeftMouseButton = 1;
+        
+        GraphRenderer graphRenderer;
         //Represents which kin of node should be created
         bool is_innerNode = false;
         void Start()
         {
-
+            //gameObject.AddComponent(SEECity());
+            SEECity city = new SEECity();
+            graphRenderer = new GraphRenderer(city, city.LoadedGraph);
         }
 
         // Update is called once per frame
         void Update()
         {
+            if (Input.GetButtonDown("Fire1"))
+            {
+               
+            }
+
             //Eventuell hilft die Mehtode GetNode from ObjectManager
             //Later replace getKeyDown with menu action
             //Test for insert a new node
@@ -37,38 +45,50 @@ namespace SEE.Controls {
             { //Eventuell statt key eine Box mit Bausteinen neben dem Tisch?
               //create new Node and let him stick to the cursor
                 newNode = new Node();
-                graphRenderer.NewLeafNode(newNode);
+                //graphRenderer.ToString(); //test output if graphrenderer works
+                nodeRepresentation = graphRenderer.NewLeafNode(newNode);
                 Debug.Log("NodeEditMODE TRUE\n");
             }
+
+
             if (newNode != null)
             {
+                nodeRepresentation.transform.position = Input.mousePosition;
+
+                //iF b is pressed change the node kind, later this will be removed and replaced with the menu action where you can choose wich node you want to add
                 if (Input.GetKeyDown(KeyCode.B))
 
                 {
                     if (is_innerNode)
                     {
                         is_innerNode = false;
-
-
-                    }
-
-
-                    //Change node type to the next in the list
-                }
-                if (Input.GetMouseButton(LeftMouseButton))
-                {
-                    Debug.Log("NodeEditModeLeftKlick\n");
-                    //Place node and set newNode to Null
-                    if (is_innerNode)
-                    {
-                        graphRenderer.NewInnerNode(newNode);
+                        nodeRepresentation = graphRenderer.NewLeafNode(newNode);
 
                     }
                     else
                     {
-                        graphRenderer.NewLeafNode(newNode);
+                        is_innerNode = true;
+                        nodeRepresentation = graphRenderer.NewInnerNode(newNode);
                     }
                 }
+                if (Input.GetButtonDown("Fire1")) //Looks for a Left Klick
+                {
+                    Debug.Log("NodeEditModeLeftKlick\n");
+                    //gets the mouse podsition
+                    Debug.Log(Input.mousePosition);
+                    //Place node and set newNode to Null
+                    if (is_innerNode)
+                    {
+                        //todo enter name of node
+
+                    }
+                    else
+                    {
+                       //enter name of node 
+                    }
+                    newNode = null;
+                }
+
             }
             if (Input.GetKeyDown(KeyCode.N) && newNode != null)
             {
