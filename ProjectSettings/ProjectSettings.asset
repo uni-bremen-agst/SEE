@@ -143,7 +143,7 @@ PlayerSettings:
       minimumSupportedHeadTracking: 0
       maximumSupportedHeadTracking: 1
     hololens:
-      depthFormat: 1
+      depthFormat: 0
       depthBufferSharingEnabled: 1
     lumin:
       depthFormat: 0
@@ -347,6 +347,7 @@ PlayerSettings:
     m_Enabled: 1
     m_Devices:
     - OpenVR
+    - WindowsMR
   openGLRequireES31: 0
   openGLRequireES31AEP: 0
   openGLRequireES32: 0
@@ -619,11 +620,11 @@ PlayerSettings:
   m_MobileRenderingPath: 1
   metroPackageName: SEECity
   metroPackageVersion: 0.9.0.0
-  metroCertificatePath: 
+  metroCertificatePath: Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: 
-  metroCertificateIssuer: 
-  metroCertificateNotAfter: 0000000000000000
+  metroCertificateSubject: Axivion
+  metroCertificateIssuer: Axivion
+  metroCertificateNotAfter: 007212d644d7d701
   metroApplicationDescription: 3D software visualization
   wsaImages: {}
   metroTileShortName: 
