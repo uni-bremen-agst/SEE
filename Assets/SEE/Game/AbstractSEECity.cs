@@ -235,7 +235,7 @@ namespace SEE.Game
         /// <returns>subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/></returns>
         protected Graph RelevantGraph(Graph graph)
         {
-            
+
             if (AllNodeTypesAreRelevant)
             {
                 return graph;
@@ -277,7 +277,7 @@ namespace SEE.Game
         /// The attribute name of the metric to be used for determining the style of leaf nodes.
         /// </summary>
         public string LeafStyleMetric = NumericAttributeNames.Complexity.Name(); // serialized by Unity
-        
+
         //----------------------------------
         // Attributes of a leaf node's label
         //----------------------------------
@@ -470,11 +470,11 @@ namespace SEE.Game
         /// The attribute name of the metric to be used for determining the style of inner nodes.
         /// </summary>
         public string InnerNodeStyleMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
-        
+
         //-----------------------------------
         // Visual attributes of an inner node
         //-----------------------------------
-        
+
         /// <summary>
         /// If true, label's with the node's SourceName will be displayed above each inner node.
         /// </summary>
@@ -619,7 +619,7 @@ namespace SEE.Game
             else
             {
                 if (File.Exists(filename))
-                {         
+                {
                     Performance p = Performance.Begin("loading graph data from " + filename);
                     GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "", new SEELogger());
                     graphCreator.Load();
@@ -717,6 +717,13 @@ namespace SEE.Game
                 CoseGraphSettings.loadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value == true).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
                 CoseGraphSettings.rootDirs = graph.GetRoots();
             }
+        }
+
+        public void SaveSelection(string path)
+        {
+            int allNodes = nodeTypes.Count;
+            nodeTypes = SelectedNodeTypes;
+            NodeTypeSelectionExporter.Persist(pathPrefix, allNodes, nodeTypes, path);
         }
     }
 }

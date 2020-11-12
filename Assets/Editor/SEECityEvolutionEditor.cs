@@ -4,6 +4,7 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using UnityEditor;
 using UnityEngine;
+using SEE.Utils;
 
 namespace SEEEditor
 {
@@ -44,7 +45,8 @@ namespace SEEEditor
         /// </summary>
         protected void Buttons()
         {
-            
+            SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
+
             SEECityEvolution city = target as SEECityEvolution;
             if (GUILayout.Button("Load First Graph")&&!isGraphLoaded)
             {                          
@@ -70,8 +72,14 @@ namespace SEEEditor
                 {
                     isGraphLoaded = false;
                     city.Reset();
-                }                    
-        }
+                }
+            if (GUILayout.Button("Save Selection") && isGraphLoaded)
+            {                             
+                string path = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select saving directory", pathPrefix.stringValue, ""));               
+                city.SaveSelection(path);
+
+            }
+            }
 
         private void DrawGraph(AbstractSEECity city, Graph graph)
         {
