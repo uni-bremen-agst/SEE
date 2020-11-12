@@ -19,6 +19,8 @@
 
 using SEE.Layout;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace SEE.Game.Evolution
@@ -32,12 +34,12 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Color of beams for newly added nodes
         /// </summary>
-        private Color NewNodeBeamColor = new Color(0,1,0.15f,1);
+        private Color NewNodeBeamColor = new Color(0, 1, 0.15f, 1);
 
         /// <summary>
         /// Color of beams for changed nodes
         /// </summary>
-        private Color ChangedNodeBeamColor = new Color(0,1,0.5f,1);
+        private Color ChangedNodeBeamColor = new Color(0, 1, 0.5f, 1);
 
         /// <summary>
         /// Moves, scales, and then finally shakes (if <paramref name="wasModified"/>) the animated game object.
@@ -124,7 +126,7 @@ namespace SEE.Game.Evolution
             {
                 // Changes the modified object's color to blue while animating
                 gameObject.GetComponent<Renderer>().material.color = Color.blue;
-                CreatePowerBeam(position,ChangedNodeBeamColor);
+                CreatePowerBeam(position, ChangedNodeBeamColor);
 
                 if (mustCallBack)
                 {
@@ -163,47 +165,124 @@ namespace SEE.Game.Evolution
             // Generate power beam above updated objects
             GameObject powerBeam = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             powerBeam.tag = "PowerBeam";
-            powerBeam.transform.localScale = new Vector3(0.02f, 3f, 0.02f);
-            powerBeam.transform.position = new Vector3(position.x, position.y + 3f, position.z);
+            powerBeam.transform.localScale = new Vector3(0.02f, 0f, 0.02f);
+            powerBeam.transform.position = new Vector3(position.x, position.y, position.z);
             // Change power beam material color
             powerBeam.GetComponent<Renderer>().material.color = beamColor;
             // Set power beam material to emissive
             powerBeam.GetComponent<Renderer>().material.EnableKeyword("_EMISSION");
             Color emissionColor = beamColor * 7f;
             powerBeam.GetComponent<Renderer>().material.SetColor("_EmissionColor", emissionColor);
-            Debug.Log("Emissive color " + powerBeam.GetComponent<Renderer>().material.color);
             // Remove power beam shadow
             powerBeam.GetComponent<Renderer>().receiveShadows = false;
             powerBeam.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            BeamAnimator.GetInstace().AddPowerBeam(powerBeam);
+            powerBeam.AddComponent<BeamAnimatorExecuter>();
         }
 
         /// <summary>
         /// Removes power beams
         /// </summary>
-        public static void DeletePowerBeams() 
-        { 
-            try
+        public static void DeletePowerBeams()
+        {
+            BeamAnimator.GetInstace().ClearPowerBeams();
+        }
+
+        class BeamAnimator
+        {
+
+            /// <summary>
+            /// Singleton instance
+            /// </summary>
+            private static BeamAnimator singleton = null;
+
+            /// <summary>
+            /// Get the singleton instance
+            /// </summary>
+            public static BeamAnimator GetInstace()
             {
-                GameObject[] powerBeams = GameObject.FindGameObjectsWithTag("PowerBeam");
-                if (powerBeams != null && powerBeams.Length > 0)
+                if (singleton == null)
                 {
-                    int i = 0;
-                    foreach (GameObject o in powerBeams)
-                    {
-                        GameObject.Destroy(o);
-                        i += 1;
-                    }
-                    Debug.Log("Deleted " + i + " power beams!");
+                    singleton = new BeamAnimator();
                 }
-                else
+                return singleton;
+            }
+
+            /// <summary>
+            /// Power beams, get animated while appearing
+            /// </summary>
+            private List<GameObject> powerBeams = new List<GameObject>();
+
+            /// <summary>
+            /// Power beams that have been removed, get aniamted while disappearing
+            /// </summary>
+            private GameObject[] removedBeams = new GameObject[0];
+
+            public void Update()
+            {
+                // Animate new power beams
+                foreach (GameObject beam in powerBeams)
                 {
-                    Debug.Log("No power beams to delete");
+                    if (beam.transform.localScale.y < 3f)
+                    {
+                        beam.transform.localScale = new Vector3(beam.transform.localScale.x, beam.transform.localScale.y + 0.0025f, beam.transform.localScale.z);
+                        beam.transform.position = new Vector3(beam.transform.position.x, beam.transform.position.y + 0.0025f, beam.transform.position.z);
+                    }
+                    else
+                    {
+                        powerBeams.Remove(beam);
+                    }
+                }
+                // Animate deleted power beams
+                foreach (GameObject deleted in removedBeams)
+                {
+                    if (deleted != null)
+                    {
+                        if (deleted.transform.localScale.y > 0f)
+                        {
+                            deleted.transform.localScale = new Vector3(deleted.transform.localScale.x, deleted.transform.localScale.y - 0.0025f, deleted.transform.localScale.z);
+                            deleted.transform.position = new Vector3(deleted.transform.position.x, deleted.transform.position.y - 0.0025f, deleted.transform.position.z);
+                        }
+                        else
+                        {
+                            GameObject.Destroy(deleted);
+                        }
+                    }
                 }
             }
-            catch
+
+            /// <summary>
+            /// Clear power beams
+            /// </summary>
+            public void ClearPowerBeams()
             {
-                Debug.LogError("Error removing power beams");
+                removedBeams = GameObject.FindGameObjectsWithTag("PowerBeam");
+                powerBeams.Clear();
+            }
+
+            /// <summary>
+            /// Add a new power beam
+            /// <param name="beam">Power beam to add</param>
+            /// </summary>
+            public void AddPowerBeam(GameObject beam)
+            {
+                powerBeams.Add(beam);
+            }
+        }
+
+        class BeamAnimatorExecuter : MonoBehaviour
+        {
+
+            private void Awake()
+            {
+                BeamAnimator.GetInstace();
+            }
+
+            private void Update()
+            {
+                BeamAnimator.GetInstace().Update();
             }
         }
     }
 }
+    
