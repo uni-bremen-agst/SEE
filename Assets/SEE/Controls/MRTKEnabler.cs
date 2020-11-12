@@ -9,7 +9,7 @@ namespace SEE.Controls
         void Start()
         {
             //TODO: MixedReality namespace seems to be missing
-            MixedRealityToolkit.Instance.enabled = false;
+            //MixedRealityToolkit.Instance.enabled = false;
         }
     }
 }
