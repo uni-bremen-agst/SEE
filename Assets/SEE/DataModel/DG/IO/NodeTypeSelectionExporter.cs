@@ -18,6 +18,8 @@ public class NodeTypeSelectionExporter
     public static bool Persist(string pathPrefix,int allNodes, Dictionary<string, bool> nodeTypes, string path)
     {
         UnityEngine.Debug.Log("Pfad: " + path);
+        String directoryDelimiter= "/";
+        string directory = path + directoryDelimiter; 
         GraphsReader gr = new GraphsReader();
         IEnumerable<string> gxlFileName = Filenames.GXLFilenames(pathPrefix);
         gxlFileName.ToList();
@@ -52,10 +54,10 @@ public class NodeTypeSelectionExporter
         try
         {
 
-            FileStream fs = new FileStream(pathPrefix + "/ProfileSettings.txt", FileMode.OpenOrCreate, FileAccess.Write);
+            FileStream fs = new FileStream(directory + "ProfileSettings.txt", FileMode.OpenOrCreate, FileAccess.Write);
             fs.Close();
 
-            StreamWriter sw = new StreamWriter(pathPrefix + "/ProfileSettings.csv");
+            StreamWriter sw = new StreamWriter(directory + "ProfileSettings.csv");
 
             sw.WriteLine(nameOfGraph + ",");
             sw.WriteLine("Number of all nodetypes of the graph" + "," + "\n" + allNodes + ",");
@@ -63,7 +65,7 @@ public class NodeTypeSelectionExporter
             sw.Flush();
             sw.Close();
 
-            System.IO.File.AppendAllLines(pathPrefix + "/ProfileSettings.csv", selected);
+            System.IO.File.AppendAllLines(directory + "ProfileSettings.csv", selected);
 
         }
         catch (Exception e)
@@ -77,8 +79,8 @@ public class NodeTypeSelectionExporter
 
         }
 
-        string text = System.IO.File.ReadAllText(pathPrefix + "/ProfileSettings.csv");
-        UnityEngine.Debug.Log(text);
+        
+
 
         return true;
     }
