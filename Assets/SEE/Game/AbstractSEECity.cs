@@ -720,10 +720,9 @@ namespace SEE.Game
         }
 
         public void SaveSelection(string path, string savedProfile)
-        {
-            int allNodes = nodeTypes.Count;
+        {          
             nodeTypes = SelectedNodeTypes;
-            NodeTypeSelectionExporter.Persist(pathPrefix, allNodes, nodeTypes, path, savedProfile);
+            NodeTypeSelectionExporter.Persist(pathPrefix, nodeTypes, path, savedProfile);
         }
     }
 }
