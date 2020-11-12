@@ -46,13 +46,13 @@ namespace SEEEditor
         {
             
             SEECityEvolution city = target as SEECityEvolution;
-            if (GUILayout.Button("Load First Graph")&&!isGraphLoaded)
+            if (GUILayout.Button("Load First Graph") && !isGraphLoaded)
             {                          
                 graph = city.LoadFirstGraph();
                 city.InspectSchema(graph);
                 isGraphLoaded = true;                           
             }         
-                if (GUILayout.Button("Draw")&&isGraphLoaded)
+                if (GUILayout.Button("Draw") && isGraphLoaded)
                 {
                     if (graph != null)
 
@@ -66,7 +66,7 @@ namespace SEEEditor
                         Debug.LogError("No valid graph loaded.\n");
                     }
                 }
-                if (GUILayout.Button("Delete")&&isGraphLoaded)
+                if (GUILayout.Button("Delete") && isGraphLoaded)
                 {
                     isGraphLoaded = false;
                     city.Reset();
@@ -75,9 +75,10 @@ namespace SEEEditor
 
         private void DrawGraph(AbstractSEECity city, Graph graph)
         {
-            if (graph.Equals(null)){             
+            if (graph==null)
+            {             
                     Debug.LogError("No graph loaded.\n");
-                }            
+            }            
                 GraphRenderer graphRenderer = new GraphRenderer(city, graph);
                 // We assume here that this SEECity instance was added to a game object as
                 // a component. The inherited attribute gameObject identifies this game object.

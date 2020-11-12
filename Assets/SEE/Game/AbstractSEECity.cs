@@ -234,8 +234,7 @@ namespace SEE.Game
         /// <param name="graph">graph whose subgraph is requested</param>
         /// <returns>subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/></returns>
         protected Graph RelevantGraph(Graph graph)
-        {
-            
+        {            
             if (AllNodeTypesAreRelevant)
             {
                 return graph;
@@ -619,7 +618,7 @@ namespace SEE.Game
             else
             {
                 if (File.Exists(filename))
-                {         
+                {
                     Performance p = Performance.Begin("loading graph data from " + filename);
                     GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "", new SEELogger());
                     graphCreator.Load();
