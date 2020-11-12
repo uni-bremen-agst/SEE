@@ -93,7 +93,7 @@ namespace SEE.Game
         /// </summary>
         /// <returns>the loaded graph or null if none could be found</returns>
         public Graph LoadFirstGraph()
-        {           
+        {
             GraphsReader reader = new GraphsReader();
             reader.Load(PathPrefix, HierarchicalEdges, 1);
             List<Graph> graphs = reader.graphs;

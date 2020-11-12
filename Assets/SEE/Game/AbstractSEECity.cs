@@ -234,7 +234,7 @@ namespace SEE.Game
         /// <param name="graph">graph whose subgraph is requested</param>
         /// <returns>subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/></returns>
         protected Graph RelevantGraph(Graph graph)
-        {            
+        {
             if (AllNodeTypesAreRelevant)
             {
                 return graph;
