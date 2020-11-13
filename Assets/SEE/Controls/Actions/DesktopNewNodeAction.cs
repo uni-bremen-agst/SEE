@@ -11,27 +11,25 @@ namespace SEE.Controls {
         // Start is called before the first frame update
         //temp save the new node
         //maybe i need graphrenderer.draw(gameObject)
-        Node newNode;
+        Node node;
         GameObject nodeRepresentation;
-        
+        SEECity city;
         GraphRenderer graphRenderer;
         //Represents which kin of node should be created
         bool is_innerNode = false;
         void Start()
         {
             //gameObject.AddComponent(SEECity());
-            SEECity city = new SEECity();
-            graphRenderer = new GraphRenderer(city, city.LoadedGraph);
+           
+           gameObject.TryGetComponent<SEECity>(out city);
+           graphRenderer = new GraphRenderer(city, city.LoadedGraph);
         }
 
         // Update is called once per frame
         void Update()
         {
-            if (Input.GetButtonDown("Fire1"))
-            {
-               
-            }
-
+            
+            //Currently i can only add one new node because we need to persist the added node 
             //Eventuell hilft die Mehtode GetNode from ObjectManager
             //Later replace getKeyDown with menu action
             //Test for insert a new node
@@ -41,19 +39,24 @@ namespace SEE.Controls {
 
             // NodeFactory -> NewBlock did this represents a new Grphic node?
 
-            if (Input.GetKeyDown(KeyCode.N) && newNode == null)
+            if (Input.GetKeyDown(KeyCode.N) && node == null)
             { //Eventuell statt key eine Box mit Bausteinen neben dem Tisch?
               //create new Node and let him stick to the cursor
-                newNode = new Node();
+                node = new Node();
+                node.SourceName= "NEW-NODE";
+                node.ItsGraph = city.LoadedGraph;
                 //graphRenderer.ToString(); //test output if graphrenderer works
-                nodeRepresentation = graphRenderer.NewLeafNode(newNode);
+                nodeRepresentation = graphRenderer.NewLeafNode(node);
                 Debug.Log("NodeEditMODE TRUE\n");
             }
 
 
-            if (newNode != null)
+            if (node != null && nodeRepresentation != null)
             {
-                nodeRepresentation.transform.position = Input.mousePosition;
+                Vector3 mp = Input.mousePosition;
+                mp.z = 1;
+                mp = Camera.main.ScreenToWorldPoint(mp);
+                nodeRepresentation.transform.position = new Vector3(mp.x, 1, mp.z);
 
                 //iF b is pressed change the node kind, later this will be removed and replaced with the menu action where you can choose wich node you want to add
                 if (Input.GetKeyDown(KeyCode.B))
@@ -62,13 +65,13 @@ namespace SEE.Controls {
                     if (is_innerNode)
                     {
                         is_innerNode = false;
-                        nodeRepresentation = graphRenderer.NewLeafNode(newNode);
+                        nodeRepresentation = graphRenderer.NewLeafNode(node);
 
                     }
                     else
                     {
                         is_innerNode = true;
-                        nodeRepresentation = graphRenderer.NewInnerNode(newNode);
+                        nodeRepresentation = graphRenderer.NewInnerNode(node);
                     }
                 }
                 if (Input.GetButtonDown("Fire1")) //Looks for a Left Klick
@@ -86,15 +89,16 @@ namespace SEE.Controls {
                     {
                        //enter name of node 
                     }
-                    newNode = null;
+                    node = null;
                 }
 
             }
-            if (Input.GetKeyDown(KeyCode.N) && newNode != null)
+            if (Input.GetKeyDown(KeyCode.Y) && node != null)
             {
                 //exit node adding
                 //remove node from cursor
-                newNode = null;
+                node = null;
+                Debug.Log("NodeEditMODE FALSE\n");
                 //DesktopInput.NodeCreationRequested()
             }
         }
