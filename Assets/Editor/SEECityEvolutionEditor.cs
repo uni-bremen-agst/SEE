@@ -43,46 +43,45 @@ namespace SEEEditor
         /// Creates the buttons for loading the first graph of the evolution series.
         /// </summary>
         protected void Buttons()
-        {
-            
+        {            
             SEECityEvolution city = target as SEECityEvolution;
-            if (GUILayout.Button("Load First Graph")&&!isGraphLoaded)
+            if (GUILayout.Button("Load First Graph") && !isGraphLoaded)
             {                          
                 graph = city.LoadFirstGraph();
                 city.InspectSchema(graph);
                 isGraphLoaded = true;                           
-            }         
-                if (GUILayout.Button("Draw")&&isGraphLoaded)
+            }
+            if (GUILayout.Button("Draw") && isGraphLoaded)
+            {
+                if (graph != null)
                 {
-                    if (graph != null)
-
-                    {   
-                        
-                        graph = city.LoadFirstGraph();
-                        DrawGraph(city, graph);                      
-                    }
-                    else
-                    {
-                        Debug.LogError("No valid graph loaded.\n");
-                    }
+                    DrawGraph(city, graph);                    
                 }
-                if (GUILayout.Button("Delete")&&isGraphLoaded)
+                else
                 {
-                    isGraphLoaded = false;
-                    city.Reset();
-                }                    
+                    Debug.LogError("No valid graph loaded.\n");
+                }
+            }
+            if (GUILayout.Button("Delete") && isGraphLoaded)
+            {
+                isGraphLoaded = false;
+                city.Reset();
+            }
         }
 
         private void DrawGraph(AbstractSEECity city, Graph graph)
         {
-            if (graph.Equals(null)){             
-                    Debug.LogError("No graph loaded.\n");
-                }            
+            if (graph == null)
+            {
+                Debug.LogError("No graph loaded.\n");
+            }
+            else
+            {
                 GraphRenderer graphRenderer = new GraphRenderer(city, graph);
                 // We assume here that this SEECity instance was added to a game object as
                 // a component. The inherited attribute gameObject identifies this game object.
                 graphRenderer.Draw(city.gameObject);
-                     
+            }
         }
     }
 }
