@@ -25,34 +25,34 @@ namespace SEE.Net
         /// <summary>
         /// The transform view to synchronize.
         /// </summary>
-        [SerializeField] private readonly Transform transformToSynchronize = null;
+        [SerializeField] private Transform transformToSynchronize = null;
 
         /// <summary>
         /// Whether the position should be synchronized.
         /// </summary>
-        [SerializeField] private readonly bool synchronizePosition = false;
+        [SerializeField] private bool synchronizePosition = false;
 
         /// <summary>
         /// Whether the rotation should be synchronized.
         /// </summary>
-        [SerializeField] private readonly bool synchronizeRotation = false;
+        [SerializeField] private bool synchronizeRotation = false;
 
         /// <summary>
         /// Whether the scale should be synchronized.
         /// </summary>
-        [SerializeField] private readonly bool synchronizeScale = false;
+        [SerializeField] private bool synchronizeScale = false;
 
         /// <summary>
         /// Whether game objects should teleport for great distances.
         /// </summary>
-        [SerializeField] private readonly bool teleportForGreatDistances = true;
+        [SerializeField] private bool teleportForGreatDistances = true;
 
         /// <summary>
         /// The minimal distance, at which the transform is teleported, rather than
         /// smoothly moved. Is ignored, if <see cref="teleportForGreatDistances"/> is
         /// <code>false</code>.
         /// </summary>
-        [SerializeField] private readonly float teleportMinDistance = 8.0f;
+        [SerializeField] private float teleportMinDistance = 8.0f;
 
         /// <summary>
         /// The squared minimal teleport distance.

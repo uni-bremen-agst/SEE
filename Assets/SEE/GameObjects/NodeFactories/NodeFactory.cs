@@ -30,15 +30,17 @@ namespace SEE.GO
         /// the subclasses. It can be used to specify a visual property of the 
         /// objects such as the color. The allowed range of a style index depends 
         /// upon the  subclasses, too, but must be in [0, NumberOfStyles()-1].
+        /// The <paramref name="renderQueueOffset"/> specifies the offset of the render
+        /// queue of the new block. The higher the value, the later the object
+        /// will be drawn. Objects drawn later will cover objects drawn earlier.
+        /// This parameter can be used for the rendering of transparent objects, 
+        /// where the inner nodes must be rendered before the leaves to ensure 
+        /// correct sorting.
         /// </summary>
         /// <param name="style">specifies an additional visual style parameter of 
         /// the object</param>
         /// <returns>new block representation</returns>
-        /// <param name="renderQueueOffset">specifies the offset of the render
-        /// queue of the new block. The higher the value, the later the object
-        /// will be drawn. This parameter can be used in for the rendering of
-        /// transparent objects, where the inner nodes must be rendered before
-        /// the leafes to ensure correct sorting.</param>
+        /// <param name="renderQueueOffset">offset in the render queue</param>
         public abstract GameObject NewBlock(int style = 0, int renderQueueOffset = 0);
 
         /// <summary>
