@@ -19,18 +19,23 @@ public class NodeTypeSelectionExporter
 
     public static bool Persist(string pathPrefix, Dictionary<string, bool> nodeTypes, string path, string savedProfile)
     {
-        UnityEngine.Debug.Log("Pfad: " + path);
-        UnityEngine.Debug.Log("Name: " + savedProfile);
+        if (savedProfile == null || savedProfile.Equals(""))
+        {
+            return false;
+        }
+
         if (path == null)
         {
             return false;
         }
-    
-        String directoryDelimiter = "/";
-        string directory = path + directoryDelimiter;
-        string nameOfGraph = graphName(pathPrefix);
 
-        
+        string csvExtension = ".csv";
+        string directoryDelimiter = "/";
+        string directory = path + directoryDelimiter;
+        string nameOfGraph = LoadedGraphName(pathPrefix);
+        string fileName = path + directoryDelimiter + savedProfile + csvExtension;
+        UnityEngine.Debug.Log("graphName" + graphName(pathPrefix));
+
         //Filter every specific nodetype the user has selected before
         ICollection<string> matches = nodeTypes.Where(pair => pair.Value == true)
               .Select(pair => pair.Key).ToList();
@@ -38,7 +43,7 @@ public class NodeTypeSelectionExporter
 
         if (matches.Count == 0 || matches.Count == nodeTypes.Count)
         {
-           UnityEngine.Debug.LogError("No comprehensable selection to be stored"); 
+            UnityEngine.Debug.LogError("No comprehensable selection to be stored");
             return false;
         }
         for (int i = 0; i < matches.Count; i++)
@@ -51,10 +56,10 @@ public class NodeTypeSelectionExporter
 
         try
         {
-            FileStream fs = new FileStream(directory + "ProfileSettings.csv", FileMode.OpenOrCreate, FileAccess.Write);
+            FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write);
             fs.Close();
 
-            StreamWriter sw = new StreamWriter(directory + "ProfileSettings.csv");
+            StreamWriter sw = new StreamWriter(fileName);
 
             sw.WriteLine(nameOfGraph + ",");
             sw.WriteLine("Number of all nodetypes of the graph" + "," + "\n" + nodeTypes.Count + ",");
@@ -62,10 +67,9 @@ public class NodeTypeSelectionExporter
             sw.Flush();
             sw.Close();
 
-            System.IO.File.AppendAllLines(directory + "ProfileSettings.csv", selected);
-            string test = LoadedGraphName(pathPrefix); 
-            UnityEngine.Debug.Log("loadedGraph" + test);
-            
+            System.IO.File.AppendAllLines(fileName, selected);
+
+
         }
         catch (FileNotFoundException e)
         {
@@ -74,19 +78,40 @@ public class NodeTypeSelectionExporter
         return true;
     }
 
-    public static bool readProfiles (String fileName)
+    public static bool readProfiles(String fileName)
     {
-        if (fileName == null || !(compareFile(fileName)) )
+        if (fileName == null || !(compareFile(fileName)))
         {
-            return false; 
+            return false;
         }
-        return setNodetypes(); 
-    }
-        
 
-    public static  bool setNodetypes()
+        Dictionary<string, bool> allTypes = new Dictionary<string, bool>();
+        List<string> relevantNodeTypes = new List<string>();
+        try
+        {
+            FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write);
+            fs.Close();
+            StreamReader strReader = new StreamReader(fileName);
+            while (!(strReader.ReadLine() == null))
+            {
+                //parsieren- first line Name 2nd ... Ab Line 6 Die Nodetypes ... 
+            }
+        }
+        catch (FileNotFoundException)
+        {
+            //
+            return false;
+        }
+
+
+        return setNodetypes(allTypes, relevantNodeTypes);
+    }
+
+
+    public static bool setNodetypes(Dictionary<string, bool> nodeTypes, List<string> relevantNodeTypes)
     {
-        return false; 
+        //iterieren , in case false setzen...
+        return false;
     }
 
     public static bool compareFile(string pathPrefix)
@@ -96,28 +121,26 @@ public class NodeTypeSelectionExporter
 
         if (localGraphname.Equals(loadedGraphName))
         {
-            return true; 
+            return true;
         }
-        return false; 
+        return false;
     }
-    
+
     public static string graphName(string path)
-    {   
+    {
         IEnumerable<string> gxlFileName = Filenames.GXLFilenames(path);
         gxlFileName.ToList();
-        
+
         //Dissect the exact name of the given graph without the specific user directory it is stored in 
-        //and store it in nameOfGraph
         StringBuilder strBuilder = new StringBuilder(gxlFileName.ElementAt(0));
         string nameOfGraph = strBuilder.ToString();
-
-        return nameOfGraph; 
+        return nameOfGraph;
     }
 
-    public static string LoadedGraphName(string fileName)       
-    {  
+    public static string LoadedGraphName(string fileName)
+    {
         string loreIpsum = fileName + "/ProfileSettings.csv";
-        UnityEngine.Debug.Log("fileName ist " + fileName) ;
+        UnityEngine.Debug.Log("fileName ist " + fileName);
         string storedGraph = null;
         try
         {
@@ -125,7 +148,7 @@ public class NodeTypeSelectionExporter
             fs.Close();
             StreamReader strReader = new StreamReader(loreIpsum);
             storedGraph = strReader.ReadLine();
-           
+
         }
         catch (FileNotFoundException e)
         {
@@ -134,7 +157,7 @@ public class NodeTypeSelectionExporter
         //Cut the name of the specific directory the GXL is saved in and the delimiter, i.e. the last index
         storedGraph = storedGraph.Remove(0, fileName.Length);
         storedGraph = storedGraph.Remove(0, 1);
-        storedGraph = storedGraph.Remove(storedGraph.Length-1, 1);
+        storedGraph = storedGraph.Remove(storedGraph.Length - 1, 1);
 
         return storedGraph;
     }
