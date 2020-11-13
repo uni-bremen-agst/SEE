@@ -20,8 +20,8 @@
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game
@@ -75,17 +75,16 @@ namespace SEE.Game
         private List<Graph> LoadData()
         {
             GraphsReader graphsReader = new GraphsReader();
-            // Load all GXL graphs in directory PathPrefix but not more than maxRevisionsToLoad many.
+            // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
             graphsReader.Load(PathPrefix, HierarchicalEdges, maxRevisionsToLoad);
-
-            // TODO: The CSV metric files should be loaded, too.
-
             return graphsReader.graphs;
         }
 
         /// <summary>
         /// Yields the graph of the first GXL found in the directory named <code>PathPrefix</code>.
         /// The order is ascending and alphabetic by the GXL filenames located in that directory.
+        /// If the first GXL file has a corresponding CSV with additional metrics, this CSV file
+        /// will be read, too, and the node metrics added to the graph.
         /// 
         /// Precondition: PathPrefix must be set and denote an existing directory in the
         /// file system containing at least one GXL file.
@@ -93,32 +92,26 @@ namespace SEE.Game
         /// <returns>the loaded graph or null if none could be found</returns>
         public Graph LoadFirstGraph()
         {
-            GraphReader graphReader = new GraphReader(FirstFilename(PathPrefix), HierarchicalEdges);
-            graphReader.Load();
-            return graphReader.GetGraph();
-        }
-
-        public void DrawGraph(Graph graph)
-        {
-            DrawGraphs(new List<Graph>() { graph });
+            GraphsReader reader = new GraphsReader();
+            reader.Load(PathPrefix, HierarchicalEdges, 1);
+            List<Graph> graphs = reader.graphs;
+            if (graphs.Count == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return graphs.First<Graph>();
+            }
         }
 
         /// <summary>
-        /// Yields the first name of a GXL file in the sorted list of GXL files located
-        /// in the given <paramref name="directory"/>.
-        /// 
-        /// If <paramref name="directory"/> does not contain any GXL file, an exception is
-        /// thrown.
+        /// Draws the given <paramref name="graph"/>.
         /// </summary>
-        /// <param name="directory">directory in which to look up the first GXL file</param>
-        /// <returns>first filename</returns>
-        private string FirstFilename(string directory)
+        /// <param name="graph">graph to be drawn</param>
+        public void DrawGraph(Graph graph)
         {
-            foreach (string filename in GraphsReader.GXLFilenames(directory))
-            {
-                return filename;
-            }
-            throw new Exception("No GXL files found in " + directory);
+            DrawGraphs(new List<Graph>() { graph });
         }
 
         /// <summary>
@@ -145,6 +138,11 @@ namespace SEE.Game
             }
         }
 
+        /// <summary>
+        /// Creates <see cref="evolutionRenderer"/> and shows the complete graph
+        /// evolution for given <paramref name="graphs"/> using it.
+        /// </summary>
+        /// <param name="graphs">the series of graph to be drawn</param>
         private void DrawGraphs(List<Graph> graphs)
         {
             evolutionRenderer = CreateEvolutionRenderer();
