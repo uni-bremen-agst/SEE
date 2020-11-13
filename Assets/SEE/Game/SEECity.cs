@@ -1,12 +1,9 @@
-using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.GO;
-using SEE.Tools;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game
@@ -367,7 +364,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Resets everything that is specific to a given graph. Here: the node types,
+        /// Resets everything that is specific to a given graph. Here: the selected node types,
         /// the underlying graph, and all game objects visualizing information about it.
         /// </summary>
         public override void Reset()
@@ -379,7 +376,8 @@ namespace SEE.Game
                 loadedGraph.Destroy();
             }
             LoadedGraph = null;
-            Measurements = new SortedDictionary<string, string>();
+            Measurements.Clear();
+            ResetSelectedNodeTypes();
         }
     }
 }
