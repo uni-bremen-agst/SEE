@@ -1,7 +1,7 @@
-﻿using SEE.Utils;
+﻿using SEE.Game.UI3D;
+using SEE.Utils;
 using System;
 using UnityEngine;
-using SEE.Game.UI3D;
 
 namespace SEE.Controls.Actions
 {
@@ -145,7 +145,7 @@ namespace SEE.Controls.Actions
         {
             base.Update();
 
-            if (CityAvailable)
+            if (CityTransform != null)
             {
                 bool isMouseOverGUI = Raycasting.IsMouseOverGUI();
 
@@ -228,7 +228,7 @@ namespace SEE.Controls.Actions
         // 'independent'.
         private void FixedUpdate()
         {
-            if (!CityAvailable)
+            if (CityTransform == null)
             {
                 return;
             }
