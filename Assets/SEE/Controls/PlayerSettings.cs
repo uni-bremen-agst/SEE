@@ -1,5 +1,6 @@
 ﻿using OdinSerializer;
 using System;
+using Microsoft.MixedReality.Toolkit;
 using UnityEngine;
 using UnityEngine.XR;
 using Valve.VR;
@@ -67,6 +68,12 @@ namespace SEE.Controls
             SetActive("VRPlayer", playerInputType == PlayerInputType.VR);
             SetActive("InControl", playerInputType == PlayerInputType.TouchGamepad);
             SetActive("MRPlayer", playerInputType == PlayerInputType.HoloLens);
+            SetActive("MixedRealityToolkit", playerInputType == PlayerInputType.HoloLens);
+            
+            if (playerInputType != PlayerInputType.HoloLens)
+            {
+                MixedRealityToolkit.SetInstanceInactive(MixedRealityToolkit.Instance);
+            }
 
             // Turn off controller hints if requested in the user settings.
             if (!ShowControllerHints)

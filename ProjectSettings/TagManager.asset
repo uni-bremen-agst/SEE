@@ -27,6 +27,7 @@ TagManager:
   - Building
   - CullingPlane
   - Code City
+  - MRTK
   layers:
   - Default
   - TransparentFX
