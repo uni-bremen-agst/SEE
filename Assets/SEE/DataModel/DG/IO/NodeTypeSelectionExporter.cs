@@ -19,7 +19,8 @@ public class NodeTypeSelectionExporter
 
     public static bool Persist(string pathPrefix, Dictionary<string, bool> nodeTypes, string path, string savedProfile)
     {
-        if (savedProfile == null || savedProfile.Equals(""))
+        //pathPrefix is set before and thus not verified again
+        if (savedProfile == null || savedProfile.Equals("") || !(Directory.Exists(path)))
         {
             return false;
         }
@@ -32,9 +33,9 @@ public class NodeTypeSelectionExporter
         string csvExtension = ".csv";
         string directoryDelimiter = "/";
         string directory = path + directoryDelimiter;
-        string nameOfGraph = LoadedGraphName(pathPrefix);
+        string nameOfGraph = storedGraphName(pathPrefix);
         string fileName = path + directoryDelimiter + savedProfile + csvExtension;
-        UnityEngine.Debug.Log("graphName" + graphName(pathPrefix));
+        UnityEngine.Debug.Log("fileName" + fileName);
 
         //Filter every specific nodetype the user has selected before
         ICollection<string> matches = nodeTypes.Where(pair => pair.Value == true)
@@ -116,17 +117,17 @@ public class NodeTypeSelectionExporter
 
     public static bool compareFile(string pathPrefix)
     {
-        string localGraphname = graphName(pathPrefix);
-        string loadedGraphName = LoadedGraphName(pathPrefix);
+        string localGraph = storedGraphName(pathPrefix);
+        string loadedGraph = loadedGraphName(pathPrefix);
 
-        if (localGraphname.Equals(loadedGraphName))
+        if (localGraph.Equals(loadedGraph))
         {
             return true;
         }
         return false;
     }
 
-    public static string graphName(string path)
+    public static string storedGraphName(string path)
     {
         IEnumerable<string> gxlFileName = Filenames.GXLFilenames(path);
         gxlFileName.ToList();
@@ -134,19 +135,21 @@ public class NodeTypeSelectionExporter
         //Dissect the exact name of the given graph without the specific user directory it is stored in 
         StringBuilder strBuilder = new StringBuilder(gxlFileName.ElementAt(0));
         string nameOfGraph = strBuilder.ToString();
+
+        UnityEngine.Debug.Log("in storedGraphName" + nameOfGraph);
         return nameOfGraph;
     }
 
-    public static string LoadedGraphName(string fileName)
+    public static string loadedGraphName(string fileName)
     {
-        string loreIpsum = fileName + "/ProfileSettings.csv";
-        UnityEngine.Debug.Log("fileName ist " + fileName);
+        
+        
         string storedGraph = null;
         try
         {
-            FileStream fs = new FileStream(loreIpsum, FileMode.OpenOrCreate, FileAccess.Write); // hardCoded fileName fehlt 
+            FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write); // hardCoded fileName fehlt 
             fs.Close();
-            StreamReader strReader = new StreamReader(loreIpsum);
+            StreamReader strReader = new StreamReader(fileName);
             storedGraph = strReader.ReadLine();
 
         }
