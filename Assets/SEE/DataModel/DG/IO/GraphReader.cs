@@ -60,7 +60,7 @@ namespace SEE.DataModel.DG.IO
                                            filename, rootName);
                     Node singleRoot = new Node
                     {
-                        Type = rootName,
+                        Type = "ROOT",
                         ID = rootName,
                         SourceName = rootName
                     };
