@@ -103,7 +103,7 @@ namespace SEE.Game
         /// they should be visualized or not.
         /// </summary>
         [NonSerialized, OdinSerialize]
-        private Dictionary<string, bool> nodeTypes = new Dictionary<string, bool>();
+        protected Dictionary<string, bool> nodeTypes = new Dictionary<string, bool>();
         /// <summary>
         /// A mapping of all node types of the nodes in the graph onto whether
         /// they should be visualized or not.
@@ -114,13 +114,20 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Resets everything that is specific to a given graph. Here: the 
-        /// node types.
+        /// Resets everything that is specific to a given graph. Here: 
+        /// all game objects created for this city.
         /// </summary>
         public virtual void Reset()
         {
             DeleteGraphGameObjects();
-            nodeTypes = new Dictionary<string, bool>();
+        }
+
+        /// <summary>
+        /// Resets the selected node types to be visualized.
+        /// </summary>
+        public void ResetSelectedNodeTypes()
+        {
+            nodeTypes.Clear();
         }
 
         /// <summary>
@@ -233,17 +240,22 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph whose subgraph is requested</param>
         /// <returns>subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/></returns>
-        protected Graph RelevantGraph(Graph graph)
-        {
-            
+        public Graph RelevantGraph(Graph graph)
+        {            
             if (AllNodeTypesAreRelevant)
             {
+                Debug.Log("All node types are relevant.\n");
                 return graph;
             }
             else
             {
                 ICollection<string> matches = nodeTypes.Where(pair => pair.Value == true)
                   .Select(pair => pair.Key).ToList();
+                Debug.Log("The following node types are relevant:\n");
+                foreach (string nodeType in matches)
+                {
+                    Debug.LogFormat("  {0}\n", nodeType);
+                }
                 return graph.Subgraph(matches);
             }
         }
@@ -621,7 +633,7 @@ namespace SEE.Game
                 if (File.Exists(filename))
                 {         
                     Performance p = Performance.Begin("loading graph data from " + filename);
-                    GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "", new SEELogger());
+                    GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, logger: new SEELogger());
                     graphCreator.Load();
                     Graph graph = graphCreator.GetGraph();
                     p.End();
@@ -632,7 +644,6 @@ namespace SEE.Game
                         + "\nElapsed time: " + p.GetElapsedTime() + "[h:m:s:ms]\n");
 
                     LoadDataForGraphListing(graph);
-
                     return graph;
                 }
                 else
