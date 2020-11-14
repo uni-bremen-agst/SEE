@@ -19,7 +19,7 @@ TagManager:
   - Runtime
   - Function Call
   - Building
-  - JLG Visualisation
+  - JLG Visualization
   layers:
   - Default
   - TransparentFX
