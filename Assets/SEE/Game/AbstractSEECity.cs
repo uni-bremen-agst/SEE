@@ -646,7 +646,7 @@ namespace SEE.Game
             else
             {
                 if (File.Exists(filename))
-                {         
+                {
                     Performance p = Performance.Begin("loading graph data from " + filename);
                     GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, logger: new SEELogger());
                     graphCreator.Load();
