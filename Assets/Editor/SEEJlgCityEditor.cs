@@ -26,8 +26,7 @@ using UnityEditor;
 using SEE.Game;
 
 namespace SEEEditor
-{
-    
+{    
         /// <summary>
         /// A custom editor for instances of SEEJlgCity as an extension of the SEECityEditor.
         /// </summary>
