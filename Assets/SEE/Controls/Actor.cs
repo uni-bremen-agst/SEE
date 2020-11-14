@@ -117,7 +117,7 @@ namespace SEE.Controls
         {
             if (transformationDevice == null)
             {
-                Debug.LogError("Transformation device must be set.\n");
+                Debug.LogErrorFormat("Transformation device must be set for game object {0}.\n", name);
             }
             else
             {
