@@ -222,6 +222,7 @@ GameObject:
   - component: {fileID: 245753566}
   - component: {fileID: 245753565}
   - component: {fileID: 245753564}
+  - component: {fileID: 245753574}
   m_Layer: 0
   m_Name: DesktopPlayer
   m_TagString: MainCamera
@@ -415,7 +416,7 @@ MonoBehaviour:
   directionDevice: {fileID: 245753567}
   viewpointDevice: {fileID: 245753568}
   selectionDevice: {fileID: 245753566}
-  transformationDevice: {fileID: 0}
+  transformationDevice: {fileID: 245753574}
   cameraAction: {fileID: 245753571}
   selectionAction: {fileID: 245753564}
 --- !u!4 &245753573
@@ -432,6 +433,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &245753574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 245753563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9514951335d02224f938b713d3ccb90f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: 
 --- !u!1 &294493391
 GameObject:
   m_ObjectHideFlags: 0
@@ -452,6 +466,7 @@ GameObject:
   - component: {fileID: 294493394}
   - component: {fileID: 294493393}
   - component: {fileID: 294493392}
+  - component: {fileID: 294493404}
   m_Layer: 0
   m_Name: GamepadPlayer
   m_TagString: MainCamera
@@ -617,7 +632,7 @@ MonoBehaviour:
   directionDevice: {fileID: 294493398}
   viewpointDevice: {fileID: 294493392}
   selectionDevice: {fileID: 294493394}
-  transformationDevice: {fileID: 0}
+  transformationDevice: {fileID: 294493404}
   cameraAction: {fileID: 294493399}
   selectionAction: {fileID: 294493395}
 --- !u!81 &294493401
@@ -685,6 +700,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &294493404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 294493391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9514951335d02224f938b713d3ccb90f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: 
 --- !u!1 &345399386
 GameObject:
   m_ObjectHideFlags: 0
@@ -767,7 +795,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  PathPrefix: 
+  PathPrefix: C:\Users\koschke\SEE\Data\GXL\TestProjectToDebug\
   gvlPath: 
   WidthMetric: Metric.LOC
   HeightMetric: Metric.LOC
@@ -788,13 +816,13 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
-  InnerNodeHeightMetric: 
+  InnerNodeHeightMetric: 0.1
   InnerNodeStyleMetric: Metric.IssuesTotal
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
-  InnerNodeObjects: 0
-  NodeLayout: 5
+  InnerNodeObjects: 3
+  NodeLayout: 4
   EdgeLayout: 0
   ZScoreScale: 1
   EdgeWidth: 0.3
@@ -803,9 +831,9 @@ MonoBehaviour:
   EdgesAboveBlocks: 1
   Tension: 0.85
   RDP: 0.05
-  gxlPath: 
-  csvPath: 
-  jlgPath: 
+  gxlPath: CodeFacts.gxl
+  csvPath: CodeFacts.csv
+  jlgPath: CodeFacts.jlg
 --- !u!4 &345399388
 Transform:
   m_ObjectHideFlags: 0
@@ -1003,7 +1031,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 715291850}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.964912, y: -4, z: 0}
+  m_LocalPosition: {x: -5.666667, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 180851003}
@@ -1185,7 +1213,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1553346102}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 8.964912, y: -4, z: 0}
+  m_LocalPosition: {x: 5.666667, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 180851003}
@@ -1538,9 +1566,22 @@ MonoBehaviour:
   directionDevice: {fileID: 1609757605}
   viewpointDevice: {fileID: 1609757606}
   selectionDevice: {fileID: 1609757610}
-  transformationDevice: {fileID: 0}
+  transformationDevice: {fileID: 1609757612}
   cameraAction: {fileID: 1609757609}
   selectionAction: {fileID: 1609757607}
+--- !u!114 &1609757612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1609757599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9514951335d02224f938b713d3ccb90f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: 
 --- !u!1 &1907336441
 GameObject:
   m_ObjectHideFlags: 0
