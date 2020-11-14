@@ -205,30 +205,45 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Inspects the node types and attributes that occur in the graph.
-        /// All node types are considered relevant initially. The node types 
-        /// can be retrieved and also be marked as irrelevant later via property 
-        /// SelectedNodeTypes.
+        /// If <paramref name="graph"/> is null, nothing happens. Otherwise:
+        /// Inspects the node types that occur in the graph and updates <see cref="SelectedNodeTypes"/>.
+        /// All new node types are considered relevant initially. If <paramref name="graph"/> contains
+        /// a node type that existed in <see cref="SelectedNodeTypes"/> before, that node type's 
+        /// selection information will be re-used. If <see cref="SelectedNodeTypes"/> contains a node
+        /// type not contained in <paramref name="graph"/>, it will be removed from <see cref="SelectedNodeTypes"/>.
+        /// 
+        /// The node types can be retrieved and also be marked as irrelevant later via property 
+        /// <see cref="SelectedNodeTypes"/>.
         /// </summary>
         /// <param name="graph">graph from which to retrieve the node types (may be null)</param>
         public void InspectSchema(Graph graph)
         {
             if (graph != null)
             {
-                HashSet<string> types = new HashSet<string>();
+                // The node types in the newly loaded graph.
+                HashSet<string> newTypes = new HashSet<string>();
                 foreach (Node node in graph.Nodes())
-                {
-                    types.Add(node.Type);
+                {                    
+                    newTypes.Add(node.Type);                    
                 }
-                nodeTypes = new Dictionary<string, bool>();
-                foreach (string type in types)
+                // nodeTypes contains the node types of the previously loaded graph.
+                // Node types in nodeTypes not in newTypes will disappear
+                // because we are iterating only over newTypes.
+                Dictionary<string, bool> newNodeTypes = new Dictionary<string, bool>();
+                foreach (string type in newTypes)
                 {
-                    nodeTypes[type] = true;
+                    if (nodeTypes.ContainsKey(type))
+                    {
+                        // preserve existing node types
+                        newNodeTypes[type] = nodeTypes[type];
+                    }
+                    else
+                    {
+                        // default is true: a node type is selected initially
+                        newNodeTypes[type] = true;
+                    }
                 }
-            }
-            else
-            {
-                nodeTypes.Clear();
+                nodeTypes = newNodeTypes;
             }
         }
 
@@ -648,7 +663,7 @@ namespace SEE.Game
                 }
                 else
                 {
-                    Debug.LogWarningFormat("GXL file {0} does not exist.\n", filename);
+                    Debug.LogErrorFormat("GXL file {0} does not exist.\n", filename);
                     return new Graph();
                 }
             }
