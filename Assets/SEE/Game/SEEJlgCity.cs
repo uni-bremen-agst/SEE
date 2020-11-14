@@ -1,7 +1,4 @@
-﻿
-using Assets.SEE.DataModel;
-using Assets.SEE.DataModel.IO;
-using SEE.DataModel;
+﻿using SEE.DataModel;
 using System.IO;
 using UnityEngine;
 
@@ -14,6 +11,16 @@ namespace SEE.Game
         /// </summary>
         public string jlgPath;
 
+        /// <summary>
+        /// Returns the concatenation of pathPrefix and jlgPath. That is the complete
+        /// absolute path to the JLG file containing the runtime trace data.
+        /// </summary>
+        /// <returns>concatenation of pathPrefix and jlgPath</returns>
+        public string JLGPath()
+        {
+            return PathPrefix + jlgPath;
+        }
+
         public override void LoadData()
         {
             base.LoadData();
@@ -25,13 +32,15 @@ namespace SEE.Game
         /// </summary>
         private void LoadJLG()
         {
-            if (string.IsNullOrEmpty(jlgPath))
+            string path = JLGPath();
+
+            if (string.IsNullOrEmpty(path))
             {
-                Debug.LogError("Path to JLG source file cannot be empty.\n");
+                Debug.LogError("Path to JLG source file must not be empty.\n");
             }
-            else if (!File.Exists(jlgPath))
+            else if (!File.Exists(path))
             {
-                Debug.LogError("Source file does not exist at that path.\n");
+                Debug.LogErrorFormat("Source file does not exist at that path {0}.\n", path);
             }
             else
             {
@@ -40,7 +49,7 @@ namespace SEE.Game
                 jlgVisualisationGameObject.name = Tags.JLGVisualization;
                 jlgVisualisationGameObject.tag = Tags.JLGVisualization;
 
-                jlgVisualisationGameObject.AddComponent<Runtime.JLGVisualizer>().jlgFilePath = jlgPath;
+                jlgVisualisationGameObject.AddComponent<Runtime.JLGVisualizer>().jlgFilePath = path;
             }
 
         }
