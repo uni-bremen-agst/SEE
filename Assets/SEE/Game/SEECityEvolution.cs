@@ -152,9 +152,15 @@ namespace SEE.Game
         {           
             for (int i = 0; i < graphs.Count; i++) 
             {
-                graphs[i] = RelevantGraph(graphs[i]);
-                LoadDataForGraphListing(graphs[i]);
-                graphs[i].FinalizeGraph();              
+                Graph relevantGraph = RelevantGraph(graphs[i]);
+                if (relevantGraph != graphs[i])
+                {
+                    // Node types have been filtered out. Because of that
+                    // there may now be multiple roots again.
+                    relevantGraph.AddSingleRoot(name: "ROOT", type: "ROOT");
+                }
+                graphs[i] = relevantGraph;
+                LoadDataForGraphListing(graphs[i]);           
             }
 
             evolutionRenderer = CreateEvolutionRenderer();
