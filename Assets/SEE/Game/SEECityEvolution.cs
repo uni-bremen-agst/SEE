@@ -85,6 +85,8 @@ namespace SEE.Game
         /// The order is ascending and alphabetic by the GXL filenames located in that directory.
         /// If the first GXL file has a corresponding CSV with additional metrics, this CSV file
         /// will be read, too, and the node metrics added to the graph.
+        /// Furthermore the selection of the specific node types selected by the user is applied in case 
+        /// the user specified it before. By default every node type is selected.
         /// 
         /// Precondition: PathPrefix must be set and denote an existing directory in the
         /// file system containing at least one GXL file.
@@ -101,7 +103,10 @@ namespace SEE.Game
             }
             else
             {
-                return graphs.First<Graph>();
+                Graph graph = graphs.First<Graph>();                
+                graph = RelevantGraph(graph);
+                graph.FinalizeGraph();
+                return graph;
             }
         }
 
@@ -139,12 +144,26 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Creates <see cref="evolutionRenderer"/> and shows the complete graph
-        /// evolution for given <paramref name="graphs"/> using it.
+        /// Creates <see cref="evolutionRenderer"/> and shows the nodes having one of the selected
+        /// node types and the edges of these specific nodes of the graph evolution 
+        /// for given <paramref name="graphs"/> using it.
         /// </summary>
         /// <param name="graphs">the series of graph to be drawn</param>
         private void DrawGraphs(List<Graph> graphs)
-        {
+        {           
+            for (int i = 0; i < graphs.Count; i++) 
+            {
+                Graph relevantGraph = RelevantGraph(graphs[i]);
+                if (relevantGraph != graphs[i])
+                {
+                    // Node types have been filtered out. Because of that
+                    // there may now be multiple roots again.
+                    relevantGraph.AddSingleRoot(name: "ROOT", type: "ROOT");
+                }
+                graphs[i] = relevantGraph;
+                LoadDataForGraphListing(graphs[i]);
+            }
+
             evolutionRenderer = CreateEvolutionRenderer();
             evolutionRenderer.ShowGraphEvolution(graphs);
         }
