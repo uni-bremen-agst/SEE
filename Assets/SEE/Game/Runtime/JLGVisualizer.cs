@@ -390,32 +390,42 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// This Method finds the path to the file of a given node and returns the content of the file.
+        /// This method finds the path to the file of a given node and returns the content of the file.
+        /// If the source code cannot be found, the single line "1. // empty" will be returned.
+        /// Precondition: <paramref name="go"/> represents a Java class.
         /// </summary>
-        /// <param name="go"></param>
-        /// <returns></returns>
+        /// <param name="go">the game object representing the class whose source code is to be returned</param>
+        /// <returns>the file content of the corresponding source-code file (line numbers are appended)</returns>
         private string GetFileContentForNode(GameObject go)
         {
             string classname = go.name;
             if (classname.Contains(".")) {
                 classname = classname.Substring(classname.LastIndexOf(".") + 1);
             }
-            classname = classname + ".java";
+            classname += ".java";
             foreach (string p in parsedJLG.FilesOfProject)
             {
                 if (p.EndsWith(classname))
                 {
-                    int i = 1;
-                    string output = "";
-                    foreach (string line in File.ReadLines(p))
+                    if (File.Exists(p))
                     {
-                        output = output + i + ". " + line + Environment.NewLine;
-                        i++;
+                        int lineNumber = 1;
+                        string output = "";
+                        foreach (string lineContent in File.ReadLines(p))
+                        {
+                            output += lineNumber.ToString() + ". " + lineContent + Environment.NewLine;
+                            lineNumber++;
+                        }
+                        return output;
                     }
-                    return output;
+                    else
+                    {
+                        Debug.LogErrorFormat("Source code file {0} not found for game object {1}.\n", p, go.name);
+                        return "1. // empty" + Environment.NewLine;
+                    }
                 }
             }
-            throw new Exception("File could not be loaded.");
+            throw new Exception("File could not be loaded for " + classname + ".");
         }
 
         /// <summary>
