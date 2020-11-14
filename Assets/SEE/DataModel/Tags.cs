@@ -1,6 +1,4 @@
-﻿using UnityEngine.PlayerLoop;
-
-namespace SEE.DataModel
+﻿namespace SEE.DataModel
 {
     /// <summary>
     /// The Unity tags for the graph entities represented by the GameObjects.
