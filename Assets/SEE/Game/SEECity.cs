@@ -38,6 +38,8 @@ namespace SEE.Game
 
         /// <summary>
         /// The graph underlying this SEE city that was loaded from disk. May be null.
+        /// If a new graph is assigned to this property, the selected node types will
+        /// be updated, too.
         /// </summary>
         public Graph LoadedGraph
         {
@@ -360,7 +362,7 @@ namespace SEE.Game
         /// </summary>
         public void SaveLayout()
         {
-            SEE.Layout.IO.Writer.Save(GVLPath, loadedGraph.Name, AllNodeDescendants(gameObject));
+            Layout.IO.Writer.Save(GVLPath, loadedGraph.Name, AllNodeDescendants(gameObject));
         }
 
         /// <summary>
@@ -377,7 +379,6 @@ namespace SEE.Game
             }
             LoadedGraph = null;
             Measurements.Clear();
-            ResetSelectedNodeTypes();
         }
     }
 }
