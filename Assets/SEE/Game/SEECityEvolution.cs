@@ -86,14 +86,14 @@ namespace SEE.Game
         /// If the first GXL file has a corresponding CSV with additional metrics, this CSV file
         /// will be read, too, and the node metrics added to the graph.
         /// Furthermore the selection of the specific node types selected by the user is applied in case 
-        /// the user speciefied it before.By default every node type is selected.
+        /// the user specified it before. By default every node type is selected.
         /// 
         /// Precondition: PathPrefix must be set and denote an existing directory in the
         /// file system containing at least one GXL file.
         /// </summary>
         /// <returns>the loaded graph or null if none could be found</returns>
         public Graph LoadFirstGraph()
-        {           
+        {
             GraphsReader reader = new GraphsReader();
             reader.Load(PathPrefix, HierarchicalEdges, 1);
             List<Graph> graphs = reader.graphs;
@@ -115,7 +115,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph to be drawn</param>
         public void DrawGraph(Graph graph)
-        {  
+        {
             DrawGraphs(new List<Graph>() { graph });
         }
 
@@ -144,8 +144,9 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Creates <see cref="evolutionRenderer"/> and shows the nodes having one of the selected node types of the graph
-        /// evolution for given <paramref name="graphs"/> using it.
+        /// Creates <see cref="evolutionRenderer"/> and shows the nodes having one of the selected
+        /// node types and the edges of these specific nodes of the graph evolution 
+        /// for given <paramref name="graphs"/> using it.
         /// </summary>
         /// <param name="graphs">the series of graph to be drawn</param>
         private void DrawGraphs(List<Graph> graphs)
@@ -160,7 +161,7 @@ namespace SEE.Game
                     relevantGraph.AddSingleRoot(name: "ROOT", type: "ROOT");
                 }
                 graphs[i] = relevantGraph;
-                LoadDataForGraphListing(graphs[i]);           
+                LoadDataForGraphListing(graphs[i]);
             }
 
             evolutionRenderer = CreateEvolutionRenderer();
