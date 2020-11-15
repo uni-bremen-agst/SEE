@@ -53,6 +53,13 @@ namespace SEE.Game.Evolution
         public Slider Slider; // serialized by Unity
 
         /// <summary>
+        /// Button to play/pause the animation.
+        /// </summary>
+        public Button PlayButton; // serialized by Unity
+
+
+
+        /// <summary>
         /// Checks if all fields are initialized.
         /// </summary>
         private void Start()

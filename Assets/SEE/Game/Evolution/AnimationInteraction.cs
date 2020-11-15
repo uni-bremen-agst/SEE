@@ -103,9 +103,28 @@ namespace SEE.Game.Evolution
             animationDataModel.Slider.maxValue = evolutionRenderer.GraphCount-1;
             animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
 
+            animationDataModel.PlayButton.onClick.AddListener(TaskOnClick);
+
             SetMode(true);
             OnShownGraphHasChanged();
             evolutionRenderer.Register(OnShownGraphHasChanged);
+        }
+
+        /// <summary>
+        /// Handles actions to do when the Play/Pause button has been clicked.
+        /// </summary>
+        private void TaskOnClick()
+        {
+            if (!evolutionRenderer.IsAutoPlay)
+            {
+                animationDataModel.PlayButton.GetComponentInChildren<Text>().text = "ll";
+                evolutionRenderer.ToggleAutoPlay();
+            } else
+            {
+                animationDataModel.PlayButton.GetComponentInChildren<Text>().text = "►";
+                evolutionRenderer.ToggleAutoPlay();
+            }
+            
         }
 
         /// <summary>
