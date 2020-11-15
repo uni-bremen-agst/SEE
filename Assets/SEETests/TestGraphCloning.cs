@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using NUnit.Framework;
-using UnityEngine;
+﻿using NUnit.Framework;
 
-namespace SEE.DataModel
+namespace SEE.DataModel.DG
 {
     /// <summary>
     /// Test of method Clone() of all Attributables.
@@ -169,7 +166,7 @@ namespace SEE.DataModel
 
         private void CompareHierarchy(Node node, Graph clone, Node clonedNode)
         {
-            Assert.That(node.ID == clonedNode.ID, 
+            Assert.That(node.ID == clonedNode.ID,
                         "Linknames differ: " + node.ID + " != " + clonedNode.ID);
             Assert.That(node.NumberOfChildren() == clonedNode.NumberOfChildren());
             Assert.That(node.Level == clonedNode.Level,
@@ -183,7 +180,7 @@ namespace SEE.DataModel
             }
             else
             {
-                Assert.That(!clonedNode.IsRoot(), 
+                Assert.That(!clonedNode.IsRoot(),
                             clonedNode.ToString() + " should not be a root. Corresponding node in original graph: "
                             + node.ToString());
                 Assert.That(node.Parent.ID == clonedNode.Parent.ID);

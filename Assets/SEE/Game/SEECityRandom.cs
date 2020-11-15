@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System;
-
+﻿using SEE.DataModel.DG;
 using SEE.Tools;
-using SEE.DataModel;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SEE.Game
@@ -27,17 +26,21 @@ namespace SEE.Game
         /// </summary>
         public List<RandomAttributeDescriptor> LeafAttributes = Defaults();
 
+        public static int DefaultAttributeMean = 10;
+
+        public static int DefaultAttributeStandardDerivation = 3;
+
         /// <summary>
         /// Returns the default settings for leaf node attribute constraints (for the random 
         /// generation of their values).
         /// </summary>
         /// <returns>default settings for leaf node attribute constraints</returns>
-        private static List<RandomAttributeDescriptor> Defaults()
+        public static List<RandomAttributeDescriptor> Defaults()
         {
             // We are using a set because the same name could be used more than once
             // in the settings below.
             HashSet<string> leafAttributeNames = new HashSet<string>();
-            foreach (var value in Enum.GetValues(typeof(SEE.DataModel.NumericAttributeNames)).Cast<SEE.DataModel.NumericAttributeNames>())
+            foreach (NumericAttributeNames value in Enum.GetValues(typeof(NumericAttributeNames)).Cast<NumericAttributeNames>())
             {
                 leafAttributeNames.Add(value.Name());
             }
@@ -45,7 +48,7 @@ namespace SEE.Game
 
             foreach (string attribute in leafAttributeNames)
             {
-                result.Add(new RandomAttributeDescriptor(attribute, 10, 3));
+                result.Add(new RandomAttributeDescriptor(attribute, DefaultAttributeMean, DefaultAttributeStandardDerivation));
             }
             return result;
         }

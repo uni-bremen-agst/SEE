@@ -25,22 +25,23 @@ using UnityEngine;
 
 namespace SEE.GO.Whiteboard
 {
+    [System.Obsolete("Experimental code. Do not use it. May be removed soon.")]
     public class Painter : MonoBehaviour
     {
         [SerializeField]
-        private PaintMode paintMode;
+        private readonly PaintMode paintMode;
 
         [SerializeField]
-        private Transform paintingTransform; // FIXME: Never assigned.
+        private readonly Transform paintingTransform; // FIXME: Never assigned.
 
         [SerializeField]
-        private float raycastLength = 0.01f;
+        private readonly float raycastLength = 0.01f;
 
         [SerializeField]
-        private Texture2D brush;
+        private readonly Texture2D brush;
 
         [SerializeField]
-        private float spacing = 1f;
+        private readonly float spacing = 1f;
 
         private float currentAngle = 0f;
         private float lastAngle = 0f;
@@ -48,7 +49,7 @@ namespace SEE.GO.Whiteboard
         private PaintReceiver paintReceiver;
         private Collider paintReceiverCollider;
 
-        private DraggableObject paintingObject;
+        private readonly DraggableObject paintingObject;
 
         private Stamp stamp;
 

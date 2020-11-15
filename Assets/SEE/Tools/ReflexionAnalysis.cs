@@ -27,13 +27,13 @@ Open issues: implementation of incremental analysis is missing.
 
 */
 
+using SEE.DataModel;
+using SEE.DataModel.DG;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-using SEE.DataModel;
-
-namespace SEE.Tools.Architecture
+namespace SEE.Tools
 {
     /// <summary>
     /// Super class for all exceptions thrown by the architecture analysis.
@@ -43,9 +43,9 @@ namespace SEE.Tools.Architecture
     /// <summary>
     /// Thrown if the hierarchy is not a tree structure.
     /// </summary>
-    public class Hierarchy_Is_Not_A_Tree : DG_Exception {}
+    public class Hierarchy_Is_Not_A_Tree : DG_Exception { }
 
-    public class Corrupt_State : DG_Exception {}
+    public class Corrupt_State : DG_Exception { }
 
     /// <summary>
     /// State of a dependency in the architecture or implementation within the 
@@ -1077,7 +1077,7 @@ namespace SEE.Tools.Architecture
         ///   data are updated; all observers are informed of the change.
         /// </summary>
         /// <param name="edge">the dependency edge to be removed from the implementation graph</param>
-        void Delete_From_Dependencies(Edge edge)
+        private void Delete_From_Dependencies(Edge edge)
         {
             throw new NotImplementedException(); // FIXME
         }
@@ -1151,7 +1151,7 @@ namespace SEE.Tools.Architecture
         /// <returns>summary of the number of edges in the architecture for each respective state</returns>
         public int[] Summary()
         {
-            Graph _architecture = this.Get_Architecture();
+            Graph _architecture = Get_Architecture();
             string[] stateNames = Enum.GetNames(typeof(State));
             int[] summary = new int[stateNames.Length];
 
@@ -1165,7 +1165,7 @@ namespace SEE.Tools.Architecture
         /// <summary>
         /// Whether descendants may implicitly access their ancestors.
         /// </summary>
-        private bool _allow_dependencies_to_parents;
+        private readonly bool _allow_dependencies_to_parents;
 
         // *****************************************
         // involved graphs
@@ -1174,17 +1174,17 @@ namespace SEE.Tools.Architecture
         /// <summary>
         /// The graph representing the implementation.
         /// </summary>
-        private Graph _implementation;
+        private readonly Graph _implementation;
 
         /// <summary>
         /// The graph representing the specified architecture model.
         /// </summary>
-        private Graph _architecture;
+        private readonly Graph _architecture;
 
         /// <summary>
         /// The graph describing the mapping of implementation entities onto architecture entities.
         /// </summary>
-        private Graph _mapping;
+        private readonly Graph _mapping;
 
         // ******************************************************************
         // node mappings from node IDs onto nodes in the various graphs
@@ -1330,7 +1330,7 @@ namespace SEE.Tools.Architecture
         /// </summary>
         /// <param name="node">implementation node</param>
         /// <returns>true if node is explicitly mapped</returns>
-        private bool Is_Mapper(Node node)
+        public bool Is_Mapper(Node node)
         {
             return _explicit_maps_to_table.ContainsKey(node.ID);
         }
@@ -1499,7 +1499,7 @@ namespace SEE.Tools.Architecture
             // Iterate on all nodes in the domain of implicit_maps_to_table
             // (N.B.: these are nodes that are in 'implementation'), and
             // propagate and lift their dependencies in the architecture
-            foreach (var mapsto in _implicit_maps_to_table)
+            foreach (KeyValuePair<string, Node> mapsto in _implicit_maps_to_table)
             {
                 // source_node is in implementation
                 Node source_node = InImplementation[mapsto.Key];
@@ -2026,7 +2026,7 @@ namespace SEE.Tools.Architecture
         /// </summary>
         /// <param name="node_set">list of nodes whose qualified name is to be dumped</param>
         /// <param name="message">message to be emitted before the nodes</param>
-        static void Dump_Node_Set(List<Node> node_set, string message)
+        private static void Dump_Node_Set(List<Node> node_set, string message)
         {
             Debug.Log(message + "\n");
             foreach (Node node in node_set)
@@ -2040,7 +2040,7 @@ namespace SEE.Tools.Architecture
         /// </summary>
         /// <param name="edge_set">list of edges whose qualified name is to be dumped</param>
         /// <param name="message">message to be emitted before the edges</param>
-        static void Dump_Edge_Set(List<Edge> edge_set)
+        private static void Dump_Edge_Set(List<Edge> edge_set)
         {
             foreach (Edge edge in edge_set)
             {
@@ -2101,7 +2101,7 @@ namespace SEE.Tools.Architecture
 
         public static void DumpTable(Dictionary<string, Node> table)
         {
-            foreach (var entry in table)
+            foreach (KeyValuePair<string, Node> entry in table)
             {
                 Debug.LogFormat("  {0} -> {1}\n", entry.Key, entry.Value.ID);
             }

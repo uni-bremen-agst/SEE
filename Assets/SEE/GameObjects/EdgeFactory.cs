@@ -1,69 +1,64 @@
 ﻿using SEE.DataModel;
+using SEE.Game;
 using SEE.Layout;
-using System;
+using SEE.Layout.EdgeLayouts;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.GO
 {
+    /// <summary>
+    /// A factory to create game objects for laid out edges.
+    /// </summary>
     public class EdgeFactory
     {
         public EdgeFactory(IEdgeLayout layout, float edgeWidth)
         {
             this.layout = layout;
             this.edgeWidth = edgeWidth;
+            defaultLineMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
         }
 
         /// <summary>
         /// Path to the material used for edges.
         /// </summary>
-        protected const string materialPath = "Hidden/Internal-Colored";
+        private const string materialPath = "Hidden/Internal-Colored";
 
         /// <summary>
         /// The material used for edges.
         /// </summary>
-        protected readonly Material defaultLineMaterial = LineMaterial();
+        protected readonly Material defaultLineMaterial;
 
-        /// <summary>
-        /// Returns the default material for edges using the materialPath.
-        /// </summary>
-        /// <returns>default material for edges</returns>
-        private static Material LineMaterial()
-        {
-            Material material = new Material(Shader.Find(materialPath));
-            if (material == null)
-            {
-                Debug.LogError("Could not find material " + materialPath + "\n");
-            }
-            return material;
-        }
+        private readonly float edgeWidth;
 
-
-        protected readonly float edgeWidth;
-
-        protected readonly IEdgeLayout layout;
+        private readonly IEdgeLayout layout;
 
         /// <summary>
         /// Returns a new game edge.
         /// </summary>
         /// <returns>new game edge</returns>
-        protected GameObject NewGameEdge(LayoutEdge layoutEdge)
+        private GameObject NewGameEdge(LayoutEdge layoutEdge)
         {
             GameObject gameEdge = new GameObject
             {
                 tag = Tags.Edge,
-                isStatic = true,
-                name = "(" + layoutEdge.Source.ID + ", " + layoutEdge.Target.ID + ")"
+                isStatic = false,
+                name = layoutEdge.ItsEdge.ID
             };
-            // FIXME: gameEdge.AddComponent<EdgeRef>().edge = edge;
+            gameEdge.AddComponent<EdgeRef>().edge = layoutEdge.ItsEdge;
             return gameEdge;
         }
 
-        public ICollection<GameObject> DrawEdges(ICollection<ILayoutNode> layoutNodes)
+        public ICollection<GameObject> DrawEdges(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges)
         {
-            List<GameObject> result = new List<GameObject>();
-
-            foreach (LayoutEdge layoutEdge in layout.Create(layoutNodes))
+            List<GameObject> result = new List<GameObject>(edges.Count);
+            if (edges.Count == 0)
+            {
+                return result;
+            }
+            layout.Create(nodes, edges.Cast<ILayoutEdge>().ToList());
+            foreach (LayoutEdge layoutEdge in edges)
             {
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);
@@ -81,7 +76,7 @@ namespace SEE.GO
                 // If enabled, the lines are defined in world space.
                 // This means the object's position is ignored, and the lines are rendered around 
                 // world origin.
-                line.useWorldSpace = true;
+                line.useWorldSpace = false;
 
                 Vector3[] points = layoutEdge.Points;
                 line.positionCount = points.Length; // number of vertices

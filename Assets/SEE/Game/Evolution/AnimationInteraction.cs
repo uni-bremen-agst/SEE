@@ -112,7 +112,7 @@ namespace SEE.Game.Evolution
         ///   0-9 => the time in between two revisions in auto-play mode is adjusted
         ///   ESC => toggle between the two canvases AnimationCanvas and RevisionSelectionCanvas
         /// </summary>
-        void Update()
+        private void Update()
         {
             if (!IsRevisionSelectionOpen)
             {
@@ -189,7 +189,7 @@ namespace SEE.Game.Evolution
                 // if revision-selection mode is enabled, we re-fill the drop-down
                 // selection menu with all available graph indices.
                 revisionSelectionDataModel.RevisionDropdown.ClearOptions();
-                var options = Enumerable
+                System.Collections.Generic.List<Dropdown.OptionData> options = Enumerable
                     .Range(1, evolutionRenderer.GraphCount)
                     .Select(i => new Dropdown.OptionData(i.ToString()))
                     .ToList();

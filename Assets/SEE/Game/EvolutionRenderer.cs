@@ -18,16 +18,18 @@
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+using SEE.DataModel.DG;
+using SEE.Game.Evolution;
+using SEE.GO;
+using SEE.Layout;
+using SEE.Layout.NodeLayouts;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Events;
-using SEE.GO;
-using SEE.Game.Evolution;
-using SEE.DataModel;
-using SEE.Layout;
-using SEE.Utils;
 
 namespace SEE.Game
 {
@@ -37,6 +39,9 @@ namespace SEE.Game
     /// 
     /// Note: The renderer is a MonoBehaviour, thus, will be added as a component to a game
     /// object. As a consequence, a constructor will not be called and is meaningless.
+    /// 
+    /// Assumption: This EvolutionRenderer is attached to a game object representing a code
+    /// city that has another component of type SEECityEvolution.
     /// </summary>
     public class EvolutionRenderer : MonoBehaviour
     {
@@ -81,17 +86,32 @@ namespace SEE.Game
         /// </summary>
         public SEECityEvolution CityEvolution
         {
-            set {
+            set
+            {
                 // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
                 // So we cannot make the following assignment in the constructor. Neither
                 // can we assign this value at the declaration of graphRenderer because
                 // we need the city argument, which comes only later. Anyhow, whenever we
                 // assign a new city, we also need a new graph renderer for that city.
                 // So in fact this is the perfect place to assign graphRenderer.
-                graphRenderer = new GraphRenderer(value);
+                graphRenderer = new GraphRenderer(value, null);
+                Assert.IsNotNull(graphRenderer);
                 diff = new NumericAttributeDiff(value.AllMetricAttributes());
                 objectManager = new ObjectManager(graphRenderer, gameObject);
-                marker = new Marker(graphRenderer);
+                float markerHeight = 1.0f;
+                float markerWidth = 1.0f;
+                if (gameObject.TryGetComponent<SEECityEvolution>(out SEECityEvolution cityEvolution))
+                {
+                    markerHeight = cityEvolution.MarkerHeight;
+                    markerWidth = cityEvolution.MarkerWidth;
+                }
+                else
+                {
+                    Debug.LogErrorFormat("This EvolutionRenderer attached to {0} has no sibling component of type SEECityEvolution",
+                                         name);
+                    enabled = false;
+                }
+                marker = new Marker(graphRenderer, markerWidth, markerHeight);
             }
         }
 
@@ -138,8 +158,11 @@ namespace SEE.Game
         /// <summary>
         /// True if animation is still ongoing.
         /// </summary>
-        public bool IsStillAnimating { get => _isStillAnimating;
-                                       set => _isStillAnimating = value; }
+        public bool IsStillAnimating
+        {
+            get => _isStillAnimating;
+            set => _isStillAnimating = value;
+        }
 
         /// <summary>
         /// The collection of registered <see cref="AbstractAnimator"/> to be updated
@@ -211,15 +234,10 @@ namespace SEE.Game
         private readonly NodeEqualityComparer nodeEqualityComparer = new NodeEqualityComparer();
 
         /// <summary>
-        /// Allows the comparison of two instances of <see cref="Edge"/> from different graphs.
-        /// </summary>
-        private readonly EdgeEqualityComparer edgeEqualityComparer = new EdgeEqualityComparer();
-
-        /// <summary>
         /// All pre-computed layouts for the whole graph series.
         /// </summary>
         private Dictionary<Graph, Dictionary<string, ILayoutNode>> Layouts { get; }
-             =  new Dictionary<Graph, Dictionary<string, ILayoutNode>>();  // not serialized by Unity
+             = new Dictionary<Graph, Dictionary<string, ILayoutNode>>();  // not serialized by Unity
 
         /// <summary>
         /// Creates and saves the layouts for all given <paramref name="graphs"/>. This will 
@@ -229,7 +247,7 @@ namespace SEE.Game
         private void CalculateAllGraphLayouts(List<Graph> graphs)
         {
             // Determine the layouts of all loaded graphs upfront.
-            var p = Performance.Begin("Layouting all " + graphs.Count + " graphs");
+            Performance p = Performance.Begin("Layouting all " + graphs.Count + " graphs");
             graphs.ForEach(graph =>
             {
                 Layouts[graph] = CalculateLayout(graph);
@@ -262,22 +280,22 @@ namespace SEE.Game
             // Collecting all game objects corresponding to nodes of the given graph.
             // If the node existed in a previous graph, we will re-use its corresponding
             // game object created earlier.
-            var gameObjects = new List<GameObject>();
+            List<GameObject> gameObjects = new List<GameObject>();
 
             // The layout to be applied.
             NodeLayout nodeLayout = graphRenderer.GetLayout();
 
             // Gather all nodes for the layout.
-            ignoreInnerNodes = ! nodeLayout.IsHierarchical();
+            ignoreInnerNodes = !nodeLayout.IsHierarchical();
             foreach (Node node in graph.Nodes())
             {
-                if (! ignoreInnerNodes || node.IsLeaf())
+                if (!ignoreInnerNodes || node.IsLeaf())
                 {
                     // All layouts (flat and hierarchical ones) must be able to handle leaves; 
                     // hence, leaves can be added at any rate. For a hierarchical layout, we 
                     // need to add the game objects for inner nodes, too. To put it differently,
                     // inner nodes are added only if we apply a hierarchical layout.
-                    objectManager.GetNode(node, out var gameNode);
+                    objectManager.GetNode(node, out GameObject gameNode);
                     // Now after having attached the new node to the game object,
                     // we must adjust the scale of it according to the newly attached node so 
                     // that the layouter has these. We need to adjust the scale only for leaves, 
@@ -294,10 +312,9 @@ namespace SEE.Game
             ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(gameObjects);
             // Note: Apply applies its results only on the layoutNodes but not on the game objects
             // these layoutNodes represent. Here, we leave the game objects untouched. The layout
-            // must be later applied when render a city. Here, we only store the layout for later use.
+            // must be later applied when we render a city. Here, we only store the layout for later use.
             nodeLayout.Apply(layoutNodes);
-            NodeLayout.MoveTo(layoutNodes, gameObject.transform.position);
-            NodeLayout.Scale(layoutNodes, gameObject.transform.lossyScale.x);
+            GraphRenderer.Fit(gameObject, layoutNodes);          
             return ToNodeIDLayout(layoutNodes);
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to 
@@ -457,7 +474,7 @@ namespace SEE.Game
             // FOR ANIMATION: next.Graph.Edges().ForEach(RenderEdge);
 
             // We have made the transition to the next graph.
-            _currentCity = next;            
+            _currentCity = next;
             RenderPlane();
             Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
@@ -471,7 +488,7 @@ namespace SEE.Game
             // Destroy all previous edges and draw all edges of next graph. This can only
             // be done when nodes have reached their final position, that is, at the end
             // of the animation cycle.
-            objectManager.RenderEdges(_currentCity.Graph);
+            objectManager.RenderEdges();
 
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();
@@ -541,9 +558,13 @@ namespace SEE.Game
         /// <param name="graphNode">graph node to be displayed</param>
         protected virtual void RenderNode(Node graphNode)
         {
+            // the layout to be applied to graphNode
             ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
+            // the game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
 
+            // will be true iff the node existed in the previous graph and any of its node
+            // attributes were changed
             bool wasModified;
             if (formerGraphNode == null)
             {
@@ -554,7 +575,7 @@ namespace SEE.Game
                 Vector3 position = layoutNode.CenterPosition;
                 position.y -= layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
-                graphRenderer.Apply(currentGameNode, layoutNode);
+                graphRenderer.Apply(currentGameNode, gameObject, layoutNode);
                 // Revert the change to the y co-ordindate.
                 position.y += layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
@@ -593,7 +614,7 @@ namespace SEE.Game
             {
                 // if the node needs to be removed, mark it dead and let it sink into the ground
                 marker.MarkDead(block);
-                var newPosition = block.transform.position;
+                Vector3 newPosition = block.transform.position;
                 newPosition.y = -block.transform.localScale.y;
                 ILayoutNode nodeTransform = new AnimationNode(newPosition, block.transform.localScale);
                 moveScaleShakeAnimator.AnimateTo(block, nodeTransform, false, OnRemovedNodeFinishedAnimation);
@@ -973,7 +994,27 @@ namespace SEE.Game
 
             public ICollection<ILayoutNode> Successors => throw new NotImplementedException();
 
+            public Vector3 RelativePosition { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public bool IsSublayoutNode { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public bool IsSublayoutRoot { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public Sublayout Sublayout { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public ILayoutNode SublayoutRoot { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
             public ICollection<ILayoutNode> Children()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetOrigin()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetRelative(ILayoutNode node)
             {
                 throw new NotImplementedException();
             }

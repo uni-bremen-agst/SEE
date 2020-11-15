@@ -1,14 +1,14 @@
-﻿using OdinSerializer;
+﻿using SEE.DataModel.DG;
+using SEE.Game.Charts;
 using System;
-
-using SEE.DataModel;
+using UnityEngine;
 
 namespace SEE.GO
 {
     /// <summary>
     /// A reference to a graph node that can be attached to a game object as a component.
     /// </summary>
-    public class NodeRef : SerializedMonoBehaviour
+    public class NodeRef : GraphElementRef
     {
         /// <summary>
         /// The graph node this node reference is referring to. It will be set either
@@ -17,7 +17,17 @@ namespace SEE.GO
         /// It will not be serialized to prevent duplicating and endless serialization
         /// by both Unity and Odin.
         /// </summary>
-        [NonSerialized]
-        public Node node;
+        [NonSerialized] public Node node;
+
+        /// <summary>
+        /// The NodeHighlights component of this NodeRef (needed for nodes represented 
+        /// in metric charts).
+        /// </summary>
+        [HideInInspector] public NodeHighlights highlights;
+
+        public void Awake()
+        {
+            highlights = GetComponent<NodeHighlights>();
+        }
     }
 }

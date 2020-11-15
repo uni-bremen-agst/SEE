@@ -14,23 +14,23 @@ namespace SEE.Game.Runtime
         /// <summary>
         /// The size (scale) of a sphere.
         /// </summary>
-        private const float SPHERE_SCALE = 0.3f;
+        private const float SPHERE_SCALE = 0.01f;
 
         /// <summary>
         /// The desired distance between each of the spheres.
         /// </summary>
-        private const float SPHERE_OPTIMAL_DISTANCE = 0.8f;
+        private const float SPHERE_OPTIMAL_DISTANCE = SPHERE_SCALE;
 
         /// <summary>
         /// The horizontal speed of a sphere.
         /// </summary>
-        private const float SPHERE_HORIZONTAL_SPEED = 1.6f;
+        private const float SPHERE_HORIZONTAL_SPEED = SPHERE_SCALE * 2;
 
         /// <summary>
         /// The maximum height of a sphere. Is reached right between <see cref="src"/>
         /// and <see cref="dst"/>.
         /// </summary>
-        private const float SPHERE_MAX_ALTITUDE = 1.0f;
+        private const float SPHERE_MAX_ALTITUDE = 0.3f;
 
         /// <summary>
         /// The maximum added size to the scale of a building.
@@ -121,6 +121,7 @@ namespace SEE.Game.Runtime
             {
                 spheres[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 spheres[i].transform.position = Vector3.Lerp(sourcePosition, targetPosition, (float)i / (float)spheres.Length); 
+                spheres[i].transform.position = Vector3.Lerp(sourcePosition, targetPosition, i / (float)spheres.Length);
                 spheres[i].transform.rotation = Quaternion.identity;
                 spheres[i].transform.localScale = new Vector3(SPHERE_SCALE, SPHERE_SCALE, SPHERE_SCALE);
                 spheres[i].transform.parent = transform;
@@ -131,7 +132,7 @@ namespace SEE.Game.Runtime
             sourceOriginalColor = src.GetComponentInChildren<MeshRenderer>().material.color;
             targetOriginalColor = dst.GetComponentInChildren<MeshRenderer>().material.color;
         }
-        
+
         /// <summary>
         /// Resets the source's and target's scale and color and destroys the object.
         /// </summary>
@@ -146,7 +147,7 @@ namespace SEE.Game.Runtime
                 Destroy(spheres[i]);
             }
         }
-        
+
         /// <summary>
         /// Updates the simulation.
         /// </summary>
@@ -201,7 +202,7 @@ namespace SEE.Game.Runtime
                 srcToDstDistFlat = srcToDstFlat.magnitude;
             }
             Vector2 flyDirFlat = srcToDstFlat.normalized;
-            
+
             // Translate first sphere
             Vector2 stepFlat = flyDirFlat * SPHERE_HORIZONTAL_SPEED * Time.deltaTime * Mathf.Sqrt(srcToDstDistFlat);
             Vector2 fstPosFlat = new Vector2(spheres[0].transform.position.x, spheres[0].transform.position.z) + stepFlat;
@@ -223,7 +224,7 @@ namespace SEE.Game.Runtime
                 Vector2 spherePosFlat = new Vector2(spherePos.x, spherePos.z);
 
                 spherePosFlat = fstPosFlat + i * sphereOffsetFlat;
-                
+
                 if (!pastDst)
                 {
                     float sphereToSrcDstFlat = Vector2.Distance(spherePosFlat, srcPosFlat);

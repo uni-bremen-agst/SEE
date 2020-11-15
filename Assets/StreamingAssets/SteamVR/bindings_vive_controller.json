@@ -1,5 +1,5 @@
 {
-  "app_key": "application.generated.unity.steamvr.exe",
+  "app_key": "application.generated.unity.seecity.exe",
   "bindings": {
     "/actions/buggy": {
       "chords": [],
@@ -10,9 +10,118 @@
     },
     "/actions/default": {
       "chords": [],
-      "poses": [],
+      "poses": [
+        {
+          "output": "/actions/default/in/pose",
+          "path": "/user/hand/left/pose/gdc2015"
+        },
+        {
+          "output": "/actions/default/in/pose",
+          "path": "/user/hand/right/pose/gdc2015"
+        }
+      ],
       "haptics": [],
-      "sources": [],
+      "sources": [
+        {
+          "path": "/user/hand/left/input/trackpad",
+          "mode": "trackpad",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/interactui"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/left/input/trigger",
+          "mode": "trigger",
+          "parameters": {},
+          "inputs": {
+            "pull": {
+              "output": "/actions/default/in/throttle"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/left/input/trackpad",
+          "mode": "scroll",
+          "parameters": {
+            "scroll_mode": "smooth"
+          },
+          "inputs": {
+            "scroll": {
+              "output": "/actions/default/in/zoom"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/left/input/application_menu",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/select"
+            },
+            "double": {
+              "output": "/actions/default/in/createchart"
+            },
+            "long": {
+              "output": "/actions/default/in/home"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/right/input/application_menu",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/cancel"
+            },
+            "double": {
+              "output": "/actions/default/in/resetcharts"
+            },
+            "long": {
+              "output": "/actions/default/in/home"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/right/input/trackpad",
+          "mode": "trackpad",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/teleport"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/right/input/trackpad",
+          "mode": "scroll",
+          "parameters": {
+            "scroll_mode": "smooth"
+          },
+          "inputs": {
+            "scroll": {
+              "output": "/actions/default/in/move"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/right/input/trigger",
+          "mode": "trigger",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/grabpinch"
+            },
+            "pull": {
+              "output": "/actions/default/in/grab"
+            }
+          }
+        }
+      ],
       "skeleton": [
         {
           "output": "/actions/default/in/skeletonlefthand",
@@ -21,6 +130,10 @@
         {
           "output": "/actions/default/in/skeletonrighthand",
           "path": "/user/hand/right/input/skeleton/right"
+        },
+        {
+          "output": "/actions/default/in/skeletonrighthand",
+          "path": "/user/hand/left/input/skeleton/right"
         }
       ]
     },
@@ -34,5 +147,5 @@
   },
   "controller_type": "vive_controller",
   "description": "",
-  "name": "vive_controller"
+  "name": "Default Configuration"
 }

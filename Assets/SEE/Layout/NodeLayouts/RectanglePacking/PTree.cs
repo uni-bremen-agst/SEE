@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout.RectanglePacking
+namespace SEE.Layout.NodeLayouts.RectanglePacking
 {
     /// <summary>
     /// A two-dimensional kd-tree.
@@ -183,7 +183,7 @@ namespace SEE.Layout.RectanglePacking
             List<PNode> result = new List<PNode>();
             foreach (PNode leaf in FreeLeaves)
             {
-                if(FitsInto(size, leaf.rectangle.size))
+                if (FitsInto(size, leaf.rectangle.size))
                 {
                     result.Add(leaf);
                 }

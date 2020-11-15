@@ -3,7 +3,7 @@
 namespace SEE.GO
 {
     /// <summary>
-    /// Provides extensions for GameObjects.
+    /// Provides extensions for GameObjects retrieving their ID.
     /// </summary>
     public static class GameObjectExtensions
     {
@@ -32,19 +32,29 @@ namespace SEE.GO
             }
             else
             {
-                return nodeRef.node.ID; 
+                return nodeRef.node.ID;
             }
         }
 
         /// <summary>
-        /// Returns the size of the given <paramref name="gameObject"/>.
+        /// Returns the render-queue offset of given <paramref name="gameObject"/>.
+        /// 
+        /// Precondition: <paramref name="gameObject"/> must have a renderer attached
+        /// to it; otherwise 0 will be returned.
         /// </summary>
-        /// <param name="gameObject"></param>
-        /// <returns>size of given <paramref name="gameObject"/></returns>
-        public static Vector3 Size(this GameObject gameObject)
+        /// <param name="gameObject">objects whose render-queue is requested</param>
+        /// <returns>render-queue offset</returns>
+        public static int GetRenderQueue(this GameObject gameObject)
         {
-            Renderer renderer = gameObject.GetComponent<Renderer>();
-            return renderer.bounds.size;
+            if (gameObject.TryGetComponent<Renderer>(out Renderer renderer))
+            {
+                return renderer.sharedMaterial.renderQueue;
+            }
+            else
+            {
+                Debug.LogWarningFormat("GetRenderQueue: Game object {0} has no renderer.\n", gameObject.name);
+                return 0;
+            }
         }
     }
 }

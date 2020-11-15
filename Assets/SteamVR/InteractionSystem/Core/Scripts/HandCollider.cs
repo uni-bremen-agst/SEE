@@ -84,6 +84,9 @@ namespace Valve.VR.InteractionSystem
         {
             colliders = GetComponentsInChildren<Collider>();
 
+            // Hack to disable collision-handling between controller and objects
+            colliders.ForEach(c => c.isTrigger = true);
+
             if (physicMaterial_lowfriction == null)
             {
                 physicMaterial_lowfriction = new PhysicMaterial("hand_lowFriction");
@@ -256,6 +259,8 @@ namespace Valve.VR.InteractionSystem
         private float lastCollisionHapticsTime;
         private void OnCollisionEnter(Collision collision)
         {
+            CurrentCollision = collision;
+
             bool touchingDynamic = false;
             if (collision.rigidbody != null)
             {
@@ -279,6 +284,8 @@ namespace Valve.VR.InteractionSystem
                 hand.hand.TriggerHapticPulse(length, 100, intensity);
             }
         }
+
+        public Collision CurrentCollision { get; private set; }
 
     }
 }

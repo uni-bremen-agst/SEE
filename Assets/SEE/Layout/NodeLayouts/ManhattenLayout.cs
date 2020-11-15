@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using SEE.DataModel.DG;
+using SEE.Layout.NodeLayouts.Cose;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// Calculates a simple grid layout for leaf nodes (only). The order is
@@ -74,6 +76,16 @@ namespace SEE.Layout
                 positionX += size.x / 2.0f + distanceBetweenBuildings;
             }
             return result;
+        }
+
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool UsesEdgesAndSublayoutNodes()
+        {
+            return false;
         }
     }
 }

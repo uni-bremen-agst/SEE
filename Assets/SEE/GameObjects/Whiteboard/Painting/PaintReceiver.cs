@@ -26,10 +26,11 @@ using UnityEngine;
 namespace SEE.GO.Whiteboard
 {
     [RequireComponent(typeof(MeshRenderer))]
+    [System.Obsolete("Experimental code. Do not use it. May be removed soon.")]
     public class PaintReceiver : MonoBehaviour
     {
         [SerializeField]
-        private Texture2D initialTexture;
+        private readonly Texture2D initialTexture;
 
         private Texture2D texture;
         private Texture2D newTexture;
@@ -83,7 +84,7 @@ namespace SEE.GO.Whiteboard
         {
             stamp.SetRotation(stampRotation);
 
-            PaintOver(stamp, (Color32)color, uvPosition);
+            PaintOver(stamp, color, uvPosition);
         }
 
         /// <summary>
@@ -125,18 +126,28 @@ namespace SEE.GO.Whiteboard
             // Checking manually if int is bigger than 0 is faster than using Mathf.Clamp
             int paintStartPositionXClamped = paintStartPositionX;
             if (paintStartPositionXClamped < 0)
+            {
                 paintStartPositionXClamped = 0;
+            }
+
             int paintStartPositionYClamped = paintStartPositionY;
             if (paintStartPositionYClamped < 0)
+            {
                 paintStartPositionYClamped = 0;
+            }
 
             // Check manually if end position doesn't exceed texture size
             int paintEndPositionXClamped = paintStartPositionX + stamp.Width;
             if (paintEndPositionXClamped >= textureWidth)
+            {
                 paintEndPositionXClamped = textureWidth - 1;
+            }
+
             int paintEndPositionYClamped = paintStartPositionY + stamp.Height;
             if (paintEndPositionYClamped >= textureHeight)
+            {
                 paintEndPositionYClamped = textureHeight - 1;
+            }
 
             int totalWidth = paintEndPositionXClamped - paintStartPositionXClamped;
             int totalHeight = paintEndPositionYClamped - paintStartPositionYClamped;
@@ -157,12 +168,16 @@ namespace SEE.GO.Whiteboard
 
                     // There is no need to do further calculations if this stamp pixel is transparent
                     if (alpha < 0.001f)
+                    {
                         continue;
+                    }
 
                     int texturePosition = paintStartPositionXClamped + x + (paintStartPositionYClamped + y) * textureWidth;
 
                     if (stamp.mode == PaintMode.Erase)
+                    {
                         color = originalTexture[texturePosition];
+                    }
 
                     aChannel = (int)(alpha * 255f);
 

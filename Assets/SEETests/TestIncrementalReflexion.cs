@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
+using SEE.DataModel.DG;
 using System.Collections.Generic;
-
-using SEE.DataModel;
 
 namespace SEE.Tools.Architecture
 {
@@ -12,21 +11,21 @@ namespace SEE.Tools.Architecture
     /// "Incremental Reflexion Analysis", Rainer Koschke, Journal on Software Maintenance
     /// and Evolution, 2011, DOI 10.1002 / smr.542 in Figure 8.
     /// </summary>
-    class TestIncrementalReflexion : TestReflexionAnalysis
+    internal class TestIncrementalReflexion : TestReflexionAnalysis
     {
         /// <summary>
         /// The implementation nodes in the implementation graph: i[j] where 1 <= j <= 17.
         /// 
         /// Note: i[0] does not exist.
         /// </summary>
-        Dictionary<int, Node> i;
+        private Dictionary<int, Node> i;
 
         /// <summary>
         /// The architecture nodes in the architecture graph: a[j] where 1 <= j <= 8.
         /// 
         /// Note: a[0] does not exist.
         /// </summary>
-        Dictionary<int, Node> a;
+        private Dictionary<int, Node> a;
 
         /// <summary>
         /// Sets up all three graphs (implementation, architecture,
@@ -156,14 +155,14 @@ namespace SEE.Tools.Architecture
                 e[j] = edge;
             }
 
-            AddToGraph(impl, e[1], i[ 3], i[15]);
-            AddToGraph(impl, e[2], i[ 4], i[16]);
-            AddToGraph(impl, e[3], i[ 5], i[17]);
-            AddToGraph(impl, e[4], i[ 8], i[ 6]);
-            AddToGraph(impl, e[5], i[ 9], i[ 8]);
-            AddToGraph(impl, e[6], i[ 9], i[10]);
+            AddToGraph(impl, e[1], i[3], i[15]);
+            AddToGraph(impl, e[2], i[4], i[16]);
+            AddToGraph(impl, e[3], i[5], i[17]);
+            AddToGraph(impl, e[4], i[8], i[6]);
+            AddToGraph(impl, e[5], i[9], i[8]);
+            AddToGraph(impl, e[6], i[9], i[10]);
             AddToGraph(impl, e[7], i[12], i[10]);
-            AddToGraph(impl, e[8], i[12], i[ 9]);
+            AddToGraph(impl, e[8], i[12], i[9]);
             AddToGraph(impl, e[9], i[14], i[13]);
 
             return impl;
@@ -371,9 +370,9 @@ namespace SEE.Tools.Architecture
             Assert.That(IsPropagated(a[1], a[3], call));
             Assert.That(IsPropagated(a[1], a[1], call));
             Assert.AreEqual(4, edgeChanges.Count);
-            Assert.That(IsAllowed   (edgeChanges, a[1], a[3], call));
+            Assert.That(IsAllowed(edgeChanges, a[1], a[3], call));
             Assert.That(IsConvergent(edgeChanges, a[1], a[3], call));
-            Assert.That(IsAllowed   (edgeChanges, a[1], a[1], call));
+            Assert.That(IsAllowed(edgeChanges, a[1], a[1], call));
             Assert.That(IsConvergent(edgeChanges, a[8], a[8], call));
             Assert.AreEqual(0, propagatedEdgesRemoved.Count);
 
@@ -402,7 +401,7 @@ namespace SEE.Tools.Architecture
             Assert.That(IsImplicitlyAllowed(edgeChanges, a[9], a[9], call));
             Assert.That(IsAbsent(edgeChanges, a[1], a[3], call));
             Assert.That(IsAbsent(edgeChanges, a[8], a[8], call));
-            
+
             ResetEvents();
             reflexion.Add_To_Mapping(i[10], a[2]);
             AssertMapped(i[10], a[2]);
@@ -462,7 +461,7 @@ namespace SEE.Tools.Architecture
             Assert.AreEqual(2, edgeChanges.Count);
             Assert.That(IsAbsent(edgeChanges, a[8], a[8], call));
             Assert.That(IsAbsent(edgeChanges, a[1], a[3], call));
- 
+
             ResetEvents();
             reflexion.Delete_From_Mapping(i[15], a[5]);
             AssertUnmapped(i[15], a[5]);

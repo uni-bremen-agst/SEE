@@ -44,7 +44,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Checks whether all fields are initialized.
         /// </summary>
-        void Start()
+        private void Start()
         {
             RevisionDropdown.AssertNotNull("RevisionDropdown");
             CloseViewButton.AssertNotNull("CloseViewButton");

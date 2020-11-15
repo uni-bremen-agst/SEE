@@ -1,4 +1,4 @@
-﻿using SEE.DataModel;
+﻿using SEE.DataModel.DG;
 using SEE.Layout;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,6 +15,14 @@ namespace SEE.Game
         /// The graph node to be laid out.
         /// </summary>
         protected readonly Node node;
+
+        /// <summary>
+        /// The underlying graph node represented by this laid out node.
+        /// </summary>
+        public Node ItsNode
+        {
+            get => node;
+        }
 
         /// <summary>
         /// Constructor setting the graph <paramref name="node"/> corresponding to this layout node
@@ -105,15 +113,33 @@ namespace SEE.Game
         /// <returns>children of this node</returns>
         public ICollection<ILayoutNode> Children()
         {
-            IList<ILayoutNode> children = new List<ILayoutNode>();
+            IList<ILayoutNode> result;
             if (!IsLeaf)
             {
-                foreach (Node node in node.Children())
+                List<Node> children = node.Children();
+                result = new List<ILayoutNode>(children.Count);
+                foreach (Node node in children)
                 {
-                    children.Add(to_layout_node[node]);
+                    result.Add(to_layout_node[node]);
                 }
             }
-            return children;
+            else
+            {
+                result = new List<ILayoutNode>();
+            }
+            return result;
+        }
+
+        public void SetOrigin()
+        {
+            CenterPosition = relativePosition + sublayoutRoot.CenterPosition;
+        }
+
+        public void SetRelative(ILayoutNode node)
+        {
+            relativePosition.x -= node.CenterPosition.x;
+            relativePosition.z -= node.CenterPosition.z;
+            sublayoutRoot = node;
         }
 
         public ICollection<ILayoutNode> Successors
@@ -131,13 +157,25 @@ namespace SEE.Game
 
         // Features defined by LayoutNode that must be implemented by subclasses.
         public abstract Vector3 LocalScale { get; set; }
-        public abstract Vector3 AbsoluteScale { get;  }
+        public abstract Vector3 AbsoluteScale { get; }
 
         public abstract void ScaleBy(float factor);
         public abstract Vector3 CenterPosition { get; set; }
         public abstract float Rotation { get; set; }
         public abstract Vector3 Roof { get; }
         public abstract Vector3 Ground { get; }
+
+        private Vector3 relativePosition;
+        private bool isSublayoutNode = false;
+        private bool isSublayoutRoot = false;
+        private Sublayout sublayout;
+        private ILayoutNode sublayoutRoot;
+
+        public Vector3 RelativePosition { get => relativePosition; set => relativePosition = value; }
+        public bool IsSublayoutNode { get => isSublayoutNode; set => isSublayoutNode = value; }
+        public bool IsSublayoutRoot { get => isSublayoutRoot; set => isSublayoutRoot = value; }
+        public Sublayout Sublayout { get => sublayout; set => sublayout = value; }
+        public ILayoutNode SublayoutRoot { get => sublayoutRoot; set => sublayoutRoot = value; }
 
         public override string ToString()
         {
@@ -146,5 +184,6 @@ namespace SEE.Game
                 + " Parent=" + (Parent != null ? Parent.ID : "<NO PARENT>");
             return result;
         }
+
     }
 }

@@ -93,7 +93,9 @@ namespace Leap.Unity
             _leapPreferenceItems.Sort((a, b) => a.attribute.order.CompareTo(b.attribute.order));
         }
 
+#pragma warning disable CS0618 // Type or member is obsolete
         [PreferenceItem("Leap Motion")]
+#pragma warning restore CS0618 // Type or member is obsolete
         public static void DrawPreferencesGUI()
         {
             ensurePreferenceItemsLoaded();

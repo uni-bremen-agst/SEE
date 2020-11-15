@@ -2,7 +2,9 @@
 using System;
 using UnityEngine;
 using UnityEngine.XR;
+using Valve.VR;
 using Valve.VR.InteractionSystem;
+using Hand = Valve.VR.InteractionSystem.Hand;
 
 namespace SEE.Controls
 {
@@ -34,6 +36,12 @@ namespace SEE.Controls
         [Tooltip("Whether hints should be shown for controllers.")]
         public bool ShowControllerHints = false;
 
+        public static PlayerInputType GetInputType()
+        {
+            PlayerInputType result = FindObjectOfType<PlayerSettings>().playerInputType;
+            return result;
+        }
+
         /// <summary>
         /// Depending on the user's selection, turns VR mode on or off and activates/deactivates
         /// the game objects representing the player in the scene.
@@ -46,26 +54,27 @@ namespace SEE.Controls
             try
             {
                 XRSettings.enabled = playerInputType == PlayerInputType.VR;
-                Debug.LogFormat("VR enabled: {0}\n", XRSettings.enabled);
             }
             catch (Exception e)
             {
-                Debug.LogWarningFormat("VR enabling/disabling issue: {0}\n", e);
+                Debug.LogWarningFormat("VR enabling/disabling issue: {0}", e);
             }
 
+            Debug.LogFormat("Player input type: {0}\n", playerInputType.ToString());
+
             SetActive("DesktopPlayer", playerInputType == PlayerInputType.Desktop);
-            SetActive("VRPlayer",      playerInputType == PlayerInputType.VR);
-            SetActive("GamepadPlayer", playerInputType == PlayerInputType.TouchGamepad);
-            SetActive("InControl",     playerInputType == PlayerInputType.TouchGamepad);
+            SetActive("VRPlayer", playerInputType == PlayerInputType.VR);
+            SetActive("InControl", playerInputType == PlayerInputType.TouchGamepad);
 
             // Turn off controller hints if requested in the user settings.
             if (!ShowControllerHints)
             {
-                foreach (Valve.VR.InteractionSystem.Hand hand in Player.instance.hands)
+                foreach (Hand hand in Player.instance.hands)
                 {
                     ControllerButtonHints.HideAllButtonHints(hand);
                     ControllerButtonHints.HideAllTextHints(hand);
                 }
+
                 if (Teleport.instance != null)
                 {
                     Teleport.instance.CancelTeleportHint();
@@ -74,46 +83,39 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Enables or disables a game object with the given <paramref name="name"/>.
+        /// Enables or disables a game object with the given <paramref name="name" />.
         /// </summary>
         /// <param name="name">name of the object to be enabled/disabled</param>
         /// <param name="activate">whether to enable or disable the object</param>
         private void SetActive(string name, bool activate)
         {
-            GameObject player = GameObject.Find(name);
-            if (player != null)
-            {
-                player.SetActive(activate);
-                Debug.LogFormat("Game object {0} {1}.\n", player.name, activate ? "enabled" : "disabled");
-            }
-            else
-            {
-                Debug.LogFormat("No game object named {0} found.\n", name);
-            }
+            GameObject.Find(name)?.SetActive(activate);
         }
 
         /// <summary>
-        /// If and only if HideControllers is true (when a VR player is playing), the VR controllers 
-        /// will not be visualized together with the hands of the player. Apparently, this 
-        /// hiding/showing must be run at each frame and, hence, we need to put this code into 
+        /// If and only if HideControllers is true (when a VR player is playing), the VR controllers
+        /// will not be visualized together with the hands of the player. Apparently, this
+        /// hiding/showing must be run at each frame and, hence, we need to put this code into
         /// an Update() method.
         /// </summary>
         private void Update()
         {
-            if (playerInputType == PlayerInputType.VR)
-            {                
-                foreach (var hand in Player.instance.hands)
+            if (playerInputType != PlayerInputType.VR)
+            {
+                return;
+            }
+
+            foreach (Hand hand in Player.instance.hands)
+            {
+                if (HideVRControllers)
                 {
-                    if (HideVRControllers)
-                    {
-                        hand.HideController();
-                        hand.SetSkeletonRangeOfMotion(Valve.VR.EVRSkeletalMotionRange.WithoutController);
-                    }
-                    else
-                    {
-                        hand.ShowController();
-                        hand.SetSkeletonRangeOfMotion(Valve.VR.EVRSkeletalMotionRange.WithController);
-                    }
+                    hand.HideController();
+                    hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithoutController);
+                }
+                else
+                {
+                    hand.ShowController();
+                    hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithController);
                 }
             }
         }

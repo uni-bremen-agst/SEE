@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Layout.TreeMap
+namespace SEE.Layout.NodeLayouts.TreeMap
 {
     internal class RectangleTiling
     {

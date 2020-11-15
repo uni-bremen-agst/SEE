@@ -1,11 +1,10 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEditor;
 using SEE.Game;
-using UnityEngine;
-using System.IO;
-using System.Collections.Generic;
 using SEE.Utils;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
 namespace SEEEditor
 {
@@ -18,26 +17,34 @@ namespace SEEEditor
     [CanEditMultipleObjects]
     public abstract class StoredSEECityEditor : AbstractSEECityEditor
     {
+        private bool pressed = false;
+        private string path = "";
+
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-            AbstractSEECity city = target as AbstractSEECity;
+
+            SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
 
             EditorGUILayout.BeginHorizontal();
             {
-                city.PathPrefix = EditorGUILayout.TextField("Data path prefix", Filenames.OnCurrentPlatform(city.PathPrefix));
+                EditorGUILayout.PropertyField(pathPrefix, new GUIContent("Data path prefix"));
                 if (GUILayout.Button("Select"))
                 {
-                    city.PathPrefix = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select GXL graph data directory", city.PathPrefix, ""));
-                    GUIUtility.ExitGUI(); // This call is to avoid the error "EndLayoutGroup: BeginLayoutGroup must be called first."
+                    pressed = true;
+                    path = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select graph data directory", pathPrefix.stringValue, ""));
                 }
-                // city.PathPrefix must end with a directory separator
-                if (city.PathPrefix.Length > 0 && city.PathPrefix[city.PathPrefix.Length - 1] != Path.DirectorySeparatorChar)
+                else if (pressed)
                 {
-                    city.PathPrefix = city.PathPrefix + Path.DirectorySeparatorChar;
+                    pressed = false;
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        pathPrefix.stringValue = path;
+                    }
                 }
             }
             EditorGUILayout.EndHorizontal();
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
         /// <summary>
@@ -49,10 +56,47 @@ namespace SEEEditor
             GUILayout.Label("Node types:", EditorStyles.boldLabel);
             // Make a copy to loop over the dictionary while making changes.
             Dictionary<string, bool> selection = new Dictionary<string, bool>(city.SelectedNodeTypes);
-            foreach (var entry in selection)
+
+            int countSelected = 0;
+            foreach (KeyValuePair<string, bool> entry in selection)
             {
                 city.SelectedNodeTypes[entry.Key] = EditorGUILayout.Toggle("  " + entry.Key, entry.Value);
+
+                if (city.SelectedNodeTypes[entry.Key])
+                {
+                    countSelected++;
+                }
             }
+
+            if (city.CoseGraphSettings.loadedForNodeTypes.Count == 0)
+            {
+                city.CoseGraphSettings.showGraphListing = true;
+                return;
+            }
+
+            bool allTypes = true;
+            foreach (KeyValuePair<string, bool> kvp in city.CoseGraphSettings.loadedForNodeTypes)
+            {
+                if (city.SelectedNodeTypes.ContainsKey(kvp.Key))
+                {
+                    allTypes = allTypes && city.SelectedNodeTypes[kvp.Key];
+                }
+                else
+                {
+                    allTypes = false;
+                }
+
+            }
+
+            if (allTypes)
+            {
+                if (countSelected != city.CoseGraphSettings.loadedForNodeTypes.Count)
+                {
+                    allTypes = false;
+                }
+            }
+
+            city.CoseGraphSettings.showGraphListing = allTypes;
         }
     }
 }

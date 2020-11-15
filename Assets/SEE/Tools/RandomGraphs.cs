@@ -1,8 +1,8 @@
-﻿using SEE.DataModel;
-using System.Collections.Generic;
-using System;
-using UnityEngine;
+﻿using SEE.DataModel.DG;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Tools
 {
@@ -22,9 +22,9 @@ namespace SEE.Tools
 
         public RandomAttributeDescriptor(string name, float mean, float standardDeviation)
         {
-            this.Name = name;
-            this.Mean = mean;
-            this.StandardDeviation = standardDeviation;
+            Name = name;
+            Mean = mean;
+            StandardDeviation = standardDeviation;
         }
         [SerializeField]
         public string Name;
@@ -64,10 +64,10 @@ namespace SEE.Tools
 
         public Constraint(string nodeType, int nodeNumber, string edgeType, float edgeDensity)
         {
-            this.NodeType = nodeType;
-            this.NodeNumber = nodeNumber;
-            this.EdgeType = edgeType;
-            this.EdgeDensity = edgeDensity;
+            NodeType = nodeType;
+            NodeNumber = nodeNumber;
+            EdgeType = edgeType;
+            EdgeDensity = edgeDensity;
             Check();
         }
 
@@ -112,8 +112,8 @@ namespace SEE.Tools
         /// <param name="leafAttributes">constraints for node attributes to be generated</param>
         /// <returns>a random graph fulfilling the given constraints</returns>
         public Graph Create
-            (Constraint leafConstraint, 
-             Constraint innerNodeConstraint, 
+            (Constraint leafConstraint,
+             Constraint innerNodeConstraint,
              ICollection<RandomAttributeDescriptor> leafAttributes)
         {
             leafConstraint.Check();
@@ -137,11 +137,11 @@ namespace SEE.Tools
 
             Debug.LogFormat("Number of edges:       {0}\n", graph.EdgeCount);
             Debug.LogFormat("Number of leaf edges:  {0}\n", leafEdgesCount);
-            Debug.LogFormat("Leaf edge density:     {0}\n", (float)leafEdgesCount / (float)leavesCount);
+            Debug.LogFormat("Leaf edge density:     {0}\n", leafEdgesCount / (float)leavesCount);
             Debug.LogFormat("Number of inner edges: {0}\n", innerEdgesCount);
-            Debug.LogFormat("Inner edge density:    {0}\n", (float)innerEdgesCount / (float)innerNodesCount);
+            Debug.LogFormat("Inner edge density:    {0}\n", innerEdgesCount / (float)innerNodesCount);
 
-            Debug.LogFormat("Maximal tree depth:    {0}\n", graph.GetMaxDepth());
+            Debug.LogFormat("Maximal tree depth:    {0}\n", graph.MaxDepth);
         }
 
         private void AssignLeaves(Graph graph, ICollection<Node> leaves, IList<Node> innerNodes)
@@ -238,7 +238,7 @@ namespace SEE.Tools
             graph.AddNode(result);
             return result;
         }
-        
+
 
         /// <summary>
         /// Returns a random number drawn from a normal distribution with given 

@@ -11,27 +11,45 @@ namespace SEE.Game.Evolution
         /// Constructor.
         /// </summary>
         /// <param name="graphRenderer">renderer used to retrieve the roof position of the game objects to be marked</param>
-        public Marker(GraphRenderer graphRenderer)
+        /// <param name="markerWidth">the width (x and z lengths) of the markers</param>
+        /// <param name="markerHeight">the height (y length) of the markers</param>
+        public Marker(GraphRenderer graphRenderer, float markerWidth, float markerHeight)
         {
             this.graphRenderer = graphRenderer;
+            ColorRange deadColorRange = new ColorRange(Color.black, Color.black, 1);
+            ColorRange bornColorRange = new ColorRange(Color.green, Color.green, 1);
+            bornPostFactory = new CubeFactory(graphRenderer.ShaderType, bornColorRange);
+            deadPostFactory = new CubeFactory(graphRenderer.ShaderType, deadColorRange);
+            if (markerHeight < 0)
+            {
+                this.markerHeight = 0;
+                Debug.LogError("SEE.Game.Evolution.Marker received a negative marker height.\n");
+            }
+            else
+            {
+                this.markerHeight = markerHeight;
+            }
+            if (markerWidth < 0)
+            {
+                this.markerWidth = 0;
+                Debug.LogError("SEE.Game.Evolution.Marker received a negative marker width.\n");
+            }
+            else
+            {
+                this.markerWidth = markerWidth;
+            }
         }
 
         /// <summary>
-        /// Black material used for the posts on top of nodes to be removed. Will be set
-        /// at Start(). Cannot be initialized here because of Unity restrictions.
+        /// The height of the posts used to mark new and deleted objects from one version to the next one.
         /// </summary>
-        private Materials black = new Materials(1, Color.black, Color.black);
+        private readonly float markerHeight;
 
         /// <summary>
-        /// Green material used for the posts on top of new nodes to be added. Will be set
-        /// at Start(). Cannot be initialized here because of Unity restrictions.
+        /// The width (x and z lengths) of the posts used to mark new and deleted objects from one version 
+        /// to the next one.
         /// </summary>
-        private Materials green = new Materials(1, Color.green, Color.green);
-
-        /// <summary>
-        /// The scale of all posts to be put onto game nodes in order to mark them.
-        /// </summary>
-        private Vector3 postScale = new Vector3(3.0f, 100.0f, 3.0f);
+        private readonly float markerWidth;
 
         /// <summary>
         /// The renderer used to retrieve the roof position of the game objects to be marked.
@@ -41,28 +59,49 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// The list of posts added for the new game objects since the last call to Clear().
         /// </summary>
-        private List<GameObject> posts = new List<GameObject>();
+        private readonly List<GameObject> posts = new List<GameObject>();
 
         /// <summary>
-        /// Marks the given <paramref name="block"/> as dying by putting a post on top
+        /// The factory to create posts above existing blocks ceasing to exist.
+        /// </summary>
+        private readonly CubeFactory deadPostFactory;
+
+        /// <summary>
+        /// The factory to create posts above new blocks coming into existence.
+        /// </summary>
+        private readonly CubeFactory bornPostFactory;
+
+        /// <summary>
+        /// Marks the given <paramref name="block"/> as dying/getting alive by putting a post on top
         /// of its roof. 
         /// </summary>
         /// <param name="block"></param>
-        /// <param name="material">the shared material for the post</param>
+        /// <param name="postFactory">the factory to create the post</param>
         /// <returns>the resulting post</returns>
-        private GameObject MarkByPost(GameObject block, Materials material)
+        private GameObject MarkByPost(GameObject block, CubeFactory postFactory)
         {
-            GameObject post = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            GameObject post = postFactory.NewBlock(0, block.GetRenderQueue() + 1);
+
+            // FIXME: These kinds of posts make sense only for leaf nodes.
+            // Could we better use some kind of blinking now that the cities
+            // are drawn in miniature?
+
             post.tag = Tags.Decoration;
-            Renderer renderer = post.GetComponent<Renderer>();
-            // Object should not cast shadows: too expensive and may hide information,
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            renderer.receiveShadows = false;
-            renderer.sharedMaterial = material.DefaultMaterial();
+            Vector3 postScale;           
             Vector3 position = graphRenderer.GetRoof(block);
+
+            postScale.x = markerWidth;
+            postScale.z = markerWidth;
+            postScale.y = markerHeight;
+
             position.y += postScale.y / 2.0f;
             post.transform.position = position;
             post.transform.localScale = postScale;
+
+            // Makes post a child of block so that it moves along with it during the animation.
+            // In addition, it will also be destroyed along with its parent block.
+            post.transform.SetParent(block.transform, true);
+
             return post;
         }
 
@@ -74,11 +113,8 @@ namespace SEE.Game.Evolution
         /// <returns>the resulting post</returns>
         public GameObject MarkDead(GameObject block)
         {
-            GameObject post = MarkByPost(block, black);
+            GameObject post = MarkByPost(block, deadPostFactory);
             post.name = "dead " + block.name;
-            // Makes post a child of block so that it moves along with it during the animation.
-            // In addition, it will also be destroyed along with its parent block.
-            post.transform.SetParent(block.transform, true);
             return post;
         }
 
@@ -90,7 +126,7 @@ namespace SEE.Game.Evolution
         /// <returns>the resulting post</returns>
         public GameObject MarkBorn(GameObject block)
         {
-            GameObject post = MarkByPost(block, green);
+            GameObject post = MarkByPost(block, bornPostFactory);
             post.name = "new " + block.name;
             // We need to add post to posts so that it can be destroyed at the beginning of the
             // next animation cycle.

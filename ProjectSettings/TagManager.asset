@@ -4,22 +4,22 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Edge
-  - Graph
-  - Node
-  - Node Prefab
-  - Text
-  - Erosion
-  - Fire
-  - Decoration
-  - Path
   - CCAnimation
-  - projectile
+  - Chart
+  - ChartContainer
+  - ChartManager
+  - VREventSystem
+  - Pointer
+  - Decoration
+  - Node
+  - Text
+  - Edge
   - FxTemporaire
-  - Runtime
-  - Function Call
-  - Building
+  - projectile
+  - CullingPlane
+  - Code City
   - JLG Visualization
+  - Function Call
   layers:
   - Default
   - TransparentFX
@@ -29,7 +29,7 @@ TagManager:
   - UI
   - 
   - 
-  - Player
+  - 
   - 
   - 
   - 
