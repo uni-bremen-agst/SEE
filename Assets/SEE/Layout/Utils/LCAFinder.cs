@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.Utils
 {
     /// <summary>
     /// Computes the lowest common ancestors (LCA) in a rooted tree or a forest based on
@@ -81,7 +81,7 @@ namespace SEE.Layout
                 visited.Add(node);
                 HNode parent = node.Parent;
                 // We should have visited the parent already in this pre-order depth-first traversal.
-                if (parent != null && ! visited.Contains(parent))
+                if (parent != null && !visited.Contains(parent))
                 {
                     throw new Exception("Parent in tree is inconsistent. Violating node: " + parent);
                 }
@@ -132,7 +132,7 @@ namespace SEE.Layout
         {
             CheckTree(roots);
             int numberOfNodes = MapAllNodes(roots);
-            this.maxLevel = 1 + Log2((uint)numberOfNodes);
+            maxLevel = 1 + Log2((uint)numberOfNodes);
             DetermineEulerTours(roots, numberOfNodes);
         }
 

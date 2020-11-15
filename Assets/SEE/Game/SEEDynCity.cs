@@ -1,9 +1,8 @@
-﻿using System.IO;
-using UnityEngine;
-
-using SEE.DataModel;
-using SEE.DataModel.IO;
+﻿using SEE.DataModel;
+using SEE.DataModel.Runtime.IO;
 using SEE.Utils;
+using System.IO;
+using UnityEngine;
 
 namespace SEE.Game
 {
@@ -31,7 +30,7 @@ namespace SEE.Game
         /// </summary>
         public override void LoadData()
         {
-            if (string.IsNullOrEmpty(GXLPath()))
+            if (string.IsNullOrEmpty(GXLPath))
             {
                 Debug.LogError("Empty graph path.\n");
             }
@@ -53,7 +52,7 @@ namespace SEE.Game
             {
                 Debug.LogError("Empty path for dynamic trace file.\n");
             }
-            else if (! File.Exists(filename))
+            else if (!File.Exists(filename))
             {
                 Debug.LogErrorFormat("Dynamic trace file {0} does not exist.\n", filename);
             }

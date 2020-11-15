@@ -1,0 +1,15 @@
+ID;Metric.Complexity;Metric.FanIn;CodeHistory.WasModified;Metric.FanOut
+src\test\java\javax\util\streamex;0;0;0;0
+src\main\java\javax\util\streamex;0;0;0;0
+streamex-root;0;0;0;0
+src\main\java\javax\util\streamex\AbstractStreamEx.java;1903;457;0;0
+src\test\java\javax\util\streamex\EntryStreamTest.java;3242;313;0;0
+src\main\java\javax\util\streamex\LongStreamEx.java;1884;589;1;0
+src\test\java\javax\util\streamex\StreamExTest.java;3857;319;0;0
+src\main\java\javax\util\streamex\IntStreamEx.java;2384;774;0;0
+src\test\java\javax\util\streamex\DoubleStreamExTest.java;1518;111;0;0
+src\main\java\javax\util\streamex\DoubleStreamEx.java;1753;522;1;0
+src\main\java\javax\util\streamex\EntryStream.java;2455;536;0;0
+src\test\java\javax\util\streamex\IntStreamExTest.java;2191;140;0;0
+src\test\java\javax\util\streamex\LongStreamExTest.java;1569;114;0;0
+src\main\java\javax\util\streamex\StreamEx.java;2206;752;0;0

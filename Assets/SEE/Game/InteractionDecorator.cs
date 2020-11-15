@@ -1,23 +1,32 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls
 {
+    /// <summary>
+    /// Adds components required for interacting with a game object.
+    /// </summary>
     public class InteractionDecorator
     {
-        private static void PrepareForInteraction(GameObject go)
+        /// <summary>
+        /// Adds an Interactable and InteractableObject component to given <paramref name="gameNode"/>.
+        /// </summary>
+        /// <param name="gameNode">game object where the components are to be added to</param>
+        public static void PrepareForInteraction(GameObject gameNode)
         {
-            go.isStatic = false; // we want to move the object during the game
-            go.AddComponent<Interactable>(); // enable interactions
-            GrabbableObject grabbableObject = go.AddComponent<GrabbableObject>(); // our customized reactions to hovering and grabbing events
-            //go.AddComponent<Rigidbody>(); // so the object follows the laws of physics
+            gameNode.isStatic = false; // we want to move the object during the game
+            Interactable interactable = gameNode.AddComponent<Interactable>(); // enable interactions
+            interactable.highlightOnHover = false;
+            gameNode.AddComponent<InteractableObject>();
         }
 
+        /// <summary>
+        /// Adds an Interactable and InteractableObject component to all given <paramref name="gameNodes"/>.
+        /// </summary>
+        /// <param name="gameNodes">game object where the components are to be added to</param>
         public static void PrepareForInteraction(ICollection<GameObject> gameNodes)
         {
-            InteractableObject.ResetAllObjects();
             foreach (GameObject go in gameNodes)
             {
                 PrepareForInteraction(go);

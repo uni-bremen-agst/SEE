@@ -27,21 +27,22 @@ using Valve.VR.InteractionSystem;
 
 namespace SEE.GO.Whiteboard
 {
+    [System.Obsolete("Experimental code. Do not use it. May be removed soon.")]
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(Interactable))]
     public class DraggableObject : MonoBehaviour
     {
         [SerializeField]
-        private Transform wallTransform, offsetTransform;
+        private readonly Transform wallTransform, offsetTransform;
 
         [SerializeField]
-        private float followingSpeed = 50f;
+        private readonly float followingSpeed = 50f;
 
         protected Rigidbody mRigidbody;
 
         private const int MaxNumberOfPositions = 8;
-        private Queue<Vector3> velocities = new Queue<Vector3>(MaxNumberOfPositions);
-        private Queue<Vector3> angularVelocities = new Queue<Vector3>(MaxNumberOfPositions);
+        private readonly Queue<Vector3> velocities = new Queue<Vector3>(MaxNumberOfPositions);
+        private readonly Queue<Vector3> angularVelocities = new Queue<Vector3>(MaxNumberOfPositions);
 
         private Vector3 startPosition;
         private Quaternion starRotation;
@@ -71,7 +72,7 @@ namespace SEE.GO.Whiteboard
             startPosition = mRigidbody.position;
             starRotation = mRigidbody.rotation;
 
-            interactable = this.GetComponent<Interactable>();
+            interactable = GetComponent<Interactable>();
             if (interactable == null)
             {
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
@@ -92,7 +93,9 @@ namespace SEE.GO.Whiteboard
 
                     velocities.Enqueue(velocity);
                     if (velocities.Count > MaxNumberOfPositions)
+                    {
                         velocities.Dequeue();
+                    }
 
                     // FIXME:
                     Vector3 angularVelocity = Vector3.zero;
@@ -100,7 +103,9 @@ namespace SEE.GO.Whiteboard
 
                     angularVelocities.Enqueue(angularVelocity);
                     if (angularVelocities.Count > MaxNumberOfPositions)
+                    {
                         angularVelocities.Dequeue();
+                    }
                 }
 
                 lastPosition = mRigidbody.position;
@@ -111,7 +116,9 @@ namespace SEE.GO.Whiteboard
         {
             float zPositionOffset = offsetTransform.position.z - transform.position.z;
             if (controllerTransform.position.z + zPositionOffset > wallTransform.position.z)
+            {
                 targetPosition.z = wallTransform.position.z - zPositionOffset;
+            }
 
             mRigidbody.position = Vector3.Lerp(mRigidbody.position, targetPosition, Time.deltaTime * followingSpeed);
         }
@@ -142,7 +149,9 @@ namespace SEE.GO.Whiteboard
             }
 
             if (velocities.Count > 0)
+            {
                 releaseVelocity /= velocities.Count;
+            }
 
             Vector3 releaseAngularVelocity = Vector3.zero;
 
@@ -152,7 +161,9 @@ namespace SEE.GO.Whiteboard
             }
 
             if (angularVelocities.Count > 0)
+            {
                 releaseAngularVelocity /= angularVelocities.Count;
+            }
 
             mRigidbody.isKinematic = false;
             mRigidbody.velocity = releaseVelocity;
@@ -205,7 +216,7 @@ namespace SEE.GO.Whiteboard
             //hand.HideGrabHint();
         }
 
-        private Hand.AttachmentFlags attachmentFlags
+        private readonly Hand.AttachmentFlags attachmentFlags
                = Hand.defaultAttachmentFlags
                  & (~Hand.AttachmentFlags.SnapOnAttach)
                  & (~Hand.AttachmentFlags.DetachOthers)
@@ -219,7 +230,7 @@ namespace SEE.GO.Whiteboard
         {
             //Debug.Log("HandHoverUpdate");
             GrabTypes startingGrabType = hand.GetGrabStarting();
-            bool isGrabEnding = hand.IsGrabEnding(this.gameObject);
+            bool isGrabEnding = hand.IsGrabEnding(gameObject);
 
             if (interactable.attachedToHand == null && startingGrabType != GrabTypes.None)
             {

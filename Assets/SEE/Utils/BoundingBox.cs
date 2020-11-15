@@ -1,5 +1,4 @@
-﻿using SEE.GO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Utils

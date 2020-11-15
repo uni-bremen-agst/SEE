@@ -1,8 +1,7 @@
-﻿using System;
+﻿using NUnit.Framework;
 using System.Collections.Generic;
-using NUnit.Framework;
 
-namespace SEE.DataModel
+namespace SEE.DataModel.DG
 {
     /// <summary>
     /// Unit tests for Graph.
@@ -53,7 +52,7 @@ namespace SEE.DataModel
             Assert.AreEqual(new HashSet<Edge>() { call_n1_n1, call_n1_n2 }, AsSet(n1.Outgoings));
             Edge call_n1_n3 = NewEdge(g, n1, n3, "call");
             Assert.AreEqual(new HashSet<Edge>() { call_n1_n1, call_n1_n2, call_n1_n3 }, AsSet(n1.Outgoings));
-            Edge use_n1_n3_a  = NewEdge(g, n1, n3, "use");
+            Edge use_n1_n3_a = NewEdge(g, n1, n3, "use");
             Assert.AreEqual(new HashSet<Edge>() { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a }, AsSet(n1.Outgoings));
             Edge use_n1_n3_b = NewEdge(g, n1, n3, "use");
             // We have overridden Equals() for edges so that they are considered the same if
@@ -118,12 +117,12 @@ namespace SEE.DataModel
             Node n3 = NewNode(g, "n3");
 
             Edge call_n1_n2 = NewEdge(g, n1, n2, "call");
-            Edge use_n1_n2  = NewEdge(g, n1, n2, "use");
+            Edge use_n1_n2 = NewEdge(g, n1, n2, "use");
 
             Edge call_n2_n3 = NewEdge(g, n2, n3, "call");
-            Edge use_n2_n3  = NewEdge(g, n2, n3, "use");
+            Edge use_n2_n3 = NewEdge(g, n2, n3, "use");
             Edge call_n2_n2 = NewEdge(g, n2, n2, "call");
-            Edge use_n2_n2  = NewEdge(g, n2, n2, "use");
+            Edge use_n2_n2 = NewEdge(g, n2, n2, "use");
 
             Edge call_n1_n3 = NewEdge(g, n1, n3, "call");
             Edge call_n3_n1 = NewEdge(g, n3, n1, "call");
@@ -138,7 +137,7 @@ namespace SEE.DataModel
             Assert.AreEqual(nodes, g.Nodes());
             Assert.AreEqual(edges, g.Edges());
 
-            Assert.AreEqual(n1.Outgoings, 
+            Assert.AreEqual(n1.Outgoings,
                             new HashSet<Edge>() { call_n1_n2, use_n1_n2, call_n1_n3 });
             Assert.AreEqual(n1.Incomings,
                             new HashSet<Edge>() { call_n3_n1 });
@@ -158,7 +157,7 @@ namespace SEE.DataModel
 
             g.RemoveNode(n2);
             nodes = new HashSet<Node>() { n1, n3 };
-            edges = new HashSet<Edge>() { call_n1_n3, call_n3_n1};
+            edges = new HashSet<Edge>() { call_n1_n3, call_n3_n1 };
 
             Assert.AreEqual(nodes.Count, g.NodeCount);
             Assert.AreEqual(edges.Count, g.EdgeCount);
@@ -313,8 +312,8 @@ namespace SEE.DataModel
             Assert.That(DA.IsRoot);
             Assert.That(E.IsRoot);
             Assert.That(BAAAA.IsLeaf);
-            Assert.That(BBA.IsLeaf);   
-            Assert.That(BCAA.IsLeaf);          
+            Assert.That(BBA.IsLeaf);
+            Assert.That(BCAA.IsLeaf);
             Assert.That(BCAB.IsLeaf);
             Assert.That(BCBA.IsLeaf);
             Assert.That(BDAA.IsLeaf);

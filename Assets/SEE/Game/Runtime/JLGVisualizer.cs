@@ -95,7 +95,7 @@ namespace SEE.Game.Runtime
         private Boolean lastDirection = true;
 
         /// <summary>
-        /// The GameObject that represents the class, to which the current statement belongs to. 
+        /// The GameObject that represents the class the current statement belongs to. 
         /// </summary>
         private GameObject currentGO;
 
@@ -127,10 +127,10 @@ namespace SEE.Game.Runtime
             ///Sets the currentGO to be the node representing the Class of the first Statement in preperation.
             if (nodesGOs == null)
             {
-                throw new Exception("There are no Nodes");
+                throw new Exception("There are no nodes");
             }
             if (GetNodeForStatement(statementCounter) == null) {
-                throw new Exception("Node is missing. Check, if the correct gxl is loaded.");
+                throw new Exception("Node is missing. Check whether the correct GXL is loaded.");
             }
             currentGO = GetNodeForStatement(statementCounter);
             currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
@@ -245,7 +245,8 @@ namespace SEE.Game.Runtime
             }
 
             ///Only Update the Spheres cause this visualization uses its own highlighting for the buildings.
-            foreach (GameObject f in functionCalls) {
+            foreach (GameObject f in functionCalls) 
+            {
                 f.GetComponent<FunctionCallSimulator>().UpdateSpheres();
             }
         }
@@ -265,11 +266,11 @@ namespace SEE.Game.Runtime
         /// This Method updates the visualization for one Step.
         /// </summary>
         private void UpdateVisualization() {
-            Debug.Log(statementCounter);
+            Debug.Log(statementCounter + "\n");
 
             CheckCurrentGO();
             
-            if (!textWindowForNodeExists(currentGO))
+            if (!TextWindowForNodeExists(currentGO))
             {
                 GenerateScrollableTextWindow();
             }
@@ -310,8 +311,10 @@ namespace SEE.Game.Runtime
         /// <param name="gameObject"></param>
         private void ActivateNodeTextWindow(GameObject gameObject)
         {
-            if (textWindows.Count != 0) {
-                foreach (GameObject go in textWindows) {
+            if (textWindows.Count != 0) 
+            {
+                foreach (GameObject go in textWindows) 
+                {
                     if (go.name == gameObject.name + "FileContent")
                     {
                         go.SetActive(true);
@@ -333,7 +336,7 @@ namespace SEE.Game.Runtime
             Ray camerMouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(camerMouseRay, out hit))
             {
-                if (hit.transform && textWindowForNodeExists(hit.transform.gameObject)) {
+                if (hit.transform && TextWindowForNodeExists(hit.transform.gameObject)) {
                     return hit.transform.gameObject;
                 }
             }
@@ -362,7 +365,7 @@ namespace SEE.Game.Runtime
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-        private bool textWindowForNodeExists(GameObject node)
+        private bool TextWindowForNodeExists(GameObject node)
         {
             bool exists = false;
             if (textWindows.Count != 0)
@@ -380,34 +383,109 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// This Method generates a new ScrollableTextMeshProWindow above the middle of the currentGO Node. Also it fills the Textfield with the written code saved in the file,
-        /// that belongs to this node aka the "FileContent". Lastly it creates a visual line between the TextWindow and the node Gameobject.
+        /// The distance between the code-city object and the source-code window
+        /// in Unity units.
+        /// </summary>
+        public float DistanceAboveCity = 0.01f;
+
+        /// <summary>
+        /// The distance between the back edge of the code-city object and the source-code window
+        /// in Unity units.
+        /// </summary>
+        public float DistanceBehindCity = 0.3f;
+
+        /// <summary>
+        /// The width of the line connecting the source-code window and the game objects
+        /// whose source code is currently shown.
+        /// </summary>
+        public float LineWidth = 0.01f;
+
+        /// <summary>
+        /// This method generates a new ScrollableTextMeshProWindow above the code city. 
+        /// This method assumes that the game object this JLGVisualizer is attached to is 
+        /// an immediate child of the code-city object. Hence, the parent of 
+        /// <see cref="gameObject"/> identifies the code-city object. Also it fills the 
+        /// Textfield with the written code saved in the file, that belongs to this node 
+        /// aka the "FileContent". Lastly it creates a visual line between the 
+        /// TextWindow and the <see cref="gameObject"/>.
         /// </summary>
         private void GenerateScrollableTextWindow()
         {
-            ///spawn textwindow in middle of map
-            Vector3 v = gameObject.transform.parent.position;
-            v.y = v.y + 2f * gameObject.transform.parent.localScale.y;
-            GameObject go = Instantiate((GameObject)Resources.Load("ScrollableTextWindow"), v, currentGO.transform.rotation, this.gameObject.transform.parent);
-            go.name = currentGO.name + "FileContent";
-            ///set canvas order in layer to textwindows.count damit die fenster voreinander gerendered werden
-            go.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = GetFileContentForNode(currentGO);
-            textWindows.Push(go);
+            Debug.LogFormat("GenerateScrollableTextWindow: windowRotation {0} \n", (Quaternion)currentGO.transform.rotation);
+            GameObject textWindow = Instantiate((GameObject)Resources.Load("ScrollableTextWindow"), Vector3.zero, rotation: currentGO.transform.rotation);
+            textWindow.name = currentGO.name + "FileContent";
+
+            float textWindowHeight = GetWindowHeight(textWindow);
+           
+            {
+                // Sets the position of the textWindow.
+                Transform referencePlane = GetReferencePlane();
+                Vector3 cityExtent = referencePlane.transform.lossyScale / 2.0f;
+
+                Vector3 windowPosition = referencePlane.position;
+                // the position of the textWindow rectangle is the 
+                windowPosition.y += DistanceAboveCity - textWindowHeight / 2;
+                windowPosition.z += cityExtent.z + DistanceBehindCity; // at the back edge of the city
+                textWindow.transform.position = windowPosition;
+            }
+
+            ///set canvas order in layer to textwindows.count so that the text windows can be renderer in front of each other
+            textWindow.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = GetFileContentForNode(currentGO);
+            textWindows.Push(textWindow);
 
             ///add line between Class and FileContentWindow
             LineRenderer line = new GameObject(currentGO.name + "FileContentConnector").AddComponent<LineRenderer>();
             line.positionCount = 2;
             line.material = new Material(Shader.Find("Sprites/Default"));
             line.material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
-            line.startWidth = 0.2f;
-            line.endWidth = 0.2f;
+            line.startWidth = LineWidth;
+            line.endWidth = LineWidth;
             line.useWorldSpace = true;
-            float heightOfTextObject = go.GetComponent<RectTransform>().rect.height * go.transform.parent.localScale.y;
-            Vector3 goPoint = go.transform.position;
-            goPoint.y = goPoint.y - heightOfTextObject / 2;
-            line.SetPosition(0, goPoint);
+            Vector3 startPosition = textWindow.transform.position;
+            // FIXME: The beam just above the lower edge of the text window. It seems as if the
+            // textWindow is resized. At least we are not getting its correct height.
+            startPosition.y -= textWindowHeight;  
+            line.SetPosition(0, startPosition);
             line.SetPosition(1, currentGO.transform.position);
-            line.gameObject.transform.parent = go.transform;
+            line.gameObject.transform.parent = textWindow.transform;
+        }
+
+        private float GetWindowHeight(GameObject textWindow)
+        {
+            if (textWindow.TryGetComponent<RectTransform>(out RectTransform rectTransform))
+            {
+                // Each corner provides its world space value. The returned array of 4 vertices 
+                // is clockwise. It starts bottom left and rotates to top left, then top right,
+                // and finally bottom right. Note that bottom left, for example, is an (x, y, z) 
+                // vector with x being left and y being bottom.
+                Vector3[] corners = new Vector3[4];
+                rectTransform.GetWorldCorners(corners);
+                return corners[1].y - corners[0].y;
+            }
+            else
+            {
+                throw new Exception("Text window " + textWindow.name + "does not have a RectTransform.");
+            }
+        }
+
+        /// <summary>
+        /// Returns the transform of the plane underlying the game objects forming the code city
+        /// if it exists; otherwise the tranform of the code-city object is returned.
+        /// 
+        /// Assumption: The plane is an immediate child of the code-city object, named "Plane"
+        /// and tagged by Tags.Decoration.
+        /// </summary>
+        /// <returns>transform of plane or code-city</returns>
+        private Transform GetReferencePlane()
+        {
+            foreach (Transform child in gameObject.transform)
+            {
+                if (child.CompareTag(Tags.Decoration) && child.name == "Plane")
+                {
+                    return child.transform;
+                }
+            }
+            return gameObject.transform.parent;
         }
 
         /// <summary>
@@ -540,8 +618,10 @@ namespace SEE.Game.Runtime
         /// <summary>
         /// Activates the Textwindow of the currentGO and disables all other.
         /// </summary>
-        private void ToggleTextWindows() {
-            foreach (GameObject go in textWindows) {
+        private void ToggleTextWindows() 
+        {
+            foreach (GameObject go in textWindows) 
+            {
                 ///Textwindow of currentGO is always active
                 if (go.name == currentGO.name + "FileContent")
                 {

@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+﻿using SEE.DataModel;
+using SEE.GO;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Collections;
-using SEE.GO;
-using SEE.DataModel;
+using UnityEngine;
 
 namespace SEE.CameraPaths
 {
@@ -16,7 +16,7 @@ namespace SEE.CameraPaths
         /// <summary>
         /// The file extension of files storing path data.
         /// </summary>
-        public const string PathFileExtension    = "csv";
+        public const string PathFileExtension = "csv";
         public const string DotPathFileExtension = ".csv";
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace SEE.CameraPaths
         /// <summary>
         /// The path data captured.
         /// </summary>
-        private List<PathData> data = new List<PathData>();
+        private readonly List<PathData> data = new List<PathData>();
 
         /// <summary>
         /// Operator[key] yielding the key'th entry in the path. The first
@@ -214,7 +214,7 @@ namespace SEE.CameraPaths
         /// <returns>an enumerator over all path data entries in the path</returns>
         public IEnumerator GetEnumerator()
         {
-            return (IEnumerator)this.data.GetEnumerator();
+            return data.GetEnumerator();
         }
 
         /// <summary>
@@ -292,7 +292,7 @@ namespace SEE.CameraPaths
                     // All path lines have the same material to reduce the number of drawing calls.
                     if (lookoutMaterial == null)
                     {
-                        lookoutMaterial = LineFactory.NewLineMaterial();
+                        lookoutMaterial = Materials.New(Materials.ShaderType.TransparentLine);
                     }
                     line.sharedMaterial = lookoutMaterial;
 
@@ -321,21 +321,21 @@ namespace SEE.CameraPaths
         private int CompareTo(Vector3 me, Vector3 other, float allowedDifference)
         {
             {
-                var delta = me.x - other.x;
+                float delta = me.x - other.x;
                 if (Mathf.Abs(delta) > allowedDifference)
                 {
                     return delta > 0 ? 1 : -1;
                 }
             }
             {
-                var delta = me.y - other.y;
+                float delta = me.y - other.y;
                 if (Mathf.Abs(delta) > allowedDifference)
                 {
                     return delta > 0 ? 1 : -1;
                 }
             }
             {
-                var delta = me.z - other.z;
+                float delta = me.z - other.z;
                 if (Mathf.Abs(delta) > allowedDifference)
                 {
                     return delta > 0 ? 1 : -1;
@@ -443,7 +443,7 @@ namespace SEE.CameraPaths
             // All path lines have the same material to reduce the number of drawing calls.
             if (pathMaterial == null)
             {
-                pathMaterial = LineFactory.NewLineMaterial();
+                pathMaterial = Materials.New(Materials.ShaderType.TransparentLine);
             }
             line.sharedMaterial = pathMaterial;
 
@@ -459,20 +459,20 @@ namespace SEE.CameraPaths
             line.positionCount = positions.Length;
             line.SetPositions(positions);
         }
-       
+
         private string Dump(Vector3 v)
         {
-            return ("("    + v.x.ToString("0.00000")
+            return ("(" + v.x.ToString("0.00000")
                     + ", " + v.y.ToString("0.00000")
                     + ", " + v.z.ToString("0.00000") + ")");
         }
 
         public void Dump()
         {
-            foreach(PathData d in data)
+            foreach (PathData d in data)
             {
-                Debug.LogFormat("position(x,y,z)={0} rotation={1}, rotation(x, y, z, w)= ({2}, {3}, {4}, {5}), rotation(Euler angles)={6}, time={7})\n", 
-                                d.position, 
+                Debug.LogFormat("position(x,y,z)={0} rotation={1}, rotation(x, y, z, w)= ({2}, {3}, {4}, {5}), rotation(Euler angles)={6}, time={7})\n",
+                                d.position,
                                 d.rotation,
                                 d.rotation.x.ToString("0.000"), d.rotation.y.ToString("0.000"), d.rotation.z.ToString("0.000"), d.rotation.w.ToString("0.000"),
                                 Dump(d.rotation.eulerAngles),

@@ -25,19 +25,20 @@ using UnityEngine;
 
 namespace SEE.GO.Whiteboard
 {
+    [System.Obsolete("Experimental code. Do not use it. May be removed soon.")]
     public class Eraser : DraggableObject
     {
         [SerializeField]
         private Color color;
 
         [SerializeField]
-        private MeshRenderer[] colouredParts;
+        private readonly MeshRenderer[] colouredParts;
 
         [SerializeField]
-        private Painter painter;
+        private readonly Painter painter;
 
         [SerializeField]
-        private PaintReceiver paintReceiver;
+        private readonly PaintReceiver paintReceiver;
 
         protected override void Awake()
         {

@@ -11,14 +11,14 @@ namespace SEE.Net
         /// <summary>
         /// The transform of the main camera.
         /// </summary>
-        Transform cameraTransform;
+        private Transform cameraTransform;
 
         /// <summary>
         /// Initializes the player prefab or destroys this script, if this client is not
         /// the owner, so that the transform is not synchronized with the main camera of
         /// the other client.
         /// </summary>
-        void Start()
+        private void Start()
         {
             if (GetComponent<ViewContainer>().IsOwner())
             {
@@ -37,7 +37,7 @@ namespace SEE.Net
         /// <summary>
         /// Synchronizes transform with camera transform.
         /// </summary>
-        void Update()
+        private void Update()
         {
             transform.position = cameraTransform.position;
             transform.rotation = cameraTransform.rotation;

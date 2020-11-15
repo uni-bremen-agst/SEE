@@ -1,11 +1,13 @@
-﻿using UnityEngine;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using SEE.DataModel;
-using System.Collections.Generic;
-using SEE.DataModel.IO;
-using System.Linq;
+using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.Game;
-using SEE.GO;
+using SEE.Layout.EdgeLayouts;
+using SEE.Layout.NodeLayouts;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace SEE.Layout
 {
@@ -42,7 +44,7 @@ namespace SEE.Layout
 
             // Apply the layout.
             Dictionary<string, NodeTransform> layoutMap = new Dictionary<string, NodeTransform>(savedLayout.Count);
-            foreach (var entry in savedLayout)
+            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in savedLayout)
             {
                 ILayoutNode node = entry.Key;
                 NodeTransform transform = entry.Value;
@@ -61,7 +63,7 @@ namespace SEE.Layout
             // that they are actually read. Note that the GVL does not contain scale.y,
             // that is why we need to maintain it.
             foreach (ILayoutNode layoutNode in gameObjects)
-            {                
+            {
                 layoutNode.LocalScale = new Vector3(0.0f, layoutNode.LocalScale.y, 0.0f);
                 layoutNode.CenterPosition = Vector3.zero;
             }
@@ -74,7 +76,7 @@ namespace SEE.Layout
             // Now savedLayout and readLayout should be the same except for  
             // scale.y and, thus, position.y (none of those are stored in GVL).
             Assert.AreEqual(savedLayout.Count, readLayout.Count); // no gameObject added or removed
-            foreach (var entry in readLayout)
+            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in readLayout)
             {
                 ILayoutNode node = entry.Key;
                 NodeTransform readTransform = entry.Value;
@@ -85,13 +87,13 @@ namespace SEE.Layout
                 Assert.That(readTransform.scale.z, Is.EqualTo(savedTransform.scale.z).Within(floatTolerance));
                 Assert.That(readTransform.position.x, Is.EqualTo(savedTransform.position.x).Within(floatTolerance));
                 Assert.That(readTransform.position.z, Is.EqualTo(savedTransform.position.z).Within(floatTolerance));
-                Assert.AreEqual(savedTransform.rotation, readTransform.rotation);                
+                Assert.AreEqual(savedTransform.rotation, readTransform.rotation);
             }
         }
 
         private void Dump(Dictionary<ILayoutNode, NodeTransform> readLayout, int howMany = int.MaxValue)
         {
-            foreach (var entry in readLayout)
+            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in readLayout)
             {
                 howMany--;
                 if (howMany <= 0)
@@ -154,34 +156,37 @@ namespace SEE.Layout
             seeCity.transform.position = Vector3.zero; // new Vector3(-1012.38f, 0.0f, 581.414f);
             seeCity.transform.localScale = Vector3.one * 100 * 18.91f;
             SEECity seeCityComponent = seeCity.AddComponent<SEECity>();
-            seeCityComponent.NodeLayout = AbstractSEECity.NodeLayouts.FromFile;
-            seeCityComponent.EdgeLayout = AbstractSEECity.EdgeLayouts.None;
+            seeCityComponent.NodeLayout = NodeLayoutKind.FromFile;
+            seeCityComponent.EdgeLayout = EdgeLayoutKind.None;
             seeCityComponent.LeafObjects = AbstractSEECity.LeafNodeKinds.Blocks;
             seeCityComponent.InnerNodeObjects = AbstractSEECity.InnerNodeKinds.Blocks;
             seeCityComponent.gvlPath = path + "Architecture.gvl";
 
             // Render the city. This will create all game objects as well as their
             // layout. As stated before, the layout does not interest us.
-            GraphRenderer graphRenderer = new GraphRenderer(seeCityComponent);
-            graphRenderer.Draw(graph, seeCity);
+            GraphRenderer graphRenderer = new GraphRenderer(seeCityComponent, graph);
+            graphRenderer.Draw(seeCity);
 
             // Now we have the game objects whose layout information was read
             // from the GVL file.
 
             // The game-object hierarchy for the nodes in graph are children of seeCity.
-            ICollection<ILayoutNode> gameObjects = graphRenderer.ToLayoutNodes(GetGameObjects(seeCity));
+            ICollection<GameNode> gameNodes = graphRenderer.ToLayoutNodes(GetGameObjects(seeCity));
+            // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
+            // (GameNode implements ILayoutNode).
+            ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
 
             //SEE.Layout.IO.Reader reader = new SEE.Layout.IO.Reader(path + "Architecture.gvl", 
             //                                                       gameObjects.Cast<IGameNode>().ToList(),
             //                                                       0.0f);
-            DumpTree(gameObjects);
+            DumpTree(layoutNodes);
             // Save the layout.
-            SEE.Layout.IO.Writer.Save(path + "Architecture-saved.gvl", "architecture", gameObjects);
+            SEE.Layout.IO.Writer.Save(path + "Architecture-saved.gvl", "architecture", layoutNodes);
         }
 
         private ICollection<GameObject> GetGameObjects(GameObject go)
         {
-            List <GameObject>  result = new List<GameObject>();
+            List<GameObject> result = new List<GameObject>();
             if (go.tag == Tags.Node)
             {
                 result.Add(go);
@@ -227,7 +232,7 @@ namespace SEE.Layout
             {
                 indentation += "-";
             }
-            Debug.LogFormat("{0}{1}: position={2} worldscale={3} rotation={4}.\n", indentation, root.ID, root.CenterPosition, root.AbsoluteScale, root.Rotation);            
+            Debug.LogFormat("{0}{1}: position={2} worldscale={3} rotation={4}.\n", indentation, root.ID, root.CenterPosition, root.AbsoluteScale, root.Rotation);
             foreach (ILayoutNode child in root.Children())
             {
                 DumpTree(child, level + 1);

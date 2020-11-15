@@ -4,11 +4,24 @@ using UnityEngine;
 
 /// <summary>
 /// This script can be added to a Canvas GameObject to make it always face the main camera.
+/// It is a component of the prefab ScrollableTextWindow.
 /// </summary>
 public class ScrollableTextWindowFaceCamera : MonoBehaviour
 {
+    private Transform mainCamera;
+
+    private void Start()
+    {
+        if (Camera.allCamerasCount > 1)
+        {
+            Debug.LogWarning("There is more than one camera in the scene.\n");
+        }
+        mainCamera = Camera.main.transform;
+        Debug.LogFormat("ScrollableTextWindows will be facing camera in {0}.\n", mainCamera.name);
+    }
+
     void LateUpdate()
     {
-        transform.LookAt(transform.position + Camera.main.transform.localRotation * Vector3.forward, Camera.main.transform.localRotation * Vector3.up);
+        transform.LookAt(transform.position + mainCamera.localRotation * Vector3.forward, mainCamera.localRotation * Vector3.up);
     }
 }

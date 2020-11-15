@@ -145,6 +145,38 @@ namespace Valve.VR
             }
         }
         
+        public virtual SteamVR_Action_Boolean ResetCharts
+        {
+            get
+            {
+                return SteamVR_Actions.default_ResetCharts;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean CreateChart
+        {
+            get
+            {
+                return SteamVR_Actions.default_CreateChart;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean LGrip
+        {
+            get
+            {
+                return SteamVR_Actions.default_LGrip;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean RGrip
+        {
+            get
+            {
+                return SteamVR_Actions.default_RGrip;
+            }
+        }
+        
         public virtual SteamVR_Action_Vibration Haptic
         {
             get

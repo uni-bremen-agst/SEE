@@ -8,7 +8,7 @@ namespace SEE.DataModel
         /// The list of currently registered observers that need to be notified
         /// upon a change of the state.
         /// </summary>
-        private IList<Observer> observers = new List<Observer>();
+        private readonly IList<Observer> observers = new List<Observer>();
 
         /// <summary>
         /// Registers given observer. The observer will then be notified via

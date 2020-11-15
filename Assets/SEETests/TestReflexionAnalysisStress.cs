@@ -1,9 +1,8 @@
 ﻿using NUnit.Framework;
-using UnityEngine;
-
-using SEE.DataModel;
-using SEE.DataModel.IO;
+using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.Tools.Architecture
 {

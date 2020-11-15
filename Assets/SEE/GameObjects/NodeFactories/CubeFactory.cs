@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel;
+using SEE.Game;
 using UnityEngine;
 
 namespace SEE.GO
@@ -12,23 +13,110 @@ namespace SEE.GO
     /// </summary>
     public class CubeFactory : InnerNodeFactory
     {
-        public override GameObject NewBlock(int style)
-        {
-            // Note: An appropriate box collider is already attached to the cube.
-            GameObject result = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            SetHeight(result, DefaultHeight);
+        private readonly Mesh cubeMesh;
 
-            result.tag = Tags.Node;
-            Renderer renderer = result.GetComponent<Renderer>();
-            // Object should not cast shadows: too expensive and may hide information,
+        public CubeFactory(Materials.ShaderType shaderType, ColorRange colorRange)
+            : base(shaderType, colorRange)
+        {
+            cubeMesh = new Mesh();
+
+            // x-, x+, y-, y+, z-, z+
+            Vector3[] vertices = new Vector3[24]
+            {
+                new Vector3(-0.5f, -0.5f,  0.5f),
+                new Vector3(-0.5f, -0.5f, -0.5f),
+                new Vector3(-0.5f,  0.5f, -0.5f),
+                new Vector3(-0.5f,  0.5f,  0.5f),
+
+                new Vector3( 0.5f, -0.5f, -0.5f),
+                new Vector3( 0.5f, -0.5f,  0.5f),
+                new Vector3( 0.5f,  0.5f,  0.5f),
+                new Vector3( 0.5f,  0.5f, -0.5f),
+
+                new Vector3( 0.5f, -0.5f, -0.5f),
+                new Vector3(-0.5f, -0.5f, -0.5f),
+                new Vector3(-0.5f, -0.5f,  0.5f),
+                new Vector3( 0.5f, -0.5f,  0.5f),
+
+                new Vector3(-0.5f,  0.5f, -0.5f),
+                new Vector3( 0.5f,  0.5f, -0.5f),
+                new Vector3( 0.5f,  0.5f,  0.5f),
+                new Vector3(-0.5f,  0.5f,  0.5f),
+
+                new Vector3(-0.5f, -0.5f, -0.5f),
+                new Vector3( 0.5f, -0.5f, -0.5f),
+                new Vector3( 0.5f,  0.5f, -0.5f),
+                new Vector3(-0.5f,  0.5f, -0.5f),
+
+                new Vector3( 0.5f, -0.5f,  0.5f),
+                new Vector3(-0.5f, -0.5f,  0.5f),
+                new Vector3(-0.5f,  0.5f,  0.5f),
+                new Vector3( 0.5f,  0.5f,  0.5f)
+            };
+
+            Vector3[] normals = new Vector3[24]
+            {
+                new Vector3(-1.0f,  0.0f,  0.0f),
+                new Vector3(-1.0f,  0.0f,  0.0f),
+                new Vector3(-1.0f,  0.0f,  0.0f),
+                new Vector3(-1.0f,  0.0f,  0.0f),
+
+                new Vector3( 1.0f,  0.0f,  0.0f),
+                new Vector3( 1.0f,  0.0f,  0.0f),
+                new Vector3( 1.0f,  0.0f,  0.0f),
+                new Vector3( 1.0f,  0.0f,  0.0f),
+
+                new Vector3( 0.0f, -1.0f,  0.0f),
+                new Vector3( 0.0f, -1.0f,  0.0f),
+                new Vector3( 0.0f, -1.0f,  0.0f),
+                new Vector3( 0.0f, -1.0f,  0.0f),
+
+                new Vector3( 0.0f,  1.0f,  0.0f),
+                new Vector3( 0.0f,  1.0f,  0.0f),
+                new Vector3( 0.0f,  1.0f,  0.0f),
+                new Vector3( 0.0f,  1.0f,  0.0f),
+
+                new Vector3( 0.0f,  0.0f, -1.0f),
+                new Vector3( 0.0f,  0.0f, -1.0f),
+                new Vector3( 0.0f,  0.0f, -1.0f),
+                new Vector3( 0.0f,  0.0f, -1.0f),
+
+                new Vector3( 0.0f,  0.0f,  1.0f),
+                new Vector3( 0.0f,  0.0f,  1.0f),
+                new Vector3( 0.0f,  0.0f,  1.0f),
+                new Vector3( 0.0f,  0.0f,  1.0f)
+            };
+
+            // Note: Winding order in unity is clockwise
+            int[] indices = new int[36]
+            {
+                 0,  3,  2,  2,  1,  0,
+                 4,  7,  6,  6,  5,  4,
+                 8, 11, 10, 10,  9,  8,
+                12, 15, 14, 14, 13, 12,
+                16, 19, 18, 18, 17, 16,
+                20, 23, 22, 22, 21, 20
+            };
+
+            cubeMesh.SetVertices(vertices);
+            cubeMesh.SetNormals(normals);
+            cubeMesh.SetIndices(indices, MeshTopology.Triangles, 0);
+        }
+
+        public override GameObject NewBlock(int style, int renderQueueOffset = 0)
+        {
+            GameObject result = new GameObject("Cube") { tag = Tags.Node };
+            //SetHeight(result, DefaultHeight);
+
+            result.AddComponent<MeshFilter>().mesh = cubeMesh;
+            result.AddComponent<BoxCollider>();
+
+            MeshRenderer renderer = result.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = Materials.Get(renderQueueOffset, Mathf.Clamp(style, 0, (int)Materials.NumberOfMaterials - 1)); ;
+            renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
 
-            // Assigns a material to the object.
-            renderer.sharedMaterial = materials.DefaultMaterial(Mathf.Clamp(style, 0, NumberOfStyles()-1));
-
-            // Object should be static so that we save rendering time at run-time.
-            result.isStatic = true;
             return result;
         }
     }

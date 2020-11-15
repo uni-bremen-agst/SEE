@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3212926452231396855}
   - component: {fileID: 3392600707512511195}
   - component: {fileID: 7478642349422850912}
-  - component: {fileID: 3852834073282233151}
+  - component: {fileID: 8038344408527833996}
   m_Layer: 0
   m_Name: ScrollContainerStatementInfo
   m_TagString: Untagged
@@ -107,7 +107,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &3852834073282233151
+--- !u!114 &8038344408527833996
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -116,10 +116,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 773676403741417182}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ShowMaskGraphic: 1
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
 --- !u!1 &2801932035385414546
 GameObject:
   m_ObjectHideFlags: 0
@@ -132,7 +133,7 @@ GameObject:
   - component: {fileID: 7436570979423130695}
   - component: {fileID: 2659717812386287499}
   m_Layer: 0
-  m_Name: TextContainer
+  m_Name: DataTextContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -381,7 +382,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7376508425101270900}
-  m_LocalRotation: {x: -0, y: -0.24896705, z: -0, w: 0.968512}
+  m_LocalRotation: {x: 0, y: -0.2419218, z: 0, w: 0.9702958}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -389,11 +390,11 @@ RectTransform:
   - {fileID: 7135334733838357858}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: -28.833002, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -28, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1.25, y: 1.25}
+  m_SizeDelta: {x: 0.5, y: 0.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &7376508425101270896
 Canvas:
@@ -479,7 +480,7 @@ GameObject:
   - component: {fileID: 7376508425394281793}
   - component: {fileID: 7376508425394281794}
   - component: {fileID: 7376508425394281795}
-  - component: {fileID: 7376508425394281796}
+  - component: {fileID: 5524482263771095177}
   m_Layer: 0
   m_Name: ScrollContainerFileContent
   m_TagString: Untagged
@@ -564,7 +565,7 @@ MonoBehaviour:
   m_Inertia: 1
   m_DecelerationRate: 0.135
   m_ScrollSensitivity: 0.05
-  m_Viewport: {fileID: 0}
+  m_Viewport: {fileID: 7376508425394281797}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 0}
   m_HorizontalScrollbarVisibility: 0
@@ -574,7 +575,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &7376508425394281796
+--- !u!114 &5524482263771095177
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -583,10 +584,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 7376508425394281798}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ShowMaskGraphic: 1
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
 --- !u!1 &7376508426226405596
 GameObject:
   m_ObjectHideFlags: 0
@@ -651,7 +653,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: hallo
+  m_text: This window shows source code.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -720,10 +722,10 @@ MonoBehaviour:
   m_margin: {x: -0.001083374, y: 0, z: 0.0033187866, w: 0}
   m_textInfo:
     textComponent: {fileID: 7376508426226405594}
-    characterCount: 5
+    characterCount: 30
     spriteCount: 0
-    spaceCount: 0
-    wordCount: 1
+    spaceCount: 4
+    wordCount: 5
     linkCount: 0
     lineCount: 1
     pageCount: 1
@@ -756,7 +758,7 @@ GameObject:
   - component: {fileID: 7376508426821294237}
   - component: {fileID: 7376508426821294238}
   m_Layer: 0
-  m_Name: TextContainer
+  m_Name: CodeTextContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -779,7 +781,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.631, y: -0.6250024}
+  m_AnchoredPosition: {x: 0.62500626, y: -0.62501454}
   m_SizeDelta: {x: 1.25, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7376508426821294236

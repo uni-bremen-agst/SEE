@@ -1,4 +1,5 @@
-﻿using SEE.DataModel;
+﻿using SEE.DataModel.DG;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -68,7 +69,17 @@ namespace SEE.GO
         /// <returns>normalized maximum</returns>
         public float GetNormalizedMaximum(string metric)
         {
-            return GetNormalizedValue(metric, metricMaxima[metric]);
+            if (metricMaxima.TryGetValue(metric, out float value))
+            {
+                return GetNormalizedValue(metric, value);
+            }
+            else
+            {
+                Debug.LogErrorFormat("Attempt to retrieve the normalized maximum of metric {0} that is not known.\n", metric);
+                Debug.Log("The available normalized metric maxima are as follows:\n");
+                DumpMetricMaxima(metricMaxima);
+                throw new Exception("A metric named " + metric + " does not exist.");
+            }
         }
 
         /// <summary>
@@ -109,7 +120,7 @@ namespace SEE.GO
         /// </summary>
         protected void DumpMetricMaxima(Dictionary<string, float> metricMaxima)
         {
-            foreach (var item in metricMaxima)
+            foreach (KeyValuePair<string, float> item in metricMaxima)
             {
                 Debug.Log("maximum of " + item.Key + ": " + item.Value + "\n");
             }

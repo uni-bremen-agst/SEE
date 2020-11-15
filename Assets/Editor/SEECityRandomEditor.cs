@@ -1,10 +1,10 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEditor;
-using UnityEngine;
+using SEE.DataModel.DG.IO;
 using SEE.Game;
+using UnityEditor;
 using UnityEditorInternal;
-using SEE.DataModel.IO;
+using UnityEngine;
 
 namespace SEEEditor
 {
@@ -32,19 +32,19 @@ namespace SEEEditor
             leafAttributes.drawElementCallback
                 = (Rect rect, int index, bool isActive, bool isFocused) =>
                 {
-                    var element = leafAttributes.serializedProperty.GetArrayElementAtIndex(index);
-                    var name = element.FindPropertyRelative("Name");
-                    var mean = element.FindPropertyRelative("Mean");
-                    var standardDeviation = element.FindPropertyRelative("StandardDeviation");
+                    SerializedProperty element = leafAttributes.serializedProperty.GetArrayElementAtIndex(index);
+                    SerializedProperty name = element.FindPropertyRelative("Name");
+                    SerializedProperty mean = element.FindPropertyRelative("Mean");
+                    SerializedProperty standardDeviation = element.FindPropertyRelative("StandardDeviation");
 
                     rect.y += 2;
                     float nameLength = rect.width * 0.75f;
                     float valueLength = (rect.width - nameLength) / 2.0f;
 
-                    city.LeafAttributes[index].Name 
+                    city.LeafAttributes[index].Name
                         = EditorGUI.TextField(new Rect(rect.x, rect.y, nameLength, EditorGUIUtility.singleLineHeight),
                                               name.stringValue);
-                    float meanValue 
+                    float meanValue
                         = EditorGUI.FloatField(new Rect(rect.x + nameLength, rect.y, valueLength, EditorGUIUtility.singleLineHeight),
                                                mean.floatValue);
                     if (meanValue >= 0.0f)
@@ -99,7 +99,7 @@ namespace SEEEditor
             // We select one hierarchicalEdge from the set of hierarchical edges arbitrarily.
             foreach (string hierarchicalEdge in city.HierarchicalEdges)
             {
-                GraphWriter.Save(city.GXLPath(), city.LoadedGraph, hierarchicalEdge);
+                GraphWriter.Save(city.GXLPath, city.LoadedGraph, hierarchicalEdge);
                 return;
             }
         }

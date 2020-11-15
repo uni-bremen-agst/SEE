@@ -1,10 +1,12 @@
-﻿using SEE.Utils;
+﻿using SEE.DataModel.DG;
+using SEE.Layout.NodeLayouts.Cose;
+using SEE.Utils;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Layout
+namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// A layout that is read from a GVL file.
@@ -27,14 +29,14 @@ namespace SEE.Layout
         /// <summary>
         /// The name of the GVL file from which to read the layout information.
         /// </summary>
-        private string filename;
+        private readonly string filename;
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes)
         {
             Dictionary<ILayoutNode, NodeTransform> result = new Dictionary<ILayoutNode, NodeTransform>();
             if (File.Exists(filename))
             {
-                SEE.Layout.IO.Reader reader 
+                SEE.Layout.IO.Reader reader
                     = new SEE.Layout.IO.Reader(filename, layoutNodes.Cast<IGameNode>().ToList(), groundLevel, new SEELogger());
                 foreach (ILayoutNode node in layoutNodes)
                 {
@@ -51,6 +53,16 @@ namespace SEE.Layout
                 Debug.LogErrorFormat("GVL file {0} does not exist. No layout could be loaded.\n", filename);
             }
             return result;
+        }
+
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool UsesEdgesAndSublayoutNodes()
+        {
+            return false;
         }
     }
 }

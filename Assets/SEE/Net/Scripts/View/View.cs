@@ -29,7 +29,7 @@ namespace SEE.Net
             InitializeImpl();
         }
 
-        void Update()
+        private void Update()
         {
             UpdateImpl();
         }

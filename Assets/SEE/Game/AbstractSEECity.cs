@@ -1,14 +1,18 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using OdinSerializer;
 
-using SEE.DataModel;
-using SEE.DataModel.IO;
-using SEE.GO;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using OdinSerializer;
+using SEE.DataModel;
+using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
+using SEE.GO;
+using SEE.Layout.EdgeLayouts;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.Game
 {
@@ -22,14 +26,41 @@ namespace SEE.Game
     public abstract class AbstractSEECity : SerializedMonoBehaviour
     {
         /// <summary>
-        /// The prefix of the absolute paths for the GXL and CSV data; that is,
-        /// the directory where these data are located in.
-        /// Note: This attribute will be set in the SEECityEditor. 
-        /// Application.dataPath (used within ProjectPath()) must not be called in a 
-        /// constructor. That is why we need to defer its definition to the 
-        /// SEECityEditor.
-        /// </summary>        
-        public string PathPrefix; // serialized by Unity
+        /// The internal representation of property PathPrefix.
+        /// The internal representation of this path is always in the Unix style
+        /// (or also Unity style), independent from the operating system we are currently
+        /// running on.
+        /// </summary>
+        /// Must not be readonly because it will be modified in an editor of the inspector.
+        [SerializeField] private string pathPrefix = null;
+
+        /// <summary>
+        /// The prefix of the absolute paths for the GXL, CSV, GVL data; that is,
+        /// the directory where these data files are located in.
+        /// 
+        /// The style of this path prefix is always the one of the current operating
+        /// system we are running on, that is, the directory separator will be \
+        /// on Windows and / on all other platforms.
+        /// 
+        /// If the path prefix has never been set or was set to the empty string, the path 
+        /// prefix is the path to the Unity project.
+        /// 
+        /// The last character will always be the directory separator of the current platform.
+        /// </summary>
+        public string PathPrefix
+        {
+            get
+            {
+                UnityEngine.Assertions.Assert.IsTrue(!string.IsNullOrEmpty(pathPrefix));
+                string result = pathPrefix;
+                if (result[result.Length - 1] != Filenames.UnixDirectorySeparator)
+                {
+                    result += Filenames.UnixDirectorySeparator;
+                }
+                result = Filenames.OnCurrentPlatform(result);
+                return result;
+            }
+        }
 
         /// <summary>
         /// The relative path for the GVL file containing the node layout information.
@@ -41,10 +72,7 @@ namespace SEE.Game
         /// absolute path to the GVL file containing the layout information.
         /// </summary>
         /// <returns>concatenation of pathPrefix and gvlPath</returns>
-        public string GVLPath()
-        {
-            return PathPrefix + gvlPath;
-        }
+        public string GVLPath => PathPrefix + gvlPath;
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
@@ -84,14 +112,71 @@ namespace SEE.Game
         {
             get => nodeTypes;
         }
-        
+
         /// <summary>
         /// Resets everything that is specific to a given graph. Here: the 
         /// node types.
         /// </summary>
         public virtual void Reset()
         {
+            DeleteGraphGameObjects();
             nodeTypes = new Dictionary<string, bool>();
+        }
+
+        /// <summary>
+        /// Deletes all game objects that were created for rendering nodes or edges
+        /// of the graph or any decoration thereof. More precisely, all children of this 
+        /// game object tagged by Tags.Node, Tags.Edge, or Tags.Decoration are destroyed 
+        /// (in editor mode or play mode).
+        /// The underlying loaded graph is not deleted.
+        /// </summary>
+        protected void DeleteGraphGameObjects()
+        {
+            // Delete all children.
+            // Note: foreach (GameObject child in transform)... would not work;
+            // we really need to collect all children first and only then can destroy each.
+            foreach (GameObject child in AllNodesEdgesDecorationChildren())
+            {
+                Destroyer.DestroyGameObject(child);
+            }
+        }
+
+        /// <summary>
+        /// Returns all immediate children of the game object this SEECity is attached to.
+        /// </summary>
+        /// <returns>immediate children of the game object this SEECity is attached to</returns>
+        private List<GameObject> AllNodesEdgesDecorationChildren()
+        {
+            List<GameObject> result = new List<GameObject>();
+            foreach (Transform child in transform)
+            {
+                if (child.CompareTag(Tags.Node) || child.CompareTag(Tags.Edge) || child.CompareTag(Tags.Decoration))
+                {
+                    result.Add(child.gameObject);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns all (transitive) descendants of <paramref name="go"/> that are tagged
+        /// by Tags.Node (including <paramref name="go"/> if it is tagged by Tags.Node).
+        /// </summary>
+        /// <param name="go">game objects whose node descendants are required</param>
+        /// <returns>all node descendants of <paramref name="go"/></returns>
+        protected static ICollection<GameObject> AllNodeDescendants(GameObject go)
+        {
+            List<GameObject> result = new List<GameObject>();
+            if (go.CompareTag(Tags.Node))
+            {
+                result.Add(go);
+            }
+            foreach (Transform child in go.transform)
+            {
+                ICollection<GameObject> ascendants = AllNodeDescendants(child.gameObject);
+                result.AddRange(ascendants);
+            }
+            return result;
         }
 
         /// <summary>
@@ -152,17 +237,25 @@ namespace SEE.Game
         {
             if (AllNodeTypesAreRelevant)
             {
-                Debug.Log("All node types are relevant.\n");
                 return graph;
-            } 
+            }
             else
             {
                 ICollection<string> matches = nodeTypes.Where(pair => pair.Value == true)
                   .Select(pair => pair.Key).ToList();
-                Debug.Log("Considering only a subgraph.\n");
                 return graph.Subgraph(matches);
             }
         }
+
+        //---------------------------------
+        // Color range of leaf nodes
+        //---------------------------------
+        public ColorRange LeafNodeColorRange = new ColorRange(Color.white, Color.red, 10);
+
+        //---------------------------------
+        // Color range of inner nodes
+        //---------------------------------
+        public ColorRange InnerNodeColorRange = new ColorRange(Color.white, Color.yellow, 10);
 
         //---------------------------------
         // Visual attributes of a leaf node
@@ -183,6 +276,22 @@ namespace SEE.Game
         /// The attribute name of the metric to be used for determining the style of leaf nodes.
         /// </summary>
         public string LeafStyleMetric = NumericAttributeNames.Complexity.Name(); // serialized by Unity
+        
+        //----------------------------------
+        // Attributes of a leaf node's label
+        //----------------------------------
+        /// <summary>
+        /// If true, label's with the node's SourceName will be displayed above each leaf node.
+        /// </summary>
+        public bool ShowLabel = true;
+        /// <summary>
+        /// The distance between the top of the leaf node and its label.
+        /// </summary>
+        public float LeafLabelDistance = 0.2f;
+        /// <summary>
+        /// The font size of the leaf node's label.
+        /// </summary>
+        public float LeafLabelFontSize = 0.4f;
 
         /// <summary>
         /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
@@ -322,6 +431,7 @@ namespace SEE.Game
         public List<string> AllMetricAttributes()
         {
             List<string> nodeMetrics = new List<string>(AllLeafMetrics());
+            nodeMetrics.AddRange(AllInnerNodeMetrics());
             nodeMetrics.AddRange(AllLeafIssues());
             nodeMetrics.AddRange(AllInnerNodeIssues());
             nodeMetrics.Add(InnerDonutMetric);
@@ -359,7 +469,35 @@ namespace SEE.Game
         /// The attribute name of the metric to be used for determining the style of inner nodes.
         /// </summary>
         public string InnerNodeStyleMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
+        
+        //-----------------------------------
+        // Visual attributes of an inner node
+        //-----------------------------------
+        
+        /// <summary>
+        /// If true, label's with the node's SourceName will be displayed above each inner node.
+        /// </summary>
+        public bool InnerNodeShowLabel = true;
+        /// <summary>
+        /// The distance between the top of the inner node and its label.
+        /// </summary>
+        public float InnerNodeLabelDistance = 0.2f;
+        /// <summary>
+        /// The font size of the inner node's label.
+        /// </summary>
+        public float InnerNodeLabelFontSize = 0.4f;
 
+
+        /// <summary>
+        /// All metrics used for visual attributes of inner nodes (InnerNodeStyleMetric
+        /// and InnerNodeHeightMetric).
+        /// Note: A metric name occurs only once (i.e., duplicate names are removed).
+        /// </summary>
+        /// <returns>all metrics used for visual attributes of an inner node</returns>
+        public ICollection<string> AllInnerNodeMetrics()
+        {
+            return new HashSet<string> { InnerNodeStyleMetric, InnerNodeHeightMetric };
+        }
 
         //--------------------------------------
         // Other visual attributes of leaf nodes
@@ -382,7 +520,6 @@ namespace SEE.Game
         public enum LeafNodeKinds
         {
             Blocks,
-            Buildings,
         }
 
         /// <summary>
@@ -409,39 +546,14 @@ namespace SEE.Game
         public InnerNodeKinds InnerNodeObjects; // serialized by Unity
 
         /// <summary>
-        /// The kinds of node layouts available.
-        /// </summary>
-        public enum NodeLayouts
-        {
-            EvoStreets,
-            Balloon,
-            RectanglePacking,
-            Treemap,
-            CirclePacking,
-            Manhattan,
-            FromFile
-        }
-
-        /// <summary>
-        /// The kinds of edge layouts available.
-        /// </summary>
-        public enum EdgeLayouts
-        {
-            None = 0,        // no edges are to be drawn
-            Straight = 1,
-            Spline = 2,
-            Bundling = 3
-        }
-
-        /// <summary>
         /// The layout that should be used for nodes.
         /// </summary>
-        public NodeLayouts NodeLayout; // serialized by Unity
+        public NodeLayoutKind NodeLayout; // serialized by Unity
 
         /// <summary>
         /// The layout that should be used for edges.
         /// </summary>
-        public EdgeLayouts EdgeLayout; // serialized by Unity
+        public EdgeLayoutKind EdgeLayout; // serialized by Unity
 
         /// <summary>
         /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
@@ -489,7 +601,7 @@ namespace SEE.Game
         /// </summary>
         [Tooltip("Tolerance for spline simplification (Ramer–Douglas–Peucker algorithm):"
             + " line points whose distances fall below that threshold are merged. A value <= 0 means "
-            + " no simplification. Recommended value: 0.05." )]
+            + " no simplification. Recommended value: 0.05.")]
         public float RDP = 0.05f;
 
         /// <summary>
@@ -507,21 +619,105 @@ namespace SEE.Game
             {
                 if (File.Exists(filename))
                 {
-                    SEE.Utils.Performance p = SEE.Utils.Performance.Begin("loading graph data from " + filename);
+                    Performance p = Performance.Begin("loading graph data from " + filename);
                     GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "", new SEELogger());
                     graphCreator.Load();
                     Graph graph = graphCreator.GetGraph();
                     p.End();
-                    Debug.Log("Number of nodes loaded: " + graph.NodeCount + "\n");
-                    Debug.Log("Number of edges loaded: " + graph.EdgeCount + "\n");
+                    Debug.Log("Loaded graph data successfully:"
+                        + "\nFilename: " + filename
+                        + "\nNumber of nodes: " + graph.NodeCount
+                        + "\nNumber of edges: " + graph.EdgeCount
+                        + "\nElapsed time: " + p.GetElapsedTime() + "[h:m:s:ms]\n");
+
+                    LoadDataForGraphListing(graph);
+
                     return graph;
                 }
                 else
                 {
                     Debug.LogWarningFormat("GXL file {0} does not exist.\n", filename);
                     return new Graph();
-                } 
+                }
+            }
+        }
+
+        /// <summary>
+        /// Cosegraph settings
+        /// </summary>
+        public CoseGraphSettings CoseGraphSettings = new CoseGraphSettings();
+
+        /// <summary>
+        /// measurements of the layout
+        /// </summary>
+        public SortedDictionary<string, string> Measurements = new SortedDictionary<string, string>();
+
+        /// <summary>
+        /// Indicates whether the measurements should be calculated or not
+        /// </summary>
+        public bool calculateMeasurements = false;
+
+        /// <summary>
+        /// Dictionary with all Nodelayouts for leaf and inner nodes
+        /// </summary>
+        public Dictionary<NodeLayoutKind, string> SubLayoutsInnerNodes = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().Where(nodeLayout => !nodeLayout.GetModel().OnlyLeaves).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
+
+        /// <summary>
+        ///  Dictionary with all Nodelayouts only for leaf nodes
+        /// </summary>
+        public Dictionary<NodeLayoutKind, string> SubLayoutsLeafNodes = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
+
+        /// <summary>
+        /// Saves all data needed for the listing of the dirs in gui in cosegraphSettings
+        /// </summary>
+        /// <param name="graph"></param>
+        public void LoadDataForGraphListing(Graph graph)
+        {
+            if (NodeLayout == NodeLayoutKind.CompoundSpringEmbedder)
+            {
+                Dictionary<string, bool> dirs = CoseGraphSettings.ListDirToggle;
+                // die neuen dirs 
+                Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
+
+                Dictionary<string, NodeLayoutKind> dirsLayout = new Dictionary<string, NodeLayoutKind>();
+                Dictionary<string, InnerNodeKinds> dirsShape = new Dictionary<string, InnerNodeKinds>();
+
+                foreach (Node node in graph.Nodes())
+                {
+                    if (!node.IsLeaf())
+                    {
+                        dirsShape.Add(node.ID, InnerNodeObjects);
+                        dirsLocal.Add(node.ID, false);
+                        dirsLayout.Add(node.ID, NodeLayout);
+                    }
+                }
+
+                // falls der key nicht in den alten dictonary ist
+                //dirsLocal = dirsLocal.Where(i => !dirs.ContainsKey(i.Key)).ToDictionary(i => i.Key, i => i.Value);
+
+                CoseGraphSettings.show = new Dictionary<string, bool>();
+
+                bool diff1 = dirs.Keys.Except(dirsLocal.Keys).Any();
+                bool diff2 = dirsLocal.Keys.Except(dirs.Keys).Any();
+
+                if (dirs.Count == dirsLocal.Count && !diff1 && !diff2)
+                {
+
+                }
+                else
+                {
+                    CoseGraphSettings.DirShape = dirsShape;
+                    CoseGraphSettings.DirNodeLayout = dirsLayout;
+                    CoseGraphSettings.ListDirToggle = dirsLocal;
+                    // get roots
+                    CoseGraphSettings.rootDirs = graph.GetRoots();
+                }
+
+                CoseGraphSettings.loadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value == true).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                CoseGraphSettings.rootDirs = graph.GetRoots();
             }
         }
     }
 }
+
+

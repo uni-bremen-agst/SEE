@@ -1,7 +1,7 @@
-using System.Collections.Generic;
-using UnityEngine;
 using System;
+using System.Collections.Generic;
 using TinySpline;
+using UnityEngine;
 
 namespace SEE.CameraPaths
 {
@@ -101,7 +101,7 @@ namespace SEE.CameraPaths
         ///
         /// Start is called before the first frame update.
         /// </summary>
-        void Start()
+        private void Start()
         {
             try
             {
@@ -133,8 +133,10 @@ namespace SEE.CameraPaths
             {
                 Debug.LogWarning($"ScriptedCamera: Interpolation failed with error '{e.Message}'\n");
                 Debug.LogWarning($"ScriptedCamera: Creating spline with default location\n");
-                spline = new BSpline(1, 4, 0);
-                spline.ControlPoints = new List<double> { 0, 0, 0, 0 };
+                spline = new BSpline(1, 4, 0)
+                {
+                    ControlPoints = new List<double> { 0, 0, 0, 0 }
+                };
                 pathIsEnabled = false;
             }
             transform.position = ListToVectors(spline.ControlPointAt(0))[0];
@@ -145,7 +147,7 @@ namespace SEE.CameraPaths
         /// Update is called once per frame and moves and rotates the camera along the
         /// timed path.
         /// </summary>
-        void Update()
+        private void Update()
         {
             if (pathIsEnabled)
             {

@@ -65,7 +65,7 @@ namespace SEE.Net
         /// The transform to synchronize.
         /// </summary>
         public Transform TransformToSynchronize { get => transformToSynchronize; }
-        
+
         /// <summary>
         /// Whether the position should be synchronized.
         /// </summary>
@@ -86,7 +86,7 @@ namespace SEE.Net
         /// <summary>
         /// Stopwatch for determining whether a positional update should be submitted.
         /// </summary>
-        private Stopwatch positionUpdateStopwatch = new Stopwatch();
+        private readonly Stopwatch positionUpdateStopwatch = new Stopwatch();
 
         /// <summary>
         /// The previous received position. Used for linear interpolation between
@@ -99,13 +99,13 @@ namespace SEE.Net
         /// positions.
         /// </summary>
         private Vector3 positionNext;
-        
+
 
 
         /// <summary>
         /// Stopwatch for determining whether a rotational update should be submitted.
         /// </summary>
-        private Stopwatch rotationUpdateStopwatch = new Stopwatch();
+        private readonly Stopwatch rotationUpdateStopwatch = new Stopwatch();
 
         /// <summary>
         /// The previous received rotation. Used for linear interpolation between
@@ -124,7 +124,7 @@ namespace SEE.Net
         /// <summary>
         /// Stopwatch for determining whether a scale update should be submitted.
         /// </summary>
-        private Stopwatch scaleUpdateStopwatch = new Stopwatch();
+        private readonly Stopwatch scaleUpdateStopwatch = new Stopwatch();
 
         /// <summary>
         /// The previous received scale. Used for linear interpolation between scales.

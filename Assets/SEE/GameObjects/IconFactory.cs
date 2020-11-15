@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using SEE.DataModel;
 using System;
-using SEE.DataModel;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -19,7 +19,7 @@ namespace SEE.GO
         /// moved to the Asset folder by click and drop to turn the instance into
         /// a prefab, wich generates a prefab file. This prefab file can then be
         /// loaded here.
-        
+
         /// <summary>
         /// The different types of software erosions.
         /// </summary>
