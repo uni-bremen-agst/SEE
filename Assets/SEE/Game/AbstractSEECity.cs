@@ -719,10 +719,14 @@ namespace SEE.Game
             }
         }
 
-        public void SaveSelection(string path, string savedProfile)
+        /// <summary>
+        /// Saves the data of the city in a file at the given <paramref name="path"/>
+        /// with the given <paramref name="savedProfileName"/>
+        /// </summary>     
+        public void SaveSelection(string path, string savedProfileName)
         {          
             nodeTypes = SelectedNodeTypes;
-            NodeTypeSelectionExporter.Persist(pathPrefix, nodeTypes, path, savedProfile);
+            NodeTypeSelectionExporter.Persist(pathPrefix, nodeTypes, path, savedProfileName, this);
         }
     }
 }
