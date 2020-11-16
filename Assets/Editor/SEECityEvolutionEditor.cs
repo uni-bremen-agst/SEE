@@ -75,7 +75,7 @@ namespace SEEEditor
             if(GUILayout.Button("Load Selection"))
             {
                 string importPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFilePanel("Select loading directory", pathPrefix.stringValue, ""));
-                 city.RestoreCity(importPath);
+                 city.RestoreCity(importPath,city);
             }
         }
 
