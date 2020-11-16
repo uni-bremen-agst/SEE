@@ -756,9 +756,9 @@ namespace SEE.Game
             NodeTypeSelectionExporter.Persist(pathPrefix, nodeTypes, exportPath, savedProfileName, this);
         }
 
-        public void RestoreCity(string importPath)
+        public void RestoreCity(string importPath, AbstractSEECity city )
         {
-            NodeTypeSelectionExporter.RestoreCity(importPath);
+            NodeTypeSelectionExporter.RestoreCity(importPath, city);
         }
     }
 }
