@@ -747,18 +747,26 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Saves the data of the city in a file at the given <paramref name="path"/>
-        /// with the given <paramref name="savedProfileName"/>
-        /// </summary>     
-        public void SaveSelection(string exportPath, string savedProfileName)
+        /// Saves a city in the chosen <paramref name="exportPath"/> directory with the 
+        /// chosen <paramref name="fileName"/> name.
+        /// </summary>
+        /// <param name="exportPath"> the path where the json will be saved </param>
+        /// <param name="fileName"> the name of the created json-file </param>
+        public void SaveSelection(string exportPath, string fileName)
         {          
             nodeTypes = SelectedNodeTypes;
-            NodeTypeSelectionExporter.Persist(pathPrefix, nodeTypes, exportPath, savedProfileName, this);
+            CityRestorer.Persist(nodeTypes, exportPath, fileName, this);
         }
 
+        /// <summary>
+        /// Loads and overwrites the <paramref name="city"/> with the city from the json-file 
+        /// found in the given <paramref name="importPath"/>.
+        /// </summary>
+        /// <param name="importPath"> the path of the json-file </param>
+        /// <param name="city"> the city which will be overwritten </param>
         public void RestoreCity(string importPath, AbstractSEECity city )
         {
-            NodeTypeSelectionExporter.RestoreCity(importPath, city);
+            CityRestorer.RestoreCity(importPath, city);
         }
     }
 }
