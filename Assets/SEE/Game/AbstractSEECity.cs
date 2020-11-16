@@ -256,7 +256,7 @@ namespace SEE.Game
         /// <param name="graph">graph whose subgraph is requested</param>
         /// <returns>subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/></returns>
 
-        protected Graph RelevantGraph(Graph graph)
+        public Graph RelevantGraph(Graph graph)
         {
             if (AllNodeTypesAreRelevant)
             {
@@ -750,10 +750,15 @@ namespace SEE.Game
         /// Saves the data of the city in a file at the given <paramref name="path"/>
         /// with the given <paramref name="savedProfileName"/>
         /// </summary>     
-        public void SaveSelection(string path, string savedProfileName)
+        public void SaveSelection(string exportPath, string savedProfileName)
         {          
             nodeTypes = SelectedNodeTypes;
-            NodeTypeSelectionExporter.Persist(pathPrefix, nodeTypes, path, savedProfileName, this);
+            NodeTypeSelectionExporter.Persist(pathPrefix, nodeTypes, exportPath, savedProfileName, this);
+        }
+
+        public void RestoreCity(string importPath)
+        {
+            NodeTypeSelectionExporter.RestoreCity(importPath);
         }
     }
 }

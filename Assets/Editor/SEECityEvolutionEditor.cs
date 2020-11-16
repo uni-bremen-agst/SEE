@@ -1,4 +1,4 @@
-﻿if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -46,13 +46,15 @@ namespace SEEEditor
         /// Creates the buttons for loading the first graph of the evolution series.
         /// </summary>
         protected void Buttons()
+        {
+            SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
 
-        {            
             SEECityEvolution city = target as SEECityEvolution;
             if (firstGraph == null && GUILayout.Button("Load First Graph"))
             {
                 firstGraph = city.LoadFirstGraph();
-                city.InspectSchema(firstGraph);                      
+                city.InspectSchema(firstGraph);
+                isGraphLoaded = true;
             }
             if (firstGraph != null && GUILayout.Button("Draw"))
             {
@@ -65,11 +67,16 @@ namespace SEEEditor
             }
             if (GUILayout.Button("Save Selection") && isGraphLoaded)
             {
-                string path = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select saving directory", pathPrefix.stringValue, ""));
-                city.SaveSelection(path, savedProfileName);
+                string exportPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select saving directory", pathPrefix.stringValue, ""));
+                city.SaveSelection(exportPath, savedProfileName);
 
             }
             savedProfileName = EditorGUILayout.TextField("Name of File: ", savedProfileName);
+            if(GUILayout.Button("Load Selection"))
+            {
+                string importPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFilePanel("Select loading directory", pathPrefix.stringValue, ""));
+                 city.RestoreCity(importPath);
+            }
         }
 
         /// <summary>
