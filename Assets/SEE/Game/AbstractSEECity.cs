@@ -103,7 +103,7 @@ namespace SEE.Game
         /// they should be visualized or not.
         /// </summary>
         [NonSerialized, OdinSerialize]
-        private Dictionary<string, bool> nodeTypes = new Dictionary<string, bool>();
+        protected Dictionary<string, bool> nodeTypes = new Dictionary<string, bool>();
         /// <summary>
         /// A mapping of all node types of the nodes in the graph onto whether
         /// they should be visualized or not.
@@ -114,13 +114,20 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Resets everything that is specific to a given graph. Here: the 
-        /// node types.
+        /// Resets everything that is specific to a given graph. Here: 
+        /// all game objects created for this city.
         /// </summary>
         public virtual void Reset()
         {
             DeleteGraphGameObjects();
-            nodeTypes = new Dictionary<string, bool>();
+        }
+
+        /// <summary>
+        /// Resets the selected node types to be visualized.
+        /// </summary>
+        public void ResetSelectedNodeTypes()
+        {
+            nodeTypes.Clear();
         }
 
         /// <summary>
@@ -198,30 +205,45 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Inspects the node types and attributes that occur in the graph.
-        /// All node types are considered relevant initially. The node types 
-        /// can be retrieved and also be marked as irrelevant later via property 
-        /// SelectedNodeTypes.
+        /// If <paramref name="graph"/> is null, nothing happens. Otherwise:
+        /// Inspects the node types that occur in the graph and updates <see cref="SelectedNodeTypes"/>.
+        /// All new node types are considered relevant initially. If <paramref name="graph"/> contains
+        /// a node type that existed in <see cref="SelectedNodeTypes"/> before, that node type's 
+        /// selection information will be re-used. If <see cref="SelectedNodeTypes"/> contains a node
+        /// type not contained in <paramref name="graph"/>, it will be removed from <see cref="SelectedNodeTypes"/>.
+        /// 
+        /// The node types can be retrieved and also be marked as irrelevant later via property 
+        /// <see cref="SelectedNodeTypes"/>.
         /// </summary>
         /// <param name="graph">graph from which to retrieve the node types (may be null)</param>
         public void InspectSchema(Graph graph)
         {
             if (graph != null)
             {
-                HashSet<string> types = new HashSet<string>();
+                // The node types in the newly loaded graph.
+                HashSet<string> newTypes = new HashSet<string>();
                 foreach (Node node in graph.Nodes())
-                {
-                    types.Add(node.Type);
+                {                    
+                    newTypes.Add(node.Type);                    
                 }
-                nodeTypes = new Dictionary<string, bool>();
-                foreach (string type in types)
+                // nodeTypes contains the node types of the previously loaded graph.
+                // Node types in nodeTypes not in newTypes will disappear
+                // because we are iterating only over newTypes.
+                Dictionary<string, bool> newNodeTypes = new Dictionary<string, bool>();
+                foreach (string type in newTypes)
                 {
-                    nodeTypes[type] = true;
+                    if (nodeTypes.ContainsKey(type))
+                    {
+                        // preserve existing node types
+                        newNodeTypes[type] = nodeTypes[type];
+                    }
+                    else
+                    {
+                        // default is true: a node type is selected initially
+                        newNodeTypes[type] = true;
+                    }
                 }
-            }
-            else
-            {
-                nodeTypes.Clear();
+                nodeTypes = newNodeTypes;
             }
         }
 
@@ -233,17 +255,23 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph whose subgraph is requested</param>
         /// <returns>subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/></returns>
+
         protected Graph RelevantGraph(Graph graph)
         {
-
             if (AllNodeTypesAreRelevant)
             {
+                Debug.Log("All node types are relevant.\n");
                 return graph;
             }
             else
             {
                 ICollection<string> matches = nodeTypes.Where(pair => pair.Value == true)
                   .Select(pair => pair.Key).ToList();
+                Debug.Log("The following node types are relevant:\n");
+                foreach (string nodeType in matches)
+                {
+                    Debug.LogFormat("  {0}\n", nodeType);
+                }
                 return graph.Subgraph(matches);
             }
         }
@@ -621,7 +649,7 @@ namespace SEE.Game
                 if (File.Exists(filename))
                 {
                     Performance p = Performance.Begin("loading graph data from " + filename);
-                    GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, "", new SEELogger());
+                    GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, logger: new SEELogger());
                     graphCreator.Load();
                     Graph graph = graphCreator.GetGraph();
                     p.End();
@@ -632,12 +660,11 @@ namespace SEE.Game
                         + "\nElapsed time: " + p.GetElapsedTime() + "[h:m:s:ms]\n");
 
                     LoadDataForGraphListing(graph);
-
                     return graph;
                 }
                 else
                 {
-                    Debug.LogWarningFormat("GXL file {0} does not exist.\n", filename);
+                    Debug.LogErrorFormat("GXL file {0} does not exist.\n", filename);
                     return new Graph();
                 }
             }
