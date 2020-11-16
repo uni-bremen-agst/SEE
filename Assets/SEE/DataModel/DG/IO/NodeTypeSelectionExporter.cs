@@ -27,7 +27,7 @@ public  class NodeTypeSelectionExporter
             return false;
         }
         json = JsonUtility.ToJson(city,true);
-        AddNodeTypes(nodeTypes);
+        //AddNodeTypes(nodeTypes);
         string dataPath = path + "/" + savedProfile + ".json";
         if (File.Exists(dataPath))
         {
@@ -64,9 +64,11 @@ public  class NodeTypeSelectionExporter
         json += sb.ToString();
     }
    
-    public static void RestoreData(string importPath)
-    {
+    public static void RestoreCity(string importPath, AbstractSEECity cty)
+    {   
+        
 
+        JsonUtility.FromJsonOverwrite(json, cty);
     }
 
 }
