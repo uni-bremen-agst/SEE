@@ -88,6 +88,12 @@ namespace SEE.Controls
         private Interactable interactable;
 
         /// <summary>
+        /// The interactable component to manipulate the environment, e.g. adding or
+        /// removing GameObjects.
+        /// </summary>
+        public GameObject menuBar;
+
+        /// <summary>
         /// The text label that's displayed above the object when the user hovers over it.
         /// Will be <code>null</code> when the label is not currently being displayed.
         /// </summary>
@@ -154,6 +160,9 @@ namespace SEE.Controls
             Assert.IsTrue(cityGo != null);
             cityGo.TryGetComponent(out city);
             isLeaf = SceneQueries.IsLeaf(gameObject);
+
+            menuBar = GameObject.Find("MenuBar");
+            menuBar.SetActive(false);
         }
 
         /// <summary>
@@ -318,6 +327,7 @@ namespace SEE.Controls
                     if (IsHovered)
                     {
                         SetHover(true, isOwner);
+                        menuBar.SetActive(true);
                     }
                     else if (hasOutline)
                     {
@@ -329,6 +339,7 @@ namespace SEE.Controls
             if (select)
             {
                 SelectedObjects.Add(this);
+                menuBar.SetActive(true);
             }
             else
             {
@@ -436,6 +447,11 @@ namespace SEE.Controls
             {
                 SetHover(false, true);
             }
+        }
+
+        private void OnMouseDown()
+        {
+            menuBar.SetActive(true);
         }
 
         //----------------------------------------------------------------
