@@ -79,10 +79,13 @@ public class CityRestorer
     }*/
    
     public static void RestoreCity(string importPath, AbstractSEECity cty)
-    {   
+    {
         
+       // as the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
 
-        JsonUtility.FromJsonOverwrite(json, cty);
+        String jsonString = null;
+        jsonString = File.ReadAllText(importPath);
+        JsonUtility.FromJsonOverwrite(jsonString, cty);
     }
 
 }
