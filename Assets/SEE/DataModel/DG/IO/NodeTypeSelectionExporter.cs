@@ -64,5 +64,9 @@ public  class NodeTypeSelectionExporter
         json += sb.ToString();
     }
    
+    public static void RestoreData(string importPath)
+    {
+
+    }
 
 }
