@@ -431,7 +431,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                throw new System.Exception("Hierarchical edges do not form a tree. Node with multiple parents: "
+                throw new Exception("Hierarchical edges do not form a tree. Node with multiple parents: "
                     + child.ID);
             }
         }

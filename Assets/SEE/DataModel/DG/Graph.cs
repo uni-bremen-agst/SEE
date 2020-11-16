@@ -98,7 +98,7 @@ namespace SEE.DataModel.DG
         {
             if (ReferenceEquals(node, null))
             {
-                throw new System.Exception("node must not be null");
+                throw new Exception("node must not be null");
             }
             else if (node.ItsGraph != this)
             {
@@ -176,15 +176,40 @@ namespace SEE.DataModel.DG
         {
             if (ReferenceEquals(node, null))
             {
-                throw new System.Exception("node must not be null");
+                throw new Exception("node must not be null");
             }
             else if (String.IsNullOrEmpty(node.ID))
             {
-                throw new System.Exception("ID of a node must neither be null nor empty");
+                throw new Exception("ID of a node must neither be null nor empty");
             }
             else
             {
                 return nodes.ContainsKey(node.ID);
+            }
+        }
+
+        /// <summary>
+        /// If the graph has only a single root, nothing happens. Otherwise
+        /// all current roots become an immediate child of a newly added
+        /// root node with given <paramref name="name"/> and <paramref name="type"/>.
+        /// </summary>
+        /// <param name="name">ID of new root node</param>
+        /// <param name="type">type of new root node</param>
+        public void AddSingleRoot(string name, string type)
+        {
+            List<Node> roots = GetRoots();
+            if (roots.Count > 0)
+            {
+                Node newRoot = new Node();
+                newRoot.SourceName = name;
+                newRoot.ID = name;
+                AddNode(newRoot);
+                foreach (Node oldRoot in roots)
+                {
+                    newRoot.AddChild(oldRoot);
+                }
+                CalculateLevels();
+                FinalizeGraph();
             }
         }
 
@@ -197,7 +222,7 @@ namespace SEE.DataModel.DG
         {
             if (String.IsNullOrEmpty(ID))
             {
-                throw new System.Exception("ID must neither be null nor empty");
+                throw new Exception("ID must neither be null nor empty");
             }
             else if (nodes.TryGetValue(ID, out Node node))
             {
@@ -218,7 +243,7 @@ namespace SEE.DataModel.DG
         {
             if (String.IsNullOrEmpty(ID))
             {
-                throw new System.Exception("ID must neither be null nor empty");
+                throw new Exception("ID must neither be null nor empty");
             }
             else if (edges.TryGetValue(ID, out Edge edge))
             {

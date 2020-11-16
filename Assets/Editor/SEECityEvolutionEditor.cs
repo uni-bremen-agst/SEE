@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+﻿if UNITY_EDITOR
 
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -23,10 +23,7 @@ namespace SEEEditor
             city.maxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.maxRevisionsToLoad);
             city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
             city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
-            if (isGraphLoaded)
-            {
-                ShowNodeTypes(city);
-            }
+            ShowNodeTypes(city);
             Buttons();
         }
 
@@ -41,62 +38,59 @@ namespace SEEEditor
         public string savedProfileName;
 
         /// <summary>
-        /// The loaded graph. The value is different from null only if isGraphLoaded is true.
+        /// The loaded graph. It is the first one in the series of graphs.
         /// </summary>
-        private Graph graph = null;
+        private Graph firstGraph = null;
 
         /// <summary>
         /// Creates the buttons for loading the first graph of the evolution series.
         /// </summary>
         protected void Buttons()
-        {
-            SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
 
+        {            
             SEECityEvolution city = target as SEECityEvolution;
-            if (GUILayout.Button("Load First Graph")&&!isGraphLoaded)
-            {                          
-                graph = city.LoadFirstGraph();
-                city.InspectSchema(graph);
-                isGraphLoaded = true;                           
-            }         
-                if (GUILayout.Button("Draw")&&isGraphLoaded)
-                {
-                    if (graph != null)
-
-                    {   
-                        
-                        graph = city.LoadFirstGraph();
-                        DrawGraph(city, graph);                      
-                    }
-                    else
-                    {
-                        Debug.LogError("No valid graph loaded.\n");
-                    }
-                }
-                if (GUILayout.Button("Delete")&&isGraphLoaded)
-                {
-                    isGraphLoaded = false;
-                    city.Reset();
-                }
+            if (firstGraph == null && GUILayout.Button("Load First Graph"))
+            {
+                firstGraph = city.LoadFirstGraph();
+                city.InspectSchema(firstGraph);                      
+            }
+            if (firstGraph != null && GUILayout.Button("Draw"))
+            {
+                DrawGraph(city, firstGraph);
+            }
+            if (firstGraph != null && GUILayout.Button("Delete Graph"))
+            {
+                city.Reset(); // will not clear the selected node types
+                firstGraph = null;
+            }
             if (GUILayout.Button("Save Selection") && isGraphLoaded)
-            {                             
-                string path = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select saving directory", pathPrefix.stringValue, ""));               
+            {
+                string path = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select saving directory", pathPrefix.stringValue, ""));
                 city.SaveSelection(path, savedProfileName);
 
             }
             savedProfileName = EditorGUILayout.TextField("Name of File: ", savedProfileName);
-            }
+        }
 
+        /// <summary>
+        /// Draws given <paramref name="graph"/> using the settings of <paramref name="city"/>.
+        /// </summary>
+        /// <param name="city">the city settings for drawing the graph</param>
+        /// <param name="graph">the graph to be drawn</param>
         private void DrawGraph(AbstractSEECity city, Graph graph)
         {
-            if (graph.Equals(null)){             
-                    Debug.LogError("No graph loaded.\n");
-                }            
+            if (graph == null)
+            {
+                Debug.LogError("No graph loaded.\n");
+            }
+            else
+            {
+                graph = city.RelevantGraph(graph);
                 GraphRenderer graphRenderer = new GraphRenderer(city, graph);
                 // We assume here that this SEECity instance was added to a game object as
                 // a component. The inherited attribute gameObject identifies this game object.
                 graphRenderer.Draw(city.gameObject);
-                     
+            }
         }
     }
 }
