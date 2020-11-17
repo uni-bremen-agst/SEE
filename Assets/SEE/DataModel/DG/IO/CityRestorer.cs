@@ -2,14 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using System;
 using System.Text;
 using SEE.DataModel.DG.IO;
-using SEE;
 using SEE.Game;
 using SEE.Utils;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using System.Dynamic;
@@ -43,7 +39,7 @@ public class CityRestorer
         }
         json = JsonUtility.ToJson(city,true);
         //AddNodeTypes(nodeTypes);
-        string dataPath = path + "/" + savedProfile + ".json";
+        string dataPath = path + "/" + fileName + ".json";
         if (File.Exists(dataPath))
         {
             UnityEngine.Debug.LogError("There already exists a file with this filename in the chosen directory");
@@ -78,14 +74,15 @@ public class CityRestorer
         json += sb.ToString();
     }*/
    
-    public static void RestoreCity(string importPath, AbstractSEECity cty)
+    /// <summary>
+    /// Loads a city from the given <paramref name="importPath"/> and overwrites the <paramref name="city"/>
+    /// </summary>
+    /// <param name="importPath"> The given json-file-path </param>
+    /// <param name="city"> The city which is to be overwritten </param>
+    public static void RestoreCity(string importPath, AbstractSEECity city)
     {
-        
        // as the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
-
-        String jsonString = null;
-        jsonString = File.ReadAllText(importPath);
-        JsonUtility.FromJsonOverwrite(jsonString, cty);
+        string jsonString = File.ReadAllText(importPath);
+        JsonUtility.FromJsonOverwrite(jsonString, city);
     }
-
 }
