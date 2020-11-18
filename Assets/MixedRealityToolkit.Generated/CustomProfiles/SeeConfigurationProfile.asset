@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SeeConfigurationProfile
   m_EditorClassIdentifier: 
   isCustomProfile: 1
-  targetExperienceScale: 3
+  targetExperienceScale: 1
   enableCameraSystem: 1
   cameraProfile: {fileID: 11400000, guid: c05603ecdf42b99468b50e49b9857453, type: 2}
   cameraSystemType:
