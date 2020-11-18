@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -89,6 +91,12 @@ namespace SEE.Controls
         /// </summary>
         public Net.Synchronizer InteractableSynchronizer { get; private set; }
 
+        /// <summary>
+        /// The local player to be informed about his/her own hovered, selected,
+        /// or grabbed objects.
+        /// </summary>
+        private PlayerActions localPlayerActions;
+
         private void Awake()
         {
             ID = nextID++;
@@ -99,6 +107,11 @@ namespace SEE.Controls
             {
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
+        }
+
+        private void Start()
+        {
+            localPlayerActions = PlayerSettings.LocalPlayer?.GetComponent<PlayerActions>();
         }
 
         /// <summary>
@@ -138,11 +151,19 @@ namespace SEE.Controls
             {
                 HoverIn?.Invoke(isOwner);
                 HoveredObjects.Add(this);
+                if (isOwner)
+                {
+                    localPlayerActions?.HoverOn(gameObject);
+                }
             }
             else
             {
                 HoverOut?.Invoke(isOwner);
                 HoveredObjects.Remove(this);
+                if (isOwner)
+                {
+                    localPlayerActions?.HoverOff(gameObject);
+                }
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
@@ -172,11 +193,19 @@ namespace SEE.Controls
             {
                 SelectIn?.Invoke(isOwner);
                 SelectedObjects.Add(this);
+                if (isOwner)
+                {
+                    localPlayerActions?.SelectOn(gameObject);
+                }
             }
             else
             {
                 SelectOut?.Invoke(isOwner);
                 SelectedObjects.Remove(this);
+                if (isOwner)
+                {
+                    localPlayerActions?.SelectOff(gameObject);
+                }
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
@@ -199,10 +228,18 @@ namespace SEE.Controls
             {
                 GrabIn?.Invoke(isOwner);
                 GrabbedObjects.Add(this);
+                if (isOwner)
+                {
+                    localPlayerActions?.GrabOn(gameObject);
+                }
             }
             else
             {
                 GrabOut?.Invoke(isOwner);
+                if (isOwner)
+                {
+                    localPlayerActions?.GrabOff(gameObject);
+                }
                 // Hovering and selection are continuous operations, that is why we call them here
                 // when the object is in the focus but not grabbed any longer.
                 if (IsSelected)

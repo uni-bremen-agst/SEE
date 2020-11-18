@@ -125,7 +125,7 @@ namespace SEE.DataModel.DG
 
             // Note: The levels must be calculated when the hierarchy has been
             // established. This is not done automatically.
-            original.CalculateLevels();
+            original.FinalizeNodeHierarchy();
 
             Graph clone = (Graph)original.Clone();
             Assert.That(clone.Path == original.Path);

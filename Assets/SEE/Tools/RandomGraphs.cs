@@ -124,7 +124,7 @@ namespace SEE.Tools
             IList<Node> innerNodes = CreateTree(graph, innerNodeConstraint);
             AssignLeaves(graph, leaves, innerNodes);
             ICollection<Edge> innerEdges = CreateEdges(graph, innerNodes, innerNodeConstraint);
-            graph.CalculateLevels();
+            graph.FinalizeNodeHierarchy();
             PrintStatistics(graph, leaves.Count, leafEdges.Count, innerNodes.Count, innerEdges.Count);
             return graph;
         }
