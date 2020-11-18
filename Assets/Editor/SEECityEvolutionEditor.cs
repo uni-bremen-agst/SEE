@@ -55,23 +55,18 @@ namespace SEEEditor
 
         /// <summary>
         /// Draws given <paramref name="graph"/> using the settings of <paramref name="city"/>.
+        /// 
+        /// Precondition: graph != null.
         /// </summary>
         /// <param name="city">the city settings for drawing the graph</param>
         /// <param name="graph">the graph to be drawn</param>
         private void DrawGraph(AbstractSEECity city, Graph graph)
         {
-            if (graph == null)
-            {
-                Debug.LogError("No graph loaded.\n");
-            }
-            else
-            {
-                graph = city.RelevantGraph(graph);
-                GraphRenderer graphRenderer = new GraphRenderer(city, graph);
-                // We assume here that this SEECity instance was added to a game object as
-                // a component. The inherited attribute gameObject identifies this game object.
-                graphRenderer.Draw(city.gameObject);
-            }
+            graph = city.RelevantGraph(graph);
+            GraphRenderer graphRenderer = new GraphRenderer(city, graph);
+            // We assume here that this SEECity instance was added to a game object as
+            // a component. The inherited attribute gameObject identifies this game object.
+            graphRenderer.Draw(city.gameObject);
         }
     }
 }
