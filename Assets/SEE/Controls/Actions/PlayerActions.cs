@@ -1,7 +1,4 @@
-﻿using SEE.DataModel.DG;
-using SEE.GO;
-using SEE.Utils;
-using System;
+﻿using SEE.Game;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -12,139 +9,220 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class PlayerActions : MonoBehaviour
     {
+        /// <summary>
+        /// The possible states a player can be in. The state determines how the player
+        /// reacts to events.
+        /// </summary>
         private enum State
         {
-            Idle,
-            MoveNode,
-            ReparentNode,
-            MapNode
+            Browse,   // the user just browses the city; this is the default
+            MoveNode, // a game node is being moved within its city
+            MapNode   // a game node is mapped from one city to another city
         }
 
-        private State state = State.Idle;
+        /// <summary>
+        /// The current state of the player.
+        /// </summary>
+        private State state = State.Browse;
 
         private void Update()
         {
             switch(state)
             {
                 case State.MoveNode:
-                    if (SelectedObject != null)
-                    {
-                        if (Input.GetMouseButton(0))
+                    // an object must be selected; otherwise we cannot move it
+                    if (selectedObject != null)
+                    {                        
+                        if (UserWantsToMove())
                         {
-                            MoveTo(SelectedObject);
+                            GameNodeMover.MoveTo(selectedObject);
                         }
                         else
                         {
-                            FinalizePosition(SelectedObject);
+                            // The selected object has reached its final destination.
+                            // It needs to be placed there.
+                            GameNodeMover.FinalizePosition(selectedObject);
+                            selectedObject = null;
                         }
                     }
                     break;
             }
         }
 
-        private void FinalizePosition(GameObject movingObject)
+        // -------------------------------------------------------------
+        // The callbacks from the circular menu to trigger state changes
+        // -------------------------------------------------------------
+
+        /// <summary>
+        /// Changes the state to Browse. 
+        /// 
+        /// This method is called as a callback from the menu.
+        /// </summary>
+        public void Browse()
         {
-            Node movingNode = movingObject.GetComponent<NodeRef>().node;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            // Note that the order of the results of RaycastAll() is undefined.
-            RaycastHit[] hits = Physics.RaycastAll(ray);
-            foreach (RaycastHit hit in hits)
-            {
-                // Must be different from the movingObject itself
-                if (hit.collider.gameObject != movingObject)
-                {
-                    // Is it a node at all?
-                    NodeRef nodeRef = hit.transform.GetComponent<NodeRef>();
-                    // Are they in the same graph?
-                    if (nodeRef != null && nodeRef.node.ItsGraph == movingNode.ItsGraph)
-                    {
-                        Debug.Log("Final destination reached.\n");
-                        movingObject.transform.position = hit.point;
-                        SelectedObject = null;
-                        // FIXME: If the node has a new parent, we need to adjust the
-                        // node hierarchy in the underlying graph.
-                        return;
-                    }
-                }
-            }
+            Enter(State.Browse);
         }
 
-        public float MovingSpeed = 1.0f;
-
-        private void MoveTo(GameObject movingObject)
-        {
-            float step = MovingSpeed * Time.deltaTime;
-            Vector3 target = TargetPosition(movingObject);            
-            movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, target, step);
-            if (Vector3.Distance(movingObject.transform.position, target) > 0.01)
-            {
-                Debug.LogFormat("Moving {0} from {1} to {2}.\n", movingObject.name, movingObject.transform.position, target);
-            }
-        }
-
-        private Vector3 TargetPosition(GameObject selectedObject)
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            return ray.GetPoint(Vector3.Distance(ray.origin, selectedObject.transform.position));
-        }
-
+        /// <summary>
+        /// Changes the state to MoveNode. 
+        /// 
+        /// This method is called as a callback from the menu.
+        /// </summary>
         public void Move()
         {
-            Debug.Log("Move\n");
-            state = State.MoveNode;
+            Enter(State.MoveNode);
         }
 
-        public void Reparent()
-        {
-            Debug.Log("Reparent\n");
-            state = State.ReparentNode;
-        }
-
+        /// <summary>
+        /// Changes the state to MapNode. 
+        /// 
+        /// This method is called as a callback from the menu.
+        /// </summary>
         public void Map()
         {
-            Debug.Log("MapNode\n");
-            state = State.MapNode;
+            Enter(State.MapNode);
         }
 
-        private Vector3 originalPositionOfSelectedObject;
-        private GameObject selectedObject;
-        private GameObject SelectedObject
+        /// <summary>
+        /// If <paramref name="newState"/> is different from the current state,
+        /// <see cref="Cancel"/> is called and <paramref name="newState"/> is
+        /// entered.
+        /// </summary>
+        /// <param name="newState">new state to be entered</param>
+        private void Enter(State newState)
         {
-            get => selectedObject;
-            set
+            if (state != newState)
             {
-                selectedObject = value;
-                if (value != null)
-                {
-                    originalPositionOfSelectedObject = selectedObject.transform.position;
-                }
+                Cancel();
+                state = newState;
             }
         }
 
+        /// <summary>
+        /// Cancels the current action before the next new state is entered.
+        /// This method can implement the "last wishes" of a running action.
+        /// </summary>
+        private void Cancel()
+        {
+            switch (state)
+            {
+                case State.Browse:
+                    // nothing to be done
+                    break;
+                case State.MapNode:
+                    break;
+                case State.MoveNode:
+                    break;
+                default:
+                    throw new System.NotImplementedException();
+            }
+        }
+
+        // ------------------------------------------------------------
+        // The management of the currently selected interactable object
+        // ------------------------------------------------------------
+
+        /// <summary>
+        /// The currently selected object. May be null if none is selected.
+        /// Do not use this attribute directly. Use <see cref="SelectedObject"/>
+        /// instead.
+        /// </summary>
+        private GameObject selectedObject;
+
+        // ------------------------------------------------------------------------------
+        // Events triggered by interactable objects when they are selected, hovered over,
+        // or grabbed.
+        // ------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Assigns the value of given <paramref name="selection"/> to
+        /// <see cref="SelectedObject"/>.
+        /// 
+        /// Called by an interactable object when it is selected (only once when the
+        /// selection starts).
+        /// </summary>
+        /// <param name="selection">the selected interactable object</param>
         public void SelectOn(GameObject selection)
         {
-            Debug.LogFormat("selected object {0}\n", selection.name);
-            SelectedObject = selection;
+            selectedObject = selection;
         }
 
+        /// <summary>
+        /// Resets <see cref="SelectedObject"/> to null.
+        /// 
+        /// Called by an interactable object when it is unselected (only once when the
+        /// selection ends).
+        /// </summary>
+        /// <param name="selection">the interactable object no longer selected</param>
         public void SelectOff(GameObject selection)
         {
-            Debug.LogFormat("deselected object {0}\n", selection.name);
-            SelectedObject = null;
+            selectedObject = null;
         }
 
+        /// <summary>
+        /// The interactable object that is currently being hovered over.
+        /// </summary>
         private GameObject hoveredObject;
 
+        /// <summary>
+        /// Assigns the value of given <paramref name="hovered"/> to
+        /// <see cref="hoveredObject"/>.
+        /// 
+        /// Called by an interactable object when it is being hovered over
+        /// (only once when the hovering starts).
+        /// </summary>
+        /// <param name="hovered">the hovered interactable object</param>
         public void HoverOn(GameObject hovered)
         {
-            Debug.LogFormat("hovered object {0}\n", hovered.name);
             hoveredObject = hovered;
         }
 
+        /// <summary>
+        /// Resets <see cref="hoveredObject"/> to null.
+        /// 
+        /// Called by an interactable object when it is no longer being hovered over
+        /// (only once when the hovering ends).
+        /// </summary>
+        /// <param name="hovered">the interactable object no longer hovered</param>
         public void HoverOff(GameObject hovered)
         {
-            Debug.LogFormat("unhovered object {0}\n", hovered.name);
             hoveredObject = null;
+        }
+
+        /// <summary>
+        /// Called by an interactable object when it is being grabbed
+        /// (only once when the grabbing begins).
+        /// </summary>
+        /// <param name="grabbed">the grabbed interactable object</param>
+        public void GrabOn(GameObject grabbed)
+        {
+            // currently empty
+        }
+
+        /// <summary>
+        /// Called by an interactable object when it is no longer being grabbed
+        /// (only once when the grabbing ends).
+        /// </summary>
+        /// <param name="grabbed">the interactable object no longer grabbed</param>
+        public void GrabOff(GameObject grabbed)
+        {
+            // currently empty
+        }
+
+        // -------------------------------------------------------------
+        // User input
+        // -------------------------------------------------------------
+
+        /// <summary>
+        /// True iff the user expresses that the moving action should start or continue.
+        /// The expression depends upon the environment (desktop, VR, etc.).
+        /// </summary>
+        /// <returns>user wants to move a selected object</returns>
+        private static bool UserWantsToMove()
+        {
+            // FIXME: We need to an interaction for VR, too.
+            // We move the node while the left mouse button is pressed.
+            return Input.GetMouseButton(0);
         }
     }
 }
