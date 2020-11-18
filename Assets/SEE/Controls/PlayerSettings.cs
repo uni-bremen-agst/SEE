@@ -1,6 +1,10 @@
-﻿using OdinSerializer;
-using System;
+﻿using System;
+using System.Linq;
 using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.Utilities;
+using OdinSerializer;
+using SEE.DataModel;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.XR;
 using Valve.VR;
@@ -38,6 +42,13 @@ namespace SEE.Controls
         [Tooltip("Whether hints should be shown for controllers.")]
         public bool ShowControllerHints = false;
 
+        [Header("HoloLens specific settings (relevant only for HoloLens players)")] 
+        [Tooltip("Which scale shall be used for HoloLens players.")]
+        public ExperienceScale experienceScale = ExperienceScale.Seated;
+
+        [Tooltip("The factor by which code cities should be scaled on startup."), OdinSerialize, Min(0.01f)]
+        public float CityScalingFactor = 1f;
+
         public static PlayerInputType GetInputType()
         {
             PlayerInputType result = FindObjectOfType<PlayerSettings>().playerInputType;
@@ -67,13 +78,7 @@ namespace SEE.Controls
             SetActive("DesktopPlayer", playerInputType == PlayerInputType.Desktop);
             SetActive("VRPlayer", playerInputType == PlayerInputType.VR);
             SetActive("InControl", playerInputType == PlayerInputType.TouchGamepad);
-            SetActive("MRPlayer", playerInputType == PlayerInputType.HoloLens);
-            SetActive("MixedRealityToolkit", playerInputType == PlayerInputType.HoloLens);
-            
-            if (playerInputType != PlayerInputType.HoloLens)
-            {
-                MixedRealityToolkit.SetInstanceInactive(MixedRealityToolkit.Instance);
-            }
+            SetMixedReality(playerInputType == PlayerInputType.HoloLens);
 
             // Turn off controller hints if requested in the user settings.
             if (!ShowControllerHints)
@@ -89,6 +94,53 @@ namespace SEE.Controls
                     Teleport.instance.CancelTeleportHint();
                 }
             }
+        }
+
+        /**
+         * Enables or disables mixed reality capabilities, including the Mixed Reality Toolkit.
+         * <param name="isActive">If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
+         */
+        private void SetMixedReality(bool isActive)
+        {
+            SetActive("MRPlayer", isActive);
+            SetActive("MixedRealityToolkit", isActive);
+            SetActive("CityCollection", isActive);
+            
+            // Disable Teleporting to avoid conflict with MRTK
+            SetActive("Teleporting", !isActive);
+            SetActive("TeleportArea", !isActive);
+            
+            // Hide all decoration to improve performance
+            GameObject.FindGameObjectsWithTag(Tags.Decoration).ForEach(go => go.SetActive(!isActive));
+
+            if (!isActive)
+            {
+                MixedRealityToolkit.SetInstanceInactive(MixedRealityToolkit.Instance);
+            }
+            else
+            {
+                // Set selected experience scale 
+                MixedRealityToolkit.Instance.ActiveProfile.TargetExperienceScale = experienceScale;
+                
+                if (experienceScale == ExperienceScale.Seated || experienceScale == ExperienceScale.OrientationOnly)
+                {
+                    // Position and scale planes and CodeCities accordingly using CityCollection grid
+                    GameObject cityCollection = GameObject.Find("CityCollection").AssertNotNull("CityCollection");
+                    UnityEngine.Assertions.Assert.IsTrue(cityCollection.TryGetComponent(out GridObjectCollection grid));
+                    GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+                    foreach (GameObject city in cities)
+                    {
+                        // City needs to be parented to collection to be organized by it
+                        city.transform.localScale *= CityScalingFactor;
+                        city.transform.parent = cityCollection.transform;
+                    }
+
+                    // To avoid overlaps, set cell width to maximum length of code cities
+                    grid.CellWidth = cities.Select(x => x.transform.localScale.MaxComponent()).Max();
+                    grid.UpdateCollection();
+                }
+            }
+            
         }
 
         /// <summary>
