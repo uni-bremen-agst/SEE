@@ -1639,6 +1639,7 @@ GameObject:
   - component: {fileID: 1566173696}
   - component: {fileID: 1566173694}
   - component: {fileID: 1566173680}
+  - component: {fileID: 1566173682}
   m_Layer: 0
   m_Name: DesktopPlayer
   m_TagString: MainCamera
@@ -1703,6 +1704,19 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &1566173682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566173679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33c7e69bbbcb32f4f995b716e96c7970, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MovingSpeed: 1
 --- !u!4 &1566173689
 Transform:
   m_ObjectHideFlags: 0
