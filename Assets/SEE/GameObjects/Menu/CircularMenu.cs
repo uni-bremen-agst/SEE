@@ -1,5 +1,6 @@
 ﻿using SEE.Controls;
 using SEE.DataModel;
+using SEE.Utils;
 using System;
 using UnityEngine;
 
@@ -11,37 +12,11 @@ namespace SEE.GO.Menu
     public class CircularMenu : MonoBehaviour
     {
         /// <summary>
-        /// The main camera the menu should be facting to.
-        /// </summary>
-        private static Camera mainCamera;
-
-        /// <summary>
         /// The distance between the menu and the camera when the menu is spawned.
         /// </summary>
         [Tooltip("The distance between the menu and the camera when the menu is spawned.")]
         [Range(0, 10)]
         public float CameraDistance = 1.0f;
-
-        /// <summary>
-        /// Creates the <see cref="menu"/> if it does not exist yet.
-        /// Sets <see cref="mainCamera"/>.
-        /// </summary>
-        private void Start()
-        {
-            if (mainCamera == null)
-            {
-                if (Camera.allCameras.Length > 1)
-                {
-                    Debug.LogFormat("There are {0} cameras in the scene. Expect unexpected visual results.\n",
-                                    Camera.allCameras.Length);
-                    foreach (Camera c in Camera.allCameras)
-                    {
-                        Debug.LogFormat("Camera: {0}\n", c.name);
-                    }
-                }
-                mainCamera = Camera.main;
-            }
-        }
 
         /// <summary>
         /// A buffer for hit objects for Physics2D.GetRayIntersectionNonAlloc()
@@ -70,7 +45,7 @@ namespace SEE.GO.Menu
             entry = -1;
             if (Input.GetMouseButtonUp(0))
             {
-                Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+                Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
                 // The integer return value is the number of objects that 
                 // intersect the ray (possibly zero) but the results array will 
                 // not be resized if it doesn't contain enough elements to report 
@@ -146,8 +121,8 @@ namespace SEE.GO.Menu
             if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop)
             {
                 Vector3 mousePosition = Input.mousePosition;
-                mousePosition.z = Mathf.Max(mainCamera.nearClipPlane, CameraDistance);
-                return mainCamera.ScreenToWorldPoint(mousePosition);
+                mousePosition.z = Mathf.Max(MainCamera.Camera.nearClipPlane, CameraDistance);
+                return MainCamera.Camera.ScreenToWorldPoint(mousePosition);
             }
             else
             {
@@ -174,7 +149,7 @@ namespace SEE.GO.Menu
                     On();
                 }
                 // Menu should be facing the camera
-                gameObject.transform.LookAt(mainCamera.transform);
+                gameObject.transform.LookAt(MainCamera.Camera.transform);
                 if (SelectedMenuEntry(out int hitEntry))
                 {
                     // hitEntry == 0 => the menu itself was selected
