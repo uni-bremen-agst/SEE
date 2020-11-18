@@ -4,30 +4,23 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Edge
-  - Graph
-  - Node
-  - Node Prefab
-  - Text
-  - Erosion
-  - Fire
-  - Decoration
-  - Path
-  - Pointer
-  - ChartManager
-  - VREventSystem
+  - CCAnimation
   - Chart
   - ChartContainer
-  - CCAnimation
-  - projectile
+  - ChartManager
+  - VREventSystem
+  - Pointer
+  - Decoration
+  - Node
+  - Text
+  - Edge
   - FxTemporaire
-  - Runtime
-  - Function Call
-  - TestHelper
-  - Building
+  - projectile
   - CullingPlane
   - Code City
   - UI
+  - JLG Visualization
+  - Function Call
   layers:
   - Default
   - TransparentFX
@@ -37,7 +30,7 @@ TagManager:
   - UI
   - 
   - 
-  - Player
+  - 
   - 
   - 
   - 
@@ -64,10 +57,4 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
-    locked: 0
-  - name: Markers
-    uniqueID: 2549648541
-    locked: 0
-  - name: Chart
-    uniqueID: 2193984551
     locked: 0
