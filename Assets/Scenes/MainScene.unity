@@ -2029,7 +2029,31 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Directory
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: File
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -2900,7 +2924,7 @@ MonoBehaviour:
       Data: 
     - Name: showGraphListing
       Entry: 5
-      Data: false
+      Data: true
     - Name: loadedForNodeTypes
       Entry: 7
       Data: 13|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
@@ -3185,7 +3209,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  pathPrefix: C:\Users\koschke\SEE\Assets
+  pathPrefix: C:\Users\koschke\SEE\Data\GXL\minimal
   gvlPath: ..\Data\GXL\SEE\CodeFacts.gvl
   WidthMetric: Metric.Number_Of_Calling_Routines
   HeightMetric: Metric.Lines.LOC
@@ -3228,8 +3252,8 @@ MonoBehaviour:
   Tension: 0.85
   RDP: 0.0001
   calculateMeasurements: 0
-  gxlPath: ..\Data\GXL\minimal_clones.gxl
-  csvPath: ..\Data\GXL\minimal_clones.csv
+  gxlPath: CodeFacts.gxl
+  csvPath: CodeFacts.csv
 --- !u!114 &1649116646
 MonoBehaviour:
   m_ObjectHideFlags: 0
