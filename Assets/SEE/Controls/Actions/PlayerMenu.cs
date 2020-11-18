@@ -5,9 +5,9 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Creates the in-game menu.
-    /// 
-    /// NOTE: This class is currently just a stub.
+    /// Creates the in-game menu with menu entries for moving a node within a 
+    /// code city, mapping a node between two code cities, and undoing these
+    /// two actions.
     /// </summary>
     public class PlayerMenu : MonoBehaviour
     {
@@ -25,6 +25,8 @@ namespace SEE.Controls.Actions
         [Range(0, 0.1f)]
         public float Depth = 0.01f;
 
+        private PlayerActions playerActions;
+
         /// <summary>
         /// Creates the <see cref="menu"/> if it does not exist yet.
         /// Sets <see cref="mainCamera"/>.
@@ -32,35 +34,38 @@ namespace SEE.Controls.Actions
         protected virtual void Start()
         {
             GameObject menu = MenuFactory.CreateMenu(EntriesParameter, Radius, Depth);
+            if (!gameObject.TryGetComponent<PlayerActions>(out playerActions))
+            {
+                Debug.LogErrorFormat("Player {0} does not have PlayerActions.\n", name);
+                enabled = false;
+            }
         }
 
-        private static void MoveOn()
+        /// <summary>
+        /// Called from the menu as a callback when the user selects the browse menu entry.
+        /// Passes the browse request on to <see cref="playerActions"/>.
+        /// </summary>
+        private void BrowseOn()
         {
-            Debug.Log("MoveOn\n");
-        }
-        private static void MoveOff()
-        {
-            Debug.Log("MoveOff\n");
-        }
-
-        private static void AddOn()
-        {
-            Debug.Log("EntryBOn\n");
+            playerActions.Browse();
         }
 
-        private static void AddOff()
+        /// <summary>
+        /// Called from the menu as a callback when the user selects the move menu entry.
+        /// Passes the move request on to <see cref="playerActions"/>.
+        /// </summary>
+        private void MoveOn()
         {
-            Debug.Log("AddOn\n");
+            playerActions.Move();
         }
 
-        private static void DeleteOn()
+        /// <summary>
+        /// Called from the menu as a callback when the user selects the map menu entry.
+        /// Passes the map request on to <see cref="playerActions"/>.
+        /// </summary>
+        private void MapOn()
         {
-            Debug.Log("DeleteOn\n");
-        }
-
-        private static void DeleteOff()
-        {
-            Debug.Log("DeleteOff.\n");
+            playerActions.Map();
         }
 
         /// <summary>
@@ -83,29 +88,40 @@ namespace SEE.Controls.Actions
             return Color.Lerp(color, Color.white, 0.5f); // To lighten by 50 %
         }
 
-        private static readonly MenuDescriptor[] EntriesParameter =
+        /// <summary>
+        /// The entries of the menu.
+        /// </summary>
+        private MenuDescriptor[] EntriesParameter;
+
+        private void Awake()
+        {
+            EntriesParameter = new MenuDescriptor[]
             {
+                // Normal browsing mode 
+                new MenuDescriptor(label: "Browse",
+                                   spriteFile: menuEntrySprite,
+                                   activeColor: Color.blue,
+                                   inactiveColor: Lighter(Color.blue),
+                                   entryOn: BrowseOn,
+                                   entryOff: null,
+                                   isTransient: true),
+                // Moving a node within a graph
                 new MenuDescriptor(label: "Move",
                                    spriteFile: menuEntrySprite,
                                    activeColor: Color.red,
                                    inactiveColor: Lighter(Color.red),
                                    entryOn: MoveOn,
-                                   entryOff: MoveOff,
-                                   isTransient: false),
-                new MenuDescriptor(label: "Add",
-                                   spriteFile: menuEntrySprite,
-                                   activeColor: gold,
-                                   inactiveColor: Lighter(gold),
-                                   entryOn: AddOn,
-                                   entryOff: AddOff,
+                                   entryOff: null,
                                    isTransient: true),
-                new MenuDescriptor(label: "Delete",
+                // Mapping a node from one graph to another graph
+                new MenuDescriptor(label: "Map",
                                    spriteFile: menuEntrySprite,
                                    activeColor: Color.green,
                                    inactiveColor: Lighter(Color.green),
-                                   entryOn: DeleteOn,
-                                   entryOff: DeleteOff,
+                                   entryOn: MapOn,
+                                   entryOff: null,
                                    isTransient: true),
             };
+        }
     }
 }
