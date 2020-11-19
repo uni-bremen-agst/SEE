@@ -41,16 +41,8 @@ public class CityRestorer
         json = JsonUtility.ToJson(city,true);
         //AddNodeTypes(nodeTypes);
         string dataPath = path + "/" + fileName + ".json";
-        if (File.Exists(dataPath))
-        {
-            UnityEngine.Debug.LogError("There already exists a file with this filename in the chosen directory");
-            return;
-        }
-        else
-        {
-            System.IO.File.WriteAllText(dataPath, json);
-            UnityEngine.Debug.Log("Export sucessfully\n");
-        }
+        System.IO.File.WriteAllText(dataPath, json);
+        UnityEngine.Debug.Log("Export sucessfully\n");
     }
 
 
