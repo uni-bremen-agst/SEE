@@ -219,7 +219,7 @@ namespace SEE.Controls.Actions
                 if (mode == NavigationMode.Rotate && cursor.HasFocus())
                 {
                     rotateState.rotateGizmo.Center = cursor.GetPosition();
-                    rotateState.rotateGizmo.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotateGizmo.Center).magnitude;
+                    rotateState.rotateGizmo.Radius = 0.2f * (MainCamera.Camera.transform.position - rotateState.rotateGizmo.Center).magnitude;
                 }
             }
         }
@@ -622,7 +622,7 @@ namespace SEE.Controls.Actions
         /// <param name="planeHitPoint">The point, the plane was hit by the ray.</param>
         private void RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint)
         {
-            Ray ray = Camera.main.ScreenPointToRay(actionState.mousePosition);
+            Ray ray = MainCamera.Camera.ScreenPointToRay(actionState.mousePosition);
 
             hitPlane = raycastPlane.Raycast(ray, out float enter);
             if (hitPlane)
