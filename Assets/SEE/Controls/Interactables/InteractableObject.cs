@@ -87,11 +87,6 @@ namespace SEE.Controls
         /// </summary>
         private Interactable interactable;
 
-        /// <summary>
-        /// The interactable component to manipulate the environment, e.g. adding or
-        /// removing GameObjects.
-        /// </summary>
-        public GameObject menuBar;
 
         /// <summary>
         /// The text label that's displayed above the object when the user hovers over it.
@@ -145,6 +140,8 @@ namespace SEE.Controls
         /// </summary>
         private readonly Color RemoteGrabColor = Utils.ColorPalette.Viridis(0.0f);
 
+        public GameObject menuBar;
+
         private void Awake()
         {
             ID = nextID++;
@@ -160,9 +157,6 @@ namespace SEE.Controls
             Assert.IsTrue(cityGo != null);
             cityGo.TryGetComponent(out city);
             isLeaf = SceneQueries.IsLeaf(gameObject);
-
-            menuBar = GameObject.Find("MenuBar");
-            menuBar.SetActive(false);
         }
 
         /// <summary>
@@ -327,7 +321,6 @@ namespace SEE.Controls
                     if (IsHovered)
                     {
                         SetHover(true, isOwner);
-                        menuBar.SetActive(true);
                     }
                     else if (hasOutline)
                     {
@@ -339,7 +332,11 @@ namespace SEE.Controls
             if (select)
             {
                 SelectedObjects.Add(this);
-                menuBar.SetActive(true);
+                
+                //GameObject.Find("MenuBarAlpha").SetActive(true);
+                //gameObject.TryGetComponent(out GameObject MenuBarAlpha);
+                //MenuBarAlpha.SetActive(true);
+                
             }
             else
             {
@@ -449,10 +446,7 @@ namespace SEE.Controls
             }
         }
 
-        private void OnMouseDown()
-        {
-            menuBar.SetActive(true);
-        }
+      
 
         //----------------------------------------------------------------
         // Private actions called by the hand when the object is hovered.
