@@ -17,7 +17,6 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using DG.Tweening;
 using SEE.Layout;
 using System;
 using UnityEngine;
@@ -72,24 +71,13 @@ namespace SEE.Game.Evolution
                 // Scale the object.
                 if (mustCallBack)
                 {
-                    gameObject.transform.DOScale(localScale, MaxAnimationTime);
+                    Tweens.Scale(gameObject, localScale, MaxAnimationTime);
 
-                  //  iTween.ScaleTo(gameObject, iTween.Hash(
-                  //      "scale", localScale,
-                  //     "time", MaxAnimationTime,
-                  //      "oncompletetarget", callBackTarget,
-                  //      "oncomplete", callbackName,
-                  //      "oncompleteparams", gameObject
-                  //  ));
                     mustCallBack = false;
                 }
                 else
                 {
-                  //  iTween.ScaleTo(gameObject, iTween.Hash(
-                  //     "scale", localScale,
-                  //   "time", MaxAnimationTime
-                  //));
-                    gameObject.transform.DOScale(localScale, MaxAnimationTime);
+                    Tweens.Scale(gameObject, localScale, MaxAnimationTime);
                 }
             }
 
@@ -98,21 +86,13 @@ namespace SEE.Game.Evolution
                 // Move the object.
                 if (mustCallBack)
                 {
-                    gameObject.transform.DOMove(position, MaxAnimationTime);
-
-                   // iTween.MoveTo(gameObject, iTween.Hash(
-                   //     "position", position,
-                   //     "time", MaxAnimationTime,
-                   //     "oncompletetarget", callBackTarget,
-                   //     "oncomplete", callbackName,
-                   //     "oncompleteparams", gameObject
-                   // ));
+                    Tweens.Move(gameObject, position, MaxAnimationTime);
+                   
                     mustCallBack = false;
                 }
                 else
                 {
-                    //iTween.MoveTo(gameObject, iTween.Hash("position", position, "time", MaxAnimationTime));
-                    gameObject.transform.DOMove(position, MaxAnimationTime);
+                    Tweens.Move(gameObject, position, MaxAnimationTime);
                 }
             }
 
@@ -121,27 +101,13 @@ namespace SEE.Game.Evolution
             {
                 if (mustCallBack)
                 {
+                    Tweens.ShakeRotate(gameObject, MaxAnimationTime / 2, new Vector3(0, 10, 0));
 
-                    gameObject.transform.DOShakeRotation(MaxAnimationTime / 2, new Vector3(0, 10, 0));
-
-                   // iTween.ShakeRotation(gameObject, iTween.Hash(
-                   //      "amount", new Vector3(0, 10, 0),
-                   //      "time", MaxAnimationTime / 2,
-                   //      "delay", MaxAnimationTime / 2,
-                   //      "oncompletetarget", callBackTarget,
-                   //      "oncomplete", callbackName,
-                   //      "oncompleteparams", gameObject
-                   // ));
                     mustCallBack = false;
                 }
                 else
                 {
-                   // iTween.ShakeRotation(gameObject, iTween.Hash(
-                   //      "amount", new Vector3(0, 10, 0),
-                   //      "time", MaxAnimationTime / 2,
-                   //      "delay", MaxAnimationTime / 2
-                   //  ));
-                    gameObject.transform.DOShakeRotation(MaxAnimationTime / 2,new Vector3(0, 10, 0)) ;
+                    Tweens.ShakeRotate(gameObject, MaxAnimationTime / 2, new Vector3(0, 10, 0));
                 }
             }
             if (mustCallBack)

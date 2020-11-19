@@ -30,7 +30,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
-using DG.Tweening;
 
 namespace SEE.Game
 {
@@ -518,14 +517,8 @@ namespace SEE.Game
                 // (new position and new scale).
                 objectManager.GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale);
 
-                plane.transform.DOScale(scale, moveAnimator.MaxAnimationTime);
-                plane.transform.DOMove(centerPosition, moveAnimator.MaxAnimationTime);
-
-                // iTween.ScaleTo(plane, iTween.Hash(
-                //         "scale", scale,
-                //         "time", moveAnimator.MaxAnimationTime
-                //    ));
-                //iTween.MoveTo(plane, iTween.Hash("position", centerPosition, "time", moveAnimator.MaxAnimationTime));
+                Tweens.Scale(plane, scale, moveAnimator.MaxAnimationTime);
+                Tweens.Move(plane, centerPosition, moveAnimator.MaxAnimationTime);
             }
         }
 
