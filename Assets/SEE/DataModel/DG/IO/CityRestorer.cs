@@ -13,8 +13,10 @@ using Newtonsoft.Json;
 using System; 
 
 /// <summary>
-/// This class is responsible for the export and the restore of a SEECity or SEECityEvolution in or from a
-/// json-file. 
+/// This class is responsible for the export and the restore of either a SEECity or a SEECityEvolution object. 
+/// The required data is stored in a .json-file.
+/// The object stores values and selections such as specific metrics of a city or selected nodetypes as well which were chosen  
+/// by the user before saving his or her profile.
 /// </summary>
 public class CityRestorer
 {
@@ -24,11 +26,10 @@ public class CityRestorer
     private static string json = "";
 
     /// <summary>
-    ///  Converts the <paramref name="city"/> in a json-formatted string and saves this string in a json-file under the given 
+    ///  Converts the <paramref name="city"/> in a json-formatted string and saves this string in a .json-file in the directory
     ///  <paramref name="path"/>.
     /// </summary>
-    /// <param name="nodeTypes"> A Dictionary which contains the node-types of the city and their states </param>
-    /// <param name="path"> The directory where the json-file will be saved </param>
+    /// <param name="path"> The directory in which the json-file will be saved </param>
     /// <param name="fileName"> The name of the json-file </param>
     /// <param name="city"> The city which will be stored in the json-file</param>
     public static void Persist(string path, string fileName, AbstractSEECity city)
