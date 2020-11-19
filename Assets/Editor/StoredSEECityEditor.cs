@@ -20,6 +20,11 @@ namespace SEEEditor
         private bool pressed = false;
         private string path = "";
 
+        /// <summary>
+        /// The name of the file where a city and the node-selection will be saved
+        /// </summary>
+        public string fileName = "Backup-V1";
+
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
@@ -97,6 +102,28 @@ namespace SEEEditor
             }
 
             city.CoseGraphSettings.showGraphListing = allTypes;
+        }
+
+        /// <summary>
+        /// Loads and restores a city from a json-file in a <paramref name="city"/>
+        /// </summary>
+        /// <param name="city">the city to be overwritten by the json-file</param>
+        protected void LoadCityFromJSON(AbstractSEECity city)
+        {
+        SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
+            string importPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFilePanel("Select loading directory", pathPrefix.stringValue, ""));
+            city.RestoreCity(importPath, city);
+        }
+
+        /// <summary>
+        /// Saves a city in a json-file
+        /// </summary>
+        /// <param name="city">the city whose to be saved in a json-file</param>
+        protected void SaveCityInJSON(AbstractSEECity city)
+        {
+        SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
+            string exportPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select saving directory", pathPrefix.stringValue, ""));
+            city.SaveSelection(exportPath, fileName);
         }
     }
 }

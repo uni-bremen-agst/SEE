@@ -14,9 +14,6 @@ namespace SEEEditor
     [CanEditMultipleObjects]
     public class SEECityEditor : StoredSEECityEditor
     {
-
-    public string fileName="Backup-V1";
-
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
@@ -32,7 +29,6 @@ namespace SEEEditor
         /// </summary>
         protected void Buttons()
         {
-       SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
             SEECity city = target as SEECity;
             EditorGUILayout.BeginHorizontal();
             if (city.LoadedGraph == null && GUILayout.Button("Load Graph"))
@@ -68,14 +64,12 @@ namespace SEEEditor
             fileName = EditorGUILayout.TextField("Name of File: ", fileName);
             if (GUILayout.Button("Save City"))
             {
-                string exportPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select saving directory", pathPrefix.stringValue, ""));
-                city.SaveSelection(exportPath, fileName);
+               SaveCityInJSON(city);
             }
             EditorGUILayout.EndHorizontal();
             if(GUILayout.Button("Load City from json"))
             {
-                string importPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFilePanel("Select loading directory", pathPrefix.stringValue, ""));
-                 city.RestoreCity(importPath,city);
+                LoadCityFromJSON(city);
             }
         }
 
