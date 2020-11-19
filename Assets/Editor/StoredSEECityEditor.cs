@@ -5,6 +5,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using System.IO;
 
 namespace SEEEditor
 {
@@ -19,6 +20,7 @@ namespace SEEEditor
     {
         private bool pressed = false;
         private string path = "";
+        private string JsonSuffix = ".json";
 
         /// <summary>
         /// The name of the file where a city and the node-selection will be saved
@@ -116,14 +118,22 @@ namespace SEEEditor
         }
 
         /// <summary>
-        /// Saves a city in a json-file
+        /// Saves a city in a json-file. If there is already a file with the same same existing, it can be overwritten or canceled.
         /// </summary>
         /// <param name="city">the city whose to be saved in a json-file</param>
         protected void SaveCityInJSON(AbstractSEECity city)
         {
         SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
             string exportPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select saving directory", pathPrefix.stringValue, ""));
-            city.SaveSelection(exportPath, fileName);
+            if (File.Exists(exportPath + "/" + fileName + JsonSuffix))
+            {
+                if (!EditorUtility.DisplayDialog("There is already a file with the same name in the given directory!", "Do you want to overwrite the existing file?", "Yes", "No"))
+                {
+                    UnityEngine.Debug.Log("Saving canceled\n");
+                    return;
+                }
+                city.SaveSelection(exportPath, fileName);
+            }
         }
     }
 }

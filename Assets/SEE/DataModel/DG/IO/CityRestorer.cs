@@ -39,19 +39,12 @@ public class CityRestorer
             return;
         }
         json = JsonUtility.ToJson(city,true);
-        //AddNodeTypes(nodeTypes);
-        string extension = "json"; 
-        string dataPath = path + "/" + fileName + extension;
-        if (File.Exists(dataPath))
-        {
-            UnityEngine.Debug.LogError("There already exists a file with this filename in the chosen directory");
-            return;
-        }
-        else
-        {
-            System.IO.File.WriteAllText(dataPath, json);
-            UnityEngine.Debug.Log("Export sucessfully\n");
-        }
+        
+        
+        string dataPath = path + "/" + fileName + ".json";
+        System.IO.File.WriteAllText(dataPath, json);
+        UnityEngine.Debug.Log("Export sucessfully\n");
+>>>>>>> 7d0422c7fe0753474115329af6de07c24c919c5e
     }
 
 
