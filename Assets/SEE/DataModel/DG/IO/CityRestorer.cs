@@ -10,6 +10,7 @@ using System.Linq;
 using System.Diagnostics;
 using System.Dynamic;
 using Newtonsoft.Json;
+using System; 
 
 /// <summary>
 /// This class is responsible for the export and the restore of a SEECity or SEECityEvolution in or from a
@@ -53,26 +54,6 @@ public class CityRestorer
     }
 
 
-   /* private static void AddNodeTypes(Dictionary<string,bool> nodeTypes)
-    {
-        JsonSerializer serializer = new JsonSerializer();
-
-        StringBuilder sb = new StringBuilder();
-        StringWriter swr = new StringWriter(sb);
-        JsonWriter writer = new JsonTextWriter(swr);
-
-        writer.Formatting = Formatting.Indented;
-        writer.WriteStartObject();
-
-        foreach (KeyValuePair<string, bool> nodeType in nodeTypes)
-        {
-            writer.WritePropertyName(nodeType.Key);
-            writer.WriteValue(nodeType.Value);
-        }
-
-        writer.WriteEndObject();
-        json += sb.ToString();
-    }*/
    
     /// <summary>
     /// Loads a city from the given <paramref name="importPath"/> and overwrites the <paramref name="city"/>
@@ -80,9 +61,10 @@ public class CityRestorer
     /// <param name="importPath"> The given json-file-path </param>
     /// <param name="city"> The city which is to be overwritten </param>
     public static void RestoreCity(string importPath, AbstractSEECity city)
-    {
-       // as the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
+    { 
+        // as the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
         string jsonString = File.ReadAllText(importPath);
         JsonUtility.FromJsonOverwrite(jsonString, city);
     }
+
 }
