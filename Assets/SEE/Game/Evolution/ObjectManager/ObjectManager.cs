@@ -212,8 +212,11 @@ namespace SEE.Game.Evolution
         public bool RemoveNode(Node node, out GameObject gameObject)
         {
             node.AssertNotNull("node");
-
+            
             bool wasNodeRemoved = nodes.TryGetValue(node.ID, out gameObject);
+            // Create power beam for deleted node
+            MoveScaleShakeAnimator.BeamAnimator.GetInstace().CreatePowerBeam(gameObject.transform.position, 
+                AdditionalBeamDetails.deletedBeamColor, AdditionalBeamDetails.powerBeamDimensions);
             nodes.Remove(node.ID);
             return wasNodeRemoved;
         }

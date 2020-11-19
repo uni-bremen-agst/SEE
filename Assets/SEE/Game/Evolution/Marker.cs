@@ -102,6 +102,10 @@ namespace SEE.Game.Evolution
             // In addition, it will also be destroyed along with its parent block.
             post.transform.SetParent(block.transform, true);
 
+            // Render new node power beam
+            MoveScaleShakeAnimator.BeamAnimator.GetInstace().CreatePowerBeam(new Vector3(position.x,block.transform.position.y,position.z),
+                AdditionalBeamDetails.newBeamColor, AdditionalBeamDetails.powerBeamDimensions);
+
             return post;
         }
 

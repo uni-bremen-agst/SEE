@@ -43,11 +43,6 @@ namespace SEE.Game.Evolution
         public Color ChangedNodeBeamColor = AdditionalBeamDetails.changedBeamColor;
 
         /// <summary>
-        /// Color of beams for deleted nodes
-        /// </summary>
-        private Color DeletedNodeBeamColor = AdditionalBeamDetails.deletedBeamColor;
-
-        /// <summary>
         /// Dimensions of power beams
         /// </summary>
         private Vector3 NodeBeamDimensions = AdditionalBeamDetails.powerBeamDimensions;
@@ -140,10 +135,9 @@ namespace SEE.Game.Evolution
                 // Refetch values, neccessary because this gets loaded before other script
                 NewNodeBeamColor = AdditionalBeamDetails.newBeamColor;
                 ChangedNodeBeamColor = AdditionalBeamDetails.changedBeamColor;
-                DeletedNodeBeamColor = AdditionalBeamDetails.deletedBeamColor;
                 NodeBeamDimensions = AdditionalBeamDetails.powerBeamDimensions;
                 // Create a new power beam
-                CreatePowerBeam(position, ChangedNodeBeamColor, NodeBeamDimensions);
+                BeamAnimator.GetInstace().CreatePowerBeam(position, ChangedNodeBeamColor, NodeBeamDimensions);
 
                 if (mustCallBack)
                 {
@@ -173,32 +167,6 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Adds power beams above gameObjects that have been changed
-        /// <param name="position">Position of the parent gameObject</param>
-        /// <param name="beamColor">Color of the power beam to create</param>
-        /// </summary>
-        private void CreatePowerBeam(Vector3 position, Color beamColor, Vector3 NodeBeamDimensions)
-        {
-            // Generate power beam above updated objects
-            GameObject powerBeam = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            powerBeam.tag = "PowerBeam";
-            powerBeam.transform.localScale = new Vector3(NodeBeamDimensions.x, 0, NodeBeamDimensions.z);
-            BeamAnimator.GetInstace().BeamHeight = NodeBeamDimensions.y;
-            powerBeam.transform.position = new Vector3(position.x, position.y, position.z);
-            // Change power beam material color
-            powerBeam.GetComponent<Renderer>().material.color = beamColor;
-            // Set power beam material to emissive
-            powerBeam.GetComponent<Renderer>().material.EnableKeyword("_EMISSION");
-            Color emissionColor = beamColor * 7f;
-            powerBeam.GetComponent<Renderer>().material.SetColor("_EmissionColor", emissionColor);
-            // Remove power beam shadow
-            powerBeam.GetComponent<Renderer>().receiveShadows = false;
-            powerBeam.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            BeamAnimator.GetInstace().AddPowerBeam(powerBeam);
-            powerBeam.AddComponent<BeamAnimatorExecuter>();
-        }
-
-        /// <summary>
         /// Removes power beams
         /// </summary>
         public static void DeletePowerBeams()
@@ -209,8 +177,34 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Singleton that stores all newly created / deleted power beams
         /// </summary>
-        class BeamAnimator
+        public class BeamAnimator
         {
+
+            /// <summary>
+            /// Adds power beams above gameObjects that have been changed
+            /// <param name="position">Position of the parent gameObject</param>
+            /// <param name="beamColor">Color of the power beam to create</param>
+            /// </summary>
+            public void CreatePowerBeam(Vector3 position, Color beamColor, Vector3 NodeBeamDimensions)
+            {
+                // Generate power beam above updated objects
+                GameObject powerBeam = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                powerBeam.tag = "PowerBeam";
+                powerBeam.transform.localScale = new Vector3(NodeBeamDimensions.x, 0, NodeBeamDimensions.z);
+                BeamAnimator.GetInstace().BeamHeight = NodeBeamDimensions.y;
+                powerBeam.transform.position = new Vector3(position.x, position.y, position.z);
+                // Change power beam material color
+                powerBeam.GetComponent<Renderer>().material.color = beamColor;
+                // Set power beam material to emissive
+                powerBeam.GetComponent<Renderer>().material.EnableKeyword("_EMISSION");
+                Color emissionColor = beamColor * 7f;
+                powerBeam.GetComponent<Renderer>().material.SetColor("_EmissionColor", emissionColor);
+                // Remove power beam shadow
+                powerBeam.GetComponent<Renderer>().receiveShadows = false;
+                powerBeam.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                BeamAnimator.GetInstace().AddPowerBeam(powerBeam);
+                powerBeam.AddComponent<BeamAnimatorExecuter>();
+            }
 
             /// <summary>
             /// Singleton instance
