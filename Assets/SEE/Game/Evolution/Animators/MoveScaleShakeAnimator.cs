@@ -31,15 +31,26 @@ namespace SEE.Game.Evolution
     /// </summary>
     public class MoveScaleShakeAnimator : AbstractAnimator
     {
+
         /// <summary>
         /// Color of beams for newly added nodes
         /// </summary>
-        private Color NewNodeBeamColor = new Color(0, 1, 0.15f, 1);
+        private Color NewNodeBeamColor = AdditionalBeamDetails.newBeamColor;
 
         /// <summary>
         /// Color of beams for changed nodes
         /// </summary>
-        private Color ChangedNodeBeamColor = new Color(0, 1, 0.5f, 1);
+        public Color ChangedNodeBeamColor = AdditionalBeamDetails.changedBeamColor;
+
+        /// <summary>
+        /// Color of beams for deleted nodes
+        /// </summary>
+        private Color DeletedNodeBeamColor = AdditionalBeamDetails.deletedBeamColor;
+
+        /// <summary>
+        /// Dimensions of power beams
+        /// </summary>
+        private Vector3 NodeBeamDimensions = AdditionalBeamDetails.powerBeamDimensions;
 
         /// <summary>
         /// Moves, scales, and then finally shakes (if <paramref name="wasModified"/>) the animated game object.
@@ -126,7 +137,13 @@ namespace SEE.Game.Evolution
             {
                 // Changes the modified object's color to blue while animating
                 gameObject.GetComponent<Renderer>().material.color = Color.blue;
-                CreatePowerBeam(position, ChangedNodeBeamColor);
+                // Refetch values, neccessary because this gets loaded before other script
+                NewNodeBeamColor = AdditionalBeamDetails.newBeamColor;
+                ChangedNodeBeamColor = AdditionalBeamDetails.changedBeamColor;
+                DeletedNodeBeamColor = AdditionalBeamDetails.deletedBeamColor;
+                NodeBeamDimensions = AdditionalBeamDetails.powerBeamDimensions;
+                // Create a new power beam
+                CreatePowerBeam(position, ChangedNodeBeamColor, NodeBeamDimensions);
 
                 if (mustCallBack)
                 {
@@ -160,12 +177,13 @@ namespace SEE.Game.Evolution
         /// <param name="position">Position of the parent gameObject</param>
         /// <param name="beamColor">Color of the power beam to create</param>
         /// </summary>
-        private void CreatePowerBeam(Vector3 position, Color beamColor)
+        private void CreatePowerBeam(Vector3 position, Color beamColor, Vector3 NodeBeamDimensions)
         {
             // Generate power beam above updated objects
             GameObject powerBeam = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             powerBeam.tag = "PowerBeam";
-            powerBeam.transform.localScale = new Vector3(0.02f, 0f, 0.02f);
+            powerBeam.transform.localScale = new Vector3(NodeBeamDimensions.x, 0, NodeBeamDimensions.z);
+            BeamAnimator.GetInstace().BeamHeight = NodeBeamDimensions.y;
             powerBeam.transform.position = new Vector3(position.x, position.y, position.z);
             // Change power beam material color
             powerBeam.GetComponent<Renderer>().material.color = beamColor;
@@ -188,6 +206,9 @@ namespace SEE.Game.Evolution
             BeamAnimator.GetInstace().ClearPowerBeams();
         }
 
+        /// <summary>
+        /// Singleton that stores all newly created / deleted power beams
+        /// </summary>
         class BeamAnimator
         {
 
@@ -209,6 +230,26 @@ namespace SEE.Game.Evolution
             }
 
             /// <summary>
+            /// Power beam height
+            /// </summary>
+            private float beamHeight;
+
+            /// <summary>
+            /// Power beam height getter/setter
+            /// </summary>
+            public float BeamHeight
+            {
+                get
+                {
+                    return this.beamHeight;
+                }
+                set
+                {
+                    this.beamHeight = value;
+                }
+            }
+
+            /// <summary>
             /// Power beams, get animated while appearing
             /// </summary>
             private List<GameObject> powerBeams = new List<GameObject>();
@@ -218,12 +259,19 @@ namespace SEE.Game.Evolution
             /// </summary>
             private GameObject[] removedBeams = new GameObject[0];
 
+            /// <summary>
+            /// Animation update function
+            /// </summary>
             public void Update()
             {
+                if (beamHeight <= 0)
+                {
+                    beamHeight = 3f;
+                }
                 // Animate new power beams
                 foreach (GameObject beam in powerBeams)
                 {
-                    if (beam.transform.localScale.y < 3f)
+                    if (beam.transform.localScale.y < beamHeight)
                     {
                         beam.transform.localScale = new Vector3(beam.transform.localScale.x, beam.transform.localScale.y + 0.0025f, beam.transform.localScale.z);
                         beam.transform.position = new Vector3(beam.transform.position.x, beam.transform.position.y + 0.0025f, beam.transform.position.z);
@@ -240,8 +288,8 @@ namespace SEE.Game.Evolution
                     {
                         if (deleted.transform.localScale.y > 0f)
                         {
-                            deleted.transform.localScale = new Vector3(deleted.transform.localScale.x, deleted.transform.localScale.y - 0.0025f, deleted.transform.localScale.z);
-                            deleted.transform.position = new Vector3(deleted.transform.position.x, deleted.transform.position.y - 0.0025f, deleted.transform.position.z);
+                            deleted.transform.localScale = new Vector3(deleted.transform.localScale.x, deleted.transform.localScale.y - 0.005f, deleted.transform.localScale.z);
+                            deleted.transform.position = new Vector3(deleted.transform.position.x, deleted.transform.position.y - 0.005f, deleted.transform.position.z);
                         }
                         else
                         {
@@ -270,6 +318,9 @@ namespace SEE.Game.Evolution
             }
         }
 
+        /// <summary>
+        /// Attached to power beam GameObjects to call update from BeamAnimator class
+        /// </summary>
         class BeamAnimatorExecuter : MonoBehaviour
         {
 
