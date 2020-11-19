@@ -750,7 +750,7 @@ namespace SEE.Game
         /// Saves a city in the chosen <paramref name="exportPath"/> directory with the 
         /// chosen <paramref name="fileName"/> name.
         /// </summary>
-        /// <param name="exportPath"> the path where the json will be saved </param>
+        /// <param name="exportPath"> the path in which the .json File will be stored </param>
         /// <param name="fileName"> the name of the created json-file </param>
         public void SaveSelection(string exportPath, string fileName)
         {          
