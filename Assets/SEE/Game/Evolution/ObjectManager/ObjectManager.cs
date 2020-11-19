@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.Layout;
 using UnityEngine;
+using SEE.Layout.Utils;
 
 namespace SEE.Game.Evolution
 {
@@ -222,9 +223,9 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// The list of edges rendered for this graph.
         /// </summary>
-        private ICollection<GameObject> edges;
+        private ICollection<GameObject> edges = new List<GameObject>();
 
-        private ICollection<LayoutEdge> oldEdges;
+        private List<(string, Vector3[])> newPoints;
 
         /// <summary>
         /// Renders all edges for the nodes in the node cache according to the settings.
@@ -232,37 +233,102 @@ namespace SEE.Game.Evolution
         /// </summary>
         public void RenderEdges()
         {
-            ClearEdges();
+            //ClearEdges();
             // FIXME: Provide meaningful values for scaleFactor.
-           
+
+            List<(string, Vector3[])> oldPoints = new List<(string, Vector3[])>();
+            List<(string, Vector3[])> newPoints = new List<(string, Vector3[])>();
+
+            if (null != edges)
+            {
+                int count = 0;
+                foreach (GameObject e in edges)
+                {
+                    LineRenderer line;
+
+                    e.TryGetComponent<LineRenderer>(out line);
+                    Vector3[] v = new Vector3[line.positionCount];
+                    for (int i = 0; i < line.positionCount; i++)
+                    {
+                        v[i] = line.GetPosition(i);
+                    }
+                    oldPoints.Add((e.name, v));
+                    count++;
+                }
+            }
+
+            ClearEdges();
 
             edges = _graphRenderer.EdgeLayout(nodes.Values);
 
-            oldEdges = _graphRenderer.CalculateEdges(nodes.Values);
-
-            
-
-            //Debug.LogFormat("Edge 01: " + le[0].Points[0].x);
 
 
-           /* int count = 0;
-            foreach(GameObject e in edges){
-                LineRenderer line;
-                
-                e.TryGetComponent<LineRenderer>(out line);
-                int pos = line.positionCount;
-                Debug.LogFormat("Count: " + pos);
+            if (null != edges)
+            {
+                int count = 0;
+                foreach (GameObject e in edges)
+                {
+                    LineRenderer line;
 
-
-                for(int i = 0; i < pos; i++){
-                    Debug.LogFormat("Edge: " + count + " Pos:" + line.GetPosition(i));
-                    
+                    e.TryGetComponent<LineRenderer>(out line);
+                    Vector3[] v = new Vector3[line.positionCount];
+                    for (int i = 0; i < line.positionCount; i++)
+                    {
+                        v[i] = line.GetPosition(i);
+                    }
+                    newPoints.Add((e.name, v));
+                    count++;
                 }
-                count++;
-            }*/
-                
-            
+            }
+
+
+            List<(string, Vector3[])> sampledOldPoints = new List<(string, Vector3[])>();
+            List<(string, Vector3[])> samplednewPoints = new List<(string, Vector3[])>();
+
+
+            foreach ((string, Vector3[]) v3 in oldPoints)
+            {
+                sampledOldPoints.Add((v3.Item1, LinePoints.BSplineLinePoints(v3.Item2, 0.85f, 200)));
+            }
+
+            foreach ((string, Vector3[]) v3 in newPoints)
+            {
+                samplednewPoints.Add((v3.Item1, LinePoints.BSplineLinePoints(v3.Item2, 0.85f, 200)));
+            }
+
+
+
+            List<(string, Vector3[], Vector3[])> pairs = new List<(string, Vector3[], Vector3[])>();
+
+
+            foreach ((string, Vector3[]) op in sampledOldPoints)
+            {
+                foreach ((string, Vector3[]) np in samplednewPoints)
+                {
+                    if (op.Item1.Equals(np.Item1) && !op.Item2.Equals(np.Item2))
+                    {
+                        pairs.Add((op.Item1, op.Item2, np.Item2));
+                    }
+                }
+            }
+
+
+            foreach ((string, Vector3[], Vector3[]) list in pairs)
+            {
+                Debug.LogFormat("Name: " + list.Item1 + " Start: " + list.Item2.Length+ " Target: " + list.Item3.Length);
+                for (int i = 0; i < 200; i++)
+                {
+                    //Debug.LogFormat("Name: " + list.Item1 + " Start: " + list.Item2[i]+ " Target: " + list.Item3[i]);
+                }
+
+            }
+
+
+
+
+
         }
+
 
         /// <summary>
         /// Clears the internal cache containing all game objects created by GetInnerNode(),
@@ -315,6 +381,7 @@ namespace SEE.Game.Evolution
                 // edges will be overridden in RenderEdges() each time, that is why we
                 // do not Clear() it but reset it to null
                 edges = null;
+                edges = new List<GameObject>();
             }
         }
     }

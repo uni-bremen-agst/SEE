@@ -26,7 +26,7 @@ namespace SEE.Layout.Utils
         /// <param name="tension">tension of the control points onto the spline points; must be in
         /// the range [0, 1]</param>
         /// <returns>points of the line along the B-spline</returns>
-        public static Vector3[] BSplineLinePoints(Vector3[] controlPoints, float tension = tensionDefault)
+        public static Vector3[] BSplineLinePoints(Vector3[] controlPoints, float tension = tensionDefault, uint samplerate = 0)
         {
             Debug.Assert(controlPoints.Length > 3);
             Debug.Assert(0.0f <= tension && tension <= 1.0f);
@@ -37,9 +37,14 @@ namespace SEE.Layout.Utils
                 // Setup control points.
                 ControlPoints = VectorsToList(controlPoints)
             };
-
-            IList<double> list = spline.Tension(tension).Sample();
-            return ListToVectors(list);
+            if(samplerate == 0){
+                IList<double> list = spline.Tension(tension).Sample();
+                return ListToVectors(list);
+            }else{
+                IList<double> list = spline.Tension(tension).Sample(samplerate);
+                return ListToVectors(list);
+            }
+            
         }
 
         /// <summary>
