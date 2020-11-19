@@ -116,6 +116,8 @@ namespace SEE.Controls
             if (!isActive)
             {
                 MixedRealityToolkit.SetInstanceInactive(MixedRealityToolkit.Instance);
+                // MRTK also changes camera attributes for a better mixed reality experience, so we revert that here
+                GameObject.FindWithTag("MainCamera").GetComponent<Camera>()?.Reset();
             }
             else
             {
@@ -130,8 +132,8 @@ namespace SEE.Controls
                     GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
                     foreach (GameObject city in cities)
                     {
-                        // City needs to be parented to collection to be organized by it
                         city.transform.localScale *= CityScalingFactor;
+                        // City needs to be parented to collection to be organized by it
                         city.transform.parent = cityCollection.transform;
                     }
 
