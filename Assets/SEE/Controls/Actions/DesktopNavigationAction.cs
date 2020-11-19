@@ -203,6 +203,7 @@ namespace SEE.Controls.Actions
                 }
 
                 // Select mode
+                //Hier muss was rein
                 if (mode != NavigationMode.Move && Input.GetKeyDown(KeyCode.Alpha1))
                 {
                     mode = NavigationMode.Move;
