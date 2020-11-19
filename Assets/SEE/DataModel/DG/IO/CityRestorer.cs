@@ -40,7 +40,8 @@ public class CityRestorer
         }
         json = JsonUtility.ToJson(city,true);
         //AddNodeTypes(nodeTypes);
-        string dataPath = path + "/" + fileName + ".json";
+        string extension = "json"; 
+        string dataPath = path + "/" + fileName + extension;
         if (File.Exists(dataPath))
         {
             UnityEngine.Debug.LogError("There already exists a file with this filename in the chosen directory");
